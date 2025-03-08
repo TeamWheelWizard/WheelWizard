@@ -17,13 +17,13 @@ public static class DolphinLaunchHelper
             process.Kill();
         }
     }
-    
+
     public static void LaunchDolphin(string arguments = "", bool shellExecute = false)
     {
         try
         {
             var startInfo = new ProcessStartInfo();
-            
+
             var dolphinLocation = (string)SettingsManager.DOLPHIN_LOCATION.Get();
             if (dolphinLocation.Contains("flatpak"))
             {
@@ -33,8 +33,8 @@ public static class DolphinLaunchHelper
             }
             else if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
             {
-                startInfo.FileName = "/bin/bash";
-                startInfo.Arguments = $"-c \"{dolphinLocation} {arguments}\"";
+                startInfo.FileName = "/usr/bin/env";
+                startInfo.Arguments = $"sh -c \"{dolphinLocation} {arguments}\"";
                 startInfo.UseShellExecute = false;
             }
             else

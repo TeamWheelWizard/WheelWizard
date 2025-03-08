@@ -14,8 +14,8 @@ public static class LinuxDolphinInstaller
         {
             var processInfo = new ProcessStartInfo
             {
-                FileName = "/bin/sh",
-                Arguments = $"-c \"command -v {command.Split(' ').First()}\"",
+                FileName = "/usr/bin/env",
+                Arguments = $"sh -c \"command -v {command.Split(' ').First()}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -204,36 +204,5 @@ public static class LinuxDolphinInstaller
 
         return true;
     }
-    
-    
-    //this should return null if not found since functions above require it
-    public static string? TryFindUserFolderPath()
-    {
-        // Get the user's home directory.
-        var home = Environment.GetEnvironmentVariable("HOME");
-        if (string.IsNullOrEmpty(home))
-            return null;
 
-        // First, try the default Flatpak location.
-        var flatpakUserFolder = Path.Combine(home, ".var", "app", "org.DolphinEmu.dolphin-emu");
-        if (Directory.Exists(flatpakUserFolder))
-            return flatpakUserFolder;
-
-        // Next, check if there's an override provided via FLATPAK_USER_DIR.
-        var flatpakOverride = Environment.GetEnvironmentVariable("FLATPAK_USER_DIR");
-        if (!string.IsNullOrEmpty(flatpakOverride))
-        {
-            // Often the structure remains the same.
-            flatpakUserFolder = Path.Combine(flatpakOverride, "org.DolphinEmu.dolphin-emu");
-            if (Directory.Exists(flatpakUserFolder))
-                return flatpakUserFolder;
-        }
-
-        var manualInstall = Path.Combine(home, ".dolphin-emu");
-        if (Directory.Exists(manualInstall))
-            return manualInstall;
-
-        // If not found, return null.
-        return null;
-    }
 }

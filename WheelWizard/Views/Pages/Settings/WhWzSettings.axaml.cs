@@ -35,18 +35,18 @@ public partial class WhWzSettings : UserControl
 
         // IMPORTANT: Make sure that the number and percentage is always the last word in the string,
         // If you don't want this, you should change the code below that parses the string back to an actual value
-      
+
         foreach (var scale in SettingValues.WindowScales)
         {
             WindowScaleDropdown.Items.Add(ScaleToString(scale));
         }
 
         var selectedItemText = ScaleToString((double)SettingsManager.WINDOW_SCALE.Get());
-        if (!WindowScaleDropdown.Items.Contains(selectedItemText)) 
+        if (!WindowScaleDropdown.Items.Contains(selectedItemText))
               WindowScaleDropdown.Items.Add(selectedItemText);
         WindowScaleDropdown.SelectedItem = selectedItemText;
-        
-        
+
+
         EnableAnimations.IsChecked = (bool)SettingsManager.ENABLE_ANIMATIONS.Get();
     }
 
@@ -77,7 +77,7 @@ public partial class WhWzSettings : UserControl
             Patterns = Environment.OSVersion.Platform switch
             {
                 PlatformID.Win32NT => new[] { "*.exe" },
-                PlatformID.Unix => new[] { "*", "*.sh" }, 
+                PlatformID.Unix => new[] { "*", "*.sh" },
                 PlatformID.MacOSX => new[] { "*", "*.app" },
                 _ => new[] { "*" } // Fallback
             }
@@ -91,36 +91,37 @@ public partial class WhWzSettings : UserControl
                 return;
             }
 
-            if (IsFlatpakDolphinInstalled() || DolphinExeInput.Text != "") return;
-
-            var wantsAutomaticInstall = await new YesNoWindow()
-                .SetMainText("Invalid configuration.")
-                .SetExtraText(
-                    "The flatpak version of Dolphin Emulator does not appear to be installed. Would you like us to install it?")
-                .SetButtonText("Install", "Manual").AwaitAnswer();
-            if (wantsAutomaticInstall)
+            if (!IsFlatpakDolphinInstalled())
             {
-                var progressWindow = new ProgressWindow()
-                    .SetGoal("Installing Dolphin Emulator")
-                    .SetExtraText("This may take a while depending on your internet connection.");
-                TogglePathSettings(true);
-                progressWindow.Show();
-                var progress = new Progress<int>(progressWindow.UpdateProgress);
-                var success = await LinuxDolphinInstaller.InstallFlatpakDolphin(progress);
-                progressWindow.Close();
-                if (!success)
+                var wantsAutomaticInstall = await new YesNoWindow()
+                    .SetMainText("Invalid configuration.")
+                    .SetExtraText(
+                        "The flatpak version of Dolphin Emulator does not appear to be installed. Would you like us to install it?")
+                    .SetButtonText("Install", "Manual").AwaitAnswer();
+                if (wantsAutomaticInstall)
                 {
-                    await new MessageBoxWindow()
-                        .SetMessageType(MessageBoxWindow.MessageType.Error)
-                        .SetTitleText("Failed to install Dolphin")
-                        .SetInfoText(
-                            "The installation of Dolphin Emulator failed. Please try manually installing flatpak dolphin.")
-                        .ShowDialog();
+                    var progressWindow = new ProgressWindow()
+                        .SetGoal("Installing Dolphin Emulator")
+                        .SetExtraText("This may take a while depending on your internet connection.");
+                    TogglePathSettings(true);
+                    progressWindow.Show();
+                    var progress = new Progress<int>(progressWindow.UpdateProgress);
+                    var success = await LinuxDolphinInstaller.InstallFlatpakDolphin(progress);
+                    progressWindow.Close();
+                    if (!success)
+                    {
+                        await new MessageBoxWindow()
+                            .SetMessageType(MessageBoxWindow.MessageType.Error)
+                            .SetTitleText("Failed to install Dolphin")
+                            .SetInfoText(
+                                "The installation of Dolphin Emulator failed. Please try manually installing flatpak dolphin.")
+                            .ShowDialog();
+                        return;
+                    }
+
+                    DolphinExeInput.Text = "flatpak run org.DolphinEmu.dolphin-emu";
                     return;
                 }
-
-                DolphinExeInput.Text = "flatpak run org.DolphinEmu.dolphin-emu";
-                return;
             }
         }
 
@@ -140,7 +141,8 @@ public partial class WhWzSettings : UserControl
                     DolphinExeInput.Text = dolphinAppPath;
                     return;
                 }
-            } else
+            }
+            else
             {
                 await new MessageBoxWindow()
                     .SetMessageType(MessageBoxWindow.MessageType.Warning)
@@ -158,36 +160,17 @@ public partial class WhWzSettings : UserControl
             }
             return; // do not do normal selection for MacOS
         }
-        
+
         var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Dolphin Emulator", new[] { executableFileType });
         if (!string.IsNullOrEmpty(filePath))
         {
             DolphinExeInput.Text = filePath;
         }
     }
-    
+
     private bool IsFlatpakDolphinInstalled()
     {
-        try
-        {
-            var processInfo = new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "flatpak",
-                Arguments = "info org.DolphinEmu.dolphin-emu",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
-            using var process = System.Diagnostics.Process.Start(processInfo);
-            // Wait a reasonable time for the process to finish.
-            process.WaitForExit(5000);
-            return process.ExitCode == 0;
-        }
-        catch
-        {
-            return false;
-        }
+        return LinuxDolphinInstaller.IsDolphinInstalledInFlatpak();
     }
 
     private async void GameLocationBrowse_OnClick(object sender, RoutedEventArgs e)
@@ -206,20 +189,6 @@ public partial class WhWzSettings : UserControl
 
     private async void DolphinUserPathBrowse_OnClick(object sender, RoutedEventArgs e)
     {
-        var currentFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
-        var topLevel = TopLevel.GetTopLevel(this);
-
-        // If a current folder exists and is valid, suggest it as the starting location
-        if (!string.IsNullOrEmpty(currentFolder) && Directory.Exists(currentFolder))
-        {
-            var folder = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentFolder);
-            var folders = await FilePickerHelper.SelectFolderAsync("Select Dolphin User Path", folder);
-
-            if (folders.Count >= 1)
-                DolphinUserPathInput.Text = folders[0].Path.LocalPath;
-            return;
-        }
-
         // Attempt to find Dolphin's default path if no valid folder is set
         var folderPath = PathManager.TryFindUserFolderPath();
         if (!string.IsNullOrEmpty(folderPath))
@@ -245,11 +214,26 @@ public partial class WhWzSettings : UserControl
                 .ShowDialog();
         }
 
-        // Let the user manually select a folder
-        var manualFolders = await FilePickerHelper.SelectFolderAsync("Select Dolphin User Path");
+        var currentFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
+        var topLevel = TopLevel.GetTopLevel(this);
+        // If a current folder exists and is valid, suggest it as the starting location
+        if (!string.IsNullOrEmpty(currentFolder) && Directory.Exists(currentFolder))
+        {
+            var folder = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentFolder);
+            var folders = await FilePickerHelper.SelectFolderAsync("Select Dolphin User Path", folder);
 
-        if (manualFolders.Count >= 1)
-            DolphinUserPathInput.Text = manualFolders[0].Path.LocalPath;
+            if (folders.Count >= 1)
+                DolphinUserPathInput.Text = folders[0].Path.LocalPath;
+            return;
+        }
+        else
+        {
+            // Let the user manually select a folder
+            var manualFolders = await FilePickerHelper.SelectFolderAsync("Select Dolphin User Path");
+
+            if (manualFolders.Count >= 1)
+                DolphinUserPathInput.Text = manualFolders[0].Path.LocalPath;
+        }
     }
 
 
@@ -261,7 +245,7 @@ public partial class WhWzSettings : UserControl
 
         var path1 = SettingsManager.DOLPHIN_LOCATION.Set(DolphinExeInput.Text);
         var path2 = SettingsManager.GAME_LOCATION.Set(MarioKartInput.Text);
-        var path3 = SettingsManager.USER_FOLDER_PATH.Set(DolphinUserPathInput.Text);
+        var path3 = SettingsManager.USER_FOLDER_PATH.Set(DolphinUserPathInput.Text.TrimEnd(Path.DirectorySeparatorChar));
         // These 3 lines is only saving the settings
         TogglePathSettings(false);
         if (!(SettingsHelper.PathsSetupCorrectly() && path1 && path2 && path3))
@@ -293,7 +277,7 @@ public partial class WhWzSettings : UserControl
     {
         if (!Directory.Exists(PathManager.WheelWizardAppdataPath))
             Directory.CreateDirectory(PathManager.WheelWizardAppdataPath);
-        
+
         FilePickerHelper.OpenFolderInFileManager(PathManager.WheelWizardAppdataPath);
     }
 
@@ -317,7 +301,7 @@ public partial class WhWzSettings : UserControl
             LocationWarningIcon.IsVisible = false;
             LocationBorderBlur.Background = new SolidColorBrush(ViewUtils.Colors.Primary600);
         }
-        
+
         LocationBorderBlur.IsVisible = !enable;
         LocationInputFields.IsEnabled = enable;
         LocationEditButton.IsVisible = !enable;
@@ -328,34 +312,34 @@ public partial class WhWzSettings : UserControl
         MarioKartInput.Text = PathManager.GameFilePath;
         DolphinUserPathInput.Text = PathManager.UserFolderPath;
     }
-    
+
     private async void WindowScaleDropdown_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!_pageLoaded || _editingScale)
             return;
-        
+
         _editingScale = true;
         var selectedLanguage = WindowScaleDropdown.SelectedItem.ToString();
         var scale = double.Parse(selectedLanguage!.Split(" ").Last()
             .Replace("%", "")) / 100;
-   
+
         SettingsManager.WINDOW_SCALE.Set(scale);
         var seconds = 10;
-        string ExtraText() => $"This change will revert in {Humanizer.HumanizeSeconds(seconds)} " 
+        string ExtraText() => $"This change will revert in {Humanizer.HumanizeSeconds(seconds)} "
                               + $"unless you decide to keep the change.";
-        
+
         var yesNoWindow = new YesNoWindow()
             .SetButtonText(Common.Action_Apply, Common.Action_Revert)
             .SetMainText(Phrases.PopupText_ApplyScale)
             .SetExtraText(ExtraText());
         // we want to now set up a timer every second to update the text, and at the last second close the window
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-       
+
         timer.Tick += (_, args) =>
         {
             seconds--;
             yesNoWindow.SetExtraText(ExtraText());
-            if (seconds != 0) 
+            if (seconds != 0)
                 return;
             yesNoWindow.Close();
             timer.Stop();
@@ -370,10 +354,10 @@ public partial class WhWzSettings : UserControl
             SettingsManager.WINDOW_SCALE.Set(SettingsManager.SAVED_WINDOW_SCALE.Get());
             WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsManager.WINDOW_SCALE.Get());
         }
-        
+
         _editingScale = false;
     }
-    
+
     private void EnableAnimations_OnClick(object sender, RoutedEventArgs e) =>
         SettingsManager.ENABLE_ANIMATIONS.Set(EnableAnimations.IsChecked == true);
 }

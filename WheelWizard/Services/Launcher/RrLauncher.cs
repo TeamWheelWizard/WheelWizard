@@ -13,7 +13,7 @@ public class RrLauncher : ILauncher
 {
     public string GameTitle { get; } = "RetroRewind";
     private static string RrLaunchJsonFilePath => Path.Combine(PathManager.WheelWizardAppdataPath, "RR.json");
-    
+
     public async Task Launch()
     {
         try
@@ -33,11 +33,11 @@ public class RrLauncher : ILauncher
                 });
                 return;
             }
-            
+
             RetroRewindLaunchHelper.GenerateLaunchJson();
             var dolphinLaunchType = (bool)SettingsManager.LAUNCH_WITH_DOLPHIN.Get() ? "" : "-b";
             DolphinLaunchHelper.LaunchDolphin(
-                $"{dolphinLaunchType} -e \"{RrLaunchJsonFilePath}\" --config=Dolphin.Core.EnableCheats=False"
+                $"{dolphinLaunchType} -e '{RrLaunchJsonFilePath}' --config=Dolphin.Core.EnableCheats=False"
                 );
         }
         catch (Exception ex)
@@ -57,7 +57,7 @@ public class RrLauncher : ILauncher
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {
-        if (!SettingsHelper.PathsSetupCorrectly()) 
+        if (!SettingsHelper.PathsSetupCorrectly())
             return WheelWizardStatus.ConfigNotFinished;
 
         var serverEnabled = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
@@ -67,7 +67,7 @@ public class RrLauncher : ILauncher
             return rrInstalled ? WheelWizardStatus.NoServerButInstalled : WheelWizardStatus.NoServer;
 
         if (!rrInstalled) return WheelWizardStatus.NotInstalled;
-        
+
         var retroRewindUpToDate = await RetroRewindUpdater.IsRRUpToDate(RetroRewindInstaller.CurrentRRVersion());
         return !retroRewindUpToDate ? WheelWizardStatus.OutOfDate : WheelWizardStatus.Ready;
     }

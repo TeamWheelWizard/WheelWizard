@@ -21,7 +21,7 @@ public class AutoUpdaterLinux : IUpdaterPlatform
         {
             identifier = "WheelWizard_Linux";
         }
-        
+
         return release.Assets.FirstOrDefault(asset =>
             asset.BrowserDownloadUrl.Contains(identifier, StringComparison.OrdinalIgnoreCase));
     }
@@ -80,7 +80,7 @@ public class AutoUpdaterLinux : IUpdaterPlatform
         var originalFileName = Path.GetFileName(currentFilePath);
         var newFileName = Path.GetFileName(newFilePath);
 
-        var scriptContent = $@"#!/bin/bash
+        var scriptContent = $@"#!/usr/bin/env sh
 echo 'Starting update process...'
 
 # Give a short delay to ensure the application has exited
