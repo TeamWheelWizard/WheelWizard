@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using WheelWizard.Models.Enums;
 using WheelWizard.Models.MiiImages;
 using WheelWizard.Services;
 
@@ -40,6 +41,15 @@ public class PlayerListItem : TemplatedControl
         get => GetValue(BrProperty);
         set => SetValue(BrProperty, value);
     }
+        
+    public static readonly StyledProperty<BadgeVariant[]> BadgesProperty =
+        AvaloniaProperty.Register<FriendsListItem, BadgeVariant[]>(nameof(Badges));
+    public BadgeVariant[] Badges
+    {
+        get => GetValue(BadgesProperty);
+        set => SetValue(BadgesProperty, value);
+    }
+
     
     public static readonly StyledProperty<string> FriendCodeProperty =
         AvaloniaProperty.Register<PlayerListItem, string>(nameof(FriendCode));
@@ -62,16 +72,14 @@ public class PlayerListItem : TemplatedControl
     {
         base.OnApplyTemplate(e);
         var container = e.NameScope.Find<StackPanel>("PART_BadgeContainer");
-        if (container != null)
+        if (container == null) return;
+
+        container.Children.Clear();
+        foreach (var badge in Badges.Select(variant => new Badge { Variant = variant }))
         {
-            container.Children.Clear();
-            var badges = BadgeManager.Instance.GetBadges(FriendCode);
-            foreach (var badge in badges)
-            {
-                badge.Height = 30;
-                badge.Width = 30;
-                container.Children.Add(badge);
-            }
+            badge.Height = 30;
+            badge.Width = 30;
+            container.Children.Add(badge);
         }
     }
 }

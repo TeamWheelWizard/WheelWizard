@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using WheelWizard.Models.Enums;
 using WheelWizard.Models.MiiImages;
 using WheelWizard.Services;
 
@@ -73,6 +74,15 @@ public class FriendsListItem : TemplatedControl
         set => SetValue(FriendCodeProperty, value);
     }
     
+    public static readonly StyledProperty<BadgeVariant[]> BadgesProperty =
+        AvaloniaProperty.Register<FriendsListItem, BadgeVariant[]>(nameof(Badges));
+    public BadgeVariant[] Badges
+    {
+        get => GetValue(BadgesProperty);
+        set => SetValue(BadgesProperty, value);
+    }
+    
+
     public static readonly StyledProperty<string> UserNameProperty =
         AvaloniaProperty.Register<FriendsListItem, string>(nameof(UserName));
     public string UserName
@@ -93,7 +103,8 @@ public class FriendsListItem : TemplatedControl
     {
         ViewRoomAction.Invoke(FriendCode);
     }
-    
+
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -101,15 +112,15 @@ public class FriendsListItem : TemplatedControl
         if (container != null)
         {
             container.Children.Clear();
-            var badges = BadgeManager.Instance.GetBadges(FriendCode);
-            foreach (var badge in badges)
+            
+            foreach (var badge in Badges.Select(variant => new Badge { Variant = variant }))
             {
                 badge.Height = 30;
                 badge.Width = 30;
                 container.Children.Add(badge);
             }
         }
-        
+
         var viewRoomButton = e.NameScope.Find<StandardLibrary.Button>("ViewRoomButton");
         if (viewRoomButton != null)
             viewRoomButton.Click += ViewRoom;

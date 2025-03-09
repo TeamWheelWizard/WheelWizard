@@ -85,6 +85,7 @@
                             Vr="{Binding Ev}"
                             Mii="{Binding FirstMii}"
                             HasBadges="{Binding HasBadges}"
+                            Badges="{Binding BadgeVariants}"
                             />
                     </DataTemplate>
                 </ListBox.ItemTemplate>

@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace WheelWizard.Views;
 
@@ -16,23 +15,17 @@ public class App : Application
 
     private IServiceProvider? _serviceProvider;
 
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
             desktop.MainWindow = new Layout();
-        }
 
         var services = new ServiceCollection();
         services.AddWheelWizardServices();
-
         _serviceProvider = services.BuildServiceProvider();
-
+        
         base.OnFrameworkInitializationCompleted();
     }
 }

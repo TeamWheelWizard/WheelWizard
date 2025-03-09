@@ -10,7 +10,7 @@ public class Badge : TemplatedControl
 
     public static readonly StyledProperty<string> HoverTipProperty =
         AvaloniaProperty.Register<Badge, string>(nameof(HoverTip), 
-            BadgeManager.Instance.BadgeToolTip[BadgeVariant.None]);
+            BadgeSingletonService.BadgeToolTip[BadgeVariant.None]);
     public string HoverTip
     {
         get => GetValue(HoverTipProperty);
@@ -35,7 +35,7 @@ public class Badge : TemplatedControl
             Classes.Remove(enumType.ToString());
         }
         Classes.Add(variant.ToString());
-        HoverTip = BadgeManager.Instance.BadgeToolTip[variant];
+        HoverTip = BadgeSingletonService.BadgeToolTip[variant];
     }
     
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

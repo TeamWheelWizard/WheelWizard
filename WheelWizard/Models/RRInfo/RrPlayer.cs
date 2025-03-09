@@ -1,6 +1,7 @@
 using WheelWizard.Models.Enums;
 using WheelWizard.Models.MiiImages;
 using WheelWizard.Services;
+using WheelWizard.Views;
 
 namespace WheelWizard.Models.RRInfo;
 
@@ -30,6 +31,26 @@ public class RrPlayer
         }
     }
     
-    public BadgeVariant[] BadgeVariants => BadgeManager.Instance.GetBadgeVariants(Fc);
+    private BadgeVariant[]? _badgeVariants;
+
+    public BadgeVariant[] BadgeVariants
+    {
+        get
+        {
+            if(_badgeVariants != null)
+                return _badgeVariants;
+            
+            var newBadges = App.Services.GetRequiredService<IBadgeSingletonService>().GetBadgeVariantsAsync(FriendCode);
+            newBadges.ContinueWith(task => BadgeVariants = task.Result);
+            
+            return [];
+        }
+        private set
+        {
+            _badgeVariants = value;
+            OnPropertyChanged(nameof(BadgeVariants));
+            OnPropertyChanged(nameof(HasBadges));
+        }
+    }
     public bool HasBadges => BadgeVariants.Length != 0;
 }

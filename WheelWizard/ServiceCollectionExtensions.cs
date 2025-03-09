@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using WheelWizard.Services;
 
 namespace WheelWizard;
 
@@ -9,6 +9,6 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static void AddWheelWizardServices(this IServiceCollection services)
     {
-        // TODO: Add services here
+        services.AddSingleton<IBadgeSingletonService, BadgeSingletonService>();
     }
 }

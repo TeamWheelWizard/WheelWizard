@@ -69,6 +69,7 @@
                                                  IsOnline="{Binding IsOnline}"
                                                  TotalLosses="{Binding Losses}"
                                                  TotalWon="{Binding Wins}"
+                                                 Badges="{Binding BadgeVariants}"
                                                  ViewRoomAction="ViewRoom_OnClick"/>
                    </DataTemplate>
                </ListBox.ItemTemplate>
