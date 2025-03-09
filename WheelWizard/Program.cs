@@ -1,5 +1,4 @@
 using Avalonia;
-using System;
 using WheelWizard.Services;
 using WheelWizard.Services.Installation;
 using WheelWizard.Services.Settings;

@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Threading;
-using System;
 
 namespace WheelWizard.Views.Components.WhWzLibrary.MiiImages;
 

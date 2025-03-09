@@ -1,8 +1,6 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
-using System;
 using WheelWizard.Models.MiiImages;
 
 namespace WheelWizard.Views.Components.WhWzLibrary.MiiImages;

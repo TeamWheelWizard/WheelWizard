@@ -1,4 +1,3 @@
-using System;
 using WheelWizard.Services.Settings;
 
 namespace WheelWizard.Models.Settings;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using WheelWizard.Helpers;
+﻿using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Installation;

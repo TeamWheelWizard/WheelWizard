@@ -1,8 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using System;
-using System.Linq;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Settings;

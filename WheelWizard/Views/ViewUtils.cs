@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using System;
 using System.Globalization;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
@@ -12,7 +11,7 @@ using WheelWizard.Utilities.RepeatedTasks;
 
 namespace WheelWizard.Views;
 
-public class ViewUtils
+public static class ViewUtils
 {
     public static void OpenLink(string link)
     {
@@ -35,9 +34,9 @@ public class ViewUtils
     public static Layout GetLayout() => Layout.Instance;
     public static void NavigateToPage(UserControl page)
     {
-        // TODO: Fix the langauge bug. for some reason when changing the language, it changes itself back to the language before
-        //  SO as a quick and dirty fix in the navigate to page we just set the langauge pack when its out of sinc, but this solution
-        //  still makes it so that the first page you enter after changing the language setting will always be the old langauge instead of the new one
+        // TODO: Fix the language bug. for some reason when changing the language, it changes itself back to the language before
+        //  SO as a quick and dirty fix in the navigate to page we just set the language pack when its out of sync, but this solution
+        //  still makes it so that the first page you enter after changing the language setting will always be the old language instead of the new one
         //  when working on the translations again, this should be fixed. and in a solid way instead of this
         var itCurrentlyIs = CultureInfo.CurrentCulture.ToString();
         var itsSupposeToBe = (string)SettingsManager.WW_LANGUAGE.Get();

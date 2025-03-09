@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WheelWizard", "WheelWizard\WheelWizard.csproj", "{DF73A1D9-B01E-4826-A0F3-A8105E66A931}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WheelWizard.Test", "WheelWizard.Test\WheelWizard.Test.csproj", "{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{DF73A1D9-B01E-4826-A0F3-A8105E66A931}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF73A1D9-B01E-4826-A0F3-A8105E66A931}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF73A1D9-B01E-4826-A0F3-A8105E66A931}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

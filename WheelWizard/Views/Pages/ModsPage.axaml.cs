@@ -1,13 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using WheelWizard.Models.Settings;
 using WheelWizard.Services;
 using WheelWizard.Services.Settings;
@@ -222,7 +217,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
 
     private void PriorityText_OnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key != Key.Enter || sender is not TextBox textBox) return;
+        if (e.Key != Key.Enter || sender is not TextBox) return;
         ViewUtils.FindParent<ListBoxItem>(e.Source)?.Focus();
     }
 }

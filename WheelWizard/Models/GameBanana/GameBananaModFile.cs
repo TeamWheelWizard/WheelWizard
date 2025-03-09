@@ -1,3 +1,5 @@
+// ReSharper disable InconsistentNaming
+
 namespace WheelWizard.Models.GameBanana;
 
 public class GameBananaModFile

@@ -6,7 +6,6 @@
         x:Class="WheelWizard.Views.Layout"
         xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
         xmlns:comps="clr-namespace:WheelWizard.Views.Components.StandardLibrary"
-        xmlns:psComps="clr-namespace:WheelWizard.Views.Components.WhWzLibrary"
         xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
         xmlns:settings="clr-namespace:WheelWizard.Views.Pages.Settings"
         Height="876" Width="656" Title="Wheel Wizard" 
@@ -24,7 +23,7 @@
                 PointerPressed="TopBar_PointerPressed">
         </Border>
         
-        <Border Grid.RowSpan="999" Grid.ColumnSpan="999" ZIndex="999" IsVisible="False"
+        <Border Grid.RowSpan="999" Grid.ColumnSpan="999" ZIndex="999" IsVisible="false"
                 x:Name="DisabledDarkenEffect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                 Background="Black"  Opacity="0.3"/> 
         

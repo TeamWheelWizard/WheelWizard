@@ -1,10 +1,7 @@
 ﻿using IniParser;
 using IniParser.Model;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using WheelWizard.Services;
 
 namespace WheelWizard.Models.Settings;

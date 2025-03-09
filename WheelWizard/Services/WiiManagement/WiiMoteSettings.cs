@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using WheelWizard.Helpers;
+﻿using WheelWizard.Helpers;
 using WheelWizard.Services.Settings;
 
 namespace WheelWizard.Services.WiiManagement;

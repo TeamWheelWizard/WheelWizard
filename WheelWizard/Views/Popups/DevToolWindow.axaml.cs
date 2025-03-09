@@ -1,6 +1,5 @@
 ﻿using Avalonia.Interactivity;
 using Avalonia.Threading;
-using System.Threading.Tasks;
 using WheelWizard.Helpers;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.WiiManagement;
@@ -45,7 +44,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
     
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
     private void HttpHelperOff_OnClick(object sender, RoutedEventArgs e) => HttpClientHelper.FakeConnectionToInternet = HttpHelperOff.IsChecked != true;
-    private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().EnableEverything();
+    private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
 
     private void ClearImageCache_OnClick(object sender, RoutedEventArgs e) => MiiImageManager.ClearImageCache();
     

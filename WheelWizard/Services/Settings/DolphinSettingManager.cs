@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 
@@ -95,7 +90,7 @@ public class DolphinSettingManager
         // finally we can read the setting
         foreach (var line in sectionLines)
         {
-            if ((!line.StartsWith($"{settingToRead}=") && !line.StartsWith($"{settingToRead} =")))
+            if (!line.StartsWith($"{settingToRead}=") && !line.StartsWith($"{settingToRead} ="))
                 continue;
             //we found the setting, now we need to return the value
             var setting = line.Split("=");
@@ -127,7 +122,7 @@ public class DolphinSettingManager
             if (lines[i].Trim().StartsWith("[") && lines[i].Trim().EndsWith("]"))
                 break; // Setting was not found in this section, so we have to append it to the section
 
-            if ((!lines[i].StartsWith($"{settingToChange}=") && !lines[i].StartsWith($"{settingToChange} =")))
+            if (!lines[i].StartsWith($"{settingToChange}=") && !lines[i].StartsWith($"{settingToChange} ="))
                 continue;
             
             lines[i] = $"{settingToChange} = {value}";

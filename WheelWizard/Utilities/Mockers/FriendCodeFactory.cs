@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace WheelWizard.Utilities.Mockers;
+﻿namespace WheelWizard.Utilities.Mockers;
 
 public class FriendCodeFactory : MockingDataFactory<string, FriendCodeFactory>
 {

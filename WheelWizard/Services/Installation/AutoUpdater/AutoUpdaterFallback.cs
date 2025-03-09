@@ -1,5 +1,4 @@
 ﻿using Semver;
-using System.Threading.Tasks;
 using WheelWizard.Models.Github;
 using WheelWizard.Views.Popups.Generic;
 

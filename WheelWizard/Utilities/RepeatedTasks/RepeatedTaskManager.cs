@@ -1,8 +1,4 @@
-using Avalonia;
 using Avalonia.Threading;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace WheelWizard.Utilities.RepeatedTasks;
 

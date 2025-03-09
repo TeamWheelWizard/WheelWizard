@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives; // Add this for PlacementMode
 using Avalonia.Media;
-using System;
 
 namespace WheelWizard.Views.Components.StandardLibrary;
 

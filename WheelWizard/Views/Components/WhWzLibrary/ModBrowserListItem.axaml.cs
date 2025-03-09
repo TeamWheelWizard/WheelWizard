@@ -2,8 +2,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media.Imaging;
-using System.IO;
-using System.Net.Http;
 
 namespace WheelWizard.Views.Components.WhWzLibrary;
 

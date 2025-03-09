@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WheelWizard.Models.Enums;
+﻿namespace WheelWizard.Models.Enums;
 
 public static class MarioKartWiiEnums
 {

@@ -2,9 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using System;
-using System.Linq;
-using WheelWizard.Models.GameData;
 using WheelWizard.Models.MiiImages;
 using WheelWizard.Services;
 

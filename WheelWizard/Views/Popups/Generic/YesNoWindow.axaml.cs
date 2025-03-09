@@ -1,6 +1,5 @@
 using Avalonia.Interactivity;
 using Avalonia.Layout;
-using System.Threading.Tasks;
 using WheelWizard.Resources.Languages;
 
 namespace WheelWizard.Views.Popups.Generic;

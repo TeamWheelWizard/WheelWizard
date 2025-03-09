@@ -1,5 +1,3 @@
-using System.IO;
-using System.Threading.Tasks;
 using WheelWizard.Helpers;
 using WheelWizard.Services.WiiManagement;
 using WheelWizard.Views.Popups.Generic;

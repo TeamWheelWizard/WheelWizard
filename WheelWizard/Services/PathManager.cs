@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 using WheelWizard.Helpers;
 using WheelWizard.Services.Settings;
 
@@ -17,30 +14,35 @@ public static class PathManager
     public static string DolphinFilePath => (string)SettingsManager.DOLPHIN_LOCATION.Get();
     public static string UserFolderPath => (string)SettingsManager.USER_FOLDER_PATH.Get();
     
-    // Wheel wizard's appdata paths  (dont have to be expressions since they dont depend on user input like the others)f
+    // Wheel wizard's appdata paths  (dont have to be expressions since they dont depend on user input like the others)
     public static readonly string WheelWizardAppdataPath = Path.Combine(GetAppDataFolder(), "CT-MKWII");
     public static readonly string WheelWizardConfigFilePath = Path.Combine(WheelWizardAppdataPath, "config.json");
     public static readonly string ModsFolderPath = Path.Combine(WheelWizardAppdataPath, "Mods");
     public static readonly string ModConfigFilePath = Path.Combine(ModsFolderPath, "modconfig.json");
     public static readonly string TempModsFolderPath = Path.Combine(ModsFolderPath, "Temp");
-    
+    public static readonly string RetroRewindTempFile = Path.Combine(TempModsFolderPath, "RetroRewind.zip");
+    public static string RetroRewindVersionFile => Path.Combine(RetroRewind6FolderPath, "version.txt");
+    public static string WiiDbFile => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib", "RFL_DB.dat");
+
     
     //In case it is unclear, the mods folder is a folder with mods that are desired to be installed (if enabled)
     //When launching we want to move the mods from the Mods folder to the MyStuff folder since that is the folder the game uses
     //Also remember that mods may not be in a subfolder, all mod files must be located in /MyStuff directly 
-    public static string MyStuffFolderPath => Path.Combine(RetroRewind6FolderPath, "MyStuff");
+    
 
-    // Keep config in ~/.config for MacOS and Linux, and in AppData for Windows
+    // Keep config in ~/.config for macOS
     private static string GetAppDataFolder()
-{
-    if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
     {
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config");
+        if (OperatingSystem.IsMacOS())
+        {
+            return Path.Combine("~", ".config"); // ~ is the home directory
+        }
+        return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     }
-    return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-}
     
     // helper paths for folders used across multiple files
+    public static string MyStuffFolderPath => Path.Combine(RetroRewind6FolderPath, "MyStuff");
+    public static string GetModDirectoryPath(string modName) => Path.Combine(ModsFolderPath, modName);
     public static string RiivolutionWhWzFolderPath => Path.Combine(LoadFolderPath, "Riivolution", "WheelWizard");
     public static string RetroRewind6FolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6");
     
@@ -52,18 +54,14 @@ public static class PathManager
     {
         get
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
+                if (string.IsNullOrWhiteSpace(UserFolderPath)) return "";
                 return Path.Combine(UserFolderPath, "Load");
             }
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return Path.Combine(UserFolderPath, "data", "dolphin-emu", "Load");
-            }
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                if (string.IsNullOrWhiteSpace(UserFolderPath)) return "";
-                return Path.Combine(UserFolderPath, "Load");
             }
             throw new PlatformNotSupportedException("Unsupported operating system");
         }
@@ -110,7 +108,7 @@ public static class PathManager
     }
 
 
-    public async static Task<string?> TryFindUserFolderPath()
+    public static string? TryFindUserFolderPath()
     {
         var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "Dolphin Emulator");
@@ -133,7 +131,7 @@ public static class PathManager
         return linuxPath;
     }
 
-    public async static Task<string?> TryToFindApplicationPath() {
+    public static string? TryToFindApplicationPath() {
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {

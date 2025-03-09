@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿// ReSharper disable InconsistentNaming
 
 namespace WheelWizard.Models.GameBanana;
 
@@ -10,7 +10,7 @@ public class GameBananaModDetails
 
     public long _tsDateModified { get; set; }
     public long _tsDateAdded { get; set; }
-    public GameBananaPreviewMedia _aPreviewMedia { get; set; }
+    public GameBananaPreviewMedia? _aPreviewMedia { get; set; }
     public string _sName { get; set; }
     public string _sProfileUrl { get; set; }
     public int _nLikeCount { get; set; }
@@ -25,18 +25,18 @@ public class GameBananaModDetails
 
     public int? _nDownloadCount { get; set; }
     public string? _sModelName { get; set; }
-    
-    public string? FirstImageUrl => _aPreviewMedia.FirstImageUrl;
+
+    public string? FirstImageUrl => _aPreviewMedia?.FirstImageUrl;
     // public List<string> _aTags { get; set; } // (e.g., "Stable", "In Development")
 
     public static GameBananaModDetails LoadingMod()
     {
-        return new GameBananaModDetails()
+        return new()
         {
             _sName = "LOADING",
             _sText = "LOADING",
             _sModelName = "LOADING",
-            _aSubmitter = new GameBananaSubmitter()
+            _aSubmitter = new()
             {
                 _sName = "LOADING",
                 _sProfileUrl = "LOADING"
@@ -74,10 +74,10 @@ public class GameBananaModDetails
     public bool _bAcceptsDonations { get; set; }
     public bool _bShowRipePromo { get; set; }
     public Embeddables _aEmbeddables { get; set; }
-  
+
     public GamebananaCatagory _aSuperCategory { get; set; }
     public List<Credit> _aCredits { get; set; }
-    
+
     public class LicenseChecklist
     {
         public List<string> yes { get; set; }
@@ -85,19 +85,19 @@ public class GameBananaModDetails
         public List<string> only_if_same { get; set; }
         public List<string> no { get; set; }
     }
-    
+
     public class Embeddables
     {
         public string _sEmbeddableImageBaseUrl { get; set; }
         public List<string> _aVariants { get; set; }
     }
-    
+
     public class Credit
     {
         public string _sGroupName { get; set; }
         public List<Author> _aAuthors { get; set; }
     }
-    
+
     public class Author
     {
         public int _idRow { get; set; }

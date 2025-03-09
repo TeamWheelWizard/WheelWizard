@@ -1,9 +1,6 @@
 ﻿#if WINDOWS
 using Microsoft.Win32;
 #endif
-using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.ModManagement;
 
@@ -76,7 +73,7 @@ public class UrlProtocolManager
     }
 #endif
     
-    async public static void SetWhWzSchemeAsync()
+    public static async void SetWhWzSchemeAsync()
     {
 #if WINDOWS
         SetWhWzSchemeAsyncInternally();

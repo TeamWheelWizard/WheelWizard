@@ -1,10 +1,7 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Utilities.RepeatedTasks;

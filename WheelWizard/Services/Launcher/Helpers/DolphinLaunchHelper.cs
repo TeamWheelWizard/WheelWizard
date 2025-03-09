@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using WheelWizard.Services.Settings;
 using WheelWizard.Views.Popups.Generic;
 

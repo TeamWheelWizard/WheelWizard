@@ -1,10 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using System;
 using WheelWizard.Services.Installation;
 using WheelWizard.Services.Installation.AutoUpdater;
 using WheelWizard.Views.Popups;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages.Settings;
 

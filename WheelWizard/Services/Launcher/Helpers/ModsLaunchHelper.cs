@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using WheelWizard.Helpers;
+﻿using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
 

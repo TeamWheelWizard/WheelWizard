@@ -1,5 +1,4 @@
 using WheelWizard.Models.Enums;
-using System.Linq;
 using System.Runtime.InteropServices;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;

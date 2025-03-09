@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace WheelWizard.Models.GameData;
+﻿namespace WheelWizard.Models.GameData;
 
 public class GameDataUser : GameDataPlayer
 {

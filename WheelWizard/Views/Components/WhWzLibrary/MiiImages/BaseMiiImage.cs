@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media.Imaging;
-using System;
 using System.ComponentModel;
 using WheelWizard.Models.MiiImages;
 

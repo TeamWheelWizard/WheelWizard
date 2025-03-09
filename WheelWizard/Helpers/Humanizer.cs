@@ -1,4 +1,3 @@
-using System;
 using WheelWizard.Resources.Languages;
 
 namespace WheelWizard.Helpers;

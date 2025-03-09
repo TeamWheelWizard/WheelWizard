@@ -1,16 +1,15 @@
 using Avalonia;
 using Avalonia.Controls;
-using System.Threading.Tasks;
 
 namespace WheelWizard.Views.Popups;
 
 public abstract class PopupContent : UserControl
 {
-    public PopupWindow Window { get; private set; }
+    public Base.PopupWindow Window { get; private set; }
     
-    protected PopupContent(bool allowClose, bool allowLayoutInteraction, bool isTopMost, string title = "", Vector? size = null)
+    protected PopupContent(bool allowClose, bool allowParentInteraction, bool isTopMost, string title = "", Vector? size = null)
     {
-        Window = new PopupWindow(allowClose, allowLayoutInteraction, isTopMost, title, size)
+        Window = new Base.PopupWindow(allowClose, allowParentInteraction, isTopMost, title, size)
         {
             PopupContent = { Content = this },
             BeforeClose = BeforeClose,
@@ -19,7 +18,7 @@ public abstract class PopupContent : UserControl
 
         // If layout interaction is enabled, that means you can close the application
         // That means you can close the base application without closing these popups. And that is just annoying
-        if(allowLayoutInteraction) 
+        if(allowParentInteraction) 
             ViewUtils.GetLayout().Closing += (_, _) => Close();
     }
 

@@ -1,8 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using System;
 using System.ComponentModel;
-using System.Linq;
 using WheelWizard.Models.Enums;
 using WheelWizard.Models.GameData;
 using WheelWizard.Models.MiiImages;

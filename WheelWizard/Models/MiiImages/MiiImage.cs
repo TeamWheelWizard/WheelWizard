@@ -1,5 +1,4 @@
 ﻿using Avalonia.Media.Imaging;
-using System;
 using System.ComponentModel;
 using WheelWizard.Services.WiiManagement;
 

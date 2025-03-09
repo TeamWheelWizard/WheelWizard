@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using WheelWizard.Models.GameBanana;
+﻿using WheelWizard.Models.GameBanana;
 
 public class GameBananaSearchResults
 {

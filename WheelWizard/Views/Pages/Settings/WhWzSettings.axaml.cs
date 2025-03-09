@@ -1,13 +1,8 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
@@ -64,12 +59,12 @@ public partial class WhWzSettings : UserControl
         return "Custom: " + percentageString;
     }
 
-    private async void AutoFillPaths()
+    private void AutoFillPaths()
     {
         if (DolphinExeInput.Text != "")
             return;
         
-        var folderPath = await PathManager.TryFindUserFolderPath();
+        var folderPath = PathManager.TryFindUserFolderPath();
         if (!string.IsNullOrEmpty(folderPath))
             DolphinUserPathInput.Text = folderPath;
     }
@@ -132,12 +127,12 @@ public partial class WhWzSettings : UserControl
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            var dolphinAppPath = await PathManager.TryToFindApplicationPath();
+            var dolphinAppPath = PathManager.TryToFindApplicationPath();
             if (!string.IsNullOrEmpty(dolphinAppPath))
             {
                 var result = await new YesNoWindow()
-                    .SetMainText($"{Phrases.PopupText_DolphinFoundText}\n{dolphinAppPath}")
-                    .SetExtraText("If you dont know what all of this means, just click yes :)")
+                    .SetMainText("Dolphin Emulator found.")
+                    .SetExtraText($"{Phrases.PopupText_DolphinFoundText}\n{dolphinAppPath}")
                     .AwaitAnswer();
 
                 if (result)
@@ -226,7 +221,7 @@ public partial class WhWzSettings : UserControl
         }
 
         // Attempt to find Dolphin's default path if no valid folder is set
-        var folderPath = await PathManager.TryFindUserFolderPath();
+        var folderPath = PathManager.TryFindUserFolderPath();
         if (!string.IsNullOrEmpty(folderPath))
         {
             // Ask the user if they want to use the automatically found folder

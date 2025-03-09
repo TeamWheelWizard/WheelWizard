@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="WheelWizard.Views.Popups.PopupWindow"
+        x:Class="WheelWizard.Views.Popups.Base.PopupWindow"
         SystemDecorations="None"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
@@ -18,6 +18,9 @@
                     <RowDefinition Height="25" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
+                <Border Grid.RowSpan="999" Grid.ColumnSpan="999" ZIndex="999" IsVisible="False"
+                        x:Name="DisabledDarkenEffect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                        Background="Black"  Opacity="0.3"/>
                 
                 <Border Grid.Row="0" Background="{StaticResource FrameColor}" 
                         CornerRadius="3,3,0,0" PointerPressed="TopBar_PointerPressed">

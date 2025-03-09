@@ -1,10 +1,6 @@
 ﻿using SharpCompress.Archives;
-using System;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using WheelWizard.Models.Settings;
 using WheelWizard.Views.Popups.Generic;
 
@@ -55,7 +51,7 @@ public static class ModInstallation
                     };
 
                     // Create INI file
-                    var modDirectory = GetModDirectoryPath(mod.Title);
+                    var modDirectory = PathManager.GetModDirectoryPath(mod.Title);
                     if (!Directory.Exists(modDirectory))
                         Directory.CreateDirectory(modDirectory);
 
@@ -85,7 +81,7 @@ public static class ModInstallation
         {
             foreach (var mod in mods)
             {
-                var modDirectory = GetModDirectoryPath(mod.Title);
+                var modDirectory = PathManager.GetModDirectoryPath(mod.Title);
                 if (!Directory.Exists(modDirectory))
                     Directory.CreateDirectory(modDirectory);
 
@@ -104,9 +100,7 @@ public static class ModInstallation
             throw new Exception($"Failed to save mods: {ex.Message}");
         }
     }
-
-    public static string GetModDirectoryPath(string modName) =>
-        Path.Combine(ModsFolderPath, modName);
+    
 
     public static bool ModExists(ObservableCollection<Mod> mods, string modName) =>
         mods.Any(mod => mod.Title.Equals(modName, StringComparison.OrdinalIgnoreCase));
@@ -133,7 +127,7 @@ public static class ModInstallation
                 processedEntries++;
                 
                 // Update the progress window
-                var progress = (int)((processedEntries / (double)totalEntries) * 100);
+                var progress = (int)(processedEntries / (double)totalEntries * 100);
                 Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
                 progressWindow.UpdateProgress(progress);
@@ -233,7 +227,7 @@ public static class ModInstallation
             progressWindow.SetGoal("Extracting files...");
             progressWindow.Show();
 
-            var modDirectory = GetModDirectoryPath(givenModName);
+            var modDirectory = PathManager.GetModDirectoryPath(givenModName);
             if (!Directory.Exists(modDirectory))
             {
                 Directory.CreateDirectory(modDirectory);

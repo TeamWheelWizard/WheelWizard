@@ -1,8 +1,5 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Templates;
-using System;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
 

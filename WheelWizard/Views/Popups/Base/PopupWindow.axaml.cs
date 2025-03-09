@@ -1,17 +1,18 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using System;
 using System.ComponentModel;
 using WheelWizard.Services.Settings;
 
-namespace WheelWizard.Views.Popups;
+namespace WheelWizard.Views.Popups.Base;
 
-public partial class PopupWindow : Window, INotifyPropertyChanged
+public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 {
+    protected override Control InteractionOverlay => DisabledDarkenEffect;
+    protected override Control InteractionContent => CompleteGrid;
+
     public PopupWindow()
     {
         // Constructor is never used, however, UI elements must have a constructor with no params
@@ -20,8 +21,6 @@ public partial class PopupWindow : Window, INotifyPropertyChanged
         Loaded += PopupWindow_Loaded;
     }
     
-   private static int _disableCount = 0; // This is used to keep track of how many popups are open that disable the layout
-    // We only want to re-enable the layout when all popups that are disabling it are closed
     private bool _isTopMost = true;
     
     public bool IsTopMost
@@ -60,21 +59,20 @@ public partial class PopupWindow : Window, INotifyPropertyChanged
     public Action BeforeOpen { get; set; } = () => { };
     public Action BeforeClose { get; set; } = () => { };
     
-    private readonly bool _allowLayoutInteraction;
-    
     // Most (if not all) of these parameters should be set in the popup you create, and not kept as a parameter for that popup
-    public PopupWindow(bool allowClose, bool allowLayoutInteraction, bool isTopMost, string title = "", Vector? size = null)
+    public PopupWindow(bool allowClose, bool allowParentInteraction, bool isTopMost, string title = "", Vector? size = null)
     {
-        size ??= new(400, 200);
+        size ??= new Vector(400, 200);
         IsTopMost = isTopMost;
         CanClose = allowClose;
         WindowTitle = title;
-        _allowLayoutInteraction = allowLayoutInteraction;
+        AllowParentInteraction = allowParentInteraction;
         var mainWindow = ViewUtils.GetLayout();
         if(mainWindow.IsVisible)
             Owner = mainWindow;
         
         InitializeComponent();
+        AddLayer();
         DataContext = this;
 
         var scaleFactor = (double)SettingsManager.WINDOW_SCALE.Get();
@@ -87,18 +85,13 @@ public partial class PopupWindow : Window, INotifyPropertyChanged
         Position = mainWindow.Position;
         Loaded += PopupWindow_Loaded;
     }
-    
 
     private void PopupWindow_Loaded(object? sender, RoutedEventArgs e)
     {
         BeforeOpen();
-        if (_allowLayoutInteraction) return;
-
-        ViewUtils.GetLayout().DisableEverything();
-        _disableCount++;
     }
     
-    private void TopBar_PointerPressed(object? sender, PointerPressedEventArgs e)
+    protected void TopBar_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             BeginMoveDrag(e);
@@ -109,19 +102,16 @@ public partial class PopupWindow : Window, INotifyPropertyChanged
     protected override void OnClosed(EventArgs e)
     {
         BeforeClose();
-        if (!_allowLayoutInteraction)
-        {
-            _disableCount--;
-            if (_disableCount <= 0)
-                ViewUtils.GetLayout().EnableEverything();
-        }
+        RemoveLayer();
+        
         base.OnClosed(e);
     }
-    
+
+    #region PropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected virtual void OnPropertyChanged(string propertyName)
+    protected void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+    #endregion
 }
-

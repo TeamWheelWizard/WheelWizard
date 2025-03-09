@@ -1,5 +1,4 @@
-﻿using System;
-using WheelWizard.Models.MiiImages;
+﻿using WheelWizard.Models.MiiImages;
 
 namespace WheelWizard.Utilities.Mockers;
 

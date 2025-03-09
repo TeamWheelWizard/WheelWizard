@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace WheelWizard.Models.Settings;
 
 public abstract class Setting

@@ -1,6 +1,3 @@
-using WheelWizard.Services.Settings;
-using System;
-
 namespace WheelWizard.Models.Settings;
 
 public class VirtualSetting : Setting, ISettingListener

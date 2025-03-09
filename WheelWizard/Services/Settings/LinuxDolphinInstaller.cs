@@ -1,10 +1,6 @@
 ﻿using Avalonia.Threading;
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using WheelWizard.Helpers;
 using WheelWizard.Views.Popups.Generic;
 
@@ -164,13 +160,13 @@ public static class LinuxDolphinInstaller
         }
 
         // Install Dolphin using Flatpak and report progress.
-        var exitCode = await RunProcessWithProgressAsync("flatpak", "install -y org.DolphinEmu.dolphin-emu", progress);
+        var exitCode = await RunProcessWithProgressAsync("pkexec", "flatpak --system install -y org.DolphinEmu.dolphin-emu", progress);
         if (exitCode is 127 or 126) //this is error unauthorized
         {
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 new MessageBoxWindow().SetTitleText("Error")
-                    .SetTitleText("You need to be an administrator to install Flatpak").Show();
+                    .SetTitleText("You need to be an administrator to install Dolphin via Flatpak").Show();
             });
             return false;
         }

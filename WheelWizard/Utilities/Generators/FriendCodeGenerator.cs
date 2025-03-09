@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Security.Cryptography;
 using WheelWizard.Services.WiiManagement.SaveData;
 

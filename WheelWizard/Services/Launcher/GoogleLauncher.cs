@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using WheelWizard.Helpers;
+﻿using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;

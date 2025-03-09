@@ -1,7 +1,3 @@
-using WheelWizard.Utilities;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WheelWizard.Helpers;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.Utilities.RepeatedTasks;
@@ -27,7 +23,9 @@ public class RRLiveRooms : RepeatedTaskManager
         // It is not important enough to bore the user with an error message or something.
         // they are not hindered if there is an error, they just don't see the rooms. that's it.
         if (!response.Succeeded || response.Content is null)
+        {
             CurrentRooms = new List<RrRoom>();
+        }
         else CurrentRooms = response.Content;
     }
 }

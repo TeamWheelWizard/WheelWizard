@@ -1,7 +1,4 @@
 ﻿using Avalonia.Data.Converters;
-using Avalonia.Media;
-using System;
-using System.Globalization;
 
 namespace WheelWizard.Views.Converters;
 

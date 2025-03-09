@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace WheelWizard.Models.Settings;
+﻿namespace WheelWizard.Models.Settings;
 
 public enum DolphinShaderCompilationMode {
     Default = 0,

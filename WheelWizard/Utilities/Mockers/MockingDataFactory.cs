@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace WheelWizard.Utilities.Mockers;
+﻿namespace WheelWizard.Utilities.Mockers;
 
 public abstract class MockingDataFactory<T, U> where U: MockingDataFactory<T,U>, new()
 {

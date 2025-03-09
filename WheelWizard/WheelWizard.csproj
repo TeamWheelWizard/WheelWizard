@@ -6,8 +6,10 @@
         <TargetFramework>net8.0</TargetFramework>
         <RootNamespace>WheelWizard</RootNamespace>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+
         <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
-        
+
         <!-- Program details -->
         <Version>2.0.0</Version>
         <Description>This program will manage RetroRewind and mods :)</Description>
@@ -15,7 +17,7 @@
         <RepositoryUrl>https://github.com/patchzyy/WheelWizard</RepositoryUrl>
         <ApplicationIcon>car-wheel.ico</ApplicationIcon>
     </PropertyGroup>
-        
+
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
         <DefineConstants>WINDOWS</DefineConstants>
     </PropertyGroup>
@@ -30,9 +32,9 @@
 
     <ItemGroup>
         <!-- Everyhitng from the OG Wheel wizard project -->
-        <PackageReference Include="Avalonia.HtmlRenderer" Version="11.0.0" />
-        <PackageReference Include="ini-parser" Version="2.5.2" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Avalonia.HtmlRenderer" Version="11.0.0"/>
+        <PackageReference Include="ini-parser" Version="2.5.2"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
 
         <!-- Everyhitng specifically for Avalonia -->
         <PackageReference Include="Avalonia" Version="11.2.4"/>
@@ -40,8 +42,8 @@
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.4"/>
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.4"/>
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.4"/>
-        <PackageReference Include="Semver" Version="3.0.0" />
-        <PackageReference Include="SharpCompress" Version="0.39.0" />
+        <PackageReference Include="Semver" Version="3.0.0"/>
+        <PackageReference Include="SharpCompress" Version="0.39.0"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -455,25 +457,25 @@
             <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\Pages\RoomDetailsPage.axaml.cs">
-          <DependentUpon>RoomDetailsPage.axaml</DependentUpon>
+            <DependentUpon>RoomDetailsPage.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\Components\StandardLibrary\SidebarRadioButton.axaml.cs">
-          <DependentUpon>SidebarRadioButton.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>SidebarRadioButton.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\Components\WhWzLibrary\PlayerListItem.axaml.cs">
-          <DependentUpon>PlayerListItem.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>PlayerListItem.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
 
     </ItemGroup>
-    
+
     <ItemGroup>
         <!-- Additional Files -->
-        <AdditionalFiles Include="Views\Styles\Resources\Constants.axaml" />
-        <AdditionalFiles Include="Views\Styles\Resources\Icons.axaml" />
-        <AdditionalFiles Include="Views\Styles\Styles\ButtonStyles.axaml" />
-        <AdditionalFiles Include="Views\Styles\Styles\TextStyles.axaml" />
-        <AdditionalFiles Include="Views\Styles\Util\IconExampleComponent.axaml" />
+        <AdditionalFiles Include="Views\Styles\Resources\Constants.axaml"/>
+        <AdditionalFiles Include="Views\Styles\Resources\Icons.axaml"/>
+        <AdditionalFiles Include="Views\Styles\Styles\ButtonStyles.axaml"/>
+        <AdditionalFiles Include="Views\Styles\Styles\TextStyles.axaml"/>
+        <AdditionalFiles Include="Views\Styles\Util\IconExampleComponent.axaml"/>
     </ItemGroup>
 </Project>

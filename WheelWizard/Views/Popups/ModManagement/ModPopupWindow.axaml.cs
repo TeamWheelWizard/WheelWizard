@@ -1,14 +1,11 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using WheelWizard.Models.GameBanana;
 using WheelWizard.Services.GameBanana;
 using WheelWizard.Views.Pages;
@@ -192,5 +189,11 @@ public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
         // a bit dirty, but it's the easiest way to refresh the mod list in the ModsPage
         ViewUtils.NavigateToPage(new ModsPage());
         base.BeforeClose();
+    }
+
+    private void SearchTextBox_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter || sender is not TextBox) return;
+        Search_Click(sender, e);
     }
 }

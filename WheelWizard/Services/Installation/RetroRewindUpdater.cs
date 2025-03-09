@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;

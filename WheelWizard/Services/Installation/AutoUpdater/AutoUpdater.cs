@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WheelWizard.Services.Installation.AutoUpdater;
+﻿namespace WheelWizard.Services.Installation.AutoUpdater;
 
 public class AutoUpdater
 {

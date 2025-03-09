@@ -19,6 +19,7 @@
             <!-- Search Bar -->
             <Grid Grid.Row="1" Margin="0,10,0,10" HorizontalAlignment="Stretch">
                 <TextBox Name="SearchTextBox" Watermark="Search for mods..." Grid.Column="0" 
+                         KeyDown="SearchTextBox_OnKeyDown"
                          Height="40" HorizontalAlignment="Stretch" Margin="0,0,60,5"/>
 
                 <components:Button Text="" FontSize="16" Height="40" IconData="{StaticResource Search}"

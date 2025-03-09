@@ -1,7 +1,6 @@
-﻿using Semver;
-using System.Collections.Generic;
+﻿using Avalonia.Threading;
+using Semver;
 using System.Text.Json;
-using System.Threading.Tasks;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Github;
 using WheelWizard.Resources.Languages;
@@ -9,10 +8,10 @@ using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Services.Installation.AutoUpdater;
 
-
 public class AutoUpdaterHandler
 {
     private readonly IUpdaterPlatform _updaterPlatform;
+
     //todo: look into assembly versioning c# best practices 
     public virtual string CurrentVersion => AutoUpdater.CurrentVersion;
 
@@ -44,7 +43,7 @@ public class AutoUpdaterHandler
             await _updaterPlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl);
         });
     }
-    
+
     private async Task<GithubRelease?> GetLatestReleaseAsync()
     {
         var response = await HttpClientHelper.GetAsync<string>(Endpoints.WhWzReleasesUrl);
@@ -55,15 +54,20 @@ public class AutoUpdaterHandler
             // It's not useful to send that error in that case so we filter those out first.
             if (response.StatusCodeGroup != 4 && response.StatusCode is not 503 and not 504)
             {
-                await new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Error)
-                    .SetTitleText("Failed to check for updates")
-                    .SetInfoText("An error occurred while checking for updates. Please try again later. " + 
-                                 "\nError: " + response.StatusMessage)
-                    .ShowDialog();
+                await Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await new MessageBoxWindow()
+                        .SetMessageType(MessageBoxWindow.MessageType.Error)
+                        .SetTitleText("Failed to check for updates")
+                        .SetInfoText("An error occurred while checking for updates. Please try again later. " +
+                                     "\nError: " + response.StatusMessage)
+                        .ShowDialog();
+                });
             }
+
             return null;
         }
+
         response.Content = response.Content.Trim('\0');
         var releases = JsonSerializer.Deserialize<List<GithubRelease>>(response.Content);
         if (releases is null || releases.Count == 0) return null;
