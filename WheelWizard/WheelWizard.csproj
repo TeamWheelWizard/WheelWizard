@@ -11,7 +11,6 @@
         <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
 
         <!-- Program details -->
-        <Version>2.0.1</Version>
         <Description>This program will manage RetroRewind and mods :)</Description>
         <Copyright>yes,no... maybe</Copyright>
         <RepositoryUrl>https://github.com/patchzyy/WheelWizard</RepositoryUrl>
@@ -31,12 +30,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Everyhitng from the OG Wheel wizard project -->
+        <!-- Everything specifically for Avalonia -->
+        <PackageReference Include="Avalonia" Version="11.2.5"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.5"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.5"/>
         <PackageReference Include="Avalonia.HtmlRenderer" Version="11.0.0"/>
-        <PackageReference Include="ini-parser" Version="2.5.2"/>
-        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.2.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1"/>
-        <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.5"/>
+
 
         <!-- Code analyzers -->
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
@@ -44,95 +45,27 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
 
-        <!-- Everyhitng specifically for Avalonia -->
-        <PackageReference Include="Avalonia" Version="11.2.4"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.2.4"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.4"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.4"/>
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.4"/>
+        <!-- MinVer configuration -->
+        <PackageReference Include="MinVer" Version="6.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
+        <!-- Everything from the OG Wheel wizard project -->
+        <PackageReference Include="ini-parser" Version="2.5.2"/>
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.3.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3"/>
+        <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
         <PackageReference Include="Semver" Version="3.0.0"/>
         <PackageReference Include="SharpCompress" Version="0.39.0"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <!-- Embedded Resources (Languages) -->
+    <ItemGroup Label="Embedded Resources">
         <EmbeddedResource Update="Resources\Languages\Common.resx">
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>Common.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.ar.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.ar.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.cs.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.cs.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.de.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.de.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.es.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.es.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.fi.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.fi.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.fr.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.fr.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.it.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.it.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.ja.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.ja.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.ko.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.ko.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.nb.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.nb.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.nl.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.nl.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.pt.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.pt.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.ru.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.ru.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.tr.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.tr.Designer.cs</LastGenOutput>
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.zh.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.zh.Designer.cs</LastGenOutput>
+        <EmbeddedResource Update="Resources\Languages\Common.*.resx">
             <DependentUpon>Common.resx</DependentUpon>
         </EmbeddedResource>
 
@@ -140,79 +73,7 @@
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>Online.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.ar.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.ar.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.cs.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.cs.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.de.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.de.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.es.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.es.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.fi.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.fi.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.fr.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.fr.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.it.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.it.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.ja.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.ja.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.ko.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.kr.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.nb.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.nb.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.nl.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.nl.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.pt.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.pt.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.ru.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.ru.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.tr.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.tr.Designer.cs</LastGenOutput>
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.zh.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.zh.Designer.cs</LastGenOutput>
+        <EmbeddedResource Update="Resources\Languages\Online.*.resx">
             <DependentUpon>Online.resx</DependentUpon>
         </EmbeddedResource>
 
@@ -220,77 +81,7 @@
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>Phrases.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.ar.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.ar.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.cs.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.cs.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.de.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.de.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.es.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.es.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.fi.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.fi.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.fr.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.fr.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.it.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.it.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.ja.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.ja.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.ko.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.kr.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.nb.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.nb.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.nl.resx">
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.pt.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.pt.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.ru.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.ru.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.tr.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.tr.Designer.cs</LastGenOutput>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.zh.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.zh.Designer.cs</LastGenOutput>
+        <EmbeddedResource Update="Resources\Languages\Phrases.*.resx">
             <DependentUpon>Phrases.resx</DependentUpon>
         </EmbeddedResource>
 
@@ -298,79 +89,7 @@
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.ar.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.ar.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.cs.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.cs.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.de.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.de.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.es.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.es.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.fi.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.fi.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.fr.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.fr.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.it.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.it.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.ja.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.ja.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.ko.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.kr.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.nb.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.nb.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.nl.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.nl.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.pt.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.pt.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.ru.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.ru.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.tr.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.tr.Designer.cs</LastGenOutput>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.zh.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.zh.Designer.cs</LastGenOutput>
+        <EmbeddedResource Update="Resources\Languages\Settings.*.resx">
             <DependentUpon>Settings.resx</DependentUpon>
         </EmbeddedResource>
 
@@ -395,87 +114,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Online.resx</DependentUpon>
         </Compile>
-
-        <Compile Update="Views\Pages\NotFoundPage.axaml.cs">
-            <DependentUpon>NotFoundPage.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Pages\Settings\SettingsPage.axaml.cs">
-            <DependentUpon>SettingsPage.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Pages\FriendsPage.axaml.cs">
-            <DependentUpon>FriendsPage.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Pages\RoomsPage.axaml.cs">
-            <DependentUpon>RoomsPage.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Pages\UserProfilePage.axaml.cs">
-            <DependentUpon>UserProfilePage.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\PageSpecific\SidebarRadioButton.axaml.cs">
-            <DependentUpon>SidebarRadioButton.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\StandardLibrary\Button.axaml.cs">
-            <DependentUpon>Button.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\StandardLibrary\EmptyPageInfo.axaml.cs">
-            <DependentUpon>EmptyPageInfo.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\StandardLibrary\FormFieldLabel.axaml.cs">
-            <DependentUpon>FormFieldLabel.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\StandardLibrary\IconLabel.axaml.cs">
-            <DependentUpon>IconLabel.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\StandardLibrary\IconLabelButton.axaml.cs">
-            <DependentUpon>IconLabelButton.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\StandardLibrary\LoadingIcon.axaml.cs">
-            <DependentUpon>LoadingIcon.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\StandardLibrary\StateBox.axaml.cs">
-            <DependentUpon>StateBox.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Popups\Generic\ProgressWindow.axaml.cs">
-            <DependentUpon>ProgressWindow.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Popups\Base\PopupWindow.axaml.cs">
-            <DependentUpon>PopupWindow.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\WhWzLibrary\MiiImages\MiiImageLoader.axaml.cs">
-            <DependentUpon>MiiImageLoader.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\WhWzLibrary\MiiImages\MiiCarousel.axaml.cs">
-            <DependentUpon>MiiCarousel.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Pages\RoomDetailsPage.axaml.cs">
-            <DependentUpon>RoomDetailsPage.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\Components\StandardLibrary\SidebarRadioButton.axaml.cs">
-            <DependentUpon>SidebarRadioButton.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Components\WhWzLibrary\PlayerListItem.axaml.cs">
-            <DependentUpon>PlayerListItem.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-
     </ItemGroup>
 
     <ItemGroup>
