@@ -12,7 +12,7 @@
 
         <!-- Program details -->
         <Description>This program will manage RetroRewind and mods :)</Description>
-        <Copyright>yes,no... maybe</Copyright>
+        <Copyright>CC BY-NC-SA 4.0</Copyright>
         <RepositoryUrl>https://github.com/patchzyy/WheelWizard</RepositoryUrl>
         <ApplicationIcon>car-wheel.ico</ApplicationIcon>
     </PropertyGroup>
