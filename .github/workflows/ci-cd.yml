@@ -1,33 +1,30 @@
-name: CI/CD for Wheel Wizard
-
+name: CI/CD
+permissions: write-all
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [ "main", "dev" ]
+    tags:
+      - *
   pull_request:
-    branches:
-      - main
-      - dev
+    branches: [ "main", "dev" ]
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  ci-cd:
+    name: CI/CD
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          fetch-depth: 0
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
 
-      - name: Build solution
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Run tests
-        run: dotnet test --configuration Release --no-build --verbosity normal
+      - name: Build, Tests, Cover, Pack and Publish (on push tag)
+        shell: bash
+        run: |
+          dotnet tool install --global dotnet-releaser
+          dotnet-releaser run --nuget-token "${{secrets.NUGET_TOKEN}}" --github-token "${{secrets.GITHUB_TOKEN}}" dotnet-releaser.toml
