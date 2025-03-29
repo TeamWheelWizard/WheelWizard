@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using WheelWizard.Models.MiiImages;
-using WheelWizard.Services;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Components;
 
@@ -93,7 +93,7 @@ public class FriendsListItem : TemplatedControl
     {
         ViewRoomAction.Invoke(FriendCode);
     }
-    
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -101,7 +101,10 @@ public class FriendsListItem : TemplatedControl
         if (container != null)
         {
             container.Children.Clear();
-            var badges = BadgeManager.Instance.GetBadges(FriendCode);
+            var badges = App.Services
+                .GetRequiredService<IWhWzDataSingletonService>()
+                .GetBadges(FriendCode)
+                .Select(variant => new Badge { Variant = variant });
             foreach (var badge in badges)
             {
                 badge.Height = 30;

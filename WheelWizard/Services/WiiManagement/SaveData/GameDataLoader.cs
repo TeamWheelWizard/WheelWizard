@@ -8,7 +8,9 @@ using WheelWizard.Services.Other;
 using WheelWizard.Services.Settings;
 using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WheelWizardData;
 
 // big big thanks to https://kazuki-4ys.github.io/web_apps/FaceThief/ for the JS implementation
 
@@ -177,15 +179,16 @@ public class GameDataLoader : RepeatedTaskManager
     {
         if (_saveData == null) throw new ArgumentNullException(nameof(_saveData));
 
+        var friendCode = FriendCodeGenerator.GetFriendCode(_saveData, offset + 0x5C);
         var user = new GameDataUser
         {
             MiiData     = ParseMiiData(offset + 0x14),
-            FriendCode  = FriendCodeGenerator.GetFriendCode(_saveData, offset + 0x5C),
+            FriendCode  = friendCode,
             Vr          = BigEndianBinaryReader.BufferToUint16(_saveData, offset + 0xB0),
             Br          = BigEndianBinaryReader.BufferToUint16(_saveData, offset + 0xB2),
             TotalRaceCount = BigEndianBinaryReader.BufferToUint32(_saveData, offset + 0xB4),
             TotalWinCount   = BigEndianBinaryReader.BufferToUint32(_saveData, offset + 0xDC),
-
+            BadgeVariants = App.Services.GetRequiredService<IWhWzDataSingletonService>().GetBadges(friendCode),
             // Region is often found near offset 0x23308 + 0x3802 in RKGD. This code is a partial guess.
             // In practice, region might be read differently depending on your rksys layout.
             RegionId = BigEndianBinaryReader.BufferToUint16(_saveData, 0x23308 + 0x3802) / 4096,
@@ -231,15 +234,17 @@ public class GameDataLoader : RepeatedTaskManager
             var currentOffset = friendOffset + i * FriendDataSize;
             if (!CheckMiiData(currentOffset + 0x1A)) continue;
 
+            var friendCode = FriendCodeGenerator.GetFriendCode(_saveData, currentOffset + 4);
             var friend = new GameDataFriend
             {
                 Vr          = BigEndianBinaryReader.BufferToUint16(_saveData, currentOffset + 0x16),
                 Br          = BigEndianBinaryReader.BufferToUint16(_saveData, currentOffset + 0x18),
-                FriendCode  = FriendCodeGenerator.GetFriendCode(_saveData, currentOffset + 4),
+                FriendCode  = friendCode,
                 Wins        = BigEndianBinaryReader.BufferToUint16(_saveData, currentOffset + 0x14),
                 Losses      = BigEndianBinaryReader.BufferToUint16(_saveData, currentOffset + 0x12),
                 CountryCode = _saveData[currentOffset + 0x68],
                 RegionId    = _saveData[currentOffset + 0x69],
+                BadgeVariants = App.Services.GetRequiredService<IWhWzDataSingletonService>().GetBadges(friendCode),
 
                 MiiData = new MiiData
                 {

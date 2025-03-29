@@ -7,6 +7,13 @@ public static class Endpoints
     /// </summary>
     public const string RwfcBaseAddress = "http://rwfc.net";
 
+    /// <summary>
+    /// The base address for accessing the WheelWizard data (data that we control)
+    /// </summary>
+    public const string WhWzDataBaseAddress = "https://raw.githubusercontent.com/TeamWheelWizard/WheelWizard-Data/main";
+    
+    // TODO: Refactor all the URLs seen below
+
     // Retro Rewind
     public const string RRUrl = "http://update.rwfc.net:8000/";
     public const string RRZipUrl = RRUrl + "RetroRewind/zip/RetroRewind.zip";
@@ -14,10 +21,10 @@ public static class Endpoints
     public const string RRVersionDeleteUrl = RRUrl + "RetroRewind/RetroRewindDelete.txt";
     public const string RRDiscordUrl = "https://discord.gg/yH3ReN8EhQ";
 
-    // Wheel Wizard
-    public const string WhWzDataUrl = "https://raw.githubusercontent.com/TeamWheelWizard/WheelWizard-Data/main/";
-    public const string WhWzStatusUrl = WhWzDataUrl + "status.json";
-    public const string WhWzBadgesUrl = WhWzDataUrl + "badges.json";
+    public const string WhWzLatestReleasesUrl = "https://api.github.com/repos/TeamWheelWizard/WheelWizard/releases/latest";
+
+    //search depth 3 releases
+    public const string WhWzReleasesUrl = "https://api.github.com/repos/TeamWheelWizard/WheelWizard/releases?per_page=3";
 
     // Branding Urls
     public const string WhWzDiscordUrl = "https://discord.gg/vZ7T2wJnsq";

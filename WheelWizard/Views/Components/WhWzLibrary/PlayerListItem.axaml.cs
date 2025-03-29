@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using WheelWizard.Models.MiiImages;
-using WheelWizard.Services;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Components;
 
@@ -62,16 +62,19 @@ public class PlayerListItem : TemplatedControl
     {
         base.OnApplyTemplate(e);
         var container = e.NameScope.Find<StackPanel>("PART_BadgeContainer");
-        if (container != null)
+        if (container == null) 
+            return;
+
+        container.Children.Clear();
+        var badges = App.Services
+            .GetRequiredService<IWhWzDataSingletonService>()
+            .GetBadges(FriendCode)
+            .Select(variant => new Badge { Variant = variant });
+        foreach (var badge in badges)
         {
-            container.Children.Clear();
-            var badges = BadgeManager.Instance.GetBadges(FriendCode);
-            foreach (var badge in badges)
-            {
-                badge.Height = 30;
-                badge.Width = 30;
-                container.Children.Add(badge);
-            }
+            badge.Height = 30;
+            badge.Width = 30;
+            container.Children.Add(badge);
         }
     }
 }

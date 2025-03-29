@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using WheelWizard.Helpers;
-using WheelWizard.Services;
 using WheelWizard.Services.Settings;
 using WheelWizard.Views.Popups.Generic;
 

@@ -3,6 +3,7 @@ using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Services.LiveData;
 
@@ -19,6 +20,7 @@ public class RRLiveRooms : RepeatedTaskManager
 
     protected override async Task ExecuteTaskAsync()
     {
+        var whWzService = App.Services.GetRequiredService<IWhWzDataSingletonService>();
         var roomsService = App.Services.GetRequiredService<IRrRoomsSingletonService>();
 
         var roomsResult = await roomsService.GetRoomsAsync();
@@ -50,6 +52,7 @@ public class RRLiveRooms : RepeatedTaskManager
                     Fc = p.Value.Fc,
                     Ev = p.Value.Ev,
                     Eb = p.Value.Eb,
+                    BadgeVariants = whWzService.GetBadges(p.Value.Fc),
                     Mii = p.Value.Mii.Select(mii => new Mii
                     {
                         Name = mii.Name,

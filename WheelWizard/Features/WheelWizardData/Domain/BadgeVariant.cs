@@ -1,4 +1,4 @@
-﻿namespace WheelWizard.Models.Enums;
+﻿namespace WheelWizard.WheelWizardData.Domain;
 
 public enum BadgeVariant
 {
@@ -11,4 +11,3 @@ public enum BadgeVariant
     SilverWinner,
     BronzeWinner
 }
-

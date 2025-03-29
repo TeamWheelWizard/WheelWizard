@@ -13,6 +13,7 @@ using WheelWizard.Services.WiiManagement.SaveData;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
+using WheelWizard.WheelWizardData.Domain;
 
 namespace WheelWizard.Views;
 
@@ -47,7 +48,10 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
         }
 
         NavigateToPage(new HomePage());
-        InitializeManagers();
+        
+        WhWzStatusManager.Instance.Subscribe(this);
+        RRLiveRooms.Instance.Subscribe(this);
+        GameDataLoader.Instance.Subscribe(this);
 #if DEBUG
         KitchenSinkButton.IsVisible = true;
 #endif
@@ -57,7 +61,6 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     {
         _brandingService = App.Services.GetRequiredService<IBrandingSingletonService>();
         Title = _brandingService.Branding.DisplayName;
-        ViewUtils.OnLoaded();
     }
     protected override void OnLoaded(RoutedEventArgs e)
     {
@@ -76,16 +79,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
         CompleteGrid.Margin = new Thickness(marginXCorrection, marginYCorrection);
         //ExtendClientAreaToDecorationsHint = scaleFactor <= 1.2f;
     }
-
-    private void InitializeManagers()
-    {
-        LiveAlertsManager.Instance.Subscribe(this);
-        LiveAlertsManager.Instance.Start(); // Temporary code, should be moved to a more appropriate location
-        RRLiveRooms.Instance.Subscribe(this);
-        RRLiveRooms.Instance.Start(); // Temporary code, should be moved to a more appropriate location
-        GameDataLoader.Instance.Subscribe(this);
-        GameDataLoader.Instance.Start(); // Temporary code, should be moved to a more appropriate location
-    }
+    
 
     public void NavigateToPage(UserControl page)
     {
@@ -112,7 +106,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
             case RRLiveRooms liveRooms:
                 UpdatePlayerAndRoomCount(liveRooms);
                 break;
-            case LiveAlertsManager liveAlerts:
+            case WhWzStatusManager liveAlerts:
                 UpdateLiveAlert(liveAlerts);
                 break;
         }
@@ -149,15 +143,15 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
         };
     }
 
-    private void UpdateLiveAlert(LiveAlertsManager sender)
+    private void UpdateLiveAlert(WhWzStatusManager sender)
     {
-        var visible = sender.Status != null && sender.Status.StatusVariant != LiveAlertsManager.LiveStatusVariant.None;
+        var visible = sender.Status != null && sender.Status.Variant != WhWzStatusVariant.None;
         LiveStatusBorder.IsVisible = visible;
         if (!visible) return;
 
         ToolTip.SetTip(LiveStatusBorder, sender.Status!.Message);
         LiveStatusBorder.Classes.Clear();
-        LiveStatusBorder.Classes.Add(sender.Status!.StatusVariant.ToString());
+        LiveStatusBorder.Classes.Add(sender.Status!.Variant.ToString());
     }
 
     private void TopBar_PointerPressed(object? sender, PointerPressedEventArgs e)

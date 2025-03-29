@@ -1,16 +1,25 @@
 ﻿using Avalonia;
 using Avalonia.Controls.Primitives;
-using WheelWizard.Models.Enums;
-using WheelWizard.Services;
+using WheelWizard.WheelWizardData.Domain;
 
 namespace WheelWizard.Views.Components;
 
 public class Badge : TemplatedControl
 {
-
+    public static readonly Dictionary<BadgeVariant, string> BadgeToolTip = new()
+    {
+        { BadgeVariant.None, "This is not a badge" },
+        { BadgeVariant.WhWzDev, "Wheel Wizard Developer (hiii!)" },
+        { BadgeVariant.RrDev, "Retro Rewind Developer" },
+        { BadgeVariant.Translator, "Translator" },
+        { BadgeVariant.TranslatorLead, "Translator Lead" },
+        { BadgeVariant.GoldWinner, "This is an award winning player" },
+        { BadgeVariant.SilverWinner, "This is an award winning player" },
+        { BadgeVariant.BronzeWinner, "This is an award winning player" },
+    };
+    
     public static readonly StyledProperty<string> HoverTipProperty =
-        AvaloniaProperty.Register<Badge, string>(nameof(HoverTip), 
-            BadgeManager.Instance.BadgeToolTip[BadgeVariant.None]);
+        AvaloniaProperty.Register<Badge, string>(nameof(HoverTip), BadgeToolTip[BadgeVariant.None]);
     public string HoverTip
     {
         get => GetValue(HoverTipProperty);
@@ -35,7 +44,7 @@ public class Badge : TemplatedControl
             Classes.Remove(enumType.ToString());
         }
         Classes.Add(variant.ToString());
-        HoverTip = BadgeManager.Instance.BadgeToolTip[variant];
+        HoverTip = BadgeToolTip[variant];
     }
     
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
