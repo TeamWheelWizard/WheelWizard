@@ -7,20 +7,20 @@
 
     <Application.Resources>
         <ResourceDictionary>
-            <FontFamily x:Key="DefaultFont">Arial, avares://WheelWizard/Resources/Fonts/ctmkf.ttf#CTMKF</FontFamily>
-            
+            <FontFamily x:Key="DefaultFont">avares://WheelWizard/Resources/Fonts/NotoSans-Regular.ttf#Noto Sans, avares://WheelWizard/Resources/Fonts/ctmkf.ttf#CTMKF</FontFamily>
+
             <!-- CONSTANTS -->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="Styles/Resources/Constants.axaml"/>
                 <ResourceInclude Source="Styles/Resources/Icons.axaml"/>
             </ResourceDictionary.MergedDictionaries>
-            
+
             <!-- CONVERTERS -->
             <converters:IsEqualToConverter x:Key="IsEqualTo"/>
         </ResourceDictionary>
     </Application.Resources>
 
-             
+
     <Application.Styles>
         <FluentTheme />
         <!-- STYLES -->
@@ -40,7 +40,7 @@
         <StyleInclude Source="Components/StandardLibrary/FormFieldLabel.axaml"/>
         <StyleInclude Source="Components/StandardLibrary/LoadingIcon.axaml"/>
         <StyleInclude Source="Components/StandardLibrary/SidebarRadioButton.axaml"/>
-        
+
         <!-- PAGE SPECIFIC COMPONENTS -->
         <StyleInclude Source="Components/WhWzLibrary/ModBrowserListItem.axaml"/>
         <StyleInclude Source="Components/WhWzLibrary/DetailedProfileBox.axaml"/>
