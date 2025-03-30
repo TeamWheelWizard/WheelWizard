@@ -7,7 +7,7 @@ public static class InternalMiiManager
     private static readonly string WiiDbFile = PathManager.WiiDbFile;
 
     private const int MiiLength = 74; // Each Mii block is 74 bytes
-    private static readonly byte[] emptyMii = new byte[MiiLength];
+    private static readonly byte[] EmptyMii = new byte[MiiLength];
 
     /// <summary>
     /// Reads the entire RFL_DB.dat and returns up to 100 Mii blocks (74 bytes each).
@@ -30,7 +30,7 @@ public static class InternalMiiManager
             var bytesRead = memoryStream.Read(miiData, 0, MiiLength);
             if (bytesRead < MiiLength)
                 break;
-            miis.Add(miiData.SequenceEqual(emptyMii) ? new byte[MiiLength] : miiData);
+            miis.Add(miiData.SequenceEqual(EmptyMii) ? new byte[MiiLength] : miiData);
         }
         return miis;
     }
@@ -50,13 +50,13 @@ public static class InternalMiiManager
         ms.Seek(0x4, SeekOrigin.Begin);
         for (var i = 0; i < 100; i++)
         {
-            var block = i < allMiis.Count ? allMiis[i] : emptyMii;
+            var block = i < allMiis.Count ? allMiis[i] : EmptyMii;
             ms.Write(block, 0, MiiLength);
         }
         const int crcOffset = 0x1F1DE;
         if (dbFile.Length >= crcOffset + 2)
         {
-            var crc = CalculateCRC16(dbFile, 0, crcOffset);
+            var crc = CalculateCrc16(dbFile, 0, crcOffset);
             dbFile[crcOffset]     = (byte)(crc >> 8);
             dbFile[crcOffset + 1] = (byte)(crc & 0xFF);
         }
@@ -69,7 +69,7 @@ public static class InternalMiiManager
     /// </summary>
     public static byte[] GetMiiDataByClientId(uint clientId)
     {
-        if (clientId == 0) return Array.Empty<byte>();
+        if (clientId == 0) return [];
 
         var allMiis = GetAllMiiData();
         foreach (var block in allMiis)
@@ -81,7 +81,7 @@ public static class InternalMiiManager
             if (thisMiiId == clientId)
                 return block;
         }
-        return Array.Empty<byte>();
+        return [];
     }
     
     public static bool UpdateMiiName(uint clientId, string newName)
@@ -137,15 +137,15 @@ public static class InternalMiiManager
     {
         try
         {
-            return !File.Exists(WiiDbFile) ? Array.Empty<byte>() : File.ReadAllBytes(WiiDbFile);
+            return !File.Exists(WiiDbFile) ? [] : File.ReadAllBytes(WiiDbFile);
         }
         catch
         {
-            return Array.Empty<byte>();
+            return [];
         }
     }
     
-    private static ushort CalculateCRC16(byte[] data, int offset, int length)
+    private static ushort CalculateCrc16(byte[] data, int offset, int length)
     {
         const ushort polynomial = 0x1021;
         ushort crc = 0x0000;

@@ -24,7 +24,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IRep
         }
     }
 
-    private readonly ObservableCollection<RrPlayer> _playersList = new();
+    private readonly ObservableCollection<RrPlayer> _playersList = [];
 
     public ObservableCollection<RrPlayer> PlayersList
     {
@@ -52,13 +52,13 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IRep
 
         PlayersList = new(Room.Players.Values);
 
-        RRLiveRooms.Instance.Subscribe(this);
+        RrLiveRooms.Instance.Subscribe(this);
         Unloaded += RoomsDetailPage_Unloaded;
     }
 
     public void OnUpdate(RepeatedTaskManager sender)
     {
-        if (sender is not RRLiveRooms liveRooms) return;
+        if (sender is not RrLiveRooms liveRooms) return;
 
         var room = liveRooms.CurrentRooms.Find(r => r.Id == Room.Id);
 
@@ -94,7 +94,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IRep
 
     private void RoomsDetailPage_Unloaded(object sender, RoutedEventArgs e)
     {
-        RRLiveRooms.Instance.Unsubscribe(this);
+        RrLiveRooms.Instance.Unsubscribe(this);
     }
 
     private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)

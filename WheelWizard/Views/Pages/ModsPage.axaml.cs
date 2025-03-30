@@ -101,7 +101,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
             return;
         }
 
-        if (selectedMod.ModID == -1)
+        if (selectedMod.ModId == -1)
         {
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Warning)
@@ -112,7 +112,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         }
 
         var modPopup = new ModIndependentWindow();
-        modPopup.LoadModAsync(selectedMod.ModID);
+        modPopup.LoadModAsync(selectedMod.ModId);
         modPopup.ShowDialog();
     }
 

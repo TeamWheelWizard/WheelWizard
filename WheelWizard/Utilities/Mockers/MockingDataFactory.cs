@@ -1,10 +1,10 @@
 ﻿namespace WheelWizard.Utilities.Mockers;
 
-public abstract class MockingDataFactory<T, U> where U: MockingDataFactory<T,U>, new()
+public abstract class MockingDataFactory<T, TU> where TU: MockingDataFactory<T,TU>, new()
 {
     public static T StaticSingle => Instance.Create();
     
-    public static U Instance { get; } = new();
+    public static TU Instance { get; } = new();
     public abstract T Create(int? seed = null);
 
     protected virtual string DictionaryKeyGenerator(T value) => value.ToString();

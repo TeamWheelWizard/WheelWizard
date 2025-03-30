@@ -12,11 +12,11 @@ public abstract class BaseWindow : Window
     protected abstract Control InteractionOverlay { get; } // Just the visual part of the interaction
     protected abstract Control InteractionContent { get; } // The content that will be disabled when the overlay is shown
     
-    protected bool AllowParentInteraction = false;
+    protected bool _allowParentInteraction = false;
 
     protected void AddLayer()
     {
-        if (!AllowParentInteraction || WindowLayers.Count == 0)
+        if (!_allowParentInteraction || WindowLayers.Count == 0)
         {
             _currentLayer = new(this);
             if(WindowLayers.Count != 0)

@@ -54,13 +54,13 @@ public static class ViewUtils
             // someone is refreshing the window a lot (happens when changing the language e.g.
             // So they would have to change the language like 1000 of times in a row)
             WhWzStatusManager.Instance.Unsubscribe(oldListener);
-            RRLiveRooms.Instance.Unsubscribe(oldListener);
+            RrLiveRooms.Instance.Unsubscribe(oldListener);
             GameDataLoader.Instance.Unsubscribe(oldListener);
         }
      
         newWindow.Show();
         oldWindow.Close();
-        newWindow.UpdatePlayerAndRoomCount(RRLiveRooms.Instance);
+        newWindow.UpdatePlayerAndRoomCount(RrLiveRooms.Instance);
     }
 
     public static T? FindParent<T>(object? child, int maxSearchDepth = 10)

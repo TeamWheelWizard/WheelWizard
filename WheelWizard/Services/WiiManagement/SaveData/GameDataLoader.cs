@@ -87,7 +87,7 @@ public class GameDataLoader : RepeatedTaskManager
     /// </summary>
     public void RefreshOnlineStatus()
     {
-        var currentRooms = RRLiveRooms.Instance.CurrentRooms;
+        var currentRooms = RrLiveRooms.Instance.CurrentRooms;
         var onlinePlayers = currentRooms.SelectMany(room => room.Players.Values).ToList();
         foreach (var user in GameData.Users)
         {
@@ -145,7 +145,7 @@ public class GameDataLoader : RepeatedTaskManager
             Br = 5000,
             TotalRaceCount = 0,
             TotalWinCount = 0,
-            Friends = new(),
+            Friends = [],
             RegionId = 10, // 10 => “unknown”
             IsOnline = false
         };
@@ -288,7 +288,7 @@ public class GameDataLoader : RepeatedTaskManager
             if (currentRegion == MarioKartWiiEnums.Regions.None)
             {
                 // Double check if there's at least one valid region
-                var validRegions = RRRegionManager.GetValidRegions();
+                var validRegions = RrRegionManager.GetValidRegions();
                 if (validRegions.First() != MarioKartWiiEnums.Regions.None)
                 {
                     currentRegion = validRegions.First();
@@ -300,7 +300,7 @@ public class GameDataLoader : RepeatedTaskManager
                 }
             }
 
-            var saveFileFolder = Path.Combine(TryCreateSaveFolderPath, RRRegionManager.ConvertRegionToGameId(currentRegion));
+            var saveFileFolder = Path.Combine(TryCreateSaveFolderPath, RrRegionManager.ConvertRegionToGameId(currentRegion));
             var saveFile = Directory.GetFiles(saveFileFolder, "rksys.dat", SearchOption.TopDirectoryOnly);
             return saveFile.Length == 0 ? null : File.ReadAllBytes(saveFile[0]);
         }
@@ -317,7 +317,7 @@ public class GameDataLoader : RepeatedTaskManager
     /// </summary>
     public static uint ComputeCrc32(byte[] data, int offset, int length)
     {
-        const uint POLY = 0xEDB88320;
+        const uint poly = 0xEDB88320;
         var crc = 0xFFFFFFFF;
 
         for (var i = offset; i < offset + length; i++)
@@ -327,7 +327,7 @@ public class GameDataLoader : RepeatedTaskManager
             for (var j = 0; j < 8; j++)
             {
                 if ((crc & 1) != 0)
-                    crc = (crc >> 1) ^ POLY;
+                    crc = (crc >> 1) ^ poly;
                 else
                     crc >>= 1;
             }
@@ -448,7 +448,7 @@ public class GameDataLoader : RepeatedTaskManager
         if (_saveData == null || string.IsNullOrWhiteSpace(TryCreateSaveFolderPath)) return false;
         FixRksysCrc(_saveData);
         var currentRegion = (MarioKartWiiEnums.Regions)SettingsManager.RR_REGION.Get();
-        var saveFolder = Path.Combine(TryCreateSaveFolderPath, RRRegionManager.ConvertRegionToGameId(currentRegion));
+        var saveFolder = Path.Combine(TryCreateSaveFolderPath, RrRegionManager.ConvertRegionToGameId(currentRegion));
 
         try
         {

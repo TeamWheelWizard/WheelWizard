@@ -7,16 +7,16 @@ public static class DownloadHelper
     private const int MaxRetries = 5;
     private const int TimeoutInSeconds = 30; // Adjust as needed
 
-    public static async Task<string> DownloadToLocationAsync(string url, string filePath, string windowTitle, string extraText = "", bool ForceGivenFilePath = false)
+    public static async Task<string> DownloadToLocationAsync(string url, string filePath, string windowTitle, string extraText = "", bool forceGivenFilePath = false)
     {
         var progressWindow = new ProgressWindow(windowTitle).SetExtraText(extraText);
         progressWindow.Show();
-        var toLocationAsync = await DownloadToLocationAsync(url, filePath, progressWindow, ForceGivenFilePath);
+        var toLocationAsync = await DownloadToLocationAsync(url, filePath, progressWindow, forceGivenFilePath);
         progressWindow.Close();
         return toLocationAsync;
     }
 
-    public static async Task<string> DownloadToLocationAsync(string url, string tempFile, ProgressWindow progressPopupWindow, bool ForceGivenFilePath = false)
+    public static async Task<string> DownloadToLocationAsync(string url, string tempFile, ProgressWindow progressPopupWindow, bool forceGivenFilePath = false)
 {
     var directory = Path.GetDirectoryName(tempFile)!;
     if (!Directory.Exists(directory))
@@ -24,7 +24,7 @@ public static class DownloadHelper
 
     var attempt = 0;
     var success = false;
-    string resolvedFilePath = tempFile;
+    var resolvedFilePath = tempFile;
 
     while (attempt < MaxRetries && !success)
     {
@@ -41,7 +41,7 @@ public static class DownloadHelper
                 return null;
             }
 
-            if (!ForceGivenFilePath)
+            if (!forceGivenFilePath)
             {
                 var finalUrl = response.RequestMessage.RequestUri.ToString();
 

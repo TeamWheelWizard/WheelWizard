@@ -14,9 +14,9 @@ public static class SettingValues
     public const string NoName = "no name";
     public const string NoLicense = "no license";
     
-    public static readonly double[] WindowScales = { 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2 };
+    public static readonly double[] WindowScales = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2];
     
-    public static readonly Dictionary<string, string> GFXRenderers = new() //Display name, value
+    public static readonly Dictionary<string, string> GfxRenderers = new() //Display name, value
     {
 #if WINDOWS
     { "DirectX 11 (Default)", "D3D11" },

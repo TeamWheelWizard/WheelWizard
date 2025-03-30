@@ -55,7 +55,7 @@ public static class LinuxDolphinInstaller
                 return;
 
             var match = Regex.Match(e.Data, @"(\d+)%");
-            if (match.Success && int.TryParse(match.Groups[1].Value, out int percent))
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var percent))
             {
                 progress?.Report(percent);
             }
@@ -67,7 +67,7 @@ public static class LinuxDolphinInstaller
                 return;
 
             var match = Regex.Match(e.Data, @"(\d+)%");
-            if (match.Success && int.TryParse(match.Groups[1].Value, out int percent))
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var percent))
             {
                 progress?.Report(percent);
             }

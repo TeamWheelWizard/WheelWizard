@@ -89,7 +89,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
             newFilePath,
             Phrases.PopupText_UpdateWhWz,
             Phrases.PopupText_LatestWhWzGithub,
-            ForceGivenFilePath: true);
+            forceGivenFilePath: true);
 
         // Wait briefly to ensure the file is saved on disk.
         await Task.Delay(200);

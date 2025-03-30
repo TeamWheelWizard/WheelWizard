@@ -11,7 +11,7 @@ public class Mod : INotifyPropertyChanged
     private bool _isEnabled;
     private string _title;
     private string _author;
-    private int _modID;
+    private int _modId;
     private int _priority; // New property for mod priority
 
     private bool IsLowest => _priority == ModManager.Instance.GetLowestActivePriority();
@@ -69,16 +69,16 @@ public class Mod : INotifyPropertyChanged
         }
     }
 
-    public int ModID
+    public int ModId
     {
-        get => _modID;
+        get => _modId;
         set
         {
-            if (_modID == value)
+            if (_modId == value)
                 return;
 
-            _modID = value;
-            OnPropertyChanged(nameof(ModID));
+            _modId = value;
+            OnPropertyChanged(nameof(ModId));
         }
     }
 
@@ -131,7 +131,7 @@ public class Mod : INotifyPropertyChanged
         {
             Title = data["Mod"]["Name"],
             Author = data["Mod"]["Author"],
-            ModID = int.TryParse(data["Mod"]["ModID"], out var id) ? id : -1,
+            ModId = int.TryParse(data["Mod"]["ModID"], out var id) ? id : -1,
             IsEnabled = bool.TryParse(data["Mod"]["IsEnabled"], out var enabled) ? enabled : true,
             Priority = int.TryParse(data["Mod"]["Priority"], out var priority) ? priority : 0
         };
@@ -148,7 +148,7 @@ public class Mod : INotifyPropertyChanged
         var data = new IniData();
         data["Mod"]["Name"] = this.Title;
         data["Mod"]["Author"] = this.Author;
-        data["Mod"]["ModID"] = this.ModID.ToString();
+        data["Mod"]["ModID"] = this.ModId.ToString();
         data["Mod"]["IsEnabled"] = this.IsEnabled.ToString();
         data["Mod"]["Priority"] = this.Priority.ToString();
 

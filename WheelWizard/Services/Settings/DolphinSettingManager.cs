@@ -7,7 +7,7 @@ public class DolphinSettingManager
 {
     private static string ConfigFolderPath(string fileName) => Path.Combine(PathManager.ConfigFolderPath, fileName);
     private bool _loaded;
-    private readonly List<DolphinSetting> _settings = new();
+    private readonly List<DolphinSetting> _settings = [];
     
     public static DolphinSettingManager Instance { get; } = new();
     private DolphinSettingManager() { }

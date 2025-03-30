@@ -7,7 +7,7 @@ namespace WheelWizard.Services.Installation;
 
 public static class RetroRewindUpdater
 {
-    public static async Task<bool> IsRRUpToDate(string currentVersion)
+    public static async Task<bool> IsRrUpToDate(string currentVersion)
     {
         var latestVersion = await GetLatestVersionString();
         return currentVersion.Trim() == latestVersion.Trim();
@@ -15,19 +15,19 @@ public static class RetroRewindUpdater
 
     private static async Task<string> GetLatestVersionString()
     {
-        var response = await HttpClientHelper.GetAsync<string>(Endpoints.RRVersionUrl);
-        if (response.Succeeded && response.Content != null)
+        var response = await HttpClientHelper.GetAsync<string>(Endpoints.RrVersionUrl);
+        if (response is { Succeeded: true, Content: not null })
             return response.Content.Split('\n').Last().Split(' ')[0];
         new YesNoWindow().SetMainText(Phrases.PopupText_FailCheckUpdates).AwaitAnswer();
         return "Failed to check for updates";
     }
 
-    public static async Task<bool> UpdateRR()
+    public static async Task<bool> UpdateRr()
     {
         try
         {
-            var currentVersion = RetroRewindInstaller.CurrentRRVersion();
-            if (await IsRRUpToDate(currentVersion))
+            var currentVersion = RetroRewindInstaller.CurrentRrVersion();
+            if (await IsRrUpToDate(currentVersion))
             {
                 await new MessageBoxWindow()
                     .SetMessageType(MessageBoxWindow.MessageType.Message)
@@ -149,12 +149,12 @@ public static class RetroRewindUpdater
         var deleteList = new List<(string Version, string Path)>();
 
         using var httpClient = new HttpClient();
-        var deleteListText = await httpClient.GetStringAsync(Endpoints.RRVersionDeleteUrl);
-        var lines = deleteListText.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var deleteListText = await httpClient.GetStringAsync(Endpoints.RrVersionDeleteUrl);
+        var lines = deleteListText.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
-            var parts = line.Split(new[] { ' ' }, 2);
+            var parts = line.Split([' '], 2);
             if (parts.Length < 2) continue;
             deleteList.Add((parts[0].Trim(), parts[1].Trim()));
         }
@@ -173,12 +173,12 @@ public static class RetroRewindUpdater
         var versions = new List<(string Version, string Url, string Path, string Description)>();
 
         using var httpClient = new HttpClient();
-        var allVersionsText = await httpClient.GetStringAsync(Endpoints.RRVersionUrl);
-        var lines = allVersionsText.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var allVersionsText = await httpClient.GetStringAsync(Endpoints.RrVersionUrl);
+        var lines = allVersionsText.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
-            var parts = line.Split(new[] { ' ' }, 4);
+            var parts = line.Split([' '], 4);
             if (parts.Length < 4) continue;
             versions.Add((parts[0].Trim(), parts[1].Trim(), parts[2].Trim(), parts[3].Trim()));
         }

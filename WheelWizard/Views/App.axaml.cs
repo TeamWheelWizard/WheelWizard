@@ -72,7 +72,7 @@ public class App : Application
     private static void InitializeManagers()
     {
         WhWzStatusManager.Instance.Start();
-        RRLiveRooms.Instance.Start();
+        RrLiveRooms.Instance.Start();
         GameDataLoader.Instance.Start();
     }
 

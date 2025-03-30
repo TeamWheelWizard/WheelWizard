@@ -8,8 +8,8 @@ namespace WheelWizard.Views.Components.MiiImages;
 
 public class MiiImageLoader : BaseMiiImage
 {
-    private static bool _initializedRandomRotation;
-    private static bool _randomRotation;
+    private static bool s_initializedRandomRotation;
+    private static bool s_randomRotation;
     
     public static readonly StyledProperty<IBrush> LoadingColorProperty =
         AvaloniaProperty.Register<MiiImageLoader, IBrush>(nameof(LoadingColor));
@@ -52,13 +52,13 @@ public class MiiImageLoader : BaseMiiImage
         var miiImageContainer = e.NameScope.Find<Grid>("MiiImageContainer");
         if (miiImageContainer == null) return;
 
-        if (!_initializedRandomRotation)
+        if (!s_initializedRandomRotation)
         {
-            _initializedRandomRotation = true;
+            s_initializedRandomRotation = true;
            // check if today is april fools
-           _randomRotation = (DateTime.Now.Month == 4) && (DateTime.Now.Day == 1);
+           s_randomRotation = (DateTime.Now.Month == 4) && (DateTime.Now.Day == 1);
         }
-        if (_randomRotation)
+        if (s_randomRotation)
         {
             // This will only happen as a joke, e.g. on april fools.
             miiImageContainer.RenderTransform = ConstraintRotationToVertical ? 

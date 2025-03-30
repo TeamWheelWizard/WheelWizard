@@ -16,7 +16,7 @@ namespace WheelWizard.Views.Pages;
 
 public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 {
-    private GameDataUser? currentPlayer;
+    private GameDataUser? _currentPlayer;
     private Mii? _currentMii;
 
     public Mii? CurrentMii
@@ -81,7 +81,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private void PopulateRegions()
     {
-        var validRegions = RRRegionManager.GetValidRegions();
+        var validRegions = RrRegionManager.GetValidRegions();
         var currentRegion = (MarioKartWiiEnums.Regions)SettingsManager.RR_REGION.Get();
         foreach (var region in Enum.GetValues<MarioKartWiiEnums.Regions>())
         {
@@ -116,25 +116,25 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
     private void UpdatePage()
     {
         CurrentUserProfile.IsChecked = FocussedUser == _currentUserIndex;
-        if (currentPlayer != null) currentPlayer.PropertyChanged -= OnMiiNameChanged;
+        if (_currentPlayer != null) _currentPlayer.PropertyChanged -= OnMiiNameChanged;
 
-        currentPlayer = GameDataLoader.Instance.GetUserData(_currentUserIndex);
-        CurrentUserProfile.FriendCode = currentPlayer.FriendCode;
-        CurrentUserProfile.UserName = currentPlayer.MiiName;
-        CurrentUserProfile.IsOnline = currentPlayer.IsOnline;
-        CurrentUserProfile.Vr = currentPlayer.Vr.ToString();
-        CurrentUserProfile.Br = currentPlayer.Br.ToString();
-        CurrentMii = currentPlayer.MiiData?.Mii;
+        _currentPlayer = GameDataLoader.Instance.GetUserData(_currentUserIndex);
+        CurrentUserProfile.FriendCode = _currentPlayer.FriendCode;
+        CurrentUserProfile.UserName = _currentPlayer.MiiName;
+        CurrentUserProfile.IsOnline = _currentPlayer.IsOnline;
+        CurrentUserProfile.Vr = _currentPlayer.Vr.ToString();
+        CurrentUserProfile.Br = _currentPlayer.Br.ToString();
+        CurrentMii = _currentPlayer.MiiData?.Mii;
 
-        currentPlayer.PropertyChanged += OnMiiNameChanged;
-        CurrentUserProfile.TotalRaces = currentPlayer.TotalRaceCount.ToString();
-        CurrentUserProfile.TotalWon = currentPlayer.TotalWinCount.ToString();
+        _currentPlayer.PropertyChanged += OnMiiNameChanged;
+        CurrentUserProfile.TotalRaces = _currentPlayer.TotalRaceCount.ToString();
+        CurrentUserProfile.TotalWon = _currentPlayer.TotalWinCount.ToString();
     }
 
     private void OnMiiNameChanged(object? sender, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName != nameof(currentPlayer.MiiName)) return;
-        CurrentUserProfile.UserName = currentPlayer.MiiName;
+        if (args.PropertyName != nameof(_currentPlayer.MiiName)) return;
+        CurrentUserProfile.UserName = _currentPlayer.MiiName;
     }
 
     private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) => SetUserAsPrimary();
@@ -173,7 +173,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private void ViewRoom_OnClick(string friendCode)
     {
-        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        foreach (var room in RrLiveRooms.Instance.CurrentRooms)
         {
             if (room.Players.All(player => player.Value.Fc != friendCode))
                 continue;

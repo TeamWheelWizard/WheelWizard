@@ -16,9 +16,9 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IRepeate
     // Made this static intentionally.
     // I personally don't think its worth saving it as a setting.
     // Though I do see the use in saving it when using the app so you can swap pages in the meantime
-    private static ListOrderCondition CurrentOrder = ListOrderCondition.IS_ONLINE;
+    private static ListOrderCondition s_currentOrder = ListOrderCondition.IS_ONLINE;
 
-    private ObservableCollection<GameDataFriend> _friendlist = new();
+    private ObservableCollection<GameDataFriend> _friendlist = [];
 
     public ObservableCollection<GameDataFriend> FriendList
     {
@@ -77,7 +77,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IRepeate
 
     private static List<GameDataFriend> GetSortedPlayerList()
     {
-        Func<GameDataFriend, object> orderMethod = CurrentOrder switch
+        Func<GameDataFriend, object> orderMethod = s_currentOrder switch
         {
             ListOrderCondition.VR => f => f.Vr,
             ListOrderCondition.BR => f => f.Br,
@@ -107,12 +107,12 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IRepeate
             SortByDropdown.Items.Add(name);
         }
 
-        SortByDropdown.SelectedIndex = (int)CurrentOrder;
+        SortByDropdown.SelectedIndex = (int)s_currentOrder;
     }
 
     private void SortByDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        CurrentOrder = (ListOrderCondition)SortByDropdown.SelectedIndex;
+        s_currentOrder = (ListOrderCondition)SortByDropdown.SelectedIndex;
         UpdateFriendList();
     }
 
@@ -141,7 +141,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IRepeate
 
     private void ViewRoom_OnClick(string friendCode)
     {
-        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        foreach (var room in RrLiveRooms.Instance.CurrentRooms)
         {
             if (room.Players.All(player => player.Value.Fc != friendCode))
                 continue;

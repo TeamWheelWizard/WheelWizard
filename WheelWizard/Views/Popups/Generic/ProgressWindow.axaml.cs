@@ -7,10 +7,10 @@ namespace WheelWizard.Views.Popups.Generic;
 
 public partial class ProgressWindow : PopupContent
 {
-    private Stopwatch _stopwatch = new();
+    private readonly Stopwatch _stopwatch = new();
     private int _progress;
     private double? _totalMb;
-    private DispatcherTimer _updateTimer;
+    private readonly DispatcherTimer _updateTimer;
 
     public ProgressWindow() : this("Progress Window") { }
 

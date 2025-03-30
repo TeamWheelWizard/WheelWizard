@@ -8,7 +8,7 @@ namespace WheelWizard.Views.Components.MiiImages;
 public class MiiCarousel : BaseMiiImage
 {
     private const int CarouselInstanceCount = 8;
-    private int CurrentCarouselInstance;
+    private int _currentCarouselInstance;
     
     
     public MiiCarousel()
@@ -35,18 +35,18 @@ public class MiiCarousel : BaseMiiImage
         
         void RotateLeft(object? obj, EventArgs _)
         {
-            CurrentCarouselInstance += 1;
-            if(CurrentCarouselInstance > 0) CurrentCarouselInstance -= CarouselInstanceCount;
-            CurrentCarouselInstance %= CarouselInstanceCount;
+            _currentCarouselInstance += 1;
+            if(_currentCarouselInstance > 0) _currentCarouselInstance -= CarouselInstanceCount;
+            _currentCarouselInstance %= CarouselInstanceCount;
             if(miiImage != null)
-                miiImage.RenderTransform = new TranslateTransform(CurrentCarouselInstance * Height, 0);
+                miiImage.RenderTransform = new TranslateTransform(_currentCarouselInstance * Height, 0);
         }
         void RotateRight(object? obj, EventArgs _)
         {
-            CurrentCarouselInstance -= 1;
-            CurrentCarouselInstance %= CarouselInstanceCount;
+            _currentCarouselInstance -= 1;
+            _currentCarouselInstance %= CarouselInstanceCount;
             if(miiImage != null)
-                miiImage.RenderTransform = new TranslateTransform(CurrentCarouselInstance * Height, 0);
+                miiImage.RenderTransform = new TranslateTransform(_currentCarouselInstance * Height, 0);
         }
         
         var rotateLeft = e.NameScope.Find<Button>("RotateLeftButton");

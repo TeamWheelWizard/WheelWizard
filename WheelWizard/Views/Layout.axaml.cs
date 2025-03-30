@@ -49,7 +49,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
         NavigateToPage(new HomePage());
         
         WhWzStatusManager.Instance.Subscribe(this);
-        RRLiveRooms.Instance.Subscribe(this);
+        RrLiveRooms.Instance.Subscribe(this);
         GameDataLoader.Instance.Subscribe(this);
 #if DEBUG
         KitchenSinkButton.IsVisible = true;
@@ -102,7 +102,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     {
         switch (sender)
         {
-            case RRLiveRooms liveRooms:
+            case RrLiveRooms liveRooms:
                 UpdatePlayerAndRoomCount(liveRooms);
                 break;
             case WhWzStatusManager liveAlerts:
@@ -111,7 +111,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
         }
     }
 
-    public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
+    public void UpdatePlayerAndRoomCount(RrLiveRooms sender)
     {
         var playerCount = sender.PlayerCount;
         var roomCount = sender.RoomCount;

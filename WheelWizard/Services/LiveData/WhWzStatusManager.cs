@@ -10,8 +10,8 @@ public class WhWzStatusManager : RepeatedTaskManager
 {
     public WhWzStatus? Status { get; private set; }
     
-    private static WhWzStatusManager? _instance;
-    public static WhWzStatusManager Instance => _instance ??= new();
+    private static WhWzStatusManager? s_instance;
+    public static WhWzStatusManager Instance => s_instance ??= new();
 
     private WhWzStatusManager() : base(90) { }
 

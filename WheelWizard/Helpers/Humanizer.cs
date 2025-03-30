@@ -60,9 +60,9 @@ public static class Humanizer
 
     public static string HumanizeSeconds(int seconds) => HumanizeTimeSpan(TimeSpan.FromSeconds(seconds));
 
-    public static string GetRegionName(uint regionID)
+    public static string GetRegionName(uint regionId)
     {
-        return regionID switch
+        return regionId switch
         {
             0 => Online.Region_Japan,
             1 => Online.Region_America,

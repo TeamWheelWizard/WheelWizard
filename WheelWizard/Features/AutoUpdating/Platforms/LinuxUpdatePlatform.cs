@@ -48,7 +48,7 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
             newFilePath,
             Phrases.PopupText_UpdateWhWz,
             Phrases.PopupText_LatestWhWzGithub,
-            ForceGivenFilePath: true);
+            forceGivenFilePath: true);
 
         // Wait briefly to ensure the file is fully written.
         await Task.Delay(201);

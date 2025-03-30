@@ -7,16 +7,16 @@ using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Services.LiveData;
 
-public class RRLiveRooms : RepeatedTaskManager
+public class RrLiveRooms : RepeatedTaskManager
 {
-    public List<RrRoom> CurrentRooms { get; private set; } = new();
+    public List<RrRoom> CurrentRooms { get; private set; } = [];
     public int PlayerCount => CurrentRooms.Sum(room => room.PlayerCount);
     public int RoomCount => CurrentRooms.Count;
 
-    private static RRLiveRooms? _instance;
-    public static RRLiveRooms Instance => _instance ??= new();
+    private static RrLiveRooms? s_instance;
+    public static RrLiveRooms Instance => s_instance ??= new();
 
-    private RRLiveRooms() : base(40) { }
+    private RrLiveRooms() : base(40) { }
 
     protected override async Task ExecuteTaskAsync()
     {

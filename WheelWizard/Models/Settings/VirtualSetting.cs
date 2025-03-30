@@ -3,16 +3,16 @@ namespace WheelWizard.Models.Settings;
 public class VirtualSetting : Setting, ISettingListener
 {
     private Setting[] _dependencies;
-    private Action<object> Setter;
-    private Func<object> Getter;
+    private readonly Action<object> _setter;
+    private readonly Func<object> _getter;
     private bool _acceptsSignals = true;
     
     public VirtualSetting(Type type, Action<object> setter, Func<object> getter) 
         : base(type, "virtual", getter())
     {
-        _dependencies = Array.Empty<Setting>();
-        Setter = setter;
-        Getter = getter;
+        _dependencies = [];
+        _setter = setter;
+        _getter = getter;
     }
     
     protected override bool SetInternal(object newValue, bool skipSave = false)
@@ -25,7 +25,7 @@ public class VirtualSetting : Setting, ISettingListener
         var succeeded = false;
         if (newIsValid)
         {
-            Setter(newValue);
+            _setter(newValue);
             succeeded = true;
         }
         else
@@ -57,7 +57,7 @@ public class VirtualSetting : Setting, ISettingListener
     
     public void Recalculate()
     {
-        Value = Getter();
+        Value = _getter();
     }
     
     public void OnSettingChanged(Setting changedSetting)

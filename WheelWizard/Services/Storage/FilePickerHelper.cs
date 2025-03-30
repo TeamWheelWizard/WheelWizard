@@ -19,7 +19,7 @@ public static class FilePickerHelper
     {
         var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
         if (storageProvider == null)
-            return new();
+            return [];
 
         var options = new FilePickerOpenOptions
         {
@@ -30,7 +30,7 @@ public static class FilePickerHelper
 
         var selectedFiles = await storageProvider.MainWindow.StorageProvider.OpenFilePickerAsync(options);
 
-        return selectedFiles?.Select(file => file.Path.LocalPath).ToList() ?? new List<string>();
+        return selectedFiles?.Select(file => file.Path.LocalPath).ToList() ?? [];
     }
     
     public static async Task<string?> OpenSingleFileAsync(string title, IEnumerable<FilePickerFileType> fileTypes)
@@ -59,7 +59,7 @@ public static class FilePickerHelper
             return null;
         
         var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
-        if (topLevel?.StorageProvider == null) return new();
+        if (topLevel?.StorageProvider == null) return [];
 
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new()
         {
@@ -68,7 +68,7 @@ public static class FilePickerHelper
             FileTypeFilter = fileTypes.ToList()
         });
 
-        return files?.Select(file => file.Path.LocalPath).ToList() ?? new List<string>();
+        return files?.Select(file => file.Path.LocalPath).ToList() ?? [];
     }
     
     public static async Task<IReadOnlyList<IStorageFolder?>> SelectFolderAsync(string title, IStorageFolder? suggestedStartLocation = null)

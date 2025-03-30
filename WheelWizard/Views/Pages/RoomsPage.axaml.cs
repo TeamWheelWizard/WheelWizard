@@ -12,7 +12,7 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
 {
     private string? _searchQuery;
 
-    private readonly ObservableCollection<RrRoom> _rooms = new();
+    private readonly ObservableCollection<RrRoom> _rooms = [];
 
     public ObservableCollection<RrRoom> Rooms
     {
@@ -24,7 +24,7 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
         }
     }
 
-    private readonly ObservableCollection<RrPlayer> _players = new();
+    private readonly ObservableCollection<RrPlayer> _players = [];
 
     public ObservableCollection<RrPlayer> Players
     {
@@ -40,15 +40,15 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
     {
         InitializeComponent();
         DataContext = this;
-        RRLiveRooms.Instance.Subscribe(this);
+        RrLiveRooms.Instance.Subscribe(this);
 
-        OnUpdate(RRLiveRooms.Instance);
+        OnUpdate(RrLiveRooms.Instance);
         Unloaded += RoomsPage_Unloaded;
     }
 
     public void OnUpdate(RepeatedTaskManager sender)
     {
-        if (sender is not RRLiveRooms liveRooms) return;
+        if (sender is not RrLiveRooms liveRooms) return;
 
         Rooms.Clear();
         var count = liveRooms.RoomCount;
@@ -89,7 +89,7 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
 
     private void RoomsPage_Unloaded(object sender, RoutedEventArgs e)
     {
-        RRLiveRooms.Instance.Unsubscribe(this);
+        RrLiveRooms.Instance.Unsubscribe(this);
     }
 
     private void PlayerSearchField_OnTextChanged(object? sender, TextChangedEventArgs e)

@@ -38,7 +38,7 @@ public static class ModInstallation
                 // Backward compatibility: Load from JSON and convert to INI
                 var json = await File.ReadAllTextAsync(ConfigFilePath);
                 json = json.Trim('\0');
-                var modDataList = JsonSerializer.Deserialize<ObservableCollection<ModData>>(json) ?? new ObservableCollection<ModData>();
+                var modDataList = JsonSerializer.Deserialize<ObservableCollection<ModData>>(json) ?? [];
 
                 foreach (var modData in modDataList)
                 {
@@ -47,7 +47,7 @@ public static class ModInstallation
                         Title = modData.Title,
                         IsEnabled = modData.IsEnabled,
                         Author = "-1", 
-                        ModID = -1,     
+                        ModId = -1,     
                         Priority = 0 
                     };
 
@@ -193,7 +193,7 @@ public static class ModInstallation
     /// <summary>
     /// Installs a mod from a file. Sets Author and ModID based on parameters.
     /// </summary>
-    public static async Task InstallModFromFileAsync(string filePath, string givenModName, string author = "-1", int modID = -1)
+    public static async Task InstallModFromFileAsync(string filePath, string givenModName, string author = "-1", int modId = -1)
     {
         ProgressWindow progressWindow = null;
         try
@@ -246,7 +246,7 @@ public static class ModInstallation
                 IsEnabled = true, // Default to enabled
                 Title = givenModName,
                 Author = author,
-                ModID = modID,
+                ModId = modId,
                 Priority = priority
             };
 

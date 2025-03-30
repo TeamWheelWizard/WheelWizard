@@ -21,21 +21,41 @@ public static class RetroRewindLaunchHelper
             DisplayName = "RR",
             Riivolution = new()
             {
-                Patches = new[]
-                {
-                    new PatchConfig
+                Patches =
+                [
+                    new()
                     {
-                        Options = new[]
-                        {
-                            new OptionConfig { Choice = 1, OptionName = "Pack", SectionName = "Retro Rewind" },
-                            new OptionConfig { Choice = 2, OptionName = "My Stuff", SectionName = "Retro Rewind" },
-                            new OptionConfig { Choice = language, OptionName = "Language", SectionName = "Retro Rewind" },
-                            new OptionConfig { Choice = removeBlur ? 1 : 0, OptionName = "Remove Blur", SectionName = "Retro Rewind" }
-                        },
+                        Options =
+                        [
+                            new()
+                            {
+                                Choice = 1,
+                                OptionName = "Pack",
+                                SectionName = "Retro Rewind"
+                            },
+                            new()
+                            {
+                                Choice = 2,
+                                OptionName = "My Stuff",
+                                SectionName = "Retro Rewind"
+                            },
+                            new()
+                            {
+                                Choice = language,
+                                OptionName = "Language",
+                                SectionName = "Retro Rewind"
+                            },
+                            new()
+                            {
+                                Choice = removeBlur ? 1 : 0,
+                                OptionName = "Remove Blur",
+                                SectionName = "Retro Rewind"
+                            }
+                        ],
                         Root = Path.GetFullPath(PathManager.RiivolutionWhWzFolderPath),
                         Xml = Path.GetFullPath(XmlFilePath)
                     }
-                }
+                ]
             },
             Type = "dolphin-game-mod-descriptor",
             Version = 1

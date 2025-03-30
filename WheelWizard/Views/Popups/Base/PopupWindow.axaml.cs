@@ -69,7 +69,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
         IsTopMost = isTopMost;
         CanClose = allowClose;
         WindowTitle = title;
-        AllowParentInteraction = allowParentInteraction;
+        _allowParentInteraction = allowParentInteraction;
         var mainWindow = ViewUtils.GetLayout();
         if (mainWindow.IsVisible)
             Owner = mainWindow;

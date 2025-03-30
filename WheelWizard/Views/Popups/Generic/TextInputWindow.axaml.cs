@@ -9,8 +9,8 @@ namespace WheelWizard.Views.Popups.Generic;
 public partial class TextInputWindow : PopupContent
 {
     private string? _result;
-    private string? initialText;
-    private bool allowCustomChars;
+    private string? _initialText;
+    private bool _allowCustomChars;
     private TaskCompletionSource<string?>? _tcs;
 
     // Constructor with dynamic label parameter
@@ -43,7 +43,7 @@ public partial class TextInputWindow : PopupContent
 
     public TextInputWindow SetAllowCustomChars(bool allow)
     {
-        allowCustomChars = allow;
+        _allowCustomChars = allow;
         CustomCharsButton.IsVisible = allow;
         // This is not really reversible, but that is also not really a problem, since when do we even want to sue that
         if (allow)
@@ -68,7 +68,7 @@ public partial class TextInputWindow : PopupContent
     public TextInputWindow SetInitialText(string text)
     {
         InputField.Text = text;
-        initialText = text;
+        _initialText = text;
         return this;
     }
     
@@ -111,14 +111,13 @@ public partial class TextInputWindow : PopupContent
         {
             chars.Add((char)i);
         }
-        chars.AddRange(new[]
-        {
+        chars.AddRange([
             (char)0xe028, (char)0xe068, (char)0xe067, (char)0xe06a, (char)0xe06b,
             (char)0xf030, (char)0xf031, (char)0xf034, (char)0xf035, (char)0xf038,
             (char)0xf039, (char)0xf03c, (char)0xf03d, (char)0xf041, (char)0xf043,
             (char)0xf044, (char)0xf047, (char)0xf050, (char)0xf058, (char)0xf05e, 
-            (char)0xf05f, (char)0xf103,
-        });
+            (char)0xf05f, (char)0xf103
+        ]);
         
         foreach (var c in chars)
         {
@@ -144,7 +143,7 @@ public partial class TextInputWindow : PopupContent
     // Update the Submit button's IsEnabled property based on input
     private void UpdateSubmitButtonState()
     {
-        var sameAsInitial = InputField.Text == initialText;
+        var sameAsInitial = InputField.Text == _initialText;
         var empty = string.IsNullOrWhiteSpace(InputField.Text);
         SubmitButton.IsEnabled = !sameAsInitial && !empty;
     }

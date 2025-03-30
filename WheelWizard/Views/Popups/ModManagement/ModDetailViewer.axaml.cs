@@ -14,8 +14,8 @@ public record ModItem(Bitmap FullImageUrl);
 
 public partial class ModDetailViewer : UserControl
 {
-    private bool loading;
-    private bool loadingVisual;
+    private bool _loading;
+    private bool _loadingVisual;
     private GameBananaModDetails? CurrentMod { get; set; }
 
     public ModDetailViewer()
@@ -28,7 +28,7 @@ public partial class ModDetailViewer : UserControl
     private void ResetVisibility()
     {
         // Method returns false if the details page is not shown
-        if (loadingVisual)
+        if (_loadingVisual)
         {
             LoadingView.IsVisible = true;
             NoDetailsView.IsVisible = false;
@@ -53,21 +53,21 @@ public partial class ModDetailViewer : UserControl
     /// <summary>
     /// Loads the details of the specified mod into the viewer.
     /// </summary>
-    /// <param name="ModId">The ID of the mod to load.</param>
+    /// <param name="modId">The ID of the mod to load.</param>
     /// <param name="newDownloadUrl">The download URL to use instead of the one from the mod details.</param>
-    public async Task<bool> LoadModDetailsAsync(int ModId, string? newDownloadUrl = null, CancellationToken cancellationToken = default)
+    public async Task<bool> LoadModDetailsAsync(int modId, string? newDownloadUrl = null, CancellationToken cancellationToken = default)
     {
         // Check if cancellation has been requested before starting
         if (cancellationToken.IsCancellationRequested) return false;
         // Set the UI to show loading state
-        loadingVisual = true;
-        loading = true;
+        _loadingVisual = true;
+        _loading = true;
         ResetVisibility();
 
         // Retrieve the mod details.
         // If GamebananaSearchHandler.GetModDetailsAsync supports cancellation,
         // consider passing the token as a parameter.
-        var modDetailsResult = await GamebananaSearchHandler.GetModDetailsAsync(ModId);
+        var modDetailsResult = await GamebananaSearchHandler.GetModDetailsAsync(modId);
         if (cancellationToken.IsCancellationRequested) return false;
 
         if (!modDetailsResult.Succeeded || modDetailsResult.Content == null)
@@ -76,8 +76,8 @@ public partial class ModDetailViewer : UserControl
             NoDetailsView.Title = "Failed to retrieve mod info";
             NoDetailsView.BodyText = modDetailsResult.StatusMessage ?? "An error occurred while fetching mod details.";
 
-            loading = false;
-            loadingVisual = false;
+            _loading = false;
+            _loadingVisual = false;
             ResetVisibility();
             return false;
         }
@@ -94,7 +94,7 @@ public partial class ModDetailViewer : UserControl
         // Wrap the mod description in a div tag so that CSS can be applied
         ModDescriptionHtmlPanel.Text = $"<body>{CurrentMod._sText}</body>";
         CurrentMod.OverrideDownloadUrl = newDownloadUrl;
-        UpdateDownloadButtonState(ModId);
+        UpdateDownloadButtonState(modId);
 
         // Clear any previous images and reset banner visibility
         ImageCarousel.Items.Clear();
@@ -103,8 +103,8 @@ public partial class ModDetailViewer : UserControl
         // If there are no images to load, finish up early
         if (CurrentMod._aPreviewMedia?._aImages == null || !CurrentMod._aPreviewMedia._aImages.Any())
         {
-            loading = false;
-            loadingVisual = false;
+            _loading = false;
+            _loadingVisual = false;
             ResetVisibility();
             return true;
         }
@@ -143,8 +143,8 @@ public partial class ModDetailViewer : UserControl
         }
 
         // Reset the loading state once all operations have completed
-        loading = false;
-        loadingVisual = false;
+        _loading = false;
+        _loadingVisual = false;
         ResetVisibility();
 
         return true;
@@ -183,7 +183,7 @@ public partial class ModDetailViewer : UserControl
         {
             await PrepareToDownloadFile();
             var downloadUrls = CurrentMod.OverrideDownloadUrl != null
-                ? new() { CurrentMod.OverrideDownloadUrl }
+                ? [CurrentMod.OverrideDownloadUrl]
                 : CurrentMod._aFiles.Select(f => f._sDownloadUrl).ToList();
             if (!downloadUrls.Any())
             {
@@ -296,8 +296,8 @@ public partial class ModDetailViewer : UserControl
 
     private void AuthorLink_Click(object? sender, EventArgs eventArgs)
     {
-        var profileURL = CurrentMod._aSubmitter._sProfileUrl;
-        ViewUtils.OpenLink(profileURL);
+        var profileUrl = CurrentMod._aSubmitter._sProfileUrl;
+        ViewUtils.OpenLink(profileUrl);
     }
 
     private void GamebananaLink_Click(object? sender, EventArgs eventArgs)

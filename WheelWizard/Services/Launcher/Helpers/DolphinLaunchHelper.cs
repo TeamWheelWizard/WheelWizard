@@ -27,15 +27,15 @@ public static class DolphinLaunchHelper
         {
             // Because with the file picker on a Flatpak build, we get XDG portal paths like these...
             // We can fix Flatpak Dolphin to gain access to this game file path though.
-            string xdgRuntimeDir = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR") ?? string.Empty;
+            var xdgRuntimeDir = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR") ?? string.Empty;
             if (EnvHelper.IsRelativeLinuxPath(xdgRuntimeDir))
             {
-                string fixablePattern = @"^/run/user/(\d+)/doc";
-                Regex fixablePatternRegex = new Regex(fixablePattern);
+                var fixablePattern = @"^/run/user/(\d+)/doc";
+                var fixablePatternRegex = new Regex(fixablePattern);
                 return fixablePatternRegex.IsMatch(gameFilePath);
             }
 
-            string xdgRuntimeDirDocPath = Path.Combine(xdgRuntimeDir, "doc");
+            var xdgRuntimeDirDocPath = Path.Combine(xdgRuntimeDir, "doc");
             return gameFilePath.StartsWith(xdgRuntimeDirDocPath);
         }
         return false;
@@ -75,10 +75,10 @@ public static class DolphinLaunchHelper
 
     private static string FixFlatpakDolphinPermissions(string flatpakDolphinLocation)
     {
-        string fixedFlatpakDolphinLocation = flatpakDolphinLocation;
+        var fixedFlatpakDolphinLocation = flatpakDolphinLocation;
         var addFilesystemPerm = (string newFilesystemPerm, string mode = "") =>
         {
-            string flatpakRunCommand = "flatpak run";
+            var flatpakRunCommand = "flatpak run";
             fixedFlatpakDolphinLocation = fixedFlatpakDolphinLocation.Replace(
                 flatpakRunCommand,
                 $"{flatpakRunCommand} --filesystem=\"{Path.GetFullPath(newFilesystemPerm)}\"{mode}");
@@ -105,9 +105,9 @@ public static class DolphinLaunchHelper
         {
             var startInfo = new ProcessStartInfo();
 
-            bool cannotPassUserFolder = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && PathManager.IsLinuxDolphinConfigSplit();
-            string userFolderArgument = cannotPassUserFolder ? "" : $"-u \"{Path.GetFullPath(PathManager.UserFolderPath)}\"";
-            string dolphinLaunchArguments = $"{arguments} {userFolderArgument}";
+            var cannotPassUserFolder = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && PathManager.IsLinuxDolphinConfigSplit();
+            var userFolderArgument = cannotPassUserFolder ? "" : $"-u \"{Path.GetFullPath(PathManager.UserFolderPath)}\"";
+            var dolphinLaunchArguments = $"{arguments} {userFolderArgument}";
 
             var dolphinLocation = (string)SettingsManager.DOLPHIN_LOCATION.Get();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

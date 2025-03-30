@@ -15,7 +15,7 @@ public class GamebananaSearchHandler
     };
 
     private const string BaseUrl = Endpoints.GameBananaBaseUrl;
-    private const int GAME_ID = 5896;
+    private const int GameId = 5896;
 
     public static async Task<HttpClientResult<GameBananaSearchResults>> SearchModsAsync(string searchString, int page = 1, int perPage = 20)
     {
@@ -23,7 +23,7 @@ public class GamebananaSearchHandler
         if (page < 1) page = 1;
         if (perPage is < 1 or > 50) perPage = 20;
         var searchUrl =
-            $"{BaseUrl}/Util/Search/Results?_sSearchString={searchString}&_nPage={page}&_nPerpage={perPage}&_idGameRow={GAME_ID}";
+            $"{BaseUrl}/Util/Search/Results?_sSearchString={searchString}&_nPage={page}&_nPerpage={perPage}&_idGameRow={GameId}";
 
         var result = await HttpClientHelper.GetAsync<GameBananaSearchResults>(searchUrl, JsonSerializerOptions);
 
@@ -42,14 +42,14 @@ public class GamebananaSearchHandler
 
     public static async Task<HttpClientResult<GameBananaSearchResults>> GetFeaturedModsAsync()
     {
-        var featuredUrl = $"{BaseUrl}/Util/List/Featured?_idGameRow={GAME_ID}";
+        var featuredUrl = $"{BaseUrl}/Util/List/Featured?_idGameRow={GameId}";
         return await HttpClientHelper.GetAsync<GameBananaSearchResults>(featuredUrl, JsonSerializerOptions);
     }
 
     public static async Task<HttpClientResult<GameBananaSearchResults>> GetLatestModsAsync(int page = 1)
     {
         if (page < 1) page = 1;
-        var latestModsUrl = $"{BaseUrl}/Game/{GAME_ID}/Subfeed?_nPage={page}";
+        var latestModsUrl = $"{BaseUrl}/Game/{GameId}/Subfeed?_nPage={page}";
         return await HttpClientHelper.GetAsync<GameBananaSearchResults>(latestModsUrl, JsonSerializerOptions);
     }
 }

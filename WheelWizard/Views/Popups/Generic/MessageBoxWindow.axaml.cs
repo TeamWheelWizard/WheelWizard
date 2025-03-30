@@ -11,23 +11,23 @@ public partial class MessageBoxWindow : PopupContent
         Warning,
         Message
     }
-    private MessageType messageType = MessageType.Message;
+    private MessageType _messageType = MessageType.Message;
     
     public MessageBoxWindow() : base(true, false, true, "Message", new(400, 230))
     {
         InitializeComponent();
-        SetMessageType(messageType);
+        SetMessageType(_messageType);
     }
     
     public MessageBoxWindow SetMessageType(MessageType newType)
     {
-        messageType = newType;
-        CancelButton.Variant = messageType == MessageType.Message ? 
+        _messageType = newType;
+        CancelButton.Variant = _messageType == MessageType.Message ? 
             Button.ButtonsVariantType.Primary: 
             Button.ButtonsVariantType.Default;
         
-        Window.WindowTitle = messageType.ToString();
-        TitleBorder.Classes.Add(messageType.ToString());
+        Window.WindowTitle = _messageType.ToString();
+        TitleBorder.Classes.Add(_messageType.ToString());
         return this;
     }
     
@@ -43,7 +43,7 @@ public partial class MessageBoxWindow : PopupContent
         return this;
     }
 
-    protected override void BeforeOpen() => PlaySound(messageType);
+    protected override void BeforeOpen() => PlaySound(_messageType);
     
     private static void PlaySound(MessageType messageType)
     {

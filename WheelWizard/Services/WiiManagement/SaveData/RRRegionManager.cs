@@ -2,7 +2,7 @@
 
 namespace WheelWizard.Services.Other;
 
-public class RRRegionManager
+public class RrRegionManager
 {
     public static List<MarioKartWiiEnums.Regions> GetValidRegions()
     {

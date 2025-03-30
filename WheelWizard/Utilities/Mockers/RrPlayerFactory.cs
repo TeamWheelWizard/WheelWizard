@@ -5,11 +5,11 @@ namespace WheelWizard.Utilities.Mockers.RrInfo;
 public class RrPlayerFactory : MockingDataFactory<RrPlayer, RrPlayerFactory>
 {
     protected override string DictionaryKeyGenerator(RrPlayer value) => value.Name;
-    private static int _playerCount = 1;
+    private static int s_playerCount = 1;
     
     public override RrPlayer Create(int? seed = null)
     {
-        var playerId = _playerCount++;
+        var playerId = s_playerCount++;
         var rand = Rand(seed);
         return new()
         {

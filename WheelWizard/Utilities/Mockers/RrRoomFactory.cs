@@ -6,7 +6,7 @@ namespace WheelWizard.Utilities.Mockers;
 public class RrRoomFactory : MockingDataFactory<RrRoom, RrRoomFactory>
 {
     protected override string DictionaryKeyGenerator(RrRoom value) => value.Id;
-    private static int _roomCount = 1;
+    private static int s_roomCount = 1;
 
     public override RrRoom Create(int? seed = null)
     {
@@ -16,7 +16,7 @@ public class RrRoomFactory : MockingDataFactory<RrRoom, RrRoomFactory>
         var isPrivate = (int)(rand.NextDouble() * 3) == 0;
         return new()
         {
-            Id = _roomCount++.ToString(),
+            Id = s_roomCount++.ToString(),
             Game = "mariokartwii",
             Created = DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(30)),
             Type = isPrivate ? "private" : "public",

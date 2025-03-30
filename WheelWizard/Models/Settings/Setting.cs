@@ -10,7 +10,7 @@ public abstract class Setting
         ValueType = type;
     }
     
-    protected readonly List<ISettingListener> DependentVirtualSettings = new();
+    protected readonly List<ISettingListener> _dependentVirtualSettings = [];
     public string Name { get; protected set; }
     public object DefaultValue { get; protected set; }
     protected object Value { get; set; }
@@ -57,16 +57,16 @@ public abstract class Setting
         return this;
     }
     
-    public bool Unsubscribe(ISettingListener dependent) => DependentVirtualSettings.Remove(dependent);
+    public bool Unsubscribe(ISettingListener dependent) => _dependentVirtualSettings.Remove(dependent);
     public void Subscribe(ISettingListener dependent)
     {
-        if (!DependentVirtualSettings.Contains(dependent))
-            DependentVirtualSettings.Add(dependent);
+        if (!_dependentVirtualSettings.Contains(dependent))
+            _dependentVirtualSettings.Add(dependent);
     }
     
     protected void SignalChange()
     {
-        foreach (var dependent in DependentVirtualSettings)
+        foreach (var dependent in _dependentVirtualSettings)
         {
             dependent.OnSettingChanged(this);
         }

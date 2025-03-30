@@ -22,7 +22,7 @@ public abstract class GameDataPlayer : INotifyPropertyChanged
     {
         get
         {
-            var currentRooms = RRLiveRooms.Instance.CurrentRooms;
+            var currentRooms = RrLiveRooms.Instance.CurrentRooms;
             if (currentRooms.Count <= 0) 
                 return false;
 

@@ -9,7 +9,7 @@ public static class ModsLaunchHelper
 {
     public static readonly string MyStuffFolderPath = PathManager.MyStuffFolderPath;
     public static readonly string ModsFolderPath = PathManager.ModsFolderPath;
-    public static readonly string[] AcceptedModExtensions = { "*.szs", "*.arc", "*.brstm", "*.brsar", "*.thp" };
+    public static readonly string[] AcceptedModExtensions = ["*.szs", "*.arc", "*.brstm", "*.brsar", "*.thp"];
     
     public static async Task PrepareModsForLaunch()
     {

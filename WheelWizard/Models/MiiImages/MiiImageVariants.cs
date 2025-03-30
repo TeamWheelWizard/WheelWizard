@@ -13,24 +13,25 @@ public static class MiiImageVariants
         FULL_BODY_CAROUSEL,
     }
 
-    private static Dictionary<Variant, Func<string, string>> _variantMap = new()
+    private static readonly Dictionary<Variant, Func<string, string>> VariantMap = new()
     {
         [Variant.SMALL] = GetMiiImageUrlFromResponse(Expression.NORMAL, BodyType.FACE, ImageSize.SMALL),
         [Variant.FULL_BODY_CAROUSEL] = GetMiiImageUrlFromResponse(Expression.NORMAL, BodyType.ALL_BODY, ImageSize.MEDIUM, instanceCount: 8),
         [Variant.SLIGHT_SIDE_PROFILE_DEFAULT] = GetMiiImageUrlFromResponse(Expression.NORMAL, BodyType.FACE, ImageSize.MEDIUM,
-            characterRotation: new(350,15,355), cameraTilt: 12),
+            characterRotation: new(350, 15, 355), cameraTilt: 12),
         [Variant.SLIGHT_SIDE_PROFILE_HOVER] = GetMiiImageUrlFromResponse(Expression.SMILE, BodyType.FACE, ImageSize.MEDIUM,
-            characterRotation: new(350,15,355), cameraTilt: 12),
-        
+            characterRotation: new(350, 15, 355), cameraTilt: 12),
         [Variant.SLIGHT_SIDE_PROFILE_INTERACT] = GetMiiImageUrlFromResponse(Expression.FRUSTRATED, BodyType.FACE, ImageSize.MEDIUM,
-            characterRotation: new(350,15,355), cameraTilt: 12),
+            characterRotation: new(350, 15, 355), cameraTilt: 12),
     };
-    
-    
+
+
     #region SETUP
-    public static Func<string, string> Get(Variant variant) => _variantMap[variant];
+
+    public static Func<string, string> Get(Variant variant) => VariantMap[variant];
+
     private static Func<string, string> GetMiiImageUrlFromResponse(
-        Expression expression, BodyType type, ImageSize size, 
+        Expression expression, BodyType type, ImageSize size,
         Vector3 characterRotation = new(), int cameraTilt = 0, int instanceCount = 1)
     {
         return miiData =>
@@ -73,11 +74,12 @@ public static class MiiImageVariants
         FACE,
         ALL_BODY
     }
+
     private enum ImageSize
     {
         SMALL = 270,
         MEDIUM = 512,
     }
-    
+
     #endregion
 }

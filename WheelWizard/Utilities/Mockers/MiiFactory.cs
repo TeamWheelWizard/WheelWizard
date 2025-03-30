@@ -5,10 +5,10 @@ namespace WheelWizard.Utilities.Mockers;
 public class MiiFactory : MockingDataFactory<Mii, MiiFactory>
 {
     protected override string DictionaryKeyGenerator(Mii value) => value.Name;
-    private static int _miiCount = 1;
+    private static int s_miiCount = 1;
     
-    private readonly string[] dataList = new[]
-    {
+    private readonly string[] _dataList =
+    [
         "AAAAQgBlAGUAAAAAAAAAAAAAAAAAAEBAgeGIAcKv7BAABEJBMb0oogiMCEgUTbiNAIoAiiUFAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         "wBAASAOzA8EDtQByACADtQB4AAAAAAAAgAAAAAAAAAAgF4+gmVMm1SCSjpgAbWAvAIoAiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         "gBYDngBxAHUAaQAAAAAAAAAAAAAAAH9QgAAAAAAAAAAAFxAAItQQPBiODhgIZVEPcKBhDSUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
@@ -25,14 +25,14 @@ public class MiiFactory : MockingDataFactory<Mii, MiiFactory>
         "gBYATQBpAG4AaQBuAGcAAAAAAAAAAEBOgAAAAAAAAAAg10KAuRQoopSMSFiiTZhtIIoAiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         "wBAAZwBhAG4AZwBuAGUAdwB3AHMDyAAAgAAAAAAAAAAEbDZAqaQosmBsCFgUTQCNAAoAgCIFAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         "wBIATABpAGMAbwByAGkAYwBlAAAAAAosgAAAAAAAAAAgTH5AuUUo8kiRCtgAbUALguAAiiUFAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-    };
+    ];
     
     public override Mii Create(int? seed = null)
     {
         return new()
         {
-            Name = $"Mii {_miiCount++}", 
-            Data = dataList[(int)(Rand(seed).NextDouble() * dataList.Length)]
+            Name = $"Mii {s_miiCount++}", 
+            Data = _dataList[(int)(Rand(seed).NextDouble() * _dataList.Length)]
         };
     }
 }

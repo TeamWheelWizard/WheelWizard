@@ -4,5 +4,5 @@ public class GameDataUser : GameDataPlayer
 {
     public required uint TotalRaceCount { get; set; }
     public required uint TotalWinCount { get; set; }
-    public List<GameDataFriend> Friends { get; set; } = new();
+    public List<GameDataFriend> Friends { get; set; } = [];
 }

@@ -54,14 +54,14 @@ public class RrLauncher : ILauncher
     }
 
     public Task Install() => RetroRewindInstaller.InstallRetroRewind();
-    public Task Update() => RetroRewindUpdater.UpdateRR();
+    public Task Update() => RetroRewindUpdater.UpdateRr();
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {
         if (!SettingsHelper.PathsSetupCorrectly())
             return WheelWizardStatus.ConfigNotFinished;
 
-        var serverEnabled = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
+        var serverEnabled = await HttpClientHelper.GetAsync<string>(Endpoints.RrUrl);
         var rrInstalled = RetroRewindInstaller.IsRetroRewindInstalled();
 
         if (!serverEnabled.Succeeded)
@@ -69,7 +69,7 @@ public class RrLauncher : ILauncher
 
         if (!rrInstalled) return WheelWizardStatus.NotInstalled;
 
-        var retroRewindUpToDate = await RetroRewindUpdater.IsRRUpToDate(RetroRewindInstaller.CurrentRRVersion());
+        var retroRewindUpToDate = await RetroRewindUpdater.IsRrUpToDate(RetroRewindInstaller.CurrentRrVersion());
         return !retroRewindUpToDate ? WheelWizardStatus.OutOfDate : WheelWizardStatus.Ready;
     }
 }

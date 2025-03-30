@@ -10,7 +10,7 @@ public static class RetroRewindInstaller
     
     public static bool IsRetroRewindInstalled() => File.Exists(PathManager.RetroRewindVersionFile);
 
-    public static string CurrentRRVersion()
+    public static string CurrentRrVersion()
     {
         var versionFilePath = PathManager.RetroRewindVersionFile;
         return IsRetroRewindInstalled() ? File.ReadAllText(versionFilePath).Trim() : "Not Installed";
@@ -47,16 +47,16 @@ public static class RetroRewindInstaller
         if (IsRetroRewindInstalled())
             DeleteExistingRetroRewind();
 
-        if (hasOldrksys())
+        if (HasOldrksys())
         {
             var rksysQuestion = new YesNoWindow()
                                 .SetMainText(Phrases.PopupText_OldRksysFound)
                                 .SetExtraText(Phrases.PopupText_OldRksysFoundExplained);
             if (await rksysQuestion.AwaitAnswer()) 
-                await backupOldrksys();
+                await BackupOldrksys();
 
         }
-        var serverResponse = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
+        var serverResponse = await HttpClientHelper.GetAsync<string>(Endpoints.RrUrl);
         if (!serverResponse.Succeeded)
         {
             await new MessageBoxWindow()
@@ -66,10 +66,10 @@ public static class RetroRewindInstaller
             return;
         }
         await DownloadAndExtractRetroRewind(PathManager.RetroRewindTempFile);
-        await RetroRewindUpdater.UpdateRR();
+        await RetroRewindUpdater.UpdateRr();
     }
 
-    public static async Task ReinstallRR()
+    public static async Task ReinstallRr()
     {
         var result = await new YesNoWindow()
             .SetMainText(Phrases.PopupText_ReinstallRR)
@@ -90,7 +90,7 @@ public static class RetroRewindInstaller
 
         try
         {
-            await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
+            await DownloadHelper.DownloadToLocationAsync(Endpoints.RrZipUrl, tempZipPath, progressWindow);
             progressWindow.SetExtraText(Common.State_Extracting);
             var extractionPath = PathManager.RiivolutionWhWzFolderPath;
             ZipFile.ExtractToDirectory(tempZipPath, extractionPath, true);
@@ -103,7 +103,7 @@ public static class RetroRewindInstaller
         }
     }
 
-    private static bool hasOldrksys()
+    private static bool HasOldrksys()
     {
         var rrWfcPaths = new[]
         {
@@ -123,7 +123,7 @@ public static class RetroRewindInstaller
         return false;
     }
 
-    private static async Task backupOldrksys()
+    private static async Task BackupOldrksys()
     {
         var rrWfc = Path.Combine(PathManager.SaveFolderPath);
         if (!Directory.Exists(rrWfc)) return;

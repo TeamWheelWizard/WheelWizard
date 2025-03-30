@@ -174,7 +174,7 @@ public partial class WhWzSettings : UserControl
             return; // do not do normal selection for MacOS
         }
 
-        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Dolphin Emulator", new[] { executableFileType });
+        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Dolphin Emulator", [executableFileType]);
         if (!string.IsNullOrEmpty(filePath))
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -198,10 +198,10 @@ public partial class WhWzSettings : UserControl
     {
         var fileType = new FilePickerFileType("Game files")
         {
-            Patterns = new[] { "*.iso", "*.wbfs", "*.rvz" }
+            Patterns = ["*.iso", "*.wbfs", "*.rvz"]
         };
 
-        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Mario Kart Wii Game File", new[] { fileType });
+        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Mario Kart Wii Game File", [fileType]);
         if (!string.IsNullOrEmpty(filePath))
         {
             MarioKartInput.Text = filePath;

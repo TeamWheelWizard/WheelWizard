@@ -123,7 +123,7 @@ public partial class OtherSettings : UserControl
         ViewUtils.RefreshWindow();
     }
 
-    private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e) => await RetroRewindInstaller.ReinstallRR();
+    private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e) => await RetroRewindInstaller.ReinstallRr();
 
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)
     {

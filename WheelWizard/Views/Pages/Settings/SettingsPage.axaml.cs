@@ -14,7 +14,7 @@ public partial class SettingsPage : UserControl
     {
         InitializeComponent();
 
-        RrVersionText.Text = "RR: " + RetroRewindInstaller.CurrentRRVersion();
+        RrVersionText.Text = "RR: " + RetroRewindInstaller.CurrentRrVersion();
 
         var part1 = "Release";
         var part2 = "Unknown OS";

@@ -15,11 +15,11 @@ public static class Endpoints
     // TODO: Refactor all the URLs seen below
 
     // Retro Rewind
-    public const string RRUrl = "http://update.rwfc.net:8000/";
-    public const string RRZipUrl = RRUrl + "RetroRewind/zip/RetroRewind.zip";
-    public const string RRVersionUrl = RRUrl + "RetroRewind/RetroRewindVersion.txt";
-    public const string RRVersionDeleteUrl = RRUrl + "RetroRewind/RetroRewindDelete.txt";
-    public const string RRDiscordUrl = "https://discord.gg/yH3ReN8EhQ";
+    public const string RrUrl = "http://update.rwfc.net:8000/";
+    public const string RrZipUrl = RrUrl + "RetroRewind/zip/RetroRewind.zip";
+    public const string RrVersionUrl = RrUrl + "RetroRewind/RetroRewindVersion.txt";
+    public const string RrVersionDeleteUrl = RrUrl + "RetroRewind/RetroRewindDelete.txt";
+    public const string RrDiscordUrl = "https://discord.gg/yH3ReN8EhQ";
 
     // Branding Urls
     public const string WhWzDiscordUrl = "https://discord.gg/vZ7T2wJnsq";
@@ -29,7 +29,7 @@ public static class Endpoints
     // Other
     public const string MiiStudioUrl = "https://qrcode.rc24.xyz/cgi-bin/studio.cgi";
     public const string MiiImageUrl = "https://studio.mii.nintendo.com/miis/image.png";
-    public const string MiiChannelWAD = "-";
+    public const string MiiChannelWad = "-";
 
     //GameBanana
     public const string GameBananaBaseUrl = "https://gamebanana.com/apiv11";

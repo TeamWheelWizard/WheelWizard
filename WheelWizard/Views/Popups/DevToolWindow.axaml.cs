@@ -31,7 +31,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
     // to be an observer pattern besides this, and it would make the codebase more complex for no reason.
     public void OnUpdate(RepeatedTaskManager sender)
     {
-        RrRefreshTimeLeft.Text = RRLiveRooms.Instance.TimeUntilNextTick.Seconds.ToString();
+        RrRefreshTimeLeft.Text = RrLiveRooms.Instance.TimeUntilNextTick.Seconds.ToString();
         MiiImagesCashed.Text = MiiImageManager.ImageCount.ToString();
         MiiParsedDataCashed.Text = MiiImageManager.ParsedMiiDataCount.ToString();
     }

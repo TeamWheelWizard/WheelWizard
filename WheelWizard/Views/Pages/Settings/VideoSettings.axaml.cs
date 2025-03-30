@@ -52,13 +52,13 @@ public partial class VideoSettings : UserControl
     private void ForceLoadSettings()
     {
         // Load settings that always display, regardless of editing being enabled
-        foreach (var renderer in SettingValues.GFXRenderers.Keys)
+        foreach (var renderer in SettingValues.GfxRenderers.Keys)
         {
             RendererDropdown.Items.Add(renderer);
         }
 
         var currentRenderer = (string)SettingsManager.GFX_BACKEND.Get();
-        var renderDisplayName = SettingValues.GFXRenderers.FirstOrDefault(x => x.Value == currentRenderer).Key;
+        var renderDisplayName = SettingValues.GfxRenderers.FirstOrDefault(x => x.Value == currentRenderer).Key;
         if (renderDisplayName != null)
         {
             RendererDropdown.SelectedItem = renderDisplayName;
@@ -67,7 +67,7 @@ public partial class VideoSettings : UserControl
 
     private void UpdateResolution(object? sender, RoutedEventArgs e)
     {
-        if (sender is RadioButton radioButton && radioButton.IsChecked == true)
+        if (sender is RadioButton { IsChecked: true } radioButton)
         {
             SettingsManager.INTERNAL_RESOLUTION.Set(int.Parse(radioButton.Tag.ToString()!));
         }
@@ -96,7 +96,7 @@ public partial class VideoSettings : UserControl
     private void RendererDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         var selectedDisplayName = RendererDropdown.SelectedItem?.ToString();
-        if (SettingValues.GFXRenderers.TryGetValue(selectedDisplayName, out var actualValue))
+        if (SettingValues.GfxRenderers.TryGetValue(selectedDisplayName, out var actualValue))
         {
             SettingsManager.GFX_BACKEND.Set(actualValue);
         }

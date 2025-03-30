@@ -6,12 +6,12 @@ public class Mii
     public required string Data { get; set; }
 
     
-    private Dictionary<MiiImageVariants.Variant, MiiImage> images = new ();
+    private readonly Dictionary<MiiImageVariants.Variant, MiiImage> _images = new ();
 
     public MiiImage GetImage(MiiImageVariants.Variant variant)
     {
-        if (!images.ContainsKey(variant))
-            images[variant] = new(this, variant);
-        return images[variant];
+        if (!_images.ContainsKey(variant))
+            _images[variant] = new(this, variant);
+        return _images[variant];
     }
 }
