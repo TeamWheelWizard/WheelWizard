@@ -8,7 +8,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
 
-        <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 
         <!-- Program details -->
         <Version>2.0.3</Version>
@@ -46,14 +46,14 @@
         </PackageReference>
 
         <!-- Everything from the OG Wheel wizard project -->
-        <PackageReference Include="ini-parser" Version="2.5.2"/>
+        <PackageReference Include="ini-parser" Version="2.5.2" NoWarn="NU1701"/>
         <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.3.0"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3"/>
         <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
         <PackageReference Include="Semver" Version="3.0.0"/>
-        <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
         <PackageReference Include="SharpCompress" Version="0.39.0"/>
         <PackageReference Include="Testably.Abstractions" Version="9.0.0"/>
     </ItemGroup>

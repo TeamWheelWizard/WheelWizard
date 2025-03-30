@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="WheelWizard.Views.Popups.Base.PopupWindow"
         SystemDecorations="None"
@@ -9,43 +10,41 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
         CanResize='False' Background="Transparent"
-        Title="{Binding WindowTitle}">
+        Title="{Binding WindowTitle}"
+        x:DataType="base:PopupWindow">
     <Grid x:Name="CompleteGrid">
         <Border Background="{StaticResource  BackgroundColor}" CornerRadius="4"
                 BorderThickness="1" BorderBrush="{StaticResource BackgroundLineColor}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+            <Grid RowDefinitions="25,*">
                 <Border Grid.RowSpan="999" Grid.ColumnSpan="999" ZIndex="999" IsVisible="False"
                         x:Name="DisabledDarkenEffect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                        Background="Black"  Opacity="0.3"/>
-                
-                <Border Grid.Row="0" Background="{StaticResource FrameColor}" 
+                        Background="Black" Opacity="0.3" />
+
+                <Border Grid.Row="0" Background="{StaticResource FrameColor}"
                         CornerRadius="3,3,0,0" PointerPressed="TopBar_PointerPressed">
                     <Grid>
                         <TextBlock FontSize="16" Margin="10,0" Text="{Binding WindowTitle}"
                                    VerticalAlignment="Center" HorizontalAlignment="Left"
-                                   Foreground="{StaticResource Neutral300}"/>
-                        
+                                   Foreground="{StaticResource Neutral300}" />
+
                         <DockPanel HorizontalAlignment="Right" VerticalAlignment="Top">
-                            
+
                             <Button Width="30" Height="25" Click="MinimizeButton_Click" Classes="TopButton">
-                                <PathIcon Data="{StaticResource MinMark}" Width="12" Height="12" 
+                                <PathIcon Data="{StaticResource MinMark}" Width="12" Height="12"
                                           Foreground="{Binding $parent[Button].Foreground}" />
                             </Button>
-                            
-                            <Button Width="30" Height="25" Click="CloseButton_Click" Classes="TopButton" IsVisible="{Binding CanClose}" >
+
+                            <Button Width="30" Height="25" Click="CloseButton_Click" Classes="TopButton"
+                                    IsVisible="{Binding CanClose}">
                                 <PathIcon Data="{StaticResource XMark}" Width="12" Height="12"
                                           Foreground="{Binding $parent[Button].Foreground}" />
                             </Button>
                         </DockPanel>
                     </Grid>
                 </Border>
-                
+
                 <ContentPresenter x:Name="PopupContent" Grid.Row="1" ClipToBounds="False"
-                                  Margin="{StaticResource EdgeGap}"/>
+                                  Margin="{StaticResource EdgeGap}" />
             </Grid>
         </Border>
     </Grid>

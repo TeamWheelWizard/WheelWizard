@@ -48,13 +48,13 @@ public abstract class GameDataPlayer : INotifyPropertyChanged
         {
             if (MiiData == null)
             {
-                MiiData = new MiiData
+                MiiData = new()
                 {
-                    Mii = new Mii { Data = "", Name = value }
+                    Mii = new() { Data = "", Name = value }
                 };
             }
             else if (MiiData.Mii == null)
-                MiiData.Mii = new Mii { Data = "", Name = value };
+                MiiData.Mii = new() { Data = "", Name = value };
             else
             {
                 MiiData.Mii.Name = value;
@@ -66,9 +66,9 @@ public abstract class GameDataPlayer : INotifyPropertyChanged
     #region PropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     
-    protected virtual void OnPropertyChanged(string propertyName)
+    protected void OnPropertyChanged(string propertyName)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
     #endregion
 }

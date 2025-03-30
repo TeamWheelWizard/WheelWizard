@@ -1,11 +1,10 @@
-﻿using Avalonia;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using WheelWizard.Models.GameBanana;
 using WheelWizard.Services.GameBanana;
 using WheelWizard.Views.Pages;
@@ -17,17 +16,17 @@ namespace WheelWizard.Views.Popups.ModManagement;
 public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
 {
     // Collection to hold the mods
-    private ObservableCollection<GameBananaModDetails> Mods { get; } = new ObservableCollection<GameBananaModDetails>();
+    private ObservableCollection<GameBananaModDetails> Mods { get; } = new();
 
     // Pagination variables
     private int _currentPage = 1;
-    private bool _isLoading = false;
+    private bool _isLoading;
     private bool _hasMoreMods = true;
     private bool _isInitialLoad = true;
 
     private const int ModsPerPage = 15;
     private const double ScrollThreshold = 50; // Adjusted threshold for earlier loading
-    
+
     private CancellationTokenSource? _loadCancellationToken;
 
 
@@ -49,7 +48,7 @@ public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
         if (!_isInitialLoad) return;
         LoadMods(_currentPage).ConfigureAwait(false);
         _isInitialLoad = false;
-        
+
         // Attach to the ListBox's scroll event
         ModListView.AddHandler(ScrollViewer.ScrollChangedEvent, ModListView_ScrollChanged);
     }
@@ -66,7 +65,7 @@ public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
         {
             var result = await GamebananaSearchHandler.SearchModsAsync(searchTerm, page, ModsPerPage);
             Mods.Where(mod => mod._sName == "LOADING").ToList().ForEach(mod => Mods.Remove(mod));
-            
+
             if (result is { Succeeded: true, Content: not null })
             {
                 var metadata = result.Content._aMetadata;
@@ -79,6 +78,7 @@ public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
                     {
                         Mods.Add(mod);
                     }
+
                     _hasMoreMods = !metadata._bIsComplete;
                     _currentPage = page;
                 }
@@ -158,7 +158,7 @@ public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
     private async void ModListView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         _loadCancellationToken?.Cancel(); //this cancels the previous load task if it's still running
-        _loadCancellationToken = new CancellationTokenSource();
+        _loadCancellationToken = new();
 
         var modId = -1;
         if (ModListView.SelectedItem is GameBananaModDetails selectedMod)
@@ -172,17 +172,9 @@ public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
             // Ignore
         }
     }
-    
-    // Implement INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>
-    /// Raises the PropertyChanged event.
-    /// </summary>
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    // Implement INotifyPropertyChanged
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected override void BeforeClose()
     {

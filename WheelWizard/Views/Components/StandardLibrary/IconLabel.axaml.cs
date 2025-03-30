@@ -44,7 +44,7 @@ public class IconLabel : TemplatedControl
     }
     
     public static readonly StyledProperty<bool> IsUnderlinedProperty =
-        AvaloniaProperty.Register<IconLabel, bool>(nameof(IsUnderlined), false);
+        AvaloniaProperty.Register<IconLabel, bool>(nameof(IsUnderlined));
 
     public bool IsUnderlined
     {

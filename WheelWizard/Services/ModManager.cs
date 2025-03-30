@@ -1,7 +1,8 @@
-﻿using IniParser;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO.Compression;
+using IniParser;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
@@ -12,7 +13,7 @@ namespace WheelWizard.Services;
 
 public class ModManager : INotifyPropertyChanged
 {
-    private static readonly Lazy<ModManager> _instance = new(() => new ModManager());
+    private static readonly Lazy<ModManager> _instance = new(() => new());
     public static ModManager Instance => _instance.Value;
 
     private ObservableCollection<Mod> _mods;
@@ -30,7 +31,7 @@ public class ModManager : INotifyPropertyChanged
 
     private ModManager()
     {
-        _mods = new ObservableCollection<Mod>();
+        _mods = new();
     }
 
     public bool IsModInstalled(int modID)
@@ -270,7 +271,7 @@ public class ModManager : INotifyPropertyChanged
         var modDirectory = PathManager.GetModDirectoryPath(selectedMod.Title);
         if (Directory.Exists(modDirectory))
         {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            Process.Start(new ProcessStartInfo
             {
                 FileName = modDirectory,
                 UseShellExecute = true,
@@ -339,7 +340,7 @@ public class ModManager : INotifyPropertyChanged
 
     protected virtual void OnPropertyChanged(string propertyName)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
     #endregion
 

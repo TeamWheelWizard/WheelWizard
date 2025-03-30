@@ -8,7 +8,7 @@ namespace WheelWizard.Views.Components.MiiImages;
 public class MiiCarousel : BaseMiiImage
 {
     private const int CarouselInstanceCount = 8;
-    private int CurrentCarouselInstance = 0;
+    private int CurrentCarouselInstance;
     
     
     public MiiCarousel()

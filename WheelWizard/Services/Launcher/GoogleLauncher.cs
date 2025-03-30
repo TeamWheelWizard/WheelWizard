@@ -8,10 +8,10 @@ namespace WheelWizard.Services.Launcher;
 // IMPORTANT: This is just an example on the launcher
 public class GoogleLauncher : ILauncher
 {
-    private bool installed = false;
+    private bool installed;
     
     protected static GoogleLauncher? _instance;
-    public static GoogleLauncher Instance => _instance ??= new GoogleLauncher();
+    public static GoogleLauncher Instance => _instance ??= new();
     public string GameTitle => "Google";
     public Task Launch()
     {

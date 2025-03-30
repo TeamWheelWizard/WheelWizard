@@ -5,83 +5,85 @@
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:gameData="clr-namespace:WheelWizard.Models.GameData"
              x:Class="WheelWizard.Views.Pages.FriendsPage">
-   <Grid>
-       <Grid.RowDefinitions>
-           <RowDefinition Height="{StaticResource TopRowSize}" />
-           <!-- This is the total height as the (Title + infoSection) - (padding) -->
-           <RowDefinition />
-       </Grid.RowDefinitions>
-       <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-               VerticalAlignment="Bottom" />
-      
-       <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-               VerticalAlignment="Bottom" />
-       
-       <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-           <TextBlock Text="{x:Static lang:Common.PageTitle_Friends}" Classes="PageTitleText" />
-           <Border VerticalAlignment="Center" HorizontalAlignment="Center"
-                   ToolTip.Tip="To add friends you need to add them in-game."
-                   ToolTip.Placement="Top" ToolTip.ShowDelay="20"
-                   Width="18" Height="18">
-               <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
-                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
-           </Border>
-       </StackPanel>
-       
-       <components:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
-                                    HorizontalAlignment="Right" VerticalAlignment="Top"/>
-       
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <!-- This is the total height as the (Title + infoSection) - (padding) -->
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
 
-  
-       <Grid Grid.Row="1" x:Name="VisibleWhenFriends" RowDefinitions="*, 12*">
-           <Grid Grid.Row="0" Margin="10,0"  >
-               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6" HorizontalAlignment="Right">
-                   <components:FormFieldLabel Text="Sort by:" VerticalAlignment="Center"/>
-                   <ComboBox x:Name="SortByDropdown"
-                             SelectionChanged="SortByDropdown_OnSelectionChanged" MinWidth="160"
-                             VerticalAlignment="Top"/>
-               </StackPanel>
-           
-               <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                   <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Friends}"/>
-                   <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount"/>
-               </StackPanel>
-               <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-                       VerticalAlignment="Bottom"  />
-           </Grid>
-           
-           <ListBox Grid.Row="1" x:Name="FriendsListView" SelectionMode="Single"
-                    Padding="0" Background="Transparent" BorderThickness="0"
-                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                    ScrollViewer.VerticalScrollBarVisibility="Auto">
-               <ListBox.ItemTemplate>
-                   <DataTemplate>
-                       <components:FriendsListItem Width="428" Height="124"
-                                                 Margin="0,5"
-                                                 UserName="{Binding MiiName}"
-                                                 FriendCode="{Binding FriendCode}"
-                                                 Vr="{Binding Vr}" 
-                                                 Br="{Binding Br}"
-                                                 Mii="{Binding Mii}"
-                                                 HasBadges="{Binding HasBadges}"
-                                                 IsOnline="{Binding IsOnline}"
-                                                 TotalLosses="{Binding Losses}"
-                                                 TotalWon="{Binding Wins}"
-                                                 ViewRoomAction="ViewRoom_OnClick"/>
-                   </DataTemplate>
-               </ListBox.ItemTemplate>
-               <ListBox.ContextMenu>
-                   <ContextMenu>
-                       <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
-                       <MenuItem Header="View Mii" Click="OpenCarousel_OnClick" />
-                   </ContextMenu>
-               </ListBox.ContextMenu>
-           </ListBox>
-       </Grid>
-      
-       <components:EmptyPageInfo Grid.Row="1" x:Name="VisibleWhenNoFriends"
-                            HorizontalAlignment="Center" Title="{x:Static lang:Phrases.EmptyText_NoFriends_Title}"
-                            BodyText="{x:Static lang:Phrases.EmptyText_NoFriends}" />
-   </Grid>
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <TextBlock Text="{x:Static lang:Common.PageTitle_Friends}" Classes="PageTitleText" />
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center"
+                    ToolTip.Tip="To add friends you need to add them in-game."
+                    ToolTip.Placement="Top" ToolTip.ShowDelay="20"
+                    Width="18" Height="18">
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
+            </Border>
+        </StackPanel>
+
+        <components:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
+                                       HorizontalAlignment="Right" VerticalAlignment="Top" />
+
+
+        <Grid Grid.Row="1" x:Name="VisibleWhenFriends" RowDefinitions="*, 12*">
+            <Grid Grid.Row="0" Margin="10,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6"
+                            HorizontalAlignment="Right">
+                    <components:FormFieldLabel Text="Sort by:" VerticalAlignment="Center" />
+                    <ComboBox x:Name="SortByDropdown"
+                              SelectionChanged="SortByDropdown_OnSelectionChanged" MinWidth="160"
+                              VerticalAlignment="Top" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
+                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Friends}" />
+                    <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount" />
+                </StackPanel>
+                <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                        VerticalAlignment="Bottom" />
+            </Grid>
+
+            <ListBox Grid.Row="1" x:Name="FriendsListView" SelectionMode="Single"
+                     Padding="0" Background="Transparent" BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type gameData:GameDataFriend}">
+                        <components:FriendsListItem Width="428" Height="124"
+                                                    Margin="0,5"
+                                                    UserName="{Binding MiiName}"
+                                                    FriendCode="{Binding FriendCode}"
+                                                    Vr="{Binding Vr}"
+                                                    Br="{Binding Br}"
+                                                    Mii="{Binding Mii}"
+                                                    HasBadges="{Binding HasBadges}"
+                                                    IsOnline="{Binding IsOnline}"
+                                                    TotalLosses="{Binding Losses}"
+                                                    TotalWon="{Binding Wins}"
+                                                    ViewRoomAction="ViewRoom_OnClick" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
+                        <MenuItem Header="View Mii" Click="OpenCarousel_OnClick" />
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+        </Grid>
+
+        <components:EmptyPageInfo Grid.Row="1" x:Name="VisibleWhenNoFriends"
+                                  HorizontalAlignment="Center"
+                                  Title="{x:Static lang:Phrases.EmptyText_NoFriends_Title}"
+                                  BodyText="{x:Static lang:Phrases.EmptyText_NoFriends}" />
+    </Grid>
 </UserControl>

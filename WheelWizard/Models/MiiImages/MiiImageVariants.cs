@@ -33,7 +33,7 @@ public static class MiiImageVariants
         Expression expression, BodyType type, ImageSize size, 
         Vector3 characterRotation = new(), int cameraTilt = 0, int instanceCount = 1)
     {
-        return (miiData) =>
+        return miiData =>
         {
             var queryParams = new List<string>
             {

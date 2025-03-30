@@ -1,5 +1,5 @@
-﻿using Avalonia.Media.Imaging;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using Avalonia.Media.Imaging;
 using WheelWizard.Services.WiiManagement;
 
 namespace WheelWizard.Models.MiiImages;
@@ -53,7 +53,7 @@ public class MiiImage : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
     #endregion
 }

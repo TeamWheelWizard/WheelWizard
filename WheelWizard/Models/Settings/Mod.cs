@@ -1,7 +1,7 @@
-﻿using IniParser;
-using IniParser.Model;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using IniParser;
+using IniParser.Model;
 using WheelWizard.Services;
 
 namespace WheelWizard.Models.Settings;
@@ -99,7 +99,7 @@ public class Mod : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
     #endregion
     
@@ -124,7 +124,7 @@ public class Mod : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to read INI file '{iniFilePath}': {ex.Message}");
+            throw new($"Failed to read INI file '{iniFilePath}': {ex.Message}");
         }
 
         var mod = new Mod
@@ -158,7 +158,7 @@ public class Mod : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to write INI file '{iniFilePath}': {ex.Message}");
+            throw new($"Failed to write INI file '{iniFilePath}': {ex.Message}");
         }
 
         await Task.CompletedTask;

@@ -1,7 +1,7 @@
-using Avalonia;
-using Avalonia.Logging;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Avalonia;
+using Avalonia.Logging;
 using Microsoft.Extensions.Logging;
 using WheelWizard.Helpers;
 using WheelWizard.Services.Settings;

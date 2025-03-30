@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 
 namespace WheelWizard.Shared.Services;
 

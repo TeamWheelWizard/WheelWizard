@@ -11,7 +11,7 @@ public class WhWzStatusManager : RepeatedTaskManager
     public WhWzStatus? Status { get; private set; }
     
     private static WhWzStatusManager? _instance;
-    public static WhWzStatusManager Instance => _instance ??= new WhWzStatusManager();
+    public static WhWzStatusManager Instance => _instance ??= new();
 
     private WhWzStatusManager() : base(90) { }
 
@@ -28,6 +28,6 @@ public class WhWzStatusManager : RepeatedTaskManager
         
         App.Services.GetRequiredService<ILogger<WhWzStatusManager>>()
             .LogError(statusResult.Error.Exception, "Failed to retrieve WhWz Status: {Message}", statusResult.Error.Message);
-        Status = new WhWzStatus {Variant = WhWzStatusVariant.Error, Message = "Failed to retrieve Wheel Wizard status"};
+        Status = new() {Variant = WhWzStatusVariant.Error, Message = "Failed to retrieve Wheel Wizard status"};
     }
 }

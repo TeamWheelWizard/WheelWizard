@@ -63,7 +63,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
             {
                 progressWindow.UpdateProgress(i * 20);
                 progressWindow.SetExtraText($"This is information for iteration {i}");
-                if(i == 3) progressWindow.SetGoal($"Changed the Goal");
+                if(i == 3) progressWindow.SetGoal("Changed the Goal");
             });
             await Task.Delay(1000); 
         }

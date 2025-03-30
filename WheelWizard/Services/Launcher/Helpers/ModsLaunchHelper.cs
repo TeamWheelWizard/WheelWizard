@@ -1,4 +1,5 @@
-﻿using WheelWizard.Helpers;
+﻿using Avalonia.Threading;
+using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
 
@@ -94,7 +95,7 @@ public static class ModsLaunchHelper
     
                 processedFiles++;
                 var progress = (int)((processedFiles) / (double)totalFiles * 100);
-                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                Dispatcher.UIThread.Post(() =>
                 {
                     progressWindow.UpdateProgress(progress);
                     progressWindow.SetExtraText($"{Common.State_Installing} {relativePath}");
@@ -109,7 +110,6 @@ public static class ModsLaunchHelper
                     if (sourceInfo.Length == destInfo.Length && sourceInfo.LastWriteTimeUtc == destInfo.LastWriteTimeUtc)
                     {
                         // Files are identical, skip copying
-                        continue;
                     }
                     else
                     {

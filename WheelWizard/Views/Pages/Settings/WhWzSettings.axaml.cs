@@ -1,9 +1,9 @@
+using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using System.Runtime.InteropServices;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
@@ -78,7 +78,7 @@ public partial class WhWzSettings : UserControl
         return inputText;
     }
 
-    private async void AssignWrappedDolphinExeInput(string inputText)
+    private void AssignWrappedDolphinExeInput(string inputText)
     {
         DolphinExeInput.Text = WrapOnWhiteSpace(inputText);
     }
@@ -245,7 +245,6 @@ public partial class WhWzSettings : UserControl
 
             if (folders.Count >= 1)
                 DolphinUserPathInput.Text = folders[0].Path.LocalPath;
-            return;
         }
         else
         {

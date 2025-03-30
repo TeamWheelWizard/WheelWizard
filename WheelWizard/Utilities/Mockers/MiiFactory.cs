@@ -29,7 +29,7 @@ public class MiiFactory : MockingDataFactory<Mii, MiiFactory>
     
     public override Mii Create(int? seed = null)
     {
-        return new Mii
+        return new()
         {
             Name = $"Mii {_miiCount++}", 
             Data = dataList[(int)(Rand(seed).NextDouble() * dataList.Length)]

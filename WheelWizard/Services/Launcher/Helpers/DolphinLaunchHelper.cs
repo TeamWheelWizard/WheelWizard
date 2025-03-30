@@ -34,11 +34,9 @@ public static class DolphinLaunchHelper
                 Regex fixablePatternRegex = new Regex(fixablePattern);
                 return fixablePatternRegex.IsMatch(gameFilePath);
             }
-            else
-            {
-                string xdgRuntimeDirDocPath = Path.Combine(xdgRuntimeDir, "doc");
-                return gameFilePath.StartsWith(xdgRuntimeDirDocPath);
-            }
+
+            string xdgRuntimeDirDocPath = Path.Combine(xdgRuntimeDir, "doc");
+            return gameFilePath.StartsWith(xdgRuntimeDirDocPath);
         }
         return false;
     }

@@ -14,7 +14,7 @@ public class RRLiveRooms : RepeatedTaskManager
     public int RoomCount => CurrentRooms.Count;
 
     private static RRLiveRooms? _instance;
-    public static RRLiveRooms Instance => _instance ??= new RRLiveRooms();
+    public static RRLiveRooms Instance => _instance ??= new();
 
     private RRLiveRooms() : base(40) { }
 

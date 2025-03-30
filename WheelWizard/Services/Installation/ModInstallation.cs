@@ -1,6 +1,7 @@
-﻿using SharpCompress.Archives;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text.Json;
+using Avalonia.Threading;
+using SharpCompress.Archives;
 using WheelWizard.Models.Settings;
 using WheelWizard.Views.Popups.Generic;
 
@@ -67,7 +68,7 @@ public static class ModInstallation
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to load mods: {ex.Message}");
+            throw new($"Failed to load mods: {ex.Message}");
         }
 
         // Sort mods based on priority
@@ -97,7 +98,7 @@ public static class ModInstallation
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to save mods: {ex.Message}");
+            throw new($"Failed to save mods: {ex.Message}");
         }
     }
     
@@ -117,7 +118,7 @@ public static class ModInstallation
             // Determine the archive type and extract accordingly
             using var archive = OpenArchive(file, extension);
             if (archive == null)
-                throw new Exception($"Unsupported archive format: {extension}");
+                throw new($"Unsupported archive format: {extension}");
             
             var totalEntries = archive.Entries.Count(entry => !entry.IsDirectory);
             var processedEntries = 0;
@@ -128,7 +129,7 @@ public static class ModInstallation
                 
                 // Update the progress window
                 var progress = (int)(processedEntries / (double)totalEntries * 100);
-                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                Dispatcher.UIThread.Post(() =>
                 {
                 progressWindow.UpdateProgress(progress);
                 });
@@ -165,7 +166,7 @@ public static class ModInstallation
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to extract archive file: {ex.Message}");
+            throw new($"Failed to extract archive file: {ex.Message}");
         }
     }
     
@@ -223,7 +224,7 @@ public static class ModInstallation
             }
 
             // Initialize progress window
-            progressWindow = new ProgressWindow("Installing Mod");
+            progressWindow = new("Installing Mod");
             progressWindow.SetGoal("Extracting files...");
             progressWindow.Show();
 

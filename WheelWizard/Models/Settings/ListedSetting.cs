@@ -2,9 +2,9 @@ namespace WheelWizard.Models.Settings;
 
 public class ListedSetting<T>
 {
-    public readonly Dictionary<string, T> Mapping = new Dictionary<string, T>();
-    public readonly List<string> AllKeys = new List<string>();
-    public readonly List<T> AllValues = new List<T>();
+    public readonly Dictionary<string, T> Mapping = new();
+    public readonly List<string> AllKeys = new();
+    public readonly List<T> AllValues = new();
     public T DefaultValue { get; set; }
     
     public ListedSetting(string defaultKey, params (string, T)[] values)

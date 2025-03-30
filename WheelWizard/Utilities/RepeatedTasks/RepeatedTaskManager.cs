@@ -30,7 +30,7 @@ public abstract class RepeatedTaskManager
     {
         if (_globalCancellation || _timer != null) return;
 
-        _timer = new DispatcherTimer
+        _timer = new()
         {
             Interval = TimeSpan.FromSeconds(IntervalSeconds)
         };

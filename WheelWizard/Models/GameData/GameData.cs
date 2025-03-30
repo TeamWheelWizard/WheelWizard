@@ -6,6 +6,6 @@ public class GameData
 
     public GameData()
     {
-        Users = new List<GameDataUser>(4);
+        Users = new(4);
     }
 }

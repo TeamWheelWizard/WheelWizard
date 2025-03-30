@@ -1,4 +1,5 @@
-﻿using WheelWizard.Helpers;
+﻿using Avalonia.Threading;
+using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Installation;
@@ -24,7 +25,7 @@ public class RrLauncher : ILauncher
             await ModsLaunchHelper.PrepareModsForLaunch();
             if (!File.Exists(PathManager.GameFilePath))
             {
-                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                Dispatcher.UIThread.Post(() =>
                 {
                     new MessageBoxWindow()
                         .SetMessageType(MessageBoxWindow.MessageType.Warning)
@@ -42,7 +43,7 @@ public class RrLauncher : ILauncher
         }
         catch (Exception ex)
         {
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Dispatcher.UIThread.Post(() =>
             {
                 new MessageBoxWindow()
                     .SetMessageType(MessageBoxWindow.MessageType.Error)

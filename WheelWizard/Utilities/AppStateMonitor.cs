@@ -8,7 +8,7 @@ public class AppStateMonitor : RepeatedTaskManager
     private AppStateMonitor() : base(0.2) { }
     
     private static AppStateMonitor? _instance;
-    public static AppStateMonitor Instance => _instance ??= new AppStateMonitor();
+    public static AppStateMonitor Instance => _instance ??= new();
     
     protected override Task ExecuteTaskAsync()
     {

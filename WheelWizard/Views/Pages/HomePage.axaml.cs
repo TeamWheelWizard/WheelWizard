@@ -16,8 +16,8 @@ namespace WheelWizard.Views.Pages;
 public partial class HomePage : UserControl
 {
     private static ILauncher currentLauncher => _launcherTypes[_launcherIndex];
-    private static int _launcherIndex = 0; // Make sure this index never goes over the list index
-    private static List<ILauncher> _launcherTypes = new List<ILauncher>()
+    private static int _launcherIndex; // Make sure this index never goes over the list index
+    private static List<ILauncher> _launcherTypes = new()
     { // Add Launcher instances here , every launch instance is a new start screen
         new RrLauncher()
         //GoogleLauncher.Instance
@@ -26,7 +26,7 @@ public partial class HomePage : UserControl
     private WheelWizardStatus _status;
     private MainButtonState currentButtonState => buttonStates[_status];
     private static Dictionary<WheelWizardStatus, MainButtonState> buttonStates =
-        new Dictionary<WheelWizardStatus, MainButtonState>()
+        new()
         {
             {
                 WheelWizardStatus.Loading,

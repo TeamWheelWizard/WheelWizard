@@ -1,11 +1,11 @@
-﻿using Avalonia.Data.Converters;
-using System.Globalization;
+﻿using System.Globalization;
+using Avalonia.Data.Converters;
 
 namespace WheelWizard.Views.Converters;
 
 public class IsEqualToConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value == null && parameter == null)
         {

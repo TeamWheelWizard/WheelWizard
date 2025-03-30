@@ -14,7 +14,7 @@ public class WhWzDataTests
     public WhWzDataTests()
     {
         _apiCaller = Substitute.For<IApiCaller<IWhWzDataApi>>();
-        _service = new WhWzDataSingletonService(_apiCaller);
+        _service = new(_apiCaller);
     }
 
     [Fact]

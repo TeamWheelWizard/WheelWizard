@@ -5,38 +5,40 @@
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             x:Class="WheelWizard.Views.Pages.RoomsPage">
-   <Grid>
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             x:Class="WheelWizard.Views.Pages.RoomsPage"
+             x:DataType="pages:RoomsPage">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-       
-       <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-               VerticalAlignment="Bottom" />
-      
-       <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-               VerticalAlignment="Bottom" />
-       
-       <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-           <TextBlock Text="{x:Static lang:Common.PageTitle_RoomDetails}" Classes="PageTitleText" />
-           <Border VerticalAlignment="Center" HorizontalAlignment="Center"
-                   ToolTip.Tip="{x:Static lang:Phrases.Hover_RoomsPageDisclaimer}"
-                   ToolTip.Placement="Top" ToolTip.ShowDelay="20"
-                   Width="18" Height="18">
-               <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
-                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
-           </Border>
-       </StackPanel>
-       
+
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <TextBlock Text="{x:Static lang:Common.PageTitle_RoomDetails}" Classes="PageTitleText" />
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center"
+                    ToolTip.Tip="{x:Static lang:Phrases.Hover_RoomsPageDisclaimer}"
+                    ToolTip.Placement="Top" ToolTip.ShowDelay="20"
+                    Width="18" Height="18">
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
+            </Border>
+        </StackPanel>
+
         <TextBox Grid.Row="0" Width="200"
-                               Watermark="{x:Static lang:Phrases.Placeholder_SearchForPlayers}"
-                               VerticalAlignment="Bottom"
-                               TextChanged="PlayerSearchField_OnTextChanged"
-                               HorizontalAlignment="Right"
-                               Margin="10,0,10,10"
-                               x:Name="PlayerSearchField" />
+                 Watermark="{x:Static lang:Phrases.Placeholder_SearchForPlayers}"
+                 VerticalAlignment="Bottom"
+                 TextChanged="PlayerSearchField_OnTextChanged"
+                 HorizontalAlignment="Right"
+                 Margin="10,0,10,10"
+                 x:Name="PlayerSearchField" />
 
         <components:EmptyPageInfo Grid.Row="2" x:Name="EmptyRoomsView"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -44,20 +46,20 @@
                                   BodyText="{x:Static lang:Phrases.EmptyText_NoRooms}" />
 
 
-           <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0" x:Name="RoomsListViewContainer">
-                <Grid Grid.Row="0" >
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                        <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Rooms}"/>
-                        <components:StateBox Text="0" IconSize="0" x:Name="RoomsListItemCount"/>
-                        <components:FormFieldLabel Foreground="{StaticResource Primary400}" Margin="4,0,0,0"
-                                                   Text="Nice!" x:Name="RoomsNiceLabel" IsVisible="False"/>
-                    </StackPanel>
-                    <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-                            VerticalAlignment="Bottom"  />
-    
-                </Grid>
-            
-            <ListBox SelectionMode="Single" Padding="0"  ItemsSource="{Binding Rooms}"
+        <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0" x:Name="RoomsListViewContainer">
+            <Grid Grid.Row="0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
+                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Rooms}" />
+                    <components:StateBox Text="0" IconSize="0" x:Name="RoomsListItemCount" />
+                    <components:FormFieldLabel Foreground="{StaticResource Primary400}" Margin="4,0,0,0"
+                                               Text="Nice!" x:Name="RoomsNiceLabel" IsVisible="False" />
+                </StackPanel>
+                <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                        VerticalAlignment="Bottom" />
+
+            </Grid>
+
+            <ListBox SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
                      Background="Transparent" BorderThickness="0" Grid.Row="1"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -67,14 +69,15 @@
                         <Border Classes="BoxItemBackground">
                             <Grid ColumnDefinitions="Auto,110,*">
                                 <PathIcon Data="{StaticResource Road}" Width="50" Height="50" Classes="RoadIcon"
-                                          Margin="0,3"   IsVisible="{Binding IsPublic }"
-                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0"/>
+                                          Margin="0,3" IsVisible="{Binding IsPublic }"
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" />
                                 <PathIcon Data="{StaticResource RoadLocked}" Width="50" Height="50" Classes="RoadIcon"
-                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" Margin="0,3"
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0"
+                                          Margin="0,3"
                                           IsVisible="{Binding IsPublic, Converter={x:Static BoolConverters.Not}}" />
-                                
-                                <!-- Temporary, will replace this later with path icon, but it's cool that this exists --> 
-                               <!-- <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True" 
+
+                                <!-- Temporary, will replace this later with path icon, but it's cool that this exists -->
+                                <!-- <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True" 
                                         Background="{StaticResource Neutral950}" Width="50" Height="50" Margin="0,3">
                                     <miiComp:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                                             LoadingColor="{StaticResource Neutral600}"
@@ -82,32 +85,34 @@
                                                             FallBackColor="{StaticResource Neutral600}"
                                                             ImageVariant="SMALL"/>
                                 </Border> -->
-                                
-                               <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                   <components:FormFieldLabel Text="{Binding GameMode}"  Margin="10,0,0,0"/>
-                                   <TextBlock Text="{Binding Id}" FontSize="14" 
-                                              Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                              Margin="10,0,0,0"/>
-                               </StackPanel>
-                               
-                               <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                   <components:FormFieldLabel Text="{x:Static lang:Online.Stat_TimeOnline}"  Margin="10,0,0,0"/>
-                                   <TextBlock Text="{Binding TimeOnline}" FontSize="14" 
-                                              Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                              Margin="10,0,0,0"/>
-                               </StackPanel>
-                     
-                               <components:StateBox Grid.Column="2" IconData="{StaticResource UserCouple}"
-                                                    Text="{Binding PlayerCount}" VerticalAlignment="Center" Variant="Dark"
-                                                    HorizontalAlignment="Right"  Margin="0,0,10,0"/>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <components:FormFieldLabel Text="{Binding GameMode}" Margin="10,0,0,0" />
+                                    <TextBlock Text="{Binding Id}" FontSize="14"
+                                               Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                               Margin="10,0,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                    <components:FormFieldLabel Text="{x:Static lang:Online.Stat_TimeOnline}"
+                                                               Margin="10,0,0,0" />
+                                    <TextBlock Text="{Binding TimeOnline}" FontSize="14"
+                                               Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                               Margin="10,0,0,0" />
+                                </StackPanel>
+
+                                <components:StateBox Grid.Column="2" IconData="{StaticResource UserCouple}"
+                                                     Text="{Binding PlayerCount}" VerticalAlignment="Center"
+                                                     Variant="Dark"
+                                                     HorizontalAlignment="Right" Margin="0,0,10,0" />
                             </Grid>
-                            
+
                             <Border.Styles>
                                 <Style Selector="ListBoxItem Border.BoxItemBackground PathIcon.RoadIcon">
-                                    <Setter Property="Foreground" Value="{StaticResource Neutral500}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
                                 </Style>
                                 <Style Selector="ListBoxItem Border.BoxItemBackground:pointerover PathIcon.RoadIcon">
-                                    <Setter Property="Foreground" Value="{StaticResource Neutral400}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
                                 </Style>
                             </Border.Styles>
                         </Border>
@@ -115,39 +120,38 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-       
-       
+
+
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0" x:Name="PlayerListViewContainer">
-            <Grid Grid.Row="0" >
+            <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Players}"/>
-                    <components:StateBox Text="0" IconSize="0" x:Name="PlayerListItemCount"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Players}" />
+                    <components:StateBox Text="0" IconSize="0" x:Name="PlayerListItemCount" />
                     <components:FormFieldLabel Foreground="{StaticResource Primary400}" Margin="4,0,0,0"
-                                               Text="Nice!" x:Name="PlayerNiceLabel" IsVisible="False"/>
+                                               Text="Nice!" x:Name="PlayerNiceLabel" IsVisible="False" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-                        VerticalAlignment="Bottom"  />
+                        VerticalAlignment="Bottom" />
 
             </Grid>
-            
+
             <ListBox Grid.Row="1" SelectionMode="Single" BorderThickness="0"
                      Padding="0" Margin="0" Background="Transparent" ItemsSource="{Binding Players}"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      SelectionChanged="PlayerView_SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <components:PlayerListItem 
+                        <components:PlayerListItem
                             UserName="{Binding Name}"
                             FriendCode="{Binding Fc}"
                             Br="{Binding Eb}"
                             Vr="{Binding Ev}"
                             Mii="{Binding FirstMii}"
-                            HasBadges="{Binding HasBadges}"
-                        />
+                            HasBadges="{Binding HasBadges}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-   </Grid>
+    </Grid>
 </UserControl>

@@ -11,7 +11,7 @@ public class Mii
     public MiiImage GetImage(MiiImageVariants.Variant variant)
     {
         if (!images.ContainsKey(variant))
-            images[variant] = new MiiImage(this, variant);
+            images[variant] = new(this, variant);
         return images[variant];
     }
 }

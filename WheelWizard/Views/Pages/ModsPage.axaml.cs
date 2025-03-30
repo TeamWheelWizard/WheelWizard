@@ -1,8 +1,8 @@
-﻿using Avalonia.Controls;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using WheelWizard.Models.Settings;
 using WheelWizard.Services;
 using WheelWizard.Services.Settings;
@@ -16,8 +16,9 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
 {
     public ModManager ModManager => ModManager.Instance;
     public ObservableCollection<Mod> Mods => ModManager.Mods;
-    
+
     private bool _hasMods;
+
     public bool HasMods
     {
         get => _hasMods;
@@ -41,10 +42,10 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
 
     private void OnModsChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if(e.PropertyName == nameof(ModManager.Mods))
+        if (e.PropertyName == nameof(ModManager.Mods))
             OnModsChanged();
     }
-    
+
     private void OnModsChanged()
     {
         ListItemCount.Text = ModManager.Mods.Count.ToString();
@@ -52,12 +53,13 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         HasMods = Mods.Count > 0;
         EnableAllCheckbox.IsChecked = !ModManager.Mods.Select(mod => mod.IsEnabled).Contains(false);
     }
-    
+
     private void BrowseMod_Click(object sender, RoutedEventArgs e)
     {
         var modPopup = new ModPopupWindow();
         modPopup.Show();
     }
+
     private void ImportMod_Click(object sender, RoutedEventArgs e)
     {
         ModManager.ImportMods();
@@ -66,7 +68,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     private void RenameMod_Click(object sender, RoutedEventArgs e)
     {
         if (ModsListBox.SelectedItem is not Mod selectedMod)
-             return;
+            return;
         ModManager.RenameMod(selectedMod);
     }
 
@@ -74,18 +76,18 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     {
         if (ModsListBox.SelectedItem is not Mod selectedMod)
             return;
-        
+
         ModManager.DeleteMod(selectedMod);
     }
-    
+
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
         if (ModsListBox.SelectedItem is not Mod selectedMod)
             return;
-        
+
         ModManager.OpenModFolder(selectedMod);
     }
-    
+
     private void ViewMod_Click(object sender, RoutedEventArgs e)
     {
         if (ModsListBox.SelectedItem is not Mod selectedMod)
@@ -98,7 +100,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
                 .Show();
             return;
         }
-       
+
         if (selectedMod.ModID == -1)
         {
             new MessageBoxWindow()
@@ -108,72 +110,75 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
                 .Show();
             return;
         }
-        
+
         var modPopup = new ModIndependentWindow();
         modPopup.LoadModAsync(selectedMod.ModID);
         modPopup.ShowDialog();
     }
-    
-        
+
+
     private void ToggleButton_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-       ModManager.ToggleAllMods(EnableAllCheckbox.IsChecked == true);
-    }
-    
-        /*
-    private static ListOrderCondition CurrentOrder = ListOrderCondition.PRIORITY;
-    private void PopulateSortingList()
-    {
-        foreach (ListOrderCondition type in Enum.GetValues(typeof(ListOrderCondition)))
-        {
-            var name = type switch
-            { // TODO: Should be replaced with actual translations
-                ListOrderCondition.IS_CHECKED => "Is Enabled",
-                ListOrderCondition.NAME => "Mod Name",
-                ListOrderCondition.PRIORITY => "Priority"
-            };
-
-            SortByDropdown.Items.Add(name);
-        }
-        SortByDropdown.SelectedIndex = (int)CurrentOrder;
+        ModManager.ToggleAllMods(EnableAllCheckbox.IsChecked == true);
     }
 
-    private void SortByDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    /*
+private static ListOrderCondition CurrentOrder = ListOrderCondition.PRIORITY;
+private void PopulateSortingList()
+{
+    foreach (ListOrderCondition type in Enum.GetValues(typeof(ListOrderCondition)))
     {
-        CurrentOrder = (ListOrderCondition)SortByDropdown.SelectedIndex;
+        var name = type switch
+        { // TODO: Should be replaced with actual translations
+            ListOrderCondition.IS_CHECKED => "Is Enabled",
+            ListOrderCondition.NAME => "Mod Name",
+            ListOrderCondition.PRIORITY => "Priority"
+        };
+
+        SortByDropdown.Items.Add(name);
     }
-    
-    private enum ListOrderCondition
-    {
-        PRIORITY,
-        IS_CHECKED,
-        NAME
-    }
-    */
+    SortByDropdown.SelectedIndex = (int)CurrentOrder;
+}
+
+private void SortByDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+{
+    CurrentOrder = (ListOrderCondition)SortByDropdown.SelectedIndex;
+}
+
+private enum ListOrderCondition
+{
+    PRIORITY,
+    IS_CHECKED,
+    NAME
+}
+*/
+
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
+
     #endregion
-    
+
     private void InputElement_OnLostFocus(object? sender, RoutedEventArgs e)
     {
         var mod = GetParentsMod(e);
         if (mod == null || e.Source is not TextBox textBox) return;
-        
-        if(int.TryParse(textBox.Text, out var newPriority))
+
+        if (int.TryParse(textBox.Text, out var newPriority))
             mod.Priority = newPriority;
         else
             textBox.Text = mod.Priority.ToString();
     }
-    
+
     private Mod? GetParentsMod(RoutedEventArgs eventArgs)
     {
         var parent = ViewUtils.FindParent<ListBoxItem>(eventArgs.Source);
-        if(parent?.Content is Mod mod) return mod;
+        if (parent?.Content is Mod mod) return mod;
         return null;
     }
 
@@ -181,15 +186,15 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     {
         var mod = GetParentsMod(e);
         if (mod == null) return;
-        
+
         ModManager.DecreasePriority(mod);
     }
-    
+
     private void ButtonDown_OnClick(object? sender, RoutedEventArgs e)
     {
         var mod = GetParentsMod(e);
         if (mod == null) return;
-        
+
         ModManager.IncreasePriority(mod);
     }
 
@@ -204,13 +209,13 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     {
         Control[] elementsToSwapClasses = [ToggleButton, ModsListBox];
         var asRows = (bool)SettingsManager.PREFERS_MODS_ROW_VIEW.Get();
-        
+
         foreach (var elementToSwapClass in elementsToSwapClasses)
         {
-            if(asRows) elementToSwapClass.Classes.Remove("Blocks");
+            if (asRows) elementToSwapClass.Classes.Remove("Blocks");
             else elementToSwapClass.Classes.Add("Blocks");
-            
-            if(asRows) elementToSwapClass.Classes.Add("Rows");
+
+            if (asRows) elementToSwapClass.Classes.Add("Rows");
             else elementToSwapClass.Classes.Remove("Rows");
         }
     }

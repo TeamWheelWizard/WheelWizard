@@ -2,11 +2,12 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+
 // Add this for PlacementMode
 
 namespace WheelWizard.Views.Components;
 
-public partial class StateBox : TemplatedControl // Change to TemplatedControl
+public class StateBox : TemplatedControl // Change to TemplatedControl
 {
     public enum StateBoxVariantType
     {
@@ -58,7 +59,7 @@ public partial class StateBox : TemplatedControl // Change to TemplatedControl
     }
 
     public static readonly StyledProperty<StateBoxVariantType> VariantProperty =
-        AvaloniaProperty.Register<StateBox, StateBoxVariantType>(nameof(Variant), StateBoxVariantType.Default);
+        AvaloniaProperty.Register<StateBox, StateBoxVariantType>(nameof(Variant));
     
     public StateBoxVariantType Variant
     {

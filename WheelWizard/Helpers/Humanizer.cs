@@ -4,7 +4,7 @@ namespace WheelWizard.Helpers;
 
 public static class Humanizer
 {
-    public static string? ReplaceDynamic(string? langString,params object[] replacements)
+    public static string? ReplaceDynamic(string? langString, params object[] replacements)
     {
         // any dynamic part should be as follows: {$1}, {$2}, etc.
         for (var i = 0; i < replacements.Length; i++)
@@ -14,14 +14,14 @@ public static class Humanizer
 
         return langString;
     }
-    
+
     public static string HumanizeTimeSpan(TimeSpan timeSpan)
     {
         // we use langauge to do the words like Phrases.Time_Days_1 or Phrases.Time_Days_x
         // howver, the one with x has to be put in the method: ReplaceDynamic(Phrases.Time_Days_x, 10);
-        
+
         // now e need to replace all the old with the new language versions
-      
+
         if (Math.Abs(timeSpan.TotalDays) >= 1)
         {
             var days = timeSpan.Days;
@@ -43,7 +43,8 @@ public static class Humanizer
             var minuteText = minutes == 1 ? Phrases.Time_Minutes_1 : ReplaceDynamic(Phrases.Time_Minutes_x, minutes);
             return $"{hourText} {minuteText}";
         }
-        if (Math.Abs(timeSpan.TotalMinutes) >= 1) 
+
+        if (Math.Abs(timeSpan.TotalMinutes) >= 1)
         {
             var minutes = timeSpan.Minutes;
             var seconds = timeSpan.Seconds;
@@ -55,13 +56,10 @@ public static class Humanizer
         }
 
         return ReplaceDynamic(Phrases.Time_Seconds_x, timeSpan.Seconds)!;
-
-        // internal method to simplify the pluralization of words
-        string P(int count) => Math.Abs(count) != 1 ? "s" : "";
     }
 
     public static string HumanizeSeconds(int seconds) => HumanizeTimeSpan(TimeSpan.FromSeconds(seconds));
-    
+
     public static string GetRegionName(uint regionID)
     {
         return regionID switch
@@ -76,7 +74,7 @@ public static class Humanizer
             _ => Common.Term_Unknown
         };
     }
-    
+
     public static string GetCountryEmoji(byte countryId)
     {
         return countryId switch
@@ -214,7 +212,7 @@ public static class Humanizer
             175 => "🇸🇾", // Syria
             176 => "🇧🇭", // Bahrain
             177 => "🇯🇴", // Jordan
-            
+
             _ => "🏳️"
         };
     }

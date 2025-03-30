@@ -19,7 +19,7 @@ public static class RetroRewindLaunchHelper
         {
             BaseFile = Path.GetFullPath(PathManager.GameFilePath),
             DisplayName = "RR",
-            Riivolution = new RiivolutionConfig
+            Riivolution = new()
             {
                 Patches = new[]
                 {

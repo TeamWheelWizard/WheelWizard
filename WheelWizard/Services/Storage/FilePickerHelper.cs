@@ -1,8 +1,8 @@
-﻿using Avalonia;
+﻿using System.Diagnostics;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
-using System.Diagnostics;
 
 namespace WheelWizard.Services;
 
@@ -19,7 +19,7 @@ public static class FilePickerHelper
     {
         var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
         if (storageProvider == null)
-            return new List<string>();
+            return new();
 
         var options = new FilePickerOpenOptions
         {
@@ -42,7 +42,7 @@ public static class FilePickerHelper
         var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
         if (topLevel?.StorageProvider == null) return null;
 
-        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new()
         {
             Title = title,
             AllowMultiple = false,
@@ -59,9 +59,9 @@ public static class FilePickerHelper
             return null;
         
         var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
-        if (topLevel?.StorageProvider == null) return new List<string>();
+        if (topLevel?.StorageProvider == null) return new();
 
-        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new()
         {
             Title = title,
             AllowMultiple = true,
@@ -80,7 +80,7 @@ public static class FilePickerHelper
         var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
         if (topLevel?.StorageProvider == null) return null;
 
-        var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new()
         {
             Title = title,
             AllowMultiple = false,

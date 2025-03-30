@@ -14,7 +14,7 @@ public class RrRoomFactory : MockingDataFactory<RrRoom, RrRoomFactory>
         var playerCount = (int)(rand.NextDouble() * 12);
         var players = RrPlayerFactory.Instance.CreateAsDictionary(playerCount, seed); 
         var isPrivate = (int)(rand.NextDouble() * 3) == 0;
-        return new RrRoom
+        return new()
         {
             Id = _roomCount++.ToString(),
             Game = "mariokartwii",

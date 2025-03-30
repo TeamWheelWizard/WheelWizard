@@ -4,7 +4,7 @@ public abstract class MockingDataFactory<T, U> where U: MockingDataFactory<T,U>,
 {
     public static T StaticSingle => Instance.Create();
     
-    public static U Instance { get; } = new U();
+    public static U Instance { get; } = new();
     public abstract T Create(int? seed = null);
 
     protected virtual string DictionaryKeyGenerator(T value) => value.ToString();
@@ -34,5 +34,5 @@ public abstract class MockingDataFactory<T, U> where U: MockingDataFactory<T,U>,
         return result;
     }
 
-    protected Random Rand(int? seed = null) => seed == null ? new Random() : new Random(seed.Value);
+    protected Random Rand(int? seed = null) => seed == null ? new() : new Random(seed.Value);
 }

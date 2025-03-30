@@ -6,7 +6,7 @@ public abstract class BaseWindow : Window
 {
     private static readonly List<WindowLayer> WindowLayers = [];
     
-    private int _disableCount = 0;
+    private int _disableCount;
     private WindowLayer? _currentLayer;
     
     protected abstract Control InteractionOverlay { get; } // Just the visual part of the interaction
@@ -18,7 +18,7 @@ public abstract class BaseWindow : Window
     {
         if (!AllowParentInteraction || WindowLayers.Count == 0)
         {
-            _currentLayer = new WindowLayer(this);
+            _currentLayer = new(this);
             if(WindowLayers.Count != 0)
                 WindowLayers.Last().SetInteractable(false);
             WindowLayers.Add(_currentLayer);

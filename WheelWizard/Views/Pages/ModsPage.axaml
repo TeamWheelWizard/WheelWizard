@@ -1,183 +1,188 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
-          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-          xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
-          xmlns:components="clr-namespace:WheelWizard.Views.Components"
-          mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
-          x:Class="WheelWizard.Views.Pages.ModsPage">
- <Grid>
-     <Grid.RowDefinitions>
-         <RowDefinition Height="{StaticResource TopRowSize}" />
-         <RowDefinition Height="*" />
-     </Grid.RowDefinitions>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             x:Class="WheelWizard.Views.Pages.ModsPage"
+             x:DataType="pages:ModsPage">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-     <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
-             HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-     <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
-             HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
 
-     <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_Mods}"
-                HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                Classes="PageTitleText" />
+        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_Mods}"
+                   HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                   Classes="PageTitleText" />
 
-     <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="12"
-                 Orientation="Horizontal" x:Name="TopBarButtons" IsVisible="{Binding HasMods}">
-         <UniformGrid Columns="2" Rows="1">
-             <components:Button Variant="Primary" Margin="3,0"
-                                Text="Browse" IconData="{StaticResource Search}"
-                                Click="BrowseMod_Click" HorizontalAlignment="Center" />
-             <components:Button Variant="Default" Margin="3,0"
-                                Text="{x:Static lang:Common.Action_Import}"
-                                IconData="{StaticResource FileImport}"
-                                Click="ImportMod_Click" HorizontalAlignment="Center" />
-         </UniformGrid>
-     </StackPanel>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="12"
+                    Orientation="Horizontal" x:Name="TopBarButtons" IsVisible="{Binding HasMods}">
+            <UniformGrid Columns="2" Rows="1">
+                <components:Button Variant="Primary" Margin="3,0"
+                                   Text="Browse" IconData="{StaticResource Search}"
+                                   Click="BrowseMod_Click" HorizontalAlignment="Center" />
+                <components:Button Variant="Default" Margin="3,0"
+                                   Text="{x:Static lang:Common.Action_Import}"
+                                   IconData="{StaticResource FileImport}"
+                                   Click="ImportMod_Click" HorizontalAlignment="Center" />
+            </UniformGrid>
+        </StackPanel>
 
-     <!-- Empty Mods Message -->
-     <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="PageWithoutMods" 
-                 IsVisible="{Binding HasMods, Converter={x:Static BoolConverters.Not}}">
-         <components:EmptyPageInfo Title="{x:Static lang:Phrases.EmptyText_NoMods_Title}"
-                                   BodyText="{x:Static lang:Phrases.EmptyText_NoMods}"
-                                   HorizontalAlignment="Center" />
-         <UniformGrid Margin="0,12" Columns="2" Rows="1">
-             <components:Button Variant="Primary" Margin="3,0"
-                                Text="Browse" IconData="{StaticResource Search}"
-                                Click="BrowseMod_Click" HorizontalAlignment="Center" />
-             <components:Button Variant="Default" Margin="3,0"
-                                Text="{x:Static lang:Common.Action_Import}"
-                                IconData="{StaticResource FileImport}"
-                                Click="ImportMod_Click" HorizontalAlignment="Center" />
-         </UniformGrid>
-     </StackPanel>
+        <!-- Empty Mods Message -->
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="PageWithoutMods"
+                    IsVisible="{Binding HasMods, Converter={x:Static BoolConverters.Not}}">
+            <components:EmptyPageInfo Title="{x:Static lang:Phrases.EmptyText_NoMods_Title}"
+                                      BodyText="{x:Static lang:Phrases.EmptyText_NoMods}"
+                                      HorizontalAlignment="Center" />
+            <UniformGrid Margin="0,12" Columns="2" Rows="1">
+                <components:Button Variant="Primary" Margin="3,0"
+                                   Text="Browse" IconData="{StaticResource Search}"
+                                   Click="BrowseMod_Click" HorizontalAlignment="Center" />
+                <components:Button Variant="Default" Margin="3,0"
+                                   Text="{x:Static lang:Common.Action_Import}"
+                                   IconData="{StaticResource FileImport}"
+                                   Click="ImportMod_Click" HorizontalAlignment="Center" />
+            </UniformGrid>
+        </StackPanel>
 
-     <Grid Grid.Row="1" x:Name="PageWithMods" RowDefinitions="*, 12*" IsVisible="{Binding HasMods}">
-         <Grid Grid.Row="0" Margin="10,0"  >
-              
-             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Column="0"
-                         Orientation="Horizontal">
-                 <CheckBox Classes="Switch" x:Name="EnableAllCheckbox"
-                           VerticalAlignment="Center" Margin="0,5,30,5"
-                           Click="ToggleButton_OnIsCheckedChanged"
-                           Content="{x:Static lang:Common.Action_EnableAll}" />
-             
-                 <components:Button HorizontalAlignment="Right" VerticalAlignment="Center" IconSize="26"
-                                    Click="ToggleModsPageView_OnClick" x:Name="ToggleButton"
-                                    Padding="13,7">
-                     <components:Button.Styles>
-                         <!-- If the current Style is blocks, then the button should show the rows icon -->
-                         <Style Selector="components|Button.Blocks">
-                            <Setter Property="IconData" Value="{StaticResource TableBars}"/>
-                        </Style>
-                         <Style Selector="components|Button">
-                             <Setter Property="IconData" Value="{StaticResource TableBlocks}"/>
-                         </Style>
-                     </components:Button.Styles>
-                 </components:Button>
-             </StackPanel>
-            
-             <!-- THIS IS A COOL IDEA, BUT IT HAS TO BE SUPPORTED FIRST
+        <Grid Grid.Row="1" x:Name="PageWithMods" RowDefinitions="*, 12*" IsVisible="{Binding HasMods}">
+            <Grid Grid.Row="0" Margin="10,0">
+
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Column="0"
+                            Orientation="Horizontal">
+                    <CheckBox Classes="Switch" x:Name="EnableAllCheckbox"
+                              VerticalAlignment="Center" Margin="0,5,30,5"
+                              Click="ToggleButton_OnIsCheckedChanged"
+                              Content="{x:Static lang:Common.Action_EnableAll}" />
+
+                    <components:Button HorizontalAlignment="Right" VerticalAlignment="Center" IconSize="26"
+                                       Click="ToggleModsPageView_OnClick" x:Name="ToggleButton"
+                                       Padding="13,7">
+                        <components:Button.Styles>
+                            <!-- If the current Style is blocks, then the button should show the rows icon -->
+                            <Style Selector="components|Button.Blocks">
+                                <Setter Property="IconData" Value="{StaticResource TableBars}" />
+                            </Style>
+                            <Style Selector="components|Button">
+                                <Setter Property="IconData" Value="{StaticResource TableBlocks}" />
+                            </Style>
+                        </components:Button.Styles>
+                    </components:Button>
+                </StackPanel>
+
+                <!-- THIS IS A COOL IDEA, BUT IT HAS TO BE SUPPORTED FIRST
              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6" HorizontalAlignment="Right">
                  <components:FormFieldLabel Text="Sort by:" VerticalAlignment="Center"/>
                  <ComboBox x:Name="SortByDropdown" MinWidth="160" VerticalAlignment="Top"
                            SelectionChanged="SortByDropdown_OnSelectionChanged" />
              </StackPanel> -->
-           
-             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                 <components:FormFieldLabel Text="Mods"/>
-                 <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount"/>
-             </StackPanel>
-             <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-                     VerticalAlignment="Bottom"  />
-         </Grid>
-         
-         <!-- Mods List -->
-         <ListBox Grid.Row="1" x:Name="ModsListBox" ItemsSource="{Binding Mods}" Margin="10,5">
-             <ListBox.ItemTemplate>
-                 <DataTemplate>
-                     <Border Classes="BoxItemBackground" Height="50">
-                         <Grid>
-                             <Grid.ColumnDefinitions>
-                                 <ColumnDefinition Width="50" />
-                                 <ColumnDefinition Width="*" />
-                             </Grid.ColumnDefinitions>
-                             
-                             <CheckBox  Grid.Column="0" IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                                        Classes="SwitchDark"  Margin="0,5" 
-                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
-                             <TextBlock Text="{Binding Title}" FontSize="14" Foreground="{StaticResource Neutral100}"
-                                        Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                             
-                             <!-- Yes i know that it already works without any change event if we remove Mode=OneWay -->
-                             <!-- Removing that will make it so editing that will also edit the model -->
-                             <!-- however, it works really weird if you do that -->
-                             <StackPanel Grid.Column="1"  Orientation="Horizontal"  HorizontalAlignment="Right" VerticalAlignment="Center">
-                                 <TextBlock Text="Priority: " FontSize="14" Foreground="{StaticResource Neutral100}"
-                                            VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                 <TextBox Text="{Binding Priority, Mode=OneWay}" Classes="dark"
-                                          LostFocus="InputElement_OnLostFocus" Padding="0" 
-                                          KeyDown="PriorityText_OnKeyDown"
-                                          x:Name="VisibleWithRows"
-                                          MinWidth="25" MaxWidth="50" MinHeight="30" Height="30">
-                                     <TextBox.Styles>
-                                         <Style Selector="TextBox /template/ DockPanel#PART_InnerDockPanel">
-                                        
-                                             <Setter Property="Margin" Value="0"/>
-                                         </Style>
-                                         <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
-                                             <Setter Property="HorizontalAlignment" Value="Center"/>
-                                             <Setter Property="VerticalScrollBarVisibility" Value="Hidden"/>
-                                         </Style>
-                                     </TextBox.Styles>
-                                 </TextBox>
-                                 
-                                 <StackPanel Margin="10,0,0,0" Spacing="2" x:Name="VisibleWithBlocks">
-                                     <components:Button HorizontalAlignment="Right" 
-                                                        IconData="{StaticResource ChevronUp}" 
-                                                        IconSize="15" Padding="10,3"
-                                                        IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}"
-                                                        Click="ButtonUp_OnClick"/>
-                                     <components:Button HorizontalAlignment="Right" 
-                                                        IconData="{StaticResource ChevronDown}" 
-                                                        IconSize="15" Padding="10,3"
-                                                        IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}"
-                                                        Click="ButtonDown_OnClick"/>
-                                     
-                                     <StackPanel.Styles>
-                                         <Style Selector="ListBoxItem Border.BoxItemBackground:pointerover components|Button">
-                                             <Setter Property="Variant" Value="UglyLight"/>
-                                         </Style>
-                                     </StackPanel.Styles>
-                                 </StackPanel>
-                                 
-                                 <StackPanel.Styles>
-                                     <Style Selector="ListBox.Rows ListBoxItem StackPanel#VisibleWithBlocks">
-                                         <Setter Property="IsVisible" Value="False"/>
-                                     </Style>
-                                     <Style Selector="ListBox.Blocks ListBoxItem TextBox#VisibleWithRows">
-                                         <Setter Property="IsVisible" Value="False"/>
-                                     </Style>
-                                 </StackPanel.Styles>
-                             </StackPanel>
-                             
-                             <!-- <components:StateBox Grid.Column="1" IconSize="0" Text="{Binding Priority}"
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
+                    <components:FormFieldLabel Text="Mods" />
+                    <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount" />
+                </StackPanel>
+                <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                        VerticalAlignment="Bottom" />
+            </Grid>
+
+            <!-- Mods List -->
+            <ListBox Grid.Row="1" x:Name="ModsListBox" ItemsSource="{Binding Mods}" Margin="10,5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Classes="BoxItemBackground" Height="50">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox Grid.Column="0" IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                          Classes="SwitchDark" Margin="0,5"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Title}" FontSize="14"
+                                           Foreground="{StaticResource Neutral100}"
+                                           Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0" />
+
+                                <!-- Yes i know that it already works without any change event if we remove Mode=OneWay -->
+                                <!-- Removing that will make it so editing that will also edit the model -->
+                                <!-- however, it works really weird if you do that -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Priority: " FontSize="14" Foreground="{StaticResource Neutral100}"
+                                               VerticalAlignment="Center" Margin="10,0,0,0" />
+                                    <TextBox Text="{Binding Priority, Mode=OneWay}" Classes="dark"
+                                             LostFocus="InputElement_OnLostFocus" Padding="0"
+                                             KeyDown="PriorityText_OnKeyDown"
+                                             x:Name="VisibleWithRows"
+                                             MinWidth="25" MaxWidth="50" MinHeight="30" Height="30">
+                                        <TextBox.Styles>
+                                            <Style Selector="TextBox /template/ DockPanel#PART_InnerDockPanel">
+
+                                                <Setter Property="Margin" Value="0" />
+                                            </Style>
+                                            <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+                                            </Style>
+                                        </TextBox.Styles>
+                                    </TextBox>
+
+                                    <StackPanel Margin="10,0,0,0" Spacing="2" x:Name="VisibleWithBlocks">
+                                        <components:Button HorizontalAlignment="Right"
+                                                           IconData="{StaticResource ChevronUp}"
+                                                           IconSize="15" Padding="10,3"
+                                                           IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}"
+                                                           Click="ButtonUp_OnClick" />
+                                        <components:Button HorizontalAlignment="Right"
+                                                           IconData="{StaticResource ChevronDown}"
+                                                           IconSize="15" Padding="10,3"
+                                                           IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}"
+                                                           Click="ButtonDown_OnClick" />
+
+                                        <StackPanel.Styles>
+                                            <Style
+                                                Selector="ListBoxItem Border.BoxItemBackground:pointerover components|Button">
+                                                <Setter Property="Variant" Value="UglyLight" />
+                                            </Style>
+                                        </StackPanel.Styles>
+                                    </StackPanel>
+
+                                    <StackPanel.Styles>
+                                        <Style Selector="ListBox.Rows ListBoxItem StackPanel#VisibleWithBlocks">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </Style>
+                                        <Style Selector="ListBox.Blocks ListBoxItem TextBox#VisibleWithRows">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </Style>
+                                    </StackPanel.Styles>
+                                </StackPanel>
+
+                                <!-- <components:StateBox Grid.Column="1" IconSize="0" Text="{Binding Priority}"
                                                   TipText="Priority" Variant="Dark" TipPlacement="Top"
                                                   HorizontalAlignment="Right" VerticalAlignment="Center" /> -->
-                         </Grid>
-                     </Border>
-                 </DataTemplate>
-             </ListBox.ItemTemplate>
-       
-             <ListBox.ContextMenu>
-                 <ContextMenu>
-                     <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
-                     <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
-                     <Separator />
-                     <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click"/>
-                     <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />
-                 </ContextMenu>
-             </ListBox.ContextMenu>
-         </ListBox>
-     </Grid>
- </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
+                        <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
+                        <Separator />
+                        <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click" />
+                        <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+        </Grid>
+    </Grid>
 </UserControl>

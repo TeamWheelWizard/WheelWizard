@@ -6,72 +6,75 @@
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:miiImages="clr-namespace:WheelWizard.Views.Components.MiiImages"
-             x:Class="WheelWizard.Views.Pages.UserProfilePage">
-   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-       <Grid.RowDefinitions>
-           <RowDefinition Height="{StaticResource TopRowSize}" />
-           <!-- This is the total height as the (Title + infoSection) - (padding) -->
-           <RowDefinition />
-       </Grid.RowDefinitions>
-       <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" 
-               HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-       <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" 
-               HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-       <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_MyProfiles}" HorizontalAlignment="Left" VerticalAlignment="Top"
-                  Classes="PageTitleText" />
-       
-       <ScrollViewer Grid.Row="0"  HorizontalScrollBarVisibility="Auto">
-           <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                       x:Name="RadioButtons">
-               <!-- DON'T ADD ANYTHING TO THIS STACK PANEL OR YOU WILL RUIN THE LAYOUT -->
-               <!-- WE ARE LAZY IN THE CODE, AND SO WE USE CHILD INDEXING TO GET THE RADIO BUTTONS -->
-               <RadioButton Classes="TopBar"
-                            Click="TopBarRadio_OnClick" Tag="0" 
-                            x:Name="Mii0" Content="{x:Static lang:Online.NoLicense}" 
-                            IsChecked="True" IsEnabled="False"/>
-               <RadioButton Classes="TopBar"
-                            Click="TopBarRadio_OnClick" Tag="1" 
-                            x:Name="Mii1" Content="{x:Static lang:Online.NoLicense}" 
-                            IsEnabled="False"/>
-               <RadioButton Classes="TopBar"
-                            Click="TopBarRadio_OnClick" Tag="2" 
-                            x:Name="Mii2" Content="{x:Static lang:Online.NoLicense}" 
-                            IsEnabled="False"/>
-               <RadioButton Classes="TopBar"
-                            Click="TopBarRadio_OnClick" Tag="3" 
-                            x:Name="Mii3" Content="{x:Static lang:Online.NoLicense}" 
-                            IsEnabled="False" />
-           </StackPanel>
-       </ScrollViewer>
-       
-       <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
-           <Border VerticalAlignment="Center" HorizontalAlignment="Center"
-                   ToolTip.Tip="This only shows regions YOU have played on"
-                   ToolTip.Placement="Top" ToolTip.ShowDelay="20"
-                   Width="18" Height="18" Margin="10">
-               <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
-                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
-           </Border>
-           <ComboBox x:Name="RegionDropdown" Margin="3,12" MinWidth="160"
-                     HorizontalAlignment="Right" VerticalAlignment="Top"/>
-       </StackPanel>
-       
-       <Grid Grid.Row="1">
-           <components:DetailedProfileBox x:Name="CurrentUserProfile" 
-                                          OnChecked="CheckBox_SetPrimaryUser" ViewRoomAction="ViewRoom_OnClick"
-                                          VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                          Mii="{Binding CurrentMii}"
-                                          OnRename="ChangeMiiName"
-                                          Margin="0,10,0,0" />
-           
-           <miiImages:MiiCarousel VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                                     Mii="{Binding CurrentMii}"
-                                     x:Name="CurrentUserCarousel" Height="280"/>
-           
-           <components:EmptyPageInfo x:Name="NoProfilesInfo"
-                                     HorizontalAlignment="Center" Title="{x:Static lang:Online.NoProfiles}"
-                                     BodyText="{x:Static lang:Phrases.EmptyText_NoProfiles}" />
-       </Grid>
- 
-   </Grid>
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             x:Class="WheelWizard.Views.Pages.UserProfilePage"
+             x:DataType="pages:UserProfilePage">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <!-- This is the total height as the (Title + infoSection) - (padding) -->
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_MyProfiles}" HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Classes="PageTitleText" />
+
+        <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                        x:Name="RadioButtons">
+                <!-- DON'T ADD ANYTHING TO THIS STACK PANEL OR YOU WILL RUIN THE LAYOUT -->
+                <!-- WE ARE LAZY IN THE CODE, AND SO WE USE CHILD INDEXING TO GET THE RADIO BUTTONS -->
+                <RadioButton Classes="TopBar"
+                             Click="TopBarRadio_OnClick" Tag="0"
+                             x:Name="Mii0" Content="{x:Static lang:Online.NoLicense}"
+                             IsChecked="True" IsEnabled="False" />
+                <RadioButton Classes="TopBar"
+                             Click="TopBarRadio_OnClick" Tag="1"
+                             x:Name="Mii1" Content="{x:Static lang:Online.NoLicense}"
+                             IsEnabled="False" />
+                <RadioButton Classes="TopBar"
+                             Click="TopBarRadio_OnClick" Tag="2"
+                             x:Name="Mii2" Content="{x:Static lang:Online.NoLicense}"
+                             IsEnabled="False" />
+                <RadioButton Classes="TopBar"
+                             Click="TopBarRadio_OnClick" Tag="3"
+                             x:Name="Mii3" Content="{x:Static lang:Online.NoLicense}"
+                             IsEnabled="False" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center"
+                    ToolTip.Tip="This only shows regions YOU have played on"
+                    ToolTip.Placement="Top" ToolTip.ShowDelay="20"
+                    Width="18" Height="18" Margin="10">
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
+            </Border>
+            <ComboBox x:Name="RegionDropdown" Margin="3,12" MinWidth="160"
+                      HorizontalAlignment="Right" VerticalAlignment="Top" />
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <components:DetailedProfileBox x:Name="CurrentUserProfile"
+                                           OnChecked="CheckBox_SetPrimaryUser" ViewRoomAction="ViewRoom_OnClick"
+                                           VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                           Mii="{Binding CurrentMii}"
+                                           OnRename="ChangeMiiName"
+                                           Margin="0,10,0,0" />
+
+            <miiImages:MiiCarousel VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                   Mii="{Binding CurrentMii}"
+                                   x:Name="CurrentUserCarousel" Height="280" />
+
+            <components:EmptyPageInfo x:Name="NoProfilesInfo"
+                                      HorizontalAlignment="Center" Title="{x:Static lang:Online.NoProfiles}"
+                                      BodyText="{x:Static lang:Phrases.EmptyText_NoProfiles}" />
+        </Grid>
+
+    </Grid>
 </UserControl>

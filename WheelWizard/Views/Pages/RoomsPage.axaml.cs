@@ -1,7 +1,7 @@
-﻿using Avalonia.Controls;
-using Avalonia.Interactivity;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Utilities.RepeatedTasks;
@@ -11,8 +11,9 @@ namespace WheelWizard.Views.Pages;
 public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedTaskListener
 {
     private string? _searchQuery;
-    
+
     private readonly ObservableCollection<RrRoom> _rooms = new();
+
     public ObservableCollection<RrRoom> Rooms
     {
         get => _rooms;
@@ -24,6 +25,7 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
     }
 
     private readonly ObservableCollection<RrPlayer> _players = new();
+
     public ObservableCollection<RrPlayer> Players
     {
         get => _players;
@@ -39,11 +41,11 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
         InitializeComponent();
         DataContext = this;
         RRLiveRooms.Instance.Subscribe(this);
-        
+
         OnUpdate(RRLiveRooms.Instance);
         Unloaded += RoomsPage_Unloaded;
     }
-    
+
     public void OnUpdate(RepeatedTaskManager sender)
     {
         if (sender is not RRLiveRooms liveRooms) return;
@@ -56,18 +58,18 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
 
         foreach (var room in liveRooms.CurrentRooms)
             Rooms.Add(room);
-        
+
         RoomsNiceLabel.IsVisible = liveRooms.CurrentRooms.Count == 69;
         RoomsListItemCount.Text = liveRooms.CurrentRooms.Count.ToString();
         PerformSearch(_searchQuery);
     }
-    
+
     private void PerformSearch(string? query)
     {
         var isStringEmpty = string.IsNullOrWhiteSpace(query);
         RoomsListViewContainer.IsVisible = isStringEmpty;
         PlayerListViewContainer.IsVisible = !isStringEmpty;
-        
+
         if (isStringEmpty) return;
 
         Players.Clear();
@@ -80,28 +82,28 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
 
         foreach (var player in matchingPlayers)
             Players.Add(player);
-        
+
         PlayerNiceLabel.IsVisible = matchingPlayers.Count == 69;
         PlayerListItemCount.Text = matchingPlayers.Count.ToString();
     }
-    
+
     private void RoomsPage_Unloaded(object sender, RoutedEventArgs e)
     {
         RRLiveRooms.Instance.Unsubscribe(this);
     }
-    
+
     private void PlayerSearchField_OnTextChanged(object? sender, TextChangedEventArgs e)
     {
         if (e.Source is not TextBox textBox) return;
         _searchQuery = textBox.Text;
         PerformSearch(textBox.Text);
     }
-    
+
     private void RoomsView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (e.Source is not ListBox listBox) return;
         if (listBox.SelectedItem is not RrRoom selectedRoom) return;
-        
+
         ViewUtils.NavigateToPage(new RoomDetailsPage(selectedRoom));
         listBox.SelectedItem = null;
         // Deselect the item immediately after navigating. This is important
@@ -123,11 +125,13 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IRepeatedT
     }
 
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
+
     #endregion
 }

@@ -2,10 +2,15 @@
 
 public class GameBananaSearchResults
 {
-    public Metadata _aMetadata { get; set; } // Metadata for the API response (e.g., total records, pagination)
+    /// <summary>
+    /// Metadata for the API response (e.g., total records, pagination)
+    /// </summary>
+    public Metadata _aMetadata { get; set; } = new();
 
-    public List<GameBananaModDetails>
-        _aRecords { get; set; } // List of records representing mods or other GameBanana content
+    /// <summary>
+    /// List of records representing mods or other GameBanana content
+    /// </summary>
+    public List<GameBananaModDetails> _aRecords { get; set; } = [];
 
     public class Metadata
     {
@@ -13,7 +18,7 @@ public class GameBananaSearchResults
         public int _nPerpage { get; set; } // Number of records per page returned by the API
         public bool _bIsComplete { get; set; }
     }
-    
+
     //public List<ModRecord> _aRecords { get; set; } // List of records representing mods or other GameBanana content
 }
 
@@ -71,4 +76,3 @@ public class TrashInfo
     public long _tsTrashDate { get; set; } // Date when the mod was trashed (timestamp)
 }
 */
-

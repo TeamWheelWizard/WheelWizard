@@ -1,15 +1,16 @@
 using Avalonia;
 using Avalonia.Controls;
+using WheelWizard.Views.Popups.Base;
 
 namespace WheelWizard.Views.Popups;
 
 public abstract class PopupContent : UserControl
 {
-    public Base.PopupWindow Window { get; private set; }
+    public PopupWindow Window { get; private set; }
     
     protected PopupContent(bool allowClose, bool allowParentInteraction, bool isTopMost, string title = "", Vector? size = null)
     {
-        Window = new Base.PopupWindow(allowClose, allowParentInteraction, isTopMost, title, size)
+        Window = new(allowClose, allowParentInteraction, isTopMost, title, size)
         {
             PopupContent = { Content = this },
             BeforeClose = BeforeClose,

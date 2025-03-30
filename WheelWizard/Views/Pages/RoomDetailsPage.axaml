@@ -5,7 +5,9 @@
              mc:Ignorable="d" d:DesignHeight="876" d:DesignWidth="456"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             x:Class="WheelWizard.Views.Pages.RoomDetailsPage">
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             x:Class="WheelWizard.Views.Pages.RoomDetailsPage"
+             x:DataType="pages:RoomDetailsPage">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
@@ -14,7 +16,7 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
-        
+
         <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
 
@@ -22,26 +24,26 @@
                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
 
-        <StackPanel  Margin="10" Orientation="Horizontal" 
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <TextBlock Text="ID: " Classes="BodyText" Margin="0,3,0,0"/>
-            <components:StateBox IconSize="0" Text="{Binding Room.Id}"/>
+        <StackPanel Margin="10" Orientation="Horizontal"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <TextBlock Text="ID: " Classes="BodyText" Margin="0,3,0,0" />
+            <components:StateBox IconSize="0" Text="{Binding Room.Id}" />
         </StackPanel>
-    
-        
-        <components:IconLabelButton Grid.Row="0" 
-                               IconData="{StaticResource ArrowLeft}"
-                               Text="{x:Static lang:Common.PageTitle_Rooms}"
-                               Foreground="{StaticResource TitleTextColor}"
-                               HoverForeground="{StaticResource Primary200}"
-                               VerticalAlignment="Top" HorizontalAlignment="Left"
-                               Click="GoBackClick"/>
+
+
+        <components:IconLabelButton Grid.Row="0"
+                                    IconData="{StaticResource ArrowLeft}"
+                                    Text="{x:Static lang:Common.PageTitle_Rooms}"
+                                    Foreground="{StaticResource TitleTextColor}"
+                                    HoverForeground="{StaticResource Primary200}"
+                                    VerticalAlignment="Top" HorizontalAlignment="Left"
+                                    Click="GoBackClick" />
 
         <Grid Grid.Row="1" ColumnDefinitions="4*,6*,2*,2*" Margin="10,0">
-            <StackPanel 
+            <StackPanel
                 Grid.Column="0">
                 <components:FormFieldLabel Text="{x:Static lang:Online.Stat_AverageRoomVr}" Margin="0,0,2,0" />
-                <components:StateBox IconSize="0" Text="{Binding Room.AverageVr}" HorizontalAlignment="Left"/>
+                <components:StateBox IconSize="0" Text="{Binding Room.AverageVr}" HorizontalAlignment="Left" />
             </StackPanel>
 
             <StackPanel Grid.Column="1">
@@ -59,39 +61,38 @@
                       HorizontalAlignment="Right" VerticalAlignment="Top"
                       Data="{StaticResource Lock}" Foreground="{StaticResource TitleTextColor}">
                 <PathIcon.IsVisible>
-                    <Binding Path="Room.Type" Converter="{StaticResource IsEqualTo}" ConverterParameter="private"/>
+                    <Binding Path="Room.Type" Converter="{StaticResource IsEqualTo}" ConverterParameter="private" />
                 </PathIcon.IsVisible>
             </PathIcon>
         </Grid>
-        
+
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0">
-            <Grid Grid.Row="0" >
+            <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Players}"/>
-                    <components:StateBox Text="{Binding Room.PlayerCount}" IconSize="0"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Players}" />
+                    <components:StateBox Text="{Binding Room.PlayerCount}" IconSize="0" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-                        VerticalAlignment="Bottom"  />
+                        VerticalAlignment="Bottom" />
             </Grid>
-            
+
             <ListBox Grid.Row="1" x:Name="PlayersListView" SelectionMode="Single" BorderThickness="0"
                      Padding="0" Margin="0" Background="Transparent" ItemsSource="{Binding PlayersList}"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      SelectionChanged="PlayerView_SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <components:PlayerListItem 
+                        <components:PlayerListItem
                             UserName="{Binding Name}"
                             FriendCode="{Binding Fc}"
                             Br="{Binding Eb}"
                             Vr="{Binding Ev}"
                             Mii="{Binding FirstMii}"
-                            HasBadges="{Binding HasBadges}"
-                            />
+                            HasBadges="{Binding HasBadges}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-                
+
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />

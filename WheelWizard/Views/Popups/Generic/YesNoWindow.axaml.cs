@@ -1,12 +1,13 @@
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Threading;
 using WheelWizard.Resources.Languages;
 
 namespace WheelWizard.Views.Popups.Generic;
 
 public partial class YesNoWindow : PopupContent
 {
-    public bool Result { get; private set; } = false;
+    public bool Result { get; private set; }
     private TaskCompletionSource<bool> _tcs;
     
     public YesNoWindow() : base(true, false,true ,"Wheel Wizard")
@@ -55,11 +56,11 @@ public partial class YesNoWindow : PopupContent
 
     public async Task<bool> AwaitAnswer()
     {
-        if (!Avalonia.Threading.Dispatcher.UIThread.CheckAccess())
+        if (!Dispatcher.UIThread.CheckAccess())
         {
-            return await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => AwaitAnswer());
+            return await Dispatcher.UIThread.InvokeAsync(() => AwaitAnswer());
         }
-        _tcs = new TaskCompletionSource<bool>();
+        _tcs = new();
         Show(); // Or ShowDialog(parentWindow) if you need it to be modal
         return await _tcs.Task;
     }

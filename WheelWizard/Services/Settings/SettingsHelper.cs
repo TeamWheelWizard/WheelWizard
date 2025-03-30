@@ -7,7 +7,7 @@ namespace WheelWizard.Services.Settings;
 public class SettingsHelper : ISettingListener
 {
     private SettingsHelper() { }
-    private static readonly SettingsHelper Instance = new SettingsHelper();
+    private static readonly SettingsHelper Instance = new();
     
     public static void LoadExtraStuff()
     {

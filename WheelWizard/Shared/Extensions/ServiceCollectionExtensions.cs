@@ -1,5 +1,5 @@
-﻿using Refit;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Refit;
 
 namespace WheelWizard.Shared;
 

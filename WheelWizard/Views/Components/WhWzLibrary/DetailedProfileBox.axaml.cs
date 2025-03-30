@@ -1,9 +1,9 @@
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
-using System.ComponentModel;
 using WheelWizard.Models.MiiImages;
 using WheelWizard.Services.Settings;
 using WheelWizard.Views.Components.MiiImages;
@@ -165,9 +165,9 @@ public class DetailedProfileBox : TemplatedControl, INotifyPropertyChanged
         }
     }
     
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
 }

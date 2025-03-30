@@ -8,8 +8,8 @@ namespace WheelWizard.Views.Components.MiiImages;
 
 public class MiiImageLoader : BaseMiiImage
 {
-    private static bool _initializedRandomRotation = false;
-    private static bool _randomRotation = false;
+    private static bool _initializedRandomRotation;
+    private static bool _randomRotation;
     
     public static readonly StyledProperty<IBrush> LoadingColorProperty =
         AvaloniaProperty.Register<MiiImageLoader, IBrush>(nameof(LoadingColor));
@@ -62,7 +62,7 @@ public class MiiImageLoader : BaseMiiImage
         {
             // This will only happen as a joke, e.g. on april fools.
             miiImageContainer.RenderTransform = ConstraintRotationToVertical ? 
-                new RotateTransform(180) : 
+                new(180) : 
                 new RotateTransform(new Random().NextDouble() * 360);
         }
             
@@ -81,7 +81,7 @@ public class MiiImageLoader : BaseMiiImage
             if (fallbackIcon == null) return;
             fallbackIcon.Width = newValue * 0.85;
             fallbackIcon.Height = newValue * 0.85;
-            fallbackIcon.Margin = new Thickness(0,0,0,-newValue * 0.05);
+            fallbackIcon.Margin = new(0,0,0,-newValue * 0.05);
 
         }, DispatcherPriority.Render); 
     }

@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Models.GameData;
-using WheelWizard.Models.MiiImages;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
 using WheelWizard.Services.Settings;
@@ -24,7 +23,7 @@ public class GameDataLoader : RepeatedTaskManager
     /// The path to where the “rksys.dat” folder structure is expected to live, e.g.
     ///   ..\path\to\Riivolution\riivolution\save\RetroWFC\RMCP\rksys.dat
     /// </summary>
-    private static string? TryCreateSaveFolderPath
+    private static string TryCreateSaveFolderPath
     {
         get
         {
@@ -36,7 +35,7 @@ public class GameDataLoader : RepeatedTaskManager
             {
                 Directory.CreateDirectory(PathManager.SaveFolderPath);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Do nothing until user directory is resolved.
                 return string.Empty;
@@ -79,7 +78,7 @@ public class GameDataLoader : RepeatedTaskManager
 
     private GameDataLoader() : base(40)
     {
-        GameData = new GameData();
+        GameData = new();
         LoadGameData();
     }
 
@@ -132,9 +131,9 @@ public class GameDataLoader : RepeatedTaskManager
         var dummyUser = new GameDataUser
         {
             FriendCode = "0000-0000-0000",
-            MiiData = new MiiData
+            MiiData = new()
             {
-                Mii = new Mii
+                Mii = new()
                 {
                     Name = "no license",
                     Data = Convert.ToBase64String(new byte[MiiSize])
@@ -146,7 +145,7 @@ public class GameDataLoader : RepeatedTaskManager
             Br = 5000,
             TotalRaceCount = 0,
             TotalWinCount = 0,
-            Friends = new List<GameDataFriend>(),
+            Friends = new(),
             RegionId = 10, // 10 => “unknown”
             IsOnline = false
         };
@@ -213,7 +212,7 @@ public class GameDataLoader : RepeatedTaskManager
 
         var miiData = new MiiData
         {
-            Mii = new Mii
+            Mii = new()
             {
                 Name = name,
                 Data = Convert.ToBase64String(rawMii)
@@ -246,9 +245,9 @@ public class GameDataLoader : RepeatedTaskManager
                 RegionId    = _saveData[currentOffset + 0x69],
                 BadgeVariants = App.Services.GetRequiredService<IWhWzDataSingletonService>().GetBadges(friendCode),
 
-                MiiData = new MiiData
+                MiiData = new()
                 {
-                    Mii = new Mii
+                    Mii = new()
                     {
                         Name = BigEndianBinaryReader.GetUtf16String(_saveData, currentOffset + 0x1C, 10),
                         Data = Convert.ToBase64String(_saveData.AsSpan(currentOffset + 0x1A, MiiSize))
@@ -376,7 +375,7 @@ public class GameDataLoader : RepeatedTaskManager
         }
         var currentName = user.MiiData.Mii.Name ?? "";
         var renamePopup =  new TextInputWindow()
-                .SetMainText($"Enter new name")
+                .SetMainText("Enter new name")
                 .SetExtraText($"Changing name from: {currentName}")
                 .SetAllowCustomChars(true)
                 .SetInitialText(currentName)

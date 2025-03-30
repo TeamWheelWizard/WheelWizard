@@ -7,7 +7,7 @@ using WheelWizard.Views.Pages;
 
 namespace WheelWizard.Views.Components;
 
-public partial class SidebarRadioButton : RadioButton
+public class SidebarRadioButton : RadioButton
 {
     private Border? _hoverEffect;
     
@@ -66,7 +66,7 @@ public partial class SidebarRadioButton : RadioButton
         var left = position.X - (_hoverEffect.Width / 2);
         var top = position.Y - (_hoverEffect.Height / 2);
         
-        _hoverEffect.Margin = new Thickness(left, top, 0, 0);
+        _hoverEffect.Margin = new(left, top, 0, 0);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)

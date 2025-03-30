@@ -11,7 +11,7 @@ public class RrPlayerFactory : MockingDataFactory<RrPlayer, RrPlayerFactory>
     {
         var playerId = _playerCount++;
         var rand = Rand(seed);
-        return new RrPlayer
+        return new()
         {
             Count = "1",
             Pid = playerId.ToString(),

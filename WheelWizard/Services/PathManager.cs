@@ -114,10 +114,8 @@ public static class PathManager
 
                 return string.Empty;
             }
-            else
-            {
-                return SplitLinuxDolphinNativeConfigDir;
-            }
+
+            return SplitLinuxDolphinNativeConfigDir;
         }
     }
 
@@ -381,10 +379,8 @@ public static class PathManager
             {
                 return TryFindLinuxFlatpakUserFolderPath();
             }
-            else
-            {
-                return TryFindLinuxNativeUserFolderPath();
-            }
+
+            return TryFindLinuxNativeUserFolderPath();
         }
 
         return null;

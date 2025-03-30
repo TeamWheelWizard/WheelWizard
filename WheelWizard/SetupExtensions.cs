@@ -1,5 +1,5 @@
-﻿using Serilog;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
+using Serilog;
 using Testably.Abstractions;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;

@@ -1,12 +1,10 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using WheelWizard.Helpers;
+using WheelWizard.Models;
 using WheelWizard.Models.GameBanana;
 
 namespace WheelWizard.Services.GameBanana;
-
-using System.Threading.Tasks;
-using Models;
 
 public class GamebananaSearchHandler
 {
@@ -23,8 +21,9 @@ public class GamebananaSearchHandler
     {
         if (string.IsNullOrWhiteSpace(searchString)) searchString = "mod";
         if (page < 1) page = 1;
-        if (perPage < 1 || perPage > 50) perPage = 20;
-        var searchUrl = $"{BaseUrl}/Util/Search/Results?_sSearchString={searchString}&_nPage={page}&_nPerpage={perPage}&_idGameRow={GAME_ID}";
+        if (perPage is < 1 or > 50) perPage = 20;
+        var searchUrl =
+            $"{BaseUrl}/Util/Search/Results?_sSearchString={searchString}&_nPage={page}&_nPerpage={perPage}&_idGameRow={GAME_ID}";
 
         var result = await HttpClientHelper.GetAsync<GameBananaSearchResults>(searchUrl, JsonSerializerOptions);
 

@@ -1,4 +1,5 @@
-﻿using Semver;
+﻿using Avalonia.Threading;
+using Semver;
 using WheelWizard.Branding;
 using WheelWizard.GitHub.Domain;
 using WheelWizard.Views.Popups.Generic;
@@ -22,7 +23,7 @@ public class FallbackUpdatePlatform(IBrandingSingletonService brandingService) :
         if (currentVersion.ComparePrecedenceTo(latestVersion) >= 0) return null;
         if (_shown) return null;
         _shown = true;
-        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+        Dispatcher.UIThread.InvokeAsync(() =>
         {
             new MessageBoxWindow()
                 .SetTitleText("New Wheel Wizard version")

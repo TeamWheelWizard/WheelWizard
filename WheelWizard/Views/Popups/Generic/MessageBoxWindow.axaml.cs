@@ -56,9 +56,6 @@ public partial class MessageBoxWindow : PopupContent
             case MessageType.Warning:
                 // SystemSounds.Exclamation.Play();
                 break;
-            case MessageType.Message or _:
-                // SystemSounds.Hand.Play();
-                break;
         }
     }
     

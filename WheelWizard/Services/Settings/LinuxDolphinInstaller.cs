@@ -1,6 +1,6 @@
-﻿using Avalonia.Threading;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Avalonia.Threading;
 using WheelWizard.Helpers;
 using WheelWizard.Views.Popups.Generic;
 
@@ -34,7 +34,7 @@ public static class LinuxDolphinInstaller
 
     // Helper method to run a process asynchronously with progress reporting.
     private static async Task<int> RunProcessWithProgressAsync(string fileName, string arguments,
-        IProgress<int> progress = null)
+        IProgress<int>? progress = null)
     {
         var processInfo = new ProcessStartInfo
         {
@@ -84,7 +84,7 @@ public static class LinuxDolphinInstaller
     /// Checks if Flatpak is installed by verifying the command exists.
     /// </summary>
     /// <returns>True if Flatpak is available; otherwise, false.</returns>
-    public static bool isFlatPakInstalled()
+    public static bool IsFlatPakInstalled()
     {
         return EnvHelper.IsValidUnixCommand("flatpak");
     }
@@ -94,9 +94,9 @@ public static class LinuxDolphinInstaller
     /// Reports progress via the provided IProgress callback.
     /// </summary>
     /// <returns>True if installation succeeded; otherwise, false.</returns>
-    public static async Task<bool> InstallFlatpak(IProgress<int> progress = null)
+    public static async Task<bool> InstallFlatpak(IProgress<int>? progress = null)
     {
-        if (isFlatPakInstalled())
+        if (IsFlatPakInstalled())
             return true;
 
         // Detect the package manager
@@ -115,9 +115,8 @@ public static class LinuxDolphinInstaller
             });
         }
 
-        return exitCode == 0 && isFlatPakInstalled();
+        return exitCode == 0 && IsFlatPakInstalled();
     }
-
 
 
     /// <summary>
@@ -125,10 +124,10 @@ public static class LinuxDolphinInstaller
     /// Ensures that Flatpak is installed and reports progress via the provided IProgress callback.
     /// </summary>
     /// <returns>True if Dolphin was successfully installed; otherwise, false.</returns>
-    public static async Task<bool> InstallFlatpakDolphin(IProgress<int> progress = null)
+    public static async Task<bool> InstallFlatpakDolphin(IProgress<int>? progress = null)
     {
         // Ensure Flatpak is installed; if not, attempt installation.
-        if (!isFlatPakInstalled())
+        if (!IsFlatPakInstalled())
         {
             var flatpakInstalled = await InstallFlatpak(progress);
             if (!flatpakInstalled)
@@ -153,7 +152,7 @@ public static class LinuxDolphinInstaller
         {
             var dolphinProcess = new Process
             {
-                StartInfo = new ProcessStartInfo
+                StartInfo = new()
                 {
                     FileName = "flatpak",
                     Arguments = "run org.DolphinEmu.dolphin-emu",
@@ -173,12 +172,11 @@ public static class LinuxDolphinInstaller
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 new MessageBoxWindow().SetTitleText("Error")
-                    .SetTitleText($"Failed to launch Dolphin")
+                    .SetTitleText("Failed to launch Dolphin")
                     .SetInfoText(ex.Message).Show();
             });
         }
 
         return true;
     }
-
 }

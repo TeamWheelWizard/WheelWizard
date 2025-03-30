@@ -74,7 +74,7 @@ public partial class TextInputWindow : PopupContent
     
     public new async Task<string?> ShowDialog()
     {
-        _tcs = new TaskCompletionSource<string?>();
+        _tcs = new();
         Show(); // or ShowDialog(parentWindow);
         return await _tcs.Task;
     }
@@ -122,13 +122,13 @@ public partial class TextInputWindow : PopupContent
         
         foreach (var c in chars)
         {
-            var button = new Button()
+            var button = new Button
             {
                 Text = c.ToString(),
                 IconSize = 0,
                 FontSize = 24,
-                Padding = new Thickness(0),
-                Margin = new Thickness(1),
+                Padding = new(0),
+                Margin = new(1),
             };
             button.Click += (_,_) => InputField.Text += c;
             CustomChars.Children.Add(button);

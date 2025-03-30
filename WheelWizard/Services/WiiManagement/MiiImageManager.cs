@@ -83,7 +83,7 @@ public static class MiiImageManager
     // If it wasn't, it means that that image is just empty, yet it still should not be requested again since it failed
     private static readonly Dictionary<string, (Bitmap smallImage, bool success)> Images = new();
     private static readonly Queue<string> ImageOrder = new();
-    public static int ImageCount { get; private set; } = 0;
+    public static int ImageCount { get; private set; }
 
     public static (Bitmap, bool)? GetCachedMiiImage(MiiImage miiConfig) => Images.TryGetValue(miiConfig.CachingKey, out var image) ? image : null;
 
