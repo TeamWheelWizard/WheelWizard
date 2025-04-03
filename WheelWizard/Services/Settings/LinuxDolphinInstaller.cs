@@ -119,7 +119,7 @@ public static class LinuxDolphinInstaller
     /// Ensures that Flatpak is installed and reports progress via the provided IProgress callback.
     /// </summary>
     /// <returns>True if Dolphin was successfully installed; otherwise, false.</returns>
-    public static async Task<bool> InstallFlatpakDolphin(IProgress<int> progress = null)
+    public static async Task<bool> InstallFlatpakDolphin(IProgress<int>? progress = null)
     {
         // Ensure Flatpak is installed; if not, attempt installation.
         if (!isFlatPakInstalled())

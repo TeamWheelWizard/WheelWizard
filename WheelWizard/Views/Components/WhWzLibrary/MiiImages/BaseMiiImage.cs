@@ -96,7 +96,7 @@ public abstract class BaseMiiImage : TemplatedControl, INotifyPropertyChanged
     public event EventHandler MiiImageLoaded;
     
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

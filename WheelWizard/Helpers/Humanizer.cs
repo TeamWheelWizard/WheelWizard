@@ -57,7 +57,7 @@ public static class Humanizer
         return ReplaceDynamic(Phrases.Time_Seconds_x, timeSpan.Seconds)!;
 
         // internal method to simplify the pluralization of words
-        string P(int count) => Math.Abs(count) != 1 ? "s" : "";
+        // string P(int count) => Math.Abs(count) != 1 ? "s" : "";
     }
 
     public static string HumanizeSeconds(int seconds) => HumanizeTimeSpan(TimeSpan.FromSeconds(seconds));

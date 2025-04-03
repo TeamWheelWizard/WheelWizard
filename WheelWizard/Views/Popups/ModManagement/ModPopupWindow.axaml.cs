@@ -148,7 +148,7 @@ public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
         _currentPage = 1;
         _hasMoreMods = true;
 
-        Dispatcher.UIThread.InvokeAsync(Mods.Clear);
+        await Dispatcher.UIThread.InvokeAsync(Mods.Clear);
         await LoadMods(_currentPage, _currentSearchTerm);
     }
 
@@ -174,12 +174,12 @@ public partial class ModPopupWindow : PopupContent, INotifyPropertyChanged
     }
     
     // Implement INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
     /// Raises the PropertyChanged event.
     /// </summary>
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

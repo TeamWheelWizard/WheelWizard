@@ -24,8 +24,8 @@ public static class EnvHelper
             };
 
             using var process = Process.Start(processInfo);
-            process.WaitForExit();
-            return process.ExitCode == 0;
+            process?.WaitForExit();
+            return process?.ExitCode == 0;
         }
         catch
         {

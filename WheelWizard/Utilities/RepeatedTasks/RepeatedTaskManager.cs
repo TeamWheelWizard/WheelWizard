@@ -46,7 +46,7 @@ public abstract class RepeatedTaskManager
         _timer.Start();
 
         // Run the initial execution
-        ExecuteAndNotifyAsync();
+        _ = ExecuteAndNotifyAsync();
     }
 
     public void Stop()

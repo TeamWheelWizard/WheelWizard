@@ -9,8 +9,8 @@ namespace WheelWizard.Models.Settings;
 public class Mod : INotifyPropertyChanged
 {
     private bool _isEnabled;
-    private string _title;
-    private string _author;
+    private string? _title;
+    private string? _author;
     private int _modID;
     private int _priority; // New property for mod priority
 
@@ -45,7 +45,7 @@ public class Mod : INotifyPropertyChanged
 
     public string Title
     {
-        get => _title;
+        get => _title ?? string.Empty;
         set
         {
             if (_title == value) 
@@ -58,8 +58,8 @@ public class Mod : INotifyPropertyChanged
 
     public string Author
     {
-        get => _author;
-        set
+        get => _author ?? string.Empty;
+        init
         {
             if (_author == value)
                 return;
@@ -72,7 +72,7 @@ public class Mod : INotifyPropertyChanged
     public int ModID
     {
         get => _modID;
-        set
+        init
         {
             if (_modID == value)
                 return;
@@ -96,8 +96,8 @@ public class Mod : INotifyPropertyChanged
     }
 
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected virtual void OnPropertyChanged(string propertyName)
+    public new event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void OnPropertyChanged(string? propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -169,5 +169,5 @@ public class Mod : INotifyPropertyChanged
 public class ModData
 {
     public bool IsEnabled { get; set; }
-    public string Title { get; set; }
+    public string? Title { get; set; }
 }

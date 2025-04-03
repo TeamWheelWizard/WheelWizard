@@ -131,7 +131,7 @@ public static class ViewUtils
         
         public static Color Black = GetColor("Black");
         
-        private static Color GetColor(string name) => (Color)Application.Current.FindResource(name);
+        private static Color GetColor(string name) => (Color)Application.Current?.FindResource(name)!;
     }
     #endregion
 }

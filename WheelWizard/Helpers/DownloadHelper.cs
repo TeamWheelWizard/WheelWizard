@@ -16,7 +16,7 @@ public static class DownloadHelper
         return toLocationAsync;
     }
 
-    public static async Task<string> DownloadToLocationAsync(string url, string tempFile, ProgressWindow progressPopupWindow, bool ForceGivenFilePath = false)
+    public static async Task<string?> DownloadToLocationAsync(string url, string tempFile, ProgressWindow progressPopupWindow, bool ForceGivenFilePath = false)
 {
     var directory = Path.GetDirectoryName(tempFile)!;
     if (!Directory.Exists(directory))
