@@ -102,7 +102,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IRep
     }
 
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {

@@ -153,7 +153,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IRepeate
     }
     
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
     
     protected virtual void OnPropertyChanged(string propertyName)
     {

@@ -61,7 +61,7 @@ public class CurrentUserProfile : TemplatedControl, INotifyPropertyChanged
     protected override void OnPointerPressed(PointerPressedEventArgs e) => ViewUtils.NavigateToPage(new UserProfilePage());
     
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

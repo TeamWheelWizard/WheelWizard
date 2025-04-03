@@ -33,8 +33,7 @@ public static class LinuxDolphinInstaller
     }
 
     // Helper method to run a process asynchronously with progress reporting.
-    private static async Task<int> RunProcessWithProgressAsync(string fileName, string arguments,
-        IProgress<int> progress = null)
+    private static async Task<int> RunProcessWithProgressAsync(string fileName, string arguments, IProgress<int>? progress = null)
     {
         var processInfo = new ProcessStartInfo
         {
@@ -55,10 +54,8 @@ public static class LinuxDolphinInstaller
                 return;
 
             var match = Regex.Match(e.Data, @"(\d+)%");
-            if (match.Success && int.TryParse(match.Groups[1].Value, out int percent))
-            {
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var percent))
                 progress?.Report(percent);
-            }
         };
 
         process.ErrorDataReceived += (sender, e) =>
@@ -68,9 +65,7 @@ public static class LinuxDolphinInstaller
 
             var match = Regex.Match(e.Data, @"(\d+)%");
             if (match.Success && int.TryParse(match.Groups[1].Value, out int percent))
-            {
                 progress?.Report(percent);
-            }
         };
 
         process.BeginOutputReadLine();
@@ -94,7 +89,7 @@ public static class LinuxDolphinInstaller
     /// Reports progress via the provided IProgress callback.
     /// </summary>
     /// <returns>True if installation succeeded; otherwise, false.</returns>
-    public static async Task<bool> InstallFlatpak(IProgress<int> progress = null)
+    public static async Task<bool> InstallFlatpak(IProgress<int>? progress = null)
     {
         if (isFlatPakInstalled())
             return true;
@@ -117,7 +112,6 @@ public static class LinuxDolphinInstaller
 
         return exitCode == 0 && isFlatPakInstalled();
     }
-
 
 
     /// <summary>
@@ -180,5 +174,4 @@ public static class LinuxDolphinInstaller
 
         return true;
     }
-
 }

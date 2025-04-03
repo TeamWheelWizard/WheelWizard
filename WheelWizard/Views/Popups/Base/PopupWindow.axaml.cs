@@ -115,7 +115,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
     }
 
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

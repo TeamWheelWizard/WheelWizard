@@ -165,7 +165,7 @@ public class DetailedProfileBox : TemplatedControl, INotifyPropertyChanged
         }
     }
     
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

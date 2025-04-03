@@ -151,7 +151,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     }
     */
     #region PropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {
