@@ -28,9 +28,9 @@ public class GameDataLoader : RepeatedTaskManager
     {
         get
         {
-            if (string.IsNullOrWhiteSpace(PathManager.UserFolderPath))
+            if (!SettingsHelper.PathsSetupCorrectly())
                 return string.Empty;
-            if (Directory.Exists(PathManager.SaveFolderPath)) 
+            if (Directory.Exists(PathManager.SaveFolderPath))
                 return PathManager.SaveFolderPath;
             try
             {
@@ -62,19 +62,19 @@ public class GameDataLoader : RepeatedTaskManager
     /// <summary>
     /// Returns the "focused" or currently active license/user as determined by the Settings.
     /// </summary>
-    public GameDataUser GetCurrentUser 
+    public GameDataUser GetCurrentUser
         => Instance.GameData.Users[(int)SettingsManager.FOCUSSED_USER.Get()];
 
-    public List<GameDataFriend> GetCurrentFriends 
+    public List<GameDataFriend> GetCurrentFriends
         => Instance.GameData.Users[(int)SettingsManager.FOCUSSED_USER.Get()].Friends;
 
-    public GameData GetGameData 
+    public GameData GetGameData
         => Instance.GameData;
 
-    public GameDataUser GetUserData(int index) 
+    public GameDataUser GetUserData(int index)
         => GameData.Users[index];
 
-    public bool HasAnyValidUsers 
+    public bool HasAnyValidUsers
         => GameData.Users.Any(user => user.FriendCode != "0000-0000-0000");
 
     private GameDataLoader() : base(40)
@@ -115,7 +115,7 @@ public class GameDataLoader : RepeatedTaskManager
             GameData.Users.Clear();
             for (var i = 0; i < MaxPlayerNum; i++)
                 CreateDummyUser();
-            
+
         }
         catch (Exception e)
         {
@@ -336,7 +336,7 @@ public class GameDataLoader : RepeatedTaskManager
 
         return ~crc;
     }
-    
+
 
     /// <summary>
     /// Fixes the MKWii save file by recalculating and inserting the CRC32 at 0x27FFC.
@@ -345,7 +345,7 @@ public class GameDataLoader : RepeatedTaskManager
     {
         if (rksysData == null || rksysData.Length < RksysSize)
             throw new ArgumentException("Invalid rksys.dat data");
-        
+
         var lengthToCrc = 0x27FFC;
         var newCrc = ComputeCrc32(rksysData, 0, lengthToCrc);
 
@@ -385,7 +385,7 @@ public class GameDataLoader : RepeatedTaskManager
         var newName = await renamePopup.ShowDialog();
         if (string.IsNullOrWhiteSpace(newName)) return;
         newName = Regex.Replace(newName, @"\s+", " ");
-        
+
         // Basic checks
         if (newName.Length is > 10 or < 3)
         {
@@ -406,7 +406,7 @@ public class GameDataLoader : RepeatedTaskManager
                 .SetTitleText("Failed to update the Mii name.")
                 .SetInfoText("It was unable to update the name in the Mii Database file.")
                 .Show();
-          
+
         }
 
         if (SaveRksysToFile())
@@ -436,14 +436,14 @@ public class GameDataLoader : RepeatedTaskManager
     private void WriteLicenseNameToSaveData(int userIndex, string newName)
     {
         if (_saveData == null || _saveData.Length < RksysSize) return;
-        var rkpdOffset = 0x8 + userIndex * RkpdSize; 
+        var rkpdOffset = 0x8 + userIndex * RkpdSize;
         var nameOffset = rkpdOffset + 0x14;
         var nameBytes = Encoding.BigEndianUnicode.GetBytes(newName);
         for (var i = 0; i < 20; i++)
             _saveData[nameOffset + i] = 0;
         Array.Copy(nameBytes, 0, _saveData, nameOffset, Math.Min(nameBytes.Length, 20));
     }
-    
+
     private bool SaveRksysToFile()
     {
         if (_saveData == null || string.IsNullOrWhiteSpace(TryCreateSaveFolderPath)) return false;
@@ -478,7 +478,7 @@ public class GameDataLoader : RepeatedTaskManager
             .SetInfoText(info)
             .Show();
     }
-    
+
     private void InvalidNameMessage(string info)
     {
         new MessageBoxWindow()
@@ -487,7 +487,7 @@ public class GameDataLoader : RepeatedTaskManager
             .SetInfoText(info)
             .Show();
     }
-    
+
     protected override Task ExecuteTaskAsync()
     {
         LoadGameData();
