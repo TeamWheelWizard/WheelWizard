@@ -17,13 +17,13 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
         AppStateMonitor.Instance.Subscribe(this);
         LoadSettings();
     }
-    
+
     protected override void BeforeClose()
     {
         AppStateMonitor.Instance.Unsubscribe(this);
         base.BeforeClose();
     }
-    
+
     // Yes, it would absolutely be more optimized to insteadof every x seconds refreshing, to just refresh when something changes
     // However, We explicitly do it this way, so all code in the codebase can stay unchanged. The idea is that you can remove the AppStateMonitor and everything will still work
     // This is indeed also possible if you make it if you make everything an observer pattern, where-ever you want to monitor something.
@@ -35,20 +35,20 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
         MiiImagesCashed.Text = MiiImageManager.ImageCount.ToString();
         MiiParsedDataCashed.Text = MiiImageManager.ParsedMiiDataCount.ToString();
     }
-    
+
     private void LoadSettings()
     {
         WhWzTopMost.IsChecked = ViewUtils.GetLayout().Topmost;
         HttpHelperOff.IsChecked = !HttpClientHelper.FakeConnectionToInternet;
     }
-    
+
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
     private void HttpHelperOff_OnClick(object sender, RoutedEventArgs e) => HttpClientHelper.FakeConnectionToInternet = HttpHelperOff.IsChecked != true;
     private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
 
     private void ClearImageCache_OnClick(object sender, RoutedEventArgs e) => MiiImageManager.ClearImageCache();
-    
-    
+
+
     #region Popup Tests
     private async void TestProgressPopup_OnClick(object sender, RoutedEventArgs e)
     {
@@ -56,7 +56,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
         var progressWindow = new ProgressWindow("test progress !!");
         progressWindow.SetGoal("Setting a goal!");
         progressWindow.Show();
-        
+
         for (var i = 0; i < 5; i++)
         {
             Dispatcher.UIThread.Invoke(() =>
@@ -65,7 +65,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
                 progressWindow.SetExtraText($"This is information for iteration {i}");
                 if(i == 3) progressWindow.SetGoal($"Changed the Goal");
             });
-            await Task.Delay(1000); 
+            await Task.Delay(1000);
         }
         Dispatcher.UIThread.Invoke(() =>
         {
@@ -73,7 +73,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
             ProgressButtonTest.IsEnabled = true;
         });
     }
-    
+
     private void TestMessagePopups_OnClick(object sender, RoutedEventArgs e)
     {
        new MessageBoxWindow()
@@ -81,18 +81,18 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
             .SetTitleText("Saved Successfully!")
             .SetInfoText("The name you entered has sucessfully saved in the system")
             .Show();
-       
+
        new MessageBoxWindow()
            .SetMessageType(MessageBoxWindow.MessageType.Warning)
            .SetTitleText("Invalid license.")
            .SetInfoText("This license has no Mii data or is incomplete.\n" +
                         "Please use the Mii Channel to create a Mii first. \n \n \n abncd")
            .Show();
-       
+
        new MessageBoxWindow()
            .SetMessageType(MessageBoxWindow.MessageType.Error)
            .SetTitleText("Update error.")
-           .SetInfoText("An error occured when trying top update Retro Rewind.")
+           .SetInfoText("An error occurred when trying to update Retro Rewind.")
            .Show();
     }
 
