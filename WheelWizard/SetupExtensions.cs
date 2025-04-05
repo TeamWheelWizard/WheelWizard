@@ -5,7 +5,6 @@ using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
 using WheelWizard.GitHub;
 using WheelWizard.RrRooms;
-using WheelWizard.Services;
 using WheelWizard.Shared.Services;
 using WheelWizard.WheelWizardData;
 
@@ -31,16 +30,7 @@ public static class SetupExtensions
 
         // Logging
         services.AddTransient<AvaloniaLoggerAdapter>();
-        services.AddLogging(builder =>
-        {
-            var configuration = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.File(Path.Combine(PathManager.WheelWizardAppdataPath, "logs/log.txt"), rollingInterval: RollingInterval.Day);
-
-            builder.AddSerilog(configuration.CreateLogger(), dispose: true);
-        });
+        services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 
         // Dynamic API calls
         services.AddTransient(typeof(IApiCaller<>), typeof(ApiCaller<>));

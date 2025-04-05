@@ -1,8 +1,9 @@
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Logging;
-using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using WheelWizard.Helpers;
+using WheelWizard.Services;
 using WheelWizard.Services.Settings;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Shared.Services;
@@ -16,7 +17,7 @@ public class Program
     public static void Main(string[] args)
     {
         // Make sure this is the first action on startup!
-        SetupWorkingDirectory();
+        Setup();
         // Start the application
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
@@ -40,9 +41,6 @@ public class Program
     private static AppBuilder ConfigureAvaloniaApp(AppBuilder builder)
     {
         var serviceProvider = BuildServiceProvider();
-        // Write startup message
-        var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
-        LogPlatformInformation(logger);
 
         // Override the default TraceLogSink with our AvaloniaLoggerAdapter
         Logger.Sink = serviceProvider.GetRequiredService<AvaloniaLoggerAdapter>();
@@ -55,11 +53,6 @@ public class Program
 
             // Set the service provider in the application instance
             app.SetServiceProvider(serviceProvider);
-
-            // Make sure this comes AFTER setting the service provider
-            // of the `App` instance! Otherwise, things like logging will not work
-            // in `Setup`.
-            Setup();
         });
 
         return builder;
@@ -96,13 +89,27 @@ public class Program
         }
     }
 
+    private static void SetupLogging()
+    {
+        Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File(Path.Combine(PathManager.WheelWizardAppdataPath, "logs/log.txt"), rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+    }
+
     private static void Setup()
     {
+        // Make sure this method call comes first!
+        SetupWorkingDirectory();
+        SetupLogging();
+        LogPlatformInformation();
         SettingsManager.Instance.LoadSettings();
         UrlProtocolManager.SetWhWzScheme();
     }
 
-    private static void LogPlatformInformation(ILogger logger)
+    private static void LogPlatformInformation()
     {
         var modeCheck = "release";
         var osCheck = "unknown";
@@ -119,6 +126,6 @@ public class Program
         osCheck = "macos";
 #endif
 
-        logger.LogInformation("Application start [Configuration: {Configuration}, OS: {OS}]", modeCheck, osCheck);
+        Log.Information("Application start [Configuration: {Configuration}, OS: {OS}]", modeCheck, osCheck);
     }
 }
