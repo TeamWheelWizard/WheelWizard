@@ -1,9 +1,8 @@
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Logging;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using WheelWizard.Helpers;
-using WheelWizard.Services;
 using WheelWizard.Services.Settings;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Shared.Services;
@@ -13,22 +12,39 @@ namespace WheelWizard;
 
 public class Program
 {
+    private static ServiceProvider? s_serviceProvider;
+
     [STAThread]
     public static void Main(string[] args)
     {
         // Make sure this is the first action on startup!
         Setup();
+
         // Start the application
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
-    private static ServiceProvider BuildServiceProvider()
+    private static bool IsServiceProviderInitialized()
     {
+        return s_serviceProvider != null;
+    }
+
+    private static void InitializeServiceProvider()
+    {
+        if (IsServiceProviderInitialized())
+            return;
+
         var services = new ServiceCollection();
         services.AddWheelWizardServices();
+        s_serviceProvider = services.BuildServiceProvider();
+    }
 
-        var serviceProvider = services.BuildServiceProvider();
-        return serviceProvider;
+    private static ServiceProvider GetServiceProvider()
+    {
+        if (!IsServiceProviderInitialized())
+            InitializeServiceProvider();
+
+        return s_serviceProvider!;
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
@@ -40,10 +56,8 @@ public class Program
 
     private static AppBuilder ConfigureAvaloniaApp(AppBuilder builder)
     {
-        var serviceProvider = BuildServiceProvider();
-
         // Override the default TraceLogSink with our AvaloniaLoggerAdapter
-        Logger.Sink = serviceProvider.GetRequiredService<AvaloniaLoggerAdapter>();
+        Logger.Sink = GetServiceProvider().GetRequiredService<AvaloniaLoggerAdapter>();
 
         // First, set up the application instance
         builder.AfterSetup(appBuilder =>
@@ -52,7 +66,7 @@ public class Program
                 throw new InvalidOperationException("The application instance is not of type App.");
 
             // Set the service provider in the application instance
-            app.SetServiceProvider(serviceProvider);
+            app.SetServiceProvider(GetServiceProvider());
         });
 
         return builder;
@@ -89,21 +103,11 @@ public class Program
         }
     }
 
-    private static void SetupLogging()
-    {
-        Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.File(Path.Combine(PathManager.WheelWizardAppdataPath, "logs/log.txt"), rollingInterval: RollingInterval.Day)
-                .CreateLogger();
-    }
-
     private static void Setup()
     {
         // Make sure this method call comes first!
         SetupWorkingDirectory();
-        SetupLogging();
+        Log.RegisterLoggingServiceProvider(GetServiceProvider());
         LogPlatformInformation();
         SettingsManager.Instance.LoadSettings();
         UrlProtocolManager.SetWhWzScheme();
@@ -126,6 +130,6 @@ public class Program
         osCheck = "macos";
 #endif
 
-        Log.Information("Application start [Configuration: {Configuration}, OS: {OS}]", modeCheck, osCheck);
+        Log.GetLogger<Program>().LogInformation("Application start [Configuration: {Configuration}, OS: {OS}]", modeCheck, osCheck);
     }
 }

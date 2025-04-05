@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using JsonElement = System.Text.Json.JsonElement;
@@ -65,7 +65,7 @@ public class WhWzSettingManager
         }
         catch (JsonException e)
         {
-            Log.Error(e, "Failed to deserialize the JSON config");
+            Log.GetLogger<WhWzSettingManager>().LogError(e, "Failed to deserialize the JSON config");
         }
     }
 }

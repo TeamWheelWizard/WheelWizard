@@ -9,7 +9,7 @@ namespace WheelWizard.Services.LiveData;
 public class WhWzStatusManager : RepeatedTaskManager
 {
     public WhWzStatus? Status { get; private set; }
-    
+
     private static WhWzStatusManager? _instance;
     public static WhWzStatusManager Instance => _instance ??= new WhWzStatusManager();
 
@@ -25,9 +25,9 @@ public class WhWzStatusManager : RepeatedTaskManager
             Status = statusResult.Value;
             return;
         }
-        
-        App.Services.GetRequiredService<ILogger<WhWzStatusManager>>()
+
+        Log.GetLogger<WhWzStatusManager>()
             .LogError(statusResult.Error.Exception, "Failed to retrieve WhWz Status: {Message}", statusResult.Error.Message);
-        Status = new WhWzStatus {Variant = WhWzStatusVariant.Error, Message = "Failed to retrieve Wheel Wizard status"};
+        Status = new WhWzStatus { Variant = WhWzStatusVariant.Error, Message = "Failed to retrieve Wheel Wizard status" };
     }
 }

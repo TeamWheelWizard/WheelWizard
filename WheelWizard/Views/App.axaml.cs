@@ -64,7 +64,7 @@ public class App : Application
         }
         catch (Exception e)
         {
-            var logger = Services.GetRequiredService<ILogger<App>>();
+            var logger = Log.GetLogger<App>();
             logger.LogError(e, "Failed to initialize application: {Message}", e.Message);
         }
     }
