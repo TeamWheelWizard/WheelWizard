@@ -14,12 +14,16 @@ public class Program
 {
     private static ServiceProvider? s_serviceProvider;
 
+    static Program()
+    {
+        // Make sure this is the first action on startup!
+        // This order is enforced using the static constructor.
+        Setup();
+    }
+
     [STAThread]
     public static void Main(string[] args)
     {
-        // Make sure this is the first action on startup!
-        Setup();
-
         // Start the application
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
