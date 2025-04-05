@@ -17,6 +17,7 @@ public class Program
     {
         // Make sure this is the first action on startup!
         SetupWorkingDirectory();
+        SettingsManager.Instance.LoadSettings();
         // Start the application
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
@@ -98,7 +99,6 @@ public class Program
 
     private static void Setup()
     {
-        SettingsManager.Instance.LoadSettings();
         UrlProtocolManager.SetWhWzScheme();
     }
 
