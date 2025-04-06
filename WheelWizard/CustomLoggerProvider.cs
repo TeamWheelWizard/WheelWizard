@@ -12,5 +12,6 @@ public class CustomLoggerProvider : ILoggerProvider
     public void Dispose()
     {
         // Do nothing
+        GC.SuppressFinalize(this);
     }
 }
