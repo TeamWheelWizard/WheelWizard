@@ -12,43 +12,24 @@ namespace WheelWizard;
 
 public class Program
 {
-    private static ServiceProvider? s_serviceProvider;
-
-    static Program()
-    {
-        // Make sure this is the first action on startup!
-        // This order is enforced using the static constructor.
-        Setup();
-    }
 
     [STAThread]
     public static void Main(string[] args)
     {
+        // Make sure this is the first action on startup!
+        Setup();
+
         // Start the application
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+
+        Cleanup();
     }
 
-    private static bool IsServiceProviderInitialized()
+    private static ServiceProvider BuildServiceProvider()
     {
-        return s_serviceProvider != null;
-    }
-
-    private static void InitializeServiceProvider()
-    {
-        if (IsServiceProviderInitialized())
-            return;
-
         var services = new ServiceCollection();
         services.AddWheelWizardServices();
-        s_serviceProvider = services.BuildServiceProvider();
-    }
-
-    private static ServiceProvider GetServiceProvider()
-    {
-        if (!IsServiceProviderInitialized())
-            InitializeServiceProvider();
-
-        return s_serviceProvider!;
+        return services.BuildServiceProvider();
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
@@ -61,7 +42,7 @@ public class Program
     private static AppBuilder ConfigureAvaloniaApp(AppBuilder builder)
     {
         // Override the default TraceLogSink with our AvaloniaLoggerAdapter
-        Logger.Sink = GetServiceProvider().GetRequiredService<AvaloniaLoggerAdapter>();
+        Logger.Sink = new AvaloniaLoggerAdapter(Log.GetLogger<AvaloniaObject>());
 
         // First, set up the application instance
         builder.AfterSetup(appBuilder =>
@@ -70,7 +51,7 @@ public class Program
                 throw new InvalidOperationException("The application instance is not of type App.");
 
             // Set the service provider in the application instance
-            app.SetServiceProvider(GetServiceProvider());
+            app.SetServiceProvider(BuildServiceProvider());
         });
 
         return builder;
@@ -111,10 +92,15 @@ public class Program
     {
         // Make sure this method call comes first!
         SetupWorkingDirectory();
-        Log.RegisterLoggingServiceProvider(GetServiceProvider());
+        Log.Initialize();
         LogPlatformInformation();
         SettingsManager.Instance.LoadSettings();
         UrlProtocolManager.SetWhWzScheme();
+    }
+
+    private static void Cleanup()
+    {
+        Log.Dispose();
     }
 
     private static void LogPlatformInformation()
