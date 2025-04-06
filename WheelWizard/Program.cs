@@ -10,7 +10,7 @@ using WheelWizard.Views;
 
 namespace WheelWizard;
 
-public class Program
+public class Program : IDesignerEntryPoint
 {
 
     [STAThread]
@@ -30,21 +30,24 @@ public class Program
     {
         var services = new ServiceCollection();
         services.AddWheelWizardServices();
-        return services.BuildServiceProvider();
+        return services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true
+        });
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
     // ReSharper disable once MemberCanBePrivate.Global
     public static AppBuilder BuildAvaloniaApp()
-        => ConfigureAvaloniaApp(AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont());
+        => CreateWheelWizardApp();
 
-    private static AppBuilder ConfigureAvaloniaApp(AppBuilder builder)
+    private static AppBuilder CreateWheelWizardApp()
     {
         // Override the default TraceLogSink with our AvaloniaLoggerAdapter
         Logger.Sink = new AvaloniaLoggerAdapter(Log.GetLogger<AvaloniaObject>());
 
+        var builder = AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
         // First, set up the application instance
         builder.AfterSetup(appBuilder =>
         {

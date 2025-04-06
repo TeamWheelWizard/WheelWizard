@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using WheelWizard.Services;
 
 namespace WheelWizard;
@@ -14,7 +15,7 @@ public static class Log
         var logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
+                .WriteTo.Console(theme: AnsiConsoleTheme.Sixteen, applyThemeToRedirectedOutput: true)
                 .WriteTo.File(Path.Combine(PathManager.WheelWizardAppdataPath, "logs/log.txt"), rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         s_loggerFactory = new LoggerFactory().AddSerilog(logger, dispose: true);
