@@ -1,5 +1,5 @@
 ﻿using System.IO.Abstractions;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using Testably.Abstractions;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
@@ -27,6 +27,9 @@ public static class SetupExtensions
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();
         services.AddSingleton<ITimeSystem, RealTimeSystem>();
+
+        // Only meant for e.g. Refit logging
+        services.AddLogging(builder => builder.AddProvider(new CustomLoggerProvider()));
 
         // Dynamic API calls
         services.AddTransient(typeof(IApiCaller<>), typeof(ApiCaller<>));

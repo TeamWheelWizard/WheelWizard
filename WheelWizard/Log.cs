@@ -25,6 +25,10 @@ public static class Log
     {
         s_loggerFactory.Dispose();
     }
+    public static ILoggerFactory GetLoggerFactory()
+    {
+        return s_loggerFactory;
+    }
 
     public static ILogger<T> GetLogger<T>()
     {
