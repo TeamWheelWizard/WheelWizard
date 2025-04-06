@@ -22,6 +22,7 @@ public class Program
         // Start the application
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
 
+        // Make sure this is only called when no logging is required anymore!
         Cleanup();
     }
 
