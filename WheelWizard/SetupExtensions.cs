@@ -36,7 +36,7 @@ public static class SetupExtensions
             var configuration = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
+                .WriteTo.Console(theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)
                 .WriteTo.File(Path.Combine(PathManager.WheelWizardAppdataPath, "logs/log.txt"), rollingInterval: RollingInterval.Day);
 
             builder.AddSerilog(configuration.CreateLogger(), dispose: true);
