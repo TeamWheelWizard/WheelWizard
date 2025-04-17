@@ -22,7 +22,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     private ObservableCollection<FriendProfile> _friendlist = [];
 
     [Inject]
-    private IGameDataSingletonService GameDataService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
 
     public ObservableCollection<FriendProfile> FriendList
     {
@@ -37,7 +37,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     public FriendsPage()
     {
         InitializeComponent();
-        GameDataService.Subscribe(this);
+        GameLicenseService.Subscribe(this);
         UpdateFriendList();
 
         DataContext = this;
@@ -48,7 +48,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     public void OnUpdate(RepeatedTaskManager sender)
     {
-        if (sender is not GameDataSingletonService)
+        if (sender is not GameLicenseSingletonService)
             return;
         UpdateFriendList();
     }
@@ -91,7 +91,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             ListOrderCondition.TOTAL_RACES => f => f.Losses + f.Wins,
             ListOrderCondition.IS_ONLINE or _ => f => f.IsOnline,
         };
-        return GameDataService.CurrentFriends.OrderByDescending(orderMethod).ToList();
+        return GameLicenseService.ActiveCurrentFriends.OrderByDescending(orderMethod).ToList();
     }
 
     private void PopulateSortingList()

@@ -103,12 +103,12 @@ public partial class WhWzSettings : UserControl
                 return;
             }
 
-            if (!IsFlatpakDolphinInstalled())
+            if (!EnvHelper.IsFlatpakSandboxed() && !IsFlatpakDolphinInstalled())
             {
                 var wantsAutomaticInstall = await new YesNoWindow()
                     .SetMainText("Dolphin Flatpak Installation")
                     .SetExtraText(
-                        "The flatpak version of Dolphin Emulator does not appear to be installed. Would you like us to install it?"
+                        "The flatpak version of Dolphin Emulator does not appear to be installed. Would you like us to install it (system-wide)?"
                     )
                     .SetButtonText("Install", "Manual")
                     .AwaitAnswer();

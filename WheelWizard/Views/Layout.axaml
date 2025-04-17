@@ -11,9 +11,9 @@
         Height="876" Width="656" WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome" 
+        ExtendClientAreaChromeHints="NoChrome"
         CanResize='False' Background="Transparent">
-    <Grid ColumnDefinitions="192,*" RowDefinitions="25,17,88,*,80" x:Name="CompleteGrid"
+    <Grid ColumnDefinitions="192,*" RowDefinitions="25,17,18,70,*,80" x:Name="CompleteGrid"
           Background="{StaticResource FrameColor}">
                 
         <Border Grid.ColumnSpan="2"
@@ -26,7 +26,8 @@
                 x:Name="DisabledDarkenEffect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                 Background="Black"  Opacity="0.3"/> 
         
-        <DockPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
+        <DockPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top"
+                   x:Name="TopBarButtons">
             <Button Width="30" Height="25" Click="MinimizeButton_Click"  Classes="TopButton">
                 <PathIcon Data="{StaticResource MinMark}" Width="12" Height="12"
                           Foreground="{Binding $parent[Button].Foreground}" />
@@ -37,16 +38,14 @@
             </Button>
         </DockPanel>
         
-        <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" VerticalAlignment="Bottom">
+        <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" VerticalAlignment="Bottom">
             <components:IconLabel IconData="{StaticResource WheelIcon}" x:Name="TitleLabel"
                              Foreground="{StaticResource Neutral400}"
-                             FontSize="20"
-                             Margin="10,10,0,0"
-                             IconSize="31" />
+                             FontSize="20" IconSize="31" IsHitTestVisible="False"
+                             Margin="10,10,0,18"/>
         </Border>
         
-        <Border Grid.Row="3"
-                VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10">
+        <Border Grid.Row="4" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10">
             <StackPanel>
                 <TextBlock Classes="TinyText" x:Name="MadeBy_Part1" Text="Made by: Patchzy" HorizontalAlignment="Right"/>
                 <TextBlock Classes="TinyText" x:Name="MadeBy_Part2" Text="And WantToBeeMe" HorizontalAlignment="Right"/>
@@ -54,13 +53,14 @@
         </Border>
         
 
-        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="4"
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
                 Background="{StaticResource BackgroundColor}"/>
-        <ContentControl Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" ClipToBounds="False"
+        <ContentControl Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="False"
                         x:Name="ContentArea" Margin="{StaticResource EdgeGap}"/>
         
-        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom"
+                    Margin="0,0,0,25">
             <components:StateBox x:Name="PlayerCountBox" Text="0" Variant="Dark"
                                   IconData="{StaticResource UserCouple}"
                                   TipText="{x:Static lang:Phrases.Hover_PlayersOnline_0}"
@@ -71,7 +71,7 @@
                             Margin="10,0,0,0" />
         </StackPanel>
         
-        <Border Grid.Column="0" Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+        <Border Grid.Column="0" Grid.Row="4" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                 ToolTip.Tip="This only shows regions YOU have played on"
                 ToolTip.Placement="TopEdgeAlignedLeft" ToolTip.ShowDelay="20"
                 x:Name="LiveStatusBorder" IsVisible="False"
@@ -111,8 +111,8 @@
         
         <!-- Sidebar -->
         <TextBlock Text="{x:Static lang:Common.Term_General}" Classes="SidebarSectionText"
-                   VerticalAlignment="Bottom" Grid.Row="2" />
-        <StackPanel x:Name="SidePanelButtons" Grid.Column="0" Grid.Row="3" Width="192" VerticalAlignment="Top">
+                   VerticalAlignment="Bottom" Grid.Row="3" />
+        <StackPanel x:Name="SidePanelButtons" Grid.Column="0" Grid.Row="4" Width="192" VerticalAlignment="Top">
             <components:SidebarRadioButton IconData="{StaticResource Home}"
                                         Text="{x:Static lang:Common.PageTitle_Home}"
                                         PageType="{x:Type pages:HomePage}"
@@ -140,7 +140,7 @@
                                         Text="Kitchen Sink" x:Name="KitchenSinkButton"/>
         </StackPanel>
         
-        <Border Grid.Column="0" Grid.Row="4" Background="{StaticResource Neutral800}">
+        <Border Grid.Column="0" Grid.Row="5" Background="{StaticResource Neutral800}">
             <StackPanel VerticalAlignment="Center" Spacing="5">
                 <components:IconLabelButton IconData="{StaticResource DiscordIcon}"
                                        Text="{x:Static lang:Phrases.Sidebar_Link_Discord}"

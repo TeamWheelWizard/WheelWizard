@@ -157,11 +157,11 @@ public static class RetroRewindUpdater
 
         using var httpClient = new HttpClient();
         var deleteListText = await httpClient.GetStringAsync(Endpoints.RRVersionDeleteUrl);
-        var lines = deleteListText.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
+        var lines = deleteListText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
-            var parts = line.Split([' '], 2);
+            var parts = line.Split(' ', 2);
             if (parts.Length < 2)
                 continue;
             deleteList.Add((parts[0].Trim(), parts[1].Trim()));
@@ -182,11 +182,11 @@ public static class RetroRewindUpdater
 
         using var httpClient = new HttpClient();
         var allVersionsText = await httpClient.GetStringAsync(Endpoints.RRVersionUrl);
-        var lines = allVersionsText.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
+        var lines = allVersionsText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
-            var parts = line.Split([' '], 4);
+            var parts = line.Split(' ', 4);
             if (parts.Length < 4)
                 continue;
             versions.Add((parts[0].Trim(), parts[1].Trim(), parts[2].Trim(), parts[3].Trim()));

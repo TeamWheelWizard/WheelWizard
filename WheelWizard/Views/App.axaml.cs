@@ -80,8 +80,8 @@ public class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new Layout();
-            var gameDataService = Services.GetRequiredService<IGameDataSingletonService>();
-            gameDataService.LoadGameData();
+            var gameDataService = Services.GetRequiredService<IGameLicenseSingletonService>();
+            gameDataService.LoadLicense();
             OnInitializedAsync();
         }
 

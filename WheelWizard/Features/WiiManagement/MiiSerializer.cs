@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using WheelWizard.Services.WiiManagement.SaveData;
 using WheelWizard.WiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement;
@@ -35,7 +36,7 @@ public static class MiiSerializer
         data[0x17] = mii.Weight.Value;
 
         // Mii ID (0x18 - 0x1B)
-        BitConverter.GetBytes(mii.MiiId).CopyTo(data, 0x18);
+        BigEndianBinaryReader.WriteUInt32BigEndian(data, 0x18, mii.MiiId);
 
         // System ID (0x1C - 0x1F)
         data[0x1C] = mii.SystemId0;
@@ -143,8 +144,8 @@ public static class MiiSerializer
         if (data == null || data.Length != 74)
             return Fail<Mii>("Invalid Mii data length.");
 
-        //if the data only contains 0xFF, return null
-        if (data.All(b => b == 0xFF))
+        //if the data only contains 0xFF or 0x00, return null
+        if (data.All(b => b == 0xFF) || data.All(b => b == 0x00))
             return Fail<Mii>("Mii data is empty.");
 
         var mii = new Mii();
@@ -174,7 +175,7 @@ public static class MiiSerializer
         mii.Weight = MiiScale.Create(data[0x17]).Value;
 
         // Mii ID (0x18 - 0x1B)
-        mii.MiiId = BitConverter.ToUInt32(data, 0x18);
+        mii.MiiId = BigEndianBinaryReader.BufferToUint32(data, 0x18);
 
         // System ID (0x1C - 0x1F)
         mii.SystemId0 = data[0x1C];

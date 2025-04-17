@@ -14,7 +14,7 @@ namespace WheelWizard.Views.Components;
 public class CurrentUserProfile : UserControlBase, INotifyPropertyChanged
 {
     [Inject]
-    private IGameDataSingletonService gameDataService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
 
     public static readonly StyledProperty<string> FriendCodeProperty = AvaloniaProperty.Register<CurrentUserProfile, string>(
         nameof(FriendCode)
@@ -51,8 +51,8 @@ public class CurrentUserProfile : UserControlBase, INotifyPropertyChanged
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        gameDataService.RefreshOnlineStatus();
-        var currentUser = gameDataService.CurrentUser;
+        GameLicenseService.RefreshOnlineStatus();
+        var currentUser = GameLicenseService.ActiveUser;
 
         var name = currentUser.NameOfMii;
         if (name == SettingValues.NoName)

@@ -21,7 +21,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private Mii? _currentMii;
 
     [Inject]
-    private IGameDataSingletonService GameDataService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
 
     public Mii? CurrentMii
     {
@@ -50,12 +50,12 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void ResetMiiTopBar()
     {
-        var validUsers = GameDataService.HasAnyValidUsers;
+        var validUsers = GameLicenseService.HasAnyValidUsers;
         CurrentUserProfile.IsVisible = validUsers;
         CurrentUserCarousel.IsVisible = validUsers;
         NoProfilesInfo.IsVisible = !validUsers;
 
-        var data = GameDataService.LicenseCollection;
+        var data = GameLicenseService.LicenseCollection;
         var userAmount = data.Users.Count;
         for (var i = 0; i < userAmount; i++)
         {
@@ -63,7 +63,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             if (radioButton == null!)
                 continue;
 
-            var miiName = data.Users[i].MiiData?.Mii?.Name.ToString() ?? SettingValues.NoName;
+            var miiName = data.Users[i].Mii?.Name.ToString() ?? SettingValues.NoName;
             var noLicense = miiName == SettingValues.NoLicense;
 
             radioButton.IsEnabled = !noLicense;
@@ -123,13 +123,13 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         if (currentPlayer != null)
             currentPlayer.PropertyChanged -= OnMiiNameChanged;
 
-        currentPlayer = GameDataService.GetUserData(_currentUserIndex);
+        currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
         CurrentUserProfile.FriendCode = currentPlayer.FriendCode;
         CurrentUserProfile.UserName = currentPlayer.NameOfMii;
         CurrentUserProfile.IsOnline = currentPlayer.IsOnline;
         CurrentUserProfile.Vr = currentPlayer.Vr.ToString();
         CurrentUserProfile.Br = currentPlayer.Br.ToString();
-        CurrentMii = currentPlayer.MiiData?.Mii;
+        CurrentMii = currentPlayer.Mii;
 
         currentPlayer.PropertyChanged += OnMiiNameChanged;
         CurrentUserProfile.TotalRaces = currentPlayer.TotalRaceCount.ToString();
@@ -168,7 +168,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
         SettingsManager.RR_REGION.Set(region);
         ResetMiiTopBar();
-        var loadResult = GameDataService.LoadGameData();
+        var loadResult = GameLicenseService.LoadLicense();
         if (loadResult.IsFailure)
         {
             new MessageBoxWindow()
@@ -209,7 +209,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         var newName = await renamePopup.ShowDialog();
         if (oldName == newName || newName == null)
             return;
-        var changeNameResult = GameDataService.ChangeMiiName(_currentUserIndex, newName);
+        var changeNameResult = GameLicenseService.ChangeMiiName(_currentUserIndex, newName);
         if (changeNameResult.IsFailure)
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Error)
@@ -224,7 +224,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
                 .Show();
 
         //reload game data, since multiple licenses can use the same mii
-        GameDataService.LoadGameData();
+        GameLicenseService.LoadLicense();
         UpdatePage();
     }
 

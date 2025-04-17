@@ -102,10 +102,14 @@ public partial class FeedbackTextBox : UserControl
 
     private void UpdateErrorState(bool hasError)
     {
-        if (hasError && !InputField.Classes.Contains("error"))
-            InputField.Classes.Add("error");
-        else
+        if (!hasError)
+        {
             InputField.Classes.Remove("error");
+            return;
+        }
+
+        if (!InputField.Classes.Contains("error"))
+            InputField.Classes.Add("error");
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

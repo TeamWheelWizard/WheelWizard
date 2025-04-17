@@ -24,7 +24,7 @@ public interface IMiiRepository
     /// returns null if the Mii is not found.
     /// </summary>
     /// <param name="clientId">The Mii's unique client Id</param>
-    byte[]? GetRawBlockByClientId(uint clientId);
+    byte[]? GetRawBlockByAvatarId(uint clientId);
 
     /// <summary>
     /// Replaces a Mii block in the database that matches the given ID.
@@ -40,7 +40,7 @@ public class MiiRepositoryService(IFileSystem fileSystem) : IMiiRepository
     private const int MaxMiiSlots = 100;
     private const int CrcOffset = 0x1F1DE;
     private const int HeaderOffset = 0x04;
-    private static readonly byte[] EmptyMii = new byte[MiiLength];
+    private static readonly byte[] EmptyMii = Enumerable.Repeat((byte)0xFF, MiiLength).ToArray();
     private readonly string _filePath = PathManager.WiiDbFile;
 
     public List<byte[]> LoadAllBlocks()
@@ -93,7 +93,7 @@ public class MiiRepositoryService(IFileSystem fileSystem) : IMiiRepository
         return Ok();
     }
 
-    public byte[]? GetRawBlockByClientId(uint clientId)
+    public byte[]? GetRawBlockByAvatarId(uint clientId)
     {
         if (clientId == 0)
             return null;
@@ -104,7 +104,7 @@ public class MiiRepositoryService(IFileSystem fileSystem) : IMiiRepository
             if (block.Length != MiiLength)
                 continue;
 
-            var thisId = BigEndianBinaryReader.ReadLittleEndianUInt32(block, 0x18);
+            var thisId = BigEndianBinaryReader.BufferToUint32(block, 0x18);
             if (thisId == clientId)
                 return block;
         }
@@ -130,7 +130,7 @@ public class MiiRepositoryService(IFileSystem fileSystem) : IMiiRepository
             if (block.Length != MiiLength)
                 continue;
 
-            var thisId = BigEndianBinaryReader.ReadLittleEndianUInt32(block, 0x18);
+            var thisId = BigEndianBinaryReader.BufferToUint32(block, 0x18);
             if (thisId != clientId)
                 continue;
 
@@ -157,23 +157,16 @@ public class MiiRepositoryService(IFileSystem fileSystem) : IMiiRepository
         }
     }
 
-    private static ushort CalculateCrc16(byte[] data, int offset, int length)
+    private static ushort CalculateCrc16(byte[] buf, int off, int len)
     {
-        const ushort polynomial = 0x1021;
-        ushort crc = 0x0000;
-
-        for (int i = offset; i < offset + length; i++)
+        const ushort poly = 0x1021;
+        ushort crc = 0xFFFF; // correct seed
+        for (int i = off; i < off + len; i++)
         {
-            crc ^= (ushort)(data[i] << 8);
-            for (int j = 0; j < 8; j++)
-            {
-                if ((crc & 0x8000) != 0)
-                    crc = (ushort)((crc << 1) ^ polynomial);
-                else
-                    crc <<= 1;
-            }
+            crc ^= (ushort)(buf[i] << 8);
+            for (int b = 0; b < 8; b++)
+                crc = (crc & 0x8000) != 0 ? (ushort)((crc << 1) ^ poly) : (ushort)(crc << 1);
         }
-
         return crc;
     }
 }

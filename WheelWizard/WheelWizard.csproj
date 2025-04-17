@@ -11,7 +11,7 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 
         <!-- Program details -->
-        <Version>2.1.0</Version>
+        <Version>2.1.2</Version>
         <Description>This program will manage RetroRewind and mods :)</Description>
         <Copyright>GNU v3.0</Copyright>
         <RepositoryUrl>https://github.com/patchzyy/WheelWizard</RepositoryUrl>

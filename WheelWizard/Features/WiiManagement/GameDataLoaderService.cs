@@ -16,7 +16,8 @@ using WheelWizard.WiiManagement.Domain.Mii;
 namespace WheelWizard.WiiManagement;
 
 // big big thanks to https://kazuki-4ys.github.io/web_apps/FaceThief/ for the JS implementation
-public interface IGameDataSingletonService
+// Also Refer to this documentation https://wiki.tockdom.com/wiki/Rksys.dat
+public interface IGameLicenseSingletonService
 {
     /// <summary>
     /// Gets the currently loaded <see cref="Models.GameData.LicenseCollection"/>.
@@ -26,7 +27,7 @@ public interface IGameDataSingletonService
     /// <summary>
     /// Loads the game data from the rksys.dat file.
     /// </summary>
-    OperationResult LoadGameData();
+    OperationResult LoadLicense();
 
     /// <summary>
     /// Retrieves the user data for a specific index.
@@ -37,12 +38,12 @@ public interface IGameDataSingletonService
     /// <summary>
     /// Gets the currently selected user.
     /// </summary>
-    LicenseProfile CurrentUser { get; }
+    LicenseProfile ActiveUser { get; }
 
     /// <summary>
     /// Gets the list of friends for the currently selected user.
     /// </summary>
-    List<FriendProfile> CurrentFriends { get; }
+    List<FriendProfile> ActiveCurrentFriends { get; }
 
     /// <summary>
     /// Checks if any user is valid (i.e., has a non-empty friend code).
@@ -65,21 +66,21 @@ public interface IGameDataSingletonService
     void Subscribe(IRepeatedTaskListener subscriber);
 }
 
-public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonService
+public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSingletonService
 {
     private readonly IMiiDbService _miiService;
     private readonly IFileSystem _fileSystem;
     private readonly IWhWzDataSingletonService _whWzDataSingletonService;
-    private LicenseCollection UserList { get; }
-    private byte[]? _saveData;
+    private LicenseCollection Licenses { get; }
+    private byte[]? _rksysData;
 
-    public GameDataSingletonService(IMiiDbService miiService, IFileSystem fileSystem, IWhWzDataSingletonService whWzDataSingletonService)
+    public GameLicenseSingletonService(IMiiDbService miiService, IFileSystem fileSystem, IWhWzDataSingletonService whWzDataSingletonService)
         : base(40)
     {
         _miiService = miiService;
         _fileSystem = fileSystem;
         _whWzDataSingletonService = whWzDataSingletonService;
-        UserList = new();
+        Licenses = new();
     }
 
     private const int RksysSize = 0x2BC000;
@@ -95,60 +96,48 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
     /// <summary>
     /// Returns the "focused" or currently active license/user as determined by the Settings.
     /// </summary>
-    public LicenseProfile CurrentUser => UserList.Users[(int)SettingsManager.FOCUSSED_USER.Get()];
+    public LicenseProfile ActiveUser => Licenses.Users[(int)SettingsManager.FOCUSSED_USER.Get()];
 
-    public List<FriendProfile> CurrentFriends => UserList.Users[(int)SettingsManager.FOCUSSED_USER.Get()].Friends;
+    public List<FriendProfile> ActiveCurrentFriends => Licenses.Users[(int)SettingsManager.FOCUSSED_USER.Get()].Friends;
 
-    public LicenseCollection LicenseCollection => UserList;
+    public LicenseCollection LicenseCollection => Licenses;
 
-    public LicenseProfile GetUserData(int index) => UserList.Users[index];
+    public LicenseProfile GetUserData(int index) => Licenses.Users[index];
 
-    public bool HasAnyValidUsers => UserList.Users.Any(user => user.FriendCode != "0000-0000-0000");
+    public bool HasAnyValidUsers => Licenses.Users.Any(user => user.FriendCode != "0000-0000-0000");
 
     public void RefreshOnlineStatus()
     {
         var currentRooms = RRLiveRooms.Instance.CurrentRooms;
         var onlinePlayers = currentRooms.SelectMany(room => room.Players.Values).ToList();
-        foreach (var user in UserList.Users)
+        foreach (var user in Licenses.Users)
         {
             user.IsOnline = onlinePlayers.Any(player => player.Fc == user.FriendCode);
         }
     }
 
-    public OperationResult LoadGameData()
+    public OperationResult LoadLicense()
     {
-        var loadSaveDataResult = LoadSaveDataFile();
-        if (loadSaveDataResult.IsFailure)
-            _saveData = null;
-        else
-            _saveData = loadSaveDataResult.Value;
-        if (_saveData != null && ValidateMagicNumber())
+        var loadSaveDataResult = ReadRksys();
+        _rksysData = loadSaveDataResult.IsSuccess ? loadSaveDataResult.Value : null;
+        if (_rksysData != null && ValidateMagicNumber())
         {
-            var result = ParseUsers();
-            if (result.IsFailure)
-                return result;
-            return Ok();
+            return ParseUsers();
         }
 
         // If the file was invalid or not found, create 4 dummy licenses
-        UserList.Users.Clear();
+        Licenses.Users.Clear();
         for (var i = 0; i < MaxPlayerNum; i++)
-            UserList.Users.Add(CreateDummyUser());
+            Licenses.Users.Add(CreateDummyUser());
         return Ok();
     }
 
-    private LicenseProfile CreateDummyUser()
+    private static LicenseProfile CreateDummyUser()
     {
-        var noLicenseName = new MiiName("no license");
         var dummyUser = new LicenseProfile
         {
             FriendCode = "0000-0000-0000",
-            MiiData = new()
-            {
-                Mii = new() { Name = noLicenseName },
-                AvatarId = 0,
-                ClientId = 0,
-            },
+            Mii = new(),
             Vr = 5000,
             Br = 5000,
             TotalRaceCount = 0,
@@ -162,91 +151,86 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
 
     private OperationResult ParseUsers()
     {
-        UserList.Users.Clear();
-        if (_saveData == null)
-            return new ArgumentNullException(nameof(_saveData));
+        Licenses.Users.Clear();
+        if (_rksysData == null)
+            return new ArgumentNullException(nameof(_rksysData));
 
         for (var i = 0; i < MaxPlayerNum; i++)
         {
             var rkpdOffset = RksysMagic.Length + i * RkpdSize;
-            var rkpdCheck = Encoding.ASCII.GetString(_saveData, rkpdOffset, RkpdMagic.Length) == RkpdMagic;
+            var rkpdCheck = Encoding.ASCII.GetString(_rksysData, rkpdOffset, RkpdMagic.Length) == RkpdMagic;
             if (!rkpdCheck)
             {
-                UserList.Users.Add(CreateDummyUser());
+                Licenses.Users.Add(CreateDummyUser());
                 continue;
             }
 
-            var user = ParseUser(rkpdOffset);
+            var user = ParseLicenseUser(rkpdOffset);
             if (user.IsFailure)
             {
-                UserList.Users.Add(CreateDummyUser());
+                Licenses.Users.Add(CreateDummyUser());
                 continue;
             }
-            UserList.Users.Add(user.Value);
+            Licenses.Users.Add(user.Value);
         }
 
         // Keep this here so we always have 4 users if the code above were to be changed
-        while (UserList.Users.Count < 4)
+        while (Licenses.Users.Count < 4)
         {
-            UserList.Users.Add(CreateDummyUser());
+            Licenses.Users.Add(CreateDummyUser());
         }
-
         return Ok();
     }
 
-    private OperationResult<LicenseProfile> ParseUser(int offset)
+    private OperationResult<LicenseProfile> ParseLicenseUser(int rkpdOffset)
     {
-        if (_saveData == null)
-            return new ArgumentNullException(nameof(_saveData));
+        if (_rksysData == null)
+            return new ArgumentNullException(nameof(_rksysData));
 
-        var friendCode = FriendCodeGenerator.GetFriendCode(_saveData, offset + 0x5C);
-        var miiDataResult = ParseMiiData(offset + 0x14);
-        var miiToUse = miiDataResult.IsFailure ? new() { Mii = new() { Name = new("no name") } } : miiDataResult.Value;
+        var friendCode = FriendCodeGenerator.GetFriendCode(_rksysData, rkpdOffset + 0x5C);
+        var miiDataResult = ParseMiiData(rkpdOffset);
+        var miiToUse = miiDataResult.IsFailure ? new() : miiDataResult.Value;
         var user = new LicenseProfile
         {
-            MiiData = miiToUse,
+            Mii = miiToUse,
             FriendCode = friendCode,
-            Vr = BigEndianBinaryReader.BufferToUint16(_saveData, offset + 0xB0),
-            Br = BigEndianBinaryReader.BufferToUint16(_saveData, offset + 0xB2),
-            TotalRaceCount = BigEndianBinaryReader.BufferToUint32(_saveData, offset + 0xB4),
-            TotalWinCount = BigEndianBinaryReader.BufferToUint32(_saveData, offset + 0xDC),
+            Vr = BigEndianBinaryReader.BufferToUint16(_rksysData, rkpdOffset + 0xB0),
+            Br = BigEndianBinaryReader.BufferToUint16(_rksysData, rkpdOffset + 0xB2),
+            TotalRaceCount = BigEndianBinaryReader.BufferToUint32(_rksysData, rkpdOffset + 0xB4),
+            TotalWinCount = BigEndianBinaryReader.BufferToUint32(_rksysData, rkpdOffset + 0xDC),
             BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
             // Region is often found near offset 0x23308 + 0x3802 in RKGD. This code is a partial guess.
             // In practice, region might be read differently depending on your rksys layout.
-            RegionId = BigEndianBinaryReader.BufferToUint16(_saveData, 0x23308 + 0x3802) / 4096,
+            RegionId = BigEndianBinaryReader.BufferToUint16(_rksysData, 0x23308 + 0x3802) / 4096,
         };
 
-        ParseFriends(user, offset);
+        ParseFriends(user, rkpdOffset);
         return user;
     }
 
-    private OperationResult<MiiData> ParseMiiData(int offset)
+    private OperationResult<Mii> ParseMiiData(int rkpdOffset)
     {
-        if (_saveData == null)
-            return new ArgumentNullException(nameof(_saveData));
+        //https://wiki.tockdom.com/wiki/Rksys.dat#DWC_User_Data
+        if (_rksysData == null)
+            return new ArgumentNullException(nameof(_rksysData));
 
-        // In Mario Kart Wii's rksys, offset +0x10 => AvatarId, offset +0x14 => ClientId
-        // The name is big-endian UTF-16 at offset itself (length 10 chars => 20 bytes).
-        var name = BigEndianBinaryReader.GetUtf16String(_saveData, offset, 10);
-        var avatarId = BitConverter.ToUInt32(_saveData, offset + 0x10);
-        var clientId = BitConverter.ToUInt32(_saveData, offset + 0x14);
+        // licenseName is NOT always the same as mii name, could be useful
+        var licenseName = BigEndianBinaryReader.GetUtf16String(_rksysData, rkpdOffset + 0x14, 10);
+        // id of mii
+        var avatarId = BigEndianBinaryReader.BufferToUint32(_rksysData, rkpdOffset + 0x28);
+        // id of the actual system
+        var clientId = BigEndianBinaryReader.BufferToUint32(_rksysData, rkpdOffset + 0x2C);
 
-        var rawMiiResult = _miiService.GetByClientId(clientId);
+        var rawMiiResult = _miiService.GetByAvatarId(avatarId);
         if (rawMiiResult.IsFailure)
             return new FormatException("Failed to parse mii data: " + rawMiiResult.Error.Message);
 
-        var miiData = new MiiData
-        {
-            Mii = rawMiiResult.Value,
-            AvatarId = avatarId,
-            ClientId = clientId,
-        };
-        return miiData;
+        return rawMiiResult.Value;
     }
 
     private void ParseFriends(LicenseProfile licenseProfile, int userOffset)
     {
-        if (_saveData == null)
+        if (_rksysData == null)
             return;
 
         var friendOffset = userOffset + FriendDataOffset;
@@ -256,28 +240,23 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
             if (!CheckForMiiData(currentOffset + 0x1A))
                 continue;
 
-            byte[] rawMiiBytes = _saveData.AsSpan(currentOffset + 0x1A, MiiSize).ToArray();
-            var friendCode = FriendCodeGenerator.GetFriendCode(_saveData, currentOffset + 4);
+            byte[] rawMiiBytes = _rksysData.AsSpan(currentOffset + 0x1A, MiiSize).ToArray();
+            var friendCode = FriendCodeGenerator.GetFriendCode(_rksysData, currentOffset + 4);
             var miiResult = MiiSerializer.Deserialize(rawMiiBytes);
             if (miiResult.IsFailure)
                 continue;
 
             var friend = new FriendProfile
             {
-                Vr = BigEndianBinaryReader.BufferToUint16(_saveData, currentOffset + 0x16),
-                Br = BigEndianBinaryReader.BufferToUint16(_saveData, currentOffset + 0x18),
+                Vr = BigEndianBinaryReader.BufferToUint16(_rksysData, currentOffset + 0x16),
+                Br = BigEndianBinaryReader.BufferToUint16(_rksysData, currentOffset + 0x18),
                 FriendCode = friendCode,
-                Wins = BigEndianBinaryReader.BufferToUint16(_saveData, currentOffset + 0x14),
-                Losses = BigEndianBinaryReader.BufferToUint16(_saveData, currentOffset + 0x12),
-                CountryCode = _saveData[currentOffset + 0x68],
-                RegionId = _saveData[currentOffset + 0x69],
+                Wins = BigEndianBinaryReader.BufferToUint16(_rksysData, currentOffset + 0x14),
+                Losses = BigEndianBinaryReader.BufferToUint16(_rksysData, currentOffset + 0x12),
+                CountryCode = _rksysData[currentOffset + 0x68],
+                RegionId = _rksysData[currentOffset + 0x69],
                 BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
-                MiiData = new()
-                {
-                    Mii = miiResult.Value,
-                    AvatarId = 0,
-                    ClientId = 0,
-                },
+                Mii = miiResult.Value,
             };
             licenseProfile.Friends.Add(friend);
         }
@@ -288,7 +267,7 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
         // If the entire 0x4A bytes are zero, we treat it as empty / no Mii data
         for (var i = 0; i < MiiSize; i++)
         {
-            if (_saveData != null && _saveData[offset + i] != 0)
+            if (_rksysData != null && _rksysData[offset + i] != 0)
                 return true;
         }
 
@@ -297,16 +276,16 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
 
     private bool ValidateMagicNumber()
     {
-        if (_saveData == null)
+        if (_rksysData == null)
             return false;
-        return Encoding.ASCII.GetString(_saveData, 0, RksysMagic.Length) == RksysMagic;
+        return Encoding.ASCII.GetString(_rksysData, 0, RksysMagic.Length) == RksysMagic;
     }
 
-    private OperationResult<byte[]> LoadSaveDataFile()
+    private OperationResult<byte[]> ReadRksys()
     {
         try
         {
-            if (!Directory.Exists(PathManager.SaveFolderPath))
+            if (!_fileSystem.Directory.Exists(PathManager.SaveFolderPath))
                 return "Save folder not found";
 
             var currentRegion = (MarioKartWiiEnums.Regions)SettingsManager.RR_REGION.Get();
@@ -384,13 +363,13 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
         if (userIndex is < 0 or >= MaxPlayerNum)
             return "Invalid license index. Please select a valid license.";
 
-        var user = UserList.Users[userIndex];
+        var user = Licenses.Users[userIndex];
         var miiIsEmptyOrNoName = IsNoNameOrEmptyMii(user);
 
         if (miiIsEmptyOrNoName)
             return "This license has no Mii data or is incomplete.\n" + "Please use the Mii Channel to create a Mii first.";
 
-        if (user.MiiData?.Mii == null)
+        if (user.Mii == null)
             return "This license has no Mii data or is incomplete.\n" + "Please use the Mii Channel to create a Mii first.";
 
         newName = Regex.Replace(newName, @"\s+", " ");
@@ -409,7 +388,7 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
         var nameWrite = WriteLicenseNameToSaveData(userIndex, newName);
         if (nameWrite.IsFailure)
             return nameWrite.Error.Message;
-        var updated = _miiService.UpdateName(user.MiiData.ClientId, newName);
+        var updated = _miiService.UpdateName(user.Mii.MiiId, newName);
         if (updated.IsFailure)
             return updated.Error.Message;
         var rksysSaveResult = SaveRksysToFile();
@@ -421,13 +400,13 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
 
     private bool IsNoNameOrEmptyMii(LicenseProfile user)
     {
-        if (user?.MiiData?.Mii == null)
+        if (user?.Mii == null)
             return true;
 
-        var name = user.MiiData.Mii.Name;
+        var name = user.Mii.Name;
         if (name.ToString() == "no name")
             return true;
-        var raw = MiiSerializer.Serialize(user.MiiData.Mii).Value;
+        var raw = MiiSerializer.Serialize(user.Mii).Value;
         if (raw.Length != 74)
             return true; // Not valid
         if (raw.All(b => b == 0))
@@ -439,29 +418,29 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
 
     private OperationResult WriteLicenseNameToSaveData(int userIndex, string newName)
     {
-        if (_saveData == null || _saveData.Length < RksysSize)
+        if (_rksysData == null || _rksysData.Length < RksysSize)
             return "Invalid save data";
         var rkpdOffset = 0x8 + userIndex * RkpdSize;
         var nameOffset = rkpdOffset + 0x14;
         var nameBytes = Encoding.BigEndianUnicode.GetBytes(newName);
         for (var i = 0; i < 20; i++)
-            _saveData[nameOffset + i] = 0;
-        Array.Copy(nameBytes, 0, _saveData, nameOffset, Math.Min(nameBytes.Length, 20));
+            _rksysData[nameOffset + i] = 0;
+        Array.Copy(nameBytes, 0, _rksysData, nameOffset, Math.Min(nameBytes.Length, 20));
         return Ok();
     }
 
     private OperationResult SaveRksysToFile()
     {
-        if (_saveData == null || !SettingsHelper.PathsSetupCorrectly())
+        if (_rksysData == null || !SettingsHelper.PathsSetupCorrectly())
             return Fail("Invalid save data or config is not setup properly.");
-        FixRksysCrc(_saveData);
+        FixRksysCrc(_rksysData);
         var currentRegion = (MarioKartWiiEnums.Regions)SettingsManager.RR_REGION.Get();
         var saveFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, RRRegionManager.ConvertRegionToGameId(currentRegion));
         var trySaveRksys = TryCatch(() =>
         {
             _fileSystem.Directory.CreateDirectory(saveFolder);
             var path = _fileSystem.Path.Combine(saveFolder, "rksys.dat");
-            _fileSystem.File.WriteAllBytes(path, _saveData);
+            _fileSystem.File.WriteAllBytes(path, _rksysData);
         });
         if (trySaveRksys.IsFailure)
             return trySaveRksys.Error.Message;
@@ -470,7 +449,7 @@ public class GameDataSingletonService : RepeatedTaskManager, IGameDataSingletonS
 
     protected override Task ExecuteTaskAsync()
     {
-        var result = LoadGameData();
+        var result = LoadLicense();
         if (result.IsFailure)
         {
             throw new(result.Error.Message);

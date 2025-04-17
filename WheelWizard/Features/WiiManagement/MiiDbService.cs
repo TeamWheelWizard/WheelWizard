@@ -16,9 +16,9 @@ public interface IMiiDbService
     /// <summary>
     /// Retrieves a specific Mii from the database using its unique client ID.
     /// </summary>
-    /// <param name="clientId">The unique identifier of the Mii to retrieve.</param>
+    /// <param name="avatarId">The unique identifier of the Mii to retrieve.</param>
     /// <returns>An <see cref="OperationResult{T}"/> containing the <see cref="Mii"/> if found and valid.</returns>
-    OperationResult<Mii> GetByClientId(uint clientId);
+    OperationResult<Mii> GetByAvatarId(uint avatarId);
 
     /// <summary>
     /// Updates an existing Mii in the database with new data.
@@ -60,9 +60,9 @@ public class MiiDbService : IMiiDbService
         return result;
     }
 
-    public OperationResult<Mii> GetByClientId(uint clientId)
+    public OperationResult<Mii> GetByAvatarId(uint avatarId)
     {
-        var raw = _repository.GetRawBlockByClientId(clientId);
+        var raw = _repository.GetRawBlockByAvatarId(avatarId);
         if (raw == null || raw.Length != MiiSerializer.MiiBlockSize)
             return "Mii block not found or invalid.";
 
@@ -80,7 +80,7 @@ public class MiiDbService : IMiiDbService
 
     public OperationResult UpdateName(uint clientId, string newName)
     {
-        var result = GetByClientId(clientId);
+        var result = GetByAvatarId(clientId);
         if (result.IsFailure)
             return result;
 

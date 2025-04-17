@@ -12,10 +12,9 @@ public abstract class PlayerProfileBase : INotifyPropertyChanged
     public required uint Vr { get; init; }
     public required uint Br { get; init; }
     public required uint RegionId { get; init; }
-    public required MiiData? MiiData { get; set; }
+    public required Mii? Mii { get; set; }
 
     public string RegionName => Humanizer.GetRegionName(RegionId);
-    public Mii? Mii => MiiData?.Mii;
 
     public bool IsOnline
     {

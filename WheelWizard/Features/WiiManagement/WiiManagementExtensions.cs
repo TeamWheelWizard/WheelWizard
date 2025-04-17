@@ -6,7 +6,7 @@ public static class WiiManagementExtensions
     {
         services.AddSingleton<IMiiDbService, MiiDbService>();
         services.AddSingleton<IMiiRepository, MiiRepositoryService>();
-        services.AddSingleton<IGameDataSingletonService, GameDataSingletonService>();
+        services.AddSingleton<IGameLicenseSingletonService, GameLicenseSingletonService>();
         return services;
     }
 }

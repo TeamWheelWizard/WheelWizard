@@ -24,7 +24,10 @@ public class Mii
     public MiiScale Height { get; set; } = new(1);
     public MiiScale Weight { get; set; } = new(1);
 
+    //Mii ID is also refered as Avatar  ID
     public uint MiiId { get; set; }
+
+    //This is also refferd as Client ID
     public byte SystemId0 { get; set; }
     public byte SystemId1 { get; set; }
     public byte SystemId2 { get; set; }

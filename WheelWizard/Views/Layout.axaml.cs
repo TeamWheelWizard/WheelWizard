@@ -1,7 +1,10 @@
+using System.Runtime.InteropServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
@@ -30,7 +33,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     private IBrandingSingletonService BrandingService { get; set; } = null!;
 
     [Inject]
-    private IGameDataSingletonService GameDataService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
 
     public Layout()
     {
@@ -49,9 +52,19 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
             MadeBy_Part2.Text = split[1];
         }
 
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            TopBarButtons.IsVisible = false;
+            TitleLabel.Margin -= new Thickness(0, 0, 0, 18);
+
+            ExtendClientAreaTitleBarHeightHint = 0;
+            SystemDecorations = SystemDecorations.Full;
+            ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.PreferSystemChrome;
+        }
+
         WhWzStatusManager.Instance.Subscribe(this);
         RRLiveRooms.Instance.Subscribe(this);
-        GameDataService.Subscribe(this);
+        GameLicenseService.Subscribe(this);
 #if DEBUG
         KitchenSinkButton.IsVisible = true;
 #endif
@@ -112,7 +125,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
 
     public void UpdateFriendCount()
     {
-        var friends = GameDataService.CurrentFriends;
+        var friends = GameLicenseService.ActiveCurrentFriends;
         FriendsButton.BoxText = $"{friends.Count(friend => friend.IsOnline)}/{friends.Count}";
         FriendsButton.BoxTip = friends.Count(friend => friend.IsOnline) switch
         {
