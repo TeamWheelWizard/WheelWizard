@@ -102,7 +102,7 @@ public static class RetroRewindUpdater
 
             foreach (var file in deletionsToApply)
             {
-                var absoluteDestinationPath = Path.GetFullPath(PathManager.RiivolutionWhWzFolderPath);
+                var absoluteDestinationPath = Path.GetFullPath(PathManager.RiivolutionWhWzFolderPath + Path.AltDirectorySeparatorChar);
                 var filePath = Path.GetFullPath(Path.Combine(absoluteDestinationPath, file.Path.TrimStart('/')));
                 //because we are actually getting the path from the server,
                 //we need to make sure we are not getting hacked, so we check if the path is in the riivolution folder
