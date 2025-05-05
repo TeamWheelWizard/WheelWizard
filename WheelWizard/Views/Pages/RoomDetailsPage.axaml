@@ -94,9 +94,11 @@
                 </ListBox.ItemTemplate>
 
                 <ListBox.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
-                        <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
+                    <ContextMenu Opening="ContextMenu_OnOpening">
+                         <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
+                         <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
+                         <Separator />
+                         <MenuItem Header="{x:Static lang:Common.Action_SaveExternalMii}" Click="CopyMii_OnClick" x:Name="CopyMiiButton"/>
                         <!--
                         <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
                         <Separator />

@@ -4,9 +4,11 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.Services.LiveData;
+using WheelWizard.Services.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.Mockers;
 using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WiiManagement;
 
@@ -127,4 +129,49 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
     }
 
     #endregion
+
+    private void CopyMii_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (!MiiDbService.Exists())
+        {
+            ViewUtils.ShowSnackbar("Cant save Mii", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
+            return;
+        if (selectedPlayer.FirstMii == null)
+            return;
+
+        // if (selectedPlayer.FirstMii?.CustomData.IsCopyable != true)
+        // {
+        //     ViewUtils.ShowSnackbar("This player doesn't want you to copy their Mii", ViewUtils.SnackbarType.Warning);
+        //     return;
+        // }
+        var desiredMii = selectedPlayer.FirstMii;
+
+        var macAddress = (string)SettingsManager.MACADDRESS.Get();
+        //We set the miiId to 0 so it will be added as a new Mii
+        desiredMii.MiiId = 0;
+        var databaseResult = MiiDbService.AddToDatabase(desiredMii, macAddress);
+        if (databaseResult.IsFailure)
+        {
+            new MessageBoxWindow()
+                .SetTitleText("Failed to Copy Mii")
+                .SetInfoText(databaseResult.Error!.Message)
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .Show();
+            return;
+        }
+
+        ViewUtils.ShowSnackbar("Mii has been added to your Miis");
+    }
+
+    private void ContextMenu_OnOpening(object? sender, CancelEventArgs e)
+    {
+        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
+            return;
+
+        // CopyMiiButton.IsEnabled = selectedPlayer.FirstMii?.CustomData.IsCopyable == true;
+    }
 }

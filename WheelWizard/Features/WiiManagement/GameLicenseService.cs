@@ -199,14 +199,14 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         {
             Mii = miiToUse,
             FriendCode = friendCode,
-            Vr = BigEndianBinaryReader.BufferToUint16(_rksysData, rkpdOffset + 0xB0),
-            Br = BigEndianBinaryReader.BufferToUint16(_rksysData, rkpdOffset + 0xB2),
-            TotalRaceCount = BigEndianBinaryReader.BufferToUint32(_rksysData, rkpdOffset + 0xB4),
-            TotalWinCount = BigEndianBinaryReader.BufferToUint32(_rksysData, rkpdOffset + 0xDC),
+            Vr = BigEndianBinaryReader.ReadUint16(_rksysData, rkpdOffset + 0xB0),
+            Br = BigEndianBinaryReader.ReadUint16(_rksysData, rkpdOffset + 0xB2),
+            TotalRaceCount = BigEndianBinaryReader.ReadUint32(_rksysData, rkpdOffset + 0xB4),
+            TotalWinCount = BigEndianBinaryReader.ReadUint32(_rksysData, rkpdOffset + 0xDC),
             BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
             // Region is often found near offset 0x23308 + 0x3802 in RKGD. This code is a partial guess.
             // In practice, region might be read differently depending on your rksys layout.
-            RegionId = BigEndianBinaryReader.BufferToUint16(_rksysData, 0x23308 + 0x3802) / 4096,
+            RegionId = (uint)BigEndianBinaryReader.ReadUint16(_rksysData, 0x23308 + 0x3802) / 4096,
         };
 
         ParseFriends(user, rkpdOffset);
@@ -222,9 +222,9 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         // licenseName is NOT always the same as mii name, could be useful
         var licenseName = BigEndianBinaryReader.GetUtf16String(_rksysData, rkpdOffset + 0x14, 10);
         // id of mii
-        var avatarId = BigEndianBinaryReader.BufferToUint32(_rksysData, rkpdOffset + 0x28);
+        var avatarId = BigEndianBinaryReader.ReadUint32(_rksysData, rkpdOffset + 0x28);
         // id of the actual system
-        var clientId = BigEndianBinaryReader.BufferToUint32(_rksysData, rkpdOffset + 0x2C);
+        var clientId = BigEndianBinaryReader.ReadUint32(_rksysData, rkpdOffset + 0x2C);
 
         var rawMiiResult = _miiService.GetByAvatarId(avatarId);
         if (rawMiiResult.IsFailure)
@@ -253,11 +253,11 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
             var friend = new FriendProfile
             {
-                Vr = BigEndianBinaryReader.BufferToUint16(_rksysData, currentOffset + 0x16),
-                Br = BigEndianBinaryReader.BufferToUint16(_rksysData, currentOffset + 0x18),
+                Vr = BigEndianBinaryReader.ReadUint16(_rksysData, currentOffset + 0x16),
+                Br = BigEndianBinaryReader.ReadUint16(_rksysData, currentOffset + 0x18),
                 FriendCode = friendCode,
-                Wins = BigEndianBinaryReader.BufferToUint16(_rksysData, currentOffset + 0x14),
-                Losses = BigEndianBinaryReader.BufferToUint16(_rksysData, currentOffset + 0x12),
+                Wins = BigEndianBinaryReader.ReadUint16(_rksysData, currentOffset + 0x14),
+                Losses = BigEndianBinaryReader.ReadUint16(_rksysData, currentOffset + 0x12),
                 CountryCode = _rksysData[currentOffset + 0x68],
                 RegionId = _rksysData[currentOffset + 0x69],
                 BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
@@ -289,11 +289,11 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             return "Invalid or unloaded rksys.dat data.";
 
         var rkpdOffset = 0x08 + userIndex * RkpdSize;
-        BigEndianBinaryReader.WriteUInt32BigEndian(_rksysData, rkpdOffset + 0x28, newMii.MiiId); // Avatar ID
+        BigEndianBinaryReader.WriteUInt32(_rksysData, rkpdOffset + 0x28, newMii.MiiId); // Avatar ID
 
         var systemid = newMii.SystemId0 << 24 | newMii.SystemId1 << 16 | newMii.SystemId2 << 8 | newMii.SystemId3;
 
-        BigEndianBinaryReader.WriteUInt32BigEndian(_rksysData, rkpdOffset + 0x2C, (uint)systemid);
+        BigEndianBinaryReader.WriteUInt32(_rksysData, rkpdOffset + 0x2C, (uint)systemid);
 
         var nameWrite = WriteLicenseNameToSaveData(userIndex, newMii.Name.ToString());
         if (nameWrite.IsFailure)
@@ -397,7 +397,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         var newCrc = ComputeCrc32(rksysData, 0, lengthToCrc);
 
         // 2) Write CRC at offset 0x27FFC in big-endian.
-        BigEndianBinaryReader.WriteUInt32BigEndian(rksysData, 0x27FFC, newCrc);
+        BigEndianBinaryReader.WriteUInt32(rksysData, 0x27FFC, newCrc);
     }
 
     public OperationResult ChangeMiiName(int userIndex, string? newName)

@@ -74,10 +74,11 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.ContextMenu>
-                    <ContextMenu>
+                    <ContextMenu Opening="ContextMenu_OnOpening">
                         <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
                         <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
-                        <MenuItem Header="{x:Static lang:Common.Action_SaveExternalMii}" Click="SaveMii_OnClick" />
+                        <Separator />
+                        <MenuItem Header="{x:Static lang:Common.Action_SaveExternalMii}" Click="SaveMii_OnClick" x:Name="CopyMiiButton"/>
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>

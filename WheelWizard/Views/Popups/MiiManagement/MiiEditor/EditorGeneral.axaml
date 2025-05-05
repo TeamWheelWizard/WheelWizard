@@ -35,6 +35,13 @@
                                               TextChanged="Name_TextChanged" />
                 </StackPanel>
 
+                <StackPanel>
+                    <CheckBox IsChecked="False" x:Name="AllowCopy" IsCheckedChanged="AllowCopy_OnIsCheckedChanged">
+                        <components:FormFieldLabel Text="Allow others to copy your Mii"
+                                                   TipText="When you check this, others will be able to save your mii in their own collection."/>
+                    </CheckBox>
+                </StackPanel>
+                
                 <StackPanel> <!-- Gender -->
                     <components:FormFieldLabel Text="Gender:" />
                     <StackPanel Orientation="Horizontal" Spacing="10">

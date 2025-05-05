@@ -26,6 +26,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
         MiiName.Text = Editor.Mii.Name.ToString();
         CreatorName.Text = Editor.Mii.CreatorName.ToString();
         GirlToggle.IsChecked = Editor.Mii.IsGirl;
+        AllowCopy.IsChecked = Editor.Mii.CustomData.IsCopyable;
         LengthSlider.Value = Editor.Mii.Height.Value;
         WidthSlider.Value = Editor.Mii.Weight.Value;
         foreach (var color in Enum.GetNames(typeof(MiiFavoriteColor)))
@@ -138,4 +139,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
         _refreshTimer.Stop();
         Editor.RefreshImage();
     }
+
+    private void AllowCopy_OnIsCheckedChanged(object? sender, RoutedEventArgs e) =>
+        Editor.Mii.CustomData.IsCopyable = AllowCopy.IsChecked == true;
 }
