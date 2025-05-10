@@ -4,6 +4,7 @@ using Serilog;
 using Testably.Abstractions;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
+using WheelWizard.CustomDistributions;
 using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
 using WheelWizard.MiiImages;
@@ -30,6 +31,7 @@ public static class SetupExtensions
         services.AddWiiManagement();
         services.AddGameBanana();
         services.AddMiiImages();
+        services.AddCustomDistributionService();
 
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();
