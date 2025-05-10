@@ -40,25 +40,30 @@ public class RetroRewind : IDistribution
         return "Failed to check for updates";
     }
 
-    public Task<OperationResult> Update()
+    public async Task<OperationResult> Update()
     {
         try
         {
             var currentVersion = GetCurrentVersion();
             if (currentVersion == null)
-                return Install();
+                return await Install();
+
+            var isRRUpToDate = await IsRRUpToDate(currentVersion);
+            if (isRRUpToDate.IsFailure)
+                return isRRUpToDate;
             
-            if (await IsRRUpToDate(currentVersion))
+            if (isRRUpToDate.Value)
             {
-                return true;
+                return Ok();
             }
 
             //if current version is below 3.2.6 we need to do a full reinstall
-            if (currentVersion.ComparePrecedenceTo("3.2.6") < 0)
+            if (currentVersion.ComparePrecedenceTo(new SemVersion(3, 2, 6)) < 0)
             {
-                var removeResult = await Remove();
-                if (removeResult.IsFailure)
-                    return removeResult;
+                //todo: look at this logic
+                var result = await Install();
+                if (result.IsFailure)
+                    return result;
                 
                 return await Install();
             }
@@ -66,8 +71,7 @@ public class RetroRewind : IDistribution
         }
         catch (Exception e)
         {
-            AbortingUpdate($"Reason: {e.Message}");
-            return false;
+            return e;
         }
     }
     
