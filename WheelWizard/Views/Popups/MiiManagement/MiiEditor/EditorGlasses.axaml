@@ -32,11 +32,9 @@
                     <!-- Glasses Color -->
                     <StackPanel>
                         <components:FormFieldLabel Text="Glasses Color:"/>
-                        <ComboBox
-                            x:Name="GlassesColorBox"
-                            SelectionChanged="GlassesColorBox_OnSelectionChanged"
-                            Width="150"
-                        />
+                        <UniformGrid Columns="6" x:Name="GlassesColorGrid">
+                            <!-- Generated elements -->
+                        </UniformGrid>
                     </StackPanel>
 
                     <!-- Vertical Position (Up/Down) -->

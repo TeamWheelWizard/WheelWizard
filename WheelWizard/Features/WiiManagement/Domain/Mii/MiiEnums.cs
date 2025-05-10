@@ -54,7 +54,7 @@ public enum MiiFacialFeature
     Wrinkles,
 }
 
-public enum HairColor
+public enum MiiHairColor
 {
     Black,
     Brown,
@@ -63,22 +63,10 @@ public enum HairColor
     Grey,
     LightBrown,
     Blonde,
-    White,
+    Gold,
 }
 
-public enum EyebrowColor
-{
-    Black,
-    Brown,
-    Red,
-    LightRed,
-    Grey,
-    LightBrown,
-    Blonde,
-    White,
-}
-
-public enum EyeColor : uint
+public enum MiiEyeColor : uint
 {
     Black,
     Grey,
@@ -88,7 +76,7 @@ public enum EyeColor : uint
     Green,
 }
 
-public enum NoseType
+public enum MiiNoseType
 {
     Default,
     SemiCircle,
@@ -104,16 +92,16 @@ public enum NoseType
     Tunnel,
 }
 
-public enum LipColor
+public enum MiiLipColor
 {
     Skin,
     Red,
     Pink,
 }
 
-public enum GlassesColor
+public enum MiiGlassesColor
 {
-    Dark,
+    Grey,
     DarkGold,
     Red,
     Blue,
@@ -121,7 +109,7 @@ public enum GlassesColor
     White,
 }
 
-public enum GlassesType
+public enum MiiGlassesType
 {
     None,
     Square,
@@ -134,19 +122,7 @@ public enum GlassesType
     CoolSunGlasses,
 }
 
-public enum MustacheColor
-{
-    Black,
-    Brown,
-    Red,
-    LightRed,
-    Grey,
-    LightBrown,
-    Tan,
-    White,
-}
-
-public enum MustacheType
+public enum MiiMustacheType
 {
     None,
     Normal,
@@ -154,7 +130,7 @@ public enum MustacheType
     Droopy,
 }
 
-public enum BeardType
+public enum MiiBeardType
 {
     None,
     Thin,

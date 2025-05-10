@@ -43,7 +43,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                 <components:Button x:Name="VerticalDecreaseButton" IconData="{StaticResource ArrowUp}" IconSize="14" Padding="4" Click="VerticalDecrease_Click"/>
                                 <TextBlock x:Name="VerticalValueText" Classes="BodyText" MinWidth="30" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
-                                <components:Button x:Name="VerticalIncreaseButton" IconData="{StaticResource  ArrowUp}" IconSize="14" Padding="4" Click="VerticalIncrease_Click"/>
+                                <components:Button x:Name="VerticalIncreaseButton" IconData="{StaticResource  ArrowDown}" IconSize="14" Padding="4" Click="VerticalIncrease_Click"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

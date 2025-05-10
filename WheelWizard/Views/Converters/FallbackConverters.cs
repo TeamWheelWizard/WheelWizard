@@ -1,6 +1,5 @@
 ﻿using Avalonia.Data.Converters;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 
 namespace WheelWizard.Views.Converters;
 

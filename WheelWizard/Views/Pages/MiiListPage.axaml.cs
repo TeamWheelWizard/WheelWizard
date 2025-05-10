@@ -186,7 +186,7 @@ public partial class MiiListPage : UserControlBase
     private async void ImportMii_OnClick(object? sender, RoutedEventArgs e)
     {
         var miiFiles = await FilePickerHelper.OpenFilePickerAsync(
-            fileType: new FilePickerFileType("mii file") { Patterns = new[] { "*.mii" } },
+            fileType: CustomFilePickerFileType.Miis,
             allowMultiple: true,
             title: "Select Mii file(s)"
         );
@@ -245,7 +245,7 @@ public partial class MiiListPage : UserControlBase
         var exportName = ReplaceInvalidFileNameChars(mii.Name.ToString());
         var diaglog = await FilePickerHelper.SaveFileAsync(
             title: "Save Mii as file",
-            fileTypes: new[] { new FilePickerFileType("Mii file") { Patterns = new[] { "*.mii" } } },
+            fileTypes: [CustomFilePickerFileType.Miis],
             defaultFileName: $"{exportName}"
         );
         if (diaglog == null)

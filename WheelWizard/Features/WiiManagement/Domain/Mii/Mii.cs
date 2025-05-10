@@ -50,15 +50,16 @@ public class Mii
         }
     }
 
-    public MiiFacialFeatures MiiFacial { get; set; } = new(MiiFaceShape.Bread, MiiSkinColor.Light, MiiFacialFeature.None, false, false);
+    public MiiFacialFeatures MiiFacialFeatures { get; set; } =
+        new(MiiFaceShape.Bread, MiiSkinColor.Light, MiiFacialFeature.None, false, false);
 
-    public MiiHair MiiHair { get; set; } = new(1, HairColor.Black, false);
-    public MiiEyebrow MiiEyebrows { get; set; } = new(1, 0, EyebrowColor.Black, 4, 10, 1);
-    public MiiEye MiiEyes { get; set; } = new(1, 6, 7, EyeColor.Black, 3, 6);
-    public MiiNose MiiNose { get; set; } = new(NoseType.Default, 6, 4);
-    public MiiLip MiiLips { get; set; } = new(1, LipColor.Skin, 4, 9);
-    public MiiGlasses MiiGlasses { get; set; } = new(GlassesType.None, GlassesColor.Dark, 4, 1);
-    public MiiFacialHair MiiFacialHair { get; set; } = new(MustacheType.None, BeardType.None, MustacheColor.Black, 1, 1);
+    public MiiHair MiiHair { get; set; } = new(1, MiiHairColor.Black, false);
+    public MiiEyebrow MiiEyebrows { get; set; } = new(1, 0, MiiHairColor.Black, 4, 10, 1);
+    public MiiEye MiiEyes { get; set; } = new(1, 6, 7, MiiEyeColor.Black, 3, 6);
+    public MiiNose MiiNose { get; set; } = new(MiiNoseType.Default, 6, 4);
+    public MiiLip MiiLips { get; set; } = new(1, MiiLipColor.Skin, 4, 9);
+    public MiiGlasses MiiGlasses { get; set; } = new(MiiGlassesType.None, MiiGlassesColor.Grey, 4, 1);
+    public MiiFacialHair MiiFacialHair { get; set; } = new(MiiMustacheType.None, MiiBeardType.None, MiiHairColor.Black, 1, 1);
     public MiiMole MiiMole { get; set; } = new(false, 0, 0, 0);
     public MiiName CreatorName { get; set; } = new("no name");
 }

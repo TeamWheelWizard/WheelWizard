@@ -3,11 +3,11 @@ namespace WheelWizard.WiiManagement.Domain.Mii;
 public class MiiLip
 {
     public int Type { get; }
-    public LipColor Color { get; }
+    public MiiLipColor Color { get; }
     public int Size { get; }
     public int Vertical { get; }
 
-    public MiiLip(int type, LipColor color, int size, int vertical)
+    public MiiLip(int type, MiiLipColor color, int size, int vertical)
     {
         if (type is < 0 or > 23)
             throw new ArgumentException("Lip type invalid");
@@ -22,6 +22,6 @@ public class MiiLip
         Vertical = vertical;
     }
 
-    public static OperationResult<MiiLip> Create(int type, LipColor color, int size, int vertical) =>
+    public static OperationResult<MiiLip> Create(int type, MiiLipColor color, int size, int vertical) =>
         TryCatch(() => new MiiLip(type, color, size, vertical));
 }

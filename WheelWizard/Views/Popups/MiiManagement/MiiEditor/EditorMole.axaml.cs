@@ -16,26 +16,27 @@ public partial class EditorMole : MiiEditorBaseControl
         : base(ew)
     {
         InitializeComponent();
-        if (Editor?.Mii?.MiiMole == null)
-            return;
         PopulateValues();
     }
 
     private void PopulateValues()
     {
+        // Attribute:
         var currentMole = Editor.Mii.MiiMole;
 
+        // Mole enabled:
         MoleEnabledCheck.IsChecked = currentMole.Exists;
-        MoleControlsPanel.IsVisible = currentMole.Exists;
 
-        UpdateValueTexts(currentMole);
+        // Transform attributes:
+        MoleControlsPanel.IsVisible = currentMole.Exists;
+        UpdateTransformTextValues(currentMole);
     }
 
-    private void UpdateValueTexts(MiiMole mole)
+    private void UpdateTransformTextValues(MiiMole mole)
     {
-        VerticalValueText.Text = mole.Vertical.ToString();
+        VerticalValueText.Text = ((mole.Vertical - 20) * -1).ToString();
         SizeValueText.Text = mole.Size.ToString();
-        HorizontalValueText.Text = mole.Horizontal.ToString();
+        HorizontalValueText.Text = (mole.Horizontal - 8).ToString(); // 8 is center of the face
 
         VerticalDecreaseButton.IsEnabled = mole.Vertical > MinVertical;
         VerticalIncreaseButton.IsEnabled = mole.Vertical < MaxVertical;
@@ -45,14 +46,9 @@ public partial class EditorMole : MiiEditorBaseControl
         HorizontalIncreaseButton.IsEnabled = mole.Horizontal < MaxHorizontal;
     }
 
-    private enum MoleProperty
-    {
-        Vertical,
-        Size,
-        Horizontal,
-    }
+    #region Transfrom
 
-    private void TryUpdateMoleValue(int change, MoleProperty property)
+    private void TryUpdateMoleValue(int change, MiiTransformProperty property)
     {
         if (Editor?.Mii?.MiiMole == null || !IsLoaded || MoleEnabledCheck.IsChecked != true)
             return;
@@ -65,54 +61,43 @@ public partial class EditorMole : MiiEditorBaseControl
 
         switch (property)
         {
-            case MoleProperty.Vertical:
+            case MiiTransformProperty.Vertical:
                 currentValue = current.Vertical;
                 min = MinVertical;
                 max = MaxVertical;
                 break;
-            case MoleProperty.Size:
+            case MiiTransformProperty.Size:
                 currentValue = current.Size;
                 min = MinSize;
                 max = MaxSize;
                 break;
-            case MoleProperty.Horizontal:
+            case MiiTransformProperty.Horizontal:
                 currentValue = current.Horizontal;
                 min = MinHorizontal;
                 max = MaxHorizontal;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(property), property, null);
+                throw new ArgumentException($"{property} is not an option that you can change in Mole");
         }
 
         newValue = currentValue + change;
 
         if (newValue < min || newValue > max)
-        {
-            Console.WriteLine($"Mole {property} limit reached ({newValue}).");
             return;
-        }
 
-        OperationResult<MiiMole> result;
-        switch (property)
+        var result = property switch
         {
-            case MoleProperty.Vertical:
-                result = MiiMole.Create(current.Exists, current.Size, newValue, current.Horizontal);
-                break;
-            case MoleProperty.Size:
-                result = MiiMole.Create(current.Exists, newValue, current.Vertical, current.Horizontal);
-                break;
-            case MoleProperty.Horizontal:
-                result = MiiMole.Create(current.Exists, current.Size, current.Vertical, newValue);
-                break;
-            default:
-                return;
-        }
+            MiiTransformProperty.Vertical => MiiMole.Create(current.Exists, current.Size, newValue, current.Horizontal),
+            MiiTransformProperty.Size => MiiMole.Create(current.Exists, newValue, current.Vertical, current.Horizontal),
+            MiiTransformProperty.Horizontal => MiiMole.Create(current.Exists, current.Size, current.Vertical, newValue),
+            _ => throw new ArgumentException($"{property} is not an option that you can change in Mole"),
+        };
 
         if (result.IsFailure)
             return;
 
         Editor.Mii.MiiMole = result.Value;
-        UpdateValueTexts(result.Value);
+        UpdateTransformTextValues(result.Value);
         Editor.RefreshImage();
     }
 
@@ -121,7 +106,7 @@ public partial class EditorMole : MiiEditorBaseControl
         if (!IsLoaded || Editor?.Mii?.MiiMole == null)
             return;
 
-        bool isEnabled = MoleEnabledCheck.IsChecked == true;
+        var isEnabled = MoleEnabledCheck.IsChecked == true;
         var current = Editor.Mii.MiiMole;
 
         if (isEnabled == current.Exists)
@@ -130,26 +115,25 @@ public partial class EditorMole : MiiEditorBaseControl
         var result = MiiMole.Create(isEnabled, current.Size, current.Vertical, current.Horizontal);
 
         if (result.IsSuccess)
-        {
             Editor.Mii.MiiMole = result.Value;
-        }
         else
-        {
             MoleEnabledCheck.IsChecked = current.Exists;
-        }
+
         MoleControlsPanel.IsVisible = Editor.Mii.MiiMole.Exists;
         Editor.RefreshImage();
     }
 
-    private void VerticalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(-1, MoleProperty.Vertical);
+    private void VerticalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(-1, MiiTransformProperty.Vertical);
 
-    private void VerticalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(+1, MoleProperty.Vertical);
+    private void VerticalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(+1, MiiTransformProperty.Vertical);
 
-    private void SizeDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(-1, MoleProperty.Size);
+    private void SizeDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(-1, MiiTransformProperty.Size);
 
-    private void SizeIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(+1, MoleProperty.Size);
+    private void SizeIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(+1, MiiTransformProperty.Size);
 
-    private void HorizontalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(-1, MoleProperty.Horizontal);
+    private void HorizontalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(-1, MiiTransformProperty.Horizontal);
 
-    private void HorizontalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(+1, MoleProperty.Horizontal);
+    private void HorizontalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateMoleValue(+1, MiiTransformProperty.Horizontal);
+
+    #endregion
 }

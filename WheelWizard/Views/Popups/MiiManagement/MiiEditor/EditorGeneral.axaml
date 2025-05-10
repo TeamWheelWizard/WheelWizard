@@ -58,16 +58,15 @@
                             Minimum="0" Maximum="127"
                             Width="220" HorizontalAlignment="Left" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel>
-                        <components:FormFieldLabel Text="Favorite Color:" />
-                        <ComboBox
-                            x:Name="FavoriteColorBox"
-                            SelectionChanged="FavoriteColorBox_OnSelectionChanged"
-                            Width="150">
-                        </ComboBox>
-                    </StackPanel>
+                
+                
+                <StackPanel> <!-- Favorite Color -->
+                    <components:FormFieldLabel Text="Favorite Color:"/>
+                    <UniformGrid Columns="5" x:Name="FavoriteColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
                 </StackPanel>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>

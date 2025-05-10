@@ -1,7 +1,5 @@
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using WheelWizard.Views.Components;
 using WheelWizard.WiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
@@ -17,20 +15,15 @@ public partial class EditorNose : MiiEditorBaseControl
         : base(ew)
     {
         InitializeComponent();
-        if (Editor?.Mii?.MiiNose == null)
-            return;
         PopulateValues();
     }
 
     private void PopulateValues()
     {
+        // Attribute:
         var currentNose = Editor.Mii.MiiNose;
-        GenerateNoseButtons();
-        UpdateValueTexts(currentNose);
-    }
 
-    private void GenerateNoseButtons()
-    {
+        // Nose:
         var color1 = new SolidColorBrush(ViewUtils.Colors.Black);
         SetButtons(
             "MiiNose",
@@ -38,11 +31,14 @@ public partial class EditorNose : MiiEditorBaseControl
             NoseTypesGrid,
             (index, button) =>
             {
-                button.IsChecked = index == (int)Editor.Mii.MiiNose.Type;
+                button.IsChecked = index == (int)currentNose.Type;
                 button.Color1 = color1;
                 button.Click += (_, _) => SetNoseType(index);
             }
         );
+
+        // Transform attributes:
+        UpdateTransformTextValues(currentNose);
     }
 
     private void SetNoseType(int index)
@@ -50,33 +46,18 @@ public partial class EditorNose : MiiEditorBaseControl
         if (Editor?.Mii?.MiiNose == null || !IsLoaded)
             return;
         var current = Editor.Mii.MiiNose;
-        var noseType = (NoseType)index;
+        var noseType = (MiiNoseType)index;
         var result = MiiNose.Create(noseType, current.Size, current.Vertical);
-        if (result.IsSuccess)
-        {
-            Editor.Mii.MiiNose = result.Value;
-            UpdateValueTexts(result.Value);
-        }
-        else
-        {
-            // Reset the button to the current type if creation fails
-            foreach (var child in NoseTypesGrid.Children)
-            {
-                if (child is MultiIconRadioButton button && button.IsChecked == true)
-                {
-                    button.IsChecked = false;
-                }
-            }
+        if (result.IsFailure)
+            return;
 
-            var currentButton = NoseTypesGrid.Children[index] as MultiIconRadioButton;
-            currentButton.IsChecked = true;
-        }
+        Editor.Mii.MiiNose = result.Value;
         Editor.RefreshImage();
     }
 
-    private void UpdateValueTexts(MiiNose nose)
+    private void UpdateTransformTextValues(MiiNose nose)
     {
-        VerticalValueText.Text = nose.Vertical.ToString();
+        VerticalValueText.Text = ((nose.Vertical - 9) * -1).ToString();
         SizeValueText.Text = nose.Size.ToString();
 
         VerticalDecreaseButton.IsEnabled = nose.Vertical > MinVertical;
@@ -85,13 +66,9 @@ public partial class EditorNose : MiiEditorBaseControl
         SizeIncreaseButton.IsEnabled = nose.Size < MaxSize;
     }
 
-    private enum NoseProperty
-    {
-        Vertical,
-        Size,
-    }
+    #region Transform
 
-    private void TryUpdateNoseValue(int change, NoseProperty property)
+    private void TryUpdateNoseValue(int change, MiiTransformProperty property)
     {
         if (Editor?.Mii?.MiiNose == null || !IsLoaded)
             return;
@@ -104,53 +81,47 @@ public partial class EditorNose : MiiEditorBaseControl
 
         switch (property)
         {
-            case NoseProperty.Vertical:
+            case MiiTransformProperty.Vertical:
                 currentValue = current.Vertical;
                 min = MinVertical;
                 max = MaxVertical;
                 break;
-            case NoseProperty.Size:
+            case MiiTransformProperty.Size:
                 currentValue = current.Size;
                 min = MinSize;
                 max = MaxSize;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(property), property, null);
+                throw new ArgumentException($"{property} is not an option that you can change in Nose");
         }
 
         newValue = currentValue + change;
 
         if (newValue < min || newValue > max)
-        {
             return;
-        }
 
-        OperationResult<MiiNose> result;
-        switch (property)
+        var result = property switch
         {
-            case NoseProperty.Vertical:
-                result = MiiNose.Create(current.Type, current.Size, newValue);
-                break;
-            case NoseProperty.Size:
-                result = MiiNose.Create(current.Type, newValue, current.Vertical);
-                break;
-            default:
-                return;
-        }
+            MiiTransformProperty.Vertical => MiiNose.Create(current.Type, current.Size, newValue),
+            MiiTransformProperty.Size => MiiNose.Create(current.Type, newValue, current.Vertical),
+            _ => throw new ArgumentException($"{property} is not an option that you can change in Nose"),
+        };
 
         if (result.IsFailure)
             return;
 
         Editor.Mii.MiiNose = result.Value;
-        UpdateValueTexts(result.Value);
+        UpdateTransformTextValues(result.Value);
         Editor.RefreshImage();
     }
 
-    private void VerticalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateNoseValue(-1, NoseProperty.Vertical);
+    private void VerticalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateNoseValue(-1, MiiTransformProperty.Vertical);
 
-    private void VerticalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateNoseValue(+1, NoseProperty.Vertical);
+    private void VerticalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateNoseValue(+1, MiiTransformProperty.Vertical);
 
-    private void SizeDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateNoseValue(-1, NoseProperty.Size);
+    private void SizeDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateNoseValue(-1, MiiTransformProperty.Size);
 
-    private void SizeIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateNoseValue(+1, NoseProperty.Size);
+    private void SizeIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateNoseValue(+1, MiiTransformProperty.Size);
+
+    #endregion
 }

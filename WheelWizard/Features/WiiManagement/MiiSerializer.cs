@@ -49,18 +49,18 @@ public static class MiiSerializer
 
         // Face (0x20 - 0x21)
         ushort face = 0;
-        face |= (ushort)(((int)mii.MiiFacial.FaceShape & 0x07) << 13);
-        face |= (ushort)(((int)mii.MiiFacial.SkinColor & 0x07) << 10);
-        face |= (ushort)(((int)mii.MiiFacial.FacialFeature & 0x0F) << 6);
-        face |= (ushort)((mii.MiiFacial.MingleOff ? 1 : 0) << 2);
-        face |= (ushort)((mii.MiiFacial.Downloaded ? 1 : 0));
+        face |= (ushort)(((int)mii.MiiFacialFeatures.FaceShape & 0x07) << 13);
+        face |= (ushort)(((int)mii.MiiFacialFeatures.SkinColor & 0x07) << 10);
+        face |= (ushort)(((int)mii.MiiFacialFeatures.FacialFeature & 0x0F) << 6);
+        face |= (ushort)((mii.MiiFacialFeatures.MingleOff ? 1 : 0) << 2);
+        face |= (ushort)((mii.MiiFacialFeatures.Downloaded ? 1 : 0));
         data[0x20] = (byte)(face >> 8);
         data[0x21] = (byte)(face & 0xFF);
 
         // Hair (0x22 - 0x23)
         ushort hair = 0;
         hair |= (ushort)((mii.MiiHair.HairType & 0x7F) << 9);
-        hair |= (ushort)(((int)mii.MiiHair.HairColor & 0x07) << 6);
+        hair |= (ushort)(((int)mii.MiiHair.MiiHairColor & 0x07) << 6);
         hair |= (ushort)((mii.MiiHair.HairFlipped ? 1 : 0) << 5);
         data[0x22] = (byte)(hair >> 8);
         data[0x23] = (byte)(hair & 0xFF);
@@ -119,8 +119,8 @@ public static class MiiSerializer
 
         // Facial hair (0x32 - 0x33)
         ushort facialHair = 0;
-        facialHair |= (ushort)(((int)mii.MiiFacialHair.MustacheType & 0x03) << 14);
-        facialHair |= (ushort)(((int)mii.MiiFacialHair.BeardType & 0x03) << 12);
+        facialHair |= (ushort)(((int)mii.MiiFacialHair.MiiMustacheType & 0x03) << 14);
+        facialHair |= (ushort)(((int)mii.MiiFacialHair.MiiBeardType & 0x03) << 12);
         facialHair |= (ushort)(((int)mii.MiiFacialHair.Color & 0x07) << 9);
         facialHair |= (ushort)((mii.MiiFacialHair.Size & 0x0F) << 5);
         facialHair |= (ushort)((mii.MiiFacialHair.Vertical & 0x1F));
@@ -216,14 +216,14 @@ public static class MiiSerializer
             mingleOff,
             downloaded
         );
-        mii.MiiFacial = miiFacialResult;
+        mii.MiiFacialFeatures = miiFacialResult;
 
         // Hair (0x22 - 0x23)
         var hair = (ushort)((data[0x22] << 8) | data[0x23]);
         var hairColor = (hair >> 6) & 0x07;
-        if (!Enum.IsDefined(typeof(HairColor), hairColor))
+        if (!Enum.IsDefined(typeof(MiiHairColor), hairColor))
             return new InvalidDataException("Invalid HairColor");
-        var miiHairResult = MiiHair.Create((hair >> 9) & 0x7F, (HairColor)hairColor, ((hair >> 5) & 0x01) != 0);
+        var miiHairResult = MiiHair.Create((hair >> 9) & 0x7F, (MiiHairColor)hairColor, ((hair >> 5) & 0x01) != 0);
         if (miiHairResult.IsFailure)
             return miiHairResult.Error;
         mii.MiiHair = miiHairResult.Value;
@@ -231,12 +231,12 @@ public static class MiiSerializer
         // Eyebrows (0x24 - 0x27)
         var brow = (uint)((data[0x24] << 24) | (data[0x25] << 16) | (data[0x26] << 8) | data[0x27]);
         var eyebrowColor = (int)((brow >> 13) & 0x07);
-        if (!Enum.IsDefined(typeof(EyebrowColor), eyebrowColor))
+        if (!Enum.IsDefined(typeof(MiiHairColor), eyebrowColor))
             return new InvalidDataException("Invalid EyebrowColor");
         var miiEyebrowsResult = MiiEyebrow.Create(
             (int)((brow >> 27) & 0x1F),
             (int)((brow >> 22) & 0x0F),
-            (EyebrowColor)eyebrowColor,
+            (MiiHairColor)eyebrowColor,
             (int)((brow >> 9) & 0x0F),
             (int)((brow >> 4) & 0x1F),
             (int)(brow & 0x0F)
@@ -248,13 +248,13 @@ public static class MiiSerializer
         // Eyes (0x28 - 0x2B)
         var eye = (uint)((data[0x28] << 24) | (data[0x29] << 16) | (data[0x2A] << 8) | data[0x2B]);
         var eyeColor = ((eye >> 13) & 0x07);
-        if (!Enum.IsDefined(typeof(EyeColor), eyeColor))
+        if (!Enum.IsDefined(typeof(MiiEyeColor), eyeColor))
             return new InvalidDataException("Invalid EyeColor");
         var miiEyesResult = MiiEye.Create(
             (int)((eye >> 26) & 0x3F),
             (int)((eye >> 21) & 0x07),
             (int)((eye >> 16) & 0x1F),
-            (EyeColor)(eyeColor),
+            (MiiEyeColor)(eyeColor),
             (int)((eye >> 9) & 0x07),
             (int)((eye >> 5) & 0x0F)
         );
@@ -265,9 +265,9 @@ public static class MiiSerializer
         // Nose (0x2C - 0x2D)
         var nose = (ushort)((data[0x2C] << 8) | data[0x2D]);
         var noseType = (nose >> 12) & 0x0F;
-        if (!Enum.IsDefined(typeof(NoseType), noseType))
+        if (!Enum.IsDefined(typeof(MiiNoseType), noseType))
             return new InvalidDataException("Invalid NoseType");
-        var miiNoseResult = MiiNose.Create((NoseType)noseType, ((nose >> 8) & 0x0F), ((nose >> 3) & 0x1F));
+        var miiNoseResult = MiiNose.Create((MiiNoseType)noseType, ((nose >> 8) & 0x0F), ((nose >> 3) & 0x1F));
         if (miiNoseResult.IsFailure)
             return miiNoseResult.Error;
         mii.MiiNose = miiNoseResult.Value;
@@ -275,9 +275,9 @@ public static class MiiSerializer
         // Lips (0x2E - 0x2F)
         var lip = (ushort)((data[0x2E] << 8) | data[0x2F]);
         var lipColor = ((lip >> 9) & 0x03);
-        if (!Enum.IsDefined(typeof(LipColor), lipColor))
+        if (!Enum.IsDefined(typeof(MiiLipColor), lipColor))
             return new InvalidDataException("Invalid LipColor");
-        var miiLipResult = MiiLip.Create(((lip >> 11) & 0x1F), (LipColor)lipColor, ((lip >> 5) & 0x0F), (lip & 0x1F));
+        var miiLipResult = MiiLip.Create(((lip >> 11) & 0x1F), (MiiLipColor)lipColor, ((lip >> 5) & 0x0F), (lip & 0x1F));
         if (miiLipResult.IsFailure)
             return miiLipResult.Error;
         mii.MiiLips = miiLipResult.Value;
@@ -285,14 +285,14 @@ public static class MiiSerializer
         // Glasses (0x30 - 0x31)
         var glasses = (ushort)((data[0x30] << 8) | data[0x31]);
         var glassesType = ((glasses >> 12) & 0x0F);
-        if (!Enum.IsDefined(typeof(GlassesType), glassesType))
+        if (!Enum.IsDefined(typeof(MiiGlassesType), glassesType))
             return new InvalidDataException("Invalid GlassesType");
         var glassesColor = ((glasses >> 9) & 0x07);
-        if (!Enum.IsDefined(typeof(GlassesColor), glassesColor))
+        if (!Enum.IsDefined(typeof(MiiGlassesColor), glassesColor))
             return new InvalidDataException("Invalid GlassesColor");
         var miiGlassesResult = MiiGlasses.Create(
-            (GlassesType)glassesType,
-            (GlassesColor)glassesColor,
+            (MiiGlassesType)glassesType,
+            (MiiGlassesColor)glassesColor,
             ((glasses >> 5) & 0x07),
             (glasses & 0x1F)
         );
@@ -303,18 +303,18 @@ public static class MiiSerializer
         // Facial hair (0x32 - 0x33)
         var facial = (ushort)((data[0x32] << 8) | data[0x33]);
         var mustacheType = ((facial >> 14) & 0x03);
-        if (!Enum.IsDefined(typeof(MustacheType), mustacheType))
+        if (!Enum.IsDefined(typeof(MiiMustacheType), mustacheType))
             return new InvalidDataException("Invalid MustacheType");
         var beardType = ((facial >> 12) & 0x03);
-        if (!Enum.IsDefined(typeof(BeardType), beardType))
+        if (!Enum.IsDefined(typeof(MiiBeardType), beardType))
             return new InvalidDataException("Invalid BeardType");
         var color = ((facial >> 9) & 0x07);
-        if (!Enum.IsDefined(typeof(MustacheColor), color))
+        if (!Enum.IsDefined(typeof(MiiHairColor), color))
             return new InvalidDataException("Invalid FacialHairColor");
         var miiFacialHairResult = MiiFacialHair.Create(
-            (MustacheType)mustacheType,
-            (BeardType)beardType,
-            (MustacheColor)color,
+            (MiiMustacheType)mustacheType,
+            (MiiBeardType)beardType,
+            (MiiHairColor)color,
             ((facial >> 5) & 0x0F),
             (facial & 0x1F)
         );

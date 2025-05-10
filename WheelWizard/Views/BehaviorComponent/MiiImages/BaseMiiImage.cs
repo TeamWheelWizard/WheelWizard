@@ -1,9 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Threading;
 using Avalonia;
 using Avalonia.Media.Imaging;
-using Microsoft.Extensions.Logging;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.Shared.DependencyInjection;

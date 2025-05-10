@@ -18,11 +18,12 @@
 
         <ScrollViewer Grid.Row="1">
             <StackPanel Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Spacing="15">
-
-                <StackPanel> <!-- Eyebrow Color -->
-                    <components:FormFieldLabel Text="Eyebrow Color:"/>
-                    <ComboBox x:Name="EyebrowColorBox" SelectionChanged="EyebrowColorBox_OnSelectionChanged"
-                              Width="150"/>
+                                
+                <StackPanel> <!-- Hair Color -->
+                    <components:FormFieldLabel Text="Hair Color:"/>
+                    <UniformGrid Columns="5" x:Name="HairColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
                 </StackPanel>
 
                 <!-- Vertical Position (Up/Down) -->

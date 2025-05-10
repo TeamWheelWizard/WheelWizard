@@ -30,13 +30,13 @@ namespace WheelWizard.Test.Features
             var height = MiiScale.Create(60);
             var weight = MiiScale.Create(50);
             var miiFacial = MiiFacialFeatures.Create(MiiFaceShape.Bread, MiiSkinColor.Brown, MiiFacialFeature.Beard, false, false);
-            var miiHair = MiiHair.Create(1, HairColor.Black, false);
-            var miiEyebrows = MiiEyebrow.Create(3, 3, EyebrowColor.Black, 3, 3, 3);
-            var miiEyes = MiiEye.Create(3, 3, 3, EyeColor.Black, 3, 3);
-            var miiNose = MiiNose.Create(NoseType.Default, 3, 3);
-            var miiLips = MiiLip.Create(3, LipColor.Pink, 3, 3);
-            var miiGlasses = MiiGlasses.Create(GlassesType.None, GlassesColor.Blue, 3, 3);
-            var miiFacialHair = MiiFacialHair.Create(MustacheType.None, BeardType.None, MustacheColor.Black, 3, 3);
+            var miiHair = MiiHair.Create(1, MiiHairColor.Black, false);
+            var miiEyebrows = MiiEyebrow.Create(3, 3, MiiHairColor.Black, 3, 3, 3);
+            var miiEyes = MiiEye.Create(3, 3, 3, MiiEyeColor.Black, 3, 3);
+            var miiNose = MiiNose.Create(MiiNoseType.Default, 3, 3);
+            var miiLips = MiiLip.Create(3, MiiLipColor.Pink, 3, 3);
+            var miiGlasses = MiiGlasses.Create(MiiGlassesType.None, MiiGlassesColor.Blue, 3, 3);
+            var miiFacialHair = MiiFacialHair.Create(MiiMustacheType.None, MiiBeardType.None, MiiHairColor.Black, 3, 3);
             var miiMole = MiiMole.Create(true, 3, 3, 3);
             var creatorName = MiiName.Create("Creator");
             var miiFavoriteColor = MiiFavoriteColor.Red;
@@ -68,7 +68,7 @@ namespace WheelWizard.Test.Features
                     MiiId = miiId,
                     Height = height.Value,
                     Weight = weight.Value,
-                    MiiFacial = miiFacial.Value,
+                    MiiFacialFeatures = miiFacial.Value,
                     MiiHair = miiHair.Value,
                     MiiEyebrows = miiEyebrows.Value,
                     MiiEyes = miiEyes.Value,
@@ -131,7 +131,6 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(result.IsFailure, true);
         }
 
         [Fact]
@@ -145,7 +144,6 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(result.IsFailure, true);
         }
 
         [Fact]
@@ -280,7 +278,7 @@ namespace WheelWizard.Test.Features
             // Arrange
             uint targetId = 666;
             var badBytes = new byte[MiiSerializer.MiiBlockSize];
-            for (int i = 0; i < badBytes.Length; i++)
+            for (var i = 0; i < badBytes.Length; i++)
             {
                 badBytes[i] = (byte)(i % 256);
             }
@@ -292,7 +290,6 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(result.IsFailure, true);
             _repositoryService.Received(1).GetRawBlockByAvatarId(targetId);
         }
 
@@ -385,8 +382,8 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 333;
-            string oldName = "OldName";
-            string newName = "NewName";
+            var oldName = "OldName";
+            var newName = "NewName";
             var miiResult = CreateValidMii(targetId, oldName);
             Assert.True(miiResult.IsSuccess, "Setup Failed: Could not create original Mii");
             var originalMii = miiResult.Value;
@@ -420,7 +417,7 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 404;
-            string newName = "NewName";
+            var newName = "NewName";
             _repositoryService.GetRawBlockByAvatarId(targetId).Returns((byte[]?)null);
 
             // Act
@@ -438,7 +435,7 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 666;
-            string newName = "NewName";
+            var newName = "NewName";
             var badBytes = new byte[MiiSerializer.MiiBlockSize]; // Correct size, bad content
             _repositoryService.GetRawBlockByAvatarId(targetId).Returns(badBytes);
 
@@ -457,8 +454,8 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 555;
-            string oldName = "ValidOld";
-            string invalidNewName = "ThisNameIsDefinitelyTooLongForTheMii"; // > 10 chars
+            var oldName = "ValidOld";
+            var invalidNewName = "ThisNameIsDefinitelyTooLongForTheMii"; // > 10 chars
             var miiResult = CreateValidMii(targetId, oldName);
             Assert.True(miiResult.IsSuccess, "Setup Failed: Could not create original Mii");
             var originalBytes = GetSerializedBytes(miiResult.Value);
@@ -470,7 +467,6 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(result.IsFailure, true);
             _repositoryService.Received(1).GetRawBlockByAvatarId(targetId);
             _repositoryService.DidNotReceive().UpdateBlockByClientId(Arg.Any<uint>(), Arg.Any<byte[]>());
         }
@@ -480,8 +476,8 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 777;
-            string oldName = "Old";
-            string newName = "New";
+            var oldName = "Old";
+            var newName = "New";
             var miiResult = CreateValidMii(targetId, oldName);
             Assert.True(miiResult.IsSuccess, "Setup Failed: Could not create original Mii");
             var originalBytes = GetSerializedBytes(miiResult.Value);
@@ -507,7 +503,7 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 111;
-            string newName = "New";
+            var newName = "New";
             var expectedException = new TimeoutException("Timeout contacting repository");
             _repositoryService.GetRawBlockByAvatarId(targetId).Throws(expectedException);
 
@@ -523,8 +519,8 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 222;
-            string oldName = "Old";
-            string newName = "New";
+            var oldName = "Old";
+            var newName = "New";
             var miiResult = CreateValidMii(targetId, oldName);
             Assert.True(miiResult.IsSuccess, "Setup Failed: Could not create original Mii");
             var originalBytes = GetSerializedBytes(miiResult.Value);

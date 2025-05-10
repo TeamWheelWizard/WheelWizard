@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 
 namespace WheelWizard.MiiImages.Domain;
 

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.Helpers;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.LiveData;
-using WheelWizard.Services.WiiManagement;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities;
 using WheelWizard.Utilities.RepeatedTasks;

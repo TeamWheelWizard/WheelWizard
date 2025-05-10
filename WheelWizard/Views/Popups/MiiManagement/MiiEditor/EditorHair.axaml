@@ -23,14 +23,14 @@
             <StackPanel Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Spacing="10">
                 <!-- The list of elements you want to edit in this page -->
 
+                    
                 <StackPanel> <!-- Hair Color -->
                     <components:FormFieldLabel Text="Hair Color:"/>
-                    <ComboBox
-                        x:Name="HairColorBox"
-                        SelectionChanged="HairColorBox_OnSelectionChanged"
-                        Width="150"
-                        />
+                    <UniformGrid Columns="5" x:Name="HairColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
                 </StackPanel>
+
 
                 <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"> <!-- Mirrored -->
                     <CheckBox
