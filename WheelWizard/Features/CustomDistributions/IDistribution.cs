@@ -27,7 +27,7 @@ public interface IDistribution
     
     Task<OperationResult> Remove();
     
-    WheelWizardStatus GetCurrentStatus();
+    Task<OperationResult<WheelWizardStatus>> GetCurrentStatus();
     
     SemVersion? GetCurrentVersion();
     

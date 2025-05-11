@@ -2,15 +2,16 @@ namespace WheelWizard.CustomDistributions;
 
 public interface ICustomDistributionSingletonService
 {
-    List<IDistribution> GetDistributions();
+    List<IDistribution> GetAllDistributions();
+    RetroRewind RetroRewind { get; }
 }
 
 public class CustomDistributionSingletonService : ICustomDistributionSingletonService
 {
-    readonly RetroRewind _retroRewind = new();
+    public RetroRewind RetroRewind { get; } = new RetroRewind();
     
-    public List<IDistribution> GetDistributions()
+    public List<IDistribution> GetAllDistributions()
     {
-        return [_retroRewind];
+        return [RetroRewind];
     }
 }

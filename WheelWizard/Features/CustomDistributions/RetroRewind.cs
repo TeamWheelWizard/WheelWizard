@@ -5,6 +5,7 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
+using WheelWizard.Services.Settings;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
@@ -17,9 +18,108 @@ public class RetroRewind : IDistribution
     public string FolderName => "RetroRewind6";
     
     
-    public Task<OperationResult> Install()
+    public async Task<OperationResult> Install()
     {
-        throw new NotImplementedException();
+        if (GetCurrentVersion() is null)
+        {
+            var removeResult = await Remove();
+            if (removeResult.IsFailure)
+                return removeResult;
+        }
+
+        if (HasOldRksys())
+        {
+            var rksysQuestion = new YesNoWindow()
+                .SetMainText(Phrases.PopupText_OldRksysFound)
+                .SetExtraText(Phrases.PopupText_OldRksysFoundExplained);
+            if (await rksysQuestion.AwaitAnswer())
+                await BackupOldrksys();
+        }
+        var serverResponse = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
+        if (!serverResponse.Succeeded)
+        {
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Warning)
+                .SetTitleText("Could not connect to the server")
+                .SetInfoText(Phrases.PopupText_CouldNotConnectServer)
+                .ShowDialog();
+            return "Could not connect to the server";
+        }
+        await DownloadAndExtractRetroRewind(PathManager.RetroRewindTempFile);
+        await Update();
+        return Ok();
+    }
+    
+    private static async Task DownloadAndExtractRetroRewind(string tempZipPath)
+    {
+        var progressWindow = new ProgressWindow(Phrases.PopupText_InstallingRR);
+        progressWindow.SetExtraText(Phrases.PopupText_InstallingRRFirstTime);
+        progressWindow.Show();
+
+        try
+        {
+            await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
+            progressWindow.SetExtraText(Common.State_Extracting);
+            var extractionPath = PathManager.RiivolutionWhWzFolderPath;
+            ZipFile.ExtractToDirectory(tempZipPath, extractionPath, true);
+        }
+        finally
+        {
+            progressWindow.Close();
+            if (File.Exists(tempZipPath))
+                File.Delete(tempZipPath);
+        }
+    }
+    
+    private static async Task BackupOldrksys()
+    {
+        var rrWfc = Path.Combine(GetOldRksys());
+        if (!Directory.Exists(rrWfc))
+            return;
+        var rksysFiles = Directory.GetFiles(rrWfc, "rksys.dat", SearchOption.AllDirectories);
+        if (rksysFiles.Length == 0)
+            return;
+        var sourceFile = rksysFiles[0];
+        var regionFolder = Path.GetDirectoryName(sourceFile);
+        var regionFolderName = Path.GetFileName(regionFolder);
+        var datFileData = await File.ReadAllBytesAsync(sourceFile);
+        if (regionFolderName == null)
+            return;
+        var destinationFolder = Path.Combine(PathManager.SaveFolderPath, regionFolderName);
+        Directory.CreateDirectory(destinationFolder);
+        var destinationFile = Path.Combine(destinationFolder, "rksys.dat");
+        await File.WriteAllBytesAsync(destinationFile, datFileData);
+    }
+    
+    
+    private static bool HasOldRksys()
+    {
+        return !string.IsNullOrWhiteSpace(GetOldRksys());
+    }
+
+    private static string GetOldRksys()
+    {
+        var rrWfcPaths = new[]
+        {
+            Path.Combine(PathManager.SaveFolderPath),
+            // Also consider the folder with upper-case `Save`
+            Path.Combine(PathManager.RiivolutionWhWzFolderPath, "riivolution", "Save", "RetroWFC"),
+            Path.Combine(PathManager.LoadFolderPath, "Riivolution", "save", "RetroWFC"),
+            Path.Combine(PathManager.LoadFolderPath, "Riivolution", "Save", "RetroWFC"),
+            Path.Combine(PathManager.LoadFolderPath, "riivolution", "save", "RetroWFC"),
+            Path.Combine(PathManager.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
+        };
+
+        foreach (var rrWfc in rrWfcPaths)
+        {
+            if (!Directory.Exists(rrWfc))
+                continue;
+            var rksysFiles = Directory.GetFiles(rrWfc, "rksys.dat", SearchOption.AllDirectories);
+            if (rksysFiles.Length > 0)
+                return rrWfc;
+        }
+
+        return string.Empty;
     }
     
     private static async Task<OperationResult<bool>> IsRRUpToDate(SemVersion currentVersion)
@@ -340,14 +440,35 @@ public class RetroRewind : IDistribution
     }
 
 
-    public async Task<OperationResult> Remove()
+    public Task<OperationResult> Remove()
     {
-        throw new NotImplementedException();
+        var retroRewindPath = PathManager.RetroRewind6FolderPath;
+        if (Directory.Exists(retroRewindPath))
+            Directory.Delete(retroRewindPath, true);
+        return Task.FromResult(Ok());
     }
 
-    public WheelWizardStatus GetCurrentStatus()
+    public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatus()
     {
-        throw new NotImplementedException();
+        if (!SettingsHelper.PathsSetupCorrectly())
+            return WheelWizardStatus.ConfigNotFinished;
+
+        var serverEnabled = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
+        var rrInstalled = GetCurrentVersion() != null;
+
+        if (!serverEnabled.Succeeded)
+            return rrInstalled ? WheelWizardStatus.NoServerButInstalled : WheelWizardStatus.NoServer;
+
+        if (!rrInstalled)
+            return WheelWizardStatus.NotInstalled;
+        var currentVersion = GetCurrentVersion();
+        if (currentVersion == null)
+            return WheelWizardStatus.NotInstalled;
+        var retroRewindUpToDateResult = await IsRRUpToDate(currentVersion);
+        if (retroRewindUpToDateResult.IsFailure)
+            return "Failed to check for updates";
+        var retroRewindUpToDate = retroRewindUpToDateResult.Value;
+        return !retroRewindUpToDate ? WheelWizardStatus.OutOfDate : WheelWizardStatus.Ready;
     }
 
     public SemVersion? GetCurrentVersion()
