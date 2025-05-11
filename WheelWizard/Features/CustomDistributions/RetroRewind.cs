@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using Semver;
@@ -12,6 +13,13 @@ namespace WheelWizard.CustomDistributions;
 
 public class RetroRewind : IDistribution
 {
+    
+    private readonly IFileSystem _fileSystem;
+    public RetroRewind(IFileSystem fileSystem)
+    {
+        _fileSystem = fileSystem;
+    }
+    
     public string Title => "Retro Rewind";
 
     // Keep in mind, whenever we download update files from the server, they are actually 1 folder higher, so it contains this folder.
