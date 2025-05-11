@@ -72,7 +72,7 @@ public class RetroRewind : IDistribution
 
     private static async Task BackupOldrksys()
     {
-        var rrWfc = Path.Combine(GetOldRksys());
+        var rrWfc = GetOldRksys();
         if (!Directory.Exists(rrWfc))
             return;
         var rksysFiles = Directory.GetFiles(rrWfc, "rksys.dat", SearchOption.AllDirectories);
@@ -134,7 +134,11 @@ public class RetroRewind : IDistribution
     {
         var response = await HttpClientHelper.GetAsync<string>(Endpoints.RRVersionUrl);
         if (response.Succeeded && response.Content != null)
-            return SemVersion.Parse(response.Content);
+        {
+            var result = response.Content.Split('\n').Last().Split(' ')[0];
+            return SemVersion.Parse(result);
+        }
+
         return "Failed to check for updates";
     }
 
@@ -162,8 +166,6 @@ public class RetroRewind : IDistribution
                 var result = await Install();
                 if (result.IsFailure)
                     return result;
-
-                return await Install();
             }
             return await ApplyUpdates(currentVersion);
         }
@@ -416,8 +418,6 @@ public class RetroRewind : IDistribution
                 updatesToApply.Add(update);
             }
         }
-        // Sort the updates by version in descending order
-        updatesToApply.Reverse();
         return updatesToApply;
     }
 
@@ -428,7 +428,9 @@ public class RetroRewind : IDistribution
     )
     {
         var deletionsToApply = new List<DeletionData>();
-        allDeletions = allDeletions.OrderByDescending(d => d.Version).ToList();
+        allDeletions = allDeletions
+            .OrderByDescending(d => d.Version, Comparer<SemVersion>.Create((a, b) => a.ComparePrecedenceTo(b)))
+            .ToList();
         foreach (var deletion in allDeletions)
         {
             if (deletion.Version.ComparePrecedenceTo(currentVersion) > 0 && deletion.Version.ComparePrecedenceTo(targetVersion) <= 0)

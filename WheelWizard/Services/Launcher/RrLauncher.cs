@@ -8,6 +8,7 @@ using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.Settings;
 using WheelWizard.Services.WiiManagement;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Services.Launcher;
@@ -18,7 +19,8 @@ public class RrLauncher : ILauncher
     private static string RrLaunchJsonFilePath => PathManager.RrLaunchJsonFilePath;
 
     [Inject]
-    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } =
+        App.Services.GetRequiredService<ICustomDistributionSingletonService>();
 
     public async Task Launch()
     {
@@ -66,6 +68,10 @@ public class RrLauncher : ILauncher
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {
+        if (CustomDistributionSingletonService == null)
+        {
+            return WheelWizardStatus.NotInstalled;
+        }
         var statusResult = await CustomDistributionSingletonService.RetroRewind.GetCurrentStatus();
         if (statusResult.IsFailure)
             return WheelWizardStatus.NotInstalled;
