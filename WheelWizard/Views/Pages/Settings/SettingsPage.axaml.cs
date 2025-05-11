@@ -1,7 +1,9 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Branding;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Services.Installation;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups;
 
 namespace WheelWizard.Views.Pages.Settings;
@@ -11,11 +13,14 @@ public partial class SettingsPage : UserControlBase
     public SettingsPage()
         : this(new WhWzSettings()) { }
 
+    [Inject]
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
+
     public SettingsPage(UserControl initialSettingsPage)
     {
         InitializeComponent();
 
-        RrVersionText.Text = "RR: " + RetroRewindInstaller.CurrentRRVersion();
+        RrVersionText.Text = "RR: " + CustomDistributionSingletonService.RetroRewind.GetCurrentVersion();
 
         var part1 = "Release";
         var part2 = "Unknown OS";

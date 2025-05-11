@@ -13,11 +13,10 @@ namespace WheelWizard.CustomDistributions;
 public class RetroRewind : IDistribution
 {
     public string Title => "Retro Rewind";
-    
+
     // Keep in mind, whenever we download update files from the server, they are actually 1 folder higher, so it contains this folder.
     public string FolderName => "RetroRewind6";
-    
-    
+
     public async Task<OperationResult> Install()
     {
         if (GetCurrentVersion() is null)
@@ -49,7 +48,7 @@ public class RetroRewind : IDistribution
         await Update();
         return Ok();
     }
-    
+
     private static async Task DownloadAndExtractRetroRewind(string tempZipPath)
     {
         var progressWindow = new ProgressWindow(Phrases.PopupText_InstallingRR);
@@ -70,7 +69,7 @@ public class RetroRewind : IDistribution
                 File.Delete(tempZipPath);
         }
     }
-    
+
     private static async Task BackupOldrksys()
     {
         var rrWfc = Path.Combine(GetOldRksys());
@@ -90,8 +89,7 @@ public class RetroRewind : IDistribution
         var destinationFile = Path.Combine(destinationFolder, "rksys.dat");
         await File.WriteAllBytesAsync(destinationFile, datFileData);
     }
-    
-    
+
     private static bool HasOldRksys()
     {
         return !string.IsNullOrWhiteSpace(GetOldRksys());
@@ -121,7 +119,7 @@ public class RetroRewind : IDistribution
 
         return string.Empty;
     }
-    
+
     private static async Task<OperationResult<bool>> IsRRUpToDate(SemVersion currentVersion)
     {
         var latestVersionResult = await LatestServerVersion();
@@ -131,7 +129,7 @@ public class RetroRewind : IDistribution
         var isUpToDate = currentVersion.ComparePrecedenceTo(latestVersion) >= 0;
         return isUpToDate;
     }
-    
+
     private static async Task<OperationResult<SemVersion>> LatestServerVersion()
     {
         var response = await HttpClientHelper.GetAsync<string>(Endpoints.RRVersionUrl);
@@ -151,7 +149,7 @@ public class RetroRewind : IDistribution
             var isRRUpToDate = await IsRRUpToDate(currentVersion);
             if (isRRUpToDate.IsFailure)
                 return isRRUpToDate;
-            
+
             if (isRRUpToDate.Value)
             {
                 return Ok();
@@ -164,7 +162,7 @@ public class RetroRewind : IDistribution
                 var result = await Install();
                 if (result.IsFailure)
                     return result;
-                
+
                 return await Install();
             }
             return await ApplyUpdates(currentVersion);
@@ -174,7 +172,7 @@ public class RetroRewind : IDistribution
             return e;
         }
     }
-    
+
     private static async Task<OperationResult> ApplyUpdates(SemVersion currentVersion)
     {
         var allVersions = await GetAllVersionData();
@@ -204,7 +202,7 @@ public class RetroRewind : IDistribution
             if (success.IsFailure)
             {
                 progressWindow.Close();
-                return(Phrases.PopupText_FailedUpdateApply);
+                return (Phrases.PopupText_FailedUpdateApply);
             }
 
             // Update the version file after each successful update
@@ -214,15 +212,19 @@ public class RetroRewind : IDistribution
         progressWindow.Close();
         return Ok();
     }
-    
+
     private static void UpdateVersionFile(SemVersion newVersion)
     {
         var versionFilePath = Path.Combine(PathManager.RetroRewind6FolderPath, "version.txt");
         File.WriteAllText(versionFilePath, newVersion.ToString());
     }
-    
-    
-    private static async Task<OperationResult> DownloadAndApplyUpdate(UpdateData update, int totalUpdates, int currentUpdateIndex, ProgressWindow popupWindow)
+
+    private static async Task<OperationResult> DownloadAndApplyUpdate(
+        UpdateData update,
+        int totalUpdates,
+        int currentUpdateIndex,
+        ProgressWindow popupWindow
+    )
     {
         var tempZipPath = Path.GetTempFileName();
         try
@@ -246,7 +248,7 @@ public class RetroRewind : IDistribution
 
         return Ok();
     }
-    
+
     private static OperationResult ExtractZipFile(string path, string destinationDirectory)
     {
         using var archive = ZipFile.OpenRead(path);
@@ -265,7 +267,7 @@ public class RetroRewind : IDistribution
             // Check for directory traversal attacks
             if (!destinationPath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal))
             {
-                return("The file path is outside the destination directory. Please contact the developers.");
+                return ("The file path is outside the destination directory. Please contact the developers.");
             }
 
             // If the entry is a directory, create it
@@ -286,7 +288,7 @@ public class RetroRewind : IDistribution
 
         return Ok();
     }
-    
+
     private static async Task<OperationResult> ApplyFileDeletionsBetweenVersions(SemVersion currentVersion, SemVersion targetVersion)
     {
         try
@@ -325,15 +327,16 @@ public class RetroRewind : IDistribution
         }
         catch (Exception e)
         {
-            return($"Failed to delete files: {e.Message}");
+            return ($"Failed to delete files: {e.Message}");
         }
     }
-    
+
     private struct DeletionData
     {
         public SemVersion Version;
         public string Path;
     }
+
     private static async Task<OperationResult<List<DeletionData>>> GetFileDeletionList()
     {
         var deleteList = new List<DeletionData>();
@@ -353,17 +356,13 @@ public class RetroRewind : IDistribution
                 continue;
             if (!SemVersion.TryParse(deletionVersion, out var parsedVersion))
                 return "Failed to parse version";
-            var deletionData = new DeletionData
-            {
-                Version = parsedVersion,
-                Path = path
-            };
+            var deletionData = new DeletionData { Version = parsedVersion, Path = path };
             deleteList.Add(deletionData);
         }
 
         return deleteList;
     }
-    
+
     private struct UpdateData
     {
         public SemVersion Version;
@@ -371,6 +370,7 @@ public class RetroRewind : IDistribution
         public string Path;
         public string Description;
     }
+
     private static async Task<List<UpdateData>> GetAllVersionData()
     {
         var versions = new List<UpdateData>();
@@ -398,13 +398,13 @@ public class RetroRewind : IDistribution
                 Version = parsedVersion,
                 Url = url,
                 Path = path,
-                Description = description
+                Description = description,
             };
             versions.Add(updateData);
         }
         return versions;
     }
-    
+
     //todo: see if we can make this generic to the point we dont have to split up deletions and updates
     private static List<UpdateData> GetUpdatesToApply(SemVersion currentVersion, List<UpdateData> allVersions)
     {
@@ -420,16 +420,18 @@ public class RetroRewind : IDistribution
         updatesToApply.Reverse();
         return updatesToApply;
     }
-    
-    private static List<DeletionData> GetDeletionsToApply(SemVersion currentVersion, SemVersion targetVersion, List<DeletionData> allDeletions
+
+    private static List<DeletionData> GetDeletionsToApply(
+        SemVersion currentVersion,
+        SemVersion targetVersion,
+        List<DeletionData> allDeletions
     )
     {
         var deletionsToApply = new List<DeletionData>();
         allDeletions = allDeletions.OrderByDescending(d => d.Version).ToList();
         foreach (var deletion in allDeletions)
         {
-            if (deletion.Version.ComparePrecedenceTo(currentVersion) > 0 &&
-                deletion.Version.ComparePrecedenceTo(targetVersion) <= 0)
+            if (deletion.Version.ComparePrecedenceTo(currentVersion) > 0 && deletion.Version.ComparePrecedenceTo(targetVersion) <= 0)
             {
                 deletionsToApply.Add(deletion);
             }
@@ -439,13 +441,21 @@ public class RetroRewind : IDistribution
         return deletionsToApply;
     }
 
-
     public Task<OperationResult> Remove()
     {
         var retroRewindPath = PathManager.RetroRewind6FolderPath;
         if (Directory.Exists(retroRewindPath))
             Directory.Delete(retroRewindPath, true);
         return Task.FromResult(Ok());
+    }
+
+    public async Task<OperationResult> Reinstall()
+    {
+        //Remove and install
+        var removeResult = await Remove();
+        if (removeResult.IsFailure)
+            return removeResult;
+        return await Install();
     }
 
     public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatus()

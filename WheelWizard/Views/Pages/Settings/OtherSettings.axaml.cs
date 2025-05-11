@@ -1,18 +1,23 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Services.Installation;
 using WheelWizard.Services.Settings;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class OtherSettings : UserControl
+public partial class OtherSettings : UserControlBase
 {
     private readonly bool _settingsAreDisabled;
+
+    [Inject]
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
 
     public OtherSettings()
     {
@@ -126,7 +131,8 @@ public partial class OtherSettings : UserControl
         ViewUtils.RefreshWindow();
     }
 
-    private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e) => await RetroRewindInstaller.ReinstallRR();
+    private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e) =>
+        await CustomDistributionSingletonService.RetroRewind.Reinstall();
 
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)
     {

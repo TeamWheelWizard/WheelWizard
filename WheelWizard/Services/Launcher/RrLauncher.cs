@@ -1,4 +1,5 @@
 ﻿using Avalonia.Threading;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
@@ -6,6 +7,7 @@ using WheelWizard.Services.Installation;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.Settings;
 using WheelWizard.Services.WiiManagement;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Services.Launcher;
@@ -14,6 +16,9 @@ public class RrLauncher : ILauncher
 {
     public string GameTitle { get; } = "Retro Rewind";
     private static string RrLaunchJsonFilePath => PathManager.RrLaunchJsonFilePath;
+
+    [Inject]
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
 
     public async Task Launch()
     {
@@ -55,25 +60,15 @@ public class RrLauncher : ILauncher
         }
     }
 
-    public Task Install() => RetroRewindInstaller.InstallRetroRewind();
+    public Task Install() => CustomDistributionSingletonService.RetroRewind.Install();
 
-    public Task Update() => RetroRewindUpdater.UpdateRR();
+    public Task Update() => CustomDistributionSingletonService.RetroRewind.Update();
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {
-        if (!SettingsHelper.PathsSetupCorrectly())
-            return WheelWizardStatus.ConfigNotFinished;
-
-        var serverEnabled = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
-        var rrInstalled = RetroRewindInstaller.IsRetroRewindInstalled();
-
-        if (!serverEnabled.Succeeded)
-            return rrInstalled ? WheelWizardStatus.NoServerButInstalled : WheelWizardStatus.NoServer;
-
-        if (!rrInstalled)
+        var statusResult = await CustomDistributionSingletonService.RetroRewind.GetCurrentStatus();
+        if (statusResult.IsFailure)
             return WheelWizardStatus.NotInstalled;
-
-        var retroRewindUpToDate = await RetroRewindUpdater.IsRRUpToDate(RetroRewindInstaller.CurrentRRVersion());
-        return !retroRewindUpToDate ? WheelWizardStatus.OutOfDate : WheelWizardStatus.Ready;
+        return statusResult.Value;
     }
 }

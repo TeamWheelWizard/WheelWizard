@@ -9,7 +9,7 @@ public interface ICustomDistributionSingletonService
 public class CustomDistributionSingletonService : ICustomDistributionSingletonService
 {
     public RetroRewind RetroRewind { get; } = new RetroRewind();
-    
+
     public List<IDistribution> GetAllDistributions()
     {
         return [RetroRewind];
