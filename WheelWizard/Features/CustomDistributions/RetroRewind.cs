@@ -44,29 +44,66 @@ public class RetroRewind : IDistribution
                 .ShowDialog();
             return "Could not connect to the server";
         }
-        await DownloadAndExtractRetroRewind(PathManager.RetroRewindTempFile);
+        await DownloadAndExtractRetroRewind();
         await Update();
         return Ok();
     }
 
-    private static async Task DownloadAndExtractRetroRewind(string tempZipPath)
+    private async Task DownloadAndExtractRetroRewind()
     {
         var progressWindow = new ProgressWindow(Phrases.PopupText_InstallingRR);
         progressWindow.SetExtraText(Phrases.PopupText_InstallingRRFirstTime);
         progressWindow.Show();
 
+        // path to the downloaded .zip
+        var tempZipPath = PathManager.RetroRewindTempFile;
+        // where we'll do the extraction
+        var tempExtractionPath = PathManager.TempModsFolderPath;
+        // where the final RR folder should live
+        var finalDestination = Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName);
+
         try
         {
+            // 1) Download
+            if (Directory.Exists(tempExtractionPath))
+                Directory.Delete(tempExtractionPath, recursive: true);
+            Directory.CreateDirectory(tempExtractionPath);
+
             await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
+
+            // 2) Extract
             progressWindow.SetExtraText(Common.State_Extracting);
-            var extractionPath = PathManager.RiivolutionWhWzFolderPath;
-            ZipFile.ExtractToDirectory(tempZipPath, extractionPath, true);
+
+            ZipFile.ExtractToDirectory(tempZipPath, tempExtractionPath, overwriteFiles: true);
+
+            // 3) Locate the extracted sub-folder
+            var sourceFolder = Path.Combine(tempExtractionPath, FolderName);
+            if (!Directory.Exists(sourceFolder))
+            {
+                var directories = Directory.GetDirectories(tempExtractionPath);
+                if (directories.Length == 1)
+                    sourceFolder = directories[0];
+                else
+                    throw new DirectoryNotFoundException($"Could not find a '{FolderName}' folder inside {tempExtractionPath}");
+            }
+
+            // 4) Replace existing install, if any
+            if (Directory.Exists(finalDestination))
+                Directory.Delete(finalDestination, recursive: true);
+
+            // 5) Move into place
+            Directory.Move(sourceFolder, finalDestination);
         }
         finally
         {
+            // always clean up UI and temp files
             progressWindow.Close();
+
             if (File.Exists(tempZipPath))
                 File.Delete(tempZipPath);
+
+            if (Directory.Exists(tempExtractionPath))
+                Directory.Delete(tempExtractionPath, recursive: true);
         }
     }
 
@@ -97,6 +134,7 @@ public class RetroRewind : IDistribution
 
     private static string GetOldRksys()
     {
+        // todo, maybe we should check for the existence of the file instead of the folder? and also find the oldest one?
         var rrWfcPaths = new[]
         {
             Path.Combine(PathManager.SaveFolderPath),
@@ -107,7 +145,7 @@ public class RetroRewind : IDistribution
             Path.Combine(PathManager.LoadFolderPath, "riivolution", "save", "RetroWFC"),
             Path.Combine(PathManager.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
         };
-
+        
         foreach (var rrWfc in rrWfcPaths)
         {
             if (!Directory.Exists(rrWfc))
@@ -162,10 +200,8 @@ public class RetroRewind : IDistribution
             //if current version is below 3.2.6 we need to do a full reinstall
             if (currentVersion.ComparePrecedenceTo(new SemVersion(3, 2, 6)) < 0)
             {
-                //todo: look at this logic
-                var result = await Install();
-                if (result.IsFailure)
-                    return result;
+                var result = await Reinstall();
+                return result.IsSuccess ? Ok() : result;
             }
             return await ApplyUpdates(currentVersion);
         }
