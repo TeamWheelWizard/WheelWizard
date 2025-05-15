@@ -29,7 +29,7 @@ public class RetroRewind : IDistribution
     // Keep in mind, whenever we download update files from the server, they are actually 1 folder higher, so it contains this folder.
     public string FolderName => "RetroRewind6";
 
-    public async Task<OperationResult> Install()
+    public async Task<OperationResult> Install(ProgressWindow? progressWindow = null)
     {
         if (GetCurrentVersion() is not null)
         {
@@ -60,11 +60,13 @@ public class RetroRewind : IDistribution
         return Ok();
     }
 
-    private async Task<OperationResult> DownloadAndExtractRetroRewind()
+    private async Task<OperationResult> DownloadAndExtractRetroRewind(ProgressWindow? progressWindow = null)
     {
-        var progressWindow = new ProgressWindow(Phrases.PopupText_InstallingRR);
-        progressWindow.SetExtraText(Phrases.PopupText_InstallingRRFirstTime);
-        progressWindow.Show();
+        if (progressWindow is not null)
+        {
+            progressWindow.SetExtraText(Phrases.PopupText_InstallingRRFirstTime);
+            progressWindow.Show();
+        }
 
         // path to the downloaded .zip
         var tempZipPath = PathManager.RetroRewindTempFile;
@@ -83,8 +85,11 @@ public class RetroRewind : IDistribution
             await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
 
             // 2) Extract
-            progressWindow.SetExtraText(Common.State_Extracting);
-
+            if (progressWindow is not null)
+            {
+                progressWindow.SetExtraText(Common.State_Extracting);
+            }
+            
             ZipFile.ExtractToDirectory(tempZipPath, tempExtractionPath, overwriteFiles: true);
 
             // 3) Locate the extracted sub-folder
@@ -108,7 +113,7 @@ public class RetroRewind : IDistribution
         finally
         {
             // always clean up UI and temp files
-            progressWindow.Close();
+            progressWindow?.Close();
 
             if (_fileSystem.File.Exists(tempZipPath))
                 _fileSystem.File.Delete(tempZipPath);
@@ -185,12 +190,12 @@ public class RetroRewind : IDistribution
         var response = await _api.CallApiAsync(api => api.GetVersionFile());
         if (!response.IsSuccess || String.IsNullOrWhiteSpace(response.Value))
             return "Failed to check for updates";
-        
+
         var result = response.Value.Split('\n').Last().Split(' ')[0];
         return SemVersion.Parse(result);
     }
 
-    public async Task<OperationResult> Update()
+    public async Task<OperationResult> Update(ProgressWindow? progressWindow = null)
     {
         try
         {
@@ -390,7 +395,7 @@ public class RetroRewind : IDistribution
     private async Task<OperationResult<List<DeletionData>>> GetFileDeletionList()
     {
         var deleteList = new List<DeletionData>();
-        
+
         var deleteListOperation = await _api.CallApiAsync(api => api.GetDeletionFile());
         if (deleteListOperation.IsFailure)
             return "Failed to get file deletion list";
@@ -425,7 +430,7 @@ public class RetroRewind : IDistribution
     private async Task<List<UpdateData>> GetAllVersionData()
     {
         var versions = new List<UpdateData>();
-        
+
         var allVersionsResult = await _api.CallApiAsync(api => api.GetVersionFile());
         if (allVersionsResult.IsFailure)
             return new();
@@ -493,7 +498,7 @@ public class RetroRewind : IDistribution
         return deletionsToApply;
     }
 
-    public Task<OperationResult> Remove()
+    public Task<OperationResult> Remove(ProgressWindow? progressWindow = null)
     {
         var retroRewindPath = PathManager.RetroRewind6FolderPath;
         if (_fileSystem.Directory.Exists(retroRewindPath))
@@ -501,7 +506,7 @@ public class RetroRewind : IDistribution
         return Task.FromResult(Ok());
     }
 
-    public async Task<OperationResult> Reinstall()
+    public async Task<OperationResult> Reinstall(ProgressWindow? progressWindow = null)
     {
         //Remove and install
         var removeResult = await Remove();
