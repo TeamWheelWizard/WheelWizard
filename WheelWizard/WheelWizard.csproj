@@ -144,8 +144,4 @@
       <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorGeneralPage.axaml" />
       <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorWindow.axaml" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Features\CustomDistributions\Domain\" />
-    </ItemGroup>
 </Project>

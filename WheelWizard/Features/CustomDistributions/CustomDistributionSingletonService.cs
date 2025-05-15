@@ -1,4 +1,6 @@
 using System.IO.Abstractions;
+using WheelWizard.CustomDistributions.Domain;
+using WheelWizard.Shared.Services;
 
 namespace WheelWizard.CustomDistributions;
 
@@ -12,10 +14,11 @@ public class CustomDistributionSingletonService : ICustomDistributionSingletonSe
 {
     public IFileSystem FileSystem { get; }
     public RetroRewind RetroRewind { get; }
-    public CustomDistributionSingletonService(IFileSystem fileSystem)
+
+    public CustomDistributionSingletonService(IFileSystem fileSystem, IApiCaller<IRetroRewindApi> api)
     {
         FileSystem = fileSystem;
-        RetroRewind = new RetroRewind(fileSystem);
+        RetroRewind = new RetroRewind(fileSystem, api);
     }
 
     public List<IDistribution> GetAllDistributions()

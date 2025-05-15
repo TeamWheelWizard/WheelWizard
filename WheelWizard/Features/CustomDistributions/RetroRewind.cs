@@ -2,24 +2,28 @@ using System.IO.Abstractions;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using Semver;
+using WheelWizard.CustomDistributions.Domain;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Services.Settings;
+using WheelWizard.Shared.Services;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
 
 public class RetroRewind : IDistribution
 {
-    
     private readonly IFileSystem _fileSystem;
-    public RetroRewind(IFileSystem fileSystem)
+    private readonly IApiCaller<IRetroRewindApi> _api;
+
+    public RetroRewind(IFileSystem fileSystem, IApiCaller<IRetroRewindApi> api)
     {
+        _api = api;
         _fileSystem = fileSystem;
     }
-    
+
     public string Title => "Retro Rewind";
 
     // Keep in mind, whenever we download update files from the server, they are actually 1 folder higher, so it contains this folder.
@@ -42,17 +46,21 @@ public class RetroRewind : IDistribution
             if (await rksysQuestion.AwaitAnswer())
                 await BackupOldrksys();
         }
-        var serverResponse = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
-        if (!serverResponse.Succeeded)
+        var serverResponse = await _api.CallApiAsync(api => api.Ping()); // actual response doesnt matter
+        if (serverResponse.IsFailure)
         {
             return "Could not connect to the server";
         }
-        await DownloadAndExtractRetroRewind();
-        await Update();
+        var downloadResult = await DownloadAndExtractRetroRewind();
+        if (downloadResult.IsFailure)
+            return downloadResult;
+        var updateResult = await Update();
+        if (updateResult.IsFailure)
+            return updateResult;
         return Ok();
     }
 
-    private async Task DownloadAndExtractRetroRewind()
+    private async Task<OperationResult> DownloadAndExtractRetroRewind()
     {
         var progressWindow = new ProgressWindow(Phrases.PopupText_InstallingRR);
         progressWindow.SetExtraText(Phrases.PopupText_InstallingRRFirstTime);
@@ -87,7 +95,7 @@ public class RetroRewind : IDistribution
                 if (directories.Length == 1)
                     sourceFolder = directories[0];
                 else
-                    throw new DirectoryNotFoundException($"Could not find a '{FolderName}' folder inside {tempExtractionPath}");
+                    return new DirectoryNotFoundException($"Could not find a '{FolderName}' folder inside {tempExtractionPath}");
             }
 
             // 4) Replace existing install, if any
@@ -108,6 +116,7 @@ public class RetroRewind : IDistribution
             if (_fileSystem.Directory.Exists(tempExtractionPath))
                 _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
         }
+        return Ok();
     }
 
     private async Task BackupOldrksys()
@@ -148,7 +157,7 @@ public class RetroRewind : IDistribution
             _fileSystem.Path.Combine(PathManager.LoadFolderPath, "riivolution", "save", "RetroWFC"),
             _fileSystem.Path.Combine(PathManager.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
         };
-        
+
         foreach (var rrWfc in rrWfcPaths)
         {
             if (!_fileSystem.Directory.Exists(rrWfc))
@@ -161,7 +170,7 @@ public class RetroRewind : IDistribution
         return string.Empty;
     }
 
-    private static async Task<OperationResult<bool>> IsRRUpToDate(SemVersion currentVersion)
+    private async Task<OperationResult<bool>> IsRRUpToDate(SemVersion currentVersion)
     {
         var latestVersionResult = await LatestServerVersion();
         if (latestVersionResult.IsFailure)
@@ -171,16 +180,14 @@ public class RetroRewind : IDistribution
         return isUpToDate;
     }
 
-    private static async Task<OperationResult<SemVersion>> LatestServerVersion()
+    private async Task<OperationResult<SemVersion>> LatestServerVersion()
     {
-        var response = await HttpClientHelper.GetAsync<string>(Endpoints.RRVersionUrl);
-        if (response.Succeeded && response.Content != null)
-        {
-            var result = response.Content.Split('\n').Last().Split(' ')[0];
-            return SemVersion.Parse(result);
-        }
-
-        return "Failed to check for updates";
+        var response = await _api.CallApiAsync(api => api.GetVersionFile());
+        if (!response.IsSuccess || String.IsNullOrWhiteSpace(response.Value))
+            return "Failed to check for updates";
+        
+        var result = response.Value.Split('\n').Last().Split(' ')[0];
+        return SemVersion.Parse(result);
     }
 
     public async Task<OperationResult> Update()
@@ -344,7 +351,9 @@ public class RetroRewind : IDistribution
 
             foreach (var file in deletionsToApply)
             {
-                var absoluteDestinationPath = _fileSystem.Path.GetFullPath(PathManager.RiivolutionWhWzFolderPath + _fileSystem.Path.AltDirectorySeparatorChar);
+                var absoluteDestinationPath = _fileSystem.Path.GetFullPath(
+                    PathManager.RiivolutionWhWzFolderPath + _fileSystem.Path.AltDirectorySeparatorChar
+                );
                 var filePath = _fileSystem.Path.GetFullPath(_fileSystem.Path.Combine(absoluteDestinationPath, file.Path.TrimStart('/')));
                 //because we are actually getting the path from the server,
                 //we need to make sure we are not getting hacked, so we check if the path is in the riivolution folder
@@ -378,13 +387,14 @@ public class RetroRewind : IDistribution
         public string Path;
     }
 
-    private static async Task<OperationResult<List<DeletionData>>> GetFileDeletionList()
+    private async Task<OperationResult<List<DeletionData>>> GetFileDeletionList()
     {
         var deleteList = new List<DeletionData>();
-
-        using var httpClient = new HttpClient();
-        var deleteListText = await httpClient.GetStringAsync(Endpoints.RRVersionDeleteUrl);
-        var lines = deleteListText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        
+        var deleteListOperation = await _api.CallApiAsync(api => api.GetDeletionFile());
+        if (deleteListOperation.IsFailure)
+            return "Failed to get file deletion list";
+        var lines = deleteListOperation.Value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
@@ -412,13 +422,14 @@ public class RetroRewind : IDistribution
         public string Description;
     }
 
-    private static async Task<List<UpdateData>> GetAllVersionData()
+    private async Task<List<UpdateData>> GetAllVersionData()
     {
         var versions = new List<UpdateData>();
-
-        using var httpClient = new HttpClient();
-        var allVersionsText = await httpClient.GetStringAsync(Endpoints.RRVersionUrl);
-        var lines = allVersionsText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        
+        var allVersionsResult = await _api.CallApiAsync(api => api.GetVersionFile());
+        if (allVersionsResult.IsFailure)
+            return new();
+        var lines = allVersionsResult.Value.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
@@ -504,10 +515,10 @@ public class RetroRewind : IDistribution
         if (!SettingsHelper.PathsSetupCorrectly())
             return WheelWizardStatus.ConfigNotFinished;
 
-        var serverEnabled = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
+        var serverEnabled = await _api.CallApiAsync(api => api.Ping());
         var rrInstalled = GetCurrentVersion() != null;
 
-        if (!serverEnabled.Succeeded)
+        if (serverEnabled.IsFailure)
             return rrInstalled ? WheelWizardStatus.NoServerButInstalled : WheelWizardStatus.NoServer;
 
         if (!rrInstalled)
