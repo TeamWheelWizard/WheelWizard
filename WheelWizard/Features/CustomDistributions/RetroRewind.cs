@@ -27,7 +27,7 @@ public class RetroRewind : IDistribution
 
     public async Task<OperationResult> Install()
     {
-        if (GetCurrentVersion() is null)
+        if (GetCurrentVersion() is not null)
         {
             var removeResult = await Remove();
             if (removeResult.IsFailure)
@@ -45,11 +45,6 @@ public class RetroRewind : IDistribution
         var serverResponse = await HttpClientHelper.GetAsync<string>(Endpoints.RRUrl);
         if (!serverResponse.Succeeded)
         {
-            await new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                .SetTitleText("Could not connect to the server")
-                .SetInfoText(Phrases.PopupText_CouldNotConnectServer)
-                .ShowDialog();
             return "Could not connect to the server";
         }
         await DownloadAndExtractRetroRewind();
@@ -68,14 +63,14 @@ public class RetroRewind : IDistribution
         // where we'll do the extraction
         var tempExtractionPath = PathManager.TempModsFolderPath;
         // where the final RR folder should live
-        var finalDestination = Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName);
+        var finalDestination = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName);
 
         try
         {
             // 1) Download
-            if (Directory.Exists(tempExtractionPath))
-                Directory.Delete(tempExtractionPath, recursive: true);
-            Directory.CreateDirectory(tempExtractionPath);
+            if (_fileSystem.Directory.Exists(tempExtractionPath))
+                _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
+            _fileSystem.Directory.CreateDirectory(tempExtractionPath);
 
             await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
 
@@ -85,10 +80,10 @@ public class RetroRewind : IDistribution
             ZipFile.ExtractToDirectory(tempZipPath, tempExtractionPath, overwriteFiles: true);
 
             // 3) Locate the extracted sub-folder
-            var sourceFolder = Path.Combine(tempExtractionPath, FolderName);
-            if (!Directory.Exists(sourceFolder))
+            var sourceFolder = _fileSystem.Path.Combine(tempExtractionPath, FolderName);
+            if (!_fileSystem.Directory.Exists(sourceFolder))
             {
-                var directories = Directory.GetDirectories(tempExtractionPath);
+                var directories = _fileSystem.Directory.GetDirectories(tempExtractionPath);
                 if (directories.Length == 1)
                     sourceFolder = directories[0];
                 else
@@ -96,69 +91,69 @@ public class RetroRewind : IDistribution
             }
 
             // 4) Replace existing install, if any
-            if (Directory.Exists(finalDestination))
-                Directory.Delete(finalDestination, recursive: true);
+            if (_fileSystem.Directory.Exists(finalDestination))
+                _fileSystem.Directory.Delete(finalDestination, recursive: true);
 
             // 5) Move into place
-            Directory.Move(sourceFolder, finalDestination);
+            _fileSystem.Directory.Move(sourceFolder, finalDestination);
         }
         finally
         {
             // always clean up UI and temp files
             progressWindow.Close();
 
-            if (File.Exists(tempZipPath))
-                File.Delete(tempZipPath);
+            if (_fileSystem.File.Exists(tempZipPath))
+                _fileSystem.File.Delete(tempZipPath);
 
-            if (Directory.Exists(tempExtractionPath))
-                Directory.Delete(tempExtractionPath, recursive: true);
+            if (_fileSystem.Directory.Exists(tempExtractionPath))
+                _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
         }
     }
 
-    private static async Task BackupOldrksys()
+    private async Task BackupOldrksys()
     {
         var rrWfc = GetOldRksys();
-        if (!Directory.Exists(rrWfc))
+        if (!_fileSystem.Directory.Exists(rrWfc))
             return;
-        var rksysFiles = Directory.GetFiles(rrWfc, "rksys.dat", SearchOption.AllDirectories);
+        var rksysFiles = _fileSystem.Directory.GetFiles(rrWfc, "rksys.dat", SearchOption.AllDirectories);
         if (rksysFiles.Length == 0)
             return;
         var sourceFile = rksysFiles[0];
-        var regionFolder = Path.GetDirectoryName(sourceFile);
-        var regionFolderName = Path.GetFileName(regionFolder);
-        var datFileData = await File.ReadAllBytesAsync(sourceFile);
+        var regionFolder = _fileSystem.Path.GetDirectoryName(sourceFile);
+        var regionFolderName = _fileSystem.Path.GetFileName(regionFolder);
+        var datFileData = await _fileSystem.File.ReadAllBytesAsync(sourceFile);
         if (regionFolderName == null)
             return;
-        var destinationFolder = Path.Combine(PathManager.SaveFolderPath, regionFolderName);
-        Directory.CreateDirectory(destinationFolder);
-        var destinationFile = Path.Combine(destinationFolder, "rksys.dat");
-        await File.WriteAllBytesAsync(destinationFile, datFileData);
+        var destinationFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, regionFolderName);
+        _fileSystem.Directory.CreateDirectory(destinationFolder);
+        var destinationFile = _fileSystem.Path.Combine(destinationFolder, "rksys.dat");
+        await _fileSystem.File.WriteAllBytesAsync(destinationFile, datFileData);
     }
 
-    private static bool HasOldRksys()
+    private bool HasOldRksys()
     {
         return !string.IsNullOrWhiteSpace(GetOldRksys());
     }
 
-    private static string GetOldRksys()
+    private string GetOldRksys()
     {
         // todo, maybe we should check for the existence of the file instead of the folder? and also find the oldest one?
         var rrWfcPaths = new[]
         {
-            Path.Combine(PathManager.SaveFolderPath),
+            _fileSystem.Path.Combine(PathManager.SaveFolderPath),
             // Also consider the folder with upper-case `Save`
-            Path.Combine(PathManager.RiivolutionWhWzFolderPath, "riivolution", "Save", "RetroWFC"),
-            Path.Combine(PathManager.LoadFolderPath, "Riivolution", "save", "RetroWFC"),
-            Path.Combine(PathManager.LoadFolderPath, "Riivolution", "Save", "RetroWFC"),
-            Path.Combine(PathManager.LoadFolderPath, "riivolution", "save", "RetroWFC"),
-            Path.Combine(PathManager.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, "riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "Riivolution", "save", "RetroWFC"),
+            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "Riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "riivolution", "save", "RetroWFC"),
+            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
         };
         
         foreach (var rrWfc in rrWfcPaths)
         {
-            if (!Directory.Exists(rrWfc))
+            if (!_fileSystem.Directory.Exists(rrWfc))
                 continue;
-            var rksysFiles = Directory.GetFiles(rrWfc, "rksys.dat", SearchOption.AllDirectories);
+            var rksysFiles = _fileSystem.Directory.GetFiles(rrWfc, "rksys.dat", SearchOption.AllDirectories);
             if (rksysFiles.Length > 0)
                 return rrWfc;
         }
@@ -219,7 +214,7 @@ public class RetroRewind : IDistribution
         }
     }
 
-    private static async Task<OperationResult> ApplyUpdates(SemVersion currentVersion)
+    private async Task<OperationResult> ApplyUpdates(SemVersion currentVersion)
     {
         var allVersions = await GetAllVersionData();
         var updatesToApply = GetUpdatesToApply(currentVersion, allVersions);
@@ -259,20 +254,20 @@ public class RetroRewind : IDistribution
         return Ok();
     }
 
-    private static void UpdateVersionFile(SemVersion newVersion)
+    private void UpdateVersionFile(SemVersion newVersion)
     {
-        var versionFilePath = Path.Combine(PathManager.RetroRewind6FolderPath, "version.txt");
-        File.WriteAllText(versionFilePath, newVersion.ToString());
+        var versionFilePath = _fileSystem.Path.Combine(PathManager.RetroRewind6FolderPath, "version.txt");
+        _fileSystem.File.WriteAllText(versionFilePath, newVersion.ToString());
     }
 
-    private static async Task<OperationResult> DownloadAndApplyUpdate(
+    private async Task<OperationResult> DownloadAndApplyUpdate(
         UpdateData update,
         int totalUpdates,
         int currentUpdateIndex,
         ProgressWindow popupWindow
     )
     {
-        var tempZipPath = Path.GetTempFileName();
+        var tempZipPath = _fileSystem.Path.GetTempFileName();
         try
         {
             popupWindow.SetExtraText($"{Common.Action_Update} {currentUpdateIndex}/{totalUpdates}: {update.Description}");
@@ -281,26 +276,26 @@ public class RetroRewind : IDistribution
             popupWindow.UpdateProgress(100);
             popupWindow.SetExtraText(Common.State_Extracting);
             var destinationDirectoryPath = PathManager.RiivolutionWhWzFolderPath;
-            Directory.CreateDirectory(destinationDirectoryPath);
+            _fileSystem.Directory.CreateDirectory(destinationDirectoryPath);
             ExtractZipFile(finalFile, destinationDirectoryPath);
-            if (File.Exists(finalFile))
-                File.Delete(finalFile);
+            if (_fileSystem.File.Exists(finalFile))
+                _fileSystem.File.Delete(finalFile);
         }
         finally
         {
-            if (File.Exists(tempZipPath))
-                File.Delete(tempZipPath);
+            if (_fileSystem.File.Exists(tempZipPath))
+                _fileSystem.File.Delete(tempZipPath);
         }
 
         return Ok();
     }
 
-    private static OperationResult ExtractZipFile(string path, string destinationDirectory)
+    private OperationResult ExtractZipFile(string path, string destinationDirectory)
     {
         using var archive = ZipFile.OpenRead(path);
 
         // Absolute path of the destination directory
-        var absoluteDestinationPath = Path.GetFullPath(destinationDirectory + Path.AltDirectorySeparatorChar);
+        var absoluteDestinationPath = _fileSystem.Path.GetFullPath(destinationDirectory + Path.AltDirectorySeparatorChar);
 
         foreach (var entry in archive.Entries)
         {
@@ -308,7 +303,7 @@ public class RetroRewind : IDistribution
                 continue; // Skip the desktop.ini file
 
             // Get the full path of the file
-            var destinationPath = Path.GetFullPath(Path.Combine(destinationDirectory, entry.FullName));
+            var destinationPath = _fileSystem.Path.GetFullPath(Path.Combine(destinationDirectory, entry.FullName));
 
             // Check for directory traversal attacks
             if (!destinationPath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal))
@@ -317,16 +312,16 @@ public class RetroRewind : IDistribution
             }
 
             // If the entry is a directory, create it
-            if (entry.FullName.EndsWith(Path.AltDirectorySeparatorChar))
+            if (entry.FullName.EndsWith(_fileSystem.Path.AltDirectorySeparatorChar))
             {
-                Directory.CreateDirectory(destinationPath);
+                _fileSystem.Directory.CreateDirectory(destinationPath);
                 continue;
             }
 
             // Create directory if it doesn't exist
-            var directoryName = Path.GetDirectoryName(destinationPath);
+            var directoryName = _fileSystem.Path.GetDirectoryName(destinationPath);
             if (!string.IsNullOrEmpty(directoryName))
-                Directory.CreateDirectory(directoryName);
+                _fileSystem.Directory.CreateDirectory(directoryName);
 
             // Extract the file
             entry.ExtractToFile(destinationPath, overwrite: true);
@@ -335,7 +330,7 @@ public class RetroRewind : IDistribution
         return Ok();
     }
 
-    private static async Task<OperationResult> ApplyFileDeletionsBetweenVersions(SemVersion currentVersion, SemVersion targetVersion)
+    private async Task<OperationResult> ApplyFileDeletionsBetweenVersions(SemVersion currentVersion, SemVersion targetVersion)
     {
         try
         {
@@ -349,11 +344,11 @@ public class RetroRewind : IDistribution
 
             foreach (var file in deletionsToApply)
             {
-                var absoluteDestinationPath = Path.GetFullPath(PathManager.RiivolutionWhWzFolderPath + Path.AltDirectorySeparatorChar);
-                var filePath = Path.GetFullPath(Path.Combine(absoluteDestinationPath, file.Path.TrimStart('/')));
+                var absoluteDestinationPath = _fileSystem.Path.GetFullPath(PathManager.RiivolutionWhWzFolderPath + _fileSystem.Path.AltDirectorySeparatorChar);
+                var filePath = _fileSystem.Path.GetFullPath(_fileSystem.Path.Combine(absoluteDestinationPath, file.Path.TrimStart('/')));
                 //because we are actually getting the path from the server,
                 //we need to make sure we are not getting hacked, so we check if the path is in the riivolution folder
-                var resolvedPath = Path.GetFullPath(new FileInfo(filePath).FullName);
+                var resolvedPath = _fileSystem.Path.GetFullPath(new FileInfo(filePath).FullName);
                 if (
                     !resolvedPath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal)
                     || !filePath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal)
@@ -363,10 +358,10 @@ public class RetroRewind : IDistribution
                     return "Invalid file path detected. Please contact the developers.\n Server error: " + resolvedPath;
                 }
 
-                if (File.Exists(filePath))
-                    File.Delete(filePath);
-                else if (Directory.Exists(filePath))
-                    Directory.Delete(filePath, recursive: true);
+                if (_fileSystem.File.Exists(filePath))
+                    _fileSystem.File.Delete(filePath);
+                else if (_fileSystem.Directory.Exists(filePath))
+                    _fileSystem.Directory.Delete(filePath, recursive: true);
             }
 
             return Ok();
@@ -490,8 +485,8 @@ public class RetroRewind : IDistribution
     public Task<OperationResult> Remove()
     {
         var retroRewindPath = PathManager.RetroRewind6FolderPath;
-        if (Directory.Exists(retroRewindPath))
-            Directory.Delete(retroRewindPath, true);
+        if (_fileSystem.Directory.Exists(retroRewindPath))
+            _fileSystem.Directory.Delete(retroRewindPath, true);
         return Task.FromResult(Ok());
     }
 
@@ -530,10 +525,10 @@ public class RetroRewind : IDistribution
     public SemVersion? GetCurrentVersion()
     {
         var versionFilePath = PathManager.RetroRewindVersionFile;
-        if (!File.Exists(versionFilePath))
+        if (!_fileSystem.File.Exists(versionFilePath))
             return null;
 
-        var versionText = File.ReadAllText(versionFilePath).Trim();
+        var versionText = _fileSystem.File.ReadAllText(versionFilePath).Trim();
         var versionPattern = @"^\d+\.\d+\.\d+$";
         if (!Regex.IsMatch(versionText, versionPattern))
             return null;
