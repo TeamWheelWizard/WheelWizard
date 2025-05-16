@@ -4,6 +4,7 @@ using Serilog;
 using Testably.Abstractions;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
+using WheelWizard.CustomCharacters;
 using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
 using WheelWizard.MiiImages;
@@ -22,6 +23,7 @@ public static class SetupExtensions
     public static void AddWheelWizardServices(this IServiceCollection services)
     {
         // Features
+        services.AddCustomCharacters();
         services.AddAutoUpdating();
         services.AddBranding();
         services.AddGitHub();

@@ -59,9 +59,27 @@ public static class MiiFactory
         var hairColor = (MiiHairColor)(random.Next() % 8);
 
         baseMii.IsGirl = random.Next() % 2 == 0;
-        baseMii.MiiHair = new(random.Next() % 71, hairColor, random.Next() % 2 == 0);
+        baseMii.MiiHair = new(random.Next() % 71, hairColor, random.Next() % 3 == 0);
         baseMii.MiiEyebrows = new(random.Next() % 23, 6, hairColor, 4, 10, 2);
         baseMii.MiiEyes = new(random.Next() % 47, 4, 12, (MiiEyeColor)(random.Next() % 6), 4, 2);
+        baseMii.MiiFavoriteColor = (MiiFavoriteColor)(random.Next() % 12);
+        baseMii.MiiFacialFeatures = new(
+            (MiiFaceShape)(random.Next() % 8),
+            (MiiSkinColor)(random.Next() % 6),
+            (MiiFacialFeature)(random.Next() % 12),
+            false,
+            false
+        );
+        baseMii.MiiNose = new((MiiNoseType)(random.Next() % 12), 4, 9);
+        baseMii.MiiLips = new(random.Next() % 23, (MiiLipColor)(random.Next() % 3), 4, 13);
+        baseMii.MiiMole = new(random.Next() % 4 == 0, 4, 20, 2);
+        if (random.Next() % 4 == 0)
+            baseMii.MiiGlasses = new((MiiGlassesType)(random.Next() % 9), (MiiGlassesColor)(random.Next() % 6), 4, 10);
+        else
+            baseMii.MiiGlasses = new(MiiGlassesType.None, MiiGlassesColor.Grey, 4, 10);
+
+        if (random.Next() % 4 == 0)
+            baseMii.MiiFacialHair = new((MiiMustacheType)(random.Next() % 4), (MiiBeardType)(random.Next() % 4), hairColor, 4, 10);
         return baseMii;
     }
 }

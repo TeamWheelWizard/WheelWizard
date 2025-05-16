@@ -195,4 +195,10 @@
     <data name="Action_Back" xml:space="preserve">
         <value>Back</value>
     </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>Unfavorite</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>Favorite</value>
+    </data>
 </root>

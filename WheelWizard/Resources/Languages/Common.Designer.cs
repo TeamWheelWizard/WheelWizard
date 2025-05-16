@@ -159,6 +159,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Favorite.
+        /// </summary>
+        public static string Action_Favorite {
+            get {
+                return ResourceManager.GetString("Action_Favorite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Import.
         /// </summary>
         public static string Action_Import {
@@ -272,6 +281,15 @@ namespace WheelWizard.Resources.Languages {
         public static string Action_SaveExternalMii {
             get {
                 return ResourceManager.GetString("Action_SaveExternalMii", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unfavorite.
+        /// </summary>
+        public static string Action_Unfavorite {
+            get {
+                return ResourceManager.GetString("Action_Unfavorite", resourceCulture);
             }
         }
         

@@ -1,10 +1,17 @@
 using Avalonia.Interactivity;
+using Testably.Abstractions;
+using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Utilities.Mockers;
 using WheelWizard.Views.Components;
+using MiiFactory = WheelWizard.WiiManagement.MiiFactory;
 
 namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
 
 public partial class EditorStartPage : MiiEditorBaseControl
 {
+    [Inject]
+    private IRandomSystem Random { get; set; } = null!;
+
     public EditorStartPage(MiiEditorWindow ew)
         : base(ew)
     {
@@ -23,6 +30,20 @@ public partial class EditorStartPage : MiiEditorBaseControl
             return;
 
         Editor.SetEditorPage(pageType);
+    }
+
+    private void RandomizeMii_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var oldMii = Editor.Mii;
+        var newMii = MiiFactory.CreateRandomMii(Random.Random.Shared);
+        newMii.Name = oldMii.Name;
+        newMii.IsFavorite = oldMii.IsFavorite;
+        newMii.MiiId = oldMii.MiiId;
+        newMii.SystemId = oldMii.SystemId;
+        newMii.CreatorName = oldMii.CreatorName;
+
+        Editor.SetMii(newMii);
+        Editor.RefreshImage();
     }
 
     private void CancelButton_OnClick(object? sender, RoutedEventArgs e) => Editor.Close();

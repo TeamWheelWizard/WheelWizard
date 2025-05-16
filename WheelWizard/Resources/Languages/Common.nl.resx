@@ -195,4 +195,10 @@
     <data name="Action_Back" xml:space="preserve">
         <value>Terug</value>
     </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>Voeg toe aan Favorieten</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>Haal uit favorieten</value>
+    </data>
 </root>

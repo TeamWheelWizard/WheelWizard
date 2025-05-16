@@ -25,8 +25,14 @@
 
                 <StackPanel> <!-- Mii Name -->
                     <components:FormFieldLabel Text="Mii Name:" />
-                    <behavior:FeedbackTextBox x:Name="MiiName" Watermark="Enter mii name"
-                                              TextChanged="Name_TextChanged" />
+                    <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto" VerticalAlignment="Top">
+                        <behavior:FeedbackTextBox x:Name="MiiName" Watermark="Enter mii name"
+                                                  TextChanged="Name_TextChanged" VerticalAlignment="Top"/>
+                        <components:Button Grid.Column="1" Variant="Default" Margin="10,0,0,0"
+                                           Padding="10,5" IconSize="23" VerticalAlignment="Top"
+                                           IconData="{StaticResource Grip}"  Click="ComplexName_OnClick" />
+                    </Grid>
+                  
                 </StackPanel>
 
                 <StackPanel> <!-- Creator Name -->

@@ -33,6 +33,20 @@
             <Grid Grid.Row="0" Margin="10,0">
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal"
                             Spacing="6">
+                    <components:Button Text="" Click="FavMii_OnClick" x:Name="FavoriteMiiButton"
+                                       Variant="Default" Padding="10"
+                                       ToolTip.ShowDelay="0" ToolTip.Placement="Top">
+                        <components:Button.Styles>
+                            <Style Selector="components|Button">
+                                <Setter Property="IconData" Value="{StaticResource StarIcon}"/>
+                                <Setter Property="ToolTip.Tip" Value="{x:Static lang:Common.Action_Favorite}"/>
+                            </Style>
+                            <Style Selector="components|Button.UnFav">
+                                <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}"/>
+                                <Setter Property="ToolTip.Tip" Value="{x:Static lang:Common.Action_Unfavorite}"/>
+                            </Style>
+                        </components:Button.Styles>
+                    </components:Button>
                     <components:Button Text="" Click="EditMii_OnClick" x:Name="EditMiisButton"
                                        IconData="{StaticResource Pen}"
                                        Variant="Default" Padding="10" IsVisible="False"

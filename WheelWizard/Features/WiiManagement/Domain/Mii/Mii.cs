@@ -12,8 +12,6 @@ public class Mii
     public MiiScale Height { get; set; } = new(1);
     public MiiScale Weight { get; set; } = new(1);
 
-    public bool IsForeign => (MiiId1 >> 5) == 0b110; // checks if the top 3 bits are set to 110, if so it got blue pants
-
     //Mii ID is also refered as Avatar  ID
     public byte MiiId1 { get; set; }
     public byte MiiId2 { get; set; }

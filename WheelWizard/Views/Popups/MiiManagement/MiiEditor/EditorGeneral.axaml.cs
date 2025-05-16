@@ -3,6 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WiiManagement.Domain;
 using WheelWizard.WiiManagement.Domain.Mii;
 
@@ -58,12 +59,16 @@ public partial class EditorGeneral : MiiEditorBaseControl
     }
 
     // We only have to check if it's a female, since if it's not, we already know the other option is going to be the male
-    private void IsGirl_OnIsCheckedChanged(object? sender, RoutedEventArgs e) => Editor.Mii.IsGirl = GirlToggle.IsChecked == true;
+    private void IsGirl_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        Editor.Mii.IsGirl = GirlToggle.IsChecked == true;
+        Editor.RefreshImage();
+    }
 
     private void Name_TextChanged(object sender, TextChangedEventArgs e)
     {
         // MiiName
-        var validationMiiNameResult = ValidateMiiName(MiiName.Text);
+        var validationMiiNameResult = ValidateMiiName(null, MiiName.Text);
         _hasMiiNameError = validationMiiNameResult.IsFailure;
         MiiName.ErrorMessage = validationMiiNameResult.Error?.Message ?? "";
 
@@ -73,7 +78,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
         CreatorName.ErrorMessage = validationCreatorNameResult.Error?.Message ?? "";
     }
 
-    private OperationResult ValidateMiiName(string newName)
+    private OperationResult ValidateMiiName(string? _, string newName)
     {
         if (newName.Length is > 10 or < 3)
             return Fail("Name must be between 3 and 10 characters long.");
@@ -139,5 +144,21 @@ public partial class EditorGeneral : MiiEditorBaseControl
     {
         _refreshTimer.Stop();
         Editor.RefreshImage();
+    }
+
+    private async void ComplexName_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var textPopup = new TextInputWindow()
+            .SetMainText($"Edit Mii name")
+            .SetExtraText($"Changing name from: {MiiName.Text}")
+            .SetAllowCustomChars(true, true)
+            .SetValidation(ValidateMiiName)
+            .SetInitialText(MiiName.Text)
+            .SetPlaceholderText("Enter Mii name");
+        var newName = await textPopup.ShowDialog();
+
+        if (string.IsNullOrWhiteSpace(newName))
+            return;
+        MiiName.Text = newName;
     }
 }

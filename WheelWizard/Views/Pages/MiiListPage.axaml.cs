@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Testably.Abstractions;
+using WheelWizard.CustomCharacters;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Services.Settings;
@@ -19,6 +20,9 @@ namespace WheelWizard.Views.Pages;
 
 public partial class MiiListPage : UserControlBase
 {
+    [Inject]
+    private ICustomCharactersService CustomCharactersService { get; set; } = null!;
+
     [Inject]
     private IMiiDbService MiiDbService { get; set; } = null!;
 
@@ -134,16 +138,21 @@ public partial class MiiListPage : UserControlBase
             miiBlock.Click += (_, _) => ChangeTopButtons();
 
             miiBlock.ContextMenu = new ContextMenu();
+            var favHeader = mii.IsFavorite ? Common.Action_Unfavorite : Common.Action_Favorite;
+            miiBlock.ContextMenu.Items.Add(
+                new MenuItem { Header = favHeader, Command = new MyCommand(() => ContextAction(mii, ToggleFavorite)) }
+            );
             miiBlock.ContextMenu.Items.Add(new MenuItem { Header = Common.Action_Edit, Command = new MyCommand(() => EditMii(mii)) });
             miiBlock.ContextMenu.Items.Add(
                 new MenuItem { Header = "Duplicate", Command = new MyCommand(() => ContextAction(mii, DuplicateMii)) }
             );
             miiBlock.ContextMenu.Items.Add(
-                new MenuItem { Header = Common.Action_Delete, Command = new MyCommand(() => ContextAction(mii, DeleteMii)) }
-            );
-            miiBlock.ContextMenu.Items.Add(
                 new MenuItem { Header = Common.Action_Export, Command = new MyCommand(() => ContextAction(mii, ExportMultipleMiiFiles)) }
             );
+            miiBlock.ContextMenu.Items.Add(
+                new MenuItem { Header = Common.Action_Delete, Command = new MyCommand(() => ContextAction(mii, DeleteMii)) }
+            );
+
             MiiList.Children.Add(miiBlock);
         }
 
@@ -177,6 +186,8 @@ public partial class MiiListPage : UserControlBase
     private async void DeleteMii_OnClick(object? sender, RoutedEventArgs e) => DeleteMii(GetSelectedMiis());
 
     private async void EditMii_OnClick(object? sender, RoutedEventArgs e) => EditMii(GetSelectedMiis()[0]);
+
+    private async void FavMii_OnClick(object? sender, RoutedEventArgs e) => ToggleFavorite(GetSelectedMiis());
 
     private async void ExportMii_OnClick(object? sender, RoutedEventArgs e) => ExportMultipleMiiFiles(GetSelectedMiis());
 
@@ -220,6 +231,23 @@ public partial class MiiListPage : UserControlBase
         ReloadMiiList();
     }
 
+    private async void ToggleFavorite(Mii[] miis)
+    {
+        var allFavorite = miis.All(m => m.IsFavorite);
+
+        foreach (var mii in miis)
+        {
+            mii.IsFavorite = !allFavorite;
+            var result = MiiDbService.Update(mii);
+            if (result.IsFailure)
+            {
+                ViewUtils.ShowSnackbar($"Failed to update Mii '{result.Error.Message}'", ViewUtils.SnackbarType.Danger);
+                return;
+            }
+        }
+        ReloadMiiList();
+    }
+
     private async void ExportMultipleMiiFiles(Mii[] miis)
     {
         if (miis.Length == 0)
@@ -241,7 +269,7 @@ public partial class MiiListPage : UserControlBase
 
     private async void ExportMiiAsFile(Mii mii)
     {
-        var exportName = ReplaceInvalidFileNameChars(mii.Name.ToString());
+        var exportName = ReplaceInvalidFileNameChars(CustomCharactersService.NormalizeToAscii(mii.Name.ToString()));
         var diaglog = await FilePickerHelper.SaveFileAsync(
             title: "Save Mii as file",
             fileTypes: [CustomFilePickerFileType.Miis],
@@ -294,6 +322,18 @@ public partial class MiiListPage : UserControlBase
 
         // TODO: add a check that you cant remove a Mii that is in use by a lisence,
         // I have no idea how tho
+
+        if (miis.Any(mii => mii.IsFavorite))
+        {
+            await new MessageBoxWindow()
+                .SetTitleText("Cant delete favorite Miis?")
+                .SetInfoText(
+                    "One or more of the selected Mii(s) is a favorite. Miis can only be deleted if they are not favorites to prevent accidental deletions."
+                )
+                .SetMessageType(MessageBoxWindow.MessageType.Warning)
+                .ShowDialog();
+            return;
+        }
 
         var mainText = $"Are you sure you want to delete {miis.Length} Miis?";
         var successMessage = $"Deleted {miis.Length} Miis";
@@ -401,14 +441,20 @@ public partial class MiiListPage : UserControlBase
             EditMiisButton.IsVisible = false;
             DuplicateMiisButton.IsVisible = false;
             ImportMiiButton.IsVisible = true;
+            FavoriteMiiButton.IsVisible = false;
             return;
         }
 
+        FavoriteMiiButton.IsVisible = true;
         EditMiisButton.IsVisible = selectedMiis.Length == 1;
         ImportMiiButton.IsVisible = false;
         DeleteMiisButton.IsVisible = true;
         ExportMiisButton.IsVisible = true;
         DuplicateMiisButton.IsVisible = true;
+
+        FavoriteMiiButton.Classes.Remove("UnFav");
+        if (selectedMiis.All(mii => mii.IsFavorite))
+            FavoriteMiiButton.Classes.Add("UnFav");
     }
 
     #region Command

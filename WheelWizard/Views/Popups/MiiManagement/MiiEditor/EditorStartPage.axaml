@@ -34,6 +34,9 @@
         <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="1" />
         
+        <components:Button Variant="Default" Grid.Row="2" Margin="10"  VerticalAlignment="Top" 
+                           HorizontalAlignment="Left" Padding="12,6" IconSize="28"
+                           IconData="{StaticResource Dice}" Click="RandomizeMii_OnClick" />
         <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="10"
                     VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="10">
             <components:Button Text="{x:Static lang:Common.Action_Cancel}" Variant="Warning"
