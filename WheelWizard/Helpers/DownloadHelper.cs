@@ -2,6 +2,7 @@
 
 namespace WheelWizard.Helpers;
 
+// todo: Delete this static class and write a service for it.
 public static class DownloadHelper
 {
     private const int MaxRetries = 5;

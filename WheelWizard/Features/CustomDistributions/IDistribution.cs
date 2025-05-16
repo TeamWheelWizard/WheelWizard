@@ -19,16 +19,16 @@ public interface IDistribution
     /// <summary>
     /// Install the distribution.
     /// </summary>
-    Task<OperationResult> Install(ProgressWindow? progressWindow = null);
+    Task<OperationResult> Install(ProgressWindow progressWindow);
 
     /// <summary>
     /// Update the distribution.
     /// </summary>
-    Task<OperationResult> Update(ProgressWindow? progressWindow = null);
+    Task<OperationResult> Update(ProgressWindow progressWindow );
 
-    Task<OperationResult> Remove(ProgressWindow? progressWindow = null);
+    Task<OperationResult> Remove(ProgressWindow progressWindow);
 
-    Task<OperationResult> Reinstall(ProgressWindow? progressWindow = null);
+    Task<OperationResult> Reinstall(ProgressWindow progressWindow);
 
     Task<OperationResult<WheelWizardStatus>> GetCurrentStatus();
 

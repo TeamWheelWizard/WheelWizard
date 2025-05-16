@@ -29,11 +29,11 @@ public class RetroRewind : IDistribution
     // Keep in mind, whenever we download update files from the server, they are actually 1 folder higher, so it contains this folder.
     public string FolderName => "RetroRewind6";
 
-    public async Task<OperationResult> Install(ProgressWindow? progressWindow = null)
+    public async Task<OperationResult> Install(ProgressWindow progressWindow)
     {
         if (GetCurrentVersion() is not null)
         {
-            var removeResult = await Remove();
+            var removeResult = await Remove(progressWindow);
             if (removeResult.IsFailure)
                 return removeResult;
         }
@@ -51,23 +51,18 @@ public class RetroRewind : IDistribution
         {
             return "Could not connect to the server";
         }
-        var downloadResult = await DownloadAndExtractRetroRewind();
+        var downloadResult = await DownloadAndExtractRetroRewind(progressWindow);
         if (downloadResult.IsFailure)
             return downloadResult;
-        var updateResult = await Update();
+        var updateResult = await Update(progressWindow);
         if (updateResult.IsFailure)
             return updateResult;
         return Ok();
     }
 
-    private async Task<OperationResult> DownloadAndExtractRetroRewind(ProgressWindow? progressWindow = null)
+    private async Task<OperationResult> DownloadAndExtractRetroRewind(ProgressWindow progressWindow)
     {
-        if (progressWindow is not null)
-        {
-            progressWindow.SetExtraText(Phrases.PopupText_InstallingRRFirstTime);
-            progressWindow.Show();
-        }
-
+        progressWindow.SetExtraText(Phrases.PopupText_InstallingRRFirstTime);
         // path to the downloaded .zip
         var tempZipPath = PathManager.RetroRewindTempFile;
         // where we'll do the extraction
@@ -85,10 +80,8 @@ public class RetroRewind : IDistribution
             await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
 
             // 2) Extract
-            if (progressWindow is not null)
-            {
-                progressWindow.SetExtraText(Common.State_Extracting);
-            }
+            progressWindow.SetExtraText(Common.State_Extracting);
+            
             
             ZipFile.ExtractToDirectory(tempZipPath, tempExtractionPath, overwriteFiles: true);
 
@@ -195,13 +188,13 @@ public class RetroRewind : IDistribution
         return SemVersion.Parse(result);
     }
 
-    public async Task<OperationResult> Update(ProgressWindow? progressWindow = null)
+    public async Task<OperationResult> Update(ProgressWindow progressWindow)
     {
         try
         {
             var currentVersion = GetCurrentVersion();
             if (currentVersion == null)
-                return await Install();
+                return await Install(progressWindow);
 
             var isRRUpToDate = await IsRRUpToDate(currentVersion);
             if (isRRUpToDate.IsFailure)
@@ -215,10 +208,10 @@ public class RetroRewind : IDistribution
             //if current version is below 3.2.6 we need to do a full reinstall
             if (currentVersion.ComparePrecedenceTo(new SemVersion(3, 2, 6)) < 0)
             {
-                var result = await Reinstall();
+                var result = await Reinstall(progressWindow);
                 return result.IsSuccess ? Ok() : result;
             }
-            return await ApplyUpdates(currentVersion);
+            return await ApplyUpdates(currentVersion, progressWindow);
         }
         catch (Exception e)
         {
@@ -226,15 +219,10 @@ public class RetroRewind : IDistribution
         }
     }
 
-    private async Task<OperationResult> ApplyUpdates(SemVersion currentVersion)
+    private async Task<OperationResult> ApplyUpdates(SemVersion currentVersion, ProgressWindow progressWindow)
     {
         var allVersions = await GetAllVersionData();
         var updatesToApply = GetUpdatesToApply(currentVersion, allVersions);
-
-        // todo: This progressbar should not be here in this context, this makes this untestable
-        var progressWindow = new ProgressWindow(Phrases.PopupText_UpdateRR);
-        progressWindow.Show();
-
         // Step 1: Get the version we are updating to
         var targetVersion = updatesToApply.Any() ? updatesToApply.Last().Version : currentVersion;
 
@@ -498,7 +486,7 @@ public class RetroRewind : IDistribution
         return deletionsToApply;
     }
 
-    public Task<OperationResult> Remove(ProgressWindow? progressWindow = null)
+    public Task<OperationResult> Remove(ProgressWindow progressWindow)
     {
         var retroRewindPath = PathManager.RetroRewind6FolderPath;
         if (_fileSystem.Directory.Exists(retroRewindPath))
@@ -506,13 +494,13 @@ public class RetroRewind : IDistribution
         return Task.FromResult(Ok());
     }
 
-    public async Task<OperationResult> Reinstall(ProgressWindow? progressWindow = null)
+    public async Task<OperationResult> Reinstall(ProgressWindow progressWindow)
     {
         //Remove and install
-        var removeResult = await Remove();
+        var removeResult = await Remove(progressWindow);
         if (removeResult.IsFailure)
             return removeResult;
-        return await Install();
+        return await Install(progressWindow);
     }
 
     public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatus()
