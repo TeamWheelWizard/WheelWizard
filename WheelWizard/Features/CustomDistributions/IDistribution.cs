@@ -19,18 +19,18 @@ public interface IDistribution
     /// <summary>
     /// Install the distribution.
     /// </summary>
-    Task<OperationResult> Install(ProgressWindow progressWindow);
+    Task<OperationResult> InstallAsync(ProgressWindow progressWindow);
 
     /// <summary>
     /// Update the distribution.
     /// </summary>
-    Task<OperationResult> Update(ProgressWindow progressWindow );
+    Task<OperationResult> UpdateAsync(ProgressWindow progressWindow );
 
-    Task<OperationResult> Remove(ProgressWindow progressWindow);
+    Task<OperationResult> RemoveAsync(ProgressWindow progressWindow);
 
-    Task<OperationResult> Reinstall(ProgressWindow progressWindow);
+    Task<OperationResult> ReinstallAsync(ProgressWindow progressWindow);
 
-    Task<OperationResult<WheelWizardStatus>> GetCurrentStatus();
+    Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync();
 
     SemVersion? GetCurrentVersion();
 }

@@ -132,7 +132,7 @@ public partial class OtherSettings : UserControlBase
     }
 
     private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e) =>
-        await CustomDistributionSingletonService.RetroRewind.Reinstall();
+        await CustomDistributionSingletonService.RetroRewind.ReinstallAsync();
 
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)
     {

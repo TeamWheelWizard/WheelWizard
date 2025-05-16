@@ -62,9 +62,23 @@ public class RrLauncher : ILauncher
         }
     }
 
-    public Task Install() => CustomDistributionSingletonService.RetroRewind.Install();
+    public async Task Install()
+    {
+        var progressWindow = new ProgressWindow();
+        progressWindow.Show();
+        await CustomDistributionSingletonService.RetroRewind.InstallAsync(progressWindow);
+        progressWindow.Close();
+    }
 
-    public Task Update() => CustomDistributionSingletonService.RetroRewind.Update();
+
+    public async Task Update()
+    {
+        var progressWindow = new ProgressWindow();
+        progressWindow.Show();
+        await CustomDistributionSingletonService.RetroRewind.UpdateAsync(progressWindow);
+        progressWindow.Close();
+    }
+    
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {
@@ -72,7 +86,7 @@ public class RrLauncher : ILauncher
         {
             return WheelWizardStatus.NotInstalled;
         }
-        var statusResult = await CustomDistributionSingletonService.RetroRewind.GetCurrentStatus();
+        var statusResult = await CustomDistributionSingletonService.RetroRewind.GetCurrentStatusAsync();
         if (statusResult.IsFailure)
             return WheelWizardStatus.NotInstalled;
         return statusResult.Value;

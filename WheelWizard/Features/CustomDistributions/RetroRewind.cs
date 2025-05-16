@@ -29,11 +29,11 @@ public class RetroRewind : IDistribution
     // Keep in mind, whenever we download update files from the server, they are actually 1 folder higher, so it contains this folder.
     public string FolderName => "RetroRewind6";
 
-    public async Task<OperationResult> Install(ProgressWindow progressWindow)
+    public async Task<OperationResult> InstallAsync(ProgressWindow progressWindow)
     {
         if (GetCurrentVersion() is not null)
         {
-            var removeResult = await Remove(progressWindow);
+            var removeResult = await RemoveAsync(progressWindow);
             if (removeResult.IsFailure)
                 return removeResult;
         }
@@ -54,7 +54,7 @@ public class RetroRewind : IDistribution
         var downloadResult = await DownloadAndExtractRetroRewind(progressWindow);
         if (downloadResult.IsFailure)
             return downloadResult;
-        var updateResult = await Update(progressWindow);
+        var updateResult = await UpdateAsync(progressWindow);
         if (updateResult.IsFailure)
             return updateResult;
         return Ok();
@@ -188,13 +188,13 @@ public class RetroRewind : IDistribution
         return SemVersion.Parse(result);
     }
 
-    public async Task<OperationResult> Update(ProgressWindow progressWindow)
+    public async Task<OperationResult> UpdateAsync(ProgressWindow progressWindow)
     {
         try
         {
             var currentVersion = GetCurrentVersion();
             if (currentVersion == null)
-                return await Install(progressWindow);
+                return await InstallAsync(progressWindow);
 
             var isRRUpToDate = await IsRRUpToDate(currentVersion);
             if (isRRUpToDate.IsFailure)
@@ -208,7 +208,7 @@ public class RetroRewind : IDistribution
             //if current version is below 3.2.6 we need to do a full reinstall
             if (currentVersion.ComparePrecedenceTo(new SemVersion(3, 2, 6)) < 0)
             {
-                var result = await Reinstall(progressWindow);
+                var result = await ReinstallAsync(progressWindow);
                 return result.IsSuccess ? Ok() : result;
             }
             return await ApplyUpdates(currentVersion, progressWindow);
@@ -486,7 +486,7 @@ public class RetroRewind : IDistribution
         return deletionsToApply;
     }
 
-    public Task<OperationResult> Remove(ProgressWindow progressWindow)
+    public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
     {
         var retroRewindPath = PathManager.RetroRewind6FolderPath;
         if (_fileSystem.Directory.Exists(retroRewindPath))
@@ -494,16 +494,16 @@ public class RetroRewind : IDistribution
         return Task.FromResult(Ok());
     }
 
-    public async Task<OperationResult> Reinstall(ProgressWindow progressWindow)
+    public async Task<OperationResult> ReinstallAsync(ProgressWindow progressWindow)
     {
         //Remove and install
-        var removeResult = await Remove(progressWindow);
+        var removeResult = await RemoveAsync(progressWindow);
         if (removeResult.IsFailure)
             return removeResult;
-        return await Install(progressWindow);
+        return await InstallAsync(progressWindow);
     }
 
-    public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatus()
+    public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync()
     {
         if (!SettingsHelper.PathsSetupCorrectly())
             return WheelWizardStatus.ConfigNotFinished;
