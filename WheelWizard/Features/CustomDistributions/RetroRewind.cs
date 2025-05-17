@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
+using Avalonia.Threading;
 using Semver;
 using WheelWizard.CustomDistributions.Domain;
 using WheelWizard.Helpers;
@@ -81,9 +82,11 @@ public class RetroRewind : IDistribution
 
             // 2) Extract
             progressWindow.SetExtraText(Common.State_Extracting);
-            
-            
-            ZipFile.ExtractToDirectory(tempZipPath, tempExtractionPath, overwriteFiles: true);
+
+            var extractResult = await Task.Run(() => ExtractZipFile(tempZipPath, tempExtractionPath, progressWindow));
+
+            if (extractResult.IsFailure)
+                return extractResult;
 
             // 3) Locate the extracted sub-folder
             var sourceFolder = _fileSystem.Path.Combine(tempExtractionPath, FolderName);
@@ -106,7 +109,7 @@ public class RetroRewind : IDistribution
         finally
         {
             // always clean up UI and temp files
-            progressWindow?.Close();
+            progressWindow.Close();
 
             if (_fileSystem.File.Exists(tempZipPath))
                 _fileSystem.File.Delete(tempZipPath);
@@ -256,7 +259,7 @@ public class RetroRewind : IDistribution
 
     private void UpdateVersionFile(SemVersion newVersion)
     {
-        var versionFilePath = _fileSystem.Path.Combine(PathManager.RetroRewind6FolderPath, "version.txt");
+        var versionFilePath = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName, "version.txt");
         _fileSystem.File.WriteAllText(versionFilePath, newVersion.ToString());
     }
 
@@ -277,7 +280,13 @@ public class RetroRewind : IDistribution
             popupWindow.SetExtraText(Common.State_Extracting);
             var destinationDirectoryPath = PathManager.RiivolutionWhWzFolderPath;
             _fileSystem.Directory.CreateDirectory(destinationDirectoryPath);
-            ExtractZipFile(finalFile, destinationDirectoryPath);
+
+            if (finalFile == null)
+                return "Failed to download update file";
+            var extractResult = ExtractZipFile(finalFile, destinationDirectoryPath, popupWindow);
+            if (extractResult.IsFailure)
+                return extractResult;
+
             if (_fileSystem.File.Exists(finalFile))
                 _fileSystem.File.Delete(finalFile);
         }
@@ -290,41 +299,57 @@ public class RetroRewind : IDistribution
         return Ok();
     }
 
-    private OperationResult ExtractZipFile(string path, string destinationDirectory)
+    private OperationResult ExtractZipFile(string path, string destinationDirectory, ProgressWindow progressWindow)
     {
         using var archive = ZipFile.OpenRead(path);
+
+        // 1) Compute total work units (we’ll treat each entry as one “unit”)
+        var entries = archive.Entries.Where(e => !e.FullName.EndsWith("desktop.ini", StringComparison.OrdinalIgnoreCase)).ToList();
+        var total = entries.Count;
+        if (total == 0)
+            return Ok();
+
+        // Tell the UI what we’re doing, and set a “goal” so it can estimate MB or items
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            progressWindow.SetExtraText(Common.State_Extracting).SetGoal($"Extracting {total} files");
+        });
 
         // Absolute path of the destination directory
         var absoluteDestinationPath = _fileSystem.Path.GetFullPath(destinationDirectory + Path.AltDirectorySeparatorChar);
 
-        foreach (var entry in archive.Entries)
+        for (var i = 0; i < total; i++)
         {
-            if (entry.FullName.EndsWith("desktop.ini", StringComparison.OrdinalIgnoreCase))
-                continue; // Skip the desktop.ini file
-
-            // Get the full path of the file
+            var entry = entries[i];
             var destinationPath = _fileSystem.Path.GetFullPath(Path.Combine(destinationDirectory, entry.FullName));
 
-            // Check for directory traversal attacks
+            // Directory traversal check
             if (!destinationPath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal))
-            {
                 return ("The file path is outside the destination directory. Please contact the developers.");
-            }
 
-            // If the entry is a directory, create it
-            if (entry.FullName.EndsWith(_fileSystem.Path.AltDirectorySeparatorChar))
+            // If it’s a directory, create it
+            if (entry.FullName.EndsWith(Path.AltDirectorySeparatorChar))
             {
                 _fileSystem.Directory.CreateDirectory(destinationPath);
-                continue;
+            }
+            else
+            {
+                // Ensure folder exists
+                var dir = _fileSystem.Path.GetDirectoryName(destinationPath);
+                if (!string.IsNullOrEmpty(dir))
+                    _fileSystem.Directory.CreateDirectory(dir);
+
+                // Extract the file
+                entry.ExtractToFile(destinationPath, overwrite: true);
             }
 
-            // Create directory if it doesn't exist
-            var directoryName = _fileSystem.Path.GetDirectoryName(destinationPath);
-            if (!string.IsNullOrEmpty(directoryName))
-                _fileSystem.Directory.CreateDirectory(directoryName);
-
-            // Extract the file
-            entry.ExtractToFile(destinationPath, overwrite: true);
+            // Report incremental progress (0–100)
+            var percent = (int)(((i + 1) / (double)total) * 100);
+            Dispatcher.UIThread.Post(() =>
+            {
+                progressWindow.UpdateProgress(percent);
+            });
         }
 
         return Ok();
@@ -488,7 +513,7 @@ public class RetroRewind : IDistribution
 
     public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
     {
-        var retroRewindPath = PathManager.RetroRewind6FolderPath;
+        var retroRewindPath = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName);
         if (_fileSystem.Directory.Exists(retroRewindPath))
             _fileSystem.Directory.Delete(retroRewindPath, true);
         return Task.FromResult(Ok());
@@ -528,7 +553,7 @@ public class RetroRewind : IDistribution
 
     public SemVersion? GetCurrentVersion()
     {
-        var versionFilePath = PathManager.RetroRewindVersionFile;
+        var versionFilePath = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName, "version.txt");
         if (!_fileSystem.File.Exists(versionFilePath))
             return null;
 

@@ -33,7 +33,6 @@ public static class PathManager
     public static readonly string ModConfigFilePath = Path.Combine(ModsFolderPath, "modconfig.json");
     public static readonly string TempModsFolderPath = Path.Combine(ModsFolderPath, "Temp");
     public static readonly string RetroRewindTempFile = Path.Combine(TempModsFolderPath, "RetroRewind.zip");
-    public static string RetroRewindVersionFile => Path.Combine(RetroRewind6FolderPath, "version.txt");
     public static string WiiDbFolder => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib");
     public static string MiiDbFile => Path.Combine(WiiDbFolder, "RFL_DB.dat");
 
@@ -42,12 +41,15 @@ public static class PathManager
     //Also remember that mods may not be in a subfolder, all mod files must be located in /MyStuff directly
 
     // Helper paths for folders used across multiple files
-    public static string MyStuffFolderPath => Path.Combine(RetroRewind6FolderPath, "MyStuff");
+
+    //todo: before we can actually add more distributions, we will have to rewrite the MyStuff as a service aswell
+    public static string MyStuffFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6", "MyStuff");
 
     public static string GetModDirectoryPath(string modName) => Path.Combine(ModsFolderPath, modName);
 
     public static string RiivolutionWhWzFolderPath => Path.Combine(LoadFolderPath, "Riivolution", "WheelWizard");
-    public static string RetroRewind6FolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6");
+
+    // public static string RetroRewind6FolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6");
 
     // This is not the folder your save file is located in, but its the folder where every Region folder is, so the save file is in SaveFolderPath/Region
     public static string SaveFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "riivolution", "save", "RetroWFC");

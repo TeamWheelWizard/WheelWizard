@@ -4,6 +4,8 @@ using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
 
+//todo: we cannot make more distributions before we also write a mystuff service
+
 public interface IDistribution
 {
     /// <summary>
@@ -24,7 +26,7 @@ public interface IDistribution
     /// <summary>
     /// Update the distribution.
     /// </summary>
-    Task<OperationResult> UpdateAsync(ProgressWindow progressWindow );
+    Task<OperationResult> UpdateAsync(ProgressWindow progressWindow);
 
     Task<OperationResult> RemoveAsync(ProgressWindow progressWindow);
 

@@ -131,8 +131,13 @@ public partial class OtherSettings : UserControlBase
         ViewUtils.RefreshWindow();
     }
 
-    private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e) =>
-        await CustomDistributionSingletonService.RetroRewind.ReinstallAsync();
+    private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e)
+    {
+        var progressWindow = new ProgressWindow();
+        progressWindow.Show();
+        await CustomDistributionSingletonService.RetroRewind.ReinstallAsync(progressWindow);
+        progressWindow.Close();
+    }
 
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)
     {

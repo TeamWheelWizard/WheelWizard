@@ -70,7 +70,6 @@ public class RrLauncher : ILauncher
         progressWindow.Close();
     }
 
-
     public async Task Update()
     {
         var progressWindow = new ProgressWindow();
@@ -78,7 +77,6 @@ public class RrLauncher : ILauncher
         await CustomDistributionSingletonService.RetroRewind.UpdateAsync(progressWindow);
         progressWindow.Close();
     }
-    
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {
