@@ -270,7 +270,9 @@ public class RetroRewind : IDistribution
         ProgressWindow popupWindow
     )
     {
-        var tempZipPath = _fileSystem.Path.GetTempFileName();
+        var tempZipPath = _fileSystem.Path.Combine(
+            _fileSystem.Path.GetTempPath(),
+            _fileSystem.Path.GetRandomFileName());
         try
         {
             popupWindow.SetExtraText($"{Common.Action_Update} {currentUpdateIndex}/{totalUpdates}: {update.Description}");
@@ -436,7 +438,6 @@ public class RetroRewind : IDistribution
     {
         public SemVersion Version;
         public string Url;
-        public string Path;
         public string Description;
     }
 
@@ -456,7 +457,7 @@ public class RetroRewind : IDistribution
                 continue;
             var version = parts[0].Trim();
             var url = parts[1].Trim();
-            var path = parts[2].Trim();
+            var path = parts[2].Trim(); // Path unused in our program since on pc we manually decide where to extract
             var description = parts[3].Trim();
             if (string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(path))
                 continue;
@@ -467,7 +468,6 @@ public class RetroRewind : IDistribution
             {
                 Version = parsedVersion,
                 Url = url,
-                Path = path,
                 Description = description,
             };
             versions.Add(updateData);
