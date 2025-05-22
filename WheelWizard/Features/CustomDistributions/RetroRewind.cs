@@ -78,6 +78,8 @@ public class RetroRewind : IDistribution
                 _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
             _fileSystem.Directory.CreateDirectory(tempExtractionPath);
 
+            
+            //todo, service
             await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
 
             // 2) Extract
