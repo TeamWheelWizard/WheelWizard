@@ -24,13 +24,12 @@
                 <!-- The list of elements you want to edit in this page -->
 
                 <StackPanel> <!-- Eye Color -->
-                    <components:FormFieldLabel Text="Eye Color:"/>
-                    <ComboBox
-                        x:Name="EyeColorBox"
-                        SelectionChanged="EyeColorBox_OnSelectionChanged"
-                        Width="150"
-                        />
+                    <components:FormFieldLabel Text="Irish Color:"/>
+                    <UniformGrid Columns="6" x:Name="EyeColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
                 </StackPanel>
+
 
                 <!-- Vertical Position (Up/Down) -->
                 <StackPanel>

@@ -23,46 +23,47 @@
             <StackPanel Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Spacing="15">
                 <!-- The list of elements you want to edit in this page -->
 
-                 <StackPanel> <!-- Facial Hair Color -->
-                    <components:FormFieldLabel Text="Facial Hair Color:"/>
-                    <ComboBox
-                        x:Name="MustacheColorBox"
-                        SelectionChanged="FacialHairColorBox_OnSelectionChanged"
-                        Width="150"
-                        />
+                <StackPanel> <!-- Hair Color -->
+                    <components:FormFieldLabel Text="Hair Color:"/>
+                    <UniformGrid Columns="5" x:Name="HairColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
                 </StackPanel>
 
-                <!-- Vertical Position (Up/Down) -->
-                <StackPanel>
-                    <components:FormFieldLabel Text="Vertical Position (Up/Down):"/>
-                    <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
-                        <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                            <components:Button x:Name="VerticalDecreaseButton" IconData="{StaticResource ArrowUp}" IconSize="14" Padding="4" Click="VerticalDecrease_Click" />
-                            <TextBlock x:Name="VerticalValueText" Classes="BodyText" MinWidth="30" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
-                            <components:Button x:Name="VerticalIncreaseButton" IconData="{StaticResource  ArrowDown}" IconSize="14" Padding="4"  Click="VerticalIncrease_Click"/>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
 
-                <!-- Size (Zoom In/Out) -->
-                <StackPanel>
-                    <components:FormFieldLabel Text="Size (Zoom In/Out):"/>
-                    <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
-                        <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                            <components:Button x:Name="SizeDecreaseButton" IconData="{StaticResource MinMark}" IconSize="14" Padding="4" Click="SizeDecrease_Click"/>
-                            <TextBlock x:Name="SizeValueText" Classes="BodyText" MinWidth="30" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
-                            <components:Button x:Name="SizeIncreaseButton" IconData="{StaticResource  PlusMark}" IconSize="14" Padding="4" Click="SizeIncrease_Click"/>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-                
                 <StackPanel> <!-- Mustache Type -->
                     <components:FormFieldLabel Text="Mustache Type:"/>
                     <UniformGrid Columns="5" x:Name="MustacheTypesGrid">
                         <!-- Generated elements -->
                     </UniformGrid>
                 </StackPanel>
+                
+                <StackPanel x:Name="MustacheTransformOptions">
+                     <!-- Vertical Position (Up/Down) -->
+                    <StackPanel>
+                        <components:FormFieldLabel Text="Mustache Vertical Position (Up/Down):"/>
+                        <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                <components:Button x:Name="VerticalDecreaseButton" IconData="{StaticResource ArrowUp}" IconSize="14" Padding="4" Click="VerticalDecrease_Click" />
+                                <TextBlock x:Name="VerticalValueText" Classes="BodyText" MinWidth="30" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                <components:Button x:Name="VerticalIncreaseButton" IconData="{StaticResource  ArrowDown}" IconSize="14" Padding="4"  Click="VerticalIncrease_Click"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
 
+                    <!-- Size (Zoom In/Out) -->
+                    <StackPanel>
+                        <components:FormFieldLabel Text="Mustache Size (Zoom In/Out):"/>
+                        <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                <components:Button x:Name="SizeDecreaseButton" IconData="{StaticResource MinMark}" IconSize="14" Padding="4" Click="SizeDecrease_Click"/>
+                                <TextBlock x:Name="SizeValueText" Classes="BodyText" MinWidth="30" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                <components:Button x:Name="SizeIncreaseButton" IconData="{StaticResource  PlusMark}" IconSize="14" Padding="4" Click="SizeIncrease_Click"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+                
                 <StackPanel> <!-- Beard Type -->
                     <components:FormFieldLabel Text="Beard Type:"/>
                     <UniformGrid Columns="5" x:Name="BeardTypesGrid">

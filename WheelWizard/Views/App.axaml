@@ -54,6 +54,7 @@
         <StyleInclude Source="Components/StandardLibrary/IconLabel.axaml" />
         <StyleInclude Source="Components/StandardLibrary/IconLabelButton.axaml" />
         <StyleInclude Source="Components/StandardLibrary/Button.axaml" />
+        <StyleInclude Source="Components/StandardLibrary/OptionButton.axaml" />
         <StyleInclude Source="Components/StandardLibrary/StateBox.axaml" />
         <StyleInclude Source="Components/StandardLibrary/EmptyPageInfo.axaml" />
         <StyleInclude Source="Components/StandardLibrary/FormFieldLabel.axaml" />

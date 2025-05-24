@@ -5,11 +5,11 @@ public class MiiEye
     public int Type { get; }
     public int Rotation { get; }
     public int Vertical { get; }
-    public EyeColor Color { get; }
+    public MiiEyeColor Color { get; }
     public int Size { get; }
     public int Spacing { get; }
 
-    public MiiEye(int type, int rotation, int vertical, EyeColor color, int size, int spacing)
+    public MiiEye(int type, int rotation, int vertical, MiiEyeColor color, int size, int spacing)
     {
         if (type is < 0 or > 47)
             throw new ArgumentException("Eye type invalid");
@@ -29,6 +29,6 @@ public class MiiEye
         Spacing = spacing;
     }
 
-    public static OperationResult<MiiEye> Create(int type, int rotation, int vertical, EyeColor color, int size, int spacing) =>
+    public static OperationResult<MiiEye> Create(int type, int rotation, int vertical, MiiEyeColor color, int size, int spacing) =>
         TryCatch(() => new MiiEye(type, rotation, vertical, color, size, spacing));
 }

@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using WheelWizard.Views.Components;
+using WheelWizard.WiiManagement.Domain;
 using WheelWizard.WiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
@@ -17,33 +17,19 @@ public partial class EditorGlasses : MiiEditorBaseControl
         : base(ew)
     {
         InitializeComponent();
-        if (Editor?.Mii?.MiiGlasses == null)
-            return;
         PopulateValues();
     }
 
     private void PopulateValues()
     {
+        // Attribute:
         var currentGlasses = Editor.Mii.MiiGlasses;
-        GlassesColorBox.Items.Clear();
-        foreach (var color in Enum.GetNames(typeof(GlassesColor)))
-        {
-            GlassesColorBox.Items.Add(color);
-            if (color == currentGlasses.Color.ToString())
-                GlassesColorBox.SelectedItem = color;
-        }
 
-        GenerateGlassesButtons();
-        UpdateValueTexts(currentGlasses);
-        HideIfNoGlasses.IsVisible = Editor.Mii.MiiGlasses.Type != GlassesType.None;
-    }
-
-    private void GenerateGlassesButtons()
-    {
+        // Glasses:
         var color1 = new SolidColorBrush(ViewUtils.Colors.Neutral50); // Skin Color
         var color2 = new SolidColorBrush(ViewUtils.Colors.Neutral300); // Skin border Color
         var color3 = new SolidColorBrush(ViewUtils.Colors.Neutral600); // Glass Color
-        var color4 = new SolidColorBrush(ViewUtils.Colors.Danger400);
+        var color4 = new SolidColorBrush(ViewUtils.Colors.Danger400); // NONE Color
         var selectedColor4 = new SolidColorBrush(ViewUtils.Colors.Danger500);
         SetButtons(
             "MiiGlasses",
@@ -51,7 +37,7 @@ public partial class EditorGlasses : MiiEditorBaseControl
             GlassesTypesGrid,
             (index, button) =>
             {
-                button.IsChecked = index == (int)Editor.Mii.MiiGlasses.Type;
+                button.IsChecked = index == (int)currentGlasses.Type;
                 button.Color1 = color1;
                 button.Color2 = color2;
                 button.Color3 = color3;
@@ -60,41 +46,53 @@ public partial class EditorGlasses : MiiEditorBaseControl
                 button.Click += (_, _) => SetGlassesType(index);
             }
         );
+
+        // Glass color:
+        SetColorButtons(
+            MiiColorMappings.GlassesColor.Count,
+            GlassesColorGrid,
+            (index, button) =>
+            {
+                button.IsChecked = index == (int)Editor.Mii.MiiGlasses.Color;
+                button.Color1 = new SolidColorBrush(MiiColorMappings.GlassesColor[(MiiGlassesColor)index]);
+                button.Click += (_, _) => SetGlassesColor(index);
+            }
+        );
+
+        // Transform attributes:
+        HideIfNoGlasses.IsVisible = Editor.Mii.MiiGlasses.Type != MiiGlassesType.None;
+        UpdateTransformTextValues(currentGlasses);
     }
 
     private void SetGlassesType(int index)
     {
-        if (Editor?.Mii?.MiiGlasses == null)
-            return;
-
         var current = Editor.Mii.MiiGlasses;
-
         if (index == (int)current.Type)
             return;
 
-        var result = MiiGlasses.Create((GlassesType)index, current.Color, current.Size, current.Vertical);
-        if (result.IsSuccess)
-        {
-            Editor.Mii.MiiGlasses = result.Value;
-            UpdateValueTexts(result.Value);
-            HideIfNoGlasses.IsVisible = result.Value.Type != GlassesType.None;
-        }
-        else
-        {
-            foreach (var child in GlassesTypesGrid.Children)
-            {
-                if (child is MultiIconRadioButton button && button.IsChecked == true)
-                    button.IsChecked = false;
-            }
-            var currentButton = GlassesTypesGrid.Children[index] as MultiIconRadioButton;
-            currentButton.IsChecked = true;
-        }
+        var result = MiiGlasses.Create((MiiGlassesType)index, current.Color, current.Size, current.Vertical);
+        if (result.IsFailure)
+            return;
+
+        Editor.Mii.MiiGlasses = result.Value;
+        HideIfNoGlasses.IsVisible = result.Value.Type != MiiGlassesType.None;
         Editor.RefreshImage();
     }
 
-    private void UpdateValueTexts(MiiGlasses glasses)
+    private void SetGlassesColor(int index)
     {
-        VerticalValueText.Text = glasses.Vertical.ToString();
+        var current = Editor.Mii.MiiGlasses;
+        var result = MiiGlasses.Create(current.Type, (MiiGlassesColor)index, current.Size, current.Vertical);
+        if (result.IsFailure)
+            return;
+
+        Editor.Mii.MiiGlasses = result.Value;
+        Editor.RefreshImage();
+    }
+
+    private void UpdateTransformTextValues(MiiGlasses glasses)
+    {
+        VerticalValueText.Text = ((glasses.Vertical - 10) * -1).ToString();
         SizeValueText.Text = glasses.Size.ToString();
 
         VerticalDecreaseButton.IsEnabled = glasses.Vertical > MinVertical;
@@ -103,13 +101,9 @@ public partial class EditorGlasses : MiiEditorBaseControl
         SizeIncreaseButton.IsEnabled = glasses.Size < MaxSize;
     }
 
-    private enum GlassesProperty
-    {
-        Vertical,
-        Size,
-    }
+    #region Transfrom
 
-    private void TryUpdateGlassValue(int change, GlassesProperty property)
+    private void TryUpdateGlassValue(int change, MiiTransformProperty property)
     {
         if (Editor?.Mii?.MiiGlasses == null || !IsLoaded)
             return;
@@ -122,18 +116,18 @@ public partial class EditorGlasses : MiiEditorBaseControl
 
         switch (property)
         {
-            case GlassesProperty.Vertical:
+            case MiiTransformProperty.Vertical:
                 currentValue = current.Vertical;
                 min = MinVertical;
                 max = MaxVertical;
                 break;
-            case GlassesProperty.Size:
+            case MiiTransformProperty.Size:
                 currentValue = current.Size;
                 min = MinSize;
                 max = MaxSize;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(property), property, null);
+                throw new ArgumentException($"{property} is not an option that you can change in Glasses");
         }
 
         newValue = currentValue + change;
@@ -141,56 +135,28 @@ public partial class EditorGlasses : MiiEditorBaseControl
         if (newValue < min || newValue > max)
             return;
 
-        OperationResult<MiiGlasses> result;
-        switch (property)
+        var result = property switch
         {
-            case GlassesProperty.Vertical:
-                result = MiiGlasses.Create(current.Type, current.Color, current.Size, newValue); // Note Vertical position
-                break;
-            case GlassesProperty.Size:
-                result = MiiGlasses.Create(current.Type, current.Color, newValue, current.Vertical); // Note Size position
-                break;
-            default:
-                return;
-        }
+            MiiTransformProperty.Vertical => MiiGlasses.Create(current.Type, current.Color, current.Size, newValue),
+            MiiTransformProperty.Size => MiiGlasses.Create(current.Type, current.Color, newValue, current.Vertical),
+            _ => throw new ArgumentException($"{property} is not an option that you can change in Glasses"),
+        };
 
         if (result.IsFailure)
             return;
 
         Editor.Mii.MiiGlasses = result.Value;
-        UpdateValueTexts(result.Value);
+        UpdateTransformTextValues(result.Value);
         Editor.RefreshImage();
     }
 
-    private void GlassesColorBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (!IsLoaded || GlassesColorBox.SelectedItem == null || Editor?.Mii?.MiiGlasses == null)
-            return;
-        if (GlassesColorBox.SelectedItem is not string colorStr)
-            return;
+    private void VerticalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateGlassValue(-1, MiiTransformProperty.Vertical);
 
-        var newColor = (GlassesColor)Enum.Parse(typeof(GlassesColor), colorStr);
-        var current = Editor.Mii.MiiGlasses;
-        if (newColor == current.Color)
-            return;
+    private void VerticalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateGlassValue(+1, MiiTransformProperty.Vertical);
 
-        var result = MiiGlasses.Create(current.Type, newColor, current.Size, current.Vertical);
-        if (result.IsSuccess)
-        {
-            Editor.Mii.MiiGlasses = result.Value;
-        }
-        else
-        {
-            GlassesColorBox.SelectedItem = current.Color.ToString();
-        }
-        Editor.RefreshImage();
-    }
+    private void SizeDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateGlassValue(-1, MiiTransformProperty.Size);
 
-    private void VerticalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateGlassValue(-1, GlassesProperty.Vertical);
+    private void SizeIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateGlassValue(+1, MiiTransformProperty.Size);
 
-    private void VerticalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateGlassValue(+1, GlassesProperty.Vertical);
-
-    private void SizeDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateGlassValue(-1, GlassesProperty.Size);
-
-    private void SizeIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateGlassValue(+1, GlassesProperty.Size);
+    #endregion
 }

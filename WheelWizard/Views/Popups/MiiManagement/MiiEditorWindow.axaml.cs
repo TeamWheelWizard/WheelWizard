@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.Views.Popups.Base;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement.MiiEditor;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.Domain.Mii;
@@ -55,6 +56,17 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
     {
         Window.WindowTitle = $"Mii Editor - {miiToEdit.Name}";
         var miiResult = miiToEdit.Clone();
+        if (miiResult.IsFailure)
+        {
+            DisableOpen(true);
+            new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText("Cant open Mii Editor")
+                .SetInfoText(miiResult.Error.Message)
+                .Show();
+            return this;
+        }
+
         Mii = miiResult.Value;
         return this;
     }

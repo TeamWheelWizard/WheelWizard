@@ -34,7 +34,7 @@ public class MiiStudioDataSerializer
         visualMiiClone.IsGirl = mii.IsGirl;
         visualMiiClone.MiiMole = mii.MiiMole;
         visualMiiClone.MiiFavoriteColor = mii.MiiFavoriteColor;
-        visualMiiClone.MiiFacial = mii.MiiFacial;
+        visualMiiClone.MiiFacialFeatures = mii.MiiFacialFeatures;
         // If id is 0, we keep it 0, any other ID will be set to 1.
         visualMiiClone.MiiId = (uint)(mii.MiiId == 0 ? 0 : 1);
 

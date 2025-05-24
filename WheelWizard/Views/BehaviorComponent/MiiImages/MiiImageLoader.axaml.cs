@@ -1,4 +1,3 @@
-using System.Numerics;
 using Avalonia;
 using Avalonia.Media;
 using Microsoft.Extensions.Caching.Memory;

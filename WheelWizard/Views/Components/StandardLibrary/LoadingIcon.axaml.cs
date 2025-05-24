@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls.Primitives;
 
 namespace WheelWizard.Views.Components;

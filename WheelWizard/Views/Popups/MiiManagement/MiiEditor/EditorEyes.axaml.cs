@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using WheelWizard.Views.Components;
+using WheelWizard.WiiManagement.Domain;
 using WheelWizard.WiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
@@ -21,27 +21,15 @@ public partial class EditorEyes : MiiEditorBaseControl
         : base(ew)
     {
         InitializeComponent();
-        if (Editor?.Mii?.MiiEyes == null)
-            return;
         PopulateValues();
     }
 
     private void PopulateValues()
     {
+        // Attribute:
         var currentEyes = Editor.Mii.MiiEyes;
-        GenerateEyeButtons();
-        EyeColorBox.Items.Clear();
-        foreach (var color in Enum.GetNames(typeof(EyeColor)))
-        {
-            EyeColorBox.Items.Add(color);
-            if (color == currentEyes.Color.ToString())
-                EyeColorBox.SelectedItem = color;
-        }
-        UpdateValueTexts(currentEyes);
-    }
 
-    private void GenerateEyeButtons()
-    {
+        // Eyes:
         var color1 = new SolidColorBrush(ViewUtils.Colors.Neutral50); // Eye white Color
         var color2 = new SolidColorBrush(ViewUtils.Colors.Neutral950); // Eye border Color
         var selectedColor2 = new SolidColorBrush(ViewUtils.Colors.Black);
@@ -53,49 +41,67 @@ public partial class EditorEyes : MiiEditorBaseControl
             EyeTypesGrid,
             (index, button) =>
             {
-                button.IsChecked = index == Editor.Mii.MiiEyes.Type;
+                button.IsChecked = index == currentEyes.Type;
                 button.Color1 = color1;
                 button.Color2 = color2;
                 button.SelectedColor2 = selectedColor2;
                 button.Color3 = color3;
-                button.Click += (_, _) => SetEyesType(index);
+                button.Click += (_, _) => SetEyeType(index);
                 button.SelectedColor3 = selectedColor3;
             }
         );
+
+        // Eye Color:
+        SetColorButtons(
+            MiiColorMappings.EyeColor.Count,
+            EyeColorGrid,
+            (index, button) =>
+            {
+                button.IsChecked = index == (int)Editor.Mii.MiiEyes.Color;
+                button.Color1 = new SolidColorBrush(MiiColorMappings.EyeColor[(MiiEyeColor)index]);
+                button.Click += (_, _) => SetEyeColor(index);
+            }
+        );
+
+        // Transform attributes:
+        UpdateTransformTextValues(currentEyes);
     }
 
-    private void SetEyesType(int index)
+    private void SetEyeType(int index)
     {
-        if (Editor?.Mii?.MiiEyes == null)
-            return;
-
         var current = Editor.Mii.MiiEyes;
         if (index == current.Type)
             return;
 
         var result = MiiEye.Create(index, current.Rotation, current.Vertical, current.Color, current.Size, current.Spacing);
-        if (result.IsSuccess)
-        {
-            Editor.Mii.MiiEyes = result.Value;
-            UpdateValueTexts(result.Value);
-        }
-        else
-        {
-            // Reset to previous value
-            var currentType = current.Type;
-            foreach (var item in EyeTypesGrid.Children.OfType<MultiIconRadioButton>())
-            {
-                item.IsChecked = item.IconData == GetMiiIconData($"Eyes{currentType:D2}");
-            }
-        }
+        if (result.IsFailure)
+            return;
+
+        Editor.Mii.MiiEyes = result.Value;
         Editor.RefreshImage();
     }
 
-    private void UpdateValueTexts(MiiEye eyes)
+    private void SetEyeColor(int index)
     {
-        VerticalValueText.Text = eyes.Vertical.ToString();
+        var current = Editor.Mii.MiiEyes;
+        if (index == current.Type)
+            return;
+
+        var result = MiiEye.Create(current.Type, current.Rotation, current.Vertical, (MiiEyeColor)index, current.Size, current.Spacing);
+        if (result.IsFailure)
+            return;
+
+        Editor.Mii.MiiEyes = result.Value;
+        Editor.RefreshImage();
+    }
+
+    #region Transform
+
+    private void UpdateTransformTextValues(MiiEye eyes)
+    {
+        VerticalValueText.Text = ((eyes.Vertical - 12) * -1).ToString();
         SizeValueText.Text = eyes.Size.ToString();
-        RotationValueText.Text = eyes.Rotation.ToString();
+        RotationValueText.Text = (eyes.Rotation - 4).ToString();
         SpacingValueText.Text = eyes.Spacing.ToString();
 
         VerticalDecreaseButton.IsEnabled = eyes.Vertical > MinVertical;
@@ -108,15 +114,7 @@ public partial class EditorEyes : MiiEditorBaseControl
         SpacingIncreaseButton.IsEnabled = eyes.Spacing < MaxSpacing;
     }
 
-    private enum EyeProperty
-    {
-        Vertical,
-        Size,
-        Rotation,
-        Spacing,
-    }
-
-    private void TryUpdateEyeValue(int change, EyeProperty property)
+    private void TryUpdateEyeValue(int change, MiiTransformProperty property)
     {
         if (Editor?.Mii?.MiiEyes == null || !IsLoaded)
             return;
@@ -128,100 +126,94 @@ public partial class EditorEyes : MiiEditorBaseControl
             max;
         switch (property)
         {
-            case EyeProperty.Vertical:
+            case MiiTransformProperty.Vertical:
                 currentValue = current.Vertical;
                 min = MinVertical;
                 max = MaxVertical;
                 break;
-            case EyeProperty.Size:
+            case MiiTransformProperty.Size:
                 currentValue = current.Size;
                 min = MinSize;
                 max = MaxSize;
                 break;
-            case EyeProperty.Rotation:
+            case MiiTransformProperty.Rotation:
                 currentValue = current.Rotation;
                 min = MinRotation;
                 max = MaxRotation;
                 break;
-            case EyeProperty.Spacing:
+            case MiiTransformProperty.Spacing:
                 currentValue = current.Spacing;
                 min = MinSpacing;
                 max = MaxSpacing;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(property), property, null);
+                throw new ArgumentException($"{property} is not an option that you can change in Eye");
         }
 
         newValue = currentValue + change;
         if (newValue < min || newValue > max)
-        {
             return;
-        }
 
-        OperationResult<MiiEye> result;
-        switch (property)
+        var result = property switch
         {
-            case EyeProperty.Vertical:
-                result = MiiEye.Create(current.Type, current.Rotation, newValue, current.Color, current.Size, current.Spacing); // Note Vertical position
-                break;
-            case EyeProperty.Size:
-                result = MiiEye.Create(current.Type, current.Rotation, current.Vertical, current.Color, newValue, current.Spacing); // Note Size position
-                break;
-            case EyeProperty.Rotation:
-                result = MiiEye.Create(current.Type, newValue, current.Vertical, current.Color, current.Size, current.Spacing); // Note Rotation position
-                break;
-            case EyeProperty.Spacing:
-                result = MiiEye.Create(current.Type, current.Rotation, current.Vertical, current.Color, current.Size, newValue); // Note Spacing position
-                break;
-            default:
-                return;
-        }
+            MiiTransformProperty.Vertical => MiiEye.Create(
+                current.Type,
+                current.Rotation,
+                newValue,
+                current.Color,
+                current.Size,
+                current.Spacing
+            ),
+            MiiTransformProperty.Size => MiiEye.Create(
+                current.Type,
+                current.Rotation,
+                current.Vertical,
+                current.Color,
+                newValue,
+                current.Spacing
+            ),
+            MiiTransformProperty.Rotation => MiiEye.Create(
+                current.Type,
+                newValue,
+                current.Vertical,
+                current.Color,
+                current.Size,
+                current.Spacing
+            ),
+            MiiTransformProperty.Spacing => MiiEye.Create(
+                current.Type,
+                current.Rotation,
+                current.Vertical,
+                current.Color,
+                current.Size,
+                newValue
+            ),
+            _ => throw new ArgumentException($"{property} is not an option that you can change in Eye"),
+        };
 
         if (result.IsFailure)
             return;
 
         Editor.Mii.MiiEyes = result.Value;
-        UpdateValueTexts(result.Value);
+        UpdateTransformTextValues(result.Value);
         Editor.RefreshImage();
     }
 
-    private void EyeColorBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (!IsLoaded || EyeColorBox.SelectedItem == null || Editor?.Mii?.MiiEyes == null)
-            return;
-        if (EyeColorBox.SelectedItem is not string colorStr)
-            return;
+    private void VerticalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(-1, MiiTransformProperty.Vertical);
 
-        var newColor = (EyeColor)Enum.Parse(typeof(EyeColor), colorStr);
-        var current = Editor.Mii.MiiEyes;
-        if (newColor == current.Color)
-            return;
+    private void VerticalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(+1, MiiTransformProperty.Vertical);
 
-        var result = MiiEye.Create(current.Type, current.Rotation, current.Vertical, newColor, current.Size, current.Spacing);
-        if (result.IsSuccess)
-        {
-            Editor.Mii.MiiEyes = result.Value;
-        }
-        else
-        {
-            EyeColorBox.SelectedItem = current.Color.ToString();
-        }
-        Editor.RefreshImage();
-    }
+    private void SizeDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(-1, MiiTransformProperty.Size);
 
-    private void VerticalDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(-1, EyeProperty.Vertical);
+    private void SizeIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(+1, MiiTransformProperty.Size);
 
-    private void VerticalIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(+1, EyeProperty.Vertical);
+    private void RotationDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(-1, MiiTransformProperty.Rotation);
 
-    private void SizeDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(-1, EyeProperty.Size);
+    private void RotationIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(+1, MiiTransformProperty.Rotation);
 
-    private void SizeIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(+1, EyeProperty.Size);
+    private void SpacingDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(-1, MiiTransformProperty.Spacing);
 
-    private void RotationDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(-1, EyeProperty.Rotation);
+    private void SpacingIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(+1, MiiTransformProperty.Spacing);
 
-    private void RotationIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(+1, EyeProperty.Rotation);
-
-    private void SpacingDecrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(-1, EyeProperty.Spacing);
-
-    private void SpacingIncrease_Click(object? sender, RoutedEventArgs e) => TryUpdateEyeValue(+1, EyeProperty.Spacing);
+    #endregion
 }

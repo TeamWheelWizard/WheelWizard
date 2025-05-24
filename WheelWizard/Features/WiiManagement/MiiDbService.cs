@@ -162,7 +162,7 @@ public class MiiDbService(IMiiRepositoryService repository, IRandomSystem random
         var now = DateTime.UtcNow;
 
         // Compute base tick (4‑second resolution)
-        uint baseCounter = (uint)((now - epoch).TotalSeconds / 4u);
+        var baseCounter = (uint)((now - epoch).TotalSeconds / 4u);
 
         uint actualCounter;
         lock (_miiIdLock)
@@ -197,9 +197,10 @@ public class MiiDbService(IMiiRepositoryService repository, IRandomSystem random
         return repository.UpdateBlockByClientId(clientId, emptyBlock);
     }
 
-    public static uint GenerateCustomMiiId()
+    /* TODO: Find out if we wanna keep this
+    public uint GenerateCustomMiiId()
     {
-        var rng = Random.Shared;
+        var rng = randomSystem.Random.Shared;
 
         // Byte 0: ensure high bit = 1 (so ID ≥ 0x80000000)
         var b0 = (byte)(rng.Next(0, 0x40) | 0x80);
@@ -212,4 +213,5 @@ public class MiiDbService(IMiiRepositoryService repository, IRandomSystem random
         // Combine into big‑endian uint:
         return ((uint)b0 << 24) | ((uint)b1 << 16) | ((uint)b2 << 8) | (uint)b3;
     }
+    */
 }

@@ -1,5 +1,4 @@
 using System.Numerics;
-using Avalonia.Media;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace WheelWizard.MiiImages.Domain;

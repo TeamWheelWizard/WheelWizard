@@ -94,13 +94,11 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         if (db.Length >= CrcOffset + 2)
         {
             // compute CRC over everything before CrcOffset
-            ushort existingCrc = (ushort)((db[CrcOffset] << 8) | db[CrcOffset + 1]);
-            ushort calcCrc = CalculateCrc16(db, 0, CrcOffset);
+            var existingCrc = (ushort)((db[CrcOffset] << 8) | db[CrcOffset + 1]);
+            var calcCrc = CalculateCrc16(db, 0, CrcOffset);
 
             if (existingCrc != calcCrc)
-            {
                 return Fail($"Corrupt Mii database (bad CRC 0x{existingCrc:X4}, expected 0x{calcCrc:X4}).");
-            }
         }
 
         using var ms = new MemoryStream(db);
@@ -194,9 +192,9 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         var allBlocks = LoadAllBlocks();
         var updated = false;
 
-        for (int i = 0; i < allBlocks.Count; i++)
+        foreach (var t in allBlocks)
         {
-            var block = allBlocks[i];
+            var block = t;
             if (block.Length != MiiLength)
                 continue;
 
@@ -204,15 +202,12 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
             if (thisId != clientId)
                 continue;
 
-            Array.Copy(newBlock, 0, allBlocks[i], 0, MiiLength);
+            Array.Copy(newBlock, 0, t, 0, MiiLength);
             updated = true;
             break;
         }
 
-        if (!updated)
-            return Fail("Mii not found.");
-
-        return SaveAllBlocks(allBlocks);
+        return !updated ? Fail("Mii not found.") : SaveAllBlocks(allBlocks);
     }
 
     private byte[] ReadDatabase()
@@ -260,10 +255,6 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
             break;
         }
 
-        if (!inserted)
-            return "No empty Mii slot available.";
-
-        // Save the updated blocks back to the database.
-        return SaveAllBlocks(blocks);
+        return !inserted ? "No empty Mii slot available." : SaveAllBlocks(blocks);
     }
 }

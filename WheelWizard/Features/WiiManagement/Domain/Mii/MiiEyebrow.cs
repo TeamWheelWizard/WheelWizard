@@ -4,12 +4,12 @@ public class MiiEyebrow
 {
     public int Type { get; }
     public int Rotation { get; }
-    public EyebrowColor Color { get; }
+    public MiiHairColor Color { get; }
     public int Size { get; }
     public int Vertical { get; }
     public int Spacing { get; }
 
-    public MiiEyebrow(int type, int rotation, EyebrowColor color, int size, int vertical, int spacing)
+    public MiiEyebrow(int type, int rotation, MiiHairColor color, int size, int vertical, int spacing)
     {
         if (type is < 0 or > 23)
             throw new ArgumentException("Eyebrow type invalid");
@@ -29,6 +29,6 @@ public class MiiEyebrow
         Spacing = spacing;
     }
 
-    public static OperationResult<MiiEyebrow> Create(int type, int rotation, EyebrowColor color, int size, int vertical, int spacing) =>
+    public static OperationResult<MiiEyebrow> Create(int type, int rotation, MiiHairColor color, int size, int vertical, int spacing) =>
         TryCatch(() => new MiiEyebrow(type, rotation, color, size, vertical, spacing));
 }

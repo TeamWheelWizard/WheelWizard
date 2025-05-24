@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using WheelWizard.Services.Settings;
+using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Components;
@@ -52,23 +53,7 @@ public class MiiBlock : RadioButton
             var mii = change.GetNewValue<Mii?>();
             MiiName = mii?.Name.ToString();
             IsFavorite = mii?.IsFavorite ?? false;
-            IsGlobal = mii?.IsForeign ?? false;
-
-            // todo: move this NOT HERE!!!!!
-            //but the mii must also count as foreign if its systemID is not the same as the current systemID
-            var macAddressString = (string)SettingsManager.MACADDRESS.Get();
-            var macParts = macAddressString.Split(':');
-            var macBytes = new byte[6];
-            for (var i = 0; i < 6; i++)
-                macBytes[i] = byte.Parse(macParts[i], System.Globalization.NumberStyles.HexNumber);
-            var systemId0 = (byte)((macBytes[0] + macBytes[1] + macBytes[2]) & 0xFF);
-            if (
-                mii?.SystemId0 != systemId0
-                || mii?.SystemId1 != macBytes[3]
-                || mii?.SystemId2 != macBytes[4]
-                || mii?.SystemId3 != macBytes[5]
-            )
-                IsGlobal = true;
+            IsGlobal = mii?.IsGlobal() ?? false;
         }
 
         Tag = MiiName ?? String.Empty;

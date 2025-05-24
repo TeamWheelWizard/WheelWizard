@@ -2,12 +2,12 @@ namespace WheelWizard.WiiManagement.Domain.Mii;
 
 public class MiiGlasses
 {
-    public GlassesType Type { get; }
-    public GlassesColor Color { get; }
+    public MiiGlassesType Type { get; }
+    public MiiGlassesColor Color { get; }
     public int Size { get; }
     public int Vertical { get; }
 
-    public MiiGlasses(GlassesType type, GlassesColor color, int size, int vertical)
+    public MiiGlasses(MiiGlassesType type, MiiGlassesColor color, int size, int vertical)
     {
         if (size is < 0 or > 7)
             throw new ArgumentException("Glasses size invalid");
@@ -19,6 +19,6 @@ public class MiiGlasses
         Vertical = vertical;
     }
 
-    public static OperationResult<MiiGlasses> Create(GlassesType type, GlassesColor color, int size, int vertical) =>
+    public static OperationResult<MiiGlasses> Create(MiiGlassesType type, MiiGlassesColor color, int size, int vertical) =>
         TryCatch(() => new MiiGlasses(type, color, size, vertical));
 }

@@ -94,7 +94,7 @@ public class MiiSerializerTests
         Assert.Equal(mii.Name.ToString(), miiRoundTrip.Name.ToString());
         Assert.Equal(mii.Height.Value, miiRoundTrip.Height.Value);
         Assert.Equal(mii.Weight.Value, miiRoundTrip.Weight.Value);
-        Assert.Equal(mii.MiiFacial.FaceShape, miiRoundTrip.MiiFacial.FaceShape);
+        Assert.Equal(mii.MiiFacialFeatures.FaceShape, miiRoundTrip.MiiFacialFeatures.FaceShape);
         Assert.Equal(mii.MiiEyes.Type, miiRoundTrip.MiiEyes.Type);
         Assert.Equal(mii.MiiGlasses.Type, miiRoundTrip.MiiGlasses.Type);
         Assert.Equal(mii.CreatorName.ToString(), miiRoundTrip.CreatorName.ToString());

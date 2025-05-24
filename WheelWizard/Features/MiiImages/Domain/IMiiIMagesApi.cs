@@ -1,4 +1,3 @@
-using Avalonia.Media.Imaging;
 using Refit;
 
 namespace WheelWizard.MiiImages.Domain;

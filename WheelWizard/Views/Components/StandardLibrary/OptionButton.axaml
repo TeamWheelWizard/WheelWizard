@@ -1,0 +1,115 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components1="clr-namespace:WheelWizard.Views.Components"
+        xmlns:behavior="clr-namespace:WheelWizard.Views.BehaviorComponent">
+
+    <Design.PreviewWith>
+        <Border Padding="20" Background="{StaticResource Neutral950}">
+            <UniformGrid Columns="3">
+                <components1:OptionButton Text="Idk" IconData="{StaticResource Dice}"/>
+                <components1:OptionButton Text="Some option" IconData="{StaticResource Award}"/>
+                <components1:OptionButton Text="MORE"/>
+                <components1:OptionButton Text="Random Options"/>
+                <components1:OptionButton Text="not an option" IsEnabled="False"/>
+              </UniformGrid>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="components1|OptionButton">
+        <!-- Set Defaults -->
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource GlobalCornerRadius}" />
+        <Setter Property="Padding" Value="16,10" />
+        <Setter Property="IconData" Value="{StaticResource Banana}"/>
+        
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+        <Setter Property="Background" Value="{StaticResource Neutral900}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <behavior:AspectGrid>
+                    <Border Background="{TemplateBinding Background}"
+                            Padding="10"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid>
+                            <Border CornerRadius="99999" IsVisible="False" Opacity="0.3" x:Name="PART_HoverEffect"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Background="{StaticResource Primary200}" Height="60" Width="60" Effect="blur(150)">
+              
+                                <Border.Styles>
+                                    <Style Selector="Border">
+                                        <Style.Animations>
+                                            <Animation Duration="0:0:5" IterationCount="INFINITE">
+                                                <KeyFrame Cue="0%">
+                                                    <Setter Property="RotateTransform.Angle" Value="0"/>
+                                                </KeyFrame>
+                                                <KeyFrame Cue="100%">
+                                                    <Setter Property="RotateTransform.Angle" Value="360"/>
+                                                </KeyFrame>
+                                            </Animation>
+                                        </Style.Animations>
+                                    </Style>
+                                </Border.Styles>
+                            </Border>
+                            
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border Background="Transparent"
+                                        Width="{TemplateBinding IconSize}"
+                                        Height="{TemplateBinding IconSize}">
+                                    <Path Data="{TemplateBinding IconData}"
+                                          Fill="{TemplateBinding Foreground }" 
+                                          Stretch="Uniform" 
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                                </Border>
+                    
+                                <TextBlock Text="{TemplateBinding Text}"
+                                           Classes="BodyText" x:Name="TitleText"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           Foreground="{StaticResource Neutral300}"
+                                           Margin="0,12,0,0"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsVisible="False"
+                            x:Name="PART_DisabledBorder"
+                            BorderBrush="{StaticResource Neutral800}" BorderThickness="1"
+                            CornerRadius="{TemplateBinding CornerRadius}"/> 
+                </behavior:AspectGrid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="components1|OptionButton:pointerover">
+        <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+        <Setter Property="Background" Value="{StaticResource Neutral800}" />
+        <Style Selector="^ /template/ Border#PART_HoverEffect">
+            <Setter Property="IsVisible" Value="True"/>
+        </Style>
+        <Style Selector="^ /template/ TextBlock#TitleText">
+            <Setter Property="Foreground" Value="{StaticResource Primary200}" />
+        </Style>
+    </Style>
+    <Style Selector="components1|OptionButton:pressed">
+        <Setter Property="Foreground" Value="{StaticResource Primary200}" />
+        <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        <Style Selector="^ /template/ TextBlock#TitleText">
+            <Setter Property="Foreground" Value="{StaticResource Primary200}" />
+        </Style>
+    </Style>
+        
+    <Style Selector="components1|OptionButton:disabled">
+        <Setter Property="Background" Value="{StaticResource Neutral950}" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral700}" />
+        <Style Selector="^ /template/ Border#PART_DisabledBorder">
+            <Setter Property="IsVisible" Value="True"/>
+        </Style>
+        <Style Selector="^ /template/ TextBlock#TitleText">
+            <Setter Property="Foreground" Value="{StaticResource Neutral600}" />
+        </Style>
+    </Style>
+</Styles>

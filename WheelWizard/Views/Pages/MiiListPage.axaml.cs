@@ -4,7 +4,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
 using Testably.Abstractions;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
@@ -42,10 +41,10 @@ public partial class MiiListPage : UserControlBase
         {
             if (SettingsHelper.PathsSetupCorrectly())
             {
-                var sucess = MiiRepositoryService.ForceCreateDatabase();
-                if (sucess.IsFailure)
+                var success = MiiRepositoryService.ForceCreateDatabase();
+                if (success.IsFailure)
                 {
-                    ViewUtils.ShowSnackbar($"Failed to create Mii database '{sucess.Error.Message}'", ViewUtils.SnackbarType.Danger);
+                    ViewUtils.ShowSnackbar($"Failed to create Mii database '{success.Error.Message}'", ViewUtils.SnackbarType.Danger);
                     VisibleWhenNoDb.IsVisible = !miiDbExists;
                 }
             }
@@ -186,7 +185,7 @@ public partial class MiiListPage : UserControlBase
     private async void ImportMii_OnClick(object? sender, RoutedEventArgs e)
     {
         var miiFiles = await FilePickerHelper.OpenFilePickerAsync(
-            fileType: new FilePickerFileType("mii file") { Patterns = new[] { "*.mii" } },
+            fileType: CustomFilePickerFileType.Miis,
             allowMultiple: true,
             title: "Select Mii file(s)"
         );
@@ -245,7 +244,7 @@ public partial class MiiListPage : UserControlBase
         var exportName = ReplaceInvalidFileNameChars(mii.Name.ToString());
         var diaglog = await FilePickerHelper.SaveFileAsync(
             title: "Save Mii as file",
-            fileTypes: new[] { new FilePickerFileType("Mii file") { Patterns = new[] { "*.mii" } } },
+            fileTypes: [CustomFilePickerFileType.Miis],
             defaultFileName: $"{exportName}"
         );
         if (diaglog == null)
@@ -337,24 +336,16 @@ public partial class MiiListPage : UserControlBase
 
     private async void CreateNewMii()
     {
-        string[] presets =
-        [
-            "liwAZgByADMAZAAAAAAAAAAAAAAAAFYXiRPnfsJmn7skBGWAYIAociBsKEATSLCNEIoAiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-            "hDQAZwByAG8AbQBwAGEAAAAAAAAAAC8AiRPogsJmn7syxGkAGYCIoiyMCECESACNAIoIiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-            "xCAAZABhAG4AaQBlAGwAbABlAAAAAGYaiRPo48Jmn7sARAjAAQBokniNaEBjUHiOAIsGiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-            "0rIAZgBvAHoAaQBsAGwAYQAAAGUAAEBAiRPpIMJmn7sABBLAAUBooohsKECjSGiNAIoGiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-            "hCgAZgByADAAZAAAAAAAAAAAAAAAAEBAiRPoU8Jmn7sABHDAWYBokoCLKEB0QIiMAIkGiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-        ];
-
-        var randomIndex = (int)(Random.Random.Shared.NextDouble() * presets.Length);
-        var miiResult = MiiSerializer.Deserialize(presets[randomIndex]);
-        if (miiResult.IsFailure)
-        {
-            ViewUtils.ShowSnackbar($"Failed to create a new Mii, Please try again, or message a developer", ViewUtils.SnackbarType.Danger);
+        Mii? mii = null;
+        await new OptionsWindow()
+            .AddOption("Dice", "Randomize", () => mii = MiiFactory.CreateRandomMii(Random.Random.Shared))
+            .AddOption("PersonMale", "Male", () => mii = MiiFactory.CreateDefaultMale())
+            .AddOption("PersonFemale", "Female", () => mii = MiiFactory.CreateDefaultFemale())
+            .AwaitAnswer();
+        if (mii == null)
             return;
-        }
 
-        var window = new MiiEditorWindow().SetMii(miiResult.Value);
+        var window = new MiiEditorWindow().SetMii(mii);
         var save = await window.AwaitAnswer();
         if (!save)
             return;

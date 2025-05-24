@@ -3,18 +3,12 @@
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                   xmlns:self="clr-namespace:WheelWizard.Views.Popups"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    ClipToBounds="False"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450">
-    <Grid Width="400" MinHeight="150" MaxHeight="350">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="2*"/>
-            <RowDefinition Height="1*"/>
-        </Grid.RowDefinitions>
-        
+    <Grid Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="40,2*,1*">
+
         <!-- Message Title -->
         <Border Grid.Row="0" Margin="-10" x:Name="TitleBorder">
             <SelectableTextBlock Margin="10" x:Name="MessageTitleBlock"

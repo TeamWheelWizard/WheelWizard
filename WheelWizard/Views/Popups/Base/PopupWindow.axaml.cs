@@ -13,6 +13,8 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
 
+    private bool _disableOpening = false;
+
     public PopupWindow()
     {
         // Constructor is never used, however, UI elements must have a constructor with no params
@@ -73,6 +75,13 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
     public Action BeforeOpen { get; set; } = () => { };
     public Action BeforeClose { get; set; } = () => { };
 
+    public void DisableOpen(bool value)
+    {
+        _disableOpening = value;
+        if (IsLoaded && _disableOpening)
+            Close();
+    }
+
     // Most (if not all) of these parameters should be set in the popup you create, and not kept as a parameter for that popup
     public PopupWindow(bool allowClose, bool allowParentInteraction, bool isTopMost, string title = "")
     {
@@ -94,6 +103,12 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
     private void PopupWindow_Loaded(object? sender, RoutedEventArgs e)
     {
+        if (_disableOpening)
+        {
+            Close();
+            return;
+        }
+
         BeforeOpen();
     }
 
