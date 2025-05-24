@@ -78,7 +78,6 @@ public class RetroRewind : IDistribution
                 _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
             _fileSystem.Directory.CreateDirectory(tempExtractionPath);
 
-            
             //todo, service
             await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
 
@@ -110,9 +109,6 @@ public class RetroRewind : IDistribution
         }
         finally
         {
-            // always clean up UI and temp files
-            progressWindow.Close();
-
             if (_fileSystem.File.Exists(tempZipPath))
                 _fileSystem.File.Delete(tempZipPath);
 
@@ -152,7 +148,7 @@ public class RetroRewind : IDistribution
         // todo, maybe we should check for the existence of the file instead of the folder? and also find the oldest one?
         var rrWfcPaths = new[]
         {
-            _fileSystem.Path.Combine(PathManager.SaveFolderPath),
+            PathManager.SaveFolderPath,
             // Also consider the folder with upper-case `Save`
             _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, "riivolution", "Save", "RetroWFC"),
             _fileSystem.Path.Combine(PathManager.LoadFolderPath, "Riivolution", "save", "RetroWFC"),
@@ -189,8 +185,10 @@ public class RetroRewind : IDistribution
         if (!response.IsSuccess || String.IsNullOrWhiteSpace(response.Value))
             return "Failed to check for updates";
 
-        var result = response.Value.Split('\n').Last().Split(' ')[0];
-        return SemVersion.Parse(result);
+        var lines = response.Value
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var last = lines.Last();
+        return SemVersion.Parse(last);
     }
 
     public async Task<OperationResult> UpdateAsync(ProgressWindow progressWindow)
@@ -235,7 +233,6 @@ public class RetroRewind : IDistribution
         var deleteSuccess = await ApplyFileDeletionsBetweenVersions(currentVersion, targetVersion);
         if (deleteSuccess.IsFailure)
         {
-            progressWindow.Close();
             return (Phrases.PopupText_FailedUpdateDelete);
         }
 
@@ -247,15 +244,12 @@ public class RetroRewind : IDistribution
             var success = await DownloadAndApplyUpdate(update, updatesToApply.Count, i + 1, progressWindow);
             if (success.IsFailure)
             {
-                progressWindow.Close();
                 return (Phrases.PopupText_FailedUpdateApply);
             }
 
             // Update the version file after each successful update
             UpdateVersionFile(update.Version);
         }
-
-        progressWindow.Close();
         return Ok();
     }
 
@@ -272,9 +266,7 @@ public class RetroRewind : IDistribution
         ProgressWindow popupWindow
     )
     {
-        var tempZipPath = _fileSystem.Path.Combine(
-            _fileSystem.Path.GetTempPath(),
-            _fileSystem.Path.GetRandomFileName());
+        var tempZipPath = _fileSystem.Path.Combine(_fileSystem.Path.GetTempPath(), _fileSystem.Path.GetRandomFileName());
         try
         {
             popupWindow.SetExtraText($"{Common.Action_Update} {currentUpdateIndex}/{totalUpdates}: {update.Description}");

@@ -4,7 +4,7 @@ using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
 
-//todo: we cannot make more distributions before we also write a mystuff service
+//todo: we cannot make more distributions before we also write a mystuff service and a service to download using UI
 
 public interface IDistribution
 {
