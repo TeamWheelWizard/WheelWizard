@@ -185,10 +185,8 @@ public class RetroRewind : IDistribution
         if (!response.IsSuccess || String.IsNullOrWhiteSpace(response.Value))
             return "Failed to check for updates";
 
-        var lines = response.Value
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        var last = lines.Last();
-        return SemVersion.Parse(last);
+        var result = response.Value.Split('\n', StringSplitOptions.RemoveEmptyEntries).Last().Split(' ')[0];
+        return SemVersion.Parse(result);
     }
 
     public async Task<OperationResult> UpdateAsync(ProgressWindow progressWindow)
