@@ -121,7 +121,16 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("HelperText_EndWithExe", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose where Wheel Wizard stores its files. Moving may take a while..
+        /// </summary>
+        public static string HelperText_WheelWizardDataFolder {
+            get {
+                return ResourceManager.GetString("HelperText_WheelWizardDataFolder", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Path can end with:.
         /// </summary>
@@ -274,7 +283,25 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("Option_OpenConfig", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Wheel Wizard data folder.
+        /// </summary>
+        public static string Option_WheelWizardDataFolder {
+            get {
+                return ResourceManager.GetString("Option_WheelWizardDataFolder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use default location.
+        /// </summary>
+        public static string Option_ResetDataFolder {
+            get {
+                return ResourceManager.GetString("Option_ResetDataFolder", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Open Game Folder.
         /// </summary>
@@ -740,6 +767,33 @@ namespace WheelWizard.Resources.Languages {
         public static string Value_Language_zTranslators {
             get {
                 return ResourceManager.GetString("Value_Language_zTranslators", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Using custom location..
+        /// </summary>
+        public static string Status_DataFolder_Custom {
+            get {
+                return ResourceManager.GetString("Status_DataFolder_Custom", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Using default location..
+        /// </summary>
+        public static string Status_DataFolder_Default {
+            get {
+                return ResourceManager.GetString("Status_DataFolder_Default", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Moving data, please wait....
+        /// </summary>
+        public static string Status_DataFolder_Moving {
+            get {
+                return ResourceManager.GetString("Status_DataFolder_Moving", resourceCulture);
             }
         }
     }

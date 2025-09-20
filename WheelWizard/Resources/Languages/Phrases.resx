@@ -156,8 +156,20 @@ To join a specific room, you'll need to either join through a friend, or hope to
     <data name="MessageSuccess_SettingsSaved_Title" xml:space="preserve">
         <value>Settings saved successfully!</value>
     </data>
+    <data name="MessageSuccess_DataFolderMoved_Title" xml:space="preserve">
+        <value>Data folder updated</value>
+    </data>
+    <data name="MessageSuccess_DataFolderMoved_Extra" xml:space="preserve">
+        <value>Wheel Wizard data is now stored in:\n{$1}</value>
+    </data>
     <data name="Question_ApplyScale_Title" xml:space="preserve">
         <value>Do you want to apply the new scale?</value>
+    </data>
+    <data name="Question_MoveData_Title" xml:space="preserve">
+        <value>Move Wheel Wizard data?</value>
+    </data>
+    <data name="Question_MoveData_Extra" xml:space="preserve">
+        <value>Wheel Wizard will move its files to:\n{$1}\nThis may take a while depending on the amount of data.</value>
     </data>
     <data name="Question_DolphinFound_Title" xml:space="preserve">
         <value>Dolphin Emulator Folder Found</value>
@@ -170,6 +182,9 @@ To join a specific room, you'll need to either join through a friend, or hope to
     </data>
     <data name="MessageWarning_DolphinNotFound_Extra" xml:space="preserve">
         <value>Dolphin Emulator folder not automatically found. Please try and find the folder manually, click 'help' for more information.</value>
+    </data>
+    <data name="MessageError_DataFolderMove_Title" xml:space="preserve">
+        <value>Failed to move data</value>
     </data>
     <data name="MessageError_AbortRR_Extra_FailedUpdateDelete" xml:space="preserve">
         <value>Failed to delete files for the update. Aborting.</value>

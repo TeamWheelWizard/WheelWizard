@@ -12,8 +12,23 @@ public static class PathManager
     // IMPORTANT: To keep things consistent all paths should be Attrib expressions,
     //            and either end with `FilePath` or `FolderPath`
 
+    private const string WheelWizardFolderName = "CT-MKWII";
+    private const string AppDataOverrideFileName = "appdata-location.txt";
+    private static readonly object WheelWizardAppdataLock = new();
+
     // Portable WheelWizard config only makes sense on non-Flatpak WheelWizard
     private static readonly bool IsPortableWhWz = !IsFlatpakSandboxed() && File.Exists("portable-ww.txt");
+    private static readonly string DefaultWheelWizardAppdataPath = FileHelper.NormalizePath(
+        FileHelper.Combine(IsPortableWhWz ? string.Empty : AppDataFolder, WheelWizardFolderName)
+    );
+    private static readonly string AppDataOverrideDirectory = DetermineAppDataOverrideDirectory();
+    private static readonly string AppDataOverrideFilePath = Path.Combine(AppDataOverrideDirectory, AppDataOverrideFileName);
+    private static string? _wheelWizardAppdataOverride;
+
+    static PathManager()
+    {
+        _wheelWizardAppdataOverride = LoadSavedWheelWizardAppdataOverride();
+    }
 
     public static string HomeFolderPath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
@@ -25,16 +40,173 @@ public static class PathManager
     private static string AppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     private static string LocalAppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-    // Wheel wizard's appdata paths  (dont have to be expressions since they dont depend on user input like the others)f
-    public static readonly string WheelWizardAppdataPath = Path.Combine(IsPortableWhWz ? string.Empty : AppDataFolder, "CT-MKWII");
-    public static readonly string WheelWizardConfigFilePath = Path.Combine(WheelWizardAppdataPath, "config.json");
-    public static readonly string RrLaunchJsonFilePath = Path.Combine(WheelWizardAppdataPath, "RR.json");
-    public static readonly string ModsFolderPath = Path.Combine(WheelWizardAppdataPath, "Mods");
-    public static readonly string ModConfigFilePath = Path.Combine(ModsFolderPath, "modconfig.json");
-    public static readonly string TempModsFolderPath = Path.Combine(ModsFolderPath, "Temp");
-    public static readonly string RetroRewindTempFile = Path.Combine(TempModsFolderPath, "RetroRewind.zip");
+    // Wheel wizard's appdata paths (don't have to be expressions since they don't depend on user input like the others)
+    public static string WheelWizardAppdataPath
+    {
+        get
+        {
+            lock (WheelWizardAppdataLock)
+            {
+                return _wheelWizardAppdataOverride ?? DefaultWheelWizardAppdataPath;
+            }
+        }
+    }
+
+    public static string DefaultWheelWizardAppdataFolderPath => DefaultWheelWizardAppdataPath;
+    public static bool IsUsingCustomWheelWizardAppdataPath
+    {
+        get
+        {
+            lock (WheelWizardAppdataLock)
+            {
+                return _wheelWizardAppdataOverride != null;
+            }
+        }
+    }
+
+    public static string WheelWizardConfigFilePath => Path.Combine(WheelWizardAppdataPath, "config.json");
+    public static string RrLaunchJsonFilePath => Path.Combine(WheelWizardAppdataPath, "RR.json");
+    public static string ModsFolderPath => Path.Combine(WheelWizardAppdataPath, "Mods");
+    public static string ModConfigFilePath => Path.Combine(ModsFolderPath, "modconfig.json");
+    public static string TempModsFolderPath => Path.Combine(ModsFolderPath, "Temp");
+    public static string RetroRewindTempFile => Path.Combine(TempModsFolderPath, "RetroRewind.zip");
     public static string WiiDbFolder => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib");
     public static string MiiDbFile => Path.Combine(WiiDbFolder, "RFL_DB.dat");
+
+    #region Wheel Wizard Appdata Override
+
+    private static string DetermineAppDataOverrideDirectory()
+    {
+        var baseDirectory = IsPortableWhWz ? Environment.CurrentDirectory : Path.Combine(AppDataFolder, "WheelWizard");
+
+        try
+        {
+            return FileHelper.NormalizePath(baseDirectory);
+        }
+        catch
+        {
+            return baseDirectory;
+        }
+    }
+
+    private static string? LoadSavedWheelWizardAppdataOverride()
+    {
+        try
+        {
+            var storedPath = FileHelper.ReadAllTextSafe(AppDataOverrideFilePath);
+            if (string.IsNullOrWhiteSpace(storedPath))
+                return null;
+
+            var normalized = FileHelper.NormalizePath(storedPath);
+            return FileHelper.PathsEqual(normalized, DefaultWheelWizardAppdataPath) ? null : normalized;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static bool TrySetWheelWizardAppdataPath(string requestedPath, out string errorMessage, IProgress<double>? progress = null)
+    {
+        errorMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(requestedPath))
+        {
+            errorMessage = "Please select a valid folder.";
+            return false;
+        }
+
+        string normalizedTarget;
+        try
+        {
+            normalizedTarget = FileHelper.NormalizePath(requestedPath);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Invalid folder path: {ex.Message}";
+            return false;
+        }
+
+        string currentPath;
+        lock (WheelWizardAppdataLock)
+        {
+            currentPath = _wheelWizardAppdataOverride ?? DefaultWheelWizardAppdataPath;
+        }
+
+        if (FileHelper.PathsEqual(currentPath, normalizedTarget))
+            return true;
+
+        if (FileHelper.IsDescendantPath(normalizedTarget, currentPath))
+        {
+            errorMessage = "The selected folder is inside the current Wheel Wizard data folder. Please choose a different folder.";
+            return false;
+        }
+
+        if (FileHelper.IsDescendantPath(currentPath, normalizedTarget))
+        {
+            errorMessage = "The selected folder contains the current Wheel Wizard data folder. Please choose a different folder.";
+            return false;
+        }
+
+        var newOverrideValue = FileHelper.PathsEqual(normalizedTarget, DefaultWheelWizardAppdataPath) ? null : normalizedTarget;
+
+        try
+        {
+            FileHelper.MoveDirectoryContents(currentPath, normalizedTarget, progress: progress);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to move Wheel Wizard files: {ex.Message}";
+            return false;
+        }
+
+        try
+        {
+            PersistWheelWizardAppdataOverride(newOverrideValue);
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                FileHelper.MoveDirectoryContents(normalizedTarget, currentPath);
+            }
+            catch (Exception rollbackEx)
+            {
+                errorMessage = $"Failed to persist the new Wheel Wizard data location: {ex.Message}. Rollback failed: {rollbackEx.Message}";
+                return false;
+            }
+
+            errorMessage = $"Failed to persist the new Wheel Wizard data location: {ex.Message}";
+            return false;
+        }
+
+        lock (WheelWizardAppdataLock)
+        {
+            _wheelWizardAppdataOverride = newOverrideValue;
+        }
+
+        return true;
+    }
+
+    public static bool TryResetWheelWizardAppdataPath(out string errorMessage) =>
+        TrySetWheelWizardAppdataPath(DefaultWheelWizardAppdataPath, out errorMessage);
+
+    private static void PersistWheelWizardAppdataOverride(string? overridePath)
+    {
+        if (string.IsNullOrWhiteSpace(overridePath) || FileHelper.PathsEqual(overridePath, DefaultWheelWizardAppdataPath))
+        {
+            if (File.Exists(AppDataOverrideFilePath))
+                File.Delete(AppDataOverrideFilePath);
+            return;
+        }
+
+        FileHelper.WriteAllTextSafe(AppDataOverrideFilePath, overridePath);
+    }
+
+    private static void MoveWheelWizardAppdataContents(string sourcePath, string destinationPath) =>
+        FileHelper.MoveDirectoryContents(sourcePath, destinationPath);
+
+    #endregion
 
     //In case it is unclear, the mods folder is a folder with mods that are desired to be installed (if enabled)
     //When launching we want to move the mods from the Mods folder to the MyStuff folder since that is the folder the game uses

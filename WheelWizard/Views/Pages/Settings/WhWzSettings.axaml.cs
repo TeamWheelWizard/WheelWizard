@@ -1,3 +1,4 @@
+using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -5,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using HarfBuzzSharp;
+using Serilog;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
@@ -13,6 +15,7 @@ using WheelWizard.Services.Settings;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 using Button = WheelWizard.Views.Components.Button;
+using SettingsResource = WheelWizard.Resources.Languages.Settings;
 
 namespace WheelWizard.Views.Pages.Settings;
 
@@ -20,6 +23,7 @@ public partial class WhWzSettings : UserControl
 {
     private readonly bool _pageLoaded;
     private bool _editingScale;
+    private bool _isMovingAppData;
 
     public WhWzSettings()
     {
@@ -27,9 +31,10 @@ public partial class WhWzSettings : UserControl
         AutoFillPaths();
         TogglePathSettings(false);
         LoadSettings();
+        UpdateAppDataLocationUi();
         _pageLoaded = true;
 
-        MKGameFieldLabel.TipText = WheelWizard.Resources.Languages.Settings.HelperText_EndWithX + "Path can end with: .wbfs/.iso/.rvz";
+        MKGameFieldLabel.TipText = SettingsResource.HelperText_EndWithX + "Path can end with: .wbfs/.iso/.rvz";
         WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
     }
 
@@ -50,9 +55,9 @@ public partial class WhWzSettings : UserControl
 
         TranslationsPercentageText.Text = Humanizer.ReplaceDynamic(
             Phrases.Text_LanguageTranslatedBy,
-            WheelWizard.Resources.Languages.Settings.Value_Language_zTranslators
+            SettingsResource.Value_Language_zTranslators
         );
-        TranslationsPercentageText.IsVisible = WheelWizard.Resources.Languages.Settings.Value_Language_zTranslators != "-";
+        TranslationsPercentageText.IsVisible = SettingsResource.Value_Language_zTranslators != "-";
 
         // -----------------
         // Window Scale settings
@@ -328,6 +333,163 @@ public partial class WhWzSettings : UserControl
         MarioKartInput.Text = PathManager.GameFilePath;
         DolphinUserPathInput.Text = PathManager.UserFolderPath;
         OpenGameFolderButton.IsEnabled = Directory.Exists(PathManager.RiivolutionWhWzFolderPath);
+        UpdateAppDataLocationUi();
+    }
+
+    private void UpdateAppDataLocationUi()
+    {
+        var currentPath = PathManager.WheelWizardAppdataPath;
+        AppDataLocationInput.Text = currentPath;
+        AppDataLocationInput.CaretIndex = currentPath.Length;
+        ToolTip.SetTip(AppDataLocationInput, currentPath);
+
+        var statusText =
+            _isMovingAppData ? SettingsResource.Status_DataFolder_Moving
+            : PathManager.IsUsingCustomWheelWizardAppdataPath ? SettingsResource.Status_DataFolder_Custom
+            : SettingsResource.Status_DataFolder_Default;
+
+        AppDataLocationStatus.Text = statusText;
+        AppDataLocationBrowseButton.IsEnabled = !_isMovingAppData;
+        AppDataLocationResetButton.IsEnabled = !_isMovingAppData && PathManager.IsUsingCustomWheelWizardAppdataPath;
+        ToolTip.SetTip(AppDataLocationResetButton, PathManager.DefaultWheelWizardAppdataFolderPath);
+    }
+
+    private void SetAppDataLocationBusyState(bool isBusy)
+    {
+        _isMovingAppData = isBusy;
+        AppDataLocationBrowseButton.IsEnabled = !isBusy;
+        AppDataLocationResetButton.IsEnabled = !isBusy && PathManager.IsUsingCustomWheelWizardAppdataPath;
+        if (isBusy)
+            AppDataLocationStatus.Text = SettingsResource.Status_DataFolder_Moving;
+    }
+
+    private async Task<bool> ConfirmAndMoveAppDataAsync(string targetPath)
+    {
+        if (string.IsNullOrWhiteSpace(targetPath))
+            return false;
+
+        var trimmedTarget = targetPath.Trim();
+
+        if (FileHelper.PathsEqual(trimmedTarget, PathManager.WheelWizardAppdataPath))
+            return false;
+
+        var extraText =
+            Humanizer.ReplaceDynamic(Phrases.Question_MoveData_Extra, trimmedTarget)
+            ?? $"Wheel Wizard will move its files to:\n{trimmedTarget}\nThis may take a while depending on the amount of data.";
+
+        var confirmed = await new YesNoWindow()
+            .SetMainText(Phrases.Question_MoveData_Title)
+            .SetExtraText(extraText)
+            .SetButtonText(Common.Action_Yes, Common.Action_No)
+            .AwaitAnswer();
+
+        if (!confirmed)
+            return false;
+
+        await MoveWheelWizardDataAsync(trimmedTarget);
+        return true;
+    }
+
+    private async Task MoveWheelWizardDataAsync(string targetPath)
+    {
+        SetAppDataLocationBusyState(true);
+        Log.CloseAndFlush();
+
+        var progressWindow = new ProgressWindow(SettingsResource.Status_DataFolder_Moving)
+            .SetExtraText(SettingsResource.HelperText_WheelWizardDataFolder)
+            .SetGoal(SettingsResource.Status_DataFolder_Moving);
+        progressWindow.Show();
+
+        var progress = new Progress<double>(value =>
+        {
+            var percentage = (int)Math.Clamp(Math.Round(value * 100), 0, 100);
+            progressWindow.UpdateProgress(percentage);
+        });
+
+        (bool success, string errorMessage) moveResult;
+        try
+        {
+            moveResult = await Task.Run(() =>
+            {
+                var moveSuccessful = PathManager.TrySetWheelWizardAppdataPath(targetPath, out var error, progress);
+                return (moveSuccessful, error);
+            });
+        }
+        catch (Exception ex)
+        {
+            progressWindow.Close();
+            WheelWizard.Logging.RecreateStaticLogger();
+            SetAppDataLocationBusyState(false);
+            UpdateAppDataLocationUi();
+
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText(Phrases.MessageError_DataFolderMove_Title)
+                .SetInfoText(ex.Message)
+                .ShowDialog();
+            return;
+        }
+
+        progressWindow.Close();
+
+        WheelWizard.Logging.RecreateStaticLogger();
+
+        SetAppDataLocationBusyState(false);
+        UpdateAppDataLocationUi();
+
+        var (success, errorMessage) = moveResult;
+
+        if (success)
+        {
+            var infoText =
+                Humanizer.ReplaceDynamic(Phrases.MessageSuccess_DataFolderMoved_Extra, PathManager.WheelWizardAppdataPath)
+                ?? $"Wheel Wizard data is now stored in:\n{PathManager.WheelWizardAppdataPath}";
+
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Message)
+                .SetTitleText(Phrases.MessageSuccess_DataFolderMoved_Title)
+                .SetInfoText(infoText)
+                .ShowDialog();
+        }
+        else
+        {
+            var window = new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText(Phrases.MessageError_DataFolderMove_Title)
+                .SetInfoText(errorMessage);
+            await window.ShowDialog();
+        }
+    }
+
+    private async void AppDataLocationBrowse_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_isMovingAppData)
+            return;
+
+        var topLevel = TopLevel.GetTopLevel(this);
+        IStorageFolder? suggestedStart = null;
+
+        var currentPath = PathManager.WheelWizardAppdataPath;
+        if (!string.IsNullOrWhiteSpace(currentPath) && Directory.Exists(currentPath))
+            suggestedStart = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentPath);
+
+        var folders = await FilePickerHelper.SelectFolderAsync("Select Wheel Wizard data folder", suggestedStart);
+        if (folders == null || folders.Count == 0)
+            return;
+
+        var selected = folders[0];
+        if (selected == null)
+            return;
+
+        await ConfirmAndMoveAppDataAsync(selected.Path.LocalPath);
+    }
+
+    private async void AppDataLocationReset_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_isMovingAppData || !PathManager.IsUsingCustomWheelWizardAppdataPath)
+            return;
+
+        await ConfirmAndMoveAppDataAsync(PathManager.DefaultWheelWizardAppdataFolderPath);
     }
 
     private async void WindowScaleDropdown_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
