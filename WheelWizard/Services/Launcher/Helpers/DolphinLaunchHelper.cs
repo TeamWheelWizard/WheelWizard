@@ -44,8 +44,10 @@ public static class DolphinLaunchHelper
         return false;
     }
 
-    private static bool TryFixFlatpakPortalAccess(string path, string additionalFlag = "")
+    private static bool TryFixFlatpakPortalAccess(string? path, string additionalFlag = "")
     {
+        if (string.IsNullOrWhiteSpace(path))
+            return false;
         if (IsFixableFlatpakGamePath(path))
         {
             try
@@ -83,11 +85,13 @@ public static class DolphinLaunchHelper
         return false;
     }
 
-    private static string FixFlatpakDolphinPermissions(string flatpakDolphinLocation)
+    private static string FixFlatpakDolphinPermissions(string flatpakDolphinLocation, string? launchFilePath)
     {
         var fixedFlatpakDolphinLocation = flatpakDolphinLocation;
         void AddFilesystemPerm(string newFilesystemPerm, string mode = "")
         {
+            if (string.IsNullOrWhiteSpace(newFilesystemPerm))
+                return;
             var flatpakRunCommand = "flatpak run";
             fixedFlatpakDolphinLocation = fixedFlatpakDolphinLocation.Replace(
                 flatpakRunCommand,
@@ -112,15 +116,32 @@ public static class DolphinLaunchHelper
 
         // Read-only permissions on files where possible
 
-        if (!TryFixFlatpakPortalAccess(PathManager.GameFilePath, "-r"))
-            AddFilesystemPerm(PathManager.GameFilePath, ":ro");
+        var launchPath = launchFilePath;
+        if (string.IsNullOrWhiteSpace(launchPath))
+            launchPath = PathManager.GameFilePath;
+
+        if (!string.IsNullOrWhiteSpace(launchPath))
+        {
+            string normalizedLaunchPath;
+            try
+            {
+                normalizedLaunchPath = Path.GetFullPath(launchPath);
+            }
+            catch
+            {
+                normalizedLaunchPath = launchPath;
+            }
+
+            if (!TryFixFlatpakPortalAccess(normalizedLaunchPath, "-r"))
+                AddFilesystemPerm(normalizedLaunchPath, ":ro");
+        }
         AddFilesystemPerm(PathManager.RrLaunchJsonFilePath, ":ro");
 
         return fixedFlatpakDolphinLocation;
     }
 
     // Make sure all file arguments are absolute paths
-    public static void LaunchDolphin(string arguments = "", bool shellExecute = false)
+    public static void LaunchDolphin(string arguments = "", bool shellExecute = false, string? launchFilePath = null)
     {
         try
         {
@@ -129,6 +150,20 @@ public static class DolphinLaunchHelper
             var cannotPassUserFolder = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && PathManager.IsLinuxDolphinConfigSplit();
             var userFolderArgument = cannotPassUserFolder ? "" : $"-u {EnvHelper.QuotePath(Path.GetFullPath(PathManager.UserFolderPath))}";
             var dolphinLaunchArguments = $"{arguments} {userFolderArgument}";
+
+            string? normalizedLaunchPath = null;
+            var baseLaunchPath = string.IsNullOrWhiteSpace(launchFilePath) ? PathManager.GameFilePath : launchFilePath;
+            if (!string.IsNullOrWhiteSpace(baseLaunchPath))
+            {
+                try
+                {
+                    normalizedLaunchPath = Path.GetFullPath(baseLaunchPath);
+                }
+                catch
+                {
+                    normalizedLaunchPath = baseLaunchPath;
+                }
+            }
 
             var dolphinLocation = (string)SettingsManager.DOLPHIN_LOCATION.Get();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -147,7 +182,7 @@ public static class DolphinLaunchHelper
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
                     if (PathManager.IsFlatpakDolphinFilePath())
-                        dolphinLocation = FixFlatpakDolphinPermissions(dolphinLocation);
+                        dolphinLocation = FixFlatpakDolphinPermissions(dolphinLocation, normalizedLaunchPath);
                     else
                         startInfo.EnvironmentVariables["QT_QPA_PLATFORM"] = "xcb";
                 }

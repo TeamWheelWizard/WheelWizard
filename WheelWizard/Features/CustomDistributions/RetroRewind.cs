@@ -77,7 +77,7 @@ public class RetroRewind : IDistribution
 
         //where all distributions are stored
         var destinationParentDir = _fileSystem.DirectoryInfo.New(PathManager.RiivolutionWhWzFolderPath);
-        
+
         OperationResult? result = null;
         try
         {

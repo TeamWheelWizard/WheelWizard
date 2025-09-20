@@ -1,3 +1,4 @@
+using System.IO;
 using WheelWizard.Helpers;
 using WheelWizard.Services.WiiManagement;
 using WheelWizard.Views.Popups.Generic;
@@ -31,6 +32,9 @@ public static class MiiChannelLaunchHelper
         }
 
         if (miiChannelExists)
-            DolphinLaunchHelper.LaunchDolphin($"-b {EnvHelper.QuotePath(Path.GetFullPath(MiiChannelPath))}");
+        {
+            var launchPath = Path.GetFullPath(MiiChannelPath);
+            DolphinLaunchHelper.LaunchDolphin($"-b {EnvHelper.QuotePath(launchPath)}", launchFilePath: launchPath);
+        }
     }
 }

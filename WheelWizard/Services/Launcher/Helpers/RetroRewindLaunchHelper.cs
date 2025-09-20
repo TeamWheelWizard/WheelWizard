@@ -10,13 +10,13 @@ public static class RetroRewindLaunchHelper
     private static string XmlFilePath => PathManager.XmlFilePath;
     private static string JsonFilePath => PathManager.RrLaunchJsonFilePath;
 
-    public static void GenerateLaunchJson()
+    public static void GenerateLaunchJson(string baseFilePath)
     {
         var removeBlur = (bool)SettingsManager.REMOVE_BLUR.Get();
 
         var launchConfig = new LaunchConfig
         {
-            BaseFile = Path.GetFullPath(PathManager.GameFilePath),
+            BaseFile = Path.GetFullPath(baseFilePath),
             DisplayName = "RR",
             Riivolution = new()
             {

@@ -81,6 +81,12 @@ public partial class ProgressWindow : PopupContent
         return this;
     }
 
+    public ProgressWindow SetIndeterminate(bool isIndeterminate = true)
+    {
+        ProgressBar.IsIndeterminate = isIndeterminate;
+        return this;
+    }
+
     public void UpdateProgress(int progress)
     {
         _progress = progress;

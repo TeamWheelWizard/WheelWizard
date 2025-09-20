@@ -1,4 +1,5 @@
-﻿using Avalonia.Threading;
+﻿using System.IO;
+using Avalonia.Threading;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
@@ -10,6 +11,7 @@ using WheelWizard.Services.WiiManagement;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WiiManagement.GameExtraction;
 
 namespace WheelWizard.Services.Launcher;
 
@@ -21,6 +23,10 @@ public class RrLauncher : ILauncher
     [Inject]
     private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } =
         App.Services.GetRequiredService<ICustomDistributionSingletonService>();
+
+    [Inject]
+    private IGameFileExtractionService GameFileExtractionService { get; set; } =
+        App.Services.GetRequiredService<IGameFileExtractionService>();
 
     public async Task Launch()
     {
@@ -43,10 +49,35 @@ public class RrLauncher : ILauncher
                 return;
             }
 
-            RetroRewindLaunchHelper.GenerateLaunchJson();
+            var extractionResult = await GameFileExtractionService.EnsureExtractedAsync();
+            if (extractionResult.IsFailure)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    var errorMessage = extractionResult.Error?.Message ?? "Failed to prepare the game files.";
+                    if (
+                        extractionResult.Error?.ExtraReplacements is { Length: > 0 } extras
+                        && extras[0] is string moreInfo
+                        && !string.IsNullOrWhiteSpace(moreInfo)
+                    )
+                        errorMessage += $"\n{moreInfo}";
+
+                    new MessageBoxWindow()
+                        .SetMessageType(MessageBoxWindow.MessageType.Error)
+                        .SetTitleText("Unable to extract game files")
+                        .SetInfoText(errorMessage)
+                        .Show();
+                });
+                return;
+            }
+
+            var launchFilePath = Path.GetFullPath(extractionResult.Value);
+
+            RetroRewindLaunchHelper.GenerateLaunchJson(launchFilePath);
             var dolphinLaunchType = (bool)SettingsManager.LAUNCH_WITH_DOLPHIN.Get() ? "" : "-b";
             DolphinLaunchHelper.LaunchDolphin(
-                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
+                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False",
+                launchFilePath: launchFilePath
             );
         }
         catch (Exception ex)
