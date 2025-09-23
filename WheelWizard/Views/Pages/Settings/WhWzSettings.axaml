@@ -133,6 +133,36 @@
                     </StackPanel>
                 </Grid>
             </Border>
+            
+            <Border Classes="SettingsBlockStyle" Margin="0,8,0,0">
+                <StackPanel>
+                    <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_WheelWizardDataFolder}"
+                                                TipText="{x:Static lang:Settings.HelperText_WheelWizardDataFolder}" />
+                    <TextBox Classes="dark"
+                             Margin="0,4,0,0"
+                             x:Name="AppDataLocationInput"
+                             IsReadOnly="True"
+                             HorizontalAlignment="Stretch"
+                             Height="40"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <components1:Button x:Name="AppDataLocationBrowseButton"
+                                            Variant="Default"
+                                            Text="{x:Static lang:Common.Action_Browse}"
+                                            IconData="{StaticResource Folder}"
+                                            Height="40"
+                                            Click="AppDataLocationBrowse_OnClick" />
+                        <components1:Button x:Name="AppDataLocationResetButton"
+                                            Variant="Default"
+                                            Text="{x:Static lang:Settings.Option_ResetDataFolder}"
+                                            Height="40"
+                                            Margin="6,0,0,0"
+                                            Click="AppDataLocationReset_OnClick" />
+                    </StackPanel>
+                    <TextBlock Classes="TinyText"
+                               Margin="0,4,0,0"
+                               x:Name="AppDataLocationStatus" />
+                </StackPanel>
+            </Border>
 
             <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,*">
                 <components1:Button Variant="Default"

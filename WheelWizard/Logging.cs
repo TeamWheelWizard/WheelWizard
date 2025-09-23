@@ -13,15 +13,18 @@ public static class Logging
     /// Do not call this method multiple times. It is intended to be called once at application startup.
     /// Do not use the static logger instance other than for the application startup.
     /// </remarks>
-    public static void CreateStaticLogger()
+    public static void CreateStaticLogger(bool logStartup = true)
     {
         try
         {
+            var logsDirectory = Path.Combine(PathManager.WheelWizardAppdataPath, "logs");
+            Directory.CreateDirectory(logsDirectory);
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
                 .WriteTo.Console(theme: AnsiConsoleTheme.Sixteen, applyThemeToRedirectedOutput: true)
-                .WriteTo.File(Path.Combine(PathManager.WheelWizardAppdataPath, "logs/log.txt"), rollingInterval: RollingInterval.Day)
+                .WriteTo.File(Path.Combine(logsDirectory, "log.txt"), rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
         catch (Exception e)
@@ -30,8 +33,20 @@ public static class Logging
             throw;
         }
 
-        // Log the application start
-        LogPlatformInformation();
+        if (logStartup)
+        {
+            // Log the application start
+            LogPlatformInformation();
+        }
+    }
+
+    /// <summary>
+    /// Recreates the static logger instance, flushing any existing loggers first.
+    /// </summary>
+    public static void RecreateStaticLogger()
+    {
+        Log.CloseAndFlush();
+        CreateStaticLogger(logStartup: false);
     }
 
     /// <summary>

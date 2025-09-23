@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -34,7 +35,8 @@ public static class FilePickerHelper
 
         var selectedFiles = await storageProvider.MainWindow.StorageProvider.OpenFilePickerAsync(options);
 
-        return selectedFiles?.Select(file => file.Path.LocalPath).ToList() ?? [];
+        return selectedFiles?.Select(TryResolveLocalPath).Where(path => !string.IsNullOrWhiteSpace(path)).Select(path => path!).ToList()
+            ?? [];
     }
 
     public static async Task<string?> OpenSingleFileAsync(string title, IEnumerable<FilePickerFileType> fileTypes)
@@ -56,7 +58,17 @@ public static class FilePickerHelper
             }
         );
 
-        return files?.FirstOrDefault()?.Path.LocalPath;
+        if (files == null)
+            return null;
+
+        foreach (var file in files)
+        {
+            var path = TryResolveLocalPath(file);
+            if (!string.IsNullOrWhiteSpace(path))
+                return path;
+        }
+
+        return null;
     }
 
     public static async Task<List<string>> OpenMultipleFilesAsync(string title, IEnumerable<FilePickerFileType> fileTypes)
@@ -78,7 +90,7 @@ public static class FilePickerHelper
             }
         );
 
-        return files?.Select(file => file.Path.LocalPath).ToList() ?? [];
+        return files?.Select(TryResolveLocalPath).Where(path => !string.IsNullOrWhiteSpace(path)).Select(path => path!).ToList() ?? [];
     }
 
     public static async Task<IReadOnlyList<IStorageFolder?>> SelectFolderAsync(string title, IStorageFolder? suggestedStartLocation = null)
@@ -158,6 +170,48 @@ public static class FilePickerHelper
             }
         );
 
-        return file?.Path.LocalPath;
+        if (file == null)
+            return null;
+
+        return TryResolveLocalPath(file);
+    }
+
+    public static string? TryResolveLocalPath(IStorageItem? item)
+    {
+        if (item == null)
+            return null;
+
+        try
+        {
+            var localPath = item.TryGetLocalPath();
+            if (!string.IsNullOrWhiteSpace(localPath))
+                return localPath;
+        }
+        catch
+        {
+            // Some platforms might throw if local paths are unsupported; ignore and fall back to URI inspection.
+        }
+
+        var uri = item.Path;
+        if (uri != null)
+        {
+            if (uri.IsAbsoluteUri)
+            {
+                try
+                {
+                    return uri.LocalPath;
+                }
+                catch (InvalidOperationException)
+                {
+                    // Ignore and fall through to raw string handling.
+                }
+            }
+
+            var raw = uri.ToString();
+            if (!string.IsNullOrWhiteSpace(raw) && Path.IsPathRooted(raw))
+                return raw;
+        }
+
+        return null;
     }
 }

@@ -410,7 +410,16 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("MessageError_ModDownloadFail_Title", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to move data.
+        /// </summary>
+        public static string MessageError_DataFolderMove_Title {
+            get {
+                return ResourceManager.GetString("MessageError_DataFolderMove_Title", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Mod folder does not exist.
         /// </summary>
@@ -455,7 +464,25 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("MessageSuccess_SettingsSaved_Title", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Data folder updated.
+        /// </summary>
+        public static string MessageSuccess_DataFolderMoved_Title {
+            get {
+                return ResourceManager.GetString("MessageSuccess_DataFolderMoved_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Wheel Wizard data is now stored in:\n{$1}.
+        /// </summary>
+        public static string MessageSuccess_DataFolderMoved_Extra {
+            get {
+                return ResourceManager.GetString("MessageSuccess_DataFolderMoved_Extra", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to One or more of the selected Mii(s) is a favorite. Miis can only be deleted if they are not favorites to prevent accidental deletions..
         /// </summary>
@@ -878,7 +905,25 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("Question_ApplyScale_Title", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Move Wheel Wizard data?.
+        /// </summary>
+        public static string Question_MoveData_Title {
+            get {
+                return ResourceManager.GetString("Question_MoveData_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Wheel Wizard will move its files to:\n{$1}\nThis may take a while depending on the amount of data.
+        /// </summary>
+        public static string Question_MoveData_Extra {
+            get {
+                return ResourceManager.GetString("Question_MoveData_Extra", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to The Flatpak version of Dolphin Emulator does not appear to be installed. Would you like us to install it (system-wide)?.
         /// </summary>
