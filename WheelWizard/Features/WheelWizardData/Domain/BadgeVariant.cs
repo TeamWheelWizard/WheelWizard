@@ -13,4 +13,7 @@ public enum BadgeVariant
     SummitShowdown_GoldWinner,
     SummitShowdown_SilverWinner,
     SummitShowdown_BronzeWinner,
+    Leafstruck_GoldWinner,
+    Leafstruck_SilverWinner,
+    Leafstruck_BronzeWinner,
 }
