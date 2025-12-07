@@ -18,4 +18,103 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="Category_Video" xml:space="preserve">
+        <value>Video</value>
+    </data>
+    <data name="Option_Recommended" xml:space="preserve">
+        <value>Doporučené Nastavení</value>
+    </data>
+    <data name="Option_RemoveBlur" xml:space="preserve">
+        <value>Odstranit Rozmazání</value>
+    </data>
+    <data name="Option_Renderer" xml:space="preserve">
+        <value>Renderování</value>
+    </data>
+    <data name="Option_ShowFPS" xml:space="preserve">
+        <value>Zobrazit FPS</value>
+    </data>
+    <data name="Option_VSync" xml:space="preserve">
+        <value>VSync</value>
+    </data>
+    <data name="Option_WhWzLanguage" xml:space="preserve">
+        <value>Jazyk Wheel Wizard</value>
+    </data>
+    <data name="Option_WindowScale" xml:space="preserve">
+        <value>Měřítko Okna</value>
+    </data>
+    <data name="Section_Language" xml:space="preserve">
+        <value>Jazyk</value>
+    </data>
+    <data name="Section_LocationPaths" xml:space="preserve">
+        <value>Nastavení Umístění</value>
+    </data>
+    <data name="Section_Resolution" xml:space="preserve">
+        <value>Rozlišení</value>
+    </data>
+    <data name="Section_Wii" xml:space="preserve">
+        <value>Nastavení Wii</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Arabština</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Čínština</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Čeština</value>
+    </data>
+    <data name="Value_Language_Dutch" xml:space="preserve">
+        <value>Nizozemština</value>
+    </data>
+    <data name="Value_Language_English" xml:space="preserve">
+        <value>Angličtina</value>
+    </data>
+    <data name="Value_Language_Finnish" xml:space="preserve">
+        <value>Finština</value>
+    </data>
+    <data name="Value_Language_France" xml:space="preserve">
+        <value>Francouzština</value>
+    </data>
+    <data name="Value_Language_German" xml:space="preserve">
+        <value>Němčina</value>
+    </data>
+    <data name="Value_Language_Italian" xml:space="preserve">
+        <value>Italština</value>
+    </data>
+    <data name="Value_Language_Japanese" xml:space="preserve">
+        <value>Japonština</value>
+    </data>
+    <data name="Value_Language_Korean" xml:space="preserve">
+        <value>Korejština</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Norština</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Portugalština</value>
+    </data>
+    <data name="Value_Language_Russian" xml:space="preserve">
+        <value>Ruština</value>
+    </data>
+    <data name="Value_Language_Spanish" xml:space="preserve">
+        <value>Španělština</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>Obecný</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>Pattyrix</value>
+    </data>
+    <data name="Option_MarioKartGame" xml:space="preserve">
+        <value>Soubor Hry Mario Kart Wii</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Instalace</value>
+    </data>
+    <data name="Value_Language_Turkish" xml:space="preserve">
+        <value>Turečtina</value>
+    </data>
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
+        <value>57</value>
+    </data>
 </root>

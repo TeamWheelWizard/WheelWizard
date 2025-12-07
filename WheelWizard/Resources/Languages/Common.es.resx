@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -13,10 +14,14 @@
         <value>1.3</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <data name="Action_Apply" xml:space="preserve">
         <value>Aplicar</value>
@@ -57,7 +62,7 @@
     <data name="Action_No" xml:space="preserve">
         <value>No</value>
     </data>
-    <data name="Action_OK" xml:space="preserve">
+    <data name="Action_Ok" xml:space="preserve">
         <value>Ok</value>
     </data>
     <data name="Action_OpenFolder" xml:space="preserve">
@@ -141,43 +146,172 @@
     <data name="State_Updating" xml:space="preserve">
         <value>Actualizando...</value>
     </data>
-    <data name="Term_Error" xml:space="preserve">
+    <data name="State_Error" xml:space="preserve">
         <value>Error</value>
     </data>
-    <data name="Term_General" xml:space="preserve">
-        <value>General</value>
-    </data>
-    <data name="Term_No" xml:space="preserve">
-        <value>No</value>
-    </data>
-    <data name="Term_Offline" xml:space="preserve">
+    <data name="Attribute_Status_Offline" xml:space="preserve">
         <value>Desconectado</value>
     </data>
-    <data name="Term_Online" xml:space="preserve">
+    <data name="Attribute_Status_Online" xml:space="preserve">
         <value>En línea</value>
     </data>
-    <data name="Term_Other" xml:space="preserve">
-        <value>Otro</value>
-    </data>
-    <data name="Term_Speed" xml:space="preserve">
+    <data name="Attribute_Speed" xml:space="preserve">
         <value>Velocidad</value>
     </data>
-    <data name="Term_Success" xml:space="preserve">
+    <data name="State_Success" xml:space="preserve">
         <value>Éxito</value>
     </data>
-    <data name="Term_Unknown" xml:space="preserve">
+    <data name="State_Unknown" xml:space="preserve">
         <value>Desconocido</value>
     </data>
-    <data name="Term_Warning" xml:space="preserve">
+    <data name="State_Warning" xml:space="preserve">
         <value>Aviso</value>
-    </data>
-    <data name="Term_Yes" xml:space="preserve">
-        <value>Si</value>
     </data>
     <data name="Action_Browse" xml:space="preserve">
         <value>Buscar</value>
     </data>
     <data name="Action_ViewMod" xml:space="preserve">
         <value>Mirar Mod</value>
+    </data>
+    <data name="Action_ViewRoom" xml:space="preserve">
+        <value>Mirar sala</value>
+    </data>
+    <data name="Action_ViewMii" xml:space="preserve">
+        <value>Mirar Mii</value>
+    </data>
+    <data name="ListTitle_Friends" xml:space="preserve">
+        <value>Amigos</value>
+    </data>
+    <data name="ListTitle_Players" xml:space="preserve">
+        <value>Jugadores</value>
+    </data>
+    <data name="ListTitle_Rooms" xml:space="preserve">
+        <value>Salas</value>
+    </data>
+    <data name="State_NoLicense" xml:space="preserve">
+        <value>Sin licencia</value>
+    </data>
+    <data name="State_NoName" xml:space="preserve">
+        <value>Sin nombre</value>
+    </data>
+    <data name="State_NoProfiles" xml:space="preserve">
+        <value>Sin perfiles</value>
+    </data>
+    <data name="Region_America" xml:space="preserve">
+        <value>América</value>
+    </data>
+    <data name="Region_Australia" xml:space="preserve">
+        <value>Australia</value>
+    </data>
+    <data name="Region_China" xml:space="preserve">
+        <value>China</value>
+    </data>
+    <data name="Region_Europe" xml:space="preserve">
+        <value>Europa</value>
+    </data>
+    <data name="Region_Japan" xml:space="preserve">
+        <value>Japón</value>
+    </data>
+    <data name="Region_SouthKorea" xml:space="preserve">
+        <value>Corea del Sur</value>
+    </data>
+    <data name="Region_Taiwan" xml:space="preserve">
+        <value>Taiwan</value>
+    </data>
+    <data name="Attribute_FriendCode" xml:space="preserve">
+        <value>Clave de amigo</value>
+    </data>
+    <data name="Attribute_Losses" xml:space="preserve">
+        <value>Derrotas</value>
+    </data>
+    <data name="Attribute_PlayerCount" xml:space="preserve">
+        <value>Jugadores</value>
+    </data>
+    <data name="Attribute_RacesPlayed" xml:space="preserve">
+        <value>Carreras jugadas</value>
+    </data>
+    <data name="Attribute_TimeOnline" xml:space="preserve">
+        <value>Tiempo en línea</value>
+    </data>
+    <data name="Attribute_Wins" xml:space="preserve">
+        <value>Victorias</value>
+    </data>
+    <data name="Action_Link_Support" xml:space="preserve">
+        <value>¡Apoyanos!</value>
+    </data>
+    <data name="Action_Link_Github" xml:space="preserve">
+        <value>Codigo Fuente</value>
+    </data>
+    <data name="Action_Link_Discord" xml:space="preserve">
+        <value>¡Habla con nosotros!</value>
+    </data>
+    <data name="Action_Back" xml:space="preserve">
+        <value>Atrás</value>
+    </data>
+    <data name="Action_Duplicate" xml:space="preserve">
+        <value>Duplicar</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>Hacer favorito</value>
+    </data>
+    <data name="Action_LaunchDolphin" xml:space="preserve">
+        <value>Lanzar Dolphin</value>
+    </data>
+    <data name="Action_Randomize" xml:space="preserve">
+        <value>Aleatorizar</value>
+    </data>
+    <data name="Action_SaveExternalMii" xml:space="preserve">
+        <value>Añadir Mii a "Mis Miis"</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>Quitar de favoritos</value>
+    </data>
+    <data name="Attribute_AverageRoomVr" xml:space="preserve">
+        <value>PC Promedio</value>
+    </data>
+    <data name="Attribute_Mii_Gender" xml:space="preserve">
+        <value>Género</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Female" xml:space="preserve">
+        <value>Mujer</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Male" xml:space="preserve">
+        <value>Hombre</value>
+    </data>
+    <data name="Attribute_IsOnline" xml:space="preserve">
+        <value>Está Online</value>
+    </data>
+    <data name="Attribute_Message" xml:space="preserve">
+        <value>Mensaje</value>
+    </data>
+    <data name="Attribute_Priority" xml:space="preserve">
+        <value>Prioridad</value>
+    </data>
+    <data name="Attribute_SortBy" xml:space="preserve">
+        <value>Ordernar por</value>
+    </data>
+    <data name="Attribute_Status" xml:space="preserve">
+        <value>Estado</value>
+    </data>
+    <data name="Attribute_TotalGamesPlayed" xml:space="preserve">
+        <value>Partidas jugadas</value>
+    </data>
+    <data name="Attribute_TotalGamesWon" xml:space="preserve">
+        <value>Partidas ganadas</value>
+    </data>
+    <data name="ListTitle_Miis" xml:space="preserve">
+        <value>Miis</value>
+    </data>
+    <data name="PageTitle_MyMiis" xml:space="preserve">
+        <value>Mis Miis</value>
+    </data>
+    <data name="Attribute_Gender" xml:space="preserve">
+        <value>Género</value>
+    </data>
+    <data name="Attribute_Gender_Female" xml:space="preserve">
+        <value>Mujer</value>
+    </data>
+    <data name="Attribute_Gender_Male" xml:space="preserve">
+        <value>Hombre</value>
     </data>
 </root>

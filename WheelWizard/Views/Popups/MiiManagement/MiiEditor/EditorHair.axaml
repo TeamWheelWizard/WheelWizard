@@ -9,7 +9,7 @@
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
         <!-- Updated Title -->
-        <TextBlock Classes="BodyText" Margin="10" Text="Hair" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_Hair}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
         <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}" IconData="{StaticResource ArrowLeft}"
@@ -23,14 +23,14 @@
             <StackPanel Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Spacing="10">
                 <!-- The list of elements you want to edit in this page -->
 
+                    
                 <StackPanel> <!-- Hair Color -->
-                    <components:FormFieldLabel Text="Hair Color:"/>
-                    <ComboBox
-                        x:Name="HairColorBox"
-                        SelectionChanged="HairColorBox_OnSelectionChanged"
-                        Width="150"
-                        />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_HairColor}"/>
+                    <UniformGrid Columns="5" x:Name="HairColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
                 </StackPanel>
+
 
                 <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"> <!-- Mirrored -->
                     <CheckBox
@@ -38,10 +38,10 @@
                         IsCheckedChanged="HairFlippedCheck_OnIsCheckedChanged"
                         VerticalAlignment="Center"
                         />
-                    <components:FormFieldLabel Text="Mirrored?" VerticalAlignment="Center"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_MirrorHair}" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <components:FormFieldLabel Text="Hair Type:"/>
+                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_HairType}"/>
                 <UniformGrid Columns="5" x:Name="HairTypesGrid">
                     <!-- Generated elements -->
                 </UniformGrid>

@@ -4,7 +4,7 @@ namespace WheelWizard.Views.Popups.Base;
 
 public abstract class PopupContent : UserControlBase
 {
-    public PopupWindow Window { get; private set; }
+    protected PopupWindow Window { get; private set; }
 
     protected PopupContent(bool allowClose, bool allowParentInteraction, bool isTopMost, string title = "")
     {
@@ -36,4 +36,10 @@ public abstract class PopupContent : UserControlBase
     public void Minimize() => Window.WindowState = WindowState.Minimized;
 
     public void Focus() => Window.Focus();
+
+    /// <summary>
+    /// Should be called Before opening the popup (internally).
+    /// It can be used to disable wether or not a popup can be opened
+    /// </summary>
+    protected void DisableOpen(bool value) => Window.DisableOpen(value);
 }

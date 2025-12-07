@@ -89,7 +89,7 @@ namespace WheelWizard.Test.Features
 
             _apiCaller
                 .CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<GameBananaSearchResults>>>>())
-                .Returns(Fail<GameBananaSearchResults>(expectedError));
+                .Returns(Fail(expectedError));
 
             // Act
             var result = await _service.GetModSearchResults(searchTerm, page);
@@ -128,9 +128,7 @@ namespace WheelWizard.Test.Features
             var modId = 123;
             var expectedError = "API Error";
 
-            _apiCaller
-                .CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<GameBananaModDetails>>>>())
-                .Returns(Fail<GameBananaModDetails>(expectedError));
+            _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<GameBananaModDetails>>>>()).Returns(Fail(expectedError));
 
             // Act
             var result = await _service.GetModDetails(modId);

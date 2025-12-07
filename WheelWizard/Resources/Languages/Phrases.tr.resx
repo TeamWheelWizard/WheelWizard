@@ -18,25 +18,25 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="EmptyText_NoFriends" xml:space="preserve">
+    <data name="EmptyContent_NoFriends" xml:space="preserve">
         <value>Oyunda arkadaş ekleyebilirsiniz</value>
     </data>
-    <data name="EmptyText_NoFriends_Title" xml:space="preserve">
+    <data name="EmptyContent_NoFriends_Title" xml:space="preserve">
         <value>Henüz arkadaş yok!</value>
     </data>
-    <data name="EmptyText_NoMods" xml:space="preserve">
+    <data name="EmptyContent_NoMods" xml:space="preserve">
         <value>Modlar oyunun işleyişini değiştirebilir. İlk modunuzu içe aktarmaya başlamak için aşağıdaki butona tıklayın.</value>
     </data>
-    <data name="EmptyText_NoMods_Title" xml:space="preserve">
+    <data name="EmptyContent_NoMods_Title" xml:space="preserve">
         <value>Mod bulunamadı</value>
     </data>
-    <data name="EmptyText_NoProfiles" xml:space="preserve">
+    <data name="EmptyContent_NoProfiles" xml:space="preserve">
         <value>Profillerinizi burada görmek için oyunu en az bir kez oynamanız gerekiyor.</value>
     </data>
-    <data name="EmptyText_NoRooms" xml:space="preserve">
+    <data name="EmptyContent_NoRooms" xml:space="preserve">
         <value>İnternet bağlantınız olmayabilir veya kimse oyun oynamıyor olabilir.</value>
     </data>
-    <data name="EmptyText_NoRooms_Title" xml:space="preserve">
+    <data name="EmptyContent_NoRooms_Title" xml:space="preserve">
         <value>Oda bulunamadı</value>
     </data>
     <data name="Hover_FriendsOnline_0" xml:space="preserve">
@@ -70,170 +70,131 @@
         <value>Lütfen bu sayfanın doğrudan bir odaya katılma işlevi sunmadığını unutmayın.
 Belirli bir odaya katılmak için bir arkadaşınız aracılığıyla katılmanız veya çevrimiçi sunuculara katılarak bu odaya girmeyi ummanız gerekecek.</value>
     </data>
-    <data name="Placeholder_EnterPath" xml:space="preserve">
-        <value>İstenen yolu buraya girin...</value>
-    </data>
-    <data name="Placeholder_SearchForPlayers" xml:space="preserve">
-        <value>Oyuncuları Ara...</value>
-    </data>
-    <data name="PopupText_AlreadyFilesRR" xml:space="preserve">
-        <value>RetroRewind Klasörünüzde zaten dosyalar var. Yüklemek ister misiniz?</value>
-    </data>
-    <data name="PopupText_ApplyScale" xml:space="preserve">
+    <data name="Question_ApplyScale_Title" xml:space="preserve">
         <value>Yeni ölçeği uygulamak istiyor musunuz?</value>
     </data>
-    <data name="PopupText_CouldNotConnectServer" xml:space="preserve">
+    <data name="MessageWarning_NoConnectServer_Extra" xml:space="preserve">
         <value>Sunucuya bağlanılamadı. Lütfen daha sonra tekrar deneyin.</value>
     </data>
-    <data name="PopupText_DolphinFound" xml:space="preserve">
+    <data name="Question_DolphinFound_Title" xml:space="preserve">
         <value>Dolphin Emulator Klasörü Bulundu</value>
     </data>
-    <data name="PopupText_DolphinFoundText" xml:space="preserve">
+    <data name="Question_DolphinFound_Extra" xml:space="preserve">
         <value>Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz :) \nDolphin Emulator klasörü bulundu. Bu klasörü kullanmak ister misiniz?</value>
     </data>
-    <data name="PopupText_DolphinNotFound" xml:space="preserve">
+    <data name="MessageWarning_DolphinNotFound_Title" xml:space="preserve">
         <value>Dolphin Emulator Klasörü Bulunamadı</value>
     </data>
-    <data name="PopupText_DolphinNotFoundText" xml:space="preserve">
+    <data name="MessageWarning_DolphinNotFound_Extra" xml:space="preserve">
         <value>Dolphin Emulator klasörü otomatik olarak bulunamadı. Lütfen klasörü manuel olarak bulmayı deneyin, daha fazla bilgi için 'yardım'ı tıklayın.</value>
     </data>
-    <data name="PopupText_DownloadRR" xml:space="preserve">
+    <data name="Question_RRNotDeterment_Title" xml:space="preserve">
         <value>Retro Rewind İndir</value>
     </data>
-    <data name="PopupText_EnsurePathsExists" xml:space="preserve">
+    <data name="MessageWarning_InvalidPaths_Extra" xml:space="preserve">
         <value>Lütfen tüm yolların doğru olduğundan emin olun ve tekrar deneyin.</value>
     </data>
-    <data name="PopupText_EnterModName" xml:space="preserve">
-        <value>Mod Adını Girin:</value>
-    </data>
-    <data name="PopupText_EnterTitle" xml:space="preserve">
-        <value>Başlık Girin:</value>
-    </data>
-    <data name="PopupText_EsimatedTimeRemaining" xml:space="preserve">
+    <data name="Progress_EstimatedTimeRemaining" xml:space="preserve">
         <value>Kalan Tahmini Süre:</value>
     </data>
-    <data name="PopupText_FailCheckUpdates" xml:space="preserve">
+    <data name="MessageWarning_FailCheckUpdates_Title" xml:space="preserve">
         <value>Güncellemeleri kontrol etme başarısız oldu</value>
     </data>
-    <data name="PopupText_FailedUpdateApply" xml:space="preserve">
+    <data name="MessageError_AbortRR_Extra_FailedUpdateApply" xml:space="preserve">
         <value>Güncellemeyi uygulamak başarısız oldu. İşlem iptal ediliyor.</value>
     </data>
-    <data name="PopupText_FailedUpdateDelete" xml:space="preserve">
+    <data name="MessageError_AbortRR_Extra_FailedUpdateDelete" xml:space="preserve">
         <value>Güncelleme dosyalarını silmek başarısız oldu. İşlem iptal ediliyor.</value>
     </data>
-    <data name="PopupText_InstallingMods" xml:space="preserve">
+    <data name="Progress_InstallingMods" xml:space="preserve">
         <value>Modlar Yükleniyor</value>
     </data>
-    <data name="PopupText_InstallingModsCount" xml:space="preserve">
+    <data name="Progress_InstallingModsCount" xml:space="preserve">
         <value>{$1} modları yükleniyor</value>
     </data>
-    <data name="PopupText_InstallingRR" xml:space="preserve">
+    <data name="Progress_InstallingRR" xml:space="preserve">
         <value>Retro Rewind Yükleniyor</value>
     </data>
-    <data name="PopupText_InstallingRRFirstTime" xml:space="preserve">
+    <data name="Progress_InstallingRRFirstTime" xml:space="preserve">
         <value>Retro Rewind ilk kez yükleniyor</value>
     </data>
-    <data name="PopupText_LatestWhWzGithub" xml:space="preserve">
+    <data name="Progress_LatestWhWzGithub" xml:space="preserve">
         <value>Github sürümlerinden en son Wheel Wizard alınıyor</value>
     </data>
-    <data name="PopupText_ModCombineQuestion" xml:space="preserve">
-        <value>Tüm dosyaları 1 modda birleştirmek ister misiniz?</value>
-    </data>
-    <data name="PopupText_ModNameEmpty" xml:space="preserve">
-        <value>Mod adı boş olamaz</value>
-    </data>
-    <data name="PopupText_ModNameExists" xml:space="preserve">
+    <data name="MessageWarning_InvalidName_Extra_ModNameExists" xml:space="preserve">
         <value>{$1}' adıyla zaten bir mod mevcut.</value>
     </data>
-    <data name="PopupText_ModsFound" xml:space="preserve">
+    <data name="Question_LaunchClearModsFound_Title" xml:space="preserve">
         <value>Modlar bulundu</value>
     </data>
-    <data name="PopupText_ModsFoundQuestion" xml:space="preserve">
+    <data name="Question_LaunchClearModsFound_Extra" xml:space="preserve">
         <value>Mod olmadan oyunu başlatmak üzeresiniz. My-stuff klasörünüzü temizlemek ister misiniz?</value>
     </data>
-    <data name="PopupText_MultipleFilesSelected" xml:space="preserve">
+    <data name="MessageWarning_MultipleFilesSelected_Title" xml:space="preserve">
         <value>Birden Fazla Dosya Seçildi</value>
     </data>
-    <data name="PopupText_NewVersionWhWz" xml:space="preserve">
+    <data name="Question_NewVersionWhWz_Extra" xml:space="preserve">
         <value>Wheel Wizard'ın {$1} sürümü mevcut (şu anda {$2}'de). Şimdi güncellemek ister misiniz?</value>
     </data>
-    <data name="PopupText_NoModFolder" xml:space="preserve">
+    <data name="MessageError_NoModFolder_Extra" xml:space="preserve">
         <value>Mod klasörü mevcut değil</value>
     </data>
-    <data name="PopupText_NotFindDolphin" xml:space="preserve">
+    <data name="MessageWarning_NotFindDolphin_Extra" xml:space="preserve">
         <value>Dolphin Emulator bulunamadı, lütfen yolu ayarlarda belirleyin</value>
     </data>
-    <data name="PopupText_NotFindGame" xml:space="preserve">
+    <data name="MessageWarning_NotFindGame_Extra" xml:space="preserve">
         <value>Oyun bulunamadı, lütfen yolu ayarlarda belirleyin</value>
     </data>
-    <data name="PopupText_OldRksysFound" xml:space="preserve">
+    <data name="Question_OldRksysFound_Title" xml:space="preserve">
         <value>Eski rksys.dat bulundu</value>
     </data>
-    <data name="PopupText_OldRksysFoundExplained" xml:space="preserve">
+    <data name="Question_OldRksysFound_Extra" xml:space="preserve">
         <value>Eski kayıt verisi bulundu. Kullanmak ister misiniz? (önerilir)</value>
     </data>
-    <data name="PopupText_OldRRFound" xml:space="preserve">
-        <value>Eski Retro Rewind bulundu</value>
-    </data>
-    <data name="PopupText_OldRRFoundExplained" xml:space="preserve">
-        <value>Eski Retro Rewind dosyaları bulundu. Bunları yeni konuma taşımak ister misiniz?</value>
-    </data>
-    <data name="PopupText_ProcessingXofY" xml:space="preserve">
+    <data name="Progress_ProcessingXofY" xml:space="preserve">
         <value>{$1} dosyasından {$2} işleniyor...</value>
     </data>
-    <data name="PopupText_ReinstallRR" xml:space="preserve">
+    <data name="Question_ReinstallRR_Title" xml:space="preserve">
         <value>Retro Rewind'ı yeniden yükle</value>
     </data>
-    <data name="PopupText_RestartAdminFail" xml:space="preserve">
+    <data name="MessageError_RestartAdminFail_Extra" xml:space="preserve">
         <value>Yöneticilik haklarıyla yeniden başlatılamadı.</value>
     </data>
-    <data name="PopupText_RRNotDeterment" xml:space="preserve">
+    <data name="Question_RRNotDeterment_Extra" xml:space="preserve">
         <value>Retro Rewind sürümünüz belirlenemedi. Retro Rewind'ı indirmek ister misiniz?</value>
     </data>
-    <data name="PopupText_RRToOld" xml:space="preserve">
+    <data name="Question_RRToOld_Extra" xml:space="preserve">
         <value>Retro Rewind sürümünüz güncellemeye çok eski. Retro Rewind'ı yeniden yüklemek ister misiniz?</value>
     </data>
-    <data name="PopupText_RRUpToDate" xml:space="preserve">
+    <data name="MessageSuccess_RRUpToDate_Title" xml:space="preserve">
         <value>Retro Rewind güncel.</value>
     </data>
-    <data name="PopupText_SettingsSaved" xml:space="preserve">
+    <data name="MessageSuccess_SettingsSaved_Title" xml:space="preserve">
         <value>Ayarlar başarıyla kaydedildi!</value>
     </data>
-    <data name="PopupText_SureDeleteQuestion" xml:space="preserve">
+    <data name="Question_SureDelete_Title" xml:space="preserve">
         <value>{$1}'i silmek istediğinizden emin misiniz?</value>
     </data>
-    <data name="PopupText_UnableUpdateWhWz_ReasonLocation" xml:space="preserve">
-        <value>Wheel Wizard güncellenemedi. Uygulamanın yazılabilir bir klasörde bulunduğundan emin olun. \nGeçerli klasör bulunamadı.</value>
+    <data name="MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation" xml:space="preserve">
+        <value>Wheel Wizard güncellenemedi. Uygulamanın erişilebilir bir klasörde bulunduğundan emin olun. \n İstenilen klasör bulunamadı.</value>
     </data>
-    <data name="PopupText_UnableUpdateWhWz_ReasonNetwork" xml:space="preserve">
+    <data name="MessageWarning_UnableUpdateWhWz_Extra_ReasonNetwork" xml:space="preserve">
         <value>Wheel Wizard'ın güncel olup olmadığını kontrol edilemedi. \nAğ sorunları yaşıyor olabilirsiniz.</value>
     </data>
-    <data name="PopupText_UpdateAdmin" xml:space="preserve">
+    <data name="Question_UpdateAdmin_Title" xml:space="preserve">
         <value>Yönetici kullanarak güncelle</value>
     </data>
-    <data name="PopupText_UpdateAdminExplained" xml:space="preserve">
+    <data name="Question_UpdateAdmin_Extra" xml:space="preserve">
         <value>Bazen bir güncelleme yönetici hakları gerektirir, bu güncelleme için onları aktif etmek ister misiniz?</value>
     </data>
-    <data name="PopupText_UpdateRR" xml:space="preserve">
-        <value>Retro Rewind'ı güncelle</value>
-    </data>
-    <data name="PopupText_UpdateWhWz" xml:space="preserve">
+    <data name="Progress_UpdateWhWz" xml:space="preserve">
         <value>Wheel Wizard güncelleniyor</value>
     </data>
-    <data name="PopupText_WhWzUpdateAvailable" xml:space="preserve">
+    <data name="Question_NewVersionWhWz_Title" xml:space="preserve">
         <value>Wheel Wizard Güncellemesi Mevcut</value>
     </data>
-    <data name="PupupText_DownloadingMb" xml:space="preserve">
+    <data name="Progress_DownloadingMb" xml:space="preserve">
         <value>{$1} MB indiriliyor</value>
-    </data>
-    <data name="Sidebar_Link_Discord" xml:space="preserve">
-        <value>Bizimle İletişime Geçin!</value>
-    </data>
-    <data name="Sidebar_Link_Github" xml:space="preserve">
-        <value>Kaynak Kodu</value>
-    </data>
-    <data name="Sidebar_Link_Support" xml:space="preserve">
-        <value>Bize Destek Olun!</value>
     </data>
     <data name="Text_MadeByString" xml:space="preserve">
         <value>Yapımcı: {$1} \n Ve {$2}</value>
@@ -267,5 +228,239 @@ Belirli bir odaya katılmak için bir arkadaşınız aracılığıyla katılman�
     </data>
     <data name="Time_Seconds_x" xml:space="preserve">
         <value>{$1} saniye</value>
+    </data>
+    <data name="EmptyContent_NoMiis" xml:space="preserve">
+        <value>Sisteminizden Mii bilgisini okuyamıyoruz. Oyunu en az bir kez başlattığınıza emin olun.</value>
+    </data>
+    <data name="EmptyContent_NoMiis_Title" xml:space="preserve">
+        <value>Şimdilik Mii yok!</value>
+    </data>
+    <data name="HelperNote_CreatorNameLess11" xml:space="preserve">
+        <value>Yapımcı adı 11 karakterden kısa olması gerekiyor.</value>
+    </data>
+    <data name="HelperNote_NameMustBetween" xml:space="preserve">
+        <value>Adın 3 ile 10 karakter arasında olması gerekiyor.</value>
+    </data>
+    <data name="Hover_FriendsPageDisclaimer" xml:space="preserve">
+        <value>Arkadaş eklemek için onları oyunun içinde eklemeniz gerekiyor.</value>
+    </data>
+    <data name="Hover_PrimaryProfile" xml:space="preserve">
+        <value>Ana profil, Wheel Wizard için referans olarak kullanılır.</value>
+    </data>
+    <data name="Hover_RegionUserSelection" xml:space="preserve">
+        <value>Bu sadece SİZİN oynadığıınız bölgeleri gösterir.</value>
+    </data>
+    <data name="MessageError_AbortRR_Extra_InvalidFilePath" xml:space="preserve">
+        <value>Yanlış dosya yolu tespit edildi. Lütfen geliştiricilere bildirin.\n Sunucu hatası: {$1}</value>
+    </data>
+    <data name="MessageError_AbortRR_Title" xml:space="preserve">
+        <value>Retro Rewind güncellemesi iptal ediliyor</value>
+    </data>
+    <data name="MessageError_FailedChangeMii_Title" xml:space="preserve">
+        <value>Mii değiştirme başarısız</value>
+    </data>
+    <data name="MessageError_FailedChangeName_Title" xml:space="preserve">
+        <value>Ad değiştirme başarısız</value>
+    </data>
+    <data name="MessageError_FailedCreateMiiDb_Title" xml:space="preserve">
+        <value>Mii Veritabanı oluşturulamadı</value>
+    </data>
+    <data name="MessageError_GenericError_Title" xml:space="preserve">
+        <value>Bir hata oluştu</value>
+    </data>
+    <data name="MessageSuccess_MiiChanged" xml:space="preserve">
+        <value>Mii başarıyla değiştirildi</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Extra" xml:space="preserve">
+        <value>Seçilen bir ya da daha fazla Mii favori olarak ayarlanmış. Mii'ler favori iken yanlışlıkla silmeyi engellemek için silinemezler</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Title" xml:space="preserve">
+        <value>Favori Mii silinemiyor</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Extra_NotFromBrowser" xml:space="preserve">
+        <value>Mod tarayıcısından indirilmemiş modlar görüntülenemez.</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Extra_SomethingElse" xml:space="preserve">
+        <value>Seçilen modu açmaya çalışırken bir hata oluştu</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Title" xml:space="preserve">
+        <value>Bu mod görüntülenemiyor</value>
+    </data>
+    <data name="MessageWarning_FailCheckUpdates_Extra" xml:space="preserve">
+        <value>Şu an güncellemeler kontrol edilemiyor. İnternete bağlı olmayabilirsiniz veya sunucular çalışmıyor olabilir.</value>
+    </data>
+    <data name="MessageWarning_InvalidName_Title" xml:space="preserve">
+        <value>Ada izin verilmiyor.</value>
+    </data>
+    <data name="MessageWarning_InvalidPaths_Title" xml:space="preserve">
+        <value>Geçersiz yol.</value>
+    </data>
+    <data name="MessageWarning_NoConnectServer_Title" xml:space="preserve">
+        <value>Sunucuya bağlanılamıyor.</value>
+    </data>
+    <data name="MessageWarning_UnableUpdateWhWz_Title" xml:space="preserve">
+        <value>Wheel Wizard güncellenemedi.</value>
+    </data>
+    <data name="Progress_UpdateRR" xml:space="preserve">
+        <value>Retro Rewind Güncelleniyor</value>
+    </data>
+    <data name="Question_ApplyScale_Extra" xml:space="preserve">
+        <value>Bu değişiklik onaylamadığınız takdirde {$1} içinde eski haline dönecek.</value>
+    </data>
+    <data name="Question_ReinstallRR_Extra" xml:space="preserve">
+        <value>Retro Rewind'ı tekrar yüklemek istediğinize emin misiniz?</value>
+    </data>
+    <data name="Question_RRToOld_Title" xml:space="preserve">
+        <value>Retro Rewind sürümü çok eski.</value>
+    </data>
+    <data name="Question_SureDelete_Extra" xml:space="preserve">
+        <value>Silmek kalıcıdır ve geri alınamaz.</value>
+    </data>
+    <data name="Question_SureDelete_Title_Miis" xml:space="preserve">
+        <value>{$1} tane Mii'yi silmek istediğinize emin misiniz?</value>
+    </data>
+    <data name="SnackbarError_MiiFailureCreate" xml:space="preserve">
+        <value>Mii '{$1}' oluşturulamadı.</value>
+    </data>
+    <data name="SnackbarError_MiiFailureDeserialize" xml:space="preserve">
+        <value>Mii '{$1}' işlenemedi.</value>
+    </data>
+    <data name="SnackbarError_MiiFailureDuplicate" xml:space="preserve">
+        <value>Mii '{$1}' çoğaltılamadı.</value>
+    </data>
+    <data name="SnackbarError_MiiFailureGet" xml:space="preserve">
+        <value>Mii '{$1}' alınamadı.</value>
+    </data>
+    <data name="SnackbarError_MiiFailureSave" xml:space="preserve">
+        <value>Mii '{$1}' kaydedilemedi.</value>
+    </data>
+    <data name="SnackbarError_MiiFailureSerialize" xml:space="preserve">
+        <value>Mii '{$1}' işlenemedi.</value>
+    </data>
+    <data name="SnackbarError_MiiFailureUpdate" xml:space="preserve">
+        <value>Mii '{$1}' güncellenemedi.</value>
+    </data>
+    <data name="SnackbarSuccess_CopiedFC" xml:space="preserve">
+        <value>Arkadaş kodu panoya kopyalandı.</value>
+    </data>
+    <data name="SnackbarSuccess_CreatedDuplicate" xml:space="preserve">
+        <value>{$1}' nin kopyası oluşturuldu.</value>
+    </data>
+    <data name="SnackbarSuccess_CreatedDuplicatesMiis" xml:space="preserve">
+        <value>{$1}' Mii kopyası oluşturuldu.</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted" xml:space="preserve">
+        <value>{$1}' silindi.</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted_Miis" xml:space="preserve">
+        <value>{$1}' Mii silindi</value>
+    </data>
+    <data name="SnackbarSuccess_MiiAdded" xml:space="preserve">
+        <value>Mii, Mii'lerinize eklendi.</value>
+    </data>
+    <data name="SnackbarSuccess_NameChange" xml:space="preserve">
+        <value>Ad, başarıyla yeni ada değiştirildi. '{$1}'</value>
+    </data>
+    <data name="SnackbarSuccess_ProfileSetPrimary" xml:space="preserve">
+        <value>Profil birincil olarak ayarlandı.</value>
+    </data>
+    <data name="SnackbarSuccess_SavedMii" xml:space="preserve">
+        <value>Mii '{$1}' '{$2}' dosyasına kaydedildi.</value>
+    </data>
+    <data name="SnackbarWarning_CantSaveMii" xml:space="preserve">
+        <value>Mii kaydedilemiyor.</value>
+    </data>
+    <data name="SnackbarWarning_NoMiiDelete" xml:space="preserve">
+        <value>Silinecek Mii bulunamadı.</value>
+    </data>
+    <data name="SnackbarWarning_NoMiiExport" xml:space="preserve">
+        <value>Aktarılıcak Mii bulunamadı</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Title" xml:space="preserve">
+        <value>Mod adı boş olamaz</value>
+    </data>
+    <data name="Placeholder_SearchForPlayers" xml:space="preserve">
+        <value>Oyuncuları Ara...</value>
+    </data>
+    <data name="Placeholder_EnterPath" xml:space="preserve">
+        <value>İstenen yolu buraya girin...</value>
+    </data>
+    <data name="EmptyContent_NoModSelected" xml:space="preserve">
+        <value>Detaylarını görmek için listeden bir mod seçin</value>
+    </data>
+    <data name="EmptyContent_NoModSelected_Title" xml:space="preserve">
+        <value>Hiçbir mod seçilmedi</value>
+    </data>
+    <data name="MessageError_FailedInstallDolphin_Extra" xml:space="preserve">
+        <value>Dolphin Emulator yüklemesi başarısız oldu. Lütfen manuel bir şekilde Flatpak Dolphin'i yüklemeyi deneyin.</value>
+    </data>
+    <data name="MessageError_FailedInstallDolphin_Title" xml:space="preserve">
+        <value>Dolphin yüklemesi başarısız oldu.</value>
+    </data>
+    <data name="MessageError_FailedRetrieveMod_Title" xml:space="preserve">
+        <value>Mod bilgisi alınamadı.</value>
+    </data>
+    <data name="MessageError_ModDownloadFail_Extra" xml:space="preserve">
+        <value>İndirme sırasında bir hata oluştu: {$1}</value>
+    </data>
+    <data name="MessageError_ModDownloadFail_Title" xml:space="preserve">
+        <value>Mod indirmesi başarısız oldu.</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Extra" xml:space="preserve">
+        <value>Lütfen bir mod adı girin.</value>
+    </data>
+    <data name="MessageWarning_ModNameInvalid_Extra" xml:space="preserve">
+        <value>Mod adında geçersiz karakter bulunuyor.</value>
+    </data>
+    <data name="MessageWarning_ModNameInvalid_Title" xml:space="preserve">
+        <value>Mod adı geçersiz.</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Extra" xml:space="preserve">
+        <value>Dosyalar bulunamadı.</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Title" xml:space="preserve">
+        <value>Mod indirilemedi.</value>
+    </data>
+    <data name="Placeholder_EnterMiiName" xml:space="preserve">
+        <value>Mii adı girin...</value>
+    </data>
+    <data name="Placeholder_EnterModName" xml:space="preserve">
+        <value>Mod adı girin...</value>
+    </data>
+    <data name="Placeholder_EnterTextHere" xml:space="preserve">
+        <value>Metni buraya girin...</value>
+    </data>
+    <data name="Placeholder_SearchMod" xml:space="preserve">
+        <value>Mod arayın...</value>
+    </data>
+    <data name="Progress_InstallingDolphin" xml:space="preserve">
+        <value>Dolphin Emulator yükleniyor</value>
+    </data>
+    <data name="Progress_ThisMayTakeAWhile" xml:space="preserve">
+        <value>Bu, internetinize bağlı biraz uzun sürebilir.</value>
+    </data>
+    <data name="Question_DolphinFlatpack_Extra" xml:space="preserve">
+        <value>Bilgisayarınızda Dolphin Emulator'ın Flatpak sürümü bulunamadı. Yüklememizi ister misiniz? (tüm kullanıcılar için)</value>
+    </data>
+    <data name="Question_DolphinFlatpack_Title" xml:space="preserve">
+        <value>Dolphin Flatpak Yüklemesi</value>
+    </data>
+    <data name="Question_EnterNewName_Extra" xml:space="preserve">
+        <value>Ad değiştiriliyor. (Eski ad: {$1})</value>
+    </data>
+    <data name="Question_EnterNewName_Title" xml:space="preserve">
+        <value>Yeni adı girin:</value>
+    </data>
+    <data name="Question_InstallMod_Title" xml:space="preserve">
+        <value>Modu indirip kurmak ister misiniz: {$1}?</value>
+    </data>
+    <data name="Question_SearchMod" xml:space="preserve">
+        <value>Modları ara...</value>
+    </data>
+    <data name="Text_LanguageTranslatedBy" xml:space="preserve">
+        <value>Bu dili çevirenler: {$1}</value>
+    </data>
+    <data name="Text_PoweredGamebanana" xml:space="preserve">
+        <value>GameBanana tarafından</value>
     </data>
 </root>

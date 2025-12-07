@@ -56,9 +56,11 @@
         <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
                 Background="{StaticResource BackgroundColor}" />
-        <ContentControl Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="False"
-                        x:Name="ContentArea" Margin="{StaticResource EdgeGap}" />
-
+        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"  ClipToBounds="True">
+            <ContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="False"
+                            x:Name="ContentArea" Margin="{StaticResource EdgeGap}" />
+        </Grid>
+        
         <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom"
                     Margin="0,0,0,25">
             <components:StateBox x:Name="PlayerCountBox" Text="0" Variant="Dark"
@@ -110,8 +112,8 @@
 
 
         <!-- Sidebar -->
-        <TextBlock Text="{x:Static lang:Common.Term_General}" Classes="SidebarSectionText"
-                   VerticalAlignment="Bottom" Grid.Row="3" />
+        <TextBlock Text="{x:Static lang:Settings.Category_General}" Classes="SidebarSectionText"
+                   VerticalAlignment="Bottom" Grid.Row="3" /> <!-- Repurposing this translation from settings -->
         <StackPanel x:Name="SidePanelButtons" Grid.Column="0" Grid.Row="4" Width="192" VerticalAlignment="Top">
             <components:SidebarRadioButton IconData="{StaticResource Home}"
                                            Text="{x:Static lang:Common.PageTitle_Home}"
@@ -126,7 +128,8 @@
             <components:SidebarRadioButton IconData="{StaticResource Shirt}"
                                            PageType="{x:Type pages:MiiListPage}"
                                            Text="{x:Static lang:Common.PageTitle_MyMiis}" />
-            <TextBlock Text="{x:Static lang:Common.Term_Online}" Classes="SidebarSectionText" />
+            <TextBlock Text="{x:Static lang:Common.Attribute_Status_Online}" Classes="SidebarSectionText" />
+            <!-- Repurposing this translation from values -->
             <components:SidebarRadioButton IconData="{StaticResource RoomUsers}"
                                            PageType="{x:Type pages:RoomsPage}"
                                            Text="{x:Static lang:Common.PageTitle_Rooms}" x:Name="RoomsButton" />
@@ -135,7 +138,8 @@
                                            PageType="{x:Type pages:FriendsPage}"
                                            BoxText="0/0" />
 
-            <TextBlock Text="{x:Static lang:Common.Term_Other}" Classes="SidebarSectionText" />
+            <TextBlock Text="{x:Static lang:Settings.Category_Other}" Classes="SidebarSectionText" />
+            <!-- Repurposing this translation from settings -->
             <components:SidebarRadioButton IconData="{StaticResource Settings}"
                                            PageType="{x:Type settings:SettingsPage}"
                                            Text="{x:Static lang:Common.PageTitle_Settings}" x:Name="SettingsButton" />
@@ -146,7 +150,7 @@
         <Border Grid.Column="0" Grid.Row="5" Background="{StaticResource Neutral800}">
             <StackPanel VerticalAlignment="Center" Spacing="5">
                 <components:IconLabelButton IconData="{StaticResource DiscordIcon}"
-                                            Text="{x:Static lang:Phrases.Sidebar_Link_Discord}"
+                                            Text="{x:Static lang:Common.Action_Link_Discord}"
                                             Foreground="{StaticResource Neutral400}"
                                             HoverForeground="{StaticResource Primary300}"
                                             FontSize="13"
@@ -154,7 +158,7 @@
                                             Margin="10,0,0,0"
                                             IconSize="20" />
                 <components:IconLabelButton IconData="{StaticResource GithubIcon}"
-                                            Text="{x:Static lang:Phrases.Sidebar_Link_Github}"
+                                            Text="{x:Static lang:Common.Action_Link_Github}"
                                             Foreground="{StaticResource Neutral400}"
                                             HoverForeground="{StaticResource Primary300}"
                                             FontSize="13"
@@ -162,7 +166,7 @@
                                             Margin="10,0,0,0"
                                             IconSize="20" />
                 <components:IconLabelButton IconData="{StaticResource CoffeeIcon}"
-                                            Text="{x:Static lang:Phrases.Sidebar_Link_Support}"
+                                            Text="{x:Static lang:Common.Action_Link_Support}"
                                             Foreground="{StaticResource Neutral400}"
                                             HoverForeground="{StaticResource Primary300}"
                                             FontSize="13"

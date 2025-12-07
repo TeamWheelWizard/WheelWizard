@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models.Settings;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Settings;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages.Settings;
@@ -27,6 +27,7 @@ public partial class VideoSettings : UserControl
         {
             rb.Checked += UpdateResolution;
         }
+
         VSyncButton.IsCheckedChanged += VSync_OnClick;
         RecommendedButton.IsCheckedChanged += Recommended_OnClick;
         ShowFPSButton.IsCheckedChanged += ShowFPS_OnClick;
@@ -102,11 +103,7 @@ public partial class VideoSettings : UserControl
         }
         else
         {
-            new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                .SetTitleText("Unknown renderer selected")
-                .SetInfoText($"{Common.Term_Warning}: Unknown renderer selected: {selectedDisplayName}")
-                .ShowDialog();
+            MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_UnkownRendererSelected, null, [selectedDisplayName]);
         }
     }
 }

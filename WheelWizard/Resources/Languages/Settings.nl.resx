@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -13,49 +14,50 @@
         <value>1.3</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <data name="Option_WhWzLanguage" xml:space="preserve">
-        <value>Wheel Wizard Taal</value>
-    </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Retro Rewind Taal</value>
+        <value>Wheel Wizard-taal</value>
     </data>
     <data name="Section_Language" xml:space="preserve">
         <value>Taal</value>
     </data>
     <data name="Section_Wii" xml:space="preserve">
-        <value>Wii Instellingen</value>
+        <value>Wii-Instellingen</value>
     </data>
     <data name="Option_ForceDisableWiimote" xml:space="preserve">
-        <value>Wiimote uitzetten forceren</value>
+        <value>Forceer uitschakelen Wii-afstandsbediening</value>
     </data>
     <data name="Option_LaunchWithDolphin" xml:space="preserve">
-        <value>Start spel met een Dolphin Venster</value>
+        <value>Start spel met Dolphin-venster</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
-        <value>Instellingen zijn op slot, maak eerste de locatie instellingen compleet</value>
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
+        <value>Instellingen zijn uitgeschakeld, voltooi eerst de locatie-instellingen.</value>
     </data>
     <data name="Section_Resolution" xml:space="preserve">
         <value>Resolutie</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
-        <value>1x is de orginele resolutie</value>
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
+        <value>1× is de orginele resolutie.</value>
     </data>
     <data name="Section_Performance" xml:space="preserve">
-        <value>Optimalisatie Instellingen</value>
+        <value>Prestatie-instellingen</value>
     </data>
     <data name="Section_Renderer" xml:space="preserve">
-        <value>Rendering Instellingen</value>
+        <value>Renderer-instellingen</value>
     </data>
     <data name="Option_VSync" xml:space="preserve">
         <value>VSync</value>
     </data>
     <data name="Option_Recommended" xml:space="preserve">
-        <value>Aanbevolen Instellingen</value>
+        <value>Aanbevolen instellingen</value>
     </data>
     <data name="Option_ShowFPS" xml:space="preserve">
         <value>FPS weergeven</value>
@@ -64,43 +66,43 @@
         <value>Renderer</value>
     </data>
     <data name="Category_Video" xml:space="preserve">
-        <value>Beeld</value>
+        <value>Video</value>
     </data>
     <data name="Section_LocationPaths" xml:space="preserve">
-        <value>Locatie Instellingen</value>
+        <value>Locatie-instellingen</value>
     </data>
     <data name="Section_WhWzAppearance" xml:space="preserve">
-        <value>Wheel Wizard uiterlijk</value>
+        <value>Wheel Wizard-weergave</value>
     </data>
     <data name="Option_OpenConfig" xml:space="preserve">
-        <value>Open instellings map</value>
+        <value>Open config-map</value>
     </data>
     <data name="Option_DolphinUserPath" xml:space="preserve">
-        <value>Dolphin gebruikers map</value>
+        <value>Dolphin-gebruiker-map</value>
     </data>
     <data name="Option_MarioKartGame" xml:space="preserve">
-        <value>Mario Kart Wii spel bestand</value>
+        <value>Mario Kart Wii-spelbestand</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
-        <value>Dolphin emulator executable locatie</value>
+        <value>Dolphin-emulator-executable</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
-        <value>Locatie moet eindigen met .exe</value>
+    <data name="HelperText_EndWithExe" xml:space="preserve">
+        <value>Locatie moet eindigen met ".exe".</value>
     </data>
     <data name="Option_WindowScale" xml:space="preserve">
-        <value>Venster grootte</value>
+        <value>Venstergrootte</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
-        <value>Met deze instelling wordt de Wiimote in de game uitgeschakeld, maar voor het Wii-kanaal ingeschakeld.</value>
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
+        <value>Deze instelling schakelt de Wii-afstandsbediening uit in het spel, maar niet in het Wii-menu.</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
-        <value>Opent de dolphin venster samen met het spel</value>
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
+        <value>Opent het Dolphin-hoofdvenster met het spel erbij.</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
-        <value>Met deze instelling worden bepaalde dolpin-instellingen gewijzigd voor de meest geoptimalizeerde speel ervaring</value>
+    <data name="HelperText_Recommended" xml:space="preserve">
+        <value>Deze instelling verandert sommige Dolphin-instellingen voor een optimale ervaring.</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
-        <value>Met deze instelling wordt het spel gedwongen om te draaien op 30 FPS (standaard is 60)</value>
+    <data name="HelperText_30FPS" xml:space="preserve">
+        <value>Met deze instelling wordt het spel gedwongen om te draaien op 30 FPS (standaard is 60).</value>
     </data>
     <data name="Value_Language_Dutch" xml:space="preserve">
         <value>Nederlands</value>
@@ -127,36 +129,78 @@
         <value>Turks</value>
     </data>
     <data name="Option_MakePrimary" xml:space="preserve">
-        <value>Zet als hoofd profiel</value>
+        <value>Maak hoofdprofiel</value>
     </data>
-    <data name="CompletePercentage" xml:space="preserve">
-        <value>100</value>
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
+        <value>90</value>
     </data>
     <data name="Option_RemoveBlur" xml:space="preserve">
-        <value>Verwijder wazigheid</value>
+        <value>Verwijder waas</value>
     </data>
     <data name="Option_EnableAnimations" xml:space="preserve">
-        <value>Animaties aanzetten</value>
+        <value>Animaties inschakelen</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
-        <value>Deze instelling zet de animaties aan in deze app</value>
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
+        <value>Dit schakelt de animaties in de Wheel Wizard-app in.</value>
     </data>
     <data name="Value_Language_Finnish" xml:space="preserve">
         <value>Fins</value>
     </data>
     <data name="Value_Language_Korean" xml:space="preserve">
-        <value>Korean</value>
+        <value>Koreaans</value>
     </data>
     <data name="Value_Language_Russian" xml:space="preserve">
         <value>Russisch</value>
     </data>
     <data name="Option_OpenGameFolder" xml:space="preserve">
-        <value>Open spel map</value>
+        <value>Open spelmap</value>
     </data>
     <data name="Option_OpenSaveFolder" xml:space="preserve">
-        <value>Open opslag map</value>
+        <value>Open opslagmap</value>
     </data>
     <data name="Category_About" xml:space="preserve">
-        <value>Info</value>
+        <value>Over</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Arabisch</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Chinees</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Tsjechisch</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Noors</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Portugees</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Overig</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>Algemeen</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Herinstalleer RR</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Installatie</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>Locatie kan eindigen met:</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>Dit verandert alleen de taal van Wheel Wizard. Om de taal in het spel zelf te wijzigen, moet je dit doen via de instellingen van het spel.</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>WantToBeeMe, Noël, Krummers</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>Optioneel</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Je moet deze 3 locaties instellen voordat je Retro Rewind kunt spelen.</value>
     </data>
 </root>

@@ -24,32 +24,32 @@
     <data name="Category_Video" xml:space="preserve">
         <value>Video</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
+    <data name="HelperText_30FPS" xml:space="preserve">
         <value>Diese Einstellung erzwingt, dass das Spiel mit 30 FPS läuft (Standard ist 60).</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
-        <value>Dateipfad muss mit .exe ende</value>
+    <data name="HelperText_EndWithExe" xml:space="preserve">
+        <value>Dateipfad muss mit .exe enden.</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>Diese Einstellung deaktiviert die Wiimote im Spiel, aber nutzt sie für den Wii-Kanal</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>Wird Dolphins Hauptfenster mit dem Spiel starten</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>Diese Einstellung wird bestimmte Dolphin Einstellungen verändern, um Ruckeln und Lagspikes zu vermindern</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>1x ist die native Auflösung</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>Einstellungen sind deaktiviert, komplettiere erst den Dateispeicherort</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
-        <value>Dolphin Emulator executeable</value>
+        <value>Dolphin Emulator Programm-Datei</value>
     </data>
     <data name="Option_DolphinUserPath" xml:space="preserve">
-        <value>Dolphin Benutzer Ordner</value>
+        <value>Dolphin Benutzer-Ordner</value>
     </data>
     <data name="Option_ForceDisableWiimote" xml:space="preserve">
         <value>Wiimote ausschalten erzwingen</value>
@@ -58,7 +58,7 @@
         <value>Starte das Spiel mit dem Dolphin Fenster zusammen</value>
     </data>
     <data name="Option_MarioKartGame" xml:space="preserve">
-        <value>Mario Kart Wii Spiel Datei</value>
+        <value>Mario Kart Wii Spiel-Datei</value>
     </data>
     <data name="Option_OpenConfig" xml:space="preserve">
         <value>Konfigurationsordner öffnen</value>
@@ -69,11 +69,8 @@
     <data name="Option_Renderer" xml:space="preserve">
         <value>Renderer</value>
     </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Retro Rewind Sprache</value>
-    </data>
     <data name="Option_ShowFPS" xml:space="preserve">
-        <value>Zeige FPS an</value>
+        <value>FPS anzeigen</value>
     </data>
     <data name="Option_VSync" xml:space="preserve">
         <value>VSync</value>
@@ -103,7 +100,7 @@
         <value>Wheel Wizard Aussehen</value>
     </data>
     <data name="Section_Wii" xml:space="preserve">
-        <value>Wii Einstellung</value>
+        <value>Wii Einstellungen</value>
     </data>
     <data name="Value_Language_Dutch" xml:space="preserve">
         <value>Niederländisch</value>
@@ -126,14 +123,14 @@
     <data name="Value_Language_Turkish" xml:space="preserve">
         <value>Türkisch</value>
     </data>
-    <data name="CompletePercentage" xml:space="preserve">
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
         <value>100</value>
     </data>
     <data name="Option_MakePrimary" xml:space="preserve">
         <value>Hauptprofil</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
-        <value>Dies aktiviert die Animationen in der Wheel Wizard App</value>
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
+        <value>Dies aktiviert die Animationen in der Wheel Wizard App.</value>
     </data>
     <data name="Option_EnableAnimations" xml:space="preserve">
         <value>Aktiviere Animationen</value>
@@ -149,5 +146,56 @@
     </data>
     <data name="Value_Language_Russian" xml:space="preserve">
         <value>Russisch</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Arabisch</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Chinesisch</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Tschechisch</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Norwegisch</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Portugisisch</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Sonstiges</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>Allgemein</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>Über</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>Spielordner öffnen</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>Speicherdatenordner öffnen</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>RR neu installieren</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Installation</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>Weebo, kytronix, Gab, ToadetteHackFan</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>Pfad kann enden mit:</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Du musst erst diese 3 Dateipfade bestimmen um Retro Rewind spielen zu können.</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>Optional</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>Dies ändert nur die Sprache innerhalb von Wheel Wizard. Um die Sprache innerhalb des Spiels zu ändern musst du das in den Spieleinstellungen vornehmen</value>
     </data>
 </root>

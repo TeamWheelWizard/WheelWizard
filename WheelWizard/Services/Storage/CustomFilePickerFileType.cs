@@ -13,4 +13,11 @@ public static class CustomFilePickerFileType
             AppleUniformTypeIdentifiers = ["com.wheelwizard.mods"], // Honestly no idea how it works
             MimeTypes = ["application/mods"], // Honestly no idea how it works
         };
+    public static FilePickerFileType Miis { get; } =
+        new("Miis")
+        {
+            Patterns = ["*.mii", "*.miigx", "*.mae"],
+            AppleUniformTypeIdentifiers = ["com.wheelwizard.miis"],
+            MimeTypes = ["application/miis"],
+        };
 }

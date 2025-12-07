@@ -1,0 +1,130 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:WheelWizard.Views.Converters"
+        xmlns:controls="using:WheelWizard.Views.Components">
+    <!-- 
+    <Styles.Resources>
+        <x:Double x:Key="HeightMultiplier">5.0</x:Double>
+    </Styles.Resources> -->
+    <Design.PreviewWith>
+        <Grid Background="{StaticResource Black}" Height="200" Width="180">
+            <!-- Now you can set the Angle on each instance -->
+            <controls:WheelTrail Background="Green" Foreground="DarkGreen" Width="31" RelativeLength="4"
+                                 X="-70" Y="50" WheelRotation="25" Angle="3" />
+            <controls:WheelTrail Background="Red" Foreground="DarkRed" Width="11" RelativeLength="10"
+                                 Angle="110" X="-50" Y="20" ExtendedHeight="-7" />
+
+            <controls:WheelTrail Background="Orange" Foreground="DarkOrange" Width="41" RelativeLength="1.5"
+                                 Angle="210" X="10" Y="30" ExtendedHeight="-7">
+                <controls:WheelTrail.Styles>
+                    <Style Selector="controls|WheelTrail">
+                        <Style.Animations>
+                            <Animation Duration="0:0:1.5" IterationCount="INFINITE">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="WheelRotation" Value="0" />
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="WheelRotation" Value="360" />
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                    <Style Selector="controls|WheelTrail">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.2" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="ExtendedHeight" Value="0" />
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="ExtendedHeight" Value="1.2" />
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </controls:WheelTrail.Styles>
+            </controls:WheelTrail>
+
+            <controls:WheelTrail Background="Cyan" Foreground="DarkCyan" Width="61"
+                                 Angle="-20" X="10" Y="90">
+                <controls:WheelTrail.Styles>
+                    <Style Selector="controls|WheelTrail">
+                        <Style.Animations>
+                            <Animation Duration="0:0:2.5" IterationCount="INFINITE"
+                                       Easing="QuadraticEaseInOut">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="WheelRotation" Value="0" />
+                                    <Setter Property="ExtendedHeight" Value="0" />
+                                </KeyFrame>
+                                <KeyFrame Cue="50%">
+                                    <Setter Property="WheelRotation" Value="180" />
+                                    <Setter Property="ExtendedHeight" Value="60" />
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="WheelRotation" Value="360" />
+                                    <Setter Property="ExtendedHeight" Value="0" />
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </controls:WheelTrail.Styles>
+            </controls:WheelTrail>
+        </Grid>
+    </Design.PreviewWith>
+
+    <Style Selector="controls|WheelTrail" x:DataType="controls:WheelTrail">
+        <Setter Property="ClipToBounds" Value="False"></Setter>
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Height" Value="{Binding Width, RelativeSource={RelativeSource Self}}" />
+
+        <Setter Property="Template">
+            <ControlTemplate>
+                    <Border Width="{TemplateBinding Width}"
+                            CornerRadius="100000,100000,0,0" VerticalAlignment="Top"
+                            Margin="{TemplateBinding ExtendedHeight, Converter={x:Static  conv:DoubleToThicknessConverters.DoubleToTop}}">
+                        <Border.Height>
+                            <MultiBinding Converter="{x:Static conv:NumberConverters.MultiplyDouble}">
+                                <Binding Path="Width" RelativeSource="{RelativeSource Self}" />
+                                <Binding Path="RelativeLength" RelativeSource="{RelativeSource TemplatedParent}" />
+                                <!-- 
+                            If you want to do a constant, you can do it like this. And then add the constant to a resource like i did above
+                            <Binding Source="{StaticResource HeightMultiplier}" /> -->
+                            </MultiBinding>
+                        </Border.Height>
+                        <Grid RowDefinitions="1*,10*,1*" ColumnDefinitions="1*,10*,1*"
+                              Width="{TemplateBinding Width}" Height="{TemplateBinding Width}"
+                              VerticalAlignment="Top" HorizontalAlignment="Center">
+
+                            <Path Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Fill="{TemplateBinding Foreground}" Data="{StaticResource WheelIcon}"
+                                  Stretch="Uniform">
+                                <Path.RenderTransform>
+                                    <RotateTransform
+                                        Angle="{Binding WheelRotation, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </Path.RenderTransform>
+                            </Path>
+                        </Grid>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                <GradientStop
+                                    Color="{Binding Background,
+                                 RelativeSource={RelativeSource TemplatedParent},
+                                 Converter={x:Static conv:BrushColorConverters.BrushToColor}}"
+                                    Offset="0.0" />
+                                <GradientStop
+                                    Color="{Binding Background,
+                                 RelativeSource={RelativeSource TemplatedParent},
+                                 Converter={x:Static conv:BrushColorConverters.BrushToColor}}"
+                                    Offset="0.75" />
+                                <GradientStop
+                                    Color="{Binding Background,
+                                 RelativeSource={RelativeSource TemplatedParent},
+                                 Converter={x:Static conv:BrushColorConverters.TransparentColor}}"
+                                    Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+            
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

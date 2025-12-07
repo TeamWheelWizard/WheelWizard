@@ -5,7 +5,8 @@ using WheelWizard.Resources.Languages;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Pages;
 using WheelWizard.WiiManagement;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.GameLicense;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.BehaviorComponent;
 
@@ -58,9 +59,9 @@ public partial class CurrentUserProfile : UserControlBase
 
         var name = currentUser.NameOfMii;
         if (name == SettingValues.NoName)
-            name = Online.NoName;
+            name = Common.State_NoName;
         if (name == SettingValues.NoLicense)
-            name = Online.NoLicense;
+            name = Common.State_NoLicense;
 
         UserName = name;
         FriendCode = currentUser.FriendCode;

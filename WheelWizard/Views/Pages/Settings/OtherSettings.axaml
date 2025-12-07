@@ -15,7 +15,7 @@
                     HorizontalAlignment="Stretch" VerticalAlignment="Top"
                     Background="{StaticResource Warning600}">
                 <TextBlock HorizontalAlignment="Center" Classes="BodyText"
-                           FontWeight="SemiBold" Text="{x:Static lang:Settings.InfoText_Topbar_LocationWarning}"
+                           FontWeight="SemiBold" Text="{x:Static lang:Settings.HelperText_Topbar_LocationWarning}"
                            Foreground="{StaticResource BackgroundColor}" />
             </Border>
 
@@ -26,33 +26,14 @@
                               Classes="SwitchDark"
                               x:Name="DisableForce">
                         <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_ForceDisableWiimote}"
-                                                   TipText="{x:Static lang:Settings.InfoText_ForceDisableWiimote}" />
+                                                   TipText="{x:Static lang:Settings.HelperText_ForceDisableWiimote}" />
                     </CheckBox>
                     <CheckBox Margin="0,2" IsChecked="False"
                               Classes="SwitchDark"
                               x:Name="LaunchWithDolphin">
                         <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_LaunchWithDolphin}"
-                                                   TipText="{x:Static lang:Settings.InfoText_LaunchWithDolphin}" />
+                                                   TipText="{x:Static lang:Settings.HelperText_LaunchWithDolphin}" />
                     </CheckBox>
-                </StackPanel>
-            </Border>
-
-            <components1:FormFieldLabel Text="{x:Static lang:Settings.Section_Language}" />
-            <Border Classes="SettingsBlockStyle">
-                <StackPanel>
-                    <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_RRLanguage}" />
-                    <ComboBox x:Name="InGameLanguageDropdown"
-                              HorizontalAlignment="Stretch"
-                              Margin="0,0,0,5"
-                              VerticalAlignment="Top"/>
-
-                    <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_WhWzLanguage}" />
-                    <ComboBox x:Name="WhWzLanguageDropdown"
-                              HorizontalAlignment="Stretch"
-                              Margin="0,0,0,5"
-                              VerticalAlignment="Top"/>
-                    
-                    <TextBlock Classes="TinyText" IsVisible="False" x:Name="TranslationsPercentageText" />
                 </StackPanel>
             </Border>
             

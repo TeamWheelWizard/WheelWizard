@@ -16,7 +16,7 @@
                     HorizontalAlignment="Stretch" VerticalAlignment="Top"
                     Background="{StaticResource Warning600}">
                 <TextBlock HorizontalAlignment="Center" Classes="BodyText"
-                           FontWeight="SemiBold" Text="{x:Static lang:Settings.InfoText_Topbar_LocationWarning}"
+                           FontWeight="SemiBold" Text="{x:Static lang:Settings.HelperText_Topbar_LocationWarning}"
                            Foreground="{StaticResource BackgroundColor}" >
                 </TextBlock>
             </Border>
@@ -28,11 +28,11 @@
                     <UniformGrid Columns="2" x:Name="ResolutionStackPanel" Rows="4">
                         <RadioButton Margin="0,2" GroupName="ResolutionGroup"
                                      IsChecked="True" Tag="1">
-                            <components1:FormFieldLabel Text="1x (640x528)" TipText="{x:Static lang:Settings.InfoText_ResolutionScale}"/>
+                            <components1:FormFieldLabel Text="1x (640x528)" TipText="{x:Static lang:Settings.HelperText_ResolutionScale}"/>
                         </RadioButton>
                         <RadioButton Margin="0,2" GroupName="ResolutionGroup"
                                       Tag="5">
-                            <components1:FormFieldLabel Text="5x (3200x2640)"/>
+                            5x (3200x2640)
                         </RadioButton>
                         <RadioButton Margin="0,2" GroupName="ResolutionGroup"
                                      IsChecked="False" Tag="2">
@@ -73,7 +73,7 @@
                     <CheckBox Margin="0,2" IsChecked="False"
                               Classes="SwitchDark" x:Name="RecommendedButton">
                         <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_Recommended}"
-                                                   TipText="{x:Static lang:Settings.InfoText_Recommended}"/>
+                                                   TipText="{x:Static lang:Settings.HelperText_Recommended}"/>
                     </CheckBox>
                     <CheckBox Margin="0,2" IsChecked="False"
                               Classes="SwitchDark" x:Name="ShowFPSButton">

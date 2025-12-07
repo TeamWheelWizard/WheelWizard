@@ -1,4 +1,5 @@
 using Avalonia.Interactivity;
+using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Base;
 using Button = WheelWizard.Views.Components.Button;
 
@@ -16,7 +17,7 @@ public partial class MessageBoxWindow : PopupContent
     private MessageType messageType = MessageType.Message;
 
     public MessageBoxWindow()
-        : base(true, false, true, "Message")
+        : base(true, false, true, Common.Attribute_Message)
     {
         InitializeComponent();
         SetMessageType(messageType);
@@ -41,6 +42,13 @@ public partial class MessageBoxWindow : PopupContent
     public MessageBoxWindow SetInfoText(string extraText)
     {
         MessageInformationBlock.Text = extraText;
+        return this;
+    }
+
+    public MessageBoxWindow SetTag(string extraText)
+    {
+        MessageTag.Text = extraText;
+        MessageTagBlock.IsVisible = true;
         return this;
     }
 

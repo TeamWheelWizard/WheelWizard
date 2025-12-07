@@ -3,10 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.BehaviorComponent;
 

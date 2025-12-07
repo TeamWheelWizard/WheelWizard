@@ -18,224 +18,185 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="EmptyText_NoFriends" xml:space="preserve">
-        <value>Вы можете добавить друзей в игре</value>
+    <data name="EmptyContent_NoFriends" xml:space="preserve">
+        <value>Друзей можно добавить через игру</value>
     </data>
-    <data name="EmptyText_NoFriends_Title" xml:space="preserve">
-        <value>Ещё нет друзей!</value>
+    <data name="EmptyContent_NoFriends_Title" xml:space="preserve">
+        <value>У вас еще нет друзей!</value>
     </data>
-    <data name="EmptyText_NoMods" xml:space="preserve">
-        <value>Моды могут изменять поведение игры. Чтобы импортировать свой мод, нажмите кнопку ниже.</value>
+    <data name="EmptyContent_NoMods" xml:space="preserve">
+        <value>С помощью модов можно изменять поведение игры. Чтобы импортировать свой мод, нажмите кнопку ниже.</value>
     </data>
-    <data name="EmptyText_NoMods_Title" xml:space="preserve">
+    <data name="EmptyContent_NoMods_Title" xml:space="preserve">
         <value>Моды не найдены</value>
     </data>
-    <data name="EmptyText_NoProfiles" xml:space="preserve">
-        <value>Вам нужно сыграть в игру как минимум один раз, чтобы видеть свои профиля здесь.</value>
+    <data name="EmptyContent_NoProfiles" xml:space="preserve">
+        <value>Ваши профили появятся здесь, как только вы сыграете хотя бы раз.</value>
     </data>
-    <data name="EmptyText_NoRooms" xml:space="preserve">
-        <value>Возможно, у вас нет подключения к интернету, либо никто сейчас не играет.</value>
+    <data name="EmptyContent_NoRooms" xml:space="preserve">
+        <value>Возможно, у вас нет подключения к Интернету, либо никто сейчас не играет.</value>
     </data>
-    <data name="EmptyText_NoRooms_Title" xml:space="preserve">
+    <data name="EmptyContent_NoRooms_Title" xml:space="preserve">
         <value>Комнаты не найдены</value>
     </data>
     <data name="Hover_FriendsOnline_0" xml:space="preserve">
-        <value>Никто из ваших друзей в сети.</value>
+        <value>Друзей в сети: 0</value>
     </data>
     <data name="Hover_FriendsOnline_1" xml:space="preserve">
-        <value>Один ваш друг сейчас в сети.</value>
+        <value>Друзей в сети: 1</value>
     </data>
     <data name="Hover_FriendsOnline_x" xml:space="preserve">
-        <value>Сейчас, {$1} ваших друзей в сети.</value>
+        <value>Друзей в сети: {$1}</value>
     </data>
     <data name="Hover_PlayersOnline_0" xml:space="preserve">
-        <value>Сейчас в сети нет игроков.</value>
+        <value>Игроков в сети: 0</value>
     </data>
     <data name="Hover_PlayersOnline_1" xml:space="preserve">
-        <value>1 игрок сейчас в сети.</value>
+        <value>Игроков в сети: 1</value>
     </data>
     <data name="Hover_PlayersOnline_x" xml:space="preserve">
-        <value>{$1} игроков сейчас в сети.</value>
+        <value>Игроков в сети: {$1}</value>
     </data>
     <data name="Hover_RoomsOnline_0" xml:space="preserve">
-        <value>Сейчас нет активных комнат.</value>
+        <value>Активных групп: 0</value>
     </data>
     <data name="Hover_RoomsOnline_1" xml:space="preserve">
-        <value>Всего одна комната сейчас активна.</value>
+        <value>Активных групп: 1</value>
     </data>
     <data name="Hover_RoomsOnline_x" xml:space="preserve">
-        <value>Сейчас активно {$1} комнат.</value>
+        <value>Активных групп: {$1}</value>
     </data>
     <data name="Hover_RoomsPageDisclaimer" xml:space="preserve">
         <value>Вы не можете заходить в комнаты прямо через это меню. Чтобы зайти в определённую комнату, вам нужно либо зайти через друга, либо надеяться попасть в неё через онлайн сервера.</value>
     </data>
-    <data name="Placeholder_EnterPath" xml:space="preserve">
-        <value>Вставьте сюда путь к файлу...</value>
-    </data>
-    <data name="Placeholder_SearchForPlayers" xml:space="preserve">
-        <value>Искать игроков...</value>
-    </data>
-    <data name="PopupText_AlreadyFilesRR" xml:space="preserve">
-        <value>В папке RetroRewind уже есть файлы. Желаете продолжить?</value>
-    </data>
-    <data name="PopupText_ApplyScale" xml:space="preserve">
+    <data name="Question_ApplyScale_Title" xml:space="preserve">
         <value>Хотите применить новый масштаб?</value>
     </data>
-    <data name="PopupText_CouldNotConnectServer" xml:space="preserve">
+    <data name="MessageWarning_NoConnectServer_Extra" xml:space="preserve">
         <value>Не удалось подключиться к серверу. Попробуйте чуть позже.</value>
     </data>
-    <data name="PopupText_DolphinFound" xml:space="preserve">
+    <data name="Question_DolphinFound_Title" xml:space="preserve">
         <value>Папка эмулятора Dolphin найдена</value>
     </data>
-    <data name="PopupText_DolphinFoundText" xml:space="preserve">
+    <data name="Question_DolphinFound_Extra" xml:space="preserve">
         <value>Если ты понятия не имеешь что это значит, просто нажми да :D \nПапка эмулятора Dolphin найдена. Хотите её использовать?</value>
     </data>
-    <data name="PopupText_DolphinNotFound" xml:space="preserve">
+    <data name="MessageWarning_DolphinNotFound_Title" xml:space="preserve">
         <value>Папка эмулятора Dolphin не найдена</value>
     </data>
-    <data name="PopupText_DolphinNotFoundText" xml:space="preserve">
+    <data name="MessageWarning_DolphinNotFound_Extra" xml:space="preserve">
         <value>Папка эмулятора Dolphin не была найдена автоматически. Пожалуйста, попробуйте найти её самостоятельно. Для подробностей, нажмите на "Помощь"</value>
     </data>
-    <data name="PopupText_DownloadRR" xml:space="preserve">
+    <data name="Question_RRNotDeterment_Title" xml:space="preserve">
         <value>Скачать Retro Rewind</value>
     </data>
-    <data name="PopupText_EnsurePathsExists" xml:space="preserve">
+    <data name="MessageWarning_InvalidPaths_Extra" xml:space="preserve">
         <value>Убедитесь, что все пути правильны и попробуйте ещё раз.</value>
     </data>
-    <data name="PopupText_EnterModName" xml:space="preserve">
-        <value>Укажите название мода:</value>
-    </data>
-    <data name="PopupText_EnterTitle" xml:space="preserve">
-        <value>Укажите заголовок:</value>
-    </data>
-    <data name="PopupText_EsimatedTimeRemaining" xml:space="preserve">
+    <data name="Progress_EstimatedTimeRemaining" xml:space="preserve">
         <value>Осталось примерно:</value>
     </data>
-    <data name="PopupText_FailCheckUpdates" xml:space="preserve">
+    <data name="MessageWarning_FailCheckUpdates_Title" xml:space="preserve">
         <value>Не удалось проверить обновления</value>
     </data>
-    <data name="PopupText_FailedUpdateApply" xml:space="preserve">
+    <data name="MessageError_AbortRR_Extra_FailedUpdateApply" xml:space="preserve">
         <value>Не удалось применить обновление. Отменяем.</value>
     </data>
-    <data name="PopupText_FailedUpdateDelete" xml:space="preserve">
+    <data name="MessageError_AbortRR_Extra_FailedUpdateDelete" xml:space="preserve">
         <value>Не удалось удалить файлы для обновления. Отменяем</value>
     </data>
-    <data name="PopupText_InstallingMods" xml:space="preserve">
+    <data name="Progress_InstallingMods" xml:space="preserve">
         <value>Устанавливаем моды</value>
     </data>
-    <data name="PopupText_InstallingModsCount" xml:space="preserve">
+    <data name="Progress_InstallingModsCount" xml:space="preserve">
         <value>Устанавливаем {$!} модов</value>
     </data>
-    <data name="PopupText_InstallingRR" xml:space="preserve">
+    <data name="Progress_InstallingRR" xml:space="preserve">
         <value>Устанавливаем Retro Rewind</value>
     </data>
-    <data name="PopupText_InstallingRRFirstTime" xml:space="preserve">
+    <data name="Progress_InstallingRRFirstTime" xml:space="preserve">
         <value>Устанавливаем Retro Rewind в первый раз</value>
     </data>
-    <data name="PopupText_LatestWhWzGithub" xml:space="preserve">
+    <data name="Progress_LatestWhWzGithub" xml:space="preserve">
         <value>Получаем последнюю версию Wheel Wizard из GitHub</value>
     </data>
-    <data name="PopupText_ModCombineQuestion" xml:space="preserve">
-        <value>Хотите соеденить все файлы в один мод?</value>
-    </data>
-    <data name="PopupText_ModNameEmpty" xml:space="preserve">
-        <value>Название мода не может быть пустым.</value>
-    </data>
-    <data name="PopupText_ModNameExists" xml:space="preserve">
+    <data name="MessageWarning_InvalidName_Extra_ModNameExists" xml:space="preserve">
         <value>Мод с названием {$1} уже существует.</value>
     </data>
-    <data name="PopupText_ModsFound" xml:space="preserve">
+    <data name="Question_LaunchClearModsFound_Title" xml:space="preserve">
         <value>Моды найдены</value>
     </data>
-    <data name="PopupText_ModsFoundQuestion" xml:space="preserve">
+    <data name="Question_LaunchClearModsFound_Extra" xml:space="preserve">
         <value>Прямо сейчас вы запускаете игру без модов. Желаете очистить папку my-stuff?</value>
     </data>
-    <data name="PopupText_MultipleFilesSelected" xml:space="preserve">
+    <data name="MessageWarning_MultipleFilesSelected_Title" xml:space="preserve">
         <value>Выбрано несколько файлов</value>
     </data>
-    <data name="PopupText_NewVersionWhWz" xml:space="preserve">
+    <data name="Question_NewVersionWhWz_Extra" xml:space="preserve">
         <value>Версия {$1} Wheel Wizard'а доступна (прямо сейчас. вы на {$2}). Хотите произвести обновление?</value>
     </data>
-    <data name="PopupText_NoModFolder" xml:space="preserve">
+    <data name="MessageError_NoModFolder_Extra" xml:space="preserve">
         <value>Папка с модами не существует</value>
     </data>
-    <data name="PopupText_NotFindDolphin" xml:space="preserve">
+    <data name="MessageWarning_NotFindDolphin_Extra" xml:space="preserve">
         <value>Не удалось найти эмулятор Dolphin, пожалуйста, установите путь в настройках.</value>
     </data>
-    <data name="PopupText_NotFindGame" xml:space="preserve">
+    <data name="MessageWarning_NotFindGame_Extra" xml:space="preserve">
         <value>Не удалось найти игру, пожалуйста, установить путь в настройках.</value>
     </data>
-    <data name="PopupText_OldRksysFound" xml:space="preserve">
-        <value>Старый rksys.dat был найден</value>
+    <data name="Question_OldRksysFound_Title" xml:space="preserve">
+        <value>Обнаружен старый rksys.dat</value>
     </data>
-    <data name="PopupText_OldRksysFoundExplained" xml:space="preserve">
+    <data name="Question_OldRksysFound_Extra" xml:space="preserve">
         <value>Старые данные сохранения были найдена. Желаете их исполльзовать? (рекоммендовано)</value>
     </data>
-    <data name="PopupText_OldRRFound" xml:space="preserve">
-        <value>Старый Retro Rewind был найден.</value>
-    </data>
-    <data name="PopupText_OldRRFoundExplained" xml:space="preserve">
-        <value>Старые файлы Retro Rewind были найдены. Хотите переместить их в новую директорию?</value>
-    </data>
-    <data name="PopupText_ProcessingXofY" xml:space="preserve">
+    <data name="Progress_ProcessingXofY" xml:space="preserve">
         <value>Обработка {$1} из {$2} файлов...</value>
     </data>
-    <data name="PopupText_ReinstallRR" xml:space="preserve">
+    <data name="Question_ReinstallRR_Title" xml:space="preserve">
         <value>Переустановить Retro Rewind</value>
     </data>
-    <data name="PopupText_RestartAdminFail" xml:space="preserve">
+    <data name="MessageError_RestartAdminFail_Extra" xml:space="preserve">
         <value>Не удалось перезапуститься с правами администратора.</value>
     </data>
-    <data name="PopupText_RRNotDeterment" xml:space="preserve">
-        <value>Не удалос определить вашу версию Retro Rewind. Хотите установить Retro Rewind?</value>
+    <data name="Question_RRNotDeterment_Extra" xml:space="preserve">
+        <value>Не удалось определить вашу версию Retro Rewind. Хотите установить Retro Rewind?</value>
     </data>
-    <data name="PopupText_RRToOld" xml:space="preserve">
-        <value>Ваша версия Retro Rewind слишком доисторическая. чтобы обновиться. Хотите переустановить Retro Rewind?</value>
+    <data name="Question_RRToOld_Extra" xml:space="preserve">
+        <value>Ваша версия Retro Rewind слишком устарела для обновлений. Хотите переустановить Retro Rewind?</value>
     </data>
-    <data name="PopupText_RRUpToDate" xml:space="preserve">
+    <data name="MessageSuccess_RRUpToDate_Title" xml:space="preserve">
         <value>Retro Rewind на последней версии.</value>
     </data>
-    <data name="PopupText_SettingsSaved" xml:space="preserve">
+    <data name="MessageSuccess_SettingsSaved_Title" xml:space="preserve">
         <value>Настройки успешно сохранены!</value>
     </data>
-    <data name="PopupText_SureDeleteQuestion" xml:space="preserve">
+    <data name="Question_SureDelete_Title" xml:space="preserve">
         <value>Вы уверены что хотите удалить {$1}?</value>
     </data>
-    <data name="PopupText_UnableUpdateWhWz_ReasonLocation" xml:space="preserve">
+    <data name="MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation" xml:space="preserve">
         <value>Не удалось обновить Wheel Wizard. Пожалуйста убедитесь, что исполняемый файл находится в папке куда можно добавлять файлы.\n Не удалось найти текущую папку.</value>
     </data>
-    <data name="PopupText_UnableUpdateWhWz_ReasonNetwork" xml:space="preserve">
+    <data name="MessageWarning_UnableUpdateWhWz_Extra_ReasonNetwork" xml:space="preserve">
         <value>Не удалось проверить, обновлён ли Wheel Wizard до последней версии? \nВы возможно испытываете проблемы с подключеним.</value>
     </data>
-    <data name="PopupText_UpdateAdmin" xml:space="preserve">
+    <data name="Question_UpdateAdmin_Title" xml:space="preserve">
         <value>Обновитесь через права администратора.</value>
     </data>
-    <data name="PopupText_UpdateAdminExplained" xml:space="preserve">
+    <data name="Question_UpdateAdmin_Extra" xml:space="preserve">
         <value>Иногда, для обновления нужны права администратора. Хотите ли вы их активировать ради этого обновления?</value>
     </data>
-    <data name="PopupText_UpdateRR" xml:space="preserve">
-        <value>Обновить Retro Rewind</value>
-    </data>
-    <data name="PopupText_UpdateWhWz" xml:space="preserve">
+    <data name="Progress_UpdateWhWz" xml:space="preserve">
         <value>Обновляем Wheel Wizard</value>
     </data>
-    <data name="PopupText_WhWzUpdateAvailable" xml:space="preserve">
+    <data name="Question_NewVersionWhWz_Title" xml:space="preserve">
         <value>Доступно обновление Wheel Wizard</value>
     </data>
-    <data name="PupupText_DownloadingMb" xml:space="preserve">
-        <value>скачиваем {$1} МБ</value>
-    </data>
-    <data name="Sidebar_Link_Discord" xml:space="preserve">
-        <value>Наш Discord сервер</value>
-    </data>
-    <data name="Sidebar_Link_Github" xml:space="preserve">
-        <value>Исходный код</value>
-    </data>
-    <data name="Sidebar_Link_Support" xml:space="preserve">
-        <value>Поддержать нас</value>
+    <data name="Progress_DownloadingMb" xml:space="preserve">
+        <value>Загружено {$1} МБ</value>
     </data>
     <data name="Text_MadeByString" xml:space="preserve">
-        <value>Сделано: {$1} \n и {$2}</value>
+        <value>Создатели: {$1}\nи {$2}</value>
     </data>
     <data name="Text_ThanksTranslators" xml:space="preserve">
         <value>Низкий поклон и спасибо переводчикам:</value>
@@ -247,24 +208,144 @@
         <value>1 день</value>
     </data>
     <data name="Time_Days_x" xml:space="preserve">
-        <value>{$1} дней</value>
+        <value>{$1} дн.</value>
     </data>
     <data name="Time_Hours_1" xml:space="preserve">
-        <value>1 час</value>
+        <value>1 ч</value>
     </data>
     <data name="Time_Hours_x" xml:space="preserve">
-        <value>{$1} часов</value>
+        <value>{$1} ч</value>
     </data>
     <data name="Time_Minutes_1" xml:space="preserve">
-        <value>1 минута</value>
+        <value>1 мин</value>
     </data>
     <data name="Time_Minutes_x" xml:space="preserve">
-        <value>{$1} минут</value>
+        <value>{$1} мин</value>
     </data>
     <data name="Time_Seconds_1" xml:space="preserve">
-        <value>1 секунда</value>
+        <value>1 сек</value>
     </data>
     <data name="Time_Seconds_x" xml:space="preserve">
-        <value>{$1} секунд</value>
+        <value>{$1} сек</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Title" xml:space="preserve">
+        <value>Название мода не может быть пустым.</value>
+    </data>
+    <data name="Placeholder_SearchForPlayers" xml:space="preserve">
+        <value>Поиск игроков...</value>
+    </data>
+    <data name="Placeholder_EnterPath" xml:space="preserve">
+        <value>Вставьте сюда путь к файлу...</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Title" xml:space="preserve">
+        <value>Не удалось загрузить мод</value>
+    </data>
+    <data name="MessageWarning_UnableUpdateWhWz_Title" xml:space="preserve">
+        <value>Не удалось обновить Wheel Wizard.</value>
+    </data>
+    <data name="Question_EnterNewName_Title" xml:space="preserve">
+        <value>Введите новое название</value>
+    </data>
+    <data name="Question_InstallMod_Title" xml:space="preserve">
+        <value>Хотите установить этот мод: {$1}?</value>
+    </data>
+    <data name="Question_ReinstallRR_Extra" xml:space="preserve">
+        <value>Вы уверены, что хотите переустановить Retro Rewind?</value>
+    </data>
+    <data name="Question_SureDelete_Title_Miis" xml:space="preserve">
+        <value>Вы уверены, что хотите удалить {$1} Mii?</value>
+    </data>
+    <data name="Text_LanguageTranslatedBy" xml:space="preserve">
+        <value>Авторы перевода: {$1}</value>
+    </data>
+    <data name="EmptyContent_NoMiis_Title" xml:space="preserve">
+        <value>У вас еще нет Mii!</value>
+    </data>
+    <data name="EmptyContent_NoModSelected_Title" xml:space="preserve">
+        <value>Моды не выбраны</value>
+    </data>
+    <data name="MessageError_FailedChangeMii_Title" xml:space="preserve">
+        <value>Не удалось изменить Mii.</value>
+    </data>
+    <data name="MessageError_FailedChangeName_Title" xml:space="preserve">
+        <value>Не удалось изменить имя.</value>
+    </data>
+    <data name="MessageError_FailedCreateMiiDb_Title" xml:space="preserve">
+        <value>Не удалось создать базу Mii.</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Title" xml:space="preserve">
+        <value>Не удалось удалить избранного(-ых) Mii</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Extra" xml:space="preserve">
+        <value>Не удалось найти файлы.</value>
+    </data>
+    <data name="SnackbarError_MiiFailureCreate" xml:space="preserve">
+        <value>Не удалось создать Mii '{$1}'</value>
+    </data>
+    <data name="Text_PoweredGamebanana" xml:space="preserve">
+        <value>Моды из GameBanana</value>
+    </data>
+    <data name="EmptyContent_NoModSelected" xml:space="preserve">
+        <value>Выберите мод из списка, чтобы узнать подробности.</value>
+    </data>
+    <data name="HelperNote_CreatorNameLess11" xml:space="preserve">
+        <value>Имя создателя должно быть длиной в меньше 11 символов.</value>
+    </data>
+    <data name="HelperNote_NameMustBetween" xml:space="preserve">
+        <value>Имена должны быть длиной от 3 до 10 символов.</value>
+    </data>
+    <data name="Hover_FriendsPageDisclaimer" xml:space="preserve">
+        <value>Чтобы добавить друга нужно сначала подружить</value>
+    </data>
+    <data name="Placeholder_EnterMiiName" xml:space="preserve">
+        <value>Введите имя Mii...</value>
+    </data>
+    <data name="Placeholder_EnterModName" xml:space="preserve">
+        <value>Введите название мода...</value>
+    </data>
+    <data name="Placeholder_EnterTextHere" xml:space="preserve">
+        <value>Введите текст...</value>
+    </data>
+    <data name="Placeholder_SearchMod" xml:space="preserve">
+        <value>Поиск модов...</value>
+    </data>
+    <data name="Progress_InstallingDolphin" xml:space="preserve">
+        <value>Установка эмулятора Dolphin</value>
+    </data>
+    <data name="Progress_UpdateRR" xml:space="preserve">
+        <value>Обновляем Retro Rewind</value>
+    </data>
+    <data name="Question_RRToOld_Title" xml:space="preserve">
+        <value>Версия Retro Rewind слишком стара</value>
+    </data>
+    <data name="Question_SearchMod" xml:space="preserve">
+        <value>Поиск модов...</value>
+    </data>
+    <data name="Question_SureDelete_Extra" xml:space="preserve">
+        <value>Удаление является необратимым и не может быть отменено.</value>
+    </data>
+    <data name="SnackbarError_MiiFailureDeserialize" xml:space="preserve">
+        <value>Не удалось импортировать Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureDuplicate" xml:space="preserve">
+        <value>Не удалось дублировать Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureGet" xml:space="preserve">
+        <value>Не удалось получить Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureSave" xml:space="preserve">
+        <value>Не удалось сохранить Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureSerialize" xml:space="preserve">
+        <value>Не удалось экспортировать Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureUpdate" xml:space="preserve">
+        <value>Не удалось обновить Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarSuccess_CopiedFC" xml:space="preserve">
+        <value>Код друга сохранён в буфер обмена</value>
+    </data>
+    <data name="SnackbarSuccess_CreatedDuplicate" xml:space="preserve">
+        <value>Создан дубликат '{$1}'</value>
     </data>
 </root>

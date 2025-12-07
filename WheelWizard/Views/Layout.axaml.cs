@@ -17,6 +17,7 @@ using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.Views;
 

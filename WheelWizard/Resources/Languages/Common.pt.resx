@@ -18,4 +18,139 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="Action_Apply" xml:space="preserve">
+        <value>Aplicar</value>
+    </data>
+    <data name="Action_Browse" xml:space="preserve">
+        <value>Procurar</value>
+    </data>
+    <data name="Action_Cancel" xml:space="preserve">
+        <value>Cancelar</value>
+    </data>
+    <data name="Action_CopyFriendCode" xml:space="preserve">
+        <value>Copiar código de amigo</value>
+    </data>
+    <data name="Action_Delete" xml:space="preserve">
+        <value>Apagar</value>
+    </data>
+    <data name="Action_DisableAll" xml:space="preserve">
+        <value>Desativar tudo</value>
+    </data>
+    <data name="Action_Edit" xml:space="preserve">
+        <value>Editar</value>
+    </data>
+    <data name="Action_EnableAll" xml:space="preserve">
+        <value>Ativar tudo</value>
+    </data>
+    <data name="Action_Export" xml:space="preserve">
+        <value>Exportar</value>
+    </data>
+    <data name="Action_Import" xml:space="preserve">
+        <value>Importar</value>
+    </data>
+    <data name="Action_Install" xml:space="preserve">
+        <value>Instalar</value>
+    </data>
+    <data name="Action_Keep" xml:space="preserve">
+        <value>Manter</value>
+    </data>
+    <data name="Action_MaybeLater" xml:space="preserve">
+        <value>Talvez mais tarde</value>
+    </data>
+    <data name="Action_No" xml:space="preserve">
+        <value>Não</value>
+    </data>
+    <data name="Action_Ok" xml:space="preserve">
+        <value>Ok</value>
+    </data>
+    <data name="Action_OpenFolder" xml:space="preserve">
+        <value>Abrir pasta</value>
+    </data>
+    <data name="Action_Play" xml:space="preserve">
+        <value>Jogar</value>
+    </data>
+    <data name="Action_PlayOffline" xml:space="preserve">
+        <value>Jogar offline</value>
+    </data>
+    <data name="Action_Rename" xml:space="preserve">
+        <value>Mudar o nome</value>
+    </data>
+    <data name="Action_Revert" xml:space="preserve">
+        <value>Reverter</value>
+    </data>
+    <data name="Action_Save" xml:space="preserve">
+        <value>Guardar</value>
+    </data>
+    <data name="Action_Update" xml:space="preserve">
+        <value>Atualizar</value>
+    </data>
+    <data name="Action_ViewMod" xml:space="preserve">
+        <value>Ver Mod</value>
+    </data>
+    <data name="Action_Yes" xml:space="preserve">
+        <value>Sim</value>
+    </data>
+    <data name="Attribute_Enabled" xml:space="preserve">
+        <value>Ativado</value>
+    </data>
+    <data name="Attribute_Id" xml:space="preserve">
+        <value>ID</value>
+    </data>
+    <data name="Attribute_ModName" xml:space="preserve">
+        <value>Nome dos Mods</value>
+    </data>
+    <data name="Attribute_Name" xml:space="preserve">
+        <value>Nome</value>
+    </data>
+    <data name="Attribute_Title" xml:space="preserve">
+        <value>Título</value>
+    </data>
+    <data name="Attribute_Type" xml:space="preserve">
+        <value>Tipo</value>
+    </data>
+    <data name="PageTitle_Friends" xml:space="preserve">
+        <value>Amigos</value>
+    </data>
+    <data name="PageTitle_Home" xml:space="preserve">
+        <value>Casa</value>
+    </data>
+    <data name="PageTitle_Mods" xml:space="preserve">
+        <value>My stuff</value>
+    </data>
+    <data name="PageTitle_MyProfiles" xml:space="preserve">
+        <value>Os meus perfis</value>
+    </data>
+    <data name="PageTitle_RoomDetails" xml:space="preserve">
+        <value>Detalhes da sala</value>
+    </data>
+    <data name="PageTitle_Rooms" xml:space="preserve">
+        <value>Salas</value>
+    </data>
+    <data name="PageTitle_Settings" xml:space="preserve">
+        <value>Definições</value>
+    </data>
+    <data name="Action_ViewRoom" xml:space="preserve">
+        <value>Ver sala</value>
+    </data>
+    <data name="Action_ViewMii" xml:space="preserve">
+        <value>Ver Mii</value>
+    </data>
+    <data name="ListTitle_Friends" xml:space="preserve">
+        <value>Amigos</value>
+    </data>
+    <data name="ListTitle_Players" xml:space="preserve">
+        <value>Jogadores</value>
+    </data>
+    <data name="ListTitle_Rooms" xml:space="preserve">
+        <value>Salas não econtradas</value>
+    </data>
+    <data name="State_NoLicense" xml:space="preserve">
+        <value>Sem licença</value>
+    </data>
+    <data name="State_NoName" xml:space="preserve">
+        <value>Sem nome</value>
+    </data>
+    <data name="State_NoProfiles" xml:space="preserve">
+        <value>Sem perfil</value>
+    </data>
 </root>

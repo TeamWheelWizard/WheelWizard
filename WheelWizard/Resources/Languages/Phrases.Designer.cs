@@ -62,81 +62,117 @@ namespace WheelWizard.Resources.Languages {
         /// <summary>
         ///   Looks up a localized string similar to You can add friends in-game.
         /// </summary>
-        public static string EmptyText_NoFriends {
+        public static string EmptyContent_NoFriends {
             get {
-                return ResourceManager.GetString("EmptyText_NoFriends", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoFriends", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to No friends yet!.
         /// </summary>
-        public static string EmptyText_NoFriends_Title {
+        public static string EmptyContent_NoFriends_Title {
             get {
-                return ResourceManager.GetString("EmptyText_NoFriends_Title", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoFriends_Title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We cant read the Mii data from your system. Make sure you started the game at least once.
+        ///   Looks up a localized string similar to We can&apos;t read the Mii data from your system. Make sure you started the game at least once.
         /// </summary>
-        public static string EmptyText_NoMiis {
+        public static string EmptyContent_NoMiis {
             get {
-                return ResourceManager.GetString("EmptyText_NoMiis", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoMiis", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to No Miis yet!.
         /// </summary>
-        public static string EmptyText_NoMiis_Title {
+        public static string EmptyContent_NoMiis_Title {
             get {
-                return ResourceManager.GetString("EmptyText_NoMiis_Title", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoMiis_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mods can alter how the game works. Start importing your first mod by clicking the button below..
         /// </summary>
-        public static string EmptyText_NoMods {
+        public static string EmptyContent_NoMods {
             get {
-                return ResourceManager.GetString("EmptyText_NoMods", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoMods", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to No mods found.
         /// </summary>
-        public static string EmptyText_NoMods_Title {
+        public static string EmptyContent_NoMods_Title {
             get {
-                return ResourceManager.GetString("EmptyText_NoMods_Title", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoMods_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a mod in the list to view its details.
+        /// </summary>
+        public static string EmptyContent_NoModSelected {
+            get {
+                return ResourceManager.GetString("EmptyContent_NoModSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No mod selected.
+        /// </summary>
+        public static string EmptyContent_NoModSelected_Title {
+            get {
+                return ResourceManager.GetString("EmptyContent_NoModSelected_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to You have to play the game at least once in order to see your profiles listed here.
         /// </summary>
-        public static string EmptyText_NoProfiles {
+        public static string EmptyContent_NoProfiles {
             get {
-                return ResourceManager.GetString("EmptyText_NoProfiles", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoProfiles", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to You might not have internet connection, or no-one might be playing..
         /// </summary>
-        public static string EmptyText_NoRooms {
+        public static string EmptyContent_NoRooms {
             get {
-                return ResourceManager.GetString("EmptyText_NoRooms", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoRooms", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to No rooms found.
         /// </summary>
-        public static string EmptyText_NoRooms_Title {
+        public static string EmptyContent_NoRooms_Title {
             get {
-                return ResourceManager.GetString("EmptyText_NoRooms_Title", resourceCulture);
+                return ResourceManager.GetString("EmptyContent_NoRooms_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creator name must be less than 11 characters long..
+        /// </summary>
+        public static string HelperNote_CreatorNameLess11 {
+            get {
+                return ResourceManager.GetString("HelperNote_CreatorNameLess11", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Names must be between 3 and 10 characters long..
+        /// </summary>
+        public static string HelperNote_NameMustBetween {
+            get {
+                return ResourceManager.GetString("HelperNote_NameMustBetween", resourceCulture);
             }
         }
         
@@ -168,6 +204,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To add friends you need to add them in-game..
+        /// </summary>
+        public static string Hover_FriendsPageDisclaimer {
+            get {
+                return ResourceManager.GetString("Hover_FriendsPageDisclaimer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There are currently no players online.
         /// </summary>
         public static string Hover_PlayersOnline_0 {
@@ -191,6 +236,24 @@ namespace WheelWizard.Resources.Languages {
         public static string Hover_PlayersOnline_x {
             get {
                 return ResourceManager.GetString("Hover_PlayersOnline_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The primary profile is used as reference in the wheel wizard client.
+        /// </summary>
+        public static string Hover_PrimaryProfile {
+            get {
+                return ResourceManager.GetString("Hover_PrimaryProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This only shows regions YOU have played on.
+        /// </summary>
+        public static string Hover_RegionUserSelection {
+            get {
+                return ResourceManager.GetString("Hover_RegionUserSelection", resourceCulture);
             }
         }
         
@@ -232,11 +295,470 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to apply an update. Aborting..
+        /// </summary>
+        public static string MessageError_AbortRR_Extra_FailedUpdateApply {
+            get {
+                return ResourceManager.GetString("MessageError_AbortRR_Extra_FailedUpdateApply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to delete files for the update. Aborting..
+        /// </summary>
+        public static string MessageError_AbortRR_Extra_FailedUpdateDelete {
+            get {
+                return ResourceManager.GetString("MessageError_AbortRR_Extra_FailedUpdateDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid file path detected. Please contact the developers.\n Server error:  {$1}.
+        /// </summary>
+        public static string MessageError_AbortRR_Extra_InvalidFilePath {
+            get {
+                return ResourceManager.GetString("MessageError_AbortRR_Extra_InvalidFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aborting RR Update.
+        /// </summary>
+        public static string MessageError_AbortRR_Title {
+            get {
+                return ResourceManager.GetString("MessageError_AbortRR_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to Change Mii.
+        /// </summary>
+        public static string MessageError_FailedChangeMii_Title {
+            get {
+                return ResourceManager.GetString("MessageError_FailedChangeMii_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to change name.
+        /// </summary>
+        public static string MessageError_FailedChangeName_Title {
+            get {
+                return ResourceManager.GetString("MessageError_FailedChangeName_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to create Mii database.
+        /// </summary>
+        public static string MessageError_FailedCreateMiiDb_Title {
+            get {
+                return ResourceManager.GetString("MessageError_FailedCreateMiiDb_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The installation of Dolphin Emulator failed. Please try manually installing Flatpak Dolphin..
+        /// </summary>
+        public static string MessageError_FailedInstallDolphin_Extra {
+            get {
+                return ResourceManager.GetString("MessageError_FailedInstallDolphin_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to install Dolphin.
+        /// </summary>
+        public static string MessageError_FailedInstallDolphin_Title {
+            get {
+                return ResourceManager.GetString("MessageError_FailedInstallDolphin_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve mod info.
+        /// </summary>
+        public static string MessageError_FailedRetrieveMod_Title {
+            get {
+                return ResourceManager.GetString("MessageError_FailedRetrieveMod_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred..
+        /// </summary>
+        public static string MessageError_GenericError_Title {
+            get {
+                return ResourceManager.GetString("MessageError_GenericError_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred during download: {$1}.
+        /// </summary>
+        public static string MessageError_ModDownloadFail_Extra {
+            get {
+                return ResourceManager.GetString("MessageError_ModDownloadFail_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod download failed..
+        /// </summary>
+        public static string MessageError_ModDownloadFail_Title {
+            get {
+                return ResourceManager.GetString("MessageError_ModDownloadFail_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to move data.
+        /// </summary>
+        public static string MessageError_DataFolderMove_Title {
+            get {
+                return ResourceManager.GetString("MessageError_DataFolderMove_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mod folder does not exist.
+        /// </summary>
+        public static string MessageError_NoModFolder_Extra {
+            get {
+                return ResourceManager.GetString("MessageError_NoModFolder_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to restart with administrator rights..
+        /// </summary>
+        public static string MessageError_RestartAdminFail_Extra {
+            get {
+                return ResourceManager.GetString("MessageError_RestartAdminFail_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mii changed successfully.
+        /// </summary>
+        public static string MessageSuccess_MiiChanged {
+            get {
+                return ResourceManager.GetString("MessageSuccess_MiiChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retro Rewind is up to date..
+        /// </summary>
+        public static string MessageSuccess_RRUpToDate_Title {
+            get {
+                return ResourceManager.GetString("MessageSuccess_RRUpToDate_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings saved successfully!.
+        /// </summary>
+        public static string MessageSuccess_SettingsSaved_Title {
+            get {
+                return ResourceManager.GetString("MessageSuccess_SettingsSaved_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Data folder updated.
+        /// </summary>
+        public static string MessageSuccess_DataFolderMoved_Title {
+            get {
+                return ResourceManager.GetString("MessageSuccess_DataFolderMoved_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Wheel Wizard data is now stored in:\n{$1}.
+        /// </summary>
+        public static string MessageSuccess_DataFolderMoved_Extra {
+            get {
+                return ResourceManager.GetString("MessageSuccess_DataFolderMoved_Extra", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to One or more of the selected Mii(s) is a favorite. Miis can only be deleted if they are not favorites to prevent accidental deletions..
+        /// </summary>
+        public static string MessageWarning_CannotDeleteFavMii_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_CannotDeleteFavMii_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot delete favorite Mii(s).
+        /// </summary>
+        public static string MessageWarning_CannotDeleteFavMii_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_CannotDeleteFavMii_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot view mod that was not installed through the mod browser..
+        /// </summary>
+        public static string MessageWarning_CantViewMod_Extra_NotFromBrowser {
+            get {
+                return ResourceManager.GetString("MessageWarning_CantViewMod_Extra_NotFromBrowser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Something went wrong when trying to open the selected mod..
+        /// </summary>
+        public static string MessageWarning_CantViewMod_Extra_SomethingElse {
+            get {
+                return ResourceManager.GetString("MessageWarning_CantViewMod_Extra_SomethingElse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot view this mod..
+        /// </summary>
+        public static string MessageWarning_CantViewMod_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_CantViewMod_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dolphin Emulator folder not automatically found. Please try and find the folder manually, click &apos;help&apos; for more information..
+        /// </summary>
+        public static string MessageWarning_DolphinNotFound_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_DolphinNotFound_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dolphin Emulator Folder Not Found.
+        /// </summary>
+        public static string MessageWarning_DolphinNotFound_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_DolphinNotFound_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t check for updates right now. You might not be connected to the internet or the server might be down..
+        /// </summary>
+        public static string MessageWarning_FailCheckUpdates_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_FailCheckUpdates_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to check for updates.
+        /// </summary>
+        public static string MessageWarning_FailCheckUpdates_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_FailCheckUpdates_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A mod with the name &apos;{$1}&apos; already exists..
+        /// </summary>
+        public static string MessageWarning_InvalidName_Extra_ModNameExists {
+            get {
+                return ResourceManager.GetString("MessageWarning_InvalidName_Extra_ModNameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name not possible..
+        /// </summary>
+        public static string MessageWarning_InvalidName_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_InvalidName_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please ensure all paths are correct and try again..
+        /// </summary>
+        public static string MessageWarning_InvalidPaths_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_InvalidPaths_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Paths..
+        /// </summary>
+        public static string MessageWarning_InvalidPaths_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_InvalidPaths_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide a mod name..
+        /// </summary>
+        public static string MessageWarning_ModNameEmpty_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_ModNameEmpty_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod name can&apos;t be empty..
+        /// </summary>
+        public static string MessageWarning_ModNameEmpty_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_ModNameEmpty_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod name contains invalid characters..
+        /// </summary>
+        public static string MessageWarning_ModNameInvalid_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_ModNameInvalid_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod name Invalid..
+        /// </summary>
+        public static string MessageWarning_ModNameInvalid_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_ModNameInvalid_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple Files Selected.
+        /// </summary>
+        public static string MessageWarning_MultipleFilesSelected_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_MultipleFilesSelected_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not connect to the server. Please try again later..
+        /// </summary>
+        public static string MessageWarning_NoConnectServer_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_NoConnectServer_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not connect to the server.
+        /// </summary>
+        public static string MessageWarning_NoConnectServer_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_NoConnectServer_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find Dolphin Emulator, please set the path in settings.
+        /// </summary>
+        public static string MessageWarning_NotFindDolphin_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_NotFindDolphin_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find the game, please set the path in settings.
+        /// </summary>
+        public static string MessageWarning_NotFindGame_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_NotFindGame_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files could not be found..
+        /// </summary>
+        public static string MessageWarning_UnableDownloadMod_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_UnableDownloadMod_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to download the mod.
+        /// </summary>
+        public static string MessageWarning_UnableDownloadMod_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_UnableDownloadMod_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to update Wheel Wizard. Please ensure the application is located in a folder that can be written to.\n Could not find current folder..
+        /// </summary>
+        public static string MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation {
+            get {
+                return ResourceManager.GetString("MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to check if Wheel Wizard is up to date. \nYou might be experiencing network issues..
+        /// </summary>
+        public static string MessageWarning_UnableUpdateWhWz_Extra_ReasonNetwork {
+            get {
+                return ResourceManager.GetString("MessageWarning_UnableUpdateWhWz_Extra_ReasonNetwork", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to update Wheel Wizard..
+        /// </summary>
+        public static string MessageWarning_UnableUpdateWhWz_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_UnableUpdateWhWz_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter Mii name....
+        /// </summary>
+        public static string Placeholder_EnterMiiName {
+            get {
+                return ResourceManager.GetString("Placeholder_EnterMiiName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter mod name....
+        /// </summary>
+        public static string Placeholder_EnterModName {
+            get {
+                return ResourceManager.GetString("Placeholder_EnterModName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enter desired path here....
         /// </summary>
         public static string Placeholder_EnterPath {
             get {
                 return ResourceManager.GetString("Placeholder_EnterPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter text here....
+        /// </summary>
+        public static string Placeholder_EnterTextHere {
+            get {
+                return ResourceManager.GetString("Placeholder_EnterTextHere", resourceCulture);
             }
         }
         
@@ -250,488 +772,560 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There are already files in your RetroRewind Folder. Would you like to install?.
+        ///   Looks up a localized string similar to Search for mods....
         /// </summary>
-        public static string PopupText_AlreadyFilesRR {
+        public static string Placeholder_SearchMod {
             get {
-                return ResourceManager.GetString("PopupText_AlreadyFilesRR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Do you want to apply the new scale?.
-        /// </summary>
-        public static string PopupText_ApplyScale {
-            get {
-                return ResourceManager.GetString("PopupText_ApplyScale", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not connect to the server. Please try again later..
-        /// </summary>
-        public static string PopupText_CouldNotConnectServer {
-            get {
-                return ResourceManager.GetString("PopupText_CouldNotConnectServer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dolphin Emulator Folder Found.
-        /// </summary>
-        public static string PopupText_DolphinFound {
-            get {
-                return ResourceManager.GetString("PopupText_DolphinFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dolphin Emulator folder found. Would you like to use this folder? If you dont know what all of this means, just click yes :).
-        /// </summary>
-        public static string PopupText_DolphinFoundText {
-            get {
-                return ResourceManager.GetString("PopupText_DolphinFoundText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dolphin Emulator Folder Not Found.
-        /// </summary>
-        public static string PopupText_DolphinNotFound {
-            get {
-                return ResourceManager.GetString("PopupText_DolphinNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dolphin Emulator folder not automatically found. Please try and find the folder manually, click &apos;help&apos; for more information..
-        /// </summary>
-        public static string PopupText_DolphinNotFoundText {
-            get {
-                return ResourceManager.GetString("PopupText_DolphinNotFoundText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Download Retro Rewind.
-        /// </summary>
-        public static string PopupText_DownloadRR {
-            get {
-                return ResourceManager.GetString("PopupText_DownloadRR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please ensure all paths are correct and try again..
-        /// </summary>
-        public static string PopupText_EnsurePathsExists {
-            get {
-                return ResourceManager.GetString("PopupText_EnsurePathsExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enter Mod Name:.
-        /// </summary>
-        public static string PopupText_EnterModName {
-            get {
-                return ResourceManager.GetString("PopupText_EnterModName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enter Title:.
-        /// </summary>
-        public static string PopupText_EnterTitle {
-            get {
-                return ResourceManager.GetString("PopupText_EnterTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Estimated time remaining:.
-        /// </summary>
-        public static string PopupText_EsimatedTimeRemaining {
-            get {
-                return ResourceManager.GetString("PopupText_EsimatedTimeRemaining", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to check for updates.
-        /// </summary>
-        public static string PopupText_FailCheckUpdates {
-            get {
-                return ResourceManager.GetString("PopupText_FailCheckUpdates", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to apply an update. Aborting..
-        /// </summary>
-        public static string PopupText_FailedUpdateApply {
-            get {
-                return ResourceManager.GetString("PopupText_FailedUpdateApply", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to delete files for the update. Aborting..
-        /// </summary>
-        public static string PopupText_FailedUpdateDelete {
-            get {
-                return ResourceManager.GetString("PopupText_FailedUpdateDelete", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Installing mods.
-        /// </summary>
-        public static string PopupText_InstallingMods {
-            get {
-                return ResourceManager.GetString("PopupText_InstallingMods", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Installing {$1} mods.
-        /// </summary>
-        public static string PopupText_InstallingModsCount {
-            get {
-                return ResourceManager.GetString("PopupText_InstallingModsCount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Installing Retro Rewind.
-        /// </summary>
-        public static string PopupText_InstallingRR {
-            get {
-                return ResourceManager.GetString("PopupText_InstallingRR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Installing Retro Rewind for the first time.
-        /// </summary>
-        public static string PopupText_InstallingRRFirstTime {
-            get {
-                return ResourceManager.GetString("PopupText_InstallingRRFirstTime", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Getting the latest Wheel Wizard from github releases.
-        /// </summary>
-        public static string PopupText_LatestWhWzGithub {
-            get {
-                return ResourceManager.GetString("PopupText_LatestWhWzGithub", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Do you want to combine all files into 1 mod?.
-        /// </summary>
-        public static string PopupText_ModCombineQuestion {
-            get {
-                return ResourceManager.GetString("PopupText_ModCombineQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Mod name can&apos;t be empty.
-        /// </summary>
-        public static string PopupText_ModNameEmpty {
-            get {
-                return ResourceManager.GetString("PopupText_ModNameEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A mod with the name &apos;{$1}&apos; already exists..
-        /// </summary>
-        public static string PopupText_ModNameExists {
-            get {
-                return ResourceManager.GetString("PopupText_ModNameExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Mods found.
-        /// </summary>
-        public static string PopupText_ModsFound {
-            get {
-                return ResourceManager.GetString("PopupText_ModsFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You are about to launch the game without any mods. Do you want to clear your my-stuff folder?.
-        /// </summary>
-        public static string PopupText_ModsFoundQuestion {
-            get {
-                return ResourceManager.GetString("PopupText_ModsFoundQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Multiple Files Selected.
-        /// </summary>
-        public static string PopupText_MultipleFilesSelected {
-            get {
-                return ResourceManager.GetString("PopupText_MultipleFilesSelected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Version {$1} of Wheel Wizard is available (currently on {$2}). Do you want to update now?.
-        /// </summary>
-        public static string PopupText_NewVersionWhWz {
-            get {
-                return ResourceManager.GetString("PopupText_NewVersionWhWz", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Mod folder does not exist.
-        /// </summary>
-        public static string PopupText_NoModFolder {
-            get {
-                return ResourceManager.GetString("PopupText_NoModFolder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find Dolphin Emulator, please set the path in settings.
-        /// </summary>
-        public static string PopupText_NotFindDolphin {
-            get {
-                return ResourceManager.GetString("PopupText_NotFindDolphin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find the game, please set the path in settings.
-        /// </summary>
-        public static string PopupText_NotFindGame {
-            get {
-                return ResourceManager.GetString("PopupText_NotFindGame", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Old rksys.dat found.
-        /// </summary>
-        public static string PopupText_OldRksysFound {
-            get {
-                return ResourceManager.GetString("PopupText_OldRksysFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Old save data was found. Would you like to use it? (recommended).
-        /// </summary>
-        public static string PopupText_OldRksysFoundExplained {
-            get {
-                return ResourceManager.GetString("PopupText_OldRksysFoundExplained", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Old Retro Rewind found.
-        /// </summary>
-        public static string PopupText_OldRRFound {
-            get {
-                return ResourceManager.GetString("PopupText_OldRRFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Old Retro Rewind files were found. Would you like to move them to the new location?.
-        /// </summary>
-        public static string PopupText_OldRRFoundExplained {
-            get {
-                return ResourceManager.GetString("PopupText_OldRRFoundExplained", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Processing {$1} of {$2} files....
-        /// </summary>
-        public static string PopupText_ProcessingXofY {
-            get {
-                return ResourceManager.GetString("PopupText_ProcessingXofY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to reinstall Retro Rewind?.
-        /// </summary>
-        public static string PopupText_ReinstallQuestion {
-            get {
-                return ResourceManager.GetString("PopupText_ReinstallQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Reinstall Retro Rewind.
-        /// </summary>
-        public static string PopupText_ReinstallRR {
-            get {
-                return ResourceManager.GetString("PopupText_ReinstallRR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to restart with administrator rights..
-        /// </summary>
-        public static string PopupText_RestartAdminFail {
-            get {
-                return ResourceManager.GetString("PopupText_RestartAdminFail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Your version of Retro Rewind could not be determined. Would you like to download Retro Rewind?.
-        /// </summary>
-        public static string PopupText_RRNotDeterment {
-            get {
-                return ResourceManager.GetString("PopupText_RRNotDeterment", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Your version of Retro Rewind is too old to update. Would you like to reinstall Retro Rewind?.
-        /// </summary>
-        public static string PopupText_RRToOld {
-            get {
-                return ResourceManager.GetString("PopupText_RRToOld", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Retro Rewind is up to date..
-        /// </summary>
-        public static string PopupText_RRUpToDate {
-            get {
-                return ResourceManager.GetString("PopupText_RRUpToDate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Settings saved successfully!.
-        /// </summary>
-        public static string PopupText_SettingsSaved {
-            get {
-                return ResourceManager.GetString("PopupText_SettingsSaved", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to delete {$1}?.
-        /// </summary>
-        public static string PopupText_SureDeleteQuestion {
-            get {
-                return ResourceManager.GetString("PopupText_SureDeleteQuestion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unable to update Wheel Wizard. Please ensure the application is located in a folder that can be written to.\n Could not find current folder..
-        /// </summary>
-        public static string PopupText_UnableUpdateWhWz_ReasonLocation {
-            get {
-                return ResourceManager.GetString("PopupText_UnableUpdateWhWz_ReasonLocation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unable to check if Wheel Wizard is up to date. \nYou might be experiencing network issues..
-        /// </summary>
-        public static string PopupText_UnableUpdateWhWz_ReasonNetwork {
-            get {
-                return ResourceManager.GetString("PopupText_UnableUpdateWhWz_ReasonNetwork", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Update using admin.
-        /// </summary>
-        public static string PopupText_UpdateAdmin {
-            get {
-                return ResourceManager.GetString("PopupText_UpdateAdmin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sometimes an update requires admin rights, do you want to active them for this update?.
-        /// </summary>
-        public static string PopupText_UpdateAdminExplained {
-            get {
-                return ResourceManager.GetString("PopupText_UpdateAdminExplained", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Update Retro Rewind.
-        /// </summary>
-        public static string PopupText_UpdateRR {
-            get {
-                return ResourceManager.GetString("PopupText_UpdateRR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Updating Wheel Wizard.
-        /// </summary>
-        public static string PopupText_UpdateWhWz {
-            get {
-                return ResourceManager.GetString("PopupText_UpdateWhWz", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wheel Wizard Update Available.
-        /// </summary>
-        public static string PopupText_WhWzUpdateAvailable {
-            get {
-                return ResourceManager.GetString("PopupText_WhWzUpdateAvailable", resourceCulture);
+                return ResourceManager.GetString("Placeholder_SearchMod", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to downloading {$1} MB.
         /// </summary>
-        public static string PupupText_DownloadingMb {
+        public static string Progress_DownloadingMb {
             get {
-                return ResourceManager.GetString("PupupText_DownloadingMb", resourceCulture);
+                return ResourceManager.GetString("Progress_DownloadingMb", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Talk to us!.
+        ///   Looks up a localized string similar to Estimated time remaining:.
         /// </summary>
-        public static string Sidebar_Link_Discord {
+        public static string Progress_EstimatedTimeRemaining {
             get {
-                return ResourceManager.GetString("Sidebar_Link_Discord", resourceCulture);
+                return ResourceManager.GetString("Progress_EstimatedTimeRemaining", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Source code.
+        ///   Looks up a localized string similar to Installing Dolphin Emulator.
         /// </summary>
-        public static string Sidebar_Link_Github {
+        public static string Progress_InstallingDolphin {
             get {
-                return ResourceManager.GetString("Sidebar_Link_Github", resourceCulture);
+                return ResourceManager.GetString("Progress_InstallingDolphin", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Support us!.
+        ///   Looks up a localized string similar to Installing mods.
         /// </summary>
-        public static string Sidebar_Link_Support {
+        public static string Progress_InstallingMods {
             get {
-                return ResourceManager.GetString("Sidebar_Link_Support", resourceCulture);
+                return ResourceManager.GetString("Progress_InstallingMods", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing {$1} mods.
+        /// </summary>
+        public static string Progress_InstallingModsCount {
+            get {
+                return ResourceManager.GetString("Progress_InstallingModsCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing Retro Rewind.
+        /// </summary>
+        public static string Progress_InstallingRR {
+            get {
+                return ResourceManager.GetString("Progress_InstallingRR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing Retro Rewind for the first time.
+        /// </summary>
+        public static string Progress_InstallingRRFirstTime {
+            get {
+                return ResourceManager.GetString("Progress_InstallingRRFirstTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Getting the latest Wheel Wizard from github releases.
+        /// </summary>
+        public static string Progress_LatestWhWzGithub {
+            get {
+                return ResourceManager.GetString("Progress_LatestWhWzGithub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processing {$1} of {$2} files....
+        /// </summary>
+        public static string Progress_ProcessingXofY {
+            get {
+                return ResourceManager.GetString("Progress_ProcessingXofY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This may take a while depending on your internet connection..
+        /// </summary>
+        public static string Progress_ThisMayTakeAWhile {
+            get {
+                return ResourceManager.GetString("Progress_ThisMayTakeAWhile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating Retro Rewind.
+        /// </summary>
+        public static string Progress_UpdateRR {
+            get {
+                return ResourceManager.GetString("Progress_UpdateRR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating Wheel Wizard.
+        /// </summary>
+        public static string Progress_UpdateWhWz {
+            get {
+                return ResourceManager.GetString("Progress_UpdateWhWz", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This change will revert in {$1} unless you decide to keep the change..
+        /// </summary>
+        public static string Question_ApplyScale_Extra {
+            get {
+                return ResourceManager.GetString("Question_ApplyScale_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to apply the new scale?.
+        /// </summary>
+        public static string Question_ApplyScale_Title {
+            get {
+                return ResourceManager.GetString("Question_ApplyScale_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Move Wheel Wizard data?.
+        /// </summary>
+        public static string Question_MoveData_Title {
+            get {
+                return ResourceManager.GetString("Question_MoveData_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Wheel Wizard will move its files to:\n{$1}\nThis may take a while depending on the amount of data.
+        /// </summary>
+        public static string Question_MoveData_Extra {
+            get {
+                return ResourceManager.GetString("Question_MoveData_Extra", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The Flatpak version of Dolphin Emulator does not appear to be installed. Would you like us to install it (system-wide)?.
+        /// </summary>
+        public static string Question_DolphinFlatpack_Extra {
+            get {
+                return ResourceManager.GetString("Question_DolphinFlatpack_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dolphin Flatpak Installation.
+        /// </summary>
+        public static string Question_DolphinFlatpack_Title {
+            get {
+                return ResourceManager.GetString("Question_DolphinFlatpack_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you dont know what all of this means, just click yes :) \nDolphin Emulator folder found. Would you like to use this folder?.
+        /// </summary>
+        public static string Question_DolphinFound_Extra {
+            get {
+                return ResourceManager.GetString("Question_DolphinFound_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dolphin Emulator Folder Found.
+        /// </summary>
+        public static string Question_DolphinFound_Title {
+            get {
+                return ResourceManager.GetString("Question_DolphinFound_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changing name from: {$1}.
+        /// </summary>
+        public static string Question_EnterNewName_Extra {
+            get {
+                return ResourceManager.GetString("Question_EnterNewName_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter new name.
+        /// </summary>
+        public static string Question_EnterNewName_Title {
+            get {
+                return ResourceManager.GetString("Question_EnterNewName_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to donwload and install the mod: {$1}?.
+        /// </summary>
+        public static string Question_InstallMod_Title {
+            get {
+                return ResourceManager.GetString("Question_InstallMod_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are about to launch the game without any mods. Do you want to clear your my-stuff folder?.
+        /// </summary>
+        public static string Question_LaunchClearModsFound_Extra {
+            get {
+                return ResourceManager.GetString("Question_LaunchClearModsFound_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods found.
+        /// </summary>
+        public static string Question_LaunchClearModsFound_Title {
+            get {
+                return ResourceManager.GetString("Question_LaunchClearModsFound_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version {$1} of Wheel Wizard is available (currently on {$2}). Do you want to update now?.
+        /// </summary>
+        public static string Question_NewVersionWhWz_Extra {
+            get {
+                return ResourceManager.GetString("Question_NewVersionWhWz_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wheel Wizard Update Available.
+        /// </summary>
+        public static string Question_NewVersionWhWz_Title {
+            get {
+                return ResourceManager.GetString("Question_NewVersionWhWz_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Old save data was found. Would you like to use it? (recommended).
+        /// </summary>
+        public static string Question_OldRksysFound_Extra {
+            get {
+                return ResourceManager.GetString("Question_OldRksysFound_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Old rksys.dat found.
+        /// </summary>
+        public static string Question_OldRksysFound_Title {
+            get {
+                return ResourceManager.GetString("Question_OldRksysFound_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to reinstall Retro Rewind?.
+        /// </summary>
+        public static string Question_ReinstallRR_Extra {
+            get {
+                return ResourceManager.GetString("Question_ReinstallRR_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reinstall Retro Rewind.
+        /// </summary>
+        public static string Question_ReinstallRR_Title {
+            get {
+                return ResourceManager.GetString("Question_ReinstallRR_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your version of Retro Rewind could not be determined. Would you like to download Retro Rewind?.
+        /// </summary>
+        public static string Question_RRNotDeterment_Extra {
+            get {
+                return ResourceManager.GetString("Question_RRNotDeterment_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Retro Rewind.
+        /// </summary>
+        public static string Question_RRNotDeterment_Title {
+            get {
+                return ResourceManager.GetString("Question_RRNotDeterment_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your version of Retro Rewind is too old to update. Would you like to reinstall Retro Rewind?.
+        /// </summary>
+        public static string Question_RRToOld_Extra {
+            get {
+                return ResourceManager.GetString("Question_RRToOld_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Retro Rewind version is too old..
+        /// </summary>
+        public static string Question_RRToOld_Title {
+            get {
+                return ResourceManager.GetString("Question_RRToOld_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search for mods....
+        /// </summary>
+        public static string Question_SearchMod {
+            get {
+                return ResourceManager.GetString("Question_SearchMod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting is permanent and cannot be undone..
+        /// </summary>
+        public static string Question_SureDelete_Extra {
+            get {
+                return ResourceManager.GetString("Question_SureDelete_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete {$1}?.
+        /// </summary>
+        public static string Question_SureDelete_Title {
+            get {
+                return ResourceManager.GetString("Question_SureDelete_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete {$1} Miis?.
+        /// </summary>
+        public static string Question_SureDelete_Title_Miis {
+            get {
+                return ResourceManager.GetString("Question_SureDelete_Title_Miis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sometimes an update requires admin rights, do you want to active them for this update?.
+        /// </summary>
+        public static string Question_UpdateAdmin_Extra {
+            get {
+                return ResourceManager.GetString("Question_UpdateAdmin_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update using admin.
+        /// </summary>
+        public static string Question_UpdateAdmin_Title {
+            get {
+                return ResourceManager.GetString("Question_UpdateAdmin_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to create Mii &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarError_MiiFailureCreate {
+            get {
+                return ResourceManager.GetString("SnackbarError_MiiFailureCreate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to deserialize Mii &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarError_MiiFailureDeserialize {
+            get {
+                return ResourceManager.GetString("SnackbarError_MiiFailureDeserialize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to duplicate Mii(s) &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarError_MiiFailureDuplicate {
+            get {
+                return ResourceManager.GetString("SnackbarError_MiiFailureDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to get Mii &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarError_MiiFailureGet {
+            get {
+                return ResourceManager.GetString("SnackbarError_MiiFailureGet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to save Mii &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarError_MiiFailureSave {
+            get {
+                return ResourceManager.GetString("SnackbarError_MiiFailureSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to serialize Mii &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarError_MiiFailureSerialize {
+            get {
+                return ResourceManager.GetString("SnackbarError_MiiFailureSerialize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to update Mii &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarError_MiiFailureUpdate {
+            get {
+                return ResourceManager.GetString("SnackbarError_MiiFailureUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copied friend code to clipboard.
+        /// </summary>
+        public static string SnackbarSuccess_CopiedFC {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_CopiedFC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created duplicate of &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarSuccess_CreatedDuplicate {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_CreatedDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created {$1} duplicate Miis.
+        /// </summary>
+        public static string SnackbarSuccess_CreatedDuplicatesMiis {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_CreatedDuplicatesMiis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleted &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarSuccess_Deleted {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_Deleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleted {$1} Miis.
+        /// </summary>
+        public static string SnackbarSuccess_Deleted_Miis {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_Deleted_Miis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mii has been added to your Miis.
+        /// </summary>
+        public static string SnackbarSuccess_MiiAdded {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_MiiAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully changed name to &apos;{$1}&apos;.
+        /// </summary>
+        public static string SnackbarSuccess_NameChange {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_NameChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set profile as primary.
+        /// </summary>
+        public static string SnackbarSuccess_ProfileSetPrimary {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_ProfileSetPrimary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saved Mii &apos;{$1}&apos; to file &apos;{$2}&apos;.
+        /// </summary>
+        public static string SnackbarSuccess_SavedMii {
+            get {
+                return ResourceManager.GetString("SnackbarSuccess_SavedMii", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t Save Mii.
+        /// </summary>
+        public static string SnackbarWarning_CantSaveMii {
+            get {
+                return ResourceManager.GetString("SnackbarWarning_CantSaveMii", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It seems there where no Miis to delete.
+        /// </summary>
+        public static string SnackbarWarning_NoMiiDelete {
+            get {
+                return ResourceManager.GetString("SnackbarWarning_NoMiiDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It seems there where no Miis to export.
+        /// </summary>
+        public static string SnackbarWarning_NoMiiExport {
+            get {
+                return ResourceManager.GetString("SnackbarWarning_NoMiiExport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This language is translated by: {$1}.
+        /// </summary>
+        public static string Text_LanguageTranslatedBy {
+            get {
+                return ResourceManager.GetString("Text_LanguageTranslatedBy", resourceCulture);
             }
         }
         
@@ -741,6 +1335,15 @@ namespace WheelWizard.Resources.Languages {
         public static string Text_MadeByString {
             get {
                 return ResourceManager.GetString("Text_MadeByString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Powered By GameBanana.
+        /// </summary>
+        public static string Text_PoweredGamebanana {
+            get {
+                return ResourceManager.GetString("Text_PoweredGamebanana", resourceCulture);
             }
         }
         

@@ -18,34 +18,34 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="CompletePercentage" xml:space="preserve">
-        <value>100</value>
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
+        <value>88</value>
     </data>
     <data name="Category_Video" xml:space="preserve">
         <value>Видео</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
-        <value>Эта настройка поставит максимальное количество ФПС нв 30 (стандарт - 60)</value>
+    <data name="HelperText_30FPS" xml:space="preserve">
+        <value>Эта настройка поставит максимальное количество FPS на 30 (стандарт - 60)</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
         <value>Эта настройка включает анимации в лаунчере Wheel Wizard.</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
+    <data name="HelperText_EndWithExe" xml:space="preserve">
         <value>Путь должен заканчиваться на .exe</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>Эта настройка отключает Wii Remote в игре, но включает для канала Wii.</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>Откроет основное окно Dolphin'а вместе с игрой</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>Это изменит некоторые некоторые настройки Dolphin'а, чтобы избежать фризов и лагов.</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>1x это нативное разрешение</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>Настройки отключены, сначала завершите настройки локации.</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
@@ -80,9 +80,6 @@
     </data>
     <data name="Option_Renderer" xml:space="preserve">
         <value>Движок рендера</value>
-    </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Язык Retro Rewind</value>
     </data>
     <data name="Option_ShowFPS" xml:space="preserve">
         <value>Показывать FPS</value>
@@ -149,5 +146,47 @@
     </data>
     <data name="Value_Language_Turkish" xml:space="preserve">
         <value>Турецкий</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Арабский</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Китайский</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Чешский</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Норвежский</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Португальский</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Другое</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>Основное</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>CaXaP,  StHydrated, OrangeCake</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>Открыть папку с игрой</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>Открыть папку сохранения</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Установка</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>О нас</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>Путь может заканчиваться на:</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Переустановить Retro Rewind</value>
     </data>
 </root>

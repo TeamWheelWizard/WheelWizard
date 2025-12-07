@@ -5,10 +5,105 @@
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent"
-             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             mc:Ignorable="d" d:DesignWidth="490" d:DesignHeight="830"
              ClipToBounds="False"
              x:Class="WheelWizard.Views.Pages.HomePage">
-    <Grid  x:Name="CompleteGrid">
+    <UserControl.Styles>
+        <Style Selector="components|WheelTrail.HoverEnterTrail">
+            <Style.Animations>
+                <Animation Duration="0:0:0.3" FillMode="Forward" Easing="ExponentialEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="ExtendedHeight" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ExtendedHeight" Value="-50" />
+                    </KeyFrame>
+                </Animation>
+                <Animation Duration="0:0:3" IterationCount="INFINITE">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="WheelRotation" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="WheelRotation" Value="360" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        <Style Selector="components|WheelTrail.HoverExitTrail">
+            <Style.Animations>
+                <Animation Duration="0:0:0.8" FillMode="Forward" Easing="BounceEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="ExtendedHeight" Value="-50" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ExtendedHeight" Value="0" />
+                    </KeyFrame>
+                </Animation>
+                <Animation Duration="0:0:0.8" FillMode="Forward" Easing="BounceEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="WheelRotation" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="WheelRotation" Value="100" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <Style Selector="components|WheelTrail.ActivateTrailFromHover">
+            <Style.Animations>
+                <Animation Duration="0:0:0.6"
+                           FillMode="Forward" Easing="CubicEaseIn">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="ExtendedHeight" Value="-50" />
+                        <Setter Property="WheelRotation" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ExtendedHeight" Value="-1200" />
+                        <Setter Property="WheelRotation" Value="360" />
+                        <Setter Property="IsVisible" Value="False" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        
+        <Style Selector="components|WheelTrail.ActivateTrailFromIdle">
+            <Style.Animations>
+                <Animation Duration="0:0:0.6"
+                           FillMode="Forward" Easing="CubicEaseIn">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="ExtendedHeight" Value="0" />
+                        <Setter Property="WheelRotation" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ExtendedHeight" Value="-1200" />
+                        <Setter Property="WheelRotation" Value="360" />
+                        <Setter Property="IsVisible" Value="False" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        
+        <Style Selector="components|WheelTrail.EntranceTrail">
+            <Style.Animations>
+                <Animation Duration="0:0:0.6" Delay="0:0:0.3"
+                           FillMode="Forward" Easing="CubicEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="ExtendedHeight" Value="250" />
+                        <Setter Property="WheelRotation" Value="-200" />
+                        <Setter Property="IsVisible" Value="True" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ExtendedHeight" Value="0" />
+                        <Setter Property="WheelRotation" Value="360" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        
+    </UserControl.Styles>
+    <Grid x:Name="CompleteGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <!-- This is the total height as the (Title + infoSection) - (padding) -->
@@ -16,29 +111,43 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
-        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_Home}" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_Home}" HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
-        
-        <behaviorComponent:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
-                                      HorizontalAlignment="Right" VerticalAlignment="Top"/>
 
-        <StackPanel Grid.Row="1"  Orientation="Horizontal" VerticalAlignment="Top" Margin="0,6" HorizontalAlignment="Right"
+        <behaviorComponent:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,6"
+                    HorizontalAlignment="Right"
                     x:Name="GameModeOption">
             <components:FormFieldLabel Text="Game mode:" VerticalAlignment="Center" />
             <ComboBox x:Name="GameModeDropdown"
                       SelectionChanged="GameModeDropdown_OnSelectionChanged" MinWidth="160"
-                      VerticalAlignment="Top"/>
+                      VerticalAlignment="Top" />
         </StackPanel>
-        
+
+        <!-- These are invisible by default, they will be set to visible once the button is turned to green 
+            This way we don't have to take in account whether or not an animation can play, since if it plays but it is not allowed, it will be invisible anyways -->
+        <components:WheelTrail Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="HomeTrail1"
+                               Width="137" Angle="45" Y="-60" X="-20" ExtendedHeight="1000" IsVisible="False"
+                               Background="{StaticResource Primary400}" Foreground="{StaticResource Primary700}" />
+        <components:WheelTrail Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="HomeTrail2"
+                               Width="137" Angle="45" Y="-40" X="170" ExtendedHeight="1000" IsVisible="False"
+                               Background="{StaticResource Primary600}" Foreground="{StaticResource Primary800}" />
+        <components:WheelTrail Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="HomeTrail3"
+                               Width="137" Angle="45" Y="150" X="190" ExtendedHeight="1000" IsVisible="False"
+                               Background="{StaticResource Primary200}" Foreground="{StaticResource Primary600}" />
+
         <Border Grid.Row="1" Height="630" Width="250" CornerRadius="125,125,0,0" VerticalAlignment="Bottom"
                 Background="{StaticResource FrameColor}" Margin="{StaticResource NegativeEdgeGap}">
             <PathIcon HorizontalAlignment="Center" VerticalAlignment="Top"
-                      Data="{StaticResource WheelIcon}" 
+                      Data="{StaticResource WheelIcon}"
                       x:Name="WheelIcon"
                       Foreground="{StaticResource Neutral600}"
-                      Width="200" Height="200" Margin="0,25"/>
+                      Width="200" Height="200" Margin="0,25" />
             <!-- 
                 Note that this icon should have the same margin on each side. Decide a padding/border, enter that number in the margin at tb.
                 Then, double this number, take the width of the parent container, and subtract the doubled margin. 
@@ -48,27 +157,35 @@
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="180" Margin="0,220">
 
-            <TextBlock HorizontalAlignment="Center" Classes="TitleText" x:Name="GameTitle"/>
+            <TextBlock HorizontalAlignment="Center" Classes="TitleText" x:Name="GameTitle" />
             <components:Button x:Name="PlayButton"
-                          IsEnabled="True" 
-                          Variant="Primary"
-                          Text="Play"
-                          IconData="{StaticResource Play}"
-                          Click="PlayButton_Click"
-                          Margin="0,20,0,0" />
+                               IsEnabled="True"
+                               Variant="Primary"
+                               Text="Play" PointerEntered="PlayButton_OnPointerEntered"
+                               PointerExited="PlayButton_OnPointerExit"
+                               IconData="{StaticResource Play}"
+                               Click="PlayButton_Click"
+                               Margin="0,20,0,0" />
 
             <!-- Normally we should not change the iconSize and/or Height since default is already correct
              But because the dolphin icon looks goofy that small, we can increase the size, and then change the size to be the default size again  -->
             <components:Button x:Name="DolphinButton"
-                          IsEnabled="True"
-                          IconData="{StaticResource DolphinIcon}"
-                          IconSize="30"
-                          ToolTip.Tip="Launch Dolphin"
-                          ToolTip.Placement="Bottom"
-                          ToolTip.ShowDelay="50"
-                          Height="40" 
-                          Click="DolphinButton_OnClick"
-                          Width="100" Margin="0,6,0,0" />
+                               IsEnabled="True"
+                               IconData="{StaticResource DolphinIcon}"
+                               IconSize="30"
+                               ToolTip.Tip="{x:Static lang:Common.Action_LaunchDolphin}"
+                               ToolTip.Placement="Bottom"
+                               ToolTip.ShowDelay="50"
+                               Height="40"
+                               Click="DolphinButton_OnClick"
+                               Width="100" Margin="0,6,0,0" />
         </StackPanel>
+        
+        <components:WheelTrail Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" x:Name="HomeTrail4"
+                               Width="137" Angle="-35" X="-160" ExtendedHeight="1000" IsVisible="False"
+                               Background="{StaticResource Primary400}" Foreground="{StaticResource Primary700}" />
+        <components:WheelTrail Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" x:Name="HomeTrail5"
+                               Width="137" Angle="-35" X="40" Y="30" ExtendedHeight="1000" IsVisible="False"
+                               Background="{StaticResource Primary600}" Foreground="{StaticResource Primary800}" />
     </Grid>
 </UserControl>

@@ -8,6 +8,7 @@ using WheelWizard.Services.LiveData;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.Views;
 

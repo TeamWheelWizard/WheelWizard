@@ -18,4 +18,193 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="EmptyContent_NoFriends" xml:space="preserve">
+        <value>Podes adicionar amigos dentro do jogo</value>
+    </data>
+    <data name="EmptyContent_NoFriends_Title" xml:space="preserve">
+        <value>Ainda não adicionaste amigos</value>
+    </data>
+    <data name="EmptyContent_NoMods" xml:space="preserve">
+        <value>Mods podem alterar o funcionamento do jogo.Começa a importar o teu primeiro mod clicando no botão abaixo</value>
+    </data>
+    <data name="EmptyContent_NoMods_Title" xml:space="preserve">
+        <value>Mods não encontrados</value>
+    </data>
+    <data name="EmptyContent_NoProfiles" xml:space="preserve">
+        <value>Tens de jogar o jogo pelo menos uma vez para poderes ver o teu perfil aqui escrito</value>
+    </data>
+    <data name="EmptyContent_NoRooms" xml:space="preserve">
+        <value>Poderás estar sem conexão à internet, ou talvez ninguém esteja a jogar</value>
+    </data>
+    <data name="EmptyContent_NoRooms_Title" xml:space="preserve">
+        <value>Não se econtrarem salas</value>
+    </data>
+    <data name="Hover_FriendsOnline_0" xml:space="preserve">
+        <value>Não tens amigos online</value>
+    </data>
+    <data name="Hover_FriendsOnline_1" xml:space="preserve">
+        <value>Tens 1 amigo online</value>
+    </data>
+    <data name="Hover_FriendsOnline_x" xml:space="preserve">
+        <value>Tens {$1} amigos online</value>
+    </data>
+    <data name="Hover_PlayersOnline_0" xml:space="preserve">
+        <value>Não há jogadores online</value>
+    </data>
+    <data name="Hover_PlayersOnline_1" xml:space="preserve">
+        <value>Há 1 jogador online</value>
+    </data>
+    <data name="Hover_PlayersOnline_x" xml:space="preserve">
+        <value>Há {$1} jogadores online</value>
+    </data>
+    <data name="Hover_RoomsOnline_0" xml:space="preserve">
+        <value>Não há salas ativas</value>
+    </data>
+    <data name="Hover_RoomsOnline_1" xml:space="preserve">
+        <value>Há 1 sala ativa</value>
+    </data>
+    <data name="Hover_RoomsOnline_x" xml:space="preserve">
+        <value>Há {$1} salas ativas</value>
+    </data>
+    <data name="Hover_RoomsPageDisclaimer" xml:space="preserve">
+        <value>Tem em conta que esta página não te oferece a funcionalidade de entrares  diretamente numa sala. Para entrares numa sala em específico, terás de entrar através de um amigo, ou então esperas que entres na sala ao entrares nos servers online</value>
+    </data>
+    <data name="Question_ApplyScale_Title" xml:space="preserve">
+        <value>Gostarias de aplicar a nova escala?</value>
+    </data>
+    <data name="MessageWarning_NoConnectServer_Extra" xml:space="preserve">
+        <value>Falha a conectar ao servidor. Tente de novo mais tarde</value>
+    </data>
+    <data name="Question_DolphinFound_Title" xml:space="preserve">
+        <value>Pasta Do Dolphin Emulator Encontrada</value>
+    </data>
+    <data name="Question_DolphinFound_Extra" xml:space="preserve">
+        <value>Se não sabes o que isto significa, clica só que sim :) \nPasta do Dolphin Emulator encontrada. Gostarias de usar esta pasta?</value>
+    </data>
+    <data name="MessageWarning_DolphinNotFound_Title" xml:space="preserve">
+        <value>Pasta Do Emulador Dolphin Não Encontrada </value>
+    </data>
+    <data name="MessageWarning_DolphinNotFound_Extra" xml:space="preserve">
+        <value>A pasta Do Emulador Dolphin não foi automáticamente encontrada. Por favor tente encontrar a pasta manualmente, clica em 'ajuda' para obter mais informação-</value>
+    </data>
+    <data name="Question_RRNotDeterment_Title" xml:space="preserve">
+        <value>Descarrega o Retro Rewind</value>
+    </data>
+    <data name="MessageWarning_InvalidPaths_Extra" xml:space="preserve">
+        <value>Por favor verifica que todos os percursos estão corretos e tenta outra vez-</value>
+    </data>
+    <data name="Progress_EstimatedTimeRemaining" xml:space="preserve">
+        <value>Tempo restante estimado:</value>
+    </data>
+    <data name="MessageWarning_FailCheckUpdates_Title" xml:space="preserve">
+        <value>Falha ao procurar atualizações</value>
+    </data>
+    <data name="MessageError_AbortRR_Extra_FailedUpdateApply" xml:space="preserve">
+        <value>Falha a aplicar a atualização. Abortando.</value>
+    </data>
+    <data name="MessageError_AbortRR_Extra_FailedUpdateDelete" xml:space="preserve">
+        <value>Falha a apagar ficheiros para a atualização. Abortando.</value>
+    </data>
+    <data name="Progress_InstallingMods" xml:space="preserve">
+        <value>Instalando mods</value>
+    </data>
+    <data name="Progress_InstallingModsCount" xml:space="preserve">
+        <value>Instalando {$1} mods</value>
+    </data>
+    <data name="Progress_InstallingRR" xml:space="preserve">
+        <value>Instalando Retro Rewind</value>
+    </data>
+    <data name="Progress_InstallingRRFirstTime" xml:space="preserve">
+        <value>Instalando Retro Rewind pela primeira vez</value>
+    </data>
+    <data name="Progress_LatestWhWzGithub" xml:space="preserve">
+        <value>Obtendo a ultima versão do Wheel Wizard pelo github</value>
+    </data>
+    <data name="MessageWarning_InvalidName_Extra_ModNameExists" xml:space="preserve">
+        <value>Um mod com o  nome '{$1}' já existe</value>
+    </data>
+    <data name="Question_LaunchClearModsFound_Title" xml:space="preserve">
+        <value>Mods não encontrados</value>
+    </data>
+    <data name="Question_LaunchClearModsFound_Extra" xml:space="preserve">
+        <value>Tu estás prestes a abrir o jogo sem nenhum mod. Queres limpar a pasta my-stuff?</value>
+    </data>
+    <data name="MessageWarning_MultipleFilesSelected_Title" xml:space="preserve">
+        <value>Multiplos Ficheiros selecionados</value>
+    </data>
+    <data name="Question_NewVersionWhWz_Extra" xml:space="preserve">
+        <value>Versão {$1} do Wheel Wizard está disponível (de momento encontra-se na versão {$2}). Queres atualizar agora?</value>
+    </data>
+    <data name="MessageError_NoModFolder_Extra" xml:space="preserve">
+        <value>A pasta de mods não existe</value>
+    </data>
+    <data name="MessageWarning_NotFindDolphin_Extra" xml:space="preserve">
+        <value>O Dolphin Emulator não foi encontrado, por favor defina o caminho nas definições</value>
+    </data>
+    <data name="MessageWarning_NotFindGame_Extra" xml:space="preserve">
+        <value>O jogo não foi encontrado, por favor defina o caminho nas definições</value>
+    </data>
+    <data name="Question_OldRksysFound_Title" xml:space="preserve">
+        <value>O antifo rksys.dat foi encontrado</value>
+    </data>
+    <data name="Question_OldRksysFound_Extra" xml:space="preserve">
+        <value>Foi encontrada uma gravação antiga. Queres usá-lá? (recomendado)</value>
+    </data>
+    <data name="Progress_ProcessingXofY" xml:space="preserve">
+        <value>A processar {$1} de {$2} ficheiros...</value>
+    </data>
+    <data name="Question_ReinstallRR_Title" xml:space="preserve">
+        <value>Reinstalar Retro Rewind</value>
+    </data>
+    <data name="MessageError_RestartAdminFail_Extra" xml:space="preserve">
+        <value>Falha ao reiniciar com direitos de administrador</value>
+    </data>
+    <data name="Question_RRNotDeterment_Extra" xml:space="preserve">
+        <value>A tua versão do Retro Rewind não pode ser determinada. Gostarias de instalar o Retro Rewind</value>
+    </data>
+    <data name="Question_RRToOld_Extra" xml:space="preserve">
+        <value>A tua versão do Retro Rewind é demasiado antiga par atualizar. Gostarias de reinstalar o Retro Rewind</value>
+    </data>
+    <data name="MessageSuccess_RRUpToDate_Title" xml:space="preserve">
+        <value>A tua versão do Retro Rewind é a mais recente</value>
+    </data>
+    <data name="MessageSuccess_SettingsSaved_Title" xml:space="preserve">
+        <value>Definições guardadas com sucesso</value>
+    </data>
+    <data name="Question_SureDelete_Title" xml:space="preserve">
+        <value>Tens a certeza que desejas apagar ($1)?</value>
+    </data>
+    <data name="MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation" xml:space="preserve">
+        <value>Incapaz de atualizar o Wheel Wizard. Garante que a aplicação se encontra numa pasta que pode ser localizada.\n Falha a encontar a pasta atual</value>
+    </data>
+    <data name="MessageWarning_UnableUpdateWhWz_Extra_ReasonNetwork" xml:space="preserve">
+        <value>Impossível verificar se o Wheel Wizard está atualizado. \nTalvez estejas a experienciar problemas de net</value>
+    </data>
+    <data name="Question_UpdateAdmin_Title" xml:space="preserve">
+        <value>Atualiza usando administrados</value>
+    </data>
+    <data name="Question_UpdateAdmin_Extra" xml:space="preserve">
+        <value>Às vezes uma atualização requere direitos de administrador. Desejas usar direitos de administrador para esteja atualização?</value>
+    </data>
+    <data name="Progress_UpdateRR" xml:space="preserve">
+        <value>Atualizar Retro Rewind</value>
+    </data>
+    <data name="Progress_UpdateWhWz" xml:space="preserve">
+        <value>Atualizar Wheel Wizard</value>
+    </data>
+    <data name="Question_NewVersionWhWz_Title" xml:space="preserve">
+        <value>Atualização do Wheel Wizard Disponível</value>
+    </data>
+    <data name="Progress_DownloadingMb" xml:space="preserve">
+        <value>A transferir {$1} MB</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Title" xml:space="preserve">
+        <value>Nome do mod não pode estar em branco</value>
+    </data>
+    <data name="Placeholder_SearchForPlayers" xml:space="preserve">
+        <value>Procura Por Jogadores...</value>
+    </data>
+    <data name="Placeholder_EnterPath" xml:space="preserve">
+        <value>Introduz aqui o caminho desejado...</value>
+    </data>
 </root>

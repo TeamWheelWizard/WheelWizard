@@ -21,25 +21,25 @@
     <data name="Category_Video" xml:space="preserve">
         <value>映像</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
+    <data name="HelperText_30FPS" xml:space="preserve">
         <value>ゲームが30FPSで動作するようになります(通常は60FPS)</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
+    <data name="HelperText_EndWithExe" xml:space="preserve">
         <value>パスの拡張子は必ず .exe にしてください</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>ゲーム内ではWiiリモコンを無効にしますが、Wiiチャンネルでは有効にします</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>ゲームと一緒にDolphinのメインウィンドウを起動します</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>スタッタリングやラグスパイクなどを軽減するために、特定のDolphinの設定を変更します</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>デフォルト解像度は1xです</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>設定が無効になっています。最初にパス設定を完了させてください</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
@@ -68,9 +68,6 @@
     </data>
     <data name="Option_Renderer" xml:space="preserve">
         <value>レンダラー</value>
-    </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Retro Rewindの言語</value>
     </data>
     <data name="Option_ShowFPS" xml:space="preserve">
         <value>FPSの表示</value>
@@ -129,10 +126,10 @@
     <data name="Value_Language_Turkish" xml:space="preserve">
         <value>トルコ語</value>
     </data>
-    <data name="CompletePercentage" xml:space="preserve">
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
         <value>100</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
         <value>Wheel Wizard内のアニメーションを有効にします</value>
     </data>
     <data name="Option_EnableAnimations" xml:space="preserve">
@@ -149,5 +146,56 @@
     </data>
     <data name="Value_Language_Russian" xml:space="preserve">
         <value>ロシア語</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>アラビア語</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>中国語</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>チェコ語</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>ノルウェー語</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>ポルトガル語</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>その他</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>一般</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>情報</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>ゲームフォルダーを開く</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>セーブフォルダーを開く</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Retro Rewindの再インストール</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>インストール</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>Haru00007,  Mosgis,  Mossan</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>パスは次のもので終わります:</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Retro Rewindをプレイする前に、これらの3つのパスを設定する必要があります</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>任意</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>これはWheel Wizardの言語のみ変更します。ゲーム内の言語を変更したい場合、ゲーム設定内で変更する必要があります</value>
     </data>
 </root>

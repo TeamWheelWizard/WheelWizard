@@ -3,9 +3,9 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-                   xmlns:self="clr-namespace:WheelWizard.Views.Popups"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
                    xmlns:behaviorComp="clr-namespace:WheelWizard.Views.BehaviorComponent"
+                   xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    x:Class="WheelWizard.Views.Popups.Generic.TextInputWindow">
     <Grid RowDefinitions="Auto,Auto,Auto" Width="400">
@@ -19,7 +19,7 @@
             <TextBlock Classes="BodyText" x:Name="ExtraTextBlock" FontSize="14"
                        HorizontalAlignment="Left" Margin="0,10,0,0" />
 
-            <behaviorComp:FeedbackTextBox x:Name="InputField" Watermark="Enter text here..."
+            <behaviorComp:FeedbackTextBox x:Name="InputField" Watermark="{x:Static lang:Phrases.Placeholder_EnterTextHere}"
                                           ErrorMessage="hey hello"
                                           Margin="0,5,0,0" Variant="Default" />
         </StackPanel>
@@ -29,7 +29,7 @@
                                     HoverForeground="{StaticResource Primary200}"
                                     IconData="{StaticResource ArrowDown}"
                                     IsIconLeft="False"
-                                    IsEnabled="True" Text="View Custom Characters" IsVisible="False"
+                                    IsEnabled="True" Text="{x:Static lang:Common.Action_ViewCustomChars}" IsVisible="False"
                                     Click="CustomCharsButton_Click" Margin="0,0,0,5" />
         <UniformGrid Columns="10" Grid.Row="1" x:Name="CustomChars" IsVisible="False" Margin="0,0,0,5">
             <!--This will be filled with buttons of all the special chars -->
@@ -42,11 +42,11 @@
         <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                      x:Name="ButtonContainer" Margin="0,5,0,0">
             <components:Button x:Name="CancelButton" Variant="Default"
-                               IsEnabled="True" Text="Cancel"
+                               IsEnabled="True" Text="{x:Static lang:Common.Action_Cancel}"
                                IconData="{StaticResource XMark}"
                                Click="CancelButton_Click" Margin="0,0,5,0" />
             <components:Button x:Name="SubmitButton" Variant="Primary"
-                               IsEnabled="False" Text="Submit"
+                               IsEnabled="False" Text="{x:Static lang:Common.Action_Submit}"
                                IconData="{StaticResource CheckMark}"
                                Click="SubmitButton_Click" Margin="5,0,0,0" />
         </UniformGrid>

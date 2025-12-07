@@ -18,13 +18,13 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="EmptyText_NoFriends" xml:space="preserve">
+    <data name="EmptyContent_NoFriends" xml:space="preserve">
         <value>ゲーム内でフレンドを追加できます</value>
     </data>
-    <data name="EmptyText_NoFriends_Title" xml:space="preserve">
+    <data name="EmptyContent_NoFriends_Title" xml:space="preserve">
         <value>まだフレンドがいません！</value>
     </data>
-    <data name="EmptyText_NoProfiles" xml:space="preserve">
+    <data name="EmptyContent_NoProfiles" xml:space="preserve">
         <value>ここにプロフィールを載せるには一度プレイする必要があります</value>
     </data>
     <data name="Hover_FriendsOnline_0" xml:space="preserve">
@@ -54,194 +54,157 @@
     <data name="Hover_RoomsOnline_x" xml:space="preserve">
         <value>現在 開いているルームが {$1}部屋あります</value>
     </data>
-    <data name="Sidebar_Link_Discord" xml:space="preserve">
-        <value>お問い合わせ</value>
-    </data>
-    <data name="Sidebar_Link_Github" xml:space="preserve">
-        <value>ソースコード</value>
-    </data>
-    <data name="Sidebar_Link_Support" xml:space="preserve">
-        <value>サポート</value>
-    </data>
     <data name="Text_MadeByString" xml:space="preserve">
         <value>作成者: {$1} \nと {$2}</value>
     </data>
     <data name="Text_ThanksTranslators" xml:space="preserve">
         <value>すべての翻訳者さんに感謝します:</value>
     </data>
-    <data name="PopupText_InstallingRRFirstTime" xml:space="preserve">
+    <data name="Progress_InstallingRRFirstTime" xml:space="preserve">
         <value>Retro Rewindをインストール (初回)</value>
     </data>
-    <data name="EmptyText_NoMods" xml:space="preserve">
+    <data name="EmptyContent_NoMods" xml:space="preserve">
         <value>Modでゲームを改変 (キャラクターの見た目など) できます。下のボタンを押してModのインポートを開始してください。</value>
     </data>
-    <data name="EmptyText_NoMods_Title" xml:space="preserve">
+    <data name="EmptyContent_NoMods_Title" xml:space="preserve">
         <value>Modが見つかりませんでした</value>
     </data>
-    <data name="EmptyText_NoRooms" xml:space="preserve">
+    <data name="EmptyContent_NoRooms" xml:space="preserve">
         <value>インターネットに接続されていないか、誰もプレイしていない可能性があります。</value>
     </data>
-    <data name="EmptyText_NoRooms_Title" xml:space="preserve">
+    <data name="EmptyContent_NoRooms_Title" xml:space="preserve">
         <value>ルームが見つかりませんでした</value>
     </data>
     <data name="Hover_RoomsPageDisclaimer" xml:space="preserve">
         <value>ルームに直接合流する機能はないことに注意してください。
 特定のルームに参加するには、フレンドを通して合流するか、オンラインサーバーに参加して合流する必要があります。</value>
     </data>
-    <data name="Placeholder_EnterPath" xml:space="preserve">
-        <value>希望のパスを入力してください...</value>
-    </data>
-    <data name="Placeholder_SearchForPlayers" xml:space="preserve">
-        <value>プレイヤーを検索します...</value>
-    </data>
-    <data name="PopupText_AlreadyFilesRR" xml:space="preserve">
-        <value>既にRetroRewindフォルダーにファイルがあります。
-インストールしますか？</value>
-    </data>
-    <data name="PopupText_ApplyScale" xml:space="preserve">
+    <data name="Question_ApplyScale_Title" xml:space="preserve">
         <value>新しいウィンドウサイズを適用しますか？</value>
     </data>
-    <data name="PopupText_CouldNotConnectServer" xml:space="preserve">
+    <data name="MessageWarning_NoConnectServer_Extra" xml:space="preserve">
         <value>サーバーに接続できませんでした。後でもう一度試してください。</value>
     </data>
-    <data name="PopupText_DolphinFound" xml:space="preserve">
+    <data name="Question_DolphinFound_Title" xml:space="preserve">
         <value>Dolphinエミュレーターのフォルダーが見つかりました</value>
     </data>
-    <data name="PopupText_DolphinFoundText" xml:space="preserve">
+    <data name="Question_DolphinFound_Extra" xml:space="preserve">
         <value>意味がよく分からなければ、「はい」をクリックしてください。\nDolphinエミュレーターのフォルダーが見つかりました。このフォルダーを使用しますか？</value>
     </data>
-    <data name="PopupText_DolphinNotFound" xml:space="preserve">
+    <data name="MessageWarning_DolphinNotFound_Title" xml:space="preserve">
         <value>Dolphinエミュレーターのフォルダーが見つかりませんでした</value>
     </data>
-    <data name="PopupText_DolphinNotFoundText" xml:space="preserve">
+    <data name="MessageWarning_DolphinNotFound_Extra" xml:space="preserve">
         <value>Dolphinエミュレーターのフォルダーが自動では見つかりませんでした。
 フォルダーを手動で見つけてください。詳細については「help」をクリックしてください。</value>
     </data>
-    <data name="PopupText_DownloadRR" xml:space="preserve">
+    <data name="Question_RRNotDeterment_Title" xml:space="preserve">
         <value>Retro Rewindをダウンロードする</value>
     </data>
-    <data name="PopupText_EnsurePathsExists" xml:space="preserve">
+    <data name="MessageWarning_InvalidPaths_Extra" xml:space="preserve">
         <value>すべてのパスが正しいことを確認して、もう一度お試しください。</value>
     </data>
-    <data name="PopupText_EnterModName" xml:space="preserve">
-        <value>Modの名前を入力:</value>
-    </data>
-    <data name="PopupText_EnterTitle" xml:space="preserve">
-        <value>タイトルを入力:</value>
-    </data>
-    <data name="PopupText_EsimatedTimeRemaining" xml:space="preserve">
+    <data name="Progress_EstimatedTimeRemaining" xml:space="preserve">
         <value>おおよその残り時間:</value>
     </data>
-    <data name="PopupText_FailCheckUpdates" xml:space="preserve">
+    <data name="MessageWarning_FailCheckUpdates_Title" xml:space="preserve">
         <value>アップデートの確認に失敗しました</value>
     </data>
-    <data name="PopupText_FailedUpdateApply" xml:space="preserve">
+    <data name="MessageError_AbortRR_Extra_FailedUpdateApply" xml:space="preserve">
         <value>アップデートの適用に失敗しました。中止しています。</value>
     </data>
-    <data name="PopupText_FailedUpdateDelete" xml:space="preserve">
+    <data name="MessageError_AbortRR_Extra_FailedUpdateDelete" xml:space="preserve">
         <value>アップデートファイルの削除に失敗しました。中止しています。</value>
     </data>
-    <data name="PopupText_InstallingMods" xml:space="preserve">
+    <data name="Progress_InstallingMods" xml:space="preserve">
         <value>Modをインストール</value>
     </data>
-    <data name="PopupText_InstallingModsCount" xml:space="preserve">
+    <data name="Progress_InstallingModsCount" xml:space="preserve">
         <value>{$1}個のModをインストール</value>
     </data>
-    <data name="PopupText_InstallingRR" xml:space="preserve">
+    <data name="Progress_InstallingRR" xml:space="preserve">
         <value>Retro Rewindをインストール</value>
     </data>
-    <data name="PopupText_LatestWhWzGithub" xml:space="preserve">
+    <data name="Progress_LatestWhWzGithub" xml:space="preserve">
         <value>githubから最新のWheel Wizardを入手</value>
     </data>
-    <data name="PopupText_ModCombineQuestion" xml:space="preserve">
-        <value>すべてのファイルを1つのModにまとめますか？</value>
-    </data>
-    <data name="PopupText_ModNameEmpty" xml:space="preserve">
-        <value>Modの名前は空にできません</value>
-    </data>
-    <data name="PopupText_ModNameExists" xml:space="preserve">
+    <data name="MessageWarning_InvalidName_Extra_ModNameExists" xml:space="preserve">
         <value>「{$1}」というModは既に存在しています。</value>
     </data>
-    <data name="PopupText_ModsFound" xml:space="preserve">
+    <data name="Question_LaunchClearModsFound_Title" xml:space="preserve">
         <value>Modが見つかりました</value>
     </data>
-    <data name="PopupText_ModsFoundQuestion" xml:space="preserve">
+    <data name="Question_LaunchClearModsFound_Extra" xml:space="preserve">
         <value>Modなしでゲームを起動しようとしています。
 My Stuffフォルダーをクリアしますか？</value>
     </data>
-    <data name="PopupText_MultipleFilesSelected" xml:space="preserve">
+    <data name="MessageWarning_MultipleFilesSelected_Title" xml:space="preserve">
         <value>複数のファイルが選択されています</value>
     </data>
-    <data name="PopupText_NewVersionWhWz" xml:space="preserve">
+    <data name="Question_NewVersionWhWz_Extra" xml:space="preserve">
         <value>Wheel Wizardのバージョン{$1} (現在のバージョンは{$2}) が利用できます。すぐにアップデートしますか？</value>
     </data>
-    <data name="PopupText_NoModFolder" xml:space="preserve">
+    <data name="MessageError_NoModFolder_Extra" xml:space="preserve">
         <value>Modフォルダーがありません</value>
     </data>
-    <data name="PopupText_NotFindDolphin" xml:space="preserve">
+    <data name="MessageWarning_NotFindDolphin_Extra" xml:space="preserve">
         <value>Dolphinエミュレーターが見つかりませんでした。設定でパスを設定してください。</value>
     </data>
-    <data name="PopupText_NotFindGame" xml:space="preserve">
+    <data name="MessageWarning_NotFindGame_Extra" xml:space="preserve">
         <value>ゲームファイルが見つかりませんでした。設定でパスを設定してください。</value>
     </data>
-    <data name="PopupText_OldRksysFound" xml:space="preserve">
+    <data name="Question_OldRksysFound_Title" xml:space="preserve">
         <value>古いrksys.datが見つかりました</value>
     </data>
-    <data name="PopupText_OldRksysFoundExplained" xml:space="preserve">
+    <data name="Question_OldRksysFound_Extra" xml:space="preserve">
         <value>古いセーブデータが見つかりました。このセーブデータを使用しますか？(おすすめ)</value>
     </data>
-    <data name="PopupText_OldRRFound" xml:space="preserve">
-        <value>古いRetro Rewindが見つかりました</value>
-    </data>
-    <data name="PopupText_OldRRFoundExplained" xml:space="preserve">
-        <value>古いRetro Rewindのファイルが見つかりました。新しい場所に移動しますか？</value>
-    </data>
-    <data name="PopupText_ProcessingXofY" xml:space="preserve">
+    <data name="Progress_ProcessingXofY" xml:space="preserve">
         <value>{$2}個中{$1} 個のファイルを処理しています...</value>
     </data>
-    <data name="PopupText_ReinstallRR" xml:space="preserve">
+    <data name="Question_ReinstallRR_Title" xml:space="preserve">
         <value>Retro Rewindの再インストール</value>
     </data>
-    <data name="PopupText_RestartAdminFail" xml:space="preserve">
+    <data name="MessageError_RestartAdminFail_Extra" xml:space="preserve">
         <value>管理者権限で再起動するのに失敗しました。</value>
     </data>
-    <data name="PopupText_RRNotDeterment" xml:space="preserve">
+    <data name="Question_RRNotDeterment_Extra" xml:space="preserve">
         <value>Retro Rewindのバージョンを判別できませんでした。Retro Rewindを再インストールしますか？</value>
     </data>
-    <data name="PopupText_RRToOld" xml:space="preserve">
+    <data name="Question_RRToOld_Extra" xml:space="preserve">
         <value>Retro Rewindのバージョンが古すぎるため更新できません。Retro Rewindを再インストールしますか？</value>
     </data>
-    <data name="PopupText_RRUpToDate" xml:space="preserve">
+    <data name="MessageSuccess_RRUpToDate_Title" xml:space="preserve">
         <value>Retro Rewindは最新です。</value>
     </data>
-    <data name="PopupText_SettingsSaved" xml:space="preserve">
+    <data name="MessageSuccess_SettingsSaved_Title" xml:space="preserve">
         <value>設定が保存されました！</value>
     </data>
-    <data name="PopupText_SureDeleteQuestion" xml:space="preserve">
+    <data name="Question_SureDelete_Title" xml:space="preserve">
         <value>{$1}を削除してもよろしいですか？</value>
     </data>
-    <data name="PopupText_UnableUpdateWhWz_ReasonLocation" xml:space="preserve">
+    <data name="MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation" xml:space="preserve">
         <value>Wheel Wizardが更新できません。アプリが書き込み可能なフォルダーにあることを確認してください。\n現在のフォルダーが見つかりません。</value>
     </data>
-    <data name="PopupText_UnableUpdateWhWz_ReasonNetwork" xml:space="preserve">
+    <data name="MessageWarning_UnableUpdateWhWz_Extra_ReasonNetwork" xml:space="preserve">
         <value>Wheel Wizardが最新かどうか確認できません。\nネットワークの問題が発生している可能性があります。</value>
     </data>
-    <data name="PopupText_UpdateAdmin" xml:space="preserve">
+    <data name="Question_UpdateAdmin_Title" xml:space="preserve">
         <value>管理者権限で更新する</value>
     </data>
-    <data name="PopupText_UpdateAdminExplained" xml:space="preserve">
+    <data name="Question_UpdateAdmin_Extra" xml:space="preserve">
         <value>アップデートには管理者権限が必要な場合があります。今回のアップデートで管理者権限を有効にしますか?</value>
     </data>
-    <data name="PopupText_UpdateRR" xml:space="preserve">
+    <data name="Progress_UpdateRR" xml:space="preserve">
         <value>Retro Rewindをアップデート</value>
     </data>
-    <data name="PopupText_UpdateWhWz" xml:space="preserve">
+    <data name="Progress_UpdateWhWz" xml:space="preserve">
         <value>Wheel Wizardをアップデート</value>
     </data>
-    <data name="PopupText_WhWzUpdateAvailable" xml:space="preserve">
+    <data name="Question_NewVersionWhWz_Title" xml:space="preserve">
         <value>Wheel Wizardのアップデートがあります</value>
     </data>
-    <data name="PupupText_DownloadingMb" xml:space="preserve">
+    <data name="Progress_DownloadingMb" xml:space="preserve">
         <value>{$1}MBをダウンロード中</value>
     </data>
     <data name="Text_WhWzTranslationPercentage" xml:space="preserve">
@@ -270,5 +233,236 @@ My Stuffフォルダーをクリアしますか？</value>
     </data>
     <data name="Time_Seconds_x" xml:space="preserve">
         <value>{$1}秒</value>
+    </data>
+    <data name="EmptyContent_NoMiis" xml:space="preserve">
+        <value>Miiのデータを読み込めません。必ず一度はゲームを起動してください。</value>
+    </data>
+    <data name="EmptyContent_NoMiis_Title" xml:space="preserve">
+        <value>まだMiiがありません！</value>
+    </data>
+    <data name="HelperNote_CreatorNameLess11" xml:space="preserve">
+        <value>作成者の名前の長さは10文字以下にしてください</value>
+    </data>
+    <data name="HelperNote_NameMustBetween" xml:space="preserve">
+        <value>名前の長さは3文字から10文字にしてください</value>
+    </data>
+    <data name="Hover_FriendsPageDisclaimer" xml:space="preserve">
+        <value>フレンドを追加するためにはゲーム内で追加する必要があります</value>
+    </data>
+    <data name="Hover_PrimaryProfile" xml:space="preserve">
+        <value>メインのプロファイルはWheel Wizardクライアントで参照されます</value>
+    </data>
+    <data name="Hover_RegionUserSelection" xml:space="preserve">
+        <value>これはあなたがプレイした地域のみを表示します</value>
+    </data>
+    <data name="MessageError_AbortRR_Extra_InvalidFilePath" xml:space="preserve">
+        <value>無効なファイルパスが検知されました。開発者に連絡してください。\n サーバーエラー:  {$1}</value>
+    </data>
+    <data name="MessageError_AbortRR_Title" xml:space="preserve">
+        <value>Retro Rewindのアップデートを中止</value>
+    </data>
+    <data name="MessageError_FailedChangeMii_Title" xml:space="preserve">
+        <value>Miiの変更に失敗しました</value>
+    </data>
+    <data name="MessageError_FailedChangeName_Title" xml:space="preserve">
+        <value>名前の変更に失敗しました</value>
+    </data>
+    <data name="MessageError_FailedCreateMiiDb_Title" xml:space="preserve">
+        <value>Miiの情報の作成に失敗しました</value>
+    </data>
+    <data name="MessageError_GenericError_Title" xml:space="preserve">
+        <value>エラーが発生しました</value>
+    </data>
+    <data name="MessageSuccess_MiiChanged" xml:space="preserve">
+        <value>Miiが正しく変更されました</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Extra" xml:space="preserve">
+        <value>選択したMiiのうち1体以上がお気に入りに設定されています。誤って削除してしまうのを防ぐため、お気に入りに設定されていないMiiのみ削除できます</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Title" xml:space="preserve">
+        <value>お気に入りのMiiは削除できません</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Extra_NotFromBrowser" xml:space="preserve">
+        <value>ModブラウザーでインストールしていないModは閲覧できません</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Extra_SomethingElse" xml:space="preserve">
+        <value>選択されたModを開こうとした際に問題が発生しました</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Title" xml:space="preserve">
+        <value>このModは閲覧できません</value>
+    </data>
+    <data name="MessageWarning_FailCheckUpdates_Extra" xml:space="preserve">
+        <value>現在アップデートを確認できません。インターネットに接続されていないか、サーバーがダウンしている可能性があります</value>
+    </data>
+    <data name="MessageWarning_InvalidName_Title" xml:space="preserve">
+        <value>その名前にはできません</value>
+    </data>
+    <data name="MessageWarning_InvalidPaths_Title" xml:space="preserve">
+        <value>無効なパスです</value>
+    </data>
+    <data name="MessageWarning_NoConnectServer_Title" xml:space="preserve">
+        <value>サーバーに接続できませんでした</value>
+    </data>
+    <data name="MessageWarning_UnableUpdateWhWz_Title" xml:space="preserve">
+        <value>Wheel Wizardのアップデートを無効にする</value>
+    </data>
+    <data name="Question_ApplyScale_Extra" xml:space="preserve">
+        <value>変更の保存を選択しないと、この変更は{$1}で変更前に戻ります</value>
+    </data>
+    <data name="Question_ReinstallRR_Extra" xml:space="preserve">
+        <value>Retro Rewindを再インストールしてもよろしいですか？</value>
+    </data>
+    <data name="Question_RRToOld_Title" xml:space="preserve">
+        <value>Retro Rewindのバージョンが古すぎます</value>
+    </data>
+    <data name="Question_SureDelete_Extra" xml:space="preserve">
+        <value>削除は永久的であり、元に戻すことはできません</value>
+    </data>
+    <data name="Question_SureDelete_Title_Miis" xml:space="preserve">
+        <value>{$1}Miiを削除してもよろしいですか？</value>
+    </data>
+    <data name="SnackbarError_MiiFailureCreate" xml:space="preserve">
+        <value>Mii '{$1}'の作成に失敗しました</value>
+    </data>
+    <data name="SnackbarError_MiiFailureDeserialize" xml:space="preserve">
+        <value>Mii '{$1}'の復元に失敗しました</value>
+    </data>
+    <data name="SnackbarError_MiiFailureDuplicate" xml:space="preserve">
+        <value>Mii '{$1}'のコピーに失敗しました</value>
+    </data>
+    <data name="SnackbarError_MiiFailureGet" xml:space="preserve">
+        <value>Mii '{$1}'の取得に失敗しました</value>
+    </data>
+    <data name="SnackbarError_MiiFailureSave" xml:space="preserve">
+        <value>Mii '{$1}'の保存に失敗しました</value>
+    </data>
+    <data name="SnackbarError_MiiFailureSerialize" xml:space="preserve">
+        <value>Mii '{$1}'の変換に失敗しました</value>
+    </data>
+    <data name="SnackbarError_MiiFailureUpdate" xml:space="preserve">
+        <value>Mii '{$1}'のアップデートに失敗しました</value>
+    </data>
+    <data name="SnackbarSuccess_CopiedFC" xml:space="preserve">
+        <value>クリップボードにフレンドコードをコピーしました</value>
+    </data>
+    <data name="SnackbarSuccess_CreatedDuplicate" xml:space="preserve">
+        <value>{$1}'のコピーを作成しました</value>
+    </data>
+    <data name="SnackbarSuccess_CreatedDuplicatesMiis" xml:space="preserve">
+        <value>{$1}Miiのコピーを作成しました</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted" xml:space="preserve">
+        <value>{$1}'を削除しました</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted_Miis" xml:space="preserve">
+        <value>{$1}Miiを削除しました</value>
+    </data>
+    <data name="SnackbarSuccess_MiiAdded" xml:space="preserve">
+        <value>MiiはあなたのMiiに追加されました</value>
+    </data>
+    <data name="SnackbarSuccess_NameChange" xml:space="preserve">
+        <value>名前を'{$1}'に変更しました</value>
+    </data>
+    <data name="SnackbarSuccess_ProfileSetPrimary" xml:space="preserve">
+        <value>プロファイルをメインに設定する</value>
+    </data>
+    <data name="SnackbarSuccess_SavedMii" xml:space="preserve">
+        <value>Mii '{$1}'をファイル '{$2}'に保存しました</value>
+    </data>
+    <data name="SnackbarWarning_CantSaveMii" xml:space="preserve">
+        <value>Miiを保存できません</value>
+    </data>
+    <data name="SnackbarWarning_NoMiiDelete" xml:space="preserve">
+        <value>削除するMiiが存在しないようです</value>
+    </data>
+    <data name="SnackbarWarning_NoMiiExport" xml:space="preserve">
+        <value>エクスポートできるMiiがなかったようです</value>
+    </data>
+    <data name="EmptyContent_NoModSelected" xml:space="preserve">
+        <value>リスト内のModを選択して詳細を表示します</value>
+    </data>
+    <data name="EmptyContent_NoModSelected_Title" xml:space="preserve">
+        <value>Modが選択されていません</value>
+    </data>
+    <data name="MessageError_FailedInstallDolphin_Extra" xml:space="preserve">
+        <value>Dolphinエミュレーターのインストールに失敗しました。Dolphinのflatpakバージョンのインストールを手動で行ってみてください。</value>
+    </data>
+    <data name="MessageError_FailedInstallDolphin_Title" xml:space="preserve">
+        <value>Dolphinのインストールに失敗</value>
+    </data>
+    <data name="MessageError_FailedRetrieveMod_Title" xml:space="preserve">
+        <value>Modの情報取得に失敗</value>
+    </data>
+    <data name="MessageError_ModDownloadFail_Extra" xml:space="preserve">
+        <value>ダウンロード中にエラーが発生しました: {$1}</value>
+    </data>
+    <data name="MessageError_ModDownloadFail_Title" xml:space="preserve">
+        <value>Modのダウンロードに失敗しました</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Extra" xml:space="preserve">
+        <value>Modの名前を入力してください</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Title" xml:space="preserve">
+        <value>Modの名前は空にできません</value>
+    </data>
+    <data name="MessageWarning_ModNameInvalid_Extra" xml:space="preserve">
+        <value>Modの名前に無効な文字が含まれています</value>
+    </data>
+    <data name="MessageWarning_ModNameInvalid_Title" xml:space="preserve">
+        <value>Modの名前が無効です</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Extra" xml:space="preserve">
+        <value>ファイルが見つかりませんでした</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Title" xml:space="preserve">
+        <value>Modをダウンロードできません</value>
+    </data>
+    <data name="Progress_InstallingDolphin" xml:space="preserve">
+        <value>Dolphinエミュレーターをインストール</value>
+    </data>
+    <data name="Progress_ThisMayTakeAWhile" xml:space="preserve">
+        <value>インターネットの状況によっては時間がかかる場合があります</value>
+    </data>
+    <data name="Question_DolphinFlatpack_Extra" xml:space="preserve">
+        <value>Dolphinエミュレーターのflatpakバージョンがインストールされていないようです。システム全体にインストールしますか？</value>
+    </data>
+    <data name="Question_DolphinFlatpack_Title" xml:space="preserve">
+        <value>Dolphin flatpakバージョンのインストール</value>
+    </data>
+    <data name="Question_InstallMod_Title" xml:space="preserve">
+        <value>Modのダウンロードとインストールを行いますか: {$1}？</value>
+    </data>
+    <data name="Question_SearchMod" xml:space="preserve">
+        <value>Modを検索しています...</value>
+    </data>
+    <data name="Text_PoweredGamebanana" xml:space="preserve">
+        <value>GameBananaによって提供されています</value>
+    </data>
+    <data name="Placeholder_SearchForPlayers" xml:space="preserve">
+        <value>プレイヤーを検索します...</value>
+    </data>
+    <data name="Placeholder_EnterPath" xml:space="preserve">
+        <value>希望のパスを入力してください...</value>
+    </data>
+    <data name="Placeholder_EnterMiiName" xml:space="preserve">
+        <value>Miiの名前を入力してください...</value>
+    </data>
+    <data name="Placeholder_EnterModName" xml:space="preserve">
+        <value>Modの名前を入力してください...</value>
+    </data>
+    <data name="Placeholder_EnterTextHere" xml:space="preserve">
+        <value>ここにテキストを入力してください...</value>
+    </data>
+    <data name="Placeholder_SearchMod" xml:space="preserve">
+        <value>Modを検索します...</value>
+    </data>
+    <data name="Question_EnterNewName_Extra" xml:space="preserve">
+        <value>名前をこれから変更します: {$1}</value>
+    </data>
+    <data name="Question_EnterNewName_Title" xml:space="preserve">
+        <value>新しい名前を入力してください</value>
+    </data>
+    <data name="Text_LanguageTranslatedBy" xml:space="preserve">
+        <value>この言語はこれらの方が翻訳しました: {$1}</value>
     </data>
 </root>

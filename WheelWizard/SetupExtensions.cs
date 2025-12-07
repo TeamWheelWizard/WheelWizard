@@ -4,6 +4,8 @@ using Serilog;
 using Testably.Abstractions;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
+using WheelWizard.CustomCharacters;
+using WheelWizard.CustomDistributions;
 using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
 using WheelWizard.MiiImages;
@@ -11,6 +13,7 @@ using WheelWizard.RrRooms;
 using WheelWizard.Shared.Services;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard;
 
@@ -22,6 +25,7 @@ public static class SetupExtensions
     public static void AddWheelWizardServices(this IServiceCollection services)
     {
         // Features
+        services.AddCustomCharacters();
         services.AddAutoUpdating();
         services.AddBranding();
         services.AddGitHub();
@@ -30,6 +34,7 @@ public static class SetupExtensions
         services.AddWiiManagement();
         services.AddGameBanana();
         services.AddMiiImages();
+        services.AddCustomDistributionService();
 
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();

@@ -6,15 +6,15 @@
     <Design.PreviewWith>
         <StackPanel Orientation="Vertical">
             <Border Height="40" Background="{StaticResource Neutral950}">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" >
-                    <RadioButton Content="Option 1" Classes="TopBar" IsChecked="True"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <RadioButton Content="Option 1" Classes="TopBar" IsChecked="True" />
                     <RadioButton Content="Option 2" Classes="TopBar" />
                     <RadioButton Content="Option 3" Classes="TopBar" />
-                    <RadioButton Content="Option 4" Classes="TopBar" IsEnabled="False"/>
+                    <RadioButton Content="Option 4" Classes="TopBar" IsEnabled="False" />
                 </StackPanel>
-              
+
             </Border>
-            <Border Background="{StaticResource Neutral900}" Height="2" 
+            <Border Background="{StaticResource Neutral900}" Height="2"
                     HorizontalAlignment="Stretch" />
             <StackPanel Orientation="Horizontal">
                 <Border Padding="20" Background="{StaticResource Neutral950}">
@@ -22,22 +22,23 @@
                         <ToggleButton Content="Toggle button" IsEnabled="False" />
                         <TextBlock Classes="TinyText" Margin="0,5">CheckBox:</TextBlock>
                         <CheckBox Content="checkbox 1" />
-                        <CheckBox Content="checkbox 2" IsChecked="True" IsEnabled="False"  />
-                        <CheckBox Content="checkbox 3" IsEnabled="False"  />
-                        
-                        <CheckBox Content="Different Style 1" Classes="RadioButton" IsChecked="True"  />
-                        <CheckBox Content="Different Style 2" Classes="RadioButton"   />
+                        <CheckBox Content="checkbox 2" IsChecked="True" IsEnabled="False" />
+                        <CheckBox Content="checkbox 3" IsEnabled="False" />
+
+                        <CheckBox Content="Different Style 1" Classes="RadioButton" IsChecked="True" />
+                        <CheckBox Content="Different Style 2" Classes="RadioButton" />
                         <TextBlock Classes="TinyText" Margin="0,5">RadioButton:</TextBlock>
                         <RadioButton Content="Radio 1" />
                         <RadioButton Content="Radio 2" />
                         <RadioButton Content="Radio 3" IsChecked="True" IsEnabled="False" />
-                        <RadioButton Content="Different Style 1" GroupName="DifferentStyle" Classes="CheckBox" IsChecked="True" />
+                        <RadioButton Content="Different Style 1" GroupName="DifferentStyle" Classes="CheckBox"
+                                     IsChecked="True" />
                         <RadioButton Content="Different Style 2" GroupName="DifferentStyle" Classes="CheckBox" />
-                        
+
                         <TextBlock Classes="TinyText" Margin="0,5">Switch:</TextBlock>
                         <CheckBox Classes="Switch" Content="Switch 1" />
-                        <CheckBox Classes="Switch" Content="Switch 2" IsChecked="True" IsEnabled="False"  />
-                        <CheckBox Classes="Switch" Content="Switch 3" IsEnabled="False"  />
+                        <CheckBox Classes="Switch" Content="Switch 2" IsChecked="True" IsEnabled="False" />
+                        <CheckBox Classes="Switch" Content="Switch 3" IsEnabled="False" />
                     </StackPanel>
                 </Border>
                 <Border Padding="20" Background="{StaticResource Neutral900}">
@@ -45,23 +46,24 @@
                         <ToggleButton Content="Toggle button" />
                         <TextBlock Classes="TinyText" Margin="0,5">CheckBox:</TextBlock>
                         <CheckBox Content="checkbox 1" />
-                        <CheckBox Content="checkbox 2" IsChecked="True" IsEnabled="False"  />
-                        <CheckBox Content="checkbox 3" IsEnabled="False"  />
-                        
-                        <CheckBox Content="Different Style 1" Classes="RadioButton" IsChecked="True"  />
-                        <CheckBox Content="Different Style 2" Classes="RadioButton"   />
+                        <CheckBox Content="checkbox 2" IsChecked="True" IsEnabled="False" />
+                        <CheckBox Content="checkbox 3" IsEnabled="False" />
+
+                        <CheckBox Content="Different Style 1" Classes="RadioButton" IsChecked="True" />
+                        <CheckBox Content="Different Style 2" Classes="RadioButton" />
                         <TextBlock Classes="TinyText" Margin="0,5">RadioButton:</TextBlock>
                         <RadioButton Content="Radio 1" />
                         <RadioButton Content="Radio 2" />
                         <RadioButton Content="Radio 3" IsChecked="True" IsEnabled="False" />
-                        
-                        <RadioButton Content="Different Style 1" GroupName="DifferentStyle" Classes="CheckBox" IsChecked="True"  />
-                        <RadioButton Content="Different Style 2" GroupName="DifferentStyle" Classes="CheckBox"   />
-                       
+
+                        <RadioButton Content="Different Style 1" GroupName="DifferentStyle" Classes="CheckBox"
+                                     IsChecked="True" />
+                        <RadioButton Content="Different Style 2" GroupName="DifferentStyle" Classes="CheckBox" />
+
                         <TextBlock Classes="TinyText" Margin="0,5">Switch:</TextBlock>
                         <CheckBox Classes="SwitchDark" Content="Switch 1" />
-                        <CheckBox Classes="SwitchDark" Content="Switch 2" IsChecked="True" IsEnabled="False"  />
-                        <CheckBox Classes="SwitchDark" Content="Switch 3" IsEnabled="False"  />
+                        <CheckBox Classes="SwitchDark" Content="Switch 2" IsChecked="True" IsEnabled="False" />
+                        <CheckBox Classes="SwitchDark" Content="Switch 3" IsEnabled="False" />
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -75,27 +77,27 @@
             <SolidColorBrush x:Key="Default-InnerWhite" Color="{StaticResource Neutral50}" />
             <SolidColorBrush x:Key="Default-Background" Color="{StaticResource Neutral950}" />
             <SolidColorBrush x:Key="Default-BorderColor" Color="{StaticResource Neutral500}" />
-            
+
             <SolidColorBrush x:Key="Disabled-CheckedColor" Color="{StaticResource Neutral700}" />
             <SolidColorBrush x:Key="Disabled-InnerWhite" Color="{StaticResource Neutral500}" />
             <SolidColorBrush x:Key="Disabled-Background" Color="{StaticResource Neutral900}" />
             <SolidColorBrush x:Key="Disabled-BorderColor" Color="{StaticResource Neutral700}" />
         </ResourceDictionary>
     </Styles.Resources>
-    
+
     <Style Selector="ToggleButton, RadioButton, CheckBox">
-        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
-        <Style Selector="^[IsEnabled=False] /template/ ContentPresenter">
+        <Style Selector="^:disabled /template/ ContentPresenter">
             <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
         </Style>
         <Style Selector="^[IsEnabled=True] /template/ ContentPresenter">
             <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
         </Style>
     </Style>
-    
+
     <Style Selector="CheckBox, RadioButton.CheckBox">
         <Setter Property="Background" Value="{StaticResource Default-Background}" />
         <Setter Property="BorderBrush" Value="{StaticResource Default-BorderColor}" />
@@ -106,11 +108,11 @@
         <Style Selector="^:pointerover">
             <Setter Property="BorderBrush" Value="{StaticResource Default-CheckedColor}" />
         </Style>
-        <Style Selector="^[IsEnabled=False]">
+        <Style Selector="^:disabled">
             <Setter Property="Background" Value="{StaticResource Disabled-Background}" />
             <Setter Property="BorderBrush" Value="{StaticResource Disabled-BorderColor}" />
         </Style>
-        <Style Selector="^[IsEnabled=False][IsChecked=True]">
+        <Style Selector="^:disabled[IsChecked=True]">
             <Setter Property="Background" Value="{StaticResource Disabled-BorderColor}" />
             <Style Selector="^ /template/ Path#Check">
                 <Setter Property="Fill" Value="{StaticResource Disabled-InnerWhite}" />
@@ -121,10 +123,10 @@
                 <ControlTemplate TargetType="CheckBox">
                     <StackPanel Orientation="Horizontal">
                         <Border Width="24" Height="24" x:Name="Border"
-                                          Background="{TemplateBinding Background}"
-                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                          BorderThickness="3" Padding="1"
-                                          CornerRadius="{StaticResource GlobalCornerRadius}">
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="3" Padding="1"
+                                CornerRadius="{StaticResource GlobalCornerRadius}">
                             <Path Fill="{StaticResource Default-InnerWhite}" x:Name="Check"
                                   Data="{StaticResource CheckMark}" IsVisible="{TemplateBinding IsChecked}"
                                   HorizontalAlignment="Stretch" VerticalAlignment="Center" Stretch="Uniform" />
@@ -137,10 +139,10 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style> 
-    
-    
-      <Style Selector="RadioButton, CheckBox.RadioButton">
+    </Style>
+
+
+    <Style Selector="RadioButton, CheckBox.RadioButton">
         <Setter Property="Background" Value="{StaticResource Default-Background}" />
         <Setter Property="BorderBrush" Value="{StaticResource Default-BorderColor}" />
         <Style Selector="^[IsChecked=True]">
@@ -150,11 +152,11 @@
         <Style Selector="^:pointerover">
             <Setter Property="BorderBrush" Value="{StaticResource Default-CheckedColor}" />
         </Style>
-        <Style Selector="^[IsEnabled=False]">
+        <Style Selector="^:disabled">
             <Setter Property="Background" Value="{StaticResource Disabled-Background}" />
             <Setter Property="BorderBrush" Value="{StaticResource Disabled-BorderColor}" />
         </Style>
-        <Style Selector="^[IsEnabled=False][IsChecked=True]">
+        <Style Selector="^:disabled[IsChecked=True]">
             <Setter Property="Background" Value="{StaticResource Disabled-BorderColor}" />
             <Style Selector="^ /template/ Ellipse#CheckDot">
                 <Setter Property="Fill" Value="{StaticResource Disabled-InnerWhite}" />
@@ -165,10 +167,10 @@
                 <ControlTemplate TargetType="RadioButton">
                     <StackPanel Orientation="Horizontal">
                         <Border Width="24" Height="24" x:Name="Border"
-                                          Background="{TemplateBinding Background}"
-                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                          BorderThickness="3" Padding="1"
-                                          CornerRadius="100">
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="3" Padding="1"
+                                CornerRadius="100">
                             <Ellipse Width="12" Height="12"
                                      Fill="{StaticResource Default-InnerWhite}"
                                      HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -182,30 +184,30 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style> 
-    
-    
+    </Style>
+
+
     <Style Selector="CheckBox.Switch, RadioButton.Switch">
         <Setter Property="Background" Value="{StaticResource Neutral700}" />
-        
+
         <Style Selector="^:pointerover">
             <Setter Property="Background" Value="{StaticResource Neutral500}" />
         </Style>
-        
+
         <Style Selector="^[IsChecked=True]">
             <Setter Property="Background" Value="{StaticResource Default-CheckedColor}" />
             <Style Selector="^ /template/ Ellipse#SwitchNob">
                 <Setter Property="HorizontalAlignment" Value="Right" />
             </Style>
         </Style>
-        
-        <Style Selector="^[IsEnabled=False]">
+
+        <Style Selector="^:disabled">
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
             <Style Selector="^ /template/ Ellipse#SwitchNob">
                 <Setter Property="Fill" Value="{StaticResource Disabled-InnerWhite}" />
             </Style>
         </Style>
-        
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
@@ -226,8 +228,8 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style> 
-    
+    </Style>
+
     <Style Selector="CheckBox.SwitchDark, RadioButton.SwitchDark">
         <Setter Property="Background" Value="{StaticResource Default-Background}" />
 
@@ -237,14 +239,14 @@
                 <Setter Property="HorizontalAlignment" Value="Right" />
             </Style>
         </Style>
-        
-        <Style Selector="^[IsEnabled=False]">
+
+        <Style Selector="^:disabled">
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
             <Style Selector="^ /template/ Ellipse#SwitchNob">
                 <Setter Property="Fill" Value="{StaticResource Disabled-InnerWhite}" />
             </Style>
         </Style>
-        
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
@@ -265,56 +267,56 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style> 
-    
+    </Style>
+
     <Style Selector="ToggleButton">
-        <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}"/>
-        <Setter Property="Background" Value="{StaticResource Neutral600}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}" />
+        <Setter Property="Background" Value="{StaticResource Neutral600}" />
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{StaticResource Neutral700}"/>
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
         <Style Selector="^[IsChecked=True] /template/ ContentPresenter">
-            <Setter Property="Background" Value="{StaticResource Primary600}"/>
+            <Setter Property="Background" Value="{StaticResource Primary600}" />
         </Style>
         <Style Selector="^:pointerover[IsChecked=True] /template/ ContentPresenter">
-            <Setter Property="Background" Value="{StaticResource Primary700}"/>
+            <Setter Property="Background" Value="{StaticResource Primary700}" />
         </Style>
         <Style Selector="^[IsEnabled=False] /template/ ContentPresenter">
-            <Setter Property="Background" Value="{StaticResource Neutral800}"/>
-            <Setter Property="Foreground" Value="{StaticResource Neutral500}"/>
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
         </Style>
     </Style>
-    
+
     <Style Selector="RadioButton.TopBar, CheckBox.TopBar">
         <Setter Property="FontSize" Value="16" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
         <Setter Property="Background" Value="Transparent" />
-        
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <ContentPresenter Padding="10,5"
                                       Background="{TemplateBinding Background}"
                                       CornerRadius="6,6,0,0"
-                                      Content="{TemplateBinding Content}" 
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                      Content="{TemplateBinding Content}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        
-        
+
+
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{StaticResource Neutral900}"/>
-            <Setter Property="Foreground" Value="{StaticResource Primary300}"/>
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="Foreground" Value="{StaticResource Primary300}" />
         </Style>
         <Style Selector="^[IsChecked=True] /template/ ContentPresenter">
-            <Setter Property="Background" Value="{StaticResource Neutral700}"/>
-            <Setter Property="Foreground" Value="{StaticResource Primary100}"/>
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+            <Setter Property="Foreground" Value="{StaticResource Primary100}" />
         </Style>
-        
+
         <Style Selector="^[IsEnabled=False] /template/ ContentPresenter">
-            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="FontStyle" Value="Italic" />
         </Style>
     </Style>
 </Styles>

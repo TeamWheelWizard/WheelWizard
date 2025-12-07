@@ -26,13 +26,27 @@
 
         <components:EmptyPageInfo Grid.Row="1" x:Name="VisibleWhenNoDb"
                                   HorizontalAlignment="Center" IsVisible="False"
-                                  Title="{x:Static lang:Phrases.EmptyText_NoMiis_Title}"
-                                  BodyText="{x:Static lang:Phrases.EmptyText_NoMiis}" />
+                                  Title="{x:Static lang:Phrases.EmptyContent_NoMiis_Title}"
+                                  BodyText="{x:Static lang:Phrases.EmptyContent_NoMiis}" />
 
         <Grid x:Name="VisibleWhenDb" Grid.Row="1" RowDefinitions="54,*">
             <Grid Grid.Row="0" Margin="10,0">
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal"
                             Spacing="6">
+                    <components:Button Text="" Click="FavMii_OnClick" x:Name="FavoriteMiiButton"
+                                       Variant="Default" Padding="10"
+                                       ToolTip.ShowDelay="0" ToolTip.Placement="Top">
+                        <components:Button.Styles>
+                            <Style Selector="components|Button">
+                                <Setter Property="IconData" Value="{StaticResource StarIcon}"/>
+                                <Setter Property="ToolTip.Tip" Value="{x:Static lang:Common.Action_Favorite}"/>
+                            </Style>
+                            <Style Selector="components|Button.UnFav">
+                                <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}"/>
+                                <Setter Property="ToolTip.Tip" Value="{x:Static lang:Common.Action_Unfavorite}"/>
+                            </Style>
+                        </components:Button.Styles>
+                    </components:Button>
                     <components:Button Text="" Click="EditMii_OnClick" x:Name="EditMiisButton"
                                        IconData="{StaticResource Pen}"
                                        Variant="Default" Padding="10" IsVisible="False"
@@ -61,7 +75,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Miis}" />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Miis}" />
                     <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"

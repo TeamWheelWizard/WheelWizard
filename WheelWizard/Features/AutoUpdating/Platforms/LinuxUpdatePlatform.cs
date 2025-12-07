@@ -28,13 +28,13 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
     {
         var currentExecutablePath = Environment.ProcessPath;
         if (currentExecutablePath is null)
-            return Phrases.PopupText_UnableUpdateWhWz_ReasonLocation;
+            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
 
         var currentExecutableName = fileSystem.Path.GetFileName(currentExecutablePath);
         var currentFolder = fileSystem.Path.GetDirectoryName(currentExecutablePath);
 
         if (currentFolder is null)
-            return Phrases.PopupText_UnableUpdateWhWz_ReasonLocation;
+            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
 
         // Download the new executable to a temporary file.
         var newFilePath = fileSystem.Path.Combine(currentFolder, currentExecutableName + "_new");
@@ -44,8 +44,8 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         await DownloadHelper.DownloadToLocationAsync(
             downloadUrl,
             newFilePath,
-            Phrases.PopupText_UpdateWhWz,
-            Phrases.PopupText_LatestWhWzGithub,
+            Phrases.Progress_UpdateWhWz,
+            Phrases.Progress_LatestWhWzGithub,
             ForceGivenFilePath: true
         );
 
@@ -66,7 +66,7 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
     {
         var currentFolder = fileSystem.Path.GetDirectoryName(currentFilePath);
         if (currentFolder is null)
-            return Phrases.PopupText_UnableUpdateWhWz_ReasonLocation;
+            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
 
         var scriptFilePath = fileSystem.Path.Combine(currentFolder, "update.sh");
         var originalFileName = fileSystem.Path.GetFileName(currentFilePath);

@@ -5,7 +5,8 @@ using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.WiiManagement;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Popups.MiiManagement;
 
@@ -15,7 +16,7 @@ public partial class MiiSelectorWindow : PopupContent
     private TaskCompletionSource<Mii?> _tcs;
 
     public MiiSelectorWindow()
-        : base(true, false, false, "Mii Selector")
+        : base(true, false, false, Common.PopupTitle_MiiSelector)
     {
         InitializeComponent();
         SaveButton.Text = Common.Action_Save;

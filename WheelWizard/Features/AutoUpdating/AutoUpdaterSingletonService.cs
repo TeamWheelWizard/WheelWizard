@@ -35,14 +35,14 @@ public class AutoUpdaterSingletonService(
             return;
 
         var latestVersion = SemVersion.Parse(latestRelease.TagName.TrimStart('v'), SemVersionStyles.Any);
-        var popupExtraText = Humanizer.ReplaceDynamic(Phrases.PopupText_NewVersionWhWz, latestVersion, CurrentVersion)!;
+        var popupExtraText = Humanizer.ReplaceDynamic(Phrases.Question_NewVersionWhWz_Extra, latestVersion, CurrentVersion)!;
 
         var shouldUpdate = false;
         await Dispatcher.UIThread.InvokeAsync(async () =>
         {
             shouldUpdate = await new YesNoWindow()
                 .SetButtonText(Common.Action_Update, Common.Action_MaybeLater)
-                .SetMainText(Phrases.PopupText_WhWzUpdateAvailable)
+                .SetMainText(Phrases.Question_NewVersionWhWz_Title)
                 .SetExtraText(popupExtraText)
                 .AwaitAnswer();
         });

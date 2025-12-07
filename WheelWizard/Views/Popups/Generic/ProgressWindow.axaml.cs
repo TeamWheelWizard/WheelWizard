@@ -47,14 +47,14 @@ public partial class ProgressWindow : PopupContent
         var elapsedSeconds = _stopwatch.Elapsed.TotalSeconds;
         var remainingSeconds = (100 - _progress) / (_progress / elapsedSeconds);
 
-        var remainingText = _progress <= 0 ? Common.Term_Unknown : Humanizer.HumanizeSeconds((int)remainingSeconds);
+        var remainingText = _progress <= 0 ? Common.State_Unknown : Humanizer.HumanizeSeconds((int)remainingSeconds);
 
-        var bottomText = $"{Phrases.PopupText_EsimatedTimeRemaining} {remainingText}";
+        var bottomText = $"{Phrases.Progress_EstimatedTimeRemaining} {remainingText}";
 
         if (_totalMb != null)
         {
             var downloadedMb = (_progress / 100.0) * (double)_totalMb;
-            bottomText = $"{Common.Term_Speed}: {downloadedMb / elapsedSeconds:F2} MB/s | {bottomText}";
+            bottomText = $"{Common.Attribute_Speed}: {downloadedMb / elapsedSeconds:F2} MB/s | {bottomText}";
         }
 
         LiveTextBlock.Text = bottomText;
@@ -77,7 +77,7 @@ public partial class ProgressWindow : PopupContent
     public ProgressWindow SetGoal(double megaBytes)
     {
         _totalMb = megaBytes;
-        GoalTextBlock.Text = Humanizer.ReplaceDynamic(Phrases.PupupText_DownloadingMb, $"{megaBytes:F2}");
+        GoalTextBlock.Text = Humanizer.ReplaceDynamic(Phrases.Progress_DownloadingMb, $"{megaBytes:F2}");
         return this;
     }
 

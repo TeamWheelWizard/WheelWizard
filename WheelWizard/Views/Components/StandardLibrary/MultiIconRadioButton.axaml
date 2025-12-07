@@ -5,28 +5,28 @@
     <Design.PreviewWith>
         <Border Padding="10" Background="{StaticResource Neutral800}">
             <StackPanel Spacing="10">
-                <controls:MultiIconRadioButton IconData="{StaticResource Example}"
+                <controls:MultiIconRadioButton IconData="{StaticResource Multi-Example}"
                                                Color1="{StaticResource Neutral400}"
                                                Color2="{StaticResource Neutral500}"
                                                Color3="{StaticResource Neutral100}"
                                                HoverColor3="{StaticResource Neutral100}"
                                                SelectedColor3="{StaticResource Warning200}"
                                                />
-                <controls:MultiIconRadioButton IconData="{StaticResource Example}"
+                <controls:MultiIconRadioButton IconData="{StaticResource Multi-Example}"
                                                Color1="{StaticResource Neutral400}"
                                                Color2="{StaticResource Neutral500}"
                                                Color3="{StaticResource Neutral100}"
                                                HoverColor3="{StaticResource Neutral100}"
                                                SelectedColor3="{StaticResource Warning200}"/>
                 
-                <controls:MultiIconRadioButton IconData="{StaticResource Example}" IsChecked="True"
+                <controls:MultiIconRadioButton IconData="{StaticResource Multi-Example}" IsChecked="True"
                                                Color1="{StaticResource Neutral400}"
                                                Color2="{StaticResource Neutral500}"
                                                Color3="{StaticResource Neutral100}"
                                                HoverColor3="{StaticResource Neutral100}"
                                                SelectedColor3="{StaticResource Warning200}"/>
-                <controls:MultiIconRadioButton IconData="{StaticResource Example}" />
-                <controls:MultiIconRadioButton IconData="{StaticResource Example}" IsEnabled="False"
+                <controls:MultiIconRadioButton IconData="{StaticResource Multi-Example}" />
+                <controls:MultiIconRadioButton IconData="{StaticResource Multi-Example}" IsEnabled="False"
                                                DisabledColor1="{StaticResource Neutral900}"
                                                DisabledColor2="{StaticResource Neutral950}"
                                                DisabledColor3="{StaticResource Neutral950}"

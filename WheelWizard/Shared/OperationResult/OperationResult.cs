@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.Shared;
 
@@ -44,25 +45,10 @@ public class OperationResult
     #region Creation Methods
 
     /// <summary>
-    /// Creates a new instance of the <see cref="OperationResult"/> class with the specified error.
-    /// </summary>
-    /// <param name="error">The error that occurred during the operation.</param>
-    /// <returns>A new instance of the <see cref="OperationResult"/> class.</returns>
-    public static OperationResult Fail(OperationError error) => new(error);
-
-    /// <summary>
     /// Creates a new instance of the <see cref="OperationResult"/> class that indicates success.
     /// </summary>
     /// <returns>A new instance of the <see cref="OperationResult"/> class.</returns>
     public static OperationResult Ok() => new();
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="OperationResult"/> class that indicates success.
-    /// </summary>
-    /// <param name="error">The error that occurred during the operation.</param>
-    /// <typeparam name="T">The type of the value.</typeparam>
-    /// <returns>A new instance of the <see cref="OperationResult{T}"/> class.</returns>
-    public static OperationResult<T> Fail<T>(OperationError error) => new(error);
 
     /// <summary>
     /// Creates a new instance of the <see cref="OperationResult{T}"/> class that indicates success.
@@ -78,9 +64,10 @@ public class OperationResult
     /// </summary>
     /// <param name="func">The function to execute.</param>
     /// <param name="errorMessage">The error message to return if the function fails.</param>
+    /// <param name="translation">The translation for this specific error.</param>
     /// <typeparam name="T">The type of the value.</typeparam>
     /// <returns>An <see cref="OperationResult{T}"/> that indicates the result of the operation.</returns>
-    public static OperationResult<T> TryCatch<T>(Func<T> func, string? errorMessage = null)
+    public static OperationResult<T> TryCatch<T>(Func<T> func, string? errorMessage = null, MessageTranslation? translation = null)
     {
         try
         {
@@ -89,7 +76,14 @@ public class OperationResult
         }
         catch (Exception ex)
         {
-            return Fail<T>(new() { Message = errorMessage ?? ex.Message, Exception = ex });
+            return new OperationError()
+            {
+                Message = errorMessage ?? ex.Message,
+                Exception = ex,
+                MessageTranslation = translation,
+                TitleReplacements = [ex.Message],
+                ExtraReplacements = [ex.Message],
+            };
         }
     }
 
@@ -99,9 +93,14 @@ public class OperationResult
     /// </summary>
     /// <param name="func">The function to execute.</param>
     /// <param name="errorMessage">The error message to return if the function fails.</param>
+    /// <param name="translation">The translation for this specific error.</param>
     /// <typeparam name="T">The type of the value.</typeparam>
     /// <returns>An <see cref="OperationResult{T}"/> that indicates the result of the operation.</returns>
-    public static async Task<OperationResult<T>> TryCatch<T>(Func<Task<T>> func, string? errorMessage = null)
+    public static async Task<OperationResult<T>> TryCatch<T>(
+        Func<Task<T>> func,
+        string? errorMessage = null,
+        MessageTranslation? translation = null
+    )
     {
         try
         {
@@ -110,7 +109,14 @@ public class OperationResult
         }
         catch (Exception ex)
         {
-            return Fail<T>(new() { Message = errorMessage ?? ex.Message, Exception = ex });
+            return new OperationError()
+            {
+                Message = errorMessage ?? ex.Message,
+                Exception = ex,
+                MessageTranslation = translation,
+                TitleReplacements = [ex.Message],
+                ExtraReplacements = [ex.Message],
+            };
         }
     }
 
@@ -120,8 +126,9 @@ public class OperationResult
     /// </summary>
     /// <param name="action">The action to execute.</param>
     /// <param name="errorMessage">The error message to return if the function fails.</param>
+    /// <param name="translation">The translation for this specific error.</param>
     /// <returns>An <see cref="OperationResult"/> that indicates the result of the operation.</returns>
-    public static OperationResult TryCatch(Action action, string? errorMessage = null)
+    public static OperationResult TryCatch(Action action, string? errorMessage = null, MessageTranslation? translation = null)
     {
         try
         {
@@ -130,7 +137,14 @@ public class OperationResult
         }
         catch (Exception ex)
         {
-            return Fail(new() { Message = errorMessage ?? ex.Message, Exception = ex });
+            return new OperationError()
+            {
+                Message = errorMessage ?? ex.Message,
+                Exception = ex,
+                MessageTranslation = translation,
+                TitleReplacements = [ex.Message],
+                ExtraReplacements = [ex.Message],
+            };
         }
     }
 
@@ -140,8 +154,13 @@ public class OperationResult
     /// </summary>
     /// <param name="action">The action to execute.</param>
     /// <param name="errorMessage">The error message to return if the function fails.</param>
+    /// <param name="translation">The translation for this specific error.</param>
     /// <returns>An <see cref="OperationResult"/> that indicates the result of the operation.</returns>
-    public static async Task<OperationResult> TryCatch(Func<Task> action, string? errorMessage = null)
+    public static async Task<OperationResult> TryCatch(
+        Func<Task> action,
+        string? errorMessage = null,
+        MessageTranslation? translation = null
+    )
     {
         try
         {
@@ -150,7 +169,14 @@ public class OperationResult
         }
         catch (Exception ex)
         {
-            return Fail(new() { Message = errorMessage ?? ex.Message, Exception = ex });
+            return new OperationError()
+            {
+                Message = errorMessage ?? ex.Message,
+                Exception = ex,
+                MessageTranslation = translation,
+                TitleReplacements = [ex.Message],
+                ExtraReplacements = [ex.Message],
+            };
         }
     }
 
@@ -158,9 +184,7 @@ public class OperationResult
 
     #region Implicit Operators
 
-    public static implicit operator OperationResult(OperationError error) => Fail(error);
-
-    public static implicit operator OperationResult(string errorMessage) => Fail(errorMessage);
+    public static implicit operator OperationResult(OperationError error) => new(error);
 
     public static implicit operator OperationResult(Exception exception) => Fail(exception);
 

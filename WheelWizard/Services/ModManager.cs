@@ -189,6 +189,7 @@ public class ModManager : INotifyPropertyChanged
     // TODO: Use this validation method when refactoring the ModManager
     public OperationResult ValidateModName(string? oldName, string newName)
     {
+        newName = newName?.Trim();
         if (string.IsNullOrWhiteSpace(newName))
             return Fail("Mod name cannot be empty.");
 
@@ -196,9 +197,6 @@ public class ModManager : INotifyPropertyChanged
             return Fail("Mod name already exists.");
 
         if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
-            return Fail("Mod name contains illegal characters.");
-
-        if (newName.Any(x => _illegalChars.Contains(x)))
             return Fail("Mod name contains illegal characters.");
 
         if (newName.Any(x => _illegalChars.Contains(x)))
@@ -282,7 +280,7 @@ public class ModManager : INotifyPropertyChanged
     public async void DeleteMod(Mod selectedMod)
     {
         var areTheySure = await new YesNoWindow()
-            .SetMainText(Humanizer.ReplaceDynamic(Phrases.PopupText_SureDeleteQuestion, selectedMod.Title))
+            .SetMainText(Humanizer.ReplaceDynamic(Phrases.Question_SureDelete_Title, selectedMod.Title)!)
             .AwaitAnswer();
         if (!areTheySure)
             return;
@@ -337,7 +335,7 @@ public class ModManager : INotifyPropertyChanged
         }
         else
         {
-            ErrorOccurred(Phrases.PopupText_NoModFolder);
+            ErrorOccurred(Phrases.MessageError_NoModFolder_Extra);
         }
     }
 
@@ -374,14 +372,14 @@ public class ModManager : INotifyPropertyChanged
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            ErrorOccurred(Phrases.PopupText_ModNameEmpty);
+            ErrorOccurred(Phrases.MessageWarning_ModNameEmpty_Title);
             return false;
         }
 
         if (!ModInstallation.ModExists(Mods, name))
             return true;
 
-        ErrorOccurred(Humanizer.ReplaceDynamic(Phrases.PopupText_ModNameExists, name));
+        ErrorOccurred(Humanizer.ReplaceDynamic(Phrases.MessageWarning_InvalidName_Extra_ModNameExists, name));
         return false;
     }
 

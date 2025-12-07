@@ -1,10 +1,9 @@
-using System.Numerics;
 using Avalonia;
 using Avalonia.Media;
 using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.BehaviorComponent;
 

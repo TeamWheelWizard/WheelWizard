@@ -18,4 +18,154 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="EmptyContent_NoFriends" xml:space="preserve">
+        <value>Můžeš přidat kamarádi ve hře</value>
+    </data>
+    <data name="EmptyContent_NoFriends_Title" xml:space="preserve">
+        <value>Zatím žádní kamarádi!</value>
+    </data>
+    <data name="Question_RRNotDeterment_Title" xml:space="preserve">
+        <value>Stáhnout Retro Rewind</value>
+    </data>
+    <data name="Progress_InstallingRR" xml:space="preserve">
+        <value>Instalování Retro Rewind</value>
+    </data>
+    <data name="Progress_InstallingRRFirstTime" xml:space="preserve">
+        <value>Instalování Retro Rewind poprvé</value>
+    </data>
+    <data name="Question_ReinstallRR_Title" xml:space="preserve">
+        <value>Přeinstalovat Retro Rewind</value>
+    </data>
+    <data name="MessageSuccess_RRUpToDate_Title" xml:space="preserve">
+        <value>Retro Rewind je aktuální.</value>
+    </data>
+    <data name="Progress_UpdateRR" xml:space="preserve">
+        <value>Aktualizování Retro Rewind</value>
+    </data>
+    <data name="Progress_UpdateWhWz" xml:space="preserve">
+        <value>Aktualizování Wheel Wizard</value>
+    </data>
+    <data name="Progress_DownloadingMb" xml:space="preserve">
+        <value>Stahování {$1} MB</value>
+    </data>
+    <data name="Text_MadeByString" xml:space="preserve">
+        <value>Vytvořili: {$1} \n a {$2}</value>
+    </data>
+    <data name="Text_ThanksTranslators" xml:space="preserve">
+        <value>Díky moc všem překladatelům:</value>
+    </data>
+    <data name="Text_WhWzTranslationPercentage" xml:space="preserve">
+        <value>Překlady pro tento jazyk jsou z {$1}% kompletní</value>
+    </data>
+    <data name="Time_Days_1" xml:space="preserve">
+        <value>1 den</value>
+    </data>
+    <data name="Time_Days_x" xml:space="preserve">
+        <value>($1) dny</value>
+    </data>
+    <data name="Time_Hours_1" xml:space="preserve">
+        <value>1 hodina</value>
+    </data>
+    <data name="Time_Hours_x" xml:space="preserve">
+        <value>($1) hodiny</value>
+    </data>
+    <data name="Time_Minutes_1" xml:space="preserve">
+        <value>1 minuta</value>
+    </data>
+    <data name="Time_Minutes_x" xml:space="preserve">
+        <value>($1) minuty</value>
+    </data>
+    <data name="Time_Seconds_1" xml:space="preserve">
+        <value>1 sekunda</value>
+    </data>
+    <data name="Time_Seconds_x" xml:space="preserve">
+        <value>($1) sekundy</value>
+    </data>
+    <data name="EmptyContent_NoMiis_Title" xml:space="preserve">
+        <value>Zatím žádné Miiy!</value>
+    </data>
+    <data name="EmptyContent_NoModSelected" xml:space="preserve">
+        <value>Vyber mod v seznamu pro zobrazení jeho podrobností</value>
+    </data>
+    <data name="EmptyContent_NoRooms" xml:space="preserve">
+        <value>Možná nemáš připojení k internetu, nebo nikdo nehraje.</value>
+    </data>
+    <data name="HelperNote_CreatorNameLess11" xml:space="preserve">
+        <value>Jméno tvůrce musí být kratší než 11 znaků.</value>
+    </data>
+    <data name="HelperNote_NameMustBetween" xml:space="preserve">
+        <value>Jména musí mít délku 3 až 10 znaků.</value>
+    </data>
+    <data name="Hover_RoomsOnline_0" xml:space="preserve">
+        <value>Momentálně nejsou žádné aktivní místnosti</value>
+    </data>
+    <data name="Hover_RoomsOnline_1" xml:space="preserve">
+        <value>Momentálně je aktivní 1 místnost</value>
+    </data>
+    <data name="Hover_RoomsOnline_x" xml:space="preserve">
+        <value>Momentálně jsou aktivní {$1} místnosti</value>
+    </data>
+    <data name="MessageError_GenericError_Title" xml:space="preserve">
+        <value>Došlo k chybě.</value>
+    </data>
+    <data name="MessageError_ModDownloadFail_Extra" xml:space="preserve">
+        <value>Během stahování došlo k chybě: {$1}</value>
+    </data>
+    <data name="MessageError_ModDownloadFail_Title" xml:space="preserve">
+        <value>Stažení modu se nezdařilo.</value>
+    </data>
+    <data name="MessageError_NoModFolder_Extra" xml:space="preserve">
+        <value>Složka s mody neexistuje</value>
+    </data>
+    <data name="MessageSuccess_SettingsSaved_Title" xml:space="preserve">
+        <value>Nastavení bylo úspěšně uloženo!</value>
+    </data>
+    <data name="MessageWarning_InvalidName_Title" xml:space="preserve">
+        <value>Jméno není možné.</value>
+    </data>
+    <data name="MessageWarning_InvalidPaths_Extra" xml:space="preserve">
+        <value>Zkontroluj prosím, zda jsou všechny cesty správné, a zkus to znovu.</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Extra" xml:space="preserve">
+        <value>Prosím, uveď název modu.</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Title" xml:space="preserve">
+        <value>Název modu nemůže být prázdný.</value>
+    </data>
+    <data name="MessageWarning_ModNameInvalid_Extra" xml:space="preserve">
+        <value>Název modu obsahuje neplatné znaky.</value>
+    </data>
+    <data name="MessageWarning_ModNameInvalid_Title" xml:space="preserve">
+        <value>Neplatný název modu.</value>
+    </data>
+    <data name="MessageWarning_NoConnectServer_Extra" xml:space="preserve">
+        <value>Nepodařilo se připojit k serveru. Zkus to prosím znovu později.</value>
+    </data>
+    <data name="MessageWarning_NoConnectServer_Title" xml:space="preserve">
+        <value>Nepodařilo se připojit k serveru.</value>
+    </data>
+    <data name="MessageWarning_NotFindDolphin_Extra" xml:space="preserve">
+        <value>Nepodařilo se najít Dolphin Emulator, prosím nastav cestu v nastavení.</value>
+    </data>
+    <data name="MessageWarning_NotFindGame_Extra" xml:space="preserve">
+        <value>Nepodařilo se najít hru, prosím nastav cestu v nastavení.</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Extra" xml:space="preserve">
+        <value>Soubory se nepodařilo nalézt.</value>
+    </data>
+    <data name="Progress_InstallingMods" xml:space="preserve">
+        <value>Instalování mody</value>
+    </data>
+    <data name="Progress_InstallingModsCount" xml:space="preserve">
+        <value>Instalování {$1} mody</value>
+    </data>
+    <data name="Question_RRToOld_Title" xml:space="preserve">
+        <value>Verze Retro Rewind je moc stará.</value>
+    </data>
+    <data name="Text_LanguageTranslatedBy" xml:space="preserve">
+        <value>Tento jazyk překládá: {$1}</value>
+    </data>
+    <data name="Text_PoweredGamebanana" xml:space="preserve">
+        <value>Poháněno společností GameBanana</value>
+    </data>
 </root>

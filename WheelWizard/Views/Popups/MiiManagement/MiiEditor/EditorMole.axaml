@@ -9,7 +9,7 @@
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
         <!-- Updated Title -->
-        <TextBlock Classes="BodyText" Margin="10" Text="Mole" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_Mole}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
         <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}" IconData="{StaticResource ArrowLeft}"
@@ -38,19 +38,19 @@
 
                     <!-- Vertical Position (Up/Down) -->
                     <StackPanel Margin="0,10,0,0"> <!-- Add margin -->
-                        <components:FormFieldLabel Text="Vertical Position (Up/Down):"/>
+                        <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_VerticalPosition}"/>
                         <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                 <components:Button x:Name="VerticalDecreaseButton" IconData="{StaticResource ArrowUp}" IconSize="14" Padding="4" Click="VerticalDecrease_Click"/>
                                 <TextBlock x:Name="VerticalValueText" Classes="BodyText" MinWidth="30" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
-                                <components:Button x:Name="VerticalIncreaseButton" IconData="{StaticResource  ArrowUp}" IconSize="14" Padding="4" Click="VerticalIncrease_Click"/>
+                                <components:Button x:Name="VerticalIncreaseButton" IconData="{StaticResource  ArrowDown}" IconSize="14" Padding="4" Click="VerticalIncrease_Click"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
 
                     <!-- Horizontal Position (Left/Right) -->
                     <StackPanel Margin="0,10,0,0"> <!-- Add margin -->
-                        <components:FormFieldLabel Text="Horizontal Position (Left/Right):"/>
+                        <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_HorizontalPosition}"/>
                         <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                 <components:Button x:Name="HorizontalDecreaseButton" IconData="{StaticResource ArrowLeft}" IconSize="14" Padding="4" Click="HorizontalDecrease_Click"/>
@@ -62,7 +62,7 @@
                     
                     <!-- Size (Zoom In/Out) -->
                     <StackPanel Margin="0,10,0,0"> <!-- Add margin -->
-                        <components:FormFieldLabel Text="Size:"/>
+                        <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Size}"/>
                         <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                 <components:Button x:Name="SizeDecreaseButton" IconData="{StaticResource MinMark}" IconSize="14" Padding="4" Click="SizeDecrease_Click"/>

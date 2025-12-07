@@ -12,7 +12,6 @@ public static class RetroRewindLaunchHelper
 
     public static void GenerateLaunchJson()
     {
-        var language = (int)SettingsManager.RR_LANGUAGE.Get();
         var removeBlur = (bool)SettingsManager.REMOVE_BLUR.Get();
 
         var launchConfig = new LaunchConfig
@@ -37,12 +36,6 @@ public static class RetroRewindLaunchHelper
                             {
                                 Choice = 2,
                                 OptionName = "My Stuff",
-                                SectionName = "Retro Rewind",
-                            },
-                            new()
-                            {
-                                Choice = language,
-                                OptionName = "Language",
                                 SectionName = "Retro Rewind",
                             },
                             new()

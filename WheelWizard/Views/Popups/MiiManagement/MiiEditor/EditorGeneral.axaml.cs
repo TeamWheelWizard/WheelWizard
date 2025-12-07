@@ -1,9 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.Helpers;
+using WheelWizard.Resources.Languages;
+using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WiiManagement.MiiManagement.Domain;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
 
@@ -23,18 +27,25 @@ public partial class EditorGeneral : MiiEditorBaseControl
 
     private void PopulateValues()
     {
+        // random attributes:
         MiiName.Text = Editor.Mii.Name.ToString();
         CreatorName.Text = Editor.Mii.CreatorName.ToString();
         GirlToggle.IsChecked = Editor.Mii.IsGirl;
         AllowCopy.IsChecked = Editor.Mii.CustomData.IsCopyable;
         LengthSlider.Value = Editor.Mii.Height.Value;
         WidthSlider.Value = Editor.Mii.Weight.Value;
-        foreach (var color in Enum.GetNames(typeof(MiiFavoriteColor)))
-        {
-            FavoriteColorBox.Items.Add(color);
-            if (color == Editor.Mii.MiiFavoriteColor.ToString())
-                FavoriteColorBox.SelectedItem = color;
-        }
+
+        // Favorite color:
+        SetColorButtons(
+            MiiColorMappings.FavoriteColor.Count,
+            FavoriteColorGrid,
+            (index, button) =>
+            {
+                button.IsChecked = index == (int)Editor.Mii.MiiFavoriteColor;
+                button.Color1 = new SolidColorBrush(MiiColorMappings.FavoriteColor[(MiiFavoriteColor)index]);
+                button.Click += (_, _) => SetSkinColor(index);
+            }
+        );
     }
 
     protected override void BeforeBack()
@@ -45,18 +56,22 @@ public partial class EditorGeneral : MiiEditorBaseControl
         if (!_hasCreatorNameError)
             Editor.Mii.CreatorName = new(CreatorName.Text);
 
-        // For now i put it here, since i dont thing we want each value to be set when you change length or width
-        // only when you stop moving that bar do we want that i think
+        // For nowI put it here, since I don't think we want each value to be set when you change length or width
+        // only when you stop moving that bar so we want that, I think at least
         Editor.RefreshImage();
     }
 
     // We only have to check if it's a female, since if it's not, we already know the other option is going to be the male
-    private void IsGirl_OnIsCheckedChanged(object? sender, RoutedEventArgs e) => Editor.Mii.IsGirl = GirlToggle.IsChecked == true;
+    private void IsGirl_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        Editor.Mii.IsGirl = GirlToggle.IsChecked == true;
+        Editor.RefreshImage();
+    }
 
     private void Name_TextChanged(object sender, TextChangedEventArgs e)
     {
         // MiiName
-        var validationMiiNameResult = ValidateMiiName(MiiName.Text);
+        var validationMiiNameResult = ValidateMiiName(null, MiiName.Text);
         _hasMiiNameError = validationMiiNameResult.IsFailure;
         MiiName.ErrorMessage = validationMiiNameResult.Error?.Message ?? "";
 
@@ -66,18 +81,20 @@ public partial class EditorGeneral : MiiEditorBaseControl
         CreatorName.ErrorMessage = validationCreatorNameResult.Error?.Message ?? "";
     }
 
-    private OperationResult ValidateMiiName(string newName)
+    private OperationResult ValidateMiiName(string? _, string newName)
     {
+        newName = newName?.Trim();
         if (newName.Length is > 10 or < 3)
-            return Fail("Name must be between 3 and 10 characters long.");
+            return Fail(Phrases.HelperNote_NameMustBetween);
 
         return Ok();
     }
 
     private OperationResult ValidateCreatorName(string newName)
     {
+        newName = newName?.Trim();
         if (newName.Length > 10)
-            return Fail("Creator name must be less than 10 characters long.");
+            return Fail(Phrases.HelperNote_CreatorNameLess11);
 
         return Ok();
     }
@@ -116,15 +133,9 @@ public partial class EditorGeneral : MiiEditorBaseControl
         RestartRefreshTimer();
     }
 
-    private void FavoriteColorBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private void SetSkinColor(int index)
     {
-        var value = FavoriteColorBox.SelectedItem;
-        if (value is null)
-            return;
-        var color = (MiiFavoriteColor)Enum.Parse(typeof(MiiFavoriteColor), value.ToString()!);
-        if (color == Editor.Mii.MiiFavoriteColor)
-            return;
-        Editor.Mii.MiiFavoriteColor = color;
+        Editor.Mii.MiiFavoriteColor = (MiiFavoriteColor)index;
         Editor.RefreshImage();
     }
 
@@ -138,6 +149,22 @@ public partial class EditorGeneral : MiiEditorBaseControl
     {
         _refreshTimer.Stop();
         Editor.RefreshImage();
+    }
+
+    private async void ComplexName_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var textPopup = new TextInputWindow()
+            .SetMainText(Phrases.Question_EnterNewName_Title)
+            .SetExtraText(Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, MiiName.Text))
+            .SetAllowCustomChars(true, true)
+            .SetValidation(ValidateMiiName)
+            .SetInitialText(MiiName.Text)
+            .SetPlaceholderText(Phrases.Placeholder_EnterMiiName);
+        var newName = await textPopup.ShowDialog();
+
+        if (string.IsNullOrWhiteSpace(newName))
+            return;
+        MiiName.Text = newName;
     }
 
     private void AllowCopy_OnIsCheckedChanged(object? sender, RoutedEventArgs e) =>

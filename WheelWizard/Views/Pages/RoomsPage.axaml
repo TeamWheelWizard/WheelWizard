@@ -22,7 +22,7 @@
                 VerticalAlignment="Bottom" />
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-            <TextBlock Text="{x:Static lang:Common.PageTitle_RoomDetails}" Classes="PageTitleText" />
+            <TextBlock Text="{x:Static lang:Common.PageTitle_Rooms}" Classes="PageTitleText" />
             <Border VerticalAlignment="Center" HorizontalAlignment="Center"
                     ToolTip.Tip="{x:Static lang:Phrases.Hover_RoomsPageDisclaimer}"
                     ToolTip.Placement="Top" ToolTip.ShowDelay="20"
@@ -42,14 +42,14 @@
 
         <components:EmptyPageInfo Grid.Row="2" x:Name="EmptyRoomsView"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                  Title="{x:Static lang:Phrases.EmptyText_NoRooms_Title}"
-                                  BodyText="{x:Static lang:Phrases.EmptyText_NoRooms}" />
+                                  Title="{x:Static lang:Phrases.EmptyContent_NoRooms_Title}"
+                                  BodyText="{x:Static lang:Phrases.EmptyContent_NoRooms}" />
 
 
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0" x:Name="RoomsListViewContainer">
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Rooms}" />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Rooms}" />
                     <components:StateBox Text="0" IconSize="0" x:Name="RoomsListItemCount" />
                     <components:FormFieldLabel Foreground="{StaticResource Primary400}" Margin="4,0,0,0"
                                                Text="Nice!" x:Name="RoomsNiceLabel" IsVisible="False" />
@@ -94,7 +94,7 @@
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                    <components:FormFieldLabel Text="{x:Static lang:Online.Stat_TimeOnline}"
+                                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_TimeOnline}"
                                                                Margin="10,0,0,0" />
                                     <TextBlock Text="{Binding TimeOnline}" FontSize="14"
                                                Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -125,7 +125,7 @@
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0" x:Name="PlayerListViewContainer">
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Players}" />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Players}" />
                     <components:StateBox Text="0" IconSize="0" x:Name="PlayerListItemCount" />
                     <components:FormFieldLabel Foreground="{StaticResource Primary400}" Margin="4,0,0,0"
                                                Text="Nice!" x:Name="PlayerNiceLabel" IsVisible="False" />

@@ -21,31 +21,31 @@
     <data name="Value_Language_Spanish" xml:space="preserve">
         <value>Español</value>
     </data>
-    <data name="CompletePercentage" xml:space="preserve">
-        <value>100</value>
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
+        <value>75</value>
     </data>
     <data name="Category_Video" xml:space="preserve">
         <value>Video</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
+    <data name="HelperText_30FPS" xml:space="preserve">
         <value>Este ajuste forzará al juego a correr en 30 FPS (Lo normal es 60)</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
+    <data name="HelperText_EndWithExe" xml:space="preserve">
         <value>La ruta debe terminar en un .exe</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>Este ajuste desactiva el Wiimote en juego, pero lo activa para el Canal Wii</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>Se lanzará la ventana principal de Dolphin junto con el juego</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>Este ajuste cambiará ciertas configuraciones de Dolphin para reducir problemas de lag</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>1x es la resolución nativa</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>Ajustes desactivados, complete la ubicación de los ajustes primero</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
@@ -74,9 +74,6 @@
     </data>
     <data name="Option_Renderer" xml:space="preserve">
         <value>Renderizar</value>
-    </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Idioma de Retro Rewind</value>
     </data>
     <data name="Option_ShowFPS" xml:space="preserve">
         <value>Mostrar FPS</value>
@@ -129,7 +126,7 @@
     <data name="Value_Language_Japanese" xml:space="preserve">
         <value>Japonés</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
         <value>Esto activa las animaciones en la aplicación Wheel Wizard</value>
     </data>
     <data name="Option_EnableAnimations" xml:space="preserve">
@@ -149,5 +146,44 @@
     </data>
     <data name="Value_Language_Turkish" xml:space="preserve">
         <value>Turco</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Arabe</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Chino</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Checo</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Noruego</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Portugués</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Otro</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>General</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>Acerca de</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>Abrir carpeta de juegos</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>Abrir carpeta de archivos de juego guardados</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Reinstalar RR</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Instalación</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>Frix, JGavidia</value>
     </data>
 </root>

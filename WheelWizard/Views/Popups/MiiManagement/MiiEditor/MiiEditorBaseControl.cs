@@ -35,18 +35,43 @@ public class MiiEditorBaseControl : UserControlBase
         {
             var index = i;
 
-            var iconName = "";
-            if (type == "Color")
-                iconName = "MiiColorBall";
-            else
-            {
-                var indexStr = index < 10 ? $"0{i}" : index.ToString();
-                iconName = $"{type}{indexStr}";
-            }
-
+            var indexStr = index < 10 ? $"0{i}" : index.ToString();
+            var iconName = $"{type}{indexStr}";
             var button = new MultiIconRadioButton() { Margin = new(6), IconData = GetMiiIconData(iconName) };
             modify(index, button);
             addTo.Children.Add(button);
         }
+    }
+
+    protected void SetColorButtons(int count, UniformGrid addTo, Action<int, MultiIconRadioButton> modify)
+    {
+        var color2 = new SolidColorBrush(ViewUtils.Colors.Neutral950);
+        var selectedColor2 = new SolidColorBrush(ViewUtils.Colors.Neutral900);
+
+        for (var i = 0; i < count; i++)
+        {
+            var index = i;
+
+            var iconData = GetMiiIconData("Multi-PaintBrush");
+            var button = new MultiIconRadioButton
+            {
+                Margin = new(6),
+                IconData = iconData,
+                Color2 = color2,
+                SelectedColor2 = selectedColor2,
+            };
+            modify(index, button);
+            addTo.Children.Add(button);
+        }
+    }
+
+    // Enum to identify which property is being changed by buttons
+    protected enum MiiTransformProperty
+    {
+        Vertical,
+        Horizontal,
+        Size,
+        Spacing,
+        Rotation,
     }
 }

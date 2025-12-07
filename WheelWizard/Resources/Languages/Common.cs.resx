@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -13,9 +14,391 @@
         <value>1.3</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
+    <data name="Action_Browse" xml:space="preserve">
+        <value>Prohlížet</value>
+    </data>
+    <data name="Action_Cancel" xml:space="preserve">
+        <value>Zrušit</value>
+    </data>
+    <data name="Action_Delete" xml:space="preserve">
+        <value>Smazat</value>
+    </data>
+    <data name="Action_Edit" xml:space="preserve">
+        <value>Upravit</value>
+    </data>
+    <data name="Action_Export" xml:space="preserve">
+        <value>Exportovat</value>
+    </data>
+    <data name="Action_Import" xml:space="preserve">
+        <value>Importovat</value>
+    </data>
+    <data name="Action_Install" xml:space="preserve">
+        <value>Nainstalovat</value>
+    </data>
+    <data name="Action_Keep" xml:space="preserve">
+        <value>Nechat</value>
+    </data>
+    <data name="Action_MaybeLater" xml:space="preserve">
+        <value>Možná Později</value>
+    </data>
+    <data name="Action_No" xml:space="preserve">
+        <value>Ne</value>
+    </data>
+    <data name="Action_Ok" xml:space="preserve">
+        <value>OK</value>
+    </data>
+    <data name="Action_OpenFolder" xml:space="preserve">
+        <value>Otevřít Složku</value>
+    </data>
+    <data name="Action_Play" xml:space="preserve">
+        <value>Hrát</value>
+    </data>
+    <data name="Action_PlayOffline" xml:space="preserve">
+        <value>Hrát Offline</value>
+    </data>
+    <data name="Action_Rename" xml:space="preserve">
+        <value>Přejmenovat</value>
+    </data>
+    <data name="Action_Revert" xml:space="preserve">
+        <value>Vrátit</value>
+    </data>
+    <data name="Action_Save" xml:space="preserve">
+        <value>Uložit</value>
+    </data>
+    <data name="Action_Update" xml:space="preserve">
+        <value>Aktualizovat</value>
+    </data>
+    <data name="Action_ViewMod" xml:space="preserve">
+        <value>Zobrazit Mod</value>
+    </data>
+    <data name="Action_Yes" xml:space="preserve">
+        <value>Ano</value>
+    </data>
+    <data name="Attribute_Id" xml:space="preserve">
+        <value>ID</value>
+    </data>
+    <data name="Attribute_ModName" xml:space="preserve">
+        <value>Jméno Modu</value>
+    </data>
+    <data name="Attribute_Name" xml:space="preserve">
+        <value>Jméno</value>
+    </data>
+    <data name="Attribute_Title" xml:space="preserve">
+        <value>Název</value>
+    </data>
+    <data name="Attribute_Type" xml:space="preserve">
+        <value>Typ</value>
+    </data>
+    <data name="PageTitle_Friends" xml:space="preserve">
+        <value>Kamarádi</value>
+    </data>
+    <data name="PageTitle_Home" xml:space="preserve">
+        <value>Domů</value>
+    </data>
+    <data name="PageTitle_Mods" xml:space="preserve">
+        <value>My Stuff</value>
+    </data>
+    <data name="PageTitle_MyProfiles" xml:space="preserve">
+        <value>Moje profily</value>
+    </data>
+    <data name="PageTitle_Rooms" xml:space="preserve">
+        <value>Místnosti</value>
+    </data>
+    <data name="PageTitle_Settings" xml:space="preserve">
+        <value>Nastavení</value>
+    </data>
+    <data name="State_Installing" xml:space="preserve">
+        <value>Instalování...</value>
+    </data>
+    <data name="State_Loading" xml:space="preserve">
+        <value>Načítání...</value>
+    </data>
+    <data name="State_NoServer" xml:space="preserve">
+        <value>Žádný server</value>
+    </data>
+    <data name="State_Updating" xml:space="preserve">
+        <value>Aktualizování...</value>
+    </data>
+    <data name="State_Error" xml:space="preserve">
+        <value>Chyba</value>
+    </data>
+    <data name="Attribute_Status_Offline" xml:space="preserve">
+        <value>Offline</value>
+    </data>
+    <data name="Attribute_Status_Online" xml:space="preserve">
+        <value>Online</value>
+    </data>
+    <data name="Attribute_Speed" xml:space="preserve">
+        <value>Rychlost</value>
+    </data>
+    <data name="State_Warning" xml:space="preserve">
+        <value>Varování</value>
+    </data>
+    <data name="ListTitle_Friends" xml:space="preserve">
+        <value>Kamarádi</value>
+    </data>
+    <data name="ListTitle_Players" xml:space="preserve">
+        <value>Hráči</value>
+    </data>
+    <data name="ListTitle_Rooms" xml:space="preserve">
+        <value>Místnosti</value>
+    </data>
+    <data name="State_NoLicense" xml:space="preserve">
+        <value>Žádný účet</value>
+    </data>
+    <data name="State_NoName" xml:space="preserve">
+        <value>Žádné jméno</value>
+    </data>
+    <data name="State_NoProfiles" xml:space="preserve">
+        <value>Žádné profily</value>
+    </data>
+    <data name="Region_America" xml:space="preserve">
+        <value>Amerika</value>
+    </data>
+    <data name="Region_Australia" xml:space="preserve">
+        <value>Austrálie</value>
+    </data>
+    <data name="Region_China" xml:space="preserve">
+        <value>Čína</value>
+    </data>
+    <data name="Region_Europe" xml:space="preserve">
+        <value>Evropa</value>
+    </data>
+    <data name="Region_Japan" xml:space="preserve">
+        <value>Japonsko</value>
+    </data>
+    <data name="Region_SouthKorea" xml:space="preserve">
+        <value>Jižní Korea</value>
+    </data>
+    <data name="Region_Taiwan" xml:space="preserve">
+        <value>Tchaj-wan</value>
+    </data>
+    <data name="Attribute_Losses" xml:space="preserve">
+        <value>Prohry</value>
+    </data>
+    <data name="Attribute_PlayerCount" xml:space="preserve">
+        <value>Hráči</value>
+    </data>
+    <data name="Attribute_TimeOnline" xml:space="preserve">
+        <value>Čas Online</value>
+    </data>
+    <data name="Attribute_Wins" xml:space="preserve">
+        <value>Vyhry</value>
+    </data>
+    <data name="Action_Link_Discord" xml:space="preserve">
+        <value>Mluvte s námi!</value>
+    </data>
+    <data name="Action_Back" xml:space="preserve">
+        <value>Zpět</value>
+    </data>
+    <data name="Action_DownloadAndInstall" xml:space="preserve">
+        <value>Stáhnout a Nainstalovat</value>
+    </data>
+    <data name="Action_Duplicate" xml:space="preserve">
+        <value>Duplikovat</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>Dát do Oblíbených</value>
+    </data>
+    <data name="Action_GamebananaPage" xml:space="preserve">
+        <value>Stránka Gamebanana</value>
+    </data>
+    <data name="Action_LaunchDolphin" xml:space="preserve">
+        <value>Spouštět Dolphin</value>
+    </data>
+    <data name="Action_Link_Github" xml:space="preserve">
+        <value>Zdrojový kód</value>
+    </data>
+    <data name="Action_Link_Support" xml:space="preserve">
+        <value>Podpořte nás!</value>
+    </data>
+    <data name="Action_Randomize" xml:space="preserve">
+        <value>Náhodně Rozdělit</value>
+    </data>
+    <data name="Action_Report" xml:space="preserve">
+        <value>Nahlásít</value>
+    </data>
+    <data name="Action_Submit" xml:space="preserve">
+        <value>Odeslat</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>Odebrat z Oblíbených</value>
+    </data>
+    <data name="Action_UnInstall" xml:space="preserve">
+        <value>Odinstalovat</value>
+    </data>
+    <data name="Action_ViewMii" xml:space="preserve">
+        <value>Zobrazit Mii</value>
+    </data>
+    <data name="Attribute_BrAbbreviation" xml:space="preserve">
+        <value>BH</value>
+    </data>
+    <data name="Attribute_BrFull" xml:space="preserve">
+        <value>Bitevní Hodnocení</value>
+    </data>
+    <data name="Attribute_Description" xml:space="preserve">
+        <value>Popis</value>
+    </data>
+    <data name="Attribute_Downloads" xml:space="preserve">
+        <value>Stažení</value>
+    </data>
+    <data name="Attribute_Gender" xml:space="preserve">
+        <value>Pohlaví</value>
+    </data>
+    <data name="Attribute_Gender_Female" xml:space="preserve">
+        <value>Žena</value>
+    </data>
+    <data name="Attribute_Gender_Male" xml:space="preserve">
+        <value>Muž</value>
+    </data>
+    <data name="Attribute_Images" xml:space="preserve">
+        <value>Obrázky</value>
+    </data>
+    <data name="Attribute_IsOnline" xml:space="preserve">
+        <value>Je Online</value>
+    </data>
+    <data name="Attribute_Likes" xml:space="preserve">
+        <value>Lajky</value>
+    </data>
+    <data name="Attribute_Message" xml:space="preserve">
+        <value>Vzkaz</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
+        <value>Obočí</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyes" xml:space="preserve">
+        <value>Oči</value>
+    </data>
+    <data name="Attribute_MiiSection_Face" xml:space="preserve">
+        <value>Obličej</value>
+    </data>
+    <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
+        <value>Vousy</value>
+    </data>
+    <data name="Attribute_MiiSection_General" xml:space="preserve">
+        <value>Obecný</value>
+    </data>
+    <data name="Attribute_MiiSection_Glasses" xml:space="preserve">
+        <value>Brýle</value>
+    </data>
+    <data name="Attribute_MiiSection_Hair" xml:space="preserve">
+        <value>Vlasy</value>
+    </data>
+    <data name="Attribute_MiiSection_Lips" xml:space="preserve">
+        <value>Rty</value>
+    </data>
+    <data name="Attribute_MiiSection_Mole" xml:space="preserve">
+        <value>Mateřské Znaménko</value>
+    </data>
+    <data name="Attribute_MiiSection_Nose" xml:space="preserve">
+        <value>Nos</value>
+    </data>
+    <data name="Attribute_Mii_BeardType" xml:space="preserve">
+        <value>Typ Vousů</value>
+    </data>
+    <data name="Attribute_Mii_CreatorName" xml:space="preserve">
+        <value>Jméno Tvůrce</value>
+    </data>
+    <data name="Attribute_Mii_DefaultName" xml:space="preserve">
+        <value>Nové Mii</value>
+    </data>
+    <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
+        <value>Typ Obočí</value>
+    </data>
+    <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
+        <value>Obličejové Rysy</value>
+    </data>
+    <data name="Attribute_Mii_FavColor" xml:space="preserve">
+        <value>Oblíbená Barva</value>
+    </data>
+    <data name="Attribute_Mii_Gender" xml:space="preserve">
+        <value>Pohlaví</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Female" xml:space="preserve">
+        <value>Žena</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Male" xml:space="preserve">
+        <value>Muž</value>
+    </data>
+    <data name="Attribute_Mii_GlassesColor" xml:space="preserve">
+        <value>Barva Brýlí</value>
+    </data>
+    <data name="Attribute_Mii_GlassesType" xml:space="preserve">
+        <value>Typ Brýlí</value>
+    </data>
+    <data name="Attribute_Mii_HairColor" xml:space="preserve">
+        <value>Barva Vlasů</value>
+    </data>
+    <data name="Attribute_Mii_HairType" xml:space="preserve">
+        <value>Typ Vlasů</value>
+    </data>
+    <data name="Attribute_Mii_HeadShape" xml:space="preserve">
+        <value>Tvar Hlavy</value>
+    </data>
+    <data name="Attribute_Mii_Height" xml:space="preserve">
+        <value>Výška</value>
+    </data>
+    <data name="Attribute_Mii_IrishColor" xml:space="preserve">
+        <value>Barva Očí</value>
+    </data>
+    <data name="Attribute_Mii_MirrorHair" xml:space="preserve">
+        <value>Zrcadlové Vlasy</value>
+    </data>
+    <data name="Attribute_Mii_MouthType" xml:space="preserve">
+        <value>Typ Úst</value>
+    </data>
+    <data name="Attribute_Mii_MustacheSize" xml:space="preserve">
+        <value>Velikost Kníru</value>
+    </data>
+    <data name="Attribute_Mii_MustacheType" xml:space="preserve">
+        <value>Typ Kníru</value>
+    </data>
+    <data name="Attribute_Mii_Name" xml:space="preserve">
+        <value>Mii Jmeno</value>
+    </data>
+    <data name="Attribute_Mii_NoseType" xml:space="preserve">
+        <value>Typ Nosu</value>
+    </data>
+    <data name="Attribute_Mii_Size" xml:space="preserve">
+        <value>Velikost</value>
+    </data>
+    <data name="Attribute_Mii_SkinColor" xml:space="preserve">
+        <value>Barva Pleti</value>
+    </data>
+    <data name="Attribute_Mii_Width" xml:space="preserve">
+        <value>Šířka</value>
+    </data>
+    <data name="Attribute_Priority" xml:space="preserve">
+        <value>Přednost</value>
+    </data>
+    <data name="Attribute_SortBy" xml:space="preserve">
+        <value>Seřadit podle</value>
+    </data>
+    <data name="Attribute_Status" xml:space="preserve">
+        <value>Status</value>
+    </data>
+    <data name="Attribute_Views" xml:space="preserve">
+        <value>Zhlédnutí</value>
+    </data>
+    <data name="Attribute_VrAbbreviation" xml:space="preserve">
+        <value>ZH</value>
+    </data>
+    <data name="Attribute_VrFull" xml:space="preserve">
+        <value>Závodní Hodnocení</value>
+    </data>
+    <data name="ListTitle_Miis" xml:space="preserve">
+        <value>Miiy</value>
+    </data>
+    <data name="PageTitle_MyMiis" xml:space="preserve">
+        <value>Moje Miiy</value>
+    </data>
 </root>

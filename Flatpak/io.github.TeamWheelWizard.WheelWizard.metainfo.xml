@@ -31,7 +31,7 @@
   <screenshots>
     <screenshot type="default">
       <caption>Wheel Wizard's home page</caption>
-      <image type="source">https://raw.githubusercontent.com/TeamWheelWizard/.github/d1c065020c1a526d80eb08f53423543f0f5c3439/images/screenshots/home_page.png</image>
+      <image type="source">https://raw.githubusercontent.com/TeamWheelWizard/.github/261be51961d07ac217d343f4a03231b57e603866/images/screenshots/home_page.png</image>
     </screenshot>
     <screenshot>
       <caption>Wheel Wizard's room details page</caption>
@@ -55,6 +55,10 @@
   </provides>
 
   <releases>
+    <release version="2.3.3" date="2025-09-14"/>
+    <release version="2.3.2" date="2025-07-01"/>
+    <release version="2.3.1" date="2025-06-30"/>
+    <release version="2.3.0" date="2025-06-28"/>
     <release version="2.2.1" date="2025-05-06"/>
     <release version="2.1.3" date="2025-04-13"/>
     <release version="2.1.0" date="2025-04-11"/>

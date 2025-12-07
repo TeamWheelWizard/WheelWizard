@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
+using WheelWizard.Resources.Languages;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Popups.Base;
@@ -38,7 +39,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     private string _currentSearchTerm = "";
 
     public ModBrowserWindow()
-        : base(true, false, false, "Mod Browser")
+        : base(true, false, false, Common.PopupTitle_ModBrowser)
     {
         InitializeComponent();
         DataContext = this;

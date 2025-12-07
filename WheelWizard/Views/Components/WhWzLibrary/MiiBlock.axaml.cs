@@ -3,7 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using WheelWizard.Services.Settings;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement.MiiManagement;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Components;
 

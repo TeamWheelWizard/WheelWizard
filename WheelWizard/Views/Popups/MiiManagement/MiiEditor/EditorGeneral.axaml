@@ -9,7 +9,7 @@
              x:Class="WheelWizard.Views.Popups.MiiManagement.MiiEditor.EditorGeneral">
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
-        <TextBlock Classes="BodyText" Margin="10" Text="General" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_General}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1" />
         <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}"
@@ -24,14 +24,20 @@
             <StackPanel Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Spacing="10">
 
                 <StackPanel> <!-- Mii Name -->
-                    <components:FormFieldLabel Text="Mii Name:" />
-                    <behavior:FeedbackTextBox x:Name="MiiName" Watermark="Enter mii name"
-                                              TextChanged="Name_TextChanged" />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Name}" />
+                    <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto" VerticalAlignment="Top">
+                        <behavior:FeedbackTextBox x:Name="MiiName" Watermark="{x:Static lang:Phrases.Placeholder_EnterMiiName}"
+                                                  TextChanged="Name_TextChanged" VerticalAlignment="Top"/>
+                        <components:Button Grid.Column="1" Variant="Default" Margin="10,0,0,0"
+                                           Padding="10,5" IconSize="23" VerticalAlignment="Top"
+                                           IconData="{StaticResource Grip}"  Click="ComplexName_OnClick" />
+                    </Grid>
+                  
                 </StackPanel>
 
                 <StackPanel> <!-- Creator Name -->
-                    <components:FormFieldLabel Text="Creator Name:" />
-                    <behavior:FeedbackTextBox x:Name="CreatorName" Watermark="Enter creator name Optional"
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_CreatorName}" />
+                    <behavior:FeedbackTextBox x:Name="CreatorName" Watermark="{x:Static lang:Settings.HelperText_Optional}"
                                               TextChanged="Name_TextChanged" />
                 </StackPanel>
 
@@ -43,38 +49,37 @@
                 </StackPanel>
                 
                 <StackPanel> <!-- Gender -->
-                    <components:FormFieldLabel Text="Gender:" />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Gender}" />
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <!-- Male is only for the fancy, but servers no real purpose -->
-                        <RadioButton Content="Male" IsChecked="True" GroupName="GenderGroup" />
-                        <RadioButton Content="Female" x:Name="GirlToggle" IsCheckedChanged="IsGirl_OnIsCheckedChanged"
+                        <RadioButton Content="{x:Static lang:Common.Attribute_Mii_Gender_Male}" IsChecked="True" GroupName="GenderGroup" />
+                        <RadioButton Content="{x:Static lang:Common.Attribute_Mii_Gender_Female}" x:Name="GirlToggle" IsCheckedChanged="IsGirl_OnIsCheckedChanged"
                                      GroupName="GenderGroup" />
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel>
-                    <components:FormFieldLabel Text="Height:" />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Height}" />
                     <Slider x:Name="LengthSlider"
                             ValueChanged="Length_OnValueChanged"
                             Minimum="0" Maximum="127"
                             Width="220" HorizontalAlignment="Left" />
 
-                    <components:FormFieldLabel Text="Width:" />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Width}" />
                     <Slider x:Name="WidthSlider"
                             ValueChanged="Width_OnValueChanged"
                             Minimum="0" Maximum="127"
                             Width="220" HorizontalAlignment="Left" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel>
-                        <components:FormFieldLabel Text="Favorite Color:" />
-                        <ComboBox
-                            x:Name="FavoriteColorBox"
-                            SelectionChanged="FavoriteColorBox_OnSelectionChanged"
-                            Width="150">
-                        </ComboBox>
-                    </StackPanel>
+                
+                
+                <StackPanel> <!-- Favorite Color -->
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_FavColor}"/>
+                    <UniformGrid Columns="5" x:Name="FavoriteColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
                 </StackPanel>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>

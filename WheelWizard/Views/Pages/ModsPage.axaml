@@ -23,33 +23,33 @@
                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
 
-        <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="12"
+        <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,12"
                     Orientation="Horizontal" x:Name="TopBarButtons" IsVisible="{Binding HasMods}">
-            <UniformGrid Columns="2" Rows="1">
-                <components:Button Variant="Primary" Margin="3,0"
-                                   Text="Browse" IconData="{StaticResource Search}"
+             <StackPanel Orientation="Horizontal" Spacing="8">
+                <components:Button Variant="Primary" 
+                                   Text="{x:Static lang:Common.Action_Browse}" IconData="{StaticResource Search}"
                                    Click="BrowseMod_Click" HorizontalAlignment="Center" />
-                <components:Button Variant="Default" Margin="3,0"
+                <components:Button Variant="Default"
                                    Text="{x:Static lang:Common.Action_Import}"
                                    IconData="{StaticResource FileImport}"
                                    Click="ImportMod_Click" HorizontalAlignment="Center" />
-            </UniformGrid>
+            </StackPanel>
         </StackPanel>
 
         <!-- Empty Mods Message -->
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="PageWithoutMods"
                     IsVisible="{Binding HasMods, Converter={x:Static BoolConverters.Not}}">
-            <components:EmptyPageInfo Title="{x:Static lang:Phrases.EmptyText_NoMods_Title}"
-                                      BodyText="{x:Static lang:Phrases.EmptyText_NoMods}"
+            <components:EmptyPageInfo Title="{x:Static lang:Phrases.EmptyContent_NoMods_Title}"
+                                      BodyText="{x:Static lang:Phrases.EmptyContent_NoMods}"
                                       HorizontalAlignment="Center" />
             <UniformGrid Margin="0,12" Columns="2" Rows="1">
                 <components:Button Variant="Primary" Margin="3,0"
-                                   Text="Browse" IconData="{StaticResource Search}"
-                                   Click="BrowseMod_Click" HorizontalAlignment="Center" />
+                                   Text="{x:Static lang:Common.Action_Browse}" IconData="{StaticResource Search}"
+                                   Click="BrowseMod_Click" HorizontalAlignment="Stretch" />
                 <components:Button Variant="Default" Margin="3,0"
                                    Text="{x:Static lang:Common.Action_Import}"
                                    IconData="{StaticResource FileImport}"
-                                   Click="ImportMod_Click" HorizontalAlignment="Center" />
+                                   Click="ImportMod_Click" HorizontalAlignment="Stretch" />
             </UniformGrid>
         </StackPanel>
 
@@ -116,8 +116,11 @@
                                 <!-- however, it works really weird if you do that -->
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
                                             VerticalAlignment="Center">
-                                    <TextBlock Text="Priority: " FontSize="14" Foreground="{StaticResource Neutral100}"
+                                    <TextBlock Text="{x:Static lang:Common.Attribute_Priority}" FontSize="14"
+                                               Foreground="{StaticResource Neutral100}"
                                                VerticalAlignment="Center" Margin="10,0,0,0" />
+                                    <TextBlock Text=": " FontSize="14" Foreground="{StaticResource Neutral100}"
+                                               VerticalAlignment="Center" />
                                     <TextBox Text="{Binding Mod.Priority, Mode=OneWay}" Classes="dark"
                                              TextChanged="PriorityText_OnTextChanged"
                                              LostFocus="PriorityText_OnLostFocus" Padding="0"

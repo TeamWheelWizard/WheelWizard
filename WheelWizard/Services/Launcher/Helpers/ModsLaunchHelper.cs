@@ -20,8 +20,8 @@ public static class ModsLaunchHelper
             {
                 var modsFoundQuestion = new YesNoWindow()
                     .SetButtonText(Common.Action_Delete, Common.Action_Keep)
-                    .SetMainText(Phrases.PopupText_ModsFound)
-                    .SetExtraText(Phrases.PopupText_ModsFoundQuestion);
+                    .SetMainText(Phrases.Question_LaunchClearModsFound_Title)
+                    .SetExtraText(Phrases.Question_LaunchClearModsFound_Extra);
                 if (await modsFoundQuestion.AwaitAnswer())
                     Directory.Delete(MyStuffFolderPath, true);
 
@@ -67,8 +67,8 @@ public static class ModsLaunchHelper
         }
 
         var totalFiles = finalFiles.Count;
-        var progressWindow = new ProgressWindow(Phrases.PopupText_InstallingMods).SetGoal(
-            Humanizer.ReplaceDynamic(Phrases.PopupText_InstallingModsCount, totalFiles)!
+        var progressWindow = new ProgressWindow(Phrases.Progress_InstallingMods).SetGoal(
+            Humanizer.ReplaceDynamic(Phrases.Progress_InstallingModsCount, totalFiles)!
         );
         progressWindow.Show();
 

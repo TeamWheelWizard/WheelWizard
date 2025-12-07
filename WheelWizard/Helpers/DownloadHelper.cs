@@ -2,6 +2,7 @@
 
 namespace WheelWizard.Helpers;
 
+// todo: Delete this static class and write a service for it.
 public static class DownloadHelper
 {
     private const int MaxRetries = 5;
@@ -22,7 +23,7 @@ public static class DownloadHelper
         return toLocationAsync;
     }
 
-    public static async Task<string> DownloadToLocationAsync(
+    public static async Task<string?> DownloadToLocationAsync(
         string url,
         string tempFile,
         ProgressWindow progressPopupWindow,
@@ -47,8 +48,6 @@ public static class DownloadHelper
                 response.EnsureSuccessStatusCode();
                 if (response.RequestMessage == null || response.RequestMessage.RequestUri == null)
                 {
-                    // Do we want this error?
-                    // new MessageBoxWindow().SetTitleText("Failed to resolve final URL.").Show();
                     return null;
                 }
 

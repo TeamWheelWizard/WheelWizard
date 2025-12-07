@@ -3,7 +3,7 @@ using Avalonia.Media.Imaging;
 using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.Shared.Services;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.MiiImages;
 
@@ -27,7 +27,11 @@ public class MiiImagesSingletonService(IApiCaller<IMiiIMagesApi> apiCaller, IMem
 
         // Even tho we also check it in the semaphore section, we also check here if it's in the cache, just to be tad faster.
         if (cache.TryGetValue(miiConfigKey, out Bitmap? cachedValue))
-            return cachedValue ?? Fail<Bitmap>("Cached image is null.");
+        {
+            if (cachedValue != null)
+                return cachedValue;
+            return Fail("Cached image is null.");
+        }
 
         var requestSemaphore = _inFlightRequests.GetOrAdd(miiConfigKey, _ => new(1, 1));
 
@@ -39,7 +43,11 @@ public class MiiImagesSingletonService(IApiCaller<IMiiIMagesApi> apiCaller, IMem
             // Double-check the cache after acquiring the semaphore
             // Another thread might have completed the request while we were waiting
             if (cache.TryGetValue(miiConfigKey, out Bitmap? doubleCheckCached))
-                return doubleCheckCached ?? Fail<Bitmap>("Cached image is null.");
+            {
+                if (doubleCheckCached != null)
+                    return doubleCheckCached;
+                return Fail("Cached image is null.");
+            }
 
             // If we get here, we're the first request and need to call the API
             var newImageResult = await apiCaller.CallApiAsync(api => GetBitmapAsync(api, data.Value, specifications));
@@ -55,7 +63,9 @@ public class MiiImagesSingletonService(IApiCaller<IMiiIMagesApi> apiCaller, IMem
                 entry.Priority = specifications.CachePriority;
             }
 
-            return newImage ?? Fail<Bitmap>("Failed to get new image.");
+            if (newImage != null)
+                return newImage;
+            return Fail("Failed to get new image.");
         }
         finally
         {

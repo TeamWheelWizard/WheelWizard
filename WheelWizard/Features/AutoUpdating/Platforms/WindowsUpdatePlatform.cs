@@ -24,8 +24,8 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
 
         // Otherwise, ask if the user wants to restart as admin.
         var restartAsAdmin = await new YesNoWindow()
-            .SetMainText(Phrases.PopupText_UpdateAdmin)
-            .SetExtraText(Phrases.PopupText_UpdateAdminExplained)
+            .SetMainText(Phrases.Question_UpdateAdmin_Title)
+            .SetExtraText(Phrases.Question_UpdateAdmin_Extra)
             .AwaitAnswer();
 
         if (!restartAsAdmin)
@@ -50,7 +50,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
                 Process.Start(startInfo);
                 Environment.Exit(0);
             },
-            errorMessage: Phrases.PopupText_RestartAdminFail
+            errorMessage: Phrases.MessageError_RestartAdminFail_Extra
         );
     }
 
@@ -68,13 +68,13 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
     {
         var currentExecutablePath = Environment.ProcessPath;
         if (currentExecutablePath is null)
-            return Phrases.PopupText_UnableUpdateWhWz_ReasonLocation;
+            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
 
         var currentExecutableName = fileSystem.Path.GetFileNameWithoutExtension(currentExecutablePath);
         var currentFolder = fileSystem.Path.GetDirectoryName(currentExecutablePath);
 
         if (currentFolder is null)
-            return Phrases.PopupText_UnableUpdateWhWz_ReasonLocation;
+            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
 
         // Download new executable to a temporary file.
         var newFilePath = fileSystem.Path.Combine(currentFolder, currentExecutableName + "_new.exe");
@@ -84,8 +84,8 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         await DownloadHelper.DownloadToLocationAsync(
             downloadUrl,
             newFilePath,
-            Phrases.PopupText_UpdateWhWz,
-            Phrases.PopupText_LatestWhWzGithub,
+            Phrases.Progress_UpdateWhWz,
+            Phrases.Progress_LatestWhWzGithub,
             ForceGivenFilePath: true
         );
 
@@ -106,7 +106,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
     {
         var currentFolder = fileSystem.Path.GetDirectoryName(currentFilePath);
         if (currentFolder is null)
-            return Phrases.PopupText_UnableUpdateWhWz_ReasonLocation;
+            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
 
         var scriptFilePath = fileSystem.Path.Combine(currentFolder, "update.ps1");
         var originalFileName = fileSystem.Path.GetFileName(currentFilePath);

@@ -11,7 +11,7 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 
         <!-- Program details -->
-        <Version>2.2.1</Version>
+        <Version>2.3.3</Version>
         <Description>This program will manage RetroRewind and mods :)</Description>
         <Copyright>GNU v3.0</Copyright>
         <RepositoryUrl>https://github.com/patchzyy/WheelWizard</RepositoryUrl>
@@ -19,15 +19,15 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
-        <DefineConstants>WINDOWS</DefineConstants>
+        <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' or '$(RuntimeIdentifier)' == 'linux-arm64'">
-        <DefineConstants>LINUX</DefineConstants>
+        <DefineConstants>$(DefineConstants);LINUX</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'osx-arm64' or '$(RuntimeIdentifier)' == 'osx-x64'">
-        <DefineConstants>MACOS</DefineConstants>
+        <DefineConstants>$(DefineConstants);MACOS</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
@@ -47,7 +47,7 @@
 
         <!-- Everything from the OG Wheel wizard project -->
         <PackageReference Include="ini-parser" Version="2.5.2" NoWarn="NU1701"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0-preview.3.25171.5" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0-preview.3.25171.5"/>
         <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.3.0"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3"/>
         <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
@@ -57,8 +57,8 @@
         <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
         <PackageReference Include="SharpCompress" Version="0.39.0"/>
         <PackageReference Include="TestableIO.System.IO.Abstractions.Analyzers" Version="2022.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Testably.Abstractions" Version="9.0.0"/>
     </ItemGroup>
@@ -70,11 +70,6 @@
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Languages\Common.*.resx">
             <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-
-        <EmbeddedResource Update="Resources\Languages\Online.resx">
-            <Generator>PublicResXFileCodeGenerator</Generator>
-            <LastGenOutput>Online.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Languages\Online.*.resx">
             <DependentUpon>Online.resx</DependentUpon>
@@ -112,18 +107,13 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Settings.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Languages\Online.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Online.resx</DependentUpon>
-        </Compile>
         <Compile Update="Views\Components\StandardLibrary\PopupListButton.axaml.cs">
-          <DependentUpon>PopupListButton.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>PopupListButton.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\Popups\MiiManagement\MiiEditor\EditorEmpty.axaml.cs">
-          <DependentUpon>EditorEmpty.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>EditorEmpty.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
 
@@ -141,7 +131,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorGeneralPage.axaml" />
-      <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorWindow.axaml" />
+        <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorGeneralPage.axaml"/>
+        <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorWindow.axaml"/>
     </ItemGroup>
 </Project>

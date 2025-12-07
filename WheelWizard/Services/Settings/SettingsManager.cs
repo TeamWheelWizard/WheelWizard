@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Models.Settings;
-using WheelWizard.Services.Other;
 
 namespace WheelWizard.Services.Settings;
 
@@ -27,14 +26,6 @@ public class SettingsManager
         // inside the data directory and not use the XDG config directory, leading to two different configs).
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && PathManager.IsLinuxDolphinConfigSplit())
         {
-            // Only verify the folders in this situation since Load/Wii and Config are split
-            string[] requiredSubdirectories = [PathManager.LoadFolderPath, PathManager.ConfigFolderPath, PathManager.WiiFolderPath];
-            foreach (string requiredSubdirectory in requiredSubdirectories)
-            {
-                if (!FileHelper.DirectoryExists(requiredSubdirectory))
-                    return false;
-            }
-
             // In this case, Dolphin would use `EMBEDDED_USER_DIR` which is the portable `user` directory
             // in the current directory (the directory of the WheelWizard executable).
             // This means a split dolphin user folder and config cannot work...
@@ -77,7 +68,7 @@ public class SettingsManager
                     return false;
                 }
             }
-            return FileHelper.FileExists(pathOrCommand) || EnvHelper.IsValidUnixCommand(pathOrCommand);
+            return EnvHelper.IsValidUnixCommand(pathOrCommand);
         }
 
         return FileHelper.FileExists(pathOrCommand);
@@ -97,21 +88,22 @@ public class SettingsManager
     public static Setting SAVED_WINDOW_SCALE = new WhWzSetting(typeof(double), "WindowScale", 1.0).SetValidation(value =>
         (double)(value ?? -1) >= 0.5 && (double)(value ?? -1) <= 2.0
     );
-    public static Setting RR_LANGUAGE = new WhWzSetting(typeof(int), "RR_Language", 0).SetValidation(value =>
-        SettingValues.RrLanguages.ContainsKey((int)(value ?? -1))
-    );
     public static Setting REMOVE_BLUR = new WhWzSetting(typeof(bool), "REMOVE_BLUR", true);
-    public static Setting RR_REGION = new WhWzSetting(
-        typeof(MarioKartWiiEnums.Regions),
-        "RR_Region",
-        RRRegionManager.GetValidRegions().First()
-    );
+    public static Setting RR_REGION = new WhWzSetting(typeof(MarioKartWiiEnums.Regions), "RR_Region", MarioKartWiiEnums.Regions.None);
     public static Setting WW_LANGUAGE = new WhWzSetting(typeof(string), "WW_Language", "en").SetValidation(value =>
         SettingValues.WhWzLanguages.ContainsKey((string)value!)
     );
     #endregion
 
     #region Dolphin Settings
+    public static Setting NAND_ROOT_PATH = new DolphinSetting(typeof(string), ("Dolphin.ini", "General", "NANDRootPath"), "").SetValidation(
+        value => Directory.Exists(value as string ?? string.Empty)
+    );
+
+    public static Setting LOAD_PATH = new DolphinSetting(typeof(string), ("Dolphin.ini", "General", "LoadPath"), "").SetValidation(value =>
+        Directory.Exists(value as string ?? string.Empty)
+    );
+
     public static Setting VSYNC = new DolphinSetting(typeof(bool), ("GFX.ini", "Hardware", "VSync"), false);
     public static Setting INTERNAL_RESOLUTION = new DolphinSetting(
         typeof(int),

@@ -11,7 +11,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="100" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
@@ -23,14 +23,14 @@
         <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_RoomDetails}"
                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
-
-        <StackPanel Margin="10" Orientation="Horizontal"
-                    HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <TextBlock Text="ID: " Classes="BodyText" Margin="0,3,0,0" />
-            <components:StateBox IconSize="0" Text="{Binding Room.Id}" />
-        </StackPanel>
-
-
+        
+        <PathIcon HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="30" Width="30" Margin="3,12"
+                  Data="{StaticResource Lock}" Foreground="{StaticResource TitleTextColor}">
+            <PathIcon.IsVisible>
+                <Binding Path="Room.Type" Converter="{StaticResource IsEqualTo}" ConverterParameter="private" />
+            </PathIcon.IsVisible>
+        </PathIcon>
+     
         <components:IconLabelButton Grid.Row="0"
                                     IconData="{StaticResource ArrowLeft}"
                                     Text="{x:Static lang:Common.PageTitle_Rooms}"
@@ -39,37 +39,42 @@
                                     VerticalAlignment="Top" HorizontalAlignment="Left"
                                     FontSize="16" Click="GoBackClick" />
 
-        <Grid Grid.Row="1" ColumnDefinitions="4*,6*,2*,2*" Margin="10,0">
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" RowDefinitions="*,*" Margin="10,0">
             <StackPanel
                 Grid.Column="0">
-                <components:FormFieldLabel Text="{x:Static lang:Online.Stat_AverageRoomVr}" Margin="0,0,2,0" />
-                <components:StateBox IconSize="0" Text="{Binding Room.AverageVr}" HorizontalAlignment="Left" />
+                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Id}" Margin="0,0,2,0" />
+                <SelectableTextBlock Text="{Binding Room.Id}" Classes="BodyText" />
             </StackPanel>
 
             <StackPanel Grid.Column="1">
-                <components:FormFieldLabel Text="{x:Static lang:Online.Stat_TimeOnline}" Margin="0,0,2,0" />
+                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_TimeOnline}" Margin="0,0,2,0" />
                 <SelectableTextBlock Text="{Binding Room.TimeOnline}" Classes="BodyText" />
             </StackPanel>
 
-            <StackPanel Grid.Column="2">
+            <StackPanel Grid.Column="0" Grid.Row="1">
                 <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Type}" Margin="0,0,2,0" />
                 <SelectableTextBlock Text="{Binding Room.GameMode}" Classes="BodyText" />
             </StackPanel>
 
 
-            <PathIcon Grid.Column="3" Height="30" Width="30" Margin="3,12"
-                      HorizontalAlignment="Right" VerticalAlignment="Top"
-                      Data="{StaticResource Lock}" Foreground="{StaticResource TitleTextColor}">
-                <PathIcon.IsVisible>
-                    <Binding Path="Room.Type" Converter="{StaticResource IsEqualTo}" ConverterParameter="private" />
-                </PathIcon.IsVisible>
-            </PathIcon>
+            <StackPanel Grid.Column="1" Grid.Row="1">
+                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_AverageRoomVr}" Margin="0,0,2,0" />
+                <components:StateBox IconSize="0" Text="{Binding Room.AverageVr}" HorizontalAlignment="Left" />
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0">
             <Grid Grid.Row="0">
+                <Grid ColumnDefinitions="9*,4*,4*,4*">
+                    <components:FormFieldLabel Grid.Column="1" Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
+                                               TipText="{x:Static lang:Common.Attribute_VrFull}"
+                                               Margin="10,0,0,0" />
+                    <components:FormFieldLabel Grid.Column="2"  Text="{x:Static lang:Common.Attribute_BrAbbreviation}"
+                                               TipText="{x:Static lang:Common.Attribute_BrFull}"
+                                               Margin="10,0,0,0" />
+                </Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Online.ListTitle_Players}" />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Players}" />
                     <components:StateBox Text="{Binding Room.PlayerCount}" IconSize="0" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"

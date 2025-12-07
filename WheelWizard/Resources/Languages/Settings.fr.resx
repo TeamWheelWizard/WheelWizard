@@ -24,25 +24,25 @@
     <data name="Category_Video" xml:space="preserve">
         <value>Vidéo</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
+    <data name="HelperText_30FPS" xml:space="preserve">
         <value>Ce paramètre va forcer le jeu à tourner en 30 FPS (60 est par défaut)</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
+    <data name="HelperText_EndWithExe" xml:space="preserve">
         <value>Le chemin doit se finir en .exe</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
-        <value>Ce paramètre ira désactiver les Wiimotes dans le jeu, mais les actives dans la chaîne Wii</value>
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
+        <value>Ce paramètre ira désactiver les Wiimotes dans le jeu, mais les activés dans le menu Wii</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
-        <value>Va lancer la fennêtre d'acceuil de Dolphin en plus du jeu</value>
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
+        <value>Ira lancer la fenêtre d'accueil de Dolphin en plus du jeu</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>Ce paramètre va changer certain paramètre Dolphin pour réduire les saccades et lag spikes </value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>1x est la résolution native</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>Les paramètres sont désactivés, complétez d'abord les paramètres de localisation</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
@@ -69,9 +69,6 @@
     <data name="Option_Renderer" xml:space="preserve">
         <value>Rendu</value>
     </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Langue de Retro Rewind</value>
-    </data>
     <data name="Option_ShowFPS" xml:space="preserve">
         <value>Montrer les FPS</value>
     </data>
@@ -88,10 +85,10 @@
         <value>Langue</value>
     </data>
     <data name="Section_LocationPaths" xml:space="preserve">
-        <value>paramètres de localisation</value>
+        <value>Paramètres de localisation</value>
     </data>
     <data name="Section_Performance" xml:space="preserve">
-        <value>Paramètres perfomance</value>
+        <value>Paramètres de perfomance</value>
     </data>
     <data name="Section_Renderer" xml:space="preserve">
         <value>Paramètres de rendu </value>
@@ -126,13 +123,13 @@
     <data name="Value_Language_Turkish" xml:space="preserve">
         <value>Turc</value>
     </data>
-    <data name="CompletePercentage" xml:space="preserve">
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
         <value>100</value>
     </data>
     <data name="Option_MakePrimary" xml:space="preserve">
         <value>Défini par défaut</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
         <value>Ceci active les animations dans l'application Wheel Wizard</value>
     </data>
     <data name="Option_EnableAnimations" xml:space="preserve">
@@ -149,5 +146,56 @@
     </data>
     <data name="Value_Language_Russian" xml:space="preserve">
         <value>Russe</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Arabe</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Chinois </value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Tchèque</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Norvégien</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Portugais</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Autre</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>Général</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>À propos</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>Ouvrir le dossier du jeu</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>Ouvrir le dossier de sauvegarde</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Réinstaller Retro Rewind </value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Installation</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>Eppe, Yawshi</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>Le chemin doit se finir avec:</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Vous devez impérativement définir ces 3 chemins afin de jouer à Retro Rewind</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>Optionnel</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>Ceci change uniquement la langue dans Wheel Wizard. Pour changer la langue dans le jeu. Veuillez le faire depuis les paramètres de Retro Rewind.</value>
     </data>
 </root>

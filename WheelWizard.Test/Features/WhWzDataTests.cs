@@ -41,7 +41,7 @@ public class WhWzDataTests
         // Arrange
         var expectedError = new OperationError { Message = "API call failed" };
 
-        _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IWhWzDataApi, Task<WhWzStatus>>>>()).Returns(Fail<WhWzStatus>(expectedError));
+        _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IWhWzDataApi, Task<WhWzStatus>>>>()).Returns(expectedError);
 
         // Act
         var result = await _service.GetStatusAsync();
@@ -59,7 +59,7 @@ public class WhWzDataTests
         {
             { "FC1", [BadgeVariant.WhWzDev, BadgeVariant.Translator] },
             { "FC2", [BadgeVariant.RrDev] },
-            { "FC3", [BadgeVariant.None, BadgeVariant.GoldWinner] },
+            { "FC3", [BadgeVariant.None, BadgeVariant.Firestarter_GoldWinner] },
         };
 
         _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IWhWzDataApi, Task<Dictionary<string, BadgeVariant[]>>>>>()).Returns(Ok(badgeData));
@@ -77,9 +77,7 @@ public class WhWzDataTests
         // Arrange
         var expectedError = new OperationError { Message = "API call failed" };
 
-        _apiCaller
-            .CallApiAsync(Arg.Any<Expression<Func<IWhWzDataApi, Task<Dictionary<string, BadgeVariant[]>>>>>())
-            .Returns(Fail<Dictionary<string, BadgeVariant[]>>(expectedError));
+        _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IWhWzDataApi, Task<Dictionary<string, BadgeVariant[]>>>>>()).Returns(expectedError);
 
         // Act
         var result = await _service.LoadBadgesAsync();
@@ -162,7 +160,7 @@ public class WhWzDataTests
         Assert.Contains(BadgeVariant.WhWzDev, initialBadges);
 
         // Arrange - Second load with different data
-        var updatedBadgeData = new Dictionary<string, BadgeVariant[]> { { "FC1", [BadgeVariant.Translator, BadgeVariant.GoldWinner] } };
+        var updatedBadgeData = new Dictionary<string, BadgeVariant[]> { { "FC1", [BadgeVariant.Translator, BadgeVariant.Firestarter_GoldWinner] } };
 
         _apiCaller
             .CallApiAsync(Arg.Any<Expression<Func<IWhWzDataApi, Task<Dictionary<string, BadgeVariant[]>>>>>())
@@ -175,7 +173,7 @@ public class WhWzDataTests
         var updatedBadges = _service.GetBadges("FC1");
         Assert.Equal(2, updatedBadges.Length);
         Assert.Contains(BadgeVariant.Translator, updatedBadges);
-        Assert.Contains(BadgeVariant.GoldWinner, updatedBadges);
+        Assert.Contains(BadgeVariant.Firestarter_GoldWinner, updatedBadges);
         Assert.DoesNotContain(BadgeVariant.WhWzDev, updatedBadges);
     }
 }

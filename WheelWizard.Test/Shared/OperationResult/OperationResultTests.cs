@@ -1,4 +1,6 @@
-﻿using WheelWizard.Shared;
+﻿using WheelWizard.Helpers;
+using WheelWizard.Shared;
+using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.Test.Shared.OperationResultTests;
 
@@ -52,12 +54,29 @@ public class OperationResultTests
         var error = new OperationError { Message = "Error message" };
 
         // Act
-        var operationResult = Fail(error);
+        OperationResult operationResult = error;
 
         // Assert
         Assert.Equal(error, operationResult.Error);
         Assert.True(operationResult.IsFailure);
         Assert.False(operationResult.IsSuccess);
+        Assert.Null(operationResult.Error!.MessageTranslation);
+    }
+
+    [Fact(DisplayName = "Create failure result, should have correct state with translation")]
+    public void CreateFailureResult_ShouldHaveCorrectStateWithTranslation()
+    {
+        const string errorMessage = "Error message";
+        const MessageTranslation errorTranslation = MessageTranslation.Error_StanderdError;
+
+        // Act
+        OperationResult operationResult = Fail(errorMessage, errorTranslation);
+
+        // Assert
+        Assert.True(operationResult.IsFailure);
+        Assert.False(operationResult.IsSuccess);
+        Assert.Equal(errorMessage, operationResult.Error.Message);
+        Assert.Equal(errorTranslation, operationResult.Error.MessageTranslation);
     }
 
     [Fact(DisplayName = "Implicit result from error, should have correct state")]
@@ -129,7 +148,7 @@ public class OperationResultTests
         var error = new OperationError { Message = "Error message" };
 
         // Act
-        var operationResult = Fail(error);
+        OperationResult operationResult = error;
 
         // Assert
         Assert.Equal(error, operationResult.Error);
@@ -150,6 +169,7 @@ public class OperationResultTests
         Assert.Equal(error, operationResult.Error);
         Assert.True(operationResult.IsFailure);
         Assert.False(operationResult.IsSuccess);
+        Assert.Null(operationResult.Error!.MessageTranslation);
     }
 
     [Fact(DisplayName = "Implicit generic result from value, should have correct state")]
@@ -168,22 +188,6 @@ public class OperationResultTests
         Assert.Equal(value, operationResult.Value);
     }
 
-    [Fact(DisplayName = "Implicit result from string, should have failed state")]
-    public void ImplicitResultFromString_ShouldHaveFailedState()
-    {
-        // Arrange
-        const string errorMessage = "Error message";
-
-        // Act
-        OperationResult operationResult = errorMessage;
-
-        // Assert
-        Assert.NotNull(operationResult.Error);
-        Assert.True(operationResult.IsFailure);
-        Assert.False(operationResult.IsSuccess);
-        Assert.Equal(errorMessage, operationResult.Error?.Message);
-    }
-
     [Fact(DisplayName = "Implicit result from exception, should have failed state")]
     public void ImplicitResultFromException_ShouldHaveFailedState()
     {
@@ -198,22 +202,7 @@ public class OperationResultTests
         Assert.True(operationResult.IsFailure);
         Assert.False(operationResult.IsSuccess);
         Assert.Equal(exception.Message, operationResult.Error?.Message);
-    }
-
-    [Fact(DisplayName = "Implicit generic result from string, should have correct failed state")]
-    public void ImplicitGenericResultFromString_ShouldHaveCorrectFailedState()
-    {
-        // Arrange
-        const string errorMessage = "Error message";
-
-        // Act
-        OperationResult<object> operationResult = errorMessage;
-
-        // Assert
-        Assert.NotNull(operationResult.Error);
-        Assert.True(operationResult.IsFailure);
-        Assert.False(operationResult.IsSuccess);
-        Assert.Equal(errorMessage, operationResult.Error?.Message);
+        Assert.Null(operationResult.Error!.MessageTranslation);
     }
 
     [Fact(DisplayName = "Implicit generic result from exception, should have correct failed state")]
@@ -278,6 +267,27 @@ public class OperationResultTests
         Assert.True(result.IsFailure);
         Assert.Equal(errorMessage, result.Error?.Message);
         Assert.Equal(exception, result.Error?.Exception);
+        Assert.Null(result.Error?.MessageTranslation);
+    }
+
+    [Fact(DisplayName = "Try catch with exception with override, should have failed state with message and translation")]
+    public void TryCatchWithExceptionWithOverride_ShouldHaveFailedStateWithMessageAndTranslation()
+    {
+        // Arrange
+        var exception = new Exception("Error message");
+        const string errorMessage = "Custom error message";
+        const MessageTranslation errorTranslation = MessageTranslation.Error_StanderdError;
+
+        // Act
+        void Action() => throw exception;
+
+        var result = TryCatch(Action, errorMessage, errorTranslation);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(errorMessage, result.Error?.Message);
+        Assert.Equal(exception, result.Error?.Exception);
+        Assert.Equal(errorTranslation, result.Error?.MessageTranslation);
     }
 
     [Fact(DisplayName = "Generic try catch without exception, should have correct success state")]

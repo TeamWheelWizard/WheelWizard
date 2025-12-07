@@ -1,4 +1,3 @@
-using System.Numerics;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.Services;
 

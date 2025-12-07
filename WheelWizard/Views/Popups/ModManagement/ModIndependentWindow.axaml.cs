@@ -1,3 +1,4 @@
+using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Popups.Base;
 
@@ -9,6 +10,8 @@ public partial class ModIndependentWindow : PopupContent
         : base(true, false, true, windowTitle)
     {
         InitializeComponent();
+        if (Window.WindowTitle == "Mod Details")
+            Window.WindowTitle = Common.PopupTitle_ModDetails;
     }
 
     public async Task LoadModAsync(int modId, string? newDownloadUrl = null)

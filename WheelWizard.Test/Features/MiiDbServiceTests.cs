@@ -1,8 +1,8 @@
 using NSubstitute.ExceptionExtensions;
 using Testably.Abstractions;
 using WheelWizard.Shared;
-using WheelWizard.WiiManagement;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Test.Features
 {
@@ -57,9 +57,7 @@ namespace WheelWizard.Test.Features
                 creatorName,
             };
             if (EveryResult.Any(r => r.IsFailure))
-            {
-                return Fail<Mii>(EveryResult.First(r => r.IsFailure).Error);
-            }
+                return EveryResult.First(r => r.IsFailure).Error!;
 
             return Ok(
                 new Mii
@@ -68,7 +66,7 @@ namespace WheelWizard.Test.Features
                     MiiId = miiId,
                     Height = height.Value,
                     Weight = weight.Value,
-                    MiiFacial = miiFacial.Value,
+                    MiiFacialFeatures = miiFacial.Value,
                     MiiHair = miiHair.Value,
                     MiiEyebrows = miiEyebrows.Value,
                     MiiEyes = miiEyes.Value,
@@ -131,7 +129,6 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(result.IsFailure, true);
         }
 
         [Fact]
@@ -145,7 +142,6 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(result.IsFailure, true);
         }
 
         [Fact]
@@ -280,7 +276,7 @@ namespace WheelWizard.Test.Features
             // Arrange
             uint targetId = 666;
             var badBytes = new byte[MiiSerializer.MiiBlockSize];
-            for (int i = 0; i < badBytes.Length; i++)
+            for (var i = 0; i < badBytes.Length; i++)
             {
                 badBytes[i] = (byte)(i % 256);
             }
@@ -292,7 +288,6 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(result.IsFailure, true);
             _repositoryService.Received(1).GetRawBlockByAvatarId(targetId);
         }
 
@@ -350,7 +345,7 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(repoError.Error, result.Error); // Propagate the exact error
+            Assert.Equal(repoError, result.Error); // Propagate the exact error
             _repositoryService.Received(1).UpdateBlockByClientId(miiToUpdate.MiiId, Arg.Is<byte[]>(b => b.SequenceEqual(expectedBytes)));
         }
 
@@ -385,8 +380,8 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 333;
-            string oldName = "OldName";
-            string newName = "NewName";
+            var oldName = "OldName";
+            var newName = "NewName";
             var miiResult = CreateValidMii(targetId, oldName);
             Assert.True(miiResult.IsSuccess, "Setup Failed: Could not create original Mii");
             var originalMii = miiResult.Value;
@@ -420,7 +415,7 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 404;
-            string newName = "NewName";
+            var newName = "NewName";
             _repositoryService.GetRawBlockByAvatarId(targetId).Returns((byte[]?)null);
 
             // Act
@@ -428,7 +423,7 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal("Mii block not found or invalid.", result.Error.Message); // Error from GetByClientId
+            Assert.Equal("Mii block not found", result.Error.Message); // Error from GetByClientId
             _repositoryService.Received(1).GetRawBlockByAvatarId(targetId);
             _repositoryService.DidNotReceive().UpdateBlockByClientId(Arg.Any<uint>(), Arg.Any<byte[]>());
         }
@@ -438,7 +433,7 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 666;
-            string newName = "NewName";
+            var newName = "NewName";
             var badBytes = new byte[MiiSerializer.MiiBlockSize]; // Correct size, bad content
             _repositoryService.GetRawBlockByAvatarId(targetId).Returns(badBytes);
 
@@ -457,8 +452,8 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 555;
-            string oldName = "ValidOld";
-            string invalidNewName = "ThisNameIsDefinitelyTooLongForTheMii"; // > 10 chars
+            var oldName = "ValidOld";
+            var invalidNewName = "ThisNameIsDefinitelyTooLongForTheMii"; // > 10 chars
             var miiResult = CreateValidMii(targetId, oldName);
             Assert.True(miiResult.IsSuccess, "Setup Failed: Could not create original Mii");
             var originalBytes = GetSerializedBytes(miiResult.Value);
@@ -470,7 +465,6 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(result.IsFailure, true);
             _repositoryService.Received(1).GetRawBlockByAvatarId(targetId);
             _repositoryService.DidNotReceive().UpdateBlockByClientId(Arg.Any<uint>(), Arg.Any<byte[]>());
         }
@@ -480,8 +474,8 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 777;
-            string oldName = "Old";
-            string newName = "New";
+            var oldName = "Old";
+            var newName = "New";
             var miiResult = CreateValidMii(targetId, oldName);
             Assert.True(miiResult.IsSuccess, "Setup Failed: Could not create original Mii");
             var originalBytes = GetSerializedBytes(miiResult.Value);
@@ -497,7 +491,7 @@ namespace WheelWizard.Test.Features
 
             // Assert
             Assert.True(result.IsFailure);
-            Assert.Equal(repoError.Error, result.Error); // Error from the repository update propagated
+            Assert.Equal(repoError, result.Error); // Error from the repository update propagated
             _repositoryService.Received(1).GetRawBlockByAvatarId(targetId);
             _repositoryService.Received(1).UpdateBlockByClientId(targetId, Arg.Any<byte[]>());
         }
@@ -507,7 +501,7 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 111;
-            string newName = "New";
+            var newName = "New";
             var expectedException = new TimeoutException("Timeout contacting repository");
             _repositoryService.GetRawBlockByAvatarId(targetId).Throws(expectedException);
 
@@ -523,8 +517,8 @@ namespace WheelWizard.Test.Features
         {
             // Arrange
             uint targetId = 222;
-            string oldName = "Old";
-            string newName = "New";
+            var oldName = "Old";
+            var newName = "New";
             var miiResult = CreateValidMii(targetId, oldName);
             Assert.True(miiResult.IsSuccess, "Setup Failed: Could not create original Mii");
             var originalBytes = GetSerializedBytes(miiResult.Value);

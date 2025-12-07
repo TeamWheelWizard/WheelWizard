@@ -9,7 +9,7 @@
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
         <!-- Updated Title -->
-        <TextBlock Classes="BodyText" Margin="10" Text="Face" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_Face}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
         <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}" IconData="{StaticResource ArrowLeft}"
@@ -24,21 +24,21 @@
                 <!-- The list of elements you want to edit in this page -->
                 
                 <StackPanel> <!-- Skin Color -->
-                    <components:FormFieldLabel Text="Skin Color:"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_SkinColor}"/>
                     <UniformGrid Columns="6" x:Name="SkinColorGrid">
                         <!-- Generated elements -->
                     </UniformGrid>
                 </StackPanel>
                 
                 <StackPanel> <!-- Head Type -->
-                    <components:FormFieldLabel Text="Head Shape:"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_HeadShape}"/>
                     <UniformGrid Columns="5" x:Name="HeadTypesGrid">
                         <!-- Generated elements -->
                     </UniformGrid>
                 </StackPanel>
             
                 <StackPanel> <!-- Facial Feature (Blemishes) -->
-                    <components:FormFieldLabel Text="Facial Feature:"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_FacialFeature}"/>
                     <ComboBox
                         x:Name="FacialFeatureBox"
                         SelectionChanged="FacialFeatureBox_OnSelectionChanged"

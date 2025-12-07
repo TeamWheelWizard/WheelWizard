@@ -7,7 +7,10 @@ public enum BadgeVariant
     RrDev,
     Translator,
     TranslatorLead,
-    GoldWinner,
-    SilverWinner,
-    BronzeWinner,
+    Firestarter_GoldWinner,
+    Firestarter_SilverWinner,
+    Firestarter_BronzeWinner,
+    SummitShowdown_GoldWinner,
+    SummitShowdown_SilverWinner,
+    SummitShowdown_BronzeWinner,
 }

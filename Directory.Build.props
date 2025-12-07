@@ -1,7 +1,54 @@
 <Project>
     <PropertyGroup>
         <CSharpier_Check>false</CSharpier_Check>
+        <Configurations>Debug;Release;Debug-Windows;Debug-Linux;Debug-macOS;Release-Windows;Release-Linux;Release-macOS</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
+
+    <!-- Platform-specific constants for Debug configurations -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug-Windows'">
+        <DefineConstants>$(DefineConstants);DEBUG;TRACE;WINDOWS</DefineConstants>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <Optimize>false</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug-Linux'">
+        <DefineConstants>$(DefineConstants);DEBUG;TRACE;LINUX</DefineConstants>
+        <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+        <Optimize>false</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug-macOS'">
+        <DefineConstants>$(DefineConstants);DEBUG;TRACE;MACOS</DefineConstants>
+        <RuntimeIdentifier>osx-arm64</RuntimeIdentifier>
+        <Optimize>false</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+    </PropertyGroup>
+
+    <!-- Platform-specific constants for Release configurations -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release-Windows'">
+        <DefineConstants>$(DefineConstants);TRACE;WINDOWS</DefineConstants>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release-Linux'">
+        <DefineConstants>$(DefineConstants);TRACE;LINUX</DefineConstants>
+        <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release-macOS'">
+        <DefineConstants>$(DefineConstants);TRACE;MACOS</DefineConstants>
+        <RuntimeIdentifier>osx-arm64</RuntimeIdentifier>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="CSharpier.MsBuild" Version="0.30.6">
             <PrivateAssets>all</PrivateAssets>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -13,16 +14,17 @@
         <value>1.3</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <data name="Option_WhWzLanguage" xml:space="preserve">
         <value>Wheel Wizard Language</value>
-    </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Retro Rewind Language</value>
     </data>
     <data name="Option_ForceDisableWiimote" xml:space="preserve">
         <value>Force Disable Wiimote</value>
@@ -36,19 +38,19 @@
     <data name="Section_Wii" xml:space="preserve">
         <value>Wii Settings</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>Settings are disabled, complete the location settings first</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>Will launch dolphins main window along with the game</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>This setting disables Wiimote ingame, but enables it for the Wii channel</value>
     </data>
     <data name="Section_Resolution" xml:space="preserve">
         <value>Resolution</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>1x is the native resolution</value>
     </data>
     <data name="Section_Performance" xml:space="preserve">
@@ -69,10 +71,10 @@
     <data name="Option_Renderer" xml:space="preserve">
         <value>Renderer</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>This setting will change certain dolphin settings to reduce stuttering and lag spikes</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
+    <data name="HelperText_30FPS" xml:space="preserve">
         <value>This setting will force the game to run in 30 FPS (default is 60)</value>
     </data>
     <data name="Category_Video" xml:space="preserve">
@@ -90,6 +92,24 @@
     <data name="Option_OpenConfig" xml:space="preserve">
         <value>Open Config Folder</value>
     </data>
+    <data name="Option_WheelWizardDataFolder" xml:space="preserve">
+        <value>Wheel Wizard data folder</value>
+    </data>
+    <data name="HelperText_WheelWizardDataFolder" xml:space="preserve">
+        <value>Choose where Wheel Wizard stores its files. Moving may take a while.</value>
+    </data>
+    <data name="Option_ResetDataFolder" xml:space="preserve">
+        <value>Use default location</value>
+    </data>
+    <data name="Status_DataFolder_Default" xml:space="preserve">
+        <value>Using default location.</value>
+    </data>
+    <data name="Status_DataFolder_Custom" xml:space="preserve">
+        <value>Using custom location.</value>
+    </data>
+    <data name="Status_DataFolder_Moving" xml:space="preserve">
+        <value>Moving data, please wait...</value>
+    </data>
     <data name="Option_DolphinUserPath" xml:space="preserve">
         <value>Dolphin User Folder</value>
     </data>
@@ -99,7 +119,7 @@
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
         <value>Dolphin Emulator executable</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
+    <data name="HelperText_EndWithExe" xml:space="preserve">
         <value>Path must end with .exe</value>
     </data>
     <data name="Value_Language_France" xml:space="preserve">
@@ -153,7 +173,7 @@
     <data name="Option_MakePrimary" xml:space="preserve">
         <value>Make Primary</value>
     </data>
-    <data name="CompletePercentage" xml:space="preserve">
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
         <value>100</value>
     </data>
     <data name="Value_Language_Finnish" xml:space="preserve">
@@ -174,8 +194,8 @@
     <data name="Option_EnableAnimations" xml:space="preserve">
         <value>Enable Animations</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
-        <value>This enables the animations in the the Wheel Wizard app</value>
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
+        <value>This enables the animations in the Wheel Wizard app</value>
     </data>
     <data name="Value_Language_Russian" xml:space="preserve">
         <value>Russian</value>
@@ -184,31 +204,31 @@
         <value>Русский</value>
     </data>
     <data name="Value_Language_Arabic" xml:space="preserve">
-        <value />
+        <value>Arabic</value>
     </data>
     <data name="Value_Language_ArabicOg" xml:space="preserve">
         <value>-</value>
     </data>
     <data name="Value_Language_Czech" xml:space="preserve">
-        <value />
+        <value>Czech</value>
     </data>
     <data name="Value_Language_CzechOg" xml:space="preserve">
         <value>-</value>
     </data>
     <data name="Value_Language_Norwegian" xml:space="preserve">
-        <value />
+        <value>Norwegian</value>
     </data>
     <data name="Value_Language_NorwegianOg" xml:space="preserve">
         <value>-</value>
     </data>
     <data name="Value_Language_Chinese" xml:space="preserve">
-        <value />
+        <value>Chinese</value>
     </data>
     <data name="Value_Language_ChineseOg" xml:space="preserve">
         <value>-</value>
     </data>
     <data name="Value_Language_Portuguese" xml:space="preserve">
-        <value />
+        <value>Portuguese</value>
     </data>
     <data name="Value_Language_PortugueseOg" xml:space="preserve">
         <value>-</value>
@@ -227,5 +247,26 @@
     </data>
     <data name="Category_About" xml:space="preserve">
         <value>About</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Other</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>General</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>Path can end with:</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>This only changes the language for Wheel Wizard. To change the in-game language, you’ll need to do that within the game settings.</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>-</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>Optional</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>You must set these 3 paths before you can start playing Retro Rewind</value>
     </data>
 </root>

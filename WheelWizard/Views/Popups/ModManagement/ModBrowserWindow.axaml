@@ -4,9 +4,9 @@
                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                      ClipToBounds="False"
+                     xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
                      xmlns:modManagement="clr-namespace:WheelWizard.Views.Popups.ModManagement"
                      xmlns:components="clr-namespace:WheelWizard.Views.Components"
-                     xmlns:gameBanana="clr-namespace:WheelWizard.GameBanana.Domain"
                      xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                      xmlns:self="clr-namespace:WheelWizard.Views.Popups.ModManagement"
                      xmlns:wheelWizard="clr-namespace:WheelWizard"
@@ -14,12 +14,12 @@
     <Grid ColumnDefinitions="2*,3*" Width="800" Height="750">
         <!-- Mod List -->
         <Grid Grid.Column="0" Margin="10" RowDefinitions="Auto,Auto,*">
-            <TextBlock Classes="TinyText" Text="Powered By Gamebanana"
+            <TextBlock Classes="TinyText" Text="{x:Static lang:Phrases.Text_PoweredGamebanana}"
                        HorizontalAlignment="Left" Grid.Row="0" />
 
             <!-- Search Bar -->
             <Grid Grid.Row="1" Margin="0,10,0,10" HorizontalAlignment="Stretch">
-                <TextBox Name="SearchTextBox" Watermark="Search for mods..." Grid.Column="0"
+                <TextBox Name="SearchTextBox" Watermark="{x:Static lang:Phrases.Placeholder_SearchMod}" Grid.Column="0"
                          KeyDown="SearchTextBox_OnKeyDown"
                          Height="40" HorizontalAlignment="Stretch" Margin="0,0,60,5" />
 

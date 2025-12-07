@@ -18,13 +18,23 @@
                     <controls:Badge Variant="TranslatorLead"/>
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="GoldWinner"/>
+                    <controls:Badge Variant="Firestarter_GoldWinner"/>
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="SilverWinner"/>
+                    <controls:Badge Variant="Firestarter_SilverWinner"/>
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="BronzeWinner"/>
+                    <controls:Badge Variant="Firestarter_BronzeWinner"/>
+                </Border>
+                
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <controls:Badge Variant="SummitShowdown_GoldWinner"/>
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <controls:Badge Variant="SummitShowdown_SilverWinner"/>
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <controls:Badge Variant="SummitShowdown_BronzeWinner"/>
                 </Border>
             </UniformGrid>
         </Border>
@@ -144,7 +154,8 @@
         </Setter>
     </Style>
     
-    <Style Selector="controls|Badge.GoldWinner">
+    <!-- FIRESTARTER BADGES -->
+    <Style Selector="controls|Badge.Firestarter_GoldWinner">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -165,7 +176,7 @@
         </Setter>
     </Style>
     
-    <Style Selector="controls|Badge.SilverWinner">
+    <Style Selector="controls|Badge.Firestarter_SilverWinner">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -186,7 +197,70 @@
         </Setter>
     </Style>
     
-    <Style Selector="controls|Badge.BronzeWinner">
+    <Style Selector="controls|Badge.Firestarter_BronzeWinner">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
+                    <Border Grid.Row="1" Grid.Column="1" CornerRadius="999" Background="#FFD19D" />
+                    
+                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
+                          Fill="#EC5616" Data="{StaticResource Award}"
+                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="21"/>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+                    </Path>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+     <!-- SUMMIT SHOWDOWN BADGES -->
+    <Style Selector="controls|Badge.SummitShowdown_GoldWinner">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
+                    <Border Grid.Row="1" Grid.Column="1"
+                            CornerRadius="999" Background="{StaticResource Warning100}" />
+                    
+                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
+                          Fill="{StaticResource Warning600}" Data="{StaticResource Award}"
+                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="21"/>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+                    </Path>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|Badge.SummitShowdown_SilverWinner">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
+                    <Border Grid.Row="1" Grid.Column="1"
+                            CornerRadius="999" Background="{StaticResource Neutral50}" />
+                    
+                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
+                          Fill="{StaticResource Neutral400}" Data="{StaticResource Award}"
+                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="21"/>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+                    </Path>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|Badge.SummitShowdown_BronzeWinner">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">

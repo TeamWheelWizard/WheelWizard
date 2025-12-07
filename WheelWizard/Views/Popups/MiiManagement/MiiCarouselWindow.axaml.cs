@@ -1,12 +1,13 @@
-﻿using WheelWizard.Views.Popups.Base;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.Resources.Languages;
+using WheelWizard.Views.Popups.Base;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Popups.MiiManagement;
 
 public partial class MiiCarouselWindow : PopupContent
 {
     public MiiCarouselWindow()
-        : base(true, true, false, "Mii Carousel")
+        : base(true, true, false, Common.PopupTitle_MiiCarousel)
     {
         InitializeComponent();
     }

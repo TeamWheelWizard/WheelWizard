@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -13,10 +14,14 @@
         <value>1.3</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <data name="Action_Delete" xml:space="preserve">
         <value>削除</value>
@@ -72,14 +77,8 @@
     <data name="Action_Update" xml:space="preserve">
         <value>アップデート</value>
     </data>
-    <data name="Term_General" xml:space="preserve">
-        <value>一般</value>
-    </data>
-    <data name="Term_Online" xml:space="preserve">
+    <data name="Attribute_Status_Online" xml:space="preserve">
         <value>オンライン</value>
-    </data>
-    <data name="Term_Other" xml:space="preserve">
-        <value>その他</value>
     </data>
     <data name="State_Installing" xml:space="preserve">
         <value>インストール中...</value>
@@ -96,10 +95,10 @@
     <data name="Attribute_Title" xml:space="preserve">
         <value>タイトル</value>
     </data>
-    <data name="Term_Unknown" xml:space="preserve">
+    <data name="State_Unknown" xml:space="preserve">
         <value>不明</value>
     </data>
-    <data name="Term_Offline" xml:space="preserve">
+    <data name="Attribute_Status_Offline" xml:space="preserve">
         <value>オフライン</value>
     </data>
     <data name="Attribute_Name" xml:space="preserve">
@@ -132,7 +131,7 @@
     <data name="Action_No" xml:space="preserve">
         <value>いいえ</value>
     </data>
-    <data name="Action_OK" xml:space="preserve">
+    <data name="Action_Ok" xml:space="preserve">
         <value>OK</value>
     </data>
     <data name="Action_Revert" xml:space="preserve">
@@ -156,28 +155,343 @@
     <data name="State_Extracting" xml:space="preserve">
         <value>ファイル展開中...</value>
     </data>
-    <data name="Term_Error" xml:space="preserve">
+    <data name="State_Error" xml:space="preserve">
         <value>エラー</value>
     </data>
-    <data name="Term_No" xml:space="preserve">
-        <value>いいえ</value>
-    </data>
-    <data name="Term_Speed" xml:space="preserve">
+    <data name="Attribute_Speed" xml:space="preserve">
         <value>速度</value>
     </data>
-    <data name="Term_Success" xml:space="preserve">
+    <data name="State_Success" xml:space="preserve">
         <value>成功</value>
     </data>
-    <data name="Term_Warning" xml:space="preserve">
+    <data name="State_Warning" xml:space="preserve">
         <value>警告</value>
-    </data>
-    <data name="Term_Yes" xml:space="preserve">
-        <value>はい</value>
     </data>
     <data name="Action_Browse" xml:space="preserve">
         <value>探す</value>
     </data>
     <data name="Action_ViewMod" xml:space="preserve">
-        <value>Modを閲覧</value>
+        <value>Modを見る</value>
+    </data>
+    <data name="Action_ViewRoom" xml:space="preserve">
+        <value>ルームを見る</value>
+    </data>
+    <data name="ListTitle_Friends" xml:space="preserve">
+        <value>フレンド</value>
+    </data>
+    <data name="ListTitle_Players" xml:space="preserve">
+        <value>プレイヤー</value>
+    </data>
+    <data name="State_NoLicense" xml:space="preserve">
+        <value>ライセンスなし</value>
+    </data>
+    <data name="State_NoName" xml:space="preserve">
+        <value>Player</value>
+    </data>
+    <data name="State_NoProfiles" xml:space="preserve">
+        <value>プロフィールなし</value>
+    </data>
+    <data name="Region_America" xml:space="preserve">
+        <value>アメリカ合衆国</value>
+    </data>
+    <data name="Region_Australia" xml:space="preserve">
+        <value>オーストラリア</value>
+    </data>
+    <data name="Region_China" xml:space="preserve">
+        <value>中国</value>
+    </data>
+    <data name="Region_Europe" xml:space="preserve">
+        <value>ヨーロッパ</value>
+    </data>
+    <data name="Region_Japan" xml:space="preserve">
+        <value>日本</value>
+    </data>
+    <data name="Region_SouthKorea" xml:space="preserve">
+        <value>韓国</value>
+    </data>
+    <data name="Region_Taiwan" xml:space="preserve">
+        <value>台湾</value>
+    </data>
+    <data name="Attribute_FriendCode" xml:space="preserve">
+        <value>フレンドコード</value>
+    </data>
+    <data name="Attribute_Losses" xml:space="preserve">
+        <value>負け</value>
+    </data>
+    <data name="Attribute_PlayerCount" xml:space="preserve">
+        <value>プレイヤー</value>
+    </data>
+    <data name="Attribute_RacesPlayed" xml:space="preserve">
+        <value>プレイしたレース数</value>
+    </data>
+    <data name="Attribute_Wins" xml:space="preserve">
+        <value>勝ち</value>
+    </data>
+    <data name="ListTitle_Rooms" xml:space="preserve">
+        <value>ルーム</value>
+    </data>
+    <data name="Attribute_TimeOnline" xml:space="preserve">
+        <value>オンライン時間</value>
+    </data>
+    <data name="Action_Link_Support" xml:space="preserve">
+        <value>サポート</value>
+    </data>
+    <data name="Action_Link_Github" xml:space="preserve">
+        <value>ソースコード</value>
+    </data>
+    <data name="Action_Link_Discord" xml:space="preserve">
+        <value>お問い合わせ</value>
+    </data>
+    <data name="Action_Back" xml:space="preserve">
+        <value>戻る</value>
+    </data>
+    <data name="Action_Duplicate" xml:space="preserve">
+        <value>コピー</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>お気に入り</value>
+    </data>
+    <data name="Action_LaunchDolphin" xml:space="preserve">
+        <value>Dolphinを起動する</value>
+    </data>
+    <data name="Action_Randomize" xml:space="preserve">
+        <value>ランダム</value>
+    </data>
+    <data name="Action_SaveExternalMii" xml:space="preserve">
+        <value>Miiを"自分のMii"に追加する</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>お気に入り解除</value>
+    </data>
+    <data name="Action_ViewMii" xml:space="preserve">
+        <value>Miiを見る</value>
+    </data>
+    <data name="Attribute_AverageRoomVr" xml:space="preserve">
+        <value>平均VR</value>
+    </data>
+    <data name="Attribute_Mii_Gender" xml:space="preserve">
+        <value>性別</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Female" xml:space="preserve">
+        <value>女</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Male" xml:space="preserve">
+        <value>男</value>
+    </data>
+    <data name="Attribute_IsOnline" xml:space="preserve">
+        <value>オンラインかどうか</value>
+    </data>
+    <data name="Attribute_Message" xml:space="preserve">
+        <value>メッセージ</value>
+    </data>
+    <data name="Attribute_Priority" xml:space="preserve">
+        <value>優先度</value>
+    </data>
+    <data name="Attribute_SortBy" xml:space="preserve">
+        <value>並び替え</value>
+    </data>
+    <data name="Attribute_Status" xml:space="preserve">
+        <value>状態</value>
+    </data>
+    <data name="Attribute_TotalGamesPlayed" xml:space="preserve">
+        <value>プレイした総回数</value>
+    </data>
+    <data name="Attribute_TotalGamesWon" xml:space="preserve">
+        <value>勝利した総回数</value>
+    </data>
+    <data name="ListTitle_Miis" xml:space="preserve">
+        <value>Mii</value>
+    </data>
+    <data name="PageTitle_MyMiis" xml:space="preserve">
+        <value>自分のMii</value>
+    </data>
+    <data name="Action_DoManually" xml:space="preserve">
+        <value>手動で行う</value>
+    </data>
+    <data name="Action_DownloadAndInstall" xml:space="preserve">
+        <value>ダウンロードとインストール</value>
+    </data>
+    <data name="Action_GamebananaPage" xml:space="preserve">
+        <value>Gamebananaのページ</value>
+    </data>
+    <data name="Action_Report" xml:space="preserve">
+        <value>報告する</value>
+    </data>
+    <data name="Action_UnInstall" xml:space="preserve">
+        <value>アンインストール</value>
+    </data>
+    <data name="Attribute_BrAbbreviation" xml:space="preserve">
+        <value>BR</value>
+    </data>
+    <data name="Attribute_BrFull" xml:space="preserve">
+        <value>バトルレーティング</value>
+    </data>
+    <data name="Attribute_Description" xml:space="preserve">
+        <value>説明</value>
+    </data>
+    <data name="Attribute_Downloads" xml:space="preserve">
+        <value>ダウンロード</value>
+    </data>
+    <data name="Attribute_Gender" xml:space="preserve">
+        <value>性別</value>
+    </data>
+    <data name="Attribute_Gender_Female" xml:space="preserve">
+        <value>女</value>
+    </data>
+    <data name="Attribute_Gender_Male" xml:space="preserve">
+        <value>男</value>
+    </data>
+    <data name="Attribute_Images" xml:space="preserve">
+        <value>画像</value>
+    </data>
+    <data name="Attribute_Likes" xml:space="preserve">
+        <value>いいね</value>
+    </data>
+    <data name="Attribute_Views" xml:space="preserve">
+        <value>閲覧</value>
+    </data>
+    <data name="Attribute_VrAbbreviation" xml:space="preserve">
+        <value>VR</value>
+    </data>
+    <data name="Attribute_VrFull" xml:space="preserve">
+        <value>バーサスレーティング</value>
+    </data>
+    <data name="PopupTitle_MiiCarousel" xml:space="preserve">
+        <value>Miiスライダー</value>
+    </data>
+    <data name="PopupTitle_MiiEditor" xml:space="preserve">
+        <value>Miiエディター</value>
+    </data>
+    <data name="PopupTitle_MiiSelector" xml:space="preserve">
+        <value>Miiセレクター</value>
+    </data>
+    <data name="PopupTitle_ModBrowser" xml:space="preserve">
+        <value>Modブラウザー</value>
+    </data>
+    <data name="PopupTitle_ModDetails" xml:space="preserve">
+        <value>Modの詳細</value>
+    </data>
+    <data name="State_Custom" xml:space="preserve">
+        <value>カスタム</value>
+    </data>
+    <data name="State_Installed" xml:space="preserve">
+        <value>インストール済み</value>
+    </data>
+    <data name="Action_Submit" xml:space="preserve">
+        <value>提出</value>
+    </data>
+    <data name="Action_ViewCustomChars" xml:space="preserve">
+        <value>特殊記号を見る</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
+        <value>眉毛</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyes" xml:space="preserve">
+        <value>目</value>
+    </data>
+    <data name="Attribute_MiiSection_Face" xml:space="preserve">
+        <value>顔</value>
+    </data>
+    <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
+        <value>ひげ</value>
+    </data>
+    <data name="Attribute_MiiSection_General" xml:space="preserve">
+        <value>一般</value>
+    </data>
+    <data name="Attribute_MiiSection_Glasses" xml:space="preserve">
+        <value>メガネ</value>
+    </data>
+    <data name="Attribute_MiiSection_Hair" xml:space="preserve">
+        <value>髪</value>
+    </data>
+    <data name="Attribute_MiiSection_Lips" xml:space="preserve">
+        <value>口</value>
+    </data>
+    <data name="Attribute_MiiSection_Mole" xml:space="preserve">
+        <value>ホクロ</value>
+    </data>
+    <data name="Attribute_MiiSection_Nose" xml:space="preserve">
+        <value>鼻</value>
+    </data>
+    <data name="Attribute_Mii_BeardType" xml:space="preserve">
+        <value>ひげの種類</value>
+    </data>
+    <data name="Attribute_Mii_CreatorName" xml:space="preserve">
+        <value>作成者の名前</value>
+    </data>
+    <data name="Attribute_Mii_DefaultName" xml:space="preserve">
+        <value>新しいMii</value>
+    </data>
+    <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
+        <value>眉毛の種類</value>
+    </data>
+    <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
+        <value>顔立ち</value>
+    </data>
+    <data name="Attribute_Mii_FavColor" xml:space="preserve">
+        <value>好きな色</value>
+    </data>
+    <data name="Attribute_Mii_GlassesColor" xml:space="preserve">
+        <value>メガネの色</value>
+    </data>
+    <data name="Attribute_Mii_GlassesType" xml:space="preserve">
+        <value>メガネの種類</value>
+    </data>
+    <data name="Attribute_Mii_HairColor" xml:space="preserve">
+        <value>髪の色</value>
+    </data>
+    <data name="Attribute_Mii_HairType" xml:space="preserve">
+        <value>髪の種類</value>
+    </data>
+    <data name="Attribute_Mii_HeadShape" xml:space="preserve">
+        <value>顔の形</value>
+    </data>
+    <data name="Attribute_Mii_Height" xml:space="preserve">
+        <value>高さ</value>
+    </data>
+    <data name="Attribute_Mii_HorizontalPosition" xml:space="preserve">
+        <value>横の位置 (左/右)</value>
+    </data>
+    <data name="Attribute_Mii_IrishColor" xml:space="preserve">
+        <value>目の色</value>
+    </data>
+    <data name="Attribute_Mii_MirrorHair" xml:space="preserve">
+        <value>髪型の反転</value>
+    </data>
+    <data name="Attribute_Mii_MouthType" xml:space="preserve">
+        <value>口の種類</value>
+    </data>
+    <data name="Attribute_Mii_MustacheSize" xml:space="preserve">
+        <value>口ひげの大きさ</value>
+    </data>
+    <data name="Attribute_Mii_MustacheType" xml:space="preserve">
+        <value>口ひげの種類</value>
+    </data>
+    <data name="Attribute_Mii_MustacheVerticalPosition" xml:space="preserve">
+        <value>口ひげの縦の位置 (上/下)</value>
+    </data>
+    <data name="Attribute_Mii_Name" xml:space="preserve">
+        <value>Miiの名前</value>
+    </data>
+    <data name="Attribute_Mii_NoseType" xml:space="preserve">
+        <value>鼻の種類</value>
+    </data>
+    <data name="Attribute_Mii_Rotation" xml:space="preserve">
+        <value>回転 (左/右に回転する)</value>
+    </data>
+    <data name="Attribute_Mii_Size" xml:space="preserve">
+        <value>大きさ</value>
+    </data>
+    <data name="Attribute_Mii_SkinColor" xml:space="preserve">
+        <value>肌の色</value>
+    </data>
+    <data name="Attribute_Mii_SpaceBetween" xml:space="preserve">
+        <value>間隔</value>
+    </data>
+    <data name="Attribute_Mii_VerticalPosition" xml:space="preserve">
+        <value>縦の位置 (上/下)</value>
+    </data>
+    <data name="Attribute_Mii_Width" xml:space="preserve">
+        <value>幅</value>
     </data>
 </root>

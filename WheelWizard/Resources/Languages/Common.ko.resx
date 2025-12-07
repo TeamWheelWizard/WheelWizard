@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -13,10 +14,14 @@
         <value>1.3</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <data name="Action_Apply" xml:space="preserve">
         <value>적용</value>
@@ -60,7 +65,7 @@
     <data name="Action_No" xml:space="preserve">
         <value>아니오</value>
     </data>
-    <data name="Action_OK" xml:space="preserve">
+    <data name="Action_Ok" xml:space="preserve">
         <value>OK</value>
     </data>
     <data name="Action_OpenFolder" xml:space="preserve">
@@ -147,37 +152,307 @@
     <data name="State_Updating" xml:space="preserve">
         <value>업데이트 중...</value>
     </data>
-    <data name="Term_Error" xml:space="preserve">
+    <data name="State_Error" xml:space="preserve">
         <value>에러</value>
     </data>
-    <data name="Term_General" xml:space="preserve">
-        <value>일반</value>
-    </data>
-    <data name="Term_No" xml:space="preserve">
-        <value>아니요</value>
-    </data>
-    <data name="Term_Offline" xml:space="preserve">
+    <data name="Attribute_Status_Offline" xml:space="preserve">
         <value>오프라인</value>
     </data>
-    <data name="Term_Online" xml:space="preserve">
+    <data name="Attribute_Status_Online" xml:space="preserve">
         <value>온라인</value>
     </data>
-    <data name="Term_Other" xml:space="preserve">
-        <value>기타</value>
-    </data>
-    <data name="Term_Speed" xml:space="preserve">
+    <data name="Attribute_Speed" xml:space="preserve">
         <value>속도</value>
     </data>
-    <data name="Term_Success" xml:space="preserve">
+    <data name="State_Success" xml:space="preserve">
         <value>성공</value>
     </data>
-    <data name="Term_Unknown" xml:space="preserve">
+    <data name="State_Unknown" xml:space="preserve">
         <value>불명</value>
     </data>
-    <data name="Term_Warning" xml:space="preserve">
+    <data name="State_Warning" xml:space="preserve">
         <value>경고</value>
     </data>
-    <data name="Term_Yes" xml:space="preserve">
-        <value>네</value>
+    <data name="Action_ViewRoom" xml:space="preserve">
+        <value>방을 보기</value>
+    </data>
+    <data name="ListTitle_Friends" xml:space="preserve">
+        <value>친구</value>
+    </data>
+    <data name="ListTitle_Players" xml:space="preserve">
+        <value>플레이어</value>
+    </data>
+    <data name="ListTitle_Rooms" xml:space="preserve">
+        <value>룸</value>
+    </data>
+    <data name="State_NoLicense" xml:space="preserve">
+        <value>라이센스 없음</value>
+    </data>
+    <data name="State_NoName" xml:space="preserve">
+        <value>이름 없음</value>
+    </data>
+    <data name="State_NoProfiles" xml:space="preserve">
+        <value>프로필 없음</value>
+    </data>
+    <data name="Region_America" xml:space="preserve">
+        <value>아메리카</value>
+    </data>
+    <data name="Region_Australia" xml:space="preserve">
+        <value>호주</value>
+    </data>
+    <data name="Region_China" xml:space="preserve">
+        <value>중국</value>
+    </data>
+    <data name="Region_Europe" xml:space="preserve">
+        <value>유럽</value>
+    </data>
+    <data name="Region_Japan" xml:space="preserve">
+        <value>일본</value>
+    </data>
+    <data name="Region_SouthKorea" xml:space="preserve">
+        <value>대한민국</value>
+    </data>
+    <data name="Region_Taiwan" xml:space="preserve">
+        <value>대만</value>
+    </data>
+    <data name="Attribute_FriendCode" xml:space="preserve">
+        <value>친구 코드</value>
+    </data>
+    <data name="Attribute_Losses" xml:space="preserve">
+        <value>패배</value>
+    </data>
+    <data name="Attribute_PlayerCount" xml:space="preserve">
+        <value>플레이어</value>
+    </data>
+    <data name="Attribute_RacesPlayed" xml:space="preserve">
+        <value>플레이한 레이스 수</value>
+    </data>
+    <data name="Attribute_TimeOnline" xml:space="preserve">
+        <value>온라인 시간</value>
+    </data>
+    <data name="Attribute_Wins" xml:space="preserve">
+        <value>승리</value>
+    </data>
+    <data name="Action_Link_Support" xml:space="preserve">
+        <value>후원하기!</value>
+    </data>
+    <data name="Action_Link_Github" xml:space="preserve">
+        <value>소스 코드</value>
+    </data>
+    <data name="Action_Link_Discord" xml:space="preserve">
+        <value>문의하기!</value>
+    </data>
+    <data name="Action_Back" xml:space="preserve">
+        <value>뒤로 가기</value>
+    </data>
+    <data name="Action_Duplicate" xml:space="preserve">
+        <value>복사</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>즐겨찾기</value>
+    </data>
+    <data name="Action_LaunchDolphin" xml:space="preserve">
+        <value>Dolphin 실행</value>
+    </data>
+    <data name="Action_Randomize" xml:space="preserve">
+        <value>랜덤</value>
+    </data>
+    <data name="Action_SaveExternalMii" xml:space="preserve">
+        <value>"나만의 Mii"에 Mii 추가하기</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>즐겨찾기 해제</value>
+    </data>
+    <data name="Action_ViewMii" xml:space="preserve">
+        <value>Mii 보기</value>
+    </data>
+    <data name="Attribute_AverageRoomVr" xml:space="preserve">
+        <value>평균 VR</value>
+    </data>
+    <data name="Attribute_Mii_Gender" xml:space="preserve">
+        <value>성별</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Female" xml:space="preserve">
+        <value>여성</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Male" xml:space="preserve">
+        <value>남성</value>
+    </data>
+    <data name="Attribute_IsOnline" xml:space="preserve">
+        <value>온라인 상태</value>
+    </data>
+    <data name="Attribute_Message" xml:space="preserve">
+        <value>메세지</value>
+    </data>
+    <data name="Attribute_Priority" xml:space="preserve">
+        <value>우선도</value>
+    </data>
+    <data name="Attribute_SortBy" xml:space="preserve">
+        <value>정렬</value>
+    </data>
+    <data name="Attribute_Status" xml:space="preserve">
+        <value>상태</value>
+    </data>
+    <data name="Attribute_TotalGamesPlayed" xml:space="preserve">
+        <value>총 플레이 횟수</value>
+    </data>
+    <data name="Attribute_TotalGamesWon" xml:space="preserve">
+        <value>총 승리 횟수</value>
+    </data>
+    <data name="ListTitle_Miis" xml:space="preserve">
+        <value>Mii</value>
+    </data>
+    <data name="Attribute_Gender" xml:space="preserve">
+        <value>성별</value>
+    </data>
+    <data name="Attribute_Gender_Female" xml:space="preserve">
+        <value>여성</value>
+    </data>
+    <data name="Attribute_Gender_Male" xml:space="preserve">
+        <value>남성</value>
+    </data>
+    <data name="Action_DoManually" xml:space="preserve">
+        <value>직접 하기</value>
+    </data>
+    <data name="Action_DownloadAndInstall" xml:space="preserve">
+        <value>다운로드 및 설치</value>
+    </data>
+    <data name="Action_GamebananaPage" xml:space="preserve">
+        <value>게임바나나 페이지</value>
+    </data>
+    <data name="Action_Report" xml:space="preserve">
+        <value>신고</value>
+    </data>
+    <data name="Action_Submit" xml:space="preserve">
+        <value>보내기</value>
+    </data>
+    <data name="Action_UnInstall" xml:space="preserve">
+        <value>삭제</value>
+    </data>
+    <data name="Action_ViewCustomChars" xml:space="preserve">
+        <value>커스텀 캐릭터 보기</value>
+    </data>
+    <data name="Attribute_BrAbbreviation" xml:space="preserve">
+        <value>BR</value>
+    </data>
+    <data name="Attribute_BrFull" xml:space="preserve">
+        <value>배틀 레이팅</value>
+    </data>
+    <data name="Attribute_Description" xml:space="preserve">
+        <value>설명</value>
+    </data>
+    <data name="Attribute_Downloads" xml:space="preserve">
+        <value>다운로드수</value>
+    </data>
+    <data name="Attribute_Images" xml:space="preserve">
+        <value>이미지</value>
+    </data>
+    <data name="Attribute_Likes" xml:space="preserve">
+        <value>좋아요 수</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
+        <value>눈썹</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyes" xml:space="preserve">
+        <value>눈</value>
+    </data>
+    <data name="Attribute_MiiSection_Face" xml:space="preserve">
+        <value>얼굴</value>
+    </data>
+    <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
+        <value>얼굴 털</value>
+    </data>
+    <data name="Attribute_MiiSection_General" xml:space="preserve">
+        <value>정보</value>
+    </data>
+    <data name="Attribute_MiiSection_Glasses" xml:space="preserve">
+        <value>안경</value>
+    </data>
+    <data name="Attribute_MiiSection_Hair" xml:space="preserve">
+        <value>머리카락</value>
+    </data>
+    <data name="Attribute_MiiSection_Lips" xml:space="preserve">
+        <value>입술</value>
+    </data>
+    <data name="Attribute_MiiSection_Mole" xml:space="preserve">
+        <value>뾰루지</value>
+    </data>
+    <data name="Attribute_MiiSection_Nose" xml:space="preserve">
+        <value>코</value>
+    </data>
+    <data name="Attribute_Mii_BeardType" xml:space="preserve">
+        <value>수염 종류</value>
+    </data>
+    <data name="Attribute_Mii_CreatorName" xml:space="preserve">
+        <value>제작자 이름</value>
+    </data>
+    <data name="Attribute_Mii_DefaultName" xml:space="preserve">
+        <value>새 Mii</value>
+    </data>
+    <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
+        <value>눈썹 종류</value>
+    </data>
+    <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
+        <value>얼굴 특징</value>
+    </data>
+    <data name="Attribute_Mii_FavColor" xml:space="preserve">
+        <value>좋아하는 색상</value>
+    </data>
+    <data name="Attribute_Mii_GlassesColor" xml:space="preserve">
+        <value>안경 색상</value>
+    </data>
+    <data name="Attribute_Mii_GlassesType" xml:space="preserve">
+        <value>안경 종류</value>
+    </data>
+    <data name="Attribute_Mii_HairColor" xml:space="preserve">
+        <value>머리카락 색상</value>
+    </data>
+    <data name="Attribute_Mii_HairType" xml:space="preserve">
+        <value>머리카락 종류</value>
+    </data>
+    <data name="Attribute_Mii_HeadShape" xml:space="preserve">
+        <value>얼굴형</value>
+    </data>
+    <data name="Attribute_Mii_Height" xml:space="preserve">
+        <value>키</value>
+    </data>
+    <data name="Attribute_Mii_HorizontalPosition" xml:space="preserve">
+        <value>수평 위치(왼쪽/오른쪽)</value>
+    </data>
+    <data name="Attribute_Mii_IrishColor" xml:space="preserve">
+        <value>눈 색상</value>
+    </data>
+    <data name="Attribute_Mii_MirrorHair" xml:space="preserve">
+        <value>머리카락 반전</value>
+    </data>
+    <data name="Attribute_Mii_MouthType" xml:space="preserve">
+        <value>입 종류</value>
+    </data>
+    <data name="Attribute_Mii_MustacheSize" xml:space="preserve">
+        <value>콧수염 크기</value>
+    </data>
+    <data name="Attribute_Mii_MustacheType" xml:space="preserve">
+        <value>콧수염 종류</value>
+    </data>
+    <data name="Attribute_Mii_MustacheVerticalPosition" xml:space="preserve">
+        <value>콧수염 수직 위치(위/아래)</value>
+    </data>
+    <data name="Attribute_Mii_Name" xml:space="preserve">
+        <value>Mii 이름</value>
+    </data>
+    <data name="Attribute_Mii_NoseType" xml:space="preserve">
+        <value>코 종류</value>
+    </data>
+    <data name="Attribute_Mii_Rotation" xml:space="preserve">
+        <value>회전(반시계/시계 방향)</value>
+    </data>
+    <data name="Attribute_Views" xml:space="preserve">
+        <value>보기</value>
+    </data>
+    <data name="Attribute_VrAbbreviation" xml:space="preserve">
+        <value>VR</value>
+    </data>
+    <data name="Attribute_VrFull" xml:space="preserve">
+        <value>VS레이팅</value>
     </data>
 </root>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -13,10 +14,14 @@
         <value>1.3</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <data name="Action_Apply" xml:space="preserve">
         <value>Применить</value>
@@ -34,13 +39,13 @@
         <value>Удалить</value>
     </data>
     <data name="Action_DisableAll" xml:space="preserve">
-        <value>Отключить всё</value>
+        <value>Отключить все</value>
     </data>
     <data name="Action_Edit" xml:space="preserve">
         <value>Редактировать</value>
     </data>
     <data name="Action_EnableAll" xml:space="preserve">
-        <value>Включить всё</value>
+        <value>Включить все</value>
     </data>
     <data name="Action_Export" xml:space="preserve">
         <value>Экспортировать</value>
@@ -60,8 +65,8 @@
     <data name="Action_No" xml:space="preserve">
         <value>Нет</value>
     </data>
-    <data name="Action_OK" xml:space="preserve">
-        <value>ОК</value>
+    <data name="Action_Ok" xml:space="preserve">
+        <value>OK</value>
     </data>
     <data name="Action_OpenFolder" xml:space="preserve">
         <value>Открыть папку</value>
@@ -70,7 +75,7 @@
         <value>Играть</value>
     </data>
     <data name="Action_PlayOffline" xml:space="preserve">
-        <value>Играть оффлайн</value>
+        <value>Играть офлайн</value>
     </data>
     <data name="Action_Rename" xml:space="preserve">
         <value>Переименовать</value>
@@ -94,7 +99,7 @@
         <value>ID</value>
     </data>
     <data name="Attribute_ModName" xml:space="preserve">
-        <value>Название мода</value>
+        <value>Название модов</value>
     </data>
     <data name="Attribute_Name" xml:space="preserve">
         <value>Название</value>
@@ -106,10 +111,10 @@
         <value>Друзья</value>
     </data>
     <data name="PageTitle_Home" xml:space="preserve">
-        <value>Заглавная</value>
+        <value>Главная</value>
     </data>
     <data name="PageTitle_Mods" xml:space="preserve">
-        <value>Моды</value>
+        <value>My Stuff</value>
     </data>
     <data name="PageTitle_MyProfiles" xml:space="preserve">
         <value>Мои профили</value>
@@ -136,7 +141,7 @@
         <value>Распаковываем файлы...</value>
     </data>
     <data name="State_Installing" xml:space="preserve">
-        <value>Устанавливаем...</value>
+        <value>Установка...</value>
     </data>
     <data name="State_Loading" xml:space="preserve">
         <value>Загрузка...</value>
@@ -147,37 +152,343 @@
     <data name="State_Updating" xml:space="preserve">
         <value>Обновляем...</value>
     </data>
-    <data name="Term_Error" xml:space="preserve">
+    <data name="State_Error" xml:space="preserve">
         <value>Ошибка</value>
     </data>
-    <data name="Term_General" xml:space="preserve">
-        <value>Основное</value>
-    </data>
-    <data name="Term_No" xml:space="preserve">
-        <value>Нет</value>
-    </data>
-    <data name="Term_Offline" xml:space="preserve">
+    <data name="Attribute_Status_Offline" xml:space="preserve">
         <value>Не в сети</value>
     </data>
-    <data name="Term_Online" xml:space="preserve">
+    <data name="Attribute_Status_Online" xml:space="preserve">
         <value>В сети</value>
     </data>
-    <data name="Term_Other" xml:space="preserve">
-        <value>Другое</value>
-    </data>
-    <data name="Term_Speed" xml:space="preserve">
+    <data name="Attribute_Speed" xml:space="preserve">
         <value>Скорость</value>
     </data>
-    <data name="Term_Success" xml:space="preserve">
+    <data name="State_Success" xml:space="preserve">
         <value>Успех</value>
     </data>
-    <data name="Term_Unknown" xml:space="preserve">
+    <data name="State_Unknown" xml:space="preserve">
         <value>Неизвестно</value>
     </data>
-    <data name="Term_Warning" xml:space="preserve">
+    <data name="State_Warning" xml:space="preserve">
         <value>Внимание</value>
     </data>
-    <data name="Term_Yes" xml:space="preserve">
-        <value>Да</value>
+    <data name="Action_ViewRoom" xml:space="preserve">
+        <value>Просмотреть комнату</value>
+    </data>
+    <data name="ListTitle_Friends" xml:space="preserve">
+        <value>Друзья</value>
+    </data>
+    <data name="ListTitle_Players" xml:space="preserve">
+        <value>Игроки</value>
+    </data>
+    <data name="ListTitle_Rooms" xml:space="preserve">
+        <value>Комнаты</value>
+    </data>
+    <data name="State_NoLicense" xml:space="preserve">
+        <value>Нет удостоверения</value>
+    </data>
+    <data name="State_NoName" xml:space="preserve">
+        <value>Нет имени</value>
+    </data>
+    <data name="State_NoProfiles" xml:space="preserve">
+        <value>Нет профилей</value>
+    </data>
+    <data name="Region_America" xml:space="preserve">
+        <value>Америка</value>
+    </data>
+    <data name="Region_Australia" xml:space="preserve">
+        <value>Австралия</value>
+    </data>
+    <data name="Region_China" xml:space="preserve">
+        <value>Китай</value>
+    </data>
+    <data name="Region_Europe" xml:space="preserve">
+        <value>Европа</value>
+    </data>
+    <data name="Region_Japan" xml:space="preserve">
+        <value>Япония</value>
+    </data>
+    <data name="Region_SouthKorea" xml:space="preserve">
+        <value>Южная Корея</value>
+    </data>
+    <data name="Region_Taiwan" xml:space="preserve">
+        <value>Тайвань</value>
+    </data>
+    <data name="Attribute_FriendCode" xml:space="preserve">
+        <value>Код друга</value>
+    </data>
+    <data name="Attribute_Losses" xml:space="preserve">
+        <value>Поражения</value>
+    </data>
+    <data name="Attribute_PlayerCount" xml:space="preserve">
+        <value>Игроки</value>
+    </data>
+    <data name="Attribute_RacesPlayed" xml:space="preserve">
+        <value>Сыграно гонок</value>
+    </data>
+    <data name="Attribute_TimeOnline" xml:space="preserve">
+        <value>Время онлайн</value>
+    </data>
+    <data name="Attribute_Wins" xml:space="preserve">
+        <value>Победы</value>
+    </data>
+    <data name="Action_Link_Support" xml:space="preserve">
+        <value>Поддержать нас</value>
+    </data>
+    <data name="Action_Link_Github" xml:space="preserve">
+        <value>Исходный код</value>
+    </data>
+    <data name="Action_Link_Discord" xml:space="preserve">
+        <value>Наш Discord-сервер</value>
+    </data>
+    <data name="Action_Back" xml:space="preserve">
+        <value>Назад</value>
+    </data>
+    <data name="Action_DoManually" xml:space="preserve">
+        <value>Сделать вручную</value>
+    </data>
+    <data name="Action_DownloadAndInstall" xml:space="preserve">
+        <value>Загрузить и установить</value>
+    </data>
+    <data name="Action_Duplicate" xml:space="preserve">
+        <value>Дублировать</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>Избранное</value>
+    </data>
+    <data name="Action_GamebananaPage" xml:space="preserve">
+        <value>Страница на GameBanana</value>
+    </data>
+    <data name="Action_LaunchDolphin" xml:space="preserve">
+        <value>Запустить Dolphin</value>
+    </data>
+    <data name="Action_Randomize" xml:space="preserve">
+        <value>Случайный</value>
+    </data>
+    <data name="Action_Report" xml:space="preserve">
+        <value>Пожаловаться</value>
+    </data>
+    <data name="Action_SaveExternalMii" xml:space="preserve">
+        <value>Добавить Mii в раздел "Мои Mii"</value>
+    </data>
+    <data name="State_Installed" xml:space="preserve">
+        <value>Установлено</value>
+    </data>
+    <data name="Action_Submit" xml:space="preserve">
+        <value>Подтведрить</value>
+    </data>
+    <data name="Action_UnInstall" xml:space="preserve">
+        <value>Удалить</value>
+    </data>
+    <data name="Action_ViewMii" xml:space="preserve">
+        <value>Показать Mii</value>
+    </data>
+    <data name="Attribute_AverageRoomVr" xml:space="preserve">
+        <value>Средний ГР</value>
+    </data>
+    <data name="Attribute_BrAbbreviation" xml:space="preserve">
+        <value>БР</value>
+    </data>
+    <data name="Attribute_BrFull" xml:space="preserve">
+        <value>Боевой рейтинг</value>
+    </data>
+    <data name="Attribute_Description" xml:space="preserve">
+        <value>Описание</value>
+    </data>
+    <data name="Attribute_Downloads" xml:space="preserve">
+        <value>Загрузки</value>
+    </data>
+    <data name="Attribute_Gender" xml:space="preserve">
+        <value>Пол</value>
+    </data>
+    <data name="Attribute_Gender_Female" xml:space="preserve">
+        <value>Мужской</value>
+    </data>
+    <data name="Attribute_Gender_Male" xml:space="preserve">
+        <value>Женский</value>
+    </data>
+    <data name="Attribute_Images" xml:space="preserve">
+        <value>Изображения</value>
+    </data>
+    <data name="Attribute_IsOnline" xml:space="preserve">
+        <value>В сети</value>
+    </data>
+    <data name="Attribute_Likes" xml:space="preserve">
+        <value>Лайки</value>
+    </data>
+    <data name="Attribute_Message" xml:space="preserve">
+        <value>Сообщение</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
+        <value>Брови</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyes" xml:space="preserve">
+        <value>Глаза</value>
+    </data>
+    <data name="Attribute_MiiSection_Face" xml:space="preserve">
+        <value>Лицо</value>
+    </data>
+    <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
+        <value>Усы и борода</value>
+    </data>
+    <data name="Attribute_MiiSection_General" xml:space="preserve">
+        <value>Основное</value>
+    </data>
+    <data name="Attribute_MiiSection_Glasses" xml:space="preserve">
+        <value>Очки</value>
+    </data>
+    <data name="Attribute_MiiSection_Hair" xml:space="preserve">
+        <value>Волосы</value>
+    </data>
+    <data name="Attribute_MiiSection_Lips" xml:space="preserve">
+        <value>Губы</value>
+    </data>
+    <data name="Attribute_MiiSection_Mole" xml:space="preserve">
+        <value>Родинка</value>
+    </data>
+    <data name="Attribute_MiiSection_Nose" xml:space="preserve">
+        <value>Нос</value>
+    </data>
+    <data name="Attribute_Mii_BeardType" xml:space="preserve">
+        <value>Тип бороды</value>
+    </data>
+    <data name="Attribute_Mii_CreatorName" xml:space="preserve">
+        <value>Имя автора</value>
+    </data>
+    <data name="Attribute_Mii_DefaultName" xml:space="preserve">
+        <value>Новый Mii</value>
+    </data>
+    <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
+        <value>Тип бровей</value>
+    </data>
+    <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
+        <value>Детали лица</value>
+    </data>
+    <data name="Attribute_Mii_FavColor" xml:space="preserve">
+        <value>Любимый цвет</value>
+    </data>
+    <data name="Attribute_Mii_Gender" xml:space="preserve">
+        <value>Пол</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Female" xml:space="preserve">
+        <value>Женский</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Male" xml:space="preserve">
+        <value>Мужской</value>
+    </data>
+    <data name="Attribute_Mii_GlassesColor" xml:space="preserve">
+        <value>Цвет очков</value>
+    </data>
+    <data name="Attribute_Mii_GlassesType" xml:space="preserve">
+        <value>Тип очков</value>
+    </data>
+    <data name="Attribute_Mii_HairColor" xml:space="preserve">
+        <value>Цвет волос</value>
+    </data>
+    <data name="Attribute_Mii_HairType" xml:space="preserve">
+        <value>Тип волос</value>
+    </data>
+    <data name="Attribute_Mii_HeadShape" xml:space="preserve">
+        <value>Форма лица</value>
+    </data>
+    <data name="Attribute_Mii_Height" xml:space="preserve">
+        <value>Высота</value>
+    </data>
+    <data name="Attribute_Mii_HorizontalPosition" xml:space="preserve">
+        <value>По горизонтали (влево/вправо)</value>
+    </data>
+    <data name="Attribute_Mii_IrishColor" xml:space="preserve">
+        <value>Цвет глаз</value>
+    </data>
+    <data name="Attribute_Mii_MirrorHair" xml:space="preserve">
+        <value>Отразить волосы</value>
+    </data>
+    <data name="Attribute_Mii_MouthType" xml:space="preserve">
+        <value>Тип рта</value>
+    </data>
+    <data name="Attribute_Mii_MustacheSize" xml:space="preserve">
+        <value>Размер усов</value>
+    </data>
+    <data name="Attribute_Mii_MustacheType" xml:space="preserve">
+        <value>Тип усов</value>
+    </data>
+    <data name="Attribute_Mii_MustacheVerticalPosition" xml:space="preserve">
+        <value>Усы по вертикали (вверх/вниз)</value>
+    </data>
+    <data name="Attribute_Mii_Name" xml:space="preserve">
+        <value>Имя Mii</value>
+    </data>
+    <data name="Attribute_Mii_NoseType" xml:space="preserve">
+        <value>Тип носа</value>
+    </data>
+    <data name="Attribute_Mii_Rotation" xml:space="preserve">
+        <value>Поворот (влево/вправо)</value>
+    </data>
+    <data name="Attribute_Mii_Size" xml:space="preserve">
+        <value>Размер</value>
+    </data>
+    <data name="Attribute_Mii_SkinColor" xml:space="preserve">
+        <value>Цвет кожи</value>
+    </data>
+    <data name="Attribute_Mii_SpaceBetween" xml:space="preserve">
+        <value>Пространство между глазами</value>
+    </data>
+    <data name="Attribute_Mii_VerticalPosition" xml:space="preserve">
+        <value>По вертикали (вверх/вниз)</value>
+    </data>
+    <data name="Attribute_Mii_Width" xml:space="preserve">
+        <value>Ширина</value>
+    </data>
+    <data name="Attribute_Priority" xml:space="preserve">
+        <value>Приоритет</value>
+    </data>
+    <data name="Attribute_SortBy" xml:space="preserve">
+        <value>Отсортировать</value>
+    </data>
+    <data name="Attribute_Status" xml:space="preserve">
+        <value>Статус</value>
+    </data>
+    <data name="Attribute_TotalGamesPlayed" xml:space="preserve">
+        <value>Всего сыграно игр</value>
+    </data>
+    <data name="Attribute_TotalGamesWon" xml:space="preserve">
+        <value>Всего выиграно игр</value>
+    </data>
+    <data name="Attribute_Views" xml:space="preserve">
+        <value>Просмотры</value>
+    </data>
+    <data name="Attribute_VrAbbreviation" xml:space="preserve">
+        <value>ГР</value>
+    </data>
+    <data name="Attribute_VrFull" xml:space="preserve">
+        <value>Гоночный рейтинг</value>
+    </data>
+    <data name="ListTitle_Miis" xml:space="preserve">
+        <value>Mii</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>Убрать из избранного</value>
+    </data>
+    <data name="Action_ViewCustomChars" xml:space="preserve">
+        <value>Показать пользовательских персонажей</value>
+    </data>
+    <data name="PageTitle_MyMiis" xml:space="preserve">
+        <value>Мои Mii</value>
+    </data>
+    <data name="PopupTitle_MiiCarousel" xml:space="preserve">
+        <value>Карусель Mii</value>
+    </data>
+    <data name="PopupTitle_MiiEditor" xml:space="preserve">
+        <value>Редактор Mii</value>
+    </data>
+    <data name="PopupTitle_MiiSelector" xml:space="preserve">
+        <value>Выбор Mii</value>
+    </data>
+    <data name="PopupTitle_ModBrowser" xml:space="preserve">
+        <value>Браузер модов</value>
+    </data>
+    <data name="PopupTitle_ModDetails" xml:space="preserve">
+        <value>Описание мода</value>
     </data>
 </root>

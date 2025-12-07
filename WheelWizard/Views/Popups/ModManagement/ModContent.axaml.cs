@@ -3,9 +3,11 @@ using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
 using WheelWizard.Helpers;
+using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Services.Installation;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Popups.ModManagement;
@@ -27,6 +29,9 @@ public partial class ModContent : UserControlBase
         InitializeComponent();
         ResetVisibility();
         UnInstallButton.IsVisible = false;
+
+        DescriptionLabel.Text = Common.Attribute_Description + ":";
+        ImageLabel.Text = Common.Attribute_Images + ":";
     }
 
     private void ResetVisibility()
@@ -80,7 +85,7 @@ public partial class ModContent : UserControlBase
         {
             CurrentMod = null;
             OverrideDownloadUrl = null;
-            NoDetailsView.Title = "Failed to retrieve mod info";
+            NoDetailsView.Title = Phrases.MessageError_FailedRetrieveMod_Title;
             NoDetailsView.BodyText = modDetailsResult.Error.Message;
 
             loading = false;
@@ -159,7 +164,7 @@ public partial class ModContent : UserControlBase
     private void UpdateDownloadButtonState(int modId)
     {
         var isInstalled = ModManager.Instance.IsModInstalled(modId);
-        InstallButton.Content = isInstalled ? "Installed" : "Download and Install";
+        InstallButton.Content = isInstalled ? Common.State_Installed : Common.Action_DownloadAndInstall;
         InstallButton.IsEnabled = !isInstalled;
         UnInstallButton.IsVisible = isInstalled;
     }
@@ -171,7 +176,7 @@ public partial class ModContent : UserControlBase
     {
         ImageCarousel.Items.Clear();
         ModTitle.Text = string.Empty;
-        AuthorButton.Text = "Unknown";
+        AuthorButton.Text = Common.State_Unknown;
         LikesCountBox.Text = ViewsCountBox.Text = DownloadsCountBox.Text = "0";
         ModDescriptionHtmlPanel.Text = string.Empty;
         IsVisible = false;
@@ -183,7 +188,7 @@ public partial class ModContent : UserControlBase
             return;
 
         var confirmation = await new YesNoWindow()
-            .SetMainText($"Do you want to download and install the mod: {CurrentMod.Name}?")
+            .SetMainText(Humanizer.ReplaceDynamic(Phrases.Question_InstallMod_Title, CurrentMod.Name) ?? CurrentMod.Name)
             .AwaitAnswer();
         if (!confirmation)
             return;
@@ -194,17 +199,13 @@ public partial class ModContent : UserControlBase
             var downloadUrls = OverrideDownloadUrl != null ? [OverrideDownloadUrl] : CurrentMod.Files.Select(f => f.DownloadUrl).ToList();
             if (!downloadUrls.Any())
             {
-                new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                    .SetTitleText("Unable to download the mod")
-                    .SetInfoText("No downloadable files found for this mod.")
-                    .Show();
+                MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_UnableToDownloadMod_Files);
                 return;
             }
 
             var progressWindow = new ProgressWindow($"Downloading {CurrentMod.Name}");
             progressWindow.Show();
-            progressWindow.SetExtraText("Loading...");
+            progressWindow.SetExtraText(Common.State_Loading);
 
             var url = downloadUrls.First();
             var fileName = GetFileNameFromUrl(url);
@@ -214,43 +215,31 @@ public partial class ModContent : UserControlBase
             var file = Directory.GetFiles(PathManager.TempModsFolderPath).FirstOrDefault();
             if (file == null)
             {
-                new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                    .SetTitleText("Unable to download the mod")
-                    .SetInfoText("Downloaded file not found.")
-                    .Show();
+                MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_UnableToDownloadMod_Files);
                 return;
             }
 
             var author = CurrentMod.Author.Name;
             var modId = CurrentMod.Id;
             var popup = new TextInputWindow()
-                .SetMainText("Mod Name")
+                .SetMainText(Common.Attribute_Name)
                 .SetInitialText(CurrentMod.Name)
                 .SetValidation(ModManager.Instance.ValidateModName)
-                .SetPlaceholderText("Enter mod name...");
+                .SetPlaceholderText(Phrases.Placeholder_EnterModName);
             var modName = await popup.ShowDialog();
             if (modName == null)
                 return;
 
             if (string.IsNullOrEmpty(modName))
             {
-                new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                    .SetTitleText("Mod name can't be empty.")
-                    .SetInfoText("Please provide a mod name.")
-                    .Show();
+                MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_ModNameCantEmpty);
                 return;
             }
 
             var invalidChars = Path.GetInvalidFileNameChars();
             if (modName.Any(c => invalidChars.Contains(c)))
             {
-                new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                    .SetTitleText("Mod name Invalid.")
-                    .SetInfoText("Mod name contains invalid characters.")
-                    .Show();
+                MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_ModNameInvalid);
                 Directory.Delete(PathManager.TempModsFolderPath, true);
                 return;
             }
@@ -260,11 +249,7 @@ public partial class ModContent : UserControlBase
         }
         catch (Exception ex)
         {
-            new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText("Download failed.")
-                .SetInfoText("An error occurred during download: " + ex.Message)
-                .Show();
+            MessageTranslationHelper.ShowMessage(MessageTranslation.Error_ModDownloadFailed, null, [ex.Message]);
         }
 
         _ = LoadModDetailsAsync(CurrentMod.Id);

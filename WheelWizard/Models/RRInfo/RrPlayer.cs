@@ -1,5 +1,5 @@
 using WheelWizard.WheelWizardData.Domain;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Models.RRInfo;
 

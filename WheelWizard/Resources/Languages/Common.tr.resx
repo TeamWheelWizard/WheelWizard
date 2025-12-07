@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
+
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -13,10 +14,14 @@
         <value>1.3</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <data name="Action_Apply" xml:space="preserve">
         <value>Uygula</value>
@@ -54,11 +59,11 @@
     <data name="Action_No" xml:space="preserve">
         <value>Hayır</value>
     </data>
-    <data name="Action_OK" xml:space="preserve">
+    <data name="Action_Ok" xml:space="preserve">
         <value>Tamam</value>
     </data>
     <data name="Action_Play" xml:space="preserve">
-        <value>Oynat</value>
+        <value>Oyna</value>
     </data>
     <data name="Action_PlayOffline" xml:space="preserve">
         <value>Çevrimdışı Oyna</value>
@@ -94,7 +99,7 @@
         <value>Etkin</value>
     </data>
     <data name="Attribute_Id" xml:space="preserve">
-        <value>Kimlik</value>
+        <value>ID</value>
     </data>
     <data name="Attribute_ModName" xml:space="preserve">
         <value>Modların Adı</value>
@@ -115,7 +120,7 @@
         <value>Anasayfa</value>
     </data>
     <data name="PageTitle_Mods" xml:space="preserve">
-        <value>Benim Eşyalarım</value>
+        <value>My Stuff</value>
     </data>
     <data name="PageTitle_MyProfiles" xml:space="preserve">
         <value>Profillerim</value>
@@ -147,37 +152,346 @@
     <data name="State_Updating" xml:space="preserve">
         <value>Güncelleniyor...</value>
     </data>
-    <data name="Term_Error" xml:space="preserve">
+    <data name="State_Error" xml:space="preserve">
         <value>Hata</value>
     </data>
-    <data name="Term_General" xml:space="preserve">
-        <value>Genel</value>
-    </data>
-    <data name="Term_No" xml:space="preserve">
-        <value>Hayır</value>
-    </data>
-    <data name="Term_Offline" xml:space="preserve">
+    <data name="Attribute_Status_Offline" xml:space="preserve">
         <value>Çevrimdışı</value>
     </data>
-    <data name="Term_Online" xml:space="preserve">
+    <data name="Attribute_Status_Online" xml:space="preserve">
         <value>Çevrimiçi</value>
     </data>
-    <data name="Term_Other" xml:space="preserve">
-        <value>Diğer</value>
-    </data>
-    <data name="Term_Speed" xml:space="preserve">
+    <data name="Attribute_Speed" xml:space="preserve">
         <value>Hız</value>
     </data>
-    <data name="Term_Success" xml:space="preserve">
+    <data name="State_Success" xml:space="preserve">
         <value>Başarı</value>
     </data>
-    <data name="Term_Unknown" xml:space="preserve">
+    <data name="State_Unknown" xml:space="preserve">
         <value>Bilinmiyor</value>
     </data>
-    <data name="Term_Warning" xml:space="preserve">
+    <data name="State_Warning" xml:space="preserve">
         <value>Uyarı</value>
     </data>
-    <data name="Term_Yes" xml:space="preserve">
-        <value>Evet</value>
+    <data name="Action_ViewRoom" xml:space="preserve">
+        <value>Odayı Görüntüle</value>
+    </data>
+    <data name="ListTitle_Friends" xml:space="preserve">
+        <value>Arkadaşlar</value>
+    </data>
+    <data name="ListTitle_Players" xml:space="preserve">
+        <value>Oyuncular</value>
+    </data>
+    <data name="ListTitle_Rooms" xml:space="preserve">
+        <value>Odalar</value>
+    </data>
+    <data name="State_NoLicense" xml:space="preserve">
+        <value>Lisans yok</value>
+    </data>
+    <data name="State_NoName" xml:space="preserve">
+        <value>Ad yok</value>
+    </data>
+    <data name="State_NoProfiles" xml:space="preserve">
+        <value>Profil yok</value>
+    </data>
+    <data name="Region_America" xml:space="preserve">
+        <value>Amerika</value>
+    </data>
+    <data name="Region_Australia" xml:space="preserve">
+        <value>Avustralya</value>
+    </data>
+    <data name="Region_China" xml:space="preserve">
+        <value>Çin</value>
+    </data>
+    <data name="Region_Europe" xml:space="preserve">
+        <value>Avrupa</value>
+    </data>
+    <data name="Region_Japan" xml:space="preserve">
+        <value>Japonya</value>
+    </data>
+    <data name="Region_SouthKorea" xml:space="preserve">
+        <value>Güney Kore</value>
+    </data>
+    <data name="Region_Taiwan" xml:space="preserve">
+        <value>Tayvan</value>
+    </data>
+    <data name="Attribute_FriendCode" xml:space="preserve">
+        <value>Arkadaş Kodu</value>
+    </data>
+    <data name="Attribute_Losses" xml:space="preserve">
+        <value>Kayıplar</value>
+    </data>
+    <data name="Attribute_PlayerCount" xml:space="preserve">
+        <value>Oyuncular</value>
+    </data>
+    <data name="Attribute_RacesPlayed" xml:space="preserve">
+        <value>Oynanan Yarışlar</value>
+    </data>
+    <data name="Attribute_TimeOnline" xml:space="preserve">
+        <value>Çevrimiçi Süre</value>
+    </data>
+    <data name="Attribute_Wins" xml:space="preserve">
+        <value>Galibiyetler</value>
+    </data>
+    <data name="Action_Link_Discord" xml:space="preserve">
+        <value>Bizimle İletişime Geçin!</value>
+    </data>
+    <data name="Action_Link_Github" xml:space="preserve">
+        <value>Kaynak Kodu</value>
+    </data>
+    <data name="Action_Link_Support" xml:space="preserve">
+        <value>Bize Destek Olun!</value>
+    </data>
+    <data name="Action_Back" xml:space="preserve">
+        <value>Geri</value>
+    </data>
+    <data name="Action_Duplicate" xml:space="preserve">
+        <value>Çoğalt</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>Favorile</value>
+    </data>
+    <data name="Action_LaunchDolphin" xml:space="preserve">
+        <value>Dolphin'i başlat</value>
+    </data>
+    <data name="Action_SaveExternalMii" xml:space="preserve">
+        <value>Mii'yi "Benim Mii'lerim"'e ekle</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>Favoriyi kaldır</value>
+    </data>
+    <data name="Action_ViewMii" xml:space="preserve">
+        <value>Mii'yi Görüntüle</value>
+    </data>
+    <data name="Attribute_AverageRoomVr" xml:space="preserve">
+        <value>Ortalama KP</value>
+    </data>
+    <data name="Attribute_Mii_Gender" xml:space="preserve">
+        <value>Cinsiyet</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Female" xml:space="preserve">
+        <value>Kadın</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Male" xml:space="preserve">
+        <value>Erkek</value>
+    </data>
+    <data name="Attribute_IsOnline" xml:space="preserve">
+        <value>Online</value>
+    </data>
+    <data name="Attribute_Message" xml:space="preserve">
+        <value>Mesaj</value>
+    </data>
+    <data name="Attribute_Priority" xml:space="preserve">
+        <value>Öncelik</value>
+    </data>
+    <data name="Attribute_Status" xml:space="preserve">
+        <value>Durum</value>
+    </data>
+    <data name="ListTitle_Miis" xml:space="preserve">
+        <value>Mii'ler</value>
+    </data>
+    <data name="Attribute_Gender" xml:space="preserve">
+        <value>Cinsiyet</value>
+    </data>
+    <data name="Attribute_Gender_Female" xml:space="preserve">
+        <value>Kadın</value>
+    </data>
+    <data name="Attribute_Gender_Male" xml:space="preserve">
+        <value>Erkek</value>
+    </data>
+    <data name="Action_DoManually" xml:space="preserve">
+        <value>El ile yap</value>
+    </data>
+    <data name="Action_DownloadAndInstall" xml:space="preserve">
+        <value>İndir ve Yükle</value>
+    </data>
+    <data name="Action_GamebananaPage" xml:space="preserve">
+        <value>Gamebanana Sayfası</value>
+    </data>
+    <data name="Action_Randomize" xml:space="preserve">
+        <value>Rastgele Seç</value>
+    </data>
+    <data name="Action_Report" xml:space="preserve">
+        <value>Raporla</value>
+    </data>
+    <data name="Action_Submit" xml:space="preserve">
+        <value>Gönder</value>
+    </data>
+    <data name="Action_UnInstall" xml:space="preserve">
+        <value>Yüklemeye Kaldır</value>
+    </data>
+    <data name="Action_ViewCustomChars" xml:space="preserve">
+        <value>Özel Karakterleri Görüntüle</value>
+    </data>
+    <data name="Attribute_BrAbbreviation" xml:space="preserve">
+        <value>SP</value>
+    </data>
+    <data name="Attribute_BrFull" xml:space="preserve">
+        <value>Savaş Puanı</value>
+    </data>
+    <data name="Attribute_Description" xml:space="preserve">
+        <value>Açıklama</value>
+    </data>
+    <data name="Attribute_Downloads" xml:space="preserve">
+        <value>İndirilenler</value>
+    </data>
+    <data name="Attribute_Images" xml:space="preserve">
+        <value>Resimler</value>
+    </data>
+    <data name="Attribute_Likes" xml:space="preserve">
+        <value>Beğeniler</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
+        <value>Kaşlar</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyes" xml:space="preserve">
+        <value>Gözler</value>
+    </data>
+    <data name="Attribute_MiiSection_Face" xml:space="preserve">
+        <value>Yüz</value>
+    </data>
+    <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
+        <value>Sakal Bıyık</value>
+    </data>
+    <data name="Attribute_MiiSection_General" xml:space="preserve">
+        <value>Genel</value>
+    </data>
+    <data name="Attribute_MiiSection_Glasses" xml:space="preserve">
+        <value>Gözlük</value>
+    </data>
+    <data name="Attribute_MiiSection_Hair" xml:space="preserve">
+        <value>Saç</value>
+    </data>
+    <data name="Attribute_MiiSection_Lips" xml:space="preserve">
+        <value>Dudaklar</value>
+    </data>
+    <data name="Attribute_MiiSection_Mole" xml:space="preserve">
+        <value>Ben</value>
+    </data>
+    <data name="Attribute_MiiSection_Nose" xml:space="preserve">
+        <value>Burun</value>
+    </data>
+    <data name="Attribute_Mii_BeardType" xml:space="preserve">
+        <value>Sakal Tipi</value>
+    </data>
+    <data name="Attribute_Mii_CreatorName" xml:space="preserve">
+        <value>Yapımcı Adı</value>
+    </data>
+    <data name="Attribute_Mii_DefaultName" xml:space="preserve">
+        <value>Yeni Mii</value>
+    </data>
+    <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
+        <value>Kaş Tipi</value>
+    </data>
+    <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
+        <value>Yüz Özelliği</value>
+    </data>
+    <data name="Attribute_Mii_FavColor" xml:space="preserve">
+        <value>En Sevdiği Renk</value>
+    </data>
+    <data name="Attribute_Mii_GlassesColor" xml:space="preserve">
+        <value>Gözlük Rengi</value>
+    </data>
+    <data name="Attribute_Mii_GlassesType" xml:space="preserve">
+        <value>Gözlük Tipi</value>
+    </data>
+    <data name="Attribute_Mii_HairColor" xml:space="preserve">
+        <value>Saç Rengi</value>
+    </data>
+    <data name="Attribute_Mii_HairType" xml:space="preserve">
+        <value>Saç Tipi</value>
+    </data>
+    <data name="Attribute_Mii_HeadShape" xml:space="preserve">
+        <value>Kafa Şekli</value>
+    </data>
+    <data name="Attribute_Mii_Height" xml:space="preserve">
+        <value>Boy</value>
+    </data>
+    <data name="Attribute_Mii_HorizontalPosition" xml:space="preserve">
+        <value>Yatay Konum (Sağ/Sol)</value>
+    </data>
+    <data name="Attribute_Mii_IrishColor" xml:space="preserve">
+        <value>Göz Rengi</value>
+    </data>
+    <data name="Attribute_Mii_MirrorHair" xml:space="preserve">
+        <value>Saç Yönünü Değiştir</value>
+    </data>
+    <data name="Attribute_Mii_MouthType" xml:space="preserve">
+        <value>Ağız Tipi</value>
+    </data>
+    <data name="Attribute_Mii_MustacheSize" xml:space="preserve">
+        <value>Bıyık Büyüklüğü</value>
+    </data>
+    <data name="Attribute_Mii_MustacheType" xml:space="preserve">
+        <value>Bıyık Tipi</value>
+    </data>
+    <data name="Attribute_Mii_MustacheVerticalPosition" xml:space="preserve">
+        <value>Bıyık Dikey Konumu (Yukarı/Aşağı)</value>
+    </data>
+    <data name="Attribute_Mii_Name" xml:space="preserve">
+        <value>Mii Adı</value>
+    </data>
+    <data name="Attribute_Mii_NoseType" xml:space="preserve">
+        <value>Burun Tipi</value>
+    </data>
+    <data name="Attribute_Mii_Rotation" xml:space="preserve">
+        <value>Çevir (Sağa/Sola Çevir)</value>
+    </data>
+    <data name="Attribute_Mii_Size" xml:space="preserve">
+        <value>Boyut</value>
+    </data>
+    <data name="Attribute_Mii_SkinColor" xml:space="preserve">
+        <value>Ten Rengi</value>
+    </data>
+    <data name="Attribute_Mii_SpaceBetween" xml:space="preserve">
+        <value>Arası Boşluk</value>
+    </data>
+    <data name="Attribute_Mii_VerticalPosition" xml:space="preserve">
+        <value>Dikey Konum (Yukarı/Aşağı)</value>
+    </data>
+    <data name="Attribute_Mii_Width" xml:space="preserve">
+        <value>Genişlik</value>
+    </data>
+    <data name="Attribute_SortBy" xml:space="preserve">
+        <value>Sıralama Tipi</value>
+    </data>
+    <data name="Attribute_TotalGamesPlayed" xml:space="preserve">
+        <value>Toplam oynanan oyun</value>
+    </data>
+    <data name="Attribute_TotalGamesWon" xml:space="preserve">
+        <value>Toplam kazanılan oyun</value>
+    </data>
+    <data name="Attribute_Views" xml:space="preserve">
+        <value>Görüntülenme</value>
+    </data>
+    <data name="Attribute_VrAbbreviation" xml:space="preserve">
+        <value>KP</value>
+    </data>
+    <data name="Attribute_VrFull" xml:space="preserve">
+        <value>Karşılaşma Puanı</value>
+    </data>
+    <data name="PageTitle_MyMiis" xml:space="preserve">
+        <value>Benim Mii'lerim</value>
+    </data>
+    <data name="PopupTitle_MiiCarousel" xml:space="preserve">
+        <value>Mii Görüntüleyicisi</value>
+    </data>
+    <data name="PopupTitle_MiiEditor" xml:space="preserve">
+        <value>Mii Düzenleyicisi</value>
+    </data>
+    <data name="PopupTitle_MiiSelector" xml:space="preserve">
+        <value>Mii Seçici</value>
+    </data>
+    <data name="PopupTitle_ModBrowser" xml:space="preserve">
+        <value>Mod Gezgini</value>
+    </data>
+    <data name="PopupTitle_ModDetails" xml:space="preserve">
+        <value>Mod Detayları</value>
+    </data>
+    <data name="State_Custom" xml:space="preserve">
+        <value>Özel</value>
+    </data>
+    <data name="State_Installed" xml:space="preserve">
+        <value>Yüklendi</value>
     </data>
 </root>

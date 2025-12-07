@@ -18,4 +18,82 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="Category_Video" xml:space="preserve">
+        <value>Video </value>
+    </data>
+    <data name="HelperText_30FPS" xml:space="preserve">
+        <value>Esta definição vai forçar o jogo a correr a 30 FPS (normalmente é 60)</value>
+    </data>
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
+        <value>Isto ativa as animações na app Wheel Wizard</value>
+    </data>
+    <data name="HelperText_EndWithExe" xml:space="preserve">
+        <value>O caminho deve acabar com .exe</value>
+    </data>
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
+        <value>Esta definição desativa o Wiimote para o jogo, mas ativa-o para o canal Wii</value>
+    </data>
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
+        <value>Irá abrir a página principal do dolphin juntamento com o jogo</value>
+    </data>
+    <data name="HelperText_Recommended" xml:space="preserve">
+        <value>Esta definição vai alterar algumas definições do dolphin para reduzir stutters e picos de lag</value>
+    </data>
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
+        <value>1x a resolução nativa</value>
+    </data>
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
+        <value>As definições estão desativadas, completa as definições de localização primeiro</value>
+    </data>
+    <data name="Option_DolphinEmulatorExe" xml:space="preserve">
+        <value>Executável do Dolphin Emulator</value>
+    </data>
+    <data name="Option_DolphinUserPath" xml:space="preserve">
+        <value>Pasta do Utilizador do Dolphin</value>
+    </data>
+    <data name="Option_EnableAnimations" xml:space="preserve">
+        <value>Ativar Animações</value>
+    </data>
+    <data name="Option_ForceDisableWiimote" xml:space="preserve">
+        <value>Força a desativar o Wiimote</value>
+    </data>
+    <data name="Option_LaunchWithDolphin" xml:space="preserve">
+        <value>Abrir o jogo com a janela do Dolphin</value>
+    </data>
+    <data name="Option_MakePrimary" xml:space="preserve">
+        <value>Tornar Primário</value>
+    </data>
+    <data name="Option_MarioKartGame" xml:space="preserve">
+        <value>Ficheiro de Jogo do Mario Kart Wii</value>
+    </data>
+    <data name="Option_OpenConfig" xml:space="preserve">
+        <value>Abrir a pasta Config</value>
+    </data>
+    <data name="Option_Recommended" xml:space="preserve">
+        <value>Definições recomensadas</value>
+    </data>
+    <data name="Option_RemoveBlur" xml:space="preserve">
+        <value>Remover Blur</value>
+    </data>
+    <data name="Option_Renderer" xml:space="preserve">
+        <value>Renderizar</value>
+    </data>
+    <data name="Option_ShowFPS" xml:space="preserve">
+        <value>Mostrar FPS</value>
+    </data>
+    <data name="Option_VSync" xml:space="preserve">
+        <value>VSync</value>
+    </data>
+    <data name="Option_WhWzLanguage" xml:space="preserve">
+        <value>Idioma do Wheel Wizard</value>
+    </data>
+    <data name="Option_WindowScale" xml:space="preserve">
+        <value>Escala da janela</value>
+    </data>
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
+        <value>0</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>JMM,  Gui_C__Tuga</value>
+    </data>
 </root>

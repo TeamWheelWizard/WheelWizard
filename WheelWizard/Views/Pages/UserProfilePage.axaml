@@ -31,26 +31,27 @@
                 <!-- WE ARE LAZY IN THE CODE, AND SO WE USE CHILD INDEXING TO GET THE RADIO BUTTONS -->
                 <RadioButton Classes="TopBar"
                              Click="TopBarRadio_OnClick" Tag="0"
-                             x:Name="Mii0" Content="{x:Static lang:Online.NoLicense}"
+                             x:Name="Mii0" Content="{x:Static lang:Common.State_NoLicense}"
                              IsChecked="True" IsEnabled="False" />
                 <RadioButton Classes="TopBar"
                              Click="TopBarRadio_OnClick" Tag="1"
-                             x:Name="Mii1" Content="{x:Static lang:Online.NoLicense}"
+                             x:Name="Mii1" Content="{x:Static lang:Common.State_NoLicense}"
                              IsEnabled="False" />
                 <RadioButton Classes="TopBar"
                              Click="TopBarRadio_OnClick" Tag="2"
-                             x:Name="Mii2" Content="{x:Static lang:Online.NoLicense}"
+                             x:Name="Mii2" Content="{x:Static lang:Common.State_NoLicense}"
                              IsEnabled="False" />
                 <RadioButton Classes="TopBar"
                              Click="TopBarRadio_OnClick" Tag="3"
-                             x:Name="Mii3" Content="{x:Static lang:Online.NoLicense}"
+                             x:Name="Mii3" Content="{x:Static lang:Common.State_NoLicense}"
                              IsEnabled="False" />
             </StackPanel>
         </ScrollViewer>
 
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
             <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="18" Height="18" Margin="10"
-                    ToolTip.Tip="This only shows regions YOU have played on" ToolTip.Placement="Top" ToolTip.ShowDelay="20">
+                    ToolTip.Tip="{x:Static lang:Phrases.Hover_RegionUserSelection}" ToolTip.Placement="Top"
+                    ToolTip.ShowDelay="20">
                 <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
             </Border>
@@ -67,7 +68,7 @@
                     <!-- BACKGROUND & COLOR TRANSITION -->
                     <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" CornerRadius="99999"
                             HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
-                            IsVisible="{Binding IsOnline}" Height="200" Width="230" 
+                            IsVisible="{Binding IsOnline}" Height="200" Width="230"
                             Background="{StaticResource Primary200}" Effect="blur(250)">
                         <Border.Styles>
                             <Style Selector="Border">
@@ -90,10 +91,12 @@
                             BorderThickness="1" Margin="0,0,5,10" CornerRadius="4" x:Name="PART_HeadBorderFace"
                             Background="{StaticResource Neutral950}">
                         <Grid>
-                            <behavior:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LowQualitySpeedup="True"
-                                                     Mii="{Binding CurrentMii}" FallBackColor="{StaticResource Neutral700}"
-                                                     ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}"/>
-                          
+                            <behavior:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                     LowQualitySpeedup="True"
+                                                     Mii="{Binding CurrentMii}"
+                                                     FallBackColor="{StaticResource Neutral700}"
+                                                     ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
+
                             <ScrollViewer HorizontalScrollBarVisibility="Auto" Margin="10"
                                           VerticalAlignment="Bottom" HorizontalAlignment="Left">
                                 <StackPanel Orientation="Horizontal" x:Name="BadgeContainer" Spacing="3" />
@@ -130,26 +133,28 @@
                     <RadioButton Grid.Column="0" Grid.Row="1" Margin="5,6,0,0" x:Name="PrimaryCheckBox"
                                  VerticalAlignment="Top" Checked="CheckBox_SetPrimaryUser" Classes="CheckBox">
                         <components:FormFieldLabel Text="{x:Static lang:Settings.Option_MakePrimary}"
-                                                   TipText="The primary profile is used as reference in the wheel wizard client" />
+                                                   TipText="{x:Static lang:Phrases.Hover_PrimaryProfile}" />
                     </RadioButton>
 
                     <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,7,0,0">
-                        <components:FormFieldLabel Text="Status"/>
-                        <SelectableTextBlock IsVisible="{Binding IsOnline}" Text="{x:Static lang:Common.Term_Online}"
+                        <components:FormFieldLabel Text="Status" />
+                        <SelectableTextBlock IsVisible="{Binding IsOnline}" Text="{x:Static lang:Common.Attribute_Status_Online}"
                                              FontSize="16" Foreground="{StaticResource Primary400}" />
-                        <SelectableTextBlock Classes="BodyText" Text="{x:Static lang:Common.Term_Offline}"
+                        <SelectableTextBlock Classes="BodyText" Text="{x:Static lang:Common.Attribute_Status_Offline}"
                                              IsVisible="{Binding IsOnline, Converter={x:Static BoolConverters.Not}}" />
                     </StackPanel>
 
                     <Grid Grid.Column="0" Grid.Row="1" ColumnDefinitions="3*,4*"
                           Margin="5,0,0,10" VerticalAlignment="Bottom">
                         <StackPanel Grid.Column="0">
-                            <components:FormFieldLabel Text="VR" />
+                            <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
+                                                       TipText="{x:Static lang:Common.Attribute_VrFull}" />
                             <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribVr" />
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
-                            <components:FormFieldLabel Text="BR" />
+                            <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_BrAbbreviation}"
+                                                       TipText="{x:Static lang:Common.Attribute_BrFull}" />
                             <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribBr" />
                         </StackPanel>
                     </Grid>
@@ -157,7 +162,7 @@
                     <components:Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left"
                                        VerticalAlignment="Bottom" Click="ViewRoom_OnClick"
                                        IsEnabled="{Binding IsOnline}" x:Name="ViewRoomButton"
-                                       Text="{x:Static lang:Online.Button_ViewRoom}"
+                                       Text="{x:Static lang:Common.Action_ViewRoom}"
                                        IconData="{StaticResource Road}" Margin="0,0,0,10" />
                     <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                             Background="{StaticResource BackgroundLineColor}" Height="1"
@@ -165,12 +170,12 @@
                     <!-- SECOND INFORMATION LAYER -->
 
                     <StackPanel Grid.Column="0" Grid.Row="2" Margin="5,8,0,0">
-                        <components:FormFieldLabel Text="Total games won" />
-                        <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribTotalWins"/>
+                        <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_TotalGamesWon}" />
+                        <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribTotalWins" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Grid.Row="2" Margin="0,8,0,0">
-                        <components:FormFieldLabel Text="Total games played" />
-                        <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribTotalRaces"/>
+                        <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_TotalGamesPlayed}" />
+                        <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribTotalRaces" />
                     </StackPanel>
                 </Grid>
 
@@ -187,9 +192,10 @@
                                   ImageVariant="{x:Static miiVars:MiiImageVariants.FullBodyCarousel}"
                                   x:Name="CurrentUserCarousel" Height="280" />
 
+            <!-- repurposing the common state text -->
             <components:EmptyPageInfo x:Name="NoProfilesInfo"
-                                      HorizontalAlignment="Center" Title="{x:Static lang:Online.NoProfiles}"
-                                      BodyText="{x:Static lang:Phrases.EmptyText_NoProfiles}" />
+                                      HorizontalAlignment="Center" Title="{x:Static lang:Common.State_NoProfiles}"
+                                      BodyText="{x:Static lang:Phrases.EmptyContent_NoProfiles}" />
         </Grid>
     </Grid>
 </UserControl>

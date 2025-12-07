@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using WheelWizard.Models.Settings;
 using WheelWizard.Services;
 using WheelWizard.Services.Settings;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.ModManagement;
 
@@ -16,6 +17,7 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest);
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
     public ModManager ModManager => ModManager.Instance;
+
     public ObservableCollection<ModListItem> Mods =>
         new(
             ModManager.Mods.Select(mod => new ModListItem(
@@ -103,21 +105,13 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (ModsListBox.SelectedItem is not ModListItem selectedMod)
         {
             // You actually never see this error, however, if for some unknown reason it happens, we don't want to disregard it
-            new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                .SetTitleText("Cannot view the selected mod")
-                .SetInfoText("Something went wrong when trying to open the selected mod")
-                .Show();
+            MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_CantViewMod_SomethingWrong);
             return;
         }
 
         if (selectedMod.Mod.ModID == -1)
         {
-            new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                .SetTitleText("Cannot view the selected mod")
-                .SetInfoText("Cannot view mod that was not installed through the mod browser.")
-                .Show();
+            MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_CantViewMod_NotFromBrowser);
             return;
         }
 

@@ -1,10 +1,14 @@
 using System.ComponentModel;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using WheelWizard.Resources.Languages;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Base;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement.MiiEditor;
 using WheelWizard.WiiManagement;
-using WheelWizard.WiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Popups.MiiManagement;
 
@@ -31,12 +35,10 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
     private VisualizationType selectedVisualization = VisualizationType.Face;
 
     public MiiEditorWindow()
-        : base(true, false, false, "Mii Editor")
+        : base(true, false, false, Common.PopupTitle_MiiEditor)
     {
         InitializeComponent();
         DataContext = this;
-
-        Window.BetaFlag = true;
     }
 
     protected override void BeforeOpen()
@@ -48,13 +50,20 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
     public void SetEditorPage(Type pageType)
     {
         EditorPresenter.Content = Activator.CreateInstance(pageType, this)!;
-        Window.WindowTitle = $"Mii Editor - {Mii.Name}";
+        Window.WindowTitle = $"{Common.PopupTitle_MiiEditor} - {Mii.Name}";
     }
 
     public MiiEditorWindow SetMii(Mii miiToEdit)
     {
-        Window.WindowTitle = $"Mii Editor - {miiToEdit.Name}";
+        Window.WindowTitle = $"{Common.PopupTitle_MiiEditor} - {miiToEdit.Name}";
         var miiResult = miiToEdit.Clone();
+        if (miiResult.IsFailure)
+        {
+            DisableOpen(true);
+            MessageTranslationHelper.ShowMessage(MessageTranslation.Error_MiiEditor_CantOpenEditor, null, [miiResult.Error.Message]);
+            return this;
+        }
+
         Mii = miiResult.Value;
         return this;
     }

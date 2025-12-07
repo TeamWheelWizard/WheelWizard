@@ -1,8 +1,8 @@
 <base:PopupContent xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                   xmlns:self="clr-namespace:WheelWizard.Views.Popups"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -18,11 +18,11 @@
         <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                      x:Name="ButtonContainer"  Margin="0,10,0,0">
             <components:Button x:Name="CancelButton" Variant="Default"
-                               IsEnabled="True" Text="Cancel" 
+                               IsEnabled="True" Text="{x:Static lang:Common.Action_Cancel}" 
                                IconData="{StaticResource XMark}"
                                Click="noButton_Click" Margin="0,0,5,0"/>
             <components:Button x:Name="SaveButton" Variant="Primary"
-                               IsEnabled="True" Text="Save"
+                               IsEnabled="True" Text="{x:Static lang:Common.Action_Save}"
                                IconData="{StaticResource CheckMark}"
                                Click="yesButton_Click" Margin="5,0,0,0"/>
         </UniformGrid>

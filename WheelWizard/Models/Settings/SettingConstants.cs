@@ -30,19 +30,6 @@ public static class SettingValues
         { "OpenGL", "OGL" },
     };
 
-    public static readonly Dictionary<int, Func<string>> RrLanguages = new()
-    {
-        { 0, () => CreateLanguageString("English") },
-        { 1, () => CreateLanguageString("Japanese") },
-        { 2, () => CreateLanguageString("France") },
-        { 3, () => CreateLanguageString("German") },
-        { 4, () => CreateLanguageString("Dutch") },
-        { 5, () => CreateLanguageString("Spanish") },
-        { 6, () => CreateLanguageString("Italian") },
-        { 7, () => CreateLanguageString("Korean") },
-        { 8, () => CreateLanguageString("Russian") },
-    };
-
     public static readonly Dictionary<string, Func<string>> WhWzLanguages = new()
     {
         { "en", () => CreateLanguageString("English") },

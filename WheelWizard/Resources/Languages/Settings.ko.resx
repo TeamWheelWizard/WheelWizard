@@ -18,31 +18,31 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="CompletePercentage" xml:space="preserve">
-        <value>100</value>
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
+        <value>80</value>
     </data>
     <data name="Category_Video" xml:space="preserve">
         <value>비디오</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
+    <data name="HelperText_30FPS" xml:space="preserve">
         <value>이 설정은 게임을 강제로 30프레임으로 구동시킵니다.(기본: 60)</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
         <value>Wheel Wizard 앱의 애니메이션을 활성화 합니다.</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
-        <value>경로는 ".exe"로 끝나야 합니다.</value>
+    <data name="HelperText_EndWithExe" xml:space="preserve">
+        <value>파일 경로는 ".exe"로 끝나야 합니다.</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>이 설정은 게임 내 위모트를 비활성 합니다. Wii 채널에선 활성화됩니다.</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>게임과 함께 Dolphin 메인 창을 킵니다.</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>이 설정은 랙을 줄이기 위해 Dolphin의 일부 설정을 바꿉니다.</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>1x는 네이티브 해상도입니다</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
@@ -54,7 +54,7 @@
     <data name="Option_ForceDisableWiimote" xml:space="preserve">
         <value>위모트 강제 비활성</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>설정이 잠겨있습니다. 지역 설정을 마치면 해금됩니다.</value>
     </data>
     <data name="Option_DolphinUserPath" xml:space="preserve">
@@ -80,9 +80,6 @@
     </data>
     <data name="Option_Renderer" xml:space="preserve">
         <value>렌더링</value>
-    </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>레트로 리와인드(Retro Rewind) 언어</value>
     </data>
     <data name="Option_ShowFPS" xml:space="preserve">
         <value>FPS 표시</value>
@@ -149,5 +146,44 @@
     </data>
     <data name="Value_Language_Turkish" xml:space="preserve">
         <value>튀르키예어</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>아랍어</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>중국어</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>체코어</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>노르웨이어</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>포르투갈어</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>기타</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>일반</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>정보</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>StationAlpha, Sinseiga, 주녕</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>파일 경로는 다음과 같이 끝날 수 있습니다:</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Retro Rewind 실행 전 3개의 경로를 설정해야 합니다.</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>옵션</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>이 설정은 Wheel Wizard의 언어만 변경합니다. 게임의 언어를 변경하기 위해서는 게임 설정에서 변경해야 합니다.</value>
     </data>
 </root>

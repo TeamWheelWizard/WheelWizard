@@ -18,34 +18,34 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="CompletePercentage" xml:space="preserve">
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
         <value>100</value>
     </data>
     <data name="Category_Video" xml:space="preserve">
         <value>Video</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
+    <data name="HelperText_30FPS" xml:space="preserve">
         <value>Questa impostazione forzerà il gioco a girare a 30FPS (di default è 60)</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
         <value>Questa impostazione abiliterà le animazioni nell'applicazione Wheel Wizard</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
+    <data name="HelperText_EndWithExe" xml:space="preserve">
         <value>L'indirizzo deve terminare con .exe</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>Questa impostazione disattiverà i Wiimote durante il gioco, ma li attiverà nel canale Wii</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>Aprirà la finestra principale di Dolphin assieme al gioco</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>Questa impostazione cambierà alcune impostazioni di Dolphin per ridurre problemi di lag</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>1x è la risoluzione nativa</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>Le impostazioni sono disattivate, completa le impostazioni della localizzazione</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
@@ -58,7 +58,7 @@
         <value>Attiva le animazioni</value>
     </data>
     <data name="Option_ForceDisableWiimote" xml:space="preserve">
-        <value>Forza la disattivazione dei Wiimote</value>
+        <value>Disattiva forzatamente i Wiimote</value>
     </data>
     <data name="Option_LaunchWithDolphin" xml:space="preserve">
         <value>Apri il gioco con la finestra di Dolphin</value>
@@ -80,9 +80,6 @@
     </data>
     <data name="Option_Renderer" xml:space="preserve">
         <value>Renderizzatore</value>
-    </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Lingua di Retro Rewind</value>
     </data>
     <data name="Option_ShowFPS" xml:space="preserve">
         <value>Mostra gli FPS</value>
@@ -148,6 +145,57 @@
         <value>Russo</value>
     </data>
     <data name="Value_Language_Turkish" xml:space="preserve">
-        <value>Turko </value>
+        <value>Turco</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Arabo</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Cinese</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Ceco</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Norvegese</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Portoghese</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>Generale</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Altro</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>A riguardo</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>Apri la cartella del gioco</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>Apri la cartella del salvataggio</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Reinstalla Retro Rewind</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Installazione</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>Ismy, Sep</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>L'indirizzo può terminare con:</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Devi impostare questi 3 indirizzi prima di poter iniziare a giocare a Retro Rewind</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>Opzionale</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>Questo cambia soltanto la lingua di Wheel Wizard. Per cambiare la lingua all'interno del gioco, dovrai farlo dalle impostazioni del gioco stesso.</value>
     </data>
 </root>

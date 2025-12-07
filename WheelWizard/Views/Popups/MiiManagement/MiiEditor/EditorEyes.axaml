@@ -9,7 +9,7 @@
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
         <!-- Updated Title -->
-        <TextBlock Classes="BodyText" Margin="10" Text="Eyes" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_Eyes}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
         <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}" IconData="{StaticResource ArrowLeft}"
@@ -24,17 +24,16 @@
                 <!-- The list of elements you want to edit in this page -->
 
                 <StackPanel> <!-- Eye Color -->
-                    <components:FormFieldLabel Text="Eye Color:"/>
-                    <ComboBox
-                        x:Name="EyeColorBox"
-                        SelectionChanged="EyeColorBox_OnSelectionChanged"
-                        Width="150"
-                        />
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_IrishColor}"/>
+                    <UniformGrid Columns="6" x:Name="EyeColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
                 </StackPanel>
+
 
                 <!-- Vertical Position (Up/Down) -->
                 <StackPanel>
-                    <components:FormFieldLabel Text="Vertical Position (Up/Down):"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_VerticalPosition}"/>
                     <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                         <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                             <components:Button x:Name="VerticalDecreaseButton" IconData="{StaticResource ArrowUp}" IconSize="14" Padding="4" Click="VerticalDecrease_Click"/>
@@ -46,7 +45,7 @@
 
                 <!-- Rotation (Rotate Left/Right) -->
                 <StackPanel>
-                    <components:FormFieldLabel Text="Rotation (Rotate Left/Right):"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Rotation}"/>
                     <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                         <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                             <components:Button x:Name="RotationDecreaseButton" IconData="{StaticResource RotateLeft}" IconSize="14" Padding="4" Click="RotationDecrease_Click"/>
@@ -58,7 +57,7 @@
                 
                 <!-- Size (Zoom In/Out) -->
                 <StackPanel>
-                    <components:FormFieldLabel Text="Size:"/>
+                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Size}"/>
                     <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                         <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                             <components:Button x:Name="SizeDecreaseButton" IconData="{StaticResource MinMark}" IconSize="14" Padding="4" Click="SizeDecrease_Click"/>
@@ -70,7 +69,7 @@
                 
                  <!-- Spacing (In/Out) -->
                  <StackPanel>
-                     <components:FormFieldLabel Text="Spacing in between:"/>
+                     <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_SpaceBetween}"/>
                      <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                          <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                              <components:Button x:Name="SpacingDecreaseButton" IconData="{StaticResource MinMark}" IconSize="14" Padding="4" Click="SpacingDecrease_Click"/>

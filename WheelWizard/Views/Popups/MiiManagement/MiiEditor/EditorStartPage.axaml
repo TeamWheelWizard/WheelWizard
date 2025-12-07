@@ -34,6 +34,9 @@
         <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="1" />
         
+        <components:Button Variant="Default" Grid.Row="2" Margin="10"  VerticalAlignment="Top" 
+                           HorizontalAlignment="Left" Padding="12,6" IconSize="28"
+                           IconData="{StaticResource Dice}" Click="RandomizeMii_OnClick" />
         <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="10"
                     VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="10">
             <components:Button Text="{x:Static lang:Common.Action_Cancel}" Variant="Warning"
@@ -45,25 +48,25 @@
         
         <ScrollViewer Grid.Row="1">
             <StackPanel>
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="General"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_General}"
                                             Type="{x:Type editor:EditorGeneral}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Face"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Face}"
                                             Type="{x:Type editor:EditorFace}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Hair"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Hair}"
                                             Type="{x:Type editor:EditorHair}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Eyebrows"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Eyebrows}"
                                             Type="{x:Type editor:EditorEyebrows}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Eyes"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Eyes}"
                                             Type="{x:Type editor:EditorEyes}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Nose"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Nose}"
                                             Type="{x:Type editor:EditorNose}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Lips"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Lips}"
                                             Type="{x:Type editor:EditorLips}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Glasses"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Glasses}"
                                             Type="{x:Type editor:EditorGlasses}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Facial Hair"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_FacialHair}"
                                             Type="{x:Type editor:EditorFacialHair}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="Mole"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Mole}"
                                             Type="{x:Type editor:EditorMole}" />
             </StackPanel>
         </ScrollViewer>

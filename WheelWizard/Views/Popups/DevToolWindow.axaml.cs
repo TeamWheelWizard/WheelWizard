@@ -4,10 +4,11 @@ using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.Helpers;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.LiveData;
-using WheelWizard.Services.WiiManagement;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities;
 using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.Views.Popups.Generic;
 
@@ -58,11 +59,13 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
 
     private void ClearCache_OnClick(object sender, RoutedEventArgs e) => ((MemoryCache)Cache).Clear();
 
+    private void MiiChannel_OnClick(object? sender, RoutedEventArgs e) => DolphinLaunchHelper.LaunchDolphin(" -b -n 0001000248414341");
+
     #region Popup Tests
 
     private async void TestProgressPopup_OnClick(object sender, RoutedEventArgs e)
     {
-        ProgressButtonTest.IsEnabled = false;
+        ProgressPopupTest.IsEnabled = false;
         var progressWindow = new ProgressWindow("test progress !!");
         progressWindow.SetGoal("Setting a goal!");
         progressWindow.Show();
@@ -82,7 +85,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
         Dispatcher.UIThread.Invoke(() =>
         {
             progressWindow.Close();
-            ProgressButtonTest.IsEnabled = true;
+            ProgressPopupTest.IsEnabled = true;
         });
     }
 
@@ -91,7 +94,8 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
         new MessageBoxWindow()
             // .SetMessageType(MessageBoxWindow.MessageType.Message) // Default, so you dont have to type this
             .SetTitleText("Saved Successfully!")
-            .SetInfoText("The name you entered has sucessfully saved in the system")
+            .SetTag("Tag")
+            .SetInfoText("The name you entered has successfully saved in the system")
             .Show();
 
         new MessageBoxWindow()
@@ -102,17 +106,32 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
             )
             .Show();
 
-        new MessageBoxWindow()
-            .SetMessageType(MessageBoxWindow.MessageType.Error)
-            .SetTitleText("Update error.")
-            .SetInfoText("An error occurred when trying to update Retro Rewind.")
-            .Show();
+        MessageTranslationHelper.ShowMessage(MessageTranslation.Error_StanderdError);
+    }
+
+    private async void YesNoPopup_OnClick(object sender, RoutedEventArgs e)
+    {
+        var yesNoWindow = await new YesNoWindow()
+            .SetExtraText("text for some extra information")
+            .SetMainText("Do you click yes or no")
+            .AwaitAnswer();
+
+        YesNoPopupButton.Variant = yesNoWindow ? Button.ButtonsVariantType.Primary : Button.ButtonsVariantType.Danger;
+    }
+
+    private async void OptionsPopup_OnClick(object sender, RoutedEventArgs e)
+    {
+        // You can do things in the action with the options.
+        // However, you can also read the button click based on the title
+        var optionsWindow = await new OptionsWindow()
+            .AddOption("PersonMale", "Boy!", () => Console.WriteLine("Option Boy!"))
+            .AddOption("PersonFemale", "Girl!", () => Console.WriteLine("Option Girl!"))
+            .AddOption("Banana", "Not an Option", () => { }, false)
+            .AwaitAnswer();
+
+        OptionsPopupButton.Variant = optionsWindow != null ? Button.ButtonsVariantType.Warning : Button.ButtonsVariantType.Danger;
+        OptionsPopupButton.Text = optionsWindow ?? "Clicked away";
     }
 
     #endregion
-
-    private void MiiChannel_OnClick(object? sender, RoutedEventArgs e)
-    {
-        DolphinLaunchHelper.LaunchDolphin(" -b -n 0001000248414341");
-    }
 }

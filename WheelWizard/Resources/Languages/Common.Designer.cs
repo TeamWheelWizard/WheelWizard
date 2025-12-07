@@ -123,6 +123,24 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do manually.
+        /// </summary>
+        public static string Action_DoManually {
+            get {
+                return ResourceManager.GetString("Action_DoManually", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download and Install.
+        /// </summary>
+        public static string Action_DownloadAndInstall {
+            get {
+                return ResourceManager.GetString("Action_DownloadAndInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Duplicate.
         /// </summary>
         public static string Action_Duplicate {
@@ -159,6 +177,24 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Favorite.
+        /// </summary>
+        public static string Action_Favorite {
+            get {
+                return ResourceManager.GetString("Action_Favorite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gamebanana page.
+        /// </summary>
+        public static string Action_GamebananaPage {
+            get {
+                return ResourceManager.GetString("Action_GamebananaPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Import.
         /// </summary>
         public static string Action_Import {
@@ -186,6 +222,42 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Launch Dolphin.
+        /// </summary>
+        public static string Action_LaunchDolphin {
+            get {
+                return ResourceManager.GetString("Action_LaunchDolphin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Talk to us!.
+        /// </summary>
+        public static string Action_Link_Discord {
+            get {
+                return ResourceManager.GetString("Action_Link_Discord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source code.
+        /// </summary>
+        public static string Action_Link_Github {
+            get {
+                return ResourceManager.GetString("Action_Link_Github", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Support us!.
+        /// </summary>
+        public static string Action_Link_Support {
+            get {
+                return ResourceManager.GetString("Action_Link_Support", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Maybe Later.
         /// </summary>
         public static string Action_MaybeLater {
@@ -206,9 +278,9 @@ namespace WheelWizard.Resources.Languages {
         /// <summary>
         ///   Looks up a localized string similar to Ok.
         /// </summary>
-        public static string Action_OK {
+        public static string Action_Ok {
             get {
-                return ResourceManager.GetString("Action_OK", resourceCulture);
+                return ResourceManager.GetString("Action_Ok", resourceCulture);
             }
         }
         
@@ -240,11 +312,29 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Randomize.
+        /// </summary>
+        public static string Action_Randomize {
+            get {
+                return ResourceManager.GetString("Action_Randomize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Rename.
         /// </summary>
         public static string Action_Rename {
             get {
                 return ResourceManager.GetString("Action_Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report.
+        /// </summary>
+        public static string Action_Report {
+            get {
+                return ResourceManager.GetString("Action_Report", resourceCulture);
             }
         }
         
@@ -276,11 +366,47 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Submit.
+        /// </summary>
+        public static string Action_Submit {
+            get {
+                return ResourceManager.GetString("Action_Submit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unfavorite.
+        /// </summary>
+        public static string Action_Unfavorite {
+            get {
+                return ResourceManager.GetString("Action_Unfavorite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uninstall.
+        /// </summary>
+        public static string Action_UnInstall {
+            get {
+                return ResourceManager.GetString("Action_UnInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Update.
         /// </summary>
         public static string Action_Update {
             get {
                 return ResourceManager.GetString("Action_Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Custom Characters.
+        /// </summary>
+        public static string Action_ViewCustomChars {
+            get {
+                return ResourceManager.GetString("Action_ViewCustomChars", resourceCulture);
             }
         }
         
@@ -303,11 +429,65 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View Room.
+        /// </summary>
+        public static string Action_ViewRoom {
+            get {
+                return ResourceManager.GetString("Action_ViewRoom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yes.
         /// </summary>
         public static string Action_Yes {
             get {
                 return ResourceManager.GetString("Action_Yes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Average VR.
+        /// </summary>
+        public static string Attribute_AverageRoomVr {
+            get {
+                return ResourceManager.GetString("Attribute_AverageRoomVr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BR.
+        /// </summary>
+        public static string Attribute_BrAbbreviation {
+            get {
+                return ResourceManager.GetString("Attribute_BrAbbreviation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Battle Rating.
+        /// </summary>
+        public static string Attribute_BrFull {
+            get {
+                return ResourceManager.GetString("Attribute_BrFull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description.
+        /// </summary>
+        public static string Attribute_Description {
+            get {
+                return ResourceManager.GetString("Attribute_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloads.
+        /// </summary>
+        public static string Attribute_Downloads {
+            get {
+                return ResourceManager.GetString("Attribute_Downloads", resourceCulture);
             }
         }
         
@@ -321,11 +501,452 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Friend Code.
+        /// </summary>
+        public static string Attribute_FriendCode {
+            get {
+                return ResourceManager.GetString("Attribute_FriendCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gender.
+        /// </summary>
+        public static string Attribute_Gender {
+            get {
+                return ResourceManager.GetString("Attribute_Gender", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Female.
+        /// </summary>
+        public static string Attribute_Gender_Female {
+            get {
+                return ResourceManager.GetString("Attribute_Gender_Female", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Male.
+        /// </summary>
+        public static string Attribute_Gender_Male {
+            get {
+                return ResourceManager.GetString("Attribute_Gender_Male", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ID.
         /// </summary>
         public static string Attribute_Id {
             get {
                 return ResourceManager.GetString("Attribute_Id", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Images.
+        /// </summary>
+        public static string Attribute_Images {
+            get {
+                return ResourceManager.GetString("Attribute_Images", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Is Online.
+        /// </summary>
+        public static string Attribute_IsOnline {
+            get {
+                return ResourceManager.GetString("Attribute_IsOnline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Likes.
+        /// </summary>
+        public static string Attribute_Likes {
+            get {
+                return ResourceManager.GetString("Attribute_Likes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Losses.
+        /// </summary>
+        public static string Attribute_Losses {
+            get {
+                return ResourceManager.GetString("Attribute_Losses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message.
+        /// </summary>
+        public static string Attribute_Message {
+            get {
+                return ResourceManager.GetString("Attribute_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Beard Type.
+        /// </summary>
+        public static string Attribute_Mii_BeardType {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_BeardType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creator Name.
+        /// </summary>
+        public static string Attribute_Mii_CreatorName {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_CreatorName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Mii.
+        /// </summary>
+        public static string Attribute_Mii_DefaultName {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_DefaultName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eyebrow Type.
+        /// </summary>
+        public static string Attribute_Mii_EyebrowType {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_EyebrowType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Facial Feature.
+        /// </summary>
+        public static string Attribute_Mii_FacialFeature {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_FacialFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Favorite Color.
+        /// </summary>
+        public static string Attribute_Mii_FavColor {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_FavColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gender.
+        /// </summary>
+        public static string Attribute_Mii_Gender {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_Gender", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Female.
+        /// </summary>
+        public static string Attribute_Mii_Gender_Female {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_Gender_Female", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Male.
+        /// </summary>
+        public static string Attribute_Mii_Gender_Male {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_Gender_Male", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Glasses Color.
+        /// </summary>
+        public static string Attribute_Mii_GlassesColor {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_GlassesColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Glasses Type.
+        /// </summary>
+        public static string Attribute_Mii_GlassesType {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_GlassesType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hair Color.
+        /// </summary>
+        public static string Attribute_Mii_HairColor {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_HairColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hair Type.
+        /// </summary>
+        public static string Attribute_Mii_HairType {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_HairType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Head Shape.
+        /// </summary>
+        public static string Attribute_Mii_HeadShape {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_HeadShape", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Height.
+        /// </summary>
+        public static string Attribute_Mii_Height {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_Height", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Horizontal Position (Left/Right).
+        /// </summary>
+        public static string Attribute_Mii_HorizontalPosition {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_HorizontalPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eye Color.
+        /// </summary>
+        public static string Attribute_Mii_IrishColor {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_IrishColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mirror Hair.
+        /// </summary>
+        public static string Attribute_Mii_MirrorHair {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_MirrorHair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mouth Type.
+        /// </summary>
+        public static string Attribute_Mii_MouthType {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_MouthType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mustache Size.
+        /// </summary>
+        public static string Attribute_Mii_MustacheSize {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_MustacheSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mustache Type.
+        /// </summary>
+        public static string Attribute_Mii_MustacheType {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_MustacheType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mustache Vertical Position (Up/Down).
+        /// </summary>
+        public static string Attribute_Mii_MustacheVerticalPosition {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_MustacheVerticalPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mii Name.
+        /// </summary>
+        public static string Attribute_Mii_Name {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nose Type.
+        /// </summary>
+        public static string Attribute_Mii_NoseType {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_NoseType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rotation (Rotate Left/Right).
+        /// </summary>
+        public static string Attribute_Mii_Rotation {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_Rotation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        public static string Attribute_Mii_Size {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_Size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skin Color.
+        /// </summary>
+        public static string Attribute_Mii_SkinColor {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_SkinColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spacing in between.
+        /// </summary>
+        public static string Attribute_Mii_SpaceBetween {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_SpaceBetween", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vertical Position (Up/Down).
+        /// </summary>
+        public static string Attribute_Mii_VerticalPosition {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_VerticalPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Width.
+        /// </summary>
+        public static string Attribute_Mii_Width {
+            get {
+                return ResourceManager.GetString("Attribute_Mii_Width", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eyebrows.
+        /// </summary>
+        public static string Attribute_MiiSection_Eyebrows {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_Eyebrows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eyes.
+        /// </summary>
+        public static string Attribute_MiiSection_Eyes {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_Eyes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Face.
+        /// </summary>
+        public static string Attribute_MiiSection_Face {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_Face", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Facial Hair.
+        /// </summary>
+        public static string Attribute_MiiSection_FacialHair {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_FacialHair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        public static string Attribute_MiiSection_General {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Glasses.
+        /// </summary>
+        public static string Attribute_MiiSection_Glasses {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_Glasses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hair.
+        /// </summary>
+        public static string Attribute_MiiSection_Hair {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_Hair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lips.
+        /// </summary>
+        public static string Attribute_MiiSection_Lips {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_Lips", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mole.
+        /// </summary>
+        public static string Attribute_MiiSection_Mole {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_Mole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nose.
+        /// </summary>
+        public static string Attribute_MiiSection_Nose {
+            get {
+                return ResourceManager.GetString("Attribute_MiiSection_Nose", resourceCulture);
             }
         }
         
@@ -348,6 +969,87 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Players.
+        /// </summary>
+        public static string Attribute_PlayerCount {
+            get {
+                return ResourceManager.GetString("Attribute_PlayerCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Priority.
+        /// </summary>
+        public static string Attribute_Priority {
+            get {
+                return ResourceManager.GetString("Attribute_Priority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Races played.
+        /// </summary>
+        public static string Attribute_RacesPlayed {
+            get {
+                return ResourceManager.GetString("Attribute_RacesPlayed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort by.
+        /// </summary>
+        public static string Attribute_SortBy {
+            get {
+                return ResourceManager.GetString("Attribute_SortBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speed.
+        /// </summary>
+        public static string Attribute_Speed {
+            get {
+                return ResourceManager.GetString("Attribute_Speed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        public static string Attribute_Status {
+            get {
+                return ResourceManager.GetString("Attribute_Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Offline.
+        /// </summary>
+        public static string Attribute_Status_Offline {
+            get {
+                return ResourceManager.GetString("Attribute_Status_Offline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Online.
+        /// </summary>
+        public static string Attribute_Status_Online {
+            get {
+                return ResourceManager.GetString("Attribute_Status_Online", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time Online.
+        /// </summary>
+        public static string Attribute_TimeOnline {
+            get {
+                return ResourceManager.GetString("Attribute_TimeOnline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Title.
         /// </summary>
         public static string Attribute_Title {
@@ -357,11 +1059,101 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Total games played.
+        /// </summary>
+        public static string Attribute_TotalGamesPlayed {
+            get {
+                return ResourceManager.GetString("Attribute_TotalGamesPlayed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total games won.
+        /// </summary>
+        public static string Attribute_TotalGamesWon {
+            get {
+                return ResourceManager.GetString("Attribute_TotalGamesWon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type.
         /// </summary>
         public static string Attribute_Type {
             get {
                 return ResourceManager.GetString("Attribute_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Views.
+        /// </summary>
+        public static string Attribute_Views {
+            get {
+                return ResourceManager.GetString("Attribute_Views", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VR.
+        /// </summary>
+        public static string Attribute_VrAbbreviation {
+            get {
+                return ResourceManager.GetString("Attribute_VrAbbreviation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Versus Rating.
+        /// </summary>
+        public static string Attribute_VrFull {
+            get {
+                return ResourceManager.GetString("Attribute_VrFull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wins.
+        /// </summary>
+        public static string Attribute_Wins {
+            get {
+                return ResourceManager.GetString("Attribute_Wins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Friends.
+        /// </summary>
+        public static string ListTitle_Friends {
+            get {
+                return ResourceManager.GetString("ListTitle_Friends", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Miis.
+        /// </summary>
+        public static string ListTitle_Miis {
+            get {
+                return ResourceManager.GetString("ListTitle_Miis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Players.
+        /// </summary>
+        public static string ListTitle_Players {
+            get {
+                return ResourceManager.GetString("ListTitle_Players", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rooms.
+        /// </summary>
+        public static string ListTitle_Rooms {
+            get {
+                return ResourceManager.GetString("ListTitle_Rooms", resourceCulture);
             }
         }
         
@@ -438,6 +1230,114 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mii Carousel.
+        /// </summary>
+        public static string PopupTitle_MiiCarousel {
+            get {
+                return ResourceManager.GetString("PopupTitle_MiiCarousel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mii Editor.
+        /// </summary>
+        public static string PopupTitle_MiiEditor {
+            get {
+                return ResourceManager.GetString("PopupTitle_MiiEditor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mii Selector.
+        /// </summary>
+        public static string PopupTitle_MiiSelector {
+            get {
+                return ResourceManager.GetString("PopupTitle_MiiSelector", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Browser.
+        /// </summary>
+        public static string PopupTitle_ModBrowser {
+            get {
+                return ResourceManager.GetString("PopupTitle_ModBrowser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Details.
+        /// </summary>
+        public static string PopupTitle_ModDetails {
+            get {
+                return ResourceManager.GetString("PopupTitle_ModDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to America.
+        /// </summary>
+        public static string Region_America {
+            get {
+                return ResourceManager.GetString("Region_America", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Australia.
+        /// </summary>
+        public static string Region_Australia {
+            get {
+                return ResourceManager.GetString("Region_Australia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to China.
+        /// </summary>
+        public static string Region_China {
+            get {
+                return ResourceManager.GetString("Region_China", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Europe.
+        /// </summary>
+        public static string Region_Europe {
+            get {
+                return ResourceManager.GetString("Region_Europe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Japan.
+        /// </summary>
+        public static string Region_Japan {
+            get {
+                return ResourceManager.GetString("Region_Japan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to South Korea.
+        /// </summary>
+        public static string Region_SouthKorea {
+            get {
+                return ResourceManager.GetString("Region_SouthKorea", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Taiwan.
+        /// </summary>
+        public static string Region_Taiwan {
+            get {
+                return ResourceManager.GetString("Region_Taiwan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Config Not Finished.
         /// </summary>
         public static string State_ConfigNotFinished {
@@ -447,11 +1347,38 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Custom.
+        /// </summary>
+        public static string State_Custom {
+            get {
+                return ResourceManager.GetString("State_Custom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string State_Error {
+            get {
+                return ResourceManager.GetString("State_Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Extracting files....
         /// </summary>
         public static string State_Extracting {
             get {
                 return ResourceManager.GetString("State_Extracting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed.
+        /// </summary>
+        public static string State_Installed {
+            get {
+                return ResourceManager.GetString("State_Installed", resourceCulture);
             }
         }
         
@@ -474,11 +1401,56 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No license.
+        /// </summary>
+        public static string State_NoLicense {
+            get {
+                return ResourceManager.GetString("State_NoLicense", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No name.
+        /// </summary>
+        public static string State_NoName {
+            get {
+                return ResourceManager.GetString("State_NoName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No profiles.
+        /// </summary>
+        public static string State_NoProfiles {
+            get {
+                return ResourceManager.GetString("State_NoProfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Server.
         /// </summary>
         public static string State_NoServer {
             get {
                 return ResourceManager.GetString("State_NoServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string State_Success {
+            get {
+                return ResourceManager.GetString("State_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string State_Unknown {
+            get {
+                return ResourceManager.GetString("State_Unknown", resourceCulture);
             }
         }
         
@@ -492,101 +1464,11 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error.
-        /// </summary>
-        public static string Term_Error {
-            get {
-                return ResourceManager.GetString("Term_Error", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to General.
-        /// </summary>
-        public static string Term_General {
-            get {
-                return ResourceManager.GetString("Term_General", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No.
-        /// </summary>
-        public static string Term_No {
-            get {
-                return ResourceManager.GetString("Term_No", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Offline.
-        /// </summary>
-        public static string Term_Offline {
-            get {
-                return ResourceManager.GetString("Term_Offline", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Online.
-        /// </summary>
-        public static string Term_Online {
-            get {
-                return ResourceManager.GetString("Term_Online", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Other.
-        /// </summary>
-        public static string Term_Other {
-            get {
-                return ResourceManager.GetString("Term_Other", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Speed.
-        /// </summary>
-        public static string Term_Speed {
-            get {
-                return ResourceManager.GetString("Term_Speed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Success.
-        /// </summary>
-        public static string Term_Success {
-            get {
-                return ResourceManager.GetString("Term_Success", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown.
-        /// </summary>
-        public static string Term_Unknown {
-            get {
-                return ResourceManager.GetString("Term_Unknown", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Warning.
         /// </summary>
-        public static string Term_Warning {
+        public static string State_Warning {
             get {
-                return ResourceManager.GetString("Term_Warning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Yes.
-        /// </summary>
-        public static string Term_Yes {
-            get {
-                return ResourceManager.GetString("Term_Yes", resourceCulture);
+                return ResourceManager.GetString("State_Warning", resourceCulture);
             }
         }
     }

@@ -1,0 +1,16 @@
+<base:PopupContent xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   x:Class="WheelWizard.Views.Popups.Generic.OptionsWindow">
+    <!-- Max Height is practically unreachable, no way that you have so many options -->
+    <Grid MaxHeight="800">
+        <ScrollViewer>
+            <UniformGrid Columns="3" HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="OptionList">
+                <!-- the list off Options are generated in this thing here -->
+            </UniformGrid>
+        </ScrollViewer>
+    </Grid>
+</base:PopupContent>

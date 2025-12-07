@@ -13,15 +13,20 @@ public class Badge : TemplatedControl
         { BadgeVariant.RrDev, "Retro Rewind Developer" },
         { BadgeVariant.Translator, "Translator" },
         { BadgeVariant.TranslatorLead, "Translator Lead" },
-        { BadgeVariant.GoldWinner, "This is an award winning player" },
-        { BadgeVariant.SilverWinner, "This is an award winning player" },
-        { BadgeVariant.BronzeWinner, "This is an award winning player" },
+        // winner badges
+        { BadgeVariant.Firestarter_GoldWinner, "Firestarter Tournament Winner" },
+        { BadgeVariant.Firestarter_SilverWinner, "Firestarter Tournament Runner-Up" },
+        { BadgeVariant.Firestarter_BronzeWinner, "Firestarter Tournament Runner-Up" },
+        { BadgeVariant.SummitShowdown_GoldWinner, "Summit Showdown Tourney Winner" },
+        { BadgeVariant.SummitShowdown_SilverWinner, "Summit Showdown Tourney Runner-Up" },
+        { BadgeVariant.SummitShowdown_BronzeWinner, "Summit Showdown Tourney Runner-Up" },
     };
 
     public static readonly StyledProperty<string> HoverTipProperty = AvaloniaProperty.Register<Badge, string>(
         nameof(HoverTip),
         BadgeToolTip[BadgeVariant.None]
     );
+
     public string HoverTip
     {
         get => GetValue(HoverTipProperty);
@@ -43,6 +48,7 @@ public class Badge : TemplatedControl
         {
             Classes.Remove(enumType.ToString());
         }
+
         Classes.Add(variant.ToString());
         HoverTip = BadgeToolTip[variant];
     }

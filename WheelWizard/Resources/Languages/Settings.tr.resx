@@ -18,34 +18,34 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="CompletePercentage" xml:space="preserve">
+    <data name="Value_Language_CompletePercentage" xml:space="preserve">
         <value>100</value>
     </data>
     <data name="Category_Video" xml:space="preserve">
         <value>Video</value>
     </data>
-    <data name="InfoText_30FPS" xml:space="preserve">
-        <value>Bu ayar, oyunu 30 FPS'de çalışmaya zorlar (varsayılan 60'tır).</value>
+    <data name="HelperText_30FPS" xml:space="preserve">
+        <value>Bu ayar, oyunu 30 FPS'de çalışmaya zorlar (varsayılan 60).</value>
     </data>
-    <data name="InfoText_EnableAnimations" xml:space="preserve">
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
         <value>Bu, Wheel Wizard uygulamasındaki animasyonları etkinleştirir.</value>
     </data>
-    <data name="InfoText_EndWithExe" xml:space="preserve">
+    <data name="HelperText_EndWithExe" xml:space="preserve">
         <value>Yol, .exe ile bitmelidir.</value>
     </data>
-    <data name="InfoText_ForceDisableWiimote" xml:space="preserve">
+    <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>Bu ayar, Wiimote'u oyun içinde devre dışı bırakır, ancak Wii kanalında etkinleştirir.</value>
     </data>
-    <data name="InfoText_LaunchWithDolphin" xml:space="preserve">
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>Oyunun yanı sıra Dolphin'in ana penceresini de başlatacak.</value>
     </data>
-    <data name="InfoText_Recommended" xml:space="preserve">
+    <data name="HelperText_Recommended" xml:space="preserve">
         <value>Bu ayar, takılmaları ve gecikme dalgalanmalarını azaltmak için belirli Dolphin ayarlarını değiştirir.</value>
     </data>
-    <data name="InfoText_ResolutionScale" xml:space="preserve">
+    <data name="HelperText_ResolutionScale" xml:space="preserve">
         <value>1x yerel çözünürlüktür.</value>
     </data>
-    <data name="InfoText_Topbar_LocationWarning" xml:space="preserve">
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
         <value>Ayarlar devre dışı, önce konum ayarlarını tamamlayın.</value>
     </data>
     <data name="Option_DolphinEmulatorExe" xml:space="preserve">
@@ -70,7 +70,7 @@
         <value>Mario Kart Wii Oyun Dosyası</value>
     </data>
     <data name="Option_OpenConfig" xml:space="preserve">
-        <value>Yapılandırma Klasörünü Aç</value>
+        <value>Yapılandırma Klasörü</value>
     </data>
     <data name="Option_Recommended" xml:space="preserve">
         <value>Tavsiye Edilen Ayarlar</value>
@@ -80,9 +80,6 @@
     </data>
     <data name="Option_Renderer" xml:space="preserve">
         <value>Render</value>
-    </data>
-    <data name="Option_RRLanguage" xml:space="preserve">
-        <value>Retro Rewind Dili</value>
     </data>
     <data name="Option_ShowFPS" xml:space="preserve">
         <value>FPS Göster</value>
@@ -149,5 +146,56 @@
     </data>
     <data name="Value_Language_Turkish" xml:space="preserve">
         <value>Türkçe</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Arapça</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Çince</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Çekçe</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Norveççe</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Portekizce</value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>Genel</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Diğer</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>Hakkında</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>Oyun Klasörünü Aç</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>Kayıt Klasörünü Aç</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Retro Rewind'ı Tekrar Kur</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Kurulum</value>
+    </data>
+    <data name="Value_Language_zTranslators" xml:space="preserve">
+        <value>wrkus, Weebo</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>Yol, bunlar ile bitebilir:</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Retro Rewind'ı oynayabilmek için önce bu üç yolu ayarlamanız gerekiyor</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>Opsiyonel</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>Bu sadece Wheel Wizard'ın dilini değiştirir. Oyun içi dili değiştirmek için oyundaki ayarları kullanın.</value>
     </data>
 </root>
