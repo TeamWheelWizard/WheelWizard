@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using WheelWizard.Helpers;
 using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 using WheelWizard.WiiManagement.Domain.Mii.Custom;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
 
@@ -41,7 +41,7 @@ public static class MiiSerializer
         data[0x17] = mii.Weight.Value;
 
         // Mii ID (0x18 - 0x1B)
-        BigEndianBinaryHelper.WriteUInt32(data, 0x18, mii.MiiId);
+        BigEndianBinaryHelper.WriteUInt32BigEndian(data, 0x18, mii.MiiId);
 
         // System ID (0x1C - 0x1F)
         data[0x1C] = mii.SystemId0;
@@ -191,7 +191,7 @@ public static class MiiSerializer
         mii.Weight = weight.Value;
 
         // Mii ID (0x18 - 0x1B)
-        mii.MiiId = BigEndianBinaryHelper.ReadUint32(data, 0x18);
+        mii.MiiId = BigEndianBinaryHelper.BufferToUint32(data, 0x18);
 
         // System ID (0x1C - 0x1F)
         mii.SystemId0 = data[0x1C];

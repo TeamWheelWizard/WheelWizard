@@ -78,7 +78,7 @@ public class MiiStudioDataSerializer
         // Offsets and logic match the 'else' block (Wii part) of miiFileRead
 
         // --- Basic Info ---
-        var tmpU16_0 = BigEndianBinaryHelper.ReadUint16(buf, 0);
+        var tmpU16_0 = BigEndianBinaryHelper.BufferToUint16(buf, 0);
         var isGirl = ((tmpU16_0 >> 14) & 1) == 1;
         var favColor = (int)((tmpU16_0 >> 1) & 0xF);
         int height = buf[0x16];
@@ -90,7 +90,7 @@ public class MiiStudioDataSerializer
         studio[2] = (byte)weight; // Weight (mapped to index 2 in studio)
 
         // --- Face ---
-        var tmpU16_20 = BigEndianBinaryHelper.ReadUint16(buf, 0x20);
+        var tmpU16_20 = BigEndianBinaryHelper.BufferToUint16(buf, 0x20);
         var faceShape = (int)(tmpU16_20 >> 13);
         var skinColor = (int)((tmpU16_20 >> 10) & 7);
         var facialFeature = (int)((tmpU16_20 >> 6) & 0xF); // Note: JS uses 0xF mask here, map to makeup/wrinkles
@@ -103,7 +103,7 @@ public class MiiStudioDataSerializer
         studio[0x12] = (byte)makeup;
 
         // --- Hair ---
-        var tmpU16_22 = BigEndianBinaryHelper.ReadUint16(buf, 0x22);
+        var tmpU16_22 = BigEndianBinaryHelper.BufferToUint16(buf, 0x22);
         var hairStyle = (int)(tmpU16_22 >> 9);
         var hairColor = (int)((tmpU16_22 >> 6) & 7);
         var flipHair = (int)((tmpU16_22 >> 5) & 1);
@@ -113,7 +113,7 @@ public class MiiStudioDataSerializer
         studio[0x1C] = (byte)flipHair;
 
         // --- Eyebrows ---
-        var tmpU32_24 = BigEndianBinaryHelper.ReadUint32(buf, 0x24);
+        var tmpU32_24 = BigEndianBinaryHelper.BufferToUint16(buf, 0x24);
         var eyebrowStyle = (int)(tmpU32_24 >> 27);
         var eyebrowRotation = (int)((tmpU32_24 >> 22) & 0xF); // Note: JS uses 0xF mask
         var eyebrowColor = (int)((tmpU32_24 >> 13) & 7);
@@ -131,7 +131,7 @@ public class MiiStudioDataSerializer
         studio[0xF] = (byte)eyebrowXSpacing;
 
         // --- Eyes ---
-        var tmpU32_28 = BigEndianBinaryHelper.ReadUint32(buf, 0x28);
+        var tmpU32_28 = BigEndianBinaryHelper.BufferToUint16(buf, 0x28);
         var eyeStyle = (int)(tmpU32_28 >> 26);
         var eyeRotation = (int)((tmpU32_28 >> 21) & 7); // Note: JS uses 7 (0b111) mask
         var eyeYPosition = (int)((tmpU32_28 >> 16) & 0x1F);
@@ -150,7 +150,7 @@ public class MiiStudioDataSerializer
         studio[8] = (byte)eyeXSpacing;
 
         // --- Nose ---
-        var tmpU16_2C = BigEndianBinaryHelper.ReadUint16(buf, 0x2C);
+        var tmpU16_2C = BigEndianBinaryHelper.BufferToUint16(buf, 0x2C);
         var noseStyle = (int)(tmpU16_2C >> 12);
         var noseScale = (int)((tmpU16_2C >> 8) & 0xF);
         var noseYposition = (int)((tmpU16_2C >> 3) & 0x1F);
@@ -161,7 +161,7 @@ public class MiiStudioDataSerializer
         studio[0x2D] = (byte)noseYposition;
 
         // --- Mouth ---
-        var tmpU16_2E = BigEndianBinaryHelper.ReadUint16(buf, 0x2E);
+        var tmpU16_2E = BigEndianBinaryHelper.BufferToUint16(buf, 0x2E);
         var mouseStyle = (int)(tmpU16_2E >> 11);
         var mouseColor = (int)((tmpU16_2E >> 9) & 3); // Lip color (0-3)
         var mouseScale = (int)((tmpU16_2E >> 5) & 0xF);
@@ -175,7 +175,7 @@ public class MiiStudioDataSerializer
         studio[0x27] = (byte)mouseYPosition;
 
         // --- Beard / Mustache ---
-        var tmpU16_32 = BigEndianBinaryHelper.ReadUint16(buf, 0x32);
+        var tmpU16_32 = BigEndianBinaryHelper.BufferToUint16(buf, 0x32);
         var mustacheStyle = (int)(tmpU16_32 >> 14);
         var beardStyle = (int)((tmpU16_32 >> 12) & 3);
         var facialHairColor = (int)((tmpU16_32 >> 9) & 7);
@@ -189,7 +189,7 @@ public class MiiStudioDataSerializer
         studio[0x2A] = (byte)mustacheYPosition;
 
         // --- Glasses ---
-        var tmpU16_30 = BigEndianBinaryHelper.ReadUint16(buf, 0x30);
+        var tmpU16_30 = BigEndianBinaryHelper.BufferToUint16(buf, 0x30);
         var glassesStyle = (int)(tmpU16_30 >> 12);
         var glassesColor = (int)((tmpU16_30 >> 9) & 7);
         var glassesScale = (int)((tmpU16_30 >> 5) & 7); // Note: JS uses 7 mask
@@ -209,7 +209,7 @@ public class MiiStudioDataSerializer
         studio[0x1A] = (byte)glassesYPosition;
 
         // --- Mole ---
-        var tmpU16_34 = BigEndianBinaryHelper.ReadUint16(buf, 0x34);
+        var tmpU16_34 = BigEndianBinaryHelper.BufferToUint16(buf, 0x34);
         var enableMole = (int)(tmpU16_34 >> 15);
         var moleScale = (int)((tmpU16_34 >> 11) & 0xF);
         var moleYPosition = (int)((tmpU16_34 >> 6) & 0x1F);

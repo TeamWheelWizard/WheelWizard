@@ -5,12 +5,12 @@ namespace WheelWizard.Helpers;
 public static class BigEndianBinaryHelper
 {
     //Helper functions to convert a buffer to an uint using big endian
-    public static uint ReadUint32(byte[] data, int offset)
+    public static uint BufferToUint32(byte[] data, int offset)
     {
         return (uint)((data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3]);
     }
 
-    public static ushort ReadUint16(byte[] data, int offset)
+    public static ushort BufferToUint16(byte[] data, int offset)
     {
         return (ushort)((data[offset] << 8) | data[offset + 1]);
     }
@@ -31,7 +31,7 @@ public static class BigEndianBinaryHelper
         return Encoding.BigEndianUnicode.GetString(bytes.ToArray());
     }
 
-    public static void WriteUInt32(byte[] data, int offset, uint value)
+    public static void WriteUInt32BigEndian(byte[] data, int offset, uint value)
     {
         data[offset] = (byte)(value >> 24);
         data[offset + 1] = (byte)((value >> 16) & 0xFF);
@@ -48,7 +48,7 @@ public static class BigEndianBinaryHelper
         return BitConverter.ToSingle(bytes, 0);
     }
 
-    public static void WriteUInt16(byte[] data, int offset, ushort value)
+    public static void WriteUInt16BigEndian(byte[] data, int offset, ushort value)
     {
         data[offset] = (byte)(value >> 8);
         data[offset + 1] = (byte)(value & 0xFF);

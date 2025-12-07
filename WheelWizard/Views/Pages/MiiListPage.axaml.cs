@@ -48,10 +48,10 @@ public partial class MiiListPage : UserControlBase
         {
             if (SettingsHelper.PathsSetupCorrectly())
             {
-                var sucess = MiiRepositoryService.ForceCreateDatabase();
-                if (sucess.IsFailure)
+                var creationResult = MiiRepositoryService.ForceCreateDatabase();
+                if (creationResult.IsFailure)
                 {
-                    ViewUtils.ShowSnackbar($"Failed to create Mii database '{sucess.Error.Message}'", ViewUtils.SnackbarType.Danger);
+                    MessageTranslationHelper.ShowMessage(creationResult.Error);
                     VisibleWhenNoDb.IsVisible = !miiDbExists;
                 }
             }
@@ -61,6 +61,7 @@ public partial class MiiListPage : UserControlBase
                 VisibleWhenNoDb.IsVisible = true;
             }
         }
+
         miiDbExists = MiiDbService.Exists();
         if (!miiDbExists)
             return;
@@ -301,15 +302,6 @@ public partial class MiiListPage : UserControlBase
             );
             return;
         }
-        var miiToExport = result.Value;
-        var saveResult = SaveMiiToDisk(miiToExport, diaglog);
-        if (saveResult.IsFailure)
-        {
-            ViewUtils.ShowSnackbar($"Failed to save Mii '{saveResult.Error.Message}'", ViewUtils.SnackbarType.Danger);
-            return;
-        }
-        ViewUtils.ShowSnackbar($"Exported Mii '{miiToExport.Name}' to file '{diaglog}'");
-    }
 
         var miiToExport = result.Value;
         var saveResult = SaveMiiToDisk(miiToExport, diaglog);
@@ -338,6 +330,7 @@ public partial class MiiListPage : UserControlBase
             );
             return miiData;
         }
+
         var file = FileSystem.FileInfo.New(path);
         using var stream = file.Open(FileMode.Create, FileAccess.Write);
         using var writer = new BinaryWriter(stream);
@@ -348,7 +341,6 @@ public partial class MiiListPage : UserControlBase
         ViewUtils.ShowSnackbar(
             Humanizer.ReplaceDynamic(Phrases.SnackbarSuccess_SavedMii, mii.Name, file.FullName) ?? "Saved Mii successfully"
         );
-        return Ok();
         return Ok();
     }
 

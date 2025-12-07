@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using WheelWizard.Services.WiiManagement.SaveData; // Assuming this path is correct for BigEndianBinaryReader
+using WheelWizard.Helpers;
 
 /// <summary>
 /// Handles the low-level reading and writing of the 24 custom bits spread across
@@ -77,12 +77,12 @@ internal static class CustomBitsCodec
     /// <param name="rawMiiBytes">The 74-byte array containing Mii data.</param>
     internal static uint Extract(byte[] rawMiiBytes)
     {
-        var faceData = BigEndianBinaryReader.ReadUint16(rawMiiBytes, OFS_FACE);
-        var hairData = BigEndianBinaryReader.ReadUint16(rawMiiBytes, OFS_HAIR);
-        var browData = BigEndianBinaryReader.ReadUint32(rawMiiBytes, OFS_BROW);
-        var eyeData = BigEndianBinaryReader.ReadUint32(rawMiiBytes, OFS_EYE);
-        var noseData = BigEndianBinaryReader.ReadUint16(rawMiiBytes, OFS_NOSE);
-        var moleData = BigEndianBinaryReader.ReadUint16(rawMiiBytes, OFS_MOLE);
+        var faceData = BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_FACE);
+        var hairData = BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_HAIR);
+        var browData = BigEndianBinaryHelper.BufferToUint32(rawMiiBytes, OFS_BROW);
+        var eyeData = BigEndianBinaryHelper.BufferToUint32(rawMiiBytes, OFS_EYE);
+        var noseData = BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_NOSE);
+        var moleData = BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_MOLE);
 
         uint payload = 0;
         var cursor = 0; // Tracks the next bit position to write into the payload (LSB).
@@ -133,51 +133,51 @@ internal static class CustomBitsCodec
         var fragIndex = 0;
 
         // Face Data (U0, U1)
-        var faceVal = BigEndianBinaryReader.ReadUint16(rawMiiBytes, OFS_FACE);
+        var faceVal = (ushort)BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_FACE);
         faceVal = (ushort)(
             (faceVal & ~MASK_FACE_COMBINED) // Clear U0 and U1 bits
             | (fragments[fragIndex++] << 3) // Write U0 (3 bits) to LSB bits 3,4,5
             | (fragments[fragIndex++] << 1)
         ); // Write U1 (1 bit) to LSB bit 1
-        BigEndianBinaryReader.WriteUInt16(rawMiiBytes, OFS_FACE, faceVal);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(rawMiiBytes, OFS_FACE, faceVal);
 
         // Hair Data (U2)
-        var hairVal = BigEndianBinaryReader.ReadUint16(rawMiiBytes, OFS_HAIR);
+        var hairVal = (ushort)BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_HAIR);
         hairVal = (ushort)(
             (hairVal & ~MASK_U2_HAIR) // Clear U2 bits
             | fragments[fragIndex++]
         ); // Write U2 (5 bits) to LSB bits 0-4
-        BigEndianBinaryReader.WriteUInt16(rawMiiBytes, OFS_HAIR, hairVal);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(rawMiiBytes, OFS_HAIR, hairVal);
 
         // Eyebrow Data (U4) - unknown_3 is NOT touched
-        var browVal = BigEndianBinaryReader.ReadUint32(rawMiiBytes, OFS_BROW);
+        var browVal = BigEndianBinaryHelper.BufferToUint32(rawMiiBytes, OFS_BROW);
         browVal =
             (browVal & ~MASK_U4_BROW) // Clear U4 bits
             | (fragments[fragIndex++] << 16); // Write U4 (6 bits) to LSB bits 16-21
-        BigEndianBinaryReader.WriteUInt32(rawMiiBytes, OFS_BROW, browVal);
+        BigEndianBinaryHelper.WriteUInt32BigEndian(rawMiiBytes, OFS_BROW, browVal);
 
         // Eye Data (U7) - unknown_5 and unknown_6 are NOT touched
-        var eyeVal = BigEndianBinaryReader.ReadUint32(rawMiiBytes, OFS_EYE);
+        var eyeVal = BigEndianBinaryHelper.BufferToUint32(rawMiiBytes, OFS_EYE);
         eyeVal =
             (eyeVal & ~MASK_U7_EYE) // Clear U7 bits
             | fragments[fragIndex++]; // Write U7 (5 bits) to LSB bits 0-4
-        BigEndianBinaryReader.WriteUInt32(rawMiiBytes, OFS_EYE, eyeVal);
+        BigEndianBinaryHelper.WriteUInt32BigEndian(rawMiiBytes, OFS_EYE, eyeVal);
 
         // Nose Data (U8)
-        var noseVal = BigEndianBinaryReader.ReadUint16(rawMiiBytes, OFS_NOSE);
+        var noseVal = BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_NOSE);
         noseVal = (ushort)(
             (noseVal & ~MASK_U8_NOSE) // Clear U8 bits
             | fragments[fragIndex++]
         ); // Write U8 (3 bits) to LSB bits 0-2
-        BigEndianBinaryReader.WriteUInt16(rawMiiBytes, OFS_NOSE, noseVal);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(rawMiiBytes, OFS_NOSE, noseVal);
 
         // Mole Data (U10)
-        var moleVal = BigEndianBinaryReader.ReadUint16(rawMiiBytes, OFS_MOLE);
+        var moleVal = BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_MOLE);
         moleVal = (ushort)(
             (moleVal & ~MASK_U10_MOLE) // Clear U10 bit
             | fragments[fragIndex++]
         ); // Write U10 (1 bit) to LSB bit 0
-        BigEndianBinaryReader.WriteUInt16(rawMiiBytes, OFS_MOLE, moleVal);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(rawMiiBytes, OFS_MOLE, moleVal);
     }
 
     /// <summary>

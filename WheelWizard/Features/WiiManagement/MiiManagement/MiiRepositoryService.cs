@@ -142,7 +142,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
             if (block.Length != MiiLength)
                 continue;
 
-            var thisId = BigEndianBinaryHelper.ReadUint32(block, 0x18);
+            var thisId = BigEndianBinaryHelper.BufferToUint32(block, 0x18);
             if (thisId == clientId)
                 return block;
         }
@@ -208,7 +208,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
             if (block.Length != MiiLength)
                 continue;
 
-            var thisId = BigEndianBinaryHelper.ReadUint32(block, 0x18);
+            var thisId = BigEndianBinaryHelper.BufferToUint32(block, 0x18);
             if (thisId != clientId)
                 continue;
 

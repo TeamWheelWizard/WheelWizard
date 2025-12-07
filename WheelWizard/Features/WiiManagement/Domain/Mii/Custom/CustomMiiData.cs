@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.WiiManagement.Domain.Mii.Custom;
 
@@ -199,7 +200,7 @@ public sealed class CustomMiiData
     /// from a <see cref="Mii"/> object.
     /// This involves serializing the Mii object to bytes first.
     /// </summary>
-    public static CustomMiiData FromMii(Mii mii)
+    public static CustomMiiData FromMii(MiiManagement.Domain.Mii.Mii mii)
     {
         var serializeResult = MiiSerializer.Serialize(mii);
         if (!serializeResult.IsSuccess)
@@ -266,7 +267,7 @@ public sealed class CustomMiiData
     /// This method returns a *new* Mii object instance with the changes applied, leaving the original untouched.
     /// </summary>
     /// <param name="mii">The original Mii object.</param>
-    public Mii ApplyTo(Mii mii)
+    public MiiManagement.Domain.Mii.Mii ApplyTo(MiiManagement.Domain.Mii.Mii mii)
     {
         // Serialize the input Mii to get its byte representation.
         // The serializer should handle cloning or creating a safe copy.
