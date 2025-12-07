@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using WheelWizard.Helpers;
 
+namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
+
 /// <summary>
 /// Handles the low-level reading and writing of the 24 custom bits spread across
 /// different locations within the 74-byte raw Mii data format.

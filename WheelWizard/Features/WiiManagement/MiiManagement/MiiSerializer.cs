@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using WheelWizard.Helpers;
 using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.WiiManagement.Domain.Mii.Custom;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
 

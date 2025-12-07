@@ -1,4 +1,4 @@
-namespace WheelWizard.WiiManagement.Domain.Mii.Custom;
+namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 //2 bits so only 4 values
 public enum MiiPreferredCameraAngle : uint
@@ -49,36 +49,36 @@ public enum MiiProfileColor : uint
 //this is 5 bits so it can be 0-31
 public enum MiiPreferredTagline
 {
-    None = 0,
-    Tagline1 = 1,
-    Tagline2 = 2,
-    Tagline3 = 3,
-    Tagline4 = 4,
-    Tagline5 = 5,
-    Tagline6 = 6,
-    Tagline7 = 7,
-    Tagline8 = 8,
-    Tagline9 = 9,
-    Tagline10 = 10,
-    Tagline11 = 11,
-    Tagline12 = 12,
-    Tagline13 = 13,
-    Tagline14 = 14,
-    Tagline15 = 15,
-    Tagline16 = 16,
-    Tagline17 = 17,
+    None = 0, //Off
+    Tagline1 = 1, // Hey there! I am using WheelWizard. (default)
+    Tagline2 = 2, // "hello world"
+    Tagline3 = 3, // game on!
+    Tagline4 = 4, // gotta go fast
+    Tagline5 = 5, // UwU
+    Tagline6 = 6, // You found me!
+    Tagline7 = 7, // how did we get here?
+    Tagline8 = 8, // return to sender
+    Tagline9 = 9, // loading...
+    Tagline10 = 10, // Funky FTW
+    Tagline11 = 11, // I'm beefbai
+    Tagline12 = 12, // Tonight... We steal the moon!
+    Tagline13 = 13, // ok
+    Tagline14 = 14, // BRB, grabbing snacks
+    Tagline15 = 15, // Ctrl + Alt + Mii
+    Tagline16 = 16, // Mii think therefore Mii am
+    Tagline17 = 17, // To Mii or not to Mii, that is the question
     Tagline18 = 18,
     Tagline19 = 19,
     Tagline20 = 20,
     Tagline21 = 21,
     Tagline22 = 22,
-    Tagline23 = 23,
+    Tagline23 = 23, 
     Tagline24 = 24,
-    Tagline25 = 25,
-    Tagline26 = 26,
-    Tagline27 = 27,
-    Tagline28 = 28,
-    Tagline29 = 29,
-    Tagline30 = 30,
+    Tagline25 = 25, 
+    Tagline26 = 26, 
+    Tagline27 = 27, 
+    Tagline28 = 28, 
+    Tagline29 = 29, 
+    Tagline30 = 30, 
     Tagline31 = 31,
 }

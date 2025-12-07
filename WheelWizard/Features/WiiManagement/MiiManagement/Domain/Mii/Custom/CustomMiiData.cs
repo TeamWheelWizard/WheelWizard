@@ -1,9 +1,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using WheelWizard.WiiManagement.MiiManagement;
 
-namespace WheelWizard.WiiManagement.Domain.Mii.Custom;
-
+namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 /// <summary>
 /// Provides a structured way to access and modify the 24 "unknown" or unused bits
 /// found within the standard 74-byte Mii data format. This allows storing custom data

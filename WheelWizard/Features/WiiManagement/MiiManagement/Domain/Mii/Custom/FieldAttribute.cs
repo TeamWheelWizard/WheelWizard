@@ -1,4 +1,4 @@
-namespace WheelWizard.WiiManagement.Domain.Mii.Custom;
+namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 /// <summary>
 /// This custom attribute is used to mark properties within the CustomMiiData class.

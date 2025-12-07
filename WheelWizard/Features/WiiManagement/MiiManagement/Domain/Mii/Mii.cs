@@ -1,4 +1,4 @@
-using WheelWizard.WiiManagement.Domain.Mii.Custom;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 

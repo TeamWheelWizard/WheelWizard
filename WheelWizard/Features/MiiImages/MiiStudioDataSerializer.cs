@@ -113,7 +113,7 @@ public class MiiStudioDataSerializer
         studio[0x1C] = (byte)flipHair;
 
         // --- Eyebrows ---
-        var tmpU32_24 = BigEndianBinaryHelper.BufferToUint16(buf, 0x24);
+        var tmpU32_24 = BigEndianBinaryHelper.BufferToUint32(buf, 0x24);
         var eyebrowStyle = (int)(tmpU32_24 >> 27);
         var eyebrowRotation = (int)((tmpU32_24 >> 22) & 0xF); // Note: JS uses 0xF mask
         var eyebrowColor = (int)((tmpU32_24 >> 13) & 7);
@@ -131,7 +131,7 @@ public class MiiStudioDataSerializer
         studio[0xF] = (byte)eyebrowXSpacing;
 
         // --- Eyes ---
-        var tmpU32_28 = BigEndianBinaryHelper.BufferToUint16(buf, 0x28);
+        var tmpU32_28 = BigEndianBinaryHelper.BufferToUint32(buf, 0x28);
         var eyeStyle = (int)(tmpU32_28 >> 26);
         var eyeRotation = (int)((tmpU32_28 >> 21) & 7); // Note: JS uses 7 (0b111) mask
         var eyeYPosition = (int)((tmpU32_28 >> 16) & 0x1F);
