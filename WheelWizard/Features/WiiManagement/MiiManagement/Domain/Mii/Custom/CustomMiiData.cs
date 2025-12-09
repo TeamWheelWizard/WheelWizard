@@ -50,9 +50,13 @@ public sealed class CustomMiiData
         // Filter to find only properties that have the [BitField] attribute.
         var bitFieldProperties = properties.Where(p => p.GetCustomAttribute<BitFieldAttribute>() is not null);
 
-        // Order these properties based on their declaration order in the source code.
-        // MetadataToken provides a stable ordering. This ensures bits are packed consistently.
-        var orderedProperties = bitFieldProperties.OrderBy(p => p.MetadataToken).ToArray();
+        // Order properties primarily by the optional [BitField(Order = X)] value,
+        // falling back to declaration order (MetadataToken) to keep layout stable.
+        var orderedProperties = bitFieldProperties
+            .Select(p => new { Prop = p, Attr = p.GetCustomAttribute<BitFieldAttribute>()! })
+            .OrderBy(p => p.Attr.Order)
+            .ThenBy(p => p.Prop.MetadataToken)
+            .ToArray();
 
         // Prepare a list to hold the metadata for each field.
         var fieldMetadataList = new List<FieldMeta>();
@@ -60,10 +64,13 @@ public sealed class CustomMiiData
         var currentBitOffset = 0;
 
         // Iterate through the ordered properties to calculate their position and mask.
-        foreach (var prop in orderedProperties)
+        foreach (var item in orderedProperties)
         {
+            var prop = item.Prop;
+            var attr = item.Attr;
+
             // Get the width specified in the [BitField] attribute for this property.
-            var width = prop.GetCustomAttribute<BitFieldAttribute>()!.Width;
+            var width = attr.Width;
 
             // Validate the specified width.
             if (width is <= 0 or > TotalBits)
@@ -110,7 +117,7 @@ public sealed class CustomMiiData
     /// This should always be the first field defined.
     /// The setter is private to ensure its only set internally (e.g., in CreateEmpty).
     /// </summary>
-    [BitField(3)]
+    [BitField(3, Order = 0)]
     public byte Version
     {
         get => (byte)GetField();
@@ -121,7 +128,7 @@ public sealed class CustomMiiData
     /// Gets or sets whether the Mii is allowed to be copied from other consoles (1 bit).
     /// Uses a boolean for easy access, mapping to 1 (true) or 0 (false).
     /// </summary>
-    [BitField(1)]
+    [BitField(1, Order = 1)]
     public bool IsCopyable
     {
         get => GetField() != 0; // Read the 1-bit value; non-zero means true.
@@ -132,7 +139,7 @@ public sealed class CustomMiiData
     /// Gets or sets a sample 4-bit colour value (0-15).
     /// The width could be changed if needed.
     /// </summary>
-    [BitField(4)]
+    [BitField(4, Order = 2)]
     public MiiProfileColor AccentColor
     {
         get => (MiiProfileColor)GetField();
@@ -142,21 +149,21 @@ public sealed class CustomMiiData
     /// <summary>
     /// Gets or sets eight individual feature flags packed into 3 bits
     /// </summary>
-    [BitField(3)]
+    [BitField(3, Order = 3)]
     public MiiPreferredFacialExpression FacialExpression
     {
         get => (MiiPreferredFacialExpression)GetField();
         set => SetField((uint)value);
     }
 
-    [BitField(2)]
+    [BitField(2, Order = 4)]
     public MiiPreferredCameraAngle CameraAngle
     {
         get => (MiiPreferredCameraAngle)GetField();
         set => SetField((uint)value);
     }
 
-    [BitField(5)]
+    [BitField(5, Order = 5)]
     public MiiPreferredTagline Tagline
     {
         get => (MiiPreferredTagline)GetField();
@@ -168,7 +175,7 @@ public sealed class CustomMiiData
     // They will be automatically allocated space in the payload after the 'Spare' field,
     // provided the total width does not exceed 24 bits. The static constructor handles layout.
 
-    [BitField(6)]
+    [BitField(6, Order = 6)]
     public ushort Spare
     {
         get => (ushort)GetField();

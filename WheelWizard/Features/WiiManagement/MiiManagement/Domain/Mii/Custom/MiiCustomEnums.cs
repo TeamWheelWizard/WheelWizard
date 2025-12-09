@@ -60,7 +60,7 @@ public enum MiiPreferredTagline
     Tagline8 = 8, // return to sender
     Tagline9 = 9, // loading...
     Tagline10 = 10, // Funky FTW
-    Tagline11 = 11, // I'm beefbai
+    Tagline11 = 11, // meow meow
     Tagline12 = 12, // Tonight... We steal the moon!
     Tagline13 = 13, // ok
     Tagline14 = 14, // BRB, grabbing snacks

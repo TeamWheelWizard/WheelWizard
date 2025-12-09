@@ -13,6 +13,12 @@ internal sealed class BitFieldAttribute : Attribute
     public int Width { get; }
 
     /// <summary>
+    /// Optional explicit ordering for packing; lower values are packed first.
+    /// Defaults to source/declaration order when not set.
+    /// </summary>
+    public int Order { get; set; } = int.MaxValue;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="BitFieldAttribute"/> class.
     /// </summary>
     /// <param name="width">The number of bits the associated property will occupy.</param>
