@@ -230,6 +230,9 @@ public sealed class CustomMiiData
         if (diskVersion >= SchemaVersion) // don't remove this, once version goes above 1 this check is not redundant anymore
             return CreateEmpty();
 
+        // todo: calculate distance walking forward from diskVersion to SchemaVersion
+        // if distance is 5 versions give a warning saying 
+        // "This mii contains old (or future) data, do you want to try and migrate it and experience possible data loss?"
         var migrated = MigrateFromVersion(rawpayload, diskVersion);
         return FromPayload(migrated);
     }
