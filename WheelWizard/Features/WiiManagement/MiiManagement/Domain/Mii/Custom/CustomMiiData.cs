@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
+
 /// <summary>
 /// Provides a structured way to access and modify the 24 "unknown" or unused bits
 /// found within the standard 74-byte Mii data format. This allows storing custom data
@@ -18,6 +19,9 @@ public sealed class CustomMiiData
     // Increment this (1-7, then loop) if the layout of properties below changes,
     // allowing older versions to recognize or ignore newer data formats.
     private const int SchemaVersion = 1;
+    private const byte VersionCycleLength = 7; // 3-bit schema cycles over 1-7
+    private const int MaxMigrationHops = 5; // beyond this, data is treated as stale
+    private const uint VersionMask = (1u << 3) - 1u;
 
     #region Layout Metadata
 
@@ -215,26 +219,39 @@ public sealed class CustomMiiData
 
     private static CustomMiiData FromPayload(uint rawpayload)
     {
-        var versionMask = (1u << 3) - 1u;
-        var diskVersion = (byte)(rawpayload & versionMask);
+        var diskVersion = (byte)(rawpayload & VersionMask);
 
-        // If it’s exactly what we expect, we’re done:
+        // Fast path: payload already matches our schema.
         if (diskVersion == SchemaVersion)
             return new(rawpayload);
 
+        // Version byte missing/zero -> accept as-is; nothing to migrate.
         if (diskVersion == 0)
             return new(rawpayload);
 
-        // If it’s an older, supported version, migrate it forward one step at a time:
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-        if (diskVersion >= SchemaVersion) // don't remove this, once version goes above 1 this check is not redundant anymore
+        if (!TryComputeForwardDistance(diskVersion, (byte)SchemaVersion, out var distance))
             return CreateEmpty();
 
-        // todo: calculate distance walking forward from diskVersion to SchemaVersion
-        // if distance is 5 versions give a warning saying 
-        // "This mii contains old (or future) data, do you want to try and migrate it and experience possible data loss?"
-        var migrated = MigrateFromVersion(rawpayload, diskVersion);
-        return FromPayload(migrated);
+        // If the payload is more than 5 migrations behind, treat it as stale and discard.
+        if (distance >= MaxMigrationHops)
+            return CreateEmpty();
+
+        // Walk forward version-by-version until we reach the current schema.
+        var migratedPayload = rawpayload;
+        var currentVersion = diskVersion;
+
+        for (var step = 0; step < distance; step++)
+        {
+            if (!TryMigrateFromVersion(currentVersion, migratedPayload, out var nextPayload))
+                return CreateEmpty();
+
+            migratedPayload = nextPayload;
+            currentVersion = NextVersion(currentVersion);
+        }
+
+        // Ensure the version bits are aligned to the current schema.
+        migratedPayload = WithVersion(migratedPayload, (byte)SchemaVersion);
+        return new(migratedPayload);
     }
 
     /// <summary>
@@ -243,21 +260,57 @@ public sealed class CustomMiiData
     /// </summary>
     /// <param name="oldPayload">The 24‐bit data block from an older schema version.</param>
     /// <param name="oldVersion">The schema version of that payload.</param>
-    private static uint MigrateFromVersion(uint oldPayload, byte oldVersion)
+    private static bool TryMigrateFromVersion(byte oldVersion, uint oldPayload, out uint migratedPayload)
     {
+        var nextVersion = NextVersion(oldVersion);
+
         switch (oldVersion)
         {
             case 1: // to version 2
-                return oldPayload;
+                // No layout changes yet; simply bump the version.
+                migratedPayload = WithVersion(oldPayload, nextVersion);
+                return true;
 
             // case 2: // to version 3
             //     // Migration logic for version 3 goes here...
             //     break;
 
             default:
-                return CreateEmpty()._payload;
+                migratedPayload = oldPayload;
+                return false;
         }
     }
+
+    /// <summary>
+    /// Advances a version value, wrapping at 7 back to 1 (since the field is 3 bits wide).
+    /// </summary>
+    private static byte NextVersion(byte version) => version >= VersionCycleLength ? (byte)1 : (byte)(version + 1);
+
+    /// <summary>
+    /// Calculates how many forward steps (wrapping 1→7→1) it takes to reach targetVersion from fromVersion.
+    /// Returns false for invalid inputs (zero) to signal unsupported/unknown payloads.
+    /// </summary>
+    private static bool TryComputeForwardDistance(byte fromVersion, byte targetVersion, out int distance)
+    {
+        distance = 0;
+
+        if (fromVersion == 0 || targetVersion == 0)
+            return false;
+
+        var cursor = fromVersion;
+        while (cursor != targetVersion && distance <= VersionCycleLength)
+        {
+            cursor = NextVersion(cursor);
+            distance++;
+        }
+
+        return cursor == targetVersion;
+    }
+
+    /// <summary>
+    /// Replaces the 3-bit version field inside a payload without touching other bits.
+    /// </summary>
+    private static uint WithVersion(uint payload, byte version) => (payload & ~VersionMask) | (version & VersionMask);
 
     /// <summary>
     /// Creates a new <see cref="CustomMiiData"/> instance with all custom bits initially set to zero,
