@@ -275,7 +275,7 @@ public sealed class CustomMiiData
     /// This method returns a *new* Mii object instance with the changes applied, leaving the original untouched.
     /// </summary>
     /// <param name="mii">The original Mii object.</param>
-    public MiiManagement.Domain.Mii.Mii ApplyTo(MiiManagement.Domain.Mii.Mii mii)
+    public Mii ApplyTo(Mii mii)
     {
         // Serialize the input Mii to get its byte representation.
         // The serializer should handle cloning or creating a safe copy.
