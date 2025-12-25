@@ -183,6 +183,12 @@ To join a specific room, you'll need to either join through a friend, or hope to
     <data name="MessageWarning_DolphinNotFound_Extra" xml:space="preserve">
         <value>Dolphin Emulator folder not automatically found. Please try and find the folder manually, click 'help' for more information.</value>
     </data>
+    <data name="MessageWarning_DolphinToolSelected_Title" xml:space="preserve">
+        <value>Wrong Dolphin executable selected</value>
+    </data>
+    <data name="MessageWarning_DolphinToolSelected_Extra" xml:space="preserve">
+        <value>You selected DolphinTool.exe. Please choose Dolphin.exe (the Dolphin emulator executable) instead.</value>
+    </data>
     <data name="MessageError_DataFolderMove_Title" xml:space="preserve">
         <value>Failed to move data</value>
     </data>
