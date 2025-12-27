@@ -94,6 +94,7 @@
                             Br="{Binding BrDisplay}"
                             Vr="{Binding VrDisplay}"
                             Mii="{Binding FirstMii}"
+                            IsOpenHost="{Binding IsOpenHost}"
                             HasBadges="{Binding HasBadges}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>

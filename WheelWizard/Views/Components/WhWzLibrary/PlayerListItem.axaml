@@ -10,6 +10,7 @@
                                        FriendCode="1234-5678-9012"
                                        UserName="Lum Patch"
                                        Vr="5000" Br="5000"
+                                       IsOpenHost="True"
                                        HasBadges="True" />
 
             <components:PlayerListItem Width="428" Height="124"
@@ -76,15 +77,26 @@
                                        Margin="10,0,0,0" />
                         </StackPanel>
 
-                        <Border Grid.Column="4" Background="Transparent" HorizontalAlignment="Stretch"
-                                IsVisible="{TemplateBinding HasBadges}" Margin="0,0,5,0"
-                                CornerRadius="6" Height="40" BorderThickness="1"
-                                BorderBrush="{StaticResource Neutral600}">
-                            <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                                <StackPanel Orientation="Horizontal" x:Name="PART_BadgeContainer" Spacing="3">
-                                </StackPanel>
-                            </ScrollViewer>
-                        </Border>
+                        <Grid Grid.Column="4" ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                            <Border Grid.Column="0" Background="Transparent" HorizontalAlignment="Stretch"
+                                    IsVisible="{TemplateBinding HasBadges}" Margin="0,0,6,0"
+                                    CornerRadius="6" Height="40" BorderThickness="1"
+                                    BorderBrush="{StaticResource Neutral600}" VerticalAlignment="Center">
+                                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                                    <StackPanel Orientation="Horizontal" x:Name="PART_BadgeContainer" Spacing="3">
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+
+                            <PathIcon Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                      IsVisible="{TemplateBinding IsOpenHost}"
+                                      Data="{StaticResource LockOpen}" Width="16" Height="16"
+                                      Foreground="{StaticResource Primary400}"
+                                      Margin="0,0,10,0"
+                                      ToolTip.Tip="Open Host"
+                                      ToolTip.Placement="Top"
+                                      ToolTip.ShowDelay="20" />
+                        </Grid>
                     </Grid>
                 </Border>
             </ControlTemplate>
