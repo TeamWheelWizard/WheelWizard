@@ -14,16 +14,15 @@ public class RrPlayerFactory : MockingDataFactory<RrPlayer, RrPlayerFactory>
         var rand = Rand(seed);
         return new()
         {
-            Count = "1",
             Pid = playerId.ToString(),
             Name = $"Player {playerId}",
-            ConnMap = "0",
-            ConnFail = "0",
-            Suspend = "0",
-            Fc = FriendCodeFactory.Instance.Create(),
-            Ev = ((int)(rand.NextDouble() * 9999)).ToString(),
-            Eb = ((int)(rand.NextDouble() * 9999)).ToString(),
-            Mii = MiiFactory.Instance.CreateMultiple(1, seed).ToList(),
+            FriendCode = FriendCodeFactory.Instance.Create(),
+            Vr = (int)(rand.NextDouble() * 99999),
+            Br = (int)(rand.NextDouble() * 9999),
+            IsOpenHost = false,
+            IsSuspended = false,
+            ConnectionMap = ["0"],
+            Mii = MiiFactory.Instance.Create(seed),
         };
     }
 }

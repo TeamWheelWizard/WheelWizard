@@ -52,7 +52,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         InitializeComponent();
         DataContext = this;
         Room = RrRoomFactory.Instance.Create(); // Create a fake room for design-time preview
-        PlayersList = new(Room.Players.Values);
+        PlayersList = new(Room.Players);
     }
 
     public RoomDetailsPage(RrRoom room)
@@ -61,7 +61,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         DataContext = this;
         Room = room;
 
-        PlayersList = new(Room.Players.Values);
+        PlayersList = new(Room.Players);
 
         RRLiveRooms.Instance.Subscribe(this);
         Unloaded += RoomsDetailPage_Unloaded;
@@ -83,7 +83,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
 
         Room = room;
         PlayersList.Clear();
-        foreach (var p in room.Players.Values)
+        foreach (var p in room.Players)
         {
             PlayersList.Add(p);
         }
@@ -95,7 +95,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
     {
         if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
             return;
-        TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(selectedPlayer.Fc);
+        TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(selectedPlayer.FriendCode);
         ViewUtils.ShowSnackbar(Phrases.SnackbarSuccess_CopiedFC);
     }
 

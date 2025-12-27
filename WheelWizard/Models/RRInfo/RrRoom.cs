@@ -6,15 +6,13 @@ namespace WheelWizard.Models.RRInfo;
 public class RrRoom
 {
     public required string Id { get; set; }
-    public string? Game { get; set; } // it always exists, but we dont care since we dont use it (and its always "mariokartwii")
     public required DateTime Created { get; set; }
     public required string Type { get; set; }
     public required bool Suspend { get; set; }
-    public string? Host { get; set; } // the key of player in the players map (that started the room)
     public string? Rk { get; set; } // RK does not exists in private rooms
-    public required Dictionary<string, RrPlayer> Players { get; set; }
+    public required List<RrPlayer> Players { get; set; }
 
-    public int PlayerCount => Players.Sum(p => p.Value.PlayerCount);
+    public int PlayerCount => Players.Count;
 
     public string TimeOnline => Humanizer.HumanizeTimeSpan(DateTime.UtcNow - Created);
     public bool IsPublic => Type != "private";
@@ -139,7 +137,16 @@ public class RrRoom
             _ => IsPublic ? "Unknown Mode" : "Private Room",
         };
 
-    public int AverageVr => PlayerCount == 0 ? 0 : Players.Sum(p => p.Value.Vr) / PlayerCount;
+    public int AverageVr
+    {
+        get
+        {
+            var vrs = Players.Select(p => p.Vr).Where(v => v.HasValue).Select(v => v!.Value).ToList();
+            return vrs.Count == 0 ? 0 : (int)vrs.Average();
+        }
+    }
 
-    public Mii? HostMii => !string.IsNullOrEmpty(Host) ? Players.GetValueOrDefault(Host)?.FirstMii : null;
+    public RrPlayer? HostPlayer => Players.FirstOrDefault(p => p.IsOpenHost);
+
+    public Mii? HostMii => HostPlayer?.FirstMii;
 }

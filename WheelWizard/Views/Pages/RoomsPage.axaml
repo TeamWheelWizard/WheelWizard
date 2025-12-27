@@ -144,9 +144,9 @@
                     <DataTemplate>
                         <components:PlayerListItem
                             UserName="{Binding Name}"
-                            FriendCode="{Binding Fc}"
-                            Br="{Binding Eb}"
-                            Vr="{Binding Ev}"
+                            FriendCode="{Binding FriendCode}"
+                            Br="{Binding BrDisplay}"
+                            Vr="{Binding VrDisplay}"
                             Mii="{Binding FirstMii}"
                             HasBadges="{Binding HasBadges}" />
                     </DataTemplate>

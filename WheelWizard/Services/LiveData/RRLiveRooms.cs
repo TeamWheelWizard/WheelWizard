@@ -38,74 +38,109 @@ public class RRLiveRooms : RepeatedTaskManager
         var raw = roomsResult.Value;
         var splitRaw = SplitMergedRooms(raw);
 
-        var rrRooms = splitRaw
-            .Select(room => new RrRoom
-            {
-                Id = room.Id,
-                Game = room.Game,
-                Created = room.Created,
-                Type = room.Type,
-                Suspend = room.Suspend,
-                Host = room.Host,
-                Rk = room.Rk,
-                Players = room.Players.ToDictionary(
-                    kv => kv.Key,
-                    kv =>
-                    {
-                        var p = kv.Value;
-                        return new RrPlayer
-                        {
-                            Count = p.Count,
-                            Pid = p.Pid,
-                            Name = p.Name,
-                            ConnMap = p.ConnMap,
-                            ConnFail = p.ConnFail,
-                            Suspend = p.Suspend,
-                            Fc = p.Fc,
-                            Ev = p.Ev,
-                            Eb = p.Eb,
-                            BadgeVariants = whWzService.GetBadges(p.Fc),
-                            Mii = p
-                                .Mii.Select(mii =>
-                                {
-                                    var bytes = Convert.FromBase64String(mii.Data);
-                                    var des = MiiSerializer.Deserialize(bytes);
-                                    return des.IsSuccess ? des.Value : new Mii();
-                                })
-                                .ToList(),
-                        };
-                    }
-                ),
-            })
-            .ToList();
+        var rrRooms = splitRaw.Select(room => MapRoom(room, whWzService)).ToList();
 
         CurrentRooms = rrRooms;
     }
 
-    private static List<RwfcRoom> SplitMergedRooms(List<RwfcRoom> rooms)
+    private static RrRoom MapRoom(RwfcRoomStatusRoom room, IWhWzDataSingletonService whWzService)
     {
-        var output = new List<RwfcRoom>();
+        return new()
+        {
+            Id = room.Id,
+            Created = room.Created,
+            Type = room.Type,
+            Suspend = room.Suspend,
+            Rk = room.Rk,
+            Players = room.Players.Select(p => MapPlayer(p, whWzService)).ToList(),
+        };
+    }
+
+    private static RrPlayer MapPlayer(RwfcRoomStatusPlayer p, IWhWzDataSingletonService whWzService)
+    {
+        Mii? mii = null;
+        if (p.Mii is not null && !string.IsNullOrWhiteSpace(p.Mii.Data))
+        {
+            try
+            {
+                var bytes = Convert.FromBase64String(p.Mii.Data);
+                var des = MiiSerializer.Deserialize(bytes);
+                if (des.IsSuccess)
+                    mii = des.Value;
+            }
+            catch
+            {
+                // ignore invalid base64/serialization
+            }
+        }
+
+        var friendCode = p.FriendCode ?? string.Empty;
+
+        return new()
+        {
+            Pid = p.Pid,
+            Name = p.Name ?? string.Empty,
+            FriendCode = friendCode,
+            Vr = p.Vr,
+            Br = p.Br,
+            IsOpenHost = p.IsOpenHost,
+            IsSuspended = p.IsSuspended,
+            ConnectionMap = p.ConnectionMap ?? [],
+            Mii = mii,
+            BadgeVariants = whWzService.GetBadges(friendCode),
+        };
+    }
+
+    private static List<RwfcRoomStatusRoom> SplitMergedRooms(List<RwfcRoomStatusRoom> rooms)
+    {
+        var output = new List<RwfcRoomStatusRoom>();
 
         foreach (var room in rooms)
         {
-            var keys = room.Players.Keys.ToList();
-            var n = keys.Count;
+            var n = room.Players.Count;
 
             // build adjacency of “two‐way” connections
             var adj = Enumerable.Range(0, n).Select(_ => new List<int>()).ToArray();
+            var anyEdgeAdded = false;
 
             for (var i = 0; i < n; i++)
             {
-                var map = room.Players[keys[i]].ConnMap;
-                for (var j = 0; j < map.Length; j++)
+                var mapList = room.Players[i].ConnectionMap;
+                if (mapList is null || mapList.Count == 0)
+                    continue;
+
+                // /api/roomstatus: connectionMap is usually length n (including self), but can vary.
+                var includesSelf = mapList.Count == n;
+                var excludesSelf = mapList.Count == n - 1;
+
+                if (!includesSelf && !excludesSelf)
+                    continue;
+
+                for (var j = 0; j < mapList.Count; j++)
                 {
-                    if (map[j] == '0')
+                    var entry = mapList[j];
+                    var c = string.IsNullOrEmpty(entry) ? '0' : entry[0];
+                    if (c == '0')
                         continue;
 
-                    var other = j >= i ? j + 1 : j;
+                    if (includesSelf && j == i)
+                        continue;
+
+                    var other = includesSelf ? j : (j >= i ? j + 1 : j);
+                    if (other < 0 || other >= n)
+                        continue;
+
                     // only add if we’ll later see the reverse link
                     adj[i].Add(other);
+                    anyEdgeAdded = true;
                 }
+            }
+
+            // If we have no connectivity information, don't attempt to split.
+            if (!anyEdgeAdded)
+            {
+                output.Add(room);
+                continue;
             }
 
             // find connected components
@@ -142,16 +177,15 @@ public class RRLiveRooms : RepeatedTaskManager
             if (components.Count > 1)
             {
                 output.AddRange(
-                    components.Select(comp => new RwfcRoom
+                    components.Select(comp => new RwfcRoomStatusRoom
                     {
                         Id = room.Id,
-                        Game = room.Game,
-                        Created = room.Created,
                         Type = room.Type,
-                        Suspend = room.Suspend,
+                        Created = room.Created,
                         Host = room.Host,
                         Rk = room.Rk,
-                        Players = comp.ToDictionary(idx => keys[idx], idx => room.Players[keys[idx]]),
+                        Suspend = room.Suspend,
+                        Players = comp.Select(idx => room.Players[idx]).ToList(),
                     })
                 );
             }

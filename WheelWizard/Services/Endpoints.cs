@@ -5,7 +5,7 @@ public static class Endpoints
     /// <summary>
     /// The base address for accessing room data
     /// </summary>
-    public const string RwfcBaseAddress = "http://rwfc.net";
+    public const string RwfcBaseAddress = "https://rwfc.net";
 
     /// <summary>
     /// The base address for accessing the WheelWizard data (data that we control)

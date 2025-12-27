@@ -77,9 +77,10 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
 
         Players.Clear();
         var matchingPlayers = Rooms
-            .SelectMany(r => r.Players.Values)
+            .SelectMany(r => r.Players)
             .Where(p =>
-                p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) || p.Fc.Contains(query, StringComparison.OrdinalIgnoreCase)
+                p.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || p.FriendCode.Contains(query, StringComparison.OrdinalIgnoreCase)
             )
             .Distinct()
             .ToList();
@@ -125,7 +126,7 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
         if (listBox.SelectedItem is not RrPlayer selectedRoom)
             return;
 
-        var room = Rooms.FirstOrDefault(r => r.Players.ContainsValue(selectedRoom));
+        var room = Rooms.FirstOrDefault(r => r.Players.Any(p => p.Equals(selectedRoom)));
 
         NavigationManager.NavigateTo<RoomDetailsPage>(room);
         listBox.SelectedItem = null;

@@ -116,10 +116,10 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     public void RefreshOnlineStatus()
     {
         var currentRooms = RRLiveRooms.Instance.CurrentRooms;
-        var onlinePlayers = currentRooms.SelectMany(room => room.Players.Values).ToList();
+        var onlinePlayers = currentRooms.SelectMany(room => room.Players).ToList();
         foreach (var user in Licenses.Users)
         {
-            user.IsOnline = onlinePlayers.Any(player => player.Fc == user.FriendCode);
+            user.IsOnline = onlinePlayers.Any(player => player.FriendCode == user.FriendCode);
         }
     }
 
