@@ -44,12 +44,13 @@
                                       IsVisible="{TemplateBinding Mii, Converter={x:Static ObjectConverters.IsNull} }"
                                       Width="1000" Foreground="{StaticResource Neutral500}" />
                             
-                            <behaviorComponent:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                              IsVisible="{TemplateBinding Mii, Converter={x:Static ObjectConverters.IsNotNull} }"
-                                                              Mii="{TemplateBinding Mii}" ImageOnlyMargin="-4,-9,-4,0"
-                                                              FallBackColor="{StaticResource Neutral500}"
-                                                              LoadingColor="{StaticResource Neutral950}"
-                                                              ImageVariant="{x:Static miiVars:MiiImageVariants.MiiBlockProfile}" />
+                            <behaviorComponent:MiiImageLoaderWithHover x:Name="PART_MiiImageLoader" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                                        IsVisible="{TemplateBinding Mii, Converter={x:Static ObjectConverters.IsNotNull} }"
+                                                                        Mii="{TemplateBinding Mii}" ImageOnlyMargin="-4,-9,-4,0"
+                                                                        FallBackColor="{StaticResource Neutral500}"
+                                                                        LoadingColor="{StaticResource Neutral950}"
+                                                                        ImageVariant="{x:Static miiVars:MiiImageVariants.MiiBlockProfile}"
+                                                                        ReloadMethod="KeepAllUntilNew" />
                             
                             <PathIcon Data="{StaticResource StarIcon}" Height="17"
                                       IsVisible="{TemplateBinding IsFavorite}" HorizontalAlignment="Left" VerticalAlignment="Top"
@@ -83,6 +84,10 @@
         
         <Style Selector="^:pointerover /template/ Border#PART_NameBorder">
             <Setter Property="Opacity" Value="1" />
+        </Style>
+        
+        <Style Selector="^:pointerover /template/ behaviorComponent|MiiImageLoaderWithHover#PART_MiiImageLoader">
+            <Setter Property="IsHovered" Value="True" />
         </Style>
         
         <Style Selector="^[IsFavorite=True] /template/ Border#PART_MainBorder">
