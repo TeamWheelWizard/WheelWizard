@@ -17,7 +17,7 @@ public class RrPlayer : IEquatable<RrPlayer>
 
     public int? LeaderboardRank { get; set; }
     public bool IsTopLeaderboardPlayer => LeaderboardRank.HasValue;
-    public string TopLabel => LeaderboardRank is { } rank ? $"TOP {rank}" : string.Empty;
+    public string TopLabel => LeaderboardRank is { } rank ? $"#{rank}" : string.Empty;
 
     public List<string> ConnectionMap { get; set; } = [];
 
