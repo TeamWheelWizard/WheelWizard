@@ -78,15 +78,17 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private readonly IMiiDbService _miiService;
     private readonly IFileSystem _fileSystem;
     private readonly IWhWzDataSingletonService _whWzDataSingletonService;
+    private readonly IRRratingReader _rrratingReader;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
 
-    public GameLicenseSingletonService(IMiiDbService miiService, IFileSystem fileSystem, IWhWzDataSingletonService whWzDataSingletonService)
+    public GameLicenseSingletonService(IMiiDbService miiService, IFileSystem fileSystem, IWhWzDataSingletonService whWzDataSingletonService, IRRratingReader rrratingReader)
         : base(40)
     {
         _miiService = miiService;
         _fileSystem = fileSystem;
         _whWzDataSingletonService = whWzDataSingletonService;
+        _rrratingReader = rrratingReader;
         Licenses = new();
     }
 
@@ -195,18 +197,54 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         if (_rksysData == null)
             return new ArgumentNullException(nameof(_rksysData));
 
+        var profileId = BigEndianBinaryHelper.BufferToUint32(_rksysData, rkpdOffset + 0x5C);
         var friendCode = FriendCodeGenerator.GetFriendCode(_rksysData, rkpdOffset + 0x5C);
         var miiDataResult = ParseMiiData(rkpdOffset);
         var miiToUse = miiDataResult.IsFailure ? new() : miiDataResult.Value;
 
         var statistics = StatisticsSerializer.ParseStatistics(_rksysData, rkpdOffset);
 
+        // Try to read VR/BR from RRrating.pul file
+        var vrFromRksys = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB0);
+        var brFromRksys = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB2);
+        var vr = vrFromRksys;
+        var br = brFromRksys;
+
+        if (profileId > 0 && !string.IsNullOrEmpty(friendCode))
+        {
+            var rrRatingData = TryReadRRratingFile();
+            if (rrRatingData != null)
+            {
+                // Try to find by profile_id first
+                var rating = _rrratingReader.ReadRatingFromFile(rrRatingData, profileId);
+
+                // Verify friend code matches if rating found
+                if (rating.HasValue)
+                {
+                    // Calculate friend code from profile_id and compare with rksys friend code
+                    var calculatedFriendCode = FriendCodeGenerator.ProfileIdToFriendCode(profileId);
+                    // Convert friend code string to ulong for comparison
+                    var fcString = friendCode.Replace("-", "");
+                    if (ulong.TryParse(fcString, out var fcDec))
+                    {
+                        // Compare friend codes - use rating if they match
+                        if (fcDec == calculatedFriendCode)
+                        {
+                            // Convert float VR/BR to uint by multiplying by 100 (e.g., 258.62 -> 25862)
+                            vr = (uint)Math.Round(rating.Value.vr * 100);
+                            br = (uint)Math.Round(rating.Value.br * 100);
+                        }
+                    }
+                }
+            }
+        }
+
         var user = new LicenseProfile
         {
             Mii = miiToUse,
             FriendCode = friendCode,
-            Vr = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB0),
-            Br = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB2),
+            Vr = vr,
+            Br = br,
             TotalRaceCount = BigEndianBinaryHelper.BufferToUint32(_rksysData, rkpdOffset + 0xB4),
             TotalWinCount = BigEndianBinaryHelper.BufferToUint32(_rksysData, rkpdOffset + 0xDC),
             BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
@@ -218,6 +256,23 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
         ParseFriends(user, rkpdOffset);
         return user;
+    }
+
+    private byte[]? TryReadRRratingFile()
+    {
+        try
+        {
+            var rrRatingPath = PathManager.RRratingFilePath;
+            if (_fileSystem.File.Exists(rrRatingPath))
+            {
+                return _fileSystem.File.ReadAllBytes(rrRatingPath);
+            }
+        }
+        catch
+        {
+            // Silently fail if file doesn't exist or can't be read
+        }
+        return null;
     }
 
     private OperationResult<Mii> ParseMiiData(int rkpdOffset)
