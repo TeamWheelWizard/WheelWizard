@@ -13,7 +13,7 @@ public sealed class RwfcRoomStatusPlayer
     public bool IsOpenHost { get; set; }
     public bool IsSuspended { get; set; }
 
-    public RwfcRoomStatusMii? Mii { get; set; }
+    public RwfcMii? Mii { get; set; }
 
     public List<string> ConnectionMap { get; set; } = [];
 }
