@@ -65,7 +65,7 @@
 
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0">
             <Grid Grid.Row="0">
-                <Grid ColumnDefinitions="9*,2*">
+                <Grid ColumnDefinitions="9*,6*,6*">
                     <components:FormFieldLabel Grid.Column="1" Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
                                                TipText="{x:Static lang:Common.Attribute_VrFull}"
                                                Margin="10,0,0,0" />
@@ -76,6 +76,7 @@
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom" />
+                
             </Grid>
 
             <ListBox Grid.Row="1" x:Name="PlayersListView" SelectionMode="Single" BorderThickness="0"
