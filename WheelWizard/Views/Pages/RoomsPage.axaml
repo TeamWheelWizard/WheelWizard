@@ -145,11 +145,12 @@
                         <components:PlayerListItem
                             UserName="{Binding Name}"
                             FriendCode="{Binding FriendCode}"
-                            Br="{Binding BrDisplay}"
                             Vr="{Binding VrDisplay}"
                             Mii="{Binding FirstMii}"
                             IsOpenHost="{Binding IsOpenHost}"
-                            HasBadges="{Binding HasBadges}" />
+                            HasBadges="{Binding HasBadges}"
+                            IsTopPlayer="{Binding IsTopLeaderboardPlayer}"
+                            TopLabel="{Binding TopLabel}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

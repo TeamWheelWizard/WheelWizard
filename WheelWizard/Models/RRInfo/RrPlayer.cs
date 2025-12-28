@@ -15,6 +15,10 @@ public class RrPlayer : IEquatable<RrPlayer>
     public bool IsOpenHost { get; set; }
     public bool IsSuspended { get; set; }
 
+    public int? LeaderboardRank { get; set; }
+    public bool IsTopLeaderboardPlayer => LeaderboardRank.HasValue;
+    public string TopLabel => LeaderboardRank is { } rank ? $"TOP {rank}" : string.Empty;
+
     public List<string> ConnectionMap { get; set; } = [];
 
     public Mii? Mii { get; set; }

@@ -65,12 +65,9 @@
 
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0">
             <Grid Grid.Row="0">
-                <Grid ColumnDefinitions="9*,4*,4*,4*">
+                <Grid ColumnDefinitions="9*,2*">
                     <components:FormFieldLabel Grid.Column="1" Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
                                                TipText="{x:Static lang:Common.Attribute_VrFull}"
-                                               Margin="10,0,0,0" />
-                    <components:FormFieldLabel Grid.Column="2"  Text="{x:Static lang:Common.Attribute_BrAbbreviation}"
-                                               TipText="{x:Static lang:Common.Attribute_BrFull}"
                                                Margin="10,0,0,0" />
                 </Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
@@ -91,11 +88,12 @@
                         <components:PlayerListItem
                             UserName="{Binding Name}"
                             FriendCode="{Binding FriendCode}"
-                            Br="{Binding BrDisplay}"
                             Vr="{Binding VrDisplay}"
                             Mii="{Binding FirstMii}"
                             IsOpenHost="{Binding IsOpenHost}"
-                            HasBadges="{Binding HasBadges}" />
+                            HasBadges="{Binding HasBadges}"
+                            IsTopPlayer="{Binding IsTopLeaderboardPlayer}"
+                            TopLabel="{Binding TopLabel}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
 

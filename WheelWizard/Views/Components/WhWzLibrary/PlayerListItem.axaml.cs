@@ -12,6 +12,13 @@ public class PlayerListItem : TemplatedControl
 
     public static readonly StyledProperty<bool> IsOpenHostProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(IsOpenHost));
 
+    public static readonly StyledProperty<bool> IsTopPlayerProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(IsTopPlayer));
+
+    public static readonly StyledProperty<string> TopLabelProperty = AvaloniaProperty.Register<PlayerListItem, string>(
+        nameof(TopLabel),
+        string.Empty
+    );
+
     public bool HasBadges
     {
         get => GetValue(HasBadgesProperty);
@@ -22,6 +29,18 @@ public class PlayerListItem : TemplatedControl
     {
         get => GetValue(IsOpenHostProperty);
         set => SetValue(IsOpenHostProperty, value);
+    }
+
+    public bool IsTopPlayer
+    {
+        get => GetValue(IsTopPlayerProperty);
+        set => SetValue(IsTopPlayerProperty, value);
+    }
+
+    public string TopLabel
+    {
+        get => GetValue(TopLabelProperty);
+        set => SetValue(TopLabelProperty, value);
     }
 
     public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<PlayerListItem, Mii?>(nameof(Mii));
