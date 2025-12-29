@@ -1,9 +1,11 @@
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using WheelWizard.Helpers;
 using WheelWizard.Models;
 using WheelWizard.Resources.Languages;
+using WheelWizard.RrRooms;
+using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.Services;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -12,6 +14,9 @@ namespace WheelWizard.Views.Popups;
 
 public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
 {
+    [Inject]
+    private IApiCaller<IRwfcApi> ApiCaller { get; set; } = null!;
+
     private PlayerProfileResponse? _profile;
     private bool _isLoading = true;
     private string _errorMessage = string.Empty;
@@ -102,34 +107,22 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
         IsLoading = true;
         ErrorMessage = string.Empty;
 
-        try
-        {
-            var url = $"https://rwfc.net/api/leaderboard/player/{friendCode}";
-            var result = await HttpClientHelper.GetAsync<PlayerProfileResponse>(url);
+        var result = await ApiCaller.CallApiAsync(rwfcApi => rwfcApi.GetPlayerProfileAsync(friendCode));
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                if (result.Succeeded && result.Content != null)
-                {
-                    Profile = result.Content;
-                    Window.WindowTitle = Profile.Name;
-                    IsLoading = false;
-                }
-                else
-                {
-                    ErrorMessage = result.StatusMessage ?? "Failed to load profile";
-                    IsLoading = false;
-                }
-            });
-        }
-        catch (Exception ex)
+        await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            if (result.IsSuccess && result.Value != null)
             {
-                ErrorMessage = $"Error: {ex.Message}";
+                Profile = result.Value;
+                Window.WindowTitle = Profile.Name;
                 IsLoading = false;
-            });
-        }
+            }
+            else
+            {
+                ErrorMessage = result.Error.Message ?? "Failed to load profile";
+                IsLoading = false;
+            }
+        });
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
