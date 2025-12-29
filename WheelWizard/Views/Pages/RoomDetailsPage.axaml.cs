@@ -8,6 +8,7 @@ using WheelWizard.Services.LiveData;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.Mockers;
 using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
@@ -106,6 +107,15 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         if (selectedPlayer.FirstMii == null)
             return;
         new MiiCarouselWindow().SetMii(selectedPlayer.FirstMii).Show();
+    }
+
+    private void ViewProfile_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
+            return;
+        if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
+            return;
+        new PlayerProfileWindow(selectedPlayer.FriendCode).Show();
     }
 
     private void RoomsDetailPage_Unloaded(object sender, RoutedEventArgs e)

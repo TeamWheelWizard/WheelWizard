@@ -7,6 +7,7 @@ using WheelWizard.Services.LiveData;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
@@ -151,6 +152,15 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (selectedPlayer.Mii == null)
             return;
         new MiiCarouselWindow().SetMii(selectedPlayer.Mii).Show();
+    }
+
+    private void ViewProfile_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
+            return;
+        if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
+            return;
+        new PlayerProfileWindow(selectedPlayer.FriendCode).Show();
     }
 
     private void ViewRoom_OnClick(string friendCode)
