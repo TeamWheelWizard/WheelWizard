@@ -24,8 +24,8 @@ public abstract class PlayerProfileBase : INotifyPropertyChanged
             if (currentRooms.Count <= 0)
                 return false;
 
-            var onlinePlayers = currentRooms.SelectMany(room => room.Players.Values).ToList();
-            return onlinePlayers.Any(player => player.Fc == FriendCode);
+            var onlinePlayers = currentRooms.SelectMany(room => room.Players).ToList();
+            return onlinePlayers.Any(player => player.FriendCode == FriendCode);
         }
         set
         {

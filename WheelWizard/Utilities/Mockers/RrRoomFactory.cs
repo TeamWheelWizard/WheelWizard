@@ -13,16 +13,18 @@ public class RrRoomFactory : MockingDataFactory<RrRoom, RrRoomFactory>
     {
         var rand = Rand(seed);
         var playerCount = (int)(rand.NextDouble() * 12);
-        var players = RrPlayerFactory.Instance.CreateAsDictionary(playerCount, seed);
+        var players = RrPlayerFactory.Instance.CreateMultiple(playerCount, seed).ToList();
         var isPrivate = (int)(rand.NextDouble() * 3) == 0;
+
+        if (players.Count > 0)
+            players[0].IsOpenHost = true;
+
         return new()
         {
             Id = _roomCount++.ToString(),
-            Game = "mariokartwii",
             Created = DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(30)),
             Type = isPrivate ? "private" : "public",
             Suspend = false,
-            Host = players.First().Value.Name,
             Rk = "vs_10",
             Players = players,
         };

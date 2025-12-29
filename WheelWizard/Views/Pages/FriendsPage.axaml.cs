@@ -157,7 +157,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     {
         foreach (var room in RRLiveRooms.Instance.CurrentRooms)
         {
-            if (room.Players.All(player => player.Value.Fc != friendCode))
+            if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;
 
             NavigationManager.NavigateTo<RoomDetailsPage>(room);

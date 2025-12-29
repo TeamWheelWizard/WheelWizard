@@ -7,9 +7,13 @@ public static class RrRoomsExtensions
 {
     public static IServiceCollection AddRrRooms(this IServiceCollection services)
     {
-        services.AddWhWzRefitApi<IRwfcApi>(Endpoints.RwfcBaseAddress, new() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower });
+        services.AddWhWzRefitApi<IRwfcApi>(
+            Endpoints.RwfcBaseAddress,
+            new() { PropertyNameCaseInsensitive = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        );
 
         services.AddSingleton<IRrRoomsSingletonService, RrRoomsSingletonService>();
+        services.AddSingleton<IRrLeaderboardSingletonService, RrLeaderboardSingletonService>();
 
         return services;
     }
