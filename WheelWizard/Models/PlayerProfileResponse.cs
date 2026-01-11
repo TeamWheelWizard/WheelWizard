@@ -30,5 +30,5 @@ public class PlayerProfileResponse
     public RwfcLeaderboardVrStats? VrStats { get; set; }
 
     [JsonPropertyName("miiData")]
-    public string? MiiData { get; set; }
+    public string MiiData { get; set; } = string.Empty;
 }
