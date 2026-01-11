@@ -4,7 +4,7 @@ namespace WheelWizard.CustomDistributions.Domain;
 
 public interface IRetroRewindApi
 {
-    [Get("/RetroRewind/zip/RetroRewind.zip")]
+    [Get("/RetroRewind/RetroRewind.zip")]
     Task<HttpContent> DownloadRetroRewindZip();
 
     [Get("/RetroRewind/RetroRewindVersion.txt")]
