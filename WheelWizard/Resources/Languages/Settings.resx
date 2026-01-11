@@ -92,6 +92,24 @@
     <data name="Option_OpenConfig" xml:space="preserve">
         <value>Open Config Folder</value>
     </data>
+    <data name="Option_WheelWizardDataFolder" xml:space="preserve">
+        <value>Wheel Wizard data folder</value>
+    </data>
+    <data name="HelperText_WheelWizardDataFolder" xml:space="preserve">
+        <value>Choose where Wheel Wizard stores its files. Moving may take a while.</value>
+    </data>
+    <data name="Option_ResetDataFolder" xml:space="preserve">
+        <value>Use default location</value>
+    </data>
+    <data name="Status_DataFolder_Default" xml:space="preserve">
+        <value>Using default location.</value>
+    </data>
+    <data name="Status_DataFolder_Custom" xml:space="preserve">
+        <value>Using custom location.</value>
+    </data>
+    <data name="Status_DataFolder_Moving" xml:space="preserve">
+        <value>Moving data, please wait...</value>
+    </data>
     <data name="Option_DolphinUserPath" xml:space="preserve">
         <value>Dolphin User Folder</value>
     </data>

@@ -43,6 +43,7 @@ public enum MessageTranslation
     Warning_ModNameCantEmpty = 1009,
     Warning_ModNameInvalid = 1010,
     Warning_UnableToDownloadMod_Files = 1011,
+    Warning_DolphinToolSelected = 1012,
 
     #endregion
 
@@ -129,6 +130,10 @@ public static class MessageTranslationHelper
             MessageTranslation.Warning_DolphinNotFound => (
                 Phrases.MessageWarning_DolphinNotFound_Title,
                 Phrases.MessageWarning_DolphinNotFound_Extra
+            ),
+            MessageTranslation.Warning_DolphinToolSelected => (
+                Phrases.MessageWarning_DolphinToolSelected_Title,
+                Phrases.MessageWarning_DolphinToolSelected_Extra
             ),
             MessageTranslation.Warning_ModNameCantEmpty => (
                 Phrases.MessageWarning_ModNameEmpty_Title,

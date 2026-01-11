@@ -5,7 +5,7 @@ public static class Endpoints
     /// <summary>
     /// The base address for accessing room data
     /// </summary>
-    public const string RwfcBaseAddress = "http://rwfc.net";
+    public const string RwfcBaseAddress = "https://rwfc.net";
 
     /// <summary>
     /// The base address for accessing the WheelWizard data (data that we control)
@@ -30,7 +30,8 @@ public static class Endpoints
     // TODO: Refactor all the URLs seen below
 
     // Retro Rewind
-    public const string RRUrl = "http://update.rwfc.net:8000/";
+    public const string OldRRUrl = "http://update.rwfc.net:8000/";
+    public const string RRUrl = "https://rwfc.net/updates/";
     public const string RRZipUrl = RRUrl + "RetroRewind/zip/RetroRewind.zip";
     public const string RRVersionUrl = RRUrl + "RetroRewind/RetroRewindVersion.txt";
     public const string RRVersionDeleteUrl = RRUrl + "RetroRewind/RetroRewindDelete.txt";

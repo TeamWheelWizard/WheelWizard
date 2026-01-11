@@ -116,6 +116,9 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
     {
         base.OnResized(e);
 
+        if (CompleteBorder == null)
+            return;
+
         CompleteBorder.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
         var desiredSize = CompleteBorder.DesiredSize;
         SetWindowSize(desiredSize);

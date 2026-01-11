@@ -9,31 +9,36 @@
             <components:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Lum Patch"
-                                       Vr="5000" Br="5000"
-                                       HasBadges="True" />
+                                       Vr="5000"
+                                       IsOpenHost="True"
+                                       HasBadges="True"
+                                       IsTopPlayer="True"
+                                       TopLabel="TOP 3" />
 
             <components:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Someone Else"
-                                       Vr="5000" Br="5000"
+                                       Vr="5000"
                                        HasBadges="True" />
 
             <components:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="WantToBeeMe"
-                                       Vr="5000" Br="5000"
-                                       HasBadges="False" />
+                                       Vr="5000"
+                                       HasBadges="False"
+                                       IsTopPlayer="True"
+                                       TopLabel="TOP 12" />
 
             <components:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Random Guy"
-                                       Vr="5000" Br="5000"
+                                       Vr="5000"
                                        HasBadges="False" />
 
             <components:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Someone Else"
-                                       Vr="5000" Br="5000"
+                                       Vr="5000"
                                        HasBadges="False" />
         </StackPanel>
     </Design.PreviewWith>
@@ -42,7 +47,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Classes="BoxItemBackground">
-                    <Grid ColumnDefinitions="Auto,130,80,70,*">
+                    <Grid ColumnDefinitions="Auto,130,80,*">
                         <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True"
                                 Background="{StaticResource Neutral950}" Width="50" Height="50" Margin="0,3">
                             <behaviorComponent:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -68,23 +73,34 @@
                                        Margin="10,0,0,0" />
                         </StackPanel>
 
-                        <StackPanel Grid.Column="3" VerticalAlignment="Center">
-                            <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_BrAbbreviation}"
-                                                       Margin="10,0,0,0" />
-                            <TextBlock Text="{TemplateBinding Br}" FontSize="14"
-                                       Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                       Margin="10,0,0,0" />
-                        </StackPanel>
+                        <Grid Grid.Column="3" ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
+                            <Border Grid.Column="0" Background="Transparent" HorizontalAlignment="Stretch"
+                                    IsVisible="{TemplateBinding HasBadges}" Margin="0,0,6,0"
+                                    CornerRadius="6" Height="40" BorderThickness="1"
+                                    BorderBrush="{StaticResource Neutral600}" VerticalAlignment="Center">
+                                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                                    <StackPanel Orientation="Horizontal" x:Name="PART_BadgeContainer" Spacing="3">
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
 
-                        <Border Grid.Column="4" Background="Transparent" HorizontalAlignment="Stretch"
-                                IsVisible="{TemplateBinding HasBadges}" Margin="0,0,5,0"
-                                CornerRadius="6" Height="40" BorderThickness="1"
-                                BorderBrush="{StaticResource Neutral600}">
-                            <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                                <StackPanel Orientation="Horizontal" x:Name="PART_BadgeContainer" Spacing="3">
-                                </StackPanel>
-                            </ScrollViewer>
-                        </Border>
+                            <Border Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                    IsVisible="{TemplateBinding IsTopPlayer}"
+                                    Background="{StaticResource Primary600}"
+                                    Padding="10,6" CornerRadius="8" Margin="0,0,10,0">
+                                <TextBlock Text="{TemplateBinding TopLabel}" FontWeight="SemiBold" FontSize="13"
+                                           Foreground="White" />
+                            </Border>
+
+                            <PathIcon Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                      IsVisible="{TemplateBinding IsOpenHost}"
+                                      Data="{StaticResource LockOpen}" Width="16" Height="16"
+                                      Foreground="{StaticResource Primary400}"
+                                      Margin="0,0,10,0"
+                                      ToolTip.Tip="Open Host"
+                                      ToolTip.Placement="Top"
+                                      ToolTip.ShowDelay="20" />
+                        </Grid>
                     </Grid>
                 </Border>
             </ControlTemplate>

@@ -4,13 +4,17 @@ namespace WheelWizard.RrRooms;
 
 public interface IRrRoomsSingletonService
 {
-    Task<OperationResult<List<RwfcRoom>>> GetRoomsAsync();
+    Task<OperationResult<List<RwfcRoomStatusRoom>>> GetRoomsAsync();
 }
 
 public class RrRoomsSingletonService(IApiCaller<IRwfcApi> apiCaller) : IRrRoomsSingletonService
 {
-    public async Task<OperationResult<List<RwfcRoom>>> GetRoomsAsync()
+    public async Task<OperationResult<List<RwfcRoomStatusRoom>>> GetRoomsAsync()
     {
-        return await apiCaller.CallApiAsync(rwfcApi => rwfcApi.GetWiiGroupsAsync());
+        var result = await apiCaller.CallApiAsync(rwfcApi => rwfcApi.GetRoomStatusAsync());
+        if (result.IsFailure)
+            return result.Error;
+
+        return result.Value.Rooms;
     }
 }

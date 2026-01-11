@@ -160,7 +160,10 @@ public class WhWzDataTests
         Assert.Contains(BadgeVariant.WhWzDev, initialBadges);
 
         // Arrange - Second load with different data
-        var updatedBadgeData = new Dictionary<string, BadgeVariant[]> { { "FC1", [BadgeVariant.Translator, BadgeVariant.Firestarter_GoldWinner] } };
+        var updatedBadgeData = new Dictionary<string, BadgeVariant[]>
+        {
+            { "FC1", [BadgeVariant.Translator, BadgeVariant.Firestarter_GoldWinner] },
+        };
 
         _apiCaller
             .CallApiAsync(Arg.Any<Expression<Func<IWhWzDataApi, Task<Dictionary<string, BadgeVariant[]>>>>>())

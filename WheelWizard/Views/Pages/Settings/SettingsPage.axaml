@@ -33,11 +33,6 @@
         </ScrollViewer>
         
         <ContentControl Grid.Row="1" x:Name="SettingsContent" />
-        <StackPanel Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <TextBlock x:Name="ReleaseText" HorizontalAlignment="Right" Classes="TinyText" Text="DEV BUILD"/>
-            <TextBlock x:Name="WhWzVersionText" HorizontalAlignment="Right" Classes="TinyText" Text="Example WhWz version 1.0.0" />
-            <TextBlock x:Name="RrVersionText" HorizontalAlignment="Right" Classes="TinyText" Text="Example RR version 1.0.0" />
-        </StackPanel>
         
         <components:Button Grid.Row="0" x:Name="DevButton" IsVisible="False"
                            Variant="Warning" Text="Dev Tool" Margin="3,12"

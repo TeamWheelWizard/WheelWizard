@@ -11,7 +11,7 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 
         <!-- Program details -->
-        <Version>2.3.3</Version>
+        <Version>2.3.4</Version>
         <Description>This program will manage RetroRewind and mods :)</Description>
         <Copyright>GNU v3.0</Copyright>
         <RepositoryUrl>https://github.com/patchzyy/WheelWizard</RepositoryUrl>
@@ -19,15 +19,15 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
-        <DefineConstants>WINDOWS</DefineConstants>
+        <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' or '$(RuntimeIdentifier)' == 'linux-arm64'">
-        <DefineConstants>LINUX</DefineConstants>
+        <DefineConstants>$(DefineConstants);LINUX</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'osx-arm64' or '$(RuntimeIdentifier)' == 'osx-x64'">
-        <DefineConstants>MACOS</DefineConstants>
+        <DefineConstants>$(DefineConstants);MACOS</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
