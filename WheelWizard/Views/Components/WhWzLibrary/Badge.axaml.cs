@@ -17,9 +17,12 @@ public class Badge : TemplatedControl
         { BadgeVariant.Firestarter_GoldWinner, "Firestarter Tournament Winner" },
         { BadgeVariant.Firestarter_SilverWinner, "Firestarter Tournament Runner-Up" },
         { BadgeVariant.Firestarter_BronzeWinner, "Firestarter Tournament Runner-Up" },
-        { BadgeVariant.SummitShowdown_GoldWinner, "Summit Showdown Tourney Winner" },
-        { BadgeVariant.SummitShowdown_SilverWinner, "Summit Showdown Tourney Runner-Up" },
-        { BadgeVariant.SummitShowdown_BronzeWinner, "Summit Showdown Tourney Runner-Up" },
+        { BadgeVariant.SummitShowdown_GoldWinner, "Summit Showdown Tournament Winner" },
+        { BadgeVariant.SummitShowdown_SilverWinner, "Summit Showdown Tournament Runner-Up" },
+        { BadgeVariant.SummitShowdown_BronzeWinner, "Summit Showdown Tournament Runner-Up" },
+        { BadgeVariant.Leafstruck_GoldWinner, "Leafstruck Tournament Winner" },
+        { BadgeVariant.Leafstruck_SilverWinner, "Leafstruck Tournament Runner-Up" },
+        { BadgeVariant.Leafstruck_BronzeWinner, "Leafstruck Tournament Runner-Up" },
     };
 
     public static readonly StyledProperty<string> HoverTipProperty = AvaloniaProperty.Register<Badge, string>(

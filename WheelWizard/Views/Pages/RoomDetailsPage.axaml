@@ -65,12 +65,9 @@
 
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0">
             <Grid Grid.Row="0">
-                <Grid ColumnDefinitions="9*,4*,4*,4*">
+                <Grid ColumnDefinitions="9*,6*,6*">
                     <components:FormFieldLabel Grid.Column="1" Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
                                                TipText="{x:Static lang:Common.Attribute_VrFull}"
-                                               Margin="10,0,0,0" />
-                    <components:FormFieldLabel Grid.Column="2"  Text="{x:Static lang:Common.Attribute_BrAbbreviation}"
-                                               TipText="{x:Static lang:Common.Attribute_BrFull}"
                                                Margin="10,0,0,0" />
                 </Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
@@ -79,6 +76,7 @@
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom" />
+                
             </Grid>
 
             <ListBox Grid.Row="1" x:Name="PlayersListView" SelectionMode="Single" BorderThickness="0"
@@ -90,26 +88,22 @@
                     <DataTemplate>
                         <components:PlayerListItem
                             UserName="{Binding Name}"
-                            FriendCode="{Binding Fc}"
-                            Br="{Binding Eb}"
-                            Vr="{Binding Ev}"
+                            FriendCode="{Binding FriendCode}"
+                            Vr="{Binding VrDisplay}"
                             Mii="{Binding FirstMii}"
-                            HasBadges="{Binding HasBadges}" />
+                            IsOpenHost="{Binding IsOpenHost}"
+                            HasBadges="{Binding HasBadges}"
+                            IsTopPlayer="{Binding IsTopLeaderboardPlayer}"
+                            TopLabel="{Binding TopLabel}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
 
                 <ListBox.ContextMenu>
-                    <ContextMenu Opening="ContextMenu_OnOpening">
-                         <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
-                         <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
-                         <Separator />
-                         <MenuItem Header="{x:Static lang:Common.Action_SaveExternalMii}" Click="CopyMii_OnClick" x:Name="CopyMiiButton"/>
-                        <!--
+                    <ContextMenu>
                         <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
+                        <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
                         <Separator />
-                        <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
-                        <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
-                         -->
+                        <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>

@@ -547,6 +547,24 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You selected DolphinTool.exe. Please choose Dolphin.exe (the Dolphin emulator executable) instead..
+        /// </summary>
+        public static string MessageWarning_DolphinToolSelected_Extra {
+            get {
+                return ResourceManager.GetString("MessageWarning_DolphinToolSelected_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong Dolphin executable selected.
+        /// </summary>
+        public static string MessageWarning_DolphinToolSelected_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_DolphinToolSelected_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t check for updates right now. You might not be connected to the internet or the server might be down..
         /// </summary>
         public static string MessageWarning_FailCheckUpdates_Extra {

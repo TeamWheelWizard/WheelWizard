@@ -193,6 +193,12 @@ public partial class WhWzSettings : UserControl
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                if (string.Equals(Path.GetFileName(filePath), "DolphinTool.exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Warning_DolphinToolSelected);
+                    return;
+                }
+
                 // On Windows, the file path is directly used as the executable, not in some command
                 DolphinExeInput.Text = filePath;
             }

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Compression;
+using Avalonia.Threading;
 using IniParser;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
@@ -153,25 +154,50 @@ public class ModManager : INotifyPropertyChanged
             .ShowDialog();
         if (!IsValidName(modName))
             return;
+
         var tempZipPath = Path.Combine(Path.GetTempPath(), $"{modName}.zip");
+        ProgressWindow? progressWindow = null;
+
         try
         {
-            using (var zipArchive = ZipFile.Open(tempZipPath, ZipArchiveMode.Create))
+            var totalFiles = filePaths.Length;
+            progressWindow = new ProgressWindow("Combining files")
+                .SetGoal($"Preparing {totalFiles} file{(totalFiles == 1 ? "" : "s")}")
+                .SetExtraText(Common.State_Loading);
+            progressWindow.Show();
+
+            await Task.Run(() =>
             {
+                using var zipArchive = ZipFile.Open(tempZipPath, ZipArchiveMode.Create);
+                var processed = 0;
                 foreach (var filePath in filePaths)
                 {
                     var entryName = Path.GetFileName(filePath);
                     zipArchive.CreateEntryFromFile(filePath, entryName, CompressionLevel.Optimal);
+                    processed++;
+
+                    var progress = (int)(processed / (double)totalFiles * 100);
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        progressWindow?.UpdateProgress(progress);
+                        progressWindow?.SetExtraText($"{Common.State_Installing} {entryName}");
+                    });
                 }
-            }
+            });
+
+            progressWindow.Close();
 
             await ModInstallation.InstallModFromFileAsync(tempZipPath, modName, author: "-1", modID: -1);
-            if (File.Exists(tempZipPath))
-                File.Delete(tempZipPath);
         }
         catch (Exception ex)
         {
             ErrorOccurred($"Failed to combine and install mod: {ex.Message}");
+        }
+        finally
+        {
+            progressWindow?.Close();
+            if (File.Exists(tempZipPath))
+                File.Delete(tempZipPath);
         }
     }
 
