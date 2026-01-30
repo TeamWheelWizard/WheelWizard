@@ -82,7 +82,12 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
 
-    public GameLicenseSingletonService(IMiiDbService miiService, IFileSystem fileSystem, IWhWzDataSingletonService whWzDataSingletonService, IRRratingReader rrratingReader)
+    public GameLicenseSingletonService(
+        IMiiDbService miiService,
+        IFileSystem fileSystem,
+        IWhWzDataSingletonService whWzDataSingletonService,
+        IRRratingReader rrratingReader
+    )
         : base(40)
     {
         _miiService = miiService;

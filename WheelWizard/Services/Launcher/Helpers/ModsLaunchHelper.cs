@@ -11,19 +11,20 @@ public static class ModsLaunchHelper
     public static readonly string ModsFolderPath = PathManager.ModsFolderPath;
     public static readonly string[] AcceptedModExtensions = ["*.szs", "*.arc", "*.brstm", "*.brsar", "*.thp"];
 
-    public static async Task PrepareModsForLaunch()
+    public static async Task PrepareModsForLaunch(string? myStuffFolderPath = null)
     {
+        var resolvedMyStuffFolderPath = myStuffFolderPath ?? MyStuffFolderPath;
         var mods = ModManager.Instance.Mods.Where(mod => mod.IsEnabled).ToArray();
         if (mods.Length == 0)
         {
-            if (Directory.Exists(MyStuffFolderPath) && Directory.EnumerateFiles(MyStuffFolderPath).Any())
+            if (Directory.Exists(resolvedMyStuffFolderPath) && Directory.EnumerateFiles(resolvedMyStuffFolderPath).Any())
             {
                 var modsFoundQuestion = new YesNoWindow()
                     .SetButtonText(Common.Action_Delete, Common.Action_Keep)
                     .SetMainText(Phrases.Question_LaunchClearModsFound_Title)
                     .SetExtraText(Phrases.Question_LaunchClearModsFound_Extra);
                 if (await modsFoundQuestion.AwaitAnswer())
-                    Directory.Delete(MyStuffFolderPath, true);
+                    Directory.Delete(resolvedMyStuffFolderPath, true);
 
                 return;
             }
@@ -52,9 +53,9 @@ public static class ModsLaunchHelper
 
         // Get existing files in MyStuff
         var existingFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        if (Directory.Exists(MyStuffFolderPath))
+        if (Directory.Exists(resolvedMyStuffFolderPath))
         {
-            var files = Directory.GetFiles(MyStuffFolderPath, "*.*", SearchOption.TopDirectoryOnly);
+            var files = Directory.GetFiles(resolvedMyStuffFolderPath, "*.*", SearchOption.TopDirectoryOnly);
             foreach (var file in files)
             {
                 var relativePath = Path.GetFileName(file);
@@ -63,7 +64,7 @@ public static class ModsLaunchHelper
         }
         else
         {
-            Directory.CreateDirectory(MyStuffFolderPath);
+            Directory.CreateDirectory(resolvedMyStuffFolderPath);
         }
 
         var totalFiles = finalFiles.Count;
@@ -76,9 +77,9 @@ public static class ModsLaunchHelper
         {
             var processedFiles = 0;
             // Delete files in MyStuff that are not in finalFiles
-            if (Directory.Exists(MyStuffFolderPath))
+            if (Directory.Exists(resolvedMyStuffFolderPath))
             {
-                var files = Directory.GetFiles(MyStuffFolderPath, "*.*", SearchOption.TopDirectoryOnly);
+                var files = Directory.GetFiles(resolvedMyStuffFolderPath, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var file in files)
                 {
                     var relativePath = Path.GetFileName(file);
@@ -93,7 +94,7 @@ public static class ModsLaunchHelper
             {
                 var relativePath = kvp.Key;
                 var sourceFile = kvp.Value;
-                var destinationFile = Path.Combine(MyStuffFolderPath, relativePath);
+                var destinationFile = Path.Combine(resolvedMyStuffFolderPath, relativePath);
 
                 processedFiles++;
                 var progress = (int)((processedFiles) / (double)totalFiles * 100);

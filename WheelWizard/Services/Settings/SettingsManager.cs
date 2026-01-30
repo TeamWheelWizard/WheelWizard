@@ -85,6 +85,7 @@ public class SettingsManager
     );
 
     public static Setting ENABLE_ANIMATIONS = new WhWzSetting(typeof(bool), "EnableAnimations", true);
+    public static Setting TESTING_MODE_ENABLED = new WhWzSetting(typeof(bool), "TestingModeEnabled", false);
     public static Setting SAVED_WINDOW_SCALE = new WhWzSetting(typeof(double), "WindowScale", 1.0).SetValidation(value =>
         (double)(value ?? -1) >= 0.5 && (double)(value ?? -1) <= 2.0
     );
