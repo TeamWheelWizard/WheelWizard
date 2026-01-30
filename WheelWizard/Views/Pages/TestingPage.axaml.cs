@@ -37,16 +37,22 @@ public partial class TestingPage : UserControlBase
     private void UpdateUi()
     {
         var pathsReady = SettingsHelper.PathsSetupCorrectly();
+        var isInstalled = _status == WheelWizardStatus.Ready;
 
         InstallButton.IsEnabled = pathsReady && !_isBusy;
-        DeleteButton.IsEnabled = !_isBusy && _status == WheelWizardStatus.Ready;
-        LaunchButton.IsEnabled = !_isBusy && _status == WheelWizardStatus.Ready;
+        InstallButton.IsVisible = !isInstalled;
+
+        DeleteButton.IsEnabled = !_isBusy && isInstalled;
+        DeleteButton.IsVisible = isInstalled;
+
+        LaunchButton.IsEnabled = !_isBusy && isInstalled;
+        LaunchButton.IsVisible = isInstalled;
 
         StatusText.Text = _status switch
         {
             WheelWizardStatus.ConfigNotFinished => "Setup required. Configure paths in Settings.",
             WheelWizardStatus.NotInstalled => "Not installed",
-            WheelWizardStatus.Ready => "Installed",
+            WheelWizardStatus.Ready => "Installed - Ready to play",
             WheelWizardStatus.NoServer or WheelWizardStatus.NoServerButInstalled => "Server offline",
             WheelWizardStatus.OutOfDate => "Update available",
             _ => "Checking status...",
