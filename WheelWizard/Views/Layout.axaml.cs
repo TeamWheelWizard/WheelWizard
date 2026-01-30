@@ -15,6 +15,7 @@ using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
@@ -29,6 +30,10 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
     public static Layout Instance { get; private set; } = null!;
+    private const int TesterClicksRequired = 10;
+    private const string TesterSecretPhrase = "WhenSonicInRR?";
+    private int _testerClickCount;
+    private bool _testerPromptOpen;
 
     [Inject]
     private IBrandingSingletonService BrandingService { get; set; } = null!;
@@ -44,6 +49,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
 
         OnSettingChanged(SettingsManager.SAVED_WINDOW_SCALE);
         SettingsManager.WINDOW_SCALE.Subscribe(this);
+        SettingsManager.TESTING_MODE_ENABLED.Subscribe(this);
+        UpdateTestingButtonVisibility();
 
         var completeString = Humanizer.ReplaceDynamic(Phrases.Text_MadeByString, "Patchzy", "WantToBeeMe");
         if (completeString != null && completeString.Contains("\\n"))
@@ -82,14 +89,21 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     public void OnSettingChanged(Setting setting)
     {
         // Note that this method will also be called whenever the setting changes
-        var scaleFactor = (double)setting.Get();
-        Height = WindowHeight * scaleFactor;
-        Width = WindowWidth * scaleFactor;
-        CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
-        var marginXCorrection = ((scaleFactor * WindowWidth) - WindowWidth) / 2f;
-        var marginYCorrection = ((scaleFactor * WindowHeight) - WindowHeight) / 2f;
-        CompleteGrid.Margin = new(marginXCorrection, marginYCorrection);
-        //ExtendClientAreaToDecorationsHint = scaleFactor <= 1.2f;
+        if (setting == SettingsManager.WINDOW_SCALE)
+        {
+            var scaleFactor = (double)setting.Get();
+            Height = WindowHeight * scaleFactor;
+            Width = WindowWidth * scaleFactor;
+            CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
+            var marginXCorrection = ((scaleFactor * WindowWidth) - WindowWidth) / 2f;
+            var marginYCorrection = ((scaleFactor * WindowHeight) - WindowHeight) / 2f;
+            CompleteGrid.Margin = new(marginXCorrection, marginYCorrection);
+            //ExtendClientAreaToDecorationsHint = scaleFactor <= 1.2f;
+            return;
+        }
+
+        if (setting == SettingsManager.TESTING_MODE_ENABLED)
+            UpdateTestingButtonVisibility();
     }
 
     public void NavigateToPage(UserControl page)
@@ -175,6 +189,58 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             BeginMoveDrag(e);
+    }
+
+    private async void TitleLabel_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        e.Handled = true;
+
+        if ((bool)SettingsManager.TESTING_MODE_ENABLED.Get())
+            return;
+
+        if (_testerPromptOpen)
+            return;
+
+        _testerClickCount++;
+        if (_testerClickCount < TesterClicksRequired)
+            return;
+
+        _testerClickCount = 0;
+        _testerPromptOpen = true;
+
+        try
+        {
+            var result = await new TextInputWindow()
+                .SetMainText("Welcome tester, write your secret phrase")
+                .SetPlaceholderText("Secret phrase")
+                .SetButtonText("Cancel", "Submit")
+                .ShowDialog();
+
+            if (string.IsNullOrWhiteSpace(result))
+                return;
+
+            if (result == TesterSecretPhrase)
+            {
+                SettingsManager.TESTING_MODE_ENABLED.Set(true);
+                ShowSnackbar("Testing mode enabled", ViewUtils.SnackbarType.Success);
+            }
+            else
+            {
+                ShowSnackbar("Incorrect secret phrase", ViewUtils.SnackbarType.Danger);
+            }
+        }
+        finally
+        {
+            _testerPromptOpen = false;
+        }
+    }
+
+    private void UpdateTestingButtonVisibility()
+    {
+        TestingButton.IsVisible = (bool)SettingsManager.TESTING_MODE_ENABLED.Get();
     }
 
     private void CloseButton_Click(object? sender, RoutedEventArgs e) => Close();

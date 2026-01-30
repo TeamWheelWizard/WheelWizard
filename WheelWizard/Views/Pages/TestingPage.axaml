@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             x:Class="WheelWizard.Views.Pages.TestingPage">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+
+        <TextBlock Grid.Row="0" Text="Testing Mode" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                   Classes="PageTitleText" />
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="8">
+            <components:Button x:Name="InstallButton"
+                               Variant="Warning"
+                               Text="Install Test"
+                               IconData="{StaticResource Download}"
+                               Margin="0,6,0,0"
+                               Click="InstallButton_OnClick" />
+            <components:Button x:Name="DeleteButton"
+                               Variant="Danger"
+                               Text="Delete Test"
+                               IconData="{StaticResource Trash}"
+                               Margin="0,6,6,0"
+                               Click="DeleteButton_OnClick" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnDefinitions="260,*" Margin="0,12,0,0">
+            <Border Grid.Column="0" CornerRadius="24" Margin="0,12,16,0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="{StaticResource Primary900}" Offset="0" />
+                        <GradientStop Color="{StaticResource Primary600}" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,20">
+                    <PathIcon Data="{StaticResource WheelIcon}" Width="120" Height="120"
+                              Foreground="{StaticResource Neutral100}" Opacity="0.85" />
+                    <TextBlock Text="Retro Rewind Beta" Classes="TitleText"
+                               Foreground="{StaticResource Neutral100}" HorizontalAlignment="Center" />
+                    <TextBlock Text="Private testing build" Classes="BodyText"
+                               Foreground="{StaticResource Neutral200}" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Top" Spacing="12" Margin="0,20,10,0">
+                <TextBlock Text="Status" Classes="SidebarSectionText" />
+                <TextBlock x:Name="StatusText" Classes="BodyText" Text="Checking status..." />
+
+                <StackPanel Spacing="8">
+                    <components:Button x:Name="LaunchButton"
+                                       Variant="Primary"
+                                       Text="Launch Beta"
+                                       IconData="{StaticResource Play}"
+                                       Click="LaunchButton_OnClick" />
+                    <components:Button x:Name="DolphinButton"
+                                       IconData="{StaticResource DolphinIcon}"
+                                       IconSize="30"
+                                       Height="40"
+                                       Width="120"
+                                       ToolTip.Tip="{x:Static lang:Common.Action_LaunchDolphin}"
+                                       ToolTip.Placement="Bottom"
+                                       ToolTip.ShowDelay="50"
+                                       Click="DolphinButton_OnClick" />
+                </StackPanel>
+
+                <Border Background="{StaticResource BackgroundLineColor}" Height="1" Margin="0,6,0,0" />
+                <TextBlock Text="Install replaces any existing test build. Delete only affects the beta files."
+                           Classes="TinyText" TextWrapping="Wrap" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
