@@ -94,10 +94,10 @@ public class RetroRewindBeta : IDistribution
 
             var betaFolderSource = _fileSystem.Path.Combine(tempExtractionPath, FolderName);
             var xmlFolderSource = _fileSystem.Path.Combine(tempExtractionPath, XMLFolderName);
-            
+
             if (!_fileSystem.Directory.Exists(betaFolderSource))
                 return Fail($"Could not find a '{FolderName}' folder inside {tempExtractionPath}");
-            
+
             if (!_fileSystem.Directory.Exists(xmlFolderSource))
                 return Fail($"Could not find a '{XMLFolderName}' folder inside {tempExtractionPath}");
 

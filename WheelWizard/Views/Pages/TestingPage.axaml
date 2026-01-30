@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="700"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              x:Class="WheelWizard.Views.Pages.TestingPage">
 
     <UserControl.Styles>
@@ -54,7 +54,7 @@
                  <Panel>
                      <!-- Background Decoration -->
                      <PathIcon Data="{StaticResource WheelIcon}" Width="400" Height="400" Opacity="0.03" Margin="-100,-50,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="White" />
-                     <PathIcon Data="{StaticResource WheelIcon}" Width="300" Height="300" Opacity="0.05" Margin="0,0,-80,-88" VerticalAlignment="Bottom" HorizontalAlignment="Right" Foreground="White" />
+                     <PathIcon Data="{StaticResource WheelIcon}" Width="300" Height="300" Opacity="0.05" Margin="0,0,-80,-70" VerticalAlignment="Bottom" HorizontalAlignment="Right" Foreground="White" />
 
                      <!-- Card Content -->
                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="24">
