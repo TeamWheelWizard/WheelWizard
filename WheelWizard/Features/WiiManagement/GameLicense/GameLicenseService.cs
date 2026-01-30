@@ -205,7 +205,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
         var statistics = StatisticsSerializer.ParseStatistics(_rksysData, rkpdOffset);
 
-        // Try to read VR/BR from RRrating.pul file
+        // Try to read VR/BR from RRRating.pul file
         var vrFromRksys = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB0);
         var brFromRksys = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB2);
         var vr = vrFromRksys;

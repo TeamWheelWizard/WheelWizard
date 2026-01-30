@@ -482,13 +482,15 @@ public class RetroRewind : IDistribution
             var description = parts[3].Trim();
             if (string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(path))
                 continue;
+            // Fix old URLs using HTTP to the new endpoint
+            var fixedUrl = url.Replace(Endpoints.OldRRUrl, Endpoints.RRUrl);
             if (!SemVersion.TryParse(version, out var _))
                 continue;
             var parsedVersion = SemVersion.Parse(version);
             var updateData = new UpdateData
             {
                 Version = parsedVersion,
-                Url = url,
+                Url = fixedUrl,
                 Description = description,
             };
             versions.Add(updateData);

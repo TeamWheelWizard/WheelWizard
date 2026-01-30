@@ -75,7 +75,7 @@ public static class PathManager
     public static string RetroRewindTempFile => Path.Combine(TempModsFolderPath, "RetroRewind.zip");
     public static string WiiDbFolder => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib");
     public static string MiiDbFile => Path.Combine(WiiDbFolder, "RFL_DB.dat");
-    public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRrating.pul");
+    public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRRating.pul");
 
     #region Wheel Wizard Appdata Override
 
