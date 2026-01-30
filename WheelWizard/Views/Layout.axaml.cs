@@ -31,6 +31,10 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     public const double WindowWidth = 656;
     public static Layout Instance { get; private set; } = null!;
     private const int TesterClicksRequired = 10;
+    
+    // so this is not really "Secret" its just ment to hold out people who are not meant to be testers
+    // if you came here to find it, it will be useless to you, you can not actually download or play
+    // testing builds since they are behind authentication walls.
     private const string TesterSecretPhrase = "WhenSonicInRR?";
     private int _testerClickCount;
     private bool _testerPromptOpen;
