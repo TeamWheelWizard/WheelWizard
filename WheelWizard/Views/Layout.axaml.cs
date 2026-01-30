@@ -35,6 +35,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     // so this is not really "Secret" its just ment to hold out people who are not meant to be testers
     // if you came here to find it, it will be useless to you, you can not actually download or play
     // testing builds since they are behind authentication walls.
+    // but have fun with the beta button :)
     private const string TesterSecretPhrase = "WhenSonicInRR?";
     private int _testerClickCount;
     private bool _testerPromptOpen;
