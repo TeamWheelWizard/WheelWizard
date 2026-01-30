@@ -41,7 +41,6 @@ public partial class TestingPage : UserControlBase
         InstallButton.IsEnabled = pathsReady && !_isBusy;
         DeleteButton.IsEnabled = !_isBusy && _status == WheelWizardStatus.Ready;
         LaunchButton.IsEnabled = !_isBusy && _status == WheelWizardStatus.Ready;
-        DolphinButton.IsEnabled = !_isBusy && pathsReady;
 
         StatusText.Text = _status switch
         {
@@ -105,6 +104,4 @@ public partial class TestingPage : UserControlBase
         _isBusy = false;
         UpdateUi();
     }
-
-    private void DolphinButton_OnClick(object? sender, RoutedEventArgs e) => DolphinLaunchHelper.LaunchDolphin();
 }
