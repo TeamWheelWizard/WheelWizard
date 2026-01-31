@@ -1,0 +1,88 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <StackPanel Spacing="10">
+                <components:MemeNumberState Text="10" IconSize="0" />
+                <components:MemeNumberState Text="69" IconSize="0" />
+                <components:MemeNumberState Text="67" IconSize="0" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="components|MemeNumberState">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+
+                    <Panel>
+                        <!-- Normal State -->
+                        <components:StateBox x:Name="PART_StateBox"
+                                             IconData="{TemplateBinding IconData}"
+                                             IconSize="{TemplateBinding IconSize}"
+                                             Text="{TemplateBinding Text}"
+                                             FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=components:MemeNumberState}}"
+                                             Variant="{TemplateBinding Variant}"
+                                             TipText="{TemplateBinding TipText}" />
+
+                        <!-- 67 Special State -->
+                        <components:StateBox x:Name="PART_SpecialBadge"
+                                             IconData="{TemplateBinding IconData}"
+                                             IconSize="{TemplateBinding IconSize}"
+                                             Variant="{TemplateBinding Variant}"
+                                             FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=components:MemeNumberState}}"
+                                             TipText="{TemplateBinding TipText}"
+                                             IsVisible="False">
+                            <components:StateBox.Content>
+                                <Grid ColumnDefinitions="Auto, Auto">
+                                    <TextBlock Text="6" Classes="BobUp"
+                                               Foreground="{StaticResource Warning100}"
+                                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=components:MemeNumberState}}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="7" Classes="BobDown" Margin="1,0,0,0"
+                                               Foreground="{StaticResource Warning100}"
+                                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=components:MemeNumberState}}"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </components:StateBox.Content>
+                        </components:StateBox>
+                    </Panel>
+
+                    <components:FormFieldLabel Foreground="{StaticResource Primary400}"
+                                               Text="Nice!"
+                                               x:Name="PART_NiceLabel"
+                                               IsVisible="False"
+                                               VerticalAlignment="Center" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="TextBlock.BobUp">
+        <Style.Animations>
+            <Animation Duration="0:0:0.25" IterationCount="Infinite" PlaybackDirection="Alternate">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.Y" Value="2" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.Y" Value="-2" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector="TextBlock.BobDown">
+        <Style.Animations>
+            <Animation Duration="0:0:0.25" Delay="0:0:0.25" IterationCount="Infinite" PlaybackDirection="Alternate">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.Y" Value="2" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.Y" Value="-2" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+</Styles>

@@ -50,9 +50,7 @@
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
                     <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Rooms}" />
-                    <components:StateBox Text="0" IconSize="0" x:Name="RoomsListItemCount" />
-                    <components:FormFieldLabel Foreground="{StaticResource Primary400}" Margin="4,0,0,0"
-                                               Text="Nice!" x:Name="RoomsNiceLabel" IsVisible="False" />
+                    <components:MemeNumberState Text="0" IconSize="0" x:Name="RoomsListItemCount" IconData="{StaticResource Dice}"/>
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom" />
@@ -126,9 +124,7 @@
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
                     <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Players}" />
-                    <components:StateBox Text="0" IconSize="0" x:Name="PlayerListItemCount" />
-                    <components:FormFieldLabel Foreground="{StaticResource Primary400}" Margin="4,0,0,0"
-                                               Text="Nice!" x:Name="PlayerNiceLabel" IsVisible="False" />
+                    <components:MemeNumberState Text="0" IconSize="0" x:Name="PlayerListItemCount" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom" />
