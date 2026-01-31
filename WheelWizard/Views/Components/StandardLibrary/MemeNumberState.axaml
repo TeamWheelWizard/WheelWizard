@@ -3,12 +3,27 @@
         xmlns:components="clr-namespace:WheelWizard.Views.Components">
 
     <Design.PreviewWith>
-        <Border Padding="20">
-            <StackPanel Spacing="10">
-                <components:MemeNumberState Text="10" IconSize="0" />
-                <components:MemeNumberState Text="69" IconSize="0" />
-                <components:MemeNumberState Text="67" IconSize="0" />
+        <Border Padding="20" Background="{StaticResource Neutral950}">
+            <StackPanel Spacing="40" Orientation="Horizontal">
+                <StackPanel Spacing="10">
+                    <components:MemeNumberState Text="10" IconSize="0" Enable67="False" Enable69="False"/>
+                    <components:MemeNumberState Text="69" IconSize="0" Enable67="False" Enable69="False"/>
+                    <components:MemeNumberState Text="67" IconSize="0" Enable67="False" Enable69="False"/>
+                </StackPanel>
+                
+                <StackPanel Spacing="10">
+                    <components:MemeNumberState Text="10" IconSize="0" />
+                    <components:MemeNumberState Text="69" IconSize="0" />
+                    <components:MemeNumberState Text="67" IconSize="0" />
+                </StackPanel>
+                
+                <StackPanel Spacing="10">
+                    <components:MemeNumberState IconData="{StaticResource Award}" Text="10" />
+                    <components:MemeNumberState IconData="{StaticResource Award}" Text="69" />
+                    <components:MemeNumberState IconData="{StaticResource Award}" Text="67" />
+                </StackPanel>
             </StackPanel>
+
         </Border>
     </Design.PreviewWith>
 
@@ -54,7 +69,7 @@
                                                Text="Nice!"
                                                x:Name="PART_NiceLabel"
                                                IsVisible="False"
-                                               VerticalAlignment="Center" />
+                                                VerticalAlignment="Center" />
                 </StackPanel>
             </ControlTemplate>
         </Setter>
