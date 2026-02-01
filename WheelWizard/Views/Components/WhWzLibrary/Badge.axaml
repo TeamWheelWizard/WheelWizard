@@ -18,6 +18,9 @@
                     <controls:Badge Variant="TranslatorLead"/>
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <controls:Badge Variant="Heart"/>
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
                     <controls:Badge Variant="Firestarter_GoldWinner"/>
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
@@ -153,6 +156,26 @@
             </ControlTemplate>
         </Setter>
     </Style>
+
+    <Style Selector="controls|Badge.Heart">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
+                            Background="#FFD1DC"/>
+                    
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"  Grid.RowSpan="3" CornerRadius="999"
+                            Background="#F0F0EC"/>
+                    
+                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="#89F0FF" Data="{StaticResource Heart}"
+                          Height="15"
+                          Stretch="Uniform" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
     
     <!-- FIRESTARTER BADGES -->
     <Style Selector="controls|Badge.Firestarter_GoldWinner">
@@ -279,4 +302,5 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    
 </Styles>
