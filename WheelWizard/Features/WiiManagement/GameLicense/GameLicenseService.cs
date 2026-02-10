@@ -408,6 +408,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode.Value);
         if (friendProfileId == 0)
             return Fail("Invalid friend code.");
+        if (!FriendCodeGenerator.TryParseFriendCode(normalizedFriendCode.Value, out var friendCodeValue))
+            return Fail("Invalid friend code.");
 
         var selectedLicense = Licenses.Users[userIndex];
         var currentUserPid = FriendCodeGenerator.FriendCodeToProfileId(selectedLicense.FriendCode);
@@ -434,6 +436,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         WriteFriendSlot(
             rkpdOffset,
             slotIndex,
+            friendCodeValue,
             friendProfileId,
             friendMiiDataResult.Value,
             (ushort)Math.Min(vr, ushort.MaxValue),
@@ -490,7 +493,15 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         return profileId == 0 && (statusFlags & 0x0003) == 0 && !hasMii;
     }
 
-    private void WriteFriendSlot(int rkpdOffset, int slotIndex, uint friendProfileId, byte[] serializedMii, ushort vr, ushort br)
+    private void WriteFriendSlot(
+        int rkpdOffset,
+        int slotIndex,
+        ulong friendCodeValue,
+        uint friendProfileId,
+        byte[] serializedMii,
+        ushort vr,
+        ushort br
+    )
     {
         if (_rksysData == null)
             return;
@@ -501,6 +512,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         Array.Clear(_rksysData, mainOffset, FriendDataSize);
         Array.Clear(_rksysData, secondaryOffset, FriendSecondaryDataSize);
 
+        // Friend identity key (high 32 bits + profile ID low 32 bits).
+        BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset, (uint)(friendCodeValue >> 32));
         BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset + 0x04, friendProfileId);
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x10, FriendSlotStateInProgress);
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x12, 0);
@@ -509,7 +522,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x18, br);
 
         Array.Copy(serializedMii, 0, _rksysData, mainOffset + 0x1A, MiiSize);
-        var miiCrc = ComputeCrc16(serializedMii, 0, serializedMii.Length);
+        var miiCrc = Crc16CcittHelper.Compute(serializedMii, 0, serializedMii.Length);
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x64, miiCrc);
 
         _rksysData[mainOffset + 0x66] = (byte)slotIndex;
@@ -576,20 +589,6 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         }
 
         return -1;
-    }
-
-    private static ushort ComputeCrc16(byte[] buf, int offset, int length)
-    {
-        const ushort poly = 0x1021;
-        ushort crc = 0x0000;
-        for (var i = offset; i < offset + length; i++)
-        {
-            crc ^= (ushort)(buf[i] << 8);
-            for (var bit = 0; bit < 8; bit++)
-                crc = (crc & 0x8000) != 0 ? (ushort)((crc << 1) ^ poly) : (ushort)(crc << 1);
-        }
-
-        return crc;
     }
 
     private static OperationResult<string> NormalizeFriendCode(string friendCode)

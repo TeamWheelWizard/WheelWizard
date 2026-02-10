@@ -96,7 +96,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         {
             // compute CRC over everything before CrcOffset
             var existingCrc = (ushort)((db[CrcOffset] << 8) | db[CrcOffset + 1]);
-            var calcCrc = CalculateCrc16(db, 0, CrcOffset);
+            var calcCrc = Crc16CcittHelper.Compute(db, 0, CrcOffset);
 
             if (existingCrc != calcCrc)
             {
@@ -122,7 +122,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
 
         if (db.Length >= CrcOffset + 2)
         {
-            var crc = CalculateCrc16(db, 0, CrcOffset);
+            var crc = Crc16CcittHelper.Compute(db, 0, CrcOffset);
             db[CrcOffset] = (byte)(crc >> 8);
             db[CrcOffset + 1] = (byte)(crc & 0xFF);
         }
@@ -182,7 +182,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         db[0x1D06] = 0xFF;
         db[0x1D07] = 0xFF;
 
-        var crc = CalculateCrc16(db, 0, CrcOffset);
+        var crc = Crc16CcittHelper.Compute(db, 0, CrcOffset);
         db[CrcOffset] = (byte)(crc >> 8);
         db[CrcOffset + 1] = (byte)(crc & 0xFF);
         fileSystem.File.WriteAllBytes(_miiDbFilePath, db);
@@ -230,20 +230,6 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         {
             return [];
         }
-    }
-
-    private static ushort CalculateCrc16(byte[] buf, int off, int len)
-    {
-        const ushort poly = 0x1021;
-        ushort crc = 0x0000;
-        for (var i = off; i < off + len; i++)
-        {
-            crc ^= (ushort)(buf[i] << 8);
-            for (var b = 0; b < 8; b++)
-                crc = (crc & 0x8000) != 0 ? (ushort)((crc << 1) ^ poly) : (ushort)(crc << 1);
-        }
-
-        return crc;
     }
 
     public OperationResult AddMiiToBlocks(byte[]? rawMiiData)
