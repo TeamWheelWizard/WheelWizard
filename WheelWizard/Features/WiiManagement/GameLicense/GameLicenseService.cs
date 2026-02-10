@@ -119,8 +119,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private const int FriendSecondaryDataSize = 0x0C;
     private const int MiiSize = 0x4A;
 
-    // Use "in-progress" so the game can resolve the friend registration state itself.
-    private const ushort FriendSlotStateInProgress = 0x0003;
+    // Pending one-sided friend entry (bit0 set, bit1 clear).
+    private const ushort FriendSlotStateAdded = 0x0001;
     private const ushort DefaultFriendCityId = 0;
     private const byte DefaultFriendGameRegion = 0;
     private const byte DefaultFriendCountryCode = 0xFF;
@@ -515,7 +515,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         // Friend identity key (high 32 bits + profile ID low 32 bits).
         BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset, (uint)(friendCodeValue >> 32));
         BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset + 0x04, friendProfileId);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x10, FriendSlotStateInProgress);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x10, FriendSlotStateAdded);
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x12, 0);
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x14, 0);
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x16, vr);
@@ -538,7 +538,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset + 0x70 + i * 8, 0xFFFFFFFF);
         }
 
-        _rksysData[secondaryOffset + 0x2] = 0x38;
+        // Keep the DWC friend-data word cleared here so this stays one-sided until reciprocity.
+        _rksysData[secondaryOffset + 0x2] = 0x00;
         BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, secondaryOffset + 0x4, friendProfileId);
     }
 
