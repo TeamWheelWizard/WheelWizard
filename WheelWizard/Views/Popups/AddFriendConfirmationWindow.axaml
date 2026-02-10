@@ -1,0 +1,59 @@
+<base:PopupContent xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:behavior="clr-namespace:WheelWizard.Views.BehaviorComponent"
+                   xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+                   xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+                   xmlns:popups="clr-namespace:WheelWizard.Views.Popups"
+                   x:Class="WheelWizard.Views.Popups.AddFriendConfirmationWindow"
+                   x:DataType="popups:AddFriendConfirmationWindow"
+                   mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="320">
+    <Grid Width="400" RowDefinitions="Auto,Auto,Auto,Auto">
+        <TextBlock Grid.Row="0" Classes="TitleText" FontSize="20"
+                   Foreground="{StaticResource FormFieldLabelColor}"
+                   Text="Is this who you want to add?"
+                   TextWrapping="Wrap" />
+
+        <Grid Grid.Row="1" Margin="0,16,0,10" ColumnDefinitions="Auto,*">
+            <Border Grid.Column="0" Width="96" Height="96" CornerRadius="999999"
+                    ClipToBounds="True" Background="{StaticResource Neutral950}" Margin="0,0,16,0">
+                <behavior:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                         Mii="{Binding FriendMii}"
+                                         LoadingColor="{StaticResource Neutral600}"
+                                         FallBackColor="{StaticResource Neutral600}"
+                                         ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
+            </Border>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
+                <TextBlock Classes="BodyText" FontSize="18"
+                           Foreground="{StaticResource FormFieldLabelColor}"
+                           Text="{Binding FriendName}" />
+                <TextBlock Classes="BodyText" FontSize="14"
+                           Foreground="{StaticResource Neutral300}"
+                           Text="{Binding FriendCode}" />
+                <components:StateBox Text="{Binding FriendVr, StringFormat='VR {0}'}"
+                                     Variant="Success"
+                                     IconSize="0"
+                                     HorizontalAlignment="Left" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" />
+
+        <UniformGrid Grid.Row="3" Columns="2" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <components:Button Text="{x:Static lang:Common.Action_Cancel}"
+                               Variant="Default"
+                               IconData="{StaticResource XMark}"
+                               Margin="0,0,6,0"
+                               Click="Cancel_OnClick" />
+            <components:Button Text="Add Friend"
+                               Variant="Primary"
+                               IconData="{StaticResource CheckMark}"
+                               Margin="6,0,0,0"
+                               Click="AddFriend_OnClick" />
+        </UniformGrid>
+    </Grid>
+</base:PopupContent>

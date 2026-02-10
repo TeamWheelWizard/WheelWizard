@@ -71,6 +71,16 @@ public interface IGameLicenseSingletonService
     /// Changes the Mii for a specific user index.
     /// </summary>
     OperationResult ChangeMii(int userIndex, Mii? newMii);
+
+    /// <summary>
+    /// Adds a friend to the specified license slot in rksys.dat.
+    /// </summary>
+    OperationResult AddFriend(int userIndex, string friendCode, Mii friendMii, uint vr = 5000, uint br = 5000);
+
+    /// <summary>
+    /// Removes a friend from the specified license slot in rksys.dat.
+    /// </summary>
+    OperationResult RemoveFriend(int userIndex, string friendCode);
 }
 
 public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSingletonService
@@ -105,7 +115,16 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private const int MaxFriendNum = 30;
     private const int FriendDataOffset = 0x56D0;
     private const int FriendDataSize = 0x1C0;
+    private const int FriendSecondaryDataOffset = 0x8B50;
+    private const int FriendSecondaryDataSize = 0x0C;
     private const int MiiSize = 0x4A;
+
+    // Use "in-progress" so the game can resolve the friend registration state itself.
+    private const ushort FriendSlotStateInProgress = 0x0003;
+    private const ushort DefaultFriendCityId = 0;
+    private const byte DefaultFriendGameRegion = 0;
+    private const byte DefaultFriendCountryCode = 0xFF;
+    private const byte DefaultFriendRegionId = 0xFF;
 
     /// <summary>
     /// Returns the "focused" or currently active license/user as determined by the Settings.
@@ -373,16 +392,221 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         return Ok();
     }
 
+    public OperationResult AddFriend(int userIndex, string friendCode, Mii friendMii, uint vr = 5000, uint br = 5000)
+    {
+        if (userIndex is < 0 or >= MaxPlayerNum)
+            return Fail("Invalid license index. Please select a valid license.");
+        if (friendMii is null)
+            return Fail("Friend Mii cannot be null.");
+        if (_rksysData is null || _rksysData.Length < RksysSize)
+            return Fail("Invalid or unloaded rksys.dat data.");
+
+        var normalizedFriendCode = NormalizeFriendCode(friendCode);
+        if (normalizedFriendCode.IsFailure)
+            return normalizedFriendCode.Error;
+
+        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode.Value);
+        if (friendProfileId == 0)
+            return Fail("Invalid friend code.");
+
+        var selectedLicense = Licenses.Users[userIndex];
+        var currentUserPid = FriendCodeGenerator.FriendCodeToProfileId(selectedLicense.FriendCode);
+        if (currentUserPid != 0 && currentUserPid == friendProfileId)
+            return Fail("You cannot add your own friend code.");
+
+        var duplicateFriend = selectedLicense.Friends.Any(friend =>
+        {
+            var pid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            return pid != 0 && pid == friendProfileId;
+        });
+        if (duplicateFriend)
+            return Fail("This friend is already in your list.");
+
+        var friendMiiDataResult = MiiSerializer.Serialize(friendMii);
+        if (friendMiiDataResult.IsFailure)
+            return friendMiiDataResult.Error;
+
+        var rkpdOffset = RksysMagic.Length + userIndex * RkpdSize;
+        var slotIndex = FindFirstEmptyFriendSlot(rkpdOffset);
+        if (slotIndex < 0)
+            return Fail("Your friend list is full. Remove a friend and try again.");
+
+        WriteFriendSlot(
+            rkpdOffset,
+            slotIndex,
+            friendProfileId,
+            friendMiiDataResult.Value,
+            (ushort)Math.Min(vr, ushort.MaxValue),
+            (ushort)Math.Min(br, ushort.MaxValue)
+        );
+
+        var saveResult = SaveRksysToFile();
+        if (saveResult.IsFailure)
+            return saveResult.Error;
+
+        return ParseUsers();
+    }
+
     private bool CheckForMiiData(int offset)
     {
+        if (_rksysData == null || offset < 0 || offset + MiiSize > _rksysData.Length)
+            return false;
+
         // If the entire 0x4A bytes are zero, we treat it as empty / no Mii data
         for (var i = 0; i < MiiSize; i++)
         {
-            if (_rksysData != null && _rksysData[offset + i] != 0)
+            if (_rksysData[offset + i] != 0)
                 return true;
         }
 
         return false;
+    }
+
+    private int FindFirstEmptyFriendSlot(int rkpdOffset)
+    {
+        if (_rksysData == null)
+            return -1;
+
+        var friendOffset = rkpdOffset + FriendDataOffset;
+        for (var i = 0; i < MaxFriendNum; i++)
+        {
+            var currentOffset = friendOffset + i * FriendDataSize;
+            if (IsFriendSlotEmpty(currentOffset))
+                return i;
+        }
+
+        return -1;
+    }
+
+    private bool IsFriendSlotEmpty(int friendSlotOffset)
+    {
+        if (_rksysData == null)
+            return true;
+
+        var statusFlags = (ushort)BigEndianBinaryHelper.BufferToUint16(_rksysData, friendSlotOffset + 0x10);
+        var profileId = BigEndianBinaryHelper.BufferToUint32(_rksysData, friendSlotOffset + 0x04);
+        var hasMii = CheckForMiiData(friendSlotOffset + 0x1A);
+
+        return profileId == 0 && (statusFlags & 0x0003) == 0 && !hasMii;
+    }
+
+    private void WriteFriendSlot(int rkpdOffset, int slotIndex, uint friendProfileId, byte[] serializedMii, ushort vr, ushort br)
+    {
+        if (_rksysData == null)
+            return;
+
+        var mainOffset = rkpdOffset + FriendDataOffset + slotIndex * FriendDataSize;
+        var secondaryOffset = rkpdOffset + FriendSecondaryDataOffset + slotIndex * FriendSecondaryDataSize;
+
+        Array.Clear(_rksysData, mainOffset, FriendDataSize);
+        Array.Clear(_rksysData, secondaryOffset, FriendSecondaryDataSize);
+
+        BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset + 0x04, friendProfileId);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x10, FriendSlotStateInProgress);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x12, 0);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x14, 0);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x16, vr);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x18, br);
+
+        Array.Copy(serializedMii, 0, _rksysData, mainOffset + 0x1A, MiiSize);
+        var miiCrc = ComputeCrc16(serializedMii, 0, serializedMii.Length);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x64, miiCrc);
+
+        _rksysData[mainOffset + 0x66] = (byte)slotIndex;
+        _rksysData[mainOffset + 0x67] = DefaultFriendGameRegion;
+        _rksysData[mainOffset + 0x68] = DefaultFriendCountryCode;
+        _rksysData[mainOffset + 0x69] = DefaultFriendRegionId;
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6A, DefaultFriendCityId);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6C, 0);
+        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6E, 0);
+
+        for (var i = 0; i < 10; i++)
+        {
+            BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset + 0x70 + i * 8, 0xFFFFFFFF);
+        }
+
+        _rksysData[secondaryOffset + 0x2] = 0x38;
+        BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, secondaryOffset + 0x4, friendProfileId);
+    }
+
+    public OperationResult RemoveFriend(int userIndex, string friendCode)
+    {
+        if (userIndex is < 0 or >= MaxPlayerNum)
+            return Fail("Invalid license index. Please select a valid license.");
+        if (_rksysData is null || _rksysData.Length < RksysSize)
+            return Fail("Invalid or unloaded rksys.dat data.");
+
+        var normalizedFriendCode = NormalizeFriendCode(friendCode);
+        if (normalizedFriendCode.IsFailure)
+            return normalizedFriendCode.Error;
+
+        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode.Value);
+        if (friendProfileId == 0)
+            return Fail("Invalid friend code.");
+
+        var rkpdOffset = RksysMagic.Length + userIndex * RkpdSize;
+        var slotIndex = FindFriendSlotByProfileId(rkpdOffset, friendProfileId);
+        if (slotIndex < 0)
+            return Fail("Friend was not found in this license.");
+
+        var mainOffset = rkpdOffset + FriendDataOffset + slotIndex * FriendDataSize;
+        var secondaryOffset = rkpdOffset + FriendSecondaryDataOffset + slotIndex * FriendSecondaryDataSize;
+        Array.Clear(_rksysData, mainOffset, FriendDataSize);
+        Array.Clear(_rksysData, secondaryOffset, FriendSecondaryDataSize);
+
+        var saveResult = SaveRksysToFile();
+        if (saveResult.IsFailure)
+            return saveResult.Error;
+
+        return ParseUsers();
+    }
+
+    private int FindFriendSlotByProfileId(int rkpdOffset, uint friendProfileId)
+    {
+        if (_rksysData == null || friendProfileId == 0)
+            return -1;
+
+        var friendOffset = rkpdOffset + FriendDataOffset;
+        for (var i = 0; i < MaxFriendNum; i++)
+        {
+            var currentOffset = friendOffset + i * FriendDataSize;
+            var currentPid = BigEndianBinaryHelper.BufferToUint32(_rksysData, currentOffset + 0x04);
+            if (currentPid == friendProfileId)
+                return i;
+        }
+
+        return -1;
+    }
+
+    private static ushort ComputeCrc16(byte[] buf, int offset, int length)
+    {
+        const ushort poly = 0x1021;
+        ushort crc = 0x0000;
+        for (var i = offset; i < offset + length; i++)
+        {
+            crc ^= (ushort)(buf[i] << 8);
+            for (var bit = 0; bit < 8; bit++)
+                crc = (crc & 0x8000) != 0 ? (ushort)((crc << 1) ^ poly) : (ushort)(crc << 1);
+        }
+
+        return crc;
+    }
+
+    private static OperationResult<string> NormalizeFriendCode(string friendCode)
+    {
+        if (string.IsNullOrWhiteSpace(friendCode))
+            return Fail("Friend code cannot be empty.");
+
+        var digits = new string(friendCode.Where(char.IsDigit).ToArray());
+        if (digits.Length != 12 || !ulong.TryParse(digits, out _))
+            return Fail("Friend code must be exactly 12 digits.");
+
+        var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
+        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        if (profileId == 0)
+            return Fail("Invalid friend code.");
+
+        return formatted;
     }
 
     private bool ValidateMagicNumber()
