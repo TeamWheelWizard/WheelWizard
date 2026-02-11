@@ -30,7 +30,8 @@
                         ToolTip.Tip="{TemplateBinding TipText}"
                         ToolTip.Placement="{TemplateBinding TipPlacement}"
                         ToolTip.ShowDelay="20">
-                    <Grid ColumnDefinitions="Auto,Auto, *">
+                    <Grid ColumnDefinitions="Auto,Auto,*">
+                        <!-- Icon (always visible if IconData is set) -->
                         <Border Background="Transparent" 
                                 IsVisible="{TemplateBinding IconData, Converter={x:Static ObjectConverters.IsNotNull}}"
                                 Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}">
@@ -38,15 +39,24 @@
                                   Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         
+                        <!-- Spacer between icon and text/content -->
                         <Rectangle Grid.Column="1" Width="4"
                                    IsVisible="{TemplateBinding IconSize, 
                                    Converter={x:Static conv:NumberConverters.GreaterThan0 }}"/>
                         
-                        <TextBlock Grid.Column="2"  x:Name="PART_StateBox_Text"
+                        <!-- Text (visible when Content is null) -->
+                        <TextBlock Grid.Column="2" x:Name="PART_StateBox_Text"
                                    Margin="0,0,0,0"
                                    Text="{TemplateBinding Text}"
                                    FontSize="{TemplateBinding FontSize}"
-                                   FontWeight="Medium" VerticalAlignment="Center"/>
+                                   FontWeight="Medium" VerticalAlignment="Center"
+                                   IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNull}}"/>
+                        
+                        <!-- Content (visible when Content is not null) -->
+                        <ContentPresenter Grid.Column="2" x:Name="PART_ContentPresenter"
+                                          Content="{TemplateBinding Content}"
+                                          IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                          VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
             </ControlTemplate>
