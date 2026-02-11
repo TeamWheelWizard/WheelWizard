@@ -522,7 +522,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x18, br);
 
         Array.Copy(serializedMii, 0, _rksysData, mainOffset + 0x1A, MiiSize);
-        var miiCrc = Crc16CcittHelper.Compute(serializedMii, 0, serializedMii.Length);
+        var miiCrc = CrcHelper.ComputeCrc16Ccitt(serializedMii, 0, serializedMii.Length);
         BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x64, miiCrc);
 
         _rksysData[mainOffset + 0x66] = (byte)slotIndex;
@@ -652,31 +652,6 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     }
 
     /// <summary>
-    /// Calculates the CRC32 of the specified slice of bytes using the
-    /// standard polynomial (0xEDB88320) in the same way MKWii does.
-    /// </summary>
-    public static uint ComputeCrc32(byte[] data, int offset, int length)
-    {
-        const uint POLY = 0xEDB88320;
-        var crc = 0xFFFFFFFF;
-
-        for (var i = offset; i < offset + length; i++)
-        {
-            var b = data[i];
-            crc ^= b;
-            for (var j = 0; j < 8; j++)
-            {
-                if ((crc & 1) != 0)
-                    crc = (crc >> 1) ^ POLY;
-                else
-                    crc >>= 1;
-            }
-        }
-
-        return ~crc;
-    }
-
-    /// <summary>
     /// Fixes the MKWii save file by recalculating and inserting the CRC32 at 0x27FFC.
     /// </summary>
     public static void FixRksysCrc(byte[] rksysData)
@@ -685,7 +660,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             throw new ArgumentException("Invalid rksys.dat data");
 
         var lengthToCrc = 0x27FFC;
-        var newCrc = ComputeCrc32(rksysData, 0, lengthToCrc);
+        var newCrc = CrcHelper.ComputeCrc32(rksysData, 0, lengthToCrc);
 
         // 2) Write CRC at offset 0x27FFC in big-endian.
         BigEndianBinaryHelper.WriteUInt32BigEndian(rksysData, 0x27FFC, newCrc);

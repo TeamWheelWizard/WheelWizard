@@ -96,7 +96,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         {
             // compute CRC over everything before CrcOffset
             var existingCrc = (ushort)((db[CrcOffset] << 8) | db[CrcOffset + 1]);
-            var calcCrc = Crc16CcittHelper.Compute(db, 0, CrcOffset);
+            var calcCrc = CrcHelper.ComputeCrc16Ccitt(db, 0, CrcOffset);
 
             if (existingCrc != calcCrc)
             {
@@ -122,7 +122,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
 
         if (db.Length >= CrcOffset + 2)
         {
-            var crc = Crc16CcittHelper.Compute(db, 0, CrcOffset);
+            var crc = CrcHelper.ComputeCrc16Ccitt(db, 0, CrcOffset);
             db[CrcOffset] = (byte)(crc >> 8);
             db[CrcOffset + 1] = (byte)(crc & 0xFF);
         }
@@ -182,7 +182,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         db[0x1D06] = 0xFF;
         db[0x1D07] = 0xFF;
 
-        var crc = Crc16CcittHelper.Compute(db, 0, CrcOffset);
+        var crc = CrcHelper.ComputeCrc16Ccitt(db, 0, CrcOffset);
         db[CrcOffset] = (byte)(crc >> 8);
         db[CrcOffset + 1] = (byte)(crc & 0xFF);
         fileSystem.File.WriteAllBytes(_miiDbFilePath, db);
