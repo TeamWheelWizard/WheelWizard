@@ -271,7 +271,7 @@ To join a specific room, you'll need to either join through a friend, or hope to
         <value>We can't read the Mii data from your system. Make sure you started the game at least once</value>
     </data>
     <data name="Hover_FriendsPageDisclaimer" xml:space="preserve">
-        <value>Add friends directly here, then launch the game to sync and accept.</value>
+        <value>Add friends directly here, then launch the game to sync.</value>
     </data>
     <data name="Question_ApplyScale_Extra" xml:space="preserve">
         <value>This change will revert in {$1} unless you decide to keep the change.</value>
