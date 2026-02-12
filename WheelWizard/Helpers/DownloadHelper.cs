@@ -8,28 +8,41 @@ public static class DownloadHelper
     private const int MaxRetries = 5;
     private const int TimeoutInSeconds = 30; // Adjust as needed
 
-    public static async Task<string> DownloadToLocationAsync(
+    public static async Task<string?> DownloadToLocationAsync(
         string url,
         string filePath,
         string windowTitle,
         string extraText = "",
-        bool ForceGivenFilePath = false
+        bool ForceGivenFilePath = false,
+        CancellationToken cancellationToken = default
     )
     {
-        var progressWindow = new ProgressWindow(windowTitle).SetExtraText(extraText);
+        using var linkedCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var progressWindow = new ProgressWindow(windowTitle).SetExtraText(extraText).SetCancellationTokenSource(linkedCancellationToken);
         progressWindow.Show();
-        var toLocationAsync = await DownloadToLocationAsync(url, filePath, progressWindow, ForceGivenFilePath);
-        progressWindow.Close();
-        return toLocationAsync;
+
+        try
+        {
+            return await DownloadToLocationAsync(url, filePath, progressWindow, ForceGivenFilePath, linkedCancellationToken.Token);
+        }
+        finally
+        {
+            progressWindow.Close();
+        }
     }
 
     public static async Task<string?> DownloadToLocationAsync(
         string url,
         string tempFile,
         ProgressWindow progressPopupWindow,
-        bool ForceGivenFilePath = false
+        bool ForceGivenFilePath = false,
+        CancellationToken cancellationToken = default
     )
     {
+        using var linkedCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var effectiveCancellationToken = linkedCancellationToken.Token;
+        progressPopupWindow.SetCancellationTokenSource(linkedCancellationToken);
+
         var directory = Path.GetDirectoryName(tempFile)!;
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
@@ -38,113 +51,152 @@ public static class DownloadHelper
         var success = false;
         string resolvedFilePath = tempFile;
 
-        while (attempt < MaxRetries && !success)
+        try
         {
-            try
+            while (attempt < MaxRetries && !success)
             {
-                using var client = new HttpClient();
-                client.Timeout = TimeSpan.FromSeconds(TimeoutInSeconds);
-                using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-                response.EnsureSuccessStatusCode();
-                if (response.RequestMessage == null || response.RequestMessage.RequestUri == null)
+                if (effectiveCancellationToken.IsCancellationRequested)
                 {
+                    progressPopupWindow.MarkCancellationRequested();
                     return null;
                 }
 
-                if (!ForceGivenFilePath)
+                try
                 {
-                    var finalUrl = response.RequestMessage.RequestUri.ToString();
-
-                    // Check for filename in Content-Disposition or fallback to URL
-                    var contentDisposition = response.Content.Headers.ContentDisposition;
-                    var fileName = contentDisposition?.FileName?.Trim('"') ?? Path.GetFileName(new Uri(url).AbsolutePath);
-                    fileName = Path.ChangeExtension(fileName, Path.GetExtension(finalUrl));
-
-                    // Add extension if missing in file path
-                    if (!Path.HasExtension(fileName))
+                    using var client = new HttpClient();
+                    client.Timeout = TimeSpan.FromSeconds(TimeoutInSeconds);
+                    using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, effectiveCancellationToken);
+                    response.EnsureSuccessStatusCode();
+                    if (response.RequestMessage == null || response.RequestMessage.RequestUri == null)
                     {
-                        var urlExtension = Path.GetExtension(new Uri(url).AbsolutePath);
-                        if (!string.IsNullOrEmpty(urlExtension))
-                        {
-                            fileName += urlExtension;
-                        }
+                        return null;
                     }
 
-                    // Update resolvedFilePath with resolved fileName
-                    resolvedFilePath = Path.Combine(directory, fileName);
+                    if (!ForceGivenFilePath)
+                    {
+                        var finalUrl = response.RequestMessage.RequestUri.ToString();
+
+                        // Check for filename in Content-Disposition or fallback to URL
+                        var contentDisposition = response.Content.Headers.ContentDisposition;
+                        var fileName = contentDisposition?.FileName?.Trim('"') ?? Path.GetFileName(new Uri(url).AbsolutePath);
+                        fileName = Path.ChangeExtension(fileName, Path.GetExtension(finalUrl));
+
+                        // Add extension if missing in file path
+                        if (!Path.HasExtension(fileName))
+                        {
+                            var urlExtension = Path.GetExtension(new Uri(url).AbsolutePath);
+                            if (!string.IsNullOrEmpty(urlExtension))
+                            {
+                                fileName += urlExtension;
+                            }
+                        }
+
+                        // Update resolvedFilePath with resolved fileName
+                        resolvedFilePath = Path.Combine(directory, fileName);
+                    }
+
+                    var totalBytes = response.Content.Headers.ContentLength ?? -1;
+                    progressPopupWindow.SetGoal(totalBytes / (1024.0 * 1024.0));
+
+                    await using var downloadStream = await response.Content.ReadAsStreamAsync(effectiveCancellationToken);
+                    await using var fileStream = new FileStream(
+                        resolvedFilePath,
+                        FileMode.Create,
+                        FileAccess.Write,
+                        FileShare.None,
+                        bufferSize: 8192,
+                        useAsync: true
+                    );
+                    var downloadedBytes = 0L;
+                    const int bufferSize = 8192;
+                    var buffer = new byte[bufferSize];
+                    int bytesRead;
+
+                    while ((bytesRead = await downloadStream.ReadAsync(buffer.AsMemory(0, bufferSize), effectiveCancellationToken)) != 0)
+                    {
+                        await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), effectiveCancellationToken);
+                        downloadedBytes += bytesRead;
+
+                        var progress = totalBytes == -1 ? 0 : (int)((float)downloadedBytes / totalBytes * 100);
+                        progressPopupWindow.UpdateProgress(progress);
+                    }
+
+                    success = true; // Download completed successfully
                 }
-
-                var totalBytes = response.Content.Headers.ContentLength ?? -1;
-                progressPopupWindow.SetGoal(totalBytes / (1024.0 * 1024.0));
-
-                await using var downloadStream = await response.Content.ReadAsStreamAsync();
-                await using var fileStream = new FileStream(
-                    resolvedFilePath,
-                    FileMode.Create,
-                    FileAccess.Write,
-                    FileShare.None,
-                    bufferSize: 8192,
-                    useAsync: true
-                );
-                var downloadedBytes = 0L;
-                const int bufferSize = 8192;
-                var buffer = new byte[bufferSize];
-                int bytesRead;
-
-                while ((bytesRead = await downloadStream.ReadAsync(buffer, 0, bufferSize)) != 0)
+                catch (TaskCanceledException ex)
+                    when (!effectiveCancellationToken.IsCancellationRequested && !ex.CancellationToken.IsCancellationRequested)
                 {
-                    await fileStream.WriteAsync(buffer, 0, bytesRead);
-                    downloadedBytes += bytesRead;
+                    attempt++;
+                    if (attempt >= MaxRetries)
+                    {
+                        new MessageBoxWindow()
+                            .SetMessageType(MessageBoxWindow.MessageType.Error)
+                            .SetTitleText("Download timed out")
+                            .SetInfoText($"The download timed out after {MaxRetries} attempts.")
+                            .Show();
+                        break;
+                    }
 
-                    var progress = totalBytes == -1 ? 0 : (int)((float)downloadedBytes / totalBytes * 100);
-                    progressPopupWindow.UpdateProgress(progress);
+                    var delay = (int)Math.Pow(2, attempt) * 1000;
+                    try
+                    {
+                        await Task.Delay(delay, effectiveCancellationToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        progressPopupWindow.MarkCancellationRequested();
+                        break;
+                    }
+                    progressPopupWindow.SetExtraText($"Retrying... Attempt {attempt + 1} of {MaxRetries}");
                 }
-
-                success = true; // Download completed successfully
-            }
-            catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested)
-            {
-                attempt++;
-                if (attempt >= MaxRetries)
+                catch (OperationCanceledException) when (effectiveCancellationToken.IsCancellationRequested)
                 {
-                    new MessageBoxWindow()
-                        .SetMessageType(MessageBoxWindow.MessageType.Error)
-                        .SetTitleText("Download timed out")
-                        .SetInfoText($"The download timed out after {MaxRetries} attempts.");
+                    progressPopupWindow.MarkCancellationRequested();
                     break;
                 }
-
-                var delay = (int)Math.Pow(2, attempt) * 1000;
-                await Task.Delay(delay);
-                progressPopupWindow.SetExtraText($"Retrying... Attempt {attempt + 1} of {MaxRetries}");
-            }
-            catch (HttpRequestException ex)
-            {
-                attempt++;
-                if (attempt >= MaxRetries)
+                catch (HttpRequestException ex)
+                {
+                    attempt++;
+                    if (attempt >= MaxRetries)
+                    {
+                        new MessageBoxWindow()
+                            .SetMessageType(MessageBoxWindow.MessageType.Error)
+                            .SetTitleText("Tried to many times")
+                            .SetInfoText($"An HTTP error occurred after {MaxRetries} attempts: {ex.Message}")
+                            .Show();
+                        break;
+                    }
+                    var delay = (int)Math.Pow(2, attempt) * 1000;
+                    try
+                    {
+                        await Task.Delay(delay, effectiveCancellationToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        progressPopupWindow.MarkCancellationRequested();
+                        break;
+                    }
+                    progressPopupWindow.SetExtraText($"Retrying... Attempt {attempt + 1} of {MaxRetries}");
+                }
+                catch (Exception ex)
                 {
                     new MessageBoxWindow()
                         .SetMessageType(MessageBoxWindow.MessageType.Error)
-                        .SetTitleText("Tried to many times")
-                        .SetInfoText($"An HTTP error occurred after {MaxRetries} attempts: {ex.Message}")
+                        .SetTitleText("Download error")
+                        .SetInfoText($"An error occurred while downloading the file: {ex.Message}")
                         .Show();
                     break;
                 }
-                var delay = (int)Math.Pow(2, attempt) * 1000;
-                await Task.Delay(delay);
-                progressPopupWindow.SetExtraText($"Retrying... Attempt {attempt + 1} of {MaxRetries}");
             }
-            catch (Exception ex)
-            {
-                new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Error)
-                    .SetTitleText("Download error")
-                    .SetInfoText($"An error occurred while downloading the file: {ex.Message}")
-                    .Show();
-                break;
-            }
-        }
 
-        return resolvedFilePath;
+            if (!success && File.Exists(resolvedFilePath))
+                File.Delete(resolvedFilePath);
+
+            return success ? resolvedFilePath : null;
+        }
+        finally
+        {
+            progressPopupWindow.SetCancellationTokenSource(null);
+        }
     }
 }
