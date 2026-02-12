@@ -27,6 +27,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private LicenseProfile? currentPlayer;
     private Mii? _currentMii;
     private bool _isOnline;
+    private string _currentFriendCode = string.Empty;
 
     [Inject]
     private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
@@ -54,6 +55,16 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         {
             _isOnline = value;
             OnPropertyChanged(nameof(IsOnline));
+        }
+    }
+
+    public string CurrentFriendCode
+    {
+        get => _currentFriendCode;
+        set
+        {
+            _currentFriendCode = value;
+            OnPropertyChanged(nameof(CurrentFriendCode));
         }
     }
 
@@ -108,8 +119,10 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     {
         var validUsers = GameLicenseService.HasAnyValidUsers;
         CurrentUserProfile.IsVisible = validUsers;
-        CurrentUserCarousel.IsVisible = validUsers;
+        CurrentUserVrGraph.IsVisible = validUsers;
         NoProfilesInfo.IsVisible = !validUsers;
+        if (!validUsers)
+            CurrentFriendCode = string.Empty;
 
         var data = GameLicenseService.LicenseCollection;
         var userAmount = data.Users.Count;
@@ -138,6 +151,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         CurrentUserProfile.Classes.Clear();
 
         currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
+        CurrentFriendCode = currentPlayer.FriendCode;
         ProfileAttribFriendCode.Text = currentPlayer.FriendCode;
         ProfileAttribFriendCode.IsVisible = !string.IsNullOrEmpty(currentPlayer.FriendCode);
         ProfileAttribUserName.Text = currentPlayer.NameOfMii;

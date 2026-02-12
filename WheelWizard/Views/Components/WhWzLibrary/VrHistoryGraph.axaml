@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d"
+             d:DesignWidth="560"
+             d:DesignHeight="390"
+             x:Class="WheelWizard.Views.Components.VrHistoryGraph"
+             x:DataType="components:VrHistoryGraph">
+    <Border Classes="SettingsBlockStyle" Padding="8" Margin="0"
+            DataContext="{Binding RelativeSource={RelativeSource AncestorType=components:VrHistoryGraph}}">
+        <StackPanel Spacing="8">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                <StackPanel Grid.Column="0">
+                    <components:FormFieldLabel Text="VR History" />
+                    <TextBlock Classes="TinyText" FontSize="11" Text="VR over time" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                    <components:FormFieldLabel Text="Range" />
+                    <ComboBox x:Name="HistoryDaysDropdown" MinWidth="145"
+                              SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal"
+                            Spacing="8" IsVisible="{Binding IsLoading}">
+                    <components:LoadingIcon Width="18" Height="18" Foreground="{StaticResource Neutral500}" />
+                    <TextBlock Classes="TinyText" FontSize="11" VerticalAlignment="Center" Text="Loading VR history..." />
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Classes="TinyText" FontSize="11" Text="{Binding DateRangeText}" IsVisible="{Binding HasData}" />
+
+            <StackPanel Spacing="2" IsVisible="{Binding HasError}">
+                <TextBlock Text="Could not load VR history." Classes="BodyText" FontSize="12" Foreground="{StaticResource Danger500}" />
+                <TextBlock Text="{Binding ErrorMessage}" Classes="TinyText" FontSize="11" Foreground="{StaticResource Danger400}" />
+            </StackPanel>
+
+            <StackPanel IsVisible="{Binding ShowNoDataState}" Spacing="2">
+                <TextBlock Text="{Binding EmptyStateText}" Classes="BodyText" FontSize="12" />
+            </StackPanel>
+
+            <Grid IsVisible="{Binding HasData}" ColumnDefinitions="*,*,*"
+                  RowDefinitions="Auto">
+                <Border Grid.Column="0" Grid.Row="0" Background="{StaticResource Neutral950}" CornerRadius="8" Padding="6" Margin="0,0,8,8">
+                    <StackPanel Spacing="1">
+                        <TextBlock Classes="TinyText" FontSize="11" Text="Start VR" />
+                        <TextBlock Classes="BodyText" FontSize="12" Text="{Binding StartingVr, StringFormat='{}{0:N0}'}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Grid.Row="0" Background="{StaticResource Neutral950}" CornerRadius="8" Padding="6" Margin="0,0,8,8">
+                    <StackPanel Spacing="1">
+                        <TextBlock Classes="TinyText" FontSize="11" Text="End VR" />
+                        <TextBlock Classes="BodyText" FontSize="12" Text="{Binding EndingVr, StringFormat='{}{0:N0}'}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Grid.Row="0" Background="{StaticResource Neutral950}" CornerRadius="8" Padding="6" Margin="0,0,0,8">
+                    <StackPanel Spacing="1">
+                        <TextBlock Classes="TinyText" FontSize="11" Text="Net Change" />
+                        <TextBlock Classes="BodyText" FontSize="12" Text="{Binding TotalChangeText}"
+                                   Foreground="{StaticResource Success500}"
+                                   IsVisible="{Binding IsTotalChangeGain}" />
+                        <TextBlock Classes="BodyText" FontSize="12" Text="{Binding TotalChangeText}"
+                                   Foreground="{StaticResource Danger500}"
+                                   IsVisible="{Binding IsTotalChangeLoss}" />
+                        <TextBlock Classes="BodyText" FontSize="12" Text="{Binding TotalChangeText}"
+                                   IsVisible="{Binding IsTotalChangeNeutral}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border IsVisible="{Binding HasData}" Background="{StaticResource Neutral950}" CornerRadius="8" Padding="8">
+                <Grid RowDefinitions="Auto,220,Auto" ColumnDefinitions="Auto,*">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Classes="TinyText" FontSize="11"
+                               Text="{Binding GraphMaxVrText}" Margin="0,0,8,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Classes="TinyText" FontSize="11"
+                               Text="{Binding GraphMinVrText}" Margin="0,0,8,0" VerticalAlignment="Bottom" />
+
+                    <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Background="{StaticResource Neutral900}" CornerRadius="6" Padding="8">
+                        <Grid>
+                            <Border Background="{StaticResource Neutral800}" Height="1" VerticalAlignment="Top" />
+                            <Border Background="{StaticResource Neutral800}" Height="1" VerticalAlignment="Center" />
+                            <Border Background="{StaticResource Neutral800}" Height="1" VerticalAlignment="Bottom" />
+                            <Path Data="{Binding GraphAreaPath}" Fill="{StaticResource Primary500}" Opacity="0.20" Stretch="Fill" />
+                            <Path Data="{Binding GraphPath}" Stroke="{StaticResource Primary400}" StrokeThickness="2"
+                                  StrokeLineCap="Round" Stretch="Fill" />
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="*,*,*" Margin="8,6,0,0">
+                        <TextBlock Grid.Column="0" Classes="TinyText" FontSize="11" Text="{Binding GraphStartLabel}" />
+                        <TextBlock Grid.Column="1" Classes="TinyText" FontSize="11" Text="{Binding GraphMidLabel}" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="TinyText" FontSize="11" Text="{Binding GraphEndLabel}" HorizontalAlignment="Right" />
+                    </Grid>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

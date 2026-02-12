@@ -132,7 +132,7 @@
                     <!-- FIRST INFORMATION LAYER -->
                     <RadioButton Grid.Column="0" Grid.Row="1" Margin="5,6,0,0" x:Name="PrimaryCheckBox"
                                  VerticalAlignment="Top" Checked="CheckBox_SetPrimaryUser" Classes="CheckBox">
-                        <components:FormFieldLabel Text="{x:Static lang:Settings.Option_MakePrimary}"
+                        <components:FormFieldLabel Margin="0,2,0,0" Text="{x:Static lang:Settings.Option_MakePrimary}"
                                                    TipText="{x:Static lang:Phrases.Hover_PrimaryProfile}" />
                     </RadioButton>
 
@@ -186,11 +186,11 @@
                 </Border.Styles>
             </Border>
 
-            <behavior:MiiCarousel VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                                  Mii="{Binding CurrentMii}"
-                                  Margin="0,20"
-                                  ImageVariant="{x:Static miiVars:MiiImageVariants.FullBodyCarousel}"
-                                  x:Name="CurrentUserCarousel" Height="280" />
+            <components:VrHistoryGraph VerticalAlignment="Bottom"
+                                       HorizontalAlignment="Stretch"
+                                       Margin="0,20,0,-4"
+                                       x:Name="CurrentUserVrGraph"
+                                       FriendCode="{Binding CurrentFriendCode}" />
 
             <!-- repurposing the common state text -->
             <components:EmptyPageInfo x:Name="NoProfilesInfo"
