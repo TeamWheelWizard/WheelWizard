@@ -71,10 +71,10 @@
                         </Border>
                         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" IsVisible="{TemplateBinding IsOnline}"
                                    Text="{x:Static lang:Common.Attribute_Status_Online}"
-                                   FontSize="16" Foreground="{StaticResource Neutral200}" />
+                                   FontSize="12" Foreground="{StaticResource Neutral200}" />
                         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom"
                                    Text="{x:Static lang:Common.Attribute_Status_Offline}"
-                                   FontSize="16"
+                                   FontSize="12"
                                    IsVisible="{TemplateBinding IsOnline,Converter={x:Static BoolConverters.Not}}"
                                    Foreground="{StaticResource Neutral200}" />
 
