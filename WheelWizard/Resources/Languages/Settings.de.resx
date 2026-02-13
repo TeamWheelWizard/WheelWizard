@@ -160,7 +160,7 @@
         <value>Norwegisch</value>
     </data>
     <data name="Value_Language_Portuguese" xml:space="preserve">
-        <value>Portugisisch</value>
+        <value>Portugiesisch</value>
     </data>
     <data name="Category_Other" xml:space="preserve">
         <value>Sonstiges</value>
@@ -169,7 +169,7 @@
         <value>Allgemein</value>
     </data>
     <data name="Category_About" xml:space="preserve">
-        <value>Über</value>
+        <value>Über uns</value>
     </data>
     <data name="Option_OpenGameFolder" xml:space="preserve">
         <value>Spielordner öffnen</value>
@@ -197,5 +197,29 @@
     </data>
     <data name="HelperText_WhWzLanguage" xml:space="preserve">
         <value>Dies ändert nur die Sprache innerhalb von Wheel Wizard. Um die Sprache innerhalb des Spiels zu ändern musst du das in den Spieleinstellungen vornehmen</value>
+    </data>
+    <data name="HelperText_WheelWizardDataFolder" xml:space="preserve">
+        <value>Wähle aus, wo Wheel Wizard seine Dateien speichert. Das Verschieben könnte eine Weile dauern.</value>
+    </data>
+    <data name="Option_ResetDataFolder" xml:space="preserve">
+        <value>Standard-Speicherort verwenden</value>
+    </data>
+    <data name="Option_WheelWizardDataFolder" xml:space="preserve">
+        <value>Ordner für Wheel Wizard Daten</value>
+    </data>
+    <data name="Status_DataFolder_Custom" xml:space="preserve">
+        <value>Verwendet benutzerdefinierten Speicherort</value>
+    </data>
+    <data name="Status_DataFolder_Default" xml:space="preserve">
+        <value>Standard-Speicherort wird verwendet.</value>
+    </data>
+    <data name="Status_DataFolder_Moving" xml:space="preserve">
+        <value>Dateien werden verschoben, bitte warten...</value>
+    </data>
+    <data name="Question_ApplyLanguageSettings_Extra" xml:space="preserve">
+        <value>Neue Spracheinstellungen anwenden?</value>
+    </data>
+    <data name="Question_ApplyLanguageSettings_Title" xml:space="preserve">
+        <value>Das jetzige Fenster wird sich schließen und ein neues wird sich mit den neuen Spracheinstellunge öffnen.</value>
     </data>
 </root>
