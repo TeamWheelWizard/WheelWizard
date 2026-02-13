@@ -91,8 +91,10 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     private void HandleVisibility()
     {
-        VisibleWhenNoFriends.IsVisible = FriendList.Count <= 0;
-        VisibleWhenFriends.IsVisible = FriendList.Count > 0;
+        var hasFriends = FriendList.Count > 0;
+        VisibleWhenNoFriends.IsVisible = !hasFriends;
+        VisibleWhenFriends.IsVisible = hasFriends;
+        TopAddFriendButton.IsVisible = hasFriends;
     }
 
     private List<FriendProfile> GetSortedPlayerList()

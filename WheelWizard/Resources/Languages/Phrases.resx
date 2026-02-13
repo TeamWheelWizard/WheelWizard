@@ -63,7 +63,7 @@
         <value>No friends yet!</value>
     </data>
     <data name="EmptyContent_NoFriends" xml:space="preserve">
-        <value>Use the + button to add friends from Wheel Wizard</value>
+        <value>Use the + button to add friends in Wheel Wizard</value>
     </data>
     <data name="Text_WhWzTranslationPercentage" xml:space="preserve">
         <value>Translations for this language are {$1}% complete</value>

@@ -17,6 +17,14 @@ public class FriendsListItem : TemplatedControl
         set => SetValue(IsOnlineProperty, value);
     }
 
+    public static readonly StyledProperty<bool> IsPendingProperty = AvaloniaProperty.Register<FriendsListItem, bool>(nameof(IsPending));
+
+    public bool IsPending
+    {
+        get => GetValue(IsPendingProperty);
+        set => SetValue(IsPendingProperty, value);
+    }
+
     public static readonly StyledProperty<bool> HasBadgesProperty = AvaloniaProperty.Register<FriendsListItem, bool>(nameof(HasBadges));
 
     public bool HasBadges

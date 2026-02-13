@@ -24,6 +24,7 @@
                     Spacing="6">
             <TextBlock Text="{x:Static lang:Common.PageTitle_Friends}" Classes="PageTitleText" />
             <components:Button Text=""
+                               x:Name="TopAddFriendButton"
                                Width="30"
                                Height="30"
                                Padding="0"
@@ -82,6 +83,7 @@
                                                     Mii="{Binding Mii}"
                                                     HasBadges="{Binding HasBadges}"
                                                     IsOnline="{Binding IsOnline}"
+                                                    IsPending="{Binding IsPending}"
                                                     TotalLosses="{Binding Losses}"
                                                     TotalWon="{Binding Wins}"
                                                     ViewRoomAction="ViewRoom_OnClick" />
@@ -100,9 +102,21 @@
             </ListBox>
         </Grid>
 
-        <components:EmptyPageInfo Grid.Row="1" x:Name="VisibleWhenNoFriends"
-                                  HorizontalAlignment="Center"
-                                  Title="{x:Static lang:Phrases.EmptyContent_NoFriends_Title}"
-                                  BodyText="{x:Static lang:Phrases.EmptyContent_NoFriends}" />
+        <StackPanel Grid.Row="1" x:Name="VisibleWhenNoFriends"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+            <components:EmptyPageInfo HorizontalAlignment="Center"
+                                      Title="{x:Static lang:Phrases.EmptyContent_NoFriends_Title}"
+                                      BodyText="{x:Static lang:Phrases.EmptyContent_NoFriends}" />
+            <components:Button Text="Add friend"
+                               MinWidth="170"
+                               Margin="0,12,0,0"
+                               Variant="Primary"
+                               IconData="{StaticResource PlusMark}"
+                               IconSize="14"
+                               Click="AddFriend_OnClick"
+                               ToolTip.Tip="Add Friend"
+                               ToolTip.Placement="Top"
+                               ToolTip.ShowDelay="20" />
+        </StackPanel>
     </Grid>
 </UserControl>

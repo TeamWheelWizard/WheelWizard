@@ -121,6 +121,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
     // Pending one-sided friend entry (bit0 set, bit1 clear).
     private const ushort FriendSlotStateAdded = 0x0001;
+    private const byte DwcFriendControlTypeInvalid = 0x00;
+    private const byte DwcFriendControlTypeFriendKey = 0x10;
     private const ushort DefaultFriendCityId = 0;
     private const byte DefaultFriendGameRegion = 0;
     private const byte DefaultFriendCountryCode = 0xFF;
@@ -331,6 +333,15 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             if (!CheckForMiiData(currentOffset + 0x1A))
                 continue;
 
+            var statusFlags = (ushort)BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x10);
+            var baseSlotState = (ushort)(statusFlags & 0x0003);
+            var secondaryOffset = userOffset + FriendSecondaryDataOffset + i * FriendSecondaryDataSize;
+            var secondaryControlByte = _rksysData[secondaryOffset + 0x2];
+            // Treat legacy one-sided entries with control byte 0x00 as pending as well.
+            var isPending =
+                baseSlotState == FriendSlotStateAdded
+                && (secondaryControlByte == DwcFriendControlTypeFriendKey || secondaryControlByte == DwcFriendControlTypeInvalid);
+
             var rawMiiBytes = _rksysData.AsSpan(currentOffset + 0x1A, MiiSize).ToArray();
             var friendCode = FriendCodeGenerator.GetFriendCode(_rksysData, currentOffset + 4);
             var miiResult = MiiSerializer.Deserialize(rawMiiBytes);
@@ -347,6 +358,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
                 CountryCode = _rksysData[currentOffset + 0x68],
                 RegionId = _rksysData[currentOffset + 0x69],
                 BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
+                IsPending = isPending,
                 Mii = miiResult.Value,
             };
             licenseProfile.Friends.Add(friend);
@@ -538,8 +550,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset + 0x70 + i * 8, 0xFFFFFFFF);
         }
 
-        // Keep the DWC friend-data word cleared here so this stays one-sided until reciprocity.
-        _rksysData[secondaryOffset + 0x2] = 0x00;
+        // One-sided pending friend request token.
+        _rksysData[secondaryOffset + 0x2] = DwcFriendControlTypeFriendKey;
         BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, secondaryOffset + 0x4, friendProfileId);
     }
 
