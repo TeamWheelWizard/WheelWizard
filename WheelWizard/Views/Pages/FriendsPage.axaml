@@ -39,6 +39,20 @@
             <Grid Grid.Row="0" Margin="10,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6"
                             HorizontalAlignment="Right">
+                    <components:Button HorizontalAlignment="Right" VerticalAlignment="Center" IconSize="26"
+                                       Click="ToggleCompactMode_OnClick" x:Name="CompactModeButton"
+                                       Padding="13,7" Margin="0,0,10,0"
+                                       ToolTip.Tip="Toggle compact mode">
+                        <components:Button.Styles>
+                            <Style Selector="components|Button.Compact">
+                                <Setter Property="IconData" Value="{StaticResource TableBlocks}" />
+                            </Style>
+                            <Style Selector="components|Button">
+                                <Setter Property="IconData" Value="{StaticResource TableBars}" />
+                            </Style>
+                        </components:Button.Styles>
+                    </components:Button>
+
                     <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_SortBy}"
                                                VerticalAlignment="Center" />
                     <components:FormFieldLabel Text=":" VerticalAlignment="Center" />
@@ -59,20 +73,44 @@
                      Padding="0" Background="Transparent" BorderThickness="0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.Styles>
+                    <Style Selector="ListBox components|FriendsListItemCompact">
+                        <Setter Property="IsVisible" Value="False" />
+                    </Style>
+                    <Style Selector="ListBox.Compact components|FriendsListItemCompact">
+                        <Setter Property="IsVisible" Value="True" />
+                    </Style>
+                    <Style Selector="ListBox.Compact components|FriendsListItem">
+                        <Setter Property="IsVisible" Value="False" />
+                    </Style>
+                </ListBox.Styles>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="domain:FriendProfile">
-                        <components:FriendsListItem Width="428" Height="124"
-                                                    Margin="0,5"
-                                                    UserName="{Binding NameOfMii}"
-                                                    FriendCode="{Binding FriendCode}"
-                                                    Vr="{Binding Vr}"
-                                                    Br="{Binding Br}"
-                                                    Mii="{Binding Mii}"
-                                                    HasBadges="{Binding HasBadges}"
-                                                    IsOnline="{Binding IsOnline}"
-                                                    TotalLosses="{Binding Losses}"
-                                                    TotalWon="{Binding Wins}"
-                                                    ViewRoomAction="ViewRoom_OnClick" />
+                        <Grid>
+                            <components:FriendsListItem HorizontalAlignment="Stretch"
+                                                        Height="124"
+                                                        Margin="0,5"
+                                                        UserName="{Binding NameOfMii}"
+                                                        FriendCode="{Binding FriendCode}"
+                                                        Vr="{Binding Vr}"
+                                                        Br="{Binding Br}"
+                                                        Mii="{Binding Mii}"
+                                                        HasBadges="{Binding HasBadges}"
+                                                        IsOnline="{Binding IsOnline}"
+                                                        TotalLosses="{Binding Losses}"
+                                                        TotalWon="{Binding Wins}"
+                                                        ViewRoomAction="ViewRoom_OnClick" />
+                            <components:FriendsListItemCompact HorizontalAlignment="Stretch"
+                                                               Height="94"
+                                                               Margin="0,5"
+                                                               UserName="{Binding NameOfMii}"
+                                                               FriendCode="{Binding FriendCode}"
+                                                               Vr="{Binding Vr}"
+                                                               Mii="{Binding Mii}"
+                                                               HasBadges="{Binding HasBadges}"
+                                                               IsOnline="{Binding IsOnline}"
+                                                               ViewRoomAction="ViewRoom_OnClick" />
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.ContextMenu>

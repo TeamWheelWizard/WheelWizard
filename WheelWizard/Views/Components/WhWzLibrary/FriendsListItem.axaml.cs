@@ -116,14 +116,15 @@ public class FriendsListItem : TemplatedControl
         if (container != null)
         {
             container.Children.Clear();
+            var badgeSize = this is FriendsListItemCompact ? 20 : 30;
             var badges = App
                 .Services.GetRequiredService<IWhWzDataSingletonService>()
                 .GetBadges(FriendCode)
                 .Select(variant => new Badge { Variant = variant });
             foreach (var badge in badges)
             {
-                badge.Height = 30;
-                badge.Width = 30;
+                badge.Height = badgeSize;
+                badge.Width = badgeSize;
                 container.Children.Add(badge);
             }
         }

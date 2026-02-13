@@ -66,6 +66,7 @@
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
         <StyleInclude Source="Components/WhWzLibrary/ModBrowserListItem.axaml" />
         <StyleInclude Source="Components/WhWzLibrary/FriendsListItem.axaml" />
+        <StyleInclude Source="Components/WhWzLibrary/FriendsListItemCompact.axaml" />
         <StyleInclude Source="Components/WhWzLibrary/PlayerListItem.axaml" />
         <StyleInclude Source="Components/WhWzLibrary/Badge.axaml" />
         <StyleInclude Source="Components/WhWzLibrary/MiiBlock.axaml" />

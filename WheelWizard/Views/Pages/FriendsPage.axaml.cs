@@ -21,6 +21,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     // I personally don't think its worth saving it as a setting.
     // Though I do see the use in saving it when using the app so you can swap pages in the meantime
     private static ListOrderCondition CurrentOrder = ListOrderCondition.IS_ONLINE;
+    private static bool IsCompactModeEnabled;
 
     private ObservableCollection<FriendProfile> _friendlist = [];
 
@@ -48,6 +49,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
         DataContext = this;
         FriendsListView.ItemsSource = FriendList;
+        SetCompactMode();
         PopulateSortingList();
         HandleVisibility();
     }
@@ -125,6 +127,24 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     {
         CurrentOrder = (ListOrderCondition)SortByDropdown.SelectedIndex;
         UpdateFriendList();
+    }
+
+    private void ToggleCompactMode_OnClick(object? sender, RoutedEventArgs e)
+    {
+        IsCompactModeEnabled = !IsCompactModeEnabled;
+        SetCompactMode();
+    }
+
+    private void SetCompactMode()
+    {
+        Control[] controlsToUpdate = [CompactModeButton, FriendsListView];
+        foreach (var control in controlsToUpdate)
+        {
+            if (IsCompactModeEnabled)
+                control.Classes.Add("Compact");
+            else
+                control.Classes.Remove("Compact");
+        }
     }
 
     private enum ListOrderCondition

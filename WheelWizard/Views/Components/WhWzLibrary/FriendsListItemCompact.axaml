@@ -1,0 +1,139 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components"
+        xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+        xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent">
+    <Design.PreviewWith>
+        <StackPanel Spacing="6" Background="{StaticResource Neutral950}">
+            <components:FriendsListItemCompact Width="428" Height="94"
+                                               FriendCode="1234-5678-9012"
+                                               UserName="Compact Friend"
+                                               Vr="30000"
+                                               HasBadges="True"
+                                               IsOnline="True" />
+            <components:FriendsListItemCompact Width="428" Height="94"
+                                               FriendCode="1234-5678-9012"
+                                               UserName="Offline Friend"
+                                               Vr="16895"
+                                               HasBadges="True"
+                                               IsOnline="False" />
+        </StackPanel>
+    </Design.PreviewWith>
+
+    <Style Selector="components|FriendsListItemCompact">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{StaticResource Neutral900}" CornerRadius="6" Padding="10,6"
+                        ClipToBounds="True">
+                    <Grid ColumnDefinitions="64,*,Auto,Auto" RowDefinitions="*,Auto">
+                        <Border Grid.RowSpan="2" Grid.Column="0" Background="{StaticResource Neutral700}"
+                                Margin="-10,-6,0,-6" CornerRadius="7,0,0,7" />
+                        <behaviorComponent:MiiImageLoader Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="-220,-24,0,-8"
+                                                          HorizontalAlignment="Left"
+                                                          VerticalAlignment="Stretch"
+                                                          Mii="{TemplateBinding Mii}"
+                                                          FallBackColor="{StaticResource Neutral500}"
+                                                          ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}"
+                                                          LoadingColor="Transparent" />
+
+                        <Border Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" Background="{StaticResource Neutral900}"
+                                Margin="-10,-6,0,-6" CornerRadius="7,0,0,7">
+                            <Border.OpacityMask>
+                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                    <GradientStop Color="Transparent" Offset="0.8" />
+                                    <GradientStop Color="#FFFFFFDF" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.OpacityMask>
+                        </Border>
+
+                        <Border Grid.RowSpan="2" Grid.ColumnSpan="999" Margin="-10,-6" CornerRadius="6"
+                                x:Name="PART_BorderColor"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1"
+                                BorderBrush="Transparent" />
+
+                        <Border Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2" CornerRadius="99999"
+                                Opacity="0.3" IsVisible="{TemplateBinding IsOnline}" HorizontalAlignment="Right"
+                                Background="{StaticResource Primary200}"
+                                Margin="0,-36,8,0"
+                                Height="68" Width="102" Effect="blur(100)" />
+
+                        <StackPanel Grid.Column="1" Margin="14,6,12,0" VerticalAlignment="Top">
+                            <SelectableTextBlock Classes="TitleText" Text="{TemplateBinding UserName}" />
+                            <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding FriendCode}" Margin="0,-1,0,0" />
+                        </StackPanel>
+
+                        <Border Grid.Column="1" Grid.Row="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Margin="0,0,8,-1"
+                                Background="{StaticResource Neutral950}"
+                                BorderBrush="{StaticResource Neutral600}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Height="26"
+                                Width="88"
+                                IsVisible="{TemplateBinding HasBadges}"
+                                x:Name="PART_BadgeBorder">
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Padding="2,2,2,1">
+                                <StackPanel Orientation="Horizontal" x:Name="PART_BadgeContainer" Spacing="2" />
+                            </ScrollViewer>
+                        </Border>
+
+                        <Border Grid.RowSpan="2" Grid.Column="2" Margin="0,0,8,0" VerticalAlignment="Center"
+                                Background="{StaticResource Neutral950}"
+                                BorderBrush="{StaticResource Neutral700}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="10,5">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Classes="BodyText" Text="{x:Static lang:Common.Attribute_VrAbbreviation}" />
+                                <TextBlock Classes="BodyText" Text=":" Margin="2,0,0,0" />
+                                <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding Vr}" Margin="4,0,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.RowSpan="2" Grid.Column="3" VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Background="{StaticResource Primary300}"
+                                CornerRadius="99999"
+                                IsVisible="{TemplateBinding IsOnline}"
+                                Height="38"
+                                Width="38"
+                                Opacity="0.65"
+                                Effect="blur(35)" />
+
+                        <components:Button Grid.RowSpan="2" Grid.Column="3" VerticalAlignment="Center"
+                                           Variant="Default"
+                                           IsEnabled="{TemplateBinding IsOnline}" x:Name="ViewRoomButton"
+                                           ToolTip.Tip="{x:Static lang:Common.Action_ViewRoom}"
+                                           IconData="{StaticResource Road}" Margin="0,0,4,0"
+                                           Padding="10" Text="" />
+
+                        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="Bottom" Margin="0,0,0,-2"
+                                   IsVisible="{TemplateBinding IsOnline}"
+                                   Text="{x:Static lang:Common.Attribute_Status_Online}"
+                                   FontSize="12" Foreground="{StaticResource Neutral200}" />
+                        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="Bottom" Margin="0,0,0,-2"
+                                   Text="{x:Static lang:Common.Attribute_Status_Offline}"
+                                   FontSize="12"
+                                   IsVisible="{TemplateBinding IsOnline,Converter={x:Static BoolConverters.Not}}"
+                                   Foreground="{StaticResource Neutral200}" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="components|FriendsListItemCompact[IsOnline=true] /template/ Border#PART_BorderColor">
+        <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+    </Style>
+
+    <Style Selector="components|FriendsListItemCompact[IsOnline=true] /template/ Border#PART_BadgeBorder">
+        <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+    </Style>
+
+    <Style Selector="components|FriendsListItemCompact[IsOnline=true] /template/ components|Button#ViewRoomButton">
+        <Setter Property="Variant" Value="Primary" />
+    </Style>
+</Styles>
