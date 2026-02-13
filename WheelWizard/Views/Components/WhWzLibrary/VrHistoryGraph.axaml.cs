@@ -14,6 +14,7 @@ namespace WheelWizard.Views.Components;
 public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
 {
     private const int DefaultHistoryDays = 30;
+    private const int lifetimeDays = 999;
     private const double GraphWidth = 1000;
     private const double GraphHeight = 260;
 
@@ -285,6 +286,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
         HistoryDaysDropdown.Items.Add(new HistoryDaysOption(7, "Last 7 days"));
         HistoryDaysDropdown.Items.Add(new HistoryDaysOption(30, "Last 30 days"));
         HistoryDaysDropdown.Items.Add(new HistoryDaysOption(60, "Last 60 days"));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(999, "Lifetime")); // i think this option could make sense
 
         foreach (var item in HistoryDaysDropdown.Items.OfType<HistoryDaysOption>())
         {
@@ -383,9 +385,11 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
         BiggestGain = gains.Max();
         BiggestDrop = losses.Min();
 
-        var fromDate = historyResponse.FromDate.ToLocalTime().ToString("MMM d");
-        var toDate = historyResponse.ToDate.ToLocalTime().ToString("MMM d");
-        DateRangeText = $"Past {days} day(s) • {fromDate} to {toDate}";
+        string dateFormat = (historyResponse.FromDate.Year != historyResponse.ToDate.Year) ? "MMM d, yyyy" : "MMM d"; // to consider if you want to show the year if it goes over
+        var fromDate = historyResponse.FromDate.ToLocalTime().ToString(dateFormat);
+        var toDate = historyResponse.ToDate.ToLocalTime().ToString("MMM d"); // also if you wanna only show the year from the old date since the current one is always now
+        DateRangeText = days == lifetimeDays ? $"Lifetime history" : $"Past {days} days ({fromDate} to {toDate})";
+        // also suggestion to add a vr peak
 
         if (orderedByDate.Count == 0)
         {
