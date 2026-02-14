@@ -393,6 +393,24 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you want to apply the new language settings?.
+        /// </summary>
+        public static string Question_ApplyLanguageSettings_Extra {
+            get {
+                return ResourceManager.GetString("Question_ApplyLanguageSettings_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This will close the current window and open a new one with the new language settings..
+        /// </summary>
+        public static string Question_ApplyLanguageSettings_Title {
+            get {
+                return ResourceManager.GetString("Question_ApplyLanguageSettings_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installation.
         /// </summary>
         public static string Section_Installation {

@@ -34,7 +34,7 @@ public partial class WhWzSettings : UserControl
         UpdateAppDataLocationUi();
         _pageLoaded = true;
 
-        MKGameFieldLabel.TipText = SettingsResource.HelperText_EndWithX + "Path can end with: .wbfs/.iso/.rvz";
+        MKGameFieldLabel.TipText = SettingsResource.HelperText_EndWithX + " .wbfs/.iso/.rvz";
         WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
     }
 
@@ -701,17 +701,26 @@ public partial class WhWzSettings : UserControl
         if (key == null || key == currentLanguage)
             return;
 
-        // TODO: translate this popup, but support multiple languages. So it should display both NL and FR when you try to switch from NL to FR
+        var currentCulture = new System.Globalization.CultureInfo(currentLanguage);
+        var targetCulture = new System.Globalization.CultureInfo(key);
+
+        var titleCurrent = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Title", currentCulture);
+        var titleTarget = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Title", targetCulture);
+
+        var extraCurrent = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Extra", currentCulture);
+        var extraTarget = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Extra", targetCulture);
+
+        // popup now shows its selection in both languages
         var yesNoWindow = await new YesNoWindow()
-            .SetMainText("Do you want to apply the new language settings?")
-            .SetExtraText("This will close the current window and open a new one with the new language settings.")
+            .SetMainText($"{titleCurrent}\n\n{titleTarget}")
+            .SetExtraText($"{extraCurrent}\n\n{extraTarget}")
             .SetButtonText(Common.Action_Apply, Common.Action_Cancel)
             .AwaitAnswer();
 
         if (!yesNoWindow)
         {
             var currentWhWzLanguage = (string)SettingsManager.WW_LANGUAGE.Get();
-            var whWzLanguageDisplayName = SettingValues.WhWzLanguages[currentWhWzLanguage];
+            var whWzLanguageDisplayName = SettingValues.WhWzLanguages[currentWhWzLanguage](); // gets the name of the current language back if the change was aborted
             WhWzLanguageDropdown.SelectedItem = whWzLanguageDisplayName;
             return; // We only want to change the setting if we really apply this change
         }

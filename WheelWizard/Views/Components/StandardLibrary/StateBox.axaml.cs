@@ -41,6 +41,14 @@ public partial class StateBox : TemplatedControl // Change to TemplatedControl
         set => SetValue(IconDataProperty, value);
     }
 
+    public static readonly StyledProperty<object?> ContentProperty = AvaloniaProperty.Register<StateBox, object?>(nameof(Content));
+
+    public object? Content
+    {
+        get => GetValue(ContentProperty);
+        set => SetValue(ContentProperty, value);
+    }
+
     public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<StateBox, double>(nameof(IconSize), 20);
 
     public double IconSize
