@@ -94,7 +94,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     public void OnSettingChanged(Setting setting)
     {
         // Note that this method will also be called whenever the setting changes
-        if (setting == SettingsManager.WINDOW_SCALE)
+        if (setting == SettingsManager.WINDOW_SCALE || setting == SettingsManager.SAVED_WINDOW_SCALE)
         {
             var scaleFactor = (double)setting.Get();
             Height = WindowHeight * scaleFactor;
