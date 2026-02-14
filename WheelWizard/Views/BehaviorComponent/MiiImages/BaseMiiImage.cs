@@ -104,10 +104,12 @@ public abstract class BaseMiiImage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
+        var effectiveVariants = variants.Select(v => v.WithCustomRenderPreferences(newMii.CustomDataV1)).ToList();
+
         if (ReloadMethod is ReloadMethodType.KeepInstanceUntilNew or ReloadMethodType.ClearAllThenInstanceNew)
         {
             var index = 0;
-            foreach (var variant in variants)
+            foreach (var variant in effectiveVariants)
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -128,7 +130,7 @@ public abstract class BaseMiiImage : UserControlBase, INotifyPropertyChanged
         else if (ReloadMethod is ReloadMethodType.KeepAllUntilNew or ReloadMethodType.ClearAllThenAllNew)
         {
             var loadedBitmaps = new List<Bitmap?>();
-            foreach (var variant in variants)
+            foreach (var variant in effectiveVariants)
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;

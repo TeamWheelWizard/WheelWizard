@@ -51,6 +51,12 @@
                                    Foreground="{StaticResource FormFieldLabelColor}" />
                         <TextBlock Text="{Binding Profile.FriendCode}" Classes="BodyText" FontSize="14"
                                    Foreground="{StaticResource Neutral400}" />
+                        <TextBlock Text="{Binding TaglineText}" Classes="TinyText"
+                                   FontStyle="Italic"
+                                   Foreground="{StaticResource Neutral300}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="260"
+                                   IsVisible="{Binding HasTagline}" />
                         <components:StateBox Text="{Binding Profile.Rank, StringFormat='Rank #{0}'}" 
                                            Variant="Success" IconSize="0" HorizontalAlignment="Left"
                                            IsVisible="{Binding Profile.Rank, Converter={x:Static conv:NumberConverters.GreaterThan0}}" />

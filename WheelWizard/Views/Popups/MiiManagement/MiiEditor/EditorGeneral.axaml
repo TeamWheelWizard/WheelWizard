@@ -47,6 +47,42 @@
                                                    TipText="When you check this, others will be able to save your mii in their own collection."/>
                     </CheckBox>
                 </StackPanel>
+
+                <StackPanel>
+                    <components:FormFieldLabel Text="Accent Color"
+                                               TipText="Sets the background tint used across all Mii renderers."/>
+                    <UniformGrid Columns="4" x:Name="AccentColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
+                </StackPanel>
+
+                <Border BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="1" CornerRadius="6" Padding="10">
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="BodyText" Text="Render Preferences"/>
+
+                        <StackPanel>
+                            <components:FormFieldLabel Text="Facial Expression" />
+                            <ComboBox x:Name="FacialExpressionBox"
+                                      SelectionChanged="FacialExpressionBox_OnSelectionChanged"
+                                      Width="240"/>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <components:FormFieldLabel Text="Camera Angle" />
+                            <ComboBox x:Name="CameraAngleBox"
+                                      SelectionChanged="CameraAngleBox_OnSelectionChanged"
+                                      Width="240"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel>
+                    <components:FormFieldLabel Text="Tagline"
+                                               TipText="Visible on profile pages." />
+                    <ComboBox x:Name="TaglineBox"
+                              SelectionChanged="TaglineBox_OnSelectionChanged"
+                              Width="320" />
+                </StackPanel>
                 
                 <StackPanel> <!-- Gender -->
                     <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Gender}" />

@@ -14,11 +14,13 @@ using WheelWizard.Views.Components;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
+using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 namespace WheelWizard.Views.Pages;
 
@@ -141,6 +143,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         ProfileAttribFriendCode.Text = currentPlayer.FriendCode;
         ProfileAttribFriendCode.IsVisible = !string.IsNullOrEmpty(currentPlayer.FriendCode);
         ProfileAttribUserName.Text = currentPlayer.NameOfMii;
+        var tagline = currentPlayer.Mii == null ? string.Empty : MiiCustomMappings.GetTaglineText(currentPlayer.Mii.CustomDataV1.Tagline);
+        ProfileAttribTagline.Text = tagline;
+        ProfileAttribTagline.IsVisible = !string.IsNullOrWhiteSpace(tagline);
         ProfileAttribVr.Text = currentPlayer.Vr.ToString();
         ProfileAttribBr.Text = currentPlayer.Br.ToString();
         CurrentMii = currentPlayer.Mii;
@@ -152,7 +157,11 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         ProfileAttribTotalWins.Text = currentPlayer.Statistics.RaceTotals.WinsVsLosses.OnlineVs.Wins.ToString();
 
         BadgeContainer.Children.Clear();
-        var badges = BadgeService.GetBadges(currentPlayer.FriendCode).Select(variant => new Badge { Variant = variant });
+        var badgeVariants = BadgeService.GetBadges(currentPlayer.FriendCode).ToList();
+        if (currentPlayer.Mii?.CustomDataV1.IsWheelWizardMii == true)
+            badgeVariants.Insert(0, BadgeVariant.WhWzMii);
+
+        var badges = badgeVariants.Select(variant => new Badge { Variant = variant });
         foreach (var badge in badges)
         {
             badge.Height = 30;

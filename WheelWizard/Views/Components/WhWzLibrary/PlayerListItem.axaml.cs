@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using WheelWizard.WheelWizardData;
+using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Components;
@@ -89,19 +90,24 @@ public class PlayerListItem : TemplatedControl
     {
         base.OnApplyTemplate(e);
         var container = e.NameScope.Find<StackPanel>("PART_BadgeContainer");
+        var badgeBorder = e.NameScope.Find<Border>("PART_BadgeBorder");
         if (container == null)
             return;
 
         container.Children.Clear();
-        var badges = App
-            .Services.GetRequiredService<IWhWzDataSingletonService>()
-            .GetBadges(FriendCode)
-            .Select(variant => new Badge { Variant = variant });
-        foreach (var badge in badges)
+        var badgeVariants = App.Services.GetRequiredService<IWhWzDataSingletonService>().GetBadges(FriendCode).ToList();
+
+        if (Mii?.CustomDataV1.IsWheelWizardMii == true)
+            badgeVariants.Insert(0, BadgeVariant.WhWzMii);
+
+        foreach (var badge in badgeVariants.Select(variant => new Badge { Variant = variant }))
         {
             badge.Height = 30;
             badge.Width = 30;
             container.Children.Add(badge);
         }
+
+        if (badgeBorder != null)
+            badgeBorder.IsVisible = badgeVariants.Count != 0;
     }
 }

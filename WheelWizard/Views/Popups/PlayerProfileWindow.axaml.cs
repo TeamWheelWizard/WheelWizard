@@ -9,6 +9,7 @@ using WheelWizard.Shared.Services;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 namespace WheelWizard.Views.Popups;
 
@@ -38,6 +39,8 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
             _profile = value;
             OnPropertyChanged(nameof(Profile));
             OnPropertyChanged(nameof(DisplayMii));
+            OnPropertyChanged(nameof(TaglineText));
+            OnPropertyChanged(nameof(HasTagline));
             OnPropertyChanged(nameof(LastSeenText));
         }
     }
@@ -101,6 +104,20 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
             return "Just now";
         }
     }
+
+    public string TaglineText
+    {
+        get
+        {
+            var mii = DisplayMii;
+            if (mii == null)
+                return string.Empty;
+
+            return MiiCustomMappings.GetTaglineText(mii.CustomDataV1.Tagline);
+        }
+    }
+
+    public bool HasTagline => !string.IsNullOrWhiteSpace(TaglineText);
 
     private async void LoadProfile(string friendCode)
     {

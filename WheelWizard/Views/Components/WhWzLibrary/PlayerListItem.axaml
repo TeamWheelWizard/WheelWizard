@@ -75,6 +75,7 @@
 
                         <Grid Grid.Column="3" ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
                             <Border Grid.Column="0" Background="Transparent" HorizontalAlignment="Stretch"
+                                    x:Name="PART_BadgeBorder"
                                     IsVisible="{TemplateBinding HasBadges}" Margin="0,0,6,0"
                                     CornerRadius="6" Height="40" BorderThickness="1"
                                     BorderBrush="{StaticResource Neutral600}" VerticalAlignment="Center">

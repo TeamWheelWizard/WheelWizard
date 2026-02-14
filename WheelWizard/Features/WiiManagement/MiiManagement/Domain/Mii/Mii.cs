@@ -172,7 +172,7 @@ public class Mii
     /// The 28 unknown Wii‑Mii bits, exposed through a high‑level wrapper.
     /// Always initialised (never null).
     /// </summary>
-    public CustomMiiData CustomData { get; set; } = CustomMiiData.CreateEmpty();
+    public CustomMiiDataV1 CustomDataV1 { get; set; } = CustomMiiDataV1.CreateEmpty();
     public MiiFacialFeatures MiiFacialFeatures { get; set; } =
         new(MiiFaceShape.Bread, MiiSkinColor.Light, MiiFacialFeature.None, false, false);
 

@@ -142,7 +142,7 @@ public static class MiiSerializer
         Buffer.BlockCopy(mii.CreatorName.ToBytes(), 0, data, 0x36, 20);
 
         // Apply the custom data from all those little bits :)
-        mii.CustomData.ApplyTo(data);
+        mii.CustomDataV1.ApplyTo(data);
 
         return data;
     }
@@ -339,7 +339,7 @@ public static class MiiSerializer
         if (creatorNameResult.IsFailure)
             return creatorNameResult.Error;
         mii.CreatorName = creatorNameResult.Value;
-        mii.CustomData = CustomMiiData.FromBytes(data);
+        mii.CustomDataV1 = CustomMiiDataV1.FromBytes(data);
         return mii;
     }
 

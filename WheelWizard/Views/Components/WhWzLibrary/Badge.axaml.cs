@@ -9,6 +9,7 @@ public class Badge : TemplatedControl
     public static readonly Dictionary<BadgeVariant, string> BadgeToolTip = new()
     {
         { BadgeVariant.None, "This is not a badge" },
+        { BadgeVariant.WhWzMii, "WheelWizard Mii" },
         { BadgeVariant.WhWzDev, "Wheel Wizard Developer (hiii!)" },
         { BadgeVariant.RrDev, "Retro Rewind Developer" },
         { BadgeVariant.Translator, "Translator" },

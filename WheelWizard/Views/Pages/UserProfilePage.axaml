@@ -121,6 +121,11 @@
                                                                 Foreground="{StaticResource Neutral500}"
                                                                 HoverForeground="{StaticResource Neutral400}" />
                                 </StackPanel>
+                                <SelectableTextBlock Classes="TinyText" x:Name="ProfileAttribTagline"
+                                                     Foreground="{StaticResource Neutral400}"
+                                                     TextWrapping="Wrap"
+                                                     MaxWidth="280"
+                                                     IsVisible="False" />
                             </StackPanel>
                             <components:Button VerticalAlignment="Top" HorizontalAlignment="Right" Margin="6"
                                                IconData="{StaticResource Shirt}" Click="OpenMiiSelector_Click"

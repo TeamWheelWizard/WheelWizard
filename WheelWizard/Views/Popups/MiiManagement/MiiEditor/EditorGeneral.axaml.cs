@@ -8,6 +8,7 @@ using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WiiManagement.MiiManagement.Domain;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
 
@@ -15,6 +16,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
 {
     private bool _hasMiiNameError;
     private bool _hasCreatorNameError;
+    private bool _isPopulatingCustomDataControls;
     private readonly DispatcherTimer _refreshTimer = new() { Interval = TimeSpan.FromSeconds(0.7), IsEnabled = false };
 
     public EditorGeneral(MiiEditorWindow ew)
@@ -31,7 +33,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
         MiiName.Text = Editor.Mii.Name.ToString();
         CreatorName.Text = Editor.Mii.CreatorName.ToString();
         GirlToggle.IsChecked = Editor.Mii.IsGirl;
-        AllowCopy.IsChecked = Editor.Mii.CustomData.IsCopyable;
+        AllowCopy.IsChecked = Editor.Mii.CustomDataV1.IsCopyable;
         LengthSlider.Value = Editor.Mii.Height.Value;
         WidthSlider.Value = Editor.Mii.Weight.Value;
 
@@ -46,6 +48,9 @@ public partial class EditorGeneral : MiiEditorBaseControl
                 button.Click += (_, _) => SetSkinColor(index);
             }
         );
+
+        PopulateAccentColors();
+        PopulateCustomDataDropDowns();
     }
 
     protected override void BeforeBack()
@@ -139,6 +144,65 @@ public partial class EditorGeneral : MiiEditorBaseControl
         Editor.RefreshImage();
     }
 
+    private void PopulateAccentColors()
+    {
+        SetColorButtons(
+            Enum.GetValues<MiiProfileColor>().Length,
+            AccentColorGrid,
+            (index, button) =>
+            {
+                button.IsChecked = index == (int)Editor.Mii.CustomDataV1.AccentColor;
+                var colorHex = MiiCustomMappings.GetAccentPreviewHex((MiiProfileColor)index);
+                button.Color1 = new SolidColorBrush(Color.Parse($"#{colorHex}"));
+                button.Click += (_, _) => SetAccentColor(index);
+            }
+        );
+    }
+
+    private void SetAccentColor(int index)
+    {
+        var selectedColor = (MiiProfileColor)index;
+        if (Editor.Mii.CustomDataV1.AccentColor == selectedColor)
+            return;
+
+        Editor.Mii.CustomDataV1.AccentColor = selectedColor;
+        Editor.RefreshImage();
+    }
+
+    private void PopulateCustomDataDropDowns()
+    {
+        _isPopulatingCustomDataControls = true;
+
+        FacialExpressionBox.Items.Clear();
+        foreach (var expression in Enum.GetValues<MiiPreferredFacialExpression>())
+        {
+            var item = new ComboBoxItem { Content = MiiCustomMappings.GetFacialExpressionLabel(expression), Tag = expression };
+            FacialExpressionBox.Items.Add(item);
+            if (expression == Editor.Mii.CustomDataV1.FacialExpression)
+                FacialExpressionBox.SelectedItem = item;
+        }
+
+        CameraAngleBox.Items.Clear();
+        foreach (var angle in Enum.GetValues<MiiPreferredCameraAngle>())
+        {
+            var item = new ComboBoxItem { Content = MiiCustomMappings.GetCameraAngleLabel(angle), Tag = angle };
+            CameraAngleBox.Items.Add(item);
+            if (angle == Editor.Mii.CustomDataV1.CameraAngle)
+                CameraAngleBox.SelectedItem = item;
+        }
+
+        TaglineBox.Items.Clear();
+        foreach (var tagline in Enum.GetValues<MiiPreferredTagline>())
+        {
+            var item = new ComboBoxItem { Content = MiiCustomMappings.GetTaglineLabel(tagline), Tag = tagline };
+            TaglineBox.Items.Add(item);
+            if (tagline == Editor.Mii.CustomDataV1.Tagline)
+                TaglineBox.SelectedItem = item;
+        }
+
+        _isPopulatingCustomDataControls = false;
+    }
+
     private void RestartRefreshTimer()
     {
         _refreshTimer.Stop();
@@ -168,5 +232,43 @@ public partial class EditorGeneral : MiiEditorBaseControl
     }
 
     private void AllowCopy_OnIsCheckedChanged(object? sender, RoutedEventArgs e) =>
-        Editor.Mii.CustomData.IsCopyable = AllowCopy.IsChecked == true;
+        Editor.Mii.CustomDataV1.IsCopyable = AllowCopy.IsChecked == true;
+
+    private void FacialExpressionBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_isPopulatingCustomDataControls)
+            return;
+        if (FacialExpressionBox.SelectedItem is not ComboBoxItem item || item.Tag is not MiiPreferredFacialExpression expression)
+            return;
+        if (Editor.Mii.CustomDataV1.FacialExpression == expression)
+            return;
+
+        Editor.Mii.CustomDataV1.FacialExpression = expression;
+        Editor.RefreshImage();
+    }
+
+    private void CameraAngleBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_isPopulatingCustomDataControls)
+            return;
+        if (CameraAngleBox.SelectedItem is not ComboBoxItem item || item.Tag is not MiiPreferredCameraAngle angle)
+            return;
+        if (Editor.Mii.CustomDataV1.CameraAngle == angle)
+            return;
+
+        Editor.Mii.CustomDataV1.CameraAngle = angle;
+        Editor.RefreshImage();
+    }
+
+    private void TaglineBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_isPopulatingCustomDataControls)
+            return;
+        if (TaglineBox.SelectedItem is not ComboBoxItem item || item.Tag is not MiiPreferredTagline tagline)
+            return;
+        if (Editor.Mii.CustomDataV1.Tagline == tagline)
+            return;
+
+        Editor.Mii.CustomDataV1.Tagline = tagline;
+    }
 }

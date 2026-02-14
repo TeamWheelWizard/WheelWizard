@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
@@ -15,6 +16,7 @@ using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Pages;
 
@@ -120,6 +122,25 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         new PlayerProfileWindow(selectedPlayer.FriendCode).Show();
     }
 
+    private void ViewMiiFields_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
+            return;
+        if (selectedPlayer.FirstMii == null)
+        {
+            ViewUtils.ShowSnackbar("No Mii data found for this player.", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        var report = BuildMiiFieldsReport(selectedPlayer, selectedPlayer.FirstMii);
+        new MessageBoxWindow()
+            .SetMessageType(MessageBoxWindow.MessageType.Message)
+            .SetTitleText("Mii Fields")
+            .SetInfoText(report)
+            .SetTag("DEBUG")
+            .Show();
+    }
+
     private void RoomsDetailPage_Unloaded(object sender, RoutedEventArgs e)
     {
         RRLiveRooms.Instance.Unsubscribe(this);
@@ -186,5 +207,127 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return;
 
         // CopyMiiButton.IsEnabled = selectedPlayer.FirstMii?.CustomData.IsCopyable == true;
+    }
+
+    private static string BuildMiiFieldsReport(RrPlayer player, Mii mii)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine("PLAYER");
+        sb.AppendLine($"Name: {player.Name}");
+        sb.AppendLine($"FriendCode: {player.FriendCode}");
+        sb.AppendLine($"PID: {player.Pid}");
+        sb.AppendLine($"VR: {player.VrDisplay}");
+        sb.AppendLine($"BR: {player.BrDisplay}");
+        sb.AppendLine($"OpenHost: {player.IsOpenHost}");
+        sb.AppendLine($"Suspended: {player.IsSuspended}");
+        sb.AppendLine($"Rank: {(player.LeaderboardRank?.ToString() ?? "--")}");
+        sb.AppendLine();
+
+        sb.AppendLine("MII CORE");
+        sb.AppendLine($"Name: {mii.Name}");
+        sb.AppendLine($"Creator: {mii.CreatorName}");
+        sb.AppendLine($"IsGirl: {mii.IsGirl}");
+        sb.AppendLine($"IsInvalid: {mii.IsInvalid}");
+        sb.AppendLine($"Date: {mii.Date}");
+        sb.AppendLine($"FavoriteColor: {mii.MiiFavoriteColor}");
+        sb.AppendLine($"IsFavorite: {mii.IsFavorite}");
+        sb.AppendLine($"MiiId: 0x{mii.MiiId:X8}");
+        sb.AppendLine($"SystemId: 0x{mii.SystemId:X8}");
+        sb.AppendLine($"IsForeign: {mii.IsForeign}");
+        sb.AppendLine($"Height: {mii.Height.Value}");
+        sb.AppendLine($"Weight: {mii.Weight.Value}");
+        sb.AppendLine();
+
+        sb.AppendLine("FACE");
+        sb.AppendLine($"FaceShape: {mii.MiiFacialFeatures.FaceShape}");
+        sb.AppendLine($"SkinColor: {mii.MiiFacialFeatures.SkinColor}");
+        sb.AppendLine($"FacialFeature: {mii.MiiFacialFeatures.FacialFeature}");
+        sb.AppendLine($"MingleOff: {mii.MiiFacialFeatures.MingleOff}");
+        sb.AppendLine($"Downloaded: {mii.MiiFacialFeatures.Downloaded}");
+        sb.AppendLine();
+
+        sb.AppendLine("HAIR");
+        sb.AppendLine($"HairType: {mii.MiiHair.HairType}");
+        sb.AppendLine($"HairColor: {mii.MiiHair.MiiHairColor}");
+        sb.AppendLine($"HairFlipped: {mii.MiiHair.HairFlipped}");
+        sb.AppendLine();
+
+        sb.AppendLine("EYEBROWS");
+        sb.AppendLine($"Type: {mii.MiiEyebrows.Type}");
+        sb.AppendLine($"Rotation: {mii.MiiEyebrows.Rotation}");
+        sb.AppendLine($"Color: {mii.MiiEyebrows.Color}");
+        sb.AppendLine($"Size: {mii.MiiEyebrows.Size}");
+        sb.AppendLine($"Vertical: {mii.MiiEyebrows.Vertical}");
+        sb.AppendLine($"Spacing: {mii.MiiEyebrows.Spacing}");
+        sb.AppendLine();
+
+        sb.AppendLine("EYES");
+        sb.AppendLine($"Type: {mii.MiiEyes.Type}");
+        sb.AppendLine($"Rotation: {mii.MiiEyes.Rotation}");
+        sb.AppendLine($"Vertical: {mii.MiiEyes.Vertical}");
+        sb.AppendLine($"Color: {mii.MiiEyes.Color}");
+        sb.AppendLine($"Size: {mii.MiiEyes.Size}");
+        sb.AppendLine($"Spacing: {mii.MiiEyes.Spacing}");
+        sb.AppendLine();
+
+        sb.AppendLine("NOSE/LIPS");
+        sb.AppendLine($"NoseType: {mii.MiiNose.Type}");
+        sb.AppendLine($"NoseSize: {mii.MiiNose.Size}");
+        sb.AppendLine($"NoseVertical: {mii.MiiNose.Vertical}");
+        sb.AppendLine($"LipType: {mii.MiiLips.Type}");
+        sb.AppendLine($"LipColor: {mii.MiiLips.Color}");
+        sb.AppendLine($"LipSize: {mii.MiiLips.Size}");
+        sb.AppendLine($"LipVertical: {mii.MiiLips.Vertical}");
+        sb.AppendLine();
+
+        sb.AppendLine("GLASSES/FACIAL HAIR/MOLE");
+        sb.AppendLine($"GlassesType: {mii.MiiGlasses.Type}");
+        sb.AppendLine($"GlassesColor: {mii.MiiGlasses.Color}");
+        sb.AppendLine($"GlassesSize: {mii.MiiGlasses.Size}");
+        sb.AppendLine($"GlassesVertical: {mii.MiiGlasses.Vertical}");
+        sb.AppendLine($"MustacheType: {mii.MiiFacialHair.MiiMustacheType}");
+        sb.AppendLine($"BeardType: {mii.MiiFacialHair.MiiBeardType}");
+        sb.AppendLine($"FacialHairColor: {mii.MiiFacialHair.Color}");
+        sb.AppendLine($"MustacheSize: {mii.MiiFacialHair.Size}");
+        sb.AppendLine($"MustacheVertical: {mii.MiiFacialHair.Vertical}");
+        sb.AppendLine($"MoleExists: {mii.MiiMole.Exists}");
+        sb.AppendLine($"MoleSize: {mii.MiiMole.Size}");
+        sb.AppendLine($"MoleVertical: {mii.MiiMole.Vertical}");
+        sb.AppendLine($"MoleHorizontal: {mii.MiiMole.Horizontal}");
+        sb.AppendLine();
+
+        sb.AppendLine("CUSTOM DATA");
+        sb.AppendLine($"SchemaVersion: {mii.CustomDataV1.Version}");
+        sb.AppendLine($"IsWheelWizardMii: {mii.CustomDataV1.IsWheelWizardMii}");
+        if (mii.CustomDataV1.IsWheelWizardMii)
+        {
+            sb.AppendLine($"IsCopyable: {mii.CustomDataV1.IsCopyable}");
+            sb.AppendLine($"AccentColor: {mii.CustomDataV1.AccentColor}");
+            sb.AppendLine($"FacialExpression: {mii.CustomDataV1.FacialExpression}");
+            sb.AppendLine($"CameraAngle: {mii.CustomDataV1.CameraAngle}");
+            sb.AppendLine($"Tagline: {mii.CustomDataV1.Tagline}");
+            sb.AppendLine($"Spare: {mii.CustomDataV1.Spare}");
+        }
+        else
+        {
+            sb.AppendLine("CustomData fields are ignored (schema/version flag not set).");
+        }
+        sb.AppendLine();
+
+        var serializeResult = MiiSerializer.Serialize(mii);
+        if (serializeResult.IsSuccess)
+        {
+            sb.AppendLine("RAW");
+            sb.AppendLine($"MiiBlockHex: {Convert.ToHexString(serializeResult.Value)}");
+            sb.AppendLine($"MiiBlockBase64: {Convert.ToBase64String(serializeResult.Value)}");
+        }
+        else
+        {
+            sb.AppendLine("RAW");
+            sb.AppendLine($"Serialization failed: {serializeResult.Error.Message}");
+        }
+
+        return sb.ToString();
     }
 }

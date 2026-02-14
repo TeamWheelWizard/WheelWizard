@@ -190,7 +190,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (selectedPlayer.Mii == null)
             return;
 
-        if (selectedPlayer.Mii?.CustomData.IsCopyable != true)
+        if (selectedPlayer.Mii?.CustomDataV1.IsCopyable != true)
         {
             ViewUtils.ShowSnackbar("This player doesn't want you to copy their Mii", ViewUtils.SnackbarType.Warning);
             return;
@@ -227,6 +227,6 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
             return;
 
-        CopyMiiButton.IsEnabled = selectedPlayer.Mii?.CustomData.IsCopyable == true;
+        CopyMiiButton.IsEnabled = selectedPlayer.Mii?.CustomDataV1.IsCopyable == true;
     }
 }

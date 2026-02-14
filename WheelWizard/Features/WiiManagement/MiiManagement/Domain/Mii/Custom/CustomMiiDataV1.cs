@@ -13,7 +13,7 @@ namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 /// • Bits 3–24 : Available for custom fields defined as properties below. These are automatically
 ///               packed based on their declaration order and specified [BitField] width.
 /// </summary>
-public sealed class CustomMiiData
+public sealed class CustomMiiDataV1
 {
     // Defines the current version of the custom data layout.
     // Increment this (1-7, then loop) if the layout of properties below changes,
@@ -46,10 +46,10 @@ public sealed class CustomMiiData
 
     // Static constructor: This runs once when the CustomMiiData class is first used.
     // Its purpose is to automatically determine the layout of the custom bit fields.
-    static CustomMiiData()
+    static CustomMiiDataV1()
     {
         // Get all public and non-public instance properties of this class.
-        var properties = typeof(CustomMiiData).GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var properties = typeof(CustomMiiDataV1).GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         // Filter to find only properties that have the [BitField] attribute.
         var bitFieldProperties = properties.Where(p => p.GetCustomAttribute<BitFieldAttribute>() is not null);
@@ -121,12 +121,19 @@ public sealed class CustomMiiData
     /// This should always be the first field defined.
     /// The setter is private to ensure its only set internally (e.g., in CreateEmpty).
     /// </summary>
+    /// todo: remove this from data v1 and in the serializer we write these version bits to the version.
     [BitField(3, Order = 0)]
     public byte Version
     {
         get => (byte)GetField();
         set => SetField(value);
     }
+
+    /// <summary>
+    /// Indicates whether this Mii contains a WheelWizard schema/version marker.
+    /// Version 0 means the Mii was not authored with WheelWizard custom data.
+    /// </summary>
+    public bool IsWheelWizardMii => Version != 0;
 
     /// <summary>
     /// Gets or sets whether the Mii is allowed to be copied from other consoles (1 bit).
@@ -192,24 +199,24 @@ public sealed class CustomMiiData
     /// Private constructor used internally to create an instance with a given payload.
     /// </summary>
     /// <param name="payload">The packed 24-bit data.</param>
-    private CustomMiiData(uint payload) => _payload = payload;
+    private CustomMiiDataV1(uint payload) => _payload = payload;
 
     /// <summary>
-    /// Creates a <see cref="CustomMiiData"/> instance by extracting the 24 custom bits
+    /// Creates a <see cref="CustomMiiDataV1"/> instance by extracting the 24 custom bits
     /// from a raw 74-byte Mii data block.
     /// </summary>
-    public static CustomMiiData FromBytes(byte[] rawMiiBytes)
+    public static CustomMiiDataV1 FromBytes(byte[] rawMiiBytes)
     {
         var result = CustomBitsCodec.Extract(rawMiiBytes);
         return FromPayload(result);
     }
 
     /// <summary>
-    /// Creates a <see cref="CustomMiiData"/> instance by extracting the 24 custom bits
+    /// Creates a <see cref="CustomMiiDataV1"/> instance by extracting the 24 custom bits
     /// from a <see cref="Mii"/> object.
     /// This involves serializing the Mii object to bytes first.
     /// </summary>
-    public static CustomMiiData FromMii(MiiManagement.Domain.Mii.Mii mii)
+    public static CustomMiiDataV1 FromMii(Mii mii)
     {
         var serializeResult = MiiSerializer.Serialize(mii);
         if (!serializeResult.IsSuccess)
@@ -217,7 +224,7 @@ public sealed class CustomMiiData
         return FromPayload(CustomBitsCodec.Extract(serializeResult.Value));
     }
 
-    private static CustomMiiData FromPayload(uint rawpayload)
+    private static CustomMiiDataV1 FromPayload(uint rawpayload)
     {
         var diskVersion = (byte)(rawpayload & VersionMask);
 
@@ -225,16 +232,17 @@ public sealed class CustomMiiData
         if (diskVersion == SchemaVersion)
             return new(rawpayload);
 
-        // Version byte missing/zero -> accept as-is; nothing to migrate.
+        // Version byte missing/zero -> this is not a WheelWizard-authored payload.
+        // Keep it explicitly unversioned so custom fields stay ignored.
         if (diskVersion == 0)
-            return new(rawpayload);
+            return CreateUnversioned();
 
         if (!TryComputeForwardDistance(diskVersion, (byte)SchemaVersion, out var distance))
-            return CreateEmpty();
+            return CreateUnversioned();
 
         // If the payload is more than 5 migrations behind, treat it as stale and discard.
         if (distance >= MaxMigrationHops)
-            return CreateEmpty();
+            return CreateUnversioned();
 
         // Walk forward version-by-version until we reach the current schema.
         var migratedPayload = rawpayload;
@@ -243,7 +251,7 @@ public sealed class CustomMiiData
         for (var step = 0; step < distance; step++)
         {
             if (!TryMigrateFromVersion(currentVersion, migratedPayload, out var nextPayload))
-                return CreateEmpty();
+                return CreateUnversioned();
 
             migratedPayload = nextPayload;
             currentVersion = NextVersion(currentVersion);
@@ -313,11 +321,17 @@ public sealed class CustomMiiData
     private static uint WithVersion(uint payload, byte version) => (payload & ~VersionMask) | (version & VersionMask);
 
     /// <summary>
-    /// Creates a new <see cref="CustomMiiData"/> instance with all custom bits initially set to zero,
+    /// Creates a new <see cref="CustomMiiDataV1"/> instance with all custom bits initially set to zero,
     /// but with the <see cref="Version"/> field automatically set to the current <see cref="SchemaVersion"/>.
     /// </summary>
-    /// <returns>A new, default-initialized <see cref="CustomMiiData"/> instance.</returns>
-    public static CustomMiiData CreateEmpty() => new(0) { Version = SchemaVersion };
+    /// <returns>A new, default-initialized <see cref="CustomMiiDataV1"/> instance.</returns>
+    public static CustomMiiDataV1 CreateEmpty() => new(0) { Version = SchemaVersion };
+
+    /// <summary>
+    /// Creates an explicitly unversioned payload (Version == 0).
+    /// Used for non-WheelWizard Miis or unsupported legacy payloads.
+    /// </summary>
+    private static CustomMiiDataV1 CreateUnversioned() => new(0);
 
     #endregion
 
@@ -362,6 +376,9 @@ public sealed class CustomMiiData
     /// <returns>The value of the requested field, extracted from the _payload.</returns>
     private uint GetField([CallerMemberName] string? propName = null)
     {
+        if (propName != nameof(Version) && GetField(nameof(Version)) == 0)
+            return 0;
+
         // Look up the metadata (offset, width, mask) for the property.
         var meta = _meta[propName!]; // Assumes propName is always valid due to CallerMemberName.
 
