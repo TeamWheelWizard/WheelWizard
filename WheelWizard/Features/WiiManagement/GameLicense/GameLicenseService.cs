@@ -213,8 +213,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         // Try to read VR/BR from RRRating.pul file
         var vrFromRksys = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB0);
         var brFromRksys = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB2);
-        var vr = vrFromRksys;
-        var br = brFromRksys;
+        uint vr = vrFromRksys;
+        uint br = brFromRksys;
 
         if (profileId > 0 && !string.IsNullOrEmpty(friendCode))
         {
