@@ -67,10 +67,10 @@ public enum MiiPreferredTagline
     Tagline15 = 15, // Ctrl + Alt + Mii
     Tagline16 = 16, // Mii think therefore Mii am
     Tagline17 = 17, // To Mii or not to Mii, that is the question
-    Tagline18 = 18,
-    Tagline19 = 19,
-    Tagline20 = 20,
-    Tagline21 = 21,
+    Tagline18 = 18, // For the colony!
+    Tagline19 = 19, // quick brown fox jumps over the lazy dog
+    Tagline20 = 20, // 6-7 on a merry rizzmas
+    Tagline21 = 21, // It's rewind time everybody!
     Tagline22 = 22,
     Tagline23 = 23,
     Tagline24 = 24,

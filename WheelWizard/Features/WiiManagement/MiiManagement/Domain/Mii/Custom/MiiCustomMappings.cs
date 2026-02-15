@@ -93,6 +93,10 @@ public static class MiiCustomMappings
             MiiPreferredTagline.Tagline15 => "Ctrl + Alt + Mii",
             MiiPreferredTagline.Tagline16 => "Mii think therefore Mii am",
             MiiPreferredTagline.Tagline17 => "To Mii or not to Mii, that is the question",
+            MiiPreferredTagline.Tagline18 => "For the colony!",
+            MiiPreferredTagline.Tagline19 => "quick brown fox jumps over the lazy dog",
+            MiiPreferredTagline.Tagline20 => "6-7 on a merry rizzmas",
+            MiiPreferredTagline.Tagline21 => "It's rewind time everybody!",
             _ => $"Tagline {(int)tagline}",
         };
     }
