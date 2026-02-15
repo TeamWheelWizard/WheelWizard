@@ -64,14 +64,12 @@
                         <components:FriendsListItem Width="428" Height="124"
                                                     Margin="0,5"
                                                     UserName="{Binding NameOfMii}"
+                                                    Tagline="{Binding Tagline}"
                                                     FriendCode="{Binding FriendCode}"
                                                     Vr="{Binding Vr}"
-                                                    Br="{Binding Br}"
                                                     Mii="{Binding Mii}"
                                                     HasBadges="{Binding HasBadges}"
                                                     IsOnline="{Binding IsOnline}"
-                                                    TotalLosses="{Binding Losses}"
-                                                    TotalWon="{Binding Wins}"
                                                     ViewRoomAction="ViewRoom_OnClick" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>

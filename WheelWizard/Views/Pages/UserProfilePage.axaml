@@ -112,6 +112,18 @@
                                                                 Foreground="{StaticResource Neutral500}"
                                                                 HoverForeground="{StaticResource Neutral400}" />
                                 </StackPanel>
+                                <SelectableTextBlock Classes="TinyText" x:Name="ProfileAttribTagline"
+                                                     Foreground="{StaticResource Neutral400}"
+                                                     TextWrapping="Wrap"
+                                                     MaxWidth="280"
+                                                     IsVisible="False" />
+                            </StackPanel>
+                            <StackPanel x:Name="ProfileFriendCodeBox"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Margin="7"
+                                        IsVisible="False">
+                                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_FriendCode}" />
                                 <StackPanel Orientation="Horizontal">
                                     <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribFriendCode" />
                                     <components:IconLabelButton VerticalAlignment="Center" x:Name="CopyFcButton"
@@ -121,11 +133,6 @@
                                                                 Foreground="{StaticResource Neutral500}"
                                                                 HoverForeground="{StaticResource Neutral400}" />
                                 </StackPanel>
-                                <SelectableTextBlock Classes="TinyText" x:Name="ProfileAttribTagline"
-                                                     Foreground="{StaticResource Neutral400}"
-                                                     TextWrapping="Wrap"
-                                                     MaxWidth="280"
-                                                     IsVisible="False" />
                             </StackPanel>
                             <components:Button VerticalAlignment="Top" HorizontalAlignment="Right" Margin="6"
                                                IconData="{StaticResource Shirt}" Click="OpenMiiSelector_Click"

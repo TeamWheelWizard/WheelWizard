@@ -26,6 +26,16 @@ public class FriendsListItem : TemplatedControl
         set => SetValue(HasBadgesProperty, value);
     }
 
+    public static readonly StyledProperty<bool> ShowWheelWizardTagProperty = AvaloniaProperty.Register<FriendsListItem, bool>(
+        nameof(ShowWheelWizardTag)
+    );
+
+    public bool ShowWheelWizardTag
+    {
+        get => GetValue(ShowWheelWizardTagProperty);
+        set => SetValue(ShowWheelWizardTagProperty, value);
+    }
+
     public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<FriendsListItem, Mii?>(nameof(Mii));
 
     public Mii? Mii
@@ -86,6 +96,14 @@ public class FriendsListItem : TemplatedControl
         set => SetValue(FriendCodeProperty, value);
     }
 
+    public static readonly StyledProperty<string> TaglineProperty = AvaloniaProperty.Register<FriendsListItem, string>(nameof(Tagline));
+
+    public string Tagline
+    {
+        get => GetValue(TaglineProperty);
+        set => SetValue(TaglineProperty, value);
+    }
+
     public static readonly StyledProperty<string> UserNameProperty = AvaloniaProperty.Register<FriendsListItem, string>(nameof(UserName));
 
     public string UserName
@@ -115,13 +133,22 @@ public class FriendsListItem : TemplatedControl
         base.OnApplyTemplate(e);
         var container = e.NameScope.Find<StackPanel>("PART_BadgeContainer");
         var badgeBorder = e.NameScope.Find<Border>("PART_BadgeBorder");
+        var wheelWizardTag = e.NameScope.Find<PathIcon>("PART_WheelWizardTag");
+
+        var isWheelWizardMii = Mii?.CustomDataV1.IsWheelWizardMii == true || ShowWheelWizardTag;
+        if (wheelWizardTag != null)
+            wheelWizardTag.IsVisible = isWheelWizardMii;
+
         if (container != null)
         {
             container.Children.Clear();
             var badgeVariants = App.Services.GetRequiredService<IWhWzDataSingletonService>().GetBadges(FriendCode).ToList();
 
-            if (Mii?.CustomDataV1.IsWheelWizardMii == true)
-                badgeVariants.Insert(0, BadgeVariant.WhWzMii);
+            if (Design.IsDesignMode && HasBadges && badgeVariants.Count == 0)
+            {
+                badgeVariants.Add(BadgeVariant.Translator);
+                badgeVariants.Add(BadgeVariant.WhWzDev);
+            }
 
             foreach (var badge in badgeVariants.Select(variant => new Badge { Variant = variant }))
             {

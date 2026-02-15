@@ -140,8 +140,10 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         CurrentUserProfile.Classes.Clear();
 
         currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
+        var hasFriendCode = !string.IsNullOrEmpty(currentPlayer.FriendCode);
         ProfileAttribFriendCode.Text = currentPlayer.FriendCode;
-        ProfileAttribFriendCode.IsVisible = !string.IsNullOrEmpty(currentPlayer.FriendCode);
+        ProfileAttribFriendCode.IsVisible = hasFriendCode;
+        ProfileFriendCodeBox.IsVisible = hasFriendCode;
         ProfileAttribUserName.Text = currentPlayer.NameOfMii;
         var tagline = currentPlayer.Mii == null ? string.Empty : MiiCustomMappings.GetTaglineText(currentPlayer.Mii.CustomDataV1.Tagline);
         ProfileAttribTagline.Text = tagline;
@@ -158,8 +160,6 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
         BadgeContainer.Children.Clear();
         var badgeVariants = BadgeService.GetBadges(currentPlayer.FriendCode).ToList();
-        if (currentPlayer.Mii?.CustomDataV1.IsWheelWizardMii == true)
-            badgeVariants.Insert(0, BadgeVariant.WhWzMii);
 
         var badges = badgeVariants.Select(variant => new Badge { Variant = variant });
         foreach (var badge in badges)

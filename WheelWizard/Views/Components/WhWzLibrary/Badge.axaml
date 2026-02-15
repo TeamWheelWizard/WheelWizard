@@ -69,16 +69,9 @@
     <Style Selector="controls|Badge.WhWzMii">
         <Setter Property="Template">
             <ControlTemplate>
-                <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
-                    <Border Grid.Row="0" Grid.Column="0"
-                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
-                            Background="{StaticResource Primary100}"/>
-
-                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
-                            Background="{StaticResource Primary500}"/>
-
-                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Fill="{StaticResource Primary900}" Data="{StaticResource StarIcon}"
+                <Grid>
+                    <Path HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="{StaticResource Primary400}" Data="{StaticResource WheelIcon}"
                           Stretch="Uniform"/>
                 </Grid>
             </ControlTemplate>

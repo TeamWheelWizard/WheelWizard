@@ -10,6 +10,7 @@
                                        FriendCode="1234-5678-9012"
                                        UserName="Lum Patch"
                                        Vr="5000"
+                                       ShowWheelWizardTag="True"
                                        IsOpenHost="True"
                                        HasBadges="True"
                                        IsTopPlayer="True"
@@ -48,14 +49,21 @@
             <ControlTemplate>
                 <Border Classes="BoxItemBackground">
                     <Grid ColumnDefinitions="Auto,130,80,*">
-                        <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True"
-                                Background="{StaticResource Neutral950}" Width="50" Height="50" Margin="0,3">
-                            <behaviorComponent:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                              LoadingColor="{StaticResource Neutral600}"
-                                                              Mii="{TemplateBinding Mii}"
-                                                              FallBackColor="{StaticResource Neutral600}"
-                                                              ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
-                        </Border>
+                        <Grid Grid.Column="0" Width="50" Height="50" Margin="0,3" VerticalAlignment="Center">
+                            <Border CornerRadius="999999" ClipToBounds="True"
+                                    Background="{StaticResource Neutral950}" Width="50" Height="50">
+                                <behaviorComponent:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                                  LoadingColor="{StaticResource Neutral600}"
+                                                                  Mii="{TemplateBinding Mii}"
+                                                                  FallBackColor="{StaticResource Neutral600}"
+                                                                  ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
+                            </Border>
+                            <PathIcon HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                      Margin="0,0,-2,-2" Width="14" Height="14"
+                                      IsVisible="False" x:Name="PART_WheelWizardTag"
+                                      ToolTip.Tip="WheelWizard Mii" ToolTip.Placement="Top" ToolTip.ShowDelay="20"
+                                      Data="{StaticResource WheelIcon}" Foreground="{StaticResource Primary400}" />
+                        </Grid>
 
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <components:FormFieldLabel Text="{TemplateBinding UserName}" Margin="10,0,0,0" />

@@ -207,6 +207,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         var friendCode = FriendCodeGenerator.GetFriendCode(_rksysData, rkpdOffset + 0x5C);
         var miiDataResult = ParseMiiData(rkpdOffset);
         var miiToUse = miiDataResult.IsFailure ? new() : miiDataResult.Value;
+        if (miiDataResult.IsSuccess)
+            TryEnsureLicenseMiiIsTagged(miiToUse);
 
         var statistics = StatisticsSerializer.ParseStatistics(_rksysData, rkpdOffset);
 
@@ -262,6 +264,19 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
         ParseFriends(user, rkpdOffset);
         return user;
+    }
+
+    private void TryEnsureLicenseMiiIsTagged(Mii mii)
+    {
+        if (!mii.CustomDataV1.EnsureWheelWizardTag())
+            return;
+
+        var updateResult = _miiService.Update(mii);
+        if (updateResult.IsFailure)
+        {
+            // Keep the in-memory model aligned with persisted state when the DB update fails.
+            mii.CustomDataV1.Version = 0;
+        }
     }
 
     private byte[]? TryReadRRratingFile()

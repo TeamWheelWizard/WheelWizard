@@ -3,6 +3,7 @@ using WheelWizard.Helpers;
 using WheelWizard.Services.LiveData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 namespace WheelWizard.WiiManagement.GameLicense.Domain;
 
@@ -40,6 +41,8 @@ public abstract class PlayerProfileBase : INotifyPropertyChanged
     public bool HasBadges => BadgeVariants.Length != 0;
 
     public string NameOfMii => Mii?.Name.ToString() ?? string.Empty;
+    public string Tagline =>
+        Mii?.CustomDataV1.IsWheelWizardMii == true ? MiiCustomMappings.GetTaglineText(Mii.CustomDataV1.Tagline) : string.Empty;
 
     #region PropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;

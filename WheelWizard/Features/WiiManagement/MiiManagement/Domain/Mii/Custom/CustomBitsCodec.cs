@@ -137,17 +137,17 @@ internal static class CustomBitsCodec
         // Face Data (U0, U1)
         var faceVal = (ushort)BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_FACE);
         faceVal = (ushort)(
-            (faceVal & ~MASK_FACE_COMBINED) // Clear U0 and U1 bits
-            | (fragments[fragIndex++] << 3) // Write U0 (3 bits) to LSB bits 3,4,5
-            | (fragments[fragIndex++] << 1)
+            (faceVal & unchecked((ushort)~MASK_FACE_COMBINED)) // Clear U0 and U1 bits
+            | ((ushort)fragments[fragIndex++] << 3) // Write U0 (3 bits) to LSB bits 3,4,5
+            | ((ushort)fragments[fragIndex++] << 1)
         ); // Write U1 (1 bit) to LSB bit 1
         BigEndianBinaryHelper.WriteUInt16BigEndian(rawMiiBytes, OFS_FACE, faceVal);
 
         // Hair Data (U2)
         var hairVal = (ushort)BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_HAIR);
         hairVal = (ushort)(
-            (hairVal & ~MASK_U2_HAIR) // Clear U2 bits
-            | fragments[fragIndex++]
+            (hairVal & unchecked((ushort)~MASK_U2_HAIR)) // Clear U2 bits
+            | (ushort)fragments[fragIndex++]
         ); // Write U2 (5 bits) to LSB bits 0-4
         BigEndianBinaryHelper.WriteUInt16BigEndian(rawMiiBytes, OFS_HAIR, hairVal);
 
@@ -168,16 +168,16 @@ internal static class CustomBitsCodec
         // Nose Data (U8)
         var noseVal = BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_NOSE);
         noseVal = (ushort)(
-            (noseVal & ~MASK_U8_NOSE) // Clear U8 bits
-            | fragments[fragIndex++]
+            (noseVal & unchecked((ushort)~MASK_U8_NOSE)) // Clear U8 bits
+            | (ushort)fragments[fragIndex++]
         ); // Write U8 (3 bits) to LSB bits 0-2
         BigEndianBinaryHelper.WriteUInt16BigEndian(rawMiiBytes, OFS_NOSE, noseVal);
 
         // Mole Data (U10)
         var moleVal = BigEndianBinaryHelper.BufferToUint16(rawMiiBytes, OFS_MOLE);
         moleVal = (ushort)(
-            (moleVal & ~MASK_U10_MOLE) // Clear U10 bit
-            | fragments[fragIndex++]
+            (moleVal & unchecked((ushort)~MASK_U10_MOLE)) // Clear U10 bit
+            | (ushort)fragments[fragIndex++]
         ); // Write U10 (1 bit) to LSB bit 0
         BigEndianBinaryHelper.WriteUInt16BigEndian(rawMiiBytes, OFS_MOLE, moleVal);
     }

@@ -169,7 +169,7 @@ public class Mii
     }
 
     /// <summary>
-    /// The 28 unknown Wii‑Mii bits, exposed through a high‑level wrapper.
+    /// The 24 usable unknown Wii-Mii bits, exposed through a high-level wrapper.
     /// Always initialised (never null).
     /// </summary>
     public CustomMiiDataV1 CustomDataV1 { get; set; } = CustomMiiDataV1.CreateEmpty();

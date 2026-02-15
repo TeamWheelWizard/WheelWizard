@@ -70,6 +70,7 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
 
     public void SignalSaveMii()
     {
+        Mii.CustomDataV1.EnsureWheelWizardTag();
         Result = true;
         _tcs.TrySetResult(true);
         Close();

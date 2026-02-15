@@ -9,6 +9,8 @@
             <components:FriendsListItem Width="428" Height="124"
                                         FriendCode="1234-5678-9012"
                                         UserName="Lum Patch"
+                                        Tagline="Hey there! I am using WheelWizard."
+                                        ShowWheelWizardTag="True"
                                         Vr="5000" Br="5000"
                                         HasBadges="True"
                                         TotalLosses="12" TotalWon="1345" />
@@ -16,6 +18,7 @@
             <components:FriendsListItem Width="428" Height="124" IsOnline="True"
                                         FriendCode="1234-5678-9012"
                                         UserName="Someone Else"
+                                        Tagline="Funky FTW"
                                         Vr="5000" Br="5000"
                                         HasBadges="True"
                                         TotalLosses="213" TotalWon="12" />
@@ -23,6 +26,7 @@
             <components:FriendsListItem Width="428" Height="124"
                                         FriendCode="1234-5678-9012"
                                         UserName="WantToBeeMe"
+                                        Tagline="To Mii or not to Mii, that is the question"
                                         Vr="5000" Br="5000"
                                         HasBadges="False"
                                         TotalLosses="213" TotalWon="12" />
@@ -30,6 +34,7 @@
             <components:FriendsListItem Width="428" Height="124"
                                         FriendCode="1234-5678-9012"
                                         UserName="Random Guy"
+                                        Tagline=""
                                         Vr="5000" Br="5000"
                                         HasBadges="False"
                                         TotalLosses="213" TotalWon="12" />
@@ -37,6 +42,7 @@
             <components:FriendsListItem Width="428" Height="124" IsOnline="True"
                                         FriendCode="1234-5678-9012"
                                         UserName="Someone Else"
+                                        Tagline="loading..."
                                         Vr="5000" Br="5000"
                                         HasBadges="False"
                                         TotalLosses="213" TotalWon="12" />
@@ -77,6 +83,11 @@
                                    FontSize="12"
                                    IsVisible="{TemplateBinding IsOnline,Converter={x:Static BoolConverters.Not}}"
                                    Foreground="{StaticResource Neutral200}" />
+                        <PathIcon Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                  Margin="0,0,0,0" Width="15" Height="15" IsVisible="False"
+                                  x:Name="PART_WheelWizardTag"
+                                  ToolTip.Tip="WheelWizard User" ToolTip.Placement="Top" ToolTip.ShowDelay="20"
+                                  Data="{StaticResource WheelIcon}" Foreground="{StaticResource Primary400}" />
 
                         <Border Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" CornerRadius="99999"
                                 Opacity="0.5" IsVisible="{TemplateBinding IsOnline}" HorizontalAlignment="Right"
@@ -106,21 +117,17 @@
 
                         <StackPanel Grid.Column="1" Margin="15,5,0,0">
                             <SelectableTextBlock Classes="TitleText" Text="{TemplateBinding UserName}" />
-                            <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding FriendCode}" />
+                            <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding Tagline}"
+                                                 IsVisible="{TemplateBinding Tagline, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                         </StackPanel>
 
-                        <Grid Grid.Column="1" Margin="15,0,0,5" ColumnDefinitions="3*,4*" VerticalAlignment="Bottom">
-                            <StackPanel Grid.Column="0">
+                        <StackPanel Grid.Column="1" Margin="15,0,0,5" VerticalAlignment="Bottom">
+                            <StackPanel>
                                 <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
                                                            TipText="{x:Static lang:Common.Attribute_VrFull}" />
                                 <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding Vr}" />
                             </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_BrAbbreviation}"
-                                                           TipText="{x:Static lang:Common.Attribute_BrFull}" />
-                                <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding Br}" />
-                            </StackPanel>
-                        </Grid>
+                        </StackPanel>
 
                         <Border Grid.Column="2" Background="{StaticResource Neutral950}" HorizontalAlignment="Left"
                                 VerticalAlignment="Top" Margin="10,10,0,0" x:Name="PART_BadgeBorder"
@@ -142,16 +149,13 @@
                                            Text="{x:Static lang:Common.Action_ViewRoom}"
                                            IconData="{StaticResource Road}" Margin="5,10" />
 
-                        <Grid Grid.Column="2" Margin="15,0,0,5" ColumnDefinitions="3*,4*" VerticalAlignment="Bottom">
-                            <StackPanel Grid.Column="0">
-                                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Wins}" />
-                                <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding TotalWon}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Losses}" />
-                                <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding TotalLosses}" />
-                            </StackPanel>
-                        </Grid>
+                        <StackPanel Grid.Column="2" Margin="15,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                            <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_FriendCode}" />
+                            <SelectableTextBlock Classes="BodyText"
+                                                 Text="{TemplateBinding FriendCode}"
+                                                 TextWrapping="NoWrap" />
+                        </StackPanel>
+
                     </Grid>
                 </Border>
             </ControlTemplate>
