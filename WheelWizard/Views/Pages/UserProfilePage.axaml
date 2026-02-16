@@ -16,7 +16,7 @@
             <Setter Property="Width" Value="10" />
             <Setter Property="Height" Value="10" />
             <Setter Property="CornerRadius" Value="9999" />
-            <Setter Property="Background" Value="{StaticResource Neutral950}" />
+            <Setter Property="Background" Value="{StaticResource Neutral500}" />
             <Setter Property="Opacity" Value="0.75" />
             <Setter Property="Transitions">
                 <Transitions>
@@ -173,7 +173,7 @@
                     <Grid Grid.Row="1" x:Name="CarouselNavigation" VerticalAlignment="Center" HorizontalAlignment="Center"
                           Margin="0,2,0,2" ColumnDefinitions="Auto,Auto,Auto" IsVisible="{Binding HasProfileInfo}">
                         <components:Button Grid.Column="0" IconData="{StaticResource ArrowLeft}" IconSize="12"
-                                           Width="26" Height="26" Padding="0" Variant="Default"
+                                           Width="26" Height="26" Padding="0" Variant="UglyLight"
                                            VerticalAlignment="Center" Margin="0,0,8,0"
                                            Click="PrevCarouselPage_OnClick" />
 
@@ -184,7 +184,7 @@
                         </StackPanel>
 
                         <components:Button Grid.Column="2" IconData="{StaticResource ArrowRight}" IconSize="12"
-                                           Width="26" Height="26" Padding="0" Variant="Default"
+                                           Width="26" Height="26" Padding="0" Variant="UglyLight"
                                            VerticalAlignment="Center" Margin="8,0,0,0"
                                            Click="NextCarouselPage_OnClick" />
                     </Grid>
