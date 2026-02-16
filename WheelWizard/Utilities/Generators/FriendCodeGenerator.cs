@@ -60,12 +60,7 @@ public class FriendCodeGenerator
     /// </summary>
     public static uint FriendCodeToProfileId(string friendCode)
     {
-        if (string.IsNullOrWhiteSpace(friendCode))
-            return 0;
-
-        // Remove dashes and parse as ulong
-        var fcString = friendCode.Replace("-", "");
-        if (fcString.Length != 12 || !ulong.TryParse(fcString, out var fcDec))
+        if (!TryParseFriendCode(friendCode, out var fcDec))
             return 0;
 
         // Extract profile ID (lower 32 bits)
@@ -78,11 +73,23 @@ public class FriendCodeGenerator
         var expectedChecksum = (uint)(expectedFc >> 32);
         var actualChecksum = (uint)(fcDec >> 32);
 
-        // Allow checksum to be 0 or match expected
-        if (actualChecksum != 0 && actualChecksum != expectedChecksum)
+        if (actualChecksum != expectedChecksum)
             return 0;
 
         return profileId;
+    }
+
+    /// <summary>
+    /// Parses a friend code string (format: "XXXX-XXXX-XXXX") into its numeric representation.
+    /// </summary>
+    public static bool TryParseFriendCode(string friendCode, out ulong friendCodeValue)
+    {
+        friendCodeValue = 0;
+        if (string.IsNullOrWhiteSpace(friendCode))
+            return false;
+
+        var fcString = friendCode.Replace("-", "");
+        return fcString.Length == 12 && ulong.TryParse(fcString, out friendCodeValue);
     }
 
     private static string GetMd5Hash(byte[] input)
