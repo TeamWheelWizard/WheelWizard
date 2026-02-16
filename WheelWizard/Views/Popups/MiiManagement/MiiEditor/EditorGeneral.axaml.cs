@@ -6,6 +6,7 @@ using Avalonia.Threading;
 using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
@@ -33,6 +34,9 @@ public partial class EditorGeneral : MiiEditorBaseControl
         GirlToggle.IsChecked = Editor.Mii.IsGirl;
         LengthSlider.Value = Editor.Mii.Height.Value;
         WidthSlider.Value = Editor.Mii.Weight.Value;
+        CreationDateText.Text = Editor.Mii.TryGetCreationDateUtc(out var creationDateUtc)
+            ? $"{creationDateUtc:yyyy-MM-dd HH:mm} UTC"
+            : "Unknown";
 
         // Favorite color:
         SetColorButtons(

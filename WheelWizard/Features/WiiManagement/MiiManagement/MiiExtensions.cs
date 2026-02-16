@@ -5,6 +5,28 @@ namespace WheelWizard.WiiManagement.MiiManagement;
 
 public static class MiiExtensions
 {
+    private static readonly DateTime MiiIdEpochUtc = new(2006, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    private const uint MiiIdCounterMask = 0x1FFFFFFF;
+    private const int MiiIdTickResolutionSeconds = 4;
+
+    public static DateTime GetCreationDateUtc(this Mii self) => GetCreationDateUtc(self.MiiId);
+
+    public static DateTime GetCreationDateUtc(uint miiId)
+    {
+        var counter = miiId & MiiIdCounterMask;
+        return MiiIdEpochUtc.AddSeconds(counter * MiiIdTickResolutionSeconds);
+    }
+
+    public static bool TryGetCreationDateUtc(this Mii self, out DateTime creationDateUtc)
+    {
+        creationDateUtc = default;
+        if (self.MiiId == 0)
+            return false;
+
+        creationDateUtc = self.GetCreationDateUtc();
+        return true;
+    }
+
     public static bool IsTheSameAs(this Mii self, Mii? other)
     {
         if (other == null)
