@@ -114,6 +114,8 @@
                                 </StackPanel>
                                 <SelectableTextBlock Classes="TinyText" x:Name="ProfileAttribTagline"
                                                      Foreground="{StaticResource Neutral400}"
+                                                     HorizontalAlignment="Left"
+                                                     TextAlignment="Left"
                                                      TextWrapping="Wrap"
                                                      MaxWidth="280"
                                                      IsVisible="False" />

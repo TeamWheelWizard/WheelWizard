@@ -99,11 +99,11 @@
                 </ListBox.ItemTemplate>
 
                 <ListBox.ContextMenu>
-                    <ContextMenu>
+                    <ContextMenu Opening="ContextMenu_OnOpening">
                         <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
                         <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
                         <Separator />
-                        <MenuItem Header="Copy Mii" Click="CopyMii_OnClick" />
+                        <MenuItem Header="Copy Mii" Click="CopyMii_OnClick" x:Name="CopyMiiButton" />
                         <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />
                     </ContextMenu>
                 </ListBox.ContextMenu>
