@@ -224,7 +224,6 @@
 
     <Style Selector="components|FriendsListItem[IsPending=true] /template/ components|Button#ViewRoomButton">
         <Setter Property="Variant" Value="Warning" />
-        <Setter Property="IsEnabled" Value="True" />
     </Style>
 
     <Style Selector="components|FriendsListItem[HasBadges=true] /template/ components|Button#ViewRoomButton">
