@@ -13,7 +13,6 @@ public static class MiiCustomRenderMappings
     {
         var customized = baseSpecifications.Clone();
 
-        customized.BackgroundColor = MiiCustomMappings.GetAccentBackgroundHex(customDataV1.AccentColor);
         customized.Expression = GetExpression(customDataV1.FacialExpression, customized.Expression);
 
         if (TryGetCameraPreset(customDataV1.CameraAngle, out var characterRotation, out var cameraRotation))

@@ -2,38 +2,6 @@ namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 
 public static class MiiCustomMappings
 {
-    private static readonly string[] _accentBackgroundHex =
-    [
-        "FFFFFF00", // None / transparent
-        "FF6B6B66",
-        "FFA94D66",
-        "FFD43B66",
-        "94D82D66",
-        "20C99766",
-        "12B88666",
-        "15AABF66",
-        "4DABF766",
-        "339AF066",
-        "5C7CFA66",
-        "9775FA66",
-        "DA77F266",
-        "F783AC66",
-        "FF878766",
-        "868E9666",
-    ];
-
-    public static string GetAccentBackgroundHex(MiiProfileColor color)
-    {
-        var index = Math.Clamp((int)color, 0, _accentBackgroundHex.Length - 1);
-        return _accentBackgroundHex[index];
-    }
-
-    public static string GetAccentPreviewHex(MiiProfileColor color)
-    {
-        var baseColor = GetAccentBackgroundHex(color);
-        return baseColor[..6] + "FF";
-    }
-
     public static string GetFacialExpressionLabel(MiiPreferredFacialExpression expression)
     {
         return expression switch

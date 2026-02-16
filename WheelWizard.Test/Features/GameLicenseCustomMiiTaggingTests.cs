@@ -15,6 +15,7 @@ namespace WheelWizard.Test.Features;
 
 public class GameLicenseCustomMiiTaggingTests
 {
+    private const byte CurrentSchemaVersion = 1;
     private const int RksysSize = 0x2BC000;
     private const int RkpdOffsetForUser0 = 0x08;
 
@@ -28,7 +29,7 @@ public class GameLicenseCustomMiiTaggingTests
         whWzData.GetBadges(Arg.Any<string>()).Returns([]);
 
         var mii = MiiFactory.CreateDefaultFemale();
-        mii.CustomDataV1.AccentColor = MiiProfileColor.Color5;
+        mii.CustomDataV1.CameraAngle = MiiPreferredCameraAngle.CameraAngle3;
         mii.CustomDataV1.Version = 0; // simulate untagged payload with stale bits
 
         miiDb.GetByAvatarId(Arg.Any<uint>()).Returns(Ok(mii));
@@ -41,8 +42,9 @@ public class GameLicenseCustomMiiTaggingTests
 
         Assert.True(result.IsSuccess);
         Assert.True(mii.CustomDataV1.IsWheelWizardMii);
-        Assert.Equal(1, mii.CustomDataV1.Version);
-        Assert.Equal(MiiProfileColor.None, mii.CustomDataV1.AccentColor); // rogue bits sanitized
+        Assert.Equal(CurrentSchemaVersion, mii.CustomDataV1.Version);
+        Assert.Equal(MiiPreferredCameraAngle.None, mii.CustomDataV1.CameraAngle); // rogue bits sanitized
+        Assert.Equal(0, mii.CustomDataV1.SpareBits);
         miiDb.Received(1).Update(mii);
     }
 

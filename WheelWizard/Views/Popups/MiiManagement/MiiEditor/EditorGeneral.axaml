@@ -48,14 +48,6 @@
                     </CheckBox>
                 </StackPanel>
 
-                <StackPanel>
-                    <components:FormFieldLabel Text="Accent Color"
-                                               TipText="Sets the background tint used across all Mii renderers."/>
-                    <UniformGrid Columns="4" x:Name="AccentColorGrid">
-                        <!-- Generated elements -->
-                    </UniformGrid>
-                </StackPanel>
-
                 <Border BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="1" CornerRadius="6" Padding="10">
                     <StackPanel Spacing="10">
                         <TextBlock Classes="BodyText" Text="Render Preferences"/>

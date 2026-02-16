@@ -49,7 +49,6 @@ public partial class EditorGeneral : MiiEditorBaseControl
             }
         );
 
-        PopulateAccentColors();
         PopulateCustomDataDropDowns();
     }
 
@@ -141,31 +140,6 @@ public partial class EditorGeneral : MiiEditorBaseControl
     private void SetSkinColor(int index)
     {
         Editor.Mii.MiiFavoriteColor = (MiiFavoriteColor)index;
-        Editor.RefreshImage();
-    }
-
-    private void PopulateAccentColors()
-    {
-        SetColorButtons(
-            Enum.GetValues<MiiProfileColor>().Length,
-            AccentColorGrid,
-            (index, button) =>
-            {
-                button.IsChecked = index == (int)Editor.Mii.CustomDataV1.AccentColor;
-                var colorHex = MiiCustomMappings.GetAccentPreviewHex((MiiProfileColor)index);
-                button.Color1 = new SolidColorBrush(Color.Parse($"#{colorHex}"));
-                button.Click += (_, _) => SetAccentColor(index);
-            }
-        );
-    }
-
-    private void SetAccentColor(int index)
-    {
-        var selectedColor = (MiiProfileColor)index;
-        if (Editor.Mii.CustomDataV1.AccentColor == selectedColor)
-            return;
-
-        Editor.Mii.CustomDataV1.AccentColor = selectedColor;
         Editor.RefreshImage();
     }
 

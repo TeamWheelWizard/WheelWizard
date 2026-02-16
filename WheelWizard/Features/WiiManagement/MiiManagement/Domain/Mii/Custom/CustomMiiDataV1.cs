@@ -3,46 +3,47 @@ namespace WheelWizard.WiiManagement.MiiManagement.Domain.Mii.Custom;
 /// <summary>
 /// Structured wrapper around the 24 custom bits stored inside otherwise-unused Wii Mii fields.
 /// Layout is fixed and explicit (no reflection):
-/// bit 0-2: schema version
-/// bit 3: copyable flag
-/// bit 4-7: accent color
-/// bit 8-10: preferred facial expression
-/// bit 11-12: preferred camera angle
-/// bit 13-17: preferred tagline
-/// bit 18-23: spare
+/// bit 0-3: schema version
+/// bit 4: copyable flag
+/// bit 5-8: spare bits (reserved for future use)
+/// bit 9-11: preferred facial expression
+/// bit 12-13: preferred camera angle
+/// bit 14-18: preferred tagline
+/// bit 19-23: reserved marker
 /// </summary>
 public sealed class CustomMiiDataV1
 {
     private const byte SchemaVersion = 1;
-    private const byte VersionCycleLength = 7; // 3-bit schema cycles over 1-7
+    private const ushort ReservedMarker = 21; // 5-bit reserved marker used to identify WheelWizard-authored payloads.
+    private const byte VersionCycleLength = 15; // 4-bit schema cycles over 1-15
     private const int MaxMigrationHops = 5; // beyond this, data is treated as stale
 
     private const int TotalBits = 24;
     private const uint PayloadMask = (1u << TotalBits) - 1u;
 
     private const int VersionShift = 0;
-    private const int IsCopyableShift = 3;
-    private const int AccentColorShift = 4;
-    private const int FacialExpressionShift = 8;
-    private const int CameraAngleShift = 11;
-    private const int TaglineShift = 13;
-    private const int SpareShift = 18;
+    private const int IsCopyableShift = 4;
+    private const int SpareBitsShift = 5;
+    private const int FacialExpressionShift = 9;
+    private const int CameraAngleShift = 12;
+    private const int TaglineShift = 14;
+    private const int ReservedMarkerShift = 19;
 
-    private const int VersionWidth = 3;
+    private const int VersionWidth = 4;
     private const int IsCopyableWidth = 1;
-    private const int AccentColorWidth = 4;
+    private const int SpareBitsWidth = 4;
     private const int FacialExpressionWidth = 3;
     private const int CameraAngleWidth = 2;
     private const int TaglineWidth = 5;
-    private const int SpareWidth = 6;
+    private const int ReservedMarkerWidth = 5;
 
     private const uint VersionMask = ((1u << VersionWidth) - 1u) << VersionShift;
     private const uint IsCopyableMask = ((1u << IsCopyableWidth) - 1u) << IsCopyableShift;
-    private const uint AccentColorMask = ((1u << AccentColorWidth) - 1u) << AccentColorShift;
+    private const uint SpareBitsMask = ((1u << SpareBitsWidth) - 1u) << SpareBitsShift;
     private const uint FacialExpressionMask = ((1u << FacialExpressionWidth) - 1u) << FacialExpressionShift;
     private const uint CameraAngleMask = ((1u << CameraAngleWidth) - 1u) << CameraAngleShift;
     private const uint TaglineMask = ((1u << TaglineWidth) - 1u) << TaglineShift;
-    private const uint SpareMask = ((1u << SpareWidth) - 1u) << SpareShift;
+    private const uint ReservedMarkerMask = ((1u << ReservedMarkerWidth) - 1u) << ReservedMarkerShift;
 
     private uint _payload;
 
@@ -58,7 +59,7 @@ public sealed class CustomMiiDataV1
     /// True if this payload has a WheelWizard schema marker.
     /// Version 0 means "not authored/tagged by WheelWizard".
     /// </summary>
-    public bool IsWheelWizardMii => Version != 0;
+    public bool IsWheelWizardMii => Version == SchemaVersion && HasReservedMarker(_payload);
 
     public bool IsCopyable
     {
@@ -66,11 +67,7 @@ public sealed class CustomMiiDataV1
         set => WriteField(value ? 1u : 0u, IsCopyableWidth, IsCopyableMask, IsCopyableShift);
     }
 
-    public MiiProfileColor AccentColor
-    {
-        get => (MiiProfileColor)ReadField(AccentColorMask, AccentColorShift);
-        set => WriteField((uint)value, AccentColorWidth, AccentColorMask, AccentColorShift);
-    }
+    public byte SpareBits => (byte)ReadField(SpareBitsMask, SpareBitsShift);
 
     public MiiPreferredFacialExpression FacialExpression
     {
@@ -90,10 +87,9 @@ public sealed class CustomMiiDataV1
         set => WriteField((uint)value, TaglineWidth, TaglineMask, TaglineShift);
     }
 
-    public ushort Spare
+    public ushort Reserved
     {
-        get => (ushort)ReadField(SpareMask, SpareShift);
-        set => WriteField(value, SpareWidth, SpareMask, SpareShift);
+        get => (ushort)ReadField(ReservedMarkerMask, ReservedMarkerShift, requiresSchemaTag: false);
     }
 
     /// <summary>
@@ -107,7 +103,7 @@ public sealed class CustomMiiDataV1
         if (IsWheelWizardMii)
             return false;
 
-        _payload = SchemaVersion;
+        _payload = CreateCanonicalTaggedPayload();
         return true;
     }
 
@@ -124,6 +120,10 @@ public sealed class CustomMiiDataV1
     private static CustomMiiDataV1 FromPayload(uint rawPayload)
     {
         rawPayload &= PayloadMask;
+
+        if (!HasReservedMarker(rawPayload))
+            return CreateUnversioned();
+
         var diskVersion = (byte)(rawPayload & VersionMask);
 
         // Fast path: payload already matches our schema.
@@ -154,6 +154,7 @@ public sealed class CustomMiiDataV1
         }
 
         migratedPayload = WithVersion(migratedPayload, SchemaVersion);
+        migratedPayload = WithReservedMarker(migratedPayload);
         return new(migratedPayload);
     }
 
@@ -199,7 +200,20 @@ public sealed class CustomMiiDataV1
 
     private static uint WithVersion(uint payload, byte version) => (payload & ~VersionMask) | (version & VersionMask);
 
-    public static CustomMiiDataV1 CreateEmpty() => new(SchemaVersion);
+    private static uint WithReservedMarker(uint payload) =>
+        (payload & ~ReservedMarkerMask) | (((uint)ReservedMarker << ReservedMarkerShift) & ReservedMarkerMask);
+
+    private static bool HasReservedMarker(uint payload) => ((payload & ReservedMarkerMask) >> ReservedMarkerShift) == ReservedMarker;
+
+    private static uint CreateCanonicalTaggedPayload()
+    {
+        var payload = 0u;
+        payload = WithVersion(payload, SchemaVersion);
+        payload = WithReservedMarker(payload);
+        return payload;
+    }
+
+    public static CustomMiiDataV1 CreateEmpty() => new(CreateCanonicalTaggedPayload());
 
     private static CustomMiiDataV1 CreateUnversioned() => new(0);
 
