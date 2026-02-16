@@ -190,11 +190,6 @@
                     </Grid>
                 </Grid>
 
-                <Border.Styles>
-                    <Style Selector="Border#CurrentUserProfile.Online">
-                        <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
-                    </Style>
-                </Border.Styles>
             </Border>
 
             <Grid Grid.Row="1" x:Name="ProfileCarouselContainer" Margin="0,14,0,0">

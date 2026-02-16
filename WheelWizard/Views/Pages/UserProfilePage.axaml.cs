@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Models.Settings;
@@ -167,6 +168,8 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         {
             CurrentFriendCode = string.Empty;
             HasCurrentUserRoom = false;
+            IsOnline = false;
+            UpdateOnlineBorders();
             ActiveInfoSlideIndex = 0;
         }
 
@@ -196,8 +199,6 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private void UpdatePage()
     {
         PrimaryCheckBox.IsChecked = FocussedUser == _currentUserIndex;
-        CurrentUserProfile.Classes.Clear();
-        PART_HeadBorderFace.Classes.Remove("Online");
 
         currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
         CurrentFriendCode = currentPlayer.FriendCode;
@@ -209,11 +210,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         CurrentMii = currentPlayer.Mii;
         IsOnline = currentPlayer.IsOnline;
         HasCurrentUserRoom = IsUserInLiveRoom(currentPlayer.FriendCode);
-        if (IsOnline)
-        {
-            CurrentUserProfile.Classes.Add("Online");
-            PART_HeadBorderFace.Classes.Add("Online");
-        }
+        UpdateOnlineBorders();
 
         ProfileAttribTotalRaces.Text = currentPlayer.Statistics.RaceTotals.OnlineRacesCount.ToString();
         ProfileAttribTotalWins.Text = currentPlayer.Statistics.RaceTotals.WinsVsLosses.OnlineVs.Wins.ToString();
@@ -423,6 +420,15 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             return false;
 
         return RRLiveRooms.Instance.CurrentRooms.Any(room => room.Players.Any(player => player.FriendCode == friendCode));
+    }
+
+    private void UpdateOnlineBorders()
+    {
+        var outerColor = IsOnline ? ViewUtils.Colors.Primary400 : ViewUtils.Colors.Neutral900;
+        var innerColor = IsOnline ? ViewUtils.Colors.Primary400 : ViewUtils.Colors.Neutral600;
+
+        CurrentUserProfile.BorderBrush = new SolidColorBrush(outerColor);
+        PART_HeadBorderFace.BorderBrush = new SolidColorBrush(innerColor);
     }
 
     #region PropertyChanged
