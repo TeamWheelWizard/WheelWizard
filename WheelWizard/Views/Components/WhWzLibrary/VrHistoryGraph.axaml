@@ -66,11 +66,16 @@
                     <TextBlock Classes="TinyText" FontSize="11" Text="{Binding DateRangeText}" />
                 </StackPanel>
 
-                <ComboBox Grid.Column="1"
-                          x:Name="HistoryDaysDropdown"
-                          MinWidth="145"
-                          VerticalAlignment="Top"
-                          SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
+                <StackPanel  Grid.Column="1" Orientation="Horizontal">
+                    
+                    <components:LoadingIcon Margin="3,3,6,3" VerticalAlignment="Center" IsVisible="{Binding IsLoading}" Width="18" Height="18" Foreground="{StaticResource Neutral500}" />
+                    <ComboBox
+                              x:Name="HistoryDaysDropdown"
+                              MinWidth="145"
+                              VerticalAlignment="Top"
+                              SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
+                </StackPanel>
+               
             </Grid>
 
             <Grid Grid.Row="2"
@@ -125,14 +130,6 @@
                         </Grid>
                     </Grid>
                 </Border>
-
-                <StackPanel IsVisible="{Binding IsLoading}"
-                            Orientation="Horizontal"
-                            Spacing="8"
-                            VerticalAlignment="Top">
-                    <components:LoadingIcon Width="18" Height="18" Foreground="{StaticResource Neutral500}" />
-                    <TextBlock Classes="TinyText" FontSize="11" VerticalAlignment="Center" Text="Loading VR history..." />
-                </StackPanel>
                 
                 <components:EmptyPageInfo IsVisible="{Binding HasError}"
                                           Title="No VR history"
