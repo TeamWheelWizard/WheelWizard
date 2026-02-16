@@ -57,7 +57,7 @@ public class RetroRewindBeta : IDistribution
             );
 
             if (string.IsNullOrWhiteSpace(downloadedFile) || !_fileSystem.File.Exists(downloadedFile))
-                return Fail("Failed to download the testing build");
+                return progressWindow.WasCancellationRequested ? Ok() : Fail("Failed to download the testing build");
 
             while (true)
             {

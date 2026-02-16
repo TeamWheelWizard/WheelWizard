@@ -61,7 +61,6 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
         foreach (var room in liveRooms.CurrentRooms)
             Rooms.Add(room);
 
-        RoomsNiceLabel.IsVisible = liveRooms.CurrentRooms.Count == 69;
         RoomsListItemCount.Text = liveRooms.CurrentRooms.Count.ToString();
         PerformSearch(_searchQuery);
     }
@@ -88,7 +87,6 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
         foreach (var player in matchingPlayers)
             Players.Add(player);
 
-        PlayerNiceLabel.IsVisible = matchingPlayers.Count == 69;
         PlayerListItemCount.Text = matchingPlayers.Count.ToString();
     }
 

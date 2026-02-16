@@ -6,41 +6,44 @@
             <UniformGrid Columns="4">
                 <!-- Just so you know, the border is not necessary, its just here to also show the bounding box-->
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="WhWzDev"/>
+                    <controls:Badge Variant="WhWzDev" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="RrDev"/>
+                    <controls:Badge Variant="RrDev" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Translator"/>
-                </Border>   
-                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="TranslatorLead"/>
+                    <controls:Badge Variant="Translator" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Firestarter_GoldWinner"/>
+                    <controls:Badge Variant="TranslatorLead" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Firestarter_SilverWinner"/>
+                    <controls:Badge Variant="Heart" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Firestarter_BronzeWinner"/>
-                </Border>
-                
-                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="SummitShowdown_GoldWinner"/>
+                    <controls:Badge Variant="Firestarter_GoldWinner" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="SummitShowdown_SilverWinner"/>
+                    <controls:Badge Variant="Firestarter_SilverWinner" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="SummitShowdown_BronzeWinner"/>
+                    <controls:Badge Variant="Firestarter_BronzeWinner" />
+                </Border>
+
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <controls:Badge Variant="SummitShowdown_GoldWinner" />
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <controls:Badge Variant="SummitShowdown_SilverWinner" />
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <controls:Badge Variant="SummitShowdown_BronzeWinner" />
                 </Border>
             </UniformGrid>
         </Border>
     </Design.PreviewWith>
 
-    
+
     <!-- 
     IMPORTANT: 
         No actual pixel values are allowed to be used. So any positioning should be done through:
@@ -49,34 +52,34 @@
         - Rotate transforms
         - LOOK OUT WITH USING UNIFORM STRETCH, IT WORKS BAD, DON'T TOUCH THE AWARDS, they are made with uniform stretch lol, and they work but they can fall apart easily
     -->
-    
+
     <Style Selector="controls|Badge">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid>
-                    <Border CornerRadius="999" Background="red"/>
+                    <Border CornerRadius="999" Background="red" />
                 </Grid>
             </ControlTemplate>
         </Setter>
-        
+
         <Style Selector="^ /template/ Grid">
-            <Setter Property="ToolTip.Tip" Value="{TemplateBinding HoverTip}"/>
-            <Setter Property="ToolTip.Placement" Value="Top"/>
-            <Setter Property="ToolTip.ShowDelay" Value="20"/>
+            <Setter Property="ToolTip.Tip" Value="{TemplateBinding HoverTip}" />
+            <Setter Property="ToolTip.Placement" Value="Top" />
+            <Setter Property="ToolTip.ShowDelay" Value="20" />
         </Style>
     </Style>
-    
+
     <Style Selector="controls|Badge.WhWzDev">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
                     <Border Grid.Row="0" Grid.Column="0"
-                        Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
-                            Background="{StaticResource Primary100}"/>
-                    
-                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"  Grid.RowSpan="3" CornerRadius="999"
-                            Background="{StaticResource Primary400}"/>
-                    
+                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
+                            Background="{StaticResource Primary100}" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="{StaticResource Primary400}" />
+
                     <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                           Fill="{StaticResource Primary900}" Data="{StaticResource Code}"
                           Stretch="Uniform" />
@@ -84,68 +87,68 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|Badge.RrDev">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
                     <Border Grid.Row="0" Grid.Column="0"
                             Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
-                            Background="{StaticResource Warning100}"/>
-                    
-                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"  Grid.RowSpan="3" CornerRadius="999"
-                            Background="{StaticResource Warning500}"/>
-                    
+                            Background="{StaticResource Warning100}" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="{StaticResource Warning500}" />
+
                     <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                           Fill="{StaticResource Warning800}" Data="{StaticResource Code}"
-                          Stretch="Uniform"/>
+                          Stretch="Uniform" />
                 </Grid>
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|Badge.TranslatorLead">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
                     <Border Grid.Row="0" Grid.Column="0"
                             Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
-                            Background="#FFC7FB"/>
-                    
-                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"  Grid.RowSpan="3" CornerRadius="999"
-                            Background="#CB01AE"/>
-                    
+                            Background="#FFC7FB" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="#CB01AE" />
+
                     <Grid Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2"
                           RowDefinitions="5.5*,3*,0*" ColumnDefinitions="0.6*,5*,4*">
                         <Path Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
                               Fill="#550C48" Data="{StaticResource StarIcon}"
                               Stretch="Uniform" />
                     </Grid>
-                  
-                    <Grid Grid.Column="2" Grid.Row="2" 
+
+                    <Grid Grid.Column="2" Grid.Row="2"
                           RowDefinitions="0*,10*,1*" ColumnDefinitions="1*,10*,0*">
                         <Path Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
                               Fill="#550C48" Data="{StaticResource Translation}"
                               Stretch="Uniform" />
                     </Grid>
-                    
-                    
+
+
                 </Grid>
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|Badge.Translator">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
                     <Border Grid.Row="0" Grid.Column="0"
                             Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
-                            Background="#E9C7FF"/>
-                    
-                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"  Grid.RowSpan="3" CornerRadius="999"
-                            Background="#8A01CB"/>
-                    
+                            Background="#E9C7FF" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="#8A01CB" />
+
                     <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                           Fill="#400C55" Data="{StaticResource Translation}"
                           Stretch="Uniform" />
@@ -153,7 +156,27 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
+    <Style Selector="controls|Badge.Heart">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
+                            Background="#A7FCFF" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="#F0F0EC" />
+
+                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="#72F2FF" Data="{StaticResource Heart}"
+                          Height="15" Margin="0,2,0,0"
+                          Stretch="Uniform" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
     <!-- FIRESTARTER BADGES -->
     <Style Selector="controls|Badge.Firestarter_GoldWinner">
         <Setter Property="Template">
@@ -161,13 +184,13 @@
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
                     <Border Grid.Row="1" Grid.Column="1"
                             CornerRadius="999" Background="{StaticResource Warning100}" />
-                    
+
                     <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
                           Fill="{StaticResource Warning600}" Data="{StaticResource Award}"
                           Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Path.RenderTransform>
                             <TransformGroup>
-                                <RotateTransform Angle="21"/>
+                                <RotateTransform Angle="21" />
                             </TransformGroup>
                         </Path.RenderTransform>
                     </Path>
@@ -175,20 +198,20 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|Badge.Firestarter_SilverWinner">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
                     <Border Grid.Row="1" Grid.Column="1"
                             CornerRadius="999" Background="{StaticResource Neutral50}" />
-                    
+
                     <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
                           Fill="{StaticResource Neutral400}" Data="{StaticResource Award}"
                           Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Path.RenderTransform>
                             <TransformGroup>
-                                <RotateTransform Angle="21"/>
+                                <RotateTransform Angle="21" />
                             </TransformGroup>
                         </Path.RenderTransform>
                     </Path>
@@ -196,19 +219,19 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|Badge.Firestarter_BronzeWinner">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
                     <Border Grid.Row="1" Grid.Column="1" CornerRadius="999" Background="#FFD19D" />
-                    
+
                     <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
                           Fill="#EC5616" Data="{StaticResource Award}"
                           Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Path.RenderTransform>
                             <TransformGroup>
-                                <RotateTransform Angle="21"/>
+                                <RotateTransform Angle="21" />
                             </TransformGroup>
                         </Path.RenderTransform>
                     </Path>
@@ -216,21 +239,21 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
-     <!-- SUMMIT SHOWDOWN BADGES -->
+
+    <!-- SUMMIT SHOWDOWN BADGES -->
     <Style Selector="controls|Badge.SummitShowdown_GoldWinner">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
                     <Border Grid.Row="1" Grid.Column="1"
                             CornerRadius="999" Background="{StaticResource Warning100}" />
-                    
+
                     <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
                           Fill="{StaticResource Warning600}" Data="{StaticResource Award}"
                           Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Path.RenderTransform>
                             <TransformGroup>
-                                <RotateTransform Angle="21"/>
+                                <RotateTransform Angle="21" />
                             </TransformGroup>
                         </Path.RenderTransform>
                     </Path>
@@ -238,20 +261,20 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|Badge.SummitShowdown_SilverWinner">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
                     <Border Grid.Row="1" Grid.Column="1"
                             CornerRadius="999" Background="{StaticResource Neutral50}" />
-                    
+
                     <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
                           Fill="{StaticResource Neutral400}" Data="{StaticResource Award}"
                           Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Path.RenderTransform>
                             <TransformGroup>
-                                <RotateTransform Angle="21"/>
+                                <RotateTransform Angle="21" />
                             </TransformGroup>
                         </Path.RenderTransform>
                     </Path>
@@ -259,19 +282,19 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|Badge.SummitShowdown_BronzeWinner">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
                     <Border Grid.Row="1" Grid.Column="1" CornerRadius="999" Background="#FFD19D" />
-                    
+
                     <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
                           Fill="#EC5616" Data="{StaticResource Award}"
                           Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Path.RenderTransform>
                             <TransformGroup>
-                                <RotateTransform Angle="21"/>
+                                <RotateTransform Angle="21" />
                             </TransformGroup>
                         </Path.RenderTransform>
                     </Path>
@@ -279,4 +302,5 @@
             </ControlTemplate>
         </Setter>
     </Style>
+
 </Styles>

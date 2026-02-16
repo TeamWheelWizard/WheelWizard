@@ -41,6 +41,12 @@
                                               TextChanged="Name_TextChanged" />
                 </StackPanel>
 
+                <StackPanel> <!-- Creation Date -->
+                    <components:FormFieldLabel Text="Creation Date" />
+                    <TextBlock x:Name="CreationDateText" Classes="BodyText" FontSize="13"
+                               Foreground="{StaticResource Neutral400}" />
+                </StackPanel>
+
                 <StackPanel> <!-- Gender -->
                     <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Gender}" />
                     <StackPanel Orientation="Horizontal" Spacing="10">

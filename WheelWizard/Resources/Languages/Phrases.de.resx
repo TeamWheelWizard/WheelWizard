@@ -463,4 +463,25 @@ Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund treff
     <data name="Text_PoweredGamebanana" xml:space="preserve">
         <value>Von GameBanana unterstützt</value>
     </data>
+    <data name="MessageError_DataFolderMove_Title" xml:space="preserve">
+        <value>Fehler beim Verschieben von Daten.</value>
+    </data>
+    <data name="MessageSuccess_DataFolderMoved_Extra" xml:space="preserve">
+        <value>Wheel WIzard's Daten sind jetzt gespeichert in:\n{$1}</value>
+    </data>
+    <data name="MessageSuccess_DataFolderMoved_Title" xml:space="preserve">
+        <value>Datenordner aktualisiert.</value>
+    </data>
+    <data name="MessageWarning_DolphinToolSelected_Extra" xml:space="preserve">
+        <value>Du hast "DolphinTool.exe" ausgewählt. Bitte wähle stattdessen "Dolphin.exe" (die Dolphin Anwendung).</value>
+    </data>
+    <data name="MessageWarning_DolphinToolSelected_Title" xml:space="preserve">
+        <value>Falsche Dolphin executable ausgewählt.</value>
+    </data>
+    <data name="Question_MoveData_Extra" xml:space="preserve">
+        <value>Wheel Wizard wird seine Datein nach\n{$1}\nverschieben. Das könnte eine Weile dauern.</value>
+    </data>
+    <data name="Question_MoveData_Title" xml:space="preserve">
+        <value>Wheel Wizard Daten verschieben?</value>
+    </data>
 </root>

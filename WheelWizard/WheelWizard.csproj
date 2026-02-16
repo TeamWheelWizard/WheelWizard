@@ -115,6 +115,9 @@
             <DependentUpon>EditorEmpty.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Views\Components\StandardLibrary\MemeNumberState.axaml.cs">
+            <DependentUpon>MemeNumberState.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup Label="Additional Files">

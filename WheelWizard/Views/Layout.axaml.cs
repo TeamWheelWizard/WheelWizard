@@ -94,7 +94,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     public void OnSettingChanged(Setting setting)
     {
         // Note that this method will also be called whenever the setting changes
-        if (setting == SettingsManager.WINDOW_SCALE)
+        if (setting == SettingsManager.WINDOW_SCALE || setting == SettingsManager.SAVED_WINDOW_SCALE)
         {
             var scaleFactor = (double)setting.Get();
             Height = WindowHeight * scaleFactor;
@@ -180,14 +180,46 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
 
     private void UpdateLiveAlert(WhWzStatusManager sender)
     {
-        var visible = sender.Status != null && sender.Status.Variant != WhWzStatusVariant.None;
+        var hasVariant = sender.Status?.Variant != null && sender.Status.Variant != WhWzStatusVariant.None;
+        var hasCustomIcon = !string.IsNullOrEmpty(sender.Status?.Icon);
+        var visible = hasVariant || hasCustomIcon;
+
         LiveStatusBorder.IsVisible = visible;
         if (!visible)
             return;
 
         ToolTip.SetTip(LiveStatusBorder, sender.Status!.Message);
         LiveStatusBorder.Classes.Clear();
-        LiveStatusBorder.Classes.Add(sender.Status!.Variant.ToString());
+
+        // If custom icon is provided, use it instead of variant
+        if (hasCustomIcon)
+        {
+            // Clear any variant-based classes
+            LiveStatusBorder.Classes.Add("Custom");
+
+            // Find the PathIcon in the LiveStatusBorder and update it dynamically
+            if (LiveStatusBorder.Child is PathIcon pathIcon)
+            {
+                // Parse the SVG path data
+                var geometry = Geometry.Parse(sender.Status.Icon!);
+                pathIcon.Data = geometry;
+
+                // Apply custom color if provided, otherwise use a default
+                if (!string.IsNullOrEmpty(sender.Status.Color))
+                {
+                    pathIcon.Foreground = new SolidColorBrush(Color.Parse(sender.Status.Color));
+                }
+                else
+                {
+                    pathIcon.Foreground = new SolidColorBrush(Colors.White);
+                }
+            }
+        }
+        else
+        {
+            // Use variant-based styling
+            LiveStatusBorder.Classes.Add(sender.Status.Variant.ToString()!);
+        }
     }
 
     private void TopBar_PointerPressed(object? sender, PointerPressedEventArgs e)

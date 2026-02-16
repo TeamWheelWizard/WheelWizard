@@ -61,6 +61,7 @@
         <StyleInclude Source="Components/StandardLibrary/LoadingIcon.axaml" />
         <StyleInclude Source="Components/StandardLibrary/SidebarRadioButton.axaml" />
         <StyleInclude Source="Components/StandardLibrary/PopupListButton.axaml" />
+        <StyleInclude Source="Components/StandardLibrary/MemeNumberState.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
         <StyleInclude Source="Components/WhWzLibrary/ModBrowserListItem.axaml" />

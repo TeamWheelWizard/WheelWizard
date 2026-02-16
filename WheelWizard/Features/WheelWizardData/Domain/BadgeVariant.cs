@@ -7,6 +7,7 @@ public enum BadgeVariant
     RrDev,
     Translator,
     TranslatorLead,
+    Heart,
     Firestarter_GoldWinner,
     Firestarter_SilverWinner,
     Firestarter_BronzeWinner,

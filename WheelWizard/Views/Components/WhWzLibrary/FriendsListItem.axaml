@@ -71,10 +71,10 @@
                         </Border>
                         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" IsVisible="{TemplateBinding IsPending}"
                                    Text="Pending"
-                                   FontSize="16" Foreground="{StaticResource Warning400}" />
+                                   FontSize="12" Foreground="{StaticResource Warning400}" />
                         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom"
                                    Text="{x:Static lang:Common.Attribute_Status_Online}"
-                                   FontSize="16" Foreground="{StaticResource Neutral200}">
+                                   FontSize="12" Foreground="{StaticResource Neutral200}">
                             <TextBlock.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="IsOnline" RelativeSource="{RelativeSource TemplatedParent}" />
@@ -85,7 +85,7 @@
                         </TextBlock>
                         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom"
                                    Text="{x:Static lang:Common.Attribute_Status_Offline}"
-                                   FontSize="16"
+                                   FontSize="12"
                                    Foreground="{StaticResource Neutral200}">
                             <TextBlock.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
