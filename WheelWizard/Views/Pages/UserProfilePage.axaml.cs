@@ -212,8 +212,8 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         HasCurrentUserRoom = IsUserInLiveRoom(currentPlayer.FriendCode);
         UpdateOnlineBorders();
 
-        ProfileAttribTotalRaces.Text = currentPlayer.Statistics.RaceTotals.OnlineRacesCount.ToString();
-        ProfileAttribTotalWins.Text = currentPlayer.Statistics.RaceTotals.WinsVsLosses.OnlineVs.Wins.ToString();
+        ProfileAttribTotalRaces.Text = currentPlayer.Statistics.RaceTotals.AllRacesCount.ToString();
+        ProfileAttribTotalWins.Text = currentPlayer.Statistics.Performance.FirstPlaces.ToString();
 
         BadgeContainer.Children.Clear();
         var badges = BadgeService.GetBadges(currentPlayer.FriendCode).Select(variant => new Badge { Variant = variant });
