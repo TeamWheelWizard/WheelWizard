@@ -4,7 +4,7 @@ using Avalonia.Threading;
 using WheelWizard.Helpers;
 using WheelWizard.Views.Popups.Generic;
 
-namespace WheelWizard.Services.Settings;
+namespace WheelWizard.Settings;
 
 public static class LinuxDolphinInstaller
 {
@@ -23,6 +23,9 @@ public static class LinuxDolphinInstaller
             };
 
             using var process = Process.Start(processInfo);
+            if (process == null)
+                return false;
+
             process.WaitForExit();
             return process.ExitCode == 0;
         }
@@ -46,6 +49,8 @@ public static class LinuxDolphinInstaller
         };
 
         using var process = Process.Start(processInfo);
+        if (process == null)
+            return -1;
 
         // Listen for output data to parse progress.
         process.OutputDataReceived += (sender, e) =>

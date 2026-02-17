@@ -1,18 +1,15 @@
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
+using WheelWizard.Services;
 
-namespace WheelWizard.Services.Settings;
+namespace WheelWizard.Settings;
 
-public class DolphinSettingManager
+public class DolphinSettingManager : IDolphinSettingManager
 {
     private static string ConfigFolderPath(string fileName) => Path.Combine(PathManager.ConfigFolderPath, fileName);
 
     private bool _loaded;
     private readonly List<DolphinSetting> _settings = [];
-
-    public static DolphinSettingManager Instance { get; } = new();
-
-    private DolphinSettingManager() { }
 
     public void RegisterSetting(DolphinSetting setting)
     {

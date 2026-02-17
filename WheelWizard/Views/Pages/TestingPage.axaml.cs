@@ -3,7 +3,7 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services.Launcher.Helpers;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Generic;
 
@@ -18,10 +18,13 @@ public partial class TestingPage : UserControlBase
     [Inject]
     private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
 
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
     public TestingPage()
     {
         InitializeComponent();
-        _launcher = new RrBetaLauncher();
+        _launcher = App.Services.GetRequiredService<RrBetaLauncher>();
         UpdateStatusAsync();
     }
 
@@ -36,7 +39,7 @@ public partial class TestingPage : UserControlBase
 
     private void UpdateUi()
     {
-        var pathsReady = SettingsHelper.PathsSetupCorrectly();
+        var pathsReady = SettingsService.PathsSetupCorrectly();
         var isInstalled = _status == WheelWizardStatus.Ready;
 
         InstallButton.IsEnabled = pathsReady && !_isBusy;

@@ -1,15 +1,19 @@
-using WheelWizard.Services.Settings;
-
 namespace WheelWizard.Models.Settings;
 
 public class DolphinSetting : Setting
 {
+    private readonly Action<DolphinSetting> _saveAction;
+
     public string FileName { get; private set; }
     public string Section { get; private set; }
 
     public DolphinSetting(Type type, (string, string, string) location, object defaultValue)
+        : this(type, location, defaultValue, _ => { }) { }
+
+    public DolphinSetting(Type type, (string, string, string) location, object defaultValue, Action<DolphinSetting> saveAction)
         : base(type, location.Item3, defaultValue)
     {
+        _saveAction = saveAction;
         FileName = location.Item1;
         Section = location.Item2;
         // name/key = location.Item3
@@ -19,8 +23,6 @@ public class DolphinSetting : Setting
             throw new ArgumentException(
                 $"FileName for dolphin setting '[{Section}]{Name}' must end with .ini (given file is '{FileName}')"
             );
-
-        DolphinSettingManager.Instance.RegisterSetting(this);
     }
 
     protected override bool SetInternal(object newValue, bool skipSave = false)
@@ -31,7 +33,7 @@ public class DolphinSetting : Setting
         if (newIsValid)
         {
             if (!skipSave)
-                DolphinSettingManager.Instance.SaveSettings(this);
+                _saveAction(this);
         }
         else
             Value = oldValue;
@@ -42,6 +44,18 @@ public class DolphinSetting : Setting
     public override object Get() => Value;
 
     public override bool IsValid() => ValidationFunc == null || ValidationFunc(Value);
+
+    public new DolphinSetting SetValidation(Func<object?, bool> validationFunc)
+    {
+        base.SetValidation(validationFunc);
+        return this;
+    }
+
+    public new DolphinSetting SetForceSave(bool saveEvenIfNotValid)
+    {
+        base.SetForceSave(saveEvenIfNotValid);
+        return this;
+    }
 
     public string GetStringValue()
     {

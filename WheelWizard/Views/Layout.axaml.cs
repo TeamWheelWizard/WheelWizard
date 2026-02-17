@@ -10,7 +10,7 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
@@ -46,15 +46,18 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     [Inject]
     private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
 
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
     public Layout()
     {
         Instance = this;
         InitializeComponent();
         AddLayer();
 
-        OnSettingChanged(SettingsManager.SAVED_WINDOW_SCALE);
-        SettingsManager.WINDOW_SCALE.Subscribe(this);
-        SettingsManager.TESTING_MODE_ENABLED.Subscribe(this);
+        OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);
+        SettingsService.WINDOW_SCALE.Subscribe(this);
+        SettingsService.TESTING_MODE_ENABLED.Subscribe(this);
         UpdateTestingButtonVisibility();
 
         var completeString = Humanizer.ReplaceDynamic(Phrases.Text_MadeByString, "Patchzy", "WantToBeeMe");
@@ -94,7 +97,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     public void OnSettingChanged(Setting setting)
     {
         // Note that this method will also be called whenever the setting changes
-        if (setting == SettingsManager.WINDOW_SCALE || setting == SettingsManager.SAVED_WINDOW_SCALE)
+        if (setting == SettingsService.WINDOW_SCALE || setting == SettingsService.SAVED_WINDOW_SCALE)
         {
             var scaleFactor = (double)setting.Get();
             Height = WindowHeight * scaleFactor;
@@ -107,7 +110,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
             return;
         }
 
-        if (setting == SettingsManager.TESTING_MODE_ENABLED)
+        if (setting == SettingsService.TESTING_MODE_ENABLED)
             UpdateTestingButtonVisibility();
     }
 
@@ -235,7 +238,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
 
         e.Handled = true;
 
-        if ((bool)SettingsManager.TESTING_MODE_ENABLED.Get())
+        if (SettingsService.TestingModeEnabled.Get())
             return;
 
         if (_testerPromptOpen)
@@ -261,7 +264,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
 
             if (result == TesterSecretPhrase)
             {
-                SettingsManager.TESTING_MODE_ENABLED.Set(true);
+                SettingsService.Set(SettingsService.TESTING_MODE_ENABLED, true);
                 ShowSnackbar("Testing mode enabled", ViewUtils.SnackbarType.Success);
             }
             else
@@ -277,7 +280,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
 
     private void UpdateTestingButtonVisibility()
     {
-        TestingButton.IsVisible = (bool)SettingsManager.TESTING_MODE_ENABLED.Get();
+        TestingButton.IsVisible = SettingsService.TestingModeEnabled.Get();
     }
 
     private void CloseButton_Click(object? sender, RoutedEventArgs e) => Close();

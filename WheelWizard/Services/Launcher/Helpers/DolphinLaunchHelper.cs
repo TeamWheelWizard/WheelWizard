@@ -1,14 +1,18 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using WheelWizard.Helpers;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
+using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Services.Launcher.Helpers;
 
 public static class DolphinLaunchHelper
 {
+    private static ISettingsManager Settings => App.Services.GetRequiredService<ISettingsManager>();
+
     public static void KillDolphin() //dont tell PETA
     {
         var dolphinLocation = PathManager.DolphinFilePath;
@@ -130,7 +134,7 @@ public static class DolphinLaunchHelper
             var userFolderArgument = cannotPassUserFolder ? "" : $"-u {EnvHelper.QuotePath(Path.GetFullPath(PathManager.UserFolderPath))}";
             var dolphinLaunchArguments = $"{arguments} {userFolderArgument}";
 
-            var dolphinLocation = (string)SettingsManager.DOLPHIN_LOCATION.Get();
+            var dolphinLocation = Settings.DolphinLocation.Get();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Windows builds

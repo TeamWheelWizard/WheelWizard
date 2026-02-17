@@ -2,27 +2,21 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
-using WheelWizard.Views;
-using JsonElement = System.Text.Json.JsonElement;
-using JsonSerializerOptions = System.Text.Json.JsonSerializerOptions;
+using WheelWizard.Services;
 
-namespace WheelWizard.Services.Settings;
+namespace WheelWizard.Settings;
 
-public class WhWzSettingManager
+public class WhWzSettingManager(ILogger<WhWzSettingManager> logger) : IWhWzSettingManager
 {
     private bool _loaded;
     private readonly Dictionary<string, WhWzSetting> _settings = new();
-
-    public static WhWzSettingManager Instance { get; } = new();
-
-    private WhWzSettingManager() { }
 
     public void RegisterSetting(WhWzSetting setting)
     {
         if (_loaded)
             return;
 
-        _settings.Add(setting.Name, setting);
+        _settings[setting.Name] = setting;
     }
 
     public void SaveSettings(WhWzSetting invokingSetting)
@@ -36,6 +30,7 @@ public class WhWzSettingManager
         {
             settingsToSave[name] = setting.Get();
         }
+
         var jsonString = JsonSerializer.Serialize(settingsToSave, new JsonSerializerOptions { WriteIndented = true });
         FileHelper.WriteAllTextSafe(PathManager.WheelWizardConfigFilePath, jsonString);
     }
@@ -67,7 +62,7 @@ public class WhWzSettingManager
         }
         catch (JsonException e)
         {
-            App.Services.GetRequiredService<ILogger<WhWzSettingManager>>().LogError(e, "Failed to deserialize the JSON config");
+            logger.LogError(e, "Failed to deserialize the JSON config");
         }
     }
 }

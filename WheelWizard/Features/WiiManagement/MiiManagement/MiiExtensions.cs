@@ -1,10 +1,14 @@
-﻿using WheelWizard.Services.Settings;
+﻿using Microsoft.Extensions.DependencyInjection;
+using WheelWizard.Settings;
+using WheelWizard.Views;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
 
 public static class MiiExtensions
 {
+    private static ISettingsManager Settings => App.Services.GetRequiredService<ISettingsManager>();
+
     private static readonly DateTime MiiIdEpochUtc = new(2006, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private const uint MiiIdCounterMask = 0x1FFFFFFF;
     private const int MiiIdTickResolutionSeconds = 4;
@@ -70,7 +74,7 @@ public static class MiiExtensions
             return true;
 
         // But it can also be global if the mac address is not the same as your own address
-        var macAddressString = (string)SettingsManager.MACADDRESS.Get();
+        var macAddressString = Settings.MacAddress.Get();
         var macParts = macAddressString.Split(':');
         var macBytes = new byte[6];
         for (var i = 0; i < 6; i++)

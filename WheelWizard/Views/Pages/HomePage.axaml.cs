@@ -4,12 +4,13 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services.Launcher.Helpers;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages.Settings;
 using Button = WheelWizard.Views.Components.Button;
@@ -18,6 +19,7 @@ namespace WheelWizard.Views.Pages;
 
 public partial class HomePage : UserControlBase
 {
+    private static ISettingsManager SettingsService => App.Services.GetRequiredService<ISettingsManager>();
     private static ILauncher currentLauncher => _launcherTypes[_launcherIndex];
     private static int _launcherIndex = 0; // Make sure this index never goes over the list index
 
@@ -26,7 +28,7 @@ public partial class HomePage : UserControlBase
 
     private static List<ILauncher> _launcherTypes =
     [
-        new RrLauncher(),
+        App.Services.GetRequiredService<RrLauncher>(),
         //GoogleLauncher.Instance
     ];
 
@@ -168,7 +170,7 @@ public partial class HomePage : UserControlBase
         PlayButton.IsEnabled = state.OnClick != null;
         if (Application.Current != null && Application.Current.FindResource(state.IconName) is Geometry geometry)
             PlayButton.IconData = geometry;
-        DolphinButton.IsEnabled = state.SubButtonsEnabled && SettingsHelper.PathsSetupCorrectly();
+        DolphinButton.IsEnabled = state.SubButtonsEnabled && SettingsService.PathsSetupCorrectly();
 
         if (_status == WheelWizardStatus.Ready)
             PlayEntranceAnimation();
@@ -188,7 +190,7 @@ public partial class HomePage : UserControlBase
         // If the animations are disabled, it will never play the entrance animation
         // The entrance animation is also the only one that makes the wheels visible, meaning hat if this one does not play
         // all the other animations are all also impossible to play
-        if (!(bool)SettingsManager.ENABLE_ANIMATIONS.Get())
+        if (!SettingsService.EnableAnimations.Get())
             return;
 
         var allowedToRun = WaitForWheelTrailState(
@@ -219,7 +221,7 @@ public partial class HomePage : UserControlBase
 
     private async void PlayActivateAnimation()
     {
-        if (!(bool)SettingsManager.ENABLE_ANIMATIONS.Get())
+        if (!SettingsService.EnableAnimations.Get())
             return;
 
         var allowedToRun = WaitForWheelTrailState(

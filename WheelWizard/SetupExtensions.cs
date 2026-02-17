@@ -10,6 +10,8 @@ using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
 using WheelWizard.MiiImages;
 using WheelWizard.RrRooms;
+using WheelWizard.Services.Launcher;
+using WheelWizard.Settings;
 using WheelWizard.Shared.Services;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
@@ -25,6 +27,7 @@ public static class SetupExtensions
     public static void AddWheelWizardServices(this IServiceCollection services)
     {
         // Features
+        services.AddSettings();
         services.AddCustomCharacters();
         services.AddAutoUpdating();
         services.AddBranding();
@@ -48,5 +51,7 @@ public static class SetupExtensions
 
         // Dynamic API calls
         services.AddTransient(typeof(IApiCaller<>), typeof(ApiCaller<>));
+        services.AddTransient<RrLauncher>();
+        services.AddTransient<RrBetaLauncher>();
     }
 }

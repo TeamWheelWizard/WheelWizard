@@ -8,7 +8,7 @@ using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
@@ -43,6 +43,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     [Inject]
     private IMiiDbService MiiDbService { get; set; } = null!;
+
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
 
     public Mii? CurrentMii
     {
@@ -110,7 +113,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     }
 
     private int _currentUserIndex;
-    private static int FocussedUser => (int)SettingsManager.FOCUSSED_USER.Get();
+    private int FocussedUser => SettingsService.FocussedUser.Get();
 
     public UserProfilePage()
     {
@@ -128,7 +131,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private void PopulateRegions()
     {
         var validRegions = RRRegionManager.GetValidRegions();
-        var currentRegion = (MarioKartWiiEnums.Regions)SettingsManager.RR_REGION.Get();
+        var currentRegion = SettingsService.Get<MarioKartWiiEnums.Regions>(SettingsService.RR_REGION);
         foreach (var region in Enum.GetValues<MarioKartWiiEnums.Regions>())
         {
             if (region == MarioKartWiiEnums.Regions.None)
@@ -241,7 +244,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         if (FocussedUser == _currentUserIndex)
             return;
 
-        SettingsManager.FOCUSSED_USER.Set(_currentUserIndex);
+        SettingsService.Set(SettingsService.FOCUSSED_USER, _currentUserIndex);
 
         PrimaryCheckBox.IsChecked = true;
         // Even though it's true when this method is called, we still set it to true,
@@ -257,7 +260,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         if (RegionDropdown.SelectedItem is not ComboBoxItem { Tag: MarioKartWiiEnums.Regions region })
             return;
 
-        SettingsManager.RR_REGION.Set(region);
+        SettingsService.Set(SettingsService.RR_REGION, region);
         ResetMiiTopBar();
         var loadResult = GameLicenseService.LoadLicense();
         if (loadResult.IsFailure)

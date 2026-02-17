@@ -3,8 +3,8 @@ using Avalonia;
 using Avalonia.Logging;
 using Serilog;
 using WheelWizard.Helpers;
-using WheelWizard.Services.Settings;
 using WheelWizard.Services.UrlProtocol;
+using WheelWizard.Settings;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views;
 
@@ -108,7 +108,7 @@ public class Program : IDesignerEntryPoint
 
     private static void Setup()
     {
-        SettingsManager.Instance.LoadSettings();
+        App.Services.GetRequiredService<ISettingsStartupInitializer>().Initialize();
         UrlProtocolManager.SetWhWzScheme();
     }
 }

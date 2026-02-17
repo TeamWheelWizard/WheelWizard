@@ -9,7 +9,7 @@ using WheelWizard.CustomCharacters;
 using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
@@ -38,6 +38,9 @@ public partial class MiiListPage : UserControlBase
     [Inject]
     private IRandomSystem Random { get; set; } = null!;
 
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
     public MiiListPage()
     {
         InitializeComponent();
@@ -46,7 +49,7 @@ public partial class MiiListPage : UserControlBase
         var miiDbExists = MiiDbService.Exists();
         if (!miiDbExists)
         {
-            if (SettingsHelper.PathsSetupCorrectly())
+            if (SettingsService.PathsSetupCorrectly())
             {
                 var creationResult = MiiRepositoryService.ForceCreateDatabase();
                 if (creationResult.IsFailure)
@@ -418,7 +421,7 @@ public partial class MiiListPage : UserControlBase
         if (!save)
             return;
 
-        var result = MiiDbService.AddToDatabase(window.Mii, (string)SettingsManager.MACADDRESS.Get());
+        var result = MiiDbService.AddToDatabase(window.Mii, SettingsService.MacAddress.Get());
         if (result.IsFailure)
         {
             ViewUtils.ShowSnackbar(
@@ -434,7 +437,7 @@ public partial class MiiListPage : UserControlBase
     private void DuplicateMii(Mii[] miis)
     {
         //assuming the mac address is already set correctly
-        var macAddress = (string)SettingsManager.MACADDRESS.Get();
+        var macAddress = SettingsService.MacAddress.Get();
         foreach (var mii in miis)
         {
             var result = MiiDbService.AddToDatabase(mii, macAddress);
