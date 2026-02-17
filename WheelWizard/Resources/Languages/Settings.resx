@@ -269,4 +269,10 @@
     <data name="HelperText_MustSetPaths" xml:space="preserve">
         <value>You must set these 3 paths before you can start playing Retro Rewind</value>
     </data>
+    <data name="Question_ApplyLanguageSettings_Title" xml:space="preserve">
+        <value>This will close the current window and open a new one with the new language settings.</value>
+    </data>
+    <data name="Question_ApplyLanguageSettings_Extra" xml:space="preserve">
+        <value>Do you want to apply the new language settings?</value>
+    </data>
 </root>

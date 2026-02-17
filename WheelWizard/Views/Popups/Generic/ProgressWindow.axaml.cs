@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
@@ -12,6 +13,9 @@ public partial class ProgressWindow : PopupContent
     private int _progress = 0;
     private double? _totalMb = null;
     private DispatcherTimer _updateTimer;
+    private CancellationTokenSource? _downloadCancellationTokenSource;
+
+    public bool WasCancellationRequested { get; private set; }
 
     public ProgressWindow()
         : this("Progress Window") { }
@@ -85,5 +89,32 @@ public partial class ProgressWindow : PopupContent
     {
         _progress = progress;
         // No need to call InternalUpdate directly, it's handled by the timer
+    }
+
+    public ProgressWindow SetCancellationTokenSource(CancellationTokenSource? cancellationTokenSource)
+    {
+        _downloadCancellationTokenSource = cancellationTokenSource;
+        if (cancellationTokenSource != null)
+            WasCancellationRequested = false;
+
+        CancelButton.IsVisible = cancellationTokenSource != null;
+        CancelButton.IsEnabled = cancellationTokenSource is { IsCancellationRequested: false };
+        return this;
+    }
+
+    public ProgressWindow MarkCancellationRequested()
+    {
+        WasCancellationRequested = true;
+        CancelButton.IsEnabled = false;
+        return SetExtraText($"{Common.Action_Cancel}...");
+    }
+
+    private void CancelButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_downloadCancellationTokenSource == null || _downloadCancellationTokenSource.IsCancellationRequested)
+            return;
+
+        _downloadCancellationTokenSource.Cancel();
+        MarkCancellationRequested();
     }
 }

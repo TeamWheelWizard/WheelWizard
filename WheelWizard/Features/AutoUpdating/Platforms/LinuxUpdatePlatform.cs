@@ -41,13 +41,16 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         if (fileSystem.File.Exists(newFilePath))
             fileSystem.File.Delete(newFilePath);
 
-        await DownloadHelper.DownloadToLocationAsync(
+        var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(
             downloadUrl,
             newFilePath,
             Phrases.Progress_UpdateWhWz,
             Phrases.Progress_LatestWhWzGithub,
             ForceGivenFilePath: true
         );
+
+        if (string.IsNullOrWhiteSpace(downloadedFilePath) || !fileSystem.File.Exists(downloadedFilePath))
+            return Ok();
 
         // Wait briefly to ensure the file is fully written.
         await Task.Delay(201);

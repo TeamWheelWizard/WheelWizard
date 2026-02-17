@@ -13,6 +13,7 @@ public class Badge : TemplatedControl
         { BadgeVariant.RrDev, "Retro Rewind Developer" },
         { BadgeVariant.Translator, "Translator" },
         { BadgeVariant.TranslatorLead, "Translator Lead" },
+        { BadgeVariant.Heart, "Heart of the Community" },
         // winner badges
         { BadgeVariant.Firestarter_GoldWinner, "Firestarter Tournament Winner" },
         { BadgeVariant.Firestarter_SilverWinner, "Firestarter Tournament Runner-Up" },

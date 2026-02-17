@@ -20,8 +20,21 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                    Spacing="6">
             <TextBlock Text="{x:Static lang:Common.PageTitle_Friends}" Classes="PageTitleText" />
+            <components:Button Text=""
+                               x:Name="TopAddFriendButton"
+                               Width="30"
+                               Height="30"
+                               Padding="0"
+                               Variant="Primary"
+                               IconData="{StaticResource PlusMark}"
+                               IconSize="14"
+                               Click="AddFriend_OnClick"
+                               ToolTip.Tip="Add Friend"
+                               ToolTip.Placement="Top"
+                               ToolTip.ShowDelay="20" />
             <Border VerticalAlignment="Center" HorizontalAlignment="Center"
                     ToolTip.Tip="{x:Static lang:Phrases.Hover_FriendsPageDisclaimer}"
                     ToolTip.Placement="Top" ToolTip.ShowDelay="20"
@@ -70,6 +83,7 @@
                                                     Mii="{Binding Mii}"
                                                     HasBadges="{Binding HasBadges}"
                                                     IsOnline="{Binding IsOnline}"
+                                                    IsPending="{Binding IsPending}"
                                                     TotalLosses="{Binding Losses}"
                                                     TotalWon="{Binding Wins}"
                                                     ViewRoomAction="ViewRoom_OnClick" />
@@ -81,15 +95,28 @@
                         <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
                         <Separator />
                         <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />
+                        <MenuItem Header="Remove Friend" Click="RemoveFriend_OnClick" />
                         <!-- <MenuItem Header="{x:Static lang:Common.Action_SaveExternalMii}" Click="SaveMii_OnClick" /> -->
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
         </Grid>
 
-        <components:EmptyPageInfo Grid.Row="1" x:Name="VisibleWhenNoFriends"
-                                  HorizontalAlignment="Center"
-                                  Title="{x:Static lang:Phrases.EmptyContent_NoFriends_Title}"
-                                  BodyText="{x:Static lang:Phrases.EmptyContent_NoFriends}" />
+        <StackPanel Grid.Row="1" x:Name="VisibleWhenNoFriends"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+            <components:EmptyPageInfo HorizontalAlignment="Center"
+                                      Title="{x:Static lang:Phrases.EmptyContent_NoFriends_Title}"
+                                      BodyText="{x:Static lang:Phrases.EmptyContent_NoFriends}" />
+            <components:Button Text="Add friend"
+                               MinWidth="170"
+                               Margin="0,12,0,0"
+                               Variant="Primary"
+                               IconData="{StaticResource PlusMark}"
+                               IconSize="14"
+                               Click="AddFriend_OnClick"
+                               ToolTip.Tip="Add Friend"
+                               ToolTip.Placement="Top"
+                               ToolTip.ShowDelay="20" />
+        </StackPanel>
     </Grid>
 </UserControl>

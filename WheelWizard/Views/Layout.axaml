@@ -41,8 +41,9 @@
         <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" VerticalAlignment="Bottom">
             <components:IconLabel IconData="{StaticResource WheelIcon}" x:Name="TitleLabel"
                                   Foreground="{StaticResource Neutral400}"
-                                  FontSize="20" IconSize="31" IsHitTestVisible="False"
-                                  Margin="10,10,0,18" />
+                                  FontSize="20" IconSize="31"
+                                  Margin="10,10,0,18"
+                                  PointerPressed="TitleLabel_OnPointerPressed" />
         </Border>
 
         <Border Grid.Row="4" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10">
@@ -143,6 +144,9 @@
             <components:SidebarRadioButton IconData="{StaticResource Settings}"
                                            PageType="{x:Type settings:SettingsPage}"
                                            Text="{x:Static lang:Common.PageTitle_Settings}" x:Name="SettingsButton" />
+            <components:SidebarRadioButton IconData="{StaticResource Code}"
+                                           PageType="{x:Type pages:TestingPage}"
+                                           Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
             <components:SidebarRadioButton IconData="{StaticResource Spinner}" IsVisible="False"
                                            Text="Kitchen Sink" x:Name="KitchenSinkButton" />
         </StackPanel>

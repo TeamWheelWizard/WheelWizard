@@ -31,25 +31,39 @@ public partial class HomePage : UserControlBase
     ];
 
     private WheelWizardStatus _status;
-    private MainButtonState currentButtonState => buttonStates[_status];
+    private MainButtonState currentButtonState => GetButtonState(_status);
 
-    private static Dictionary<WheelWizardStatus, MainButtonState> buttonStates = new()
-    {
-        { WheelWizardStatus.Loading, new(Common.State_Loading, Button.ButtonsVariantType.Default, "Spinner", null, false) },
-        { WheelWizardStatus.NoServer, new(Common.State_NoServer, Button.ButtonsVariantType.Danger, "RoadError", null, true) },
+    private static MainButtonState GetButtonState(WheelWizardStatus status) =>
+        status switch
         {
-            WheelWizardStatus.NoServerButInstalled,
-            new(Common.Action_PlayOffline, Button.ButtonsVariantType.Warning, "Play", LaunchGame, true)
-        },
-        { WheelWizardStatus.NoDolphin, new("Dolphin not setup", Button.ButtonsVariantType.Warning, "Settings", NavigateToSettings, false) },
-        {
-            WheelWizardStatus.ConfigNotFinished,
-            new(Common.State_ConfigNotFinished, Button.ButtonsVariantType.Warning, "Settings", NavigateToSettings, true)
-        },
-        { WheelWizardStatus.NotInstalled, new(Common.Action_Install, Button.ButtonsVariantType.Warning, "Download", Download, true) },
-        { WheelWizardStatus.OutOfDate, new(Common.Action_Update, Button.ButtonsVariantType.Warning, "Download", Update, true) },
-        { WheelWizardStatus.Ready, new(Common.Action_Play, Button.ButtonsVariantType.Primary, "Play", LaunchGame, true) },
-    };
+            WheelWizardStatus.Loading => new(Common.State_Loading, Button.ButtonsVariantType.Default, "Spinner", null, false),
+            WheelWizardStatus.NoServer => new(Common.State_NoServer, Button.ButtonsVariantType.Danger, "RoadError", null, true),
+            WheelWizardStatus.NoServerButInstalled => new(
+                Common.Action_PlayOffline,
+                Button.ButtonsVariantType.Warning,
+                "Play",
+                LaunchGame,
+                true
+            ),
+            WheelWizardStatus.NoDolphin => new(
+                "Dolphin not setup",
+                Button.ButtonsVariantType.Warning,
+                "Settings",
+                NavigateToSettings,
+                false
+            ),
+            WheelWizardStatus.ConfigNotFinished => new(
+                Common.State_ConfigNotFinished,
+                Button.ButtonsVariantType.Warning,
+                "Settings",
+                NavigateToSettings,
+                true
+            ),
+            WheelWizardStatus.NotInstalled => new(Common.Action_Install, Button.ButtonsVariantType.Warning, "Download", Download, true),
+            WheelWizardStatus.OutOfDate => new(Common.Action_Update, Button.ButtonsVariantType.Warning, "Download", Update, true),
+            WheelWizardStatus.Ready => new(Common.Action_Play, Button.ButtonsVariantType.Primary, "Play", LaunchGame, true),
+            _ => new(Common.State_Loading, Button.ButtonsVariantType.Default, "Spinner", null, false),
+        };
 
     public HomePage()
     {

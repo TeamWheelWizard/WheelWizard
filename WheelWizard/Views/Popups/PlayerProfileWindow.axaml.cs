@@ -1,8 +1,6 @@
 using System.ComponentModel;
-using Avalonia.Controls;
 using Avalonia.Threading;
 using WheelWizard.Models;
-using WheelWizard.Resources.Languages;
 using WheelWizard.RrRooms;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.Services;
@@ -39,6 +37,9 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
             OnPropertyChanged(nameof(Profile));
             OnPropertyChanged(nameof(DisplayMii));
             OnPropertyChanged(nameof(LastSeenText));
+            OnPropertyChanged(nameof(Vr24HoursText));
+            OnPropertyChanged(nameof(VrWeekText));
+            OnPropertyChanged(nameof(VrMonthText));
         }
     }
 
@@ -64,6 +65,12 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
     }
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+
+    public string Vr24HoursText => Profile?.VrStats == null ? "--" : FormatSignedValue(Profile.VrStats.Last24Hours);
+
+    public string VrWeekText => Profile?.VrStats == null ? "--" : FormatSignedValue(Profile.VrStats.LastWeek);
+
+    public string VrMonthText => Profile?.VrStats == null ? "--" : FormatSignedValue(Profile.VrStats.LastMonth);
 
     public Mii? DisplayMii
     {
@@ -119,10 +126,18 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
             }
             else
             {
-                ErrorMessage = result.Error.Message ?? "Failed to load profile";
+                ErrorMessage = result.Error?.Message ?? "Failed to load profile";
                 IsLoading = false;
             }
         });
+    }
+
+    private static string FormatSignedValue(int value)
+    {
+        if (value > 0)
+            return $"+{value:N0}";
+
+        return value.ToString("N0");
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

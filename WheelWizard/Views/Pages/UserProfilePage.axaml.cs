@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Models.Settings;
@@ -24,9 +25,15 @@ namespace WheelWizard.Views.Pages;
 
 public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 {
+    private const int ProfileCarouselPageCount = 2;
+
     private LicenseProfile? currentPlayer;
     private Mii? _currentMii;
     private bool _isOnline;
+    private bool _hasCurrentUserRoom;
+    private bool _hasProfileInfo;
+    private string _currentFriendCode = string.Empty;
+    private int _activeInfoSlideIndex;
 
     [Inject]
     private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
@@ -57,6 +64,51 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         }
     }
 
+    public bool HasCurrentUserRoom
+    {
+        get => _hasCurrentUserRoom;
+        set
+        {
+            _hasCurrentUserRoom = value;
+            OnPropertyChanged(nameof(HasCurrentUserRoom));
+        }
+    }
+
+    public bool HasProfileInfo
+    {
+        get => _hasProfileInfo;
+        set
+        {
+            _hasProfileInfo = value;
+            OnPropertyChanged(nameof(HasProfileInfo));
+        }
+    }
+
+    public string CurrentFriendCode
+    {
+        get => _currentFriendCode;
+        set
+        {
+            _currentFriendCode = value;
+            OnPropertyChanged(nameof(CurrentFriendCode));
+        }
+    }
+
+    public int ActiveInfoSlideIndex
+    {
+        get => _activeInfoSlideIndex;
+        set
+        {
+            var normalizedIndex = NormalizeCarouselIndex(value);
+            if (_activeInfoSlideIndex == normalizedIndex)
+                return;
+
+            _activeInfoSlideIndex = normalizedIndex;
+            OnPropertyChanged(nameof(ActiveInfoSlideIndex));
+            UpdateCarouselIndicators();
+        }
+    }
+
     private int _currentUserIndex;
     private static int FocussedUser => (int)SettingsManager.FOCUSSED_USER.Get();
 
@@ -68,6 +120,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         PopulateRegions();
         UpdatePage();
         DataContext = this;
+        UpdateCarouselIndicators();
         // Make sure this action gets subscribed AFTER the PopulateRegions method
         RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
     }
@@ -107,9 +160,18 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private void ResetMiiTopBar()
     {
         var validUsers = GameLicenseService.HasAnyValidUsers;
+        HasProfileInfo = validUsers;
         CurrentUserProfile.IsVisible = validUsers;
-        CurrentUserCarousel.IsVisible = validUsers;
+        ProfileCarouselContainer.IsVisible = validUsers;
         NoProfilesInfo.IsVisible = !validUsers;
+        if (!validUsers)
+        {
+            CurrentFriendCode = string.Empty;
+            HasCurrentUserRoom = false;
+            IsOnline = false;
+            UpdateOnlineBorders();
+            ActiveInfoSlideIndex = 0;
+        }
 
         var data = GameLicenseService.LicenseCollection;
         var userAmount = data.Users.Count;
@@ -130,14 +192,16 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
                 _ => miiName,
             };
         }
+
+        UpdateCarouselIndicators();
     }
 
     private void UpdatePage()
     {
         PrimaryCheckBox.IsChecked = FocussedUser == _currentUserIndex;
-        CurrentUserProfile.Classes.Clear();
 
         currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
+        CurrentFriendCode = currentPlayer.FriendCode;
         ProfileAttribFriendCode.Text = currentPlayer.FriendCode;
         ProfileAttribFriendCode.IsVisible = !string.IsNullOrEmpty(currentPlayer.FriendCode);
         ProfileAttribUserName.Text = currentPlayer.NameOfMii;
@@ -145,11 +209,11 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         ProfileAttribBr.Text = currentPlayer.Br.ToString();
         CurrentMii = currentPlayer.Mii;
         IsOnline = currentPlayer.IsOnline;
-        if (IsOnline)
-            CurrentUserProfile.Classes.Add("Online");
+        HasCurrentUserRoom = IsUserInLiveRoom(currentPlayer.FriendCode);
+        UpdateOnlineBorders();
 
-        ProfileAttribTotalRaces.Text = currentPlayer.Statistics.RaceTotals.OnlineRacesCount.ToString();
-        ProfileAttribTotalWins.Text = currentPlayer.Statistics.RaceTotals.WinsVsLosses.OnlineVs.Wins.ToString();
+        ProfileAttribTotalRaces.Text = currentPlayer.Statistics.RaceTotals.AllRacesCount.ToString();
+        ProfileAttribTotalWins.Text = currentPlayer.Statistics.Performance.FirstPlaces.ToString();
 
         BadgeContainer.Children.Clear();
         var badges = BadgeService.GetBadges(currentPlayer.FriendCode).Select(variant => new Badge { Variant = variant });
@@ -225,6 +289,10 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     }
 
     private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) => SetUserAsPrimary();
+
+    private void PrevCarouselPage_OnClick(object? sender, RoutedEventArgs e) => MoveCarouselPage(-1);
+
+    private void NextCarouselPage_OnClick(object? sender, RoutedEventArgs e) => MoveCarouselPage(1);
 
     private async void OpenMiiSelector_Click(object? sender, RoutedEventArgs e)
     {
@@ -319,6 +387,48 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         //reload game data, since multiple licenses can use the same mii
         GameLicenseService.LoadLicense();
         UpdatePage();
+    }
+
+    private void MoveCarouselPage(int offset)
+    {
+        ActiveInfoSlideIndex += offset;
+    }
+
+    private static int NormalizeCarouselIndex(int index)
+    {
+        var normalized = index % ProfileCarouselPageCount;
+        return normalized < 0 ? normalized + ProfileCarouselPageCount : normalized;
+    }
+
+    private void UpdateCarouselIndicators()
+    {
+        SetDotActive(CarouselDot0, ActiveInfoSlideIndex == 0);
+        SetDotActive(CarouselDot1, ActiveInfoSlideIndex == 1);
+    }
+
+    private static void SetDotActive(Border dot, bool active)
+    {
+        if (active && !dot.Classes.Contains("active"))
+            dot.Classes.Add("active");
+        else if (!active && dot.Classes.Contains("active"))
+            dot.Classes.Remove("active");
+    }
+
+    private static bool IsUserInLiveRoom(string? friendCode)
+    {
+        if (string.IsNullOrWhiteSpace(friendCode))
+            return false;
+
+        return RRLiveRooms.Instance.CurrentRooms.Any(room => room.Players.Any(player => player.FriendCode == friendCode));
+    }
+
+    private void UpdateOnlineBorders()
+    {
+        var outerColor = IsOnline ? ViewUtils.Colors.Primary400 : ViewUtils.Colors.Neutral900;
+        var innerColor = IsOnline ? ViewUtils.Colors.Primary400 : ViewUtils.Colors.Neutral600;
+
+        CurrentUserProfile.BorderBrush = new SolidColorBrush(outerColor);
+        PART_HeadBorderFace.BorderBrush = new SolidColorBrush(innerColor);
     }
 
     #region PropertyChanged

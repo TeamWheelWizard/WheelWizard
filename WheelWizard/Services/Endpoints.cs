@@ -30,8 +30,10 @@ public static class Endpoints
     // TODO: Refactor all the URLs seen below
 
     // Retro Rewind
-    public const string RRUrl = "http://update.rwfc.net:8000/";
+    public const string OldRRUrl = "http://update.rwfc.net:8000/";
+    public const string RRUrl = "https://rwfc.net/updates/";
     public const string RRZipUrl = RRUrl + "RetroRewind/zip/RetroRewind.zip";
+    public const string RRTestersZipUrl = RRUrl + "RetroRewind/zip/Testers.zip";
     public const string RRVersionUrl = RRUrl + "RetroRewind/RetroRewindVersion.txt";
     public const string RRVersionDeleteUrl = RRUrl + "RetroRewind/RetroRewindDelete.txt";
     public const string RRDiscordUrl = "https://discord.gg/yH3ReN8EhQ";

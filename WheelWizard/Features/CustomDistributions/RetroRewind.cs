@@ -60,6 +60,9 @@ public class RetroRewind : IDistribution
         if (downloadResult.IsFailure)
             return downloadResult;
 
+        if (progressWindow.WasCancellationRequested)
+            return Ok();
+
         var updateResult = await UpdateAsync(progressWindow);
         if (updateResult.IsFailure)
             return updateResult;
@@ -70,8 +73,7 @@ public class RetroRewind : IDistribution
     private async Task<OperationResult> DownloadAndExtractRetroRewind(ProgressWindow progressWindow)
     {
         progressWindow.SetExtraText(Phrases.Progress_InstallingRRFirstTime);
-        // path to the downloaded .zip
-        var tempZipPath = PathManager.RetroRewindTempFile;
+        var downloadedZipPath = PathManager.RetroRewindTempFile;
         // where we'll do the extraction
         var tempExtractionPath = PathManager.TempModsFolderPath;
 
@@ -87,12 +89,16 @@ public class RetroRewind : IDistribution
             _fileSystem.Directory.CreateDirectory(tempExtractionPath);
 
             //todo, service
-            await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, tempZipPath, progressWindow);
+            var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, downloadedZipPath, progressWindow);
+            if (string.IsNullOrWhiteSpace(downloadedFilePath) || !_fileSystem.File.Exists(downloadedFilePath))
+                return progressWindow.WasCancellationRequested ? Ok() : Fail("Failed to download Retro Rewind files.");
+
+            downloadedZipPath = downloadedFilePath;
 
             // 2) Extract
             progressWindow.SetExtraText(Common.State_Extracting);
 
-            var extractResult = await Task.Run(() => ExtractZipFile(tempZipPath, tempExtractionPath, progressWindow));
+            var extractResult = await Task.Run(() => ExtractZipFile(downloadedZipPath, tempExtractionPath, progressWindow));
 
             if (extractResult.IsFailure)
             {
@@ -140,8 +146,8 @@ public class RetroRewind : IDistribution
         }
         finally
         {
-            if (_fileSystem.File.Exists(tempZipPath))
-                _fileSystem.File.Delete(tempZipPath);
+            if (_fileSystem.File.Exists(downloadedZipPath))
+                _fileSystem.File.Delete(downloadedZipPath);
 
             if (_fileSystem.Directory.Exists(tempExtractionPath))
                 _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
@@ -268,6 +274,9 @@ public class RetroRewind : IDistribution
             var update = updatesToApply[i];
 
             var success = await DownloadAndApplyUpdate(update, updatesToApply.Count, i + 1, progressWindow);
+            if (progressWindow.WasCancellationRequested)
+                return Ok();
+
             if (success.IsFailure)
                 return Fail(Phrases.MessageError_AbortRR_Extra_FailedUpdateApply);
 
@@ -296,13 +305,13 @@ public class RetroRewind : IDistribution
             popupWindow.SetExtraText($"{Common.Action_Update} {currentUpdateIndex}/{totalUpdates}: {update.Description}");
             var finalFile = await DownloadHelper.DownloadToLocationAsync(update.Url, tempZipPath, popupWindow);
 
+            if (finalFile == null)
+                return Fail("Failed to download update file");
+
             popupWindow.UpdateProgress(100);
             popupWindow.SetExtraText(Common.State_Extracting);
             var destinationDirectoryPath = PathManager.RiivolutionWhWzFolderPath;
             _fileSystem.Directory.CreateDirectory(destinationDirectoryPath);
-
-            if (finalFile == null)
-                return Fail("Failed to download update file");
             var extractResult = ExtractZipFile(finalFile, destinationDirectoryPath, popupWindow);
             if (extractResult.IsFailure)
                 return extractResult;
@@ -482,13 +491,15 @@ public class RetroRewind : IDistribution
             var description = parts[3].Trim();
             if (string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(path))
                 continue;
+            // Fix old URLs using HTTP to the new endpoint
+            var fixedUrl = url.Replace(Endpoints.OldRRUrl, Endpoints.RRUrl);
             if (!SemVersion.TryParse(version, out var _))
                 continue;
             var parsedVersion = SemVersion.Parse(version);
             var updateData = new UpdateData
             {
                 Version = parsedVersion,
-                Url = url,
+                Url = fixedUrl,
                 Description = description,
             };
             versions.Add(updateData);

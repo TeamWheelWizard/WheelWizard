@@ -102,6 +102,7 @@
                     <ContextMenu>
                         <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
                         <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
+                        <MenuItem Header="Add Friend" Click="AddFriend_OnClick" />
                         <Separator />
                         <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />
                     </ContextMenu>

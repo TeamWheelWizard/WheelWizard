@@ -1,13 +1,19 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using WheelWizard.Models;
 using WheelWizard.Resources.Languages;
+using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
+using WheelWizard.Services.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Shared.Services;
+using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Popups;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
@@ -29,6 +35,9 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     [Inject]
     private IMiiDbService MiiDbService { get; set; } = null!;
+
+    [Inject]
+    private IApiCaller<IRwfcApi> ApiCaller { get; set; } = null!;
 
     public ObservableCollection<FriendProfile> FriendList
     {
@@ -82,8 +91,10 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     private void HandleVisibility()
     {
-        VisibleWhenNoFriends.IsVisible = FriendList.Count <= 0;
-        VisibleWhenFriends.IsVisible = FriendList.Count > 0;
+        var hasFriends = FriendList.Count > 0;
+        VisibleWhenNoFriends.IsVisible = !hasFriends;
+        VisibleWhenFriends.IsVisible = hasFriends;
+        TopAddFriendButton.IsVisible = hasFriends;
     }
 
     private List<FriendProfile> GetSortedPlayerList()
@@ -127,6 +138,140 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         UpdateFriendList();
     }
 
+    private async void AddFriend_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var focusedUserIndex = (int)SettingsManager.FOCUSSED_USER.Get();
+        if (focusedUserIndex is < 0 or > 3)
+        {
+            ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        var activeUserPid = FriendCodeGenerator.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
+        if (activeUserPid == 0)
+        {
+            ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        if (GameLicenseService.ActiveCurrentFriends.Count >= 30)
+        {
+            ViewUtils.ShowSnackbar("Your friend list is full.", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        var inputFriendCode = await new TextInputWindow()
+            .SetMainText("Add Friend")
+            .SetExtraText("Enter a 12-digit friend code.")
+            .SetPlaceholderText("0000-0000-0000")
+            .SetButtonText(Common.Action_Cancel, Common.Action_Submit)
+            .SetValidation((_, newText) => ValidateFriendCodeInput(newText))
+            .ShowDialog();
+
+        if (inputFriendCode == null)
+            return;
+
+        var normalizedFriendCodeResult = NormalizeFriendCode(inputFriendCode);
+        if (normalizedFriendCodeResult.IsFailure)
+        {
+            ViewUtils.ShowSnackbar(normalizedFriendCodeResult.Error.Message, ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        var normalizedFriendCode = normalizedFriendCodeResult.Value;
+        var profileResult = await ApiCaller.CallApiAsync(rwfcApi => rwfcApi.GetPlayerProfileAsync(normalizedFriendCode));
+        if (profileResult.IsFailure || profileResult.Value == null)
+        {
+            ViewUtils.ShowSnackbar("Could not find that friend code online.", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        var miiResult = MiiSerializer.Deserialize(profileResult.Value.MiiData);
+        if (miiResult.IsFailure)
+        {
+            ViewUtils.ShowSnackbar("This profile has no valid Mii data.", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        var profile = WithFallbackFriendCode(profileResult.Value, normalizedFriendCode);
+        var shouldAdd = await new AddFriendConfirmationWindow(profile, miiResult.Value).AwaitAnswer();
+        if (!shouldAdd)
+            return;
+
+        var addResult = GameLicenseService.AddFriend(
+            focusedUserIndex,
+            normalizedFriendCode,
+            miiResult.Value,
+            (uint)Math.Max(profile.Vr, 0)
+        );
+
+        if (addResult.IsFailure)
+        {
+            ViewUtils.ShowSnackbar(addResult.Error.Message, ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        UpdateFriendList();
+        ViewUtils.GetLayout().UpdateFriendCount();
+        ViewUtils.ShowSnackbar($"Added {profile.Name} to your friend list.");
+    }
+
+    private OperationResult ValidateFriendCodeInput(string? rawFriendCode)
+    {
+        var normalizedFriendCodeResult = NormalizeFriendCode(rawFriendCode ?? string.Empty);
+        if (normalizedFriendCodeResult.IsFailure)
+            return normalizedFriendCodeResult.Error;
+
+        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
+        var currentProfileId = FriendCodeGenerator.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
+        if (currentProfileId != 0 && currentProfileId == friendProfileId)
+            return Fail("You cannot add your own friend code.");
+
+        var duplicateFriend = GameLicenseService.ActiveCurrentFriends.Any(friend =>
+        {
+            var existingPid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            return existingPid != 0 && existingPid == friendProfileId;
+        });
+
+        return duplicateFriend ? Fail("This friend is already in your list.") : Ok();
+    }
+
+    private static OperationResult<string> NormalizeFriendCode(string friendCode)
+    {
+        if (string.IsNullOrWhiteSpace(friendCode))
+            return Fail("Friend code cannot be empty.");
+
+        var digits = new string(friendCode.Where(char.IsDigit).ToArray());
+        if (digits.Length != 12 || !ulong.TryParse(digits, out _))
+            return Fail("Friend code must be exactly 12 digits.");
+
+        var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
+        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        if (profileId == 0)
+            return Fail("Invalid friend code.");
+
+        return formatted;
+    }
+
+    private static PlayerProfileResponse WithFallbackFriendCode(PlayerProfileResponse profile, string fallbackFriendCode)
+    {
+        if (!string.IsNullOrWhiteSpace(profile.FriendCode))
+            return profile;
+
+        return new()
+        {
+            Pid = profile.Pid,
+            Name = profile.Name,
+            FriendCode = fallbackFriendCode,
+            Vr = profile.Vr,
+            Rank = profile.Rank,
+            LastSeen = profile.LastSeen,
+            IsSuspicious = profile.IsSuspicious,
+            VrStats = profile.VrStats,
+            MiiData = profile.MiiData,
+        };
+    }
+
     private enum ListOrderCondition
     {
         IS_ONLINE,
@@ -161,6 +306,32 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
             return;
         new PlayerProfileWindow(selectedPlayer.FriendCode).Show();
+    }
+
+    private void RemoveFriend_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
+            return;
+        if (string.IsNullOrWhiteSpace(selectedPlayer.FriendCode))
+            return;
+
+        var focusedUserIndex = (int)SettingsManager.FOCUSSED_USER.Get();
+        if (focusedUserIndex is < 0 or > 3)
+        {
+            ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        var removeResult = GameLicenseService.RemoveFriend(focusedUserIndex, selectedPlayer.FriendCode);
+        if (removeResult.IsFailure)
+        {
+            ViewUtils.ShowSnackbar(removeResult.Error.Message, ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        UpdateFriendList();
+        ViewUtils.GetLayout().UpdateFriendCount();
+        ViewUtils.ShowSnackbar($"Removed {selectedPlayer.NameOfMii} from your friend list.");
     }
 
     private void ViewRoom_OnClick(string friendCode)

@@ -210,10 +210,17 @@ public partial class ModContent : UserControlBase
             var url = downloadUrls.First();
             var fileName = GetFileNameFromUrl(url);
             var filePath = Path.Combine(PathManager.TempModsFolderPath, fileName);
-            await DownloadHelper.DownloadToLocationAsync(url, filePath, progressWindow);
+            var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(url, filePath, progressWindow);
             progressWindow.Close();
-            var file = Directory.GetFiles(PathManager.TempModsFolderPath).FirstOrDefault();
-            if (file == null)
+
+            if (string.IsNullOrWhiteSpace(downloadedFilePath))
+            {
+                if (Directory.Exists(PathManager.TempModsFolderPath))
+                    Directory.Delete(PathManager.TempModsFolderPath, true);
+                return;
+            }
+
+            if (!File.Exists(downloadedFilePath))
             {
                 MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_UnableToDownloadMod_Files);
                 return;
@@ -244,7 +251,7 @@ public partial class ModContent : UserControlBase
                 return;
             }
 
-            await ModInstallation.InstallModFromFileAsync(file, modName, author, modId);
+            await ModInstallation.InstallModFromFileAsync(downloadedFilePath, modName, author, modId);
             Directory.Delete(PathManager.TempModsFolderPath, true);
         }
         catch (Exception ex)

@@ -73,9 +73,12 @@ public static class PathManager
     public static string ModConfigFilePath => Path.Combine(ModsFolderPath, "modconfig.json");
     public static string TempModsFolderPath => Path.Combine(ModsFolderPath, "Temp");
     public static string RetroRewindTempFile => Path.Combine(TempModsFolderPath, "RetroRewind.zip");
+    public static string RrBetaTempFolderPath => Path.Combine(TempModsFolderPath, "RRBetaTemp");
+    public static string RrBetaTempFilePath => Path.Combine(RrBetaTempFolderPath, "Testers.zip");
+    public static string RrBetaManifestFilePath => Path.Combine(WheelWizardAppdataPath, "RRBeta.manifest.json");
     public static string WiiDbFolder => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib");
     public static string MiiDbFile => Path.Combine(WiiDbFolder, "RFL_DB.dat");
-    public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRrating.pul");
+    public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRRating.pul");
 
     #region Wheel Wizard Appdata Override
 
@@ -499,8 +502,9 @@ public static class PathManager
 
     // Helper paths for folders used across multiple files
 
-    //todo: before we can actually add more distributions, we will have to rewrite the MyStuff as a service aswell
     public static string MyStuffFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6", "MyStuff");
+    public static string RrBetaFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RRBeta");
+    public static string RrBetaMyStuffFolderPath => Path.Combine(RrBetaFolderPath, "MyStuff");
 
     public static string GetModDirectoryPath(string modName) => Path.Combine(ModsFolderPath, modName);
 
@@ -512,6 +516,7 @@ public static class PathManager
     public static string SaveFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "riivolution", "save", "RetroWFC");
     public static string RiivolutionXmlFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "riivolution");
     public static string XmlFilePath => Path.Combine(RiivolutionXmlFolderPath, "RetroRewind6.xml");
+    public static string RrBetaXmlFilePath => Path.Combine(RiivolutionXmlFolderPath, "RRBeta.xml");
 
     private static string PortableUserFolderPath =>
         Path.Combine(GetDolphinExeDirectory(), RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "user" : "User");

@@ -69,18 +69,65 @@
                                 </LinearGradientBrush>
                             </Border.OpacityMask>
                         </Border>
-                        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" IsVisible="{TemplateBinding IsOnline}"
+                        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" IsVisible="{TemplateBinding IsPending}"
+                                   Text="Pending"
+                                   FontSize="12" Foreground="{StaticResource Warning400}" />
+                        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom"
                                    Text="{x:Static lang:Common.Attribute_Status_Online}"
-                                   FontSize="16" Foreground="{StaticResource Neutral200}" />
+                                   FontSize="12" Foreground="{StaticResource Neutral200}">
+                            <TextBlock.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="IsOnline" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="IsPending" RelativeSource="{RelativeSource TemplatedParent}"
+                                             Converter="{x:Static BoolConverters.Not}" />
+                                </MultiBinding>
+                            </TextBlock.IsVisible>
+                        </TextBlock>
                         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom"
                                    Text="{x:Static lang:Common.Attribute_Status_Offline}"
-                                   FontSize="16"
-                                   IsVisible="{TemplateBinding IsOnline,Converter={x:Static BoolConverters.Not}}"
-                                   Foreground="{StaticResource Neutral200}" />
+                                   FontSize="12"
+                                   Foreground="{StaticResource Neutral200}">
+                            <TextBlock.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="IsOnline" RelativeSource="{RelativeSource TemplatedParent}"
+                                             Converter="{x:Static BoolConverters.Not}" />
+                                    <Binding Path="IsPending" RelativeSource="{RelativeSource TemplatedParent}"
+                                             Converter="{x:Static BoolConverters.Not}" />
+                                </MultiBinding>
+                            </TextBlock.IsVisible>
+                        </TextBlock>
 
                         <Border Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" CornerRadius="99999"
-                                Opacity="0.5" IsVisible="{TemplateBinding IsOnline}" HorizontalAlignment="Right"
+                                Opacity="0.5" HorizontalAlignment="Right"
                                 Background="{StaticResource Primary200}"
+                                Margin="0,-100,20,0"
+                                Height="175" Width="100" Effect="blur(250)">
+                            <Border.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="IsOnline" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="IsPending" RelativeSource="{RelativeSource TemplatedParent}"
+                                             Converter="{x:Static BoolConverters.Not}" />
+                                </MultiBinding>
+                            </Border.IsVisible>
+                            <Border.Styles>
+                                <Style Selector="Border">
+                                    <Style.Animations>
+                                        <Animation Duration="0:0:5" IterationCount="INFINITE">
+                                            <KeyFrame Cue="0%">
+                                                <Setter Property="RotateTransform.Angle" Value="0" />
+                                            </KeyFrame>
+                                            <KeyFrame Cue="100%">
+                                                <Setter Property="RotateTransform.Angle" Value="360" />
+                                            </KeyFrame>
+                                        </Animation>
+                                    </Style.Animations>
+                                </Style>
+                            </Border.Styles>
+                        </Border>
+
+                        <Border Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" CornerRadius="99999"
+                                Opacity="0.5" IsVisible="{TemplateBinding IsPending}" HorizontalAlignment="Right"
+                                Background="{StaticResource Warning200}"
                                 Margin="0,-100,20,0"
                                 Height="175" Width="100" Effect="blur(250)">
                             <Border.Styles>
@@ -138,7 +185,8 @@
 
                         <components:Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top"
                                            Variant="Primary"
-                                           IsEnabled="{TemplateBinding IsOnline}" x:Name="ViewRoomButton"
+                                           IsEnabled="{TemplateBinding IsOnline}"
+                                           x:Name="ViewRoomButton"
                                            Text="{x:Static lang:Common.Action_ViewRoom}"
                                            IconData="{StaticResource Road}" Margin="5,10" />
 
@@ -159,9 +207,23 @@
     </Style>
 
     <Style
-        Selector="components|FriendsListItem[IsOnline=true] /template/ Border#PART_BorderColor,
-                     components|FriendsListItem[IsOnline=true] /template/ Border#PART_BadgeBorder">
+        Selector="components|FriendsListItem[IsOnline=true][IsPending=false] /template/ Border#PART_BorderColor,
+                     components|FriendsListItem[IsOnline=true][IsPending=false] /template/ Border#PART_BadgeBorder">
         <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+    </Style>
+
+    <Style
+        Selector="components|FriendsListItem[IsPending=true] /template/ Border#PART_BorderColor,
+                     components|FriendsListItem[IsPending=true] /template/ Border#PART_BadgeBorder">
+        <Setter Property="BorderBrush" Value="{StaticResource Warning500}" />
+    </Style>
+
+    <Style Selector="components|FriendsListItem[IsPending=true] /template/ behaviorComponent|MiiImageLoader">
+        <Setter Property="ImageVariant" Value="{x:Static miiVars:MiiImageVariants.FriendsSideProfilePending}" />
+    </Style>
+
+    <Style Selector="components|FriendsListItem[IsPending=true] /template/ components|Button#ViewRoomButton">
+        <Setter Property="Variant" Value="Warning" />
     </Style>
 
     <Style Selector="components|FriendsListItem[HasBadges=true] /template/ components|Button#ViewRoomButton">

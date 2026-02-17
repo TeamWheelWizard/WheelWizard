@@ -5,12 +5,12 @@ namespace WheelWizard.Utilities.Generators;
 public interface IRRratingReader
 {
     /// <summary>
-    /// Reads VR and BR values from RRrating.pul file for a given profile ID.
+    /// Reads VR and BR values from RRRating.pul file for a given profile ID.
     /// </summary>
     (float vr, float br)? ReadRatingFromFile(byte[] fileData, uint profileId);
 
     /// <summary>
-    /// Reads VR and BR values from RRrating.pul file for a given friend code.
+    /// Reads VR and BR values from RRRating.pul file for a given friend code.
     /// </summary>
     (float vr, float br)? ReadRatingFromFileByFriendCode(byte[] fileData, string friendCode);
 }
@@ -25,7 +25,7 @@ public class RRratingReader : IRRratingReader
     private const uint FlagHasData = 0x1;
 
     /// <summary>
-    /// Reads VR and BR values from RRrating.pul file for a given profile ID.
+    /// Reads VR and BR values from RRRating.pul file for a given profile ID.
     /// </summary>
     public (float vr, float br)? ReadRatingFromFile(byte[] fileData, uint profileId)
     {
@@ -63,7 +63,7 @@ public class RRratingReader : IRRratingReader
     }
 
     /// <summary>
-    /// Reads VR and BR values from RRrating.pul file for a given friend code.
+    /// Reads VR and BR values from RRRating.pul file for a given friend code.
     /// </summary>
     public (float vr, float br)? ReadRatingFromFileByFriendCode(byte[] fileData, string friendCode)
     {

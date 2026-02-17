@@ -70,6 +70,17 @@ public static class MiiImageVariants
         ExpirationSeconds = TimeSpan.FromMinutes(60),
     };
 
+    public static readonly MiiImageSpecifications FriendsSideProfilePending = new()
+    {
+        Name = "FriendsSideProfilePending",
+        Expression = MiiImageSpecifications.FaceExpression.anger,
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.medium,
+        CharacterRotate = new(350, 15, 355),
+        CameraRotate = new(12, 0, 0),
+        ExpirationSeconds = TimeSpan.FromMinutes(60),
+    };
+
     public static readonly MiiImageSpecifications FullBodyCarousel = new()
     {
         Name = "FullBodyCarousel",
