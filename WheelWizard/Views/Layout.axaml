@@ -134,6 +134,9 @@
             <components:SidebarRadioButton IconData="{StaticResource RoomUsers}"
                                            PageType="{x:Type pages:RoomsPage}"
                                            Text="{x:Static lang:Common.PageTitle_Rooms}" x:Name="RoomsButton" />
+            <components:SidebarRadioButton IconData="{StaticResource Award}"
+                                           PageType="{x:Type pages:LeaderboardPage}"
+                                           Text="Leaderboard" />
             <components:SidebarRadioButton IconData="{StaticResource Friends}"
                                            Text="{x:Static lang:Common.PageTitle_Friends}" x:Name="FriendsButton"
                                            PageType="{x:Type pages:FriendsPage}"

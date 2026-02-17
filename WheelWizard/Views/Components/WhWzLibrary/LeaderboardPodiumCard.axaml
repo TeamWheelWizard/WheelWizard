@@ -1,0 +1,468 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="using:WheelWizard.Views.Components"
+        xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent"
+        xmlns:miiVars="using:WheelWizard.MiiImages.Domain">
+    <Design.PreviewWith>
+        <Border Background="{StaticResource Neutral950}" Padding="20">
+            <Grid ColumnDefinitions="*,*,*">
+                <components:LeaderboardPodiumCard Grid.Column="0"
+                                                  Classes="Silver EntrySecond FloatB"
+                                                  Rank="2"
+                                                  PlacementLabel="2nd Place"
+                                                  PlayerName="RoadRunner"
+                                                  VrText="18,611"
+                                                  ShowBadge="True"
+                                                  BadgeVariant="Translator" />
+                <components:LeaderboardPodiumCard Grid.Column="1"
+                                                  Margin="4,-10,4,0"
+                                                  Classes="Gold EntryFirst FloatA"
+                                                  Rank="1"
+                                                  PlacementLabel="Champion"
+                                                  PlayerName="Patchzy"
+                                                  VrText="19,402"
+                                                  AvatarSize="122"
+                                                  ShowBadge="True"
+                                                  BadgeVariant="WhWzDev" />
+                <components:LeaderboardPodiumCard Grid.Column="2"
+                                                  Classes="Bronze EntryThird FloatC"
+                                                  Rank="3"
+                                                  PlacementLabel="3rd Place"
+                                                  PlayerName="WantToBeeMe"
+                                                  VrText="18,224"
+                                                  ShowBadge="True"
+                                                  BadgeVariant="Heart" />
+            </Grid>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="components|LeaderboardPodiumCard">
+        <Setter Property="MinWidth" Value="126" />
+        <Setter Property="MinHeight" Value="190" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="#1220222A" />
+        <Setter Property="BorderBrush" Value="#35414658" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
+        <Setter Property="RenderTransform" Value="translate(0, 0)" />
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ClipToBounds="False">
+                    <Border x:Name="PART_Aura"
+                            Width="130"
+                            Height="130"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Margin="0,26,0,0"
+                            CornerRadius="9999"
+                            Opacity="0.3"
+                            IsHitTestVisible="False"
+                            Effect="blur(70)"
+                            Background="{TemplateBinding BorderBrush}" />
+
+                    <Border x:Name="PART_CardSurface"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="20"
+                            Padding="10,14,10,10"
+                            Margin="4,5,4,5"
+                            ClipToBounds="True"
+                            BoxShadow="0 18 30 0 #22000000">
+                        <Grid RowDefinitions="Auto,Auto,Auto,*"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch">
+                            <Grid ColumnDefinitions="Auto,*"
+                                  Margin="0,0,0,8">
+                                <Border Grid.Column="0"
+                                        CornerRadius="9999"
+                                        Padding="8,2"
+                                        BorderThickness="1"
+                                        BorderBrush="#4FFFFFFF"
+                                        Background="#22FFFFFF"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Rank, RelativeSource={RelativeSource TemplatedParent}, StringFormat='#{0}'}"
+                                               FontSize="12"
+                                               FontWeight="Bold"
+                                               Foreground="White" />
+                                </Border>
+
+                                <TextBlock Grid.Column="1"
+                                           Margin="8,0,0,0"
+                                           Text="{TemplateBinding PlacementLabel}"
+                                           FontWeight="SemiBold"
+                                           FontSize="12"
+                                           Foreground="{StaticResource Neutral200}"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Grid Grid.Row="1"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,0,10">
+                                <Border Width="{TemplateBinding AvatarSize}"
+                                        Height="{TemplateBinding AvatarSize}"
+                                        CornerRadius="9999"
+                                        BorderBrush="#64FFFFFF"
+                                        BorderThickness="2"
+                                        Background="#22000000"
+                                        ClipToBounds="True">
+                                    <Grid>
+                                        <PathIcon Data="{StaticResource User}"
+                                                  Width="40"
+                                                  Height="40"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Foreground="#52FFFFFF"
+                                                  IsHitTestVisible="False" />
+                                        <behaviorComponent:MiiImageLoader HorizontalAlignment="Stretch"
+                                                                          VerticalAlignment="Stretch"
+                                                                          LoadingColor="{StaticResource Neutral600}"
+                                                                          FallBackColor="{StaticResource Neutral600}"
+                                                                          Mii="{TemplateBinding Mii}"
+                                                                          ImageVariant="{x:Static miiVars:MiiImageVariants.MiiBlockProfile}" />
+                                    </Grid>
+                                </Border>
+
+                                <Border HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Margin="0,0,-6,-2"
+                                        IsVisible="{TemplateBinding ShowBadge}"
+                                        Width="28"
+                                        Height="28"
+                                        CornerRadius="9999"
+                                        Background="{StaticResource Neutral950}"
+                                        BorderBrush="{StaticResource Neutral700}"
+                                        BorderThickness="1">
+                                    <components:Badge Variant="{TemplateBinding BadgeVariant}"
+                                                      Width="20"
+                                                      Height="20"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center" />
+                                </Border>
+                            </Grid>
+
+                            <TextBlock Grid.Row="2"
+                                       Text="{TemplateBinding PlayerName}"
+                                       FontWeight="Bold"
+                                       FontSize="16"
+                                       HorizontalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       MaxWidth="110"
+                                       Foreground="White" />
+
+                            <Grid Grid.Row="3"
+                                  Margin="0,8,0,0"
+                                  ColumnDefinitions="Auto,*"
+                                  HorizontalAlignment="Center">
+                                <PathIcon Grid.Column="0"
+                                          Data="{StaticResource Chart}"
+                                          Width="14"
+                                          Height="14"
+                                          VerticalAlignment="Center"
+                                          Foreground="{StaticResource Neutral200}" />
+                                <TextBlock Grid.Column="1"
+                                           Margin="6,0,0,0"
+                                           Text="{TemplateBinding VrText}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource Neutral100}"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+
+                            <PathIcon Grid.Row="0"
+                                      Grid.RowSpan="4"
+                                      Data="{StaticResource WarningTip}"
+                                      Width="14"
+                                      Height="14"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Top"
+                                      Foreground="{StaticResource Danger400}"
+                                      Margin="0,2,2,0"
+                                      IsVisible="{TemplateBinding IsSuspicious}" />
+                        </Grid>
+                    </Border>
+
+                    <Border x:Name="PART_Shimmer"
+                            IsHitTestVisible="False"
+                            Opacity="0.2"
+                            Width="80"
+                            Height="220"
+                            CornerRadius="14"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Margin="-60,-16,0,0"
+                            RenderTransform="rotate(25deg)">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#00FFFFFF" Offset="0" />
+                                <GradientStop Color="#9FFFFFFF" Offset="0.52" />
+                                <GradientStop Color="#00FFFFFF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+
+                    <Border x:Name="PART_ParticleA"
+                            Width="7"
+                            Height="7"
+                            CornerRadius="9999"
+                            Background="#AAFFFFFF"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Margin="12,22,0,0"
+                            IsHitTestVisible="False"
+                            Effect="blur(2)" />
+                    <Border x:Name="PART_ParticleB"
+                            Width="5"
+                            Height="5"
+                            CornerRadius="9999"
+                            Background="#AAFFFFFF"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Margin="0,38,16,0"
+                            IsHitTestVisible="False"
+                            Effect="blur(2)" />
+                    <Border x:Name="PART_ParticleC"
+                            Width="4"
+                            Height="4"
+                            CornerRadius="9999"
+                            Background="#AAFFFFFF"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Margin="0,12,0,0"
+                            IsHitTestVisible="False"
+                            Effect="blur(2)" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="components|LeaderboardPodiumCard /template/ Border#PART_CardSurface">
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.22" Easing="CircularEaseOut" />
+                <DoubleTransition Property="Opacity" Duration="0:0:0.22" Easing="CircularEaseOut" />
+                <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.22" Easing="CircularEaseOut" />
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="components|LeaderboardPodiumCard:pointerover /template/ Border#PART_CardSurface">
+        <Setter Property="RenderTransform" Value="scale(1.03)" />
+        <Setter Property="BoxShadow" Value="0 24 44 0 #32000000" />
+    </Style>
+
+    <Style Selector="components|LeaderboardPodiumCard.Gold">
+        <Setter Property="Background">
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#2E341B07" Offset="0" />
+                <GradientStop Color="#2D3A2710" Offset="1" />
+            </LinearGradientBrush>
+        </Setter>
+        <Setter Property="BorderBrush" Value="#EEC21E" />
+    </Style>
+    <Style Selector="components|LeaderboardPodiumCard.Silver">
+        <Setter Property="Background">
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#27363A42" Offset="0" />
+                <GradientStop Color="#29313847" Offset="1" />
+            </LinearGradientBrush>
+        </Setter>
+        <Setter Property="BorderBrush" Value="#90A9B8D7" />
+    </Style>
+    <Style Selector="components|LeaderboardPodiumCard.Bronze">
+        <Setter Property="Background">
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#2C3C2418" Offset="0" />
+                <GradientStop Color="#2B4C2A1D" Offset="1" />
+            </LinearGradientBrush>
+        </Setter>
+        <Setter Property="BorderBrush" Value="#A8D77E47" />
+    </Style>
+
+    <Style Selector="components|LeaderboardPodiumCard.EntryFirst">
+        <Style.Animations>
+            <Animation Duration="0:0:0.45" FillMode="Forward" Easing="CircularEaseOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.Y" Value="30" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="components|LeaderboardPodiumCard.EntrySecond">
+        <Style.Animations>
+            <Animation Delay="0:0:0.08" Duration="0:0:0.45" FillMode="Forward" Easing="CircularEaseOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.Y" Value="30" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="components|LeaderboardPodiumCard.EntryThird">
+        <Style.Animations>
+            <Animation Delay="0:0:0.16" Duration="0:0:0.45" FillMode="Forward" Easing="CircularEaseOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.Y" Value="30" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector="components|LeaderboardPodiumCard.FloatA /template/ Border#PART_CardSurface">
+        <Style.Animations>
+            <Animation Duration="0:0:5.2" IterationCount="INFINITE" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="TranslateTransform.Y" Value="-5" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="components|LeaderboardPodiumCard.FloatB /template/ Border#PART_CardSurface">
+        <Style.Animations>
+            <Animation Duration="0:0:4.7" IterationCount="INFINITE" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.Y" Value="-1" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="TranslateTransform.Y" Value="-6" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.Y" Value="-1" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="components|LeaderboardPodiumCard.FloatC /template/ Border#PART_CardSurface">
+        <Style.Animations>
+            <Animation Duration="0:0:5.7" IterationCount="INFINITE" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.Y" Value="-2" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="TranslateTransform.Y" Value="-7" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.Y" Value="-2" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector="components|LeaderboardPodiumCard /template/ Border#PART_Aura">
+        <Style.Animations>
+            <Animation Duration="0:0:9" IterationCount="INFINITE">
+                <KeyFrame Cue="0%">
+                    <Setter Property="RotateTransform.Angle" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="RotateTransform.Angle" Value="360" />
+                </KeyFrame>
+            </Animation>
+            <Animation Duration="0:0:4.4" IterationCount="INFINITE" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0.2" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="Opacity" Value="0.34" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0.2" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector="components|LeaderboardPodiumCard /template/ Border#PART_Shimmer">
+        <Style.Animations>
+            <Animation Duration="0:0:3.8" IterationCount="INFINITE" Easing="CircularEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.X" Value="-90" />
+                </KeyFrame>
+                <KeyFrame Cue="20%">
+                    <Setter Property="Opacity" Value="0.27" />
+                </KeyFrame>
+                <KeyFrame Cue="80%">
+                    <Setter Property="Opacity" Value="0.27" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="TranslateTransform.X" Value="160" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector="components|LeaderboardPodiumCard /template/ Border#PART_ParticleA">
+        <Style.Animations>
+            <Animation Duration="0:0:3.2" IterationCount="INFINITE" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0.35" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="Opacity" Value="0.95" />
+                    <Setter Property="TranslateTransform.Y" Value="-8" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0.35" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="components|LeaderboardPodiumCard /template/ Border#PART_ParticleB">
+        <Style.Animations>
+            <Animation Duration="0:0:2.9" IterationCount="INFINITE" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0.2" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="Opacity" Value="0.8" />
+                    <Setter Property="TranslateTransform.Y" Value="-7" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0.2" />
+                    <Setter Property="TranslateTransform.Y" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="components|LeaderboardPodiumCard /template/ Border#PART_ParticleC">
+        <Style.Animations>
+            <Animation Duration="0:0:3.7" IterationCount="INFINITE" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0.25" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="Opacity" Value="0.85" />
+                    <Setter Property="TranslateTransform.Y" Value="-6" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0.25" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+</Styles>
