@@ -302,11 +302,7 @@
             </ControlTemplate>
         </Setter>
     </Style>
-</Styles>
-    
-    
-    
-    <!-- LEAFSTRUCK BADGES -->
+        <!-- LEAFSTRUCK BADGES -->
     <Style Selector="controls|Badge.Leafstruck_GoldWinner">
         <Setter Property="Template">
             <ControlTemplate>
@@ -369,3 +365,6 @@
         </Setter>
     </Style>
 </Styles>
+
+    
+    
