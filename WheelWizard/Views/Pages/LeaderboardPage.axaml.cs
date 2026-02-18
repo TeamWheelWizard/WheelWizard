@@ -21,6 +21,19 @@ namespace WheelWizard.Views.Pages;
 
 public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 {
+    private static readonly LeaderboardPlayerItem EmptyPodiumPlayer = new()
+    {
+        Rank = 0,
+        PlacementLabel = string.Empty,
+        Name = string.Empty,
+        FriendCode = string.Empty,
+        VrText = string.Empty,
+        PrimaryBadge = BadgeVariant.None,
+        HasBadge = false,
+        IsSuspicious = false,
+        IsEvenRow = true,
+    };
+
     private CancellationTokenSource? _loadCts;
 
     [Inject]
@@ -33,6 +46,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     private IGameLicenseSingletonService GameDataService { get; set; } = null!;
 
     private bool _hasLoadedOnce;
+    private bool _isLoading;
     private bool _hasError;
     private bool _hasNoData;
     private bool _hasData;
@@ -53,6 +67,18 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
                 return;
             _hasError = value;
             OnPropertyChanged(nameof(HasError));
+        }
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        private set
+        {
+            if (_isLoading == value)
+                return;
+            _isLoading = value;
+            OnPropertyChanged(nameof(IsLoading));
         }
     }
 
@@ -98,46 +124,25 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
     public LeaderboardPlayerItem? PodiumFirst
     {
-        get => _podiumFirst;
-        private set
-        {
-            if (_podiumFirst == value)
-                return;
-            _podiumFirst = value;
-            OnPropertyChanged(nameof(PodiumFirst));
-            OnPropertyChanged(nameof(HasPodiumFirst));
-        }
+        get => _podiumFirst ?? EmptyPodiumPlayer;
+        private set => SetPodiumPlayer(ref _podiumFirst, value, nameof(PodiumFirst), nameof(HasPodiumFirst));
     }
 
     public LeaderboardPlayerItem? PodiumSecond
     {
-        get => _podiumSecond;
-        private set
-        {
-            if (_podiumSecond == value)
-                return;
-            _podiumSecond = value;
-            OnPropertyChanged(nameof(PodiumSecond));
-            OnPropertyChanged(nameof(HasPodiumSecond));
-        }
+        get => _podiumSecond ?? EmptyPodiumPlayer;
+        private set => SetPodiumPlayer(ref _podiumSecond, value, nameof(PodiumSecond), nameof(HasPodiumSecond));
     }
 
     public LeaderboardPlayerItem? PodiumThird
     {
-        get => _podiumThird;
-        private set
-        {
-            if (_podiumThird == value)
-                return;
-            _podiumThird = value;
-            OnPropertyChanged(nameof(PodiumThird));
-            OnPropertyChanged(nameof(HasPodiumThird));
-        }
+        get => _podiumThird ?? EmptyPodiumPlayer;
+        private set => SetPodiumPlayer(ref _podiumThird, value, nameof(PodiumThird), nameof(HasPodiumThird));
     }
 
-    public bool HasPodiumFirst => PodiumFirst != null;
-    public bool HasPodiumSecond => PodiumSecond != null;
-    public bool HasPodiumThird => PodiumThird != null;
+    public bool HasPodiumFirst => _podiumFirst != null;
+    public bool HasPodiumSecond => _podiumSecond != null;
+    public bool HasPodiumThird => _podiumThird != null;
 
     public LeaderboardPage()
     {
@@ -181,6 +186,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
         SetLoadingState();
         ClearLeaderboardData();
+        await Task.Yield();
 
         var leaderboardResult = await LeaderboardService.GetTopPlayersAsync(50);
         if (cancellationToken.IsCancellationRequested)
@@ -204,7 +210,21 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        var mappedPlayers = orderedEntries.Select((entry, index) => CreateLeaderboardPlayer(entry.Entry, entry.Rank, index)).ToList();
+        List<LeaderboardPlayerItem> mappedPlayers;
+        try
+        {
+            mappedPlayers = await Task.Run(
+                () => orderedEntries.Select((entry, index) => CreateLeaderboardPlayer(entry.Entry, entry.Rank, index)).ToList(),
+                cancellationToken
+            );
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
 
         _loadedPlayerCount = mappedPlayers.Count;
         OnPropertyChanged(nameof(TotalPlayerCountText));
@@ -213,21 +233,12 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         PodiumSecond = mappedPlayers.ElementAtOrDefault(1);
         PodiumThird = mappedPlayers.ElementAtOrDefault(2);
 
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         foreach (var player in mappedPlayers.Skip(3))
         {
-            if (cancellationToken.IsCancellationRequested)
-                return;
-
             RemainingPlayers.Add(player);
-
-            try
-            {
-                await Task.Delay(12, cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
         }
 
         SetDataState();
@@ -279,19 +290,37 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(miiData))
             return null;
 
-        try
-        {
-            var result = MiiSerializer.Deserialize(miiData);
-            return result.IsSuccess ? result.Value : null;
-        }
-        catch
-        {
+        // Mii block payload should be ~100 base64 chars (74 bytes decoded).
+        // Guarding the size avoids expensive decode failures for large non-Mii payloads.
+        if (miiData.Length is < 90 or > 120)
             return null;
-        }
+
+        var buffer = new byte[MiiSerializer.MiiBlockSize];
+        if (!Convert.TryFromBase64String(miiData, buffer, out var bytesWritten) || bytesWritten != MiiSerializer.MiiBlockSize)
+            return null;
+
+        var result = MiiSerializer.Deserialize(buffer);
+        return result.IsSuccess ? result.Value : null;
+    }
+
+    private void SetPodiumPlayer(
+        ref LeaderboardPlayerItem? field,
+        LeaderboardPlayerItem? value,
+        string propertyName,
+        string hasPropertyName
+    )
+    {
+        if (field == value)
+            return;
+
+        field = value;
+        OnPropertyChanged(propertyName);
+        OnPropertyChanged(hasPropertyName);
     }
 
     private void SetLoadingState()
     {
+        IsLoading = true;
         HasError = false;
         HasNoData = false;
         HasData = false;
@@ -300,6 +329,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
     private void SetErrorState(string message)
     {
+        IsLoading = false;
         HasError = true;
         HasNoData = false;
         HasData = false;
@@ -308,6 +338,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
     private void SetEmptyState()
     {
+        IsLoading = false;
         HasError = false;
         HasNoData = true;
         HasData = false;
@@ -315,6 +346,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
     private void SetDataState()
     {
+        IsLoading = false;
         HasError = false;
         HasNoData = false;
         HasData = true;

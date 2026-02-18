@@ -84,12 +84,13 @@
                                 </ScrollViewer>
                             </Border>
 
-                            <Border Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"
+                            <Border x:Name="PART_TopLabelBadge"
+                                    Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"
                                     IsVisible="{TemplateBinding IsTopPlayer}"
-                                    Background="{StaticResource Primary600}"
                                     Padding="10,6" CornerRadius="8" Margin="0,0,10,0">
-                                <TextBlock Text="{TemplateBinding TopLabel}" FontWeight="SemiBold" FontSize="13"
-                                           Foreground="White" />
+                                <TextBlock x:Name="PART_TopLabelText"
+                                           Text="{TemplateBinding TopLabel}" FontWeight="SemiBold" FontSize="13"
+                                           />
                             </Border>
 
                             <PathIcon Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right"
@@ -105,5 +106,14 @@
                 </Border>
             </ControlTemplate>
         </Setter>
+    </Style>
+
+    <Style Selector="components|PlayerListItem /template/ Border#PART_TopLabelBadge">
+        <Setter Property="Background" Value="{StaticResource Primary600}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="components|PlayerListItem /template/ TextBlock#PART_TopLabelText">
+        <Setter Property="Foreground" Value="White" />
     </Style>
 </Styles>

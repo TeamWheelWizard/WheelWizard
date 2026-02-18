@@ -55,6 +55,14 @@
         <Style Selector="components|PlayerListItem:pointerover /template/ Border.BoxItemBackground">
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
+        <Style Selector="components|PlayerListItem /template/ Border#PART_TopLabelBadge">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="components|PlayerListItem /template/ TextBlock#PART_TopLabelText">
+            <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
+        </Style>
     </UserControl.Styles>
 
     <Grid>
@@ -90,6 +98,21 @@
         </Grid>
 
         <Grid Grid.Row="1">
+            <StackPanel IsVisible="{Binding IsLoading}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="20"
+                        Spacing="10">
+                <components:LoadingIcon Width="68"
+                                        Height="68"
+                                        Foreground="{StaticResource Neutral700}"
+                                        HorizontalAlignment="Center" />
+                <TextBlock Text="Loading leaderboard..."
+                           Classes="BodyText"
+                           FontSize="14"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
             <StackPanel IsVisible="{Binding HasError}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
@@ -221,8 +244,8 @@
                                                            Mii="{Binding FirstMii}"
                                                            IsOpenHost="{Binding IsOpenHost}"
                                                            HasBadges="{Binding HasBadges}"
-                                                           IsTopPlayer="False"
-                                                           TopLabel="">
+                                                           IsTopPlayer="True"
+                                                           TopLabel="{Binding TopLabel}">
                                     <components:PlayerListItem.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
