@@ -15,6 +15,8 @@ public sealed class LeaderboardPlayerItem
     public bool HasBadge { get; init; }
     public bool IsSuspicious { get; init; }
     public bool IsEvenRow { get; init; }
+    public bool IsFriend { get; init; }
+    public bool IsOnline { get; init; }
 
     // Keep parity with RoomDetailsPage player template bindings.
     public string VrDisplay => VrText;

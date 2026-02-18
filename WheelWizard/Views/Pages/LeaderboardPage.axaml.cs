@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.Resources.Languages;
 using WheelWizard.RrRooms;
+using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.Generators;
@@ -204,6 +205,16 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             .Take(50)
             .ToList();
 
+        var friendProfileIds = GameDataService
+            .ActiveCurrentFriends.Select(friend => FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode))
+            .Where(profileId => profileId != 0)
+            .ToHashSet();
+        var onlineProfileIds = RRLiveRooms
+            .Instance.CurrentRooms.SelectMany(room => room.Players)
+            .Select(player => FriendCodeGenerator.FriendCodeToProfileId(player.FriendCode))
+            .Where(profileId => profileId != 0)
+            .ToHashSet();
+
         if (orderedEntries.Count == 0)
         {
             SetEmptyState();
@@ -214,7 +225,12 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         try
         {
             mappedPlayers = await Task.Run(
-                () => orderedEntries.Select((entry, index) => CreateLeaderboardPlayer(entry.Entry, entry.Rank, index)).ToList(),
+                () =>
+                    orderedEntries
+                        .Select(
+                            (entry, index) => CreateLeaderboardPlayer(entry.Entry, entry.Rank, index, friendProfileIds, onlineProfileIds)
+                        )
+                        .ToList(),
                 cancellationToken
             );
         }
@@ -244,9 +260,16 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         SetDataState();
     }
 
-    private LeaderboardPlayerItem CreateLeaderboardPlayer(RwfcLeaderboardEntry entry, int rank, int index)
+    private LeaderboardPlayerItem CreateLeaderboardPlayer(
+        RwfcLeaderboardEntry entry,
+        int rank,
+        int index,
+        IReadOnlySet<uint> friendProfileIds,
+        IReadOnlySet<uint> onlineProfileIds
+    )
     {
         var friendCode = entry.FriendCode ?? string.Empty;
+        var profileId = FriendCodeGenerator.FriendCodeToProfileId(friendCode);
         var badges = string.IsNullOrWhiteSpace(friendCode) ? [] : BadgeService.GetBadges(friendCode);
         var primaryBadge = badges.FirstOrDefault(BadgeVariant.None);
 
@@ -262,6 +285,8 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             HasBadge = primaryBadge != BadgeVariant.None,
             IsSuspicious = entry.IsSuspicious,
             IsEvenRow = index % 2 == 0,
+            IsFriend = profileId != 0 && friendProfileIds.Contains(profileId),
+            IsOnline = profileId != 0 && onlineProfileIds.Contains(profileId),
         };
     }
 
@@ -482,6 +507,23 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
         ViewUtils.GetLayout().UpdateFriendCount();
         ViewUtils.ShowSnackbar($"Added {player.Name} to your friend list.");
+    }
+
+    private void JoinRoom_OnClick(string friendCode)
+    {
+        if (string.IsNullOrWhiteSpace(friendCode))
+            return;
+
+        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        {
+            if (room.Players.All(player => player.FriendCode != friendCode))
+                continue;
+
+            NavigationManager.NavigateTo<RoomDetailsPage>(room);
+            return;
+        }
+
+        ViewUtils.ShowSnackbar("Could not find an active room for this player.", ViewUtils.SnackbarType.Warning);
     }
 
     private static LeaderboardPlayerItem? GetContextPlayer(object sender)
