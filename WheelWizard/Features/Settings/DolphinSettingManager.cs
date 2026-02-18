@@ -1,10 +1,10 @@
-using WheelWizard.Helpers;
+using System.IO.Abstractions;
 using WheelWizard.Models.Settings;
 using WheelWizard.Services;
 
 namespace WheelWizard.Settings;
 
-public class DolphinSettingManager : IDolphinSettingManager
+public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingManager
 {
     private static string ConfigFolderPath(string fileName) => Path.Combine(PathManager.ConfigFolderPath, fileName);
 
@@ -69,7 +69,7 @@ public class DolphinSettingManager : IDolphinSettingManager
             settingsSnapshot = [.. _settings];
         }
 
-        if (!FileHelper.DirectoryExists(PathManager.ConfigFolderPath))
+        if (!fileSystem.Directory.Exists(PathManager.ConfigFolderPath))
             return;
 
         // TODO: This method can maybe be optimized in the future, since now it reads the file for every setting
@@ -87,14 +87,23 @@ public class DolphinSettingManager : IDolphinSettingManager
         }
     }
 
-    private static string[]? ReadIniFile(string fileName)
+    private string[]? ReadIniFile(string fileName)
     {
         var filePath = ConfigFolderPath(fileName);
-        var lines = FileHelper.ReadAllLinesSafe(filePath);
-        return lines;
+        if (!fileSystem.File.Exists(filePath))
+            return null;
+
+        try
+        {
+            return fileSystem.File.ReadAllLines(filePath);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
-    private static string? ReadIniSetting(string fileName, string section, string settingToRead)
+    private string? ReadIniSetting(string fileName, string section, string settingToRead)
     {
         var lines = ReadIniFile(fileName);
         if (lines == null)
@@ -125,7 +134,7 @@ public class DolphinSettingManager : IDolphinSettingManager
     }
 
     // TODO: find out when to use `setting=value` and when to use `setting = value`
-    private static void ChangeIniSettings(string fileName, string section, string settingToChange, string value)
+    private void ChangeIniSettings(string fileName, string section, string settingToChange, string value)
     {
         var lines = ReadIniFile(fileName)?.ToList();
         if (lines == null)
@@ -136,7 +145,7 @@ public class DolphinSettingManager : IDolphinSettingManager
         {
             lines.Add($"[{section}]");
             lines.Add($"{settingToChange} = {value}");
-            FileHelper.WriteAllLines(ConfigFolderPath(fileName), lines);
+            fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
             return;
         }
 
@@ -150,12 +159,12 @@ public class DolphinSettingManager : IDolphinSettingManager
                 continue;
 
             lines[i] = $"{settingToChange} = {value}";
-            FileHelper.WriteAllLines(ConfigFolderPath(fileName), lines);
+            fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
             return;
         }
         // you only get here if the setting was not found in the section
 
         lines.Insert(sectionIndex + 1, $"{settingToChange} = {value}");
-        FileHelper.WriteAllLines(ConfigFolderPath(fileName), lines);
+        fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
     }
 }

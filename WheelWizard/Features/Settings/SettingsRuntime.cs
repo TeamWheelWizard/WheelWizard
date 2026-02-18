@@ -1,5 +1,8 @@
 namespace WheelWizard.Settings;
 
+// TODO: This file is temporary. 
+//  it serves as a bridge for legacy code that cannot get constructor injection (like PathManager or NaviagtionManager).
+//  Once those are all one day migrated or removed, we can and MUST remove this Runtime
 public static class SettingsRuntime
 {
     private static readonly object SyncRoot = new();

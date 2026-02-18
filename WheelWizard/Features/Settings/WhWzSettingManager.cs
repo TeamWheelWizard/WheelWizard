@@ -1,12 +1,12 @@
+using System.IO.Abstractions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using WheelWizard.Services;
 
 namespace WheelWizard.Settings;
 
-public class WhWzSettingManager(ILogger<WhWzSettingManager> logger) : IWhWzSettingManager
+public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem fileSystem) : IWhWzSettingManager
 {
     private readonly object _syncRoot = new();
     private readonly object _fileIoSync = new();
@@ -45,7 +45,19 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger) : IWhWzSetti
         var jsonString = JsonSerializer.Serialize(settingsToSave, new JsonSerializerOptions { WriteIndented = true });
         lock (_fileIoSync)
         {
-            FileHelper.WriteAllTextSafe(PathManager.WheelWizardConfigFilePath, jsonString);
+            var configPath = PathManager.WheelWizardConfigFilePath;
+            try
+            {
+                var directoryPath = fileSystem.Path.GetDirectoryName(configPath);
+                if (!string.IsNullOrWhiteSpace(directoryPath) && !fileSystem.Directory.Exists(directoryPath))
+                    fileSystem.Directory.CreateDirectory(directoryPath);
+
+                fileSystem.File.WriteAllText(configPath, jsonString);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to save settings file: {Path}", configPath);
+            }
         }
     }
 
@@ -65,7 +77,16 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger) : IWhWzSetti
         string? jsonString;
         lock (_fileIoSync)
         {
-            jsonString = FileHelper.ReadAllTextSafe(PathManager.WheelWizardConfigFilePath);
+            var configPath = PathManager.WheelWizardConfigFilePath;
+            try
+            {
+                jsonString = fileSystem.File.Exists(configPath) ? fileSystem.File.ReadAllText(configPath) : null;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to read settings file: {Path}", configPath);
+                jsonString = null;
+            }
         }
 
         if (jsonString == null)
@@ -79,12 +100,20 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger) : IWhWzSetti
 
             foreach (var kvp in loadedSettings)
             {
-                settingsSnapshot.TryGetValue(kvp.Key, out var setting);
-
-                if (setting == null)
+                if (!settingsSnapshot.TryGetValue(kvp.Key, out var setting))
                     continue;
 
-                setting.SetFromJson(kvp.Value, skipSave: true);
+                try
+                {
+                    var success = setting.SetFromJson(kvp.Value, skipSave: true);
+                    if (!success)
+                        setting.Set(setting.DefaultValue, skipSave: true);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "Invalid value for setting {SettingName}; resetting to default.", setting.Name);
+                    setting.Set(setting.DefaultValue, skipSave: true);
+                }
             }
         }
         catch (JsonException e)

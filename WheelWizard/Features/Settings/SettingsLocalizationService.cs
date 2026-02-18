@@ -1,12 +1,13 @@
 using System.Globalization;
-using WheelWizard.Models.Settings;
 
 namespace WheelWizard.Settings;
 
-public sealed class SettingsLocalizationService(ISettingsManager settingsManager) : ISettingsLocalizationService, ISettingListener
+public sealed class SettingsLocalizationService(ISettingsManager settingsManager, ISettingsSignalBus settingsSignalBus)
+    : ISettingsLocalizationService
 {
     private readonly object _syncRoot = new();
     private bool _initialized;
+    private IDisposable? _subscription;
 
     public void Initialize()
     {
@@ -15,15 +16,15 @@ public sealed class SettingsLocalizationService(ISettingsManager settingsManager
             if (_initialized)
                 return;
 
-            settingsManager.WW_LANGUAGE.Subscribe(this);
+            _subscription = settingsSignalBus.Subscribe(OnSignal);
             ApplyCulture();
             _initialized = true;
         }
     }
 
-    public void OnSettingChanged(Setting setting)
+    private void OnSignal(SettingChangedSignal signal)
     {
-        if (setting == settingsManager.WW_LANGUAGE)
+        if (signal.Setting == settingsManager.WW_LANGUAGE)
             ApplyCulture();
     }
 

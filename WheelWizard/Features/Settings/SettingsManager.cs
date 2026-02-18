@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
@@ -13,6 +14,7 @@ public class SettingsManager : ISettingsManager
     private readonly IWhWzSettingManager _whWzSettingManager;
     private readonly IDolphinSettingManager _dolphinSettingManager;
     private readonly ILinuxDolphinInstaller _linuxDolphinInstaller;
+    private readonly IFileSystem _fileSystem;
 
     private readonly Setting _dolphinCompilationMode;
     private readonly Setting _dolphinCompileShadersAtStart;
@@ -25,12 +27,14 @@ public class SettingsManager : ISettingsManager
     public SettingsManager(
         IWhWzSettingManager whWzSettingManager,
         IDolphinSettingManager dolphinSettingManager,
-        ILinuxDolphinInstaller linuxDolphinInstaller
+        ILinuxDolphinInstaller linuxDolphinInstaller,
+        IFileSystem fileSystem
     )
     {
         _whWzSettingManager = whWzSettingManager;
         _dolphinSettingManager = dolphinSettingManager;
         _linuxDolphinInstaller = linuxDolphinInstaller;
+        _fileSystem = fileSystem;
 
         DOLPHIN_LOCATION = RegisterWhWz(
             CreateWhWzSetting(typeof(string), "DolphinLocation", "")
@@ -55,7 +59,7 @@ public class SettingsManager : ISettingsManager
                         return EnvHelper.IsValidUnixCommand(pathOrCommand);
                     }
 
-                    return FileHelper.FileExists(pathOrCommand);
+                    return _fileSystem.File.Exists(pathOrCommand);
                 })
         );
 
@@ -64,7 +68,7 @@ public class SettingsManager : ISettingsManager
                 .SetValidation(value =>
                 {
                     var userFolderPath = value as string ?? string.Empty;
-                    if (!FileHelper.DirectoryExists(userFolderPath))
+                    if (!_fileSystem.Directory.Exists(userFolderPath))
                         return false;
 
                     string dolphinLocation = Get<string>(DOLPHIN_LOCATION);
@@ -78,11 +82,11 @@ public class SettingsManager : ISettingsManager
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && PathManager.IsLinuxDolphinConfigSplit())
                     {
                         // In this case, Dolphin would use `EMBEDDED_USER_DIR` (portable `user` directory).
-                        if (FileHelper.DirectoryExists("user"))
+                        if (_fileSystem.Directory.Exists("user"))
                             return false;
 
                         // The Dolphin executable directory with `portable.txt` case
-                        if (FileHelper.FileExists(Path.Combine(PathManager.GetDolphinExeDirectory(), "portable.txt")))
+                        if (_fileSystem.File.Exists(Path.Combine(PathManager.GetDolphinExeDirectory(), "portable.txt")))
                             return false;
 
                         // The value of this environment variable would be used instead if it was somehow set
@@ -95,7 +99,10 @@ public class SettingsManager : ISettingsManager
                             return false;
 
                         // `~/.dolphin-emu` would be used if it exists
-                        if (!PathManager.IsFlatpakDolphinFilePath() && FileHelper.DirectoryExists(PathManager.LinuxDolphinLegacyFolderPath))
+                        if (
+                            !PathManager.IsFlatpakDolphinFilePath()
+                            && _fileSystem.Directory.Exists(PathManager.LinuxDolphinLegacyFolderPath)
+                        )
                             return false;
                     }
 
@@ -105,7 +112,7 @@ public class SettingsManager : ISettingsManager
 
         GAME_LOCATION = RegisterWhWz(
             CreateWhWzSetting(typeof(string), "GameLocation", "")
-                .SetValidation(value => FileHelper.FileExists(value as string ?? string.Empty))
+                .SetValidation(value => _fileSystem.File.Exists(value as string ?? string.Empty))
         );
         FORCE_WIIMOTE = RegisterWhWz(CreateWhWzSetting(typeof(bool), "ForceWiimote", false));
         LAUNCH_WITH_DOLPHIN = RegisterWhWz(CreateWhWzSetting(typeof(bool), "LaunchWithDolphin", false));
@@ -129,12 +136,12 @@ public class SettingsManager : ISettingsManager
 
         NAND_ROOT_PATH = RegisterDolphin(
             CreateDolphinSetting(typeof(string), ("Dolphin.ini", "General", "NANDRootPath"), "")
-                .SetValidation(value => Directory.Exists(value as string ?? string.Empty))
+                .SetValidation(value => _fileSystem.Directory.Exists(value as string ?? string.Empty))
         );
 
         LOAD_PATH = RegisterDolphin(
             CreateDolphinSetting(typeof(string), ("Dolphin.ini", "General", "LoadPath"), "")
-                .SetValidation(value => Directory.Exists(value as string ?? string.Empty))
+                .SetValidation(value => _fileSystem.Directory.Exists(value as string ?? string.Empty))
         );
 
         VSYNC = RegisterDolphin(CreateDolphinSetting(typeof(bool), ("GFX.ini", "Hardware", "VSync"), false));

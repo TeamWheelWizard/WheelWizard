@@ -1,18 +1,21 @@
+using WheelWizard.Settings;
+
 namespace WheelWizard.Models.Settings;
 
-public class VirtualSetting : Setting, ISettingListener
+public class VirtualSetting : Setting
 {
     private Setting[] _dependencies;
-    private Action<object> Setter;
-    private Func<object> Getter;
+    private readonly Action<object> _setter;
+    private readonly Func<object> _getter;
     private bool _acceptsSignals = true;
+    private IDisposable? _signalSubscription;
 
     public VirtualSetting(Type type, Action<object> setter, Func<object> getter)
         : base(type, "virtual", getter())
     {
         _dependencies = [];
-        Setter = setter;
-        Getter = getter;
+        _setter = setter;
+        _getter = getter;
     }
 
     protected override bool SetInternal(object newValue, bool skipSave = false)
@@ -25,7 +28,7 @@ public class VirtualSetting : Setting, ISettingListener
         var succeeded = false;
         if (newIsValid)
         {
-            Setter(newValue);
+            _setter(newValue);
             succeeded = true;
         }
         else
@@ -48,22 +51,26 @@ public class VirtualSetting : Setting, ISettingListener
             throw new ArgumentException("Dependencies have already been set once");
 
         _dependencies = dependencies;
-        foreach (var dependency in dependencies)
+        SettingsSignalRuntime.OnInitialized(signalBus =>
         {
-            dependency.Subscribe(this);
-        }
+            _signalSubscription?.Dispose();
+            _signalSubscription = signalBus.Subscribe(OnSignal);
+        });
 
         return this;
     }
 
     public void Recalculate()
     {
-        Value = Getter();
+        Value = _getter();
     }
 
-    public void OnSettingChanged(Setting changedSetting)
+    private void OnSignal(SettingChangedSignal signal)
     {
         if (!_acceptsSignals)
+            return;
+
+        if (!_dependencies.Contains(signal.Setting))
             return;
 
         SignalChange();

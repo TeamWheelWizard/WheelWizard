@@ -1,3 +1,5 @@
+using WheelWizard.Settings;
+
 namespace WheelWizard.Models.Settings;
 
 public abstract class Setting
@@ -59,8 +61,10 @@ public abstract class Setting
         return this;
     }
 
+    [Obsolete("Use ISettingsSignalBus subscriptions instead of direct setting subscriptions.")]
     public bool Unsubscribe(ISettingListener dependent) => DependentVirtualSettings.Remove(dependent);
 
+    [Obsolete("Use ISettingsSignalBus subscriptions instead of direct setting subscriptions.")]
     public void Subscribe(ISettingListener dependent)
     {
         if (!DependentVirtualSettings.Contains(dependent))
@@ -69,6 +73,8 @@ public abstract class Setting
 
     protected void SignalChange()
     {
+        SettingsSignalRuntime.Publish(this);
+
         foreach (var dependent in DependentVirtualSettings)
         {
             dependent.OnSettingChanged(this);
