@@ -201,7 +201,21 @@
                                                                   Mii="{Binding PodiumSecond.Mii}"
                                                                   ShowBadge="{Binding PodiumSecond.HasBadge}"
                                                                   BadgeVariant="{Binding PodiumSecond.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumSecond.IsSuspicious}" />
+                                                                  IsSuspicious="{Binding PodiumSecond.IsSuspicious}">
+                                    <components:LeaderboardPodiumCard.ContextMenu>
+                                        <ContextMenu DataContext="{Binding PodiumSecond}">
+                                            <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
+                                                      Click="CopyFriendCode_OnClick" />
+                                            <MenuItem Header="{x:Static lang:Common.Action_ViewMii}"
+                                                      Click="OpenCarousel_OnClick" />
+                                            <MenuItem Header="Add Friend"
+                                                      Click="AddFriend_OnClick" />
+                                            <Separator />
+                                            <MenuItem Header="View Profile"
+                                                      Click="ViewProfile_OnClick" />
+                                        </ContextMenu>
+                                    </components:LeaderboardPodiumCard.ContextMenu>
+                                </components:LeaderboardPodiumCard>
 
                                 <components:LeaderboardPodiumCard Grid.Column="1"
                                                                   Grid.Row="0"
@@ -216,7 +230,21 @@
                                                                   Mii="{Binding PodiumFirst.Mii}"
                                                                   ShowBadge="{Binding PodiumFirst.HasBadge}"
                                                                   BadgeVariant="{Binding PodiumFirst.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumFirst.IsSuspicious}" />
+                                                                  IsSuspicious="{Binding PodiumFirst.IsSuspicious}">
+                                    <components:LeaderboardPodiumCard.ContextMenu>
+                                        <ContextMenu DataContext="{Binding PodiumFirst}">
+                                            <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
+                                                      Click="CopyFriendCode_OnClick" />
+                                            <MenuItem Header="{x:Static lang:Common.Action_ViewMii}"
+                                                      Click="OpenCarousel_OnClick" />
+                                            <MenuItem Header="Add Friend"
+                                                      Click="AddFriend_OnClick" />
+                                            <Separator />
+                                            <MenuItem Header="View Profile"
+                                                      Click="ViewProfile_OnClick" />
+                                        </ContextMenu>
+                                    </components:LeaderboardPodiumCard.ContextMenu>
+                                </components:LeaderboardPodiumCard>
 
                                 <components:LeaderboardPodiumCard Grid.Column="2"
                                                                   Grid.Row="0"
@@ -230,7 +258,21 @@
                                                                   Mii="{Binding PodiumThird.Mii}"
                                                                   ShowBadge="{Binding PodiumThird.HasBadge}"
                                                                   BadgeVariant="{Binding PodiumThird.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumThird.IsSuspicious}" />
+                                                                  IsSuspicious="{Binding PodiumThird.IsSuspicious}">
+                                    <components:LeaderboardPodiumCard.ContextMenu>
+                                        <ContextMenu DataContext="{Binding PodiumThird}">
+                                            <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
+                                                      Click="CopyFriendCode_OnClick" />
+                                            <MenuItem Header="{x:Static lang:Common.Action_ViewMii}"
+                                                      Click="OpenCarousel_OnClick" />
+                                            <MenuItem Header="Add Friend"
+                                                      Click="AddFriend_OnClick" />
+                                            <Separator />
+                                            <MenuItem Header="View Profile"
+                                                      Click="ViewProfile_OnClick" />
+                                        </ContextMenu>
+                                    </components:LeaderboardPodiumCard.ContextMenu>
+                                </components:LeaderboardPodiumCard>
                             </Grid>
                         </Grid>
                     </Border>
