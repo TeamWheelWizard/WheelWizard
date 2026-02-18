@@ -1,8 +1,6 @@
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
-using WheelWizard.Views;
 #if WINDOWS
 using Microsoft.Win32;
 #endif
@@ -11,7 +9,7 @@ namespace WheelWizard.Services;
 
 public static class PathManager
 {
-    private static ISettingsManager Settings => App.Services.GetRequiredService<ISettingsManager>();
+    private static ISettingsManager Settings => SettingsRuntime.Current;
 
     // IMPORTANT: To keep things consistent all paths should be Attrib expressions,
     //            and either end with `FilePath` or `FolderPath`

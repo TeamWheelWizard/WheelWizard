@@ -135,7 +135,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return;
         }
 
-        var focusedUserIndex = SettingsService.FocussedUser.Get();
+        var focusedUserIndex = SettingsService.FocusedUser.Get();
         if (focusedUserIndex is < 0 or > 3)
         {
             ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);

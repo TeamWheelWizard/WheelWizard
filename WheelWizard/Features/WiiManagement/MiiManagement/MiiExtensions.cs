@@ -1,13 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using WheelWizard.Settings;
-using WheelWizard.Views;
+﻿using WheelWizard.Settings;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
 
 public static class MiiExtensions
 {
-    private static ISettingsManager Settings => App.Services.GetRequiredService<ISettingsManager>();
+    private static ISettingsManager Settings => SettingsRuntime.Current;
 
     private static readonly DateTime MiiIdEpochUtc = new(2006, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private const uint MiiIdCounterMask = 0x1FFFFFFF;

@@ -11,6 +11,9 @@ public partial class AppInfo : UserControlBase
     [Inject]
     private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
 
+    [Inject]
+    private IBrandingSingletonService BrandingSingletonService { get; set; } = null!;
+
     public AppInfo()
     {
         InitializeComponent();
@@ -46,7 +49,7 @@ public partial class AppInfo : UserControlBase
 
     protected override void OnInitialized()
     {
-        var branding = App.Services.GetRequiredService<IBrandingSingletonService>().Branding;
+        var branding = BrandingSingletonService.Branding;
         WhWzVersionText.Text = $"WhWz: v{branding.Version}";
         base.OnInitialized();
     }

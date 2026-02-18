@@ -6,11 +6,13 @@ using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
 using WheelWizard.CustomCharacters;
 using WheelWizard.CustomDistributions;
+using WheelWizard.DolphinInstaller;
 using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
 using WheelWizard.MiiImages;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.Launcher;
+using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Services;
 using WheelWizard.WheelWizardData;
@@ -27,6 +29,7 @@ public static class SetupExtensions
     public static void AddWheelWizardServices(this IServiceCollection services)
     {
         // Features
+        services.AddDolphinInstaller();
         services.AddSettings();
         services.AddCustomCharacters();
         services.AddAutoUpdating();
@@ -53,5 +56,7 @@ public static class SetupExtensions
         services.AddTransient(typeof(IApiCaller<>), typeof(ApiCaller<>));
         services.AddTransient<RrLauncher>();
         services.AddTransient<RrBetaLauncher>();
+        services.AddSingleton<WhWzStatusManager>();
+        services.AddSingleton<RRLiveRooms>();
     }
 }

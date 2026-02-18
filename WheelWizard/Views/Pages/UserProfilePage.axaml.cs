@@ -113,13 +113,13 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     }
 
     private int _currentUserIndex;
-    private int FocussedUser => SettingsService.FocussedUser.Get();
+    private int FocusedUser => SettingsService.FocusedUser.Get();
 
     public UserProfilePage()
     {
         InitializeComponent();
         ResetMiiTopBar();
-        ViewMii(FocussedUser);
+        ViewMii(FocusedUser);
         PopulateRegions();
         UpdatePage();
         DataContext = this;
@@ -201,7 +201,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void UpdatePage()
     {
-        PrimaryCheckBox.IsChecked = FocussedUser == _currentUserIndex;
+        PrimaryCheckBox.IsChecked = FocusedUser == _currentUserIndex;
 
         currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
         CurrentFriendCode = currentPlayer.FriendCode;
@@ -241,10 +241,10 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void SetUserAsPrimary()
     {
-        if (FocussedUser == _currentUserIndex)
+        if (FocusedUser == _currentUserIndex)
             return;
 
-        SettingsService.Set(SettingsService.FOCUSSED_USER, _currentUserIndex);
+        SettingsService.Set(SettingsService.FOCUSED_USER, _currentUserIndex);
 
         PrimaryCheckBox.IsChecked = true;
         // Even though it's true when this method is called, we still set it to true,

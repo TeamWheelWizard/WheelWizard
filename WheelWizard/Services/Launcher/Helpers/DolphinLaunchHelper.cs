@@ -1,17 +1,15 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.DependencyInjection;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
-using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Services.Launcher.Helpers;
 
 public static class DolphinLaunchHelper
 {
-    private static ISettingsManager Settings => App.Services.GetRequiredService<ISettingsManager>();
+    private static ISettingsManager Settings => SettingsRuntime.Current;
 
     public static void KillDolphin() //dont tell PETA
     {

@@ -8,57 +8,83 @@ public class DolphinSettingManager : IDolphinSettingManager
 {
     private static string ConfigFolderPath(string fileName) => Path.Combine(PathManager.ConfigFolderPath, fileName);
 
+    private readonly object _syncRoot = new();
+    private readonly object _fileIoSync = new();
     private bool _loaded;
     private readonly List<DolphinSetting> _settings = [];
 
     public void RegisterSetting(DolphinSetting setting)
     {
-        if (_loaded)
-            return;
+        lock (_syncRoot)
+        {
+            if (_loaded)
+                return;
 
-        _settings.Add(setting);
+            _settings.Add(setting);
+        }
     }
 
     public void SaveSettings(DolphinSetting invokingSetting)
     {
-        // TODO: This method definitely has to be optimized
-        if (!_loaded)
-            return;
-
-        foreach (var setting in _settings)
+        List<DolphinSetting> settingsSnapshot;
+        lock (_syncRoot)
         {
-            ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
+            // TODO: This method definitely has to be optimized
+            if (!_loaded)
+                return;
+
+            settingsSnapshot = [.. _settings];
+        }
+
+        lock (_fileIoSync)
+        {
+            foreach (var setting in settingsSnapshot)
+            {
+                ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
+            }
         }
     }
 
     public void ReloadSettings()
     {
-        // TODO: this method could also be optimized by checking if the previously loaded directory
-        //       is still the current ConfigFolderPath and if so, just not run the LoadSettings method again
-        _loaded = false;
+        lock (_syncRoot)
+        {
+            // TODO: this method could also be optimized by checking if the previously loaded directory
+            //       is still the current ConfigFolderPath and if so, just not run the LoadSettings method again
+            _loaded = false;
+        }
+
         LoadSettings();
     }
 
     public void LoadSettings()
     {
-        if (_loaded)
-            return;
+        List<DolphinSetting> settingsSnapshot;
+        lock (_syncRoot)
+        {
+            if (_loaded)
+                return;
+
+            _loaded = true;
+            settingsSnapshot = [.. _settings];
+        }
 
         if (!FileHelper.DirectoryExists(PathManager.ConfigFolderPath))
             return;
 
         // TODO: This method can maybe be optimized in the future, since now it reads the file for every setting
         //       and on top of that for reach setting it loops over each line and section and stuff like that.
-        foreach (var setting in _settings)
+        lock (_fileIoSync)
         {
-            var value = ReadIniSetting(setting.FileName, setting.Section, setting.Name);
-            if (value == null)
-                ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
-            else
-                setting.SetFromString(value, true); // we read it, which means there is no purpose in saving it again
+            foreach (var setting in settingsSnapshot)
+            {
+                var value = ReadIniSetting(setting.FileName, setting.Section, setting.Name);
+                if (value == null)
+                    ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
+                else
+                    setting.SetFromString(value, true); // we read it, which means there is no purpose in saving it again
+            }
         }
-
-        _loaded = true;
     }
 
     private static string[]? ReadIniFile(string fileName)

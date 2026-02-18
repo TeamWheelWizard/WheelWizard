@@ -7,6 +7,7 @@ public static class SettingsExtensions
         services.AddSingleton<IWhWzSettingManager, WhWzSettingManager>();
         services.AddSingleton<IDolphinSettingManager, DolphinSettingManager>();
         services.AddSingleton<ISettingsManager, SettingsManager>();
+        services.AddSingleton<ISettingsLocalizationService, SettingsLocalizationService>();
         services.AddSingleton<ISettingsStartupInitializer, SettingsStartupInitializer>();
 
         return services;

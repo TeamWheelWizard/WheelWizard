@@ -7,6 +7,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using HarfBuzzSharp;
 using Serilog;
+using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
@@ -32,6 +33,9 @@ public partial class WhWzSettings : UserControlBase
 
     [Inject]
     private IDolphinSettingManager DolphinSettingsService { get; set; } = null!;
+
+    [Inject]
+    private ILinuxDolphinInstaller LinuxDolphinInstallerService { get; set; } = null!;
 
     public WhWzSettings()
     {
@@ -146,11 +150,15 @@ public partial class WhWzSettings : UserControlBase
                     TogglePathSettings(true);
                     progressWindow.Show();
                     var progress = new Progress<int>(progressWindow.UpdateProgress);
-                    var success = await LinuxDolphinInstaller.InstallFlatpakDolphin(progress);
+                    var installResult = await LinuxDolphinInstallerService.InstallFlatpakDolphin(progress);
                     progressWindow.Close();
-                    if (!success)
+                    if (installResult.IsFailure)
                     {
-                        await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Error_FailedInstallDolphin);
+                        await new MessageBoxWindow()
+                            .SetMessageType(MessageBoxWindow.MessageType.Error)
+                            .SetTitleText("Failed to install Dolphin")
+                            .SetInfoText(installResult.Error.Message)
+                            .ShowDialog();
                         return;
                     }
 
@@ -219,7 +227,7 @@ public partial class WhWzSettings : UserControlBase
 
     private bool IsFlatpakDolphinInstalled()
     {
-        return LinuxDolphinInstaller.IsDolphinInstalledInFlatpak();
+        return LinuxDolphinInstallerService.IsDolphinInstalledInFlatpak();
     }
 
     private async void GameLocationBrowse_OnClick(object sender, RoutedEventArgs e)

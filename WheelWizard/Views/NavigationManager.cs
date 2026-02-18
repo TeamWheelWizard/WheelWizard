@@ -1,13 +1,12 @@
 using System.Globalization;
 using Avalonia.Controls;
-using Microsoft.Extensions.DependencyInjection;
 using WheelWizard.Settings;
 
 namespace WheelWizard.Views;
 
 public static class NavigationManager
 {
-    private static ISettingsManager Settings => App.Services.GetRequiredService<ISettingsManager>();
+    private static ISettingsManager Settings => SettingsRuntime.Current;
 
     public static void NavigateTo(Type pageType, params object?[] args)
     {

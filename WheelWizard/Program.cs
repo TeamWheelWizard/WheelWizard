@@ -69,7 +69,7 @@ public class Program : IDesignerEntryPoint
             // Make sure this comes AFTER setting the service provider
             // of the `App` instance! Otherwise, things like logging will not work
             // in `Setup`.
-            Setup();
+            Setup(serviceProvider);
         });
 
         return builder;
@@ -106,9 +106,9 @@ public class Program : IDesignerEntryPoint
         }
     }
 
-    private static void Setup()
+    private static void Setup(IServiceProvider serviceProvider)
     {
-        App.Services.GetRequiredService<ISettingsStartupInitializer>().Initialize();
+        serviceProvider.GetRequiredService<ISettingsStartupInitializer>().Initialize();
         UrlProtocolManager.SetWhWzScheme();
     }
 }

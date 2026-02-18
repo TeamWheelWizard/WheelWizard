@@ -8,41 +8,66 @@ namespace WheelWizard.Settings;
 
 public class WhWzSettingManager(ILogger<WhWzSettingManager> logger) : IWhWzSettingManager
 {
+    private readonly object _syncRoot = new();
+    private readonly object _fileIoSync = new();
     private bool _loaded;
     private readonly Dictionary<string, WhWzSetting> _settings = new();
 
     public void RegisterSetting(WhWzSetting setting)
     {
-        if (_loaded)
-            return;
+        lock (_syncRoot)
+        {
+            if (_loaded)
+                return;
 
-        _settings[setting.Name] = setting;
+            _settings[setting.Name] = setting;
+        }
     }
 
     public void SaveSettings(WhWzSetting invokingSetting)
     {
-        if (!_loaded)
-            return;
+        Dictionary<string, WhWzSetting> settingsSnapshot;
+        lock (_syncRoot)
+        {
+            if (!_loaded)
+                return;
+
+            settingsSnapshot = new(_settings);
+        }
 
         var settingsToSave = new Dictionary<string, object?>();
 
-        foreach (var (name, setting) in _settings)
+        foreach (var (name, setting) in settingsSnapshot)
         {
             settingsToSave[name] = setting.Get();
         }
 
         var jsonString = JsonSerializer.Serialize(settingsToSave, new JsonSerializerOptions { WriteIndented = true });
-        FileHelper.WriteAllTextSafe(PathManager.WheelWizardConfigFilePath, jsonString);
+        lock (_fileIoSync)
+        {
+            FileHelper.WriteAllTextSafe(PathManager.WheelWizardConfigFilePath, jsonString);
+        }
     }
 
     public void LoadSettings()
     {
-        if (_loaded)
-            return;
+        Dictionary<string, WhWzSetting> settingsSnapshot;
+        lock (_syncRoot)
+        {
+            if (_loaded)
+                return;
 
-        _loaded = true;
-        // even if it will now return early, that means its still done loading since then there is nothing to load
-        var jsonString = FileHelper.ReadAllTextSafe(PathManager.WheelWizardConfigFilePath);
+            _loaded = true;
+            settingsSnapshot = new(_settings);
+        }
+
+        // Even if it now returns early, loading has been considered complete.
+        string? jsonString;
+        lock (_fileIoSync)
+        {
+            jsonString = FileHelper.ReadAllTextSafe(PathManager.WheelWizardConfigFilePath);
+        }
+
         if (jsonString == null)
             return;
 
@@ -54,10 +79,12 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger) : IWhWzSetti
 
             foreach (var kvp in loadedSettings)
             {
-                if (!_settings.TryGetValue(kvp.Key, out var setting))
+                settingsSnapshot.TryGetValue(kvp.Key, out var setting);
+
+                if (setting == null)
                     continue;
 
-                setting.SetFromJson(kvp.Value);
+                setting.SetFromJson(kvp.Value, skipSave: true);
             }
         }
         catch (JsonException e)

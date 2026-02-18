@@ -26,7 +26,7 @@ public interface ITypedSetting<T>
     Setting RawSetting { get; }
 }
 
-public interface ISettingsManager
+public interface IGeneralSettings
 {
     Setting USER_FOLDER_PATH { get; }
     Setting DOLPHIN_LOCATION { get; }
@@ -34,7 +34,7 @@ public interface ISettingsManager
     Setting FORCE_WIIMOTE { get; }
     Setting LAUNCH_WITH_DOLPHIN { get; }
     Setting PREFERS_MODS_ROW_VIEW { get; }
-    Setting FOCUSSED_USER { get; }
+    Setting FOCUSED_USER { get; }
     Setting ENABLE_ANIMATIONS { get; }
     Setting TESTING_MODE_ENABLED { get; }
     Setting SAVED_WINDOW_SCALE { get; }
@@ -42,6 +42,22 @@ public interface ISettingsManager
     Setting RR_REGION { get; }
     Setting WW_LANGUAGE { get; }
 
+    ITypedSetting<string> UserFolderPath { get; }
+    ITypedSetting<string> DolphinLocation { get; }
+    ITypedSetting<string> GameLocation { get; }
+    ITypedSetting<bool> ForceWiimote { get; }
+    ITypedSetting<bool> LaunchWithDolphin { get; }
+    ITypedSetting<bool> PrefersModsRowView { get; }
+    ITypedSetting<int> FocusedUser { get; }
+    ITypedSetting<bool> EnableAnimations { get; }
+    ITypedSetting<bool> TestingModeEnabled { get; }
+    ITypedSetting<double> SavedWindowScale { get; }
+    ITypedSetting<bool> RemoveBlur { get; }
+    ITypedSetting<string> WwLanguage { get; }
+}
+
+public interface IDolphinSettings
+{
     Setting NAND_ROOT_PATH { get; }
     Setting LOAD_PATH { get; }
     Setting VSYNC { get; }
@@ -51,20 +67,12 @@ public interface ISettingsManager
     Setting MACADDRESS { get; }
     Setting WINDOW_SCALE { get; }
     Setting RECOMMENDED_SETTINGS { get; }
-
-    ITypedSetting<string> UserFolderPath { get; }
-    ITypedSetting<string> DolphinLocation { get; }
-    ITypedSetting<string> GameLocation { get; }
-    ITypedSetting<bool> ForceWiimote { get; }
-    ITypedSetting<bool> LaunchWithDolphin { get; }
-    ITypedSetting<bool> PrefersModsRowView { get; }
-    ITypedSetting<int> FocussedUser { get; }
-    ITypedSetting<bool> EnableAnimations { get; }
-    ITypedSetting<bool> TestingModeEnabled { get; }
-    ITypedSetting<double> SavedWindowScale { get; }
-    ITypedSetting<bool> RemoveBlur { get; }
-    ITypedSetting<string> WwLanguage { get; }
     ITypedSetting<string> MacAddress { get; }
+}
+
+public interface ISettingsManager : IGeneralSettings, IDolphinSettings
+{
+    OperationResult<SettingsValidationReport> ValidateCorePathSettings();
 
     T Get<T>(Setting setting);
     bool Set<T>(Setting setting, T value, bool skipSave = false);
@@ -73,6 +81,11 @@ public interface ISettingsManager
 }
 
 public interface ISettingsStartupInitializer
+{
+    void Initialize();
+}
+
+public interface ISettingsLocalizationService
 {
     void Initialize();
 }

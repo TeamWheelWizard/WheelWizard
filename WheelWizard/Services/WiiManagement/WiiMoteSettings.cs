@@ -1,13 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using WheelWizard.Helpers;
+﻿using WheelWizard.Helpers;
 using WheelWizard.Settings;
-using WheelWizard.Views;
 
 namespace WheelWizard.Services.WiiManagement;
 
 public static class WiiMoteSettings
 {
-    private static ISettingsManager Settings => App.Services.GetRequiredService<ISettingsManager>();
+    private static ISettingsManager Settings => SettingsRuntime.Current;
 
     private const string WiimoteSection = "[Wiimote1]";
     private const string SourceParameter = "Source";

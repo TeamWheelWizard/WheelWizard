@@ -2,7 +2,6 @@ using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services.Launcher;
-using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Generic;
@@ -11,7 +10,6 @@ namespace WheelWizard.Views.Pages;
 
 public partial class TestingPage : UserControlBase
 {
-    private readonly ILauncher _launcher;
     private WheelWizardStatus _status = WheelWizardStatus.Loading;
     private bool _isBusy;
 
@@ -21,10 +19,12 @@ public partial class TestingPage : UserControlBase
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
 
+    [Inject]
+    private RrBetaLauncher LauncherService { get; set; } = null!;
+
     public TestingPage()
     {
         InitializeComponent();
-        _launcher = App.Services.GetRequiredService<RrBetaLauncher>();
         UpdateStatusAsync();
     }
 
@@ -33,7 +33,7 @@ public partial class TestingPage : UserControlBase
         _status = WheelWizardStatus.Loading;
         UpdateUi();
 
-        _status = await _launcher.GetCurrentStatus();
+        _status = await LauncherService.GetCurrentStatus();
         UpdateUi();
     }
 
@@ -70,7 +70,7 @@ public partial class TestingPage : UserControlBase
         _isBusy = true;
         UpdateUi();
 
-        await _launcher.Install();
+        await LauncherService.Install();
 
         _isBusy = false;
         UpdateStatusAsync();
@@ -109,7 +109,7 @@ public partial class TestingPage : UserControlBase
 
         _isBusy = true;
         UpdateUi();
-        await _launcher.Launch();
+        await LauncherService.Launch();
         _isBusy = false;
         UpdateUi();
     }

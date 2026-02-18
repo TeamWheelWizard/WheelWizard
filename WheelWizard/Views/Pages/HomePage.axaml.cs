@@ -4,13 +4,13 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
-using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Settings;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages.Settings;
 using Button = WheelWizard.Views.Components.Button;
@@ -19,23 +19,27 @@ namespace WheelWizard.Views.Pages;
 
 public partial class HomePage : UserControlBase
 {
-    private static ISettingsManager SettingsService => App.Services.GetRequiredService<ISettingsManager>();
-    private static ILauncher currentLauncher => _launcherTypes[_launcherIndex];
-    private static int _launcherIndex = 0; // Make sure this index never goes over the list index
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
+    [Inject]
+    private RrLauncher RrLauncher { get; set; } = null!;
+
+    [Inject]
+    private IRandomSystem RandomSystem { get; set; } = null!;
+
+    private ILauncher CurrentLauncher => _launcherTypes[_launcherIndex];
+    private int _launcherIndex; // Make sure this index never goes over the list index
 
     private WheelTrail[] _trails; // also used as a lock
     private WheelTrailState _currentTrailState = WheelTrailState.Static_None;
 
-    private static List<ILauncher> _launcherTypes =
-    [
-        App.Services.GetRequiredService<RrLauncher>(),
-        //GoogleLauncher.Instance
-    ];
+    private readonly List<ILauncher> _launcherTypes = [];
 
     private WheelWizardStatus _status;
-    private MainButtonState currentButtonState => GetButtonState(_status);
+    private MainButtonState CurrentButtonState => GetButtonState(_status);
 
-    private static MainButtonState GetButtonState(WheelWizardStatus status) =>
+    private MainButtonState GetButtonState(WheelWizardStatus status) =>
         status switch
         {
             WheelWizardStatus.Loading => new(Common.State_Loading, Button.ButtonsVariantType.Default, "Spinner", null, false),
@@ -70,18 +74,17 @@ public partial class HomePage : UserControlBase
     public HomePage()
     {
         InitializeComponent();
+        _launcherTypes.Add(RrLauncher);
         PopulateGameModeDropdown();
         UpdatePage();
 
         _trails = [HomeTrail1, HomeTrail2, HomeTrail3, HomeTrail4, HomeTrail5];
-        App.Services.GetService<IRandomSystem>()?.Random.Shared.Shuffle(_trails);
-        // We have to do it like `App.Service.GetService`. We cant make use of `private IRandomSystem Random { get; set; } = null!;` here
-        // This is because this HomePage is always loaded first
+        RandomSystem.Random.Shared.Shuffle(_trails);
     }
 
     private void UpdatePage()
     {
-        GameTitle.Text = currentLauncher.GameTitle;
+        GameTitle.Text = CurrentLauncher.GameTitle;
         UpdateActionButton();
     }
 
@@ -91,29 +94,29 @@ public partial class HomePage : UserControlBase
         DisableAllButtonsTemporarily();
     }
 
-    private static void LaunchGame() => currentLauncher.Launch();
+    private void LaunchGame() => _ = CurrentLauncher.Launch();
 
-    private static void NavigateToSettings() => NavigationManager.NavigateTo<SettingsPage>();
+    private void NavigateToSettings() => NavigationManager.NavigateTo<SettingsPage>();
 
-    private static async void Download()
+    private async void Download()
     {
         ViewUtils.GetLayout().SetInteractable(false);
-        await currentLauncher.Install();
+        await CurrentLauncher.Install();
         ViewUtils.GetLayout().SetInteractable(true);
         NavigationManager.NavigateTo<HomePage>();
     }
 
-    private static async void Update()
+    private async void Update()
     {
         ViewUtils.GetLayout().SetInteractable(false);
-        await currentLauncher.Update();
+        await CurrentLauncher.Update();
         ViewUtils.GetLayout().SetInteractable(true);
         NavigationManager.NavigateTo<HomePage>();
     }
 
     private void PlayButton_Click(object? sender, RoutedEventArgs e)
     {
-        currentButtonState?.OnClick?.Invoke();
+        CurrentButtonState?.OnClick?.Invoke();
         PlayActivateAnimation();
         UpdateActionButton();
         DisableAllButtonsTemporarily();
@@ -143,9 +146,9 @@ public partial class HomePage : UserControlBase
     private async void UpdateActionButton()
     {
         _status = WheelWizardStatus.Loading;
-        SetButtonState(currentButtonState);
-        _status = await currentLauncher.GetCurrentStatus();
-        SetButtonState(currentButtonState);
+        SetButtonState(CurrentButtonState);
+        _status = await CurrentLauncher.GetCurrentStatus();
+        SetButtonState(CurrentButtonState);
     }
 
     private void DisableAllButtonsTemporarily()
@@ -157,7 +160,7 @@ public partial class HomePage : UserControlBase
             {
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    SetButtonState(currentButtonState);
+                    SetButtonState(CurrentButtonState);
                     return CompleteGrid.IsEnabled = true;
                 });
             });

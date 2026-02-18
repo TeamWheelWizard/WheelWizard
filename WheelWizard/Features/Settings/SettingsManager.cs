@@ -1,5 +1,5 @@
-using System.Globalization;
 using System.Runtime.InteropServices;
+using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Models.Settings;
@@ -7,23 +7,30 @@ using WheelWizard.Services;
 
 namespace WheelWizard.Settings;
 
-public class SettingsManager : ISettingsManager, ISettingListener
+public class SettingsManager : ISettingsManager
 {
+    private readonly object _syncRoot = new();
     private readonly IWhWzSettingManager _whWzSettingManager;
     private readonly IDolphinSettingManager _dolphinSettingManager;
+    private readonly ILinuxDolphinInstaller _linuxDolphinInstaller;
 
     private readonly Setting _dolphinCompilationMode;
     private readonly Setting _dolphinCompileShadersAtStart;
     private readonly Setting _dolphinSsaa;
     private readonly Setting _dolphinMsaa;
 
-    private bool _hasInitializedLanguageSync;
+    private bool _hasLoadedSettings;
     private double _internalScale = -1.0;
 
-    public SettingsManager(IWhWzSettingManager whWzSettingManager, IDolphinSettingManager dolphinSettingManager)
+    public SettingsManager(
+        IWhWzSettingManager whWzSettingManager,
+        IDolphinSettingManager dolphinSettingManager,
+        ILinuxDolphinInstaller linuxDolphinInstaller
+    )
     {
         _whWzSettingManager = whWzSettingManager;
         _dolphinSettingManager = dolphinSettingManager;
+        _linuxDolphinInstaller = linuxDolphinInstaller;
 
         DOLPHIN_LOCATION = RegisterWhWz(
             CreateWhWzSetting(typeof(string), "DolphinLocation", "")
@@ -37,7 +44,9 @@ public class SettingsManager : ISettingsManager, ISettingListener
                     {
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                         {
-                            if (PathManager.IsFlatpakDolphinFilePath(pathOrCommand) && !LinuxDolphinInstaller.IsDolphinInstalledInFlatpak())
+                            if (
+                                PathManager.IsFlatpakDolphinFilePath(pathOrCommand) && !_linuxDolphinInstaller.IsDolphinInstalledInFlatpak()
+                            )
                             {
                                 return false;
                             }
@@ -65,14 +74,10 @@ public class SettingsManager : ISettingsManager, ISettingListener
                         return true;
 
                     // If we want to use a split XDG dolphin config,
-                    // this only really works as expected if certain conditions are met
-                    // (we cannot simply pass `-u` to Dolphin since that would put the `Config` directory
-                    // inside the data directory and not use the XDG config directory, leading to two different configs).
+                    // this only really works as expected if certain conditions are met.
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && PathManager.IsLinuxDolphinConfigSplit())
                     {
-                        // In this case, Dolphin would use `EMBEDDED_USER_DIR` which is the portable `user` directory
-                        // in the current directory (the directory of the WheelWizard executable).
-                        // This means a split dolphin user folder and config cannot work...
+                        // In this case, Dolphin would use `EMBEDDED_USER_DIR` (portable `user` directory).
                         if (FileHelper.DirectoryExists("user"))
                             return false;
 
@@ -105,7 +110,7 @@ public class SettingsManager : ISettingsManager, ISettingListener
         FORCE_WIIMOTE = RegisterWhWz(CreateWhWzSetting(typeof(bool), "ForceWiimote", false));
         LAUNCH_WITH_DOLPHIN = RegisterWhWz(CreateWhWzSetting(typeof(bool), "LaunchWithDolphin", false));
         PREFERS_MODS_ROW_VIEW = RegisterWhWz(CreateWhWzSetting(typeof(bool), "PrefersModsRowView", true));
-        FOCUSSED_USER = RegisterWhWz(
+        FOCUSED_USER = RegisterWhWz(
             CreateWhWzSetting(typeof(int), "FavoriteUser", 0).SetValidation(value => (int)(value ?? -1) >= 0 && (int)(value ?? -1) < 4)
         );
 
@@ -201,7 +206,7 @@ public class SettingsManager : ISettingsManager, ISettingListener
         ForceWiimote = new TypedSetting<bool>(FORCE_WIIMOTE);
         LaunchWithDolphin = new TypedSetting<bool>(LAUNCH_WITH_DOLPHIN);
         PrefersModsRowView = new TypedSetting<bool>(PREFERS_MODS_ROW_VIEW);
-        FocussedUser = new TypedSetting<int>(FOCUSSED_USER);
+        FocusedUser = new TypedSetting<int>(FOCUSED_USER);
         EnableAnimations = new TypedSetting<bool>(ENABLE_ANIMATIONS);
         TestingModeEnabled = new TypedSetting<bool>(TESTING_MODE_ENABLED);
         SavedWindowScale = new TypedSetting<double>(SAVED_WINDOW_SCALE);
@@ -216,7 +221,7 @@ public class SettingsManager : ISettingsManager, ISettingListener
     public Setting FORCE_WIIMOTE { get; }
     public Setting LAUNCH_WITH_DOLPHIN { get; }
     public Setting PREFERS_MODS_ROW_VIEW { get; }
-    public Setting FOCUSSED_USER { get; }
+    public Setting FOCUSED_USER { get; }
     public Setting ENABLE_ANIMATIONS { get; }
     public Setting TESTING_MODE_ENABLED { get; }
     public Setting SAVED_WINDOW_SCALE { get; }
@@ -240,7 +245,7 @@ public class SettingsManager : ISettingsManager, ISettingListener
     public ITypedSetting<bool> ForceWiimote { get; }
     public ITypedSetting<bool> LaunchWithDolphin { get; }
     public ITypedSetting<bool> PrefersModsRowView { get; }
-    public ITypedSetting<int> FocussedUser { get; }
+    public ITypedSetting<int> FocusedUser { get; }
     public ITypedSetting<bool> EnableAnimations { get; }
     public ITypedSetting<bool> TestingModeEnabled { get; }
     public ITypedSetting<double> SavedWindowScale { get; }
@@ -267,33 +272,46 @@ public class SettingsManager : ISettingsManager, ISettingListener
 
     public bool PathsSetupCorrectly()
     {
-        return USER_FOLDER_PATH.IsValid() && DOLPHIN_LOCATION.IsValid() && GAME_LOCATION.IsValid();
+        var reportResult = ValidateCorePathSettings();
+        return reportResult.IsSuccess && reportResult.Value.IsValid;
+    }
+
+    public OperationResult<SettingsValidationReport> ValidateCorePathSettings()
+    {
+        try
+        {
+            var issues = new List<SettingsValidationIssue>();
+
+            if (!USER_FOLDER_PATH.IsValid())
+                issues.Add(new(SettingsValidationCode.InvalidUserFolderPath, USER_FOLDER_PATH.Name, "User folder path is invalid."));
+
+            if (!DOLPHIN_LOCATION.IsValid())
+                issues.Add(
+                    new(SettingsValidationCode.InvalidDolphinLocation, DOLPHIN_LOCATION.Name, "Dolphin path or command is invalid.")
+                );
+
+            if (!GAME_LOCATION.IsValid())
+                issues.Add(new(SettingsValidationCode.InvalidGameLocation, GAME_LOCATION.Name, "Game file path is invalid."));
+
+            return Ok(new SettingsValidationReport(issues));
+        }
+        catch (Exception ex)
+        {
+            return Fail(ex);
+        }
     }
 
     public void LoadSettings()
     {
-        _whWzSettingManager.LoadSettings();
-        _dolphinSettingManager.LoadSettings();
+        lock (_syncRoot)
+        {
+            if (_hasLoadedSettings)
+                return;
 
-        if (_hasInitializedLanguageSync)
-            return;
-
-        WW_LANGUAGE.Subscribe(this);
-        OnWheelWizardLanguageChange();
-        _hasInitializedLanguageSync = true;
-    }
-
-    public void OnSettingChanged(Setting setting)
-    {
-        if (setting == WW_LANGUAGE)
-            OnWheelWizardLanguageChange();
-    }
-
-    private void OnWheelWizardLanguageChange()
-    {
-        var newCulture = new CultureInfo(WwLanguage.Get());
-        CultureInfo.CurrentCulture = newCulture;
-        CultureInfo.CurrentUICulture = newCulture;
+            _whWzSettingManager.LoadSettings();
+            _dolphinSettingManager.LoadSettings();
+            _hasLoadedSettings = true;
+        }
     }
 
     private WhWzSetting CreateWhWzSetting(Type valueType, string name, object defaultValue)
