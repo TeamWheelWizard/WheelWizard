@@ -4,7 +4,12 @@ public static class SettingsExtensions
 {
     public static IServiceCollection AddSettings(this IServiceCollection services)
     {
-        // NExt step:
+        // TODO(naming-cleanup, later):
+        // - Prefix casing is inconsistent: `WhWz*` vs `WW_*` vs `Ww*` (example: `WhWzSettingManager`, `WW_LANGUAGE`, `WwLanguage`).
+        // - Some setting identifiers use all-caps while others use PascalCase (example: `MACADDRESS` vs `GAME_LOCATION` and typed props).
+        // - Domain type naming is mixed between generic and feature-specific terms (`Setting`, `WhWzSetting`, `DolphinSetting`).
+
+        // Next step:
         // - we created Settings Singal bus, make sure it is also being used everywhere such that you dont subseribve or unsubscribe to a setting model anymore.
         // - Remove/ move the model to the settings add it in Domains. make sure there is no ugly remenance somewhere in the depricated codebase anymore
         // - i saw setting still use path manager, can we simply replace that iwt the IFileSystem? or does that need some more work

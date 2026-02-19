@@ -73,7 +73,7 @@ public class VirtualSetting : Setting
         if (!_dependencies.Contains(signal.Setting))
             return;
 
-        SignalChange();
         Recalculate();
+        SignalChange();
     }
 }

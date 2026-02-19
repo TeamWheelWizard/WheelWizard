@@ -2,7 +2,6 @@ using WheelWizard.Models.Settings;
 
 namespace WheelWizard.Settings;
 
-
 public readonly record struct SettingChangedSignal(Setting Setting);
 
 public interface ISettingsSignalBus
