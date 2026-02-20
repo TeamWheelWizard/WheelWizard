@@ -94,7 +94,9 @@
                             IsOpenHost="{Binding IsOpenHost}"
                             HasBadges="{Binding HasBadges}"
                             IsTopPlayer="{Binding IsTopLeaderboardPlayer}"
-                            TopLabel="{Binding TopLabel}" />
+                            TopLabel="{Binding TopLabel}"
+                            ShowConnectionQuality="True"
+                            ConnectionQualityBars="{Binding ConnectionQualityBars}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
 

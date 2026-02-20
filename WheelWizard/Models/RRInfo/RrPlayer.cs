@@ -28,6 +28,32 @@ public class RrPlayer : IEquatable<RrPlayer>
     public string VrDisplay => Vr?.ToString() ?? "--";
     public string BrDisplay => Br?.ToString() ?? "--";
 
+    public int ConnectionAmp
+    {
+        get
+        {
+            var parsedAmps = ConnectionMap.Select(ParseConnectionAmp).Where(amp => amp > 0).ToList();
+
+            if (parsedAmps.Count == 0)
+                return 0;
+
+            return parsedAmps
+                .GroupBy(amp => amp)
+                .OrderByDescending(group => group.Count())
+                .ThenByDescending(group => group.Key)
+                .First()
+                .Key;
+        }
+    }
+
+    public int ConnectionQualityBars =>
+        ConnectionAmp switch
+        {
+            >= 3 => 3,
+            >= 2 => 2,
+            _ => 1,
+        };
+
     public BadgeVariant[] BadgeVariants { get; set; } = [];
     public bool HasBadges => BadgeVariants.Length != 0;
 
@@ -42,4 +68,11 @@ public class RrPlayer : IEquatable<RrPlayer>
     public override bool Equals(object? obj) => obj is RrPlayer other && Equals(other);
 
     public override int GetHashCode() => HashCode.Combine(Pid, FriendCode);
+
+    private static int ParseConnectionAmp(string? rawAmp)
+    {
+        if (string.IsNullOrWhiteSpace(rawAmp))
+            return 0;
+        return int.TryParse(rawAmp, out var parsedAmp) ? parsedAmp : 0;
+    }
 }

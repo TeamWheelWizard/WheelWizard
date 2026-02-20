@@ -8,6 +8,16 @@ namespace WheelWizard.Views.Components;
 
 public class PlayerListItem : TemplatedControl
 {
+    public static readonly StyledProperty<bool> ShowConnectionQualityProperty = AvaloniaProperty.Register<PlayerListItem, bool>(
+        nameof(ShowConnectionQuality)
+    );
+
+    public static readonly StyledProperty<int> ConnectionQualityBarsProperty = AvaloniaProperty.Register<PlayerListItem, int>(
+        nameof(ConnectionQualityBars),
+        1,
+        coerce: (_, value) => Math.Clamp(value, 1, 3)
+    );
+
     public static readonly StyledProperty<bool> HasBadgesProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(HasBadges));
 
     public static readonly StyledProperty<bool> IsOpenHostProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(IsOpenHost));
@@ -41,6 +51,18 @@ public class PlayerListItem : TemplatedControl
     {
         get => GetValue(TopLabelProperty);
         set => SetValue(TopLabelProperty, value);
+    }
+
+    public bool ShowConnectionQuality
+    {
+        get => GetValue(ShowConnectionQualityProperty);
+        set => SetValue(ShowConnectionQualityProperty, value);
+    }
+
+    public int ConnectionQualityBars
+    {
+        get => GetValue(ConnectionQualityBarsProperty);
+        set => SetValue(ConnectionQualityBarsProperty, value);
     }
 
     public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<PlayerListItem, Mii?>(nameof(Mii));

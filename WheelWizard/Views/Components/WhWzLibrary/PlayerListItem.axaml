@@ -47,7 +47,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Classes="BoxItemBackground">
-                    <Grid ColumnDefinitions="Auto,130,80,*">
+                    <Grid ColumnDefinitions="Auto,130,80,*,Auto">
                         <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True"
                                 Background="{StaticResource Neutral950}" Width="50" Height="50" Margin="0,3">
                             <behaviorComponent:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -101,9 +101,43 @@
                                       ToolTip.Placement="Top"
                                       ToolTip.ShowDelay="20" />
                         </Grid>
+
+                        <StackPanel Grid.Column="4"
+                                    Orientation="Horizontal"
+                                    Spacing="3"
+                                    Margin="0,0,4,6"
+                                    VerticalAlignment="Bottom"
+                                    HorizontalAlignment="Right"
+                                    IsVisible="{TemplateBinding ShowConnectionQuality}">
+                            <Border x:Name="PART_ConnectionBar1" Classes="ConnectionQualityBar" Height="8" />
+                            <Border x:Name="PART_ConnectionBar2" Classes="ConnectionQualityBar" Height="12" />
+                            <Border x:Name="PART_ConnectionBar3" Classes="ConnectionQualityBar" Height="16" />
+                        </StackPanel>
                     </Grid>
                 </Border>
             </ControlTemplate>
         </Setter>
+    </Style>
+
+    <Style Selector="components|PlayerListItem /template/ Border.ConnectionQualityBar">
+        <Setter Property="Width" Value="4" />
+        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+    </Style>
+
+    <Style Selector="components|PlayerListItem[ConnectionQualityBars=1] /template/ Border#PART_ConnectionBar1">
+        <Setter Property="Background" Value="{StaticResource Danger400}" />
+    </Style>
+
+    <Style Selector="components|PlayerListItem[ConnectionQualityBars=2] /template/ Border#PART_ConnectionBar1,
+                     components|PlayerListItem[ConnectionQualityBars=2] /template/ Border#PART_ConnectionBar2">
+        <Setter Property="Background" Value="{StaticResource Warning400}" />
+    </Style>
+
+    <Style Selector="components|PlayerListItem[ConnectionQualityBars=3] /template/ Border#PART_ConnectionBar1,
+                     components|PlayerListItem[ConnectionQualityBars=3] /template/ Border#PART_ConnectionBar2,
+                     components|PlayerListItem[ConnectionQualityBars=3] /template/ Border#PART_ConnectionBar3">
+        <Setter Property="Background" Value="{StaticResource Primary400}" />
     </Style>
 </Styles>
