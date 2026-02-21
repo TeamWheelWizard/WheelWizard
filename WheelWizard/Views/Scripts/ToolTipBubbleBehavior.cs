@@ -8,7 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 
-namespace WheelWizard.Views;
+namespace WheelWizard.Views.Scripts;
 
 public static class ToolTipBubbleBehavior
 {
