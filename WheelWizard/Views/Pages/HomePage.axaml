@@ -174,7 +174,7 @@
                                IconData="{StaticResource DolphinIcon}"
                                IconSize="30"
                                ToolTip.Tip="{x:Static lang:Common.Action_LaunchDolphin}"
-                               ToolTip.Placement="Bottom"
+                               ToolTip.Placement="Top"
                                ToolTip.ShowDelay="50"
                                Height="40"
                                Click="DolphinButton_OnClick"

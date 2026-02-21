@@ -24,7 +24,7 @@
                                    IconData="{StaticResource WheelIcon}"
                                    IconSize="25"
                                    ToolTip.Tip="Launch Dolphin"
-                                   ToolTip.Placement="Bottom"
+                                   ToolTip.Placement="Top"
                                    ToolTip.ShowDelay="50"
                                    HorizontalAlignment="Center" Margin="0,6,0,0" />
             </StackPanel>

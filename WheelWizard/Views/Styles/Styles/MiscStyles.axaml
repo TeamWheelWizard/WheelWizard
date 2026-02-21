@@ -55,7 +55,85 @@
         <Setter Property="Background" Value="{StaticResource Neutral700}"/>
     </Style>
     
-    <Style Selector="ToolTip, ContextMenu">
+    <Style Selector="Control">
+        <Setter Property="ToolTip.Placement" Value="Top"/>
+    </Style>
+
+    <Style Selector="ToolTip">
+        <Setter Property="Background" Value="{StaticResource BlackIsh}"/>
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid x:Name="PART_ToolTipChrome" RowDefinitions="Auto,Auto,21">
+                    <Border Grid.Row="0"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <Path Grid.Row="1"
+                          x:Name="PART_ToolTipTail"
+                          Width="12"
+                          Height="8"
+                          Data="M 0 0 L 12 0 L 6 8 Z"
+                          Fill="{TemplateBinding Background}"
+                          HorizontalAlignment="Center"
+                          Margin="0,-1,0,0"
+                          Stretch="Fill"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="ToolTip.BubblePointerLeft /template/ Path#PART_ToolTipTail">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Margin" Value="16,-1,0,0"/>
+    </Style>
+    <Style Selector="ToolTip.BubblePointerMiddle /template/ Path#PART_ToolTipTail">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,-1,0,0"/>
+    </Style>
+    <Style Selector="ToolTip.BubblePointerRight /template/ Path#PART_ToolTipTail">
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="0,-1,16,0"/>
+    </Style>
+
+    <Style Selector="ToolTip.BubbleAnimateIn /template/ Grid#PART_ToolTipChrome">
+        <Style.Animations>
+            <Animation Duration="0:0:0.04" IterationCount="1" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.Y" Value="11"/>
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.Y" Value="0"/>
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="ToolTip.BubbleAnimateOut /template/ Grid#PART_ToolTipChrome">
+        <Style.Animations>
+            <Animation Duration="0:0:0.04" IterationCount="1" FillMode="Forward">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.Y" Value="0"/>
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.Y" Value="11"/>
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="ToolTip TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}"/>
+    </Style>
+
+    <Style Selector="ContextMenu">
         <Setter Property="Background" Value="{StaticResource BlackIsh}"/>
         <Setter Property="Foreground" Value="{StaticResource Neutral300}"/>
         <Setter Property="BorderThickness" Value="0"/>

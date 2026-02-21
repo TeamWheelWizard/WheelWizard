@@ -38,6 +38,7 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        ToolTipBubbleBehavior.Initialize();
     }
 
     private static void OpenGameBananaModWindow()

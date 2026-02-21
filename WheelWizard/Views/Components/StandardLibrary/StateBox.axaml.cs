@@ -78,7 +78,7 @@ public partial class StateBox : TemplatedControl // Change to TemplatedControl
 
     public static readonly StyledProperty<PlacementMode> TipPlacementProperty = AvaloniaProperty.Register<StateBox, PlacementMode>(
         nameof(TipPlacement),
-        PlacementMode.Right
+        PlacementMode.Top
     );
 
     public PlacementMode TipPlacement
