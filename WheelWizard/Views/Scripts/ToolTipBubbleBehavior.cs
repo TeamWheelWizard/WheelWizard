@@ -18,6 +18,8 @@ public static class ToolTipBubbleBehavior
     private const string BubbleAnimateInClass = "BubbleAnimateIn";
     private const string BubbleAnimateOutClass = "BubbleAnimateOut";
     private const double TailCenterOffsetFromSide = 22d;
+    private const double TooltipVerticalOffset = -4d;
+    private static readonly TimeSpan HoverOpenDelay = TimeSpan.FromMilliseconds(200);
     private static readonly TimeSpan MinimumVisibleTime = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan CloseAnimationDuration = TimeSpan.FromMilliseconds(40);
     private static readonly ConditionalWeakTable<Control, ToolTipState> ToolTipStates = new();
@@ -32,8 +34,7 @@ public static class ToolTipBubbleBehavior
         ToolTip.TipProperty.Changed.AddClassHandler<Control>(OnTipChanged);
         ToolTip.ToolTipOpeningEvent.AddClassHandler<Control>(OnToolTipOpening);
         ToolTip.IsOpenProperty.Changed.AddClassHandler<Control>(OnIsOpenChanged);
-        InputElement.PointerExitedEvent.AddClassHandler<Control>(OnPointerExited);
-        InputElement.PointerEnteredEvent.AddClassHandler<Control>(OnPointerEntered);
+        InputElement.IsPointerOverProperty.Changed.AddClassHandler<Control>(OnIsPointerOverChanged);
     }
 
     private static void OnTipChanged(Control control, AvaloniaPropertyChangedEventArgs args)
@@ -41,6 +42,9 @@ public static class ToolTipBubbleBehavior
         var newTip = args.GetNewValue<object?>();
         if (newTip == null || ReferenceEquals(newTip, AvaloniaProperty.UnsetValue))
         {
+            var state = GetState(control);
+            CancelPendingOpen(state);
+            CancelPendingClose(state);
             ToolTip.SetIsOpen(control, false);
             ToolTip.SetServiceEnabled(control, true);
             return;
@@ -65,6 +69,17 @@ public static class ToolTipBubbleBehavior
 
     private static void OnToolTipOpening(Control control, CancelRoutedEventArgs _) => PrepareToolTip(control);
 
+    private static void OnIsPointerOverChanged(Control control, AvaloniaPropertyChangedEventArgs args)
+    {
+        if (args.GetNewValue<bool>())
+        {
+            OnPointerEntered(control);
+            return;
+        }
+
+        OnPointerExited(control);
+    }
+
     private static void OnIsOpenChanged(Control control, AvaloniaPropertyChangedEventArgs args)
     {
         var wasOpen = args.GetOldValue<bool>();
@@ -77,23 +92,25 @@ public static class ToolTipBubbleBehavior
         if (isOpen)
         {
             state.OpenedAt = DateTimeOffset.UtcNow;
+            CancelPendingOpen(state);
             CancelPendingClose(state);
             return;
         }
 
+        CancelPendingOpen(state);
         CancelPendingClose(state);
         ClearBubbleAnimationClasses(control);
     }
 
-    private static void OnPointerEntered(Control control, PointerEventArgs _)
+    private static void OnPointerEntered(Control control)
     {
         if (!HasToolTip(control))
             return;
 
         var state = GetState(control);
         var hadPendingClose = state.PendingCloseCts != null;
+        CancelPendingOpen(state);
         CancelPendingClose(state);
-        PrepareToolTip(control);
 
         if (ToolTip.GetIsOpen(control))
         {
@@ -102,16 +119,19 @@ public static class ToolTipBubbleBehavior
             return;
         }
 
-        ApplyBubbleAnimationClass(control, animateIn: true);
-        ToolTip.SetIsOpen(control, true);
+        var cts = new CancellationTokenSource();
+        state.PendingOpenCts = cts;
+        _ = DeferredOpenAsync(control, state, HoverOpenDelay, cts.Token);
     }
 
-    private static void OnPointerExited(Control control, PointerEventArgs pointerEventArgs)
+    private static void OnPointerExited(Control control)
     {
+        var state = GetState(control);
+        CancelPendingOpen(state);
+
         if (!ToolTip.GetIsOpen(control))
             return;
 
-        var state = GetState(control);
         var elapsed = DateTimeOffset.UtcNow - state.OpenedAt;
         var remaining = MinimumVisibleTime - elapsed;
         if (remaining < TimeSpan.Zero)
@@ -142,6 +162,7 @@ public static class ToolTipBubbleBehavior
         };
 
         ToolTip.SetHorizontalOffset(control, horizontalOffset);
+        ToolTip.SetVerticalOffset(control, TooltipVerticalOffset);
     }
 
     private static ToolTipState GetState(Control control) => ToolTipStates.GetOrCreateValue(control);
@@ -204,6 +225,44 @@ public static class ToolTipBubbleBehavior
         state.PendingCloseCts.Cancel();
         state.PendingCloseCts.Dispose();
         state.PendingCloseCts = null;
+    }
+
+    private static void CancelPendingOpen(ToolTipState state)
+    {
+        if (state.PendingOpenCts == null)
+            return;
+
+        state.PendingOpenCts.Cancel();
+        state.PendingOpenCts.Dispose();
+        state.PendingOpenCts = null;
+    }
+
+    private static async Task DeferredOpenAsync(Control control, ToolTipState state, TimeSpan delay, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(delay, cancellationToken);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            state.PendingOpenCts?.Dispose();
+            state.PendingOpenCts = null;
+
+            if (!control.IsPointerOver || ToolTip.GetIsOpen(control) || !HasToolTip(control))
+                return;
+
+            PrepareToolTip(control);
+            ApplyBubbleAnimationClass(control, animateIn: true);
+            ToolTip.SetIsOpen(control, true);
+        });
     }
 
     private static async Task DeferredCloseAsync(Control control, ToolTipState state, TimeSpan delay, CancellationToken cancellationToken)
@@ -292,6 +351,7 @@ public static class ToolTipBubbleBehavior
     private sealed class ToolTipState
     {
         public DateTimeOffset OpenedAt { get; set; }
+        public CancellationTokenSource? PendingOpenCts { get; set; }
         public CancellationTokenSource? PendingCloseCts { get; set; }
     }
 }

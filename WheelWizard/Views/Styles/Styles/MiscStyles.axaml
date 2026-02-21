@@ -63,11 +63,12 @@
         <Setter Property="Background" Value="{StaticResource BlackIsh}"/>
         <Setter Property="Foreground" Value="{StaticResource Neutral300}"/>
         <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="MaxWidth" Value="520"/>
         <Setter Property="Padding" Value="10,6"/>
         <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <Grid x:Name="PART_ToolTipChrome" RowDefinitions="Auto,Auto,21">
+                <Grid x:Name="PART_ToolTipChrome" RowDefinitions="Auto,Auto">
                     <Border Grid.Row="0"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
@@ -86,7 +87,8 @@
                           Fill="{TemplateBinding Background}"
                           HorizontalAlignment="Center"
                           Margin="0,-1,0,0"
-                          Stretch="Fill"/>
+                          Stretch="Fill"
+                          IsHitTestVisible="False"/>
                 </Grid>
             </ControlTemplate>
         </Setter>
@@ -131,6 +133,8 @@
     </Style>
     <Style Selector="ToolTip TextBlock">
         <Setter Property="Foreground" Value="{StaticResource Neutral300}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="TextTrimming" Value="None"/>
     </Style>
 
     <Style Selector="ContextMenu">
