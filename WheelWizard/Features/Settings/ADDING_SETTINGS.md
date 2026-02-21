@@ -1,24 +1,23 @@
 # Adding a Setting in WheelWizard
 
-This is the quick guide for adding settings with the current setup.
-
-## Where to edit
-1. `WheelWizard/Features/Settings/SettingsManager.cs`
-2. `WheelWizard/Features/Settings/ISettingsServices.cs`
-
-Note: you still touch 3 spots, but 2 are inside `SettingsManager.cs`:
-1. Constructor registration
-2. Public `Setting` property
-3. Matching interface property
-
 ## Setting Types
-- WheelWizard JSON setting: `RegisterWhWz(...)`
-- Dolphin INI setting: `RegisterDolphin(...)`
-- Computed (not persisted): `VirtualSetting`
+- **WheelWizard:** Our own settings, we save them in a JSON file.
+- **Dolphin:** Settings from the Dolphin emulator. they store them in INI files. this implementation allows us to also modify them=
+- **Virtual:** Settings that are not saved. These are used for managing for computing state and managing side effect. For instance, if you want to control 3 settings with 1 toggle, virtual settings is perfect for that.
 
-## WhWz setting template
-Use in `SettingsManager` constructor:
+## Adding settings
+You first always define the setting in the `ISettingsServices.cs` file in the `ISettingsProperties` class
+```csharp
+Setting MY_NEW_SETTING { get; }
+```
+then you also define this setting in the `SettingsManager.cs` as a property
+```csharp
+public Setting MY_NEW_SETTING { get; }
+```
 
+after that you have to register the setting. This depends on the type of setting you want to add.
+
+### Wheel Wizard
 ```csharp
 MY_NEW_SETTING = RegisterWhWz(
     "MyNewSetting",
@@ -27,21 +26,7 @@ MY_NEW_SETTING = RegisterWhWz(
 );
 ```
 
-Add property in `SettingsManager`:
-
-```csharp
-public Setting MY_NEW_SETTING { get; }
-```
-
-Add property in `IGeneralSettings` (or `IDolphinSettings` when appropriate):
-
-```csharp
-Setting MY_NEW_SETTING { get; }
-```
-
-## Dolphin setting template
-Use in `SettingsManager` constructor:
-
+### Dolphin
 ```csharp
 MY_DOLPHIN_SETTING = RegisterDolphin(
     ("GFX.ini", "Settings", "MyDolphinKey"),
@@ -50,46 +35,24 @@ MY_DOLPHIN_SETTING = RegisterDolphin(
 );
 ```
 
-Add property in `SettingsManager`:
-
-```csharp
-public Setting MY_DOLPHIN_SETTING { get; }
-```
-
-Add property in `IDolphinSettings`:
-
-```csharp
-Setting MY_DOLPHIN_SETTING { get; }
-```
-
-## Virtual setting template
-Use when setting depends on other settings and should not be saved:
-
+### Virtual
 ```csharp
 MY_VIRTUAL_SETTING = new VirtualSetting(
     typeof(bool),
     value => { /* apply side-effects */ },
     () => { /* compute value */ return true; }
-).SetDependencies(DEP_A, DEP_B);
+).SetDependencies(SETTING_A, SETTING_B);
 ```
+Usually you create virtual settigns that reference one or more real settings.
+The value of the virtual setting is cached. However, if the value relies on e.g. SETTING_A. than once SETTING_A changes, your cache is wrong.
+// For that reason, you have to set dependencies. That way if SETTING_A changes, the virtual setting gets a signal to recompute its value
 
-## Read/Write usage
+
+## Reading/Writing settings
 Use type-safe manager methods in callers:
-
 ```csharp
-var value = settings.Get<bool>(settings.MY_NEW_SETTING);
-settings.Set(settings.MY_NEW_SETTING, true);
+// reading
+bool value = SettingsManager.Get<bool>(SettingsManager.MY_NEW_SETTING);
+// writeing
+SettingsManager.Set(SettingsManager.MY_NEW_SETTING, true);
 ```
-
-## Important notes
-- No `ITypedSetting` layer anymore.
-- WhWz invalid/unreadable values are reset to default during load.
-- Setting change notifications go through `ISettingsSignalBus`.
-- Keep new logic in `Features/Settings` (not deprecated folders).
-
-## Minimal checklist
-- Register setting in constructor.
-- Add public `Setting` property.
-- Add interface property.
-- Add validation.
-- Use `Get<T>` / `Set(...)` where consumed.

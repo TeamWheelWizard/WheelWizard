@@ -17,7 +17,7 @@ public interface IDolphinSettingManager
     void LoadSettings();
 }
 
-public interface IGeneralSettings
+public interface ISettingsProperties
 {
     Setting USER_FOLDER_PATH { get; }
     Setting DOLPHIN_LOCATION { get; }
@@ -32,10 +32,6 @@ public interface IGeneralSettings
     Setting REMOVE_BLUR { get; }
     Setting RR_REGION { get; }
     Setting WW_LANGUAGE { get; }
-}
-
-public interface IDolphinSettings
-{
     Setting NAND_ROOT_PATH { get; }
     Setting LOAD_PATH { get; }
     Setting VSYNC { get; }
@@ -47,7 +43,7 @@ public interface IDolphinSettings
     Setting RECOMMENDED_SETTINGS { get; }
 }
 
-public interface ISettingsManager : IGeneralSettings, IDolphinSettings
+public interface ISettingsManager : ISettingsProperties
 {
     OperationResult<SettingsValidationReport> ValidateCorePathSettings();
 
