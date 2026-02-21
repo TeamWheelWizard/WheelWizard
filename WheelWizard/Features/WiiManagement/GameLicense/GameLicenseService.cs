@@ -7,7 +7,7 @@ using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
 using WheelWizard.Settings;
-using WheelWizard.Settings.Domain;
+using WheelWizard.Settings.Types;
 using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.WheelWizardData;

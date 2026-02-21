@@ -2,7 +2,7 @@ using System.IO.Abstractions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using WheelWizard.Services;
-using WheelWizard.Settings.Domain;
+using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Settings;
 

@@ -8,7 +8,7 @@ using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
 using WheelWizard.Settings;
-using WheelWizard.Settings.Domain;
+using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;

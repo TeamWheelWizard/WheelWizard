@@ -10,7 +10,7 @@ using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
-using WheelWizard.Settings.Domain;
+using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;

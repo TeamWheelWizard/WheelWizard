@@ -9,7 +9,7 @@ public static class SettingsExtensions
         // - Some setting identifiers use all-caps while others use PascalCase (example: `MACADDRESS` vs `GAME_LOCATION`).
         // - Domain type naming is mixed between generic and feature-specific terms (`Setting`, `WhWzSetting`, `DolphinSetting`).
 
-       // TODO:  Investigate / migrate to IOptions: https://learn.microsoft.com/en-us/dotnet/core/extensions/options
+        // TODO:  Investigate / migrate to IOptions: https://learn.microsoft.com/en-us/dotnet/core/extensions/options
 
         services.AddSingleton<ISettingsSignalBus, SettingsSignalBus>();
         services.AddSingleton<IWhWzSettingManager, WhWzSettingManager>();
