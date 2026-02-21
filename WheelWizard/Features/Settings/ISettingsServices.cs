@@ -1,4 +1,4 @@
-using WheelWizard.Models.Settings;
+using WheelWizard.Settings.Domain;
 
 namespace WheelWizard.Settings;
 

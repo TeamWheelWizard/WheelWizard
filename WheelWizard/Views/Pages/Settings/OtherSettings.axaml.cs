@@ -1,11 +1,6 @@
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
-using WheelWizard.Helpers;
-using WheelWizard.Models.Settings;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
-using WheelWizard.Services.Installation;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Generic;

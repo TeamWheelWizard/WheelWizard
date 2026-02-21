@@ -1,6 +1,6 @@
 using System.IO.Abstractions;
-using WheelWizard.Models.Settings;
 using WheelWizard.Services;
+using WheelWizard.Settings.Domain;
 
 namespace WheelWizard.Settings;
 

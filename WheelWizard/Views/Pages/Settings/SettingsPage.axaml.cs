@@ -1,9 +1,5 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using WheelWizard.Branding;
-using WheelWizard.CustomDistributions;
-using WheelWizard.Services.Installation;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups;
 
 namespace WheelWizard.Views.Pages.Settings;

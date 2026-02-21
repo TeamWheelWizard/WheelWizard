@@ -1,11 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using WheelWizard.Models.Settings;
 using WheelWizard.Settings;
+using WheelWizard.Settings.Domain;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.Views;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages.Settings;
 

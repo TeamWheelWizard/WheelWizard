@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Models.Settings;
 using WheelWizard.Services;
+using WheelWizard.Settings.Domain;
 
 namespace WheelWizard.Settings;
 
@@ -24,6 +24,7 @@ public class SettingsManager : ISettingsManager
     private bool _hasLoadedSettings;
     private double _internalScale = -1.0;
 
+    #region Constructor
     public SettingsManager(
         IWhWzSettingManager whWzSettingManager,
         IDolphinSettingManager dolphinSettingManager,
@@ -36,6 +37,7 @@ public class SettingsManager : ISettingsManager
         _linuxDolphinInstaller = linuxDolphinInstaller;
         _fileSystem = fileSystem;
 
+        #region WhWz settings
         DOLPHIN_LOCATION = RegisterWhWz(
             "DolphinLocation",
             "",
@@ -117,7 +119,9 @@ public class SettingsManager : ISettingsManager
         REMOVE_BLUR = RegisterWhWz("REMOVE_BLUR", true);
         RR_REGION = RegisterWhWz("RR_Region", MarioKartWiiEnums.Regions.None);
         WW_LANGUAGE = RegisterWhWz("WW_Language", "en", value => SettingValues.WhWzLanguages.ContainsKey((string)value!));
+        #endregion
 
+        #region Dolphin settings
         NAND_ROOT_PATH = RegisterDolphin(
             ("Dolphin.ini", "General", "NANDRootPath"),
             "",
@@ -147,7 +151,9 @@ public class SettingsManager : ISettingsManager
 
         // Readonly settings
         MACADDRESS = RegisterDolphin(("Dolphin.ini", "General", "WirelessMac"), "02:01:02:03:04:05");
+        #endregion
 
+        #region Virtual settings
         WINDOW_SCALE = new VirtualSetting(
             typeof(double),
             value => _internalScale = (double)value!,
@@ -180,8 +186,11 @@ public class SettingsManager : ISettingsManager
                 return !value4 && value2 && value3 == "0x00000002" && value1 == DolphinShaderCompilationMode.HybridUberShaders;
             }
         ).SetDependencies(_dolphinCompilationMode, _dolphinCompileShadersAtStart, _dolphinMsaa, _dolphinSsaa);
+        #endregion
     }
+    #endregion
 
+    #region Settings Properties
     public Setting USER_FOLDER_PATH { get; }
     public Setting DOLPHIN_LOCATION { get; }
     public Setting GAME_LOCATION { get; }
@@ -205,7 +214,9 @@ public class SettingsManager : ISettingsManager
     public Setting MACADDRESS { get; }
     public Setting WINDOW_SCALE { get; }
     public Setting RECOMMENDED_SETTINGS { get; }
+    #endregion
 
+    #region Public API
     public T Get<T>(Setting setting)
     {
         var value = setting.Get();
@@ -266,7 +277,9 @@ public class SettingsManager : ISettingsManager
             _hasLoadedSettings = true;
         }
     }
+    #endregion
 
+    #region Registration Helpers
     private WhWzSetting RegisterWhWz<T>(string name, T defaultValue, Func<object?, bool>? validation = null)
     {
         var setting = new WhWzSetting(typeof(T), name, defaultValue!, _whWzSettingManager.SaveSettings);
@@ -286,4 +299,5 @@ public class SettingsManager : ISettingsManager
         _dolphinSettingManager.RegisterSetting(setting);
         return setting;
     }
+    #endregion
 }

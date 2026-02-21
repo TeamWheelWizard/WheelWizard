@@ -1,8 +1,8 @@
 using System.IO.Abstractions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using WheelWizard.Models.Settings;
 using WheelWizard.Services;
+using WheelWizard.Settings.Domain;
 
 namespace WheelWizard.Settings;
 

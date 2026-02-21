@@ -1,6 +1,6 @@
 using WheelWizard.Settings;
 
-namespace WheelWizard.Models.Settings;
+namespace WheelWizard.Settings.Domain;
 
 public class VirtualSetting : Setting
 {

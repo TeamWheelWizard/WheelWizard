@@ -7,10 +7,10 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
-using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
+using WheelWizard.Settings.Domain;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
@@ -22,7 +22,7 @@ using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.Views;
 
-public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListener
+public partial class Layout : BaseWindow, IRepeatedTaskListener
 {
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
@@ -39,6 +39,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     private const string TesterSecretPhrase = "WhenSonicInRR?";
     private int _testerClickCount;
     private bool _testerPromptOpen;
+    private IDisposable? _settingsSignalSubscription;
 
     [Inject]
     private IBrandingSingletonService BrandingService { get; set; } = null!;
@@ -49,6 +50,9 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
 
+    [Inject]
+    private ISettingsSignalBus SettingsSignalBus { get; set; } = null!;
+
     public Layout()
     {
         Instance = this;
@@ -56,8 +60,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
         AddLayer();
 
         OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);
-        SettingsService.WINDOW_SCALE.Subscribe(this);
-        SettingsService.TESTING_MODE_ENABLED.Subscribe(this);
+        _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
 
         var completeString = Humanizer.ReplaceDynamic(Phrases.Text_MadeByString, "Patchzy", "WantToBeeMe");
@@ -94,7 +97,16 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
         NavigationManager.NavigateTo<HomePage>();
     }
 
-    public void OnSettingChanged(Setting setting)
+    protected override void OnClosed(EventArgs e)
+    {
+        _settingsSignalSubscription?.Dispose();
+        _settingsSignalSubscription = null;
+        base.OnClosed(e);
+    }
+
+    private void OnSettingSignal(SettingChangedSignal signal) => OnSettingChanged(signal.Setting);
+
+    private void OnSettingChanged(Setting setting)
     {
         // Note that this method will also be called whenever the setting changes
         if (setting == SettingsService.WINDOW_SCALE || setting == SettingsService.SAVED_WINDOW_SCALE)

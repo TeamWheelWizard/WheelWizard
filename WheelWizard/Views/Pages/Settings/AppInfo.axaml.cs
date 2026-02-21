@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using WheelWizard.Branding;
 using WheelWizard.CustomDistributions;

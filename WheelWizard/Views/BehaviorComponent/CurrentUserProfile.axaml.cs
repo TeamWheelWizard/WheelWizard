@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Input;
-using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
+using WheelWizard.Settings.Domain;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Pages;
 using WheelWizard.WiiManagement;

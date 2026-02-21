@@ -1,4 +1,4 @@
-namespace WheelWizard.Models.Settings;
+namespace WheelWizard.Settings.Domain;
 
 public class DolphinSetting : Setting
 {

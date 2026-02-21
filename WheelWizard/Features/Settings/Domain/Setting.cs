@@ -1,6 +1,6 @@
 using WheelWizard.Settings;
 
-namespace WheelWizard.Models.Settings;
+namespace WheelWizard.Settings.Domain;
 
 public abstract class Setting
 {
@@ -12,7 +12,6 @@ public abstract class Setting
         ValueType = type;
     }
 
-    protected readonly List<ISettingListener> DependentVirtualSettings = [];
     public string Name { get; protected set; }
     public object DefaultValue { get; protected set; }
     protected object Value { get; set; }
@@ -61,23 +60,5 @@ public abstract class Setting
         return this;
     }
 
-    [Obsolete("Use ISettingsSignalBus subscriptions instead of direct setting subscriptions.")]
-    public bool Unsubscribe(ISettingListener dependent) => DependentVirtualSettings.Remove(dependent);
-
-    [Obsolete("Use ISettingsSignalBus subscriptions instead of direct setting subscriptions.")]
-    public void Subscribe(ISettingListener dependent)
-    {
-        if (!DependentVirtualSettings.Contains(dependent))
-            DependentVirtualSettings.Add(dependent);
-    }
-
-    protected void SignalChange()
-    {
-        SettingsSignalRuntime.Publish(this);
-
-        foreach (var dependent in DependentVirtualSettings)
-        {
-            dependent.OnSettingChanged(this);
-        }
-    }
+    protected void SignalChange() => SettingsSignalRuntime.Publish(this);
 }
