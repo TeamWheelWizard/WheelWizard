@@ -113,7 +113,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     }
 
     private int _currentUserIndex;
-    private int FocusedUser => SettingsService.FocusedUser.Get();
+    private int FocusedUser => SettingsService.Get<int>(SettingsService.FOCUSED_USER);
 
     public UserProfilePage()
     {

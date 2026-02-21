@@ -183,7 +183,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void ToggleModsPageView_OnClick(object? sender, RoutedEventArgs e)
     {
-        var current = SettingsService.PrefersModsRowView.Get();
+        var current = SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW);
         SettingsService.Set(SettingsService.PREFERS_MODS_ROW_VIEW, !current);
         SetModsViewVariant();
     }
@@ -191,7 +191,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     private void SetModsViewVariant()
     {
         Control[] elementsToSwapClasses = [ToggleButton, ModsListBox];
-        var asRows = SettingsService.PrefersModsRowView.Get();
+        var asRows = SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW);
 
         foreach (var elementToSwapClass in elementsToSwapClasses)
         {

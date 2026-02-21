@@ -238,7 +238,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
 
         e.Handled = true;
 
-        if (SettingsService.TestingModeEnabled.Get())
+        if (SettingsService.Get<bool>(SettingsService.TESTING_MODE_ENABLED))
             return;
 
         if (_testerPromptOpen)
@@ -280,7 +280,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener, ISettingListene
 
     private void UpdateTestingButtonVisibility()
     {
-        TestingButton.IsVisible = SettingsService.TestingModeEnabled.Get();
+        TestingButton.IsVisible = SettingsService.Get<bool>(SettingsService.TESTING_MODE_ENABLED);
     }
 
     private void CloseButton_Click(object? sender, RoutedEventArgs e) => Close();

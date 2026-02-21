@@ -132,7 +132,7 @@ public static class DolphinLaunchHelper
             var userFolderArgument = cannotPassUserFolder ? "" : $"-u {EnvHelper.QuotePath(Path.GetFullPath(PathManager.UserFolderPath))}";
             var dolphinLaunchArguments = $"{arguments} {userFolderArgument}";
 
-            var dolphinLocation = Settings.DolphinLocation.Get();
+            var dolphinLocation = Settings.Get<string>(Settings.DOLPHIN_LOCATION);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Windows builds

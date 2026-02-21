@@ -15,7 +15,7 @@ public static class NavigationManager
         //  still makes it so that the first page you enter after changing the language setting will always be the old language instead of the new one
         //  when working on the translations again, this should be fixed. and in a solid way instead of this
         var itCurrentlyIs = CultureInfo.CurrentCulture.ToString();
-        var itsSupposeToBe = Settings.WwLanguage.Get();
+        var itsSupposeToBe = Settings.Get<string>(Settings.WW_LANGUAGE);
         if (itCurrentlyIs != itsSupposeToBe)
         {
             Settings.Set(Settings.WW_LANGUAGE, itCurrentlyIs);

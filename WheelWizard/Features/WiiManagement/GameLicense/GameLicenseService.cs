@@ -134,9 +134,9 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     /// <summary>
     /// Returns the "focused" or currently active license/user as determined by the Settings.
     /// </summary>
-    public LicenseProfile ActiveUser => Licenses.Users[_settingsManager.FocusedUser.Get()];
+    public LicenseProfile ActiveUser => Licenses.Users[_settingsManager.Get<int>(_settingsManager.FOCUSED_USER)];
 
-    public List<FriendProfile> ActiveCurrentFriends => Licenses.Users[_settingsManager.FocusedUser.Get()].Friends;
+    public List<FriendProfile> ActiveCurrentFriends => Licenses.Users[_settingsManager.Get<int>(_settingsManager.FOCUSED_USER)].Friends;
 
     public LicenseCollection LicenseCollection => Licenses;
 

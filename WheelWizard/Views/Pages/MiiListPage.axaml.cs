@@ -421,7 +421,7 @@ public partial class MiiListPage : UserControlBase
         if (!save)
             return;
 
-        var result = MiiDbService.AddToDatabase(window.Mii, SettingsService.MacAddress.Get());
+        var result = MiiDbService.AddToDatabase(window.Mii, SettingsService.Get<string>(SettingsService.MACADDRESS));
         if (result.IsFailure)
         {
             ViewUtils.ShowSnackbar(
@@ -437,7 +437,7 @@ public partial class MiiListPage : UserControlBase
     private void DuplicateMii(Mii[] miis)
     {
         //assuming the mac address is already set correctly
-        var macAddress = SettingsService.MacAddress.Get();
+        var macAddress = SettingsService.Get<string>(SettingsService.MACADDRESS);
         foreach (var mii in miis)
         {
             var result = MiiDbService.AddToDatabase(mii, macAddress);

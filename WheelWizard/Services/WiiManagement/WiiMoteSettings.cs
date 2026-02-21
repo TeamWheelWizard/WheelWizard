@@ -14,7 +14,7 @@ public static class WiiMoteSettings
 
     public static void DisableVirtualWiiMote() => ModifyWiiMoteSource(0);
 
-    public static bool IsForceSettingsEnabled() => Settings.ForceWiimote.Get();
+    public static bool IsForceSettingsEnabled() => Settings.Get<bool>(Settings.FORCE_WIIMOTE);
 
     private static string GetSavedWiiMoteLocation()
     {

@@ -143,7 +143,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     private async void AddFriend_OnClick(object? sender, RoutedEventArgs e)
     {
-        var focusedUserIndex = SettingsService.FocusedUser.Get();
+        var focusedUserIndex = SettingsService.Get<int>(SettingsService.FOCUSED_USER);
         if (focusedUserIndex is < 0 or > 3)
         {
             ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);
@@ -318,7 +318,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (string.IsNullOrWhiteSpace(selectedPlayer.FriendCode))
             return;
 
-        var focusedUserIndex = SettingsService.FocusedUser.Get();
+        var focusedUserIndex = SettingsService.Get<int>(SettingsService.FOCUSED_USER);
         if (focusedUserIndex is < 0 or > 3)
         {
             ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);

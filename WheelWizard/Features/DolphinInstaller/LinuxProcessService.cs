@@ -103,7 +103,7 @@ public sealed class LinuxProcessService : ILinuxProcessService
             return;
 
         var match = Regex.Match(output, @"(\d+)%");
-        if (match.Success && int.TryParse(match.Groups[1].Value, out int percent))
+        if (match.Success && int.TryParse(match.Groups[1].Value, out var percent))
             progress?.Report(percent);
     }
 }

@@ -71,9 +71,6 @@ public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnviro
             return Fail($"Dolphin installation failed with exit code {installDolphinResult.Value}.");
 
         var launchResult = await processService.LaunchAndStopAsync("flatpak", "run org.DolphinEmu.dolphin-emu", TimeSpan.FromSeconds(4));
-        if (launchResult.IsFailure)
-            return launchResult.Error;
-
-        return Ok();
+        return launchResult.IsFailure ? launchResult.Error : Ok();
     }
 }

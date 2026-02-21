@@ -5,8 +5,8 @@ public static class SettingsExtensions
     public static IServiceCollection AddSettings(this IServiceCollection services)
     {
         // TODO(naming-cleanup, later):
-        // - Prefix casing is inconsistent: `WhWz*` vs `WW_*` vs `Ww*` (example: `WhWzSettingManager`, `WW_LANGUAGE`, `WwLanguage`).
-        // - Some setting identifiers use all-caps while others use PascalCase (example: `MACADDRESS` vs `GAME_LOCATION` and typed props).
+        // - Prefix casing is inconsistent: `WhWz*` vs `WW_*` (example: `WhWzSettingManager`, `WW_LANGUAGE`).
+        // - Some setting identifiers use all-caps while others use PascalCase (example: `MACADDRESS` vs `GAME_LOCATION`).
         // - Domain type naming is mixed between generic and feature-specific terms (`Setting`, `WhWzSetting`, `DolphinSetting`).
 
         // Next step:

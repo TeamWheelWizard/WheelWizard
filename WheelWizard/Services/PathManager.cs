@@ -36,9 +36,9 @@ public static class PathManager
     public static string HomeFolderPath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
     // Paths set by the user
-    public static string GameFilePath => Settings.GameLocation.Get();
-    public static string DolphinFilePath => Settings.DolphinLocation.Get();
-    public static string UserFolderPath => Settings.UserFolderPath.Get();
+    public static string GameFilePath => Settings.Get<string>(Settings.GAME_LOCATION);
+    public static string DolphinFilePath => Settings.Get<string>(Settings.DOLPHIN_LOCATION);
+    public static string UserFolderPath => Settings.Get<string>(Settings.USER_FOLDER_PATH);
 
     private static string AppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     private static string LocalAppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

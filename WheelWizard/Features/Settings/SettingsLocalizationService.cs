@@ -30,7 +30,7 @@ public sealed class SettingsLocalizationService(ISettingsManager settingsManager
 
     private void ApplyCulture()
     {
-        var newCulture = new CultureInfo(settingsManager.WwLanguage.Get());
+        var newCulture = new CultureInfo(settingsManager.Get<string>(settingsManager.WW_LANGUAGE));
         CultureInfo.CurrentCulture = newCulture;
         CultureInfo.CurrentUICulture = newCulture;
     }

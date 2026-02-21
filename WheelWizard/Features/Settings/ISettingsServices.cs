@@ -17,15 +17,6 @@ public interface IDolphinSettingManager
     void LoadSettings();
 }
 
-public interface ITypedSetting<T>
-{
-    string Name { get; }
-    T Get();
-    bool Set(T value, bool skipSave = false);
-    bool IsValid();
-    Setting RawSetting { get; }
-}
-
 public interface IGeneralSettings
 {
     Setting USER_FOLDER_PATH { get; }
@@ -41,19 +32,6 @@ public interface IGeneralSettings
     Setting REMOVE_BLUR { get; }
     Setting RR_REGION { get; }
     Setting WW_LANGUAGE { get; }
-
-    ITypedSetting<string> UserFolderPath { get; }
-    ITypedSetting<string> DolphinLocation { get; }
-    ITypedSetting<string> GameLocation { get; }
-    ITypedSetting<bool> ForceWiimote { get; }
-    ITypedSetting<bool> LaunchWithDolphin { get; }
-    ITypedSetting<bool> PrefersModsRowView { get; }
-    ITypedSetting<int> FocusedUser { get; }
-    ITypedSetting<bool> EnableAnimations { get; }
-    ITypedSetting<bool> TestingModeEnabled { get; }
-    ITypedSetting<double> SavedWindowScale { get; }
-    ITypedSetting<bool> RemoveBlur { get; }
-    ITypedSetting<string> WwLanguage { get; }
 }
 
 public interface IDolphinSettings
@@ -67,7 +45,6 @@ public interface IDolphinSettings
     Setting MACADDRESS { get; }
     Setting WINDOW_SCALE { get; }
     Setting RECOMMENDED_SETTINGS { get; }
-    ITypedSetting<string> MacAddress { get; }
 }
 
 public interface ISettingsManager : IGeneralSettings, IDolphinSettings

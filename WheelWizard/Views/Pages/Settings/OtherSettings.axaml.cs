@@ -41,8 +41,8 @@ public partial class OtherSettings : UserControlBase
     private void LoadSettings()
     {
         // Only loads when the settings are not disabled (aka when the paths are set up correctly)
-        DisableForce.IsChecked = SettingsService.ForceWiimote.Get();
-        LaunchWithDolphin.IsChecked = SettingsService.LaunchWithDolphin.Get();
+        DisableForce.IsChecked = SettingsService.Get<bool>(SettingsService.FORCE_WIIMOTE);
+        LaunchWithDolphin.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_WITH_DOLPHIN);
         OpenSaveFolderButton.IsEnabled = Directory.Exists(PathManager.SaveFolderPath);
     }
 

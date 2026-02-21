@@ -72,7 +72,7 @@ public static class MiiExtensions
             return true;
 
         // But it can also be global if the mac address is not the same as your own address
-        var macAddressString = Settings.MacAddress.Get();
+        var macAddressString = Settings.Get<string>(Settings.MACADDRESS);
         var macParts = macAddressString.Split(':');
         var macBytes = new byte[6];
         for (var i = 0; i < 6; i++)

@@ -1,99 +1,95 @@
 # Adding a Setting in WheelWizard
 
-This guide explains how to add a setting with the current Settings feature architecture.
+This is the quick guide for adding settings with the current setup.
 
-## Where Settings Live
-- WheelWizard app settings (JSON): `WhWzSetting`
-- Dolphin config settings (INI): `DolphinSetting`
-- Derived/read-only computed settings: `VirtualSetting`
+## Where to edit
+1. `WheelWizard/Features/Settings/SettingsManager.cs`
+2. `WheelWizard/Features/Settings/ISettingsServices.cs`
 
-Main wiring is in `WheelWizard/Features/Settings/SettingsManager.cs`.
+Note: you still touch 3 spots, but 2 are inside `SettingsManager.cs`:
+1. Constructor registration
+2. Public `Setting` property
+3. Matching interface property
 
-## Rules
-- Add new setting logic in `Features/Settings`, not deprecated `Services/Helpers/Models/Utilities`.
-- Use constructor-registered settings in `SettingsManager`.
-- Use validation with `.SetValidation(...)` where possible.
-- Prefer typed access (`ITypedSetting<T>`) over raw `Setting` where possible.
+## Setting Types
+- WheelWizard JSON setting: `RegisterWhWz(...)`
+- Dolphin INI setting: `RegisterDolphin(...)`
+- Computed (not persisted): `VirtualSetting`
 
-## 1) Add a new WhWz setting (stored in WheelWizard JSON)
+## WhWz setting template
+Use in `SettingsManager` constructor:
 
-### Step A: Register in `SettingsManager` constructor
 ```csharp
 MY_NEW_SETTING = RegisterWhWz(
-    CreateWhWzSetting(typeof(bool), "MyNewSetting", false)
-        .SetValidation(value => value is bool)
+    "MyNewSetting",
+    false,
+    value => value is bool
 );
 ```
 
-### Step B: Expose public properties in `SettingsManager`
+Add property in `SettingsManager`:
+
 ```csharp
 public Setting MY_NEW_SETTING { get; }
-public ITypedSetting<bool> MyNewSetting { get; }
 ```
 
-And initialize typed wrapper in constructor:
-```csharp
-MyNewSetting = new TypedSetting<bool>(MY_NEW_SETTING);
-```
+Add property in `IGeneralSettings` (or `IDolphinSettings` when appropriate):
 
-### Step C: Add interface members in `ISettingsServices.cs`
-Add raw + typed members to the correct interface (`IGeneralSettings` or `IDolphinSettings`):
 ```csharp
 Setting MY_NEW_SETTING { get; }
-ITypedSetting<bool> MyNewSetting { get; }
 ```
 
-## 2) Add a new Dolphin setting (stored in Dolphin INI)
+## Dolphin setting template
+Use in `SettingsManager` constructor:
 
-### Step A: Register in `SettingsManager` constructor
 ```csharp
 MY_DOLPHIN_SETTING = RegisterDolphin(
-    CreateDolphinSetting(typeof(int), ("GFX.ini", "Settings", "MyDolphinKey"), 0)
-        .SetValidation(value => (int)(value ?? -1) >= 0)
+    ("GFX.ini", "Settings", "MyDolphinKey"),
+    0,
+    value => (int)(value ?? -1) >= 0
 );
 ```
 
-### Step B: Expose public property in `SettingsManager`
+Add property in `SettingsManager`:
+
 ```csharp
 public Setting MY_DOLPHIN_SETTING { get; }
 ```
 
-If you want typed access:
-```csharp
-public ITypedSetting<int> MyDolphinSetting { get; }
-MyDolphinSetting = new TypedSetting<int>(MY_DOLPHIN_SETTING);
-```
+Add property in `IDolphinSettings`:
 
-### Step C: Add to interface in `ISettingsServices.cs`
 ```csharp
 Setting MY_DOLPHIN_SETTING { get; }
-ITypedSetting<int> MyDolphinSetting { get; }
 ```
 
-## 3) Add a derived/computed setting (`VirtualSetting`)
-Use this when value depends on other settings and should not be directly persisted.
+## Virtual setting template
+Use when setting depends on other settings and should not be saved:
 
 ```csharp
 MY_VIRTUAL_SETTING = new VirtualSetting(
     typeof(bool),
-    value => { /* setter side-effects */ },
-    () => { /* compute current value */ return true; }
+    value => { /* apply side-effects */ },
+    () => { /* compute value */ return true; }
 ).SetDependencies(DEP_A, DEP_B);
 ```
 
-## Behavior Notes
-- WhWz settings are loaded from JSON in `WhWzSettingManager`.
-- If a WhWz stored value is invalid/unreadable, it is reset to default during load.
-- Dolphin settings are read/written via `DolphinSettingManager` to `.ini` files.
-- Setting changes publish through the settings signal bus (`ISettingsSignalBus`).
+## Read/Write usage
+Use type-safe manager methods in callers:
 
-## If You Add a New Value Type
-- Update JSON parsing in `WheelWizard/Models/Settings/WhWzSetting.cs` (`SetFromJson`).
-- Update INI parsing in `WheelWizard/Models/Settings/DolphinSetting.cs` (`SetFromString`) if needed.
+```csharp
+var value = settings.Get<bool>(settings.MY_NEW_SETTING);
+settings.Set(settings.MY_NEW_SETTING, true);
+```
 
-## Quick Checklist
-- Register setting in `SettingsManager` constructor.
-- Add public property/properties in `SettingsManager`.
-- Add interface members in `ISettingsServices.cs`.
+## Important notes
+- No `ITypedSetting` layer anymore.
+- WhWz invalid/unreadable values are reset to default during load.
+- Setting change notifications go through `ISettingsSignalBus`.
+- Keep new logic in `Features/Settings` (not deprecated folders).
+
+## Minimal checklist
+- Register setting in constructor.
+- Add public `Setting` property.
+- Add interface property.
 - Add validation.
-- Use typed setting in calling code.
+- Use `Get<T>` / `Set(...)` where consumed.

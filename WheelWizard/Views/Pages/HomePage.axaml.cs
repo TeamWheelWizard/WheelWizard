@@ -193,7 +193,7 @@ public partial class HomePage : UserControlBase
         // If the animations are disabled, it will never play the entrance animation
         // The entrance animation is also the only one that makes the wheels visible, meaning hat if this one does not play
         // all the other animations are all also impossible to play
-        if (!SettingsService.EnableAnimations.Get())
+        if (!SettingsService.Get<bool>(SettingsService.ENABLE_ANIMATIONS))
             return;
 
         var allowedToRun = WaitForWheelTrailState(
@@ -224,7 +224,7 @@ public partial class HomePage : UserControlBase
 
     private async void PlayActivateAnimation()
     {
-        if (!SettingsService.EnableAnimations.Get())
+        if (!SettingsService.Get<bool>(SettingsService.ENABLE_ANIMATIONS))
             return;
 
         var allowedToRun = WaitForWheelTrailState(
