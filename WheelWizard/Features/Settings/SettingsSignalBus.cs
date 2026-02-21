@@ -18,8 +18,7 @@ public sealed class SettingsSignalBus : ISettingsSignalBus
 
     public IDisposable Subscribe(Action<SettingChangedSignal> handler)
     {
-        if (handler == null)
-            throw new ArgumentNullException(nameof(handler));
+        ArgumentNullException.ThrowIfNull(handler);
 
         long id;
         lock (_syncRoot)

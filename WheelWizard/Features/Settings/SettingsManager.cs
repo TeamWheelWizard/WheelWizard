@@ -49,11 +49,11 @@ public class SettingsManager : ISettingsManager
 
                 if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
                 {
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    {
-                        if (PathManager.IsFlatpakDolphinFilePath(pathOrCommand) && !_linuxDolphinInstaller.IsDolphinInstalledInFlatpak())
-                            return false;
-                    }
+                    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                        return EnvHelper.IsValidUnixCommand(pathOrCommand);
+
+                    if (PathManager.IsFlatpakDolphinFilePath(pathOrCommand) && !_linuxDolphinInstaller.IsDolphinInstalledInFlatpak())
+                        return false;
 
                     return EnvHelper.IsValidUnixCommand(pathOrCommand);
                 }

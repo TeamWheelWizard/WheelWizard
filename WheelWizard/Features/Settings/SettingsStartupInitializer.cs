@@ -24,17 +24,17 @@ public sealed class SettingsStartupInitializer(
         }
 
         var report = reportResult.Value;
-        if (!report.IsValid)
+        if (report.IsValid)
+            return;
+
+        foreach (var issue in report.Issues)
         {
-            foreach (var issue in report.Issues)
-            {
-                logger.LogWarning(
-                    "Settings validation warning: {Code} ({SettingName}) {Message}",
-                    issue.Code,
-                    issue.SettingName,
-                    issue.Message
-                );
-            }
+            logger.LogWarning(
+                "Settings validation warning: {Code} ({SettingName}) {Message}",
+                issue.Code,
+                issue.SettingName,
+                issue.Message
+            );
         }
     }
 }
