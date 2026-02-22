@@ -100,21 +100,29 @@
                         <Border Classes="BoxItemBackground" Height="50">
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="30" />
                                     <ColumnDefinition Width="50" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <CheckBox Grid.Column="0" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
+                                <!-- Drag handle -->
+                                <Panel Grid.Column="0" Background="Transparent" Cursor="Hand"
+                                       PointerPressed="DragHandle_PointerPressed">
+                                    <PathIcon Data="{StaticResource Grip}" Width="12" Height="12"
+                                              Foreground="{StaticResource Neutral500}" />
+                                </Panel>
+
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
                                           Classes="SwitchDark" Margin="0,5"
                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Mod.Title}" FontSize="14"
                                            Foreground="{StaticResource Neutral100}"
-                                           Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                           Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0" />
 
                                 <!-- Yes i know that it already works without any change event if we remove Mode=OneWay -->
                                 <!-- Removing that will make it so editing that will also edit the model -->
                                 <!-- however, it works really weird if you do that -->
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
                                             VerticalAlignment="Center">
                                     <TextBlock Text="{x:Static lang:Common.Attribute_Priority}" FontSize="14"
                                                Foreground="{StaticResource Neutral100}"
@@ -188,5 +196,9 @@
                 </ListBox.ContextMenu>
             </ListBox>
         </Grid>
+
+        <!-- Drag-and-drop overlay canvas -->
+        <Canvas x:Name="DragCanvas" IsVisible="False" IsHitTestVisible="False"
+                Grid.RowSpan="2" ZIndex="1000" />
     </Grid>
 </UserControl>

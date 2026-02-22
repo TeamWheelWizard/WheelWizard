@@ -1,8 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.VisualTree;
 using WheelWizard.Models.Settings;
 using WheelWizard.Services;
 using WheelWizard.Services.Settings;
@@ -42,6 +46,20 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         }
     }
 
+    // Drag-and-drop state
+    private bool _isDragPending;
+    private bool _isDragging;
+    private Point _dragStartPoint;
+    private ModListItem? _draggedItem;
+    private int _dragStartIndex;
+    private int _currentDropIndex;
+    private ListBoxItem? _draggedListBoxItem;
+    private double _dragOffsetY;
+    private Border? _dragAdorner;
+    private Border? _dropIndicatorLine;
+    private IPointer? _capturedPointer;
+    private const double DragThreshold = 5.0;
+
     public ModsPage()
     {
         InitializeComponent();
@@ -49,6 +67,11 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         ModManager.PropertyChanged += OnModsChanged;
         ModManager.ReloadAsync();
         SetModsViewVariant();
+
+        // Wire up drag-and-drop pointer tracking
+        PointerMoved += OnDragPointerMoved;
+        PointerReleased += OnDragPointerReleased;
+        PointerCaptureLost += OnDragPointerCaptureLost;
     }
 
     private void OnModsChanged(object? sender, PropertyChangedEventArgs e)
@@ -59,6 +82,9 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void OnModsChanged()
     {
+        if (_isDragging)
+            return; // Suppress UI updates during drag to prevent stale container references
+
         ListItemCount.Text = ModManager.Mods.Count.ToString();
         OnPropertyChanged(nameof(Mods));
         HasMods = Mods.Count > 0;
@@ -209,6 +235,350 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             return;
         ViewUtils.FindParent<ListBoxItem>(e.Source)?.Focus();
     }
+
+    #region Drag and Drop
+
+    private void DragHandle_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        var listBoxItem = ViewUtils.FindParent<ListBoxItem>(sender);
+        if (listBoxItem?.Content is not ModListItem modItem)
+            return;
+
+        if (Mods.Count <= 1)
+            return;
+
+        ModsListBox.SelectedItem = modItem;
+
+        _isDragPending = true;
+        _isDragging = false;
+        _dragStartPoint = e.GetPosition(this);
+        _draggedItem = modItem;
+        _draggedListBoxItem = listBoxItem;
+        _dragOffsetY = e.GetPosition(listBoxItem).Y;
+
+        _capturedPointer = e.Pointer;
+        e.Pointer.Capture(this);
+        e.Handled = true;
+    }
+
+    private void OnDragPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (!_isDragPending && !_isDragging)
+            return;
+
+        var currentPos = e.GetPosition(this);
+
+        if (_isDragPending && !_isDragging)
+        {
+            var delta = currentPos - _dragStartPoint;
+            if (Math.Abs(delta.Y) < DragThreshold && Math.Abs(delta.X) < DragThreshold)
+                return;
+
+            StartDrag(currentPos);
+        }
+
+        if (_isDragging)
+            UpdateDrag(e, currentPos);
+    }
+
+    private void OnDragPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (_isDragging)
+        {
+            EndDrag(commit: true);
+            e.Handled = true;
+        }
+        else if (_isDragPending)
+        {
+            CancelDrag();
+        }
+    }
+
+    private void OnDragPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        if (_isDragging || _isDragPending)
+            CancelDrag();
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.Key == Key.Escape && (_isDragging || _isDragPending))
+        {
+            CancelDrag();
+            e.Handled = true;
+        }
+    }
+
+    private void StartDrag(Point currentPos)
+    {
+        _isDragPending = false;
+        _isDragging = true;
+
+        _dragStartIndex = GetModIndex(_draggedItem!);
+        _currentDropIndex = _dragStartIndex;
+
+        if (_draggedListBoxItem != null)
+            _draggedListBoxItem.Opacity = 0.3;
+
+        CreateDragAdorner(currentPos);
+        CreateDropIndicator();
+    }
+
+    private void CreateDragAdorner(Point pos)
+    {
+        var title = _draggedItem?.Mod.Title ?? "Mod";
+
+        var content = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            VerticalAlignment = VerticalAlignment.Center,
+            Spacing = 10,
+        };
+
+        try
+        {
+            if (this.FindResource("Grip") is Geometry gripData)
+            {
+                content.Children.Add(
+                    new PathIcon
+                    {
+                        Data = gripData,
+                        Width = 12,
+                        Height = 12,
+                        Foreground = new SolidColorBrush(Color.Parse("#6C7389")),
+                    }
+                );
+            }
+        }
+        catch
+        {
+            // Resource not found, skip grip icon
+        }
+
+        content.Children.Add(
+            new TextBlock
+            {
+                Text = title,
+                Foreground = new SolidColorBrush(Colors.White),
+                FontSize = 14,
+                VerticalAlignment = VerticalAlignment.Center,
+            }
+        );
+
+        _dragAdorner = new Border
+        {
+            Background = new SolidColorBrush(Color.Parse("#474B5D")),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(15, 0),
+            Height = 50,
+            MinWidth = 250,
+            RenderTransform = new RotateTransform(1.5),
+            Opacity = 0.95,
+            BoxShadow = new BoxShadows(
+                new BoxShadow
+                {
+                    Blur = 15,
+                    Color = Color.Parse("#80000000"),
+                    OffsetX = 0,
+                    OffsetY = 4,
+                }
+            ),
+            Child = content,
+        };
+
+        Canvas.SetLeft(_dragAdorner, pos.X - 30);
+        Canvas.SetTop(_dragAdorner, pos.Y - _dragOffsetY);
+
+        DragCanvas.Children.Add(_dragAdorner);
+        DragCanvas.IsVisible = true;
+    }
+
+    private void CreateDropIndicator()
+    {
+        _dropIndicatorLine = new Border
+        {
+            Height = 3,
+            Background = new SolidColorBrush(Color.Parse("#34EAC5")),
+            CornerRadius = new CornerRadius(2),
+            IsVisible = false,
+        };
+
+        DragCanvas.Children.Add(_dropIndicatorLine);
+    }
+
+    private void UpdateDrag(PointerEventArgs e, Point currentPos)
+    {
+        if (_dragAdorner != null)
+        {
+            Canvas.SetLeft(_dragAdorner, currentPos.X - 30);
+            Canvas.SetTop(_dragAdorner, currentPos.Y - _dragOffsetY);
+        }
+
+        var dropIndex = CalculateDropIndex(e);
+        _currentDropIndex = dropIndex;
+        UpdateDropIndicator(dropIndex);
+        HandleAutoScroll(e);
+    }
+
+    private int CalculateDropIndex(PointerEventArgs e)
+    {
+        var posInListBox = e.GetPosition(ModsListBox);
+        var items = GetListBoxItems();
+
+        if (items.Count == 0)
+            return 0;
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            var itemPos = items[i].TranslatePoint(new Point(0, 0), ModsListBox);
+            if (itemPos == null)
+                continue;
+
+            var midY = itemPos.Value.Y + items[i].Bounds.Height / 2;
+            if (posInListBox.Y < midY)
+                return i;
+        }
+
+        return items.Count;
+    }
+
+    private void UpdateDropIndicator(int gapIndex)
+    {
+        if (_dropIndicatorLine == null)
+            return;
+
+        var items = GetListBoxItems();
+        if (items.Count == 0)
+            return;
+
+        // Hide indicator when hovering over the no-op zone (same position)
+        if (gapIndex == _dragStartIndex || gapIndex == _dragStartIndex + 1)
+        {
+            _dropIndicatorLine.IsVisible = false;
+            return;
+        }
+
+        _dropIndicatorLine.IsVisible = true;
+
+        if (gapIndex < items.Count)
+        {
+            var item = items[gapIndex];
+            var itemPos = item.TranslatePoint(new Point(0, -2), DragCanvas);
+            if (itemPos != null)
+            {
+                Canvas.SetLeft(_dropIndicatorLine, itemPos.Value.X);
+                Canvas.SetTop(_dropIndicatorLine, itemPos.Value.Y);
+                _dropIndicatorLine.Width = item.Bounds.Width;
+            }
+        }
+        else
+        {
+            var lastItem = items[^1];
+            var itemPos = lastItem.TranslatePoint(new Point(0, lastItem.Bounds.Height + 2), DragCanvas);
+            if (itemPos != null)
+            {
+                Canvas.SetLeft(_dropIndicatorLine, itemPos.Value.X);
+                Canvas.SetTop(_dropIndicatorLine, itemPos.Value.Y);
+                _dropIndicatorLine.Width = lastItem.Bounds.Width;
+            }
+        }
+    }
+
+    private void HandleAutoScroll(PointerEventArgs e)
+    {
+        var scrollViewer = ModsListBox.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+        if (scrollViewer == null)
+            return;
+
+        var pos = e.GetPosition(scrollViewer);
+        const double scrollZone = 40.0;
+        const double scrollSpeed = 8.0;
+
+        if (pos.Y < scrollZone && scrollViewer.Offset.Y > 0)
+        {
+            var factor = 1.0 - pos.Y / scrollZone;
+            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, Math.Max(0, scrollViewer.Offset.Y - scrollSpeed * factor));
+        }
+        else if (pos.Y > scrollViewer.Viewport.Height - scrollZone)
+        {
+            var maxScroll = scrollViewer.Extent.Height - scrollViewer.Viewport.Height;
+            if (scrollViewer.Offset.Y < maxScroll)
+            {
+                var factor = 1.0 - (scrollViewer.Viewport.Height - pos.Y) / scrollZone;
+                scrollViewer.Offset = new Vector(scrollViewer.Offset.X, Math.Min(maxScroll, scrollViewer.Offset.Y + scrollSpeed * factor));
+            }
+        }
+    }
+
+    private List<ListBoxItem> GetListBoxItems()
+    {
+        var items = new List<ListBoxItem>();
+        for (var i = 0; i < Mods.Count; i++)
+        {
+            if (ModsListBox.ContainerFromIndex(i) is ListBoxItem lbi)
+                items.Add(lbi);
+        }
+        return items;
+    }
+
+    private int GetModIndex(ModListItem modItem)
+    {
+        for (var i = 0; i < Mods.Count; i++)
+        {
+            if (Mods[i].Mod == modItem.Mod)
+                return i;
+        }
+        return -1;
+    }
+
+    private void EndDrag(bool commit)
+    {
+        if (_draggedListBoxItem != null)
+            _draggedListBoxItem.Opacity = 1.0;
+
+        var modToMove = _draggedItem?.Mod;
+        var targetGapIndex = _currentDropIndex;
+        var sourceIndex = _dragStartIndex;
+        var shouldCommit = commit && modToMove != null && targetGapIndex != sourceIndex && targetGapIndex != sourceIndex + 1;
+
+        CleanupDrag();
+
+        if (shouldCommit)
+            ModManager.MoveModToIndex(modToMove!, targetGapIndex);
+    }
+
+    private void CancelDrag()
+    {
+        if (!_isDragging && !_isDragPending)
+            return;
+
+        if (_draggedListBoxItem != null)
+            _draggedListBoxItem.Opacity = 1.0;
+
+        CleanupDrag();
+    }
+
+    private void CleanupDrag()
+    {
+        _isDragging = false;
+        _isDragPending = false;
+        _draggedItem = null;
+        _draggedListBoxItem = null;
+        _dragAdorner = null;
+        _dropIndicatorLine = null;
+
+        DragCanvas.Children.Clear();
+        DragCanvas.IsVisible = false;
+
+        _capturedPointer?.Capture(null);
+        _capturedPointer = null;
+    }
+
+    #endregion
 
     #region PropertyChanged
 
