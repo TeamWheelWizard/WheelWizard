@@ -6,7 +6,7 @@ using WheelWizard.Models;
 using WheelWizard.Resources.Languages;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Services;
@@ -38,6 +38,9 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     [Inject]
     private IApiCaller<IRwfcApi> ApiCaller { get; set; } = null!;
+
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
 
     public ObservableCollection<FriendProfile> FriendList
     {
@@ -140,7 +143,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     private async void AddFriend_OnClick(object? sender, RoutedEventArgs e)
     {
-        var focusedUserIndex = (int)SettingsManager.FOCUSSED_USER.Get();
+        var focusedUserIndex = SettingsService.Get<int>(SettingsService.FOCUSED_USER);
         if (focusedUserIndex is < 0 or > 3)
         {
             ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);
@@ -315,7 +318,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (string.IsNullOrWhiteSpace(selectedPlayer.FriendCode))
             return;
 
-        var focusedUserIndex = (int)SettingsManager.FOCUSSED_USER.Get();
+        var focusedUserIndex = SettingsService.Get<int>(SettingsService.FOCUSED_USER);
         if (focusedUserIndex is < 0 or > 3)
         {
             ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);

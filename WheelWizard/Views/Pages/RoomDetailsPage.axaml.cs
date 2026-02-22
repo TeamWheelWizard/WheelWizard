@@ -6,7 +6,7 @@ using WheelWizard.Models;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.Mockers;
@@ -26,6 +26,9 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
 
     [Inject]
     private IMiiDbService MiiDbService { get; set; } = null!;
+
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
 
     private RrRoom _room = null!;
 
@@ -132,7 +135,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return;
         }
 
-        var focusedUserIndex = (int)SettingsManager.FOCUSSED_USER.Get();
+        var focusedUserIndex = SettingsService.Get<int>(SettingsService.FOCUSED_USER);
         if (focusedUserIndex is < 0 or > 3)
         {
             ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);

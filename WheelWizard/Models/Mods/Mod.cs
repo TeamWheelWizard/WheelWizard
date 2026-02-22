@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using IniParser;
 using IniParser.Model;
 
-namespace WheelWizard.Models.Settings;
+namespace WheelWizard.Models.Mods;
 
 public class Mod : INotifyPropertyChanged
 {

@@ -1,11 +1,13 @@
 using System.Globalization;
 using Avalonia.Controls;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 
 namespace WheelWizard.Views;
 
 public static class NavigationManager
 {
+    private static ISettingsManager Settings => SettingsRuntime.Current;
+
     public static void NavigateTo(Type pageType, params object?[] args)
     {
         // TODO: Fix the language bug. for some reason when changing the language, it changes itself back to the language before
@@ -13,11 +15,11 @@ public static class NavigationManager
         //  still makes it so that the first page you enter after changing the language setting will always be the old language instead of the new one
         //  when working on the translations again, this should be fixed. and in a solid way instead of this
         var itCurrentlyIs = CultureInfo.CurrentCulture.ToString();
-        var itsSupposeToBe = (string)SettingsManager.WW_LANGUAGE.Get();
+        var itsSupposeToBe = Settings.Get<string>(Settings.WW_LANGUAGE);
         if (itCurrentlyIs != itsSupposeToBe)
         {
-            SettingsManager.WW_LANGUAGE.Set(itCurrentlyIs);
-            SettingsManager.WW_LANGUAGE.Set(itsSupposeToBe);
+            Settings.Set(Settings.WW_LANGUAGE, itCurrentlyIs);
+            Settings.Set(Settings.WW_LANGUAGE, itsSupposeToBe);
         }
 
         if (Activator.CreateInstance(pageType, args) is not UserControl instance)

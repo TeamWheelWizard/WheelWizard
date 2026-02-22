@@ -1,77 +1,109 @@
-using WheelWizard.Helpers;
-using WheelWizard.Models.Settings;
+using System.IO.Abstractions;
+using WheelWizard.Services;
+using WheelWizard.Settings.Types;
 
-namespace WheelWizard.Services.Settings;
+namespace WheelWizard.Settings;
 
-public class DolphinSettingManager
+public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingManager
 {
     private static string ConfigFolderPath(string fileName) => Path.Combine(PathManager.ConfigFolderPath, fileName);
 
+    private readonly object _syncRoot = new();
+    private readonly object _fileIoSync = new();
     private bool _loaded;
     private readonly List<DolphinSetting> _settings = [];
 
-    public static DolphinSettingManager Instance { get; } = new();
-
-    private DolphinSettingManager() { }
-
     public void RegisterSetting(DolphinSetting setting)
     {
-        if (_loaded)
-            return;
+        lock (_syncRoot)
+        {
+            if (_loaded)
+                return;
 
-        _settings.Add(setting);
+            _settings.Add(setting);
+        }
     }
 
     public void SaveSettings(DolphinSetting invokingSetting)
     {
-        // TODO: This method definitely has to be optimized
-        if (!_loaded)
-            return;
-
-        foreach (var setting in _settings)
+        List<DolphinSetting> settingsSnapshot;
+        lock (_syncRoot)
         {
-            ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
+            // TODO: This method definitely has to be optimized
+            if (!_loaded)
+                return;
+
+            settingsSnapshot = [.. _settings];
+        }
+
+        lock (_fileIoSync)
+        {
+            foreach (var setting in settingsSnapshot)
+            {
+                ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
+            }
         }
     }
 
     public void ReloadSettings()
     {
-        // TODO: this method could also be optimized by checking if the previously loaded directory
-        //       is still the current ConfigFolderPath and if so, just not run the LoadSettings method again
-        _loaded = false;
+        lock (_syncRoot)
+        {
+            // TODO: this method could also be optimized by checking if the previously loaded directory
+            //       is still the current ConfigFolderPath and if so, just not run the LoadSettings method again
+            _loaded = false;
+        }
+
         LoadSettings();
     }
 
     public void LoadSettings()
     {
-        if (_loaded)
-            return;
+        List<DolphinSetting> settingsSnapshot;
+        lock (_syncRoot)
+        {
+            if (_loaded)
+                return;
 
-        if (!FileHelper.DirectoryExists(PathManager.ConfigFolderPath))
+            _loaded = true;
+            settingsSnapshot = [.. _settings];
+        }
+
+        if (!fileSystem.Directory.Exists(PathManager.ConfigFolderPath))
             return;
 
         // TODO: This method can maybe be optimized in the future, since now it reads the file for every setting
         //       and on top of that for reach setting it loops over each line and section and stuff like that.
-        foreach (var setting in _settings)
+        lock (_fileIoSync)
         {
-            var value = ReadIniSetting(setting.FileName, setting.Section, setting.Name);
-            if (value == null)
-                ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
-            else
-                setting.SetFromString(value, true); // we read it, which means there is no purpose in saving it again
+            foreach (var setting in settingsSnapshot)
+            {
+                var value = ReadIniSetting(setting.FileName, setting.Section, setting.Name);
+                if (value == null)
+                    ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
+                else
+                    setting.SetFromString(value, true); // we read it, which means there is no purpose in saving it again
+            }
         }
-
-        _loaded = true;
     }
 
-    private static string[]? ReadIniFile(string fileName)
+    private string[]? ReadIniFile(string fileName)
     {
         var filePath = ConfigFolderPath(fileName);
-        var lines = FileHelper.ReadAllLinesSafe(filePath);
-        return lines;
+        if (!fileSystem.File.Exists(filePath))
+            return null;
+
+        try
+        {
+            return fileSystem.File.ReadAllLines(filePath);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
-    private static string? ReadIniSetting(string fileName, string section, string settingToRead)
+    private string? ReadIniSetting(string fileName, string section, string settingToRead)
     {
         var lines = ReadIniFile(fileName);
         if (lines == null)
@@ -102,7 +134,7 @@ public class DolphinSettingManager
     }
 
     // TODO: find out when to use `setting=value` and when to use `setting = value`
-    private static void ChangeIniSettings(string fileName, string section, string settingToChange, string value)
+    private void ChangeIniSettings(string fileName, string section, string settingToChange, string value)
     {
         var lines = ReadIniFile(fileName)?.ToList();
         if (lines == null)
@@ -113,7 +145,7 @@ public class DolphinSettingManager
         {
             lines.Add($"[{section}]");
             lines.Add($"{settingToChange} = {value}");
-            FileHelper.WriteAllLines(ConfigFolderPath(fileName), lines);
+            fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
             return;
         }
 
@@ -127,12 +159,12 @@ public class DolphinSettingManager
                 continue;
 
             lines[i] = $"{settingToChange} = {value}";
-            FileHelper.WriteAllLines(ConfigFolderPath(fileName), lines);
+            fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
             return;
         }
         // you only get here if the setting was not found in the section
 
         lines.Insert(sectionIndex + 1, $"{settingToChange} = {value}");
-        FileHelper.WriteAllLines(ConfigFolderPath(fileName), lines);
+        fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
     }
 }
