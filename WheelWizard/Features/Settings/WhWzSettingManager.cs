@@ -8,6 +8,13 @@ namespace WheelWizard.Settings;
 
 public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem fileSystem) : IWhWzSettingManager
 {
+    // LOCKS:
+    // We are working with locks. This is to ensure that we always have accurate information in our settings / application.
+    // We do not create multiple threads. However, some of our features run through Tasks. Those are executed asynchronously, therefore still require locks.
+
+    // Sync Root:  Responsible for synchronizing access to the _settings list and the _loaded flag.
+    // It ensures that multiple threads don't modify the settings list or the loaded state at the same time
+    // File IO Sync:  Responsible for reading and writing the INI files. It ensures that multiple threads don't read/write at the same time
     private readonly object _syncRoot = new();
     private readonly object _fileIoSync = new();
     private bool _loaded;

@@ -27,6 +27,16 @@ public class LinuxDolphinInstallerTests
     }
 
     [Fact]
+    public void IsDolphinInstalledInFlatpak_ReturnsFalse_WhenFlatpakInfoExitCodeIsNonZero()
+    {
+        _processService.Run("flatpak", "info org.DolphinEmu.dolphin-emu").Returns(Ok(1));
+
+        var result = _installer.IsDolphinInstalledInFlatpak();
+
+        Assert.False(result);
+    }
+
+    [Fact]
     public async Task InstallFlatpak_ReturnsFailure_WhenPackageManagerCannotBeDetected()
     {
         _commandEnvironment.IsCommandAvailable("flatpak").Returns(false);

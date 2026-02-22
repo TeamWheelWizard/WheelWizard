@@ -43,10 +43,9 @@ MY_VIRTUAL_SETTING = new VirtualSetting(
     () => { /* compute value */ return true; }
 ).SetDependencies(SETTING_A, SETTING_B);
 ```
-Usually you create virtual settigns that reference one or more real settings.
-The value of the virtual setting is cached. However, if the value relies on e.g. SETTING_A. than once SETTING_A changes, your cache is wrong.
-// For that reason, you have to set dependencies. That way if SETTING_A changes, the virtual setting gets a signal to recompute its value
-
+Usually, you create virtual settings that reference one or more real settings.
+The value of the virtual setting is cached. However, if the value relies on, for example, SETTING_A, then once SETTING_A changes, your cache is incorrect.
+For that reason, you have to set dependencies. That way, if SETTING_A changes, the virtual setting gets a signal to recompute its value.
 
 ## Reading/Writing settings
 Use type-safe manager methods in callers:

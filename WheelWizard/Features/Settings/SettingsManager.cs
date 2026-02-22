@@ -10,7 +10,6 @@ namespace WheelWizard.Settings;
 
 public class SettingsManager : ISettingsManager
 {
-    private readonly object _syncRoot = new();
     private readonly IWhWzSettingManager _whWzSettingManager;
     private readonly IDolphinSettingManager _dolphinSettingManager;
     private readonly ILinuxDolphinInstaller _linuxDolphinInstaller;
@@ -267,15 +266,12 @@ public class SettingsManager : ISettingsManager
 
     public void LoadSettings()
     {
-        lock (_syncRoot)
-        {
-            if (_hasLoadedSettings)
-                return;
+        if (_hasLoadedSettings)
+            return;
 
-            _whWzSettingManager.LoadSettings();
-            _dolphinSettingManager.LoadSettings();
-            _hasLoadedSettings = true;
-        }
+        _whWzSettingManager.LoadSettings();
+        _dolphinSettingManager.LoadSettings();
+        _hasLoadedSettings = true;
     }
     #endregion
 

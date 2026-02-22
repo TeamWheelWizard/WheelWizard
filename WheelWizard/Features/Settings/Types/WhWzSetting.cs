@@ -12,7 +12,7 @@ public class WhWzSetting : Setting
     public WhWzSetting(Type type, string name, object defaultValue, Action<WhWzSetting> saveAction)
         : base(type, name, defaultValue)
     {
-        _saveAction = saveAction;
+        _saveAction = saveAction ?? throw new ArgumentNullException(nameof(saveAction));
     }
 
     protected override bool SetInternal(object newValue, bool skipSave = false)

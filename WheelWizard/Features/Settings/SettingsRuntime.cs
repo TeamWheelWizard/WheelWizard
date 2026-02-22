@@ -10,33 +10,22 @@ namespace WheelWizard.Settings;
 [Obsolete("SettingsRuntime is deprecated. Use constructor injection for ISettingsManager instead.")]
 public static class SettingsRuntime
 {
-    private static readonly object SyncRoot = new();
     private static ISettingsManager? _current;
 
     public static ISettingsManager Current
     {
-        get
-        {
-            lock (SyncRoot)
-            {
-                return _current ?? throw new InvalidOperationException("Settings runtime has not been initialized yet.");
-            }
-        }
+        get { return _current ?? throw new InvalidOperationException("Settings runtime has not been initialized yet."); }
     }
 
     public static void Initialize(ISettingsManager settingsManager)
     {
-        lock (SyncRoot)
-        {
-            _current = settingsManager;
-        }
+        _current = settingsManager;
     }
 }
 
 [Obsolete("SettingsSignalRuntime is deprecated. Use constructor injection for ISettingsSignalBus instead.")]
 public static class SettingsSignalRuntime
 {
-    private static readonly object SyncRoot = new();
     private static ISettingsSignalBus? _current;
     private static readonly List<Action<ISettingsSignalBus>> PendingInitializers = [];
 
@@ -44,13 +33,9 @@ public static class SettingsSignalRuntime
     {
         ArgumentNullException.ThrowIfNull(signalBus);
 
-        List<Action<ISettingsSignalBus>> callbacksToRun;
-        lock (SyncRoot)
-        {
-            _current = signalBus;
-            callbacksToRun = [.. PendingInitializers];
-            PendingInitializers.Clear();
-        }
+        _current = signalBus;
+        var callbacksToRun = PendingInitializers.ToArray();
+        PendingInitializers.Clear();
 
         foreach (var callback in callbacksToRun)
         {
@@ -62,15 +47,11 @@ public static class SettingsSignalRuntime
     {
         ArgumentNullException.ThrowIfNull(callback);
 
-        ISettingsSignalBus? signalBus;
-        lock (SyncRoot)
+        var signalBus = _current;
+        if (signalBus == null)
         {
-            signalBus = _current;
-            if (signalBus == null)
-            {
-                PendingInitializers.Add(callback);
-                return;
-            }
+            PendingInitializers.Add(callback);
+            return;
         }
 
         callback(signalBus);
@@ -78,12 +59,6 @@ public static class SettingsSignalRuntime
 
     public static void Publish(Setting setting)
     {
-        ISettingsSignalBus? signalBus;
-        lock (SyncRoot)
-        {
-            signalBus = _current;
-        }
-
-        signalBus?.Publish(setting);
+        _current?.Publish(setting);
     }
 }
