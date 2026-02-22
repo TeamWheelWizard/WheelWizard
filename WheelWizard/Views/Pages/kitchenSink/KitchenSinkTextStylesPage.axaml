@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="640"
+             x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkTextStylesPage">
+    <StackPanel Spacing="8">
+        <TextBlock Classes="TitleText" Text="TitleText: Section headline" />
+        <TextBlock Classes="PageTitleText" Margin="0" Text="PageTitleText: Page header style" />
+        <TextBlock Classes="SidebarSectionText" Margin="0" Text="SidebarSectionText: Sidebar category title" />
+        <TextBlock Classes="BodyText" Text="BodyText: Default readable paragraph text for content sections." />
+        <TextBlock Classes="TinyText" Text="TinyText: helper and metadata text." />
+        <TextBlock Text="Default text style without extra class." />
+
+        <TextBlock Classes="TinyText" Margin="0,8,0,0" Text="Tooltip placement previews:" />
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <components:Button Variant="Default"
+                               Text="Left"
+                               ToolTip.Tip="Left aligned tooltip pointer."
+                               ToolTip.Placement="TopEdgeAlignedLeft"
+                               ToolTip.ShowDelay="20" />
+            <components:Button Variant="Default"
+                               Text="Center"
+                               ToolTip.Tip="Centered tooltip pointer."
+                               ToolTip.Placement="Top"
+                               ToolTip.ShowDelay="20" />
+            <components:Button Variant="Default"
+                               Text="Right"
+                               ToolTip.Tip="Right aligned tooltip pointer."
+                               ToolTip.Placement="TopEdgeAlignedRight"
+                               ToolTip.ShowDelay="20" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

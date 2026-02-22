@@ -5,7 +5,7 @@
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
-             x:Class="WheelWizard.Views.Pages.Settings.SettingsPage">
+             x:Class="WheelWizard.Views.Pages.SettingsPage">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />

@@ -1,8 +1,9 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
+using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Popups;
 
-namespace WheelWizard.Views.Pages.Settings;
+namespace WheelWizard.Views.Pages;
 
 public partial class SettingsPage : UserControlBase
 {
@@ -25,9 +26,9 @@ public partial class SettingsPage : UserControlBase
         if (sender is not RadioButton radioButton)
             return;
 
-        // As long as the Ks... files are next to this file, it works.
-        var namespaceName = GetType().Namespace;
-        var typeName = $"{namespaceName}.{radioButton.Tag}";
+        // Settings sub-pages stay in the nested Settings namespace.
+        var settingsSubPagesNamespace = typeof(WhWzSettings).Namespace;
+        var typeName = $"{settingsSubPagesNamespace}.{radioButton.Tag}";
         var type = Type.GetType(typeName);
         if (type == null || !typeof(UserControl).IsAssignableFrom(type))
             return;

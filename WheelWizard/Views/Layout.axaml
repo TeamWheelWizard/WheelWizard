@@ -6,7 +6,6 @@
         x:Class="WheelWizard.Views.Layout"
         xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
         xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
-        xmlns:settings="clr-namespace:WheelWizard.Views.Pages.Settings"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         Height="876" Width="656" WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
@@ -142,12 +141,13 @@
             <TextBlock Text="{x:Static lang:Settings.Category_Other}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from settings -->
             <components:SidebarRadioButton IconData="{StaticResource Settings}"
-                                           PageType="{x:Type settings:SettingsPage}"
+                                           PageType="{x:Type pages:SettingsPage}"
                                            Text="{x:Static lang:Common.PageTitle_Settings}" x:Name="SettingsButton" />
             <components:SidebarRadioButton IconData="{StaticResource Code}"
                                            PageType="{x:Type pages:TestingPage}"
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
             <components:SidebarRadioButton IconData="{StaticResource Sink}" IsVisible="False"
+                                           PageType="{x:Type pages:KitchenSinkPage}"
                                            Text="Kitchen Sink" x:Name="KitchenSinkButton" />
         </StackPanel>
 
