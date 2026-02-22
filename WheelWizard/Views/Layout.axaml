@@ -147,7 +147,7 @@
             <components:SidebarRadioButton IconData="{StaticResource Code}"
                                            PageType="{x:Type pages:TestingPage}"
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
-            <components:SidebarRadioButton IconData="{StaticResource Spinner}" IsVisible="False"
+            <components:SidebarRadioButton IconData="{StaticResource Sink}" IsVisible="False"
                                            Text="Kitchen Sink" x:Name="KitchenSinkButton" />
         </StackPanel>
 

@@ -23,11 +23,11 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
             <TextBlock Text="{x:Static lang:Common.PageTitle_Rooms}" Classes="PageTitleText" />
-            <Border VerticalAlignment="Center" HorizontalAlignment="Center"
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6,0,0,0"
                     ToolTip.Tip="{x:Static lang:Phrases.Hover_RoomsPageDisclaimer}"
                     ToolTip.Placement="Top" ToolTip.ShowDelay="20"
                     Width="18" Height="18">
-                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
             </Border>
         </StackPanel>

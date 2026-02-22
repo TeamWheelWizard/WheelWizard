@@ -78,7 +78,7 @@
             <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="18" Height="18" Margin="10"
                     ToolTip.Tip="{x:Static lang:Phrases.Hover_RegionUserSelection}" ToolTip.Placement="Top"
                     ToolTip.ShowDelay="20">
-                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
             </Border>
             <ComboBox x:Name="RegionDropdown" Margin="3,12" MinWidth="160"

@@ -6,6 +6,7 @@ using WheelWizard.AutoUpdating;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.UrlProtocol;
+using WheelWizard.Views.Scripts;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
@@ -38,6 +39,7 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        ToolTipBubbleBehavior.Initialize();
     }
 
     private static void OpenGameBananaModWindow()
