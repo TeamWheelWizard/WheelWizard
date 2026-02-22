@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="430"
+             x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkIconsPage">
+    <StackPanel Spacing="12">
+        <TextBlock Classes="TinyText" Text="Normal Icons (PathIcon)" />
+        <Grid ColumnDefinitions="*,*,*">
+            <StackPanel Grid.Column="0" Margin="0,0,6,0" HorizontalAlignment="Center" Spacing="6">
+                <PathIcon Data="{StaticResource WheelIcon}"
+                          Foreground="{StaticResource Neutral300}"
+                          Width="34"
+                          Height="34" />
+                <TextBlock Classes="TinyText" Text="WheelIcon" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Margin="6,0,6,0" HorizontalAlignment="Center" Spacing="6">
+                <PathIcon Data="{StaticResource Download}"
+                          Foreground="{StaticResource Neutral300}"
+                          Width="34"
+                          Height="34" />
+                <TextBlock Classes="TinyText" Text="Download" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Margin="6,0,0,0" HorizontalAlignment="Center" Spacing="6">
+                <PathIcon Data="{StaticResource WarningTip}"
+                          Foreground="{StaticResource Neutral300}"
+                          Width="34"
+                          Height="34" />
+                <TextBlock Classes="TinyText" Text="WarningTip" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Classes="TinyText" Margin="0,6,0,0" Text="MultiColoredIcon" />
+        <Grid ColumnDefinitions="*,*,*">
+            <StackPanel Grid.Column="0" Margin="0,0,6,0" HorizontalAlignment="Center" Spacing="6">
+                <components:MultiColoredIcon Width="42"
+                                             Height="42"
+                                             IconData="{DynamicResource Multi-Example}"
+                                             Color1="{StaticResource Primary400}"
+                                             Color2="{StaticResource Warning400}"
+                                             Color3="{StaticResource Neutral100}" />
+                <TextBlock Classes="TinyText" Text="Multi-Example" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Margin="6,0,6,0" HorizontalAlignment="Center" Spacing="6">
+                <components:MultiColoredIcon Width="42"
+                                             Height="42"
+                                             IconData="{DynamicResource Multi-PaintBrush}"
+                                             Color1="{StaticResource Danger300}"
+                                             Color2="{StaticResource Primary300}" />
+                <TextBlock Classes="TinyText" Text="Multi-PaintBrush" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Margin="6,0,0,0" HorizontalAlignment="Center" Spacing="6">
+                <components:MultiColoredIcon Width="42"
+                                             Height="42"
+                                             IconData="{DynamicResource MiiMouth13}"
+                                             Color1="{StaticResource Danger400}"
+                                             Color2="{StaticResource Danger200}"
+                                             Color3="{StaticResource Neutral900}" />
+                <TextBlock Classes="TinyText" Text="MiiMouth13" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</UserControl>

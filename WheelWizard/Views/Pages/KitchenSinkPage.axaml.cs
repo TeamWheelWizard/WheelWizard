@@ -17,6 +17,8 @@ public partial class KitchenSinkPage : UserControlBase
         SectionDefinition.Create<KitchenSinkDropdownsPage>(),
         SectionDefinition.Create<KitchenSinkButtonsPage>(),
         SectionDefinition.Create<KitchenSinkIconLabelsPage>(),
+        SectionDefinition.Create<KitchenSinkStateBoxesPage>(),
+        SectionDefinition.Create<KitchenSinkIconsPage>(),
     ];
 
     // Add more configurable section groups here.
@@ -29,7 +31,9 @@ public partial class KitchenSinkPage : UserControlBase
             typeof(KitchenSinkInputFieldsPage),
             typeof(KitchenSinkDropdownsPage),
             typeof(KitchenSinkButtonsPage),
-            typeof(KitchenSinkIconLabelsPage)
+            typeof(KitchenSinkIconLabelsPage),
+            typeof(KitchenSinkStateBoxesPage),
+            typeof(KitchenSinkIconsPage)
         ),
     ];
 

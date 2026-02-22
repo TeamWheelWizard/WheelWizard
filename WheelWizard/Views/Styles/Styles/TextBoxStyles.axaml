@@ -15,6 +15,13 @@
                 <TextBox Classes="dark error" Watermark="Enter text here..." Margin="0,2" />
                 <TextBox Classes="error" Watermark="Enter text here..." Margin="0,2" IsEnabled="False" />
                 <TextBox Classes="dark error" Watermark="Enter text here..." Margin="0,2" IsEnabled="False" />
+
+                <Border Height="1" Background="{StaticResource Neutral900}" />
+
+                <TextBox Classes="warning" Watermark="Enter text here..." Margin="0,2" />
+                <TextBox Classes="dark warning" Watermark="Enter text here..." Margin="0,2" />
+                <TextBox Classes="warning" Watermark="Enter text here..." Margin="0,2" IsEnabled="False" />
+                <TextBox Classes="dark warning" Watermark="Enter text here..." Margin="0,2" IsEnabled="False" />
             </StackPanel>
         </Border>
     </Design.PreviewWith>
@@ -81,6 +88,19 @@
         <Setter Property="BorderBrush" Value="{StaticResource Danger500}" />
     </Style>
 
+    <Style Selector="TextBox.warning /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{StaticResource Warning600}" />
+    </Style>
+    <Style Selector="TextBox.dark.warning /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{StaticResource Warning700}" />
+    </Style>
+    <Style Selector="TextBox.warning:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{StaticResource Warning500}" />
+    </Style>
+    <Style Selector="TextBox.warning:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{StaticResource Warning500}" />
+    </Style>
+
     <Style Selector="TextBox:disabled /template/ Border#PART_BorderElement">
         <Setter Property="Background" Value="{StaticResource Neutral900}" />
         <Setter Property="BorderBrush" Value="{StaticResource Neutral900}" />
@@ -105,5 +125,8 @@
 
     <Style Selector="TextBox.error:disabled /template/ Border#PART_BorderElement">
         <Setter Property="BorderBrush" Value="{StaticResource Danger900}" />
+    </Style>
+    <Style Selector="TextBox.warning:disabled /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{StaticResource Warning900}" />
     </Style>
 </Styles>

@@ -17,6 +17,10 @@ public partial class FeedbackTextBox : UserControlBase
         nameof(ErrorMessage)
     );
 
+    public static readonly StyledProperty<string> WarningMessageProperty = AvaloniaProperty.Register<FeedbackTextBox, string>(
+        nameof(WarningMessage)
+    );
+
     public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<FeedbackTextBox, string>(nameof(Text));
 
     public static readonly StyledProperty<string> WatermarkProperty = AvaloniaProperty.Register<FeedbackTextBox, string>(
@@ -49,6 +53,12 @@ public partial class FeedbackTextBox : UserControlBase
     {
         get => GetValue(ErrorMessageProperty);
         set => SetValue(ErrorMessageProperty, value);
+    }
+
+    public string WarningMessage
+    {
+        get => GetValue(WarningMessageProperty);
+        set => SetValue(WarningMessageProperty, value);
     }
 
     public string Text
@@ -89,6 +99,7 @@ public partial class FeedbackTextBox : UserControlBase
         DataContext = this;
 
         InputField.TextChanged += (_, _) => RaiseEvent(new TextChangedEventArgs(TextChangedEvent, this));
+        UpdateValidationState(hasError: !string.IsNullOrWhiteSpace(ErrorMessage), hasWarning: !string.IsNullOrWhiteSpace(WarningMessage));
         // If there is uses for more other events, then we can always add them
     }
 
@@ -100,16 +111,26 @@ public partial class FeedbackTextBox : UserControlBase
             InputField.Classes.Remove("dark");
     }
 
-    private void UpdateErrorState(bool hasError)
+    private void UpdateValidationState(bool hasError, bool hasWarning)
     {
-        if (!hasError)
+        if (hasError)
         {
-            InputField.Classes.Remove("error");
+            if (!InputField.Classes.Contains("error"))
+                InputField.Classes.Add("error");
+            InputField.Classes.Remove("warning");
             return;
         }
 
-        if (!InputField.Classes.Contains("error"))
-            InputField.Classes.Add("error");
+        InputField.Classes.Remove("error");
+
+        if (!hasWarning)
+        {
+            InputField.Classes.Remove("warning");
+            return;
+        }
+
+        if (!InputField.Classes.Contains("warning"))
+            InputField.Classes.Add("warning");
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -119,7 +140,10 @@ public partial class FeedbackTextBox : UserControlBase
         if (change.Property == VariantProperty)
             UpdateStyleClasses(change.GetNewValue<TextBoxVariantType>());
 
-        if (change.Property == ErrorMessageProperty)
-            UpdateErrorState(hasError: !string.IsNullOrWhiteSpace(change.GetNewValue<string?>()));
+        if (change.Property == ErrorMessageProperty || change.Property == WarningMessageProperty)
+            UpdateValidationState(
+                hasError: !string.IsNullOrWhiteSpace(ErrorMessage),
+                hasWarning: !string.IsNullOrWhiteSpace(WarningMessage)
+            );
     }
 }

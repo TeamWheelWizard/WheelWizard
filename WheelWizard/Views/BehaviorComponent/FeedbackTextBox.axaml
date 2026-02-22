@@ -19,6 +19,12 @@
                               IconData="{StaticResource WarningTriangle}"
                               IconSize="15" FontSize="13" Margin="4,4,0,0"
                               />
+        <components:IconLabel IsIconLeft="True" Text="{Binding WarningMessage}"
+                              IsVisible="{Binding WarningMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                              Foreground="{StaticResource Warning600}"
+                              IconData="{StaticResource WarningTip}"
+                              IconSize="15" FontSize="13" Margin="4,4,0,0"
+                              />
     </StackPanel>
     
 </UserControl>
