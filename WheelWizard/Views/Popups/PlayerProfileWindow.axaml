@@ -88,7 +88,7 @@
 
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" />
 
-                <components:VrHistoryGraph FriendCode="{Binding Profile.FriendCode}" />
+                <behavior:VrHistoryGraph FriendCode="{Binding Profile.FriendCode}" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

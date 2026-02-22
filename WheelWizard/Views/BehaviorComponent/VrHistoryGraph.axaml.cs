@@ -9,7 +9,7 @@ using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views;
 
-namespace WheelWizard.Views.Components;
+namespace WheelWizard.Views.BehaviorComponent;
 
 public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
 {

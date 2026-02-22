@@ -2,12 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:behaviorComp="clr-namespace:WheelWizard.Views.BehaviorComponent"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              mc:Ignorable="d"
              d:DesignWidth="560"
              d:DesignHeight="390"
-             x:Class="WheelWizard.Views.Components.VrHistoryGraph"
-             x:DataType="components:VrHistoryGraph">
+             x:Class="WheelWizard.Views.BehaviorComponent.VrHistoryGraph"
+             x:DataType="behaviorComp:VrHistoryGraph">
     <UserControl.Styles>
         <Style Selector="Border.profileStatCard">
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
@@ -19,7 +20,7 @@
             Margin="0"
             Background="Transparent"
             BorderThickness="0"
-            DataContext="{Binding RelativeSource={RelativeSource AncestorType=components:VrHistoryGraph}}">
+            DataContext="{Binding RelativeSource={RelativeSource AncestorType=behaviorComp:VrHistoryGraph}}">
         <Grid RowDefinitions="Auto,Auto,*">
             <Grid Grid.Row="0"
                   ColumnDefinitions="*,*,*"

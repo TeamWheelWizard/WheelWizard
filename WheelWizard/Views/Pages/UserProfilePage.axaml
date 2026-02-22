@@ -203,9 +203,9 @@
                     </Carousel.PageTransition>
                     <Carousel.Items>
                         <Border Background="Transparent" BorderThickness="0" Padding="0">
-                            <components:VrHistoryGraph HorizontalAlignment="Stretch"
-                                                       VerticalAlignment="Stretch"
-                                                       FriendCode="{Binding CurrentFriendCode}" />
+                            <behavior:VrHistoryGraph HorizontalAlignment="Stretch"
+                                                     VerticalAlignment="Stretch"
+                                                     FriendCode="{Binding CurrentFriendCode}" />
                         </Border>
 
                         <Border Background="Transparent" BorderThickness="0">
