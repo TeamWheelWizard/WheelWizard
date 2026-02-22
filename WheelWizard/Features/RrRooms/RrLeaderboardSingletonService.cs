@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using WheelWizard.Shared.Services;
 
@@ -8,85 +9,55 @@ public interface IRrLeaderboardSingletonService
     Task<OperationResult<List<RwfcLeaderboardEntry>>> GetTopPlayersAsync(int limit = 50);
 }
 
-public class RrLeaderboardSingletonService(IApiCaller<IRwfcApi> apiCaller, ILogger<RrLeaderboardSingletonService> logger)
-    : IRrLeaderboardSingletonService
+public class RrLeaderboardSingletonService(
+    IApiCaller<IRwfcApi> apiCaller,
+    IMemoryCache cache,
+    ILogger<RrLeaderboardSingletonService> logger
+) : IRrLeaderboardSingletonService
 {
+    private const string FreshCacheKey = "rrrooms:leaderboard:fresh";
+    private const string StaleCacheKey = "rrrooms:leaderboard:stale";
     private static readonly TimeSpan CacheLifetime = TimeSpan.FromSeconds(90);
-    private readonly SemaphoreSlim _refreshGate = new(1, 1);
-    private readonly object _cacheLock = new();
-
-    private DateTimeOffset _cacheFetchedAt = DateTimeOffset.MinValue;
-    private List<RwfcLeaderboardEntry> _cachedEntries = [];
 
     public async Task<OperationResult<List<RwfcLeaderboardEntry>>> GetTopPlayersAsync(int limit = 50)
     {
         var boundedLimit = Math.Clamp(limit, 1, 200);
 
-        if (TryGetFreshCache(boundedLimit, out var freshCache))
+        if (TryGetCached(FreshCacheKey, boundedLimit, out var freshCache))
             return freshCache;
 
-        await _refreshGate.WaitAsync();
-
-        try
+        var fetchResult = await apiCaller.CallApiAsync(api => api.GetTopLeaderboardAsync(boundedLimit));
+        if (fetchResult.IsFailure)
         {
-            if (TryGetFreshCache(boundedLimit, out freshCache))
-                return freshCache;
-
-            var fetchResult = await apiCaller.CallApiAsync(api => api.GetTopLeaderboardAsync(boundedLimit));
-            if (fetchResult.IsFailure)
-            {
-                if (TryGetAnyCache(boundedLimit, out var staleCache))
-                {
-                    logger.LogWarning("RWFC leaderboard fetch failed; returning stale cached leaderboard for top {Limit}.", boundedLimit);
-                    return staleCache;
-                }
-
+            if (!TryGetCached(StaleCacheKey, boundedLimit, out var staleCache))
                 return fetchResult;
-            }
+            
+            logger.LogWarning("RWFC leaderboard fetch failed; returning stale cached leaderboard for top {Limit}.", boundedLimit);
+            return staleCache;
 
-            lock (_cacheLock)
-            {
-                _cachedEntries = fetchResult.Value.ToList();
-                _cacheFetchedAt = DateTimeOffset.UtcNow;
-            }
+        }
 
-            return TrimToLimit(fetchResult.Value, boundedLimit);
-        }
-        finally
-        {
-            _refreshGate.Release();
-        }
+        var fetchedEntries = fetchResult.Value.ToList();
+
+        cache.Set(FreshCacheKey, fetchedEntries, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = CacheLifetime });
+        cache.Set(StaleCacheKey, fetchedEntries);
+
+        return TrimToLimit(fetchedEntries, boundedLimit);
     }
 
-    private bool TryGetFreshCache(int limit, out OperationResult<List<RwfcLeaderboardEntry>> result)
+    private bool TryGetCached(string cacheKey, int limit, out OperationResult<List<RwfcLeaderboardEntry>> result)
     {
-        lock (_cacheLock)
+        if (
+            !cache.TryGetValue(cacheKey, out List<RwfcLeaderboardEntry>? cachedEntries)
+            || cachedEntries == null || cachedEntries.Count < limit
+        )
         {
-            var hasFreshCache = DateTimeOffset.UtcNow - _cacheFetchedAt <= CacheLifetime;
-            if (!hasFreshCache || _cachedEntries.Count < limit)
-            {
-                result = default!;
-                return false;
-            }
-
-            result = TrimToLimit(_cachedEntries, limit);
-            return true;
+            result = default!;
+            return false;
         }
-    }
 
-    private bool TryGetAnyCache(int limit, out OperationResult<List<RwfcLeaderboardEntry>> result)
-    {
-        lock (_cacheLock)
-        {
-            if (_cachedEntries.Count < limit)
-            {
-                result = default!;
-                return false;
-            }
-
-            result = TrimToLimit(_cachedEntries, limit);
-            return true;
-        }
+        result = TrimToLimit(cachedEntries, limit);
+        return true;
     }
 
     private static OperationResult<List<RwfcLeaderboardEntry>> TrimToLimit(IEnumerable<RwfcLeaderboardEntry> entries, int limit)
