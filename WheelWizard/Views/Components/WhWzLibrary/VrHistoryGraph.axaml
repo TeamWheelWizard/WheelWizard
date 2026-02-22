@@ -22,7 +22,6 @@
             DataContext="{Binding RelativeSource={RelativeSource AncestorType=components:VrHistoryGraph}}">
         <Grid RowDefinitions="Auto,Auto,*">
             <Grid Grid.Row="0"
-                  IsVisible="{Binding HasData}"
                   ColumnDefinitions="*,*,*"
                   Margin="0,0,0,8">
                 <Border Grid.Column="0" Classes="profileStatCard" Margin="0,0,4,0">
@@ -58,7 +57,6 @@
             </Grid>
 
             <Grid Grid.Row="1"
-                  IsVisible="{Binding HasData}"
                   ColumnDefinitions="*,Auto"
                   Margin="0,0,0,8">
                 <StackPanel Grid.Column="0">
@@ -66,16 +64,13 @@
                     <TextBlock Classes="TinyText" FontSize="11" Text="{Binding DateRangeText}" />
                 </StackPanel>
 
-                <StackPanel  Grid.Column="1" Orientation="Horizontal">
-                    
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <components:LoadingIcon Margin="3,3,6,3" VerticalAlignment="Center" IsVisible="{Binding IsLoading}" Width="18" Height="18" Foreground="{StaticResource Neutral500}" />
-                    <ComboBox
-                              x:Name="HistoryDaysDropdown"
+                    <ComboBox x:Name="HistoryDaysDropdown"
                               MinWidth="145"
                               VerticalAlignment="Top"
                               SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
                 </StackPanel>
-               
             </Grid>
 
             <Grid Grid.Row="2"
