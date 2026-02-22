@@ -37,7 +37,7 @@ public class VirtualSettingTests
     [Fact]
     public void SetDependencies_RecalculatesValue_WhenDependencySignalsChange()
     {
-        SettingsTestUtils.InitializeSignalRuntime(new SettingsSignalBus());
+        SettingsTestUtils.InitializeSignalRuntime(SettingsTestUtils.CreateSettingsSignalBus());
         var dependency = new WhWzSetting(typeof(int), "Dependency", 1);
         var setting = new VirtualSetting(typeof(int), _ => { }, () => (int)dependency.Get()).SetDependencies(dependency);
 

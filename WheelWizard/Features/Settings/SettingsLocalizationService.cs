@@ -5,21 +5,17 @@ namespace WheelWizard.Settings;
 public sealed class SettingsLocalizationService(ISettingsManager settingsManager, ISettingsSignalBus settingsSignalBus)
     : ISettingsLocalizationService
 {
-    private readonly object _syncRoot = new();
     private bool _initialized;
     private IDisposable? _subscription;
 
     public void Initialize()
     {
-        lock (_syncRoot)
-        {
-            if (_initialized)
-                return;
+        if (_initialized)
+            return;
 
-            _subscription = settingsSignalBus.Subscribe(OnSignal);
-            ApplyCulture();
-            _initialized = true;
-        }
+        _subscription = settingsSignalBus.Subscribe(OnSignal);
+        ApplyCulture();
+        _initialized = true;
     }
 
     private void OnSignal(SettingChangedSignal signal)

@@ -114,7 +114,7 @@ public class SettingsSignalBusTests
     [Fact]
     public void Publish_NotifiesActiveSubscribers()
     {
-        var signalBus = new SettingsSignalBus();
+        var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var setting = new WhWzSetting(typeof(int), "Volume", 10);
         SettingChangedSignal? receivedSignal = null;
         using var _ = signalBus.Subscribe(signal => receivedSignal = signal);
@@ -128,7 +128,7 @@ public class SettingsSignalBusTests
     [Fact]
     public void DisposeSubscription_StopsReceivingSignals()
     {
-        var signalBus = new SettingsSignalBus();
+        var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var setting = new WhWzSetting(typeof(int), "Volume", 10);
         var receiveCount = 0;
         var subscription = signalBus.Subscribe(_ => receiveCount++);
@@ -143,7 +143,7 @@ public class SettingsSignalBusTests
     [Fact]
     public void Subscribe_Throws_WhenHandlerIsNull()
     {
-        var signalBus = new SettingsSignalBus();
+        var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
 
         Assert.Throws<ArgumentNullException>(() => signalBus.Subscribe(null!));
     }
@@ -157,7 +157,7 @@ public class SettingsLocalizationServiceTests
     {
         var originalCulture = CultureInfo.CurrentCulture;
         var originalUiCulture = CultureInfo.CurrentUICulture;
-        var signalBus = new SettingsSignalBus();
+        var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var settingsManager = Substitute.For<ISettingsManager>();
         var languageSetting = new WhWzSetting(typeof(string), "WW_Language", "fr");
         settingsManager.WW_LANGUAGE.Returns(languageSetting);
@@ -183,7 +183,7 @@ public class SettingsLocalizationServiceTests
     {
         var originalCulture = CultureInfo.CurrentCulture;
         var originalUiCulture = CultureInfo.CurrentUICulture;
-        var signalBus = new SettingsSignalBus();
+        var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var settingsManager = Substitute.For<ISettingsManager>();
         var languageSetting = new WhWzSetting(typeof(string), "WW_Language", "en");
         settingsManager.WW_LANGUAGE.Returns(languageSetting);
@@ -214,7 +214,7 @@ public class SettingsStartupInitializerTests
     public void Initialize_LoadsSettings_InitializesLocalization_AndSetsRuntimes()
     {
         var settingsManager = Substitute.For<ISettingsManager>();
-        var signalBus = new SettingsSignalBus();
+        var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var localizationService = Substitute.For<ISettingsLocalizationService>();
         var logger = Substitute.For<ILogger<SettingsStartupInitializer>>();
         settingsManager.ValidateCorePathSettings().Returns(Ok(new SettingsValidationReport([])));
@@ -233,7 +233,7 @@ public class SettingsStartupInitializerTests
     public void Initialize_DoesNotThrow_WhenValidationFails()
     {
         var settingsManager = Substitute.For<ISettingsManager>();
-        var signalBus = new SettingsSignalBus();
+        var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var localizationService = Substitute.For<ISettingsLocalizationService>();
         var logger = Substitute.For<ILogger<SettingsStartupInitializer>>();
         settingsManager.ValidateCorePathSettings().Returns(Fail("validation failed"));
@@ -261,8 +261,14 @@ internal static class SettingsTestUtils
     public static void InitializeSignalRuntime(ISettingsSignalBus? signalBus = null)
     {
 #pragma warning disable CS0618
-        SettingsSignalRuntime.Initialize(signalBus ?? new SettingsSignalBus());
+        SettingsSignalRuntime.Initialize(signalBus ?? CreateSettingsSignalBus());
 #pragma warning restore CS0618
+    }
+
+    public static ISettingsSignalBus CreateSettingsSignalBus()
+    {
+        var logger = Substitute.For<ILogger<SettingsSignalBus>>();
+        return new SettingsSignalBus(logger);
     }
 
     public static void ResetSettingsRuntime()

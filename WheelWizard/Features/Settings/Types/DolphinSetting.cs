@@ -13,7 +13,7 @@ public class DolphinSetting : Setting
     public DolphinSetting(Type type, (string, string, string) location, object defaultValue, Action<DolphinSetting> saveAction)
         : base(type, location.Item3, defaultValue)
     {
-        _saveAction = saveAction;
+        _saveAction = saveAction ?? throw new ArgumentNullException(nameof(saveAction));
         FileName = location.Item1;
         Section = location.Item2;
         // name/key = location.Item3

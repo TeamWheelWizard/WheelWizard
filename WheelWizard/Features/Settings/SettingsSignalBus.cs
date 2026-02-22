@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Settings;
@@ -10,9 +11,13 @@ public interface ISettingsSignalBus
     void Publish(Setting setting);
 }
 
-public sealed class SettingsSignalBus : ISettingsSignalBus
+public sealed class SettingsSignalBus(ILogger<SettingsSignalBus> logger) : ISettingsSignalBus
 {
-    private readonly object _syncRoot = new();
+    // LOCKS:
+    // We are working with locks. This is to ensure that we always have accurate information in our settings / application.
+    // We do not create multiple threads. However, some of our features run through Tasks. Those are executed asynchronously, therefore still require locks.
+
+    private readonly object _syncSubscribers = new();
     private readonly Dictionary<long, Action<SettingChangedSignal>> _subscribers = [];
     private long _nextSubscriberId;
 
@@ -21,7 +26,7 @@ public sealed class SettingsSignalBus : ISettingsSignalBus
         ArgumentNullException.ThrowIfNull(handler);
 
         long id;
-        lock (_syncRoot)
+        lock (_syncSubscribers)
         {
             id = _nextSubscriberId++;
             _subscribers[id] = handler;
@@ -33,21 +38,29 @@ public sealed class SettingsSignalBus : ISettingsSignalBus
     public void Publish(Setting setting)
     {
         Action<SettingChangedSignal>[] handlers;
-        lock (_syncRoot)
-        {
-            handlers = [.. _subscribers.Values];
-        }
+
+        // You could use a lock for reading the subscribes. But let's minimize the lock usage to where it is important.
+        // If the handlers list is slightly outdated it is not a problem (unlike when this happens when modifying this list)
+        handlers = [.. _subscribers.Values];
 
         var signal = new SettingChangedSignal(setting);
         foreach (var handler in handlers)
         {
-            handler(signal);
+            try
+            {
+                handler(signal);
+            }
+            catch
+            {
+                // Exceptions from subscribers should not affect the publisher or other subscribers, so we catch and log them.
+                logger.LogError("A subscriber threw an exception while handling a setting changed signal.");
+            }
         }
     }
 
     private void Unsubscribe(long subscriberId)
     {
-        lock (_syncRoot)
+        lock (_syncSubscribers)
         {
             _subscribers.Remove(subscriberId);
         }

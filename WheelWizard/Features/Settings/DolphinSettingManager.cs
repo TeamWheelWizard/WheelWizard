@@ -8,6 +8,13 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
 {
     private static string ConfigFolderPath(string fileName) => Path.Combine(PathManager.ConfigFolderPath, fileName);
 
+    // LOCKS:
+    // We are working with locks. This is to ensure that we always have accurate information in our settings / application.
+    // We do not create multiple threads. However, some of our features run through Tasks. Those are executed asynchronously, therefore still require locks.
+
+    // Sync Root:  Responsible for synchronizing access to the _settings list and the _loaded flag.
+    // It ensures that multiple threads don't modify the settings list or the loaded state at the same time
+    // File IO Sync:  Responsible for reading and writing the INI files. It ensures that multiple threads don't read/write at the same time
     private readonly object _syncRoot = new();
     private readonly object _fileIoSync = new();
     private bool _loaded;
@@ -60,17 +67,19 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
     public void LoadSettings()
     {
         List<DolphinSetting> settingsSnapshot;
+        if (_loaded || !fileSystem.Directory.Exists(PathManager.ConfigFolderPath))
+            return;
+
         lock (_syncRoot)
         {
+            // Since we are working with concurrency here, we have to check loaded again since it might be changed while we where waiting
+            // for the lock to open
             if (_loaded)
                 return;
 
             _loaded = true;
             settingsSnapshot = [.. _settings];
         }
-
-        if (!fileSystem.Directory.Exists(PathManager.ConfigFolderPath))
-            return;
 
         // TODO: This method can maybe be optimized in the future, since now it reads the file for every setting
         //       and on top of that for reach setting it loops over each line and section and stuff like that.
