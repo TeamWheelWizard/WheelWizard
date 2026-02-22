@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO.Abstractions;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Testably.Abstractions;
 using Testably.Abstractions.Testing;
@@ -264,6 +265,26 @@ internal static class SettingsTestUtils
 #pragma warning restore CS0618
     }
 
+    public static void ResetSettingsRuntime()
+    {
+#pragma warning disable CS0618
+        SetPrivateStaticFieldValue(typeof(SettingsRuntime), "_current", null);
+#pragma warning restore CS0618
+    }
+
+    public static void ResetSignalRuntime()
+    {
+#pragma warning disable CS0618
+        SetPrivateStaticFieldValue(typeof(SettingsSignalRuntime), "_current", null);
+        var pendingInitializersField =
+            typeof(SettingsSignalRuntime).GetField("PendingInitializers", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new InvalidOperationException("SettingsSignalRuntime pending initializers field was not found.");
+#pragma warning restore CS0618
+        if (pendingInitializersField.GetValue(null) is not System.Collections.IList pendingInitializers)
+            throw new InvalidOperationException("SettingsSignalRuntime pending initializers storage has an unexpected type.");
+        pendingInitializers.Clear();
+    }
+
     public static string GetValidDolphinLocation(IFileSystem fileSystem)
     {
         if (!OperatingSystem.IsWindows())
@@ -295,5 +316,13 @@ internal static class SettingsTestUtils
             .Returns(_ => (string)dolphinLocationSetting.Get());
 
         return settings;
+    }
+
+    private static void SetPrivateStaticFieldValue(Type targetType, string fieldName, object? value)
+    {
+        var field =
+            targetType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new InvalidOperationException($"{targetType.Name}.{fieldName} field was not found.");
+        field.SetValue(null, value);
     }
 }

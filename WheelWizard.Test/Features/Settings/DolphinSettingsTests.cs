@@ -56,7 +56,7 @@ public class DolphinSettingTests
 }
 
 [Collection("SettingsFeature")]
-public class DolphinSettingManagerTests
+public class DolphinSettingManagerTests : IDisposable
 {
     [Fact]
     public void LoadSettings_ReadsExistingValue_FromIniFile()
@@ -139,5 +139,11 @@ public class DolphinSettingManagerTests
         manager.ReloadSettings();
 
         Assert.Equal("/second", Assert.IsType<string>(setting.Get()));
+    }
+
+    public void Dispose()
+    {
+        SettingsTestUtils.ResetSettingsRuntime();
+        SettingsTestUtils.ResetSignalRuntime();
     }
 }
