@@ -13,10 +13,39 @@
             <Setter Property="BorderBrush" Value="{StaticResource Neutral900}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Background" Value="{StaticResource Neutral950}" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background"
+                                     Duration="0:0:0.18"
+                                     Easing="CircularEaseOut" />
+                    <BrushTransition Property="BorderBrush"
+                                     Duration="0:0:0.18"
+                                     Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
         </Style>
 
         <Style Selector="Border.KitchenSinkSectionBlock.BlockBackground900">
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral950}" />
+        </Style>
+
+        <Style Selector="Border.KitchenSinkSectionBlock Border.KitchenSinkSectionDivider">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="Height" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="-10,0,-10,0" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background"
+                                     Duration="0:0:0.18"
+                                     Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.KitchenSinkSectionBlock.BlockBackground900 Border.KitchenSinkSectionDivider">
+            <Setter Property="Background" Value="{StaticResource Neutral950}" />
         </Style>
     </UserControl.Styles>
 
@@ -34,14 +63,15 @@
         <Grid Grid.Row="0" RowDefinitions="Auto,*">
             <CheckBox x:Name="BackgroundSwitch"
                       Grid.Row="0"
-                      Classes="SwitchDark"
+                      Classes="Switch"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Top"
                       Margin="3,8,3,0"
                       IsChecked="True"
                       IsCheckedChanged="BackgroundSwitch_OnIsCheckedChanged">
-                <components:FormFieldLabel Text="Neutral900 blocks"
-                                           TipText="Toggle section block previews between Neutral900 and Neutral950 backgrounds." />
+                <components:FormFieldLabel Text="Light Background"
+                                           TipPlacement="TopEdgeAlignedRight"
+                                           TipText="Toggle section block previews between light (Neutral900) and dark (Neutral950) backgrounds." />
             </CheckBox>
 
             <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,7">

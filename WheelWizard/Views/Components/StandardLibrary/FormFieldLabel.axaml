@@ -10,6 +10,7 @@
 
     <Style Selector="components|FormFieldLabel">
         <Setter Property="Foreground" Value="{StaticResource FormFieldLabelColor}"/>
+        <Setter Property="ToolTip.Placement" Value="TopEdgeAlignedLeft"/>
         
         <Setter Property="Template">
             <ControlTemplate>
@@ -23,7 +24,8 @@
                     
                      <Border Background="Transparent" Width="14" Height="14" 
                              ToolTip.Tip="{TemplateBinding TipText}"
-                             ToolTip.Placement="TopEdgeAlignedLeft" ToolTip.ShowDelay="50">
+                             ToolTip.Placement="{Binding (ToolTip.Placement), RelativeSource={RelativeSource TemplatedParent}}"
+                             ToolTip.ShowDelay="50">
                          <Border.RenderTransform>
                              <!-- This 1 pixel difference improves it exactly 271 x times -->
                              <TranslateTransform Y="-1"/>
