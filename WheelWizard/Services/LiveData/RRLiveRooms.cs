@@ -1,9 +1,11 @@
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
+using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
@@ -26,6 +28,7 @@ public class RRLiveRooms : RepeatedTaskManager
         var whWzService = App.Services.GetRequiredService<IWhWzDataSingletonService>();
         var roomsService = App.Services.GetRequiredService<IRrRoomsSingletonService>();
         var leaderboardService = App.Services.GetRequiredService<IRrLeaderboardSingletonService>();
+        var gameLicenseService = App.Services.GetRequiredService<IGameLicenseSingletonService>();
 
         var roomsTask = roomsService.GetRoomsAsync();
         var leaderboardTask = leaderboardService.GetTopPlayersAsync(50);
@@ -59,7 +62,14 @@ public class RRLiveRooms : RepeatedTaskManager
         var raw = roomsResult.Value;
         var splitRaw = SplitMergedRooms(raw);
 
-        var rrRooms = splitRaw.Select(room => MapRoom(room, whWzService, leaderboardByPid, leaderboardByFriendCode)).ToList();
+        var friendProfileIds = gameLicenseService
+            .ActiveCurrentFriends.Select(friend => FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode))
+            .Where(profileId => profileId != 0)
+            .ToHashSet();
+
+        var rrRooms = splitRaw
+            .Select(room => MapRoom(room, whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
+            .ToList();
 
         CurrentRooms = rrRooms;
     }
@@ -68,7 +78,8 @@ public class RRLiveRooms : RepeatedTaskManager
         RwfcRoomStatusRoom room,
         IWhWzDataSingletonService whWzService,
         IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByPid,
-        IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode
+        IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode,
+        IReadOnlySet<uint> friendProfileIds
     )
     {
         return new()
@@ -78,7 +89,9 @@ public class RRLiveRooms : RepeatedTaskManager
             Type = room.Type,
             Suspend = room.Suspend,
             Rk = room.Rk,
-            Players = room.Players.Select(p => MapPlayer(p, whWzService, leaderboardByPid, leaderboardByFriendCode)).ToList(),
+            Players = room
+                .Players.Select(p => MapPlayer(p, whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
+                .ToList(),
         };
     }
 
@@ -86,7 +99,8 @@ public class RRLiveRooms : RepeatedTaskManager
         RwfcRoomStatusPlayer p,
         IWhWzDataSingletonService whWzService,
         IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByPid,
-        IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode
+        IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode,
+        IReadOnlySet<uint> friendProfileIds
     )
     {
         Mii? mii = null;
@@ -106,6 +120,7 @@ public class RRLiveRooms : RepeatedTaskManager
         }
 
         var friendCode = p.FriendCode ?? string.Empty;
+        var profileId = FriendCodeGenerator.FriendCodeToProfileId(friendCode);
 
         var leaderboardEntry = GetLeaderboardEntry(p, friendCode, leaderboardByPid, leaderboardByFriendCode);
 
@@ -122,6 +137,7 @@ public class RRLiveRooms : RepeatedTaskManager
             Mii = mii,
             BadgeVariants = whWzService.GetBadges(friendCode),
             LeaderboardRank = leaderboardEntry?.Rank ?? leaderboardEntry?.ActiveRank,
+            IsFriend = profileId != 0 && friendProfileIds.Contains(profileId),
         };
     }
 
