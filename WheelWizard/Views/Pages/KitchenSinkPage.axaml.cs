@@ -64,11 +64,7 @@ public partial class KitchenSinkPage : UserControlBase
         out Border sectionBorder
     )
     {
-        var header = new FormFieldLabel
-        {
-            Text = sectionName,
-            TipText = sectionTooltip ?? string.Empty
-        };
+        var header = new FormFieldLabel { Text = sectionName, TipText = sectionTooltip ?? string.Empty };
         var divider = new Border();
         divider.Classes.Add("KitchenSinkSectionDivider");
         var body = new StackPanel { Spacing = 8 };

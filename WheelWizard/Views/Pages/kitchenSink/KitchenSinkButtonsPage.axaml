@@ -5,39 +5,86 @@
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="680"
              x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkButtonsPage">
-    <StackPanel Spacing="12">
-        <StackPanel Spacing="8">
-            <TextBlock Classes="TinyText" Text="Button variants" />
-            <WrapPanel ItemHeight="44" ItemWidth="200" Orientation="Horizontal">
-                <components:Button Variant="Default" Text="Default" IconData="{StaticResource Home}" Margin="3" />
-                <components:Button Variant="Primary" Text="Primary" IconData="{StaticResource Play}" Margin="3" />
-                <components:Button Variant="Warning" Text="Warning" IconData="{StaticResource WarningTip}" Margin="3" />
-                <components:Button Variant="Danger" Text="Danger" IconData="{StaticResource XMark}" Margin="3" />
-                <components:Button Variant="UglyLight" Text="UglyLight" IconData="{StaticResource Search}" Margin="3" />
-            </WrapPanel>
-        </StackPanel>
+    <StackPanel Spacing="8">
+        <Grid ColumnDefinitions="*,*"
+          RowDefinitions="Auto,Auto,Auto">
+        <components:Button Grid.Row="0"
+                           Grid.Column="0"
+                           Margin="0,0,5,5"
+                           Variant="Default"
+                           Text="Text only" />
+        <components:Button Grid.Row="0"
+                           Grid.Column="1"
+                           Margin="5,0,0,5"
+                           Variant="Default"
+                           IconData="{StaticResource Folder}"
+                           Text=""
+                           Width="44"
+                           Height="44"
+                           Padding="10"
+                           HorizontalAlignment="Left"
+                           ToolTip.Tip="Icon only button"
+                           ToolTip.Placement="Top"
+                           ToolTip.ShowDelay="20" />
 
-        <StackPanel Spacing="8">
-            <TextBlock Classes="TinyText" Text="Text-only, icon-only, and text+icon combinations" />
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <components:Button Variant="Primary" Text="Text only" />
-                <components:Button Variant="Default"
-                                   IconData="{StaticResource Folder}"
-                                   Text=""
-                                   Width="44"
-                                   Height="44"
-                                   Padding="10"
-                                   ToolTip.Tip="Icon only button"
-                                   ToolTip.Placement="Top"
-                                   ToolTip.ShowDelay="20" />
-                <components:Button Variant="Warning" Text="Text + Icon" IconData="{StaticResource Download}" />
-            </StackPanel>
+        <components:Button Grid.Row="1"
+                           Grid.Column="0"
+                           Margin="0,5,5,5"
+                           Variant="Default"
+                           Text="Text + Icon"
+                           IconData="{StaticResource Download}" />
+        <components:Button Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="5,5,0,5"
+                           Variant="Default"
+                           Text="Icon + Text"
+                           IconData="{StaticResource ArrowRight}" />
 
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <components:Button Variant="Danger" Text="Destructive action" IconData="{StaticResource Trash}" />
-                <components:Button Variant="Default" Text="Secondary action" />
-                <components:Button Variant="Primary" Text="Forward" IconData="{StaticResource ArrowRight}" />
-            </StackPanel>
-        </StackPanel>
+        <components:Button Grid.Row="2"
+                           Grid.Column="0"
+                           Margin="0,5,5,0"
+                           Variant="Default"
+                           Text="Compact"
+                           IconData="{StaticResource Home}"
+                           Width="150" />
+        <components:Button Grid.Row="2"
+                           Grid.Column="1"
+                           Margin="5,5,0,0"
+                           Variant="Default"
+                           Text="Disabled"
+                           IconData="{StaticResource Search}"
+                           IsEnabled="False" />
+        </Grid>
+        <TextBlock Classes="TinyText" Text="Varients" />
+        <Grid ColumnDefinitions="*,*"
+              RowDefinitions="Auto,Auto,Auto">
+            <components:Button Grid.Row="0"
+                               Grid.Column="0"
+                               Margin="0,0,5,5"
+                               Variant="Default"
+                               Text="Default" />
+            <components:Button Grid.Row="0"
+                               Grid.Column="1"
+                               Margin="0,0,5,5"
+                               Variant="UglyLight"
+                               Text="UglyLight" />
+
+            <components:Button Grid.Row="1"
+                               Grid.Column="0"
+                               Margin="0,0,5,5"
+                               Variant="Primary"
+                               Text="Primary"  />
+            <components:Button Grid.Row="1"
+                               Grid.Column="1"
+                               Margin="0,0,5,5"
+                               Variant="Warning"
+                               Text="Warning"  />
+
+            <components:Button Grid.Row="2"
+                               Grid.Column="0"
+                               Margin="0,0,5,5"
+                               Variant="Danger"
+                               Text="Danger"  />
+        </Grid>
     </StackPanel>
 </UserControl>
