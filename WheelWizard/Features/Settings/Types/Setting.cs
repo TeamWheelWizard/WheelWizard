@@ -1,6 +1,6 @@
 using WheelWizard.Settings;
 
-namespace WheelWizard.Settings.Domain;
+namespace WheelWizard.Settings.Types;
 
 public abstract class Setting
 {

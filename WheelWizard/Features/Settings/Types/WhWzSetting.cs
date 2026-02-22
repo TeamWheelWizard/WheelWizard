@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace WheelWizard.Settings.Domain;
+namespace WheelWizard.Settings.Types;
 
 public class WhWzSetting : Setting
 {

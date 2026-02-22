@@ -4,7 +4,7 @@ using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
-using WheelWizard.Settings.Domain;
+using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Settings;
 

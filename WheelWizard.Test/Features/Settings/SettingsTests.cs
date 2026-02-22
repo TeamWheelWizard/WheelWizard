@@ -5,7 +5,7 @@ using Testably.Abstractions;
 using Testably.Abstractions.Testing;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Settings;
-using WheelWizard.Settings.Domain;
+using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Test.Features.Settings;
 
