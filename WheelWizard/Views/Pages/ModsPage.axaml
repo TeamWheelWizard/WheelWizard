@@ -93,7 +93,7 @@
                         VerticalAlignment="Bottom" />
             </Grid>
 
-            <!-- Mods List -->
+            <!-- Mods List (Blocks / arrow mode) -->
             <ListBox Grid.Row="1" x:Name="ModsListBox" ItemsSource="{Binding Mods}" Margin="10,5">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -195,6 +195,34 @@
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
+
+            <!-- Mods Grid (Rows / priority text mode) -->
+            <ScrollViewer Grid.Row="1" x:Name="ModsGridView" IsVisible="False" Margin="10,5"
+                          HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Mods}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="2" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border>
+                                <components:GridModPanel />
+                                <Border.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
+                                        <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
+                                        <Separator />
+                                        <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click" />
+                                        <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
 
         <!-- Drag-and-drop overlay canvas -->

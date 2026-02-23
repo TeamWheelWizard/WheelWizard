@@ -104,7 +104,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void RenameMod_Click(object sender, RoutedEventArgs e)
     {
-        if (ModsListBox.SelectedItem is not ModListItem selectedMod)
+        var selectedMod = GetContextModListItem(sender);
+        if (selectedMod == null)
             return;
 
         ModManager.RenameMod(selectedMod.Mod);
@@ -112,7 +113,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void DeleteMod_Click(object sender, RoutedEventArgs e)
     {
-        if (ModsListBox.SelectedItem is not ModListItem selectedMod)
+        var selectedMod = GetContextModListItem(sender);
+        if (selectedMod == null)
             return;
 
         ModManager.DeleteMod(selectedMod.Mod);
@@ -120,7 +122,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
-        if (ModsListBox.SelectedItem is not ModListItem selectedMod)
+        var selectedMod = GetContextModListItem(sender);
+        if (selectedMod == null)
             return;
 
         ModManager.OpenModFolder(selectedMod.Mod);
@@ -128,7 +131,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void ViewMod_Click(object sender, RoutedEventArgs e)
     {
-        if (ModsListBox.SelectedItem is not ModListItem selectedMod)
+        var selectedMod = GetContextModListItem(sender);
+        if (selectedMod == null)
         {
             // You actually never see this error, however, if for some unknown reason it happens, we don't want to disregard it
             MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_CantViewMod_SomethingWrong);
@@ -144,6 +148,16 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         var modPopup = new ModIndependentWindow();
         _ = modPopup.LoadModAsync(selectedMod.Mod.ModID);
         modPopup.ShowDialog();
+    }
+
+    /// <summary>
+    /// Resolves the ModListItem from either a grid context menu (DataContext) or ListBox selection.
+    /// </summary>
+    private ModListItem? GetContextModListItem(object? sender)
+    {
+        if (sender is MenuItem { DataContext: ModListItem item })
+            return item;
+        return ModsListBox.SelectedItem as ModListItem;
     }
 
     private void ToggleButton_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
@@ -227,6 +241,10 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             else
                 elementToSwapClass.Classes.Remove("Rows");
         }
+
+        // Toggle between list view (Blocks/arrows mode) and grid view (Rows/priority text mode)
+        ModsListBox.IsVisible = !asRows;
+        ModsGridView.IsVisible = asRows;
     }
 
     private void PriorityText_OnKeyDown(object? sender, KeyEventArgs e)
