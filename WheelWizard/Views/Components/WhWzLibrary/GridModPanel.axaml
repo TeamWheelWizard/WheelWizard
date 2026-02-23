@@ -7,14 +7,12 @@
              x:DataType="pages:ModListItem">
 
     <Border CornerRadius="8" Background="{StaticResource Neutral900}"
-            ClipToBounds="True" Margin="4" MinHeight="200">
-        <Grid RowDefinitions="*, Auto">
+            ClipToBounds="True" Margin="4" Height="160">
+        <Grid>
             <!-- Image area -->
-            <Border Grid.Row="0" Background="{StaticResource Neutral700}"
-                    ClipToBounds="True" MinHeight="120">
+            <Border Background="{StaticResource Neutral700}" ClipToBounds="True">
                 <Panel>
-                    <Image x:Name="ModImage" Stretch="UniformToFill"
-                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Image x:Name="ModImage" Stretch="UniformToFill" />
                     <!-- Placeholder icon when no image is loaded -->
                     <PathIcon x:Name="PlaceholderIcon"
                               Data="{StaticResource CubesStacked}"
@@ -24,57 +22,63 @@
                 </Panel>
             </Border>
 
-            <!-- Gradient overlay with title at bottom of image -->
-            <Border Grid.Row="0" VerticalAlignment="Bottom" IsHitTestVisible="False">
+            <!-- Gradient overlay for the bottom area -->
+            <Border VerticalAlignment="Bottom" Height="100" IsHitTestVisible="False">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
                         <GradientStop Color="Transparent" Offset="0.0" />
-                        <GradientStop Color="#DD000000" Offset="1.0" />
+                        <GradientStop Color="{StaticResource Neutral900}" Offset="0.7" />
+                        <GradientStop Color="{StaticResource Neutral900}" Offset="1.0" />
                     </LinearGradientBrush>
                 </Border.Background>
-                <TextBlock Text="{Binding Mod.Title}" FontSize="13" FontWeight="SemiBold"
+            </Border>
+
+            <!-- Content -->
+            <Grid RowDefinitions="*, Auto, Auto">
+                <!-- Title -->
+                <TextBlock Grid.Row="1" Text="{Binding Mod.Title}" FontSize="13" FontWeight="SemiBold"
                            Foreground="{StaticResource Neutral100}"
                            TextTrimming="CharacterEllipsis"
-                           Margin="10,24,10,6" />
-            </Border>
+                           Margin="10,0,10,4" />
 
-            <!-- Bottom controls bar: Enabled switch + Priority -->
-            <Border Grid.Row="1" Background="{StaticResource Neutral900}" Padding="8,6">
-                <Grid ColumnDefinitions="Auto, *, Auto">
-                    <CheckBox Grid.Column="0"
-                              IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
-                              Classes="SwitchDark"
-                              VerticalAlignment="Center" />
+                <!-- Bottom controls bar: Enabled switch + Priority -->
+                <Border Grid.Row="2" Padding="8,0,8,8">
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <CheckBox Grid.Column="0"
+                                  IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
+                                  Classes="SwitchDark"
+                                  VerticalAlignment="Center" />
 
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
-                                VerticalAlignment="Center">
-                        <TextBlock Text="#" FontSize="13"
-                                   Foreground="{StaticResource Neutral500}"
-                                   VerticalAlignment="Center" />
-                        <TextBox x:Name="PriorityTextBox"
-                                 Text="{Binding Mod.Priority, Mode=OneWay}"
-                                 Classes="dark"
-                                 MinWidth="30" MaxWidth="50"
-                                 MinHeight="28" Height="28"
-                                 VerticalAlignment="Center"
-                                 Padding="4,2"
-                                 HorizontalContentAlignment="Center"
-                                 TextChanged="PriorityText_OnTextChanged"
-                                 LostFocus="PriorityText_OnLostFocus"
-                                 KeyDown="PriorityText_OnKeyDown">
-                            <TextBox.Styles>
-                                <Style Selector="TextBox /template/ DockPanel#PART_InnerDockPanel">
-                                    <Setter Property="Margin" Value="0" />
-                                </Style>
-                                <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
-                                    <Setter Property="HorizontalAlignment" Value="Center" />
-                                    <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
-                                </Style>
-                            </TextBox.Styles>
-                        </TextBox>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
+                                    VerticalAlignment="Center">
+                            <TextBlock Text="#" FontSize="13"
+                                       Foreground="{StaticResource Neutral500}"
+                                       VerticalAlignment="Center" />
+                            <TextBox x:Name="PriorityTextBox"
+                                     Text="{Binding Mod.Priority, Mode=OneWay}"
+                                     Classes="dark"
+                                     MinWidth="30" MaxWidth="50"
+                                     MinHeight="28" Height="28"
+                                     VerticalAlignment="Center"
+                                     Padding="4,2"
+                                     HorizontalContentAlignment="Center"
+                                     TextChanged="PriorityText_OnTextChanged"
+                                     LostFocus="PriorityText_OnLostFocus"
+                                     KeyDown="PriorityText_OnKeyDown">
+                                <TextBox.Styles>
+                                    <Style Selector="TextBox /template/ DockPanel#PART_InnerDockPanel">
+                                        <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                    <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                        <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+                                    </Style>
+                                </TextBox.Styles>
+                            </TextBox>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
 
         <!-- Hover effect -->
