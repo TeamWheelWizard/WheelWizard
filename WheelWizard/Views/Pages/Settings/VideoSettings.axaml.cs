@@ -1,20 +1,23 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using WheelWizard.Models.Settings;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
+using WheelWizard.Settings.Types;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class VideoSettings : UserControl
+public partial class VideoSettings : UserControlBase
 {
     private readonly bool _settingsAreDisabled;
+
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
 
     public VideoSettings()
     {
         InitializeComponent();
-        _settingsAreDisabled = !SettingsHelper.PathsSetupCorrectly();
+        _settingsAreDisabled = !SettingsService.PathsSetupCorrectly();
         DisabledWarningText.IsVisible = _settingsAreDisabled;
         VideoBorder.IsEnabled = !_settingsAreDisabled;
 
@@ -38,12 +41,12 @@ public partial class VideoSettings : UserControl
     private void LoadSettings()
     {
         // Load settings that are enabled for editing
-        VSyncButton.IsChecked = (bool)SettingsManager.VSYNC.Get();
-        RecommendedButton.IsChecked = (bool)SettingsManager.RECOMMENDED_SETTINGS.Get();
-        ShowFPSButton.IsChecked = (bool)SettingsManager.SHOW_FPS.Get();
-        RemoveBlurButton.IsChecked = (bool)SettingsManager.REMOVE_BLUR.Get();
+        VSyncButton.IsChecked = SettingsService.Get<bool>(SettingsService.VSYNC);
+        RecommendedButton.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMMENDED_SETTINGS);
+        ShowFPSButton.IsChecked = SettingsService.Get<bool>(SettingsService.SHOW_FPS);
+        RemoveBlurButton.IsChecked = SettingsService.Get<bool>(SettingsService.REMOVE_BLUR);
 
-        var finalResolution = (int)SettingsManager.INTERNAL_RESOLUTION.Get();
+        var finalResolution = SettingsService.Get<int>(SettingsService.INTERNAL_RESOLUTION);
         foreach (RadioButton radioButton in ResolutionStackPanel.Children)
         {
             radioButton.IsChecked = (radioButton.Tag.ToString() == finalResolution.ToString());
@@ -58,7 +61,7 @@ public partial class VideoSettings : UserControl
             RendererDropdown.Items.Add(renderer);
         }
 
-        var currentRenderer = (string)SettingsManager.GFX_BACKEND.Get();
+        var currentRenderer = SettingsService.Get<string>(SettingsService.GFX_BACKEND);
         var renderDisplayName = SettingValues.GFXRenderers.FirstOrDefault(x => x.Value == currentRenderer).Key;
         if (renderDisplayName != null)
         {
@@ -70,28 +73,28 @@ public partial class VideoSettings : UserControl
     {
         if (sender is RadioButton radioButton && radioButton.IsChecked == true)
         {
-            SettingsManager.INTERNAL_RESOLUTION.Set(int.Parse(radioButton.Tag.ToString()!));
+            SettingsService.Set(SettingsService.INTERNAL_RESOLUTION, int.Parse(radioButton.Tag.ToString()!));
         }
     }
 
     private void VSync_OnClick(object? sender, RoutedEventArgs e)
     {
-        SettingsManager.VSYNC.Set(VSyncButton.IsChecked == true);
+        SettingsService.Set(SettingsService.VSYNC, VSyncButton.IsChecked == true);
     }
 
     private void Recommended_OnClick(object? sender, RoutedEventArgs e)
     {
-        SettingsManager.RECOMMENDED_SETTINGS.Set(RecommendedButton.IsChecked == true);
+        SettingsService.Set(SettingsService.RECOMMENDED_SETTINGS, RecommendedButton.IsChecked == true);
     }
 
     private void ShowFPS_OnClick(object? sender, RoutedEventArgs e)
     {
-        SettingsManager.SHOW_FPS.Set(ShowFPSButton.IsChecked == true);
+        SettingsService.Set(SettingsService.SHOW_FPS, ShowFPSButton.IsChecked == true);
     }
 
     private void RemoveBlur_OnClick(object? sender, RoutedEventArgs e)
     {
-        SettingsManager.REMOVE_BLUR.Set(RemoveBlurButton.IsChecked == true);
+        SettingsService.Set(SettingsService.REMOVE_BLUR, RemoveBlurButton.IsChecked == true);
     }
 
     private void RendererDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -99,7 +102,7 @@ public partial class VideoSettings : UserControl
         var selectedDisplayName = RendererDropdown.SelectedItem?.ToString();
         if (SettingValues.GFXRenderers.TryGetValue(selectedDisplayName, out var actualValue))
         {
-            SettingsManager.GFX_BACKEND.Set(actualValue);
+            SettingsService.Set(SettingsService.GFX_BACKEND, actualValue);
         }
         else
         {

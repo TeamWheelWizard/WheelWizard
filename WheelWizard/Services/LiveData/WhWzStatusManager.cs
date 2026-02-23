@@ -8,18 +8,23 @@ namespace WheelWizard.Services.LiveData;
 
 public class WhWzStatusManager : RepeatedTaskManager
 {
+    private readonly IWhWzDataSingletonService _whWzDataService;
+    private readonly ILogger<WhWzStatusManager> _logger;
+
     public WhWzStatus? Status { get; private set; }
 
-    private static WhWzStatusManager? _instance;
-    public static WhWzStatusManager Instance => _instance ??= new();
+    public static WhWzStatusManager Instance => App.Services.GetRequiredService<WhWzStatusManager>();
 
-    private WhWzStatusManager()
-        : base(90) { }
+    public WhWzStatusManager(IWhWzDataSingletonService whWzDataService, ILogger<WhWzStatusManager> logger)
+        : base(90)
+    {
+        _whWzDataService = whWzDataService;
+        _logger = logger;
+    }
 
     protected override async Task ExecuteTaskAsync()
     {
-        var whWzDataService = App.Services.GetRequiredService<IWhWzDataSingletonService>();
-        var statusResult = await whWzDataService.GetStatusAsync();
+        var statusResult = await _whWzDataService.GetStatusAsync();
 
         if (statusResult.IsSuccess)
         {
@@ -27,8 +32,7 @@ public class WhWzStatusManager : RepeatedTaskManager
             return;
         }
 
-        App.Services.GetRequiredService<ILogger<WhWzStatusManager>>()
-            .LogError(statusResult.Error.Exception, "Failed to retrieve WhWz Status: {Message}", statusResult.Error.Message);
+        _logger.LogError(statusResult.Error.Exception, "Failed to retrieve WhWz Status: {Message}", statusResult.Error.Message);
         Status = new() { Variant = WhWzStatusVariant.Error, Message = "Failed to retrieve Wheel Wizard status" };
     }
 }

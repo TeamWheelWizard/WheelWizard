@@ -1,14 +1,18 @@
 using System.Text.Json;
-using WheelWizard.Services.Settings;
 
-namespace WheelWizard.Models.Settings;
+namespace WheelWizard.Settings.Types;
 
 public class WhWzSetting : Setting
 {
+    private readonly Action<WhWzSetting> _saveAction;
+
     public WhWzSetting(Type type, string name, object defaultValue)
+        : this(type, name, defaultValue, _ => { }) { }
+
+    public WhWzSetting(Type type, string name, object defaultValue, Action<WhWzSetting> saveAction)
         : base(type, name, defaultValue)
     {
-        WhWzSettingManager.Instance.RegisterSetting(this);
+        _saveAction = saveAction ?? throw new ArgumentNullException(nameof(saveAction));
     }
 
     protected override bool SetInternal(object newValue, bool skipSave = false)
@@ -19,7 +23,7 @@ public class WhWzSetting : Setting
         if (newIsValid)
         {
             if (!skipSave)
-                WhWzSettingManager.Instance.SaveSettings(this);
+                _saveAction(this);
         }
         else
             Value = oldValue;
@@ -30,6 +34,18 @@ public class WhWzSetting : Setting
     public override object Get() => Value;
 
     public override bool IsValid() => ValidationFunc == null || ValidationFunc(Value);
+
+    public new WhWzSetting SetValidation(Func<object?, bool> validationFunc)
+    {
+        base.SetValidation(validationFunc);
+        return this;
+    }
+
+    public new WhWzSetting SetForceSave(bool saveEvenIfNotValid)
+    {
+        base.SetForceSave(saveEvenIfNotValid);
+        return this;
+    }
 
     public bool SetFromJson(JsonElement newValue, bool skipSave = false)
     {

@@ -1,4 +1,4 @@
-﻿namespace WheelWizard.Models.Settings;
+﻿namespace WheelWizard.Settings.Types;
 
 public enum DolphinShaderCompilationMode
 {

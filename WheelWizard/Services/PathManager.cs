@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 using WheelWizard.Helpers;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 #if WINDOWS
 using Microsoft.Win32;
 #endif
@@ -9,6 +9,8 @@ namespace WheelWizard.Services;
 
 public static class PathManager
 {
+    private static ISettingsManager Settings => SettingsRuntime.Current;
+
     // IMPORTANT: To keep things consistent all paths should be Attrib expressions,
     //            and either end with `FilePath` or `FolderPath`
 
@@ -34,9 +36,9 @@ public static class PathManager
     public static string HomeFolderPath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
     // Paths set by the user
-    public static string GameFilePath => (string)SettingsManager.GAME_LOCATION.Get();
-    public static string DolphinFilePath => (string)SettingsManager.DOLPHIN_LOCATION.Get();
-    public static string UserFolderPath => (string)SettingsManager.USER_FOLDER_PATH.Get();
+    public static string GameFilePath => Settings.Get<string>(Settings.GAME_LOCATION);
+    public static string DolphinFilePath => Settings.Get<string>(Settings.DOLPHIN_LOCATION);
+    public static string UserFolderPath => Settings.Get<string>(Settings.USER_FOLDER_PATH);
 
     private static string AppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     private static string LocalAppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -603,9 +605,9 @@ public static class PathManager
     {
         get
         {
-            if (SettingsManager.LOAD_PATH.IsValid())
+            if (Settings.LOAD_PATH.IsValid())
             {
-                return (string)SettingsManager.LOAD_PATH.Get();
+                return Settings.Get<string>(Settings.LOAD_PATH);
             }
             return Path.Combine(UserFolderPath, "Load");
         }
@@ -637,9 +639,9 @@ public static class PathManager
     {
         get
         {
-            if (SettingsManager.NAND_ROOT_PATH.IsValid())
+            if (Settings.NAND_ROOT_PATH.IsValid())
             {
-                return (string)SettingsManager.NAND_ROOT_PATH.Get();
+                return Settings.Get<string>(Settings.NAND_ROOT_PATH);
             }
             return Path.Combine(UserFolderPath, "Wii");
         }
