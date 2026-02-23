@@ -9,7 +9,7 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views.Popups.Generic;
 
@@ -20,12 +20,19 @@ public class RetroRewind : IDistribution
     private readonly IFileSystem _fileSystem;
     private readonly IApiCaller<IRetroRewindApi> _api;
     private readonly ILogger<IDistribution> _logger;
+    private readonly ISettingsManager _settingsManager;
 
-    public RetroRewind(IFileSystem fileSystem, IApiCaller<IRetroRewindApi> api, ILogger<IDistribution> logger)
+    public RetroRewind(
+        IFileSystem fileSystem,
+        IApiCaller<IRetroRewindApi> api,
+        ILogger<IDistribution> logger,
+        ISettingsManager settingsManager
+    )
     {
         _api = api;
         _fileSystem = fileSystem;
         _logger = logger;
+        _settingsManager = settingsManager;
     }
 
     public string Title => "Retro Rewind";
@@ -566,7 +573,7 @@ public class RetroRewind : IDistribution
 
     public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync()
     {
-        if (!SettingsHelper.PathsSetupCorrectly())
+        if (!_settingsManager.PathsSetupCorrectly())
             return WheelWizardStatus.ConfigNotFinished;
 
         var serverEnabled = await _api.CallApiAsync(api => api.Ping());

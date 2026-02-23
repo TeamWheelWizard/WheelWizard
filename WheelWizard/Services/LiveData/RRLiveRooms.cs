@@ -13,25 +13,32 @@ namespace WheelWizard.Services.LiveData;
 
 public class RRLiveRooms : RepeatedTaskManager
 {
+    private readonly IWhWzDataSingletonService _whWzService;
+    private readonly IRrRoomsSingletonService _roomsService;
+    private readonly IRrLeaderboardSingletonService _leaderboardService;
+
     public List<RrRoom> CurrentRooms { get; private set; } = [];
     public int PlayerCount => CurrentRooms.Sum(room => room.PlayerCount);
     public int RoomCount => CurrentRooms.Count;
 
-    private static RRLiveRooms? _instance;
-    public static RRLiveRooms Instance => _instance ??= new();
+    public static RRLiveRooms Instance => App.Services.GetRequiredService<RRLiveRooms>();
 
-    private RRLiveRooms()
-        : base(40) { }
+    public RRLiveRooms(
+        IWhWzDataSingletonService whWzService,
+        IRrRoomsSingletonService roomsService,
+        IRrLeaderboardSingletonService leaderboardService
+    )
+        : base(40)
+    {
+        _whWzService = whWzService;
+        _roomsService = roomsService;
+        _leaderboardService = leaderboardService;
+    }
 
     protected override async Task ExecuteTaskAsync()
     {
-        var whWzService = App.Services.GetRequiredService<IWhWzDataSingletonService>();
-        var roomsService = App.Services.GetRequiredService<IRrRoomsSingletonService>();
-        var leaderboardService = App.Services.GetRequiredService<IRrLeaderboardSingletonService>();
-        var gameLicenseService = App.Services.GetRequiredService<IGameLicenseSingletonService>();
-
-        var roomsTask = roomsService.GetRoomsAsync();
-        var leaderboardTask = leaderboardService.GetTopPlayersAsync(50);
+        var roomsTask = _roomsService.GetRoomsAsync();
+        var leaderboardTask = _leaderboardService.GetTopPlayersAsync(50);
 
         await Task.WhenAll(roomsTask, leaderboardTask);
 
@@ -68,7 +75,7 @@ public class RRLiveRooms : RepeatedTaskManager
             .ToHashSet();
 
         var rrRooms = splitRaw
-            .Select(room => MapRoom(room, whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
+            .Select(room => MapRoom(room, _whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
             .ToList();
 
         CurrentRooms = rrRooms;

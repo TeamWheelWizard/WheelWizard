@@ -1,17 +1,17 @@
-using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using HarfBuzzSharp;
 using Serilog;
+using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
-using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
+using WheelWizard.Settings.Types;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 using Button = WheelWizard.Views.Components.Button;
@@ -19,11 +19,20 @@ using SettingsResource = WheelWizard.Resources.Languages.Settings;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class WhWzSettings : UserControl
+public partial class WhWzSettings : UserControlBase
 {
     private readonly bool _pageLoaded;
     private bool _editingScale;
     private bool _isMovingAppData;
+
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
+    [Inject]
+    private IDolphinSettingManager DolphinSettingsService { get; set; } = null!;
+
+    [Inject]
+    private ILinuxDolphinInstaller LinuxDolphinInstallerService { get; set; } = null!;
 
     public WhWzSettings()
     {
@@ -49,7 +58,7 @@ public partial class WhWzSettings : UserControl
             WhWzLanguageDropdown.Items.Add(lang());
         }
 
-        var currentWhWzLanguage = (string)SettingsManager.WW_LANGUAGE.Get();
+        var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
         var whWzLanguageDisplayName = SettingValues.WhWzLanguages[currentWhWzLanguage];
         WhWzLanguageDropdown.SelectedItem = whWzLanguageDisplayName();
 
@@ -70,12 +79,12 @@ public partial class WhWzSettings : UserControl
             WindowScaleDropdown.Items.Add(ScaleToString(scale));
         }
 
-        var selectedItemText = ScaleToString((double)SettingsManager.WINDOW_SCALE.Get());
+        var selectedItemText = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
         if (!WindowScaleDropdown.Items.Contains(selectedItemText))
             WindowScaleDropdown.Items.Add(selectedItemText);
         WindowScaleDropdown.SelectedItem = selectedItemText;
 
-        EnableAnimations.IsChecked = (bool)SettingsManager.ENABLE_ANIMATIONS.Get();
+        EnableAnimations.IsChecked = (bool)SettingsService.ENABLE_ANIMATIONS.Get();
     }
 
     private static string ScaleToString(double scale)
@@ -138,11 +147,15 @@ public partial class WhWzSettings : UserControl
                     TogglePathSettings(true);
                     progressWindow.Show();
                     var progress = new Progress<int>(progressWindow.UpdateProgress);
-                    var success = await LinuxDolphinInstaller.InstallFlatpakDolphin(progress);
+                    var installResult = await LinuxDolphinInstallerService.InstallFlatpakDolphin(progress);
                     progressWindow.Close();
-                    if (!success)
+                    if (installResult.IsFailure)
                     {
-                        await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Error_FailedInstallDolphin);
+                        await new MessageBoxWindow()
+                            .SetMessageType(MessageBoxWindow.MessageType.Error)
+                            .SetTitleText("Failed to install Dolphin")
+                            .SetInfoText(installResult.Error.Message)
+                            .ShowDialog();
                         return;
                     }
 
@@ -211,7 +224,7 @@ public partial class WhWzSettings : UserControl
 
     private bool IsFlatpakDolphinInstalled()
     {
-        return LinuxDolphinInstaller.IsDolphinInstalledInFlatpak();
+        return LinuxDolphinInstallerService.IsDolphinInstalledInFlatpak();
     }
 
     private async void GameLocationBrowse_OnClick(object sender, RoutedEventArgs e)
@@ -248,7 +261,7 @@ public partial class WhWzSettings : UserControl
             await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Warning_DolphinNotFound);
         }
 
-        var currentFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
+        var currentFolder = (string)SettingsService.USER_FOLDER_PATH.Get();
         var topLevel = TopLevel.GetTopLevel(this);
         // If a current folder exists and is valid, suggest it as the starting location
         if (!string.IsNullOrEmpty(currentFolder) && Directory.Exists(currentFolder))
@@ -280,16 +293,16 @@ public partial class WhWzSettings : UserControl
 
     private async void SaveButton_OnClick(object sender, RoutedEventArgs e)
     {
-        var oldPath1 = (string)SettingsManager.DOLPHIN_LOCATION.Get();
-        var oldPath2 = (string)SettingsManager.GAME_LOCATION.Get();
-        var oldPath3 = (string)SettingsManager.USER_FOLDER_PATH.Get();
+        var oldPath1 = (string)SettingsService.DOLPHIN_LOCATION.Get();
+        var oldPath2 = (string)SettingsService.GAME_LOCATION.Get();
+        var oldPath3 = (string)SettingsService.USER_FOLDER_PATH.Get();
 
-        var path1 = SettingsManager.DOLPHIN_LOCATION.Set(DolphinExeInput.Text);
-        var path2 = SettingsManager.GAME_LOCATION.Set(MarioKartInput.Text);
-        var path3 = SettingsManager.USER_FOLDER_PATH.Set(DolphinUserPathInput.Text.TrimEnd(Path.DirectorySeparatorChar));
+        var path1 = SettingsService.DOLPHIN_LOCATION.Set(DolphinExeInput.Text);
+        var path2 = SettingsService.GAME_LOCATION.Set(MarioKartInput.Text);
+        var path3 = SettingsService.USER_FOLDER_PATH.Set(DolphinUserPathInput.Text.TrimEnd(Path.DirectorySeparatorChar));
         // These 3 lines is only saving the settings
         TogglePathSettings(false);
-        if (!(SettingsHelper.PathsSetupCorrectly() && path1 && path2 && path3))
+        if (!(SettingsService.PathsSetupCorrectly() && path1 && path2 && path3))
             await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Warning_InvalidPathSettings);
         else
         {
@@ -297,7 +310,7 @@ public partial class WhWzSettings : UserControl
 
             // This is not really the best approach, but it works for now
             if (oldPath1 + oldPath2 + oldPath3 != DolphinExeInput.Text + MarioKartInput.Text + DolphinUserPathInput.Text)
-                DolphinSettingManager.Instance.ReloadSettings();
+                DolphinSettingsService.ReloadSettings();
         }
     }
 
@@ -326,7 +339,7 @@ public partial class WhWzSettings : UserControl
         {
             LocationBorder.BorderBrush = new SolidColorBrush(ViewUtils.Colors.Neutral900);
         }
-        else if (!SettingsHelper.PathsSetupCorrectly())
+        else if (!SettingsService.PathsSetupCorrectly())
         {
             LocationBorder.BorderBrush = new SolidColorBrush(ViewUtils.Colors.Warning400);
             LocationEditButton.Variant = Button.ButtonsVariantType.Warning;
@@ -630,7 +643,7 @@ public partial class WhWzSettings : UserControl
         var selectedScale = WindowScaleDropdown.SelectedItem?.ToString() ?? "1";
         var scale = double.Parse(selectedScale.Split(" ").Last().Replace("%", "")) / 100;
 
-        SettingsManager.WINDOW_SCALE.Set(scale);
+        SettingsService.WINDOW_SCALE.Set(scale);
         var seconds = 10;
 
         string ExtraScaleText() =>
@@ -657,11 +670,11 @@ public partial class WhWzSettings : UserControl
 
         var yesNoAnswer = await yesNoWindow.AwaitAnswer();
         if (yesNoAnswer)
-            SettingsManager.SAVED_WINDOW_SCALE.Set(SettingsManager.WINDOW_SCALE.Get());
+            SettingsService.SAVED_WINDOW_SCALE.Set(SettingsService.WINDOW_SCALE.Get());
         else
         {
-            SettingsManager.WINDOW_SCALE.Set(SettingsManager.SAVED_WINDOW_SCALE.Get());
-            WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsManager.WINDOW_SCALE.Get());
+            SettingsService.WINDOW_SCALE.Set(SettingsService.SAVED_WINDOW_SCALE.Get());
+            WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
         }
 
         _editingScale = false;
@@ -697,7 +710,7 @@ public partial class WhWzSettings : UserControl
         var selectedLanguage = WhWzLanguageDropdown.SelectedItem.ToString();
         var key = SettingValues.WhWzLanguages.FirstOrDefault(x => x.Value() == selectedLanguage).Key;
 
-        var currentLanguage = (string)SettingsManager.WW_LANGUAGE.Get();
+        var currentLanguage = (string)SettingsService.WW_LANGUAGE.Get();
         if (key == null || key == currentLanguage)
             return;
 
@@ -719,16 +732,16 @@ public partial class WhWzSettings : UserControl
 
         if (!yesNoWindow)
         {
-            var currentWhWzLanguage = (string)SettingsManager.WW_LANGUAGE.Get();
+            var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
             var whWzLanguageDisplayName = SettingValues.WhWzLanguages[currentWhWzLanguage](); // gets the name of the current language back if the change was aborted
             WhWzLanguageDropdown.SelectedItem = whWzLanguageDisplayName;
             return; // We only want to change the setting if we really apply this change
         }
 
-        SettingsManager.WW_LANGUAGE.Set(key);
+        SettingsService.WW_LANGUAGE.Set(key);
         ViewUtils.RefreshWindow();
     }
 
     private void EnableAnimations_OnClick(object sender, RoutedEventArgs e) =>
-        SettingsManager.ENABLE_ANIMATIONS.Set(EnableAnimations.IsChecked == true);
+        SettingsService.ENABLE_ANIMATIONS.Set(EnableAnimations.IsChecked == true);
 }
