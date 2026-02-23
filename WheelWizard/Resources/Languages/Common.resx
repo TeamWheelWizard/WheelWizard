@@ -41,6 +41,9 @@
     <data name="PageTitle_Friends" xml:space="preserve">
         <value>Friends</value>
     </data>
+    <data name="PageTitle_Leaderboard" xml:space="preserve">
+        <value>Leaderboard</value>
+    </data>
     <data name="Attribute_Status_Online" xml:space="preserve">
         <value>Online</value>
     </data>

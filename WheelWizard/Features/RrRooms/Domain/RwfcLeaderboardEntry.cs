@@ -16,5 +16,5 @@ public sealed class RwfcLeaderboardEntry
 
     public RwfcLeaderboardVrStats? VrStats { get; set; }
 
-    public string? MiiImageBase64 { get; set; }
+    public string? MiiData { get; set; }
 }

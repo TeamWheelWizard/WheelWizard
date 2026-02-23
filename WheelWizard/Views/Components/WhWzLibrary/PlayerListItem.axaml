@@ -73,7 +73,7 @@
                                        Margin="10,0,0,0" />
                         </StackPanel>
 
-                        <Grid Grid.Column="3" ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
+                        <Grid Grid.Column="3" ColumnDefinitions="*,Auto,Auto,Auto" VerticalAlignment="Center">
                             <Border Grid.Column="0" Background="Transparent" HorizontalAlignment="Stretch"
                                     IsVisible="{TemplateBinding HasBadges}" Margin="0,0,6,0"
                                     CornerRadius="6" Height="40" BorderThickness="1"
@@ -84,15 +84,34 @@
                                 </ScrollViewer>
                             </Border>
 
-                            <Border Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"
+                            <components:Button x:Name="PART_JoinRoomButton"
+                                               Grid.Column="1"
+                                               IsVisible="False"
+                                               Variant="Primary"
+                                               Text=""
+                                               IconData="{StaticResource Road}"
+                                               IconSize="11"
+                                               FontSize="12"
+                                               Padding="8,5"
+                                               Margin="0,0,8,0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Right"
+                                               ToolTip.Tip="{x:Static lang:Common.Action_ViewRoom}"
+                                               ToolTip.Placement="Pointer"
+                                               ToolTip.HorizontalOffset="12"
+                                               ToolTip.VerticalOffset="0"
+                                               ToolTip.ShowDelay="20" />
+
+                            <Border x:Name="PART_TopLabelBadge"
+                                    Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right"
                                     IsVisible="{TemplateBinding IsTopPlayer}"
-                                    Background="{StaticResource Primary600}"
                                     Padding="10,6" CornerRadius="8" Margin="0,0,10,0">
-                                <TextBlock Text="{TemplateBinding TopLabel}" FontWeight="SemiBold" FontSize="13"
-                                           Foreground="White" />
+                                <TextBlock x:Name="PART_TopLabelText"
+                                           Text="{TemplateBinding TopLabel}" FontWeight="SemiBold" FontSize="13"
+                                           />
                             </Border>
 
-                            <PathIcon Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right"
+                            <PathIcon Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right"
                                       IsVisible="{TemplateBinding IsOpenHost}"
                                       Data="{StaticResource LockOpen}" Width="16" Height="16"
                                       Foreground="{StaticResource Primary400}"
@@ -105,5 +124,18 @@
                 </Border>
             </ControlTemplate>
         </Setter>
+    </Style>
+
+    <Style Selector="components|PlayerListItem /template/ Border#PART_TopLabelBadge">
+        <Setter Property="Background" Value="{StaticResource Primary600}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="components|PlayerListItem /template/ TextBlock#PART_TopLabelText">
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style Selector="components|PlayerListItem[ShowJoinRoomButton=true][IsOnline=true] /template/ components|Button#PART_JoinRoomButton">
+        <Setter Property="IsVisible" Value="True" />
     </Style>
 </Styles>
