@@ -6,11 +6,12 @@ namespace WheelWizard.Settings;
 
 public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingManager
 {
-    private static string ConfigFolderPath(string fileName) => Path.Combine(PathManager.ConfigFolderPath, fileName);
+    private string ConfigFolderPath(string fileName) => fileSystem.Path.Combine(PathManager.ConfigFolderPath, fileName);
 
     // LOCKS:
-    // We are working with locks. This is to ensure that we always have accurate information in our settings / application.
-    // We do not create multiple threads. However, some of our features run through Tasks. Those are executed asynchronously, therefore still require locks.
+    // We use locks to keep the settings state and file IO consistent.
+    // Even though we do not manually create threads in this class, work can still happen concurrently
+    // (for example the Avalonia UI thread + Task/thread-pool execution), so synchronization is still required.
 
     // Sync Root:  Responsible for synchronizing access to the _settings list and the _loaded flag.
     // It ensures that multiple threads don't modify the settings list or the loaded state at the same time
@@ -72,7 +73,7 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
 
         lock (_syncRoot)
         {
-            // Since we are working with concurrency here, we have to check loaded again since it might be changed while we where waiting
+            // Since we are working with concurrency here, we have to check loaded again since it might be changed while we were waiting
             // for the lock to open
             if (_loaded)
                 return;
