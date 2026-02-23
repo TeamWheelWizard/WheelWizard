@@ -1165,6 +1165,15 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("PageTitle_Friends", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Leaderboard.
+        /// </summary>
+        public static string PageTitle_Leaderboard {
+            get {
+                return ResourceManager.GetString("PageTitle_Leaderboard", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Home.
