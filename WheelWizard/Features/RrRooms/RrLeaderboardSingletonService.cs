@@ -31,10 +31,9 @@ public class RrLeaderboardSingletonService(
         {
             if (!TryGetCached(StaleCacheKey, boundedLimit, out var staleCache))
                 return fetchResult;
-            
+
             logger.LogWarning("RWFC leaderboard fetch failed; returning stale cached leaderboard for top {Limit}.", boundedLimit);
             return staleCache;
-
         }
 
         var fetchedEntries = fetchResult.Value.ToList();
@@ -49,7 +48,8 @@ public class RrLeaderboardSingletonService(
     {
         if (
             !cache.TryGetValue(cacheKey, out List<RwfcLeaderboardEntry>? cachedEntries)
-            || cachedEntries == null || cachedEntries.Count < limit
+            || cachedEntries == null
+            || cachedEntries.Count < limit
         )
         {
             result = default!;

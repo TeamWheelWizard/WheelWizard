@@ -16,6 +16,7 @@ public class RRLiveRooms : RepeatedTaskManager
     private readonly IWhWzDataSingletonService _whWzService;
     private readonly IRrRoomsSingletonService _roomsService;
     private readonly IRrLeaderboardSingletonService _leaderboardService;
+    private readonly IGameLicenseSingletonService _gameLicenseService;
 
     public List<RrRoom> CurrentRooms { get; private set; } = [];
     public int PlayerCount => CurrentRooms.Sum(room => room.PlayerCount);
@@ -26,13 +27,15 @@ public class RRLiveRooms : RepeatedTaskManager
     public RRLiveRooms(
         IWhWzDataSingletonService whWzService,
         IRrRoomsSingletonService roomsService,
-        IRrLeaderboardSingletonService leaderboardService
+        IRrLeaderboardSingletonService leaderboardService,
+        IGameLicenseSingletonService gameLicenseService
     )
         : base(40)
     {
         _whWzService = whWzService;
         _roomsService = roomsService;
         _leaderboardService = leaderboardService;
+        _gameLicenseService = gameLicenseService;
     }
 
     protected override async Task ExecuteTaskAsync()
@@ -69,7 +72,7 @@ public class RRLiveRooms : RepeatedTaskManager
         var raw = roomsResult.Value;
         var splitRaw = SplitMergedRooms(raw);
 
-        var friendProfileIds = gameLicenseService
+        var friendProfileIds = _gameLicenseService
             .ActiveCurrentFriends.Select(friend => FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode))
             .Where(profileId => profileId != 0)
             .ToHashSet();

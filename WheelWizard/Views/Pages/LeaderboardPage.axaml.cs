@@ -7,7 +7,7 @@ using WheelWizard.Models;
 using WheelWizard.Resources.Languages;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.Generators;
 using WheelWizard.Views.Popups;
@@ -69,6 +69,9 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
     [Inject]
     private IGameLicenseSingletonService GameDataService { get; set; } = null!;
+
+    [Inject]
+    private ISettingsManager SettingsManager { get; set; } = null!;
 
     private bool _hasLoadedOnce;
     private bool _isLoading;
@@ -463,7 +466,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        var focusedUserIndex = (int)SettingsManager.FOCUSSED_USER.Get();
+        var focusedUserIndex = SettingsManager.Get<int>(SettingsManager.FOCUSED_USER);
         if (focusedUserIndex is < 0 or > 3)
         {
             ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);
