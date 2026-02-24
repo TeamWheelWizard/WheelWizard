@@ -8,7 +8,7 @@ using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
-namespace WheelWizard.Views.BehaviorComponent;
+namespace WheelWizard.Views.Patterns;
 
 public partial class CurrentUserProfile : UserControlBase
 {

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
-             xmlns:behavior="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:animation="clr-namespace:Avalonia.Animation;assembly=Avalonia.Base"
              xmlns:miiVars="using:WheelWizard.MiiImages.Domain"

@@ -3,10 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             xmlns:behaviorComp="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:converters="clr-namespace:WheelWizard.Views.Converters"
-             x:Class="WheelWizard.Views.BehaviorComponent.MiiCarousel" x:Name="Self">
+             x:Class="WheelWizard.Views.Patterns.MiiCarousel" x:Name="Self">
     
         <Grid ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding GeneratedImages, ElementName=Self, Converter={x:Static 
                    converters:CollectionConverters.FirstIsNotNull }}">

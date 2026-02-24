@@ -6,7 +6,7 @@ using WheelWizard.AutoUpdating;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.UrlProtocol;
-using WheelWizard.Views.Scripts;
+using WheelWizard.Views.Behaviors;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
@@ -39,6 +39,12 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        InitializeBehaviorOverrides();
+    }
+
+    private void InitializeBehaviorOverrides()
+    {
+        //Behavior overrides are native components where we are overriding the behavior of
         ToolTipBubbleBehavior.Initialize();
     }
 

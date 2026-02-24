@@ -5,7 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:domain="clr-namespace:WheelWizard.WiiManagement.GameLicense.Domain"
              x:Class="WheelWizard.Views.Pages.FriendsPage">
     <Grid>

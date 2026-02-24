@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
-namespace WheelWizard.Views.BehaviorComponent;
+namespace WheelWizard.Views.Patterns;
 
 public partial class FeedbackTextBox : UserControlBase
 {

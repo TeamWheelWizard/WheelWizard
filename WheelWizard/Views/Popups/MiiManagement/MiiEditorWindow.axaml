@@ -3,7 +3,7 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
-                   xmlns:behavior="clr-namespace:WheelWizard.Views.BehaviorComponent"
+                   xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
                    xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    xmlns:miiManagement="clr-namespace:WheelWizard.Views.Popups.MiiManagement"

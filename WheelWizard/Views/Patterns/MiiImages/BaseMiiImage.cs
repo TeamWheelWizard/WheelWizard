@@ -7,7 +7,7 @@ using WheelWizard.MiiImages.Domain;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
-namespace WheelWizard.Views.BehaviorComponent;
+namespace WheelWizard.Views.Patterns;
 
 public abstract class BaseMiiImage : UserControlBase, INotifyPropertyChanged
 {

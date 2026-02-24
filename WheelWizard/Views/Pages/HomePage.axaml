@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              mc:Ignorable="d" d:DesignWidth="490" d:DesignHeight="830"
              ClipToBounds="False"
              x:Class="WheelWizard.Views.Pages.HomePage">

@@ -1,7 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
-        xmlns:behaviorComp="clr-namespace:WheelWizard.Views.BehaviorComponent">
+        xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns">
     <Design.PreviewWith >
         <StackPanel Orientation="Vertical" Spacing="5" Background="Black">
             <StackPanel Orientation="Horizontal" Spacing="5">

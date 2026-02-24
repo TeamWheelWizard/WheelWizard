@@ -1,6 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Diagnostics;
@@ -8,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 
-namespace WheelWizard.Views.Scripts;
+namespace WheelWizard.Views.Behaviors;
 
 public static class ToolTipBubbleBehavior
 {

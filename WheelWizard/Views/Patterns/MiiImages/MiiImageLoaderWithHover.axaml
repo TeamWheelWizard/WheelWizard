@@ -3,11 +3,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
-             x:Class="WheelWizard.Views.BehaviorComponent.MiiImageLoader"
-             xmlns:behaviorComp="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             x:Class="WheelWizard.Views.Patterns.MiiImageLoaderWithHover"
+             xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:conv="clr-namespace:WheelWizard.Views.Converters"
-             x:DataType="behaviorComp:MiiImageLoader" x:Name="Self"
+             x:DataType="behaviorComp:MiiImageLoaderWithHover" x:Name="Self"
              VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
     <behaviorComp:AspectGrid x:Name="MiiImageContainer" ClipToBounds="True" ColumnDefinitions="*,3*,*"
                              RowDefinitions="*,3*,*"
@@ -38,16 +38,17 @@
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
               Margin="{Binding ImageOnlyMargin, ElementName=Self}" Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Grid.RowSpan="3">
            
-            <!-- LowQuality (or Normal if low quality doesn't exist) -->
+            <!-- Normal expression -->
             <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                    Source="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.First }}"
-                   IsVisible="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.SecondIsNull }}"/>
+                   IsVisible="{Binding ShowNormalImage, ElementName=Self}"/>
            
-            <!-- Normal (if low quality exists) -->
+            <!-- Hover expression -->
             <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                    Source="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.Second }}"
-                   IsVisible="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.SecondIsNotNull }}"/>
+                   IsVisible="{Binding ShowHoverImage, ElementName=Self}"/>
         </Grid>
      
     </behaviorComp:AspectGrid>
 </UserControl>
+

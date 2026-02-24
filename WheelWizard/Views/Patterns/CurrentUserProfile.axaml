@@ -1,8 +1,8 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
-             x:Class="WheelWizard.Views.BehaviorComponent.CurrentUserProfile"
+             x:Class="WheelWizard.Views.Patterns.CurrentUserProfile"
              x:DataType="behaviorComponent:CurrentUserProfile">
 
     <StackPanel Orientation="Horizontal" Background="Transparent">

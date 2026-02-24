@@ -5,7 +5,7 @@ using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
-namespace WheelWizard.Views.BehaviorComponent;
+namespace WheelWizard.Views.Patterns;
 
 public partial class MiiImageLoaderWithHover : BaseMiiImage
 {
