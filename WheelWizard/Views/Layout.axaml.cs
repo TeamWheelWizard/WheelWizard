@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -38,6 +39,16 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     // testing builds since they are behind authentication walls.
     // but have fun with the beta button :)
     private const string TesterSecretPhrase = "WhenSonicInRR?";
+    private static readonly TimeSpan PageSwapDuration = TimeSpan.FromMilliseconds(250);
+    private static readonly IPageTransition RoomsPageTransition = new CompositePageTransition
+    {
+        PageTransitions =
+        [
+            new PageSlide { Duration = PageSwapDuration, Orientation = PageSlide.SlideAxis.Horizontal },
+            new CrossFade { Duration = PageSwapDuration },
+        ],
+    };
+
     private int _testerClickCount;
     private bool _testerPromptOpen;
     private IDisposable? _settingsSignalSubscription;
@@ -129,8 +140,18 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     public void NavigateToPage(UserControl page)
     {
-        ContentArea.Content = page;
+        var oldPage = ContentArea.Content as Control;
+        var isRoomsToDetails = oldPage is RoomsPage && page is RoomDetailsPage;
+        var isDetailsToRooms = oldPage is RoomDetailsPage && page is RoomsPage;
 
+        ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms ? RoomsPageTransition : null;
+        ContentArea.IsTransitionReversed = isDetailsToRooms;
+        ContentArea.Content = page;
+        UpdateSidebarSelection(page);
+    }
+
+    private void UpdateSidebarSelection(UserControl page)
+    {
         // Update the IsChecked state of the SidebarRadioButtons
         foreach (var child in SidePanelButtons.Children)
         {

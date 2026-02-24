@@ -57,9 +57,11 @@
         <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
                 Background="{StaticResource BackgroundColor}" />
-        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"  ClipToBounds="True">
-            <ContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="False"
-                            x:Name="ContentArea" Margin="{StaticResource EdgeGap}" />
+        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="True">
+            <TransitioningContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                         ClipToBounds="False"
+                                         x:Name="ContentArea"
+                                         Margin="{StaticResource EdgeGap}" />
         </Grid>
         
         <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom"
