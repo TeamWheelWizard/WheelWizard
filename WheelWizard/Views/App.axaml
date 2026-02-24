@@ -59,17 +59,17 @@
         <StyleInclude Source="Components/StandardLibrary/EmptyPageInfo.axaml" />
         <StyleInclude Source="Components/StandardLibrary/FormFieldLabel.axaml" />
         <StyleInclude Source="Components/StandardLibrary/LoadingIcon.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/SidebarRadioButton.axaml" />
+        <StyleInclude Source="Patterns/SidebarRadioButton.axaml" />
         <StyleInclude Source="Components/StandardLibrary/PopupListButton.axaml" />
         <StyleInclude Source="Components/StandardLibrary/MemeNumberState.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
-        <StyleInclude Source="Components/WhWzLibrary/ModBrowserListItem.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/FriendsListItem.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/PlayerListItem.axaml" />
+        <StyleInclude Source="Patterns/WhWzLibrary/ModBrowserListItem.axaml" />
+        <StyleInclude Source="Patterns/WhWzLibrary/FriendsListItem.axaml" />
+        <StyleInclude Source="Patterns/WhWzLibrary/PlayerListItem.axaml" />
         <StyleInclude Source="Components/WhWzLibrary/Badge.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/MiiBlock.axaml" />
+        <StyleInclude Source="Patterns/WhWzLibrary/MiiBlock.axaml" />
         <StyleInclude Source="Components/WhWzLibrary/WheelTrail.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/LeaderboardPodiumCard.axaml" />
+        <StyleInclude Source="Patterns/WhWzLibrary/LeaderboardPodiumCard.axaml" />
     </Application.Styles>
 </Application>

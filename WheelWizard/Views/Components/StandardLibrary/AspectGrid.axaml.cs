@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 
-namespace WheelWizard.Views.Patterns;
+namespace WheelWizard.Views.Components;
 
 public partial class AspectGrid : Grid
 {

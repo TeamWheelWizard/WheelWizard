@@ -6,6 +6,7 @@
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:domain="clr-namespace:WheelWizard.WiiManagement.GameLicense.Domain"
              x:Class="WheelWizard.Views.Pages.FriendsPage">
     <Grid>
@@ -74,7 +75,7 @@
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="domain:FriendProfile">
-                        <components:FriendsListItem Width="428" Height="124"
+                        <patterns:FriendsListItem Width="428" Height="124"
                                                     Margin="0,5"
                                                     UserName="{Binding NameOfMii}"
                                                     FriendCode="{Binding FriendCode}"

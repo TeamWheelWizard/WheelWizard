@@ -15,6 +15,7 @@ using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
+using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement;

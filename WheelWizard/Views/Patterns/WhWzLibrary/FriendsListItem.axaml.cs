@@ -1,11 +1,12 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+using Badge = WheelWizard.Views.Components.Badge;
 
-namespace WheelWizard.Views.Components;
+namespace WheelWizard.Views.Patterns;
 
 public class FriendsListItem : TemplatedControl
 {

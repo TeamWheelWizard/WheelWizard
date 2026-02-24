@@ -12,7 +12,7 @@
                    converters:CollectionConverters.FirstIsNotNull }}">
             <Border Grid.Column="1" Padding="6" CornerRadius="6" BorderThickness="1" x:Name="ImageBorder"
                     BorderBrush="{StaticResource BackgroundLineColor}" SizeChanged="ImageBorder_OnSizeChanged">
-                <behaviorComp:AspectGrid ClipToBounds="True" x:Name="MiiImageCounter"
+                <components:AspectGrid ClipToBounds="True" x:Name="MiiImageCounter"
                                          VerticalAlignment="Stretch">
                     <Image HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="MiiPreviewImage"
                            Source="{Binding GeneratedImages, ElementName=Self, Converter={x:Static 
@@ -24,7 +24,7 @@
                     <Image HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="MiiImage"
                            Source="{Binding GeneratedImages, ElementName=Self, Converter={x:Static 
                    converters:CollectionConverters.Second }}" RenderTransformOrigin="0,0"/>
-                </behaviorComp:AspectGrid>
+                </components:AspectGrid>
             </Border>
             
             <components:Button Grid.Column="0" VerticalAlignment="Center" IconData="{StaticResource RotateLeft}"

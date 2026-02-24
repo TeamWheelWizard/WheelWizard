@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WheelWizard.GameBanana;
 using WheelWizard.Views.Pages;
 
-namespace WheelWizard.Views.Components;
+namespace WheelWizard.Views.Patterns;
 
 public partial class GridModPanel : UserControl
 {

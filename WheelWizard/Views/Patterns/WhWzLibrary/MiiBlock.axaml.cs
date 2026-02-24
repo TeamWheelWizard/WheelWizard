@@ -5,12 +5,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
-using WheelWizard.Views.Patterns;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
-namespace WheelWizard.Views.Components;
+namespace WheelWizard.Views.Patterns;
 
 public class MiiBlock : RadioButton
 {

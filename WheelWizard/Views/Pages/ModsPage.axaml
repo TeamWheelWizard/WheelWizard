@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              x:Class="WheelWizard.Views.Pages.ModsPage"
@@ -208,7 +209,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border>
-                                <components:GridModPanel />
+                                <patterns:GridModPanel />
                                 <Border.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />

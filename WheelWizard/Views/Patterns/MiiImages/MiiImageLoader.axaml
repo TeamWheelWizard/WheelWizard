@@ -9,7 +9,7 @@
              xmlns:conv="clr-namespace:WheelWizard.Views.Converters"
              x:DataType="behaviorComp:MiiImageLoader" x:Name="Self"
              VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-    <behaviorComp:AspectGrid x:Name="MiiImageContainer" ClipToBounds="True" ColumnDefinitions="*,3*,*"
+    <components:AspectGrid x:Name="MiiImageContainer" ClipToBounds="True" ColumnDefinitions="*,3*,*"
                              RowDefinitions="*,3*,*"
                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <components:LoadingIcon HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="MiiLoadingIcon"
@@ -49,5 +49,5 @@
                    IsVisible="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.SecondIsNotNull }}"/>
         </Grid>
      
-    </behaviorComp:AspectGrid>
+    </components:AspectGrid>
 </UserControl>

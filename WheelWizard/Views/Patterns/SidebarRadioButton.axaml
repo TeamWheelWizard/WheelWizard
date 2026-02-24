@@ -2,27 +2,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
         xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
-        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+        xmlns:components="clr-namespace:WheelWizard.Views.Components"
+        xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns">
   <Design.PreviewWith>
     <Border Padding="2" Width="300" Background="{StaticResource Neutral600}">
       <StackPanel>
-        <components:SidebarRadioButton IconData="{StaticResource Home}" 
+        <patterns:SidebarRadioButton IconData="{StaticResource Home}" 
                                      Text="{x:Static lang:Common.PageTitle_Home}"
                                      PageType="{x:Type pages:HomePage}"/>
         
-        <components:SidebarRadioButton  IsChecked="True"
+        <patterns:SidebarRadioButton  IsChecked="True"
                                    IconData="{StaticResource Settings}" 
                                    Text="{x:Static lang:Common.PageTitle_Settings}"
                                    PageType="{x:Type pages:HomePage}"/>
         
-        <components:SidebarRadioButton IconData="{StaticResource Friends}" 
+        <patterns:SidebarRadioButton IconData="{StaticResource Friends}" 
                                   Text="{x:Static lang:Common.PageTitle_Friends}"
                                   PageType="{x:Type pages:HomePage}"
                                   BoxText="0/0"/>  
-        <components:SidebarRadioButton IconData="{StaticResource CubesStacked}" 
+        <patterns:SidebarRadioButton IconData="{StaticResource CubesStacked}" 
                                   Text="{x:Static lang:Common.PageTitle_Mods}"
                                   PageType="{x:Type pages:HomePage}"/>
-        <components:SidebarRadioButton IconData="{StaticResource RoomUsers}" 
+        <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}" 
                                   Text="{x:Static lang:Common.PageTitle_Rooms}"
                                   PageType="{x:Type pages:RoomsPage}"/>
                                   
@@ -30,7 +31,7 @@
     </Border>
   </Design.PreviewWith>
 
-  <Style Selector="components|SidebarRadioButton">
+  <Style Selector="patterns|SidebarRadioButton">
     <Setter Property="Background" Value="{DynamicResource Neutral900}" />
     <Setter Property="Foreground" Value="{DynamicResource Neutral400}" />
     <Setter Property="Height" Value="50" />
@@ -84,7 +85,7 @@
     </Setter>
   </Style>
   
-  <Style Selector="components|SidebarRadioButton:pointerover">
+  <Style Selector="patterns|SidebarRadioButton:pointerover">
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Background" Value="{StaticResource Neutral800}" />
     <Setter Property="Foreground" Value="{StaticResource Primary200}" />
@@ -93,7 +94,7 @@
     </Style>
   </Style>
 
-  <Style Selector="components|SidebarRadioButton:checked">
+  <Style Selector="patterns|SidebarRadioButton:checked">
     <Setter Property="Background" Value="{StaticResource Neutral950}" />
     <Setter Property="Foreground" Value="{StaticResource Primary300}" />
     <Style Selector="^ /template/ Border#PART_HoverEffect">

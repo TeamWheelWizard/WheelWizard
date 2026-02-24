@@ -1,33 +1,34 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:components="using:WheelWizard.Views.Components">
+        xmlns:components="using:WheelWizard.Views.Components"
+        xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns">
     <Design.PreviewWith>
         <StackPanel Spacing="6" Background="{StaticResource Neutral950}">
-            <components:ModBrowserListItem Width="294" Height="89"
+            <patterns:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="My Title"
                                            ModAuthor="Me"/>
             
-            <components:ModBrowserListItem Width="294" Height="89"
+            <patterns:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="Some other mod"
                                            ModAuthor="somebody else"/>
             
-            <components:ModBrowserListItem Width="294" Height="89"
+            <patterns:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="Coolest mod ever made"
                                            ModAuthor="random guy"
                                            Classes="TestSelected"/> <!-- Dont use this class in the code, it servers no real usefull purpose -->
             
-            <components:ModBrowserListItem Width="294" Height="89"
+            <patterns:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="My Title"
                                            ModAuthor="Me"/>
             
-            <components:ModBrowserListItem Width="294" Height="89"
+            <patterns:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="LOADING"
                                            ModAuthor="LOADING"/>
         </StackPanel>
       
     </Design.PreviewWith>
 
-    <Style Selector="components|ModBrowserListItem">
+    <Style Selector="patterns|ModBrowserListItem">
         <Setter Property="Template">
             <ControlTemplate>
                 <Border x:Name="PART_ModItemBorder"
@@ -121,13 +122,13 @@
                             </Style>
                         </Style>
                         
-                        <Style Selector="ListBoxItem:selected Border#PART_ModItemBorder, components|ModBrowserListItem.TestSelected Border#PART_ModItemBorder">
+                        <Style Selector="ListBoxItem:selected Border#PART_ModItemBorder, patterns|ModBrowserListItem.TestSelected Border#PART_ModItemBorder">
                             <Style Selector="^ Border#PART_OverlayBorder, ^ Border#PART_SelectedBlur">
                                 <Setter Property="IsVisible" Value="True"/>
                             </Style>
                         </Style>
                         
-                        <Style Selector="components|ModBrowserListItem[ModTitle=LOADING][ModAuthor=LOADING] Border#PART_ModItemBorder">
+                        <Style Selector="patterns|ModBrowserListItem[ModTitle=LOADING][ModAuthor=LOADING] Border#PART_ModItemBorder">
                             <Style Selector="^ Border#PART_OverlayLoading">
                                 <Setter Property="IsVisible" Value="True"/>
                             </Style>

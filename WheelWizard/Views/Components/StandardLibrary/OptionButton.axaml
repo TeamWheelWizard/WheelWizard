@@ -27,7 +27,7 @@
         <Setter Property="Background" Value="{StaticResource Neutral900}" />
         <Setter Property="Template">
             <ControlTemplate>
-                <behavior:AspectGrid>
+                <components1:AspectGrid>
                     <Border Background="{TemplateBinding Background}"
                             Padding="10"
                             BorderBrush="{TemplateBinding BorderBrush}"
@@ -79,7 +79,7 @@
                             x:Name="PART_DisabledBorder"
                             BorderBrush="{StaticResource Neutral800}" BorderThickness="1"
                             CornerRadius="{TemplateBinding CornerRadius}"/> 
-                </behavior:AspectGrid>
+                </components1:AspectGrid>
             </ControlTemplate>
         </Setter>
     </Style>

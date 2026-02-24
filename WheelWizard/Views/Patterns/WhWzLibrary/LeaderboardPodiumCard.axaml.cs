@@ -3,7 +3,7 @@ using Avalonia.Controls.Primitives;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
-namespace WheelWizard.Views.Components;
+namespace WheelWizard.Views.Patterns;
 
 public class LeaderboardPodiumCard : TemplatedControl
 {

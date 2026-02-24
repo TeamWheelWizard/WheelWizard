@@ -2,11 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
         xmlns:components="using:WheelWizard.Views.Components"
+        xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
         xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns">
     <Design.PreviewWith>
         <StackPanel Background="{StaticResource Neutral950}">
-            <components:PlayerListItem Width="428" Height="124"
+            <patterns:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Lum Patch"
                                        Vr="5000"
@@ -15,13 +16,13 @@
                                        IsTopPlayer="True"
                                        TopLabel="TOP 3" />
 
-            <components:PlayerListItem Width="428" Height="124"
+            <patterns:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Someone Else"
                                        Vr="5000"
                                        HasBadges="True" />
 
-            <components:PlayerListItem Width="428" Height="124"
+            <patterns:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="WantToBeeMe"
                                        Vr="5000"
@@ -29,13 +30,13 @@
                                        IsTopPlayer="True"
                                        TopLabel="TOP 12" />
 
-            <components:PlayerListItem Width="428" Height="124"
+            <patterns:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Random Guy"
                                        Vr="5000"
                                        HasBadges="False" />
 
-            <components:PlayerListItem Width="428" Height="124"
+            <patterns:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Someone Else"
                                        Vr="5000"
@@ -43,7 +44,7 @@
         </StackPanel>
     </Design.PreviewWith>
 
-    <Style Selector="components|PlayerListItem">
+    <Style Selector="patterns|PlayerListItem">
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Classes="BoxItemBackground">
@@ -126,16 +127,16 @@
         </Setter>
     </Style>
 
-    <Style Selector="components|PlayerListItem /template/ Border#PART_TopLabelBadge">
+    <Style Selector="patterns|PlayerListItem /template/ Border#PART_TopLabelBadge">
         <Setter Property="Background" Value="{StaticResource Primary600}" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
 
-    <Style Selector="components|PlayerListItem /template/ TextBlock#PART_TopLabelText">
+    <Style Selector="patterns|PlayerListItem /template/ TextBlock#PART_TopLabelText">
         <Setter Property="Foreground" Value="White" />
     </Style>
 
-    <Style Selector="components|PlayerListItem[ShowJoinRoomButton=true][IsOnline=true] /template/ components|Button#PART_JoinRoomButton">
+    <Style Selector="patterns|PlayerListItem[ShowJoinRoomButton=true][IsOnline=true] /template/ components|Button#PART_JoinRoomButton">
         <Setter Property="IsVisible" Value="True" />
     </Style>
 </Styles>

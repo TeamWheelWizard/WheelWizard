@@ -3,7 +3,7 @@
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
-             x:Class="WheelWizard.Views.Components.GridModPanel"
+             x:Class="WheelWizard.Views.Patterns.GridModPanel"
              x:DataType="pages:ModListItem">
 
     <Border CornerRadius="8" Background="{StaticResource Neutral900}"

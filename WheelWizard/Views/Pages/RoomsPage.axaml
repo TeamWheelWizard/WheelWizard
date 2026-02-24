@@ -5,6 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
              x:Class="WheelWizard.Views.Pages.RoomsPage"
              x:DataType="pages:RoomsPage">
@@ -139,7 +140,7 @@
                      SelectionChanged="PlayerView_SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <components:PlayerListItem
+                        <patterns:PlayerListItem
                             UserName="{Binding Name}"
                             FriendCode="{Binding FriendCode}"
                             Vr="{Binding VrDisplay}"

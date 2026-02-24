@@ -4,12 +4,13 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+using Badge = WheelWizard.Views.Components.Badge;
 
-namespace WheelWizard.Views.Components;
+namespace WheelWizard.Views.Patterns;
 
 public class PlayerListItem : TemplatedControl
 {
-    private Button? _joinRoomButton;
+    private Avalonia.Controls.Button? _joinRoomButton;
 
     public static readonly StyledProperty<bool> IsOnlineProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(IsOnline));
     public static readonly StyledProperty<bool> ShowJoinRoomButtonProperty = AvaloniaProperty.Register<PlayerListItem, bool>(
@@ -147,7 +148,7 @@ public class PlayerListItem : TemplatedControl
         if (_joinRoomButton != null)
             _joinRoomButton.Click -= JoinRoom_OnClick;
 
-        _joinRoomButton = e.NameScope.Find<Button>("PART_JoinRoomButton");
+        _joinRoomButton = e.NameScope.Find<Avalonia.Controls.Button>("PART_JoinRoomButton");
         if (_joinRoomButton != null)
             _joinRoomButton.Click += JoinRoom_OnClick;
     }

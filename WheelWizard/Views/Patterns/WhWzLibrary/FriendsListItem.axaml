@@ -3,38 +3,39 @@
         xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
-        xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns">
+        xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
+        xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns">
     <Design.PreviewWith>
         <StackPanel Spacing="6" Background="{StaticResource Neutral950}">
-            <components:FriendsListItem Width="428" Height="124"
+            <patterns:FriendsListItem Width="428" Height="124"
                                         FriendCode="1234-5678-9012"
                                         UserName="Lum Patch"
                                         Vr="5000" Br="5000"
                                         HasBadges="True"
                                         TotalLosses="12" TotalWon="1345" />
 
-            <components:FriendsListItem Width="428" Height="124" IsOnline="True"
+            <patterns:FriendsListItem Width="428" Height="124" IsOnline="True"
                                         FriendCode="1234-5678-9012"
                                         UserName="Someone Else"
                                         Vr="5000" Br="5000"
                                         HasBadges="True"
                                         TotalLosses="213" TotalWon="12" />
 
-            <components:FriendsListItem Width="428" Height="124"
+            <patterns:FriendsListItem Width="428" Height="124"
                                         FriendCode="1234-5678-9012"
                                         UserName="WantToBeeMe"
                                         Vr="5000" Br="5000"
                                         HasBadges="False"
                                         TotalLosses="213" TotalWon="12" />
 
-            <components:FriendsListItem Width="428" Height="124"
+            <patterns:FriendsListItem Width="428" Height="124"
                                         FriendCode="1234-5678-9012"
                                         UserName="Random Guy"
                                         Vr="5000" Br="5000"
                                         HasBadges="False"
                                         TotalLosses="213" TotalWon="12" />
 
-            <components:FriendsListItem Width="428" Height="124" IsOnline="True"
+            <patterns:FriendsListItem Width="428" Height="124" IsOnline="True"
                                         FriendCode="1234-5678-9012"
                                         UserName="Someone Else"
                                         Vr="5000" Br="5000"
@@ -43,7 +44,7 @@
         </StackPanel>
     </Design.PreviewWith>
 
-    <Style Selector="components|FriendsListItem">
+    <Style Selector="patterns|FriendsListItem">
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Background="{StaticResource Neutral900}" CornerRadius="6" Padding="10,5"
@@ -207,26 +208,26 @@
     </Style>
 
     <Style
-        Selector="components|FriendsListItem[IsOnline=true][IsPending=false] /template/ Border#PART_BorderColor,
-                     components|FriendsListItem[IsOnline=true][IsPending=false] /template/ Border#PART_BadgeBorder">
+        Selector="patterns|FriendsListItem[IsOnline=true][IsPending=false] /template/ Border#PART_BorderColor,
+                     patterns|FriendsListItem[IsOnline=true][IsPending=false] /template/ Border#PART_BadgeBorder">
         <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
     </Style>
 
     <Style
-        Selector="components|FriendsListItem[IsPending=true] /template/ Border#PART_BorderColor,
-                     components|FriendsListItem[IsPending=true] /template/ Border#PART_BadgeBorder">
+        Selector="patterns|FriendsListItem[IsPending=true] /template/ Border#PART_BorderColor,
+                     patterns|FriendsListItem[IsPending=true] /template/ Border#PART_BadgeBorder">
         <Setter Property="BorderBrush" Value="{StaticResource Warning500}" />
     </Style>
 
-    <Style Selector="components|FriendsListItem[IsPending=true] /template/ behaviorComponent|MiiImageLoader">
+    <Style Selector="patterns|FriendsListItem[IsPending=true] /template/ behaviorComponent|MiiImageLoader">
         <Setter Property="ImageVariant" Value="{x:Static miiVars:MiiImageVariants.FriendsSideProfilePending}" />
     </Style>
 
-    <Style Selector="components|FriendsListItem[IsPending=true] /template/ components|Button#ViewRoomButton">
+    <Style Selector="patterns|FriendsListItem[IsPending=true] /template/ components|Button#ViewRoomButton">
         <Setter Property="Variant" Value="Warning" />
     </Style>
 
-    <Style Selector="components|FriendsListItem[HasBadges=true] /template/ components|Button#ViewRoomButton">
+    <Style Selector="patterns|FriendsListItem[HasBadges=true] /template/ components|Button#ViewRoomButton">
         <Setter Property="Padding" Value="10" />
         <Setter Property="Text" Value="" />
     </Style>
