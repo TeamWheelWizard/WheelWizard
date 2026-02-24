@@ -3,11 +3,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Models.Settings;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
+using WheelWizard.Settings.Types;
 using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.WheelWizardData;
@@ -89,6 +89,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private readonly IFileSystem _fileSystem;
     private readonly IWhWzDataSingletonService _whWzDataSingletonService;
     private readonly IRRratingReader _rrratingReader;
+    private readonly ISettingsManager _settingsManager;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
 
@@ -96,7 +97,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         IMiiDbService miiService,
         IFileSystem fileSystem,
         IWhWzDataSingletonService whWzDataSingletonService,
-        IRRratingReader rrratingReader
+        IRRratingReader rrratingReader,
+        ISettingsManager settingsManager
     )
         : base(40)
     {
@@ -104,6 +106,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         _fileSystem = fileSystem;
         _whWzDataSingletonService = whWzDataSingletonService;
         _rrratingReader = rrratingReader;
+        _settingsManager = settingsManager;
         Licenses = new();
     }
 
@@ -131,9 +134,9 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     /// <summary>
     /// Returns the "focused" or currently active license/user as determined by the Settings.
     /// </summary>
-    public LicenseProfile ActiveUser => Licenses.Users[(int)SettingsManager.FOCUSSED_USER.Get()];
+    public LicenseProfile ActiveUser => Licenses.Users[_settingsManager.Get<int>(_settingsManager.FOCUSED_USER)];
 
-    public List<FriendProfile> ActiveCurrentFriends => Licenses.Users[(int)SettingsManager.FOCUSSED_USER.Get()].Friends;
+    public List<FriendProfile> ActiveCurrentFriends => Licenses.Users[_settingsManager.Get<int>(_settingsManager.FOCUSED_USER)].Friends;
 
     public LicenseCollection LicenseCollection => Licenses;
 
@@ -635,7 +638,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             if (!_fileSystem.Directory.Exists(PathManager.SaveFolderPath))
                 return Fail("Save folder not found");
 
-            var currentRegion = (MarioKartWiiEnums.Regions)SettingsManager.RR_REGION.Get();
+            var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
             if (currentRegion == MarioKartWiiEnums.Regions.None)
             {
                 // Double check if there's at least one valid region
@@ -643,7 +646,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
                 if (validRegions.First() != MarioKartWiiEnums.Regions.None)
                 {
                     currentRegion = validRegions.First();
-                    SettingsManager.RR_REGION.Set(currentRegion);
+                    _settingsManager.Set(_settingsManager.RR_REGION, currentRegion);
                 }
                 else
                 {
@@ -753,10 +756,10 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
     private OperationResult SaveRksysToFile()
     {
-        if (_rksysData == null || !SettingsHelper.PathsSetupCorrectly())
+        if (_rksysData == null || !_settingsManager.PathsSetupCorrectly())
             return Fail("Invalid save data or config is not setup properly.");
         FixRksysCrc(_rksysData);
-        var currentRegion = (MarioKartWiiEnums.Regions)SettingsManager.RR_REGION.Get();
+        var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
         var saveFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, RRRegionManager.ConvertRegionToGameId(currentRegion));
         var trySaveRksys = TryCatch(() =>
         {

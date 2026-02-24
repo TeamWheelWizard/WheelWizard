@@ -5,7 +5,7 @@ using System.IO.Compression;
 using Avalonia.Threading;
 using IniParser;
 using WheelWizard.Helpers;
-using WheelWizard.Models.Settings;
+using WheelWizard.Models.Mods;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Installation;
 using WheelWizard.Views.Popups.Generic;

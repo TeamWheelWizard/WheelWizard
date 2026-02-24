@@ -1,6 +1,7 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
@@ -8,6 +9,13 @@ namespace WheelWizard.Views.Components;
 
 public class PlayerListItem : TemplatedControl
 {
+    private Button? _joinRoomButton;
+
+    public static readonly StyledProperty<bool> IsOnlineProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(IsOnline));
+    public static readonly StyledProperty<bool> ShowJoinRoomButtonProperty = AvaloniaProperty.Register<PlayerListItem, bool>(
+        nameof(ShowJoinRoomButton)
+    );
+
     public static readonly StyledProperty<bool> HasBadgesProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(HasBadges));
 
     public static readonly StyledProperty<bool> IsOpenHostProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(IsOpenHost));
@@ -23,6 +31,18 @@ public class PlayerListItem : TemplatedControl
     {
         get => GetValue(HasBadgesProperty);
         set => SetValue(HasBadgesProperty, value);
+    }
+
+    public bool IsOnline
+    {
+        get => GetValue(IsOnlineProperty);
+        set => SetValue(IsOnlineProperty, value);
+    }
+
+    public bool ShowJoinRoomButton
+    {
+        get => GetValue(ShowJoinRoomButtonProperty);
+        set => SetValue(ShowJoinRoomButtonProperty, value);
     }
 
     public bool IsOpenHost
@@ -85,23 +105,50 @@ public class PlayerListItem : TemplatedControl
         set => SetValue(UserNameProperty, value);
     }
 
+    public static readonly StyledProperty<Action<string>?> JoinRoomActionProperty = AvaloniaProperty.Register<
+        PlayerListItem,
+        Action<string>?
+    >(nameof(JoinRoomAction));
+
+    public Action<string>? JoinRoomAction
+    {
+        get => GetValue(JoinRoomActionProperty);
+        set => SetValue(JoinRoomActionProperty, value);
+    }
+
+    private void JoinRoom_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(FriendCode))
+            return;
+
+        JoinRoomAction?.Invoke(FriendCode);
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        var container = e.NameScope.Find<StackPanel>("PART_BadgeContainer");
-        if (container == null)
-            return;
 
-        container.Children.Clear();
-        var badges = App
-            .Services.GetRequiredService<IWhWzDataSingletonService>()
-            .GetBadges(FriendCode)
-            .Select(variant => new Badge { Variant = variant });
-        foreach (var badge in badges)
+        var container = e.NameScope.Find<StackPanel>("PART_BadgeContainer");
+        if (container != null)
         {
-            badge.Height = 30;
-            badge.Width = 30;
-            container.Children.Add(badge);
+            container.Children.Clear();
+            var badges = App
+                .Services.GetRequiredService<IWhWzDataSingletonService>()
+                .GetBadges(FriendCode)
+                .Select(variant => new Badge { Variant = variant });
+            foreach (var badge in badges)
+            {
+                badge.Height = 30;
+                badge.Width = 30;
+                container.Children.Add(badge);
+            }
         }
+
+        if (_joinRoomButton != null)
+            _joinRoomButton.Click -= JoinRoom_OnClick;
+
+        _joinRoomButton = e.NameScope.Find<Button>("PART_JoinRoomButton");
+        if (_joinRoomButton != null)
+            _joinRoomButton.Click += JoinRoom_OnClick;
     }
 }

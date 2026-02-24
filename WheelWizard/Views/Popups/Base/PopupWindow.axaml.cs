@@ -4,12 +4,16 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
+using WheelWizard.Shared.DependencyInjection;
 
 namespace WheelWizard.Views.Popups.Base;
 
 public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 {
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
 
@@ -126,7 +130,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
     public void SetWindowSize(Size size)
     {
-        var scaleFactor = (double)SettingsManager.WINDOW_SCALE.Get();
+        var scaleFactor = SettingsService.Get<double>(SettingsService.WINDOW_SCALE);
         Width = size.Width * scaleFactor;
         Height = size.Height * scaleFactor;
         CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);

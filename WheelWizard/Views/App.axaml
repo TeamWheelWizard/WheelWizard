@@ -70,5 +70,6 @@
         <StyleInclude Source="Components/WhWzLibrary/Badge.axaml" />
         <StyleInclude Source="Components/WhWzLibrary/MiiBlock.axaml" />
         <StyleInclude Source="Components/WhWzLibrary/WheelTrail.axaml" />
+        <StyleInclude Source="Components/WhWzLibrary/LeaderboardPodiumCard.axaml" />
     </Application.Styles>
 </Application>

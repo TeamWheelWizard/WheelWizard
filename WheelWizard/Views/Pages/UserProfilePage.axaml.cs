@@ -4,11 +4,11 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Models.Settings;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
+using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
@@ -43,6 +43,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     [Inject]
     private IMiiDbService MiiDbService { get; set; } = null!;
+
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
 
     public Mii? CurrentMii
     {
@@ -110,13 +113,13 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     }
 
     private int _currentUserIndex;
-    private static int FocussedUser => (int)SettingsManager.FOCUSSED_USER.Get();
+    private int FocusedUser => SettingsService.Get<int>(SettingsService.FOCUSED_USER);
 
     public UserProfilePage()
     {
         InitializeComponent();
         ResetMiiTopBar();
-        ViewMii(FocussedUser);
+        ViewMii(FocusedUser);
         PopulateRegions();
         UpdatePage();
         DataContext = this;
@@ -128,7 +131,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private void PopulateRegions()
     {
         var validRegions = RRRegionManager.GetValidRegions();
-        var currentRegion = (MarioKartWiiEnums.Regions)SettingsManager.RR_REGION.Get();
+        var currentRegion = SettingsService.Get<MarioKartWiiEnums.Regions>(SettingsService.RR_REGION);
         foreach (var region in Enum.GetValues<MarioKartWiiEnums.Regions>())
         {
             if (region == MarioKartWiiEnums.Regions.None)
@@ -198,7 +201,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void UpdatePage()
     {
-        PrimaryCheckBox.IsChecked = FocussedUser == _currentUserIndex;
+        PrimaryCheckBox.IsChecked = FocusedUser == _currentUserIndex;
 
         currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
         CurrentFriendCode = currentPlayer.FriendCode;
@@ -238,10 +241,10 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void SetUserAsPrimary()
     {
-        if (FocussedUser == _currentUserIndex)
+        if (FocusedUser == _currentUserIndex)
             return;
 
-        SettingsManager.FOCUSSED_USER.Set(_currentUserIndex);
+        SettingsService.Set(SettingsService.FOCUSED_USER, _currentUserIndex);
 
         PrimaryCheckBox.IsChecked = true;
         // Even though it's true when this method is called, we still set it to true,
@@ -257,7 +260,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         if (RegionDropdown.SelectedItem is not ComboBoxItem { Tag: MarioKartWiiEnums.Regions region })
             return;
 
-        SettingsManager.RR_REGION.Set(region);
+        SettingsService.Set(SettingsService.RR_REGION, region);
         ResetMiiTopBar();
         var loadResult = GameLicenseService.LoadLicense();
         if (loadResult.IsFailure)

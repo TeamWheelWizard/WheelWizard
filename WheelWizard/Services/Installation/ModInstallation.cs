@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Avalonia.Threading;
 using SharpCompress.Archives;
-using WheelWizard.Models.Settings;
+using WheelWizard.Models.Mods;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Services.Installation;

@@ -7,9 +7,10 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
-using WheelWizard.Models.Settings;
+using WheelWizard.Models.Mods;
 using WheelWizard.Services;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.ModManagement;
@@ -20,6 +21,9 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest);
 
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
     public ModManager ModManager => ModManager.Instance;
 
     public ObservableCollection<ModListItem> Mods =>
@@ -219,15 +223,15 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void ToggleModsPageView_OnClick(object? sender, RoutedEventArgs e)
     {
-        var current = (bool)SettingsManager.PREFERS_MODS_ROW_VIEW.Get();
-        SettingsManager.PREFERS_MODS_ROW_VIEW.Set(!current);
+        var current = SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW);
+        SettingsService.Set(SettingsService.PREFERS_MODS_ROW_VIEW, !current);
         SetModsViewVariant();
     }
 
     private void SetModsViewVariant()
     {
         Control[] elementsToSwapClasses = [ToggleButton, ModsListBox];
-        var asRows = (bool)SettingsManager.PREFERS_MODS_ROW_VIEW.Get();
+        var asRows = SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW);
 
         foreach (var elementToSwapClass in elementsToSwapClasses)
         {
