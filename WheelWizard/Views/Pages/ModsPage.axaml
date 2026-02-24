@@ -93,28 +93,36 @@
                         VerticalAlignment="Bottom" />
             </Grid>
 
-            <!-- Mods List -->
+            <!-- Mods List (Blocks / arrow mode) -->
             <ListBox Grid.Row="1" x:Name="ModsListBox" ItemsSource="{Binding Mods}" Margin="10,5">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Classes="BoxItemBackground" Height="50">
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="30" />
                                     <ColumnDefinition Width="50" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <CheckBox Grid.Column="0" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
+                                <!-- Drag handle -->
+                                <Panel Grid.Column="0" Background="Transparent" Cursor="Hand"
+                                       PointerPressed="DragHandle_PointerPressed">
+                                    <PathIcon Data="{StaticResource Grip}" Width="12" Height="12"
+                                              Foreground="{StaticResource Neutral500}" />
+                                </Panel>
+
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
                                           Classes="SwitchDark" Margin="0,5"
                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Mod.Title}" FontSize="14"
                                            Foreground="{StaticResource Neutral100}"
-                                           Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                           Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0" />
 
                                 <!-- Yes i know that it already works without any change event if we remove Mode=OneWay -->
                                 <!-- Removing that will make it so editing that will also edit the model -->
                                 <!-- however, it works really weird if you do that -->
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
                                             VerticalAlignment="Center">
                                     <TextBlock Text="{x:Static lang:Common.Attribute_Priority}" FontSize="14"
                                                Foreground="{StaticResource Neutral100}"
@@ -187,6 +195,38 @@
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
+
+            <!-- Mods Grid (Rows / priority text mode) -->
+            <ScrollViewer Grid.Row="1" x:Name="ModsGridView" IsVisible="False" Margin="10,5"
+                          HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Mods}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="2" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border>
+                                <components:GridModPanel />
+                                <Border.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
+                                        <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
+                                        <Separator />
+                                        <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click" />
+                                        <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
+
+        <!-- Drag-and-drop overlay canvas -->
+        <Canvas x:Name="DragCanvas" IsVisible="False" IsHitTestVisible="False"
+                Grid.RowSpan="2" ZIndex="1000" />
     </Grid>
 </UserControl>
