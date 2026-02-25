@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="520"
+             x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkInputFieldsPage">
+    <StackPanel Spacing="12">
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="Standard Input Field" />
+            <TextBox Width="320" Watermark="Enter text here..." />
+            <TextBox Width="320" Classes="dark" Watermark="Enter text here... (dark)" />
+            <TextBox Width="320" Text="Read-only example" IsReadOnly="True" />
+            <TextBox Width="320" Watermark="Disabled input field" IsEnabled="False" />
+            <TextBox Width="320" Classes="dark" Watermark="Disabled dark input field" IsEnabled="False" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="FeedbackTextBox Behavior Component" />
+            <behaviorComp:FeedbackTextBox Width="320"
+                                          Label="Display Name"
+                                          TipText="This is the reusable labeled input with inline validation feedback."
+                                          Watermark="Enter display name..."
+                                          Text="PlayerOne"
+                                          ErrorMessage="This name is already in use." />
+            <behaviorComp:FeedbackTextBox Width="320"
+                                          Label="Display Name (Dark)"
+                                          Variant="Dark"
+                                          Watermark="Enter display name..."
+                                          Text="PlayerOne"
+                                          ErrorMessage="This name is already in use." />
+            <behaviorComp:FeedbackTextBox Width="320"
+                                          Label="Password"
+                                          Watermark="Choose a strong password..."
+                                          Text="hello123"
+                                          WarningMessage="This password is weak." />
+            <behaviorComp:FeedbackTextBox Width="320"
+                                          Label="Password (Dark)"
+                                          Variant="Dark"
+                                          Watermark="Choose a strong password..."
+                                          Text="hello123"
+                                          WarningMessage="This password is weak." />
+            <behaviorComp:FeedbackTextBox Width="320"
+                                          Label="Optional Note"
+                                          Watermark="Optional..."
+                                          Text="Disabled behavior component"
+                                          IsEnabled="False" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

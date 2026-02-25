@@ -2,7 +2,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using WheelWizard.Resources.Languages;
-using WheelWizard.Views.Components;
+using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;

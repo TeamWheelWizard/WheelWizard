@@ -1,9 +1,11 @@
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
+using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
@@ -11,24 +13,35 @@ namespace WheelWizard.Services.LiveData;
 
 public class RRLiveRooms : RepeatedTaskManager
 {
+    private readonly IWhWzDataSingletonService _whWzService;
+    private readonly IRrRoomsSingletonService _roomsService;
+    private readonly IRrLeaderboardSingletonService _leaderboardService;
+    private readonly IGameLicenseSingletonService _gameLicenseService;
+
     public List<RrRoom> CurrentRooms { get; private set; } = [];
     public int PlayerCount => CurrentRooms.Sum(room => room.PlayerCount);
     public int RoomCount => CurrentRooms.Count;
 
-    private static RRLiveRooms? _instance;
-    public static RRLiveRooms Instance => _instance ??= new();
+    public static RRLiveRooms Instance => App.Services.GetRequiredService<RRLiveRooms>();
 
-    private RRLiveRooms()
-        : base(40) { }
+    public RRLiveRooms(
+        IWhWzDataSingletonService whWzService,
+        IRrRoomsSingletonService roomsService,
+        IRrLeaderboardSingletonService leaderboardService,
+        IGameLicenseSingletonService gameLicenseService
+    )
+        : base(40)
+    {
+        _whWzService = whWzService;
+        _roomsService = roomsService;
+        _leaderboardService = leaderboardService;
+        _gameLicenseService = gameLicenseService;
+    }
 
     protected override async Task ExecuteTaskAsync()
     {
-        var whWzService = App.Services.GetRequiredService<IWhWzDataSingletonService>();
-        var roomsService = App.Services.GetRequiredService<IRrRoomsSingletonService>();
-        var leaderboardService = App.Services.GetRequiredService<IRrLeaderboardSingletonService>();
-
-        var roomsTask = roomsService.GetRoomsAsync();
-        var leaderboardTask = leaderboardService.GetTopPlayersAsync(50);
+        var roomsTask = _roomsService.GetRoomsAsync();
+        var leaderboardTask = _leaderboardService.GetTopPlayersAsync(50);
 
         await Task.WhenAll(roomsTask, leaderboardTask);
 
@@ -59,7 +72,14 @@ public class RRLiveRooms : RepeatedTaskManager
         var raw = roomsResult.Value;
         var splitRaw = SplitMergedRooms(raw);
 
-        var rrRooms = splitRaw.Select(room => MapRoom(room, whWzService, leaderboardByPid, leaderboardByFriendCode)).ToList();
+        var friendProfileIds = _gameLicenseService
+            .ActiveCurrentFriends.Select(friend => FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode))
+            .Where(profileId => profileId != 0)
+            .ToHashSet();
+
+        var rrRooms = splitRaw
+            .Select(room => MapRoom(room, _whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
+            .ToList();
 
         CurrentRooms = rrRooms;
     }
@@ -68,7 +88,8 @@ public class RRLiveRooms : RepeatedTaskManager
         RwfcRoomStatusRoom room,
         IWhWzDataSingletonService whWzService,
         IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByPid,
-        IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode
+        IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode,
+        IReadOnlySet<uint> friendProfileIds
     )
     {
         return new()
@@ -78,7 +99,9 @@ public class RRLiveRooms : RepeatedTaskManager
             Type = room.Type,
             Suspend = room.Suspend,
             Rk = room.Rk,
-            Players = room.Players.Select(p => MapPlayer(p, whWzService, leaderboardByPid, leaderboardByFriendCode)).ToList(),
+            Players = room
+                .Players.Select(p => MapPlayer(p, whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
+                .ToList(),
         };
     }
 
@@ -86,7 +109,8 @@ public class RRLiveRooms : RepeatedTaskManager
         RwfcRoomStatusPlayer p,
         IWhWzDataSingletonService whWzService,
         IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByPid,
-        IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode
+        IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode,
+        IReadOnlySet<uint> friendProfileIds
     )
     {
         Mii? mii = null;
@@ -106,6 +130,7 @@ public class RRLiveRooms : RepeatedTaskManager
         }
 
         var friendCode = p.FriendCode ?? string.Empty;
+        var profileId = FriendCodeGenerator.FriendCodeToProfileId(friendCode);
 
         var leaderboardEntry = GetLeaderboardEntry(p, friendCode, leaderboardByPid, leaderboardByFriendCode);
 
@@ -122,6 +147,7 @@ public class RRLiveRooms : RepeatedTaskManager
             Mii = mii,
             BadgeVariants = whWzService.GetBadges(friendCode),
             LeaderboardRank = leaderboardEntry?.Rank ?? leaderboardEntry?.ActiveRank,
+            IsFriend = profileId != 0 && friendProfileIds.Contains(profileId),
         };
     }
 

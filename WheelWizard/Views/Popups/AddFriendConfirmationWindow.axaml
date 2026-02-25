@@ -4,7 +4,7 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
-                   xmlns:behavior="clr-namespace:WheelWizard.Views.BehaviorComponent"
+                   xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
                    xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
                    xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
                    xmlns:popups="clr-namespace:WheelWizard.Views.Popups"

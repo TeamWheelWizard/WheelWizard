@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="380"
+             x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkStateBoxesPage">
+    <StackPanel Spacing="12">
+        <TextBlock Classes="TinyText" Text="StateBox Variants" />
+
+        <Grid ColumnDefinitions="Auto,Auto,Auto"
+              RowDefinitions="Auto,Auto">
+            <components:StateBox Grid.Row="0"
+                                 Grid.Column="0"
+                                 Margin="0,0,6,6"
+                                 Text="Default"
+                                 IconData="{StaticResource InfoTip}"
+                                 IconSize="14" />
+            <components:StateBox Grid.Row="0"
+                                 Grid.Column="1"
+                                 Margin="6,0,6,6"
+                                 Text="Dark"
+                                 Variant="Dark"
+                                 IconData="{StaticResource Hourglass}"
+                                 IconSize="14" />
+            <components:StateBox Grid.Row="0"
+                                 Grid.Column="2"
+                                 Margin="6,0,0,6"
+                                 Text="Success"
+                                 Variant="Success"
+                                 IconData="{StaticResource CheckMark}"
+                                 IconSize="12" />
+
+            <components:StateBox Grid.Row="1"
+                                 Grid.Column="0"
+                                 Margin="0,6,6,0"
+                                 Text="Warning"
+                                 Variant="Warning"
+                                 IconData="{StaticResource WarningTip}"
+                                 IconSize="14" />
+            <components:StateBox Grid.Row="1"
+                                 Grid.Column="1"
+                                 Margin="6,6,6,0"
+                                 Text="Danger"
+                                 Variant="Danger"
+                                 IconData="{StaticResource XMark}"
+                                 IconSize="12" />
+            <components:StateBox Grid.Row="1"
+                                 Grid.Column="2"
+                                 Margin="6,6,0,0"
+                                 IconData="{StaticResource UserCouple}"
+                                 IconSize="14"
+                                 TipText="Shows that content can replace text.">
+                <components:StateBox.Content>
+                    <TextBlock Classes="TinyText" Text="Players: 12" />
+                </components:StateBox.Content>
+            </components:StateBox>
+        </Grid>
+    </StackPanel>
+</UserControl>

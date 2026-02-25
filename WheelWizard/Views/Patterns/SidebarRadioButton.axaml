@@ -1,0 +1,104 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+        xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components"
+        xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns">
+  <Design.PreviewWith>
+    <Border Padding="2" Width="300" Background="{StaticResource Neutral600}">
+      <StackPanel>
+        <patterns:SidebarRadioButton IconData="{StaticResource Home}" 
+                                     Text="{x:Static lang:Common.PageTitle_Home}"
+                                     PageType="{x:Type pages:HomePage}"/>
+        
+        <patterns:SidebarRadioButton  IsChecked="True"
+                                   IconData="{StaticResource Settings}" 
+                                   Text="{x:Static lang:Common.PageTitle_Settings}"
+                                   PageType="{x:Type pages:HomePage}"/>
+        
+        <patterns:SidebarRadioButton IconData="{StaticResource Friends}" 
+                                  Text="{x:Static lang:Common.PageTitle_Friends}"
+                                  PageType="{x:Type pages:HomePage}"
+                                  BoxText="0/0"/>  
+        <patterns:SidebarRadioButton IconData="{StaticResource CubesStacked}" 
+                                  Text="{x:Static lang:Common.PageTitle_Mods}"
+                                  PageType="{x:Type pages:HomePage}"/>
+        <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}" 
+                                  Text="{x:Static lang:Common.PageTitle_Rooms}"
+                                  PageType="{x:Type pages:RoomsPage}"/>
+                                  
+      </StackPanel>
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="patterns|SidebarRadioButton">
+    <Setter Property="Background" Value="{DynamicResource Neutral900}" />
+    <Setter Property="Foreground" Value="{DynamicResource Neutral400}" />
+    <Setter Property="Height" Value="50" />
+    <Setter Property="GroupName" Value="SidebarRadioButton"/> <!-- Because its a radio button, they have to be in the same group to work -->
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderThickness="0" >
+          <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+            
+            <Border CornerRadius="99999" IsVisible="False" Opacity="0.3" Name="PART_HoverEffect"
+                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Background="{StaticResource Primary200}" Height="50" Width="50" Effect="blur(150)">
+              
+              <Border.Styles>
+                <Style Selector="Border">
+                  <Style.Animations>
+                    <Animation Duration="0:0:5" IterationCount="INFINITE">
+                      <KeyFrame Cue="0%">
+                        <Setter Property="RotateTransform.Angle" Value="0"/>
+                      </KeyFrame>
+                      <KeyFrame Cue="100%">
+                        <Setter Property="RotateTransform.Angle" Value="360"/>
+                      </KeyFrame>
+                    </Animation>
+                  </Style.Animations>
+                </Style>
+              </Border.Styles>
+            </Border>
+            
+            <components:IconLabel x:Name="RadioIcon" IconSize="25" FontSize="20"
+                             IconData="{TemplateBinding IconData}"
+                             Text="{TemplateBinding Text}"
+                             Foreground="{TemplateBinding Foreground}"
+                             HorizontalAlignment="Left" VerticalAlignment="Center"
+                             Margin="10,0,10,0" />
+
+            <components:StateBox IsVisible="{TemplateBinding BoxText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                            x:Name="StateBox" Classes="Dark"
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Right"
+                            Text="{TemplateBinding BoxText}"
+                            TipPlacement="Top"
+                            IconSize="0"
+                            TipText="{TemplateBinding BoxTip}"
+            />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  
+  <Style Selector="patterns|SidebarRadioButton:pointerover">
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background" Value="{StaticResource Neutral800}" />
+    <Setter Property="Foreground" Value="{StaticResource Primary200}" />
+    <Style Selector="^ /template/ Border#PART_HoverEffect">
+      <Setter Property="IsVisible" Value="True"/>
+    </Style>
+  </Style>
+
+  <Style Selector="patterns|SidebarRadioButton:checked">
+    <Setter Property="Background" Value="{StaticResource Neutral950}" />
+    <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+    <Style Selector="^ /template/ Border#PART_HoverEffect">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+  </Style>
+</Styles>

@@ -1,10 +1,12 @@
 ﻿using WheelWizard.Helpers;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 
 namespace WheelWizard.Services.WiiManagement;
 
 public static class WiiMoteSettings
 {
+    private static ISettingsManager Settings => SettingsRuntime.Current;
+
     private const string WiimoteSection = "[Wiimote1]";
     private const string SourceParameter = "Source";
 
@@ -12,7 +14,7 @@ public static class WiiMoteSettings
 
     public static void DisableVirtualWiiMote() => ModifyWiiMoteSource(0);
 
-    public static bool IsForceSettingsEnabled() => (bool)SettingsManager.FORCE_WIIMOTE.Get();
+    public static bool IsForceSettingsEnabled() => Settings.Get<bool>(Settings.FORCE_WIIMOTE);
 
     private static string GetSavedWiiMoteLocation()
     {

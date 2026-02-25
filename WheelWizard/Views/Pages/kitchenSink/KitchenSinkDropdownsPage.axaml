@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="400"
+             x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkDropdownsPage">
+    <StackPanel Spacing="12">
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="Standard Dropdown" />
+            <ComboBox MinWidth="300" SelectedIndex="1">
+                <ComboBoxItem Content="Sort by Name" />
+                <ComboBoxItem Content="Sort by Last Active" />
+                <ComboBoxItem Content="Sort by VR" />
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="Dropdown With Disabled Options" />
+            <ComboBox MinWidth="300" SelectedIndex="0">
+                <ComboBoxItem Content="Automatic (Recommended)" />
+                <ComboBoxItem Content="OpenGL" />
+                <ComboBoxItem Content="Direct3D 11 (Windows only)" IsEnabled="False" />
+                <ComboBoxItem Content="Metal (macOS only)" IsEnabled="False" />
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="Disabled Dropdown" />
+            <ComboBox MinWidth="300" SelectedIndex="2" IsEnabled="False">
+                <ComboBoxItem Content="Low" />
+                <ComboBoxItem Content="Medium" />
+                <ComboBoxItem Content="High" />
+            </ComboBox>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

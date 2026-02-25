@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              mc:Ignorable="d" d:DesignWidth="490" d:DesignHeight="830"
              ClipToBounds="False"
              x:Class="WheelWizard.Views.Pages.HomePage">
@@ -173,12 +173,13 @@
                                IsEnabled="True"
                                IconData="{StaticResource DolphinIcon}"
                                IconSize="30"
-                               ToolTip.Tip="{x:Static lang:Common.Action_LaunchDolphin}"
-                               ToolTip.Placement="Bottom"
-                               ToolTip.ShowDelay="50"
                                Height="40"
                                Click="DolphinButton_OnClick"
                                Width="100" Margin="0,6,0,0" />
+            <!-- removed tooltip for dolphin startup button as this doesn't look so nice, and I think everyone knows it by the dolphin icon -->
+            <!-- ToolTip.Tip="{x:Static lang:Common.Action_LaunchDolphin}"
+                               ToolTip.Placement="Top"
+                               ToolTip.ShowDelay="50"  -->
         </StackPanel>
         
         <components:WheelTrail Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" x:Name="HomeTrail4"
