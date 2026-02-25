@@ -69,6 +69,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid x:Name="PART_ToolTipChrome" RowDefinitions="Auto,Auto">
+                    
                     <Border Grid.Row="0"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
