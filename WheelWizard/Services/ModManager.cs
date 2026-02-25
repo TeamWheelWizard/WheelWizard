@@ -121,7 +121,7 @@ public class ModManager : INotifyPropertyChanged
         )
         {
             SaveModsAsync();
-            OnPropertyChanged(e.PropertyName);
+            OnPropertyChanged(nameof(Mods));
         }
     }
 
@@ -224,7 +224,7 @@ public class ModManager : INotifyPropertyChanged
         }
 
         SaveModsAsync();
-        OnPropertyChanged(nameof(Mod.IsEnabled));
+        OnPropertyChanged(nameof(Mods));
     }
 
     // TODO: Use this validation method when refactoring the ModManager

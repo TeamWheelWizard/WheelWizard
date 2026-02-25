@@ -124,11 +124,11 @@ public static class ToolTipBubbleBehavior
 
     private static void OnPointerExited(Control control)
     {
+        if (!HasToolTip(control) && !ToolTip.GetIsOpen(control))
+            return;
+
         var state = GetState(control);
         CancelPendingOpen(state);
-
-        if (!ToolTip.GetIsOpen(control))
-            return;
 
         var elapsed = DateTimeOffset.UtcNow - state.OpenedAt;
         var remaining = MinimumVisibleTime - elapsed;
