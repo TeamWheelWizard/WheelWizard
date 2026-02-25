@@ -68,9 +68,13 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     {
         InitializeComponent();
         DataContext = this;
+        Focusable = true;
         ModManager.PropertyChanged += OnModsChanged;
         ModManager.ReloadAsync();
         SetModsViewVariant();
+
+        // Apply priority edits as soon as the user clicks anywhere outside the textbox.
+        AddHandler(PointerPressedEvent, OnPagePointerPressed, RoutingStrategies.Tunnel, true);
 
         // Wire up drag-and-drop pointer tracking
         PointerMoved += OnDragPointerMoved;
@@ -263,6 +267,21 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (e.Key != Key.Enter || sender is not TextBox)
             return;
         ViewUtils.FindParent<ListBoxItem>(e.Source)?.Focus();
+    }
+
+    private void OnPagePointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        if (e.Source is TextBox || ViewUtils.FindParent<TextBox>(e.Source) != null)
+            return;
+
+        var clickedControl = e.Source as Control ?? ViewUtils.FindParent<Control>(e.Source);
+        if (clickedControl?.Focusable == true)
+            clickedControl.Focus(NavigationMethod.Pointer, e.KeyModifiers);
+        else
+            Focus(NavigationMethod.Pointer, e.KeyModifiers);
     }
 
     #region Drag and Drop

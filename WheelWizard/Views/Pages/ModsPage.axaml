@@ -199,11 +199,12 @@
 
             <!-- Mods Grid (Rows / priority text mode) -->
             <ScrollViewer Grid.Row="1" x:Name="ModsGridView" IsVisible="False" Margin="10,5"
-                          HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Mods}">
+                          HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                          VerticalContentAlignment="Top">
+                <ItemsControl ItemsSource="{Binding Mods}" VerticalAlignment="Top">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="2" />
+                            <UniformGrid Columns="2" VerticalAlignment="Top" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
