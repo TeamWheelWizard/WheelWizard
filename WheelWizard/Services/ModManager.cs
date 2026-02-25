@@ -30,7 +30,6 @@ public class ModManager : INotifyPropertyChanged
         }
     }
 
-    private bool _isProcessing;
     private bool _isBatchUpdating;
 
     private ModManager()
@@ -107,17 +106,23 @@ public class ModManager : INotifyPropertyChanged
         if (_isBatchUpdating)
             return;
 
-        if (
-            e.PropertyName != nameof(Mod.IsEnabled)
-            && e.PropertyName != nameof(Mod.Title)
-            && e.PropertyName != nameof(Mod.Author)
-            && e.PropertyName != nameof(Mod.ModID)
-            && e.PropertyName != nameof(Mod.Priority)
-        )
+        if (e.PropertyName == nameof(Mod.Priority))
+        {
+            SaveModsAsync();
+            SortModsByPriority();
             return;
+        }
 
-        SaveModsAsync();
-        SortModsByPriority();
+        if (
+            e.PropertyName == nameof(Mod.IsEnabled)
+            || e.PropertyName == nameof(Mod.Title)
+            || e.PropertyName == nameof(Mod.Author)
+            || e.PropertyName == nameof(Mod.ModID)
+        )
+        {
+            SaveModsAsync();
+            OnPropertyChanged(nameof(Mods));
+        }
     }
 
     private void SortModsByPriority()
@@ -207,12 +212,18 @@ public class ModManager : INotifyPropertyChanged
 
     public void ToggleAllMods(bool enable)
     {
-        foreach (var mod in Mods)
+        _isBatchUpdating = true;
+        try
         {
-            mod.IsEnabled = enable;
+            foreach (var mod in Mods)
+                mod.IsEnabled = enable;
+        }
+        finally
+        {
+            _isBatchUpdating = false;
         }
 
-        _isProcessing = !_isProcessing;
+        SaveModsAsync();
         OnPropertyChanged(nameof(Mods));
     }
 

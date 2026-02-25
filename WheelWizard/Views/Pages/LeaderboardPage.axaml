@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
              mc:Ignorable="d"
              d:DesignWidth="477"
@@ -46,21 +47,21 @@
         </Style>
 
         <!-- Match RoomDetailsPage entry background treatment for PlayerListItem -->
-        <Style Selector="components|PlayerListItem /template/ Border.BoxItemBackground">
+        <Style Selector="patterns|PlayerListItem /template/ Border.BoxItemBackground">
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Margin" Value="0,3" />
             <Setter Property="Padding" Value="7,0" />
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
         </Style>
-        <Style Selector="components|PlayerListItem:pointerover /template/ Border.BoxItemBackground">
+        <Style Selector="patterns|PlayerListItem:pointerover /template/ Border.BoxItemBackground">
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
-        <Style Selector="components|PlayerListItem /template/ Border#PART_TopLabelBadge">
+        <Style Selector="patterns|PlayerListItem /template/ Border#PART_TopLabelBadge">
             <Setter Property="Background" Value="{StaticResource Neutral800}" />
             <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
-        <Style Selector="components|PlayerListItem /template/ TextBlock#PART_TopLabelText">
+        <Style Selector="patterns|PlayerListItem /template/ TextBlock#PART_TopLabelText">
             <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
         </Style>
     </UserControl.Styles>
@@ -189,7 +190,7 @@
                                   RowDefinitions="Auto,16"
                                   VerticalAlignment="Center"
                                   ColumnDefinitions="*,1.1*,*">
-                                <components:LeaderboardPodiumCard Grid.Column="0"
+                                <patterns:LeaderboardPodiumCard Grid.Column="0"
                                                                   Grid.Row="0"
                                                                   Margin="4,16,4,0"
                                                                   IsVisible="{Binding HasPodiumSecond}"
@@ -202,7 +203,7 @@
                                                                   ShowBadge="{Binding PodiumSecond.HasBadge}"
                                                                   BadgeVariant="{Binding PodiumSecond.PrimaryBadge}"
                                                                   IsSuspicious="{Binding PodiumSecond.IsSuspicious}">
-                                    <components:LeaderboardPodiumCard.ContextMenu>
+                                    <patterns:LeaderboardPodiumCard.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumSecond}">
                                             <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
                                                       Click="CopyFriendCode_OnClick" />
@@ -214,10 +215,10 @@
                                             <MenuItem Header="View Profile"
                                                       Click="ViewProfile_OnClick" />
                                         </ContextMenu>
-                                    </components:LeaderboardPodiumCard.ContextMenu>
-                                </components:LeaderboardPodiumCard>
+                                    </patterns:LeaderboardPodiumCard.ContextMenu>
+                                </patterns:LeaderboardPodiumCard>
 
-                                <components:LeaderboardPodiumCard Grid.Column="1"
+                                <patterns:LeaderboardPodiumCard Grid.Column="1"
                                                                   Grid.Row="0"
                                                                   Margin="4,0,4,0"
                                                                   IsVisible="{Binding HasPodiumFirst}"
@@ -231,7 +232,7 @@
                                                                   ShowBadge="{Binding PodiumFirst.HasBadge}"
                                                                   BadgeVariant="{Binding PodiumFirst.PrimaryBadge}"
                                                                   IsSuspicious="{Binding PodiumFirst.IsSuspicious}">
-                                    <components:LeaderboardPodiumCard.ContextMenu>
+                                    <patterns:LeaderboardPodiumCard.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumFirst}">
                                             <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
                                                       Click="CopyFriendCode_OnClick" />
@@ -243,10 +244,10 @@
                                             <MenuItem Header="View Profile"
                                                       Click="ViewProfile_OnClick" />
                                         </ContextMenu>
-                                    </components:LeaderboardPodiumCard.ContextMenu>
-                                </components:LeaderboardPodiumCard>
+                                    </patterns:LeaderboardPodiumCard.ContextMenu>
+                                </patterns:LeaderboardPodiumCard>
 
-                                <components:LeaderboardPodiumCard Grid.Column="2"
+                                <patterns:LeaderboardPodiumCard Grid.Column="2"
                                                                   Grid.Row="0"
                                                                   Margin="4,16,4,0"
                                                                   IsVisible="{Binding HasPodiumThird}"
@@ -259,7 +260,7 @@
                                                                   ShowBadge="{Binding PodiumThird.HasBadge}"
                                                                   BadgeVariant="{Binding PodiumThird.PrimaryBadge}"
                                                                   IsSuspicious="{Binding PodiumThird.IsSuspicious}">
-                                    <components:LeaderboardPodiumCard.ContextMenu>
+                                    <patterns:LeaderboardPodiumCard.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumThird}">
                                             <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
                                                       Click="CopyFriendCode_OnClick" />
@@ -271,8 +272,8 @@
                                             <MenuItem Header="View Profile"
                                                       Click="ViewProfile_OnClick" />
                                         </ContextMenu>
-                                    </components:LeaderboardPodiumCard.ContextMenu>
-                                </components:LeaderboardPodiumCard>
+                                    </patterns:LeaderboardPodiumCard.ContextMenu>
+                                </patterns:LeaderboardPodiumCard>
                             </Grid>
                         </Grid>
                     </Border>
@@ -280,7 +281,7 @@
                     <ItemsControl ItemsSource="{Binding RemainingPlayers}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
-                                <components:PlayerListItem UserName="{Binding Name}"
+                                <patterns:PlayerListItem UserName="{Binding Name}"
                                                            FriendCode="{Binding FriendCode}"
                                                            Vr="{Binding VrDisplay}"
                                                            Mii="{Binding FirstMii}"
@@ -291,7 +292,7 @@
                                                            HasBadges="{Binding HasBadges}"
                                                            IsTopPlayer="True"
                                                            TopLabel="{Binding TopLabel}">
-                                    <components:PlayerListItem.ContextMenu>
+                                    <patterns:PlayerListItem.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
                                                       Click="CopyFriendCode_OnClick" />
@@ -303,8 +304,8 @@
                                             <MenuItem Header="View Profile"
                                                       Click="ViewProfile_OnClick" />
                                         </ContextMenu>
-                                    </components:PlayerListItem.ContextMenu>
-                                </components:PlayerListItem>
+                                    </patterns:PlayerListItem.ContextMenu>
+                                </patterns:PlayerListItem>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

@@ -12,7 +12,6 @@ using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Components;
-using WheelWizard.Views.Pages.Settings;
 using Button = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Pages;

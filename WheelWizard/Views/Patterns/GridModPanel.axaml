@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             x:Class="WheelWizard.Views.Patterns.GridModPanel"
+             x:DataType="pages:ModListItem">
+
+    <Border x:Name="RootCardBorder"
+            CornerRadius="8" Background="{StaticResource Neutral900}"
+            ClipToBounds="True" Margin="4" Height="160">
+        <Grid>
+            <!-- Image area -->
+            <Border Background="{StaticResource Neutral700}" ClipToBounds="True">
+                <Panel>
+                    <Image x:Name="ModImage" Stretch="UniformToFill" />
+                    <!-- Placeholder icon when no image is loaded -->
+                    <PathIcon x:Name="PlaceholderIcon"
+                              Data="{StaticResource CubesStacked}"
+                              Width="36" Height="36"
+                              Foreground="{StaticResource Neutral500}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Panel>
+            </Border>
+
+            <!-- Gradient overlay for the bottom area -->
+            <Border VerticalAlignment="Bottom" Height="100" IsHitTestVisible="False">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Color="Transparent" Offset="0.0" />
+                        <GradientStop Color="{StaticResource Neutral900}" Offset="0.7" />
+                        <GradientStop Color="{StaticResource Neutral900}" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+
+            <!-- Content -->
+            <Grid RowDefinitions="*, Auto, Auto">
+                <!-- Title -->
+                <TextBlock Grid.Row="1" Text="{Binding Mod.Title}" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{StaticResource Neutral100}"
+                           TextTrimming="CharacterEllipsis"
+                           Margin="10,0,10,4" />
+
+                <!-- Bottom controls bar: Enabled switch + Priority -->
+                <Border Grid.Row="2" Padding="8,0,8,8">
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <CheckBox Grid.Column="0"
+                                  IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
+                                  Classes="SwitchDark"
+                                  VerticalAlignment="Center" />
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
+                                    VerticalAlignment="Center">
+                            <TextBlock Text="#" FontSize="13"
+                                       Foreground="{StaticResource Neutral500}"
+                                       VerticalAlignment="Center" />
+                            <TextBox x:Name="PriorityTextBox"
+                                     Text="{Binding Mod.Priority, Mode=OneWay}"
+                                     Classes="dark"
+                                     MinWidth="30" MaxWidth="50"
+                                     MinHeight="28" Height="28"
+                                     VerticalAlignment="Center"
+                                     Padding="4,2"
+                                     HorizontalContentAlignment="Center"
+                                     TextChanged="PriorityText_OnTextChanged"
+                                     LostFocus="PriorityText_OnLostFocus"
+                                     KeyDown="PriorityText_OnKeyDown">
+                                <TextBox.Styles>
+                                    <Style Selector="TextBox /template/ DockPanel#PART_InnerDockPanel">
+                                        <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                    <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                        <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+                                    </Style>
+                                </TextBox.Styles>
+                            </TextBox>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Hover effect -->
+        <Border.Styles>
+            <Style Selector="Border#RootCardBorder:pointerover">
+                <Setter Property="Background" Value="{StaticResource Neutral700}" />
+            </Style>
+        </Border.Styles>
+    </Border>
+</UserControl>

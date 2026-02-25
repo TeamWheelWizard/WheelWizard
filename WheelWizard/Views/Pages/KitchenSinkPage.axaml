@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             x:Class="WheelWizard.Views.Pages.KitchenSinkPage">
+    <UserControl.Styles>
+        <Style Selector="Border.KitchenSinkSectionBlock">
+            <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}" />
+            <Setter Property="Margin" Value="0,0,0,7" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Background" Value="{StaticResource Neutral950}" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background"
+                                     Duration="0:0:0.18"
+                                     Easing="CircularEaseOut" />
+                    <BrushTransition Property="BorderBrush"
+                                     Duration="0:0:0.18"
+                                     Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.KitchenSinkSectionBlock.BlockBackground900">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral950}" />
+        </Style>
+
+        <Style Selector="Border.KitchenSinkSectionBlock Border.KitchenSinkSectionDivider">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="Height" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="-10,0,-10,0" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background"
+                                     Duration="0:0:0.18"
+                                     Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.KitchenSinkSectionBlock.BlockBackground900 Border.KitchenSinkSectionDivider">
+            <Setter Property="Background" Value="{StaticResource Neutral950}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+
+        <Grid Grid.Row="0" RowDefinitions="Auto,*">
+            <CheckBox x:Name="BackgroundSwitch"
+                      Grid.Row="0"
+                      Classes="Switch"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Top"
+                      Margin="3,8,3,0"
+                      IsChecked="True"
+                      IsCheckedChanged="BackgroundSwitch_OnIsCheckedChanged">
+                <components:FormFieldLabel Text="Light Background"
+                                           TipPlacement="TopEdgeAlignedRight"
+                                           TipText="Toggle section block previews between light (Neutral900) and dark (Neutral950) backgrounds." />
+            </CheckBox>
+
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,7">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,0">
+                    <TextBlock Text="Kitchen Sink" Classes="PageTitleText" Margin="0" VerticalAlignment="Bottom" />
+                    <Border Margin="6,0,0,5"
+                            Width="18"
+                            Height="18"
+                            VerticalAlignment="Bottom"
+                            ToolTip.Tip="Preview core UI components and styles."
+                            ToolTip.Placement="Top"
+                            ToolTip.ShowDelay="20">
+                        <PathIcon Data="{StaticResource InfoTip}"
+                                  Foreground="{StaticResource TitleIconColor}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch" />
+                    </Border>
+                </StackPanel>
+
+                <ComboBox x:Name="SectionDropdown"
+                          Grid.Column="1"
+                          Width="220"
+                          Margin="3,0"
+                          VerticalAlignment="Bottom"
+                          SelectionChanged="SectionDropdown_OnSelectionChanged" />
+            </Grid>
+        </Grid>
+
+        <ScrollViewer x:Name="AllSectionsScrollViewer"
+                      Grid.Row="1"
+                      Margin="0,10,0,0"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="AllSectionsContainer" Spacing="14" />
+        </ScrollViewer>
+
+        <ContentControl x:Name="SectionContent"
+                        Grid.Row="1"
+                        Margin="0,10,0,0"
+                        IsVisible="False" />
+    </Grid>
+</UserControl>

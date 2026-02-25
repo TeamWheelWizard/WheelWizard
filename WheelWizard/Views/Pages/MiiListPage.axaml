@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              mc:Ignorable="d" d:DesignWidth="456" d:DesignHeight="776"
              x:Class="WheelWizard.Views.Pages.MiiListPage">
@@ -83,7 +83,7 @@
             </Grid>
             <ScrollViewer Grid.Row="1">
                 <UniformGrid Columns="4" HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="MiiList">
-                    <components:MiiBlock Width="90" Height="90" Margin="8,10" />
+                    <behaviorComponent:MiiBlock Width="90" Height="90" Margin="8,10" />
                 </UniformGrid>
             </ScrollViewer>
         </Grid>

@@ -17,6 +17,7 @@ public partial class TextInputWindow : PopupContent
     private TaskCompletionSource<string?>? _tcs;
     private string? _initialText;
     private Func<string?, string, OperationResult>? inputValidationFunc; // (oldText?, newText) => OperationResult
+    private Func<string?, string, string?>? warningValidationFunc; // (oldText?, newText) => warningMessage?
 
     // Constructor with dynamic label parameter
     public TextInputWindow()
@@ -82,6 +83,12 @@ public partial class TextInputWindow : PopupContent
         return this;
     }
 
+    public TextInputWindow SetWarningValidation(Func<string?, string, string?> warningValidationFunction)
+    {
+        warningValidationFunc = warningValidationFunction;
+        return this;
+    }
+
     public new async Task<string?> ShowDialog()
     {
         _tcs = new();
@@ -117,11 +124,16 @@ public partial class TextInputWindow : PopupContent
     // Update the Submit button's IsEnabled property based on input
     private void UpdateSubmitButtonState()
     {
-        var inputText = GetInputText();
-        var validationResultError = inputValidationFunc?.Invoke(_initialText, inputText!).Error?.Message;
+        var inputText = GetInputText() ?? string.Empty;
+        var validationError = inputValidationFunc?.Invoke(_initialText, inputText).Error?.Message;
+        var warningMessage = warningValidationFunc?.Invoke(_initialText, inputText);
 
-        SubmitButton.IsEnabled = validationResultError == null;
-        InputField.ErrorMessage = validationResultError ?? "";
+        var hasError = !string.IsNullOrWhiteSpace(validationError);
+        var hasWarning = !string.IsNullOrWhiteSpace(warningMessage);
+
+        SubmitButton.IsEnabled = !hasError && !hasWarning;
+        InputField.ErrorMessage = hasError ? validationError! : string.Empty;
+        InputField.WarningMessage = !hasError && hasWarning ? warningMessage! : string.Empty;
     }
 
     private void CustomCharsButton_Click(object sender, EventArgs e)
