@@ -158,10 +158,10 @@ public partial class EditorGeneral : MiiEditorBaseControl
     {
         var textPopup = new TextInputWindow()
             .SetMainText(Phrases.Question_EnterNewName_Title)
-            .SetExtraText(Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, MiiName.Text))
+            .SetExtraText(Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, MiiName.Text ?? string.Empty) ?? string.Empty)
             .SetAllowCustomChars(true, true)
             .SetValidation(ValidateMiiName)
-            .SetInitialText(MiiName.Text)
+            .SetInitialText(MiiName.Text ?? string.Empty)
             .SetPlaceholderText(Phrases.Placeholder_EnterMiiName);
         var newName = await textPopup.ShowDialog();
 

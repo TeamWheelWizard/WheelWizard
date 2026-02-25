@@ -25,6 +25,8 @@ public static class FilePickerHelper
         var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
         if (storageProvider == null)
             return [];
+        if (storageProvider.MainWindow?.StorageProvider == null)
+            return [];
 
         var options = new FilePickerOpenOptions
         {
@@ -71,37 +73,15 @@ public static class FilePickerHelper
         return null;
     }
 
-    public static async Task<List<string>> OpenMultipleFilesAsync(string title, IEnumerable<FilePickerFileType> fileTypes)
-    {
-        var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        if (storageProvider == null)
-            return null;
-
-        var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
-        if (topLevel?.StorageProvider == null)
-            return [];
-
-        var files = await topLevel.StorageProvider.OpenFilePickerAsync(
-            new()
-            {
-                Title = title,
-                AllowMultiple = true,
-                FileTypeFilter = fileTypes.ToList(),
-            }
-        );
-
-        return files?.Select(TryResolveLocalPath).Where(path => !string.IsNullOrWhiteSpace(path)).Select(path => path!).ToList() ?? [];
-    }
-
     public static async Task<IReadOnlyList<IStorageFolder?>> SelectFolderAsync(string title, IStorageFolder? suggestedStartLocation = null)
     {
         var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
         if (storageProvider == null)
-            return null;
+            return [];
 
         var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
         if (topLevel?.StorageProvider == null)
-            return null;
+            return [];
 
         var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(
             new()

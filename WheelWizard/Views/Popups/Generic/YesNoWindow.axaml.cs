@@ -9,7 +9,7 @@ namespace WheelWizard.Views.Popups.Generic;
 public partial class YesNoWindow : PopupContent
 {
     public bool Result { get; private set; } = false;
-    private TaskCompletionSource<bool> _tcs;
+    private TaskCompletionSource<bool>? _tcs;
 
     public YesNoWindow()
         : base(true, false, true, "Wheel Wizard")
@@ -45,7 +45,7 @@ public partial class YesNoWindow : PopupContent
     private void yesButton_Click(object sender, RoutedEventArgs e)
     {
         Result = true;
-        _tcs.TrySetResult(true); // Signal that the task is complete
+        _tcs?.TrySetResult(true); // Signal that the task is complete
         Close();
     }
 
@@ -54,7 +54,7 @@ public partial class YesNoWindow : PopupContent
     protected override void BeforeClose()
     {
         // If you want to return something different, then to the TrySetResult before you close it
-        _tcs.TrySetResult(false);
+        _tcs?.TrySetResult(false);
     }
 
     public async Task<bool> AwaitAnswer()

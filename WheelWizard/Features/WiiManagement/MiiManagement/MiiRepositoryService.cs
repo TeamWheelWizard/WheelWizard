@@ -54,7 +54,6 @@ public interface IMiiRepositoryService
 
 public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositoryService
 {
-    private readonly IFileSystem _fileSystem;
     private const int MiiLength = 74;
     private const int MaxMiiSlots = 100;
     private const int CrcOffset = 0x1F1DE;

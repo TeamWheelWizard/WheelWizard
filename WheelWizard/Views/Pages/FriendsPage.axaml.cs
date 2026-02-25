@@ -127,6 +127,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
                 ListOrderCondition.WINS => Common.Attribute_Wins,
                 ListOrderCondition.TOTAL_RACES => Common.Attribute_RacesPlayed,
                 ListOrderCondition.IS_ONLINE => Common.Attribute_IsOnline,
+                _ => Common.State_Unknown,
             };
 
             SortByDropdown.Items.Add(name);
@@ -393,7 +394,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     #region PropertyChanged
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {

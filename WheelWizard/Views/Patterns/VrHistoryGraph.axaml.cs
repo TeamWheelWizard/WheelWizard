@@ -531,7 +531,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
         return digits.All(digit => digit == '0');
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {

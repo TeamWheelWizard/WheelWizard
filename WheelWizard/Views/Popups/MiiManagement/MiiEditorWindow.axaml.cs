@@ -16,9 +16,9 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
 {
     // whether you want to save the Mii
     public bool Result { get; private set; } = false;
-    private TaskCompletionSource<bool> _tcs;
+    private TaskCompletionSource<bool>? _tcs;
 
-    private Mii _mii;
+    private Mii _mii = null!;
     public Mii Mii
     {
         get => _mii;
@@ -71,14 +71,14 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
     public void SignalSaveMii()
     {
         Result = true;
-        _tcs.TrySetResult(true);
+        _tcs?.TrySetResult(true);
         Close();
     }
 
     protected override void BeforeClose()
     {
         // If you want to return something different, then to the TrySetResult before you close it
-        _tcs.TrySetResult(false);
+        _tcs?.TrySetResult(false);
     }
 
     public async Task<bool> AwaitAnswer()
