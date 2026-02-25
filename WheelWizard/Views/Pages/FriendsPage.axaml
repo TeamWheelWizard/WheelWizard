@@ -5,7 +5,6 @@
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:domain="clr-namespace:WheelWizard.WiiManagement.GameLicense.Domain"
              x:Class="WheelWizard.Views.Pages.FriendsPage">
@@ -45,8 +44,8 @@
             </Border>
         </StackPanel>
 
-        <behaviorComponent:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
-                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
+        <patterns:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
+                                     HorizontalAlignment="Right" VerticalAlignment="Top" />
 
 
         <Grid Grid.Row="1" x:Name="VisibleWhenFriends" RowDefinitions="*, 12*">
