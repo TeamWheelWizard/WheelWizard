@@ -82,6 +82,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     {
         if (e.PropertyName == nameof(ModManager.Mods))
             OnModsChanged();
+        else if (e.PropertyName == nameof(Mod.IsEnabled))
+            UpdateEnableAllCheckboxState();
     }
 
     private void OnModsChanged()
@@ -91,7 +93,12 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
         ListItemCount.Text = ModManager.Mods.Count.ToString();
         OnPropertyChanged(nameof(Mods));
-        HasMods = Mods.Count > 0;
+        HasMods = ModManager.Mods.Count > 0;
+        UpdateEnableAllCheckboxState();
+    }
+
+    private void UpdateEnableAllCheckboxState()
+    {
         EnableAllCheckbox.IsChecked = !ModManager.Mods.Select(mod => mod.IsEnabled).Contains(false);
     }
 

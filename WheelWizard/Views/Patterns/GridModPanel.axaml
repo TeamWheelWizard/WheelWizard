@@ -6,7 +6,8 @@
              x:Class="WheelWizard.Views.Patterns.GridModPanel"
              x:DataType="pages:ModListItem">
 
-    <Border CornerRadius="8" Background="{StaticResource Neutral900}"
+    <Border x:Name="RootCardBorder"
+            CornerRadius="8" Background="{StaticResource Neutral900}"
             ClipToBounds="True" Margin="4" Height="160">
         <Grid>
             <!-- Image area -->
@@ -83,7 +84,7 @@
 
         <!-- Hover effect -->
         <Border.Styles>
-            <Style Selector="Border:pointerover">
+            <Style Selector="Border#RootCardBorder:pointerover">
                 <Setter Property="Background" Value="{StaticResource Neutral700}" />
             </Style>
         </Border.Styles>

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -10,6 +11,10 @@ namespace WheelWizard.Views.Patterns;
 
 public partial class GridModPanel : UserControl
 {
+    private static readonly HttpClient s_httpClient = new();
+    private static readonly ConcurrentDictionary<int, Bitmap> s_imageCache = new();
+    private int? _currentModId;
+
     public GridModPanel()
     {
         InitializeComponent();
@@ -18,15 +23,39 @@ public partial class GridModPanel : UserControl
 
     private void OnDataContextChanged(object? sender, EventArgs e)
     {
-        // Reset image state when DataContext changes
+        if (DataContext is not ModListItem item)
+        {
+            _currentModId = null;
+            ModImage.Source = null;
+            PlaceholderIcon.IsVisible = true;
+            return;
+        }
+
+        var modId = item.Mod.ModID;
+        _currentModId = modId;
+
+        if (modId <= 0)
+        {
+            ModImage.Source = null;
+            PlaceholderIcon.IsVisible = true;
+            return;
+        }
+
+        if (s_imageCache.TryGetValue(modId, out var cachedImage))
+        {
+            ModImage.Source = cachedImage;
+            PlaceholderIcon.IsVisible = false;
+            return;
+        }
+
         ModImage.Source = null;
         PlaceholderIcon.IsVisible = true;
-        LoadModImageAsync();
+        LoadModImageAsync(modId);
     }
 
-    private async void LoadModImageAsync()
+    private async void LoadModImageAsync(int modId)
     {
-        if (DataContext is not ModListItem item || item.Mod.ModID <= 0)
+        if (modId <= 0)
             return;
 
         try
@@ -35,7 +64,7 @@ public partial class GridModPanel : UserControl
             if (gameBananaService == null)
                 return;
 
-            var result = await gameBananaService.GetModDetails(item.Mod.ModID);
+            var result = await gameBananaService.GetModDetails(modId);
             if (!result.IsSuccess || result.Value.PreviewMedia?.Images == null || result.Value.PreviewMedia.Images.Count == 0)
                 return;
 
@@ -43,15 +72,22 @@ public partial class GridModPanel : UserControl
             // Prefer smaller 220px thumbnail for grid cards, fall back to full size
             var imageUrl = image.File220 != null ? $"{image.BaseUrl}/{image.File220}" : $"{image.BaseUrl}/{image.File}";
 
-            using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(imageUrl);
+            var response = await s_httpClient.GetAsync(imageUrl);
             response.EnsureSuccessStatusCode();
 
             await using var stream = await response.Content.ReadAsStreamAsync();
             var memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
-            ModImage.Source = new Bitmap(memoryStream);
+
+            var bitmap = new Bitmap(memoryStream);
+            if (!s_imageCache.TryAdd(modId, bitmap))
+                bitmap.Dispose();
+
+            if (_currentModId != modId)
+                return;
+
+            ModImage.Source = s_imageCache[modId];
             PlaceholderIcon.IsVisible = false;
         }
         catch
