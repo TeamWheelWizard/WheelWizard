@@ -60,9 +60,14 @@ public static class ToolTipBubbleBehavior
             return;
         }
 
-        var wrappedToolTip = new ToolTip { Content = newTip };
-        ApplyPointerClass(wrappedToolTip, normalizedPlacement);
-        ToolTip.SetTip(control, wrappedToolTip);
+        // Keep the original ToolTip.Tip binding intact for dynamic values (e.g. live player/room counts).
+        // If we set ToolTip.Tip here, we overwrite bindings and the tooltip content gets stuck.
+        var generatedToolTip = control.GetValue(ToolTipDiagnostics.ToolTipProperty) as ToolTip;
+        if (generatedToolTip != null)
+        {
+            generatedToolTip.Content = newTip;
+            ApplyPointerClass(generatedToolTip, normalizedPlacement);
+        }
     }
 
     private static void OnToolTipOpening(Control control, CancelRoutedEventArgs _) => PrepareToolTip(control);
@@ -258,8 +263,8 @@ public static class ToolTipBubbleBehavior
                 return;
 
             PrepareToolTip(control);
-            ApplyBubbleAnimationClass(control, animateIn: true);
             ToolTip.SetIsOpen(control, true);
+            ApplyBubbleAnimationClass(control, animateIn: true);
         });
     }
 
