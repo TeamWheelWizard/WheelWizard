@@ -115,7 +115,7 @@ public class FriendsListItem : TemplatedControl
 
     public void ViewRoom(object? sender, RoutedEventArgs e)
     {
-        ViewRoomAction.Invoke(FriendCode);
+        ViewRoomAction?.Invoke(FriendCode);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)

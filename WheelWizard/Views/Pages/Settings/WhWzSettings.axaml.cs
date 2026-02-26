@@ -297,9 +297,14 @@ public partial class WhWzSettings : UserControlBase
         var oldPath2 = (string)SettingsService.GAME_LOCATION.Get();
         var oldPath3 = (string)SettingsService.USER_FOLDER_PATH.Get();
 
-        var path1 = SettingsService.DOLPHIN_LOCATION.Set(DolphinExeInput.Text);
-        var path2 = SettingsService.GAME_LOCATION.Set(MarioKartInput.Text);
-        var path3 = SettingsService.USER_FOLDER_PATH.Set(DolphinUserPathInput.Text.TrimEnd(Path.DirectorySeparatorChar));
+        var dolphinPath = DolphinExeInput.Text ?? string.Empty;
+        var gamePath = MarioKartInput.Text ?? string.Empty;
+        var userPathInput = DolphinUserPathInput.Text;
+        var userPath = string.IsNullOrWhiteSpace(userPathInput) ? string.Empty : userPathInput.TrimEnd(Path.DirectorySeparatorChar);
+
+        var path1 = SettingsService.DOLPHIN_LOCATION.Set(dolphinPath);
+        var path2 = SettingsService.GAME_LOCATION.Set(gamePath);
+        var path3 = SettingsService.USER_FOLDER_PATH.Set(userPath);
         // These 3 lines is only saving the settings
         TogglePathSettings(false);
         if (!(SettingsService.PathsSetupCorrectly() && path1 && path2 && path3))

@@ -135,10 +135,11 @@ public static class ModInstallation
                 });
 
                 // Normalize entry path by removing empty folder segments
+                var entryKey = entry.Key ?? string.Empty;
                 var sanitizedKey = string.Join(
                     Path.DirectorySeparatorChar.ToString(),
-                    entry
-                        .Key.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                    entryKey
+                        .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                         .Where(segment => !string.IsNullOrWhiteSpace(segment))
                 );
 
@@ -176,7 +177,7 @@ public static class ModInstallation
         }
     }
 
-    private static IArchive OpenArchive(string filePath, string extension)
+    private static IArchive? OpenArchive(string filePath, string extension)
     {
         try
         {
@@ -201,7 +202,7 @@ public static class ModInstallation
     /// </summary>
     public static async Task InstallModFromFileAsync(string filePath, string givenModName, string author = "-1", int modID = -1)
     {
-        ProgressWindow progressWindow = null;
+        ProgressWindow? progressWindow = null;
         try
         {
             if (!File.Exists(filePath))

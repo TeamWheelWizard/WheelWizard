@@ -227,7 +227,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         return formatted;
     }
 
-    private void RoomsDetailPage_Unloaded(object sender, RoutedEventArgs e)
+    private void RoomsDetailPage_Unloaded(object? sender, RoutedEventArgs e)
     {
         RRLiveRooms.Instance.Unsubscribe(this);
     }
@@ -241,7 +241,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
 
     #region PropertyChanged
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {

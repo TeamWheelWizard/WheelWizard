@@ -12,6 +12,15 @@ indent_size = 2
 [*.cs]
 max_line_length = 140
 
+# Transitional analyzer levels while legacy filesystem/settings migration is in progress.
+dotnet_diagnostic.CS0618.severity = suggestion
+dotnet_diagnostic.IO0002.severity = suggestion
+dotnet_diagnostic.IO0003.severity = suggestion
+dotnet_diagnostic.IO0004.severity = suggestion
+dotnet_diagnostic.IO0005.severity = suggestion
+dotnet_diagnostic.IO0006.severity = suggestion
+dotnet_diagnostic.IO0007.severity = suggestion
+
 #### Core EditorConfig Options ####
 
 # Indentation and spacing
