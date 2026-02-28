@@ -37,8 +37,12 @@ public partial class MiiCarousel : BaseMiiImage
     private Point _lastPointerPosition;
     private CancellationTokenSource? _interactionSettleCts;
     private WriteableBitmap? _surfaceBitmap;
+    private byte[]? _upscaledPreviewBuffer;
     private Mii? _currentMii;
     private string? _studioData;
+    private int _stableSurfaceWidth;
+    private int _stableSurfaceHeight;
+    private bool _forceNextSurfaceRecreate;
 
     private MiiImageSpecifications _baseVariant = MiiImageVariants.FullBodyCarousel.Clone();
     private float _currentYaw;
@@ -70,6 +74,10 @@ public partial class MiiCarousel : BaseMiiImage
         _interactionSettleCts = null;
         _surfaceBitmap?.Dispose();
         _surfaceBitmap = null;
+        _upscaledPreviewBuffer = null;
+        _stableSurfaceWidth = 0;
+        _stableSurfaceHeight = 0;
+        _forceNextSurfaceRecreate = false;
         RenderImage.Source = null;
     }
 
@@ -85,6 +93,10 @@ public partial class MiiCarousel : BaseMiiImage
         _currentYaw = _baseVariant.CharacterRotate.Y;
         _currentPitch = _baseVariant.CameraRotate.X;
         _currentZoom = Math.Clamp(_baseVariant.CameraZoom, MinZoom, MaxZoom);
+        _stableSurfaceWidth = 0;
+        _stableSurfaceHeight = 0;
+        _upscaledPreviewBuffer = null;
+        _forceNextSurfaceRecreate = true;
         QueueRenderCurrentView(renderScale: 1f);
     }
 
@@ -108,6 +120,7 @@ public partial class MiiCarousel : BaseMiiImage
         }
 
         _studioData = serialized.Value;
+        _forceNextSurfaceRecreate = true;
         QueueRenderCurrentView(renderScale: 1f);
     }
 
@@ -183,12 +196,69 @@ public partial class MiiCarousel : BaseMiiImage
             return;
 
         _lastPresentedGeneration = render.Generation;
-        EnsureSurfaceBitmap(buffer.Width, buffer.Height);
+
+        var renderScale = Math.Clamp(render.Specifications.RenderScale, 0.05f, 1f);
+        var surfaceWidth = buffer.Width;
+        var surfaceHeight = buffer.Height;
+        byte[] pixelsToPresent = buffer.BgraPixels;
+
+        if (renderScale >= 0.999f)
+        {
+            _stableSurfaceWidth = buffer.Width;
+            _stableSurfaceHeight = buffer.Height;
+        }
+        else if (_stableSurfaceWidth > 0 && _stableSurfaceHeight > 0)
+        {
+            surfaceWidth = _stableSurfaceWidth;
+            surfaceHeight = _stableSurfaceHeight;
+            pixelsToPresent = UpscalePreviewBuffer(buffer.BgraPixels, buffer.Width, buffer.Height, surfaceWidth, surfaceHeight);
+        }
+
+        var forceFullSurfaceRefresh = renderScale < 0.999f || _forceNextSurfaceRecreate;
+        EnsureSurfaceBitmap(surfaceWidth, surfaceHeight, forceFullSurfaceRefresh);
         using var locked = _surfaceBitmap!.Lock();
-        CopyBufferToSurface(locked, buffer.BgraPixels, buffer.Width, buffer.Height);
+        CopyBufferToSurface(locked, pixelsToPresent, surfaceWidth, surfaceHeight);
+        if (forceFullSurfaceRefresh)
+        {
+            _forceNextSurfaceRecreate = false;
+            RenderImage.Source = null;
+        }
         RenderImage.Source = _surfaceBitmap;
         ImageBorder.IsVisible = true;
         MiiLoaded = true;
+    }
+
+    private byte[] UpscalePreviewBuffer(byte[] source, int sourceWidth, int sourceHeight, int targetWidth, int targetHeight)
+    {
+        if (sourceWidth <= 0 || sourceHeight <= 0 || targetWidth <= 0 || targetHeight <= 0)
+            return source;
+
+        if (sourceWidth == targetWidth && sourceHeight == targetHeight)
+            return source;
+
+        var requiredLength = checked(targetWidth * targetHeight * 4);
+        if (_upscaledPreviewBuffer == null || _upscaledPreviewBuffer.Length != requiredLength)
+            _upscaledPreviewBuffer = new byte[requiredLength];
+
+        for (var y = 0; y < targetHeight; y++)
+        {
+            var srcY = Math.Min(sourceHeight - 1, y * sourceHeight / targetHeight);
+            var srcRow = srcY * sourceWidth * 4;
+            var dstRow = y * targetWidth * 4;
+
+            for (var x = 0; x < targetWidth; x++)
+            {
+                var srcX = Math.Min(sourceWidth - 1, x * sourceWidth / targetWidth);
+                var srcIndex = srcRow + srcX * 4;
+                var dstIndex = dstRow + x * 4;
+                _upscaledPreviewBuffer[dstIndex + 0] = source[srcIndex + 0];
+                _upscaledPreviewBuffer[dstIndex + 1] = source[srcIndex + 1];
+                _upscaledPreviewBuffer[dstIndex + 2] = source[srcIndex + 2];
+                _upscaledPreviewBuffer[dstIndex + 3] = source[srcIndex + 3];
+            }
+        }
+
+        return _upscaledPreviewBuffer;
     }
 
     private static void CopyBufferToSurface(ILockedFramebuffer locked, byte[] pixels, int width, int height)
@@ -202,9 +272,9 @@ public partial class MiiCarousel : BaseMiiImage
         }
     }
 
-    private void EnsureSurfaceBitmap(int width, int height)
+    private void EnsureSurfaceBitmap(int width, int height, bool forceRecreate = false)
     {
-        if (_surfaceBitmap is { } existing && existing.PixelSize.Width == width && existing.PixelSize.Height == height)
+        if (!forceRecreate && _surfaceBitmap is { } existing && existing.PixelSize.Width == width && existing.PixelSize.Height == height)
             return;
 
         _surfaceBitmap?.Dispose();
