@@ -287,7 +287,7 @@ public class MiiVisualParityTests
             ["data"] = studioData,
             ["type"] = specifications.Type.ToString(),
             ["expression"] = specifications.Expression.ToString(),
-            ["width"] = ((int)specifications.Size).ToString(),
+            ["width"] = ResolveOutputWidth(specifications).ToString(),
             ["characterXRotate"] = ((int)MathF.Round(specifications.CharacterRotate.X)).ToString(),
             ["characterYRotate"] = ((int)MathF.Round(specifications.CharacterRotate.Y)).ToString(),
             ["characterZRotate"] = ((int)MathF.Round(specifications.CharacterRotate.Z)).ToString(),
@@ -309,6 +309,13 @@ public class MiiVisualParityTests
         }
 
         return builder.ToString();
+    }
+
+    private static int ResolveOutputWidth(MiiImageSpecifications specifications)
+    {
+        var renderScale = Math.Clamp(specifications.RenderScale, 0.05f, 1f);
+        var scaledWidth = MathF.Round((int)specifications.Size * renderScale);
+        return Math.Clamp((int)scaledWidth, 16, 4096);
     }
 
     private static void SaveBgraAsPng(byte[] bgraPixels, int width, int height, string outputPath)

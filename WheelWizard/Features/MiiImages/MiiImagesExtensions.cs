@@ -26,6 +26,7 @@ public static class MiiImagesExtensions
             CharacterRotate = new(specifications.CharacterRotate.X, specifications.CharacterRotate.Y, specifications.CharacterRotate.Z),
             CameraRotate = new(specifications.CameraRotate.X, specifications.CameraRotate.Y, specifications.CameraRotate.Z),
             CameraZoom = specifications.CameraZoom,
+            RenderScale = specifications.RenderScale,
             ExpirationSeconds =
                 specifications.ExpirationSeconds?.TotalSeconds == null
                     ? null

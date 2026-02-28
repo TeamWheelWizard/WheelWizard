@@ -19,8 +19,10 @@ public partial class MiiCarousel : BaseMiiImage
     private const float YawDragSensitivity = 0.8f;
     private const float PitchDragSensitivity = 0.8f;
     private const float ZoomStep = 0.1f;
+    private const float DragPreviewRenderScale = 0.2f;
     private const float MinZoom = 0.35f;
     private const float MaxZoom = 3f;
+    private const int HighQualitySettleDelayMs = 90;
 
     [Inject]
     private IMiiNativeRenderer NativeRenderer { get; set; } = null!;
@@ -33,6 +35,7 @@ public partial class MiiCarousel : BaseMiiImage
 
     private bool _isDragging;
     private Point _lastPointerPosition;
+    private CancellationTokenSource? _interactionSettleCts;
     private WriteableBitmap? _surfaceBitmap;
     private Mii? _currentMii;
     private string? _studioData;
@@ -62,6 +65,9 @@ public partial class MiiCarousel : BaseMiiImage
     {
         base.OnDetachedFromVisualTree(e);
         InvalidatePendingWork();
+        _interactionSettleCts?.Cancel();
+        _interactionSettleCts?.Dispose();
+        _interactionSettleCts = null;
         _surfaceBitmap?.Dispose();
         _surfaceBitmap = null;
         RenderImage.Source = null;
@@ -79,15 +85,12 @@ public partial class MiiCarousel : BaseMiiImage
         _currentYaw = _baseVariant.CharacterRotate.Y;
         _currentPitch = _baseVariant.CameraRotate.X;
         _currentZoom = Math.Clamp(_baseVariant.CameraZoom, MinZoom, MaxZoom);
-        QueueRenderCurrentView();
+        QueueRenderCurrentView(renderScale: 1f);
     }
 
     protected override void OnMiiChanged(Mii? newMii)
     {
         _currentMii = newMii;
-        _currentYaw = _baseVariant.CharacterRotate.Y;
-        _currentPitch = _baseVariant.CameraRotate.X;
-        _currentZoom = Math.Clamp(_baseVariant.CameraZoom, MinZoom, MaxZoom);
 
         if (newMii == null)
         {
@@ -105,10 +108,10 @@ public partial class MiiCarousel : BaseMiiImage
         }
 
         _studioData = serialized.Value;
-        QueueRenderCurrentView();
+        QueueRenderCurrentView(renderScale: 1f);
     }
 
-    private void QueueRenderCurrentView()
+    private void QueueRenderCurrentView(float renderScale)
     {
         var mii = _currentMii;
         if (mii == null || string.IsNullOrWhiteSpace(_studioData))
@@ -122,6 +125,7 @@ public partial class MiiCarousel : BaseMiiImage
         variant.CharacterRotate = new(_baseVariant.CharacterRotate.X, NormalizeDegrees(_currentYaw), _baseVariant.CharacterRotate.Z);
         variant.CameraRotate = new(NormalizeDegrees(_currentPitch), _baseVariant.CameraRotate.Y, _baseVariant.CameraRotate.Z);
         variant.CameraZoom = Math.Clamp(_currentZoom, MinZoom, MaxZoom);
+        variant.RenderScale = Math.Clamp(renderScale, 0.05f, 1f);
 
         var generation = Interlocked.Increment(ref _latestQueuedGeneration);
         MiiLoaded = false;
@@ -222,9 +226,45 @@ public partial class MiiCarousel : BaseMiiImage
     {
         var generation = Interlocked.Increment(ref _latestQueuedGeneration);
         _lastPresentedGeneration = generation;
+        _interactionSettleCts?.Cancel();
+        _interactionSettleCts?.Dispose();
+        _interactionSettleCts = null;
         lock (_pendingRenderLock)
             _pendingRender = null;
         return generation;
+    }
+
+    private void ScheduleHighQualityRefresh()
+    {
+        _interactionSettleCts?.Cancel();
+        _interactionSettleCts?.Dispose();
+
+        var cts = new CancellationTokenSource();
+        _interactionSettleCts = cts;
+        var token = cts.Token;
+
+        _ = Task.Run(
+            async () =>
+            {
+                try
+                {
+                    await Task.Delay(HighQualitySettleDelayMs, token);
+                    await Dispatcher.UIThread.InvokeAsync(
+                        () =>
+                        {
+                            if (!token.IsCancellationRequested)
+                                QueueRenderCurrentView(renderScale: 1f);
+                        },
+                        DispatcherPriority.Background
+                    );
+                }
+                catch (OperationCanceledException)
+                {
+                    // Ignore cancellation: new interaction superseded this request.
+                }
+            },
+            token
+        );
     }
 
     private static float NormalizeDegrees(float degrees)
@@ -260,7 +300,8 @@ public partial class MiiCarousel : BaseMiiImage
 
         _currentYaw += (float)(deltaX * YawDragSensitivity);
         _currentPitch += (float)(deltaY * PitchDragSensitivity);
-        QueueRenderCurrentView();
+        QueueRenderCurrentView(renderScale: DragPreviewRenderScale);
+        ScheduleHighQualityRefresh();
     }
 
     private void ImageBorder_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -269,12 +310,20 @@ public partial class MiiCarousel : BaseMiiImage
             return;
 
         _isDragging = false;
+        _interactionSettleCts?.Cancel();
+        _interactionSettleCts?.Dispose();
+        _interactionSettleCts = null;
+        QueueRenderCurrentView(renderScale: 1f);
         e.Pointer.Capture(null);
     }
 
     private void ImageBorder_OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
     {
         _isDragging = false;
+        _interactionSettleCts?.Cancel();
+        _interactionSettleCts?.Dispose();
+        _interactionSettleCts = null;
+        QueueRenderCurrentView(renderScale: 1f);
     }
 
     private void ImageBorder_OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
@@ -284,7 +333,8 @@ public partial class MiiCarousel : BaseMiiImage
 
         _currentZoom -= (float)e.Delta.Y * ZoomStep;
         _currentZoom = Math.Clamp(_currentZoom, MinZoom, MaxZoom);
-        QueueRenderCurrentView();
+        QueueRenderCurrentView(renderScale: DragPreviewRenderScale);
+        ScheduleHighQualityRefresh();
     }
 
     private readonly record struct PendingRender(int Generation, Mii Mii, string StudioData, MiiImageSpecifications Specifications);

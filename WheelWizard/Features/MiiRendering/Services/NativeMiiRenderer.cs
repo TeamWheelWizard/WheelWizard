@@ -36,6 +36,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
     private static readonly object ManagedArchiveLock = new();
     private static ManagedFflResourceArchive? _managedArchive;
     private static string? _managedArchivePath;
+    private static readonly object HeadDrawCacheLock = new();
+    private static readonly Dictionary<string, CachedHeadDrawParams> HeadDrawCache = new(StringComparer.Ordinal);
 
     private static readonly Vector3 LightAmbient = new(0.73f, 0.73f, 0.73f);
     private static readonly Vector3 LightDiffuse = new(0.60f, 0.60f, 0.60f);
@@ -212,85 +214,66 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
 
         var charInfo = MapStudioDataToCharInfo(decodeResult.Value);
         var expressionId = MapExpression(request.Expression);
-        using var arena = new RenderAllocationTracker();
-        var generatedTextureHandles = new List<IntPtr>(capacity: 8);
 
-        try
+        var cachedHeadResult = GetOrCreateCachedHeadDrawParams(
+            archiveResult.Value,
+            charInfo,
+            request,
+            expressionId,
+            studioData,
+            resourcePathResult.Value
+        );
+        if (cachedHeadResult.IsFailure)
+            return cachedHeadResult.Error!;
+
+        var drawMeshes = cachedHeadResult.Value.DrawMeshes;
+        if (drawMeshes.Count == 0)
+            return Fail("Managed renderer produced no drawable meshes for this Mii.");
+
+        var viewParameters = ResolveViewParameters(request, charInfo);
+        var bodyRenderData = request.BodyType == MiiImageSpecifications.BodyType.face_only ? null : TryCreateBodyRenderData(charInfo);
+        var frameWidth = request.Width;
+        var frameHeight = RoundUpToEven((int)MathF.Ceiling(frameWidth * viewParameters.AspectHeightFactor));
+        if (frameHeight <= 0)
+            frameHeight = frameWidth;
+
+        var outputWidth = checked(frameWidth * request.InstanceCount);
+        var outputHeight = frameHeight;
+        var pixels = new byte[outputWidth * outputHeight * 4];
+        var depth = new float[outputWidth * outputHeight];
+        var background = ParseStudioRgba(request.BackgroundColor, defaultColor: new(255, 255, 255, 0));
+
+        FillBackground(pixels, depth, outputWidth, outputHeight, background);
+
+        for (var i = 0; i < request.InstanceCount; i++)
         {
-            var drawParamsResult = BuildManagedDrawParams(
-                archiveResult.Value,
-                charInfo,
-                request,
-                expressionId,
-                arena,
-                generatedTextureHandles
-            );
-            if (drawParamsResult.IsFailure)
-                return drawParamsResult.Error!;
+            var instanceYaw = request.CharacterYRotate + (360f / request.InstanceCount) * i;
+            var cameraRotate = ConvertDegreesToRadians(request.CameraXRotate, request.CameraYRotate, request.CameraZRotate);
+            var modelRotate = ConvertDegreesToRadians(request.CharacterXRotate, instanceYaw, request.CharacterZRotate);
 
-            var drawParams = drawParamsResult.Value;
-            if (drawParams.Count == 0)
-                return Fail("Managed renderer produced no drawable meshes for this Mii.");
+            var orbitRadius = viewParameters.OrbitRadius * request.CameraZoom;
+            var cameraPosition = CalculateCameraOrbitPosition(orbitRadius, cameraRotate);
+            cameraPosition.Y += viewParameters.BaseCameraY;
+            var cameraUp = CalculateUpVector(cameraRotate);
+            var baseRotationMatrix = CreateRotationMatrix(modelRotate);
 
-            var viewParameters = ResolveViewParameters(request, charInfo);
-            var bodyRenderData = request.BodyType == MiiImageSpecifications.BodyType.face_only ? null : TryCreateBodyRenderData(charInfo);
-            var frameWidth = request.Width;
-            var frameHeight = RoundUpToEven((int)MathF.Ceiling(frameWidth * viewParameters.AspectHeightFactor));
-            if (frameHeight <= 0)
-                frameHeight = frameWidth;
-
-            var outputWidth = checked(frameWidth * request.InstanceCount);
-            var outputHeight = frameHeight;
-            var pixels = new byte[outputWidth * outputHeight * 4];
-            var depth = new float[outputWidth * outputHeight];
-            var background = ParseStudioRgba(request.BackgroundColor, defaultColor: new(255, 255, 255, 0));
-
-            FillBackground(pixels, depth, outputWidth, outputHeight, background);
-
-            for (var i = 0; i < request.InstanceCount; i++)
+            var cameraTarget = viewParameters.Target;
+            var headModelMatrix = baseRotationMatrix;
+            if (bodyRenderData is { } bodyData)
             {
-                var instanceYaw = request.CharacterYRotate + (360f / request.InstanceCount) * i;
-                var cameraRotate = ConvertDegreesToRadians(request.CameraXRotate, request.CameraYRotate, request.CameraZRotate);
-                var modelRotate = ConvertDegreesToRadians(request.CharacterXRotate, instanceYaw, request.CharacterZRotate);
-
-                var orbitRadius = viewParameters.OrbitRadius * request.CameraZoom;
-                var cameraPosition = CalculateCameraOrbitPosition(orbitRadius, cameraRotate);
-                cameraPosition.Y += viewParameters.BaseCameraY;
-                var cameraUp = CalculateUpVector(cameraRotate);
-                var baseRotationMatrix = CreateRotationMatrix(modelRotate);
-
-                var cameraTarget = viewParameters.Target;
-                var headModelMatrix = baseRotationMatrix;
-                if (bodyRenderData is { } bodyData)
+                headModelMatrix = baseRotationMatrix * bodyData.HeadModelMatrix;
+                if (!viewParameters.IsCameraPositionAbsolute)
                 {
-                    headModelMatrix = baseRotationMatrix * bodyData.HeadModelMatrix;
-                    if (!viewParameters.IsCameraPositionAbsolute)
-                    {
-                        cameraPosition += bodyData.HeadTranslation;
-                        cameraTarget += bodyData.HeadTranslation;
-                    }
+                    cameraPosition += bodyData.HeadTranslation;
+                    cameraTarget += bodyData.HeadTranslation;
                 }
+            }
 
-                var viewMatrix = Matrix4x4.CreateLookAt(cameraPosition, cameraTarget, cameraUp);
+            var viewMatrix = Matrix4x4.CreateLookAt(cameraPosition, cameraTarget, cameraUp);
 
-                if (bodyRenderData is { } bodyMeshData)
-                {
-                    RasterizeBodyInstance(
-                        pixels,
-                        depth,
-                        outputWidth,
-                        outputHeight,
-                        i * frameWidth,
-                        frameWidth,
-                        frameHeight,
-                        bodyMeshData,
-                        baseRotationMatrix,
-                        viewMatrix,
-                        viewParameters.Projection
-                    );
-                }
-
-                RasterizeInstance(
+            if (bodyRenderData is { } bodyMeshData)
+            {
+                RasterizeBodyInstance(
                     pixels,
                     depth,
                     outputWidth,
@@ -298,25 +281,36 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                     i * frameWidth,
                     frameWidth,
                     frameHeight,
-                    drawParams,
-                    headModelMatrix,
+                    bodyMeshData,
+                    baseRotationMatrix,
                     viewMatrix,
                     viewParameters.Projection
                 );
             }
 
-            return new NativeMiiPixelBuffer(outputWidth, outputHeight, pixels);
+            RasterizeInstance(
+                pixels,
+                depth,
+                outputWidth,
+                outputHeight,
+                i * frameWidth,
+                frameWidth,
+                frameHeight,
+                drawMeshes,
+                headModelMatrix,
+                viewMatrix,
+                viewParameters.Projection
+            );
         }
-        finally
-        {
-            foreach (var handle in generatedTextureHandles)
-                TextureRegistry.RemoveTexture(handle);
-        }
+
+        return new NativeMiiPixelBuffer(outputWidth, outputHeight, pixels);
     }
 
     public NativeMiiRenderRequest BuildRequest(string studioData, MiiImageSpecifications specifications)
     {
-        var width = Math.Clamp((int)specifications.Size, 16, 4096);
+        var renderScale = Math.Clamp(specifications.RenderScale, 0.05f, 1f);
+        var scaledWidth = MathF.Round((int)specifications.Size * renderScale);
+        var width = Math.Clamp((int)scaledWidth, 16, 4096);
         var instanceCount = Math.Clamp(specifications.InstanceCount, 1, 32);
 
         return new NativeMiiRenderRequest(
@@ -360,6 +354,90 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             MiiImageSpecifications.FaceExpression.wink_right_open_mouth => FflNativeInterop.FflExpressionWinkRightOpenMouth,
             _ => FflNativeInterop.FflExpressionNormal,
         };
+
+    private static OperationResult<CachedHeadDrawParams> GetOrCreateCachedHeadDrawParams(
+        ManagedFflResourceArchive archive,
+        FflNativeInterop.FFLiCharInfo charInfo,
+        NativeMiiRenderRequest request,
+        int expressionId,
+        string studioData,
+        string resourcePath
+    )
+    {
+        var key = BuildHeadDrawCacheKey(studioData, expressionId, request.Width, resourcePath);
+
+        lock (HeadDrawCacheLock)
+        {
+            if (HeadDrawCache.TryGetValue(key, out var cached))
+                return cached;
+        }
+
+        var arena = new RenderAllocationTracker();
+        var generatedTextureHandles = new List<IntPtr>(capacity: 8);
+        var drawParamsResult = BuildManagedDrawParams(archive, charInfo, request, expressionId, arena, generatedTextureHandles);
+        if (drawParamsResult.IsFailure)
+        {
+            foreach (var handle in generatedTextureHandles)
+                TextureRegistry.RemoveTexture(handle);
+            arena.Dispose();
+            return drawParamsResult.Error!;
+        }
+
+        var decodedMeshes = BuildDecodedDrawMeshes(drawParamsResult.Value);
+        if (decodedMeshes.Count == 0)
+        {
+            foreach (var handle in generatedTextureHandles)
+                TextureRegistry.RemoveTexture(handle);
+            arena.Dispose();
+            return Fail("Managed renderer produced no valid decoded meshes for this Mii.");
+        }
+
+        var created = new CachedHeadDrawParams(drawParamsResult.Value, decodedMeshes, generatedTextureHandles, arena);
+        lock (HeadDrawCacheLock)
+        {
+            if (HeadDrawCache.TryGetValue(key, out var existing))
+            {
+                created.Dispose();
+                return existing;
+            }
+
+            HeadDrawCache[key] = created;
+            return created;
+        }
+    }
+
+    private static string BuildHeadDrawCacheKey(string studioData, int expressionId, int width, string resourcePath)
+    {
+        var resolutionBucket = width <= 384 ? 256 : 512;
+        return $"{Path.GetFullPath(resourcePath)}|{resolutionBucket}|{expressionId}|{studioData}";
+    }
+
+    private static List<DecodedDrawMesh> BuildDecodedDrawMeshes(IReadOnlyList<FflNativeInterop.FFLDrawParam> drawParams)
+    {
+        var decoded = new List<DecodedDrawMesh>(drawParams.Count);
+        foreach (var drawParam in drawParams)
+        {
+            var positions = ReadPositions(drawParam.attributeBufferParam.position);
+            if (positions.Length == 0)
+                continue;
+
+            var texcoords = ReadTexcoords(drawParam.attributeBufferParam.texcoord, positions.Length);
+            var normals = ReadNormals(drawParam.attributeBufferParam.normal, positions.Length);
+            var tangents = ReadTangents(drawParam.attributeBufferParam.tangent, positions.Length);
+            var vertexParameters = ReadVertexParameters(drawParam.attributeBufferParam.color, positions.Length);
+            var indices = ReadIndices(drawParam.primitiveParam.pIndexBuffer, (int)drawParam.primitiveParam.indexCount);
+            if (indices.Length < 3)
+                continue;
+
+            var hasTangent = drawParam.attributeBufferParam.tangent.ptr != IntPtr.Zero && drawParam.attributeBufferParam.tangent.stride > 0;
+            var material = ResolveMaterial(drawParam.modulateParam.type);
+            decoded.Add(
+                new DecodedDrawMesh(drawParam, positions, texcoords, normals, tangents, vertexParameters, indices, hasTangent, material)
+            );
+        }
+
+        return decoded;
+    }
 
     private static OverlayTexture RenderOverlayTexture(
         IReadOnlyList<FflNativeInterop.FFLDrawParam> drawParams,
@@ -2539,20 +2617,76 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         int frameX,
         int frameWidth,
         int frameHeight,
-        IReadOnlyList<FflNativeInterop.FFLDrawParam> drawParams,
+        IReadOnlyList<DecodedDrawMesh> drawMeshes,
         Matrix4x4 modelMatrix,
         Matrix4x4 viewMatrix,
         Matrix4x4 projectionMatrix
     )
     {
-        foreach (var drawParam in drawParams)
+        foreach (var drawMesh in drawMeshes)
         {
-            var mesh = PrepareMesh(drawParam, frameX, frameWidth, frameHeight, modelMatrix, viewMatrix, projectionMatrix);
+            var mesh = PrepareMesh(drawMesh, frameX, frameWidth, frameHeight, modelMatrix, viewMatrix, projectionMatrix);
             if (mesh == null)
                 continue;
 
             RasterizeMesh(target, depth, outputWidth, outputHeight, mesh, lightEnabled: true, BlendMode.Over);
         }
+    }
+
+    private static PreparedMesh? PrepareMesh(
+        DecodedDrawMesh drawMesh,
+        int frameX,
+        int frameWidth,
+        int frameHeight,
+        Matrix4x4 modelMatrix,
+        Matrix4x4 viewMatrix,
+        Matrix4x4 projectionMatrix
+    )
+    {
+        if (drawMesh.Positions.Length == 0 || drawMesh.Indices.Length < 3)
+            return null;
+
+        var modelView = modelMatrix * viewMatrix;
+        var vertices = new RasterVertex[drawMesh.Positions.Length];
+
+        for (var i = 0; i < drawMesh.Positions.Length; i++)
+        {
+            var worldPosition = Vector3.Transform(drawMesh.Positions[i], modelMatrix);
+            var viewPosition = Vector3.Transform(worldPosition, viewMatrix);
+            var clip = Vector4.Transform(new Vector4(viewPosition, 1f), projectionMatrix);
+            if (MathF.Abs(clip.W) <= 1e-6f)
+                return null;
+
+            var invW = 1f / clip.W;
+            var ndc = new Vector3(clip.X * invW, clip.Y * invW, clip.Z * invW);
+            var depthValue = ndc.Z * 0.5f + 0.5f;
+            var screenX = frameX + (ndc.X * 0.5f + 0.5f) * frameWidth;
+            var screenY = (1f - (ndc.Y * 0.5f + 0.5f)) * frameHeight;
+
+            var normal = Vector3.TransformNormal(drawMesh.Normals[i], modelView);
+            var tangent = Vector3.TransformNormal(drawMesh.Tangents[i], modelView);
+
+            vertices[i] = new RasterVertex(
+                new Vector2(screenX, screenY),
+                depthValue,
+                invW,
+                drawMesh.Texcoords[i],
+                viewPosition,
+                normal,
+                tangent,
+                drawMesh.VertexParameters.Values[i]
+            );
+        }
+
+        return new PreparedMesh(
+            drawMesh.DrawParam,
+            vertices,
+            drawMesh.Indices,
+            drawMesh.Material,
+            drawMesh.VertexParameters.Mode,
+            constantColor: null,
+            hasTangent: drawMesh.HasTangent
+        );
     }
 
     private static PreparedMesh? PrepareMesh(
@@ -3397,6 +3531,54 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         Vector4 BodyColor,
         Vector4 PantsColor
     );
+
+    private sealed class CachedHeadDrawParams(
+        List<FflNativeInterop.FFLDrawParam> drawParams,
+        List<DecodedDrawMesh> drawMeshes,
+        List<IntPtr> textureHandles,
+        RenderAllocationTracker arena
+    ) : IDisposable
+    {
+        public List<FflNativeInterop.FFLDrawParam> DrawParams { get; } = drawParams;
+        public List<DecodedDrawMesh> DrawMeshes { get; } = drawMeshes;
+        private List<IntPtr> TextureHandles { get; } = textureHandles;
+        private RenderAllocationTracker Arena { get; } = arena;
+        private int _disposed;
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+                return;
+
+            foreach (var handle in TextureHandles)
+                TextureRegistry.RemoveTexture(handle);
+
+            Arena.Dispose();
+        }
+    }
+
+    private sealed class DecodedDrawMesh(
+        FflNativeInterop.FFLDrawParam drawParam,
+        Vector3[] positions,
+        Vector2[] texcoords,
+        Vector3[] normals,
+        Vector3[] tangents,
+        VertexParameterData vertexParameters,
+        int[] indices,
+        bool hasTangent,
+        MaterialInfo material
+    )
+    {
+        public FflNativeInterop.FFLDrawParam DrawParam { get; } = drawParam;
+        public Vector3[] Positions { get; } = positions;
+        public Vector2[] Texcoords { get; } = texcoords;
+        public Vector3[] Normals { get; } = normals;
+        public Vector3[] Tangents { get; } = tangents;
+        public VertexParameterData VertexParameters { get; } = vertexParameters;
+        public int[] Indices { get; } = indices;
+        public bool HasTangent { get; } = hasTangent;
+        public MaterialInfo Material { get; } = material;
+    }
 
     private sealed class BodyModelDatabase(float modelScale, float headYTranslate, BodyMeshModel maleModel, BodyMeshModel femaleModel)
     {

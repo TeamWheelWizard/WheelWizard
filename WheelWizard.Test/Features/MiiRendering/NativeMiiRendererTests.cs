@@ -39,6 +39,22 @@ public class NativeMiiRendererTests
     }
 
     [Fact]
+    public void BuildRequest_ShouldApplyRenderScale_WhenSpecified()
+    {
+        var renderer = CreateRenderer();
+        var specifications = new MiiImageSpecifications
+        {
+            Size = MiiImageSpecifications.ImageSize.medium,
+            RenderScale = 0.125f,
+            InstanceCount = 1,
+        };
+
+        var request = renderer.BuildRequest("001122", specifications);
+
+        Assert.Equal(64, request.Width);
+    }
+
+    [Fact]
     public void RenderToBuffer_ShouldFail_WhenResourceMissing()
     {
         var fileSystem = new MockFileSystem();
