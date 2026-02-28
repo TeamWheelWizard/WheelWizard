@@ -28,10 +28,9 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         int CameraXRotate,
         int CameraYRotate,
         int CameraZRotate,
+        float CameraZoom,
         string BackgroundColor
     );
-
-    public sealed record NativeMiiRenderBuffer(int Width, int Height, byte[] BgraPixels);
 
     private static readonly TextureStore TextureRegistry = new();
     private static readonly object ManagedArchiveLock = new();
@@ -143,29 +142,49 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
     private const string EmbeddedBodyMaleResource = "WheelWizard.Features.MiiRendering.Resources.mii_static_body_3ds_male_LE.rmdl";
     private const string EmbeddedBodyFemaleResource = "WheelWizard.Features.MiiRendering.Resources.mii_static_body_3ds_female_LE.rmdl";
 
-    public Task<OperationResult<Bitmap>> RenderAsync(
+    public async Task<OperationResult<Bitmap>> RenderAsync(
         Mii mii,
         string studioData,
         MiiImageSpecifications specifications,
         CancellationToken cancellationToken = default
     )
     {
-        var bufferResult = RenderToBuffer(mii, studioData, specifications, cancellationToken);
+        var bufferResult = await RenderBufferAsync(mii, studioData, specifications, cancellationToken);
         if (bufferResult.IsFailure)
-            return Task.FromResult<OperationResult<Bitmap>>(bufferResult.Error!);
+            return bufferResult.Error!;
 
         try
         {
             var bitmap = CreateBitmap(bufferResult.Value.BgraPixels, bufferResult.Value.Width, bufferResult.Value.Height);
-            return Task.FromResult<OperationResult<Bitmap>>(bitmap);
+            return bitmap;
         }
         catch (Exception exception)
         {
-            return Task.FromResult<OperationResult<Bitmap>>(Fail($"Failed to create bitmap from rendered buffer: {exception.Message}"));
+            return Fail($"Failed to create bitmap from rendered buffer: {exception.Message}");
         }
     }
 
-    public OperationResult<NativeMiiRenderBuffer> RenderToBuffer(
+    public async Task<OperationResult<NativeMiiPixelBuffer>> RenderBufferAsync(
+        Mii mii,
+        string studioData,
+        MiiImageSpecifications specifications,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return Fail("Mii render cancelled.");
+
+        try
+        {
+            return await Task.Run(() => RenderToBuffer(mii, studioData, specifications, cancellationToken), cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return Fail("Mii render cancelled.");
+        }
+    }
+
+    public OperationResult<NativeMiiPixelBuffer> RenderToBuffer(
         Mii mii,
         string studioData,
         MiiImageSpecifications specifications,
@@ -234,7 +253,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                 var cameraRotate = ConvertDegreesToRadians(request.CameraXRotate, request.CameraYRotate, request.CameraZRotate);
                 var modelRotate = ConvertDegreesToRadians(request.CharacterXRotate, instanceYaw, request.CharacterZRotate);
 
-                var cameraPosition = CalculateCameraOrbitPosition(viewParameters.OrbitRadius, cameraRotate);
+                var orbitRadius = viewParameters.OrbitRadius * request.CameraZoom;
+                var cameraPosition = CalculateCameraOrbitPosition(orbitRadius, cameraRotate);
                 cameraPosition.Y += viewParameters.BaseCameraY;
                 var cameraUp = CalculateUpVector(cameraRotate);
                 var baseRotationMatrix = CreateRotationMatrix(modelRotate);
@@ -285,7 +305,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                 );
             }
 
-            return new NativeMiiRenderBuffer(outputWidth, outputHeight, pixels);
+            return new NativeMiiPixelBuffer(outputWidth, outputHeight, pixels);
         }
         finally
         {
@@ -311,6 +331,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             (int)MathF.Round(specifications.CameraRotate.X),
             (int)MathF.Round(specifications.CameraRotate.Y),
             (int)MathF.Round(specifications.CameraRotate.Z),
+            Math.Clamp(specifications.CameraZoom, 0.35f, 3f),
             string.IsNullOrWhiteSpace(specifications.BackgroundColor) ? "FFFFFF00" : specifications.BackgroundColor
         );
     }

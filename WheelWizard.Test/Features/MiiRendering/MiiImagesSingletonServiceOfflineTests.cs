@@ -65,5 +65,16 @@ public class MiiImagesSingletonServiceOfflineTests
             await Task.Delay(60, cancellationToken);
             return Fail("Synthetic renderer failure for headless tests.");
         }
+
+        public Task<OperationResult<NativeMiiPixelBuffer>> RenderBufferAsync(
+            Mii mii,
+            string studioData,
+            MiiImageSpecifications specifications,
+            CancellationToken cancellationToken = default
+        )
+        {
+            Interlocked.Increment(ref _callCount);
+            return Task.FromResult<OperationResult<NativeMiiPixelBuffer>>(Fail("Synthetic renderer failure for headless tests."));
+        }
     }
 }

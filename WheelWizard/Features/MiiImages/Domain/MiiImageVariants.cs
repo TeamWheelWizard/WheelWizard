@@ -47,7 +47,7 @@ public static class MiiImageVariants
         Size = MiiImageSpecifications.ImageSize.medium,
         CachePriority = CacheItemPriority.Low,
         ExpirationSeconds = TimeSpan.FromSeconds(30),
-        InstanceCount = 8,
+        InstanceCount = 1,
     };
 
     public static readonly MiiImageSpecifications CurrentUserSideProfile = new()
@@ -88,6 +88,6 @@ public static class MiiImageVariants
         Type = MiiImageSpecifications.BodyType.all_body,
         Size = MiiImageSpecifications.ImageSize.medium,
         ExpirationSeconds = TimeSpan.FromMinutes(10),
-        InstanceCount = 8,
+        InstanceCount = 1,
     };
 }

@@ -4,9 +4,18 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.MiiRendering.Services;
 
+public readonly record struct NativeMiiPixelBuffer(int Width, int Height, byte[] BgraPixels);
+
 public interface IMiiNativeRenderer
 {
     Task<OperationResult<Bitmap>> RenderAsync(
+        Mii mii,
+        string studioData,
+        MiiImageSpecifications specifications,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<OperationResult<NativeMiiPixelBuffer>> RenderBufferAsync(
         Mii mii,
         string studioData,
         MiiImageSpecifications specifications,
