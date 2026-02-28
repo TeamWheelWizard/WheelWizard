@@ -133,6 +133,10 @@
         <AvaloniaResource Include="Resources\Fonts\ctmkf.ttf"/>
     </ItemGroup>
 
+    <ItemGroup Label="Mii Rendering Resources">
+        <EmbeddedResource Include="Features\MiiRendering\Resources\*.rmdl" />
+    </ItemGroup>
+
     <ItemGroup>
         <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorGeneralPage.axaml"/>
         <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorWindow.axaml"/>

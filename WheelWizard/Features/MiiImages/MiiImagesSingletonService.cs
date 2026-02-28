@@ -1,8 +1,9 @@
 using System.Collections.Concurrent;
 using Avalonia.Media.Imaging;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using WheelWizard.MiiImages.Domain;
-using WheelWizard.Shared.Services;
+using WheelWizard.MiiRendering.Services;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.MiiImages;
@@ -12,20 +13,30 @@ public interface IMiiImagesSingletonService
     Task<OperationResult<Bitmap>> GetImageAsync(Mii? mii, MiiImageSpecifications specifications);
 }
 
-public class MiiImagesSingletonService(IApiCaller<IMiiIMagesApi> apiCaller, IMemoryCache cache) : IMiiImagesSingletonService
+public class MiiImagesSingletonService(IMiiNativeRenderer nativeRenderer, IMemoryCache cache, ILogger<MiiImagesSingletonService> logger)
+    : IMiiImagesSingletonService
 {
-    // Track in-flight requests to prevent duplicate API calls
-    private readonly ConcurrentDictionary<string, SemaphoreSlim> _inFlightRequests = new();
+    // Track in-flight requests to prevent duplicate renders.
+    private readonly ConcurrentDictionary<string, Task<OperationResult<Bitmap>>> _inFlightRequests = new();
 
     public async Task<OperationResult<Bitmap>> GetImageAsync(Mii? mii, MiiImageSpecifications specifications)
     {
         var data = MiiStudioDataSerializer.Serialize(mii);
         if (data.IsFailure)
+        {
+            logger.LogWarning(
+                "Mii studio serialization failed for image '{ImageName}' ({BodyType}/{Expression}): {Error}",
+                specifications.Name,
+                specifications.Type,
+                specifications.Expression,
+                data.Error?.Message
+            );
             return data.Error;
+        }
 
         var miiConfigKey = data.Value + specifications;
 
-        // Even tho we also check it in the semaphore section, we also check here if it's in the cache, just to be tad faster.
+        // Fast path: return from cache before looking up or creating in-flight render work.
         if (cache.TryGetValue(miiConfigKey, out Bitmap? cachedValue))
         {
             if (cachedValue != null)
@@ -33,74 +44,53 @@ public class MiiImagesSingletonService(IApiCaller<IMiiIMagesApi> apiCaller, IMem
             return Fail("Cached image is null.");
         }
 
-        var requestSemaphore = _inFlightRequests.GetOrAdd(miiConfigKey, _ => new(1, 1));
-
+        var renderTask = _inFlightRequests.GetOrAdd(miiConfigKey, _ => RenderAndCacheAsync(mii, data.Value, specifications, miiConfigKey));
         try
         {
-            // Wait to acquire the semaphore - only the first request will proceed immediately
-            await requestSemaphore.WaitAsync();
-
-            // Double-check the cache after acquiring the semaphore
-            // Another thread might have completed the request while we were waiting
-            if (cache.TryGetValue(miiConfigKey, out Bitmap? doubleCheckCached))
-            {
-                if (doubleCheckCached != null)
-                    return doubleCheckCached;
-                return Fail("Cached image is null.");
-            }
-
-            // If we get here, we're the first request and need to call the API
-            var newImageResult = await apiCaller.CallApiAsync(api => GetBitmapAsync(api, data.Value, specifications));
-
-            Bitmap? newImage = null;
-            if (newImageResult.IsSuccess)
-                newImage = newImageResult.Value;
-
-            using (var entry = cache.CreateEntry(miiConfigKey))
-            {
-                entry.Value = newImage;
-                entry.SlidingExpiration = specifications.ExpirationSeconds;
-                entry.Priority = specifications.CachePriority;
-            }
-
-            if (newImage != null)
-                return newImage;
-            return Fail("Failed to get new image.");
+            return await renderTask;
         }
         finally
         {
-            // We can also do it all without try catch. But we need to make sure that whatever happens, we release the semaphore
-            // So just to be safe, if anything happens, we release the semaphore anyway.
-            requestSemaphore.Release();
-            _inFlightRequests.TryRemove(miiConfigKey, out _);
+            _inFlightRequests.TryRemove(new KeyValuePair<string, Task<OperationResult<Bitmap>>>(miiConfigKey, renderTask));
         }
     }
 
-    private static async Task<Bitmap> GetBitmapAsync(IMiiIMagesApi api, string data, MiiImageSpecifications specifications)
+    private async Task<OperationResult<Bitmap>> RenderAndCacheAsync(
+        Mii mii,
+        string studioData,
+        MiiImageSpecifications specifications,
+        string cacheKey
+    )
     {
-        var result = await api.GetImageAsync(
-            data,
-            specifications.Type.ToString(),
-            specifications.Expression.ToString(),
-            (int)specifications.Size,
-            characterXRotate: (int)specifications.CharacterRotate.X,
-            characterYRotate: (int)specifications.CharacterRotate.Y,
-            characterZRotate: (int)specifications.CharacterRotate.Z,
-            bgColor: specifications.BackgroundColor,
-            instanceCount: specifications.InstanceCount,
-            cameraXRotate: (int)specifications.CameraRotate.X,
-            cameraYRotate: (int)specifications.CameraRotate.Y,
-            cameraZRotate: (int)specifications.CameraRotate.Z
-        );
+        if (cache.TryGetValue(cacheKey, out Bitmap? cached))
+        {
+            if (cached != null)
+                return cached;
+            return Fail("Cached image is null.");
+        }
 
-        using var memoryStream = new MemoryStream();
-        await result.CopyToAsync(memoryStream);
-        memoryStream.Position = 0; // Reset stream position for Bitmap constructor
+        var newImageResult = await nativeRenderer.RenderAsync(mii, studioData, specifications);
+        if (newImageResult.IsFailure)
+        {
+            logger.LogWarning(
+                "Native Mii render failed for image '{ImageName}' ({BodyType}/{Expression}, size={Size}): {Error}",
+                specifications.Name,
+                specifications.Type,
+                specifications.Expression,
+                specifications.Size,
+                newImageResult.Error?.Message
+            );
+            return newImageResult.Error!;
+        }
 
-        if (memoryStream.Length == 0)
-            throw new InvalidOperationException("Received empty image stream.");
+        var newImage = newImageResult.Value;
+        using (var entry = cache.CreateEntry(cacheKey))
+        {
+            entry.Value = newImage;
+            entry.SlidingExpiration = specifications.ExpirationSeconds;
+            entry.Priority = specifications.CachePriority;
+        }
 
-        var bitmap = new Bitmap(memoryStream);
-        return bitmap;
+        return newImage;
     }
 }

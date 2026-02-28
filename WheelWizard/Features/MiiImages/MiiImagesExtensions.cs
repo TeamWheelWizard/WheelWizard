@@ -1,5 +1,5 @@
 using WheelWizard.MiiImages.Domain;
-using WheelWizard.Services;
+using WheelWizard.MiiRendering;
 
 namespace WheelWizard.MiiImages;
 
@@ -7,8 +7,7 @@ public static class MiiImagesExtensions
 {
     public static IServiceCollection AddMiiImages(this IServiceCollection services)
     {
-        services.AddWhWzRefitApi<IMiiIMagesApi>(Endpoints.MiiImageAddress);
-
+        services.AddMiiRendering();
         services.AddSingleton<IMiiImagesSingletonService, MiiImagesSingletonService>();
 
         return services;
