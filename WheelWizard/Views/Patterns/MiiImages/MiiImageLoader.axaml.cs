@@ -78,6 +78,8 @@ public partial class MiiImageLoader : BaseMiiImage
         InitializeComponent();
     }
 
+    public void RefreshCurrentMii() => OnMiiChanged(Mii);
+
     protected void OnVariantChanged(MiiImageSpecifications newSpecifications)
     {
         List<MiiImageSpecifications> variants = [];

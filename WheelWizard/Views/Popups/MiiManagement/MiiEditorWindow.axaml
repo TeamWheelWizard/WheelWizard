@@ -30,7 +30,7 @@
            </Grid>
            
            <Grid Grid.Row="0" x:Name="VisualizationCarousel" IsVisible="False">
-               <behavior:MiiCarousel x:Name="MiiCarousel" Height="350" Width="388" HorizontalAlignment="Center" VerticalAlignment="Center"
+               <behavior:Mii3DRender x:Name="Mii3DRenderControl" Height="350" Width="388" HorizontalAlignment="Center" VerticalAlignment="Center"
                                      ReloadMethod="KeepInstanceUntilNew"
                                      ImageVariant="{x:Static miiVars:MiiImageVariants.MiiEditorPreviewCarousel}"
                                      Mii="{Binding Mii}"/>
