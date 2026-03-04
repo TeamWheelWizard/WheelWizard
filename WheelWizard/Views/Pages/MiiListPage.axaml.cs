@@ -1,5 +1,6 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO.Abstractions;
-using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -24,6 +25,9 @@ namespace WheelWizard.Views.Pages;
 
 public partial class MiiListPage : UserControlBase
 {
+    public ObservableCollection<MiiListRow> MiiRows { get; } = [];
+    private readonly List<MiiListEntry> _miiEntries = [];
+
     [Inject]
     private ICustomCharactersService CustomCharactersService { get; set; } = null!;
 
@@ -102,8 +106,6 @@ public partial class MiiListPage : UserControlBase
         if (e.Key is not (Key.LeftShift or Key.RightShift or Key.LeftCtrl or Key.RightCtrl))
             return;
 
-        if (!_isShiftPressed)
-            ChangeBlockSelectionType(true);
         _isShiftPressed = true;
     }
 
@@ -112,83 +114,43 @@ public partial class MiiListPage : UserControlBase
         if (e.Key is not (Key.LeftShift or Key.RightShift or Key.LeftCtrl or Key.RightCtrl))
             return;
 
-        if (_isShiftPressed)
-            ChangeBlockSelectionType(false);
         _isShiftPressed = false;
-    }
-
-    private void ChangeBlockSelectionType(bool multiSelect)
-    {
-        foreach (var miiBlock in MiiList.Children.OfType<MiiBlock>())
-        {
-            var groupName = multiSelect ? Guid.NewGuid().ToString() : "MiiListSingleSelect";
-            miiBlock.GroupName = groupName;
-        }
     }
 
     #endregion
 
     private void ReloadMiiList()
     {
-        var size = 90;
-        var margin = new Thickness(8, 10);
-
-        MiiList.Children.Clear();
-        foreach (var mii in MiiDbService.GetAllMiis().OrderByDescending(m => m.IsFavorite).ToList())
+        _miiEntries.Clear();
+        foreach (var mii in MiiDbService.GetAllMiis().OrderByDescending(m => m.IsFavorite))
         {
-            var miiBlock = new MiiBlock
-            {
-                Mii = mii,
-                Width = size,
-                Height = size,
-                Margin = margin,
-            };
-            miiBlock.Click += (_, _) => ChangeTopButtons();
-
-            miiBlock.ContextMenu = new ContextMenu();
-            var favHeader = mii.IsFavorite ? Common.Action_Unfavorite : Common.Action_Favorite;
-            miiBlock.ContextMenu.Items.Add(
-                new MenuItem { Header = favHeader, Command = new MyCommand(() => ContextAction(mii, ToggleFavorite)) }
-            );
-            miiBlock.ContextMenu.Items.Add(new MenuItem { Header = Common.Action_Edit, Command = new MyCommand(() => EditMii(mii)) });
-            miiBlock.ContextMenu.Items.Add(
-                new MenuItem { Header = "Duplicate", Command = new MyCommand(() => ContextAction(mii, DuplicateMii)) }
-            );
-            miiBlock.ContextMenu.Items.Add(
-                new MenuItem { Header = Common.Action_Export, Command = new MyCommand(() => ContextAction(mii, ExportMultipleMiiFiles)) }
-            );
-            miiBlock.ContextMenu.Items.Add(
-                new MenuItem { Header = Common.Action_Delete, Command = new MyCommand(() => ContextAction(mii, DeleteMii)) }
-            );
-
-            MiiList.Children.Add(miiBlock);
+            _miiEntries.Add(new MiiListEntry(mii));
         }
 
-        var count = MiiList.Children.Count;
+        var count = _miiEntries.Count;
         ListItemCount.Text = count.ToString();
 
+        if (count < 100)
+            _miiEntries.Add(MiiListEntry.CreateAddEntry());
+
+        RebuildRows();
         ChangeTopButtons();
-        if (count >= 100)
-            return;
+    }
 
-        var addBlock = new MiiBlock
+    private void RebuildRows()
+    {
+        MiiRows.Clear();
+        for (var i = 0; i < _miiEntries.Count; i += 4)
         {
-            Width = size,
-            Height = size,
-            Margin = margin,
-        };
-        addBlock.Click += (_, _) =>
-        {
-            foreach (var miiBlock in MiiList.Children.OfType<MiiBlock>())
-            {
-                miiBlock.IsChecked = false;
-            }
+            var chunk = _miiEntries.Skip(i).Take(4).ToList();
+            MiiRows.Add(new MiiListRow(chunk));
+        }
+    }
 
-            ChangeTopButtons();
-            CreateNewMii();
-        };
-
-        MiiList.Children.Add(addBlock);
+    private void ClearSelectedEntries()
+    {
+        foreach (var entry in _miiEntries)
+            entry.IsSelected = false;
     }
 
     private async void DeleteMii_OnClick(object? sender, RoutedEventArgs e) => DeleteMii(GetSelectedMiis());
@@ -244,6 +206,73 @@ public partial class MiiListPage : UserControlBase
         }
 
         ReloadMiiList();
+    }
+
+    private void MiiBlock_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MiiBlock { DataContext: MiiListEntry entry })
+            return;
+
+        if (entry.IsAddEntry)
+        {
+            ClearSelectedEntries();
+            ChangeTopButtons();
+            CreateNewMii();
+            return;
+        }
+
+        if (!_isShiftPressed)
+        {
+            var shouldSelectThis = entry.IsSelected;
+            foreach (var item in _miiEntries)
+                item.IsSelected = false;
+
+            entry.IsSelected = shouldSelectThis;
+        }
+
+        ChangeTopButtons();
+    }
+
+    private void FavoriteContextMenu_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TryGetMenuMii(sender, out var mii))
+            ContextAction(mii, ToggleFavorite);
+    }
+
+    private void EditContextMenu_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TryGetMenuMii(sender, out var mii))
+            EditMii(mii);
+    }
+
+    private void DuplicateContextMenu_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TryGetMenuMii(sender, out var mii))
+            ContextAction(mii, DuplicateMii);
+    }
+
+    private void ExportContextMenu_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TryGetMenuMii(sender, out var mii))
+            ContextAction(mii, ExportMultipleMiiFiles);
+    }
+
+    private void DeleteContextMenu_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TryGetMenuMii(sender, out var mii))
+            ContextAction(mii, DeleteMii);
+    }
+
+    private static bool TryGetMenuMii(object? sender, out Mii mii)
+    {
+        if (sender is MenuItem { CommandParameter: MiiListEntry { Mii: not null } entry })
+        {
+            mii = entry.Mii!;
+            return true;
+        }
+
+        mii = null!;
+        return false;
     }
 
     private async void ToggleFavorite(Mii[] miis)
@@ -462,11 +491,7 @@ public partial class MiiListPage : UserControlBase
 
     private Mii[] GetSelectedMiis()
     {
-        var selected = MiiList
-            .Children.OfType<MiiBlock>()
-            .Where(block => block is { IsChecked: true, Mii: not null })
-            .Select(block => block.Mii!);
-        return selected.ToArray();
+        return _miiEntries.Where(entry => entry is { IsSelected: true, Mii: not null }).Select(entry => entry.Mii!).ToArray();
     }
 
     private void ChangeTopButtons()
@@ -496,8 +521,6 @@ public partial class MiiListPage : UserControlBase
             FavoriteMiiButton.Classes.Add("UnFav");
     }
 
-    #region Command
-
     private void ContextAction(Mii mii, Action<Mii[]> command)
     {
         var selectedMiis = GetSelectedMiis();
@@ -506,15 +529,36 @@ public partial class MiiListPage : UserControlBase
         command.Invoke(selectedMiis.Contains(mii) ? selectedMiis : [mii]);
     }
 
-    // There must be a better way to do this. Since this seems absurd
-    private class MyCommand(Action command) : ICommand
+    public sealed class MiiListRow(List<MiiListEntry> items)
     {
-        public bool CanExecute(object? parameter) => true;
-
-        public void Execute(object? parameter) => command.Invoke();
-
-        public event EventHandler? CanExecuteChanged;
+        public IReadOnlyList<MiiListEntry> Items { get; } = items;
     }
 
-    #endregion
+    public sealed class MiiListEntry(Mii? mii, bool isAddEntry = false) : INotifyPropertyChanged
+    {
+        private bool _isSelected;
+
+        public Mii? Mii { get; } = mii;
+        public bool IsAddEntry { get; } = isAddEntry;
+        public bool HasMii => Mii != null;
+        public string SelectionGroup { get; } = Guid.NewGuid().ToString("N");
+        public string FavoriteActionHeader => Mii?.IsFavorite == true ? Common.Action_Unfavorite : Common.Action_Favorite;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected == value)
+                    return;
+
+                _isSelected = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+            }
+        }
+
+        public static MiiListEntry CreateAddEntry() => new(null, true);
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
 }

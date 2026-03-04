@@ -21,6 +21,16 @@ public static class MiiImageVariants
         Size = MiiImageSpecifications.ImageSize.medium,
     };
 
+    public static readonly MiiImageSpecifications MiiListTile = new()
+    {
+        Name = "MiiListTile",
+        Expression = MiiImageSpecifications.FaceExpression.normal,
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.tiny,
+        CachePriority = CacheItemPriority.Low,
+        ExpirationSeconds = TimeSpan.FromMinutes(8),
+    };
+
     public static readonly MiiImageSpecifications OnlinePlayerSmall = new()
     {
         Name = "OnlinePlayerSmall",
@@ -36,7 +46,7 @@ public static class MiiImageVariants
         Expression = MiiImageSpecifications.FaceExpression.normal,
         Type = MiiImageSpecifications.BodyType.face,
         Size = MiiImageSpecifications.ImageSize.medium,
-        ExpirationSeconds = TimeSpan.FromSeconds(30),
+        ExpirationSeconds = TimeSpan.Zero,
         CachePriority = CacheItemPriority.Low,
     };
     public static readonly MiiImageSpecifications MiiEditorPreviewCarousel = new()
@@ -46,7 +56,7 @@ public static class MiiImageVariants
         Type = MiiImageSpecifications.BodyType.all_body,
         Size = MiiImageSpecifications.ImageSize.medium,
         CachePriority = CacheItemPriority.Low,
-        ExpirationSeconds = TimeSpan.FromSeconds(30),
+        ExpirationSeconds = TimeSpan.Zero,
         InstanceCount = 1,
     };
 

@@ -9,6 +9,8 @@ namespace WheelWizard.Views.Patterns;
 
 public partial class MiiImageLoaderWithHover : BaseMiiImage
 {
+    private bool _hasLoadedHoverVariant;
+
     public static readonly StyledProperty<bool> IsHoveredProperty = AvaloniaProperty.Register<MiiImageLoaderWithHover, bool>(
         nameof(IsHovered),
         false
@@ -116,12 +118,9 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
     private static MiiImageSpecifications? CoerceHoverVariant(AvaloniaObject o, MiiImageSpecifications? value)
     {
         var loader = (MiiImageLoaderWithHover)o;
-        // Reload both variants when hover variant changes (if Mii is already set)
-        // If Mii is not set yet, OnMiiChanged will handle the reload
-        if (loader.Mii != null && value != null)
-        {
-            loader.ReloadBothVariants();
-        }
+        loader._hasLoadedHoverVariant = false;
+        if (loader.Mii != null)
+            loader.ReloadPrimaryVariant();
         return value;
     }
 
@@ -145,6 +144,8 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
 
         if (change.Property == IsHoveredProperty)
         {
+            if (IsHovered)
+                TryLoadHoverVariant();
             UpdateImageVisibility();
         }
     }
@@ -159,14 +160,18 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
 
     private void OnVariantChanged(MiiImageSpecifications newSpecifications)
     {
-        ReloadBothVariants();
+        _hasLoadedHoverVariant = false;
+        ReloadPrimaryVariant();
+        if (IsHovered)
+            TryLoadHoverVariant();
     }
 
     protected override void OnMiiChanged(Mii? newMii)
     {
-        // Always reload both variants when Mii changes
-        // This ensures both images are loaded even if hover variant is set later
-        ReloadBothVariants();
+        _hasLoadedHoverVariant = false;
+        ReloadPrimaryVariant();
+        if (IsHovered)
+            TryLoadHoverVariant();
     }
 
     public void ReloadBothVariants()
@@ -185,6 +190,20 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
             variants.Add(HoverVariant);
         }
 
+        _hasLoadedHoverVariant = HoverVariant != null;
         ReloadImages(Mii, variants);
+    }
+
+    private void ReloadPrimaryVariant()
+    {
+        ReloadImages(Mii, [ImageVariant]);
+    }
+
+    private void TryLoadHoverVariant()
+    {
+        if (Mii == null || HoverVariant == null || _hasLoadedHoverVariant)
+            return;
+
+        ReloadBothVariants();
     }
 }

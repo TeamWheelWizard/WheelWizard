@@ -60,6 +60,7 @@ public class MiiImageSpecifications
 
     public enum ImageSize
     {
+        tiny = 128,
         small = 270,
         medium = 512,
     }

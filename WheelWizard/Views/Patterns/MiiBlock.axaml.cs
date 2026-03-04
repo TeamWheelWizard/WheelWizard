@@ -58,16 +58,11 @@ public class MiiBlock : RadioButton
         if (_miiImageLoader != null)
         {
             // Create hover variant with smile expression
-            var hoverVariant = MiiImageVariants.MiiBlockProfile.Clone();
+            var hoverVariant = MiiImageVariants.MiiListTile.Clone();
             hoverVariant.Name = "MiiBlockProfileHover";
             hoverVariant.Expression = MiiImageSpecifications.FaceExpression.smile;
+            hoverVariant.ExpirationSeconds = TimeSpan.Zero;
             _miiImageLoader.HoverVariant = hoverVariant;
-
-            // If Mii is already set, trigger reload
-            if (Mii != null)
-            {
-                _miiImageLoader.ReloadBothVariants();
-            }
         }
     }
 
@@ -76,9 +71,10 @@ public class MiiBlock : RadioButton
         if (_miiImageLoader != null)
         {
             // Create hover variant with smile expression
-            var hoverVariant = MiiImageVariants.MiiBlockProfile.Clone();
+            var hoverVariant = MiiImageVariants.MiiListTile.Clone();
             hoverVariant.Name = "MiiBlockProfileHover";
             hoverVariant.Expression = MiiImageSpecifications.FaceExpression.smile;
+            hoverVariant.ExpirationSeconds = TimeSpan.Zero;
             _miiImageLoader.HoverVariant = hoverVariant;
         }
     }
@@ -98,11 +94,6 @@ public class MiiBlock : RadioButton
             if (_miiImageLoader != null)
             {
                 SetupHoverVariant();
-                // Trigger reload if Mii is set
-                if (mii != null)
-                {
-                    _miiImageLoader.ReloadBothVariants();
-                }
             }
         }
 

@@ -38,6 +38,12 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
     private static string? _managedArchivePath;
     private static readonly object HeadDrawCacheLock = new();
     private static readonly Dictionary<string, CachedHeadDrawParams> HeadDrawCache = new(StringComparer.Ordinal);
+    private static readonly Dictionary<string, LinkedListNode<string>> HeadDrawCacheNodes = new(StringComparer.Ordinal);
+    private static readonly LinkedList<string> HeadDrawCacheLru = new();
+    private const int MaxHeadDrawCacheEntries = 96;
+    private static readonly object CharInfoCacheLock = new();
+    private static readonly Dictionary<string, FflNativeInterop.FFLiCharInfo> StudioCharInfoCache = new(StringComparer.Ordinal);
+    private const int MaxStudioCharInfoCacheEntries = 512;
 
     private static readonly Vector3 LightAmbient = new(0.73f, 0.73f, 0.73f);
     private static readonly Vector3 LightDiffuse = new(0.60f, 0.60f, 0.60f);
@@ -208,11 +214,11 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         if (cancellationToken.IsCancellationRequested)
             return Fail("Mii render cancelled.");
 
-        var decodeResult = DecodeStudioData(studioData);
-        if (decodeResult.IsFailure)
-            return decodeResult.Error!;
+        var charInfoResult = GetOrCreateCharInfo(studioData);
+        if (charInfoResult.IsFailure)
+            return charInfoResult.Error!;
 
-        var charInfo = MapStudioDataToCharInfo(decodeResult.Value);
+        var charInfo = charInfoResult.Value;
         var expressionId = MapExpression(request.Expression);
 
         var cachedHeadResult = GetOrCreateCachedHeadDrawParams(
@@ -369,7 +375,10 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         lock (HeadDrawCacheLock)
         {
             if (HeadDrawCache.TryGetValue(key, out var cached))
+            {
+                TouchHeadDrawCacheKey_NoLock(key);
                 return cached;
+            }
         }
 
         var arena = new RenderAllocationTracker();
@@ -397,12 +406,47 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         {
             if (HeadDrawCache.TryGetValue(key, out var existing))
             {
+                TouchHeadDrawCacheKey_NoLock(key);
                 created.Dispose();
                 return existing;
             }
 
             HeadDrawCache[key] = created;
+            TouchHeadDrawCacheKey_NoLock(key);
+            EvictHeadDrawCacheIfNeeded_NoLock();
             return created;
+        }
+    }
+
+    private static void TouchHeadDrawCacheKey_NoLock(string key)
+    {
+        if (HeadDrawCacheNodes.TryGetValue(key, out var node))
+        {
+            if (!ReferenceEquals(HeadDrawCacheLru.Last, node))
+            {
+                HeadDrawCacheLru.Remove(node);
+                HeadDrawCacheLru.AddLast(node);
+            }
+
+            return;
+        }
+
+        HeadDrawCacheNodes[key] = HeadDrawCacheLru.AddLast(key);
+    }
+
+    private static void EvictHeadDrawCacheIfNeeded_NoLock()
+    {
+        while (HeadDrawCache.Count > MaxHeadDrawCacheEntries)
+        {
+            var oldestNode = HeadDrawCacheLru.First;
+            if (oldestNode == null)
+                return;
+
+            HeadDrawCacheLru.RemoveFirst();
+            var oldestKey = oldestNode.Value;
+            HeadDrawCacheNodes.Remove(oldestKey);
+            if (HeadDrawCache.Remove(oldestKey, out var evicted))
+                evicted.Dispose();
         }
     }
 
@@ -663,6 +707,33 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
 
     private static float ReadSingle(byte[] bytes, int offset) => BitConverter.Int32BitsToSingle(ReadInt32(bytes, offset));
 
+    private static OperationResult<FflNativeInterop.FFLiCharInfo> GetOrCreateCharInfo(string studioData)
+    {
+        lock (CharInfoCacheLock)
+        {
+            if (StudioCharInfoCache.TryGetValue(studioData, out var cached))
+                return cached;
+        }
+
+        var decodeResult = DecodeStudioData(studioData);
+        if (decodeResult.IsFailure)
+            return decodeResult.Error!;
+
+        var mapped = MapStudioDataToCharInfo(decodeResult.Value);
+        lock (CharInfoCacheLock)
+        {
+            if (StudioCharInfoCache.Count >= MaxStudioCharInfoCacheEntries)
+                StudioCharInfoCache.Clear();
+
+            if (!StudioCharInfoCache.TryGetValue(studioData, out var existing))
+                StudioCharInfoCache[studioData] = mapped;
+            else
+                mapped = existing;
+        }
+
+        return mapped;
+    }
+
     private static OperationResult<byte[]> DecodeStudioData(string studioHex)
     {
         if (string.IsNullOrWhiteSpace(studioHex))
@@ -671,16 +742,20 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         if (studioHex.Length % 2 != 0)
             return Fail("Studio data hex length is invalid.");
 
-        var encoded = new byte[studioHex.Length / 2];
-        for (var i = 0; i < encoded.Length; i++)
-        {
-            var hex = studioHex.Substring(i * 2, 2);
-            if (!byte.TryParse(hex, System.Globalization.NumberStyles.HexNumber, null, out encoded[i]))
-                return Fail("Studio data is not valid hex.");
-        }
+        var encodedLength = studioHex.Length / 2;
+        if (encodedLength != 47)
+            return Fail($"Studio data must decode to 47 bytes but got {encodedLength}.");
 
-        if (encoded.Length != 47)
-            return Fail($"Studio data must decode to 47 bytes but got {encoded.Length}.");
+        var encoded = new byte[encodedLength];
+        for (var i = 0; i < encodedLength; i++)
+        {
+            var high = HexToNibble(studioHex[i * 2]);
+            var low = HexToNibble(studioHex[i * 2 + 1]);
+            if (high < 0 || low < 0)
+                return Fail("Studio data is not valid hex.");
+
+            encoded[i] = (byte)((high << 4) | low);
+        }
 
         var decoded = new byte[46];
         var previous = encoded[0];
@@ -694,6 +769,18 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         }
 
         return decoded;
+    }
+
+    private static int HexToNibble(char value)
+    {
+        if ((uint)(value - '0') <= 9u)
+            return value - '0';
+
+        value = (char)(value | 0x20);
+        if ((uint)(value - 'a') <= 5u)
+            return value - 'a' + 10;
+
+        return -1;
     }
 
     private static FflNativeInterop.FFLiCharInfo MapStudioDataToCharInfo(byte[] studio)
@@ -2605,7 +2692,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             material,
             FflNativeInterop.ParameterModeDefault1,
             constantColor: color,
-            hasTangent: false
+            hasTangent: false,
+            modulateContext: default
         );
     }
 
@@ -2685,7 +2773,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             drawMesh.Material,
             drawMesh.VertexParameters.Mode,
             constantColor: null,
-            hasTangent: drawMesh.HasTangent
+            hasTangent: drawMesh.HasTangent,
+            modulateContext: BuildModulateContext(drawMesh.DrawParam.modulateParam)
         );
     }
 
@@ -2745,7 +2834,16 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         }
 
         var hasTangent = drawParam.attributeBufferParam.tangent.ptr != IntPtr.Zero && drawParam.attributeBufferParam.tangent.stride > 0;
-        return new PreparedMesh(drawParam, vertices, indices, material, parameterData.Mode, constantColor: null, hasTangent: hasTangent);
+        return new PreparedMesh(
+            drawParam,
+            vertices,
+            indices,
+            material,
+            parameterData.Mode,
+            constantColor: null,
+            hasTangent: hasTangent,
+            modulateContext: BuildModulateContext(drawParam.modulateParam)
+        );
     }
 
     private static void RasterizeMesh(
@@ -2820,42 +2918,49 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         if (cullMode == FflNativeInterop.FflCullFront && area <= 0f)
             return;
 
-        var minX = Math.Clamp(
-            (int)MathF.Floor(MathF.Min(a.ScreenPosition.X, MathF.Min(b.ScreenPosition.X, c.ScreenPosition.X))),
-            0,
-            outputWidth - 1
-        );
-        var maxX = Math.Clamp(
-            (int)MathF.Ceiling(MathF.Max(a.ScreenPosition.X, MathF.Max(b.ScreenPosition.X, c.ScreenPosition.X))),
-            0,
-            outputWidth - 1
-        );
-        var minY = Math.Clamp(
-            (int)MathF.Floor(MathF.Min(a.ScreenPosition.Y, MathF.Min(b.ScreenPosition.Y, c.ScreenPosition.Y))),
-            0,
-            outputHeight - 1
-        );
-        var maxY = Math.Clamp(
-            (int)MathF.Ceiling(MathF.Max(a.ScreenPosition.Y, MathF.Max(b.ScreenPosition.Y, c.ScreenPosition.Y))),
-            0,
-            outputHeight - 1
-        );
+        var ax = a.ScreenPosition.X;
+        var ay = a.ScreenPosition.Y;
+        var bx = b.ScreenPosition.X;
+        var by = b.ScreenPosition.Y;
+        var cx = c.ScreenPosition.X;
+        var cy = c.ScreenPosition.Y;
+
+        var minX = Math.Clamp((int)MathF.Floor(MathF.Min(ax, MathF.Min(bx, cx))), 0, outputWidth - 1);
+        var maxX = Math.Clamp((int)MathF.Ceiling(MathF.Max(ax, MathF.Max(bx, cx))), 0, outputWidth - 1);
+        var minY = Math.Clamp((int)MathF.Floor(MathF.Min(ay, MathF.Min(by, cy))), 0, outputHeight - 1);
+        var maxY = Math.Clamp((int)MathF.Ceiling(MathF.Max(ay, MathF.Max(by, cy))), 0, outputHeight - 1);
 
         var invArea = 1f / area;
+        var sampleX = minX + 0.5f;
+        var sampleY = minY + 0.5f;
+
+        var e0x = by - cy;
+        var e0y = cx - bx;
+        var e0c = bx * cy - by * cx;
+        var e1x = cy - ay;
+        var e1y = ax - cx;
+        var e1c = cx * ay - cy * ax;
+        var e2x = ay - by;
+        var e2y = bx - ax;
+        var e2c = ax * by - ay * bx;
+
+        var e0Row = e0x * sampleX + e0y * sampleY + e0c;
+        var e1Row = e1x * sampleX + e1y * sampleY + e1c;
+        var e2Row = e2x * sampleX + e2y * sampleY + e2c;
 
         for (var y = minY; y <= maxY; y++)
         {
+            var e0 = e0Row;
+            var e1 = e1Row;
+            var e2 = e2Row;
+            var pixelIndex = y * outputWidth + minX;
+
             for (var x = minX; x <= maxX; x++)
             {
-                var p = new Vector2(x + 0.5f, y + 0.5f);
-                var e0 = Cross2D(b.ScreenPosition, c.ScreenPosition, p);
-                var e1 = Cross2D(c.ScreenPosition, a.ScreenPosition, p);
-                var e2 = Cross2D(a.ScreenPosition, b.ScreenPosition, p);
-
                 var hasNegative = e0 < 0f || e1 < 0f || e2 < 0f;
                 var hasPositive = e0 > 0f || e1 > 0f || e2 > 0f;
                 if (hasNegative && hasPositive)
-                    continue;
+                    goto NextPixel;
 
                 var w0 = e0 * invArea;
                 var w1 = e1 * invArea;
@@ -2863,18 +2968,13 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
 
                 var perspectiveDenominator = w0 * a.InvW + w1 * b.InvW + w2 * c.InvW;
                 if (MathF.Abs(perspectiveDenominator) < 1e-8f)
-                    continue;
+                    goto NextPixel;
 
                 var depthValue = (w0 * a.Depth * a.InvW + w1 * b.Depth * b.InvW + w2 * c.Depth * c.InvW) / perspectiveDenominator;
                 if (depthValue is < 0f or > 1f)
-                    continue;
-
-                var pixelIndex = y * outputWidth + x;
-                if (depth != null)
-                {
-                    if (depthValue > depth[pixelIndex])
-                        continue;
-                }
+                    goto NextPixel;
+                if (depth != null && depthValue > depth[pixelIndex])
+                    goto NextPixel;
 
                 var uv = (w0 * a.Texcoord * a.InvW + w1 * b.Texcoord * b.InvW + w2 * c.Texcoord * c.InvW) / perspectiveDenominator;
                 var viewPosition =
@@ -2886,12 +2986,22 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
 
                 var color = EvaluateModulateColor(mesh, uv, viewPosition, normal, tangent, parameter, lightEnabled);
                 if (color.W <= 0f)
-                    continue;
+                    goto NextPixel;
 
-                BlendPixel(target, outputWidth, x, y, color, blendMode);
+                BlendPixel(target, pixelIndex * 4, color, blendMode);
                 if (depth != null)
                     depth[pixelIndex] = depthValue;
+
+                NextPixel:
+                e0 += e0x;
+                e1 += e1x;
+                e2 += e2x;
+                pixelIndex++;
             }
+
+            e0Row += e0y;
+            e1Row += e1y;
+            e2Row += e2y;
         }
     }
 
@@ -2912,29 +3022,36 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         }
         else
         {
-            var modulate = mesh.DrawParam.modulateParam;
-            var textureColor = SampleTexture(modulate.pTexture2D, uv);
-            var colorR = ReadColor(modulate.pColorR);
-            var colorG = ReadColor(modulate.pColorG);
-            var colorB = ReadColor(modulate.pColorB);
+            var modulate = mesh.ModulateContext;
+            var textureColor = SampleTexture(modulate.Texture, uv);
 
-            baseColor = modulate.mode switch
+            baseColor = modulate.Mode switch
             {
-                0 => new Vector4(colorR.X, colorR.Y, colorR.Z, 1f),
+                0 => new Vector4(modulate.ColorR.X, modulate.ColorR.Y, modulate.ColorR.Z, 1f),
                 1 => textureColor,
                 2 => new Vector4(
-                    textureColor.X * colorR.X + textureColor.Y * colorG.X + textureColor.Z * colorB.X,
-                    textureColor.X * colorR.Y + textureColor.Y * colorG.Y + textureColor.Z * colorB.Y,
-                    textureColor.X * colorR.Z + textureColor.Y * colorG.Z + textureColor.Z * colorB.Z,
+                    textureColor.X * modulate.ColorR.X + textureColor.Y * modulate.ColorG.X + textureColor.Z * modulate.ColorB.X,
+                    textureColor.X * modulate.ColorR.Y + textureColor.Y * modulate.ColorG.Y + textureColor.Z * modulate.ColorB.Y,
+                    textureColor.X * modulate.ColorR.Z + textureColor.Y * modulate.ColorG.Z + textureColor.Z * modulate.ColorB.Z,
                     textureColor.W
                 ),
-                3 => new Vector4(colorR.X, colorR.Y, colorR.Z, textureColor.X),
-                4 => new Vector4(textureColor.Y * colorR.X, textureColor.Y * colorR.Y, textureColor.Y * colorR.Z, textureColor.X),
-                5 => new Vector4(textureColor.X * colorR.X, textureColor.X * colorR.Y, textureColor.X * colorR.Z, 1f),
+                3 => new Vector4(modulate.ColorR.X, modulate.ColorR.Y, modulate.ColorR.Z, textureColor.X),
+                4 => new Vector4(
+                    textureColor.Y * modulate.ColorR.X,
+                    textureColor.Y * modulate.ColorR.Y,
+                    textureColor.Y * modulate.ColorR.Z,
+                    textureColor.X
+                ),
+                5 => new Vector4(
+                    textureColor.X * modulate.ColorR.X,
+                    textureColor.X * modulate.ColorR.Y,
+                    textureColor.X * modulate.ColorR.Z,
+                    1f
+                ),
                 _ => Vector4.One,
             };
 
-            if (modulate.mode != 0 && baseColor.W <= 0f)
+            if (modulate.Mode != 0 && baseColor.W <= 0f)
                 return Vector4.Zero;
         }
 
@@ -2942,7 +3059,6 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             return new Vector4(Clamp01(baseColor.X), Clamp01(baseColor.Y), Clamp01(baseColor.Z), Clamp01(baseColor.W));
 
         var n = NormalizeOrDefault(normal, new Vector3(0f, 0f, 1f));
-        var t = NormalizeOrDefault(tangent, new Vector3(1f, 0f, 0f));
         var eye = NormalizeOrDefault(-viewPosition, new Vector3(0f, 0f, 1f));
         var light = LightDirection;
 
@@ -2951,9 +3067,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
 
         var specularPower = mesh.Material.SpecularPower;
         var blinn = MathF.Pow(MathF.Max(Vector3.Dot(Vector3.Reflect(-light, n), eye), 0f), specularPower);
-        var specularMode = mesh.Material.SpecularMode;
-        if (!mesh.HasTangent)
-            specularMode = FflNativeInterop.SpecularModeBlinn;
+        var specularMode = mesh.HasTangent ? mesh.Material.SpecularMode : FflNativeInterop.SpecularModeBlinn;
 
         var strength = parameter.Y;
         float reflection;
@@ -2964,6 +3078,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         }
         else
         {
+            var t = NormalizeOrDefault(tangent, new Vector3(1f, 0f, 0f));
             var dotLt = Vector3.Dot(light, t);
             var dotVt = Vector3.Dot(eye, t);
             var dotLn = MathF.Sqrt(MathF.Max(0f, 1f - dotLt * dotLt));
@@ -2980,34 +3095,31 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         return new Vector4(Clamp01(lit.X), Clamp01(lit.Y), Clamp01(lit.Z), Clamp01(baseColor.W));
     }
 
-    private static Vector4 SampleTexture(IntPtr textureHandle, Vector2 uv)
+    private static Vector4 SampleTexture(TextureData? texture, Vector2 uv)
     {
-        if (textureHandle == IntPtr.Zero || textureHandle == FflNativeInterop.FflTexturePlaceholder)
+        if (texture is not { } resolvedTexture)
             return new(1f, 1f, 1f, 1f);
 
-        if (!TextureRegistry.TryGet(textureHandle, out var texture))
-            return new(1f, 1f, 1f, 1f);
-
-        if (texture.Width <= 1 || texture.Height <= 1)
-            return ReadTextureTexel(texture, 0, 0);
+        if (resolvedTexture.Width <= 1 || resolvedTexture.Height <= 1)
+            return ReadTextureTexel(resolvedTexture, 0, 0);
 
         var u = MirrorRepeat(uv.X);
         var v = MirrorRepeat(uv.Y);
-        var fx = u * (texture.Width - 1);
-        var fy = v * (texture.Height - 1);
+        var fx = u * (resolvedTexture.Width - 1);
+        var fy = v * (resolvedTexture.Height - 1);
 
-        var x0 = Math.Clamp((int)MathF.Floor(fx), 0, texture.Width - 1);
-        var y0 = Math.Clamp((int)MathF.Floor(fy), 0, texture.Height - 1);
-        var x1 = Math.Min(x0 + 1, texture.Width - 1);
-        var y1 = Math.Min(y0 + 1, texture.Height - 1);
+        var x0 = Math.Clamp((int)MathF.Floor(fx), 0, resolvedTexture.Width - 1);
+        var y0 = Math.Clamp((int)MathF.Floor(fy), 0, resolvedTexture.Height - 1);
+        var x1 = Math.Min(x0 + 1, resolvedTexture.Width - 1);
+        var y1 = Math.Min(y0 + 1, resolvedTexture.Height - 1);
 
         var tx = fx - x0;
         var ty = fy - y0;
 
-        var c00 = ReadTextureTexel(texture, x0, y0);
-        var c10 = ReadTextureTexel(texture, x1, y0);
-        var c01 = ReadTextureTexel(texture, x0, y1);
-        var c11 = ReadTextureTexel(texture, x1, y1);
+        var c00 = ReadTextureTexel(resolvedTexture, x0, y0);
+        var c10 = ReadTextureTexel(resolvedTexture, x1, y0);
+        var c01 = ReadTextureTexel(resolvedTexture, x0, y1);
+        var c11 = ReadTextureTexel(resolvedTexture, x1, y1);
 
         var c0 = Vector4.Lerp(c00, c10, tx);
         var c1 = Vector4.Lerp(c01, c11, tx);
@@ -3267,6 +3379,27 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         return MaterialTable[modulateType];
     }
 
+    private static MeshModulateContext BuildModulateContext(FflNativeInterop.FFLModulateParam modulate)
+    {
+        TextureData? texture = null;
+        if (
+            modulate.pTexture2D != IntPtr.Zero
+            && modulate.pTexture2D != FflNativeInterop.FflTexturePlaceholder
+            && TextureRegistry.TryGet(modulate.pTexture2D, out var resolvedTexture)
+        )
+        {
+            texture = resolvedTexture;
+        }
+
+        return new MeshModulateContext(
+            modulate.mode,
+            ReadColor(modulate.pColorR),
+            ReadColor(modulate.pColorG),
+            ReadColor(modulate.pColorB),
+            texture
+        );
+    }
+
     private static ViewParameters ResolveViewParameters(NativeMiiRenderRequest request, FflNativeInterop.FFLiCharInfo charInfo)
     {
         static Matrix4x4 BuildProjection(float near, float far, float fovyDegrees, float aspect) =>
@@ -3403,11 +3536,21 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         return rgba;
     }
 
-    private static void BlendPixel(byte[] target, int width, int x, int y, Vector4 src, BlendMode blendMode)
+    private static void BlendPixel(byte[] target, int i, Vector4 src, BlendMode blendMode)
     {
-        var i = (y * width + x) * 4;
-
         var srcA = Math.Clamp(src.W, 0f, 1f);
+        if (srcA <= 0f)
+            return;
+
+        if (blendMode == BlendMode.Over && srcA >= 0.999f)
+        {
+            target[i + 0] = ToByte01(src.Z);
+            target[i + 1] = ToByte01(src.Y);
+            target[i + 2] = ToByte01(src.X);
+            target[i + 3] = 255;
+            return;
+        }
+
         var dstA = target[i + 3] / 255f;
 
         var dstB = target[i + 0] / 255f;
@@ -3443,10 +3586,10 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                 break;
         }
 
-        target[i + 0] = (byte)Math.Clamp((int)MathF.Round(Clamp01(outB) * 255f), 0, 255);
-        target[i + 1] = (byte)Math.Clamp((int)MathF.Round(Clamp01(outG) * 255f), 0, 255);
-        target[i + 2] = (byte)Math.Clamp((int)MathF.Round(Clamp01(outR) * 255f), 0, 255);
-        target[i + 3] = (byte)Math.Clamp((int)MathF.Round(Clamp01(outA) * 255f), 0, 255);
+        target[i + 0] = ToByte01(outB);
+        target[i + 1] = ToByte01(outG);
+        target[i + 2] = ToByte01(outR);
+        target[i + 3] = ToByte01(outA);
     }
 
     private static Bitmap CreateBitmap(byte[] pixels, int width, int height)
@@ -3460,6 +3603,12 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
 
         using var locked = bitmap.Lock();
         var rowBytes = width * 4;
+        if (locked.RowBytes == rowBytes)
+        {
+            Marshal.Copy(pixels, 0, locked.Address, rowBytes * height);
+            return bitmap;
+        }
+
         for (var y = 0; y < height; y++)
         {
             var sourceOffset = y * rowBytes;
@@ -3482,6 +3631,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
     }
 
     private static float Clamp01(float value) => Math.Clamp(value, 0f, 1f);
+
+    private static byte ToByte01(float value) => (byte)Math.Clamp((int)MathF.Round(Clamp01(value) * 255f), 0, 255);
 
     private enum BlendMode
     {
@@ -3608,7 +3759,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         MaterialInfo material,
         int parameterMode,
         Vector4? constantColor,
-        bool hasTangent
+        bool hasTangent,
+        MeshModulateContext modulateContext
     )
     {
         public FflNativeInterop.FFLDrawParam DrawParam { get; } = drawParam;
@@ -3618,7 +3770,10 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         public int ParameterMode { get; } = parameterMode;
         public Vector4? ConstantColor { get; } = constantColor;
         public bool HasTangent { get; } = hasTangent;
+        public MeshModulateContext ModulateContext { get; } = modulateContext;
     }
+
+    private readonly record struct MeshModulateContext(int Mode, Vector4 ColorR, Vector4 ColorG, Vector4 ColorB, TextureData? Texture);
 
     private readonly record struct RgbaColor(byte R, byte G, byte B, byte A);
 
