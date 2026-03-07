@@ -1,3 +1,5 @@
+using WheelWizard.Services;
+
 namespace WheelWizard.MiiRendering.Configuration;
 
 public sealed class MiiRenderingConfiguration
@@ -8,6 +10,11 @@ public sealed class MiiRenderingConfiguration
     /// Optional explicit path to the resource file (or directory containing it).
     /// </summary>
     public string? ResourcePath { get; init; }
+
+    /// <summary>
+    /// The managed Wheel Wizard location for the resource file.
+    /// </summary>
+    public string ManagedResourcePath { get; init; } = PathManager.MiiRenderingResourceFilePath;
 
     /// <summary>
     /// Optional extra directories to probe for the resource file.
@@ -27,6 +34,11 @@ public sealed class MiiRenderingConfiguration
             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
         );
 
-        return new MiiRenderingConfiguration { ResourcePath = configuredPath, AdditionalSearchDirectories = configuredDirectories };
+        return new MiiRenderingConfiguration
+        {
+            ResourcePath = configuredPath,
+            ManagedResourcePath = PathManager.MiiRenderingResourceFilePath,
+            AdditionalSearchDirectories = configuredDirectories,
+        };
     }
 }

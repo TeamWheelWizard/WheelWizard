@@ -22,6 +22,14 @@ public static class Endpoints
     /// </summary>
     public const string GitHubAddress = "https://api.github.com";
 
+    /// <summary>
+    /// The base address for archived external assets.
+    /// </summary>
+    public const string InternetArchiveBaseAddress = "https://web.archive.org";
+
+    public const string MiiRenderingArchivePath =
+        "/web/20180502054513/http://download-cdn.miitomo.com/native/20180125111639/android/v2/asset_model_character_mii_AFLResHigh_2_3_dat.zip";
+
     // TODO: Refactor all the URLs seen below
 
     // Retro Rewind
