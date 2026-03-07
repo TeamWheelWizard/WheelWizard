@@ -793,7 +793,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             parts = new()
             {
                 beardColor = CommonColor(studio[0]),
-                mustacheType = studio[1],
+                beardType = studio[1],
                 eyeScaleY = studio[3],
                 eyeColor = CommonColor(studio[4]),
                 eyeRotate = studio[5],
@@ -829,7 +829,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                 mouthType = studio[38],
                 mouthPositionY = studio[39],
                 mustacheScale = studio[40],
-                beardType = studio[41],
+                mustacheType = studio[41],
                 mustachePositionY = studio[42],
                 noseScale = studio[43],
                 noseType = studio[44],
