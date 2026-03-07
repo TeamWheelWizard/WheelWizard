@@ -1,13 +1,13 @@
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Microsoft.Extensions.Logging;
 using WheelWizard.MiiRendering.Services;
 using WheelWizard.Services;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Views.Popups.Base;
 
-namespace WheelWizard.Views;
+namespace WheelWizard.Views.Popups.Generic;
 
-public partial class MiiRenderingSetupWindow : BaseWindow
+public partial class MiiRenderingSetupPopup : PopupContent
 {
     private readonly TaskCompletionSource<bool> _completionSource = new();
     private CancellationTokenSource? _downloadCancellationTokenSource;
@@ -17,17 +17,12 @@ public partial class MiiRenderingSetupWindow : BaseWindow
     private IMiiRenderingResourceInstaller ResourceInstaller { get; set; } = null!;
 
     [Inject]
-    private ILogger<MiiRenderingSetupWindow> Logger { get; set; } = null!;
+    private ILogger<MiiRenderingSetupPopup> Logger { get; set; } = null!;
 
-    protected override Control InteractionOverlay => DisabledOverlay;
-    protected override Control InteractionContent => MainContent;
-
-    public MiiRenderingSetupWindow()
+    public MiiRenderingSetupPopup()
+        : base(true, false, true, "Wheel Wizard")
     {
         InitializeComponent();
-        AddLayer();
-
-        Title = "Wheel Wizard";
         PathTextBlock.Text = PathManager.MiiRenderingResourceFilePath;
         StatusTextBlock.Text = "Download the Mii rendering resource to continue.";
         ProgressTextBlock.Text = "Ready to install.";
@@ -98,12 +93,10 @@ public partial class MiiRenderingSetupWindow : BaseWindow
         Close();
     }
 
-    protected override void OnClosed(EventArgs e)
+    protected override void BeforeClose()
     {
         _downloadCancellationTokenSource?.Cancel();
         _completionSource.TrySetResult(_downloadCompleted);
-        RemoveLayer();
-        base.OnClosed(e);
     }
 
     private void SetBusyState(bool busy, string statusText)

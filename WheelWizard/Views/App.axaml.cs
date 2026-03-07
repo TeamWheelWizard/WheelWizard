@@ -9,6 +9,7 @@ using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Views.Behaviors;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
@@ -104,10 +105,8 @@ public class App : Application
             var resourceInstaller = Services.GetRequiredService<IMiiRenderingResourceInstaller>();
             if (resourceInstaller.GetResolvedResourcePath().IsFailure)
             {
-                var setupWindow = new MiiRenderingSetupWindow();
-                desktop.MainWindow = setupWindow;
-
-                var shouldContinue = await setupWindow.ShowAndAwaitCompletionAsync();
+                var setupPopup = new MiiRenderingSetupPopup();
+                var shouldContinue = await setupPopup.ShowAndAwaitCompletionAsync();
                 if (!shouldContinue)
                 {
                     desktop.Shutdown();

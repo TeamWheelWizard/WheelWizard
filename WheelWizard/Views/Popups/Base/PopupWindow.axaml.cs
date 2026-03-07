@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -93,16 +94,32 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
         CanClose = allowClose;
         WindowTitle = title;
         AllowParentInteraction = allowParentInteraction;
-        var mainWindow = ViewUtils.GetLayout();
-        if (mainWindow.IsVisible)
-            Owner = mainWindow;
 
         InitializeComponent();
         AddLayer();
         DataContext = this;
 
-        Position = mainWindow.Position;
+        var mainWindow = TryGetVisibleMainWindow();
+        if (mainWindow != null)
+        {
+            Owner = mainWindow;
+            Position = mainWindow.Position;
+        }
+        else
+        {
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        }
+
         Loaded += PopupWindow_Loaded;
+    }
+
+    private static Window? TryGetVisibleMainWindow()
+    {
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
+            return null;
+
+        var mainWindow = desktop.MainWindow;
+        return mainWindow is { IsVisible: true } ? mainWindow : null;
     }
 
     private void PopupWindow_Loaded(object? sender, RoutedEventArgs e)

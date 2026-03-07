@@ -16,8 +16,8 @@ public sealed class MiiRenderingResourceInstaller(
 ) : IMiiRenderingResourceInstaller
 {
     private const string ArchiveEntryPath = "asset/model/character/mii/AFLResHigh_2_3.dat";
-    private const string TemporaryArchiveFileName = "ffl-resource-download.zip";
     private const string TemporaryExtractedFileName = "FFLResHigh.dat.partial";
+    private const int MaxDownloadAttempts = 3;
 
     public string ManagedResourcePath => configuration.ManagedResourcePath;
 
@@ -54,32 +54,23 @@ public sealed class MiiRenderingResourceInstaller(
             return Fail("Unable to determine the Mii rendering resource folder.");
 
         fileSystem.Directory.CreateDirectory(targetDirectory);
-
-        var temporaryArchivePath = fileSystem.Path.Combine(targetDirectory, TemporaryArchiveFileName);
         var temporaryExtractedPath = fileSystem.Path.Combine(targetDirectory, TemporaryExtractedFileName);
 
         try
         {
-            progress?.Report(new("Downloading archive", 0, null));
+            var archiveBufferResult = await DownloadArchiveAsync(progress, cancellationToken);
+            if (archiveBufferResult.IsFailure)
+                return archiveBufferResult.Error!;
 
-            using var response = await assetApi.DownloadArchiveAsync(cancellationToken);
-            response.EnsureSuccessStatusCode();
-
-            var totalBytes = response.Content.Headers.ContentLength;
-            await using (var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken))
-            await using (var archiveFileStream = fileSystem.File.Create(temporaryArchivePath))
-            {
-                await CopyWithProgressAsync(responseStream, archiveFileStream, totalBytes, progress, cancellationToken);
-            }
-
-            progress?.Report(new("Extracting resource", totalBytes ?? 0, totalBytes));
-            await ExtractResourceAsync(temporaryArchivePath, temporaryExtractedPath, cancellationToken);
+            var archiveBuffer = archiveBufferResult.Value;
+            progress?.Report(new("Extracting resource", archiveBuffer.Length, archiveBuffer.Length));
+            await ExtractResourceAsync(archiveBuffer, temporaryExtractedPath, cancellationToken);
 
             var validationResult = ValidateExtractedFile(temporaryExtractedPath);
             if (validationResult.IsFailure)
                 return validationResult.Error!;
 
-            progress?.Report(new("Finalizing install", totalBytes ?? 0, totalBytes));
+            progress?.Report(new("Finalizing install", archiveBuffer.Length, archiveBuffer.Length));
             fileSystem.File.Move(temporaryExtractedPath, configuration.ManagedResourcePath, overwrite: true);
 
             logger.LogInformation("Installed Mii rendering resource to {ResourcePath}", configuration.ManagedResourcePath);
@@ -87,14 +78,54 @@ public sealed class MiiRenderingResourceInstaller(
         }
         finally
         {
-            TryDeleteFile(temporaryArchivePath);
             TryDeleteFile(temporaryExtractedPath);
         }
     }
 
-    private async Task ExtractResourceAsync(string archivePath, string extractedPath, CancellationToken cancellationToken)
+    private async Task<OperationResult<byte[]>> DownloadArchiveAsync(
+        IProgress<MiiRenderingInstallerProgress>? progress,
+        CancellationToken cancellationToken
+    )
     {
-        using var archive = ZipFile.OpenRead(archivePath);
+        for (var attempt = 1; attempt <= MaxDownloadAttempts; attempt++)
+        {
+            progress?.Report(new($"Downloading archive (attempt {attempt}/{MaxDownloadAttempts})", 0, null));
+
+            using var response = await assetApi.DownloadArchiveAsync(cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var totalBytes = response.Content.Headers.ContentLength;
+            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            await using var bufferStream = new MemoryStream(totalBytes is > 0 and <= int.MaxValue ? (int)totalBytes.Value : 0);
+
+            var bytesDownloaded = await CopyWithProgressAsync(
+                responseStream,
+                bufferStream,
+                totalBytes,
+                progress,
+                cancellationToken,
+                $"Downloading archive (attempt {attempt}/{MaxDownloadAttempts})"
+            );
+
+            var archiveBytes = bufferStream.ToArray();
+            var validationResult = ValidateArchiveBytes(archiveBytes, totalBytes, bytesDownloaded, attempt);
+            if (validationResult.IsSuccess)
+                return archiveBytes;
+
+            logger.LogWarning(
+                "Downloaded Mii rendering archive was invalid on attempt {Attempt}: {Message}",
+                attempt,
+                validationResult.Error?.Message
+            );
+        }
+
+        return Fail("Failed to download a valid Mii rendering archive after multiple attempts.");
+    }
+
+    private async Task ExtractResourceAsync(byte[] archiveBytes, string extractedPath, CancellationToken cancellationToken)
+    {
+        await using var archiveStream = new MemoryStream(archiveBytes, writable: false);
+        using var archive = new ZipArchive(archiveStream, ZipArchiveMode.Read, leaveOpen: false);
         var entry = archive.GetEntry(ArchiveEntryPath) ?? throw new InvalidDataException($"Archive did not contain '{ArchiveEntryPath}'.");
 
         await using var entryStream = entry.Open();
@@ -116,12 +147,44 @@ public sealed class MiiRenderingResourceInstaller(
         return extractedPath;
     }
 
-    private static async Task CopyWithProgressAsync(
+    private OperationResult ValidateArchiveBytes(byte[] archiveBytes, long? expectedBytes, long actualBytes, int attempt)
+    {
+        if (expectedBytes.HasValue && actualBytes != expectedBytes.Value)
+        {
+            return Fail(
+                $"Downloaded archive size mismatch on attempt {attempt}: expected {expectedBytes.Value} bytes, got {actualBytes} bytes."
+            );
+        }
+
+        if (archiveBytes.Length < 4)
+            return Fail($"Downloaded archive was too small on attempt {attempt}.");
+
+        if (archiveBytes[0] != (byte)'P' || archiveBytes[1] != (byte)'K')
+            return Fail($"Downloaded archive did not have a ZIP signature on attempt {attempt}.");
+
+        try
+        {
+            using var archive = new ZipArchive(new MemoryStream(archiveBytes, writable: false), ZipArchiveMode.Read, leaveOpen: false);
+            _ = archive.GetEntry(ArchiveEntryPath) ?? throw new InvalidDataException($"Archive did not contain '{ArchiveEntryPath}'.");
+            return Ok();
+        }
+        catch (Exception exception)
+        {
+            return new OperationError
+            {
+                Message = $"Downloaded archive was invalid on attempt {attempt}: {exception.Message}",
+                Exception = exception,
+            };
+        }
+    }
+
+    private static async Task<long> CopyWithProgressAsync(
         Stream source,
         Stream destination,
         long? totalBytes,
         IProgress<MiiRenderingInstallerProgress>? progress,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken,
+        string stage
     )
     {
         var buffer = new byte[81920];
@@ -135,8 +198,10 @@ public sealed class MiiRenderingResourceInstaller(
 
             await destination.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
             totalRead += bytesRead;
-            progress?.Report(new("Downloading archive", totalRead, totalBytes));
+            progress?.Report(new(stage, totalRead, totalBytes));
         }
+
+        return totalRead;
     }
 
     private void TryDeleteFile(string path)
