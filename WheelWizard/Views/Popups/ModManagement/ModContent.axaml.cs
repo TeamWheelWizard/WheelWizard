@@ -16,7 +16,6 @@ public record ModItem(Bitmap FullImageUrl);
 
 public partial class ModContent : UserControlBase
 {
-    private bool loading;
     private bool loadingVisual;
     private GameBananaModDetails? CurrentMod { get; set; }
     private string? OverrideDownloadUrl { get; set; }
@@ -71,7 +70,6 @@ public partial class ModContent : UserControlBase
             return false;
         // Set the UI to show loading state
         loadingVisual = true;
-        loading = true;
         ResetVisibility();
 
         // Retrieve the mod details.
@@ -88,7 +86,6 @@ public partial class ModContent : UserControlBase
             NoDetailsView.Title = Phrases.MessageError_FailedRetrieveMod_Title;
             NoDetailsView.BodyText = modDetailsResult.Error.Message;
 
-            loading = false;
             loadingVisual = false;
             ResetVisibility();
             return false;
@@ -115,7 +112,6 @@ public partial class ModContent : UserControlBase
         // If there are no images to load, finish up early
         if (CurrentMod.PreviewMedia?.Images == null || !CurrentMod.PreviewMedia.Images.Any())
         {
-            loading = false;
             loadingVisual = false;
             ResetVisibility();
             return true;
@@ -154,7 +150,6 @@ public partial class ModContent : UserControlBase
         }
 
         // Reset the loading state once all operations have completed
-        loading = false;
         loadingVisual = false;
         ResetVisibility();
 

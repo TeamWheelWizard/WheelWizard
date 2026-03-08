@@ -74,12 +74,13 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
         if (isStringEmpty)
             return;
 
+        var safeQuery = query ?? string.Empty;
         Players.Clear();
         var matchingPlayers = Rooms
             .SelectMany(r => r.Players)
             .Where(p =>
-                p.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
-                || p.FriendCode.Contains(query, StringComparison.OrdinalIgnoreCase)
+                (p.Name?.Contains(safeQuery, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (p.FriendCode?.Contains(safeQuery, StringComparison.OrdinalIgnoreCase) ?? false)
             )
             .Distinct()
             .ToList();
@@ -90,7 +91,7 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
         PlayerListItemCount.Text = matchingPlayers.Count.ToString();
     }
 
-    private void RoomsPage_Unloaded(object sender, RoutedEventArgs e)
+    private void RoomsPage_Unloaded(object? sender, RoutedEventArgs e)
     {
         RRLiveRooms.Instance.Unsubscribe(this);
     }
@@ -135,7 +136,7 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
 
     #region PropertyChanged
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {

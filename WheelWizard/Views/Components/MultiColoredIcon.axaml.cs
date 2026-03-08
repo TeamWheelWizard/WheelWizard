@@ -146,7 +146,7 @@ public class MultiColoredIcon : TemplatedControl
         var originalDrawing = IconData;
         if (originalDrawing?.Drawing is not DrawingGroup originalGroup)
         {
-            ProcessedIconData = originalDrawing;
+            ProcessedIconData = originalDrawing ?? new DrawingImage();
             return;
         }
 

@@ -101,7 +101,7 @@ public class ModManager : INotifyPropertyChanged
         OnPropertyChanged(nameof(Mods));
     }
 
-    private void Mod_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Mod_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (_isBatchUpdating)
             return;
@@ -161,7 +161,7 @@ public class ModManager : INotifyPropertyChanged
             .SetPlaceholderText("Enter mod name...")
             .SetValidation(ValidateModName)
             .ShowDialog();
-        if (!IsValidName(modName))
+        if (string.IsNullOrWhiteSpace(modName) || !IsValidName(modName))
             return;
 
         var tempZipPath = Path.Combine(Path.GetTempPath(), $"{modName}.zip");
@@ -230,7 +230,7 @@ public class ModManager : INotifyPropertyChanged
     // TODO: Use this validation method when refactoring the ModManager
     public OperationResult ValidateModName(string? oldName, string newName)
     {
-        newName = newName?.Trim();
+        newName = (newName ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(newName))
             return Fail("Mod name cannot be empty.");
 
@@ -423,7 +423,7 @@ public class ModManager : INotifyPropertyChanged
         new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Error)
             .SetTitleText("An error occurred")
-            .SetInfoText(errorMessage)
+            .SetInfoText(errorMessage ?? "An unknown error occurred.")
             .Show();
     }
 

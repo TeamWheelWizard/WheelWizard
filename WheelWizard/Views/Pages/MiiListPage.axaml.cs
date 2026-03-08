@@ -153,15 +153,15 @@ public partial class MiiListPage : UserControlBase
             entry.IsSelected = false;
     }
 
-    private async void DeleteMii_OnClick(object? sender, RoutedEventArgs e) => DeleteMii(GetSelectedMiis());
+    private void DeleteMii_OnClick(object? sender, RoutedEventArgs e) => DeleteMii(GetSelectedMiis());
 
-    private async void EditMii_OnClick(object? sender, RoutedEventArgs e) => EditMii(GetSelectedMiis()[0]);
+    private void EditMii_OnClick(object? sender, RoutedEventArgs e) => EditMii(GetSelectedMiis()[0]);
 
-    private async void FavMii_OnClick(object? sender, RoutedEventArgs e) => ToggleFavorite(GetSelectedMiis());
+    private void FavMii_OnClick(object? sender, RoutedEventArgs e) => ToggleFavorite(GetSelectedMiis());
 
-    private async void ExportMii_OnClick(object? sender, RoutedEventArgs e) => ExportMultipleMiiFiles(GetSelectedMiis());
+    private void ExportMii_OnClick(object? sender, RoutedEventArgs e) => ExportMultipleMiiFiles(GetSelectedMiis());
 
-    private async void DuplicateMii_OnClick(object? sender, RoutedEventArgs e) => DuplicateMii(GetSelectedMiis());
+    private void DuplicateMii_OnClick(object? sender, RoutedEventArgs e) => DuplicateMii(GetSelectedMiis());
 
     private async void ImportMii_OnClick(object? sender, RoutedEventArgs e)
     {
@@ -275,7 +275,7 @@ public partial class MiiListPage : UserControlBase
         return false;
     }
 
-    private async void ToggleFavorite(Mii[] miis)
+    private void ToggleFavorite(Mii[] miis)
     {
         var allFavorite = miis.All(m => m.IsFavorite);
 
@@ -296,7 +296,7 @@ public partial class MiiListPage : UserControlBase
         ReloadMiiList();
     }
 
-    private async void ExportMultipleMiiFiles(Mii[] miis)
+    private void ExportMultipleMiiFiles(Mii[] miis)
     {
         if (miis.Length == 0)
         {
