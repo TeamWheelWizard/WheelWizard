@@ -266,7 +266,11 @@ internal sealed class ManagedFflResourceArchive
             {
                 return DecompressWithZlib(compressed);
             }
-            catch
+            catch (InvalidDataException)
+            {
+                return DecompressWithGzip(compressed);
+            }
+            catch (IOException)
             {
                 return DecompressWithGzip(compressed);
             }
