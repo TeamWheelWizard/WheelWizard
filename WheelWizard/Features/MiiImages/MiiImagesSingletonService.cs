@@ -13,17 +13,23 @@ public interface IMiiImagesSingletonService
     Task<OperationResult<Bitmap>> GetImageAsync(Mii? mii, MiiImageSpecifications specifications);
 }
 
-public class MiiImagesSingletonService(IMiiNativeRenderer nativeRenderer, ILogger<MiiImagesSingletonService> logger)
-    : IMiiImagesSingletonService,
-        IDisposable
+public class MiiImagesSingletonService : IMiiImagesSingletonService, IDisposable
 {
     private const long ImageCacheSizeLimitBytes = 64L * 1024L * 1024L;
+    private readonly IMiiNativeRenderer _nativeRenderer;
+    private readonly ILogger<MiiImagesSingletonService> _logger;
     private readonly MemoryCache _imageCache = new(
         new MemoryCacheOptions { SizeLimit = ImageCacheSizeLimitBytes, CompactionPercentage = 0.2 }
     );
 
     // Track in-flight requests to prevent duplicate renders.
     private readonly ConcurrentDictionary<string, Task<OperationResult<Bitmap>>> _inFlightRequests = new();
+
+    public MiiImagesSingletonService(IMiiNativeRenderer nativeRenderer, ILogger<MiiImagesSingletonService> logger)
+    {
+        _nativeRenderer = nativeRenderer;
+        _logger = logger;
+    }
 
     public async Task<OperationResult<Bitmap>> GetImageAsync(Mii? mii, MiiImageSpecifications specifications)
     {
@@ -33,7 +39,7 @@ public class MiiImagesSingletonService(IMiiNativeRenderer nativeRenderer, ILogge
         var data = MiiStudioDataSerializer.Serialize(mii);
         if (data.IsFailure)
         {
-            logger.LogWarning(
+            _logger.LogWarning(
                 "Mii studio serialization failed for image '{ImageName}' ({BodyType}/{Expression}): {Error}",
                 specifications.Name,
                 specifications.Type,
@@ -71,10 +77,10 @@ public class MiiImagesSingletonService(IMiiNativeRenderer nativeRenderer, ILogge
 
     private async Task<OperationResult<Bitmap>> RenderWithoutCacheAsync(Mii mii, string studioData, MiiImageSpecifications specifications)
     {
-        var newImageResult = await nativeRenderer.RenderAsync(mii, studioData, specifications);
+        var newImageResult = await _nativeRenderer.RenderAsync(mii, studioData, specifications);
         if (newImageResult.IsFailure)
         {
-            logger.LogWarning(
+            _logger.LogWarning(
                 "Native Mii render failed for uncached image '{ImageName}' ({BodyType}/{Expression}, size={Size}): {Error}",
                 specifications.Name,
                 specifications.Type,
@@ -102,10 +108,10 @@ public class MiiImagesSingletonService(IMiiNativeRenderer nativeRenderer, ILogge
             return Fail("Cached image is null.");
         }
 
-        var newImageResult = await nativeRenderer.RenderAsync(mii, studioData, specifications);
+        var newImageResult = await _nativeRenderer.RenderAsync(mii, studioData, specifications);
         if (newImageResult.IsFailure)
         {
-            logger.LogWarning(
+            _logger.LogWarning(
                 "Native Mii render failed for image '{ImageName}' ({BodyType}/{Expression}, size={Size}): {Error}",
                 specifications.Name,
                 specifications.Type,

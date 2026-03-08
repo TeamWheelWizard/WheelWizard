@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using WheelWizard.MiiImages.Domain;
+using WheelWizard.MiiRendering.Configuration;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.MiiRendering.Services;
@@ -49,7 +50,6 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
     private static readonly Vector3 LightDiffuse = new(0.60f, 0.60f, 0.60f);
     private static readonly Vector3 LightSpecular = new(0.70f, 0.70f, 0.70f);
     private static readonly Vector3 LightDirection = Vector3.Normalize(new Vector3(-0.4531539381f, 0.4226179123f, 0.7848858833f));
-    private const float RimPower = 2.0f;
 
     private static readonly MaterialInfo[] MaterialTable =
     [
@@ -207,6 +207,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             return resourcePathResult.Error!;
 
         var request = BuildRequest(studioData, specifications);
+        var lightingProfile = ResolveLightingProfile();
         var archiveResult = GetManagedArchive(resourcePathResult.Value);
         if (archiveResult.IsFailure)
             return archiveResult.Error!;
@@ -290,7 +291,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                     bodyMeshData,
                     baseRotationMatrix,
                     viewMatrix,
-                    viewParameters.Projection
+                    viewParameters.Projection,
+                    lightingProfile
                 );
             }
 
@@ -305,7 +307,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                 drawMeshes,
                 headModelMatrix,
                 viewMatrix,
-                viewParameters.Projection
+                viewParameters.Projection,
+                lightingProfile
             );
         }
 
@@ -335,6 +338,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             string.IsNullOrWhiteSpace(specifications.BackgroundColor) ? "FFFFFF00" : specifications.BackgroundColor
         );
     }
+
+    public MiiLightingProfile ResolveLightingProfile() => MiiLightingProfiles.Default;
 
     private static int MapExpression(MiiImageSpecifications.FaceExpression expression) =>
         expression switch
@@ -501,7 +506,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             if (mesh == null)
                 continue;
 
-            RasterizeMesh(target, depth: null, width, height, mesh, lightEnabled: false, blendMode);
+            RasterizeMesh(target, depth: null, width, height, mesh, lightEnabled: false, blendMode, MiiLightingProfiles.Default);
         }
 
         return new OverlayTexture(width, height, target);
@@ -2598,7 +2603,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         BodyRenderData bodyRenderData,
         Matrix4x4 baseRotationMatrix,
         Matrix4x4 viewMatrix,
-        Matrix4x4 projectionMatrix
+        Matrix4x4 projectionMatrix,
+        MiiLightingProfile lightingProfile
     )
     {
         var bodyModelMatrix = baseRotationMatrix * bodyRenderData.BodyScaleMatrix;
@@ -2621,7 +2627,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             if (mesh == null)
                 continue;
 
-            RasterizeMesh(target, depth, outputWidth, outputHeight, mesh, lightEnabled: true, BlendMode.Over);
+            RasterizeMesh(target, depth, outputWidth, outputHeight, mesh, lightEnabled: true, BlendMode.Over, lightingProfile);
         }
     }
 
@@ -2708,7 +2714,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         IReadOnlyList<DecodedDrawMesh> drawMeshes,
         Matrix4x4 modelMatrix,
         Matrix4x4 viewMatrix,
-        Matrix4x4 projectionMatrix
+        Matrix4x4 projectionMatrix,
+        MiiLightingProfile lightingProfile
     )
     {
         foreach (var drawMesh in drawMeshes)
@@ -2717,7 +2724,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             if (mesh == null)
                 continue;
 
-            RasterizeMesh(target, depth, outputWidth, outputHeight, mesh, lightEnabled: true, BlendMode.Over);
+            RasterizeMesh(target, depth, outputWidth, outputHeight, mesh, lightEnabled: true, BlendMode.Over, lightingProfile);
         }
     }
 
@@ -2853,7 +2860,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         int outputHeight,
         PreparedMesh mesh,
         bool lightEnabled,
-        BlendMode blendMode
+        BlendMode blendMode,
+        MiiLightingProfile lightingProfile
     )
     {
         if (mesh.DrawParam.primitiveParam.primitiveType == FflNativeInterop.PrimitiveTriangles)
@@ -2867,6 +2875,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                     mesh,
                     lightEnabled,
                     blendMode,
+                    lightingProfile,
                     mesh.Indices[i],
                     mesh.Indices[i + 1],
                     mesh.Indices[i + 2]
@@ -2883,7 +2892,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                 var c = mesh.Indices[i + 2];
                 if ((i & 1) == 1)
                     (b, c) = (c, b);
-                RasterizeTriangle(target, depth, outputWidth, outputHeight, mesh, lightEnabled, blendMode, a, b, c);
+                RasterizeTriangle(target, depth, outputWidth, outputHeight, mesh, lightEnabled, blendMode, lightingProfile, a, b, c);
             }
         }
     }
@@ -2896,6 +2905,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         PreparedMesh mesh,
         bool lightEnabled,
         BlendMode blendMode,
+        MiiLightingProfile lightingProfile,
         int ia,
         int ib,
         int ic
@@ -2984,7 +2994,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
                 var parameter =
                     (w0 * a.Parameter * a.InvW + w1 * b.Parameter * b.InvW + w2 * c.Parameter * c.InvW) / perspectiveDenominator;
 
-                var color = EvaluateModulateColor(mesh, uv, viewPosition, normal, tangent, parameter, lightEnabled);
+                var color = EvaluateModulateColor(mesh, uv, viewPosition, normal, tangent, parameter, lightEnabled, lightingProfile);
                 if (color.W <= 0f)
                     goto NextPixel;
 
@@ -3012,7 +3022,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         Vector3 normal,
         Vector3 tangent,
         Vector4 parameter,
-        bool lightEnabled
+        bool lightEnabled,
+        MiiLightingProfile lightingProfile
     )
     {
         Vector4 baseColor;
@@ -3062,8 +3073,10 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         var eye = NormalizeOrDefault(-viewPosition, new Vector3(0f, 0f, 1f));
         var light = LightDirection;
 
-        var ambient = Hadamard(LightAmbient, mesh.Material.Ambient);
-        var diffuse = Hadamard(LightDiffuse, mesh.Material.Diffuse) * MathF.Max(Vector3.Dot(light, n), 0.1f);
+        var ambient = Hadamard(LightAmbient, mesh.Material.Ambient) * lightingProfile.AmbientScale;
+        var directionalDiffuse = MathF.Max(Vector3.Dot(light, n), lightingProfile.DiffuseFloor);
+        var diffuseFactor = 1f + (directionalDiffuse - 1f) * lightingProfile.DirectionalLightInfluence;
+        var diffuse = Hadamard(LightDiffuse, mesh.Material.Diffuse) * (diffuseFactor * lightingProfile.DiffuseScale);
 
         var specularPower = mesh.Material.SpecularPower;
         var blinn = MathF.Pow(MathF.Max(Vector3.Dot(Vector3.Reflect(-light, n), eye), 0f), specularPower);
@@ -3087,9 +3100,9 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             reflection = anisotropic + (blinn - anisotropic) * parameter.X;
         }
 
-        var specular = Hadamard(LightSpecular, mesh.Material.Specular) * reflection * strength;
-        var rimFactor = MathF.Pow(MathF.Max(0f, parameter.W * (1f - MathF.Abs(n.Z))), RimPower);
-        var rim = mesh.Material.RimColor * rimFactor;
+        var specular = Hadamard(LightSpecular, mesh.Material.Specular) * reflection * strength * lightingProfile.SpecularScale;
+        var rimFactor = MathF.Pow(MathF.Max(0f, parameter.W * (1f - MathF.Abs(n.Z))), lightingProfile.RimPower);
+        var rim = mesh.Material.RimColor * (rimFactor * lightingProfile.RimScale);
 
         var lit = (ambient + diffuse) * new Vector3(baseColor.X, baseColor.Y, baseColor.Z) + specular + rim;
         return new Vector4(Clamp01(lit.X), Clamp01(lit.Y), Clamp01(lit.Z), Clamp01(baseColor.W));
