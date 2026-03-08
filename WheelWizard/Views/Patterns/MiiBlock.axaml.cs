@@ -13,7 +13,6 @@ namespace WheelWizard.Views.Patterns;
 
 public class MiiBlock : RadioButton
 {
-    private static ContextMenu? s_oldMenu;
     private MiiImageLoaderWithHover? _miiImageLoader;
 
     public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<MiiBlock, Mii?>(nameof(Mii));

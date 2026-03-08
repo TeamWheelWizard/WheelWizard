@@ -9,6 +9,7 @@
         <ImplicitUsings>true</ImplicitUsings>
 
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <NoWarn>$(NoWarn);AVLN3001</NoWarn>
 
         <!-- Program details -->
         <Version>2.4.1</Version>

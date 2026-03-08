@@ -8,7 +8,7 @@ public abstract class MockingDataFactory<T, U>
     public static U Instance { get; } = new();
     public abstract T Create(int? seed = null);
 
-    protected virtual string DictionaryKeyGenerator(T value) => value.ToString();
+    protected virtual string DictionaryKeyGenerator(T value) => value is null ? string.Empty : value.ToString() ?? string.Empty;
 
     public T[] CreateMultiple(int count = 5, int? seed = null)
     {
