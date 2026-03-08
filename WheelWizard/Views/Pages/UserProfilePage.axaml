@@ -243,7 +243,7 @@
                                 </Grid>
 
                                 <Grid Background="Transparent">
-                                <behavior:MiiCarousel VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                <behavior:Mii3DRender VerticalAlignment="Bottom" HorizontalAlignment="Center"
                                                       Mii="{Binding CurrentMii}"
                                                       Margin="0,0,0,15"
                                                       ImageVariant="{x:Static miiVars:MiiImageVariants.FullBodyCarousel}"

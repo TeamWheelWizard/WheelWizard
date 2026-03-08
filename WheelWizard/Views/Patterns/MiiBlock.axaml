@@ -50,7 +50,7 @@
                                                                         Mii="{TemplateBinding Mii}" ImageOnlyMargin="-4,-9,-4,0"
                                                                         FallBackColor="{StaticResource Neutral500}"
                                                                         LoadingColor="{StaticResource Neutral950}"
-                                                                        ImageVariant="{x:Static miiVars:MiiImageVariants.MiiBlockProfile}"
+                                                                        ImageVariant="{x:Static miiVars:MiiImageVariants.MiiListTile}"
                                                                         ReloadMethod="KeepAllUntilNew" />
                             
                             <PathIcon Data="{StaticResource StarIcon}" Height="17"

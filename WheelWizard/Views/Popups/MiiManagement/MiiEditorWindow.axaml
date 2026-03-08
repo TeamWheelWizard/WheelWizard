@@ -22,7 +22,7 @@
            <Grid Grid.Row="0" x:Name="VisualizationFace" IsVisible="True">
                <Border CornerRadius="6"  BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="1"
                        Height="350" Width="350" HorizontalAlignment="Center" VerticalAlignment="Center">
-                   <behavior:MiiImageLoader  x:Name="MiiFaceImage" ReloadMethod="KeepInstanceUntilNew" LowQualitySpeedup="True"
+                   <behavior:MiiImageLoader  x:Name="MiiFaceImage" ReloadMethod="KeepInstanceUntilNew"
                                             Mii="{Binding Mii}" FallBackColor="{StaticResource Neutral700}"
                                             ImageVariant="{x:Static miiVars:MiiImageVariants.MiiEditorSmall}"/>
                </Border>
@@ -30,7 +30,7 @@
            </Grid>
            
            <Grid Grid.Row="0" x:Name="VisualizationCarousel" IsVisible="False">
-               <behavior:MiiCarousel x:Name="MiiCarousel" Height="350" Width="388" HorizontalAlignment="Center" VerticalAlignment="Center"
+               <behavior:Mii3DRender x:Name="Mii3DRenderControl" Height="350" Width="388" HorizontalAlignment="Center" VerticalAlignment="Center"
                                      ReloadMethod="KeepInstanceUntilNew"
                                      ImageVariant="{x:Static miiVars:MiiImageVariants.MiiEditorPreviewCarousel}"
                                      Mii="{Binding Mii}"/>

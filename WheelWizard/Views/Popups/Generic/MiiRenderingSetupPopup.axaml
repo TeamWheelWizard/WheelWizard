@@ -1,0 +1,75 @@
+<base:PopupContent xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
+                   mc:Ignorable="d"
+                   x:Class="WheelWizard.Views.Popups.Generic.MiiRenderingSetupPopup">
+    <Grid Width="480" MinHeight="300" MaxHeight="420" RowDefinitions="Auto,Auto,Auto,*,Auto">
+        <TextBlock Classes="TitleText"
+                   Text="Mii Rendering Setup" />
+
+        <TextBlock Grid.Row="1"
+                   Margin="0,14,0,0"
+                   TextWrapping="Wrap"
+                   Classes="BodyText"
+                   Text="Wheel Wizard needs one external file to render Miis offline. Download it once and it will be stored in your Wheel Wizard data folder." />
+
+        <Border Grid.Row="2"
+                Margin="0,18,0,0"
+                Padding="14"
+                Background="#12000000"
+                BorderBrush="{StaticResource Neutral700}"
+                BorderThickness="1"
+                CornerRadius="10">
+            <StackPanel Spacing="8">
+                <TextBlock Classes="BodyText"
+                           FontWeight="SemiBold"
+                           Text="Install location" />
+                <TextBlock x:Name="PathTextBlock"
+                           Classes="BodyText"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="3"
+                    Margin="0,18,0,0"
+                    Spacing="8">
+            <TextBlock x:Name="StatusTextBlock"
+                       Classes="BodyText"
+                       TextWrapping="Wrap" />
+            <ProgressBar x:Name="DownloadProgressBar"
+                         Minimum="0"
+                         Maximum="100"
+                         Height="10" />
+            <TextBlock x:Name="ProgressTextBlock"
+                       Classes="BodyText"
+                       Opacity="0.75" />
+            <TextBlock Classes="BodyText"
+                       TextWrapping="Wrap"
+                       Opacity="0.75"
+                       Text="Closing this popup exits Wheel Wizard. The main app will only open after the required Mii rendering file is installed." />
+            <TextBlock x:Name="ErrorTextBlock"
+                       Classes="BodyText"
+                       Foreground="{StaticResource Danger400}"
+                       TextWrapping="Wrap"
+                       IsVisible="False" />
+        </StackPanel>
+
+        <UniformGrid Grid.Row="4"
+                     Columns="2"
+                     Margin="0,24,0,0">
+            <components:Button x:Name="CloseButton"
+                               Margin="0,0,6,0"
+                               Variant="Default"
+                               Text="Close"
+                               Click="CloseButton_OnClick" />
+            <components:Button x:Name="DownloadButton"
+                               Margin="6,0,0,0"
+                               Variant="Primary"
+                               Text="Download"
+                               Click="DownloadButton_OnClick" />
+        </UniformGrid>
+    </Grid>
+</base:PopupContent>

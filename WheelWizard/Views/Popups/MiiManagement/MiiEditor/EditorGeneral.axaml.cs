@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Threading;
 using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
@@ -16,14 +15,12 @@ public partial class EditorGeneral : MiiEditorBaseControl
 {
     private bool _hasMiiNameError;
     private bool _hasCreatorNameError;
-    private readonly DispatcherTimer _refreshTimer = new() { Interval = TimeSpan.FromSeconds(0.7), IsEnabled = false };
 
     public EditorGeneral(MiiEditorWindow ew)
         : base(ew)
     {
         InitializeComponent();
         PopulateValues();
-        _refreshTimer.Tick += RefreshTimer_Tick;
     }
 
     private void PopulateValues()
@@ -59,8 +56,6 @@ public partial class EditorGeneral : MiiEditorBaseControl
         if (!_hasCreatorNameError)
             Editor.Mii.CreatorName = new(CreatorName.Text);
 
-        // For nowI put it here, since I don't think we want each value to be set when you change length or width
-        // only when you stop moving that bar so we want that, I think at least
         Editor.RefreshImage();
     }
 
@@ -116,7 +111,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
             return;
         }
         Editor.Mii.Height = heightResult.Value;
-        RestartRefreshTimer();
+        Editor.RefreshImage();
     }
 
     private void Width_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
@@ -133,24 +128,12 @@ public partial class EditorGeneral : MiiEditorBaseControl
             return;
         }
         Editor.Mii.Weight = weightResult.Value;
-        RestartRefreshTimer();
+        Editor.RefreshImage();
     }
 
     private void SetSkinColor(int index)
     {
         Editor.Mii.MiiFavoriteColor = (MiiFavoriteColor)index;
-        Editor.RefreshImage();
-    }
-
-    private void RestartRefreshTimer()
-    {
-        _refreshTimer.Stop();
-        _refreshTimer.Start();
-    }
-
-    private void RefreshTimer_Tick(object? sender, EventArgs e)
-    {
-        _refreshTimer.Stop();
         Editor.RefreshImage();
     }
 

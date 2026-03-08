@@ -6,6 +6,7 @@
              xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              mc:Ignorable="d" d:DesignWidth="456" d:DesignHeight="776"
+             x:CompileBindings="False"
              x:Class="WheelWizard.Views.Pages.MiiListPage">
     <Grid x:Name="CompleteGrid">
         <Grid.RowDefinitions>
@@ -81,11 +82,56 @@
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom" />
             </Grid>
-            <ScrollViewer Grid.Row="1">
-                <UniformGrid Columns="4" HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="MiiList">
-                    <behaviorComponent:MiiBlock Width="90" Height="90" Margin="8,10" />
-                </UniformGrid>
-            </ScrollViewer>
+            <ListBox Grid.Row="1" x:Name="MiiList" SelectionMode="Single" BorderThickness="0"
+                     Background="Transparent" Padding="0" ItemsSource="{Binding MiiRows}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <ItemsControl ItemsSource="{Binding Items}" HorizontalAlignment="Center">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="4" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <behaviorComponent:MiiBlock Width="90" Height="90" Margin="8,10"
+                                                                Mii="{Binding Mii}"
+                                                                GroupName="{Binding SelectionGroup}"
+                                                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                                Click="MiiBlock_OnClick">
+                                        <behaviorComponent:MiiBlock.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="{Binding FavoriteActionHeader}"
+                                                          CommandParameter="{Binding}" Click="FavoriteContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                                <MenuItem Header="{x:Static lang:Common.Action_Edit}"
+                                                          CommandParameter="{Binding}" Click="EditContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                                <MenuItem Header="Duplicate"
+                                                          CommandParameter="{Binding}" Click="DuplicateContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                                <MenuItem Header="{x:Static lang:Common.Action_Export}"
+                                                          CommandParameter="{Binding}" Click="ExportContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                                <MenuItem Header="{x:Static lang:Common.Action_Delete}"
+                                                          CommandParameter="{Binding}" Click="DeleteContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                            </ContextMenu>
+                                        </behaviorComponent:MiiBlock.ContextMenu>
+                                    </behaviorComponent:MiiBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
     </Grid>
 </UserControl>
