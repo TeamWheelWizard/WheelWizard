@@ -14,12 +14,10 @@ using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.RepeatedTasks;
-using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData.Domain;
-using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.Views;
@@ -198,20 +196,26 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         var playerCount = sender.PlayerCount;
         var roomCount = sender.RoomCount;
         PlayerCountBox.Text = playerCount.ToString();
-        PlayerCountBox.TipText = playerCount switch
-        {
-            1 => Phrases.Hover_PlayersOnline_1,
-            0 => Phrases.Hover_PlayersOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_PlayersOnline_x, playerCount)
-                ?? $"There are currently {playerCount} players online",
-        };
+        ToolTip.SetTip(
+            PlayerCountBox,
+            playerCount switch
+            {
+                1 => Phrases.Hover_PlayersOnline_1,
+                0 => Phrases.Hover_PlayersOnline_0,
+                _ => Humanizer.ReplaceDynamic(Phrases.Hover_PlayersOnline_x, playerCount)
+                    ?? $"There are currently {playerCount} players online",
+            }
+        );
         RoomCountBox.Text = roomCount.ToString();
-        RoomCountBox.TipText = roomCount switch
-        {
-            1 => Phrases.Hover_RoomsOnline_1,
-            0 => Phrases.Hover_RoomsOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_RoomsOnline_x, roomCount) ?? $"There are currently {roomCount} rooms active",
-        };
+        ToolTip.SetTip(
+            RoomCountBox,
+            roomCount switch
+            {
+                1 => Phrases.Hover_RoomsOnline_1,
+                0 => Phrases.Hover_RoomsOnline_0,
+                _ => Humanizer.ReplaceDynamic(Phrases.Hover_RoomsOnline_x, roomCount) ?? $"There are currently {roomCount} rooms active",
+            }
+        );
         UpdateFriendCount();
     }
 

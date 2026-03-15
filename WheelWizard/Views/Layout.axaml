@@ -68,11 +68,11 @@
                     Margin="0,0,0,25">
             <components:StateBox x:Name="PlayerCountBox" Text="0" Variant="Dark"
                                  IconData="{StaticResource UserCouple}"
-                                 TipText="{x:Static lang:Phrases.Hover_PlayersOnline_0}"
+                                 ToolTip.Tip="{x:Static lang:Phrases.Hover_PlayersOnline_0}"
                                  Margin="10,0,0,0" />
             <components:StateBox x:Name="RoomCountBox" Text="0" Variant="Dark"
                                  IconData="{StaticResource RoomUsers}"
-                                 TipText="{x:Static lang:Phrases.Hover_RoomsOnline_0}"
+                                 ToolTip.Tip="{x:Static lang:Phrases.Hover_RoomsOnline_0}"
                                  Margin="10,0,0,0" />
         </StackPanel>
 
