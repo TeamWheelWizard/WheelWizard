@@ -78,6 +78,8 @@ public static class PathManager
     public static string RrBetaTempFolderPath => Path.Combine(TempModsFolderPath, "RRBetaTemp");
     public static string RrBetaTempFilePath => Path.Combine(RrBetaTempFolderPath, "Testers.zip");
     public static string RrBetaManifestFilePath => Path.Combine(WheelWizardAppdataPath, "RRBeta.manifest.json");
+    public static string MiiRenderingFolderPath => Path.Combine(WheelWizardAppdataPath, "MiiRendering");
+    public static string MiiRenderingResourceFilePath => Path.Combine(MiiRenderingFolderPath, "FFLResHigh.dat");
     public static string WiiDbFolder => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib");
     public static string MiiDbFile => Path.Combine(WiiDbFolder, "RFL_DB.dat");
     public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRRating.pul");
