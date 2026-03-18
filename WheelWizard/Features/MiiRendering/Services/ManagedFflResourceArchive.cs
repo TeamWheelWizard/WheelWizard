@@ -261,22 +261,34 @@ internal sealed class ManagedFflResourceArchive
             return DecompressWithGzip(compressed);
 
         if (windowBits == 16)
-        {
-            try
-            {
-                return DecompressWithZlib(compressed);
-            }
-            catch (InvalidDataException)
-            {
-                return DecompressWithGzip(compressed);
-            }
-            catch (IOException)
-            {
-                return DecompressWithGzip(compressed);
-            }
-        }
+            return DecompressWithFallback(compressed, DecompressWithZlib, DecompressWithGzip);
 
         return DecompressWithZlib(compressed);
+    }
+
+    private static byte[] DecompressWithFallback(byte[] compressed, Func<byte[], byte[]> primary, Func<byte[], byte[]> fallback)
+    {
+        Exception primaryException;
+        try
+        {
+            return primary(compressed);
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            primaryException = exception;
+        }
+
+        try
+        {
+            return fallback(compressed);
+        }
+        catch (Exception fallbackException) when (fallbackException is not OutOfMemoryException)
+        {
+            throw new InvalidDataException(
+                $"Failed to decompress part using either supported format. Primary error: {primaryException.Message}. Fallback error: {fallbackException.Message}.",
+                new AggregateException(primaryException, fallbackException)
+            );
+        }
     }
 
     private static byte[] DecompressWithZlib(byte[] compressed)
