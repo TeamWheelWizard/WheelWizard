@@ -91,32 +91,54 @@ public sealed class MiiRenderingResourceInstaller(
         {
             progress?.Report(new($"Downloading archive (attempt {attempt}/{MaxDownloadAttempts})", 0, null));
 
-            using var response = await assetApi.DownloadArchiveAsync(cancellationToken);
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                using var response = await assetApi.DownloadArchiveAsync(cancellationToken);
+                if (!response.IsSuccessStatusCode)
+                {
+                    logger.LogWarning(
+                        "Failed to download Mii rendering archive on attempt {Attempt}/{MaxDownloadAttempts}: HTTP {StatusCode} {ReasonPhrase}",
+                        attempt,
+                        MaxDownloadAttempts,
+                        (int)response.StatusCode,
+                        response.ReasonPhrase
+                    );
+                    continue;
+                }
 
-            var totalBytes = response.Content.Headers.ContentLength;
-            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            await using var bufferStream = new MemoryStream(totalBytes is > 0 and <= int.MaxValue ? (int)totalBytes.Value : 0);
+                var totalBytes = response.Content.Headers.ContentLength;
+                await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                await using var bufferStream = new MemoryStream(totalBytes is > 0 and <= int.MaxValue ? (int)totalBytes.Value : 0);
 
-            var bytesDownloaded = await CopyWithProgressAsync(
-                responseStream,
-                bufferStream,
-                totalBytes,
-                progress,
-                cancellationToken,
-                $"Downloading archive (attempt {attempt}/{MaxDownloadAttempts})"
-            );
+                var bytesDownloaded = await CopyWithProgressAsync(
+                    responseStream,
+                    bufferStream,
+                    totalBytes,
+                    progress,
+                    cancellationToken,
+                    $"Downloading archive (attempt {attempt}/{MaxDownloadAttempts})"
+                );
 
-            var archiveBytes = bufferStream.ToArray();
-            var validationResult = ValidateArchiveBytes(archiveBytes, totalBytes, bytesDownloaded, attempt);
-            if (validationResult.IsSuccess)
-                return archiveBytes;
+                var archiveBytes = bufferStream.ToArray();
+                var validationResult = ValidateArchiveBytes(archiveBytes, totalBytes, bytesDownloaded, attempt);
+                if (validationResult.IsSuccess)
+                    return archiveBytes;
 
-            logger.LogWarning(
-                "Downloaded Mii rendering archive was invalid on attempt {Attempt}: {Message}",
-                attempt,
-                validationResult.Error?.Message
-            );
+                logger.LogWarning(
+                    "Downloaded Mii rendering archive was invalid on attempt {Attempt}: {Message}",
+                    attempt,
+                    validationResult.Error?.Message
+                );
+            }
+            catch (HttpRequestException exception)
+            {
+                logger.LogWarning(
+                    exception,
+                    "Failed to download Mii rendering archive on attempt {Attempt}/{MaxDownloadAttempts} due to an HTTP error.",
+                    attempt,
+                    MaxDownloadAttempts
+                );
+            }
         }
 
         return Fail("Failed to download a valid Mii rendering archive after multiple attempts.");
