@@ -85,10 +85,11 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             FflNativeInterop.SpecularModeBlinn,
             new Vector3(0.3f, 0.3f, 0.3f)
         ),
+        // Hair
         new(
             new Vector3(1.00f, 1.00f, 1.00f),
             new Vector3(0.70f, 0.70f, 0.70f),
-            new Vector3(0.35f, 0.35f, 0.35f),
+            new Vector3(0.10f, 0.10f, 0.10f),
             10.0f,
             FflNativeInterop.SpecularModeAnisotropic,
             new Vector3(0.3f, 0.3f, 0.3f)
