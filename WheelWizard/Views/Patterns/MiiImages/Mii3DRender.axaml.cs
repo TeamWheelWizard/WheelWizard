@@ -272,6 +272,7 @@ public partial class Mii3DRender : BaseMiiImage
 
             if (result.IsFailure)
             {
+                await Dispatcher.UIThread.InvokeAsync(() => ClearSurface(render.Generation), DispatcherPriority.Background);
                 continue;
             }
 

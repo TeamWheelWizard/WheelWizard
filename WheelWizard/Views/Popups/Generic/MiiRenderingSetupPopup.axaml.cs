@@ -12,6 +12,7 @@ public partial class MiiRenderingSetupPopup : PopupContent
     private readonly TaskCompletionSource<bool> _completionSource = new();
     private CancellationTokenSource? _downloadCancellationTokenSource;
     private bool _downloadCompleted;
+    private bool _skipRequested;
 
     [Inject]
     private IMiiRenderingResourceInstaller ResourceInstaller { get; set; } = null!;
@@ -24,7 +25,7 @@ public partial class MiiRenderingSetupPopup : PopupContent
     {
         InitializeComponent();
         PathTextBlock.Text = PathManager.MiiRenderingResourceFilePath;
-        StatusTextBlock.Text = "Download the Mii rendering resource to continue.";
+        StatusTextBlock.Text = "Download the Mii rendering resource to enable offline 3D Mii rendering.";
         ProgressTextBlock.Text = "Ready to install.";
     }
 
@@ -66,7 +67,7 @@ public partial class MiiRenderingSetupPopup : PopupContent
             _downloadCancellationTokenSource = null;
 
             if (!_downloadCompleted)
-                SetBusyState(false, "Download the Mii rendering resource to continue.");
+                SetBusyState(false, "Download the Mii rendering resource to enable offline 3D Mii rendering.");
         }
     }
 
@@ -93,16 +94,27 @@ public partial class MiiRenderingSetupPopup : PopupContent
         Close();
     }
 
+    private void SkipButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_downloadCancellationTokenSource != null)
+            return;
+
+        _skipRequested = true;
+        _completionSource.TrySetResult(true);
+        Close();
+    }
+
     protected override void BeforeClose()
     {
         _downloadCancellationTokenSource?.Cancel();
-        _completionSource.TrySetResult(_downloadCompleted);
+        _completionSource.TrySetResult(_downloadCompleted || _skipRequested);
     }
 
     private void SetBusyState(bool busy, string statusText)
     {
         StatusTextBlock.Text = statusText;
         DownloadButton.IsEnabled = !busy;
+        SkipButton.IsEnabled = !busy;
         CloseButton.IsEnabled = true;
         CloseButton.Text = busy ? "Close and Exit" : "Close";
     }
@@ -111,7 +123,7 @@ public partial class MiiRenderingSetupPopup : PopupContent
     {
         ErrorTextBlock.Text = message;
         ErrorTextBlock.IsVisible = true;
-        SetBusyState(false, "Download the Mii rendering resource to continue.");
+        SetBusyState(false, "Download the Mii rendering resource to enable offline 3D Mii rendering.");
     }
 
     private static string FormatMegabytes(long bytes) => $"{bytes / 1024d / 1024d:F2} MB";

@@ -14,7 +14,7 @@
                    Margin="0,14,0,0"
                    TextWrapping="Wrap"
                    Classes="BodyText"
-                   Text="Wheel Wizard needs one external file to render Miis offline. Download it once and it will be stored in your Wheel Wizard data folder." />
+                   Text="Wheel Wizard can use one external file to render Miis offline in 3D. Download it once and it will be stored in your Wheel Wizard data folder, or skip and continue without 3D Mii rendering." />
 
         <Border Grid.Row="2"
                 Margin="0,18,0,0"
@@ -49,7 +49,7 @@
             <TextBlock Classes="BodyText"
                        TextWrapping="Wrap"
                        Opacity="0.75"
-                       Text="Closing this popup exits Wheel Wizard. The main app will only open after the required Mii rendering file is installed." />
+                       Text="Skip opens Wheel Wizard without offline 3D Mii rendering. Close exits the app." />
             <TextBlock x:Name="ErrorTextBlock"
                        Classes="BodyText"
                        Foreground="{StaticResource Danger400}"
@@ -58,15 +58,20 @@
         </StackPanel>
 
         <UniformGrid Grid.Row="4"
-                     Columns="2"
+                     Columns="3"
                      Margin="0,24,0,0">
             <components:Button x:Name="CloseButton"
                                Margin="0,0,6,0"
                                Variant="Default"
                                Text="Close"
                                Click="CloseButton_OnClick" />
+            <components:Button x:Name="SkipButton"
+                               Margin="0,0,6,0"
+                               Variant="Default"
+                               Text="Skip"
+                               Click="SkipButton_OnClick" />
             <components:Button x:Name="DownloadButton"
-                               Margin="6,0,0,0"
+                               Margin="0,0,0,0"
                                Variant="Primary"
                                Text="Download"
                                Click="DownloadButton_OnClick" />
