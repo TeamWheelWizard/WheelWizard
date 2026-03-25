@@ -20,7 +20,7 @@ public partial class Mii3DRender : BaseMiiImage
     private const float PitchDragSensitivity = 0.8f;
     private const float ZoomStep = 0.1f;
     private const float MinZoom = 0.35f;
-    private const float MaxZoom = 3f;
+    private const float MaxZoom = 1.5f;
     private static readonly TimeSpan RapidModelUpdateThreshold = TimeSpan.FromMilliseconds(120);
 
     [Inject]
