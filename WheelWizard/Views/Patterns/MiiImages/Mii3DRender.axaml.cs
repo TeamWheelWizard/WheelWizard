@@ -18,9 +18,12 @@ public partial class Mii3DRender : BaseMiiImage
 {
     private const float YawDragSensitivity = 0.8f;
     private const float PitchDragSensitivity = 0.8f;
+    private const float MiddlePanSensitivity = 0.35f;
     private const float ZoomStep = 0.1f;
     private const float MinZoom = 0.35f;
     private const float MaxZoom = 1.5f;
+    private const float MinCameraVerticalOffset = -90f;
+    private const float MaxCameraVerticalOffset = 90f;
     private static readonly TimeSpan RapidModelUpdateThreshold = TimeSpan.FromMilliseconds(120);
 
     [Inject]
@@ -46,6 +49,7 @@ public partial class Mii3DRender : BaseMiiImage
     private MiiImageSpecifications _baseVariant = MiiImageVariants.FullBodyCarousel.Clone();
     private float _currentYaw;
     private float _currentPitch;
+    private float _currentCameraVerticalOffset;
     private float _currentZoom = 1f;
 
     public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty = AvaloniaProperty.Register<
@@ -128,6 +132,7 @@ public partial class Mii3DRender : BaseMiiImage
         _baseVariant = newSpecifications.Clone();
         _currentYaw = _baseVariant.CharacterRotate.Y;
         _currentPitch = _baseVariant.CameraRotate.X;
+        _currentCameraVerticalOffset = Math.Clamp(_baseVariant.CameraVerticalOffset, MinCameraVerticalOffset, MaxCameraVerticalOffset);
         _currentZoom = Math.Clamp(_baseVariant.CameraZoom, MinZoom, MaxZoom);
         _forceNextSurfaceRecreate = true;
         QueueRenderCurrentView(renderScale: 1f);
@@ -200,6 +205,7 @@ public partial class Mii3DRender : BaseMiiImage
         variant.InstanceCount = 1;
         variant.CharacterRotate = new(_baseVariant.CharacterRotate.X, NormalizeDegrees(_currentYaw), _baseVariant.CharacterRotate.Z);
         variant.CameraRotate = new(NormalizeDegrees(_currentPitch), _baseVariant.CameraRotate.Y, _baseVariant.CameraRotate.Z);
+        variant.CameraVerticalOffset = Math.Clamp(_currentCameraVerticalOffset, MinCameraVerticalOffset, MaxCameraVerticalOffset);
         variant.CameraZoom = Math.Clamp(_currentZoom, MinZoom, MaxZoom);
         variant.RenderScale = Math.Clamp(renderScale, 0.05f, 1f);
 
@@ -434,7 +440,8 @@ public partial class Mii3DRender : BaseMiiImage
         if (!Interactive)
             return;
 
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        var properties = e.GetCurrentPoint(this).Properties;
+        if (!properties.IsLeftButtonPressed && !properties.IsMiddleButtonPressed)
             return;
 
         _isDragging = true;
@@ -458,8 +465,18 @@ public partial class Mii3DRender : BaseMiiImage
         if (Math.Abs(deltaX) < 0.5 && Math.Abs(deltaY) < 0.5)
             return;
 
-        _currentYaw += (float)(deltaX * YawDragSensitivity);
-        _currentPitch += (float)(deltaY * PitchDragSensitivity);
+        var properties = e.GetCurrentPoint(this).Properties;
+        if (properties.IsMiddleButtonPressed)
+        {
+            _currentCameraVerticalOffset += (float)(deltaY * MiddlePanSensitivity);
+            _currentCameraVerticalOffset = Math.Clamp(_currentCameraVerticalOffset, MinCameraVerticalOffset, MaxCameraVerticalOffset);
+        }
+        else
+        {
+            _currentYaw += (float)(deltaX * YawDragSensitivity);
+            _currentPitch += (float)(deltaY * PitchDragSensitivity);
+        }
+
         QueueRenderCurrentView(renderScale: GetPreviewRenderScale());
         ScheduleHighQualityRefresh();
     }

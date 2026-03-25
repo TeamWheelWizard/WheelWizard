@@ -29,6 +29,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         int CameraXRotate,
         int CameraYRotate,
         int CameraZRotate,
+        float CameraVerticalOffset,
         float CameraZoom,
         string BackgroundColor
     );
@@ -261,11 +262,11 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
 
             var orbitRadius = viewParameters.OrbitRadius * request.CameraZoom;
             var cameraPosition = CalculateCameraOrbitPosition(orbitRadius, cameraRotate);
-            cameraPosition.Y += viewParameters.BaseCameraY;
+            cameraPosition.Y += viewParameters.BaseCameraY + request.CameraVerticalOffset;
             var cameraUp = CalculateUpVector(cameraRotate);
             var baseRotationMatrix = CreateRotationMatrix(modelRotate);
 
-            var cameraTarget = viewParameters.Target;
+            var cameraTarget = viewParameters.Target + new Vector3(0f, request.CameraVerticalOffset, 0f);
             var headModelMatrix = baseRotationMatrix;
             if (bodyRenderData is { } bodyData)
             {
@@ -335,6 +336,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             (int)MathF.Round(specifications.CameraRotate.X),
             (int)MathF.Round(specifications.CameraRotate.Y),
             (int)MathF.Round(specifications.CameraRotate.Z),
+            specifications.CameraVerticalOffset,
             Math.Clamp(specifications.CameraZoom, 0.35f, 3f),
             string.IsNullOrWhiteSpace(specifications.BackgroundColor) ? "FFFFFF00" : specifications.BackgroundColor
         );

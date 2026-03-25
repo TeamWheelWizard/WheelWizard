@@ -16,6 +16,7 @@ public class MiiImageSpecifications
     // All between 0 and 360, obviously
     public Vector3 CharacterRotate { get; set; } = Vector3.Zero;
     public Vector3 CameraRotate { get; set; } = Vector3.Zero;
+    public float CameraVerticalOffset { get; set; }
     public float CameraZoom { get; set; } = 1f;
     public float RenderScale { get; set; } = 1f;
 
@@ -27,7 +28,7 @@ public class MiiImageSpecifications
         // If we put all the things in this string, then the Key at least is unique
         var parts = $"{Name}_{Size}{Expression}{Type}";
         parts += $"{BackgroundColor}{InstanceCount}";
-        parts += $"{CharacterRotate}{CameraRotate}{CameraZoom}{RenderScale}";
+        parts += $"{CharacterRotate}{CameraRotate}{CameraVerticalOffset}{CameraZoom}{RenderScale}";
         parts += $"{CachePriority}";
         return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(parts));
     }
