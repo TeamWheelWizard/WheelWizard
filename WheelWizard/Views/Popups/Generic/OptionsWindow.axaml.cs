@@ -10,7 +10,7 @@ namespace WheelWizard.Views.Popups.Generic;
 public partial class OptionsWindow : PopupContent
 {
     public string? Result { get; private set; } = null;
-    private TaskCompletionSource<string?> _tcs;
+    private TaskCompletionSource<string?>? _tcs;
 
     public OptionsWindow()
         : base(true, false, true, "Wheel Wizard")
@@ -36,7 +36,7 @@ public partial class OptionsWindow : PopupContent
         {
             onClick.Invoke();
             Result = title;
-            _tcs.TrySetResult(title);
+            _tcs?.TrySetResult(title);
             Close();
         };
 
@@ -65,7 +65,7 @@ public partial class OptionsWindow : PopupContent
     protected override void BeforeClose()
     {
         // If you want to return something different, then to the TrySetResult before you close it
-        _tcs.TrySetResult(null);
+        _tcs?.TrySetResult(null);
     }
 
     public async Task<string?> AwaitAnswer()

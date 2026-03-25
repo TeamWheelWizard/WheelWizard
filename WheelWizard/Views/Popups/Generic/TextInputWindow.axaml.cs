@@ -116,7 +116,7 @@ public partial class TextInputWindow : PopupContent
     }
 
     // Handle text changes to enable/disable Submit button
-    private void InputField_TextChanged(object sender, TextChangedEventArgs e)
+    private void InputField_TextChanged(object? sender, TextChangedEventArgs e)
     {
         UpdateSubmitButtonState();
     }

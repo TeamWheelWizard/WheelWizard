@@ -1,5 +1,5 @@
 using WheelWizard.MiiImages.Domain;
-using WheelWizard.Services;
+using WheelWizard.MiiRendering;
 
 namespace WheelWizard.MiiImages;
 
@@ -7,8 +7,7 @@ public static class MiiImagesExtensions
 {
     public static IServiceCollection AddMiiImages(this IServiceCollection services)
     {
-        services.AddWhWzRefitApi<IMiiIMagesApi>(Endpoints.MiiImageAddress);
-
+        services.AddMiiRendering();
         services.AddSingleton<IMiiImagesSingletonService, MiiImagesSingletonService>();
 
         return services;
@@ -26,6 +25,9 @@ public static class MiiImagesExtensions
             InstanceCount = specifications.InstanceCount,
             CharacterRotate = new(specifications.CharacterRotate.X, specifications.CharacterRotate.Y, specifications.CharacterRotate.Z),
             CameraRotate = new(specifications.CameraRotate.X, specifications.CameraRotate.Y, specifications.CameraRotate.Z),
+            CameraVerticalOffset = specifications.CameraVerticalOffset,
+            CameraZoom = specifications.CameraZoom,
+            RenderScale = specifications.RenderScale,
             ExpirationSeconds =
                 specifications.ExpirationSeconds?.TotalSeconds == null
                     ? null

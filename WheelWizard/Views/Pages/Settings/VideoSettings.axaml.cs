@@ -49,7 +49,8 @@ public partial class VideoSettings : UserControlBase
         var finalResolution = SettingsService.Get<int>(SettingsService.INTERNAL_RESOLUTION);
         foreach (RadioButton radioButton in ResolutionStackPanel.Children)
         {
-            radioButton.IsChecked = (radioButton.Tag.ToString() == finalResolution.ToString());
+            var tag = radioButton.Tag?.ToString();
+            radioButton.IsChecked = string.Equals(tag, finalResolution.ToString(), StringComparison.Ordinal);
         }
     }
 
@@ -73,7 +74,8 @@ public partial class VideoSettings : UserControlBase
     {
         if (sender is RadioButton radioButton && radioButton.IsChecked == true)
         {
-            SettingsService.Set(SettingsService.INTERNAL_RESOLUTION, int.Parse(radioButton.Tag.ToString()!));
+            if (int.TryParse(radioButton.Tag?.ToString(), out var resolution))
+                SettingsService.Set(SettingsService.INTERNAL_RESOLUTION, resolution);
         }
     }
 
@@ -100,6 +102,9 @@ public partial class VideoSettings : UserControlBase
     private void RendererDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         var selectedDisplayName = RendererDropdown.SelectedItem?.ToString();
+        if (string.IsNullOrWhiteSpace(selectedDisplayName))
+            return;
+
         if (SettingValues.GFXRenderers.TryGetValue(selectedDisplayName, out var actualValue))
         {
             SettingsService.Set(SettingsService.GFX_BACKEND, actualValue);

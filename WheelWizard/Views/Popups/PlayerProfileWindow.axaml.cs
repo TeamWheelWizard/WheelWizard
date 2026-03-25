@@ -140,7 +140,7 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
         return value.ToString("N0");
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {

@@ -135,7 +135,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
         _currentPage = 1;
         _hasMoreMods = true;
 
-        Dispatcher.UIThread.InvokeAsync(Mods.Clear);
+        await Dispatcher.UIThread.InvokeAsync(Mods.Clear);
         await LoadMods(_currentPage, _currentSearchTerm);
     }
 

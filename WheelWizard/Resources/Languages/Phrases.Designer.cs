@@ -60,7 +60,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use the + button to add friends from Wheel Wizard.
+        ///   Looks up a localized string similar to Use the + button to add friends in Wheel Wizard.
         /// </summary>
         public static string EmptyContent_NoFriends {
             get {
@@ -979,7 +979,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to donwload and install the mod: {$1}?.
+        ///   Looks up a localized string similar to Do you want to download and install the mod: {$1}?.
         /// </summary>
         public static string Question_InstallMod_Title {
             get {

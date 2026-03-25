@@ -255,7 +255,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         ViewUtils.ShowSnackbar(Phrases.SnackbarSuccess_ProfileSetPrimary);
     }
 
-    private void RegionDropdown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void RegionDropdown_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (RegionDropdown.SelectedItem is not ComboBoxItem { Tag: MarioKartWiiEnums.Regions region })
             return;
@@ -356,7 +356,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     // But we as team wheel wizard don't think it makes sense to have a mii name shorter than 3, and so from the UI we don't allow it
     private OperationResult ValidateMiiName(string? oldName, string newName)
     {
-        newName = newName?.Trim();
+        newName = (newName ?? string.Empty).Trim();
         if (newName.Length is > 10 or < 3)
             return Fail(Phrases.HelperNote_NameMustBetween);
 
@@ -366,9 +366,10 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private async void RenameMii_OnClick(object? sender, EventArgs e)
     {
         var oldName = CurrentMii?.Name.ToString();
+        var extraText = Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, oldName ?? string.Empty) ?? string.Empty;
         var renamePopup = new TextInputWindow()
             .SetMainText(Phrases.Question_EnterNewName_Title)
-            .SetExtraText(Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, oldName))
+            .SetExtraText(extraText)
             .SetAllowCustomChars(true)
             .SetValidation(ValidateMiiName)
             .SetInitialText(oldName ?? "")
@@ -436,7 +437,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     #region PropertyChanged
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {

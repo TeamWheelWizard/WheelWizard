@@ -1,5 +1,4 @@
-﻿using Testably.Abstractions;
-using WheelWizard.Shared.MessageTranslations;
+﻿using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
@@ -55,7 +54,7 @@ public interface IMiiDbService
     bool Exists();
 }
 
-public class MiiDbService(IMiiRepositoryService repository, IRandomSystem randomSystem) : IMiiDbService
+public class MiiDbService(IMiiRepositoryService repository) : IMiiDbService
 {
     public List<Mii> GetAllMiis()
     {

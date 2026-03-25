@@ -1,12 +1,15 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
 using WheelWizard.AutoUpdating;
+using WheelWizard.MiiRendering.Services;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Views.Behaviors;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
@@ -88,12 +91,43 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new Layout();
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            _ = InitializeDesktopAsync(desktop);
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    private async Task InitializeDesktopAsync(IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        try
+        {
+            var resourceInstaller = Services.GetRequiredService<IMiiRenderingResourceInstaller>();
+            if (resourceInstaller.GetResolvedResourcePath().IsFailure)
+            {
+                var setupPopup = new MiiRenderingSetupPopup();
+                var shouldContinue = await setupPopup.ShowAndAwaitCompletionAsync();
+                if (!shouldContinue)
+                {
+                    desktop.Shutdown();
+                    return;
+                }
+            }
+
+            var layout = new Layout();
+            desktop.MainWindow = layout;
+            desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            layout.Show();
+
             var gameDataService = Services.GetRequiredService<IGameLicenseSingletonService>();
             gameDataService.LoadLicense();
             OnInitializedAsync();
         }
-
-        base.OnFrameworkInitializationCompleted();
+        catch (Exception e)
+        {
+            var logger = Services.GetRequiredService<ILogger<App>>();
+            logger.LogError(e, "Failed to initialize desktop application: {Message}", e.Message);
+            desktop.Shutdown();
+        }
     }
 }
