@@ -11,7 +11,7 @@ public partial class MiiImageLoader : BaseMiiImage
 {
     #region properties
 
-    public static readonly StyledProperty<bool> LowQualitySpeedupProperty = AvaloniaProperty.Register<MiiCarousel, bool>(
+    public static readonly StyledProperty<bool> LowQualitySpeedupProperty = AvaloniaProperty.Register<MiiImageLoader, bool>(
         nameof(LowQualitySpeedup)
     );
 
@@ -78,14 +78,19 @@ public partial class MiiImageLoader : BaseMiiImage
         InitializeComponent();
     }
 
+    public void RefreshCurrentMii() => OnMiiChanged(Mii);
+
     protected void OnVariantChanged(MiiImageSpecifications newSpecifications)
     {
         List<MiiImageSpecifications> variants = [];
 
         if (LowQualitySpeedup)
         {
+            if (GeneratedImages.Count > 0)
+                GeneratedImages[0] = null;
             if (GeneratedImages.Count > 1)
                 GeneratedImages[1] = null;
+            OnPropertyChanged(nameof(GeneratedImages));
             variants.Add(GetLowQualityClone(newSpecifications));
         }
 
@@ -99,8 +104,11 @@ public partial class MiiImageLoader : BaseMiiImage
 
         if (LowQualitySpeedup)
         {
+            if (GeneratedImages.Count > 0)
+                GeneratedImages[0] = null;
             if (GeneratedImages.Count > 1)
                 GeneratedImages[1] = null;
+            OnPropertyChanged(nameof(GeneratedImages));
             variants.Add(GetLowQualityClone(ImageVariant));
         }
 

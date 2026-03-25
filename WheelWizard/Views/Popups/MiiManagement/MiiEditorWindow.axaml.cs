@@ -95,9 +95,9 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
     public void RefreshImage()
     {
         if (selectedVisualization == VisualizationType.Carousel)
-            MiiCarousel.Mii = Mii;
+            Mii3DRenderControl.RefreshCurrentMii();
         else if (selectedVisualization == VisualizationType.Face)
-            MiiFaceImage.Mii = Mii;
+            MiiFaceImage.RefreshCurrentMii();
     }
 
     #region PropertyChanged

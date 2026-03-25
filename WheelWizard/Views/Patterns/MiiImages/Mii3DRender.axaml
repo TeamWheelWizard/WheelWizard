@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WheelWizard.Views.Patterns.Mii3DRender">
+
+    <Border Padding="6"
+            CornerRadius="6"
+            BorderThickness="1"
+            x:Name="ImageBorder"
+            BorderBrush="{StaticResource BackgroundLineColor}"
+            IsVisible="False"
+            PointerPressed="ImageBorder_OnPointerPressed"
+            PointerMoved="ImageBorder_OnPointerMoved"
+            PointerReleased="ImageBorder_OnPointerReleased"
+            PointerCaptureLost="ImageBorder_OnPointerCaptureLost"
+            PointerWheelChanged="ImageBorder_OnPointerWheelChanged">
+        <Image x:Name="RenderImage"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"
+               Stretch="Uniform"/>
+    </Border>
+</UserControl>
