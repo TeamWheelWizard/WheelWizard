@@ -295,6 +295,9 @@ public partial class Mii3DRender : BaseMiiImage
         _forceNextSurfaceRecreate = false;
         RenderImage.Source = _surfaceBitmap;
         ImageBorder.IsVisible = true;
+        RenderImage.InvalidateVisual();
+        ImageBorder.InvalidateVisual();
+        InvalidateVisual();
         _hasPresentedFrame = true;
         MiiLoaded = true;
     }
@@ -337,6 +340,9 @@ public partial class Mii3DRender : BaseMiiImage
         DisposeSurfaceBitmap();
         RenderImage.Source = null;
         ImageBorder.IsVisible = false;
+        RenderImage.InvalidateVisual();
+        ImageBorder.InvalidateVisual();
+        InvalidateVisual();
         _hasPresentedFrame = false;
         _lastModelChangeUtc = DateTime.MinValue;
         MiiLoaded = true;
