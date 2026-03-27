@@ -3,6 +3,7 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Resources.Languages;
+using WheelWizard.Services.Input;
 using WheelWizard.Services.Installation;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.Settings;
@@ -27,6 +28,7 @@ public class RrLauncher : ILauncher
         try
         {
             DolphinLaunchHelper.KillDolphin();
+            MarioKartInputConfigService.EnsureLaunchProfileIsApplied();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
             await ModsLaunchHelper.PrepareModsForLaunch();

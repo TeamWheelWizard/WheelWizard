@@ -1,0 +1,140 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:input="clr-namespace:WheelWizard.Services.Input"
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             x:Class="WheelWizard.Views.Pages.InputPage">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" VerticalAlignment="Bottom">
+            <TextBlock Text="Input" Classes="PageTitleText" />
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="10,12">
+                <components:Button x:Name="ReloadButton"
+                                   Text="Reload"
+                                   Variant="Default"
+                                   Click="ReloadButton_OnClick" />
+                <components:Button x:Name="AutoMapButton"
+                                   Text="Auto Map"
+                                   Variant="Primary"
+                                   Click="AutoMapButton_OnClick" />
+                <components:Button x:Name="TestRumbleButton"
+                                   Text="Test Rumble"
+                                   Variant="Default"
+                                   Click="TestRumbleButton_OnClick" />
+            </StackPanel>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10,10,10,16" Spacing="10">
+                <Grid ColumnDefinitions="*,Auto"
+                      RowDefinitions="Auto,Auto">
+                    <StackPanel Spacing="6" Margin="0,0,16,0">
+                        <TextBlock Text="Controller"
+                                   Classes="TitleText"
+                                   FontSize="18"
+                                   Foreground="{StaticResource Neutral100}" />
+                        <ComboBox x:Name="ControllerDropdown"
+                                  MinWidth="320"
+                                  SelectionChanged="ControllerDropdown_OnSelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="input:ControllerDeviceOption">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                        <TextBlock Text="{Binding Subtitle}"
+                                                   Classes="TinyText"
+                                                   Foreground="{StaticResource Neutral400}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="1"
+                               Grid.ColumnSpan="2"
+                               x:Name="ControllerStatusText"
+                               Margin="0,10,0,0"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Neutral300}" />
+                </Grid>
+
+                <Border x:Name="FeedbackBorder"
+                        Background="{StaticResource Neutral900}"
+                        BorderBrush="{StaticResource Neutral700}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource GlobalCornerRadius}"
+                        Padding="14">
+                    <TextBlock x:Name="FeedbackText"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Neutral200}" />
+                </Border>
+
+                <Border Background="{StaticResource Neutral900}"
+                        BorderBrush="{StaticResource Neutral700}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource GlobalCornerRadius}"
+                        Padding="0">
+                    <ItemsControl x:Name="BindingsList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="pages:InputBindingRow">
+                                <Border BorderBrush="{StaticResource Neutral700}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="14,12">
+                                    <Grid ColumnDefinitions="170,*,Auto"
+                                          VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Title}"
+                                                   Classes="TitleText"
+                                                   FontSize="17"
+                                                   Foreground="{StaticResource Neutral100}"
+                                                   Margin="0,0,14,0"
+                                                   VerticalAlignment="Center" />
+
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Value}"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="{StaticResource Neutral300}"
+                                                   Margin="0,0,14,0"
+                                                   VerticalAlignment="Center" />
+
+                                        <components:Button Grid.Column="2"
+                                                           Text="{Binding ActionButtonText}"
+                                                           Tag="{Binding Action}"
+                                                           MinWidth="124"
+                                                           HorizontalAlignment="Right"
+                                                           VerticalAlignment="Center"
+                                                           Click="ChangeBinding_OnClick" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid.Styles>
+            <Style Selector="Border#FeedbackBorder.Info">
+                <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            </Style>
+            <Style Selector="Border#FeedbackBorder.Success">
+                <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+            </Style>
+            <Style Selector="Border#FeedbackBorder.Error">
+                <Setter Property="BorderBrush" Value="{StaticResource Danger400}" />
+            </Style>
+        </Grid.Styles>
+    </Grid>
+</UserControl>
