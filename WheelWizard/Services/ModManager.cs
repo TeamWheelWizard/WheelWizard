@@ -5,7 +5,7 @@ using System.IO.Compression;
 using Avalonia.Threading;
 using IniParser;
 using WheelWizard.Helpers;
-using WheelWizard.Models.Settings;
+using WheelWizard.Models.Mods;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Installation;
 using WheelWizard.Views.Popups.Generic;
@@ -30,7 +30,7 @@ public class ModManager : INotifyPropertyChanged
         }
     }
 
-    private bool _isProcessing;
+    private bool _isBatchUpdating;
 
     private ModManager()
     {
@@ -101,19 +101,28 @@ public class ModManager : INotifyPropertyChanged
         OnPropertyChanged(nameof(Mods));
     }
 
-    private void Mod_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Mod_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (
-            e.PropertyName != nameof(Mod.IsEnabled)
-            && e.PropertyName != nameof(Mod.Title)
-            && e.PropertyName != nameof(Mod.Author)
-            && e.PropertyName != nameof(Mod.ModID)
-            && e.PropertyName != nameof(Mod.Priority)
-        )
+        if (_isBatchUpdating)
             return;
 
-        SaveModsAsync();
-        SortModsByPriority();
+        if (e.PropertyName == nameof(Mod.Priority))
+        {
+            SaveModsAsync();
+            SortModsByPriority();
+            return;
+        }
+
+        if (
+            e.PropertyName == nameof(Mod.IsEnabled)
+            || e.PropertyName == nameof(Mod.Title)
+            || e.PropertyName == nameof(Mod.Author)
+            || e.PropertyName == nameof(Mod.ModID)
+        )
+        {
+            SaveModsAsync();
+            OnPropertyChanged(nameof(Mods));
+        }
     }
 
     private void SortModsByPriority()
@@ -152,7 +161,7 @@ public class ModManager : INotifyPropertyChanged
             .SetPlaceholderText("Enter mod name...")
             .SetValidation(ValidateModName)
             .ShowDialog();
-        if (!IsValidName(modName))
+        if (string.IsNullOrWhiteSpace(modName) || !IsValidName(modName))
             return;
 
         var tempZipPath = Path.Combine(Path.GetTempPath(), $"{modName}.zip");
@@ -203,19 +212,25 @@ public class ModManager : INotifyPropertyChanged
 
     public void ToggleAllMods(bool enable)
     {
-        foreach (var mod in Mods)
+        _isBatchUpdating = true;
+        try
         {
-            mod.IsEnabled = enable;
+            foreach (var mod in Mods)
+                mod.IsEnabled = enable;
+        }
+        finally
+        {
+            _isBatchUpdating = false;
         }
 
-        _isProcessing = !_isProcessing;
+        SaveModsAsync();
         OnPropertyChanged(nameof(Mods));
     }
 
     // TODO: Use this validation method when refactoring the ModManager
     public OperationResult ValidateModName(string? oldName, string newName)
     {
-        newName = newName?.Trim();
+        newName = (newName ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(newName))
             return Fail("Mod name cannot be empty.");
 
@@ -408,7 +423,7 @@ public class ModManager : INotifyPropertyChanged
         new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Error)
             .SetTitleText("An error occurred")
-            .SetInfoText(errorMessage)
+            .SetInfoText(errorMessage ?? "An unknown error occurred.")
             .Show();
     }
 
@@ -490,4 +505,48 @@ public class ModManager : INotifyPropertyChanged
     public int GetLowestActivePriority() => Mods.Min(m => m.Priority);
 
     public int GetHighestActivePriority() => Mods.Max(m => m.Priority);
+
+    /// <summary>
+    /// Moves a mod to a new position in the list using gap-based indexing.
+    /// Gap 0 = before first item, gap Count = after last item.
+    /// </summary>
+    public void MoveModToIndex(Mod mod, int gapIndex)
+    {
+        var sortedMods = Mods.OrderBy(m => m.Priority).ToList();
+        var currentIndex = sortedMods.IndexOf(mod);
+
+        if (currentIndex == -1)
+            return;
+
+        // Convert gap index to target index after removal
+        int targetIndex;
+        if (gapIndex <= currentIndex)
+            targetIndex = gapIndex;
+        else if (gapIndex > currentIndex + 1)
+            targetIndex = gapIndex - 1;
+        else
+            return; // No change needed (dropped in same position)
+
+        targetIndex = Math.Clamp(targetIndex, 0, sortedMods.Count - 1);
+
+        if (currentIndex == targetIndex)
+            return;
+
+        _isBatchUpdating = true;
+        try
+        {
+            sortedMods.RemoveAt(currentIndex);
+            sortedMods.Insert(targetIndex, mod);
+
+            for (var i = 0; i < sortedMods.Count; i++)
+                sortedMods[i].Priority = i;
+        }
+        finally
+        {
+            _isBatchUpdating = false;
+        }
+
+        SortModsByPriority();
+        SaveModsAsync();
+    }
 }

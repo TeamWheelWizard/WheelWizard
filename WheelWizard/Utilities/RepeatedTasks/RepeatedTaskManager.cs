@@ -44,7 +44,9 @@ public abstract class RepeatedTaskManager
         _timer.Start();
 
         // Run the initial execution
+#pragma warning disable CS4014
         ExecuteAndNotifyAsync();
+#pragma warning restore CS4014
     }
 
     public void Stop()

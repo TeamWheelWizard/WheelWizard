@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="100"
+             x:Class="WheelWizard.Views.Patterns.FeedbackTextBox"
+             xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             x:DataType="behaviorComp:FeedbackTextBox"
+             >
+    <StackPanel Orientation="Vertical">
+        <components:FormFieldLabel Text="{Binding Label}" TipText="{Binding TipText}" 
+                                   IsVisible="{Binding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <TextBox x:Name="InputField" Text="{Binding Text}"
+                 Watermark="{Binding Watermark}"/>
+        <components:IconLabel IsIconLeft="True" Text="{Binding ErrorMessage}" 
+                              IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                              Foreground="{StaticResource Danger600}"
+                              IconData="{StaticResource WarningTriangle}"
+                              IconSize="15" FontSize="13" Margin="4,4,0,0"
+                              />
+        <components:IconLabel IsIconLeft="True" Text="{Binding WarningMessage}"
+                              IsVisible="{Binding WarningMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                              Foreground="{StaticResource Warning600}"
+                              IconData="{StaticResource WarningTip}"
+                              IconSize="15" FontSize="13" Margin="4,4,0,0"
+                              />
+    </StackPanel>
+    
+</UserControl>

@@ -1,15 +1,20 @@
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
+using WheelWizard.Shared.DependencyInjection;
 
 namespace WheelWizard.Views.Popups.Base;
 
 public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 {
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
 
@@ -89,16 +94,32 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
         CanClose = allowClose;
         WindowTitle = title;
         AllowParentInteraction = allowParentInteraction;
-        var mainWindow = ViewUtils.GetLayout();
-        if (mainWindow.IsVisible)
-            Owner = mainWindow;
 
         InitializeComponent();
         AddLayer();
         DataContext = this;
 
-        Position = mainWindow.Position;
+        var mainWindow = TryGetVisibleMainWindow();
+        if (mainWindow != null)
+        {
+            Owner = mainWindow;
+            Position = mainWindow.Position;
+        }
+        else
+        {
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        }
+
         Loaded += PopupWindow_Loaded;
+    }
+
+    private static Window? TryGetVisibleMainWindow()
+    {
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
+            return null;
+
+        var mainWindow = desktop.MainWindow;
+        return mainWindow is { IsVisible: true } ? mainWindow : null;
     }
 
     private void PopupWindow_Loaded(object? sender, RoutedEventArgs e)
@@ -126,7 +147,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
     public void SetWindowSize(Size size)
     {
-        var scaleFactor = (double)SettingsManager.WINDOW_SCALE.Get();
+        var scaleFactor = SettingsService.Get<double>(SettingsService.WINDOW_SCALE);
         Width = size.Width * scaleFactor;
         Height = size.Height * scaleFactor;
         CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
@@ -157,7 +178,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
     #region PropertyChanged
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnPropertyChanged(string propertyName)
     {

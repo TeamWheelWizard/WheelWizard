@@ -436,7 +436,7 @@ To join a specific room, you'll need to either join through a friend, or hope to
         <value>Search for mods...</value>
     </data>
     <data name="Question_InstallMod_Title" xml:space="preserve">
-        <value>Do you want to donwload and install the mod: {$1}?</value>
+        <value>Do you want to download and install the mod: {$1}?</value>
     </data>
     <data name="MessageError_FailedRetrieveMod_Title" xml:space="preserve">
         <value>Failed to retrieve mod info</value>

@@ -23,9 +23,12 @@ public static class Endpoints
     public const string GitHubAddress = "https://api.github.com";
 
     /// <summary>
-    /// The address for the Mii image
+    /// The base address for archived external assets.
     /// </summary>
-    public const string MiiImageAddress = "https://studio.mii.nintendo.com";
+    public const string InternetArchiveBaseAddress = "https://web.archive.org";
+
+    public const string MiiRenderingArchivePath =
+        "/web/20180502054513id_/http://download-cdn.miitomo.com/native/20180125111639/android/v2/asset_model_character_mii_AFLResHigh_2_3_dat.zip";
 
     // TODO: Refactor all the URLs seen below
 
@@ -44,7 +47,6 @@ public static class Endpoints
     public const string SupportLink = "https://ko-fi.com/wheelwizard";
 
     // Other
-    public const string MiiImageUrl = "https://studio.mii.nintendo.com/miis/image.png";
     public const string MiiChannelWAD = "-";
 
     //GameBanana

@@ -6,9 +6,8 @@ using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Input;
 using WheelWizard.Services.Installation;
 using WheelWizard.Services.Launcher.Helpers;
-using WheelWizard.Services.Settings;
 using WheelWizard.Services.WiiManagement;
-using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Settings;
 using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
 
@@ -18,10 +17,14 @@ public class RrLauncher : ILauncher
 {
     public string GameTitle { get; } = "Retro Rewind";
     private static string RrLaunchJsonFilePath => PathManager.RrLaunchJsonFilePath;
+    private readonly ICustomDistributionSingletonService _customDistributionSingletonService;
+    private readonly ISettingsManager _settingsManager;
 
-    [Inject]
-    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } =
-        App.Services.GetRequiredService<ICustomDistributionSingletonService>();
+    public RrLauncher(ICustomDistributionSingletonService customDistributionSingletonService, ISettingsManager settingsManager)
+    {
+        _customDistributionSingletonService = customDistributionSingletonService;
+        _settingsManager = settingsManager;
+    }
 
     public async Task Launch()
     {
@@ -46,7 +49,7 @@ public class RrLauncher : ILauncher
             }
 
             RetroRewindLaunchHelper.GenerateLaunchJson();
-            var dolphinLaunchType = (bool)SettingsManager.LAUNCH_WITH_DOLPHIN.Get() ? "" : "-b";
+            var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";
             DolphinLaunchHelper.LaunchDolphin(
                 $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
             );
@@ -68,7 +71,7 @@ public class RrLauncher : ILauncher
     {
         var progressWindow = new ProgressWindow();
         progressWindow.Show();
-        var installResult = await CustomDistributionSingletonService.RetroRewind.InstallAsync(progressWindow);
+        var installResult = await _customDistributionSingletonService.RetroRewind.InstallAsync(progressWindow);
         progressWindow.Close();
         if (installResult.IsFailure)
         {
@@ -84,17 +87,13 @@ public class RrLauncher : ILauncher
     {
         var progressWindow = new ProgressWindow();
         progressWindow.Show();
-        await CustomDistributionSingletonService.RetroRewind.UpdateAsync(progressWindow);
+        await _customDistributionSingletonService.RetroRewind.UpdateAsync(progressWindow);
         progressWindow.Close();
     }
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {
-        if (CustomDistributionSingletonService == null)
-        {
-            return WheelWizardStatus.NotInstalled;
-        }
-        var statusResult = await CustomDistributionSingletonService.RetroRewind.GetCurrentStatusAsync();
+        var statusResult = await _customDistributionSingletonService.RetroRewind.GetCurrentStatusAsync();
         if (statusResult.IsFailure)
             return WheelWizardStatus.NotInstalled;
         return statusResult.Value;

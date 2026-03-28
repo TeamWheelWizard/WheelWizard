@@ -1,5 +1,4 @@
 using NSubstitute.ExceptionExtensions;
-using Testably.Abstractions;
 using WheelWizard.Shared;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -9,7 +8,6 @@ namespace WheelWizard.Test.Features
     public class MiiDbServiceTests
     {
         private readonly IMiiRepositoryService _repositoryService;
-        private readonly IRandomSystem _randomSystemService;
         private readonly MiiDbService _service;
 
         // --- Test Setup ---
@@ -17,8 +15,7 @@ namespace WheelWizard.Test.Features
         public MiiDbServiceTests()
         {
             _repositoryService = Substitute.For<IMiiRepositoryService>();
-            _randomSystemService = Substitute.For<IRandomSystem>();
-            _service = new(_repositoryService, _randomSystemService);
+            _service = new(_repositoryService);
         }
 
         // --- Helper Methods ---
@@ -188,7 +185,7 @@ namespace WheelWizard.Test.Features
             Assert.True(mii1Result.IsSuccess, "Setup Failed: Could not create valid Mii");
             var mii1Bytes = GetSerializedBytes(mii1Result.Value);
             var invalidBytesShort = new byte[10]; // Invalid length
-            var invalidBytesNull = (byte[])null; // Null entry (if possible from repo)
+            byte[]? invalidBytesNull = null; // Null entry (if possible from repo)
             // Simulate a block that's the right size but contains garbage data causing deserialization failure
             var potentiallyBadBytes = new byte[MiiSerializer.MiiBlockSize];
             _repositoryService.LoadAllBlocks().Returns([invalidBytesShort, mii1Bytes, potentiallyBadBytes, invalidBytesNull!]);

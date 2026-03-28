@@ -5,7 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.BehaviorComponent"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:domain="clr-namespace:WheelWizard.WiiManagement.GameLicense.Domain"
              x:Class="WheelWizard.Views.Pages.FriendsPage">
     <Grid>
@@ -35,17 +35,17 @@
                                ToolTip.Tip="Add Friend"
                                ToolTip.Placement="Top"
                                ToolTip.ShowDelay="20" />
-            <Border VerticalAlignment="Center" HorizontalAlignment="Center"
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6,0,0,0"
                     ToolTip.Tip="{x:Static lang:Phrases.Hover_FriendsPageDisclaimer}"
                     ToolTip.Placement="Top" ToolTip.ShowDelay="20"
                     Width="18" Height="18">
-                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="15,2,5,0"
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
             </Border>
         </StackPanel>
 
-        <behaviorComponent:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
-                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
+        <patterns:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
+                                     HorizontalAlignment="Right" VerticalAlignment="Top" />
 
 
         <Grid Grid.Row="1" x:Name="VisibleWhenFriends" RowDefinitions="*, 12*">
@@ -74,7 +74,7 @@
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="domain:FriendProfile">
-                        <components:FriendsListItem Width="428" Height="124"
+                        <patterns:FriendsListItem Width="428" Height="124"
                                                     Margin="0,5"
                                                     UserName="{Binding NameOfMii}"
                                                     FriendCode="{Binding FriendCode}"

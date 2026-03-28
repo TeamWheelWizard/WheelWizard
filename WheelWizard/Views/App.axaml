@@ -49,26 +49,27 @@
         <StyleInclude Source="Styles/Styles/SliderStyles.axaml" />
 
         <!-- STANDARD COMPONENTS -->
-        <StyleInclude Source="Components/StandardLibrary/MultiColoredIcon.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/MultiIconRadioButton.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/IconLabel.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/IconLabelButton.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/Button.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/OptionButton.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/StateBox.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/EmptyPageInfo.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/FormFieldLabel.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/LoadingIcon.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/SidebarRadioButton.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/PopupListButton.axaml" />
-        <StyleInclude Source="Components/StandardLibrary/MemeNumberState.axaml" />
+        <StyleInclude Source="Components/MultiColoredIcon.axaml" />
+        <StyleInclude Source="Components/MultiIconRadioButton.axaml" />
+        <StyleInclude Source="Components/IconLabel.axaml" />
+        <StyleInclude Source="Components/IconLabelButton.axaml" />
+        <StyleInclude Source="Components/Button.axaml" />
+        <StyleInclude Source="Components/OptionButton.axaml" />
+        <StyleInclude Source="Components/StateBox.axaml" />
+        <StyleInclude Source="Components/EmptyPageInfo.axaml" />
+        <StyleInclude Source="Components/FormFieldLabel.axaml" />
+        <StyleInclude Source="Components/LoadingIcon.axaml" />
+        <StyleInclude Source="Patterns/SidebarRadioButton.axaml" />
+        <StyleInclude Source="Components/PopupListButton.axaml" />
+        <StyleInclude Source="Components/MemeNumberState.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
-        <StyleInclude Source="Components/WhWzLibrary/ModBrowserListItem.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/FriendsListItem.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/PlayerListItem.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/Badge.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/MiiBlock.axaml" />
-        <StyleInclude Source="Components/WhWzLibrary/WheelTrail.axaml" />
+        <StyleInclude Source="Patterns/ModBrowserListItem.axaml" />
+        <StyleInclude Source="Patterns/FriendsListItem.axaml" />
+        <StyleInclude Source="Patterns/PlayerListItem.axaml" />
+        <StyleInclude Source="Components/Badge.axaml" />
+        <StyleInclude Source="Patterns/MiiBlock.axaml" />
+        <StyleInclude Source="Components/WheelTrail.axaml" />
+        <StyleInclude Source="Patterns/LeaderboardPodiumCard.axaml" />
     </Application.Styles>
 </Application>

@@ -3,7 +3,7 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
-                   xmlns:behavior="clr-namespace:WheelWizard.Views.BehaviorComponent"
+                   xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
                    xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    xmlns:miiManagement="clr-namespace:WheelWizard.Views.Popups.MiiManagement"
@@ -22,7 +22,7 @@
            <Grid Grid.Row="0" x:Name="VisualizationFace" IsVisible="True">
                <Border CornerRadius="6"  BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="1"
                        Height="350" Width="350" HorizontalAlignment="Center" VerticalAlignment="Center">
-                   <behavior:MiiImageLoader  x:Name="MiiFaceImage" ReloadMethod="KeepInstanceUntilNew" LowQualitySpeedup="True"
+                   <behavior:MiiImageLoader  x:Name="MiiFaceImage" ReloadMethod="KeepInstanceUntilNew"
                                             Mii="{Binding Mii}" FallBackColor="{StaticResource Neutral700}"
                                             ImageVariant="{x:Static miiVars:MiiImageVariants.MiiEditorSmall}"/>
                </Border>
@@ -30,7 +30,7 @@
            </Grid>
            
            <Grid Grid.Row="0" x:Name="VisualizationCarousel" IsVisible="False">
-               <behavior:MiiCarousel x:Name="MiiCarousel" Height="350" Width="388" HorizontalAlignment="Center" VerticalAlignment="Center"
+               <behavior:Mii3DRender x:Name="Mii3DRenderControl" Height="350" Width="388" HorizontalAlignment="Center" VerticalAlignment="Center"
                                      ReloadMethod="KeepInstanceUntilNew"
                                      ImageVariant="{x:Static miiVars:MiiImageVariants.MiiEditorPreviewCarousel}"
                                      Mii="{Binding Mii}"/>

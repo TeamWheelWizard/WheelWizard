@@ -4,7 +4,7 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
-                   xmlns:behaviorComp="clr-namespace:WheelWizard.Views.BehaviorComponent"
+                   xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns"
                    xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    x:Class="WheelWizard.Views.Popups.Generic.TextInputWindow">
