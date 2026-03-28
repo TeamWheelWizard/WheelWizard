@@ -1,3 +1,4 @@
+using System.Globalization;
 using IniParser;
 using IniParser.Model;
 using WheelWizard.Helpers;
@@ -18,7 +19,9 @@ public static class MarioKartInputConfigService
     private const string RightStickBinding = "right-stick";
     private const string DPadBinding = "dpad";
     private const string FullDPadBinding = "full-dpad";
+    private const string CustomDirectionalBindingPrefix = "custom|";
     private const string DefaultCalibration = "100.00";
+    private const int DefaultDeadZonePercent = 0;
     private const string DefaultRumbleBinding = "`Motor` | `Motor L` | `Motor R` | `Strong` | `Weak`";
 
     private static readonly string[] GameCubeSections = ["GCPad1", "GCPad2", "GCPad3", "GCPad4"];
@@ -35,6 +38,7 @@ public static class MarioKartInputConfigService
         {
             SourceSection = sourceSection,
             DeviceExpression = GetValue(section, "Device"),
+            MainStickDeadZonePercent = LoadDeadZonePercent(section, "Main Stick/Dead Zone"),
             MainStickCalibration = GetValue(section, "Main Stick/Calibration", DefaultCalibration),
             CStickCalibration = GetValue(section, "C-Stick/Calibration", DefaultCalibration),
             RumbleBinding = GetValue(section, "Rumble/Motor", DefaultRumbleBinding),
@@ -70,6 +74,7 @@ public static class MarioKartInputConfigService
         var section = EnsureSection(padData, "GCPad1");
 
         section["Device"] = profile.DeviceExpression;
+        section["Main Stick/Dead Zone"] = profile.MainStickDeadZonePercent.ToString(CultureInfo.InvariantCulture);
         section["Main Stick/Calibration"] = string.IsNullOrWhiteSpace(profile.MainStickCalibration)
             ? DefaultCalibration
             : profile.MainStickCalibration;
@@ -146,14 +151,75 @@ public static class MarioKartInputConfigService
             return "Not set";
 
         if (action == MarioKartInputAction.Steering)
-            return DescribeDirectionalBinding(binding);
+            return IsCustomDirectionalBinding(binding) ? "Custom" : DescribeDirectionalBinding(binding);
 
         if (action == MarioKartInputAction.TrickWheelie && binding == FullDPadBinding)
             return "D-Pad";
 
+        if (action == MarioKartInputAction.TrickWheelie && IsCustomDirectionalBinding(binding))
+            return "Custom";
+
         var tokens = SplitBinding(binding).Select(HumanizeToken).Where(token => !string.IsNullOrWhiteSpace(token)).ToList();
 
         return tokens.Count == 0 ? "Not set" : string.Join(" or ", tokens);
+    }
+
+    public static bool SupportsStickSettings(MarioKartInputAction action, string binding) =>
+        action == MarioKartInputAction.Steering && binding is LeftStickBinding or RightStickBinding;
+
+    public static bool SupportsDirectionEditor(MarioKartInputAction action, string binding)
+    {
+        if (string.IsNullOrWhiteSpace(binding))
+            return false;
+
+        return action switch
+        {
+            MarioKartInputAction.Steering => binding == DPadBinding || IsCustomDirectionalBinding(binding),
+            MarioKartInputAction.TrickWheelie => binding == FullDPadBinding || IsDPadToken(binding) || IsCustomDirectionalBinding(binding),
+            _ => false,
+        };
+    }
+
+    public static string GetStickBindingDisplayName(string binding)
+    {
+        return binding switch
+        {
+            LeftStickBinding => "Left Stick",
+            RightStickBinding => "Right Stick",
+            _ => "Stick",
+        };
+    }
+
+    public static DirectionalBindingSet GetDirectionalBindingSet(MarioKartInputAction action, string binding)
+    {
+        if (action == MarioKartInputAction.Steering)
+            return GetSteeringDirectionalBindingSet(binding);
+
+        if (action == MarioKartInputAction.TrickWheelie)
+            return GetTrickWheelieDirectionalBindingSet(binding);
+
+        return new();
+    }
+
+    public static string CreateDirectionalBinding(MarioKartInputAction action, DirectionalBindingSet bindingSet)
+    {
+        if (action == MarioKartInputAction.Steering)
+        {
+            if (MatchesDefaultDirectionalPad(bindingSet))
+                return DPadBinding;
+
+            return BuildCustomDirectionalBinding(bindingSet);
+        }
+
+        if (action == MarioKartInputAction.TrickWheelie)
+        {
+            if (MatchesDefaultDirectionalPad(bindingSet))
+                return FullDPadBinding;
+
+            return BuildCustomDirectionalBinding(bindingSet);
+        }
+
+        return string.Empty;
     }
 
     public static string GetSavedDeviceDisplayName(string deviceExpression)
@@ -201,10 +267,11 @@ public static class MarioKartInputConfigService
         var left = GetValue(section, "D-Pad/Left");
         var right = GetValue(section, "D-Pad/Right");
 
-        if (up == WrapToken("Pad N") && down == WrapToken("Pad S") && left == WrapToken("Pad W") && right == WrapToken("Pad E"))
-        {
+        if (MatchesDefaultDirectionalPad(up, down, left, right))
             return FullDPadBinding;
-        }
+
+        if (!string.IsNullOrWhiteSpace(down) || !string.IsNullOrWhiteSpace(left) || !string.IsNullOrWhiteSpace(right))
+            return BuildCustomDirectionalBinding(up, down, left, right);
 
         return up;
     }
@@ -238,16 +305,7 @@ public static class MarioKartInputConfigService
             return;
         }
 
-        var parts = binding.Split('|', StringSplitOptions.TrimEntries);
-        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var part in parts.Skip(1))
-        {
-            var splitIndex = part.IndexOf('=');
-            if (splitIndex <= 0 || splitIndex == part.Length - 1)
-                continue;
-
-            values[part[..splitIndex]] = part[(splitIndex + 1)..];
-        }
+        var values = ParseDirectionalBindingValues(binding);
 
         section["Main Stick/Up"] = values.GetValueOrDefault("up", string.Empty);
         section["Main Stick/Down"] = values.GetValueOrDefault("down", string.Empty);
@@ -265,6 +323,16 @@ public static class MarioKartInputConfigService
             section["D-Pad/Down"] = WrapToken("Pad S");
             section["D-Pad/Left"] = WrapToken("Pad W");
             section["D-Pad/Right"] = WrapToken("Pad E");
+            return;
+        }
+
+        if (IsCustomDirectionalBinding(normalizedBinding))
+        {
+            var customBinding = ParseCustomDirectionalBinding(normalizedBinding);
+            section["D-Pad/Up"] = customBinding.Up;
+            section["D-Pad/Down"] = customBinding.Down;
+            section["D-Pad/Left"] = customBinding.Left;
+            section["D-Pad/Right"] = customBinding.Right;
             return;
         }
 
@@ -299,6 +367,74 @@ public static class MarioKartInputConfigService
     private static string NormalizeCombinedBinding(string binding) => CombineDistinctBindings(binding);
 
     private static string NormalizeTrickWheelieBinding(string binding) => IsDPadToken(binding) ? FullDPadBinding : binding;
+
+    private static bool IsCustomDirectionalBinding(string binding) =>
+        binding.StartsWith(CustomDirectionalBindingPrefix, StringComparison.Ordinal);
+
+    private static DirectionalBindingSet GetSteeringDirectionalBindingSet(string binding)
+    {
+        if (binding == DPadBinding)
+            return GetDefaultDirectionalPad();
+
+        return IsCustomDirectionalBinding(binding) ? ParseCustomDirectionalBinding(binding) : new();
+    }
+
+    private static DirectionalBindingSet GetTrickWheelieDirectionalBindingSet(string binding)
+    {
+        if (binding == FullDPadBinding || IsDPadToken(binding))
+            return GetDefaultDirectionalPad();
+
+        return IsCustomDirectionalBinding(binding) ? ParseCustomDirectionalBinding(binding) : new();
+    }
+
+    private static DirectionalBindingSet ParseCustomDirectionalBinding(string binding)
+    {
+        var values = ParseDirectionalBindingValues(binding);
+        return new()
+        {
+            Up = values.GetValueOrDefault("up", string.Empty),
+            Down = values.GetValueOrDefault("down", string.Empty),
+            Left = values.GetValueOrDefault("left", string.Empty),
+            Right = values.GetValueOrDefault("right", string.Empty),
+        };
+    }
+
+    private static Dictionary<string, string> ParseDirectionalBindingValues(string binding)
+    {
+        var parts = binding.Split('|', StringSplitOptions.TrimEntries);
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var part in parts.Skip(1))
+        {
+            var splitIndex = part.IndexOf('=');
+            if (splitIndex <= 0 || splitIndex == part.Length - 1)
+                continue;
+
+            values[part[..splitIndex]] = part[(splitIndex + 1)..];
+        }
+
+        return values;
+    }
+
+    private static string BuildCustomDirectionalBinding(DirectionalBindingSet bindingSet) =>
+        BuildCustomDirectionalBinding(bindingSet.Up, bindingSet.Down, bindingSet.Left, bindingSet.Right);
+
+    private static string BuildCustomDirectionalBinding(string up, string down, string left, string right) =>
+        $"{CustomDirectionalBindingPrefix}up={up}|down={down}|left={left}|right={right}";
+
+    private static DirectionalBindingSet GetDefaultDirectionalPad() =>
+        new()
+        {
+            Up = WrapToken("Pad N"),
+            Down = WrapToken("Pad S"),
+            Left = WrapToken("Pad W"),
+            Right = WrapToken("Pad E"),
+        };
+
+    private static bool MatchesDefaultDirectionalPad(DirectionalBindingSet bindingSet) =>
+        MatchesDefaultDirectionalPad(bindingSet.Up, bindingSet.Down, bindingSet.Left, bindingSet.Right);
+
+    private static bool MatchesDefaultDirectionalPad(string up, string down, string left, string right) =>
+        up == WrapToken("Pad N") && down == WrapToken("Pad S") && left == WrapToken("Pad W") && right == WrapToken("Pad E");
 
     private static bool IsDPadToken(string binding)
     {
@@ -388,6 +524,7 @@ public static class MarioKartInputConfigService
         var profileData = new IniData();
         var profileSection = EnsureSection(profileData, "Profile");
         profileSection["Device"] = profile.DeviceExpression;
+        profileSection["Main Stick/Dead Zone"] = profile.MainStickDeadZonePercent.ToString(CultureInfo.InvariantCulture);
         profileSection["Buttons/A"] = profile.Bindings.GetValueOrDefault(MarioKartInputAction.Accelerate, string.Empty);
         profileSection["Buttons/B"] = profile.Bindings.GetValueOrDefault(MarioKartInputAction.BrakeReverse, string.Empty);
         profileSection["Buttons/Start"] = profile.Bindings.GetValueOrDefault(MarioKartInputAction.Pause, "Start");
@@ -471,6 +608,15 @@ public static class MarioKartInputConfigService
             return fallback;
 
         return section[key] ?? fallback;
+    }
+
+    private static int LoadDeadZonePercent(KeyDataCollection section, string key)
+    {
+        var rawValue = GetValue(section, key);
+        if (!double.TryParse(rawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var percent))
+            return DefaultDeadZonePercent;
+
+        return Math.Clamp((int)Math.Round(percent), 0, 95);
     }
 
     private static string GetConfigPath(string fileName) => Path.Combine(PathManager.ConfigFolderPath, fileName);

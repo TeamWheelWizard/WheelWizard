@@ -95,6 +95,26 @@ public static class SdlControllerService
         return SDL.RumbleGamepad(controller.GamepadHandle, ushort.MaxValue, ushort.MaxValue, 400);
     }
 
+    public static bool TryGetStickPreview(uint instanceId, out ControllerStickPreview preview)
+    {
+        preview = new(0, 0, 0, 0);
+
+        if (!EnsureInitialized())
+            return false;
+
+        RefreshControllers();
+        if (!OpenControllers.TryGetValue(instanceId, out var controller))
+            return false;
+
+        preview = new(
+            NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftX)),
+            NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftY)),
+            NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightX)),
+            NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightY))
+        );
+        return true;
+    }
+
     public static void BeginCapture(uint instanceId)
     {
         if (!EnsureInitialized())
@@ -257,6 +277,12 @@ public static class SdlControllerService
     }
 
     private static bool IsAxisActivated(short value) => Math.Abs(value) >= AxisCaptureThreshold;
+
+    private static double NormalizeAxis(short value)
+    {
+        var normalized = value / (double)short.MaxValue;
+        return Math.Clamp(normalized, -1d, 1d);
+    }
 
     private static string MapButtonToDolphinExpression(SDL.GamepadButton button)
     {

@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SDL3;
 using WheelWizard.Services.Input;
+using WheelWizard.Views.Popups.Input;
 using Button = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Pages;
@@ -151,6 +152,9 @@ public partial class InputPage : UserControlBase
             var binding = _profile.Bindings.GetValueOrDefault(row.Action, string.Empty);
             row.Value = MarioKartInputConfigService.DescribeBinding(row.Action, binding);
             row.ActionButtonText = _listeningAction == row.Action ? "Listening..." : "Change";
+            row.IsAdvancedVisible =
+                MarioKartInputConfigService.SupportsStickSettings(row.Action, binding)
+                || MarioKartInputConfigService.SupportsDirectionEditor(row.Action, binding);
         }
     }
 
@@ -193,6 +197,31 @@ public partial class InputPage : UserControlBase
                 : $"Press the control you want to use for {definition.Title}.";
 
         SetFeedback(prompt, FeedbackVariant.Info);
+    }
+
+    private async void AdvancedBinding_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button advancedButton || advancedButton.Tag is not MarioKartInputAction action)
+            return;
+
+        _listeningAction = null;
+        UpdateBindingRows();
+
+        var binding = _profile.Bindings.GetValueOrDefault(action, string.Empty);
+        if (MarioKartInputConfigService.SupportsStickSettings(action, binding))
+        {
+            await new StickDeadzoneWindow().SetProfile(_profile).SetController(_selectedController).SetStickBinding(binding).ShowDialog();
+
+            LoadProfileFromDisk();
+            return;
+        }
+
+        if (!MarioKartInputConfigService.SupportsDirectionEditor(action, binding))
+            return;
+
+        await new DirectionalBindingWindow().SetProfile(_profile).SetController(_selectedController).SetAction(action).ShowDialog();
+
+        LoadProfileFromDisk();
     }
 
     private void AutoMapButton_OnClick(object? sender, RoutedEventArgs e)

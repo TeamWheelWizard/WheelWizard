@@ -1,3 +1,4 @@
+using System.Globalization;
 using WheelWizard.Services.Input;
 using WheelWizard.Services.Settings;
 
@@ -121,6 +122,98 @@ public sealed class MarioKartInputConfigServiceTests
             Assert.Contains("[Profile]", savedProfileContents);
             Assert.Contains("Device = SDL/0/Arcade Pad", savedProfileContents);
             Assert.Contains("D-Pad/Down = `Pad S`", savedProfileContents);
+        }
+        finally
+        {
+            SettingsManager.USER_FOLDER_PATH.Set(originalUserFolder, skipSave: true);
+            Directory.Delete(userFolder, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void LoadProfile_WhenDeadZoneUsesInvariantDecimal_ShouldRoundCorrectly()
+    {
+        var userFolder = CreateTempUserFolder();
+        var configFolder = Path.Combine(userFolder, "Config");
+        Directory.CreateDirectory(configFolder);
+
+        var originalUserFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
+        var originalCulture = CultureInfo.CurrentCulture;
+        var originalUiCulture = CultureInfo.CurrentUICulture;
+        try
+        {
+            File.WriteAllText(
+                Path.Combine(configFolder, "GCPadNew.ini"),
+                """
+                [GCPad1]
+                Device = SDL/0/Test Controller
+                Main Stick/Dead Zone = 24.6
+                Main Stick/Up = `Left Y+`
+                Main Stick/Down = `Left Y-`
+                Main Stick/Left = `Left X-`
+                Main Stick/Right = `Left X+`
+                """
+            );
+
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+            CultureInfo.CurrentUICulture = new CultureInfo("de-DE");
+            SettingsManager.USER_FOLDER_PATH.Set(userFolder, skipSave: true);
+
+            var profile = MarioKartInputConfigService.LoadProfile();
+
+            Assert.Equal(25, profile.MainStickDeadZonePercent);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+            CultureInfo.CurrentUICulture = originalUiCulture;
+            SettingsManager.USER_FOLDER_PATH.Set(originalUserFolder, skipSave: true);
+            Directory.Delete(userFolder, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void SaveProfile_WhenTrickWheelieUsesCustomDirections_ShouldPersistAllDirections()
+    {
+        var userFolder = CreateTempUserFolder();
+        var configFolder = Path.Combine(userFolder, "Config");
+        Directory.CreateDirectory(configFolder);
+
+        var originalUserFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
+        try
+        {
+            SettingsManager.USER_FOLDER_PATH.Set(userFolder, skipSave: true);
+
+            var profile = new MarioKartInputProfile { DeviceExpression = "SDL/0/Test Controller" };
+
+            profile.Bindings[MarioKartInputAction.Steering] = "left-stick";
+            profile.Bindings[MarioKartInputAction.TrickWheelie] = MarioKartInputConfigService.CreateDirectionalBinding(
+                MarioKartInputAction.TrickWheelie,
+                new DirectionalBindingSet
+                {
+                    Up = "`Button Y`",
+                    Down = "`Button A`",
+                    Left = "`Shoulder L`",
+                    Right = "`Shoulder R`",
+                }
+            );
+
+            Assert.Equal(
+                "Custom",
+                MarioKartInputConfigService.DescribeBinding(
+                    MarioKartInputAction.TrickWheelie,
+                    profile.Bindings[MarioKartInputAction.TrickWheelie]
+                )
+            );
+
+            MarioKartInputConfigService.SaveProfile(profile);
+
+            var gcpadContents = File.ReadAllText(Path.Combine(configFolder, "GCPadNew.ini"));
+
+            Assert.Contains("D-Pad/Up = `Button Y`", gcpadContents);
+            Assert.Contains("D-Pad/Down = `Button A`", gcpadContents);
+            Assert.Contains("D-Pad/Left = `Shoulder L`", gcpadContents);
+            Assert.Contains("D-Pad/Right = `Shoulder R`", gcpadContents);
         }
         finally
         {

@@ -8,6 +8,7 @@ public sealed class InputBindingRow(MarioKartInputAction action, string title) :
 {
     private string _value = "Not set";
     private string _actionButtonText = "Change";
+    private bool _isAdvancedVisible;
 
     public MarioKartInputAction Action { get; } = action;
     public string Title { get; } = title;
@@ -22,6 +23,12 @@ public sealed class InputBindingRow(MarioKartInputAction action, string title) :
     {
         get => _actionButtonText;
         set => SetField(ref _actionButtonText, value);
+    }
+
+    public bool IsAdvancedVisible
+    {
+        get => _isAdvancedVisible;
+        set => SetField(ref _isAdvancedVisible, value);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

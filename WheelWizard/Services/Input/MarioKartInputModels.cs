@@ -31,6 +31,7 @@ public sealed class MarioKartInputProfile
 {
     public string SourceSection { get; set; } = "GCPad1";
     public string DeviceExpression { get; set; } = string.Empty;
+    public int MainStickDeadZonePercent { get; set; }
     public string MainStickCalibration { get; set; } = "100.00";
     public string CStickCalibration { get; set; } = "100.00";
     public string RumbleBinding { get; set; } = string.Empty;
@@ -42,6 +43,7 @@ public sealed class MarioKartInputProfile
         {
             SourceSection = SourceSection,
             DeviceExpression = DeviceExpression,
+            MainStickDeadZonePercent = MainStickDeadZonePercent,
             MainStickCalibration = MainStickCalibration,
             CStickCalibration = CStickCalibration,
             RumbleBinding = RumbleBinding,
@@ -67,6 +69,23 @@ public sealed record ControllerDeviceOption(
 {
     public override string ToString() => DisplayName;
 }
+
+public enum InputBindingAdvancedKind
+{
+    None,
+    StickSettings,
+    DirectionEditor,
+}
+
+public sealed class DirectionalBindingSet
+{
+    public string Up { get; set; } = string.Empty;
+    public string Down { get; set; } = string.Empty;
+    public string Left { get; set; } = string.Empty;
+    public string Right { get; set; } = string.Empty;
+}
+
+public sealed record ControllerStickPreview(double LeftX, double LeftY, double RightX, double RightY);
 
 public static class MarioKartInputCatalog
 {

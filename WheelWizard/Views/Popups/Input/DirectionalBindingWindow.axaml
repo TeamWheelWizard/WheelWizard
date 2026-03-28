@@ -1,0 +1,153 @@
+<base:PopupContent x:Class="WheelWizard.Views.Popups.Input.DirectionalBindingWindow"
+                   xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
+                   ClipToBounds="False"
+                   mc:Ignorable="d"
+                   d:DesignWidth="520"
+                   d:DesignHeight="420">
+    <Grid Width="520"
+          RowDefinitions="Auto,Auto,*,Auto">
+        <StackPanel Spacing="4"
+                    Margin="0,0,0,14">
+            <TextBlock x:Name="TitleText"
+                       Classes="TitleText"
+                       FontSize="20"
+                       Foreground="{StaticResource Neutral50}" />
+            <TextBlock x:Name="SummaryText"
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource Neutral300}" />
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Margin="0,0,0,14"
+                Background="{StaticResource Neutral900}"
+                BorderBrush="{StaticResource Neutral700}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource GlobalCornerRadius}"
+                Padding="12">
+            <TextBlock x:Name="StatusText"
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource Neutral200}" />
+        </Border>
+
+        <Border Grid.Row="2"
+                Margin="0,0,0,14"
+                Background="{StaticResource Neutral900}"
+                BorderBrush="{StaticResource Neutral700}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource GlobalCornerRadius}"
+                Padding="0">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="90,*,Auto"
+                      Margin="14,12">
+                    <TextBlock Text="Up"
+                               Classes="TitleText"
+                               FontSize="17"
+                               Foreground="{StaticResource Neutral100}" />
+                    <TextBlock Grid.Column="1"
+                               x:Name="UpValueText"
+                               Margin="14,0"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Neutral300}"
+                               VerticalAlignment="Center" />
+                    <components:Button Grid.Column="2"
+                                       x:Name="UpButton"
+                                       Tag="up"
+                                       Text="Change"
+                                       MinWidth="124"
+                                       Click="ChangeDirection_OnClick" />
+                </Grid>
+
+                <Border Grid.Row="0"
+                        Background="{StaticResource Neutral700}"
+                        Height="1"
+                        VerticalAlignment="Bottom" />
+
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="90,*,Auto"
+                      Margin="14,12">
+                    <TextBlock Text="Down"
+                               Classes="TitleText"
+                               FontSize="17"
+                               Foreground="{StaticResource Neutral100}" />
+                    <TextBlock Grid.Column="1"
+                               x:Name="DownValueText"
+                               Margin="14,0"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Neutral300}"
+                               VerticalAlignment="Center" />
+                    <components:Button Grid.Column="2"
+                                       x:Name="DownButton"
+                                       Tag="down"
+                                       Text="Change"
+                                       MinWidth="124"
+                                       Click="ChangeDirection_OnClick" />
+                </Grid>
+
+                <Border Grid.Row="1"
+                        Background="{StaticResource Neutral700}"
+                        Height="1"
+                        VerticalAlignment="Bottom" />
+
+                <Grid Grid.Row="2"
+                      ColumnDefinitions="90,*,Auto"
+                      Margin="14,12">
+                    <TextBlock Text="Left"
+                               Classes="TitleText"
+                               FontSize="17"
+                               Foreground="{StaticResource Neutral100}" />
+                    <TextBlock Grid.Column="1"
+                               x:Name="LeftValueText"
+                               Margin="14,0"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Neutral300}"
+                               VerticalAlignment="Center" />
+                    <components:Button Grid.Column="2"
+                                       x:Name="LeftButton"
+                                       Tag="left"
+                                       Text="Change"
+                                       MinWidth="124"
+                                       Click="ChangeDirection_OnClick" />
+                </Grid>
+
+                <Border Grid.Row="2"
+                        Background="{StaticResource Neutral700}"
+                        Height="1"
+                        VerticalAlignment="Bottom" />
+
+                <Grid Grid.Row="3"
+                      ColumnDefinitions="90,*,Auto"
+                      Margin="14,12">
+                    <TextBlock Text="Right"
+                               Classes="TitleText"
+                               FontSize="17"
+                               Foreground="{StaticResource Neutral100}" />
+                    <TextBlock Grid.Column="1"
+                               x:Name="RightValueText"
+                               Margin="14,0"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Neutral300}"
+                               VerticalAlignment="Center" />
+                    <components:Button Grid.Column="2"
+                                       x:Name="RightButton"
+                                       Tag="right"
+                                       Text="Change"
+                                       MinWidth="124"
+                                       Click="ChangeDirection_OnClick" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <components:Button Grid.Row="3"
+                           Text="Done"
+                           Width="140"
+                           HorizontalAlignment="Center"
+                           Variant="Primary"
+                           Click="DoneButton_OnClick" />
+    </Grid>
+</base:PopupContent>

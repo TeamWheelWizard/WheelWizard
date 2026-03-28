@@ -1,0 +1,125 @@
+<base:PopupContent x:Class="WheelWizard.Views.Popups.Input.StickDeadzoneWindow"
+                   xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
+                   ClipToBounds="False"
+                   mc:Ignorable="d"
+                   d:DesignWidth="560"
+                   d:DesignHeight="420">
+    <Grid Width="560"
+          RowDefinitions="Auto,Auto,Auto,Auto">
+        <StackPanel Spacing="4"
+                    Margin="0,0,0,14">
+            <TextBlock x:Name="TitleText"
+                       Classes="TitleText"
+                       FontSize="20"
+                       Foreground="{StaticResource Neutral50}" />
+            <TextBlock Text="Adjust how much stick movement Wheel Wizard ignores before steering starts."
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource Neutral300}" />
+        </StackPanel>
+
+        <Grid Grid.Row="1"
+              ColumnDefinitions="240,*"
+              Margin="0,0,0,14">
+            <Border Width="220"
+                    Height="220"
+                    Padding="20"
+                    CornerRadius="18"
+                    Background="{StaticResource Neutral950}"
+                    BorderBrush="{StaticResource Neutral700}"
+                    BorderThickness="1">
+                <Canvas x:Name="VisualizerCanvas"
+                        Width="180"
+                        Height="180"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <Ellipse Width="180"
+                             Height="180"
+                             Stroke="{StaticResource Neutral600}"
+                             StrokeThickness="1.5" />
+                    <Ellipse x:Name="DeadZoneCircle"
+                             Width="0"
+                             Height="0"
+                             Fill="#22FF5C5C"
+                             Stroke="{StaticResource Danger400}"
+                             StrokeThickness="1.5" />
+                    <Border Width="2"
+                            Height="180"
+                            Background="{StaticResource Neutral700}"
+                            CornerRadius="999"
+                            Canvas.Left="89"
+                            Canvas.Top="0" />
+                    <Border Width="180"
+                            Height="2"
+                            Background="{StaticResource Neutral700}"
+                            CornerRadius="999"
+                            Canvas.Left="0"
+                            Canvas.Top="89" />
+                    <Border Width="14"
+                            Height="14"
+                            CornerRadius="999"
+                            Background="{StaticResource Neutral300}"
+                            BorderBrush="{StaticResource Neutral50}"
+                            BorderThickness="1"
+                            x:Name="RawDot" />
+                    <Border Width="14"
+                            Height="14"
+                            CornerRadius="999"
+                            Background="{StaticResource Primary400}"
+                            BorderBrush="{StaticResource Primary100}"
+                            BorderThickness="1"
+                            x:Name="FilteredDot" />
+                </Canvas>
+            </Border>
+
+            <StackPanel Grid.Column="1"
+                        Spacing="12"
+                        Margin="14,0,0,0">
+                <TextBlock x:Name="DeadZoneValueText"
+                           Classes="TitleText"
+                           FontSize="18"
+                           Foreground="{StaticResource Neutral50}" />
+                <Slider x:Name="DeadZoneSlider"
+                        Minimum="0"
+                        Maximum="50"
+                        TickFrequency="1"
+                        ValueChanged="DeadZoneSlider_OnValueChanged" />
+                <Border Background="{StaticResource Neutral900}"
+                        BorderBrush="{StaticResource Neutral700}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource GlobalCornerRadius}"
+                        Padding="12">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Live Input"
+                                   Classes="TitleText"
+                                   FontSize="16"
+                                   Foreground="{StaticResource Neutral100}" />
+                        <TextBlock x:Name="LiveInputText"
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource Neutral300}" />
+                        <TextBlock Text="Gray shows the raw stick. Blue shows the deadzone-adjusted output."
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource Neutral400}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Grid.Row="2"
+                   x:Name="ControllerStatusText"
+                   Margin="0,0,0,14"
+                   TextWrapping="Wrap"
+                   Foreground="{StaticResource Neutral300}" />
+
+        <components:Button Grid.Row="3"
+                           Text="Done"
+                           Width="140"
+                           HorizontalAlignment="Center"
+                           Variant="Primary"
+                           Click="DoneButton_OnClick" />
+    </Grid>
+</base:PopupContent>

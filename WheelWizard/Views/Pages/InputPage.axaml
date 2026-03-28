@@ -93,7 +93,7 @@
                                 <Border BorderBrush="{StaticResource Neutral700}"
                                         BorderThickness="0,0,0,1"
                                         Padding="14,12">
-                                    <Grid ColumnDefinitions="170,*,Auto"
+                                    <Grid ColumnDefinitions="170,*,Auto,Auto"
                                           VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Title}"
                                                    Classes="TitleText"
@@ -110,9 +110,19 @@
                                                    VerticalAlignment="Center" />
 
                                         <components:Button Grid.Column="2"
+                                                           Text=">"
+                                                           Width="42"
+                                                           HorizontalAlignment="Right"
+                                                           VerticalAlignment="Center"
+                                                           IsVisible="{Binding IsAdvancedVisible}"
+                                                           Tag="{Binding Action}"
+                                                           Click="AdvancedBinding_OnClick" />
+
+                                        <components:Button Grid.Column="3"
                                                            Text="{Binding ActionButtonText}"
                                                            Tag="{Binding Action}"
                                                            MinWidth="124"
+                                                           Margin="10,0,0,0"
                                                            HorizontalAlignment="Right"
                                                            VerticalAlignment="Center"
                                                            Click="ChangeBinding_OnClick" />
