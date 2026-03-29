@@ -81,7 +81,7 @@ public static class MarioKartInputConfigService
         section["C-Stick/Calibration"] = string.IsNullOrWhiteSpace(profile.CStickCalibration)
             ? DefaultCalibration
             : profile.CStickCalibration;
-        section["Rumble/Motor"] = string.IsNullOrWhiteSpace(profile.RumbleBinding) ? DefaultRumbleBinding : profile.RumbleBinding;
+        section["Rumble/Motor"] = profile.RumbleBinding;
 
         WriteDirectionalBinding(section, profile.Bindings.GetValueOrDefault(MarioKartInputAction.Steering, LeftStickBinding));
         section["Buttons/A"] = profile.Bindings.GetValueOrDefault(MarioKartInputAction.Accelerate, string.Empty);
@@ -119,10 +119,6 @@ public static class MarioKartInputConfigService
     public static void EnsureLaunchProfileIsApplied()
     {
         var profile = LoadProfile();
-
-        if (string.IsNullOrWhiteSpace(profile.RumbleBinding))
-            profile.RumbleBinding = DefaultRumbleBinding;
-
         SaveProfile(profile);
     }
 
@@ -130,7 +126,6 @@ public static class MarioKartInputConfigService
     {
         var autoMappedProfile = currentProfile.Clone();
         autoMappedProfile.DeviceExpression = controller.DeviceExpression;
-        autoMappedProfile.RumbleBinding = DefaultRumbleBinding;
         autoMappedProfile.Bindings[MarioKartInputAction.Steering] = LeftStickBinding;
         autoMappedProfile.Bindings[MarioKartInputAction.Accelerate] = WrapToken("Button A");
         autoMappedProfile.Bindings[MarioKartInputAction.BrakeReverse] = WrapToken("Button B");
@@ -143,6 +138,17 @@ public static class MarioKartInputConfigService
         autoMappedProfile.Bindings[MarioKartInputAction.TrickWheelie] = FullDPadBinding;
         autoMappedProfile.Bindings[MarioKartInputAction.Pause] = "Start";
         return autoMappedProfile;
+    }
+
+    public static bool IsRumbleEnabled(MarioKartInputProfile profile) => !string.IsNullOrWhiteSpace(profile.RumbleBinding);
+
+    public static void SetRumbleEnabled(MarioKartInputProfile profile, bool enabled)
+    {
+        profile.RumbleBinding = enabled
+            ? string.IsNullOrWhiteSpace(profile.RumbleBinding)
+                ? DefaultRumbleBinding
+                : profile.RumbleBinding
+            : string.Empty;
     }
 
     public static string DescribeBinding(MarioKartInputAction action, string binding)
@@ -529,7 +535,7 @@ public static class MarioKartInputConfigService
         profileSection["Buttons/B"] = profile.Bindings.GetValueOrDefault(MarioKartInputAction.BrakeReverse, string.Empty);
         profileSection["Buttons/Start"] = profile.Bindings.GetValueOrDefault(MarioKartInputAction.Pause, "Start");
         WriteTrickWheelieBinding(profileSection, profile.Bindings.GetValueOrDefault(MarioKartInputAction.TrickWheelie, string.Empty));
-        profileSection["Rumble/Motor"] = string.IsNullOrWhiteSpace(profile.RumbleBinding) ? DefaultRumbleBinding : profile.RumbleBinding;
+        profileSection["Rumble/Motor"] = profile.RumbleBinding;
         profileSection["Main Stick/Calibration"] = string.IsNullOrWhiteSpace(profile.MainStickCalibration)
             ? DefaultCalibration
             : profile.MainStickCalibration;

@@ -29,14 +29,21 @@
                                    Text="Auto Map"
                                    Variant="Primary"
                                    Click="AutoMapButton_OnClick" />
-                <components:Button x:Name="TestRumbleButton"
-                                   Text="Test Rumble"
-                                   Variant="Default"
-                                   Click="TestRumbleButton_OnClick" />
+                <CheckBox x:Name="RumbleToggle"
+                          Classes="SwitchDark"
+                          Content="Rumble"
+                          Click="RumbleToggle_OnClick" />
             </StackPanel>
         </Grid>
 
+        <components:EmptyPageInfo Grid.Row="1"
+                                  x:Name="NoControllerInfo"
+                                  IsVisible="False"
+                                  Title="No controller connected"
+                                  BodyText="Please connect a controller to map controls and configure rumble." />
+
         <ScrollViewer Grid.Row="1"
+                      x:Name="InputContent"
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="10,10,10,16" Spacing="10">

@@ -17,7 +17,9 @@ public partial class InputPage : UserControlBase
     private MarioKartInputProfile _profile = new();
     private MarioKartInputAction? _listeningAction;
     private ControllerDeviceOption? _selectedController;
+    private bool _hasConnectedControllers;
     private bool _suppressControllerChange;
+    private bool _suppressRumbleToggleChange;
 
     public InputPage()
     {
@@ -78,6 +80,7 @@ public partial class InputPage : UserControlBase
     private void RefreshControllerOptions()
     {
         var connectedControllers = SdlControllerService.GetControllers().ToList();
+        _hasConnectedControllers = connectedControllers.Count > 0;
         var options = new List<ControllerDeviceOption>(connectedControllers);
 
         if (
@@ -114,11 +117,15 @@ public partial class InputPage : UserControlBase
 
     private void UpdateControllerState()
     {
+        InputContent.IsVisible = _hasConnectedControllers;
+        NoControllerInfo.IsVisible = !_hasConnectedControllers && string.IsNullOrWhiteSpace(SdlControllerService.InitializationError);
+        UpdateRumbleToggleState();
+
         if (!string.IsNullOrWhiteSpace(SdlControllerService.InitializationError))
         {
             ControllerStatusText.Text = $"Controller support could not start: {SdlControllerService.InitializationError}";
             AutoMapButton.IsEnabled = false;
-            TestRumbleButton.IsEnabled = false;
+            RumbleToggle.IsEnabled = false;
             return;
         }
 
@@ -126,7 +133,7 @@ public partial class InputPage : UserControlBase
         {
             ControllerStatusText.Text = "No controller detected yet. Plug one in to remap controls or test rumble.";
             AutoMapButton.IsEnabled = false;
-            TestRumbleButton.IsEnabled = false;
+            RumbleToggle.IsEnabled = false;
             return;
         }
 
@@ -135,14 +142,21 @@ public partial class InputPage : UserControlBase
             ControllerStatusText.Text =
                 $"{_selectedController.DisplayName} is connected. Click Change on any action, then press the control you want to use.";
             AutoMapButton.IsEnabled = true;
-            TestRumbleButton.IsEnabled = true;
+            RumbleToggle.IsEnabled = true;
             return;
         }
 
         ControllerStatusText.Text =
             $"{_selectedController.DisplayName} is saved in Dolphin, but it is not connected right now. Connect it to remap controls or test rumble.";
         AutoMapButton.IsEnabled = false;
-        TestRumbleButton.IsEnabled = false;
+        RumbleToggle.IsEnabled = false;
+    }
+
+    private void UpdateRumbleToggleState()
+    {
+        _suppressRumbleToggleChange = true;
+        RumbleToggle.IsChecked = MarioKartInputConfigService.IsRumbleEnabled(_profile);
+        _suppressRumbleToggleChange = false;
     }
 
     private void UpdateBindingRows()
@@ -236,24 +250,44 @@ public partial class InputPage : UserControlBase
         _profile = MarioKartInputConfigService.CreateAutoMappedProfile(controller, _profile);
         MarioKartInputConfigService.SaveProfile(_profile);
         UpdateBindingRows();
+        UpdateRumbleToggleState();
         SetFeedback("A Mario Kart Wii layout has been applied and saved to Dolphin.", FeedbackVariant.Success);
     }
 
-    private void TestRumbleButton_OnClick(object? sender, RoutedEventArgs e)
+    private void RumbleToggle_OnClick(object? sender, RoutedEventArgs e)
     {
+        if (_suppressRumbleToggleChange || sender is not CheckBox rumbleToggle)
+            return;
+
         if (_selectedController is not { IsConnected: true } controller)
         {
-            SetFeedback("Connect the controller you want to test first.", FeedbackVariant.Error);
+            UpdateRumbleToggleState();
+            SetFeedback("Connect the controller you want to configure first.", FeedbackVariant.Error);
+            return;
+        }
+
+        var enableRumble = rumbleToggle.IsChecked == true;
+
+        _profile.DeviceExpression = controller.DeviceExpression;
+        MarioKartInputConfigService.SetRumbleEnabled(_profile, enableRumble);
+        MarioKartInputConfigService.SaveProfile(_profile);
+
+        if (!enableRumble)
+        {
+            SetFeedback("Rumble disabled and saved to Dolphin.", FeedbackVariant.Success);
             return;
         }
 
         if (!SdlControllerService.TestRumble(controller.InstanceId))
         {
-            SetFeedback("Rumble is not available for this controller right now.", FeedbackVariant.Error);
+            SetFeedback(
+                "Rumble enabled and saved to Dolphin, but this controller did not accept a test rumble right now.",
+                FeedbackVariant.Error
+            );
             return;
         }
 
-        SetFeedback("Rumble test sent.", FeedbackVariant.Success);
+        SetFeedback("Rumble enabled, saved to Dolphin, and tested.", FeedbackVariant.Success);
     }
 
     private void ReloadButton_OnClick(object? sender, RoutedEventArgs e)

@@ -1,6 +1,6 @@
 using System.Globalization;
 using WheelWizard.Services.Input;
-using WheelWizard.Services.Settings;
+using WheelWizard.Test.Features.Settings;
 
 namespace WheelWizard.Test.Services;
 
@@ -14,7 +14,6 @@ public sealed class MarioKartInputConfigServiceTests
         var configFolder = Path.Combine(userFolder, "Config");
         Directory.CreateDirectory(configFolder);
 
-        var originalUserFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
         try
         {
             File.WriteAllText(
@@ -45,7 +44,7 @@ public sealed class MarioKartInputConfigServiceTests
                 """
             );
 
-            SettingsManager.USER_FOLDER_PATH.Set(userFolder, skipSave: true);
+            SettingsTestUtils.InitializeSettingsRuntime(userFolder);
 
             var profile = MarioKartInputConfigService.LoadProfile();
 
@@ -59,7 +58,8 @@ public sealed class MarioKartInputConfigServiceTests
         }
         finally
         {
-            SettingsManager.USER_FOLDER_PATH.Set(originalUserFolder, skipSave: true);
+            SettingsTestUtils.ResetSettingsRuntime();
+            SettingsTestUtils.ResetSignalRuntime();
             Directory.Delete(userFolder, recursive: true);
         }
     }
@@ -71,10 +71,9 @@ public sealed class MarioKartInputConfigServiceTests
         var configFolder = Path.Combine(userFolder, "Config");
         Directory.CreateDirectory(configFolder);
 
-        var originalUserFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
         try
         {
-            SettingsManager.USER_FOLDER_PATH.Set(userFolder, skipSave: true);
+            SettingsTestUtils.InitializeSettingsRuntime(userFolder);
 
             var profile = new MarioKartInputProfile { DeviceExpression = "SDL/0/Arcade Pad", RumbleBinding = "`Motor L`" };
 
@@ -125,7 +124,8 @@ public sealed class MarioKartInputConfigServiceTests
         }
         finally
         {
-            SettingsManager.USER_FOLDER_PATH.Set(originalUserFolder, skipSave: true);
+            SettingsTestUtils.ResetSettingsRuntime();
+            SettingsTestUtils.ResetSignalRuntime();
             Directory.Delete(userFolder, recursive: true);
         }
     }
@@ -137,7 +137,6 @@ public sealed class MarioKartInputConfigServiceTests
         var configFolder = Path.Combine(userFolder, "Config");
         Directory.CreateDirectory(configFolder);
 
-        var originalUserFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
         var originalCulture = CultureInfo.CurrentCulture;
         var originalUiCulture = CultureInfo.CurrentUICulture;
         try
@@ -157,7 +156,7 @@ public sealed class MarioKartInputConfigServiceTests
 
             CultureInfo.CurrentCulture = new CultureInfo("de-DE");
             CultureInfo.CurrentUICulture = new CultureInfo("de-DE");
-            SettingsManager.USER_FOLDER_PATH.Set(userFolder, skipSave: true);
+            SettingsTestUtils.InitializeSettingsRuntime(userFolder);
 
             var profile = MarioKartInputConfigService.LoadProfile();
 
@@ -167,7 +166,8 @@ public sealed class MarioKartInputConfigServiceTests
         {
             CultureInfo.CurrentCulture = originalCulture;
             CultureInfo.CurrentUICulture = originalUiCulture;
-            SettingsManager.USER_FOLDER_PATH.Set(originalUserFolder, skipSave: true);
+            SettingsTestUtils.ResetSettingsRuntime();
+            SettingsTestUtils.ResetSignalRuntime();
             Directory.Delete(userFolder, recursive: true);
         }
     }
@@ -179,10 +179,9 @@ public sealed class MarioKartInputConfigServiceTests
         var configFolder = Path.Combine(userFolder, "Config");
         Directory.CreateDirectory(configFolder);
 
-        var originalUserFolder = (string)SettingsManager.USER_FOLDER_PATH.Get();
         try
         {
-            SettingsManager.USER_FOLDER_PATH.Set(userFolder, skipSave: true);
+            SettingsTestUtils.InitializeSettingsRuntime(userFolder);
 
             var profile = new MarioKartInputProfile { DeviceExpression = "SDL/0/Test Controller" };
 
@@ -217,9 +216,65 @@ public sealed class MarioKartInputConfigServiceTests
         }
         finally
         {
-            SettingsManager.USER_FOLDER_PATH.Set(originalUserFolder, skipSave: true);
+            SettingsTestUtils.ResetSettingsRuntime();
+            SettingsTestUtils.ResetSignalRuntime();
             Directory.Delete(userFolder, recursive: true);
         }
+    }
+
+    [Fact]
+    public void SaveProfile_WhenRumbleIsDisabled_ShouldPersistRumbleAsDisabled()
+    {
+        var userFolder = CreateTempUserFolder();
+        var configFolder = Path.Combine(userFolder, "Config");
+        Directory.CreateDirectory(configFolder);
+
+        try
+        {
+            SettingsTestUtils.InitializeSettingsRuntime(userFolder);
+
+            var profile = new MarioKartInputProfile { DeviceExpression = "SDL/0/Test Controller", RumbleBinding = string.Empty };
+
+            MarioKartInputConfigService.SaveProfile(profile);
+
+            var gcpadContents = File.ReadAllText(Path.Combine(configFolder, "GCPadNew.ini"));
+            var savedProfileContents = File.ReadAllText(Path.Combine(configFolder, "Profiles", "GCPad", "WheelWizard Active.ini"));
+
+            Assert.Contains("Rumble/Motor =", gcpadContents);
+            Assert.DoesNotContain("Rumble/Motor = `Motor` | `Motor L` | `Motor R` | `Strong` | `Weak`", gcpadContents);
+            Assert.Contains("Rumble/Motor =", savedProfileContents);
+            Assert.DoesNotContain("Rumble/Motor = `Motor` | `Motor L` | `Motor R` | `Strong` | `Weak`", savedProfileContents);
+        }
+        finally
+        {
+            SettingsTestUtils.ResetSettingsRuntime();
+            SettingsTestUtils.ResetSignalRuntime();
+            Directory.Delete(userFolder, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void CreateAutoMappedProfile_ShouldPreserveExistingRumblePreference()
+    {
+        var controller = new ControllerDeviceOption(
+            1,
+            0,
+            "Test Controller",
+            "Subtitle",
+            "SDL/0/Test Controller",
+            SDL3.SDL.GamepadType.XboxOne,
+            IsConnected: true
+        );
+
+        var disabledRumbleProfile = new MarioKartInputProfile { RumbleBinding = string.Empty };
+        var enabledRumbleProfile = new MarioKartInputProfile { RumbleBinding = "`Motor L`" };
+
+        var autoMappedWithDisabledRumble = MarioKartInputConfigService.CreateAutoMappedProfile(controller, disabledRumbleProfile);
+        var autoMappedWithEnabledRumble = MarioKartInputConfigService.CreateAutoMappedProfile(controller, enabledRumbleProfile);
+
+        Assert.False(MarioKartInputConfigService.IsRumbleEnabled(autoMappedWithDisabledRumble));
+        Assert.True(MarioKartInputConfigService.IsRumbleEnabled(autoMappedWithEnabledRumble));
+        Assert.Equal("`Motor L`", autoMappedWithEnabledRumble.RumbleBinding);
     }
 
     private static string CreateTempUserFolder()
