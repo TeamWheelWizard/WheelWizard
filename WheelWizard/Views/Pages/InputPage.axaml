@@ -78,17 +78,6 @@
                                Foreground="{StaticResource Neutral300}" />
                 </Grid>
 
-                <Border x:Name="FeedbackBorder"
-                        Background="{StaticResource Neutral900}"
-                        BorderBrush="{StaticResource Neutral700}"
-                        BorderThickness="1"
-                        CornerRadius="{StaticResource GlobalCornerRadius}"
-                        Padding="14">
-                    <TextBlock x:Name="FeedbackText"
-                               TextWrapping="Wrap"
-                               Foreground="{StaticResource Neutral200}" />
-                </Border>
-
                 <Border Background="{StaticResource Neutral900}"
                         BorderBrush="{StaticResource Neutral700}"
                         BorderThickness="1"
@@ -142,16 +131,5 @@
             </StackPanel>
         </ScrollViewer>
 
-        <Grid.Styles>
-            <Style Selector="Border#FeedbackBorder.Info">
-                <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
-            </Style>
-            <Style Selector="Border#FeedbackBorder.Success">
-                <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
-            </Style>
-            <Style Selector="Border#FeedbackBorder.Error">
-                <Setter Property="BorderBrush" Value="{StaticResource Danger400}" />
-            </Style>
-        </Grid.Styles>
     </Grid>
 </UserControl>

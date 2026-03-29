@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SDL3;
 using WheelWizard.Services.Input;
+using WheelWizard.Views;
 using WheelWizard.Views.Popups.Input;
 using Button = WheelWizard.Views.Components.Button;
 
@@ -33,8 +34,6 @@ public partial class InputPage : UserControlBase
         _controllerTimer.Tick += ControllerTimer_OnTick;
 
         LoadProfileFromDisk();
-        SetFeedback("Choose a controller, click a control, then press the button you want to use.", FeedbackVariant.Info);
-
         _controllerTimer.Start();
     }
 
@@ -64,7 +63,7 @@ public partial class InputPage : UserControlBase
 
         _listeningAction = null;
         UpdateBindingRows();
-        SetFeedback($"{actionTitle} is now set to {bindingDescription}.", FeedbackVariant.Success);
+        ShowSnackbar($"{actionTitle} is now set to {bindingDescription}.", ViewUtils.SnackbarType.Success);
     }
 
     private void LoadProfileFromDisk()
@@ -185,7 +184,7 @@ public partial class InputPage : UserControlBase
 
         _profile.DeviceExpression = controller.DeviceExpression;
         MarioKartInputConfigService.SaveProfile(_profile);
-        SetFeedback($"{controller.DisplayName} is now the active Mario Kart Wii controller.", FeedbackVariant.Success);
+        ShowSnackbar($"{controller.DisplayName} is now the active Mario Kart Wii controller.", ViewUtils.SnackbarType.Success);
     }
 
     private void ChangeBinding_OnClick(object? sender, RoutedEventArgs e)
@@ -195,7 +194,7 @@ public partial class InputPage : UserControlBase
 
         if (_selectedController is not { IsConnected: true } controller)
         {
-            SetFeedback("Connect and select a controller before changing controls.", FeedbackVariant.Error);
+            ShowSnackbar("Connect and select a controller before changing controls.", ViewUtils.SnackbarType.Danger);
             return;
         }
 
@@ -210,7 +209,7 @@ public partial class InputPage : UserControlBase
                 ? $"Move a stick or press the D-pad for {definition.Title}."
                 : $"Press the control you want to use for {definition.Title}.";
 
-        SetFeedback(prompt, FeedbackVariant.Info);
+        ShowSnackbar(prompt, ViewUtils.SnackbarType.Warning);
     }
 
     private async void AdvancedBinding_OnClick(object? sender, RoutedEventArgs e)
@@ -242,7 +241,7 @@ public partial class InputPage : UserControlBase
     {
         if (_selectedController is not { IsConnected: true } controller)
         {
-            SetFeedback("Connect a controller first to build an automatic layout.", FeedbackVariant.Error);
+            ShowSnackbar("Connect a controller first to build an automatic layout.", ViewUtils.SnackbarType.Danger);
             return;
         }
 
@@ -251,7 +250,7 @@ public partial class InputPage : UserControlBase
         MarioKartInputConfigService.SaveProfile(_profile);
         UpdateBindingRows();
         UpdateRumbleToggleState();
-        SetFeedback("A Mario Kart Wii layout has been applied and saved to Dolphin.", FeedbackVariant.Success);
+        ShowSnackbar("A Mario Kart Wii layout has been applied and saved to Dolphin.", ViewUtils.SnackbarType.Success);
     }
 
     private void RumbleToggle_OnClick(object? sender, RoutedEventArgs e)
@@ -262,7 +261,7 @@ public partial class InputPage : UserControlBase
         if (_selectedController is not { IsConnected: true } controller)
         {
             UpdateRumbleToggleState();
-            SetFeedback("Connect the controller you want to configure first.", FeedbackVariant.Error);
+            ShowSnackbar("Connect the controller you want to configure first.", ViewUtils.SnackbarType.Danger);
             return;
         }
 
@@ -274,46 +273,34 @@ public partial class InputPage : UserControlBase
 
         if (!enableRumble)
         {
-            SetFeedback("Rumble disabled and saved to Dolphin.", FeedbackVariant.Success);
+            ShowSnackbar("Rumble disabled and saved to Dolphin.", ViewUtils.SnackbarType.Success);
             return;
         }
 
         if (!SdlControllerService.TestRumble(controller.InstanceId))
         {
-            SetFeedback(
+            ShowSnackbar(
                 "Rumble enabled and saved to Dolphin, but this controller did not accept a test rumble right now.",
-                FeedbackVariant.Error
+                ViewUtils.SnackbarType.Danger
             );
             return;
         }
 
-        SetFeedback("Rumble enabled, saved to Dolphin, and tested.", FeedbackVariant.Success);
+        ShowSnackbar("Rumble enabled, saved to Dolphin, and tested.", ViewUtils.SnackbarType.Success);
     }
 
     private void ReloadButton_OnClick(object? sender, RoutedEventArgs e)
     {
         _listeningAction = null;
         LoadProfileFromDisk();
-        SetFeedback("Reloaded the current Dolphin controller setup.", FeedbackVariant.Success);
+        ShowSnackbar("Reloaded the current Dolphin controller setup.", ViewUtils.SnackbarType.Success);
     }
 
-    private void SetFeedback(string text, FeedbackVariant variant)
-    {
-        FeedbackText.Text = text;
-        FeedbackBorder.Classes.Clear();
-        FeedbackBorder.Classes.Add(variant.ToString());
-    }
+    private static void ShowSnackbar(string text, ViewUtils.SnackbarType type) => ViewUtils.ShowSnackbar(text, type);
 
     private static int ParseSavedDeviceIndex(string deviceExpression)
     {
         var split = deviceExpression.Split('/');
         return split.Length >= 2 && int.TryParse(split[1], out var index) ? index : 0;
-    }
-
-    private enum FeedbackVariant
-    {
-        Info,
-        Success,
-        Error,
     }
 }
