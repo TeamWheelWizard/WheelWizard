@@ -165,7 +165,11 @@ public static class MarioKartInputConfigService
         if (action == MarioKartInputAction.TrickWheelie && IsCustomDirectionalBinding(binding))
             return "Custom";
 
-        var tokens = SplitBinding(binding).Select(HumanizeToken).Where(token => !string.IsNullOrWhiteSpace(token)).ToList();
+        var rawTokens = SplitBinding(binding).Where(token => !string.IsNullOrWhiteSpace(token)).ToList();
+        if (action == MarioKartInputAction.LookBehind && rawTokens.Count > 1)
+            return "Custom";
+
+        var tokens = rawTokens.Select(HumanizeToken).Where(token => !string.IsNullOrWhiteSpace(token)).ToList();
 
         return tokens.Count == 0 ? "Not set" : string.Join(" or ", tokens);
     }
@@ -186,6 +190,8 @@ public static class MarioKartInputConfigService
         };
     }
 
+    public static bool SupportsMultiBindingEditor(MarioKartInputAction action) => action == MarioKartInputAction.LookBehind;
+
     public static string GetStickBindingDisplayName(string binding)
     {
         return binding switch
@@ -194,6 +200,16 @@ public static class MarioKartInputConfigService
             RightStickBinding => "Right Stick",
             _ => "Stick",
         };
+    }
+
+    public static IReadOnlyList<string> GetBindingTokens(string binding) => SplitBinding(binding).ToList();
+
+    public static string CreateCombinedBinding(params string[] rawBindings) => CombineDistinctBindings(rawBindings);
+
+    public static string DescribeSingleInputBinding(string binding)
+    {
+        var firstToken = SplitBinding(binding).FirstOrDefault();
+        return string.IsNullOrWhiteSpace(firstToken) ? "Not set" : HumanizeToken(firstToken);
     }
 
     public static DirectionalBindingSet GetDirectionalBindingSet(MarioKartInputAction action, string binding)

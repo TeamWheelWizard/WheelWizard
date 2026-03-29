@@ -1,0 +1,119 @@
+<base:PopupContent x:Class="WheelWizard.Views.Popups.Input.MultiBindingWindow"
+                   xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
+                   ClipToBounds="False"
+                   mc:Ignorable="d"
+                   d:DesignWidth="560"
+                   d:DesignHeight="360">
+    <Grid Width="560"
+          RowDefinitions="Auto,Auto,*,Auto">
+        <StackPanel Spacing="4"
+                    Margin="0,0,0,14">
+            <TextBlock x:Name="TitleText"
+                       Classes="TitleText"
+                       FontSize="20"
+                       Foreground="{StaticResource Neutral50}" />
+            <TextBlock x:Name="SummaryText"
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource Neutral300}" />
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Margin="0,0,0,14"
+                Background="{StaticResource Neutral900}"
+                BorderBrush="{StaticResource Neutral700}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource GlobalCornerRadius}"
+                Padding="12">
+            <TextBlock x:Name="StatusText"
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource Neutral200}" />
+        </Border>
+
+        <Border Grid.Row="2"
+                Margin="0,0,0,14"
+                Background="{StaticResource Neutral900}"
+                BorderBrush="{StaticResource Neutral700}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource GlobalCornerRadius}"
+                Padding="0">
+            <Grid RowDefinitions="Auto,Auto">
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="90,*,Auto,Auto"
+                      Margin="14,12">
+                    <TextBlock Text="Primary"
+                               Classes="TitleText"
+                               FontSize="17"
+                               Foreground="{StaticResource Neutral100}" />
+                    <TextBlock Grid.Column="1"
+                               x:Name="PrimaryValueText"
+                               Margin="14,0"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Neutral300}"
+                               VerticalAlignment="Center" />
+                    <components:Button Grid.Column="2"
+                                       x:Name="PrimaryButton"
+                                       Tag="0"
+                                       Text="Change"
+                                       Width="124"
+                                       Margin="10,0,0,0"
+                                       Click="ChangeBinding_OnClick" />
+                    <components:Button Grid.Column="3"
+                                       x:Name="PrimaryClearButton"
+                                       Tag="0"
+                                       Text="Clear"
+                                       Width="92"
+                                       Margin="10,0,0,0"
+                                       Variant="Default"
+                                       Click="ClearBinding_OnClick" />
+                </Grid>
+
+                <Border Grid.Row="0"
+                        Background="{StaticResource Neutral700}"
+                        Height="1"
+                        VerticalAlignment="Bottom" />
+
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="90,*,Auto,Auto"
+                      Margin="14,12">
+                    <TextBlock Text="Secondary"
+                               Classes="TitleText"
+                               FontSize="17"
+                               Foreground="{StaticResource Neutral100}" />
+                    <TextBlock Grid.Column="1"
+                               x:Name="SecondaryValueText"
+                               Margin="14,0"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Neutral300}"
+                               VerticalAlignment="Center" />
+                    <components:Button Grid.Column="2"
+                                       x:Name="SecondaryButton"
+                                       Tag="1"
+                                       Text="Change"
+                                       Width="124"
+                                       Margin="10,0,0,0"
+                                       Click="ChangeBinding_OnClick" />
+                    <components:Button Grid.Column="3"
+                                       x:Name="SecondaryClearButton"
+                                       Tag="1"
+                                       Text="Clear"
+                                       Width="92"
+                                       Margin="10,0,0,0"
+                                       Variant="Default"
+                                       Click="ClearBinding_OnClick" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <components:Button Grid.Row="3"
+                           Text="Done"
+                           Width="140"
+                           HorizontalAlignment="Center"
+                           Variant="Primary"
+                           Click="DoneButton_OnClick" />
+    </Grid>
+</base:PopupContent>

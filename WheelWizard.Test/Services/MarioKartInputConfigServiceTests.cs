@@ -277,6 +277,22 @@ public sealed class MarioKartInputConfigServiceTests
         Assert.Equal("`Motor L`", autoMappedWithEnabledRumble.RumbleBinding);
     }
 
+    [Fact]
+    public void DescribeBinding_WhenLookBehindHasMultipleBindings_ShouldReturnCustom()
+    {
+        var description = MarioKartInputConfigService.DescribeBinding(MarioKartInputAction.LookBehind, "`Button X` | `Shoulder R`");
+
+        Assert.Equal("Custom", description);
+    }
+
+    [Fact]
+    public void CreateCombinedBinding_ShouldRemoveDuplicatesAndPreserveOrder()
+    {
+        var binding = MarioKartInputConfigService.CreateCombinedBinding("`Button X`", "`Shoulder R`", "`Button X`");
+
+        Assert.Equal("`Button X` | `Shoulder R`", binding);
+    }
+
     private static string CreateTempUserFolder()
     {
         var path = Path.Combine(Path.GetTempPath(), $"wheelwizard-input-tests-{Guid.NewGuid():N}");

@@ -163,11 +163,13 @@ public partial class InputPage : UserControlBase
         foreach (var row in _bindingRows)
         {
             var binding = _profile.Bindings.GetValueOrDefault(row.Action, string.Empty);
-            row.Value = MarioKartInputConfigService.DescribeBinding(row.Action, binding);
-            row.ActionButtonText = _listeningAction == row.Action ? "Listening..." : "Change";
+            var bindingDescription = MarioKartInputConfigService.DescribeBinding(row.Action, binding);
+            row.Value = bindingDescription;
+            row.ActionButtonText = _listeningAction == row.Action ? "Listening..." : bindingDescription;
             row.IsAdvancedVisible =
                 MarioKartInputConfigService.SupportsStickSettings(row.Action, binding)
-                || MarioKartInputConfigService.SupportsDirectionEditor(row.Action, binding);
+                || MarioKartInputConfigService.SupportsDirectionEditor(row.Action, binding)
+                || MarioKartInputConfigService.SupportsMultiBindingEditor(row.Action);
         }
     }
 
@@ -224,6 +226,14 @@ public partial class InputPage : UserControlBase
         if (MarioKartInputConfigService.SupportsStickSettings(action, binding))
         {
             await new StickDeadzoneWindow().SetProfile(_profile).SetController(_selectedController).SetStickBinding(binding).ShowDialog();
+
+            LoadProfileFromDisk();
+            return;
+        }
+
+        if (MarioKartInputConfigService.SupportsMultiBindingEditor(action))
+        {
+            await new MultiBindingWindow().SetProfile(_profile).SetController(_selectedController).SetAction(action).ShowDialog();
 
             LoadProfileFromDisk();
             return;
