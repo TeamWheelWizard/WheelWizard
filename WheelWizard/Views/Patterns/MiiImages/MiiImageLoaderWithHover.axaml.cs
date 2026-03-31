@@ -3,13 +3,14 @@ using Avalonia;
 using Avalonia.Media;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
+using WheelWizard.Utilities;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
 
 public partial class MiiImageLoaderWithHover : BaseMiiImage
 {
-    private static readonly bool IsAprilFirst = DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
+    private static readonly bool IsAprilFirst = AprilFirstHelper.IsAprilFirstLocalOrBst();
     private bool _hasLoadedHoverVariant;
 
     public static readonly StyledProperty<bool> IsHoveredProperty = AvaloniaProperty.Register<MiiImageLoaderWithHover, bool>(

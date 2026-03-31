@@ -3,13 +3,14 @@ using Avalonia.Media;
 using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
+using WheelWizard.Utilities;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
 
 public partial class MiiImageLoader : BaseMiiImage
 {
-    private static readonly bool IsAprilFirst = DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
+    private static readonly bool IsAprilFirst = AprilFirstHelper.IsAprilFirstLocalOrBst();
 
     #region properties
 

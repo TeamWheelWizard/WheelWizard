@@ -11,14 +11,24 @@ using WheelWizard.Services.Launcher;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Utilities;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Popups.Generic;
 using Button = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Pages;
 
 public partial class HomePage : UserControlBase
 {
-    private static readonly bool IsAprilFirst = DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
+    private static readonly bool IsAprilFirst = AprilFirstHelper.IsAprilFirstLocalOrBst();
+    private static readonly (string MainText, string ExtraText, string YesText, string NoText)[] AprilFirstLaunchPrompts =
+    [
+        ("You wanna start the game?", "This feels suspiciously productive.", "Yeah", "Nah"),
+        ("Eeeeh not feeling like it", "Try asking a little nicer next time.", "Please", "Whatever"),
+        ("Launch Retro Beefbai?", "I am consulting the ancient wheel.", "Do it", "Nope"),
+        ("You again?", "The game is pretending not to notice you.", "Open it", "Leave it"),
+        ("Starting the game already?", "That was fast. Almost too fast.", "Fine", "Hold on"),
+    ];
 
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
@@ -97,6 +107,25 @@ public partial class HomePage : UserControlBase
 
     private void LaunchGame() => _ = CurrentLauncher.Launch();
 
+    private bool ShouldShowAprilFirstLaunchPrompts() =>
+        IsAprilFirst && _status is WheelWizardStatus.Ready or WheelWizardStatus.NoServerButInstalled;
+
+    private async Task ShowAprilFirstLaunchPromptsAsync()
+    {
+        var promptPool = ((string MainText, string ExtraText, string YesText, string NoText)[])AprilFirstLaunchPrompts.Clone();
+        RandomSystem.Random.Shared.Shuffle(promptPool);
+
+        for (var i = 0; i < 4; i++)
+        {
+            var prompt = promptPool[i];
+            await new YesNoWindow()
+                .SetMainText(prompt.MainText)
+                .SetExtraText(prompt.ExtraText)
+                .SetButtonText(prompt.YesText, prompt.NoText)
+                .AwaitAnswer();
+        }
+    }
+
     private void NavigateToSettings() => NavigationManager.NavigateTo<SettingsPage>();
 
     private async void Download()
@@ -115,9 +144,15 @@ public partial class HomePage : UserControlBase
         NavigationManager.NavigateTo<HomePage>();
     }
 
-    private void PlayButton_Click(object? sender, RoutedEventArgs e)
+    private async void PlayButton_Click(object? sender, RoutedEventArgs e)
     {
-        CurrentButtonState?.OnClick?.Invoke();
+        if (CurrentButtonState?.OnClick == null)
+            return;
+
+        if (ShouldShowAprilFirstLaunchPrompts())
+            await ShowAprilFirstLaunchPromptsAsync();
+
+        CurrentButtonState.OnClick.Invoke();
         PlayActivateAnimation();
         UpdateActionButton();
         DisableAllButtonsTemporarily();
