@@ -24,6 +24,7 @@ public interface ISettingsProperties
     Setting GAME_LOCATION { get; }
     Setting FORCE_WIIMOTE { get; }
     Setting LAUNCH_WITH_DOLPHIN { get; }
+    Setting LAUNCH_RR_ON_STARTUP { get; }
     Setting PREFERS_MODS_ROW_VIEW { get; }
     Setting FOCUSED_USER { get; }
     Setting ENABLE_ANIMATIONS { get; }

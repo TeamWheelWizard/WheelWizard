@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
 using WheelWizard.AutoUpdating;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Settings;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
@@ -132,7 +133,9 @@ public class App : Application
             await whWzDataService.LoadBadgesAsync();
             InitializeManagers();
 
-            if (GetStartupLaunchTarget() == StartupLaunchTarget.RetroRewind)
+            var settingsManager = Services.GetRequiredService<ISettingsManager>();
+            var shouldLaunchRrOnStartup = settingsManager.Get<bool>(settingsManager.LAUNCH_RR_ON_STARTUP);
+            if (GetStartupLaunchTarget() == StartupLaunchTarget.RetroRewind || shouldLaunchRrOnStartup)
             {
                 var rrLauncher = Services.GetRequiredService<RrLauncher>();
                 await rrLauncher.Launch();
