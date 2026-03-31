@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
 using WheelWizard.AutoUpdating;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Services.Launcher;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.UrlProtocol;
@@ -18,6 +19,12 @@ namespace WheelWizard.Views;
 
 public class App : Application
 {
+    private enum StartupLaunchTarget
+    {
+        None,
+        RetroRewind,
+    }
+
     /// <summary>
     /// Gets the service provider configured for this application.
     /// </summary>
@@ -51,13 +58,64 @@ public class App : Application
         ToolTipBubbleBehavior.Initialize();
     }
 
-    private static void OpenGameBananaModWindow()
+    private static string? GetLaunchProtocolArgument()
     {
         var args = Environment.GetCommandLineArgs();
+        for (var i = 1; i < args.Length; i++)
+        {
+            var argument = args[i];
+            if (argument.StartsWith("wheelwizard://", StringComparison.OrdinalIgnoreCase))
+                return argument;
+        }
+
+        return null;
+    }
+
+    private static StartupLaunchTarget GetStartupLaunchTarget()
+    {
+        var args = Environment.GetCommandLineArgs();
+
+        for (var i = 1; i < args.Length; i++)
+        {
+            var argument = args[i];
+            if (argument.Equals("--launch", StringComparison.OrdinalIgnoreCase) || argument.Equals("-l", StringComparison.OrdinalIgnoreCase))
+            {
+                if (i + 1 >= args.Length)
+                    continue;
+
+                var launchTarget = args[++i];
+                if (launchTarget.Equals("rr", StringComparison.OrdinalIgnoreCase) ||
+                    launchTarget.Equals("retrorewind", StringComparison.OrdinalIgnoreCase) ||
+                    launchTarget.Equals("retro-rewind", StringComparison.OrdinalIgnoreCase))
+                {
+                    return StartupLaunchTarget.RetroRewind;
+                }
+
+                continue;
+            }
+
+            if (!argument.StartsWith("--launch=", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var launchTargetFromEquals = argument["--launch=".Length..].Trim();
+            if (launchTargetFromEquals.Equals("rr", StringComparison.OrdinalIgnoreCase) ||
+                launchTargetFromEquals.Equals("retrorewind", StringComparison.OrdinalIgnoreCase) ||
+                launchTargetFromEquals.Equals("retro-rewind", StringComparison.OrdinalIgnoreCase))
+            {
+                return StartupLaunchTarget.RetroRewind;
+            }
+        }
+
+        return StartupLaunchTarget.None;
+    }
+
+    private static void OpenGameBananaModWindow()
+    {
         ModManager.Instance.ReloadAsync();
-        if (args.Length <= 1)
+        var protocolArgument = GetLaunchProtocolArgument();
+        if (string.IsNullOrWhiteSpace(protocolArgument))
             return;
-        var protocolArgument = args[1];
+
         _ = UrlProtocolManager.ShowPopupForLaunchUrlAsync(protocolArgument);
     }
 
@@ -73,6 +131,12 @@ public class App : Application
             await updateService.CheckForUpdatesAsync();
             await whWzDataService.LoadBadgesAsync();
             InitializeManagers();
+
+            if (GetStartupLaunchTarget() == StartupLaunchTarget.RetroRewind)
+            {
+                var rrLauncher = Services.GetRequiredService<RrLauncher>();
+                await rrLauncher.Launch();
+            }
         }
         catch (Exception e)
         {
