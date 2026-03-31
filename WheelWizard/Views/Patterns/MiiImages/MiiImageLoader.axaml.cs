@@ -9,6 +9,8 @@ namespace WheelWizard.Views.Patterns;
 
 public partial class MiiImageLoader : BaseMiiImage
 {
+    private static readonly bool IsAprilFirst = DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
+
     #region properties
 
     public static readonly StyledProperty<bool> LowQualitySpeedupProperty = AvaloniaProperty.Register<MiiImageLoader, bool>(
@@ -76,6 +78,9 @@ public partial class MiiImageLoader : BaseMiiImage
     public MiiImageLoader()
     {
         InitializeComponent();
+
+        if (IsAprilFirst)
+            MiiImageContainer.RenderTransform = new RotateTransform(Random.Shared.NextDouble() * 360);
     }
 
     public void RefreshCurrentMii() => OnMiiChanged(Mii);

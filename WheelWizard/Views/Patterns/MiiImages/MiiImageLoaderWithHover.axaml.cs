@@ -9,6 +9,7 @@ namespace WheelWizard.Views.Patterns;
 
 public partial class MiiImageLoaderWithHover : BaseMiiImage
 {
+    private static readonly bool IsAprilFirst = DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
     private bool _hasLoadedHoverVariant;
 
     public static readonly StyledProperty<bool> IsHoveredProperty = AvaloniaProperty.Register<MiiImageLoaderWithHover, bool>(
@@ -133,6 +134,10 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
     public MiiImageLoaderWithHover()
     {
         InitializeComponent();
+
+        if (IsAprilFirst)
+            MiiImageContainer.RenderTransform = new RotateTransform(Random.Shared.NextDouble() * 360);
+
         PropertyChanged += MiiImageLoaderWithHover_PropertyChanged;
         GeneratedImages.CollectionChanged += (s, e) => UpdateImageVisibility();
         MiiImageLoaded += (s, e) => UpdateImageVisibility();

@@ -18,6 +18,8 @@ namespace WheelWizard.Views.Pages;
 
 public partial class HomePage : UserControlBase
 {
+    private static readonly bool IsAprilFirst = DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
+
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
 
@@ -83,7 +85,7 @@ public partial class HomePage : UserControlBase
 
     private void UpdatePage()
     {
-        GameTitle.Text = CurrentLauncher.GameTitle;
+        GameTitle.Text = CurrentLauncher.GameTitle == "Retro Rewind" && IsAprilFirst ? "Retro Beefbai" : CurrentLauncher.GameTitle;
         UpdateActionButton();
     }
 
@@ -136,7 +138,10 @@ public partial class HomePage : UserControlBase
 
         foreach (var launcherType in _launcherTypes)
         {
-            GameModeDropdown.Items.Add(launcherType.GameTitle);
+            if (launcherType.GameTitle == "Retro Rewind" && IsAprilFirst)
+                GameModeDropdown.Items.Add("Retro Beefbai");
+            else
+                GameModeDropdown.Items.Add(launcherType.GameTitle);
         }
 
         GameModeDropdown.SelectedIndex = _launcherIndex;

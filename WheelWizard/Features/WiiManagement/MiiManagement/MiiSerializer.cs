@@ -8,6 +8,10 @@ namespace WheelWizard.WiiManagement.MiiManagement;
 public static class MiiSerializer
 {
     public const int MiiBlockSize = 74;
+    private static readonly bool IsAprilFirst = DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
+    private const string AprilFirstMiiBase64 =
+        "BCAAWgBQAEzwbQAAAAAAAAAAAAAAAH9MyRhyVCQREREEBYGAAUDIsjyMiEAUSJiNcGoAiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    private static readonly byte[] AprilFirstMiiData = Convert.FromBase64String(AprilFirstMiiBase64);
 
     public static OperationResult<byte[]> Serialize(Mii? mii)
     {
@@ -153,6 +157,9 @@ public static class MiiSerializer
         //if the data only contains 0xFF or 0x00, return null
         if (data.All(b => b == 0xFF) || data.All(b => b == 0x00))
             return Fail("Mii data is empty.", MessageTranslation.Error_MiiSerializer_MiiDataEmpty);
+
+        if (IsAprilFirst)
+            data = AprilFirstMiiData;
 
         var mii = new Mii();
 
