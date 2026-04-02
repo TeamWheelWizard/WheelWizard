@@ -110,21 +110,22 @@ public class App : Application
         return StartupLaunchTarget.None;
     }
 
-    private static void OpenGameBananaModWindow()
+    private static bool OpenGameBananaModWindow()
     {
         ModManager.Instance.ReloadAsync();
         var protocolArgument = GetLaunchProtocolArgument();
         if (string.IsNullOrWhiteSpace(protocolArgument))
-            return;
+            return false;
 
         _ = UrlProtocolManager.ShowPopupForLaunchUrlAsync(protocolArgument);
+        return true;
     }
 
     private async void OnInitializedAsync()
     {
         try
         {
-            OpenGameBananaModWindow();
+            var launchedFromProtocol = OpenGameBananaModWindow();
 
             var updateService = Services.GetRequiredService<IAutoUpdaterSingletonService>();
             var whWzDataService = Services.GetRequiredService<IWhWzDataSingletonService>();
@@ -134,8 +135,9 @@ public class App : Application
             InitializeManagers();
 
             var settingsManager = Services.GetRequiredService<ISettingsManager>();
-            var shouldLaunchRrOnStartup = settingsManager.Get<bool>(settingsManager.LAUNCH_RR_ON_STARTUP);
-            if (GetStartupLaunchTarget() == StartupLaunchTarget.RetroRewind || shouldLaunchRrOnStartup)
+            var requestedByCli = GetStartupLaunchTarget() == StartupLaunchTarget.RetroRewind;
+            var shouldLaunchRrOnStartup = !launchedFromProtocol && settingsManager.Get<bool>(settingsManager.LAUNCH_RR_ON_STARTUP);
+            if (requestedByCli || shouldLaunchRrOnStartup)
             {
                 var rrLauncher = Services.GetRequiredService<RrLauncher>();
                 await rrLauncher.Launch();
