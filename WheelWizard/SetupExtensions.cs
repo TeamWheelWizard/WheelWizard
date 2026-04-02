@@ -42,6 +42,13 @@ public static class SetupExtensions
         services.AddMiiImages();
         services.AddCustomDistributionService();
 
+        // Ghost services
+        services.AddHttpClient();
+        services.AddSingleton<WheelWizard.Services.TrackHexMappingService>();
+        services.AddSingleton<WheelWizard.Services.GhostTrackService>();
+        services.AddTransient<WheelWizard.Services.GhostLeaderboardService>();
+        services.AddSingleton<WheelWizard.Services.LocalGhostService>();
+
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();
         services.AddSingleton<ITimeSystem, RealTimeSystem>();

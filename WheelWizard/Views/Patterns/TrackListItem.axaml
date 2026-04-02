@@ -1,0 +1,138 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+         xmlns:components="using:WheelWizard.Views.Components"
+         xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns">
+    <Design.PreviewWith>
+        <StackPanel Background="{StaticResource Neutral950}">
+            <patterns:TrackListItem Width="428" Height="80"
+                                   TrackName="Mario Circuit 1"
+                                   Console="SNES"
+                                   ConsoleColor="Yellow"
+                                   IsCustomTrack="False" />
+                                   
+            <patterns:TrackListItem Width="428" Height="80"
+                                   TrackName="Phendrana Frostbite"
+                                   Console=""
+                                   ConsoleColor=""
+                                   IsCustomTrack="True" />
+        </StackPanel>
+    </Design.PreviewWith>
+
+    <Style Selector="patterns|TrackListItem">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Classes="BoxItemBackground">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <!-- Track Icon -->
+                        <Border Grid.Column="0" CornerRadius="6" ClipToBounds="True"
+                                Background="{StaticResource Neutral800}" Width="48" Height="48" Margin="10,3">
+                            <PathIcon Data="{StaticResource Road}" Width="24" Height="24"
+                                      Foreground="{StaticResource Neutral400}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+
+                        <!-- Track Info -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="15,0">
+                            <StackPanel Orientation="Horizontal">
+                                <!-- Console Label for retro tracks (hidden, replaced by badge) -->
+                                <TextBlock Text="{TemplateBinding Console}" 
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0"
+                                           x:Name="PART_ConsoleLabel"
+                                           IsVisible="False" />
+
+                                <!-- RETRO Badge for retro tracks -->
+                                <Border x:Name="PART_RetroBadge"
+                                        Background="DodgerBlue"
+                                        CornerRadius="4"
+                                        Padding="6,2"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="RETRO" 
+                                               FontWeight="Bold"
+                                               FontSize="10"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Border>
+
+                                <!-- CT Badge for custom tracks -->
+                                <Border x:Name="PART_CustomBadge"
+                                        Background="Orange"
+                                        CornerRadius="4"
+                                        Padding="6,2"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="CT" 
+                                               FontWeight="Bold"
+                                               FontSize="10"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                           
+                                <!-- Track Name -->
+                                <TextBlock Text="{TemplateBinding TrackName}" 
+                                           Classes="BodyText"
+                                           FontWeight="SemiBold"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource Neutral100}" />
+                            </StackPanel>
+                        </StackPanel>
+
+
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <!-- Hover Effect -->
+    <Style Selector="patterns|TrackListItem:pointerover /template/ Border.BoxItemBackground">
+        <Setter Property="Background" Value="{StaticResource Neutral800}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Primary500}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Console Color Styles -->
+    <Style Selector="patterns|TrackListItem[ConsoleColor=yellow] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#FFD700" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=green] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#00FF00" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=blue1] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#4169E1" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=red2] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#DC143C" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=yor3] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#FF6347" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=white] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=yor7] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#FF7F50" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=blue2] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#1E90FF" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=yor5] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#FFA500" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=yor0] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#FFB6C1" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=red1] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#FF4500" />
+    </Style>
+    <Style Selector="patterns|TrackListItem[ConsoleColor=yor2] /template/ TextBlock#PART_ConsoleLabel">
+        <Setter Property="Foreground" Value="#DAA520" />
+    </Style>
+</Styles>

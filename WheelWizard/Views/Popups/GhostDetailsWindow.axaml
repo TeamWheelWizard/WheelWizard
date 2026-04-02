@@ -1,0 +1,152 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:WheelWizard.Models"
+        xmlns:converters="clr-namespace:WheelWizard.Converters"
+        mc:Ignorable="d" 
+        d:DesignWidth="500" d:DesignHeight="600"
+        Width="500" Height="600"
+        MinWidth="450" MinHeight="550"
+        x:Class="WheelWizard.Views.Popups.GhostDetailsWindow"
+        x:DataType="models:GhostSubmission"
+        Title="Ghost Run Details"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource Neutral950}"
+        Icon="{StaticResource AppIconPath}">
+    
+    <Window.Resources>
+        <converters:CharacterIdToNameConverter x:Key="CharacterIdToName" />
+        <converters:VehicleIdToNameConverter x:Key="VehicleIdToName" />
+        <converters:DriftTypeToNameConverter x:Key="DriftTypeToName" />
+        <converters:ControllerTypeToNameConverter x:Key="ControllerTypeToName" />
+        <converters:LapTimesToAverageConverter x:Key="LapTimesToAverage" />
+        <converters:CountryCodeToFlagConverter x:Key="CountryCodeToFlag" />
+    </Window.Resources>
+
+    <ScrollViewer Padding="20">
+        <StackPanel Spacing="20">
+            <!-- Header -->
+            <Border Background="{StaticResource Neutral900}" CornerRadius="8" Padding="20">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,8">
+                        <TextBlock Text="{Binding PlayerName}" 
+                                   Classes="PageTitleText" 
+                                   FontSize="24" 
+                                   FontWeight="Bold" />
+                        <TextBlock Text="{Binding CountryAlpha2, Converter={StaticResource CountryCodeToFlag}}" 
+                                   Classes="BodyText" 
+                                   FontSize="20" 
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="15">
+                        <TextBlock Text="{Binding FinishTimeDisplay, StringFormat=Final Time: {0}}" 
+                                   Classes="BodyText" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource Primary}" />
+                        <TextBlock Text="{Binding Rank, StringFormat=Rank: #{0}}" 
+                                   Classes="BodyText" 
+                                   FontSize="14" 
+                                   Foreground="{StaticResource Neutral400}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Lap Times -->
+            <Border Background="{StaticResource Neutral900}" CornerRadius="8" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Lap Times" 
+                               Classes="BodyText" 
+                               FontSize="18" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,15" />
+                    
+                    <!-- Individual Lap Times -->
+                    <Border Background="{StaticResource Neutral800}" CornerRadius="6" Padding="15" Margin="0,15,0,0">
+                        <StackPanel x:Name="LapTimesContainer" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Setup Details -->
+            <Border Background="{StaticResource Neutral900}" CornerRadius="8" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Setup Details" 
+                               Classes="BodyText" 
+                               FontSize="18" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,15" />
+                    
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                        <TextBlock Grid.Column="0" Grid.Row="0" 
+                                   Text="Character:" 
+                                   Classes="BodyText" 
+                                   Foreground="{StaticResource Neutral400}"
+                                   Margin="0,0,10,6" />
+                        <TextBlock Grid.Column="1" Grid.Row="0" 
+                                   Text="{Binding CharacterId, Converter={StaticResource CharacterIdToName}}" 
+                                   Classes="BodyText" 
+                                   HorizontalAlignment="Right"
+                                   Margin="10,0,0,6" />
+                        
+                        <TextBlock Grid.Column="0" Grid.Row="1" 
+                                   Text="Vehicle:" 
+                                   Classes="BodyText" 
+                                   Foreground="{StaticResource Neutral400}"
+                                   Margin="0,0,10,6" />
+                        <TextBlock Grid.Column="1" Grid.Row="1" 
+                                   Text="{Binding VehicleId, Converter={StaticResource VehicleIdToName}}" 
+                                   Classes="BodyText" 
+                                   HorizontalAlignment="Right"
+                                   Margin="10,0,0,6" />
+                        
+                        <TextBlock Grid.Column="0" Grid.Row="2" 
+                                   Text="Drift:" 
+                                   Classes="BodyText" 
+                                   Foreground="{StaticResource Neutral400}"
+                                   Margin="0,0,10,6" />
+                        <TextBlock Grid.Column="1" Grid.Row="2" 
+                                   Text="{Binding DriftType, Converter={StaticResource DriftTypeToName}}" 
+                                   Classes="BodyText" 
+                                   HorizontalAlignment="Right"
+                                   Margin="10,0,0,6" />
+                        
+                        <TextBlock Grid.Column="0" Grid.Row="3" 
+                                   Text="Controller:" 
+                                   Classes="BodyText" 
+                                   Foreground="{StaticResource Neutral400}"
+                                   Margin="0,0,10,6" />
+                        <TextBlock Grid.Column="1" Grid.Row="3" 
+                                   Text="{Binding ControllerType, Converter={StaticResource ControllerTypeToName}}" 
+                                   Classes="BodyText" 
+                                   HorizontalAlignment="Right"
+                                   Margin="10,0,0,6" />
+                        
+                        <TextBlock Grid.Column="0" Grid.Row="4" 
+                                   Text="Date Set:" 
+                                   Classes="BodyText" 
+                                   Foreground="{StaticResource Neutral400}" />
+                        <TextBlock Grid.Column="1" Grid.Row="4" 
+                                   Text="{Binding DateSet}" 
+                                   Classes="BodyText" 
+                                   FontFamily="DejaVu Sans Mono,Adwaita Mono,Consolas,Monaco,monospace"
+                                   HorizontalAlignment="Right"
+                                   Margin="10,0,0,0" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Close Button -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                <Button Content="Close" 
+                        Padding="20,10" 
+                        Click="CloseButton_Click"
+                        Background="{StaticResource Neutral800}"
+                        Foreground="{StaticResource Neutral100}"
+                        CornerRadius="6"
+                        BorderThickness="0" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

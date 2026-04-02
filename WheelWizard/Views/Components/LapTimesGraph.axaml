@@ -1,0 +1,117 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" 
+             d:DesignWidth="500" d:DesignHeight="200"
+             x:Class="WheelWizard.Views.Components.LapTimesGraph"
+             x:DataType="components:LapTimesGraph">
+    
+    <Border Background="{StaticResource Neutral900}" 
+            CornerRadius="8" 
+            Padding="20"
+            IsVisible="{Binding HasData}">
+        <StackPanel>
+            <TextBlock Text="Lap Times Graph" 
+                       Classes="BodyText" 
+                       FontSize="18" 
+                       FontWeight="Bold" 
+                       Margin="0,0,0,15" />
+            
+            <!-- Stats Row -->
+            <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,15">
+                <StackPanel Grid.Column="0" Spacing="2">
+                    <TextBlock Text="Fastest" 
+                               Classes="BodyText" 
+                               FontSize="12" 
+                               Foreground="{StaticResource Neutral400}" />
+                    <TextBlock Text="{Binding FastestLapText}" 
+                               Classes="BodyText" 
+                               FontFamily="DejaVu Sans Mono,Adwaita Mono,Consolas,Monaco,monospace"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource Primary}" />
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Center">
+                    <TextBlock Text="Average" 
+                               Classes="BodyText" 
+                               FontSize="12" 
+                               Foreground="{StaticResource Neutral400}" />
+                    <TextBlock Text="{Binding AverageLapText}" 
+                               Classes="BodyText" 
+                               FontFamily="DejaVu Sans Mono,Adwaita Mono,Consolas,Monaco,monospace" />
+                </StackPanel>
+                
+                <StackPanel Grid.Column="2" Spacing="2" HorizontalAlignment="Right">
+                    <TextBlock Text="Slowest" 
+                               Classes="BodyText" 
+                               FontSize="12" 
+                               Foreground="{StaticResource Neutral400}" />
+                    <TextBlock Text="{Binding SlowestLapText}" 
+                               Classes="BodyText" 
+                               FontFamily="DejaVu Sans Mono,Adwaita Mono,Consolas,Monaco,monospace"
+                               Foreground="{StaticResource Danger400}" />
+                </StackPanel>
+            </Grid>
+            
+            <!-- Graph Container -->
+            <Border Background="{StaticResource Neutral950}"
+                    BorderBrush="{StaticResource Neutral800}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Height="140">
+                <Grid>
+                    <!-- Grid lines -->
+                    <Border Background="{StaticResource Neutral800}" 
+                            Height="1" 
+                            VerticalAlignment="Top" 
+                            Opacity="0.5" />
+                    <Border Background="{StaticResource Neutral800}" 
+                            Height="1" 
+                            VerticalAlignment="Center" 
+                            Opacity="0.5" />
+                    <Border Background="{StaticResource Neutral800}" 
+                            Height="1" 
+                            VerticalAlignment="Bottom" 
+                            Opacity="0.5" />
+                    <Border Background="{StaticResource Neutral800}" 
+                            Width="1" 
+                            HorizontalAlignment="Left" 
+                            Opacity="0.3" />
+                    <Border Background="{StaticResource Neutral800}" 
+                            Width="1" 
+                            HorizontalAlignment="Center" 
+                            Opacity="0.3" />
+                    <Border Background="{StaticResource Neutral800}" 
+                            Width="1" 
+                            HorizontalAlignment="Right" 
+                            Opacity="0.3" />
+                    
+                    <!-- Area under curve -->
+                    <Path Data="{Binding GraphAreaPath}" 
+                          Opacity="0.25" 
+                          Stretch="Fill">
+                        <Path.Fill>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="{StaticResource Primary300}" Offset="0" />
+                                <GradientStop Color="{StaticResource Primary700}" Offset="1" />
+                            </LinearGradientBrush>
+                        </Path.Fill>
+                    </Path>
+                    
+                    <!-- Line graph -->
+                    <Path Data="{Binding GraphPath}" 
+                          Stroke="{StaticResource Primary400}" 
+                          StrokeThickness="3"
+                          StrokeLineCap="Round" 
+                          Stretch="Fill" />
+                    
+                    <!-- Data points -->
+                    <Canvas x:Name="DataPointsCanvas" />
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>
