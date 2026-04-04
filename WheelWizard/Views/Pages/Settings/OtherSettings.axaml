@@ -34,6 +34,12 @@
                         <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_LaunchWithDolphin}"
                                                    TipText="{x:Static lang:Settings.HelperText_LaunchWithDolphin}" />
                     </CheckBox>
+                    <CheckBox Margin="0,2" IsChecked="False"
+                              Classes="SwitchDark"
+                              x:Name="LaunchRrOnStartup">
+                        <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_LaunchRrOnStartup}"
+                                                   TipText="{x:Static lang:Settings.HelperText_LaunchRrOnStartup}" />
+                    </CheckBox>
                 </StackPanel>
             </Border>
             

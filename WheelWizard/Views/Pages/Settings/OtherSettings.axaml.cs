@@ -31,6 +31,7 @@ public partial class OtherSettings : UserControlBase
         // Attach event handlers after loading settings to avoid unwanted triggers
         DisableForce.IsCheckedChanged += ClickForceWiimote;
         LaunchWithDolphin.IsCheckedChanged += ClickLaunchWithDolphinWindow;
+        LaunchRrOnStartup.IsCheckedChanged += ClickLaunchRrOnStartup;
     }
 
     private void LoadSettings()
@@ -38,6 +39,7 @@ public partial class OtherSettings : UserControlBase
         // Only loads when the settings are not disabled (aka when the paths are set up correctly)
         DisableForce.IsChecked = SettingsService.Get<bool>(SettingsService.FORCE_WIIMOTE);
         LaunchWithDolphin.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_WITH_DOLPHIN);
+        LaunchRrOnStartup.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_RR_ON_STARTUP);
         OpenSaveFolderButton.IsEnabled = Directory.Exists(PathManager.SaveFolderPath);
     }
 
@@ -54,6 +56,11 @@ public partial class OtherSettings : UserControlBase
     private void ClickLaunchWithDolphinWindow(object? sender, RoutedEventArgs e)
     {
         SettingsService.Set(SettingsService.LAUNCH_WITH_DOLPHIN, LaunchWithDolphin.IsChecked == true);
+    }
+
+    private void ClickLaunchRrOnStartup(object? sender, RoutedEventArgs e)
+    {
+        SettingsService.Set(SettingsService.LAUNCH_RR_ON_STARTUP, LaunchRrOnStartup.IsChecked == true);
     }
 
     private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e)

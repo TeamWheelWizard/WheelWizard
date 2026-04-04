@@ -109,6 +109,7 @@ public class SettingsManager : ISettingsManager
         GAME_LOCATION = RegisterWhWz("GameLocation", "", value => _fileSystem.File.Exists(value as string ?? string.Empty));
         FORCE_WIIMOTE = RegisterWhWz("ForceWiimote", false);
         LAUNCH_WITH_DOLPHIN = RegisterWhWz("LaunchWithDolphin", false);
+        LAUNCH_RR_ON_STARTUP = RegisterWhWz("LaunchRrOnStartup", false);
         PREFERS_MODS_ROW_VIEW = RegisterWhWz("PrefersModsRowView", true);
         FOCUSED_USER = RegisterWhWz("FavoriteUser", 0, value => (int)(value ?? -1) >= 0 && (int)(value ?? -1) < 4);
 
@@ -195,6 +196,7 @@ public class SettingsManager : ISettingsManager
     public Setting GAME_LOCATION { get; }
     public Setting FORCE_WIIMOTE { get; }
     public Setting LAUNCH_WITH_DOLPHIN { get; }
+    public Setting LAUNCH_RR_ON_STARTUP { get; }
     public Setting PREFERS_MODS_ROW_VIEW { get; }
     public Setting FOCUSED_USER { get; }
     public Setting ENABLE_ANIMATIONS { get; }
