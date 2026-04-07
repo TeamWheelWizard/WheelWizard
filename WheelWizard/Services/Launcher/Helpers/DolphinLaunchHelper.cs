@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Serilog;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
 using WheelWizard.Views.Popups.Generic;
@@ -122,7 +123,7 @@ public static class DolphinLaunchHelper
     }
 
     // Make sure all file arguments are absolute paths
-    public static void LaunchDolphin(string arguments = "", bool shellExecute = false)
+    public static void LaunchDolphin(string arguments = "", bool shellExecute = false, bool throwOnFailure = false)
     {
         try
         {
@@ -161,6 +162,11 @@ public static class DolphinLaunchHelper
         }
         catch (Exception ex)
         {
+            if (throwOnFailure)
+                throw;
+
+            Log.Error(ex, "Failed to launch Dolphin");
+
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Error)
                 .SetTitleText("Failed to launch Dolphin")

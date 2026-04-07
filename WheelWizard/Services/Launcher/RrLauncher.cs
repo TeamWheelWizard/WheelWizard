@@ -1,4 +1,5 @@
 ﻿using Avalonia.Threading;
+using Serilog;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
@@ -29,10 +30,37 @@ public class RrLauncher : ILauncher
     {
         try
         {
-            DolphinLaunchHelper.KillDolphin();
+            try
+            {
+                DolphinLaunchHelper.KillDolphin();
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(
+                    ex,
+                    "Failed to stop Dolphin before launching Retro Rewind. Continuing launch. Dolphin path: {DolphinPath}",
+                    PathManager.DolphinFilePath
+                );
+            }
+
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
-            await ModsLaunchHelper.PrepareModsForLaunch();
+
+            try
+            {
+                await ModsLaunchHelper.PrepareModsForLaunch();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(
+                    ex,
+                    "Failed to prepare Retro Rewind mods for launch. Mods path: {ModsPath}, MyStuff path: {MyStuffPath}",
+                    PathManager.ModsFolderPath,
+                    PathManager.MyStuffFolderPath
+                );
+                throw new InvalidOperationException("Failed to prepare mods for launch.", ex);
+            }
+
             if (!File.Exists(PathManager.GameFilePath))
             {
                 Dispatcher.UIThread.Post(() =>
@@ -46,14 +74,47 @@ public class RrLauncher : ILauncher
                 return;
             }
 
-            RetroRewindLaunchHelper.GenerateLaunchJson();
+            try
+            {
+                RetroRewindLaunchHelper.GenerateLaunchJson();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(
+                    ex,
+                    "Failed to generate Retro Rewind launch json. Json path: {LaunchJsonPath}, Xml path: {XmlPath}",
+                    PathManager.RrLaunchJsonFilePath,
+                    PathManager.XmlFilePath
+                );
+                throw new InvalidOperationException("Failed to generate the Retro Rewind launch config.", ex);
+            }
+
             var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";
-            DolphinLaunchHelper.LaunchDolphin(
-                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
-            );
+            try
+            {
+                DolphinLaunchHelper.LaunchDolphin(
+                    $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False",
+                    throwOnFailure: true
+                );
+            }
+            catch (Exception ex)
+            {
+                Log.Error(
+                    ex,
+                    "Failed to start Dolphin for Retro Rewind. Dolphin path: {DolphinPath}, Game path: {GamePath}, User path: {UserPath}, Launch json: {LaunchJsonPath}",
+                    PathManager.DolphinFilePath,
+                    PathManager.GameFilePath,
+                    PathManager.UserFolderPath,
+                    PathManager.RrLaunchJsonFilePath
+                );
+                throw new InvalidOperationException("Failed to start Dolphin with the Retro Rewind launch config.", ex);
+            }
         }
         catch (Exception ex)
         {
+            if (ex.InnerException is null)
+                Log.Error(ex, "Failed to launch Retro Rewind");
+
             Dispatcher.UIThread.Post(() =>
             {
                 new MessageBoxWindow()
