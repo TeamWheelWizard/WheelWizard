@@ -1,350 +1,90 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using WheelWizard.Helpers;
+using WheelWizard.Models;
+using Serilog;
 
 namespace WheelWizard.Services;
 
 /// <summary>
-/// Service that maps track names to their hex folder values for ghost file organization
-/// Note these was all taken from the discord surly there has to be a better way of getting this info
+/// Resolves ghost folder hashes by grouping tracks via courseId and hashing main SZS bytes.
 /// </summary>
 public class TrackHexMappingService
 {
-    private static readonly Dictionary<string, string> _trackNameToHexMap = new()
+    private const int CourseIdBase = 256;
+    private static readonly Regex ColorCodeRegex = new("\\\\c\\{[^}]+\\}", RegexOptions.Compiled);
+    private static readonly Regex MappingLineRegex = new("^(?<name>.+?)\\s*=\\s*(?<hex>[0-9A-Fa-f]{8})$", RegexOptions.Compiled);
+    private static readonly Regex NonAlphaNumRegex = new("[^a-z0-9]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private readonly Dictionary<string, string> _trackNameToHexMap = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<int, string> _courseIdToHexMap = new();
+    private readonly Dictionary<string, int> _trackNameToCourseIdMap = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<int, List<string>> _courseIdToTrackNamesMap = new();
+    private readonly object _lock = new();
+
+    private Dictionary<string, string>? _szsIndex;
+    private Dictionary<string, string>? _folderToTrackNameMap;
+    private bool _initialized;
+
+    public void InitializeFromTrackInfo(IEnumerable<TrackInfo> trackInfos)
     {
-        // SNES Tracks
-        {"SNES Mario Circuit 1", "44E5205F"},
-        {"SNES Donut Plains 1", "EB586DFF"},
-        {"SNES Ghost Valley 1", "DE75621F"},
-        {"SNES Bowser Castle 1", "D87A17D8"},
-        {"SNES Mario Circuit 2", "D9E184B1"},
-        {"SNES Choco Island 1", "CAE3C36D"},
-        {"SNES Ghost Valley 2", "8301A1DB"},
-        {"SNES Donut Plains 2", "CA066F62"},
-        {"SNES Bowser Castle 2", "971A5C34"},
-        {"SNES Mario Circuit 3", "E50ED939"},
-        {"SNES Koopa Beach 1", "038C74CF"},
-        {"SNES Choco Island 2", "F520145E"},
-        {"SNES Vanilla Lake 1", "26383B16"},
-        {"SNES Bowser Castle 3", "2F793D6A"},
-        {"SNES Mario Circuit 4", "B2E12767"},
-        {"SNES Donut Plains 3", "9EB3ABD9"},
-        {"SNES Koopa Beach 2", "68165DDB"},
-        {"SNES Ghost Valley 3", "F3122981"},
-        {"SNES Vanilla Lake 2", "F4CA3226"},
-        {"SNES Rainbow Road", "13BA92A6"},
+        var tracks = trackInfos?
+            .Where(t => t.CourseId > 0)
+            .ToList() ?? new List<TrackInfo>();
 
-        // N64 Tracks
-        {"N64 Luigi Raceway", "D233950F"},
-        {"N64 Moo Moo Farm", "A1D9CBF4"},
-        {"N64 Koopa Troopa Beach", "DFBF7765"},
-        {"N64 Kalimari Desert", "DD799A8B"},
-        {"N64 Toad's Turnpike", "A13B369E"},
-        {"N64 Frappe Snowland", "638CD778"},
-        {"N64 Choco Mountain", "3E613DFD"},
-        {"N64 Mario Raceway", "2BC0BC7F"},
-        {"N64 Wario Stadium", "9C687079"},
-        {"N64 Sherbet Land", "5CA26075"},
-        {"N64 Royal Raceway", "1A34960A"},
-        {"N64 Bowser's Castle", "B6EF6CDC"},
-        {"N64 DK's Jungle Parkway", "E747148E"},
-        {"N64 Yoshi Valley", "EA7143FA"},
-        {"N64 Banshee Boardwalk", "D5FD5530"},
-        {"N64 Rainbow Road", "887ED844"},
+        if (tracks.Count == 0)
+        {
+            Log.Warning("Track hash initialization skipped: no valid track info entries were provided");
+            return;
+        }
 
-        // GBA Tracks
-        {"GBA Peach Circuit", "250F872B"},
-        {"GBA Shy Guy Beach", "A3D2E690"},
-        {"GBA Riverside Park", "7FF67CF4"},
-        {"GBA Bowser Castle 1", "99906E32"},
-        {"GBA Mario Circuit", "2D62D5AB"},
-        {"GBA Boo Lake", "CBD96C35"},
-        {"GBA Cheese Land", "6F599A06"},
-        {"GBA Bowser Castle 2", "405C4AAD"},
-        {"GBA Luigi Circuit", "C50E4B19"},
-        {"GBA Sky Garden", "7BABCBE2"},
-        {"GBA Cheep-Cheep Island", "5571E08D"},
-        {"GBA Sunset Wilds", "B1CB0053"},
-        {"GBA Snow Land", "C453E8D1"},
-        {"GBA Ribbon Road", "5C3A3924"},
-        {"GBA Yoshi Desert", "03C5CC88"},
-        {"GBA Bowser Castle 3", "EAEB9FF5"},
-        {"GBA Lakeside Park", "5C8AE5E6"},
-        {"GBA Broken Pier", "2B007603"},
-        {"GBA Bowser Castle 4", "48AC0DEF"},
-        {"GBA Rainbow Road", "5109EC5A"},
+        lock (_lock)
+        {
+            _trackNameToHexMap.Clear();
+            _courseIdToHexMap.Clear();
+            _trackNameToCourseIdMap.Clear();
+            _courseIdToTrackNamesMap.Clear();
+            _szsIndex = null;
+            _folderToTrackNameMap = null;
 
-        // GCN Tracks
-        {"GCN Luigi Circuit", "DE5B4372"},
-        {"GCN Peach Beach", "B6548636"},
-        {"GCN Baby Park", "D6CAC6A4"},
-        {"GCN Dry Dry Desert", "7278C3E5"},
-        {"GCN Mushroom Bridge", "BB02C680"},
-        {"GCN Mario Circuit", "A3EB62E4"},
-        {"GCN Daisy Cruiser", "263AEA09"},
-        {"GCN Waluigi Stadium", "2AB5DADE"},
-        {"GCN Sherbet Land", "6E9C9A9F"},
-        {"GCN Mushroom City", "6813B49F"},
-        {"GCN Yoshi Circuit", "F352BF51"},
-        {"GCN DK Mountain", "40F755DE"},
-        {"GCN Wario Colosseum", "01A52CBA"},
-        {"GCN Dino Dino Jungle", "5207422E"},
-        {"GCN Bowser's Castle", "E1EF4FAE"},
-        {"GCN Rainbow Road", "31BFD489"},
+            foreach (var group in tracks.GroupBy(t => t.CourseId))
+            {
+                var courseId = group.Key;
+                _courseIdToTrackNamesMap[courseId] = group
+                    .OrderBy(t => t.Id)
+                    .Select(t => t.Name)
+                    .ToList();
 
-        // DS Tracks
-        {"DS Figure 8 Circuit", "3B0B90BD"},
-        {"DS Yoshi Falls", "CCB71442"},
-        {"DS Cheep Cheep Beach", "C3018CB9"},
-        {"DS Luigi's Mansion", "C364863D"},
-        {"DS Desert Hills", "108C1986"},
-        {"DS Delfino Square", "7F08B08C"},
-        {"DS Waluigi Pinball", "23C4CB09"},
-        {"DS Shroom Ridge", "3F104183"},
-        {"DS DK Pass", "37187F25"},
-        {"DS Tick-Tock Clock", "3CFBC7A4"},
-        {"DS Mario Circuit", "315444E0"},
-        {"DS Airship Fortress", "1DB6DCEA"},
-        {"DS Wario Stadium", "EC1DB9B9"},
-        {"DS Peach Gardens", "94C0207E"},
-        {"DS Bowser Castle", "6128C751"},
-        {"DS Rainbow Road", "0DA7DECC"},
+                foreach (var track in group)
+                    _trackNameToCourseIdMap[track.Name] = courseId;
+            }
 
-        // Wii Tracks
-        {"Wii Luigi Circuit", "95AB4053"},
-        {"Wii Moo Moo Meadows", "1CD97A59"},
-        {"Wii Mushroom Gorge", "3B74F7C0"},
-        {"Wii Toad's Factory", "359C708C"},
-        {"Wii Mario Circuit", "08FFED33"},
-        {"Wii Coconut Mall", "64580E20"},
-        {"Wii DK Summit", "E96F4A07"},
-        {"Wii Wario's Gold Mine", "19BC903B"},
-        {"Wii Daisy Circuit", "17B39F40"},
-        {"Wii Koopa Cape", "D66ED3F6"},
-        {"Wii Maple Treeway", "C8F7895A"},
-        {"Wii Grumble Volcano", "A2E5580D"},
-        {"Wii Dry Dry Ruins", "70BC1733"},
-        {"Wii Moonview Highway", "B27AE292"},
-        {"Wii Bowser's Castle", "250C90C7"},
-        {"Wii Rainbow Road", "33C6D0A8"},
+            _initialized = true;
 
-        // 3DS Tracks
-        {"3DS Toad Circuit", "1BD14032"},
-        {"3DS Daisy Hills", "2E8D060C"},
-        {"3DS Cheep Cheep Lagoon", "B847F4AD"},
-        {"3DS Shy Guy Bazaar", "03ED2EEE"},
-        {"3DS Wuhu Loop", "783E8785"},
-        {"3DS Mario Circuit", "B3B581FA"},
-        {"3DS Music Park", "42EF53CC"},
-        {"3DS Rock Rock Mountain", "41A721A4"},
-        {"3DS Piranha Plant Slide", "3581D820"},
-        {"3DS Wario's Shipyard", "634E554E"},
-        {"3DS Neo Bowser City", "E333C032"},
-        {"3DS Maka Wuhu", "766E361D"},
-        {"3DS DK Jungle", "76234567"},
-        {"3DS Rosalina's Ice World", "3AD2B35D"},
-        {"3DS Bowser's Castle", "C4F54EA5"},
-        {"3DS Rainbow Road", "3867D46B"},
-
-        // Wii U Tracks
-        {"Wii U Mario Kart Stadium", "05455418"},
-        {"Wii U Sweet Sweet Canyon", "1E5898DC"},
-        {"Wii U Thwomp Ruins", "50468F87"},
-        {"Wii U Mario Circuit", "9B4BF180"},
-        {"Wii U Toad Harbor", "D43A9EDE"},
-        {"Wii U Twisted Mansion", "14356546"},
-        {"Wii U Shy Guy Falls", "5A41F8ED"},
-        {"Wii U Dolphin Shoals", "AD34E224"},
-        {"Wii U Electrodrome", "5267BEC1"},
-        {"Wii U Mount Wario", "94AE9BD1"},
-        {"Wii U Cloudtop Cruise", "FD364D78"},
-        {"Wii U Bone-Dry Dunes", "AD6EEB84"},
-        {"Wii U Bowser's Castle", "E0AE04FB"},
-        {"Wii U Rainbow Road", "F46537E0"},
-        {"Wii U Mute City", "718663CD"},
-        {"Wii U Excitebike Arena", "F3F0E87A"},
-        {"Wii U Hyrule Circuit", "7B5EA129"},
-        {"Wii U Wild Woods", "80C444DB"},
-        {"Wii U Animal Crossing", "36336689"},
-        {"Wii U Super Bell Subway", "FD915536"},
-        {"Wii U Big Blue", "3F802444"},
-        {"SW Sky High Sundae", "CEA6E34A"},
-        {"SW Yoshi's Island", "B448BECA"},
-
-        // Tour Tracks
-        {"Tour Tokyo Blur", "5EF5C68C"},
-        {"Tour Vancouver Velocity", "DAEECD56"},
-        {"Tour Singapore Speedway", "F2509519"},
-        {"Tour Madrid Drive", "8FA4A735"},
-        {"Tour Merry Mountain", "61BDF4BD"},
-        {"Tour Ninja Hideaway", "55141E9B"},
-        {"RMX Mario Circuit 1", "3FA252C1"},
-        {"RMX Choco Island 1", "9739C08D"},
-        {"RMX Rainbow Road 1", "EB9CA56D"},
-        {"RMX Rainbow Road 2", "31504EEB"},
-        {"RMX Vanilla Lake 1", "B64FA39B"},
-        {"RMX Vanilla Lake 2", "B9AAE71A"},
-        {"RMX Ghost Valley 1", "025BB3EB"},
-        {"RMX Bowser Castle 1", "209B2E7C"},
-        {"RMX Donut Plains 1", "41480970"},
-
-        // GP Tracks
-        {"GP Mario Beach", "BE601CD3"},
-        {"GP Bananan Ruins", "8FA1D2F9"},
-        {"GP Snow Panic", "90F239F5"},
-        {"GP Bowser's Castle", "57EDADD6"},
-        {"GP Rainbow Coaster", "924F73EE"},
-
-        // SW2 Tracks
-        {"SW2 Mario Bros Circuit", "8FC68FE2"},
-        {"SW2 Crown City", "A06EB422"},
-        {"SW2 Whistlestop Summit", "E2EE948D"},
-        {"SW2 Faraway Oasis", "F556BF4C"},
-        {"SW2 Peach Resort", "5C879204"},
-        {"SW2 Great ? Block Ruins", "EEAB29D7"},
-        {"SW2 Cheep Cheep Falls", "D48A3506"},
-        {"SW2 Dandelion Depths", "12BC7970"},
-        {"SW2 Boo Cinema", "179E7823"},
-        {"SW2 Ghost Valley", "4EB70D51"},
-        {"SW2 Bowser's Castle", "4BF31278"},
-        {"SW2 Mario Circuit", "47701DE8"},
-        {"SW2 Peach Stadium", "71102C00"},
-        {"SW2 Rainbow Road", "92023DD6"},
-
-        // Beta Tracks
-        {"Beta Choco Island 3", "66CD4E55"},
-        {"Beta Dokan Course", "7A539095"},
-        {"Beta Nokonoko Beach", "B18E18B7"},
-
-        // Custom Tracks
-        {"Phendrana Frostbite", "57F96209"},
-        {"Honeymoon Lune", "0BB85D95"},
-        {"Poké Floats", "605EFF4B"},
-        {"DK Jungle Tour", "F69AA04A"},
-        {"Terra Ursae", "663C97E6"},
-        {"Confectionery Cliffs", "A1196212"},
-        {"WP Tanks!", "B7A52AFA"},
-        {"Cloud Mist Castle", "D05E811A"},
-        {"Rooster Island", "E71329EC"},
-        {"Wario's Cosmic Construction", "2117925D"},
-        {"Jiyuu Village", "DC256B66"},
-        {"Cargo Bay", "38A2BDEA"},
-        {"Jigsaw Circuit", "B75A74EE"},
-        {"Cruel Angel's Thesis", "F0176BA1"},
-        {"Bowser's Termination Station", "7CE8E29A"},
-        {"Stargaze Summit", "AACD272B"},
-        {"Good Egg Drive", "A5977F84"},
-        {"Starry Cityscape", "3506F19B"},
-        {"Stickerbush Sunset", "D9E9E850"},
-        {"Alone and Incomplete", "B2F093A9"},
-        {"Gallant Grotto", "E6354900"},
-        {"Fort Francis", "2668F932"},
-        {"Bowser Jr.'s Fort", "0832F7D8"},
-        {"Backside of the TV", "B5DC9D88"},
-        {"Garden of Dreams", "810DE2B6"},
-        {"Overgrown Temple", "5EB53D91"},
-        {"Lava Lake", "59406428"},
-        {"Timber Rapids", "96DCC931"},
-        {"Musical Cliff", "336BCD4C"},
-        {"Toad's Temple", "09225C9B"},
-        {"Luncheon Tour", "C617D846"},
-        {"Shy Guy Lumber Co.", "1180A148"},
-        {"Super Marine World", "F008353B"},
-        {"Icebound Stronghold", "8C760E8F"},
-        {"Kamek's Library", "55AF8516"},
-        {"Wario Circuit", "FA433BA9"},
-        {"Sunrise Slopes", "0C2DA3C4"},
-        {"Banished Courtyard", "CA26B98F"},
-        {"Shadow Woods", "40828870"},
-        {"Hells Dimension", "18BF40A9"},
-        {"Botania", "15154EFB"},
-        {"Cascade Kingdom", "68F30C84"},
-        {"Sandcastle Park", "3FD07D4F"},
-        {"Emerald Coast", "181FB8F2"},
-        {"Super Bell Circuit", "F0A265E7"},
-        {"Midnight Museum", "0231B08C"},
-        {"Crystal Canopy", "2CF9A752"},
-        {"Shy Guy Skies", "4476CA85"},
-        {"Forgotten Facility", "D963BD23"},
-        {"Kitayama Keep", "6242ADB2"},
-        {"Dolphin Harbor", "46E50ABD"},
-        {"Aqua Dungeon", "45B613F8"},
-        {"Divine Paradise", "4046963A"},
-        {"Moonlit Grounds", "9710B84E"},
-        {"Frigid Freezeway", "29E90C9E"},
-        {"Honeyhive Falls", "C0E1BEDA"},
-        {"Heavenly Sanctuary", "C2B07486"},
-        {"Luigi's Island", "A7EE45EA"},
-        {"Mystic Tangle", "9BE97F6C"},
-        {"Maplewood Caverns", "8414F594"},
-        {"Fiery Factory, Fading Frost", "C1D1A9A1"},
-        {"Sunset Forest", "4B2200E9"},
-        {"Pandora Palace", "F4126175"},
-        {"Comet Starway", "798094B1"},
-        {"The Seamlands", "251431B2"},
-        {"Northern Heights", "0EC1C1DD"},
-        {"Thunder City", "080FF38B"},
-        {"Goomba Circuit", "E3573373"},
-        {"Propeller Paradise", "03B4BECD"},
-        {"µTorrent's Divinity", "D66ACE2B"},
-        {"Ghostly Gulch", "56C93A3A"},
-        {"Cubing Conundrum", "C4B0DE9E"},
-        {"Daisy Gardens", "BA84A7B4"},
-        {"Lunar Lights", "7053298B"},
-        {"Fruity Folly", "69AF68D7"},
-        {"Thunder Canyon", "BA7FFC8E"},
-        {"Fungal Jungle", "29BD08BD"},
-        {"Cherry Blossom Garden", "5DF12D4D"},
-        {"Frostburn Fortress", "2B367EEB"},
-        {"Seaside Palace", "302EEC77"},
-        {"Vile Isle", "C89E6232"},
-        {"Blooper Ruins", "2C00A068"},
-        {"Blizzerno Fortress", "21B34D42"},
-        {"Desert Fort", "9B64FB97"},
-        {"Spectral Station", "B4D55DAB"},
-        {"Bouldergeist's Ghostly Manor", "202D8BE2"},
-        {"Forest Creek", "81FAF60D"},
-        {"Mushlight's Reprise", "67D05E23"},
-        {"Call of the Glassheart", "A3EE136D"},
-        {"Anthill & Apian Apts.", "0EF54323"},
-        {"Breathing Bosque", "F78A9E7B"},
-        {"Hot Air Skyway", "45799355"},
-        {"Redwood Village", "10BBE9B5"},
-        {"Corrupted Maelstrom", "4B4DDDBE"},
-        {"Bubblegum Skyline", "8A01E15A"},
-        {"Cool Shroom Castle", "D7D7DDE2"},
-        {"Sugar Rush", "58F3E600"},
-        {"Stereo Madness", "86151331"},
-        {"Neuron Jungle", "65747950"},
-        {"Digital Refinery", "D43387E6"},
-        {"Lunar Lantern Festival", "5319A1EB"},
-        {"Green Hill Zone", "D71607E0"},
-        {"Honeybee Hideout", "F1EBC08C"},
-        {"Grave Danger", "3F065B14"},
-        {"Welkin Cluster", "3E71D120"},
-        {"Dark Star Castle", "D00E1853"},
-        {"Lantern Light Terrace", "2E668FE1"},
-        {"Dark Matter Fortress", "18D235DC"},
-        {"King Bob-omb's Factory", "0FF9B316"},
-        {"Glistening Highway", "0BC2346C"},
-        {"Kinoko Cave", "D8BFDDBA"},
-        {"Icecream Sweetland", "22E6FA20"},
-        {"Toxic Mushroom Falls", "BAAB358E"},
-        {"NYC Zoo", "BEDF929C"},
-        {"Thump Bump Forest", "01E2B8BC"},
-        {"Gleamhaven", "BB463D79"},
-        {"Leviathan Conflagration", "BA1F03D1"},
-        {"Area 64", "EC2965EF"},
-        {"Bowser's Flooded Castle", "E04728E2"},
-        {"ElectriCity", "18FA4707"},
-        {"Ruinated Peach's Castle", "8C07A8D4"},
-        {"Conkdor Ruins", "27604A73"},
-        {"Reactive Factory", "B6DE0C18"},
-        {"Crash Cove", "19482648"}
-    };
+            Log.Information(
+                "Initialized lazy track hash metadata for {TrackCount} tracks across {CourseCount} course groups",
+                _trackNameToCourseIdMap.Count,
+                _courseIdToTrackNamesMap.Count);
+        }
+    }
 
     public string? GetHexValueForTrack(string trackName)
     {
-        _trackNameToHexMap.TryGetValue(trackName, out var hexValue);
-        return hexValue;
+        int courseId;
+
+        lock (_lock)
+        {
+            _trackNameToHexMap.TryGetValue(trackName, out var hexValue);
+            if (hexValue != null)
+                return hexValue;
+
+            if (!_trackNameToCourseIdMap.TryGetValue(trackName, out courseId))
+                return null;
+        }
+
+        return ResolveHexValueForCourse(courseId);
     }
 
     public string? GetHexValueForTrack(string console, string trackName)
@@ -355,6 +95,247 @@ public class TrackHexMappingService
 
     public Dictionary<string, string> GetAllMappings()
     {
-        return new Dictionary<string, string>(_trackNameToHexMap);
+        lock (_lock)
+        {
+            return new Dictionary<string, string>(_trackNameToHexMap, StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    public bool IsInitialized()
+    {
+        lock (_lock)
+        {
+            return _initialized;
+        }
+    }
+
+    private static string ComputeGhostFolderHash(string szsPath)
+    {
+        var bytes = File.ReadAllBytes(szsPath);
+        var crc = CrcHelper.ComputeCrc32(bytes, 0, bytes.Length);
+        return crc.ToString("X8");
+    }
+
+    private string? ResolveHexValueForCourse(int courseId)
+    {
+        List<string>? trackNames;
+
+        lock (_lock)
+        {
+            if (_courseIdToHexMap.TryGetValue(courseId, out var cachedHash))
+                return cachedHash;
+
+            if (!_courseIdToTrackNamesMap.TryGetValue(courseId, out trackNames) || trackNames.Count == 0)
+                return null;
+        }
+
+        EnsureLookupSourcesLoaded();
+
+        string? hash = null;
+        var slotIndex = courseId - CourseIdBase;
+
+        if (slotIndex >= 0)
+        {
+            var mainFileName = $"{slotIndex}.szs";
+            var szsIndex = GetSzsIndexSnapshot();
+
+            if (szsIndex.TryGetValue(mainFileName, out var mainSzsPath))
+            {
+                try
+                {
+                    hash = ComputeGhostFolderHash(mainSzsPath);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex,
+                        "Failed to compute ghost folder hash from SZS '{SzsPath}' for courseId {CourseId}",
+                        mainSzsPath,
+                        courseId);
+                }
+            }
+        }
+
+        if (hash == null)
+        {
+            var folderMap = GetFolderToTrackNameMapSnapshot();
+            foreach (var trackName in trackNames)
+            {
+                if (TryGetMappedHash(folderMap, trackName, out var mappedHash))
+                {
+                    hash = mappedHash;
+                    break;
+                }
+            }
+        }
+
+        if (hash == null)
+        {
+            Log.Warning(
+                "Could not resolve ghost hash for courseId {CourseId}; no slot file and no FolderToTrackName match",
+                courseId);
+            return null;
+        }
+
+        lock (_lock)
+        {
+            _courseIdToHexMap[courseId] = hash;
+            foreach (var trackName in trackNames)
+                _trackNameToHexMap[trackName] = hash;
+        }
+
+        Log.Debug("Resolved ghost hash {Hash} for courseId {CourseId} on demand", hash, courseId);
+        return hash;
+    }
+
+    private void EnsureLookupSourcesLoaded()
+    {
+        lock (_lock)
+        {
+            if (_szsIndex != null && _folderToTrackNameMap != null)
+                return;
+        }
+
+        var szsIndex = BuildSzsFileIndex();
+        var folderToTrackNameMap = BuildFolderToTrackNameMap();
+
+        lock (_lock)
+        {
+            _szsIndex ??= szsIndex;
+            _folderToTrackNameMap ??= folderToTrackNameMap;
+        }
+    }
+
+    private Dictionary<string, string> GetSzsIndexSnapshot()
+    {
+        lock (_lock)
+        {
+            return _szsIndex ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    private Dictionary<string, string> GetFolderToTrackNameMapSnapshot()
+    {
+        lock (_lock)
+        {
+            return _folderToTrackNameMap ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    private static Dictionary<string, string> BuildSzsFileIndex()
+    {
+        var index = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var root in GetSzsSearchRoots())
+        {
+            if (!Directory.Exists(root))
+                continue;
+
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(root, "*.szs", SearchOption.AllDirectories))
+                {
+                    var name = Path.GetFileName(file);
+                    if (!index.ContainsKey(name))
+                        index[name] = file;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed while indexing SZS files under {Root}", root);
+            }
+        }
+
+        return index;
+    }
+
+    private static Dictionary<string, string> BuildFolderToTrackNameMap()
+    {
+        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var ghostsRoot = Path.Combine(PathManager.RiivolutionWhWzFolderPath, "RetroRewind6", "Ghosts");
+        var mappingFiles = new[]
+        {
+            Path.Combine(ghostsRoot, "FolderToTrackNameRT.txt"),
+            Path.Combine(ghostsRoot, "FolderToTrackNameCT.txt"),
+            Path.Combine(ghostsRoot, "FolderToTrackName.txt")
+        };
+
+        foreach (var file in mappingFiles)
+        {
+            if (!File.Exists(file))
+                continue;
+
+            try
+            {
+                foreach (var rawLine in File.ReadLines(file))
+                {
+                    var line = ColorCodeRegex.Replace(rawLine, string.Empty).Trim();
+                    if (line.Length == 0)
+                        continue;
+
+                    var match = MappingLineRegex.Match(line);
+                    if (!match.Success)
+                        continue;
+
+                    var trackName = match.Groups["name"].Value.Trim();
+                    var hash = match.Groups["hex"].Value.ToUpperInvariant();
+
+                    AddMappingIfMissing(map, trackName, hash);
+                    AddMappingIfMissing(map, NormalizeTrackName(trackName), hash);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed while parsing {MappingFile}", file);
+            }
+        }
+
+        return map;
+    }
+
+    private static bool TryGetMappedHash(Dictionary<string, string> map, string trackName, out string? hash)
+    {
+        if (map.TryGetValue(trackName, out var directHash))
+        {
+            hash = directHash;
+            return true;
+        }
+
+        var normalized = NormalizeTrackName(trackName);
+        if (map.TryGetValue(normalized, out var normalizedHash))
+        {
+            hash = normalizedHash;
+            return true;
+        }
+
+        hash = null;
+        return false;
+    }
+
+    private static string NormalizeTrackName(string value)
+    {
+        var lowered = value.ToLowerInvariant();
+        var cleaned = NonAlphaNumRegex.Replace(lowered, " ");
+        return string.Join(' ', cleaned.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    private static void AddMappingIfMissing(Dictionary<string, string> map, string key, string hash)
+    {
+        if (key.Length == 0)
+            return;
+
+        if (!map.ContainsKey(key))
+            map[key] = hash;
+    }
+
+    private static IEnumerable<string> GetSzsSearchRoots()
+    {
+        var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            Path.Combine(PathManager.RiivolutionWhWzFolderPath, "RetroRewind6"),
+            PathManager.MyStuffFolderPath,
+            PathManager.RrBetaFolderPath
+        };
+
+        return roots;
     }
 }

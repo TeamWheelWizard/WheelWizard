@@ -70,14 +70,9 @@
                  Margin="10,0,10,10"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Spacing="2" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="models:ApiTrack">
-                        <Grid>
+                        <Grid Margin="0,0,0,2">
                             <patterns:TrackListItem 
                                 TrackName="{Binding Name}"
                                 Console="{Binding Console}"

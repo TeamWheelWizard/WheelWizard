@@ -27,6 +27,7 @@ public partial class GhostTimesPage : UserControlBase, INotifyPropertyChanged
     [Inject] private GhostLeaderboardService _leaderboardService { get; set; } = null!;
     [Inject] private LocalGhostService _localGhostService { get; set; } = null!;
     [Inject] private TrackHexMappingService _trackHexMappingService { get; set; } = null!;
+    [Inject] private TrackVariantMappingService _trackVariantMappingService { get; set; } = null!;
     private GhostTrack? _selectedTrack;
     private bool _isOnlineTabSelected = true;
     private bool _isLoading = false;
@@ -116,6 +117,7 @@ public partial class GhostTimesPage : UserControlBase, INotifyPropertyChanged
     public void SetTrack(GhostTrack track)
     {
         _selectedTrack = track;
+        _ = _ghostTrackService.EnsureTrackMappingsInitializedAsync();
         
         if (_selectedTrack != null)
         {
@@ -234,6 +236,8 @@ public partial class GhostTimesPage : UserControlBase, INotifyPropertyChanged
         {
             try
             {
+                await _ghostTrackService.EnsureTrackMappingsInitializedAsync();
+
                 Log.Information("Requesting download for ghost: {PlayerName} - {Time}", 
                     submission.PlayerName, submission.FinishTimeDisplay);
                 
@@ -249,7 +253,7 @@ public partial class GhostTimesPage : UserControlBase, INotifyPropertyChanged
                     return;
                 }
                 
-                var hexValue = _trackHexMappingService.GetHexValueForTrack(submission.TrackName);
+                var hexValue = _trackVariantMappingService.GetHexValueForTrack(submission.TrackName, _trackHexMappingService);
                 if (string.IsNullOrEmpty(hexValue))
                 {
                     Log.Warning("No hex value found for track: {TrackName}", submission.TrackName);
@@ -258,8 +262,18 @@ public partial class GhostTimesPage : UserControlBase, INotifyPropertyChanged
                 
                 var downloadUrl = $"https://rwfc.net/api/timetrial/ghost/{submission.Id}/download";
                 
-                var ccFolder = submission.Cc.ToString();
-                var targetFolder = Path.Combine(PathManager.GhostsFolderPath, hexValue.ToLowerInvariant(), ccFolder);
+                // Use variant mapping to get the correct folder path (handles both main and variant tracks)
+                var targetFolder = _trackVariantMappingService.GetGhostFolderPath(
+                    submission.TrackName, 
+                    submission.Cc, 
+                    _trackHexMappingService, 
+                    PathManager.GhostsFolderPath);
+                
+                if (string.IsNullOrEmpty(targetFolder))
+                {
+                    Log.Warning("Could not determine target folder for track: {TrackName}", submission.TrackName);
+                    return;
+                }
                 var placeholderFilePath = Path.Combine(targetFolder, "placeholder.rkg"); // Ensure .rkg extension
                 
                 Directory.CreateDirectory(targetFolder);
@@ -342,13 +356,25 @@ public partial class GhostTimesPage : UserControlBase, INotifyPropertyChanged
 
         try
         {
+            await _ghostTrackService.EnsureTrackMappingsInitializedAsync();
+
             IsLoadingLocalGhosts = true;
             LocalGhosts.Clear();
-            Log.Information("Loading local ghosts for track {TrackName} (HexValue: {HexValue})", _selectedTrack.Name, _selectedTrack.HexValue);
-
-            if (uint.TryParse(_selectedTrack.HexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var trackId))
+            
+            // Use variant mapping to get the correct hex value
+            var resolvedHexValue = _trackVariantMappingService.GetHexValueForTrack(_selectedTrack.Name, _trackHexMappingService);
+            if (string.IsNullOrEmpty(resolvedHexValue))
             {
-                _currentLocalTrackGhosts = await _localGhostService.GetTrackGhostsAsync(trackId, _selectedTrack.HexValue);
+                Log.Warning("No hex value found for track: {TrackName}", _selectedTrack.Name);
+                IsLoadingLocalGhosts = false;
+                return;
+            }
+            
+            Log.Information("Loading local ghosts for track {TrackName} (ResolvedHex: {HexValue})", _selectedTrack.Name, resolvedHexValue);
+
+            if (uint.TryParse(resolvedHexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var trackId))
+            {
+                _currentLocalTrackGhosts = await _localGhostService.GetTrackGhostsAsync(trackId, resolvedHexValue);
                 
                 if (_currentLocalTrackGhosts?.HasGhosts == true)
                 {
@@ -390,12 +416,30 @@ public partial class GhostTimesPage : UserControlBase, INotifyPropertyChanged
         LocalGhosts.Clear();
 
         var is150cc = Local150Radio?.IsChecked == true;
-        var ghostsToLoad = is150cc 
-            ? _currentLocalTrackGhosts.Ghosts150.Concat(_currentLocalTrackGhosts.VariantGhosts150)
-            : _currentLocalTrackGhosts.Ghosts200.Concat(_currentLocalTrackGhosts.VariantGhosts200);
+        var isVariantTrack = _trackVariantMappingService.IsVariantTrack(_selectedTrack?.Name ?? "");
+        
+        List<LocalGhostData> ghostsToLoad;
+        
+        if (isVariantTrack)
+        {
+            // For variant tracks, show only variant ghosts
+            ghostsToLoad = is150cc 
+                ? _currentLocalTrackGhosts.VariantGhosts150
+                : _currentLocalTrackGhosts.VariantGhosts200;
+            Log.Information("Loading variant track ghosts for {TrackName}", _selectedTrack?.Name);
+        }
+        else
+        {
+            // For main tracks, show only main ghosts
+            ghostsToLoad = is150cc 
+                ? _currentLocalTrackGhosts.Ghosts150
+                : _currentLocalTrackGhosts.Ghosts200;
+            Log.Information("Loading main track ghosts for {TrackName}", _selectedTrack?.Name);
+        }
 
         var ghostList = ghostsToLoad.OrderBy(g => g.TotalTimeMs).ToList();
-        Log.Information("Loading {GhostCount} ghosts for {CC}cc", ghostList.Count, is150cc ? 150 : 200);
+        Log.Information("Loading {GhostCount} ghosts for {CC}cc ({TrackType})", 
+            ghostList.Count, is150cc ? 150 : 200, isVariantTrack ? "variant" : "main");
 
         for (int i = 0; i < ghostList.Count; i++)
         {
@@ -438,11 +482,21 @@ public partial class GhostTimesPage : UserControlBase, INotifyPropertyChanged
         LoadLocalGhosts();
     }
 
-    private void ShowGhostFolder_Click(object? sender, RoutedEventArgs e)
+    private async void ShowGhostFolder_Click(object? sender, RoutedEventArgs e)
     {
         if (_selectedTrack != null)
         {
-            _localGhostService.OpenTrackFolderInExplorer(_selectedTrack.HexValue);
+            await _ghostTrackService.EnsureTrackMappingsInitializedAsync();
+
+            // Debug logging to see what we're actually getting
+            Log.Information("ShowGhostFolder_Click - Track details:");
+            Log.Information("  Name: '{Name}'", _selectedTrack.Name);
+            Log.Information("  Console: '{Console}'", _selectedTrack.Console); 
+            Log.Information("  DisplayName: '{DisplayName}'", _selectedTrack.DisplayName);
+            Log.Information("  HexValue: '{HexValue}'", _selectedTrack.HexValue);
+            
+            // Use the Name property (without console prefix) for hex lookup
+            _localGhostService.OpenTrackFolderInExplorer(_selectedTrack.Name);
         }
     }
 

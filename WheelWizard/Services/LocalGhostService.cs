@@ -10,7 +10,15 @@ namespace WheelWizard.Services;
 public class LocalGhostService
 {
     private readonly Dictionary<uint, LocalTrackGhosts> _cachedTrackGhosts = new();
+    private readonly TrackVariantMappingService _variantMappingService;
+    private readonly TrackHexMappingService _trackHexMappingService;
     private bool _hasScannedFolder = false;
+
+    public LocalGhostService(TrackVariantMappingService variantMappingService, TrackHexMappingService trackHexMappingService)
+    {
+        _variantMappingService = variantMappingService;
+        _trackHexMappingService = trackHexMappingService;
+    }
 
     /// <summary>
     /// Scans the Dolphin ghosts folder and returns local ghost data for all tracks
@@ -46,26 +54,89 @@ public class LocalGhostService
     }
 
     /// <summary>
-    /// Opens the ghost folder for a specific track in file explorer
+    /// Opens the correct ghost folder for a specific track (considering variant mappings) in file explorer
     /// </summary>
-    public void OpenTrackFolderInExplorer(string hexValue)
+    /// <param name="trackName">The full track name</param>
+    /// <param name="cc">Optional CC value to open specific CC folder (150 or 200)</param>
+    public void OpenTrackFolderInExplorer(string trackName, int? cc = null)
     {
         try
         {
-            var trackFolderPath = Path.Combine(PathManager.GhostsFolderPath, hexValue.ToLowerInvariant());
+            Log.Information("Opening ghost folder for track: {TrackName}, CC: {CC}", trackName, cc);
             
-            if (!Directory.Exists(trackFolderPath))
+            var isVariant = _variantMappingService.IsVariantTrack(trackName);
+            var mainTrack = _variantMappingService.GetMainTrackName(trackName);
+            Log.Information("Track variant status - IsVariant: {IsVariant}, MainTrack: {MainTrack}", isVariant, mainTrack);
+            
+            var hexValue = _variantMappingService.GetHexValueForTrack(trackName, _trackHexMappingService);
+            if (hexValue == null)
             {
-                Log.Warning("Track ghost folder does not exist: {FolderPath}", trackFolderPath);
-                Directory.CreateDirectory(trackFolderPath);
+                Log.Warning("No hex value found for track: {TrackName}", trackName);
+                return;
+            }
+            
+            Log.Information("Using hex value: {HexValue}", hexValue);
+
+            string targetFolderPath;
+            
+            if (cc.HasValue)
+            {
+                // Open specific CC folder with variant support
+                var ccFolderPath = _variantMappingService.GetGhostFolderPath(trackName, cc.Value, 
+                    _trackHexMappingService, PathManager.GhostsFolderPath);
+                
+                if (ccFolderPath == null)
+                {
+                    Log.Warning("Could not determine ghost folder path for track: {TrackName}", trackName);
+                    return;
+                }
+                
+                targetFolderPath = ccFolderPath;
+                Log.Information("Using CC-specific folder path: {TargetPath}", targetFolderPath);
+            }
+            else
+            {
+                // Start with the main hex folder
+                targetFolderPath = Path.Combine(PathManager.GhostsFolderPath, hexValue.ToLowerInvariant());
+                
+                // If it's a variant track, navigate to the variant subfolder
+                if (_variantMappingService.IsVariantTrack(trackName))
+                {
+                    targetFolderPath = Path.Combine(targetFolderPath, "1");
+                    Log.Information("Variant track - opening variant subfolder: {TargetPath}", targetFolderPath);
+                }
+                else
+                {
+                    Log.Information("Main track - opening hex folder: {TargetPath}", targetFolderPath);
+                }
+            }
+            
+            if (!Directory.Exists(targetFolderPath))
+            {
+                Log.Information("Creating ghost folder: {FolderPath}", targetFolderPath);
+                Directory.CreateDirectory(targetFolderPath);
+                
+                if (!cc.HasValue)
+                {
+                    Directory.CreateDirectory(Path.Combine(targetFolderPath, "150"));
+                    Directory.CreateDirectory(Path.Combine(targetFolderPath, "200"));
+                    
+                    if (_variantMappingService.IsVariantTrack(trackName))
+                    {
+                        var variantFolder = Path.Combine(targetFolderPath, "1");
+                        Directory.CreateDirectory(variantFolder);
+                        Directory.CreateDirectory(Path.Combine(variantFolder, "150"));
+                        Directory.CreateDirectory(Path.Combine(variantFolder, "200"));
+                    }
+                }
             }
 
-            FilePickerHelper.OpenFolderInFileManager(trackFolderPath);
-            Log.Information("Opened track ghost folder: {FolderPath}", trackFolderPath);
+            FilePickerHelper.OpenFolderInFileManager(targetFolderPath);
+            Log.Information("Opened ghost folder for track '{TrackName}': {FolderPath}", trackName, targetFolderPath);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to open track ghost folder for hex: {HexValue}", hexValue);
+            Log.Error(ex, "Failed to open ghost folder for track: {TrackName}", trackName);
         }
     }
 

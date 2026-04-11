@@ -13,15 +13,21 @@ namespace WheelWizard.Services
     {
         private readonly HttpClient _httpClient;
         private readonly TrackHexMappingService _hexMappingService;
+        private readonly TrackVariantMappingService _variantMappingService;
         private List<ApiTrack> _allTracks = new();
         private Dictionary<int, TrackInfo> _trackInfoCache = new();
         private bool _tracksLoaded = false;
         private bool _trackInfoLoaded = false;
+        private bool _trackMappingsInitialized = false;
 
-        public GhostTrackService(HttpClient httpClient, TrackHexMappingService hexMappingService)
+        public GhostTrackService(
+            HttpClient httpClient,
+            TrackHexMappingService hexMappingService,
+            TrackVariantMappingService variantMappingService)
         {
             _httpClient = httpClient;
             _hexMappingService = hexMappingService;
+            _variantMappingService = variantMappingService;
         }
 
         public async Task<List<ApiTrack>> GetAllTracksAsync()
@@ -35,35 +41,42 @@ namespace WheelWizard.Services
             try
             {
                 Log.Information("Loading tracks from API (first time)");
-                
-                await LoadTrackInfoAsync();
-                
+
+                var trackInfoTask = LoadTrackInfoAsync(initializeMappings: false);
                 const string worldRecordsUrl = "https://rwfc.net/api/timetrial/worldrecords/all?glitchAllowed=true&cc=150";
-                var response = await _httpClient.GetStringAsync(worldRecordsUrl);
-                
-                var worldRecords = JsonSerializer.Deserialize<WorldRecordsResponse[]>(response, new JsonSerializerOptions
+                var worldRecordsTask = _httpClient.GetStringAsync(worldRecordsUrl);
+
+                await Task.WhenAll(trackInfoTask, worldRecordsTask).ConfigureAwait(false);
+
+                var response = await worldRecordsTask.ConfigureAwait(false);
+
+                var jsonOptions = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
-                });
+                };
+
+                var worldRecords = await Task.Run(() =>
+                    JsonSerializer.Deserialize<WorldRecordsResponse[]>(response, jsonOptions)
+                ).ConfigureAwait(false);
 
                 if (worldRecords != null)
                 {
-                    _allTracks = worldRecords
-                        .Where(wr => wr.TrackId > 0)
-                        .Select(wr => 
-                        {
-                            _trackInfoCache.TryGetValue(wr.TrackId, out var trackInfo);
-                            var track = ApiTrack.FromWorldRecordAndTrackInfo(wr, trackInfo);
-                            
-                            track.HexValue = _hexMappingService.GetHexValueForTrack(wr.TrackName) ?? 
-                                           _hexMappingService.GetHexValueForTrack(track.Console, wr.TrackName) ?? 
-                                           wr.TrackId.ToString("X8");
-                            
-                            return track;
-                        })
-                        .OrderBy(t => t.TrackType)
-                        .ThenBy(t => t.Name)
-                        .ToList();
+                    _allTracks = await Task.Run(() =>
+                        worldRecords
+                            .Where(wr => wr.TrackId > 0)
+                            .Select(wr =>
+                            {
+                                _trackInfoCache.TryGetValue(wr.TrackId, out var trackInfo);
+                                var track = ApiTrack.FromWorldRecordAndTrackInfo(wr, trackInfo);
+                                track.HexValue = string.Empty;
+
+                                return track;
+                            })
+                            .OrderBy(t => t.TrackType)
+                            .ThenBy(t => t.Name)
+                            .ToList()
+                    ).ConfigureAwait(false);
+
                     _tracksLoaded = true;
                     Log.Information("Loaded and cached {Count} tracks from API with category data", _allTracks.Count);
                 }
@@ -76,11 +89,18 @@ namespace WheelWizard.Services
             return _allTracks;
         }
 
-        private async Task LoadTrackInfoAsync()
+        private async Task LoadTrackInfoAsync(bool initializeMappings = true)
         {
             if (_trackInfoLoaded && _trackInfoCache.Count > 0)
             {
                 Log.Debug("Using cached track info ({Count} tracks)", _trackInfoCache.Count);
+                if (initializeMappings && !_trackMappingsInitialized)
+                {
+                    var tracks = _trackInfoCache.Values.ToArray();
+                    _hexMappingService.InitializeFromTrackInfo(tracks);
+                    _variantMappingService.InitializeFromTrackInfo(tracks);
+                    _trackMappingsInitialized = true;
+                }
                 return;
             }
 
@@ -88,16 +108,26 @@ namespace WheelWizard.Services
             {
                 Log.Information("Loading track info from tracks API (first time)");
                 const string tracksUrl = "https://rwfc.net/api/timetrial/tracks";
-                var response = await _httpClient.GetStringAsync(tracksUrl);
-                
-                var tracks = JsonSerializer.Deserialize<TrackInfo[]>(response, new JsonSerializerOptions
+                var response = await _httpClient.GetStringAsync(tracksUrl).ConfigureAwait(false);
+
+                var jsonOptions = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
-                });
+                };
+
+                var tracks = await Task.Run(() =>
+                    JsonSerializer.Deserialize<TrackInfo[]>(response, jsonOptions)
+                ).ConfigureAwait(false);
 
                 if (tracks != null)
                 {
                     _trackInfoCache = tracks.ToDictionary(t => t.Id);
+                    if (initializeMappings)
+                    {
+                        _hexMappingService.InitializeFromTrackInfo(tracks);
+                        _variantMappingService.InitializeFromTrackInfo(tracks);
+                        _trackMappingsInitialized = true;
+                    }
                     _trackInfoLoaded = true;
                     Log.Information("Loaded and cached track info for {Count} tracks", _trackInfoCache.Count);
                 }
@@ -106,6 +136,11 @@ namespace WheelWizard.Services
             {
                 Log.Error(ex, "Failed to load track info from API");
             }
+        }
+
+        public async Task EnsureTrackMappingsInitializedAsync()
+        {
+            await LoadTrackInfoAsync(initializeMappings: true).ConfigureAwait(false);
         }
 
         public List<ApiTrack> GetFilteredTracks(GhostTrackType trackFilter, GhostLocation locationFilter, string searchText = "")

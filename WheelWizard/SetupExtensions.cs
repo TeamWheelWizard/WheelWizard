@@ -45,6 +45,7 @@ public static class SetupExtensions
         // Ghost services
         services.AddHttpClient();
         services.AddSingleton<WheelWizard.Services.TrackHexMappingService>();
+        services.AddSingleton<WheelWizard.Services.TrackVariantMappingService>();
         services.AddSingleton<WheelWizard.Services.GhostTrackService>();
         services.AddTransient<WheelWizard.Services.GhostLeaderboardService>();
         services.AddSingleton<WheelWizard.Services.LocalGhostService>();
