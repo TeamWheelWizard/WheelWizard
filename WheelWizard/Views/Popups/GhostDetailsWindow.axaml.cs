@@ -28,92 +28,49 @@ public partial class GhostDetailsWindow : Window
         
         for (int i = 0; i < actualLaps.Count; i++)
         {
-            var grid = new Grid
-            {
-                ColumnDefinitions = new ColumnDefinitions("*,*"),
-                Margin = new Avalonia.Thickness(0, 0, 0, 4)
-            };
-            
-            var lapLabel = new TextBlock
-            {
-                Text = $"Lap {i + 1}:",
-                Classes = { "BodyText" },
-                Margin = new Avalonia.Thickness(0, 0, 10, 0)
-            };
-            Grid.SetColumn(lapLabel, 0);
-            
-            var lapTime = new TextBlock
-            {
-                Text = actualLaps[i],
-                Classes = { "BodyText" },
-                FontFamily = "DejaVu Sans Mono,Adwaita Mono,Consolas,Monaco,monospace",
-                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
-                Margin = new Avalonia.Thickness(10, 0, 0, 0)
-            };
-            Grid.SetColumn(lapTime, 1);
-            
-            grid.Children.Add(lapLabel);
-            grid.Children.Add(lapTime);
+            var grid = CreateLapRow($"Lap {i + 1}:", actualLaps[i]);
             LapTimesContainer.Children.Add(grid);
         }
-        
-        var avgGrid = new Grid
-        {
-            ColumnDefinitions = new ColumnDefinitions("*,*"),
-            Margin = new Avalonia.Thickness(0, 0, 0, 4)
-        };
-        
-        var avgLabel = new TextBlock
-        {
-            Text = "Average Lap:",
-            Classes = { "BodyText" },
-            Margin = new Avalonia.Thickness(0, 0, 10, 0)
-        };
-        Grid.SetColumn(avgLabel, 0);
-        
-        var averageMs = submission.LapSplitsMs.Take(expectedLaps).Average();
-        var avgTime = new TextBlock
-        {
-            Text = FormatTime((int)averageMs),
-            Classes = { "BodyText" },
-            FontFamily = "DejaVu Sans Mono,Adwaita Mono,Consolas,Monaco,monospace",
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
-            Margin = new Avalonia.Thickness(10, 0, 0, 0)
-        };
-        Grid.SetColumn(avgTime, 1);
-        
-        avgGrid.Children.Add(avgLabel);
-        avgGrid.Children.Add(avgTime);
+
+        var averageMs = submission.LapSplitsMs.Take(expectedLaps).DefaultIfEmpty(0).Average();
+        var avgGrid = CreateLapRow("Average Lap:", FormatTime((int)averageMs));
         LapTimesContainer.Children.Add(avgGrid);
-        
-        var fastestGrid = new Grid
+
+        var fastestGrid = CreateLapRow("Fastest Lap:", submission.FastestLapDisplay, isBold: true, bottomMargin: 0);
+        LapTimesContainer.Children.Add(fastestGrid);
+    }
+
+    private static Grid CreateLapRow(string label, string time, bool isBold = false, int bottomMargin = 4)
+    {
+        var grid = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,*"),
-            Margin = new Avalonia.Thickness(0, 0, 0, 0)
+            Margin = new Avalonia.Thickness(0, 0, 0, bottomMargin)
         };
-        
-        var fastestLabel = new TextBlock
+
+        var labelText = new TextBlock
         {
-            Text = "Fastest Lap:",
+            Text = label,
             Classes = { "BodyText" },
             Margin = new Avalonia.Thickness(0, 0, 10, 0)
         };
-        Grid.SetColumn(fastestLabel, 0);
-        
-        var fastestTime = new TextBlock
+        Grid.SetColumn(labelText, 0);
+
+        var timeText = new TextBlock
         {
-            Text = submission.FastestLapDisplay,
+            Text = time,
             Classes = { "BodyText" },
             FontFamily = "DejaVu Sans Mono,Adwaita Mono,Consolas,Monaco,monospace",
-            FontWeight = Avalonia.Media.FontWeight.SemiBold,
+            FontWeight = isBold ? Avalonia.Media.FontWeight.SemiBold : Avalonia.Media.FontWeight.Normal,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
             Margin = new Avalonia.Thickness(10, 0, 0, 0)
         };
-        Grid.SetColumn(fastestTime, 1);
-        
-        fastestGrid.Children.Add(fastestLabel);
-        fastestGrid.Children.Add(fastestTime);
-        LapTimesContainer.Children.Add(fastestGrid);
+        Grid.SetColumn(timeText, 1);
+
+        grid.Children.Add(labelText);
+        grid.Children.Add(timeText);
+
+        return grid;
     }
 
     private static string FormatTime(int milliseconds)

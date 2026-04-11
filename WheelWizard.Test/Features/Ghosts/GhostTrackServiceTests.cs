@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Collections.Concurrent;
 using WheelWizard.Services;
 
 namespace WheelWizard.Test.Features.Ghosts;
@@ -76,7 +77,7 @@ public class GhostTrackServiceTests
     private sealed class StubHttpMessageHandler : HttpMessageHandler
     {
         private readonly Dictionary<string, string> _responses;
-        private readonly Dictionary<string, int> _requestCounts = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, int> _requestCounts = new(StringComparer.OrdinalIgnoreCase);
 
         public StubHttpMessageHandler(Dictionary<string, string> responses)
         {
@@ -91,7 +92,7 @@ public class GhostTrackServiceTests
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var url = request.RequestUri!.ToString();
-            _requestCounts[url] = GetRequestCount(url) + 1;
+            _requestCounts.AddOrUpdate(url, 1, (_, current) => current + 1);
 
             if (!_responses.TryGetValue(url, out var content))
             {

@@ -96,6 +96,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        public static string Action_Close {
+            get {
+                return ResourceManager.GetString("Action_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy Friend Code.
         /// </summary>
         public static string Action_CopyFriendCode {
@@ -474,11 +483,47 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Character:.
+        /// </summary>
+        public static string Attribute_Character {
+            get {
+                return ResourceManager.GetString("Attribute_Character", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Controller:.
+        /// </summary>
+        public static string Attribute_Controller {
+            get {
+                return ResourceManager.GetString("Attribute_Controller", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Date Set:.
+        /// </summary>
+        public static string Attribute_DateSet {
+            get {
+                return ResourceManager.GetString("Attribute_DateSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
         public static string Attribute_Description {
             get {
                 return ResourceManager.GetString("Attribute_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drift:.
+        /// </summary>
+        public static string Attribute_Drift {
+            get {
+                return ResourceManager.GetString("Attribute_Drift", resourceCulture);
             }
         }
         
@@ -1086,6 +1131,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Vehicle:.
+        /// </summary>
+        public static string Attribute_Vehicle {
+            get {
+                return ResourceManager.GetString("Attribute_Vehicle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Views.
         /// </summary>
         public static string Attribute_Views {
@@ -1280,6 +1334,33 @@ namespace WheelWizard.Resources.Languages {
         public static string PopupTitle_ModDetails {
             get {
                 return ResourceManager.GetString("PopupTitle_ModDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ghost Run Details.
+        /// </summary>
+        public static string PopupTitle_GhostRunDetails {
+            get {
+                return ResourceManager.GetString("PopupTitle_GhostRunDetails", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Lap Times.
+        /// </summary>
+        public static string Section_LapTimes {
+            get {
+                return ResourceManager.GetString("Section_LapTimes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Setup Details.
+        /// </summary>
+        public static string Section_SetupDetails {
+            get {
+                return ResourceManager.GetString("Section_SetupDetails", resourceCulture);
             }
         }
         

@@ -54,7 +54,7 @@ public class CountryCodeToFlagConverter : IValueConverter
     {
         if (value is string countryCode && !string.IsNullOrEmpty(countryCode))
         {
-            return CountryFlags.TryGetValue(countryCode.ToUpper(), out var flag) ? flag : countryCode;
+            return CountryFlags.TryGetValue(countryCode.ToUpperInvariant(), out var flag) ? flag : countryCode;
         }
         return "🌍";
     }

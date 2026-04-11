@@ -497,4 +497,31 @@
     <data name="Action_Submit" xml:space="preserve">
         <value>Submit</value>
     </data>
+    <data name="Action_Close" xml:space="preserve">
+        <value>Close</value>
+    </data>
+    <data name="PopupTitle_GhostRunDetails" xml:space="preserve">
+        <value>Ghost Run Details</value>
+    </data>
+    <data name="Section_LapTimes" xml:space="preserve">
+        <value>Lap Times</value>
+    </data>
+    <data name="Section_SetupDetails" xml:space="preserve">
+        <value>Setup Details</value>
+    </data>
+    <data name="Attribute_Character" xml:space="preserve">
+        <value>Character:</value>
+    </data>
+    <data name="Attribute_Vehicle" xml:space="preserve">
+        <value>Vehicle:</value>
+    </data>
+    <data name="Attribute_Drift" xml:space="preserve">
+        <value>Drift:</value>
+    </data>
+    <data name="Attribute_Controller" xml:space="preserve">
+        <value>Controller:</value>
+    </data>
+    <data name="Attribute_DateSet" xml:space="preserve">
+        <value>Date Set:</value>
+    </data>
 </root>

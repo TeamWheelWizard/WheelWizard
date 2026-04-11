@@ -91,7 +91,7 @@ public class TrackListItem : TemplatedControl
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == IsCustomTrackProperty || change.Property == IsRetroTrackProperty || change.Property == ConsoleProperty)
+        if (change.Property == IsCustomTrackProperty || change.Property == IsRetroTrackProperty)
         {
             UpdateVisibility();
         }
