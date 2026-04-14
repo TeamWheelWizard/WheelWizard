@@ -66,7 +66,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     /// <summary>
     /// Loads mods for the specified page and search term.
     /// </summary>
-    private async Task LoadMods(int page, string searchTerm = "")
+    private async Task LoadMods(int page, string searchTerm = "", bool ensurePatchResults = true)
     {
         if (_isLoading || !_hasMoreMods)
             return;
@@ -102,7 +102,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
         _isLoading = false;
         ApplyModListFilters();
 
-        if (ShowPatchesOnly)
+        if (ShowPatchesOnly && ensurePatchResults)
             await EnsurePatchesOnlyResultsAsync();
     }
 
@@ -233,7 +233,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     private async Task EnsurePatchesOnlyResultsAsync()
     {
         while (ShowPatchesOnly && _hasMoreMods && !LoadedMods.Any(mod => mod.Mod.UsesPatches))
-            await LoadMods(_currentPage + 1, _currentSearchTerm);
+            await LoadMods(_currentPage + 1, _currentSearchTerm, false);
     }
 
     private async void PatchesOnlyToggle_Click(object? sender, RoutedEventArgs e)
