@@ -2,7 +2,6 @@ using System.Text;
 using System.Xml.Linq;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services.Other;
-using WheelWizard.Services.Settings;
 
 namespace WheelWizard.Services.Launcher.Helpers;
 
