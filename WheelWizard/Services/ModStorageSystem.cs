@@ -52,10 +52,9 @@ public static class ModStorageSystemHelper
             return false;
 
         var titleOnly = normalizedTitle.Split(':', 2)[0].Trim();
-        return normalizedTitle is not null
-            && (
-                titleOnly.Equals("patch", StringComparison.OrdinalIgnoreCase)
-                || titleOnly.Equals("patches", StringComparison.OrdinalIgnoreCase)
-            );
+        return (
+            titleOnly.Equals("patch", StringComparison.OrdinalIgnoreCase)
+            || titleOnly.Equals("patches", StringComparison.OrdinalIgnoreCase)
+        );
     }
 }
