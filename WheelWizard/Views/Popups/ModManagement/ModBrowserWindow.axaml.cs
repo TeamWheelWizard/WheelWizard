@@ -22,6 +22,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 {
     // Collection to hold the mods
     private ObservableCollection<ModSearchResult> Mods { get; } = [];
+    private List<ModSearchResult> LoadedMods { get; } = [];
 
     [Inject]
     private IGameBananaSingletonService GameBananaService { get; set; } = null!;
@@ -72,8 +73,8 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 
         _isLoading = true;
 
-        var result = await GameBananaService.GetModSearchResults(searchTerm, page);
-        Mods.Where(mod => mod.Mod.Name == "LOADING").ToList().ForEach(mod => Mods.Remove(mod));
+        var effectiveSearchTerm = GetEffectiveSearchTerm(searchTerm);
+        var result = await GameBananaService.GetModSearchResults(effectiveSearchTerm, page);
 
         if (result.IsFailure)
         {
@@ -91,13 +92,18 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 
         foreach (var mod in newMods)
         {
-            Mods.Add(new(mod, mod.PreviewMedia != null ? mod.PreviewMedia.Images[0].BaseUrl + "/" + mod.PreviewMedia.Images[0].File : ""));
+            LoadedMods.Add(
+                new(mod, mod.PreviewMedia != null ? mod.PreviewMedia.Images[0].BaseUrl + "/" + mod.PreviewMedia.Images[0].File : "")
+            );
         }
 
-        if (!metadata.IsComplete)
-            Mods.Add(new(GameBananaService.GetLoadingPreview(), ""));
+        _hasMoreMods = !metadata.IsComplete;
         _currentPage = page;
         _isLoading = false;
+        ApplyModListFilters();
+
+        if (ShowPatchesOnly)
+            await EnsurePatchesOnlyResultsAsync();
     }
 
     /// <summary>
@@ -132,11 +138,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     private async void Search_Click(object? sender, RoutedEventArgs e)
     {
         _currentSearchTerm = SearchTextBox.Text?.Trim() ?? "";
-        _currentPage = 1;
-        _hasMoreMods = true;
-
-        await Dispatcher.UIThread.InvokeAsync(Mods.Clear);
-        await LoadMods(_currentPage, _currentSearchTerm);
+        await ReloadSearchResults();
     }
 
     /// <summary>
@@ -149,7 +151,12 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 
         var modId = -1;
         if (ModListView.SelectedItem is ModSearchResult selectedMod)
+        {
+            if (selectedMod.Mod.Name == "LOADING")
+                return;
+
             modId = selectedMod.Mod.Id;
+        }
         try
         {
             await ModDetailViewer.LoadModDetailsAsync(modId, cancellationToken: _loadCancellationToken.Token);
@@ -173,6 +180,65 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
             return;
 
         Search_Click(sender, e);
+    }
+
+    private bool ShowPatchesOnly => PatchesOnlyToggle.IsChecked == true;
+
+    private string GetEffectiveSearchTerm(string searchTerm)
+    {
+        if (ShowPatchesOnly && string.IsNullOrWhiteSpace(searchTerm))
+            return "Patches";
+
+        return searchTerm;
+    }
+
+    private async Task ReloadSearchResults()
+    {
+        _currentPage = 1;
+        _hasMoreMods = true;
+        LoadedMods.Clear();
+        await Dispatcher.UIThread.InvokeAsync(Mods.Clear);
+        await LoadMods(_currentPage, _currentSearchTerm);
+    }
+
+    private void ApplyModListFilters()
+    {
+        var selectedModId = (ModListView.SelectedItem as ModSearchResult)?.Mod.Id;
+
+        Mods.Clear();
+
+        IEnumerable<ModSearchResult> visibleMods = LoadedMods;
+        if (ShowPatchesOnly)
+        {
+            visibleMods = visibleMods.Where(mod => mod.Mod.UsesPatches);
+        }
+        else
+        {
+            visibleMods = visibleMods
+                .Select((mod, index) => new { Mod = mod, Index = index })
+                .OrderByDescending(entry => entry.Mod.Mod.UsesPatches)
+                .ThenBy(entry => entry.Index)
+                .Select(entry => entry.Mod);
+        }
+
+        foreach (var mod in visibleMods)
+            Mods.Add(mod);
+
+        if (_hasMoreMods)
+            Mods.Add(new(GameBananaService.GetLoadingPreview(), ""));
+
+        ModListView.SelectedItem = selectedModId == null ? null : Mods.FirstOrDefault(mod => mod.Mod.Id == selectedModId);
+    }
+
+    private async Task EnsurePatchesOnlyResultsAsync()
+    {
+        while (ShowPatchesOnly && _hasMoreMods && !LoadedMods.Any(mod => mod.Mod.UsesPatches))
+            await LoadMods(_currentPage + 1, _currentSearchTerm);
+    }
+
+    private async void PatchesOnlyToggle_Click(object? sender, RoutedEventArgs e)
+    {
+        await ReloadSearchResults();
     }
 
     #region Property Changed

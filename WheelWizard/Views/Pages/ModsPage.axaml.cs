@@ -21,8 +21,13 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest);
 
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
+    private IDisposable? _settingsSignalSubscription;
+
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
+
+    [Inject]
+    private ISettingsSignalBus SettingsSignalBus { get; set; } = null!;
 
     public ModManager ModManager => ModManager.Instance;
 
@@ -34,6 +39,21 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
                 mod.Priority == ModManager.Instance.GetHighestActivePriority()
             ))
         );
+
+    public bool UsePatches
+    {
+        get => SettingsService.Get<bool>(SettingsService.USE_PATCHES_SYSTEM);
+        set
+        {
+            if (UsePatches == value)
+                return;
+
+            SettingsService.Set(SettingsService.USE_PATCHES_SYSTEM, value);
+            RefreshStorageMode();
+        }
+    }
+
+    public string StoragePageTitle => ModStorageSystemHelper.GetDisplayName(ModStorageSystemHelper.GetCurrent(SettingsService));
 
     private bool _hasMods;
 
@@ -70,8 +90,10 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         DataContext = this;
         Focusable = true;
         ModManager.PropertyChanged += OnModsChanged;
+        _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         ModManager.ReloadAsync();
         SetModsViewVariant();
+        RefreshStorageMode();
 
         // Apply priority edits as soon as the user clicks anywhere outside the textbox.
         AddHandler(PointerPressedEvent, OnPagePointerPressed, RoutingStrategies.Tunnel, true);
@@ -80,6 +102,14 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         PointerMoved += OnDragPointerMoved;
         PointerReleased += OnDragPointerReleased;
         PointerCaptureLost += OnDragPointerCaptureLost;
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        ModManager.PropertyChanged -= OnModsChanged;
+        _settingsSignalSubscription?.Dispose();
+        _settingsSignalSubscription = null;
+        base.OnDetachedFromVisualTree(e);
     }
 
     private void OnModsChanged(object? sender, PropertyChangedEventArgs e)
@@ -99,6 +129,18 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         OnPropertyChanged(nameof(Mods));
         HasMods = ModManager.Mods.Count > 0;
         UpdateEnableAllCheckboxState();
+    }
+
+    private void OnSettingSignal(SettingChangedSignal signal)
+    {
+        if (signal.Setting == SettingsService.USE_PATCHES_SYSTEM)
+            RefreshStorageMode();
+    }
+
+    private void RefreshStorageMode()
+    {
+        OnPropertyChanged(nameof(UsePatches));
+        OnPropertyChanged(nameof(StoragePageTitle));
     }
 
     private void UpdateEnableAllCheckboxState()

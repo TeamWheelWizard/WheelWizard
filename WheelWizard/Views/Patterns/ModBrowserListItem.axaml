@@ -9,8 +9,9 @@
                                            ModAuthor="Me"/>
             
             <patterns:ModBrowserListItem Width="294" Height="89"
-                                           ModTitle="Some other mod"
-                                           ModAuthor="somebody else"/>
+                                           ModTitle="Some other mod with quite a long title"
+                                           UsesPatches="true"
+                                           ModAuthor="somebody else with also a long name and the name"/>
             
             <patterns:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="Coolest mod ever made"
@@ -72,6 +73,15 @@
                                 <TextBlock Classes="TinyText" Text="By: " />
                                 <TextBlock Classes="TinyText" Text="{TemplateBinding ModAuthor}" />
                             </StackPanel>
+                            <Border x:Name="PART_PatchesBadge"
+                                    IsVisible="False"
+                                    Margin="0,6,0,0"
+                                    Padding="6,2"
+                                    Background="#1E5E3A"
+                                    CornerRadius="9999"
+                                    HorizontalAlignment="Left">
+                                <TextBlock Classes="TinyText" Text="Uses Patches!" Foreground="#D6FFE2" />
+                            </Border>
                         </StackPanel>
                         
                         <!-- Icon -->
@@ -124,6 +134,16 @@
                         
                         <Style Selector="ListBoxItem:selected Border#PART_ModItemBorder, patterns|ModBrowserListItem.TestSelected Border#PART_ModItemBorder">
                             <Style Selector="^ Border#PART_OverlayBorder, ^ Border#PART_SelectedBlur">
+                                <Setter Property="IsVisible" Value="True"/>
+                            </Style>
+                        </Style>
+
+                        <Style Selector="patterns|ModBrowserListItem[UsesPatches=true] Border#PART_ModItemBorder">
+                            <Setter Property="Background" Value="#173726"/>
+                            <Style Selector="^ Border#PART_ImageBorder">
+                                <Setter Property="Background" Value="#28503B"/>
+                            </Style>
+                            <Style Selector="^ Border#PART_PatchesBadge">
                                 <Setter Property="IsVisible" Value="True"/>
                             </Style>
                         </Style>

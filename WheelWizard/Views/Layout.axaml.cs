@@ -9,6 +9,7 @@ using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
+using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
@@ -105,6 +106,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         Title = BrandingService.Branding.DisplayName;
         TitleLabel.Text = BrandingService.Branding.DisplayName;
+        UpdateModsButtonText();
 
         NavigationManager.NavigateTo<HomePage>();
     }
@@ -136,6 +138,15 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
         if (setting == SettingsService.TESTING_MODE_ENABLED)
             UpdateTestingButtonVisibility();
+
+        if (setting == SettingsService.USE_PATCHES_SYSTEM)
+            UpdateModsButtonText();
+    }
+
+    private void UpdateModsButtonText()
+    {
+        var storageSystem = ModStorageSystemHelper.GetCurrent(SettingsService);
+        ModsButton.Text = ModStorageSystemHelper.GetDisplayName(storageSystem);
     }
 
     public void NavigateToPage(UserControl page)

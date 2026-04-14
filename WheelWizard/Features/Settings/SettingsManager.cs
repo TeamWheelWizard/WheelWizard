@@ -111,6 +111,7 @@ public class SettingsManager : ISettingsManager
         LAUNCH_WITH_DOLPHIN = RegisterWhWz("LaunchWithDolphin", false);
         LAUNCH_RR_ON_STARTUP = RegisterWhWz("LaunchRrOnStartup", false);
         PREFERS_MODS_ROW_VIEW = RegisterWhWz("PrefersModsRowView", true);
+        USE_PATCHES_SYSTEM = RegisterWhWz("UsePatchesSystem", false);
         FOCUSED_USER = RegisterWhWz("FavoriteUser", 0, value => (int)(value ?? -1) >= 0 && (int)(value ?? -1) < 4);
 
         ENABLE_ANIMATIONS = RegisterWhWz("EnableAnimations", true);
@@ -198,6 +199,7 @@ public class SettingsManager : ISettingsManager
     public Setting LAUNCH_WITH_DOLPHIN { get; }
     public Setting LAUNCH_RR_ON_STARTUP { get; }
     public Setting PREFERS_MODS_ROW_VIEW { get; }
+    public Setting USE_PATCHES_SYSTEM { get; }
     public Setting FOCUSED_USER { get; }
     public Setting ENABLE_ANIMATIONS { get; }
     public Setting TESTING_MODE_ENABLED { get; }
