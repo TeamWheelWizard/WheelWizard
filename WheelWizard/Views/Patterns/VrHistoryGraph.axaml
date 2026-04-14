@@ -65,11 +65,18 @@
                     <TextBlock Classes="TinyText" FontSize="11" Text="{Binding DateRangeText}" />
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                     <components:LoadingIcon Margin="3,3,6,3" VerticalAlignment="Center" IsVisible="{Binding IsLoading}" Width="18" Height="18" Foreground="{StaticResource Neutral500}" />
+                    
+                    <CheckBox Classes="Switch" 
+                              Content="Matches" 
+                              IsChecked="{Binding UseMatchesAsXAxis}"
+                              FontSize="12"
+                              VerticalAlignment="Center"/>
+
                     <ComboBox x:Name="HistoryDaysDropdown"
                               MinWidth="145"
-                              VerticalAlignment="Top"
+                              VerticalAlignment="Center"
                               SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
                 </StackPanel>
             </Grid>
