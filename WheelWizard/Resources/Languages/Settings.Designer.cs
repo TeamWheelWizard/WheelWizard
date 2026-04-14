@@ -157,6 +157,15 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("HelperText_LaunchWithDolphin", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically launches Retro Rewind when Wheel Wizard starts.
+        /// </summary>
+        public static string HelperText_LaunchRrOnStartup {
+            get {
+                return ResourceManager.GetString("HelperText_LaunchRrOnStartup", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to You must set these 3 paths before you can start playing Retro Rewind.
@@ -254,6 +263,15 @@ namespace WheelWizard.Resources.Languages {
         public static string Option_LaunchWithDolphin {
             get {
                 return ResourceManager.GetString("Option_LaunchWithDolphin", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launch Retro Rewind On Startup.
+        /// </summary>
+        public static string Option_LaunchRrOnStartup {
+            get {
+                return ResourceManager.GetString("Option_LaunchRrOnStartup", resourceCulture);
             }
         }
         

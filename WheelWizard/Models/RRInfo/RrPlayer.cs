@@ -14,6 +14,7 @@ public class RrPlayer : IEquatable<RrPlayer>
 
     public bool IsOpenHost { get; set; }
     public bool IsSuspended { get; set; }
+    public bool IsFriend { get; set; }
 
     public int? LeaderboardRank { get; set; }
     public bool IsTopLeaderboardPlayer => LeaderboardRank.HasValue;

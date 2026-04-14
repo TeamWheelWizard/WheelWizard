@@ -1,13 +1,7 @@
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
-using WheelWizard.Helpers;
-using WheelWizard.Models.Enums;
-using WheelWizard.Models.Settings;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
-using WheelWizard.Services.Installation;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Generic;
 
@@ -27,10 +21,13 @@ public partial class OtherSettings : UserControlBase
     [Inject]
     private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
 
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
     public OtherSettings()
     {
         InitializeComponent();
-        _settingsAreDisabled = !SettingsHelper.PathsSetupCorrectly();
+        _settingsAreDisabled = !SettingsService.PathsSetupCorrectly();
         DisabledWarningText.IsVisible = _settingsAreDisabled;
 
         DolphinBorder.IsEnabled = !_settingsAreDisabled;
@@ -42,13 +39,15 @@ public partial class OtherSettings : UserControlBase
         DisableForce.IsCheckedChanged += ClickForceWiimote;
         LaunchWithDolphin.IsCheckedChanged += ClickLaunchWithDolphinWindow;
         RrAspectRatioDropdown.SelectionChanged += RrAspectRatioDropdown_OnSelectionChanged;
+        LaunchRrOnStartup.IsCheckedChanged += ClickLaunchRrOnStartup;
     }
 
     private void LoadSettings()
     {
         // Only loads when the settings are not disabled (aka when the paths are set up correctly)
-        DisableForce.IsChecked = (bool)SettingsManager.FORCE_WIIMOTE.Get();
-        LaunchWithDolphin.IsChecked = (bool)SettingsManager.LAUNCH_WITH_DOLPHIN.Get();
+        DisableForce.IsChecked = SettingsService.Get<bool>(SettingsService.FORCE_WIIMOTE);
+        LaunchWithDolphin.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_WITH_DOLPHIN);
+        LaunchRrOnStartup.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_RR_ON_STARTUP);
         OpenSaveFolderButton.IsEnabled = Directory.Exists(PathManager.SaveFolderPath);
     }
 
@@ -70,12 +69,17 @@ public partial class OtherSettings : UserControlBase
 
     private void ClickForceWiimote(object? sender, RoutedEventArgs e)
     {
-        SettingsManager.FORCE_WIIMOTE.Set(DisableForce.IsChecked == true);
+        SettingsService.Set(SettingsService.FORCE_WIIMOTE, DisableForce.IsChecked == true);
     }
 
     private void ClickLaunchWithDolphinWindow(object? sender, RoutedEventArgs e)
     {
-        SettingsManager.LAUNCH_WITH_DOLPHIN.Set(LaunchWithDolphin.IsChecked == true);
+        SettingsService.Set(SettingsService.LAUNCH_WITH_DOLPHIN, LaunchWithDolphin.IsChecked == true);
+    }
+
+    private void ClickLaunchRrOnStartup(object? sender, RoutedEventArgs e)
+    {
+        SettingsService.Set(SettingsService.LAUNCH_RR_ON_STARTUP, LaunchRrOnStartup.IsChecked == true);
     }
 
     private void RrAspectRatioDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)

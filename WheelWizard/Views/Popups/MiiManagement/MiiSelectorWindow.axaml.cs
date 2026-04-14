@@ -2,7 +2,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using WheelWizard.Resources.Languages;
-using WheelWizard.Views.Components;
+using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
@@ -13,7 +13,7 @@ namespace WheelWizard.Views.Popups.MiiManagement;
 public partial class MiiSelectorWindow : PopupContent
 {
     public Mii? Result { get; private set; } = null;
-    private TaskCompletionSource<Mii?> _tcs;
+    private TaskCompletionSource<Mii?>? _tcs;
 
     public MiiSelectorWindow()
         : base(true, false, false, Common.PopupTitle_MiiSelector)
@@ -64,7 +64,7 @@ public partial class MiiSelectorWindow : PopupContent
     private void yesButton_Click(object sender, RoutedEventArgs e)
     {
         Result = MiiList.Children.OfType<MiiBlock>().FirstOrDefault(block => block.IsChecked == true)?.Mii;
-        _tcs.TrySetResult(Result); // Signal that the task is complete
+        _tcs?.TrySetResult(Result); // Signal that the task is complete
         Close();
     }
 
@@ -73,7 +73,7 @@ public partial class MiiSelectorWindow : PopupContent
     protected override void BeforeClose()
     {
         // If you want to return something different, then to the TrySetResult before you close it
-        _tcs.TrySetResult(null);
+        _tcs?.TrySetResult(null);
     }
 
     public async Task<Mii?> AwaitAnswer()

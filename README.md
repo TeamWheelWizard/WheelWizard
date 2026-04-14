@@ -81,7 +81,6 @@ You are free to use, modify, and distribute this software, provided any derivati
 ## Sources
 
 Retro Rewind was made by ZPL. More information about Retro Rewind can be found on the [Tockdom Wiki](https://wiki.tockdom.com/wiki/Retro_Rewind).
-
+Huge parts from the mii renderer were inspired and ported from [ariankordi's branch](https://github.com/ariankordi/FFL-Testing) of abood's [FFL-Testing](https://github.com/aboood40091/FFL-Testing) project. You can find their website [here](https://mii-unsecure.ariankordi.net/).
 Some of the icons used in Wheel Wizard are from [Game Icons](https://game-icons.net/about.html). Specifically, the [car wheel icon](https://game-icons.net/1x1/delapouite/car-wheel.html) and the [flat tire icon](https://game-icons.net/1x1/delapouite/flat-tire.html), both created by Delapouite.
-Also thanks to the MarioCube Repository for providing the symbols for ro's mii channel.
 Also thanks Chadderz' for the specials icons in ["Chadderz' Terrible Mario Kart Font"](https://wiki.tockdom.com/wiki/CTMKF)

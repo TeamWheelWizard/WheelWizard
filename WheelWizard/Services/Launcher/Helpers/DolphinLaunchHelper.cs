@@ -2,13 +2,15 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using WheelWizard.Helpers;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Services.Launcher.Helpers;
 
 public static class DolphinLaunchHelper
 {
+    private static ISettingsManager Settings => SettingsRuntime.Current;
+
     public static void KillDolphin() //dont tell PETA
     {
         var dolphinLocation = PathManager.DolphinFilePath;
@@ -114,7 +116,9 @@ public static class DolphinLaunchHelper
 
         if (!TryFixFlatpakPortalAccess(PathManager.GameFilePath, "-r"))
             AddFilesystemPerm(PathManager.GameFilePath, ":ro");
-        AddFilesystemPerm(PathManager.RrLaunchJsonFilePath, ":ro");
+        // We need to provide the directory where the `RR.json` is located in for portal access!
+        if (!TryFixFlatpakPortalAccess(Path.GetDirectoryName(PathManager.RrLaunchJsonFilePath) ?? "", "-r"))
+            AddFilesystemPerm(PathManager.RrLaunchJsonFilePath, ":ro");
 
         return fixedFlatpakDolphinLocation;
     }
@@ -130,7 +134,7 @@ public static class DolphinLaunchHelper
             var userFolderArgument = cannotPassUserFolder ? "" : $"-u {EnvHelper.QuotePath(Path.GetFullPath(PathManager.UserFolderPath))}";
             var dolphinLaunchArguments = $"{arguments} {userFolderArgument}";
 
-            var dolphinLocation = (string)SettingsManager.DOLPHIN_LOCATION.Get();
+            var dolphinLocation = Settings.Get<string>(Settings.DOLPHIN_LOCATION);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Windows builds

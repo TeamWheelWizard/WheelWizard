@@ -2,8 +2,7 @@ using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services.Launcher;
-using WheelWizard.Services.Launcher.Helpers;
-using WheelWizard.Services.Settings;
+using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Generic;
 
@@ -11,17 +10,21 @@ namespace WheelWizard.Views.Pages;
 
 public partial class TestingPage : UserControlBase
 {
-    private readonly ILauncher _launcher;
     private WheelWizardStatus _status = WheelWizardStatus.Loading;
     private bool _isBusy;
 
     [Inject]
     private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
 
+    [Inject]
+    private ISettingsManager SettingsService { get; set; } = null!;
+
+    [Inject]
+    private RrBetaLauncher LauncherService { get; set; } = null!;
+
     public TestingPage()
     {
         InitializeComponent();
-        _launcher = new RrBetaLauncher();
         UpdateStatusAsync();
     }
 
@@ -30,13 +33,13 @@ public partial class TestingPage : UserControlBase
         _status = WheelWizardStatus.Loading;
         UpdateUi();
 
-        _status = await _launcher.GetCurrentStatus();
+        _status = await LauncherService.GetCurrentStatus();
         UpdateUi();
     }
 
     private void UpdateUi()
     {
-        var pathsReady = SettingsHelper.PathsSetupCorrectly();
+        var pathsReady = SettingsService.PathsSetupCorrectly();
         var isInstalled = _status == WheelWizardStatus.Ready;
 
         InstallButton.IsEnabled = pathsReady && !_isBusy;
@@ -67,7 +70,7 @@ public partial class TestingPage : UserControlBase
         _isBusy = true;
         UpdateUi();
 
-        await _launcher.Install();
+        await LauncherService.Install();
 
         _isBusy = false;
         UpdateStatusAsync();
@@ -106,7 +109,7 @@ public partial class TestingPage : UserControlBase
 
         _isBusy = true;
         UpdateUi();
-        await _launcher.Launch();
+        await LauncherService.Launch();
         _isBusy = false;
         UpdateUi();
     }

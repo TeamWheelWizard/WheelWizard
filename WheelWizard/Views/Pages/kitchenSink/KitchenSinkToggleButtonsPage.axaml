@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="760"
+             x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkToggleButtonsPage">
+    <StackPanel Spacing="12">
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="CheckBoxes" />
+            <CheckBox Content="Default checkbox" IsChecked="True" />
+            <CheckBox Content="Unchecked checkbox" />
+            <CheckBox Content="Disabled checked checkbox" IsChecked="True" IsEnabled="False" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="Switches" />
+            <CheckBox Classes="Switch" Content="Switch (light style)" />
+            <CheckBox Classes="Switch" Content="Switch (checked)" IsChecked="True" />
+            <CheckBox Classes="SwitchDark" Content="SwitchDark (settings style)" />
+            <CheckBox Classes="SwitchDark" Content="SwitchDark (checked)" IsChecked="True" />
+            <CheckBox Classes="SwitchDark" Content="SwitchDark (disabled)" IsEnabled="False" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="Radio Buttons" />
+            <RadioButton GroupName="KitchenSinkStandardRadio" Content="Option A" IsChecked="True" />
+            <RadioButton GroupName="KitchenSinkStandardRadio" Content="Option B" />
+            <RadioButton GroupName="KitchenSinkStandardRadio" Content="Option C (disabled)" IsEnabled="False" />
+
+            <TextBlock Classes="TinyText" Margin="0,4,0,0" Text="Alternative radio style using checkbox visuals:" />
+            <RadioButton GroupName="KitchenSinkAltRadio" Classes="CheckBox" Content="Alt A" IsChecked="True" />
+            <RadioButton GroupName="KitchenSinkAltRadio" Classes="CheckBox" Content="Alt B" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

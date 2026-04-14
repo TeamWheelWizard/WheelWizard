@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="420"
+             x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkIconLabelsPage">
+    <StackPanel Spacing="12">
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="IconLabel" />
+            <components:IconLabel Text="Text with left icon"
+                                  IconData="{StaticResource Folder}"
+                                  IconSize="18"
+                                  FontSize="15"
+                                  Foreground="{StaticResource Neutral300}" />
+            <components:IconLabel Text="Text with right icon"
+                                  IconData="{StaticResource ArrowRight}"
+                                  IsIconLeft="False"
+                                  IconSize="16"
+                                  FontSize="15"
+                                  Foreground="{StaticResource Neutral300}" />
+            <components:IconLabel Text="Underlined icon label"
+                                  IconData="{StaticResource ExternalLink}"
+                                  IsUnderlined="True"
+                                  IconSize="16"
+                                  FontSize="15"
+                                  Foreground="{StaticResource Neutral300}" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="IconLabelButton" />
+            <StackPanel Orientation="Horizontal" Spacing="24">
+                <components:IconLabelButton Text="Open docs"
+                                            IconData="{StaticResource ExternalLink}"
+                                            IconSize="16"
+                                            FontSize="15"
+                                            Foreground="{StaticResource Neutral300}"
+                                            HoverForeground="{StaticResource Neutral200}" />
+                <components:IconLabelButton Text="Underlined action"
+                                            IconData="{StaticResource ArrowRight}"
+                                            IsUnderlined="True"
+                                            IconSize="16"
+                                            FontSize="15"
+                                            Foreground="{StaticResource Neutral300}"
+                                            HoverForeground="{StaticResource Primary300}" />
+                <components:IconLabelButton Text="Icon on right"
+                                            IconData="{StaticResource ExternalLink}"
+                                            IsIconLeft="False"
+                                            IconSize="16"
+                                            FontSize="15"
+                                            Foreground="{StaticResource Neutral300}"
+                                            HoverForeground="{StaticResource Neutral200}" />
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

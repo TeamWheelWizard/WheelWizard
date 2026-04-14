@@ -32,6 +32,9 @@
     <data name="Option_LaunchWithDolphin" xml:space="preserve">
         <value>Launch Game With Dolphin Window</value>
     </data>
+    <data name="Option_LaunchRrOnStartup" xml:space="preserve">
+        <value>Launch Retro Rewind On Startup</value>
+    </data>
     <data name="Section_Language" xml:space="preserve">
         <value>Language</value>
     </data>
@@ -43,6 +46,9 @@
     </data>
     <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
         <value>Will launch dolphins main window along with the game</value>
+    </data>
+    <data name="HelperText_LaunchRrOnStartup" xml:space="preserve">
+        <value>Automatically launches Retro Rewind when Wheel Wizard starts</value>
     </data>
     <data name="HelperText_ForceDisableWiimote" xml:space="preserve">
         <value>This setting disables Wiimote ingame, but enables it for the Wii channel</value>

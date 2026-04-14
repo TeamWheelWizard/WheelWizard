@@ -393,6 +393,9 @@ FodyWeavers.xsd
 # Local History for Visual Studio Code
 .history/
 
+# Avalonia build task artifacts
+**/.avalonia-build-tasks/
+
 # Windows Installer files from build outputs
 *.cab
 *.msi
@@ -482,3 +485,4 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+AGENTS.md

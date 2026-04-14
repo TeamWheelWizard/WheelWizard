@@ -1,5 +1,6 @@
 using System.Text;
 using WheelWizard.Helpers;
+using WheelWizard.Utilities;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -8,6 +9,10 @@ namespace WheelWizard.MiiImages;
 
 public class MiiStudioDataSerializer
 {
+    private static readonly bool IsAprilFirst = AprilFirstHelper.IsAprilFirstLocalOrBst();
+    private const string AprilFirstMiiBase64 =
+        "BCAAWgBQAEzwbQAAAAAAAAAAAAAAAH9MyRhyVCQREREEBYGAAUDIsjyMiEAUSJiNcGoAiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    private static readonly byte[] AprilFirstMiiData = Convert.FromBase64String(AprilFirstMiiBase64);
     private static readonly int[] MakeupMap = [0, 1, 6, 9, 0, 0, 0, 0, 0, 10, 0, 0];
     private static readonly int[] WrinklesMap = [0, 0, 0, 0, 5, 2, 3, 7, 8, 0, 9, 11];
 
@@ -18,6 +23,15 @@ public class MiiStudioDataSerializer
     {
         if (mii == null)
             return Fail("Mii cannot be null.");
+
+        if (IsAprilFirst)
+        {
+            var aprilFirstMiiResult = MiiSerializer.Deserialize(AprilFirstMiiData);
+            if (aprilFirstMiiResult.IsFailure)
+                return aprilFirstMiiResult.Error;
+
+            mii = aprilFirstMiiResult.Value;
+        }
 
         // First we create a clone of the Mii that only contains features that are visual
         // This means no name, date or other non-visual features.

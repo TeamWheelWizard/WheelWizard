@@ -57,6 +57,7 @@ public sealed class DirectoryMoveContentsResult
 
 // From now on we to have this FileHelper as a middle man whenever we do anything file related. This makes
 // it easier to create helper methods, mock data, and most importantly, easy to make it multi-platform later on
+[Obsolete("FileHelper is deprecated. Use IFileSystem and feature-specific services instead.")]
 public static class FileHelper
 {
     public static bool FileExists(string path) => File.Exists(path);

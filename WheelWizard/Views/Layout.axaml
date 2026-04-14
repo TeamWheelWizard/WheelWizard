@@ -6,8 +6,8 @@
         x:Class="WheelWizard.Views.Layout"
         xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
         xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
-        xmlns:settings="clr-namespace:WheelWizard.Views.Pages.Settings"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
+        xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
         Height="876" Width="656" WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
         ExtendClientAreaToDecorationsHint="True"
@@ -57,9 +57,11 @@
         <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
                 Background="{StaticResource BackgroundColor}" />
-        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"  ClipToBounds="True">
-            <ContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="False"
-                            x:Name="ContentArea" Margin="{StaticResource EdgeGap}" />
+        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="True">
+            <TransitioningContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                         ClipToBounds="False"
+                                         x:Name="ContentArea"
+                                         Margin="{StaticResource EdgeGap}" />
         </Grid>
         
         <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom"
@@ -116,38 +118,42 @@
         <TextBlock Text="{x:Static lang:Settings.Category_General}" Classes="SidebarSectionText"
                    VerticalAlignment="Bottom" Grid.Row="3" /> <!-- Repurposing this translation from settings -->
         <StackPanel x:Name="SidePanelButtons" Grid.Column="0" Grid.Row="4" Width="192" VerticalAlignment="Top">
-            <components:SidebarRadioButton IconData="{StaticResource Home}"
+            <patterns:SidebarRadioButton IconData="{StaticResource Home}"
                                            Text="{x:Static lang:Common.PageTitle_Home}"
                                            PageType="{x:Type pages:HomePage}"
                                            IsChecked="True" />
-            <components:SidebarRadioButton IconData="{StaticResource UserCircle}"
+            <patterns:SidebarRadioButton IconData="{StaticResource UserCircle}"
                                            PageType="{x:Type pages:UserProfilePage}"
                                            Text="{x:Static lang:Common.PageTitle_MyProfiles}" x:Name="MyProfilesButton" />
-            <components:SidebarRadioButton IconData="{StaticResource CubesStacked}"
+            <patterns:SidebarRadioButton IconData="{StaticResource CubesStacked}"
                                            PageType="{x:Type pages:ModsPage}"
                                            Text="{x:Static lang:Common.PageTitle_Mods}" />
-            <components:SidebarRadioButton IconData="{StaticResource Shirt}"
+            <patterns:SidebarRadioButton IconData="{StaticResource Shirt}"
                                            PageType="{x:Type pages:MiiListPage}"
                                            Text="{x:Static lang:Common.PageTitle_MyMiis}" />
             <TextBlock Text="{x:Static lang:Common.Attribute_Status_Online}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from values -->
-            <components:SidebarRadioButton IconData="{StaticResource RoomUsers}"
+            <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}"
                                            PageType="{x:Type pages:RoomsPage}"
                                            Text="{x:Static lang:Common.PageTitle_Rooms}" x:Name="RoomsButton" />
-            <components:SidebarRadioButton IconData="{StaticResource Friends}"
+            <patterns:SidebarRadioButton IconData="{StaticResource Award}"
+                                           PageType="{x:Type pages:LeaderboardPage}"
+                                           Text="{x:Static lang:Common.PageTitle_Leaderboard}" />
+            <patterns:SidebarRadioButton IconData="{StaticResource Friends}"
                                            Text="{x:Static lang:Common.PageTitle_Friends}" x:Name="FriendsButton"
                                            PageType="{x:Type pages:FriendsPage}"
                                            BoxText="0/0" />
 
             <TextBlock Text="{x:Static lang:Settings.Category_Other}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from settings -->
-            <components:SidebarRadioButton IconData="{StaticResource Settings}"
-                                           PageType="{x:Type settings:SettingsPage}"
+            <patterns:SidebarRadioButton IconData="{StaticResource Settings}"
+                                           PageType="{x:Type pages:SettingsPage}"
                                            Text="{x:Static lang:Common.PageTitle_Settings}" x:Name="SettingsButton" />
-            <components:SidebarRadioButton IconData="{StaticResource Code}"
+            <patterns:SidebarRadioButton IconData="{StaticResource Code}"
                                            PageType="{x:Type pages:TestingPage}"
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
-            <components:SidebarRadioButton IconData="{StaticResource Spinner}" IsVisible="False"
+            <patterns:SidebarRadioButton IconData="{StaticResource Sink}" IsVisible="False"
+                                           PageType="{x:Type pages:KitchenSinkPage}"
                                            Text="Kitchen Sink" x:Name="KitchenSinkButton" />
         </StackPanel>
 

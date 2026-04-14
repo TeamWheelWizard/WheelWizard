@@ -17,6 +17,7 @@
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0-preview.3.25171.5" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/>
         <PackageReference Include="NSubstitute" Version="5.3.0"/>
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
         <PackageReference Include="Testably.Abstractions.Testing" Version="4.0.1" />
         <PackageReference Include="xunit" Version="2.9.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">

@@ -9,9 +9,10 @@
         <ImplicitUsings>true</ImplicitUsings>
 
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <NoWarn>$(NoWarn);AVLN3001</NoWarn>
 
         <!-- Program details -->
-        <Version>2.3.5</Version>
+        <Version>2.4.3</Version>
         <Description>This program will manage RetroRewind and mods :)</Description>
         <Copyright>GNU v3.0</Copyright>
         <RepositoryUrl>https://github.com/patchzyy/WheelWizard</RepositoryUrl>
@@ -131,6 +132,10 @@
     <ItemGroup Label="Fonts">
         <AvaloniaResource Include="Resources\Fonts\Roboto-Regular.ttf"/>
         <AvaloniaResource Include="Resources\Fonts\ctmkf.ttf"/>
+    </ItemGroup>
+
+    <ItemGroup Label="Mii Rendering Resources">
+        <EmbeddedResource Include="Features\MiiRendering\Resources\*.rmdl" />
     </ItemGroup>
 
     <ItemGroup>

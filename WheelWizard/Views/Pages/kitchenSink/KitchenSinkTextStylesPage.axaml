@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="640"
+             x:Class="WheelWizard.Views.Pages.KitchenSink.KitchenSinkTextStylesPage">
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Grid.Row="0" Spacing="8">
+            <TextBlock Classes="TitleText" Text="TitleText: Section headline" />
+            <TextBlock Classes="PageTitleText" Margin="0" Text="PageTitleText: Page header style" />
+            <TextBlock Classes="SidebarSectionText" Margin="0" Text="SidebarSectionText: Sidebar category title" />
+            <TextBlock Classes="BodyText" Text="BodyText: Default readable paragraph text for content sections." />
+            <TextBlock Classes="TinyText" Text="TinyText: helper and metadata text." />
+        </StackPanel>
+
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,*,*"
+              Margin="24,14,24,0"
+              VerticalAlignment="Bottom">
+            <Border Grid.Column="0"
+                    Width="18"
+                    Height="18"
+                    HorizontalAlignment="Center"
+                    ToolTip.Tip="Left aligned tooltip pointer."
+                    ToolTip.Placement="TopEdgeAlignedLeft"
+                    ToolTip.ShowDelay="20">
+                <PathIcon Data="{StaticResource InfoTip}"
+                          Foreground="{StaticResource TitleIconColor}"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch" />
+            </Border>
+
+            <Border Grid.Column="1"
+                    Width="18"
+                    Height="18"
+                    HorizontalAlignment="Center"
+                    ToolTip.Tip="Centered tooltip pointer."
+                    ToolTip.Placement="Top"
+                    ToolTip.ShowDelay="20">
+                <PathIcon Data="{StaticResource InfoTip}"
+                          Foreground="{StaticResource TitleIconColor}"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch" />
+            </Border>
+
+            <Border Grid.Column="2"
+                    Width="18"
+                    Height="18"
+                    HorizontalAlignment="Center"
+                    ToolTip.Tip="Right aligned tooltip pointer."
+                    ToolTip.Placement="TopEdgeAlignedRight"
+                    ToolTip.ShowDelay="20">
+                <PathIcon Data="{StaticResource InfoTip}"
+                          Foreground="{StaticResource TitleIconColor}"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch" />
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

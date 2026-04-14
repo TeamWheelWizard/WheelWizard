@@ -1,0 +1,46 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
+             xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+             x:Class="WheelWizard.Views.Patterns.CurrentUserProfile"
+             x:DataType="behaviorComponent:CurrentUserProfile">
+
+    <StackPanel Orientation="Horizontal" Background="Transparent">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center"
+                       Classes="SidebarSectionText" x:Name="PlayerNameBlock"
+                       Text="{Binding UserName}"
+                       Margin="0,0,10,0" />
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center"
+                       Classes="TinyText" x:Name="FriendCodeBlock"
+                       Text="{Binding FriendCode}"
+                       Margin="0,0,10,0" />
+        </StackPanel>
+
+        <Border CornerRadius="999999" ClipToBounds="True" Background="{StaticResource Neutral900}"
+                Width="50" Height="50" x:Name="Part_MiiBall">
+            <behaviorComponent:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                              LoadingColor="{StaticResource Neutral600}"
+                                              Mii="{Binding Mii}" x:Name="Part_MiiImage"
+                                              FallBackColor="{StaticResource Neutral600}"
+                                              ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSmall}" />
+        </Border>
+
+        <StackPanel.Styles>
+            <Style Selector="StackPanel:pointerover">
+                <Setter Property="Cursor" Value="Hand"/>
+                <Style Selector="^ Border#Part_MiiBall">
+                    <Setter Property="Background" Value="{StaticResource Neutral800}"/>
+                </Style>
+                <Style Selector="^ behaviorComponent|MiiImageLoader#Part_MiiImage">
+                    <Setter Property="LoadingColor" Value="{StaticResource Neutral500}"/>
+                    <Setter Property="FallBackColor" Value="{StaticResource Neutral500}"/>
+                </Style>
+                <Style Selector="^ TextBlock">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral300}"/>
+                </Style>
+            </Style>
+        </StackPanel.Styles>
+    </StackPanel>
+</UserControl>
