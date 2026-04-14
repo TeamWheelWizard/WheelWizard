@@ -500,15 +500,17 @@ public static class PathManager
 
     #endregion
 
-    //In case it is unclear, the mods folder is a folder with mods that are desired to be installed (if enabled)
-    //When launching we want to move the mods from the Mods folder to the MyStuff folder since that is the folder the game uses
-    //Also remember that mods may not be in a subfolder, all mod files must be located in /MyStuff directly
+    // In case it is unclear, the mods folder is a folder with mods that are desired to be installed (if enabled).
+    // When launching we sync those mods into the active loose-mod runtime folder.
+    // The runtime folder is either MyStuff (legacy) or patches, and all files must be located there directly.
 
     // Helper paths for folders used across multiple files
 
     public static string MyStuffFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6", "MyStuff");
+    public static string PatchesFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6", "Patches");
     public static string RrBetaFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RRBeta");
     public static string RrBetaMyStuffFolderPath => Path.Combine(RrBetaFolderPath, "MyStuff");
+    public static string RrBetaPatchesFolderPath => Path.Combine(RrBetaFolderPath, "Patches");
 
     public static string GetModDirectoryPath(string modName) => Path.Combine(ModsFolderPath, modName);
 

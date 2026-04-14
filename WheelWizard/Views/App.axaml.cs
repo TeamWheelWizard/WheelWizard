@@ -5,11 +5,11 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
 using WheelWizard.AutoUpdating;
 using WheelWizard.MiiRendering.Services;
-using WheelWizard.Settings;
-using WheelWizard.Services.Launcher;
 using WheelWizard.Services;
+using WheelWizard.Services.Launcher;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.UrlProtocol;
+using WheelWizard.Settings;
 using WheelWizard.Views.Behaviors;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData;
@@ -79,15 +79,19 @@ public class App : Application
         for (var i = 1; i < args.Length; i++)
         {
             var argument = args[i];
-            if (argument.Equals("--launch", StringComparison.OrdinalIgnoreCase) || argument.Equals("-l", StringComparison.OrdinalIgnoreCase))
+            if (
+                argument.Equals("--launch", StringComparison.OrdinalIgnoreCase) || argument.Equals("-l", StringComparison.OrdinalIgnoreCase)
+            )
             {
                 if (i + 1 >= args.Length)
                     continue;
 
                 var launchTarget = args[++i];
-                if (launchTarget.Equals("rr", StringComparison.OrdinalIgnoreCase) ||
-                    launchTarget.Equals("retrorewind", StringComparison.OrdinalIgnoreCase) ||
-                    launchTarget.Equals("retro-rewind", StringComparison.OrdinalIgnoreCase))
+                if (
+                    launchTarget.Equals("rr", StringComparison.OrdinalIgnoreCase)
+                    || launchTarget.Equals("retrorewind", StringComparison.OrdinalIgnoreCase)
+                    || launchTarget.Equals("retro-rewind", StringComparison.OrdinalIgnoreCase)
+                )
                 {
                     return StartupLaunchTarget.RetroRewind;
                 }
@@ -99,9 +103,11 @@ public class App : Application
                 continue;
 
             var launchTargetFromEquals = argument["--launch=".Length..].Trim();
-            if (launchTargetFromEquals.Equals("rr", StringComparison.OrdinalIgnoreCase) ||
-                launchTargetFromEquals.Equals("retrorewind", StringComparison.OrdinalIgnoreCase) ||
-                launchTargetFromEquals.Equals("retro-rewind", StringComparison.OrdinalIgnoreCase))
+            if (
+                launchTargetFromEquals.Equals("rr", StringComparison.OrdinalIgnoreCase)
+                || launchTargetFromEquals.Equals("retrorewind", StringComparison.OrdinalIgnoreCase)
+                || launchTargetFromEquals.Equals("retro-rewind", StringComparison.OrdinalIgnoreCase)
+            )
             {
                 return StartupLaunchTarget.RetroRewind;
             }

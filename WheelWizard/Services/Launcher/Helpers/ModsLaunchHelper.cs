@@ -1,5 +1,6 @@
 ﻿using Avalonia.Threading;
 using WheelWizard.Helpers;
+using WheelWizard.Models.Mods;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
 
@@ -7,24 +8,80 @@ namespace WheelWizard.Services.Launcher.Helpers;
 
 public static class ModsLaunchHelper
 {
-    public static readonly string MyStuffFolderPath = PathManager.MyStuffFolderPath;
     public static readonly string ModsFolderPath = PathManager.ModsFolderPath;
-    public static readonly string[] AcceptedModExtensions = ["*.szs", "*.arc", "*.brstm", "*.brsar", "*.thp"];
 
-    public static async Task PrepareModsForLaunch(string? myStuffFolderPath = null)
+    //todo: move this to like an actual static place somewhere that makes more sense.
+    public static readonly string[] AcceptedMyStuffExtensions =
+    [
+        ".bcp",
+        ".szs",
+        ".bdof",
+        ".bfg",
+        ".blight",
+        ".bmg",
+        ".bmm",
+        ".brctr",
+        ".breff",
+        ".breft",
+        ".brfnt",
+        ".brlan",
+        ".brlyt",
+        ".brres",
+        ".brsar",
+        ".brstm",
+        ".bsp",
+        ".bti",
+        ".chr0",
+        ".clr0",
+        ".krm",
+        ".mdl0",
+        ".pat0",
+        ".rkc",
+        ".rkg",
+        ".scn0",
+        ".shp0",
+        ".srt0",
+        ".tex0",
+        ".thp",
+        ".tpl",
+        ".u8",
+        ".yaz0",
+        ".ast",
+        ".bdl",
+        ".bmd",
+        ".bco",
+        ".bol",
+        ".dat",
+        ".rarc",
+        ".ct-def",
+        ".le-def",
+        ".lex",
+        ".lfl",
+        ".lpar",
+        ".lta",
+        ".tplx",
+        ".wbz",
+        ".wlz",
+        ".wu8",
+        ".ybz",
+        ".ylz",
+    ];
+
+    public static async Task PrepareModsForLaunch(string targetFolderPath, string inactiveFolderPath, ModStorageSystem storageSystem)
     {
-        var resolvedMyStuffFolderPath = myStuffFolderPath ?? MyStuffFolderPath;
+        ClearInactiveFolder(inactiveFolderPath);
+
         var mods = ModManager.Instance.Mods.Where(mod => mod.IsEnabled).ToArray();
         if (mods.Length == 0)
         {
-            if (Directory.Exists(resolvedMyStuffFolderPath) && Directory.EnumerateFiles(resolvedMyStuffFolderPath).Any())
+            if (Directory.Exists(targetFolderPath) && Directory.EnumerateFiles(targetFolderPath).Any())
             {
                 var modsFoundQuestion = new YesNoWindow()
                     .SetButtonText(Common.Action_Delete, Common.Action_Keep)
                     .SetMainText(Phrases.Question_LaunchClearModsFound_Title)
-                    .SetExtraText(Phrases.Question_LaunchClearModsFound_Extra);
+                    .SetExtraText(ModStorageSystemHelper.GetClearFolderPrompt(storageSystem));
                 if (await modsFoundQuestion.AwaitAnswer())
-                    Directory.Delete(resolvedMyStuffFolderPath, true);
+                    Directory.Delete(targetFolderPath, true);
 
                 return;
             }
@@ -38,34 +95,23 @@ public static class ModsLaunchHelper
         {
             if (!mod.IsEnabled)
                 continue;
+
             var modFolder = Path.Combine(ModsFolderPath, mod.Title);
-            foreach (var extension in AcceptedModExtensions)
+            if (!Directory.Exists(modFolder))
+                continue;
+
+            foreach (var file in Directory.GetFiles(modFolder, "*", SearchOption.AllDirectories))
             {
-                var files = Directory.GetFiles(modFolder, extension, SearchOption.AllDirectories);
-                foreach (var file in files)
-                {
-                    var relativePath = Path.GetFileName(file);
-                    // Since higher priority mods overwrite lower ones, we can overwrite entries in the dictionary
-                    finalFiles[relativePath] = file;
-                }
+                if (!ShouldCopyFile(mod, file, storageSystem))
+                    continue;
+
+                var relativePath = Path.GetFileName(file);
+                // Since higher priority mods overwrite lower ones, we can overwrite entries in the dictionary
+                finalFiles[relativePath] = file;
             }
         }
 
-        // Get existing files in MyStuff
-        var existingFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        if (Directory.Exists(resolvedMyStuffFolderPath))
-        {
-            var files = Directory.GetFiles(resolvedMyStuffFolderPath, "*.*", SearchOption.TopDirectoryOnly);
-            foreach (var file in files)
-            {
-                var relativePath = Path.GetFileName(file);
-                existingFiles.Add(relativePath);
-            }
-        }
-        else
-        {
-            Directory.CreateDirectory(resolvedMyStuffFolderPath);
-        }
+        Directory.CreateDirectory(targetFolderPath);
 
         var totalFiles = finalFiles.Count;
         var progressWindow = new ProgressWindow(Phrases.Progress_InstallingMods).SetGoal(
@@ -76,10 +122,10 @@ public static class ModsLaunchHelper
         await Task.Run(() =>
         {
             var processedFiles = 0;
-            // Delete files in MyStuff that are not in finalFiles
-            if (Directory.Exists(resolvedMyStuffFolderPath))
+            // Delete files in the active loose-mod folder that are not in finalFiles
+            if (Directory.Exists(targetFolderPath))
             {
-                var files = Directory.GetFiles(resolvedMyStuffFolderPath, "*.*", SearchOption.TopDirectoryOnly);
+                var files = Directory.GetFiles(targetFolderPath, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var file in files)
                 {
                     var relativePath = Path.GetFileName(file);
@@ -94,7 +140,7 @@ public static class ModsLaunchHelper
             {
                 var relativePath = kvp.Key;
                 var sourceFile = kvp.Value;
-                var destinationFile = Path.Combine(resolvedMyStuffFolderPath, relativePath);
+                var destinationFile = Path.Combine(targetFolderPath, relativePath);
 
                 processedFiles++;
                 var progress = (int)((processedFiles) / (double)totalFiles * 100);
@@ -130,5 +176,26 @@ public static class ModsLaunchHelper
         });
 
         progressWindow.Close();
+    }
+
+    private static void ClearInactiveFolder(string inactiveFolderPath)
+    {
+        if (!Directory.Exists(inactiveFolderPath))
+            return;
+
+        Directory.Delete(inactiveFolderPath, true);
+    }
+
+    private static bool ShouldCopyFile(Mod mod, string filePath, ModStorageSystem storageSystem)
+    {
+        var modMetadataFile = Path.Combine(ModsFolderPath, mod.Title, $"{mod.Title}.ini");
+        if (Path.GetFullPath(filePath).Equals(Path.GetFullPath(modMetadataFile), StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (storageSystem == ModStorageSystem.Patches)
+            return true;
+
+        var extension = Path.GetExtension(filePath);
+        return AcceptedMyStuffExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
     }
 }

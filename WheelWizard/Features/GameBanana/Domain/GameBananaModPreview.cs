@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using WheelWizard.Services;
 
 namespace WheelWizard.GameBanana.Domain;
 
@@ -16,7 +17,8 @@ public class GameBananaModPreview
     public required string Version { get; set; }
 
     [JsonPropertyName("_aTags")]
-    public required List<string> Tags { get; set; }
+    [JsonConverter(typeof(GameBananaTagListJsonConverter))]
+    public required List<GameBananaTag> Tags { get; set; }
 
     [JsonPropertyName("_sProfileUrl")]
     public required string ProfileUrl { get; set; }
@@ -52,4 +54,7 @@ public class GameBananaModPreview
     /// </summary>
     [JsonPropertyName("_sModelName")]
     public required string ModelName { get; set; }
+
+    [JsonIgnore]
+    public bool UsesPatches => ModStorageSystemHelper.UsesPatches(Tags);
 }

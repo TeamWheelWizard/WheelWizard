@@ -32,7 +32,12 @@ public class RrLauncher : ILauncher
             DolphinLaunchHelper.KillDolphin();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
-            await ModsLaunchHelper.PrepareModsForLaunch();
+            var storageSystem = ModStorageSystemHelper.GetCurrent(_settingsManager);
+            await ModsLaunchHelper.PrepareModsForLaunch(
+                ModStorageSystemHelper.GetTargetFolderPath(storageSystem),
+                ModStorageSystemHelper.GetInactiveFolderPath(storageSystem),
+                storageSystem
+            );
             if (!File.Exists(PathManager.GameFilePath))
             {
                 Dispatcher.UIThread.Post(() =>
