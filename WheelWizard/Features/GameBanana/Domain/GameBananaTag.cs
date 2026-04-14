@@ -17,7 +17,7 @@ public sealed class GameBananaTagListJsonConverter : JsonConverter<List<GameBana
             return [];
 
         if (reader.TokenType != JsonTokenType.StartArray)
-            return []; //maybe throw but now just do this
+            throw new JsonException($"Expected StartArray token, but got {reader.TokenType}.");
 
         var tags = new List<GameBananaTag>();
 
