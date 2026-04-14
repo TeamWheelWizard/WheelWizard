@@ -67,6 +67,16 @@ public class ModBrowserListItem : TemplatedControl
         set => SetValue(ImageUrlProperty, value);
     }
 
+    public static readonly StyledProperty<bool> UsesPatchesProperty = AvaloniaProperty.Register<ModBrowserListItem, bool>(
+        nameof(UsesPatches)
+    );
+
+    public bool UsesPatches
+    {
+        get => GetValue(UsesPatchesProperty);
+        set => SetValue(UsesPatchesProperty, value);
+    }
+
     protected override async void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);

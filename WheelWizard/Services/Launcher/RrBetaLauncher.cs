@@ -31,7 +31,12 @@ public class RrBetaLauncher : ILauncher
             DolphinLaunchHelper.KillDolphin();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
-            await ModsLaunchHelper.PrepareModsForLaunch(PathManager.RrBetaMyStuffFolderPath);
+            var storageSystem = ModStorageSystemHelper.GetCurrent(_settingsManager);
+            await ModsLaunchHelper.PrepareModsForLaunch(
+                ModStorageSystemHelper.GetTargetFolderPath(storageSystem, isBeta: true),
+                ModStorageSystemHelper.GetInactiveFolderPath(storageSystem, isBeta: true),
+                storageSystem
+            );
             if (!File.Exists(PathManager.GameFilePath))
             {
                 Dispatcher.UIThread.Post(() =>

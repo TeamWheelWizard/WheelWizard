@@ -26,6 +26,7 @@ public interface ISettingsProperties
     Setting LAUNCH_WITH_DOLPHIN { get; }
     Setting LAUNCH_RR_ON_STARTUP { get; }
     Setting PREFERS_MODS_ROW_VIEW { get; }
+    Setting USE_PATCHES_SYSTEM { get; }
     Setting FOCUSED_USER { get; }
     Setting ENABLE_ANIMATIONS { get; }
     Setting TESTING_MODE_ENABLED { get; }
