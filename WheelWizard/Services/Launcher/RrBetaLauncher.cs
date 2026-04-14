@@ -43,9 +43,11 @@ public class RrBetaLauncher : ILauncher
             }
 
             RetroRewindLaunchHelper.GenerateLaunchJson(PathManager.RrBetaXmlFilePath);
+            RetroRewindAspectRatioHelper.ApplyDolphinGraphicsAspectRatio();
+            var wiiAspectConfig = RetroRewindAspectRatioHelper.GetWiiAspectLaunchConfig();
             var dolphinLaunchType = (bool)SettingsManager.LAUNCH_WITH_DOLPHIN.Get() ? "" : "-b";
             DolphinLaunchHelper.LaunchDolphin(
-                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
+                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} {wiiAspectConfig} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
             );
         }
         catch (Exception ex)

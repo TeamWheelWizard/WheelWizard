@@ -36,6 +36,22 @@
                     </CheckBox>
                 </StackPanel>
             </Border>
+
+            <components1:FormFieldLabel Text="Retro Rewind Aspect Ratio" />
+            <Border Classes="SettingsBlockStyle">
+                <StackPanel>
+                    <components1:FormFieldLabel Text="Mode"
+                                                TipText="16:10 open matte forces Wii 4:3; all other modes force Wii 16:9." />
+                    <ComboBox x:Name="RrAspectRatioDropdown"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Top"
+                              Margin="0,0,0,6" />
+                    <TextBlock x:Name="RrAspectRatioDescription"
+                               TextWrapping="Wrap"
+                               Classes="BodyText"
+                               Foreground="{StaticResource Neutral500}" />
+                </StackPanel>
+            </Border>
             
             <components1:FormFieldLabel Text="{x:Static lang:Settings.Section_Installation}" />
             <StackPanel>

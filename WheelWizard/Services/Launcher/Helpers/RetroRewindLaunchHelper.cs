@@ -17,12 +17,14 @@ public static class RetroRewindLaunchHelper
     public static void GenerateLaunchJson(string xmlFilePath)
     {
         var launchInfo = GetLaunchInfo(xmlFilePath);
+        RetroRewindAspectRatioHelper.EnsureAspectPatches(xmlFilePath, launchInfo.SectionName);
         GenerateLaunchJson(
             xmlFilePath,
             PathManager.RiivolutionWhWzFolderPath,
             launchInfo.SectionName,
             launchInfo.MyStuffChoice,
-            launchInfo.EnableSeparateSave
+            launchInfo.EnableSeparateSave,
+            RetroRewindAspectRatioHelper.GetSelectedChoice()
         );
     }
 
@@ -31,7 +33,8 @@ public static class RetroRewindLaunchHelper
         string rootFolderPath,
         string sectionName,
         int myStuffChoice,
-        bool enableSeparateSave
+        bool enableSeparateSave,
+        int aspectRatioChoice
     )
     {
         var launchConfig = new LaunchConfig
@@ -44,7 +47,7 @@ public static class RetroRewindLaunchHelper
                 [
                     new()
                     {
-                        Options = BuildOptions(sectionName, myStuffChoice, enableSeparateSave).ToArray(),
+                        Options = BuildOptions(sectionName, myStuffChoice, enableSeparateSave, aspectRatioChoice).ToArray(),
                         Root = Path.GetFullPath(rootFolderPath),
                         Xml = Path.GetFullPath(xmlFilePath),
                     },
@@ -67,7 +70,7 @@ public static class RetroRewindLaunchHelper
         File.WriteAllText(JsonFilePath, jsonString);
     }
 
-    private static List<OptionConfig> BuildOptions(string sectionName, int myStuffChoice, bool enableSeparateSave)
+    private static List<OptionConfig> BuildOptions(string sectionName, int myStuffChoice, bool enableSeparateSave, int aspectRatioChoice)
     {
         var options = new List<OptionConfig>
         {
@@ -81,6 +84,12 @@ public static class RetroRewindLaunchHelper
             {
                 Choice = myStuffChoice,
                 OptionName = "My Stuff",
+                SectionName = sectionName,
+            },
+            new()
+            {
+                Choice = aspectRatioChoice,
+                OptionName = "Aspect Ratio",
                 SectionName = sectionName,
             },
         };

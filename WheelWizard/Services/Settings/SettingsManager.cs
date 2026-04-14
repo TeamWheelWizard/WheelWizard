@@ -112,6 +112,9 @@ public class SettingsManager
         1
     ).SetValidation(value => (int)(value ?? -1) >= 0);
     public static Setting SHOW_FPS = new DolphinSetting(typeof(bool), ("GFX.ini", "Settings", "ShowFPS"), false);
+    public static Setting GFX_ASPECT_RATIO = new DolphinSetting(typeof(int), ("GFX.ini", "Settings", "AspectRatio"), 1).SetValidation(
+        value => (int)(value ?? -1) >= 0 && (int)(value ?? -1) <= 3
+    );
     public static Setting GFX_BACKEND = new DolphinSetting(
         typeof(string),
         ("Dolphin.ini", "Core", "GFXBackend"),
@@ -176,6 +179,7 @@ public class SettingsManager
     ).SetDependencies(DOLPHIN_COMPILATION_MODE, DOLPHIN_COMPILE_SHADERS_AT_START, DOLPHIN_MSAA, DOLPHIN_SSAA);
 
     private static RrGameMode _internalRrGameMode = RrGameMode.RETRO_TRACKS;
+    public static Setting RR_ASPECT_RATIO = new WhWzSetting(typeof(RrAspectRatioMode), "RR_AspectRatio", RrAspectRatioMode.Widescreen16By9);
     #endregion
 
 
