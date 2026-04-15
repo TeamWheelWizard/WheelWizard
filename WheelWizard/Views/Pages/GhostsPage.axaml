@@ -1,0 +1,104 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
+             xmlns:models="clr-namespace:WheelWizard.Models"
+              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             x:Class="WheelWizard.Views.Pages.GhostsPage"
+              x:DataType="pages:GhostsPage">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Page Header -->
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                    Spacing="6">
+            <TextBlock Text="Ghosts" Classes="PageTitleText" />
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6,0,0,0"
+                    ToolTip.Tip="View and manage your ghost data and race replays"
+                    ToolTip.Placement="Top" ToolTip.ShowDelay="20"
+                    Width="18" Height="18">
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
+            </Border>
+        </StackPanel>
+
+        <patterns:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
+                                     HorizontalAlignment="Right" VerticalAlignment="Top" />
+
+        <!-- Search Bar -->
+        <Border Grid.Row="1" Margin="10,8,10,4" Background="{StaticResource Neutral900}" CornerRadius="8" Padding="15,8">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0" x:Name="SearchTextBox" 
+                         Watermark="Search tracks..."
+                         TextChanged="SearchTextBox_TextChanged" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5" Margin="15,0,0,0" VerticalAlignment="Center">
+                    <components:StateBox Text="0" IconSize="0" x:Name="TrackCount" />
+                    <TextBlock Text="tracks found" Classes="BodyText" Foreground="{StaticResource Neutral400}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Filters Bar -->
+        <Border Grid.Row="2" Margin="10,4,10,8" Background="{StaticResource Neutral800}" CornerRadius="8" Padding="15,8">
+            <StackPanel Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center">
+                <RadioButton x:Name="AllTracksRadio" Content="All Tracks" IsChecked="True" 
+                             Checked="FilterChanged" Unchecked="FilterChanged" GroupName="TrackType" />
+                <RadioButton x:Name="RetroTracksRadio" Content="Retro"
+                             Checked="FilterChanged" Unchecked="FilterChanged" GroupName="TrackType" />
+                <RadioButton x:Name="CustomTracksRadio" Content="Custom"
+                             Checked="FilterChanged" Unchecked="FilterChanged" GroupName="TrackType" />
+            </StackPanel>
+        </Border>
+        <!-- Track List -->
+        <ListBox Grid.Row="3" 
+                 x:Name="TrackListBox"
+                 Background="Transparent" 
+                 BorderThickness="0"
+                 ItemsSource="{Binding FilteredTracks}"
+                 Margin="10,0,10,10"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="models:ApiTrack">
+                        <Grid Margin="0,0,0,2">
+                            <patterns:TrackListItem 
+                                TrackName="{Binding Name}"
+                                Console="{Binding Console}"
+                                IsCustomTrack="{Binding IsCustomTrack}"
+                                IsRetroTrack="{Binding IsRetroTrack}"
+                                HexValue="{Binding HexValue}"
+                                Height="80" />
+                            <!-- Invisible overlay button for click handling -->
+                            <Button Background="Transparent" 
+                                    BorderThickness="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    Padding="0,0,110,0"
+                                    Click="ViewTimesButton_Click"
+                                    Tag="{Binding}">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border Background="Transparent" />
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+    </Grid>
+</UserControl>

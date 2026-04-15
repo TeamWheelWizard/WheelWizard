@@ -67,6 +67,7 @@
         <StyleInclude Source="Patterns/ModBrowserListItem.axaml" />
         <StyleInclude Source="Patterns/FriendsListItem.axaml" />
         <StyleInclude Source="Patterns/PlayerListItem.axaml" />
+        <StyleInclude Source="Patterns/TrackListItem.axaml" />
         <StyleInclude Source="Components/Badge.axaml" />
         <StyleInclude Source="Patterns/MiiBlock.axaml" />
         <StyleInclude Source="Components/WheelTrail.axaml" />

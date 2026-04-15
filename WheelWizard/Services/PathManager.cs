@@ -83,6 +83,7 @@ public static class PathManager
     public static string WiiDbFolder => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib");
     public static string MiiDbFile => Path.Combine(WiiDbFolder, "RFL_DB.dat");
     public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRRating.pul");
+    public static string GhostsFolderPath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "Ghosts");
 
     #region Wheel Wizard Appdata Override
 

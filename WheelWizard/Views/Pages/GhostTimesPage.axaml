@@ -1,0 +1,412 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
+             xmlns:models="clr-namespace:WheelWizard.Models"
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             xmlns:converters="clr-namespace:WheelWizard.Converters"
+             x:Class="WheelWizard.Views.Pages.GhostTimesPage"
+             x:DataType="pages:GhostTimesPage">
+    
+    <UserControl.Resources>
+        <converters:RankToMedalConverter x:Key="RankToMedal" />
+        <converters:CountryCodeToFlagConverter x:Key="CountryCodeToFlag" />
+        <converters:CharacterIdToNameConverter x:Key="CharacterIdToName" />
+        <converters:VehicleIdToNameConverter x:Key="VehicleIdToName" />
+        <converters:DriftTypeToNameConverter x:Key="DriftTypeToName" />
+        <converters:ControllerTypeToNameConverter x:Key="ControllerTypeToName" />
+        <converters:LapTimesToAverageConverter x:Key="LapTimesToAverage" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Page Header -->
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                    Spacing="6">
+            <components:Button Variant="Default"
+                               IconData="{StaticResource ChevronLeft}"
+                               IconSize="16"
+                               Padding="8,6"
+                               Click="BackButton_Click"
+                               VerticalAlignment="Center" />
+            <TextBlock x:Name="TrackTitle" Text="" Classes="PageTitleText" />
+        </StackPanel>
+
+        <patterns:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
+                                     HorizontalAlignment="Right" VerticalAlignment="Top" />
+
+        <!-- Tabs -->
+        <Border Grid.Row="1" Margin="10,8" Background="{StaticResource Neutral900}" CornerRadius="8" Padding="15,8">
+            <StackPanel Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center">
+                <RadioButton x:Name="OnlineTabRadio" Content="Online" IsChecked="True" 
+                             Checked="TabChanged" GroupName="GhostTabs" />
+                <RadioButton x:Name="OfflineTabRadio" Content="Local Saves"
+                             Checked="TabChanged" GroupName="GhostTabs" />
+            </StackPanel>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Row="2" Margin="10">
+            <!-- Online Tab Content -->
+            <ScrollViewer x:Name="OnlineContent" IsVisible="{Binding IsOnlineTabSelected}">
+                <StackPanel Spacing="15">
+                    <!-- Filters -->
+                    <Border Background="{StaticResource Neutral900}" CornerRadius="8" Padding="15">
+                        <StackPanel Spacing="15">
+                            <!-- Glitch Filter -->
+                            <StackPanel>
+                                <TextBlock Text="Glitch:" Classes="BodyText" FontWeight="SemiBold" Margin="0,0,0,8" />
+                                <StackPanel Orientation="Horizontal" Spacing="15">
+                                    <RadioButton x:Name="GlitchAllowedRadio" Content="Allowed" IsChecked="True" 
+                                                 Checked="FilterChanged" GroupName="Glitch" />
+                                    <RadioButton x:Name="NoGlitchRadio" Content="No Glitch"
+                                                 Checked="FilterChanged" GroupName="Glitch" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- CC Filter -->
+                            <StackPanel>
+                                <TextBlock Text="Engine Class:" Classes="BodyText" FontWeight="SemiBold" Margin="0,0,0,8" />
+                                <StackPanel Orientation="Horizontal" Spacing="15">
+                                    <RadioButton x:Name="Cc150Radio" Content="150cc" IsChecked="True" 
+                                                 Checked="FilterChanged" GroupName="CC" />
+                                    <RadioButton x:Name="Cc200Radio" Content="200cc"
+                                                 Checked="FilterChanged" GroupName="CC" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Leaderboard Type Filter -->
+                            <StackPanel>
+                                <TextBlock Text="Leaderboard Type:" Classes="BodyText" FontWeight="SemiBold" Margin="0,0,0,8" />
+                                <StackPanel Orientation="Horizontal" Spacing="15">
+                                    <RadioButton x:Name="RegularTypeRadio" Content="Regular" IsChecked="True" 
+                                                 Checked="FilterChanged" GroupName="LeaderboardType" />
+                                    <RadioButton x:Name="FlapTypeRadio" Content="Flap"
+                                                 Checked="FilterChanged" GroupName="LeaderboardType" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Refresh Button -->
+                            <Border BorderThickness="0,1,0,0" BorderBrush="{StaticResource Neutral700}" Padding="0,15,0,0" Margin="0,10,0,0">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <components:Button x:Name="RefreshButton"
+                                                       Variant="Primary"
+                                                       Text="Refresh Leaderboard"
+                                                       IconData="{StaticResource Refresh}"
+                                                       Click="RefreshButton_Click"
+                                                       IsEnabled="True" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Leaderboard -->
+                    <Border Background="{StaticResource Neutral900}" CornerRadius="8" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="Online Leaderboard" Classes="BodyText" FontWeight="Bold" Margin="0,0,0,10" />
+                            <ListBox x:Name="LeaderboardListBox"
+                                     Background="Transparent" 
+                                     BorderThickness="0"
+                                     ItemsSource="{Binding Submissions}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Spacing="8" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="models:GhostSubmission">
+                                        <Border Classes="BoxItemBackground" Padding="20,15" CornerRadius="8">
+                                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                                <!-- Medal/Rank -->
+                                                <Border Grid.Column="0" CornerRadius="25" 
+                                                        Background="{StaticResource Neutral800}" 
+                                                        Width="55" Height="55" Margin="0,0,20,0"
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Rank, Converter={StaticResource RankToMedal}}" 
+                                                               Classes="BodyText"
+                                                               FontSize="24"
+                                                               FontWeight="Bold"
+                                                               HorizontalAlignment="Center" 
+                                                               VerticalAlignment="Center" />
+                                                </Border>
+
+                                                <!-- Main Info -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <!-- Player Name & Country Flag -->
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+                                                        <TextBlock Text="{Binding PlayerName}" 
+                                                                   Classes="BodyText"
+                                                                   FontWeight="SemiBold"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding CountryAlpha2, Converter={StaticResource CountryCodeToFlag}}" 
+                                                                   Classes="BodyText"
+                                                                   FontSize="16"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    
+                                                    <!-- Mii Name (More Prominent) -->
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,8">
+                                                        <PathIcon Data="{StaticResource User}" 
+                                                                  Width="14" Height="14"
+                                                                  Foreground="{StaticResource Primary}"
+                                                                  VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding MiiName}" 
+                                                                   Classes="BodyText"
+                                                                   FontSize="14"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource Primary}" />
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <!-- Times & Actions -->
+                                                <StackPanel Grid.Column="2" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="8">
+                                                    <!-- Finish Time -->
+                                                    <TextBlock Text="{Binding FinishTimeDisplay}" 
+                                                               Classes="BodyText"
+                                                               FontWeight="Bold"
+                                                               FontSize="20"
+                                                               HorizontalAlignment="Right"
+                                                               Margin="0,0,0,2" />
+                                                    
+                                                    <!-- Best Lap -->
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4" Margin="0,0,0,8">
+                                                        <TextBlock Text="Best:" 
+                                                                   Classes="BodyText"
+                                                                   FontSize="12"
+                                                                   Foreground="{StaticResource Neutral400}" />
+                                                        <TextBlock Text="{Binding FastestLapDisplay}" 
+                                                                   Classes="BodyText"
+                                                                   FontSize="12"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource Neutral200}" />
+                                                    </StackPanel>
+                                                    
+                                                    <!-- Action Buttons -->
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                                        <components:Button Variant="Default"
+                                                                           Text="Details"
+                                                                           IconData="{StaticResource InfoTip}"
+                                                                           IconSize="12"
+                                                                           FontSize="12"
+                                                                           Padding="10,6"
+                                                                           Click="DetailsButton_Click"
+                                                                           Tag="{Binding}" />
+                                                        
+                                                        <components:Button Variant="Primary"
+                                                                           Text="Download"
+                                                                           IconData="{StaticResource Download}"
+                                                                           IconSize="12"
+                                                                           FontSize="12"
+                                                                           Padding="10,6"
+                                                                           Click="DownloadGhostButton_Click"
+                                                                           Tag="{Binding}" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            
+                            <!-- Loading/Empty State -->
+                            <TextBlock x:Name="LoadingText" 
+                                       Text="Loading..." 
+                                       Classes="BodyText" 
+                                       HorizontalAlignment="Center" 
+                                       Margin="0,20"
+                                       IsVisible="False" />
+                            
+                            <TextBlock x:Name="EmptyText" 
+                                       Text="No ghost times available." 
+                                       Classes="BodyText" 
+                                       HorizontalAlignment="Center" 
+                                       Margin="0,20"
+                                       IsVisible="False" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Saves Tab Content -->
+            <ScrollViewer x:Name="SavesContent" IsVisible="{Binding !IsOnlineTabSelected}">
+                <StackPanel Spacing="15">
+                    <!-- Header -->
+                    <Border Background="{StaticResource Neutral900}" CornerRadius="8" Padding="15">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Local Ghost Files" 
+                                      Classes="BodyText" 
+                                      FontWeight="SemiBold" 
+                                      FontSize="18" />
+                            <TextBlock Text="{Binding LocalGhostsSummary}" 
+                                      Classes="CaptionText" 
+                                      Foreground="{StaticResource Neutral400}" />
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Button Content="📁 Show in Folder" 
+                                        Classes="SecondaryButton" 
+                                        Click="ShowGhostFolder_Click" 
+                                        Height="30" 
+                                        Padding="10,5" />
+                                <Button Content="🔄 Refresh" 
+                                        Classes="SecondaryButton" 
+                                        Click="RefreshLocalGhosts_Click" 
+                                        Height="30" 
+                                        Padding="10,5" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CC Filter -->
+                    <Border Background="{StaticResource Neutral900}" CornerRadius="8" Padding="15">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Engine Class:" Classes="BodyText" FontWeight="SemiBold" />
+                            <StackPanel Orientation="Horizontal" Spacing="15">
+                                <RadioButton x:Name="Local150Radio" Content="150cc" IsChecked="True" 
+                                            Checked="LocalCcChanged" GroupName="LocalCc" />
+                                <RadioButton x:Name="Local200Radio" Content="200cc"
+                                            Checked="LocalCcChanged" GroupName="LocalCc" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Local Ghosts List -->
+                    <Border Background="{StaticResource Neutral900}" CornerRadius="8" Padding="15">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Your Local Ghost Times" Classes="BodyText" FontWeight="Bold" />
+                            
+                            <!-- Loading State -->
+                            <Border x:Name="LocalLoadingBorder" IsVisible="{Binding IsLoadingLocalGhosts}"
+                                   Padding="20">
+                                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                    <TextBlock Text="Loading local ghosts..." Classes="BodyText" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Ghosts ListBox -->
+                            <ListBox x:Name="LocalGhostsList" 
+                                     ItemsSource="{Binding LocalGhosts}"
+                                     IsVisible="{Binding !IsLoadingLocalGhosts}"
+                                     Background="Transparent"
+                                     BorderThickness="0">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Spacing="8" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="models:LocalGhostData">
+                                        <Border Classes="BoxItemBackground" Padding="20,15" CornerRadius="8">
+                                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                                <!-- Medal/Rank -->
+                                                <Border Grid.Column="0" CornerRadius="25" 
+                                                        Background="{StaticResource Neutral800}" 
+                                                        Width="55" Height="55" Margin="0,0,20,0"
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Rank, Converter={StaticResource RankToMedal}}" 
+                                                               Classes="BodyText"
+                                                               FontSize="24"
+                                                               FontWeight="Bold"
+                                                               HorizontalAlignment="Center" 
+                                                               VerticalAlignment="Center" />
+                                                </Border>
+
+                                                <!-- Main Info -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <!-- Mii Name -->
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+                                                        <TextBlock Text="{Binding MiiData}" 
+                                                                   Classes="BodyText"
+                                                                   FontWeight="SemiBold"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding DateDisplay}" 
+                                                                   Classes="BodyText"
+                                                                   FontSize="14"
+                                                                   Foreground="{StaticResource Neutral400}"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <!-- Times & Actions -->
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="8">
+                                                    <!-- Finish Time -->
+                                                    <TextBlock Text="{Binding TotalTimeDisplay}" 
+                                                               Classes="BodyText"
+                                                               FontWeight="Bold"
+                                                               FontSize="20"
+                                                               HorizontalAlignment="Right"
+                                                               Margin="0,0,0,2" />
+                                                    
+                                                    <!-- Best Lap -->
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4" Margin="0,0,0,8">
+                                                        <TextBlock Text="Best:" 
+                                                                   Classes="BodyText"
+                                                                   FontSize="12"
+                                                                   Foreground="{StaticResource Neutral400}" />
+                                                        <TextBlock Text="{Binding FastestLapDisplay}" 
+                                                                   Classes="BodyText"
+                                                                   FontSize="12"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource Neutral200}" />
+                                                    </StackPanel>
+                                                    
+                                                    <!-- Action Buttons -->
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                                        <components:Button Variant="Default"
+                                                                           Text="Details"
+                                                                           IconData="{StaticResource InfoTip}"
+                                                                           IconSize="12"
+                                                                           FontSize="12"
+                                                                           Padding="10,6"
+                                                                           Click="LocalGhostDetails_Click"
+                                                                           Tag="{Binding}" />
+                                                         
+                                                        <components:Button Variant="Danger"
+                                                                           Text="Delete"
+                                                                           IconData="{StaticResource Trash}"
+                                                                           IconSize="12"
+                                                                           FontSize="12"
+                                                                           Padding="10,6"
+                                                                           Click="DeleteGhostFile_Click"
+                                                                           Tag="{Binding}" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- Empty State -->
+                            <Border x:Name="NoLocalGhostsBorder" 
+                                   IsVisible="{Binding HasNoLocalGhosts}"
+                                   Padding="40">
+                                <StackPanel Spacing="10" HorizontalAlignment="Center">
+                                    <TextBlock Text="No local ghost files found" 
+                                              Classes="BodyText" 
+                                              FontSize="16"
+                                              Foreground="{StaticResource Neutral400}"
+                                              HorizontalAlignment="Center" />
+                                    <TextBlock Text="Ghost files should be in your Dolphin Wii/shared2/Pulsar/RetroRewind6/Ghosts folder" 
+                                              Classes="CaptionText" 
+                                              Foreground="{StaticResource Neutral500}"
+                                              HorizontalAlignment="Center"
+                                              TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

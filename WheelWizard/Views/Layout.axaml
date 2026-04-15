@@ -139,6 +139,9 @@
             <patterns:SidebarRadioButton IconData="{StaticResource Award}"
                                            PageType="{x:Type pages:LeaderboardPage}"
                                            Text="{x:Static lang:Common.PageTitle_Leaderboard}" />
+            <patterns:SidebarRadioButton IconData="{StaticResource LilGuy}"
+                                           PageType="{x:Type pages:GhostsPage}"
+                                           Text="Ghosts" />
             <patterns:SidebarRadioButton IconData="{StaticResource Friends}"
                                            Text="{x:Static lang:Common.PageTitle_Friends}" x:Name="FriendsButton"
                                            PageType="{x:Type pages:FriendsPage}"
