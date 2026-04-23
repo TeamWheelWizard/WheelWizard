@@ -109,6 +109,7 @@ public static class ModInstallation
     public static void ProcessFile(string file, string destinationDirectory, ProgressWindow progressWindow)
     {
         var extension = Path.GetExtension(file).ToLowerInvariant();
+        var normalizedDestinationDirectory = Path.GetFullPath(destinationDirectory + Path.DirectorySeparatorChar);
 
         if (!Directory.Exists(destinationDirectory))
             Directory.CreateDirectory(destinationDirectory);
@@ -144,12 +145,10 @@ public static class ModInstallation
                 );
 
                 var entryDestinationPath = Path.Combine(destinationDirectory, sanitizedKey);
+                var normalizedEntryDestinationPath = Path.GetFullPath(entryDestinationPath);
 
                 // Ensure the entry destination path is within the destination directory
-                if (
-                    !Path.GetFullPath(entryDestinationPath)
-                        .StartsWith(Path.GetFullPath(destinationDirectory), StringComparison.OrdinalIgnoreCase)
-                )
+                if (!normalizedEntryDestinationPath.StartsWith(normalizedDestinationDirectory, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new UnauthorizedAccessException("Entry is attempting to extract outside of the destination directory.");
                 }

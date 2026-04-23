@@ -78,8 +78,9 @@ public static class DownloadHelper
 
                         // Check for filename in Content-Disposition or fallback to URL
                         var contentDisposition = response.Content.Headers.ContentDisposition;
-                        var fileName = contentDisposition?.FileName?.Trim('"') ?? Path.GetFileName(new Uri(url).AbsolutePath);
-                        fileName = Path.ChangeExtension(fileName, Path.GetExtension(finalUrl));
+                        var fileName =
+                            contentDisposition?.FileNameStar ?? contentDisposition?.FileName ?? Path.GetFileName(new Uri(url).AbsolutePath);
+                        fileName = GetSafeDownloadFileName(fileName, finalUrl, url);
 
                         // Add extension if missing in file path
                         if (!Path.HasExtension(fileName))
@@ -93,6 +94,7 @@ public static class DownloadHelper
 
                         // Update resolvedFilePath with resolved fileName
                         resolvedFilePath = Path.Combine(directory, fileName);
+                        EnsurePathStaysWithinDirectory(resolvedFilePath, directory);
                     }
 
                     var totalBytes = response.Content.Headers.ContentLength ?? -1;
@@ -198,5 +200,34 @@ public static class DownloadHelper
         {
             progressPopupWindow.SetCancellationTokenSource(null);
         }
+    }
+
+    private static string GetSafeDownloadFileName(string fileName, string finalUrl, string originalUrl)
+    {
+        var trimmedName = fileName.Trim().Trim('"');
+        if (string.IsNullOrWhiteSpace(trimmedName))
+        {
+            trimmedName = Path.GetFileName(new Uri(originalUrl).AbsolutePath);
+        }
+
+        // Only allow a basename from remote input, never a relative or absolute path.
+        var safeFileName = Path.GetFileName(trimmedName.Replace('\\', '/'));
+        if (string.IsNullOrWhiteSpace(safeFileName))
+            throw new InvalidOperationException("The server returned an invalid download filename.");
+
+        var finalExtension = Path.GetExtension(finalUrl);
+        if (!string.IsNullOrWhiteSpace(finalExtension))
+            safeFileName = Path.ChangeExtension(safeFileName, finalExtension);
+
+        return safeFileName;
+    }
+
+    private static void EnsurePathStaysWithinDirectory(string path, string directory)
+    {
+        var normalizedDirectory = Path.GetFullPath(directory + Path.DirectorySeparatorChar);
+        var normalizedPath = Path.GetFullPath(path);
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        if (!normalizedPath.StartsWith(normalizedDirectory, comparison))
+            throw new InvalidOperationException("The download path escaped the target directory.");
     }
 }
