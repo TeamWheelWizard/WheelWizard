@@ -36,6 +36,8 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
     private int _reloadVersion;
     private bool _isInitializingDaysDropdown;
     private int _selectedHistoryDays = DefaultHistoryDays;
+    private bool _useMatchesAsXAxis;
+    private RwfcPlayerVrHistoryResponse? _lastHistoryResponse;
     private Geometry? _graphPath;
     private Geometry? _graphAreaPath;
     private string _graphStartLabel = string.Empty;
@@ -52,6 +54,22 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
     static VrHistoryGraph()
     {
         FriendCodeProperty.Changed.AddClassHandler<VrHistoryGraph>((graph, _) => graph.TriggerHistoryReload());
+    }
+
+    public bool UseMatchesAsXAxis
+    {
+        get => _useMatchesAsXAxis;
+        set
+        {
+            if (_useMatchesAsXAxis == value)
+                return;
+
+            _useMatchesAsXAxis = value;
+            OnPropertyChanged(nameof(UseMatchesAsXAxis));
+
+            if (_lastHistoryResponse != null)
+                ApplyHistoryData(_lastHistoryResponse, _selectedHistoryDays);
+        }
     }
 
     public string? FriendCode
@@ -372,6 +390,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
 
     private void ApplyHistoryData(RwfcPlayerVrHistoryResponse historyResponse, int days)
     {
+        _lastHistoryResponse = historyResponse;
         EmptyStateText = "No VR history found for this range yet.";
         StartingVr = historyResponse.StartingVr;
         EndingVr = historyResponse.EndingVr;
@@ -408,19 +427,40 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
 
         GraphMinVrText = minVr.ToString("N0");
         GraphMaxVrText = maxVr.ToString("N0");
-        var labelFormat = days >= 7 ? "MMM d" : "MMM d HH:mm";
-        GraphStartLabel = graphStart.ToLocalTime().ToString(labelFormat);
-        GraphMidLabel = graphStart.AddSeconds(totalSeconds / 2).ToLocalTime().ToString(labelFormat);
-        GraphEndLabel = graphEnd.ToLocalTime().ToString(labelFormat);
+
+        if (UseMatchesAsXAxis)
+        {
+            GraphStartLabel = "Match 1";
+            GraphMidLabel = $"Match {(orderedByDate.Count / 2) + 1}";
+            GraphEndLabel = $"Match {orderedByDate.Count}";
+        }
+        else
+        {
+            var labelFormat = days >= 7 ? "MMM d" : "MMM d HH:mm";
+            GraphStartLabel = graphStart.ToLocalTime().ToString(labelFormat);
+            GraphMidLabel = graphStart.AddSeconds(totalSeconds / 2).ToLocalTime().ToString(labelFormat);
+            GraphEndLabel = graphEnd.ToLocalTime().ToString(labelFormat);
+        }
 
         var points = orderedByDate
-            .Select(entry =>
-            {
-                var seconds = (entry.Date - graphStart).TotalSeconds;
-                var x = seconds / totalSeconds * GraphWidth;
-                var y = GraphHeight - (entry.TotalVr - minVr) / (double)vrRange * GraphHeight;
-                return new Point(x, y);
-            })
+            .Select(
+                (entry, i) =>
+                {
+                    double x;
+                    if (UseMatchesAsXAxis)
+                    {
+                        x = orderedByDate.Count > 1 ? (double)i / (orderedByDate.Count - 1) * GraphWidth : 0;
+                    }
+                    else
+                    {
+                        var seconds = (entry.Date - graphStart).TotalSeconds;
+                        x = seconds / totalSeconds * GraphWidth;
+                    }
+
+                    var y = GraphHeight - (entry.TotalVr - minVr) / (double)vrRange * GraphHeight;
+                    return new Point(x, y);
+                }
+            )
             .ToList();
 
         GraphPath = BuildLineGeometry(points);
@@ -430,6 +470,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
 
     private void ResetGraph()
     {
+        _lastHistoryResponse = null;
         GraphPath = null;
         GraphAreaPath = null;
         GraphStartLabel = string.Empty;
