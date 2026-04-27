@@ -237,9 +237,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Message)
                 .SetTitleText("Converted to patches")
-                .SetInfoText(
-                    $"Converted {conversion.ConvertedFileCount} archive file(s) into {conversion.WrittenPatchCount} patch file(s)."
-                )
+                .SetInfoText(BuildPatchConversionResultMessage(conversion))
                 .Show();
             return;
         }
@@ -249,6 +247,18 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             .SetTitleText("Could not convert mod")
             .SetInfoText(result.Error.Message)
             .Show();
+    }
+
+    private static string BuildPatchConversionResultMessage(ModPatchConversionResult conversion)
+    {
+        var message = $"Converted {conversion.ConvertedFileCount} archive file(s) into {conversion.WrittenPatchCount} patch file(s).";
+        if (conversion.Skipped.Count == 0)
+            return message;
+
+        return $"{message}{Environment.NewLine}{Environment.NewLine}"
+            + $"Left {conversion.Skipped.Count} file(s) unchanged because they could not be converted."
+            + $"{Environment.NewLine}{Environment.NewLine}"
+            + string.Join(Environment.NewLine, conversion.Skipped.Take(8));
     }
 
     private void ViewMod_Click(object sender, RoutedEventArgs e)

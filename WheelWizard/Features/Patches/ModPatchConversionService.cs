@@ -120,9 +120,6 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         convertedCount++;
                     }
 
-                    if (skipped.Count > 0)
-                        throw new InvalidOperationException(BuildSkippedConversionMessage(skipped));
-
                     Dispatcher.UIThread.Post(() =>
                     {
                         progressWindow.UpdateProgress(85);
@@ -135,6 +132,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         ConvertedFileCount = convertedCount,
                         WrittenPatchCount = writtenPatchCount,
                         Warnings = warnings,
+                        Skipped = skipped,
                     };
                 },
                 cts.Token
@@ -177,15 +175,6 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
             logger.LogWarning(ex, "Failed to analyze archive {ArchivePath}.", file);
             return new OperationError { Message = ex.Message, Exception = ex };
         }
-    }
-
-    private static string BuildSkippedConversionMessage(IReadOnlyList<string> skipped)
-    {
-        var message = "Some files could not be converted, so the original mod was left unchanged.";
-        if (skipped.Count == 0)
-            return message;
-
-        return $"{message}{Environment.NewLine}{Environment.NewLine}{string.Join(Environment.NewLine, skipped.Take(8))}";
     }
 
     private BaselineEntry? SelectBaseline(string fileName, byte[] moddedBytes)
