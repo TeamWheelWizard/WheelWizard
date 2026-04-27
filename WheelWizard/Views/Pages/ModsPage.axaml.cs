@@ -225,6 +225,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         var selectedMod = GetContextModListItem(sender);
         if (selectedMod == null)
             return;
+        if (!selectedMod.Mod.HasIncompatibleFiles)
+            return;
 
         var result = await ModPatchConversionService.ConvertToPatchesAsync(selectedMod.Mod, CancellationToken.None);
         OnModsChanged();
