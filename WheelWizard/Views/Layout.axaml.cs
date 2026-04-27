@@ -8,12 +8,14 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
+using WheelWizard.Mods;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
@@ -66,6 +68,9 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     [Inject]
     private ISettingsSignalBus SettingsSignalBus { get; set; } = null!;
 
+    [Inject]
+    private IModManager ModManagerService { get; set; } = null!;
+
     public Layout()
     {
         Instance = this;
@@ -97,6 +102,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         WhWzStatusManager.Instance.Subscribe(this);
         RRLiveRooms.Instance.Subscribe(this);
         GameLicenseService.Subscribe(this);
+        ModManagerService.PropertyChanged += ModManager_PropertyChanged;
+        _ = ReloadModsAndShowErrorsAsync();
 #if DEBUG
         KitchenSinkButton.IsVisible = true;
 #endif
@@ -107,6 +114,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         Title = BrandingService.Branding.DisplayName;
         TitleLabel.Text = BrandingService.Branding.DisplayName;
         UpdateModsButtonText();
+        UpdateModsActionIndicator();
 
         NavigationManager.NavigateTo<HomePage>();
     }
@@ -115,7 +123,21 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         _settingsSignalSubscription?.Dispose();
         _settingsSignalSubscription = null;
+        ModManagerService.PropertyChanged -= ModManager_PropertyChanged;
         base.OnClosed(e);
+    }
+
+    private void ModManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ModManager.Mods))
+            UpdateModsActionIndicator();
+    }
+
+    private async Task ReloadModsAndShowErrorsAsync()
+    {
+        var reloadResult = await ModManagerService.ReloadAsync();
+        if (reloadResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(reloadResult.Error);
     }
 
     private void OnSettingSignal(SettingChangedSignal signal) => OnSettingChanged(signal.Setting);
@@ -138,15 +160,17 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
         if (setting == SettingsService.TESTING_MODE_ENABLED)
             UpdateTestingButtonVisibility();
-
-        if (setting == SettingsService.USE_PATCHES_SYSTEM)
-            UpdateModsButtonText();
     }
 
     private void UpdateModsButtonText()
     {
-        var storageSystem = ModStorageSystemHelper.GetCurrent(SettingsService);
-        ModsButton.Text = ModStorageSystemHelper.GetDisplayName(storageSystem);
+        ModsButton.Text = "Patches";
+    }
+
+    private void UpdateModsActionIndicator()
+    {
+        ModsButton.WarningVisible = ModManagerService.Mods.Any(mod => mod.HasIncompatibleFiles);
+        ModsButton.WarningTip = "Some mods need to be converted to patches.";
     }
 
     public void NavigateToPage(UserControl page)

@@ -53,6 +53,26 @@ public partial class SidebarRadioButton : RadioButton
         set => SetValue(BoxTipProperty, value);
     }
 
+    public static readonly StyledProperty<bool> WarningVisibleProperty = AvaloniaProperty.Register<SidebarRadioButton, bool>(
+        nameof(WarningVisible)
+    );
+
+    public bool WarningVisible
+    {
+        get => GetValue(WarningVisibleProperty);
+        set => SetValue(WarningVisibleProperty, value);
+    }
+
+    public static readonly StyledProperty<string> WarningTipProperty = AvaloniaProperty.Register<SidebarRadioButton, string>(
+        nameof(WarningTip)
+    );
+
+    public string WarningTip
+    {
+        get => GetValue(WarningTipProperty);
+        set => SetValue(WarningTipProperty, value);
+    }
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);

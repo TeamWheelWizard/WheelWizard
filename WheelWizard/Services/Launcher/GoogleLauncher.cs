@@ -14,23 +14,24 @@ public class GoogleLauncher : ILauncher
     public static GoogleLauncher Instance => _instance ??= new();
     public string GameTitle => "Google";
 
-    public Task Launch()
+    public Task<OperationResult> Launch()
     {
         ViewUtils.OpenLink("https://www.google.com/");
-        return Task.CompletedTask;
+        return Task.FromResult(Ok());
     }
 
-    public Task Install()
+    public async Task<OperationResult> Install()
     {
         installed = true;
-        return new MessageBoxWindow()
+        await new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Message)
             .SetTitleText("Installed google")
             .SetInfoText("just kidding, this is just a test launch option. we didn't do anything")
             .ShowDialog();
+        return Ok();
     }
 
-    public Task Update() => Task.CompletedTask;
+    public Task<OperationResult> Update() => Task.FromResult(Ok());
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {

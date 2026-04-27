@@ -3,9 +3,9 @@ using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
 using WheelWizard.Helpers;
+using WheelWizard.Mods;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
-using WheelWizard.Services.Installation;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
@@ -22,6 +22,9 @@ public partial class ModContent : UserControlBase
 
     [Inject]
     private IGameBananaSingletonService GameBananaService { get; set; } = null!;
+
+    [Inject]
+    private IModManager ModManager { get; set; } = null!;
 
     public ModContent()
     {
@@ -158,7 +161,7 @@ public partial class ModContent : UserControlBase
 
     private void UpdateDownloadButtonState(int modId)
     {
-        var isInstalled = ModManager.Instance.IsModInstalled(modId);
+        var isInstalled = ModManager.IsModInstalled(modId);
         InstallButton.Content = isInstalled ? Common.State_Installed : Common.Action_DownloadAndInstall;
         InstallButton.IsEnabled = !isInstalled;
         UnInstallButton.IsVisible = isInstalled;
@@ -188,88 +191,137 @@ public partial class ModContent : UserControlBase
         if (!confirmation)
             return;
 
-        try
+        var installResult = await DownloadAndInstallCurrentModAsync();
+        if (installResult.IsFailure)
         {
-            await PrepareToDownloadFile();
-            var downloadUrls = OverrideDownloadUrl != null ? [OverrideDownloadUrl] : CurrentMod.Files.Select(f => f.DownloadUrl).ToList();
-            if (!downloadUrls.Any())
-            {
-                MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_UnableToDownloadMod_Files);
-                return;
-            }
-
-            var progressWindow = new ProgressWindow($"Downloading {CurrentMod.Name}");
-            progressWindow.Show();
-            progressWindow.SetExtraText(Common.State_Loading);
-
-            var url = downloadUrls.First();
-            var fileName = GetFileNameFromUrl(url);
-            var filePath = Path.Combine(PathManager.TempModsFolderPath, fileName);
-            var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(url, filePath, progressWindow);
-            progressWindow.Close();
-
-            if (string.IsNullOrWhiteSpace(downloadedFilePath))
-            {
-                if (Directory.Exists(PathManager.TempModsFolderPath))
-                    Directory.Delete(PathManager.TempModsFolderPath, true);
-                return;
-            }
-
-            if (!File.Exists(downloadedFilePath))
-            {
-                MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_UnableToDownloadMod_Files);
-                return;
-            }
-
-            var author = CurrentMod.Author.Name;
-            var modId = CurrentMod.Id;
-            var popup = new TextInputWindow()
-                .SetMainText(Common.Attribute_Name)
-                .SetInitialText(CurrentMod.Name)
-                .SetValidation(ModManager.Instance.ValidateModName)
-                .SetPlaceholderText(Phrases.Placeholder_EnterModName);
-            var modName = await popup.ShowDialog();
-            if (modName == null)
-                return;
-
-            if (string.IsNullOrEmpty(modName))
-            {
-                MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_ModNameCantEmpty);
-                return;
-            }
-
-            var invalidChars = Path.GetInvalidFileNameChars();
-            if (modName.Any(c => invalidChars.Contains(c)))
-            {
-                MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_ModNameInvalid);
-                Directory.Delete(PathManager.TempModsFolderPath, true);
-                return;
-            }
-
-            await ModInstallation.InstallModFromFileAsync(downloadedFilePath, modName, author, modId);
-            Directory.Delete(PathManager.TempModsFolderPath, true);
+            MessageTranslationHelper.ShowMessage(MessageTranslation.Error_ModDownloadFailed, null, [installResult.Error.Message]);
         }
-        catch (Exception ex)
+        else
         {
-            MessageTranslationHelper.ShowMessage(MessageTranslation.Error_ModDownloadFailed, null, [ex.Message]);
+            new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Message)
+                .SetTitleText("Successfully installed mod!")
+                .SetInfoText($"Mod '{CurrentMod.Name}' installed successfully.")
+                .Show();
         }
 
         _ = LoadModDetailsAsync(CurrentMod.Id);
     }
 
+    private async Task<OperationResult> DownloadAndInstallCurrentModAsync()
+    {
+        if (CurrentMod == null)
+            return Ok();
+
+        var prepareResult = await PrepareToDownloadFile();
+        if (prepareResult.IsFailure)
+            return prepareResult.Error;
+
+        var downloadUrls = OverrideDownloadUrl != null ? [OverrideDownloadUrl] : CurrentMod.Files.Select(f => f.DownloadUrl).ToList();
+        if (!downloadUrls.Any())
+            return Fail("No downloadable files were found for this mod.");
+
+        var progressWindow = new ProgressWindow($"Downloading {CurrentMod.Name}");
+        progressWindow.Show();
+        progressWindow.SetExtraText(Common.State_Loading);
+
+        var url = downloadUrls.First();
+        var fileName = GetFileNameFromUrl(url);
+        var filePath = Path.Combine(PathManager.TempModsFolderPath, fileName);
+        var downloadResult = await DownloadModFileAsync(url, filePath, progressWindow);
+        progressWindow.Close();
+
+        if (downloadResult.IsFailure)
+            return downloadResult.Error;
+
+        var downloadedFilePath = downloadResult.Value;
+        if (string.IsNullOrWhiteSpace(downloadedFilePath))
+        {
+            TryDeleteTempModsFolder();
+            return Ok();
+        }
+
+        if (!File.Exists(downloadedFilePath))
+            return Fail("Downloaded mod file could not be found.");
+
+        var popup = new TextInputWindow()
+            .SetMainText(Common.Attribute_Name)
+            .SetInitialText(CurrentMod.Name)
+            .SetValidation(ModManager.ValidateModName)
+            .SetPlaceholderText(Phrases.Placeholder_EnterModName);
+        var modName = await popup.ShowDialog();
+        if (modName == null)
+        {
+            TryDeleteTempModsFolder();
+            return Ok();
+        }
+
+        if (string.IsNullOrEmpty(modName))
+        {
+            TryDeleteTempModsFolder();
+            return Fail("Mod name cannot be empty.");
+        }
+
+        var invalidChars = Path.GetInvalidFileNameChars();
+        if (modName.Any(c => invalidChars.Contains(c)))
+        {
+            TryDeleteTempModsFolder();
+            return Fail("Mod name contains invalid characters.");
+        }
+
+        var installResult = await ModManager.InstallModFromFileAsync(downloadedFilePath, modName, CurrentMod.Author.Name, CurrentMod.Id);
+        if (installResult.IsFailure)
+            return installResult.Error;
+
+        return TryDeleteTempModsFolder();
+    }
+
     /// <summary>
     /// Prepares the temporary folder for downloading files.
     /// </summary>
-    private static async Task PrepareToDownloadFile()
+    private static async Task<OperationResult> PrepareToDownloadFile()
     {
-        var tempFolder = PathManager.TempModsFolderPath;
-        if (Directory.Exists(tempFolder))
+        try
         {
-            Directory.Delete(tempFolder, true);
-        }
+            var tempFolder = PathManager.TempModsFolderPath;
+            if (Directory.Exists(tempFolder))
+                Directory.Delete(tempFolder, true);
 
-        Directory.CreateDirectory(tempFolder);
-        await Task.CompletedTask;
+            Directory.CreateDirectory(tempFolder);
+            await Task.CompletedTask;
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return new OperationError { Message = $"Failed to prepare the temporary download folder: {ex.Message}", Exception = ex };
+        }
+    }
+
+    private static OperationResult TryDeleteTempModsFolder()
+    {
+        try
+        {
+            if (Directory.Exists(PathManager.TempModsFolderPath))
+                Directory.Delete(PathManager.TempModsFolderPath, true);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return new OperationError { Message = $"Failed to clean up the temporary download folder: {ex.Message}", Exception = ex };
+        }
+    }
+
+    private static async Task<OperationResult<string?>> DownloadModFileAsync(string url, string filePath, ProgressWindow progressWindow)
+    {
+        try
+        {
+            return await DownloadHelper.DownloadToLocationAsync(url, filePath, progressWindow);
+        }
+        catch (Exception ex)
+        {
+            return new OperationError { Message = $"Failed to download mod file: {ex.Message}", Exception = ex };
+        }
     }
 
     /// <summary>
@@ -315,7 +367,13 @@ public partial class ModContent : UserControlBase
         if (id is null or -1)
             return;
 
-        ModManager.Instance.DeleteModById(id.Value);
+        var deleteResult = await ModManager.DeleteModByIdAsync(id.Value);
+        if (deleteResult.IsFailure)
+        {
+            MessageTranslationHelper.ShowMessage(deleteResult.Error);
+            return;
+        }
+
         await LoadModDetailsAsync(id.Value);
     }
 }

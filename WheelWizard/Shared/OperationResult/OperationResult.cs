@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Serilog;
 using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.Shared;
@@ -76,6 +77,7 @@ public class OperationResult
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "OperationResult.TryCatch failed.");
             return new OperationError()
             {
                 Message = errorMessage ?? ex.Message,
@@ -109,6 +111,7 @@ public class OperationResult
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "OperationResult.TryCatch async value operation failed.");
             return new OperationError()
             {
                 Message = errorMessage ?? ex.Message,
@@ -137,6 +140,7 @@ public class OperationResult
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "OperationResult.TryCatch action failed.");
             return new OperationError()
             {
                 Message = errorMessage ?? ex.Message,
@@ -169,6 +173,7 @@ public class OperationResult
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "OperationResult.TryCatch async action failed.");
             return new OperationError()
             {
                 Message = errorMessage ?? ex.Message,

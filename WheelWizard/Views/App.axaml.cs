@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
 using WheelWizard.AutoUpdating;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Mods;
 using WheelWizard.Services;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services.LiveData;
@@ -116,14 +117,23 @@ public class App : Application
         return StartupLaunchTarget.None;
     }
 
-    private static bool OpenGameBananaModWindow()
+    private static async Task<bool> OpenGameBananaModWindowAsync()
     {
-        ModManager.Instance.ReloadAsync();
+        var reloadResult = await Services.GetRequiredService<IModManager>().ReloadAsync();
+        if (reloadResult.IsFailure)
+        {
+            var logger = Services.GetRequiredService<ILogger<App>>();
+            logger.LogError(
+                reloadResult.Error.Exception,
+                "Failed to reload mods before opening protocol window: {Message}",
+                reloadResult.Error.Message
+            );
+        }
         var protocolArgument = GetLaunchProtocolArgument();
         if (string.IsNullOrWhiteSpace(protocolArgument))
             return false;
 
-        _ = UrlProtocolManager.ShowPopupForLaunchUrlAsync(protocolArgument);
+        await UrlProtocolManager.ShowPopupForLaunchUrlAsync(protocolArgument);
         return true;
     }
 
@@ -131,7 +141,7 @@ public class App : Application
     {
         try
         {
-            var launchedFromProtocol = OpenGameBananaModWindow();
+            var launchedFromProtocol = await OpenGameBananaModWindowAsync();
 
             var updateService = Services.GetRequiredService<IAutoUpdaterSingletonService>();
             var whWzDataService = Services.GetRequiredService<IWhWzDataSingletonService>();
@@ -146,7 +156,16 @@ public class App : Application
             if (requestedByCli || shouldLaunchRrOnStartup)
             {
                 var rrLauncher = Services.GetRequiredService<RrLauncher>();
-                await rrLauncher.Launch();
+                var launchResult = await rrLauncher.Launch();
+                if (launchResult.IsFailure)
+                {
+                    var logger = Services.GetRequiredService<ILogger<App>>();
+                    logger.LogError(
+                        launchResult.Error.Exception,
+                        "Failed to launch Retro Rewind on startup: {Message}",
+                        launchResult.Error.Message
+                    );
+                }
             }
         }
         catch (Exception e)

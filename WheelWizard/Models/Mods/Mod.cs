@@ -12,6 +12,7 @@ public class Mod : INotifyPropertyChanged
     private string _author = string.Empty;
     private int _modID;
     private int _priority; // New property for mod priority
+    private bool _hasIncompatibleFiles;
 
     public bool IsEnabled
     {
@@ -78,6 +79,19 @@ public class Mod : INotifyPropertyChanged
         }
     }
 
+    public bool HasIncompatibleFiles
+    {
+        get => _hasIncompatibleFiles;
+        set
+        {
+            if (_hasIncompatibleFiles == value)
+                return;
+
+            _hasIncompatibleFiles = value;
+            OnPropertyChanged(nameof(HasIncompatibleFiles));
+        }
+    }
+
     protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value))
@@ -118,6 +132,7 @@ public class Mod : INotifyPropertyChanged
     /// <summary>
     /// Saves the mod details to an INI file.
     /// </summary>
+    //todo: reevaluate if the mod class should be responsible for saving itself to an INI file
     public async Task SaveToIniAsync(string iniFilePath)
     {
         var parser = new FileIniDataParser();
