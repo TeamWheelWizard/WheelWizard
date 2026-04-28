@@ -11,7 +11,7 @@ public static class ModPatchCompatibilityText
 {
     public const string IncompatibleTitle = "INCOMPATIBLE MOD";
     public const string IncompatibleMessage =
-        "This mod is incompatible with other mods, launching the game with this game other mods might show up incorrectly or your game can crash, Consider converting this mod to patches by right clicking";
+        "This mod is incompatible with other mods. Launching with this mod enabled may cause incorrect behavior or crashes. Consider converting it to patches by right-clicking the mod.";
 }
 
 public interface IModPatchConversionService
