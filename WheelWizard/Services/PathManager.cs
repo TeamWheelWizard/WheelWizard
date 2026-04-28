@@ -500,7 +500,6 @@ public static class PathManager
     #endregion
 
     // In case it is unclear, the mods folder is a folder with mods that are desired to be installed (if enabled).
-    // When launching we sync those mods into the active loose-mod runtime folder.
     // When launching, enabled mods are synced into the active Patches runtime folder.
 
     // Helper paths for folders used across multiple files

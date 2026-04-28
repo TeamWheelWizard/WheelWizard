@@ -240,10 +240,7 @@ public static class FileHelper
                 verificationFailures
             );
 
-        DirectoryMoveContentsResult? CreateEnsureDirectoryFailureResult(
-            OperationResult ensureDirectoryResult,
-            bool copyAttempted = false
-        )
+        DirectoryMoveContentsResult? CreateEnsureDirectoryFailureResult(OperationResult ensureDirectoryResult, bool copyAttempted = false)
         {
             if (ensureDirectoryResult.IsSuccess)
                 return null;
@@ -331,10 +328,7 @@ public static class FileHelper
                 var destinationDirectory = Path.GetDirectoryName(destinationFile);
                 if (!string.IsNullOrEmpty(destinationDirectory))
                 {
-                    var ensureResult = CreateEnsureDirectoryFailureResult(
-                        EnsureDirectory(destinationDirectory),
-                        copyAttempted
-                    );
+                    var ensureResult = CreateEnsureDirectoryFailureResult(EnsureDirectory(destinationDirectory), copyAttempted);
                     if (ensureResult is not null)
                     {
                         progress?.Report(1.0);

@@ -36,7 +36,7 @@ public class RrLauncher : ILauncher
             //case SHOULD be impossible since launch button should be disabled
             if (!File.Exists(PathManager.GameFilePath))
                 return Fail(Phrases.MessageWarning_NotFindGame_Extra);
-            
+
             DolphinLaunchHelper.KillDolphin();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
