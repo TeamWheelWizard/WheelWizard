@@ -544,7 +544,7 @@ To join a specific room, you'll need to either join through a friend, or hope to
         <value>Mod name:</value>
     </data>
     <data name="Question_LaunchClearPatchesFound_Extra" xml:space="preserve">
-        <value>You are about to launch the game without mods. Do you want to clear your Patches folder?</value>
+        <value>You are about to launch the game without mods. Do you want to clear your Patches folder? Launching your game anyways will launch it with the current patches folder still active!</value>
     </data>
     <data name="Text_BrsarEntry" xml:space="preserve">
         <value>{$1} entry {$2}</value>
