@@ -119,6 +119,10 @@ public class App : Application
 
     private static async Task<bool> OpenGameBananaModWindowAsync()
     {
+        var protocolArgument = GetLaunchProtocolArgument();
+        if (string.IsNullOrWhiteSpace(protocolArgument))
+            return false;
+
         var reloadResult = await Services.GetRequiredService<IModManager>().ReloadAsync();
         if (reloadResult.IsFailure)
         {
@@ -129,9 +133,6 @@ public class App : Application
                 reloadResult.Error.Message
             );
         }
-        var protocolArgument = GetLaunchProtocolArgument();
-        if (string.IsNullOrWhiteSpace(protocolArgument))
-            return false;
 
         await UrlProtocolManager.ShowPopupForLaunchUrlAsync(protocolArgument);
         return true;
