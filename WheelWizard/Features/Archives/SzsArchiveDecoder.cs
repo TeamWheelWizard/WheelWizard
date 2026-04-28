@@ -8,86 +8,101 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
 
     public OperationResult<DecodedArchive> TryDecodeU8Archive(byte[] bytes)
     {
-        var decompressResult = DecompressYaz0IfNeeded(bytes);
-        if (decompressResult.IsFailure)
-            return new OperationError { Message = decompressResult.Error.Message };
+        try
+        {
+            var decompressResult = DecompressYaz0IfNeeded(bytes);
+            if (decompressResult.IsFailure)
+                return decompressResult.Error;
 
-        var raw = decompressResult.Value;
+            var raw = decompressResult.Value;
 
-        if (BigEndianBinaryHelper.BufferToUint32(raw, 0) != U8Magic)
-            return new OperationError { Message = "The provided file is not a valid Yaz0/U8 archive." };
-        if (raw.Length < 8)
-            return new OperationError { Message = "The provided file is too small to contain a valid U8 archive header." };
-        return ParseU8Archive(raw);
+            if (raw.Length < 8)
+                return new OperationError { Message = "The provided file is too small to contain a valid U8 archive header." };
+            if (BigEndianBinaryHelper.BufferToUint32(raw, 0) != U8Magic)
+                return new OperationError { Message = "The provided file is not a valid Yaz0/U8 archive." };
+
+            return ParseU8Archive(raw);
+        }
+        catch (Exception ex)
+        {
+            return new OperationError { Message = $"Failed to decode U8 archive: {ex.Message}", Exception = ex };
+        }
     }
 
     public OperationResult<byte[]> DecompressYaz0IfNeeded(byte[] bytes)
     {
-        if (bytes.Length < 4)
-            return bytes;
-
-        if (BinaryStringHelper.ReadAscii(bytes, 0, 4) != "Yaz0")
-            return bytes;
-
-        if (bytes.Length < 8)
-            return new OperationError { Message = "Yaz0 header is truncated." };
-
-        var outputSize = checked((int)BigEndianBinaryHelper.BufferToUint32(bytes, 4));
-        var output = new byte[outputSize];
-        var src = 0x10;
-        var dst = 0;
-        var groupHeader = 0;
-        var bitsRemaining = 0;
-
-        while (dst < output.Length)
+        try
         {
-            if (bitsRemaining == 0)
-            {
-                if (src >= bytes.Length)
-                    return new OperationError { Message = "Yaz0 group header is truncated." };
-                groupHeader = bytes[src++];
-                bitsRemaining = 8;
-            }
+            if (bytes.Length < 4)
+                return bytes;
 
-            if ((groupHeader & 0x80) != 0)
-            {
-                if (src >= bytes.Length)
-                    return new OperationError { Message = "Yaz0 literal chunk is truncated." };
-                output[dst++] = bytes[src++];
-            }
-            else
-            {
-                if (src + 1 >= bytes.Length)
-                    return new OperationError { Message = "Yaz0 backreference is truncated." };
+            if (BinaryStringHelper.ReadAscii(bytes, 0, 4) != "Yaz0")
+                return bytes;
 
-                var b1 = bytes[src++];
-                var b2 = bytes[src++];
-                var backOffset = (((b1 & 0x0f) << 8) | b2) + 1;
-                var length = b1 >> 4;
-                if (length == 0)
+            if (bytes.Length < 8)
+                return new OperationError { Message = "Yaz0 header is truncated." };
+
+            var outputSize = checked((int)BigEndianBinaryHelper.BufferToUint32(bytes, 4));
+            var output = new byte[outputSize];
+            var src = 0x10;
+            var dst = 0;
+            var groupHeader = 0;
+            var bitsRemaining = 0;
+
+            while (dst < output.Length)
+            {
+                if (bitsRemaining == 0)
                 {
                     if (src >= bytes.Length)
-                        return new OperationError { Message = "Yaz0 extended length byte is truncated." };
-                    length = bytes[src++] + 0x12;
+                        return new OperationError { Message = "Yaz0 group header is truncated." };
+                    groupHeader = bytes[src++];
+                    bitsRemaining = 8;
+                }
+
+                if ((groupHeader & 0x80) != 0)
+                {
+                    if (src >= bytes.Length)
+                        return new OperationError { Message = "Yaz0 literal chunk is truncated." };
+                    output[dst++] = bytes[src++];
                 }
                 else
                 {
-                    length += 2;
+                    if (src + 1 >= bytes.Length)
+                        return new OperationError { Message = "Yaz0 backreference is truncated." };
+
+                    var b1 = bytes[src++];
+                    var b2 = bytes[src++];
+                    var backOffset = (((b1 & 0x0f) << 8) | b2) + 1;
+                    var length = b1 >> 4;
+                    if (length == 0)
+                    {
+                        if (src >= bytes.Length)
+                            return new OperationError { Message = "Yaz0 extended length byte is truncated." };
+                        length = bytes[src++] + 0x12;
+                    }
+                    else
+                    {
+                        length += 2;
+                    }
+
+                    if (backOffset > dst)
+                        return new OperationError { Message = "Yaz0 backreference offset is out of bounds." };
+
+                    var copySrc = dst - backOffset;
+                    for (var index = 0; index < length && dst < output.Length; index++)
+                        output[dst++] = output[copySrc++];
                 }
 
-                if (backOffset > dst)
-                    return new OperationError { Message = "Yaz0 backreference offset is out of bounds." };
-
-                var copySrc = dst - backOffset;
-                for (var index = 0; index < length && dst < output.Length; index++)
-                    output[dst++] = output[copySrc++];
+                groupHeader <<= 1;
+                bitsRemaining--;
             }
 
-            groupHeader <<= 1;
-            bitsRemaining--;
+            return output;
         }
-
-        return output;
+        catch (Exception ex)
+        {
+            return new OperationError { Message = $"Failed to decompress Yaz0 data: {ex.Message}", Exception = ex };
+        }
     }
 
     private static DecodedArchive ParseU8Archive(byte[] bytes)

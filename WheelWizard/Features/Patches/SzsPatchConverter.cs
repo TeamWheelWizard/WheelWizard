@@ -5,10 +5,10 @@ namespace WheelWizard.Features.Patches;
 
 public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsPatchConverter
 {
-    public PatchConversionAnalysis AnalyzeAgainstBaseline(BaselineEntry baseline, string moddedName, byte[] moddedBytes)
+    public OperationResult<PatchConversionAnalysis> AnalyzeAgainstBaseline(BaselineEntry baseline, string moddedName, byte[] moddedBytes)
     {
         if (!string.Equals(baseline.Kind, "szs", StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("The selected baseline is not an SZS file.");
+            return Fail("The selected baseline is not an SZS file.");
 
         var warnings = new List<string>();
         var skipped = new List<string>();
@@ -17,17 +17,16 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         if (!StripExtension(moddedName).Equals(archiveTag, StringComparison.OrdinalIgnoreCase))
             warnings.Add($"The selected file name differs from the original archive tag \"{archiveTag}.szs\".");
 
-        var moddedU8 = archiveDecoder.TryDecodeU8Archive(moddedBytes);
         var wholeFileHash = HashBytes64(moddedBytes);
         var wholeFileMatches = moddedBytes.Length == baseline.WholeFileSize && wholeFileHash == baseline.WholeFileHash;
-
         var baselineMode = baseline.Mode ?? string.Empty;
-        if (baselineMode == "raw" || moddedU8 == null)
+
+        if (baselineMode == "raw")
         {
             if (wholeFileMatches)
             {
                 warnings.Add("The selected SZS matches the built-in game baseline exactly.");
-                return new()
+                return new PatchConversionAnalysis
                 {
                     CleanName = baseline.RelativePath,
                     ModdedName = moddedName,
@@ -37,13 +36,9 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                 };
             }
 
-            warnings.Add(
-                baselineMode == "u8" && moddedU8 == null
-                    ? "The original game file is an archive, but the selected file is not a Yaz0/U8 archive. Exporting a whole-file override instead."
-                    : "This SZS is stored as a whole-file baseline. Exporting a whole-file override."
-            );
+            warnings.Add("This SZS is stored as a whole-file baseline. Exporting a whole-file override.");
 
-            return new()
+            return new PatchConversionAnalysis
             {
                 CleanName = baseline.RelativePath,
                 ModdedName = moddedName,
@@ -57,6 +52,11 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
             };
         }
 
+        var moddedU8Result = archiveDecoder.TryDecodeU8Archive(moddedBytes);
+        if (moddedU8Result.IsFailure)
+            return moddedU8Result.Error;
+
+        var moddedU8 = moddedU8Result.Value;
         var baselineMembers = BuildBaselineMembers(baseline);
         var entries = new List<PatchConversionEntry>();
 
@@ -97,7 +97,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         if (entries.Count == 0 && skipped.Count == 0)
             warnings.Add("No SZS differences were found against the built-in game baseline.");
 
-        return new()
+        return new PatchConversionAnalysis
         {
             CleanName = baseline.RelativePath,
             ModdedName = moddedName,
@@ -118,10 +118,11 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         if (baselineMode == "raw")
             return 1;
 
-        var moddedU8 = archiveDecoder.TryDecodeU8Archive(moddedBytes);
-        if (moddedU8 == null)
+        var moddedU8Result = archiveDecoder.TryDecodeU8Archive(moddedBytes);
+        if (moddedU8Result.IsFailure)
             return 1;
 
+        var moddedU8 = moddedU8Result.Value;
         var baselineMembers = BuildBaselineMembers(baseline);
         var differences = 0;
 

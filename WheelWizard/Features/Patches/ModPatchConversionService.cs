@@ -185,7 +185,11 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
             if (baseline == null)
                 return new ArchiveConversion(null, new PatchConversionAnalysis());
 
-            return new ArchiveConversion(baseline, AnalyzeArchive(baseline, Path.GetFileName(file), fileBytes));
+            var analysisResult = AnalyzeArchive(baseline, Path.GetFileName(file), fileBytes);
+            if (analysisResult.IsFailure)
+                return analysisResult.Error;
+
+            return new ArchiveConversion(baseline, analysisResult.Value);
         }
         catch (Exception ex)
         {
@@ -217,7 +221,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
             ?.Entry;
     }
 
-    private PatchConversionAnalysis AnalyzeArchive(BaselineEntry baseline, string fileName, byte[] fileBytes) =>
+    private OperationResult<PatchConversionAnalysis> AnalyzeArchive(BaselineEntry baseline, string fileName, byte[] fileBytes) =>
         string.Equals(baseline.Kind, "brsar", StringComparison.OrdinalIgnoreCase)
             ? BrsarPatchConverter.AnalyzeAgainstBaseline(baseline, fileName, fileBytes)
             : szsPatchConverter.AnalyzeAgainstBaseline(baseline, fileName, fileBytes);
