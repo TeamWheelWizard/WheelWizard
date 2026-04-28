@@ -10,14 +10,14 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
     {
         var decompressResult = DecompressYaz0IfNeeded(bytes);
         if (decompressResult.IsFailure)
-            return new OperationError { Message = decompressResult.Error.Message };        
-        
+            return new OperationError { Message = decompressResult.Error.Message };
+
         var raw = decompressResult.Value;
 
         if (BigEndianBinaryHelper.BufferToUint32(raw, 0) != U8Magic)
-            return new OperationError{ Message = "The provided file is not a valid Yaz0/U8 archive." };
+            return new OperationError { Message = "The provided file is not a valid Yaz0/U8 archive." };
         if (raw.Length < 8)
-            return new OperationError{ Message = "The provided file is too small to contain a valid U8 archive header." };)
+            return new OperationError { Message = "The provided file is too small to contain a valid U8 archive header." };
         return ParseU8Archive(raw);
     }
 
@@ -25,12 +25,12 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
     {
         if (bytes.Length < 4)
             return bytes;
-        
+
         if (BinaryStringHelper.ReadAscii(bytes, 0, 4) != "Yaz0")
             return bytes;
-        
+
         if (bytes.Length < 8)
-            return new OperationError{Message = "Yaz0 header is truncated."};
+            return new OperationError { Message = "Yaz0 header is truncated." };
 
         var outputSize = checked((int)BigEndianBinaryHelper.BufferToUint32(bytes, 4));
         var output = new byte[outputSize];
@@ -44,7 +44,7 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
             if (bitsRemaining == 0)
             {
                 if (src >= bytes.Length)
-                    return new OperationError{Message = "Yaz0 group header is truncated."};
+                    return new OperationError { Message = "Yaz0 group header is truncated." };
                 groupHeader = bytes[src++];
                 bitsRemaining = 8;
             }
@@ -52,13 +52,13 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
             if ((groupHeader & 0x80) != 0)
             {
                 if (src >= bytes.Length)
-                    return new OperationError{Message = "Yaz0 literal chunk is truncated."};
+                    return new OperationError { Message = "Yaz0 literal chunk is truncated." };
                 output[dst++] = bytes[src++];
             }
             else
             {
                 if (src + 1 >= bytes.Length)
-                    return new OperationError{Message = "Yaz0 backreference is truncated."};
+                    return new OperationError { Message = "Yaz0 backreference is truncated." };
 
                 var b1 = bytes[src++];
                 var b2 = bytes[src++];
@@ -67,7 +67,7 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
                 if (length == 0)
                 {
                     if (src >= bytes.Length)
-                        return new OperationError{Message = "Yaz0 extended length byte is truncated."};
+                        return new OperationError { Message = "Yaz0 extended length byte is truncated." };
                     length = bytes[src++] + 0x12;
                 }
                 else
@@ -76,7 +76,7 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
                 }
 
                 if (backOffset > dst)
-                    return new OperationError{Message = "Yaz0 backreference offset is out of bounds."};
+                    return new OperationError { Message = "Yaz0 backreference offset is out of bounds." };
 
                 var copySrc = dst - backOffset;
                 for (var index = 0; index < length && dst < output.Length; index++)

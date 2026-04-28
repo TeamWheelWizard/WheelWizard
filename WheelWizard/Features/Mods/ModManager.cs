@@ -66,6 +66,7 @@ public sealed class ModManager : IModManager
     private static readonly char[] _illegalChars = new[] { '.', '/', '~', '\\' };
     private readonly IModInstallationService _modInstallationService;
     private readonly IModPatchConversionService _modPatchConversionService;
+    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
     private ObservableCollection<Mod> _mods;
 
@@ -513,17 +514,16 @@ public sealed class ModManager : IModManager
             var modsRoot = Path.GetFullPath(PathManager.ModsFolderPath)
                 .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-            var target = Path.GetFullPath(modDirectory)
-                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var target = Path.GetFullPath(modDirectory).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
             var relativePath = Path.GetRelativePath(modsRoot, target);
 
             if (
-                relativePath == "." ||
-                relativePath == ".." ||
-                relativePath.StartsWith(".." + Path.DirectorySeparatorChar) ||
-                relativePath.StartsWith(".." + Path.AltDirectorySeparatorChar) ||
-                Path.IsPathRooted(relativePath)
+                relativePath == "."
+                || relativePath == ".."
+                || relativePath.StartsWith(".." + Path.DirectorySeparatorChar)
+                || relativePath.StartsWith(".." + Path.AltDirectorySeparatorChar)
+                || Path.IsPathRooted(relativePath)
             )
             {
                 return Fail("Invalid mod directory.");
@@ -532,9 +532,9 @@ public sealed class ModManager : IModManager
             if (!Directory.Exists(target))
                 return Fail("Mod directory does not exist.");
 
-            GC.Collect(); 
+            GC.Collect();
             GC.WaitForPendingFinalizers();
-            
+
             var di = new DirectoryInfo(target);
 
             foreach (var dir in di.EnumerateDirectories("*", SearchOption.AllDirectories))
@@ -550,17 +550,35 @@ public sealed class ModManager : IModManager
         }
         catch (Exception ex)
         {
-            return new OperationError
-            {
-                Message = $"Failed to delete mod directory: {ex.Message}",
-                Exception = ex
-            };
+            return new OperationError { Message = $"Failed to delete mod directory: {ex.Message}", Exception = ex };
         }
     }
 
     private void QueueSaveMods()
     {
-        _ = SaveModsAndLogAsync();
+        _ = EnqueueSaveAsync();
+    }
+
+    private async Task EnqueueSaveAsync()
+    {
+        var semaphoreEntered = false;
+
+        try
+        {
+            await _saveSemaphore.WaitAsync();
+            semaphoreEntered = true;
+
+            await SaveModsAndLogAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to save mods.");
+        }
+        finally
+        {
+            if (semaphoreEntered)
+                _saveSemaphore.Release();
+        }
     }
 
     private async Task SaveModsAndLogAsync()
