@@ -63,13 +63,6 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         foreach (var (logicalPath, moddedEntry) in moddedU8.Files)
         {
             baselineMembers.TryGetValue(logicalPath, out var baselineMember);
-            if (baselineMember == null)
-                continue;
-
-            var moddedHash = HashBytes64(moddedEntry);
-
-            if (baselineMember.Size == moddedEntry.Length && baselineMember.Hash == moddedHash)
-                continue;
 
             if (IsBlockedLooseRawOverrideExtension(logicalPath))
             {
@@ -77,7 +70,28 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                 continue;
             }
 
-            entries.Add(new(BuildTaggedPatchName(logicalPath, archiveTag), logicalPath, moddedEntry.ToArray(), "Modified archive member"));
+            if (baselineMember != null)
+            {
+                var moddedHash = HashBytes64(moddedEntry);
+
+                if (baselineMember.Size == moddedEntry.Length && baselineMember.Hash == moddedHash)
+                    continue;
+            }
+
+            entries.Add(
+                new(
+                    BuildTaggedPatchName(logicalPath, archiveTag),
+                    logicalPath,
+                    moddedEntry.ToArray(),
+                    baselineMember == null ? "New archive member" : "Modified archive member"
+                )
+            );
+        }
+
+        foreach (var logicalPath in baselineMembers.Keys)
+        {
+            if (!moddedU8.Files.ContainsKey(logicalPath))
+                skipped.Add($"{logicalPath} exists only in the original archive. File deletions are not exportable as loose patches.");
         }
 
         if (entries.Count == 0 && skipped.Count == 0)
@@ -115,10 +129,19 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         {
             baselineMembers.TryGetValue(logicalPath, out var baselineMember);
             if (baselineMember == null)
+            {
+                differences++;
                 continue;
+            }
 
             var moddedHash = HashBytes64(moddedEntry);
             if (baselineMember.Size != moddedEntry.Length || baselineMember.Hash != moddedHash)
+                differences++;
+        }
+
+        foreach (var logicalPath in baselineMembers.Keys)
+        {
+            if (!moddedU8.Files.ContainsKey(logicalPath))
                 differences++;
         }
 
