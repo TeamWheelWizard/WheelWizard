@@ -142,6 +142,7 @@ public sealed class ModManager : IModManager
         if (!Mods.Contains(mod))
             return Ok();
 
+        mod.PropertyChanged -= Mod_PropertyChanged;
         Mods.Remove(mod);
         OnPropertyChanged(nameof(Mods));
         return await SaveModsAsync();
@@ -507,26 +508,53 @@ public sealed class ModManager : IModManager
 
     private static OperationResult DeleteModDirectory(string modDirectory)
     {
-        var normalizedModsFolder = Path.GetFullPath(PathManager.ModsFolderPath);
-        if (!modDirectory.StartsWith(normalizedModsFolder, StringComparison.OrdinalIgnoreCase))
-            return Fail("Invalid mod directory.");
-
         try
         {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            var modsRoot = Path.GetFullPath(PathManager.ModsFolderPath)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-            var di = new DirectoryInfo(modDirectory);
-            di.Attributes &= ~FileAttributes.ReadOnly;
+            var target = Path.GetFullPath(modDirectory)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            var relativePath = Path.GetRelativePath(modsRoot, target);
+
+            if (
+                relativePath == "." ||
+                relativePath == ".." ||
+                relativePath.StartsWith(".." + Path.DirectorySeparatorChar) ||
+                relativePath.StartsWith(".." + Path.AltDirectorySeparatorChar) ||
+                Path.IsPathRooted(relativePath)
+            )
+            {
+                return Fail("Invalid mod directory.");
+            }
+
+            if (!Directory.Exists(target))
+                return Fail("Mod directory does not exist.");
+
+            GC.Collect(); 
+            GC.WaitForPendingFinalizers();
+            
+            var di = new DirectoryInfo(target);
+
+            foreach (var dir in di.EnumerateDirectories("*", SearchOption.AllDirectories))
+                dir.Attributes &= ~FileAttributes.ReadOnly;
+
             foreach (var file in di.EnumerateFiles("*", SearchOption.AllDirectories))
                 file.Attributes &= ~FileAttributes.ReadOnly;
 
-            Directory.Delete(modDirectory, true);
+            di.Attributes &= ~FileAttributes.ReadOnly;
+
+            Directory.Delete(target, true);
             return Ok();
         }
         catch (Exception ex)
         {
-            return new OperationError { Message = $"Failed to delete mod directory: {ex.Message}", Exception = ex };
+            return new OperationError
+            {
+                Message = $"Failed to delete mod directory: {ex.Message}",
+                Exception = ex
+            };
         }
     }
 
