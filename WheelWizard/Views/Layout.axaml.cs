@@ -114,7 +114,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         Title = BrandingService.Branding.DisplayName;
         TitleLabel.Text = BrandingService.Branding.DisplayName;
         UpdateModsButtonText();
-        UpdateModsActionIndicator();
+        // UpdateModsActionIndicator();
 
         NavigationManager.NavigateTo<HomePage>();
     }
@@ -129,8 +129,9 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     private void ModManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ModManager.Mods))
-            UpdateModsActionIndicator();
+        //todo: after patches is more stable, uncomment this
+        // if (e.PropertyName == nameof(ModManager.Mods))
+        //     UpdateModsActionIndicator();
     }
 
     private async Task ReloadModsAndShowErrorsAsync()
@@ -167,11 +168,12 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         ModsButton.Text = "Patches";
     }
 
-    private void UpdateModsActionIndicator()
-    {
-        ModsButton.WarningVisible = ModManagerService.Mods.Any(mod => mod.HasIncompatibleFiles);
-        ModsButton.WarningTip = "Some mods need to be converted to patches.";
-    }
+    //todo: after patches is more stable, uncomment this
+    // private void UpdateModsActionIndicator()
+    // {
+    //     ModsButton.WarningVisible = ModManagerService.Mods.Any(mod => mod.HasIncompatibleFiles);
+    //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
+    // }
 
     public void NavigateToPage(UserControl page)
     {

@@ -79,16 +79,17 @@
                             IconSize="0"
                             TipText="{TemplateBinding BoxTip}"
             />
-            <PathIcon Data="{StaticResource WarningTriangle}"
-                      IsVisible="{TemplateBinding WarningVisible}"
-                      ToolTip.Tip="{TemplateBinding WarningTip}"
-                      ToolTip.Placement="Right"
-                      Width="17"
-                      Height="17"
-                      Margin="0,0,12,0"
-                      Foreground="{StaticResource Danger500}"
-                      HorizontalAlignment="Right"
-                      VerticalAlignment="Center" />
+            <!-- This will be added at a future date after patches is more stable this will turn on -->
+            <!-- <PathIcon Data="{StaticResource WarningTriangle}" -->
+            <!--           IsVisible="{TemplateBinding WarningVisible}" -->
+            <!--           ToolTip.Tip="{TemplateBinding WarningTip}" -->
+            <!--           ToolTip.Placement="Right" -->
+            <!--           Width="17" -->
+            <!--           Height="17" -->
+            <!--           Margin="0,0,12,0" -->
+            <!--           Foreground="{StaticResource Danger500}" -->
+            <!--           HorizontalAlignment="Right" -->
+            <!--           VerticalAlignment="Center" /> -->
           </Grid>
         </Border>
       </ControlTemplate>
