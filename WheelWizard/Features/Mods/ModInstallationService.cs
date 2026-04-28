@@ -115,6 +115,9 @@ public sealed class ModInstallationService : IModInstallationService
             using var archive = archiveResult.Value;
             var totalEntries = archive.Entries.Count(entry => !entry.IsDirectory);
             var processedEntries = 0;
+            var fullRoot = Path.GetFullPath(destinationDirectory);
+            if (!Path.EndsInDirectorySeparator(fullRoot))
+                fullRoot += Path.DirectorySeparatorChar;
 
             foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
             {
@@ -135,21 +138,17 @@ public sealed class ModInstallationService : IModInstallationService
                 );
 
                 var entryDestinationPath = Path.Combine(destinationDirectory, sanitizedKey);
+                var fullEntry = Path.GetFullPath(entryDestinationPath);
 
-                if (
-                    !Path.GetFullPath(entryDestinationPath)
-                        .StartsWith(Path.GetFullPath(destinationDirectory), StringComparison.OrdinalIgnoreCase)
-                )
-                {
+                if (!fullEntry.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase))
                     return Fail("Entry is attempting to extract outside of the destination directory.");
-                }
 
-                var directoryPath = Path.GetDirectoryName(entryDestinationPath);
+                var directoryPath = Path.GetDirectoryName(fullEntry);
                 if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
                     Directory.CreateDirectory(directoryPath);
 
                 using var stream = entry.OpenEntryStream();
-                using var fileStream = File.Create(entryDestinationPath);
+                using var fileStream = File.Create(fullEntry);
                 stream.CopyTo(fileStream);
             }
 
