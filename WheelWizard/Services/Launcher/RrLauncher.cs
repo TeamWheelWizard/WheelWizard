@@ -33,6 +33,10 @@ public class RrLauncher : ILauncher
     {
         try
         {
+            //case SHOULD be impossible since launch button should be disabled
+            if (!File.Exists(PathManager.GameFilePath))
+                return Fail(Phrases.MessageWarning_NotFindGame_Extra);
+            
             DolphinLaunchHelper.KillDolphin();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
@@ -50,9 +54,6 @@ public class RrLauncher : ILauncher
             var modsLaunchResult = await _modsLaunchService.PrepareModsForLaunch(targetFolderPath, clearTargetFolder);
             if (modsLaunchResult.IsFailure)
                 return modsLaunchResult.Error;
-
-            if (!File.Exists(PathManager.GameFilePath))
-                return Fail(Phrases.MessageWarning_NotFindGame_Extra);
 
             RetroRewindLaunchHelper.GenerateLaunchJson();
             var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";
