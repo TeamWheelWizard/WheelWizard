@@ -1454,5 +1454,245 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("Time_Seconds_x", resourceCulture);
             }
         }
+
+        public static string FilePicker_SelectModFile {
+            get {
+                return ResourceManager.GetString("FilePicker_SelectModFile", resourceCulture);
+            }
+        }
+
+        public static string MessageSuccess_ModConvertedToPatches_Title {
+            get {
+                return ResourceManager.GetString("MessageSuccess_ModConvertedToPatches_Title", resourceCulture);
+            }
+        }
+
+        public static string MessageSuccess_ModInstalled_Extra {
+            get {
+                return ResourceManager.GetString("MessageSuccess_ModInstalled_Extra", resourceCulture);
+            }
+        }
+
+        public static string MessageSuccess_ModInstalled_Title {
+            get {
+                return ResourceManager.GetString("MessageSuccess_ModInstalled_Title", resourceCulture);
+            }
+        }
+
+        public static string MessageSuccess_PatchConversionResult {
+            get {
+                return ResourceManager.GetString("MessageSuccess_PatchConversionResult", resourceCulture);
+            }
+        }
+
+        public static string MessageSuccess_PatchConversionSkipped {
+            get {
+                return ResourceManager.GetString("MessageSuccess_PatchConversionSkipped", resourceCulture);
+            }
+        }
+
+        public static string MessageWarning_CouldNotConvertMod_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_CouldNotConvertMod_Title", resourceCulture);
+            }
+        }
+
+        public static string Patch_IncompatibleMod_Message {
+            get {
+                return ResourceManager.GetString("Patch_IncompatibleMod_Message", resourceCulture);
+            }
+        }
+
+        public static string Patch_IncompatibleMod_Title {
+            get {
+                return ResourceManager.GetString("Patch_IncompatibleMod_Title", resourceCulture);
+            }
+        }
+
+        public static string Progress_ApplyingConvertedMod {
+            get {
+                return ResourceManager.GetString("Progress_ApplyingConvertedMod", resourceCulture);
+            }
+        }
+
+        public static string Progress_CombiningFiles {
+            get {
+                return ResourceManager.GetString("Progress_CombiningFiles", resourceCulture);
+            }
+        }
+
+        public static string Progress_ConvertingFile {
+            get {
+                return ResourceManager.GetString("Progress_ConvertingFile", resourceCulture);
+            }
+        }
+
+        public static string Progress_ConvertingFilesCount {
+            get {
+                return ResourceManager.GetString("Progress_ConvertingFilesCount", resourceCulture);
+            }
+        }
+
+        public static string Progress_ConvertingModToPatches {
+            get {
+                return ResourceManager.GetString("Progress_ConvertingModToPatches", resourceCulture);
+            }
+        }
+
+        public static string Progress_DownloadingMod {
+            get {
+                return ResourceManager.GetString("Progress_DownloadingMod", resourceCulture);
+            }
+        }
+
+        public static string Progress_InstallingMod {
+            get {
+                return ResourceManager.GetString("Progress_InstallingMod", resourceCulture);
+            }
+        }
+
+        public static string Progress_PreparingFilesCount {
+            get {
+                return ResourceManager.GetString("Progress_PreparingFilesCount", resourceCulture);
+            }
+        }
+
+        public static string Question_EnterModName_Title {
+            get {
+                return ResourceManager.GetString("Question_EnterModName_Title", resourceCulture);
+            }
+        }
+
+        public static string Question_LaunchClearPatchesFound_Extra {
+            get {
+                return ResourceManager.GetString("Question_LaunchClearPatchesFound_Extra", resourceCulture);
+            }
+        }
+
+        public static string Text_BrsarEntry {
+            get {
+                return ResourceManager.GetString("Text_BrsarEntry", resourceCulture);
+            }
+        }
+
+        public static string Text_BrsarEntryWithRwar {
+            get {
+                return ResourceManager.GetString("Text_BrsarEntryWithRwar", resourceCulture);
+            }
+        }
+
+        public static string Text_ExternalReference {
+            get {
+                return ResourceManager.GetString("Text_ExternalReference", resourceCulture);
+            }
+        }
+
+        public static string Text_ExternalReferenceWithPath {
+            get {
+                return ResourceManager.GetString("Text_ExternalReferenceWithPath", resourceCulture);
+            }
+        }
+
+        public static string Text_ModifiedArchiveMember {
+            get {
+                return ResourceManager.GetString("Text_ModifiedArchiveMember", resourceCulture);
+            }
+        }
+
+        public static string Text_NewArchiveMember {
+            get {
+                return ResourceManager.GetString("Text_NewArchiveMember", resourceCulture);
+            }
+        }
+
+        public static string Text_WholeFileOverride {
+            get {
+                return ResourceManager.GetString("Text_WholeFileOverride", resourceCulture);
+            }
+        }
+
+        public static string Warning_BrsarExternalCount {
+            get {
+                return ResourceManager.GetString("Warning_BrsarExternalCount", resourceCulture);
+            }
+        }
+
+        public static string Warning_BrsarFileIdExternal {
+            get {
+                return ResourceManager.GetString("Warning_BrsarFileIdExternal", resourceCulture);
+            }
+        }
+
+        public static string Warning_BrsarFileIdUnsupportedMagic {
+            get {
+                return ResourceManager.GetString("Warning_BrsarFileIdUnsupportedMagic", resourceCulture);
+            }
+        }
+
+        public static string Warning_BrsarFileIdUnresolved {
+            get {
+                return ResourceManager.GetString("Warning_BrsarFileIdUnresolved", resourceCulture);
+            }
+        }
+
+        public static string Warning_BrsarNoSupportedDifferences {
+            get {
+                return ResourceManager.GetString("Warning_BrsarNoSupportedDifferences", resourceCulture);
+            }
+        }
+
+        public static string Warning_BrsarUnresolvedCount {
+            get {
+                return ResourceManager.GetString("Warning_BrsarUnresolvedCount", resourceCulture);
+            }
+        }
+
+        public static string Warning_BrsarUnsupportedSummary {
+            get {
+                return ResourceManager.GetString("Warning_BrsarUnsupportedSummary", resourceCulture);
+            }
+        }
+
+        public static string Warning_FileDeletionNotExportable {
+            get {
+                return ResourceManager.GetString("Warning_FileDeletionNotExportable", resourceCulture);
+            }
+        }
+
+        public static string Warning_FileNameDiffersFromArchiveTag {
+            get {
+                return ResourceManager.GetString("Warning_FileNameDiffersFromArchiveTag", resourceCulture);
+            }
+        }
+
+        public static string Warning_FileNotInBuiltInBaseline {
+            get {
+                return ResourceManager.GetString("Warning_FileNotInBuiltInBaseline", resourceCulture);
+            }
+        }
+
+        public static string Warning_NoSzsDifferences {
+            get {
+                return ResourceManager.GetString("Warning_NoSzsDifferences", resourceCulture);
+            }
+        }
+
+        public static string Warning_SzsMatchesBaseline {
+            get {
+                return ResourceManager.GetString("Warning_SzsMatchesBaseline", resourceCulture);
+            }
+        }
+
+        public static string Warning_UnsupportedLooseOverrideExtension {
+            get {
+                return ResourceManager.GetString("Warning_UnsupportedLooseOverrideExtension", resourceCulture);
+            }
+        }
+
+        public static string Warning_WholeFileBaseline {
+            get {
+                return ResourceManager.GetString("Warning_WholeFileBaseline", resourceCulture);
+            }
+        }
     }
 }

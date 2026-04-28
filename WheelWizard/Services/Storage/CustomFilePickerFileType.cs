@@ -1,11 +1,12 @@
 ﻿using Avalonia.Platform.Storage;
+using WheelWizard.Resources.Languages;
 
 namespace WheelWizard.Services;
 
 public static class CustomFilePickerFileType
 {
     public static FilePickerFileType All { get; } =
-        new("All")
+        new(Common.Attribute_All)
         {
             Patterns = ["*"],
             AppleUniformTypeIdentifiers = ["public.data"],

@@ -13,7 +13,9 @@ public static class KartSzsAllowList
     {
         var assembly = Assembly.GetExecutingAssembly();
         var resourceName =
-            assembly.GetManifestResourceNames().First(name => name.EndsWith("allowed-kart-szs.json", StringComparison.OrdinalIgnoreCase))
+            assembly
+                .GetManifestResourceNames()
+                .FirstOrDefault(name => name.EndsWith("allowed-kart-szs.json", StringComparison.OrdinalIgnoreCase))
             ?? throw new FileNotFoundException("Embedded kart SZS allow-list was not found.");
         using var stream =
             assembly.GetManifestResourceStream(resourceName)

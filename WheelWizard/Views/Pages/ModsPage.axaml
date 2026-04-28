@@ -104,7 +104,7 @@
                                     <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
                                     <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
                                     <Separator />
-                                    <MenuItem Header="Convert to patches"
+                                    <MenuItem Header="{x:Static lang:Common.Action_ConvertToPatches}"
                                               IsEnabled="{Binding Mod.HasIncompatibleFiles}"
                                               Click="ConvertToPatches_Click" />
                                     <Separator />
@@ -239,7 +239,7 @@
                                         <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
                                         <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
                                         <Separator />
-                                        <MenuItem Header="Convert to patches"
+                                        <MenuItem Header="{x:Static lang:Common.Action_ConvertToPatches}"
                                                   IsEnabled="{Binding Mod.HasIncompatibleFiles}"
                                                   Click="ConvertToPatches_Click" />
                                         <Separator />

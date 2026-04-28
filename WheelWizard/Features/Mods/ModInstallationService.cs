@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using SharpCompress.Archives;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
+using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Views.Popups.Generic;
 
@@ -141,7 +142,7 @@ public sealed class ModInstallationService : IModInstallationService
                 var fullEntry = Path.GetFullPath(entryDestinationPath);
 
                 if (!fullEntry.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase))
-                    return Fail("Entry is attempting to extract outside of the destination directory.");
+                    return Fail("Archive entry is outside of the destination directory.");
 
                 var directoryPath = Path.GetDirectoryName(fullEntry);
                 if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
@@ -200,8 +201,8 @@ public sealed class ModInstallationService : IModInstallationService
         ProgressWindow? progressWindow = null;
         try
         {
-            progressWindow = new("Installing Mod");
-            progressWindow.SetGoal("Extracting files...");
+            progressWindow = new(Phrases.Progress_InstallingMod);
+            progressWindow.SetGoal(Common.State_Extracting);
             progressWindow.Show();
 
             var modDirectory = PathManager.GetModDirectoryPath(givenModName);

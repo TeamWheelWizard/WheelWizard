@@ -47,7 +47,7 @@ public class RrLauncher : ILauncher
                 clearTargetFolder = await new YesNoWindow()
                     .SetButtonText(Common.Action_Delete, Common.Action_Keep)
                     .SetMainText(Phrases.Question_LaunchClearModsFound_Title)
-                    .SetExtraText("You are about to launch the game without mods. Do you want to clear your Patches folder?")
+                    .SetExtraText(Phrases.Question_LaunchClearPatchesFound_Extra)
                     .AwaitAnswer();
             }
 

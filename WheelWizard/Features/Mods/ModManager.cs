@@ -192,8 +192,8 @@ public sealed class ModManager : IModManager
         {
             var totalFiles = filePaths.Length;
             //todo: this is supposed to be backend only, ProgressWindow should not be created here.
-            progressWindow = new ProgressWindow("Combining files")
-                .SetGoal($"Preparing {totalFiles} file{(totalFiles == 1 ? "" : "s")}")
+            progressWindow = new ProgressWindow(Phrases.Progress_CombiningFiles)
+                .SetGoal(Humanizer.ReplaceDynamic(Phrases.Progress_PreparingFilesCount, totalFiles)!)
                 .SetExtraText(Common.State_Loading);
             progressWindow.Show();
 
@@ -602,7 +602,7 @@ public sealed class ModManager : IModManager
     public async Task<OperationResult> DecreasePriorityAsync(Mod mod)
     {
         if (Mods.IndexOf(mod) == -1)
-            return Fail("Cannot find the mod to decrease priority.");
+            return Fail("Cannot find mod to decrease priority.");
 
         if (mod.Priority == GetLowestActivePriority() || Mods.Count == 1)
             return Fail("Cannot decrease priority of the first mod.");

@@ -200,8 +200,8 @@ public partial class ModContent : UserControlBase
         {
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Message)
-                .SetTitleText("Successfully installed mod!")
-                .SetInfoText($"Mod '{CurrentMod.Name}' installed successfully.")
+                .SetTitleText(Phrases.MessageSuccess_ModInstalled_Title)
+                .SetInfoText(Humanizer.ReplaceDynamic(Phrases.MessageSuccess_ModInstalled_Extra, CurrentMod.Name)!)
                 .Show();
         }
 
@@ -221,7 +221,7 @@ public partial class ModContent : UserControlBase
         if (!downloadUrls.Any())
             return Fail("No downloadable files were found for this mod.");
 
-        var progressWindow = new ProgressWindow($"Downloading {CurrentMod.Name}");
+        var progressWindow = new ProgressWindow(Humanizer.ReplaceDynamic(Phrases.Progress_DownloadingMod, CurrentMod.Name)!);
         progressWindow.Show();
         progressWindow.SetExtraText(Common.State_Loading);
 
@@ -242,7 +242,7 @@ public partial class ModContent : UserControlBase
         }
 
         if (!File.Exists(downloadedFilePath))
-            return Fail("Downloaded mod file could not be found.");
+            return Fail(Phrases.MessageWarning_UnableDownloadMod_Extra);
 
         var popup = new TextInputWindow()
             .SetMainText(Common.Attribute_Name)
@@ -266,7 +266,7 @@ public partial class ModContent : UserControlBase
         if (modName.Any(c => invalidChars.Contains(c)))
         {
             TryDeleteTempModsFolder();
-            return Fail("Mod name contains invalid characters.");
+            return Fail(Phrases.MessageWarning_ModNameInvalid_Extra);
         }
 
         var installResult = await ModManager.InstallModFromFileAsync(downloadedFilePath, modName, CurrentMod.Author.Name, CurrentMod.Id);

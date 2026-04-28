@@ -1,5 +1,6 @@
 using System.Text;
 using WheelWizard.Helpers;
+using WheelWizard.Resources.Languages;
 using static WheelWizard.Features.Patches.PatchConversionHelpers;
 
 namespace WheelWizard.Features.Patches;
@@ -54,29 +55,29 @@ public static class BrsarPatchConverter
             if (moddedEntry.Kind == BrsarEntryKind.Unsupported)
             {
                 skipped.Add(
-                    $"BRSAR fileId {fileId} changed, but it resolves to {moddedEntry.Magic} and Pulsar only supports RBNK/RSEQ/RWSD loose overrides."
+                    Humanizer.ReplaceDynamic(Phrases.Warning_BrsarFileIdUnsupportedMagic, fileId, moddedEntry.Magic ?? string.Empty)!
                 );
                 continue;
             }
 
             if (moddedEntry.Kind == BrsarEntryKind.External)
             {
-                skipped.Add($"BRSAR fileId {fileId} is an external file reference and cannot be exported.");
+                skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarFileIdExternal, fileId)!);
                 continue;
             }
 
-            skipped.Add($"BRSAR fileId {fileId} could not be resolved to a supported embedded sound file.");
+            skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarFileIdUnresolved, fileId)!);
         }
 
         var unsupportedSummary = SummarizeUnsupportedBrsarCounts(moddedParse.UnsupportedCounts);
         if (unsupportedSummary != null)
-            warnings.Add($"Only RBNK/RSEQ/RWSD entries can be exported. The scanned archive also contains {unsupportedSummary}.");
+            warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarUnsupportedSummary, unsupportedSummary)!);
         if (moddedParse.ExternalCount > 0)
-            warnings.Add($"{moddedParse.ExternalCount} BRSAR file entries are external references and cannot be exported.");
+            warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarExternalCount, moddedParse.ExternalCount)!);
         if (moddedParse.UnresolvedCount > 0)
-            warnings.Add($"{moddedParse.UnresolvedCount} embedded BRSAR file entries could not be resolved confidently.");
+            warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarUnresolvedCount, moddedParse.UnresolvedCount)!);
         if (entries.Count == 0 && skipped.Count == 0)
-            warnings.Add("No supported RBNK/RSEQ/RWSD differences were found against the built-in game baseline.");
+            warnings.Add(Phrases.Warning_BrsarNoSupportedDifferences);
 
         return new()
         {
@@ -196,7 +197,9 @@ public static class BrsarPatchConverter
                     Utf8.GetBytes(externalPath),
                     null,
                     null,
-                    externalPath.Length > 0 ? $"External reference: {externalPath}" : "External reference"
+                    externalPath.Length > 0
+                        ? Humanizer.ReplaceDynamic(Phrases.Text_ExternalReferenceWithPath, externalPath)!
+                        : Phrases.Text_ExternalReference
                 );
                 continue;
             }
@@ -247,18 +250,24 @@ public static class BrsarPatchConverter
             if (!IsSupportedBrsarMagic(mainHeader.Magic))
             {
                 unsupportedCounts[mainHeader.Magic] = unsupportedCounts.GetValueOrDefault(mainHeader.Magic) + 1;
-                entries[fileId] = new(BrsarEntryKind.Unsupported, mainBytes, null, mainHeader.Magic, $"{mainHeader.Magic} entry {fileId}");
+                entries[fileId] = new(
+                    BrsarEntryKind.Unsupported,
+                    mainBytes,
+                    null,
+                    mainHeader.Magic,
+                    Humanizer.ReplaceDynamic(Phrases.Text_BrsarEntry, mainHeader.Magic, fileId)!
+                );
                 continue;
             }
 
             var exportBytes = mainBytes;
-            var detail = $"{mainHeader.Magic} entry {fileId}";
+            var detail = Humanizer.ReplaceDynamic(Phrases.Text_BrsarEntry, mainHeader.Magic, fileId)!;
             var waveHeader = FindNearestRwarHeader(rwarHeaders, waveGuess, declaredWaveSize, mainHeader.Offset - mainGuess);
             if (declaredWaveSize > 0 && waveHeader != null)
             {
                 var waveBytes = SliceBytes(bytes, waveHeader.Offset, waveHeader.Offset + waveHeader.Size);
                 exportBytes = JoinWithAlignment(mainBytes, waveBytes, 0x20);
-                detail += " + RWAR";
+                detail = Humanizer.ReplaceDynamic(Phrases.Text_BrsarEntryWithRwar, mainHeader.Magic, fileId)!;
             }
 
             entries[fileId] = new(BrsarEntryKind.Supported, exportBytes, exportBytes, mainHeader.Magic, detail);

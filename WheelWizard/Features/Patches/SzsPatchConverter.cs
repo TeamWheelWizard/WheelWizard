@@ -1,4 +1,6 @@
 using WheelWizard.Features.Archives;
+using WheelWizard.Helpers;
+using WheelWizard.Resources.Languages;
 using static WheelWizard.Features.Patches.PatchConversionHelpers;
 
 namespace WheelWizard.Features.Patches;
@@ -15,7 +17,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         var archiveTag = baseline.ArchiveTag;
 
         if (!StripExtension(moddedName).Equals(archiveTag, StringComparison.OrdinalIgnoreCase))
-            warnings.Add($"The selected file name differs from the original archive tag \"{archiveTag}.szs\".");
+            warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_FileNameDiffersFromArchiveTag, archiveTag)!);
 
         var wholeFileHash = HashBytes64(moddedBytes);
         var wholeFileMatches = moddedBytes.Length == baseline.WholeFileSize && wholeFileHash == baseline.WholeFileHash;
@@ -25,7 +27,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         {
             if (wholeFileMatches)
             {
-                warnings.Add("The selected SZS matches the built-in game baseline exactly.");
+                warnings.Add(Phrases.Warning_SzsMatchesBaseline);
                 return new PatchConversionAnalysis
                 {
                     CleanName = baseline.RelativePath,
@@ -36,7 +38,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                 };
             }
 
-            warnings.Add("This SZS is stored as a whole-file baseline. Exporting a whole-file override.");
+            warnings.Add(Phrases.Warning_WholeFileBaseline);
 
             return new PatchConversionAnalysis
             {
@@ -45,7 +47,12 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                 Mode = "whole-file",
                 Entries =
                 [
-                    new PatchConversionEntry($"{archiveTag}.szs", baseline.RelativePath, moddedBytes.ToArray(), "Whole-file override"),
+                    new PatchConversionEntry(
+                        $"{archiveTag}.szs",
+                        baseline.RelativePath,
+                        moddedBytes.ToArray(),
+                        Phrases.Text_WholeFileOverride
+                    ),
                 ],
                 Warnings = warnings,
                 Skipped = skipped,
@@ -66,7 +73,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
 
             if (IsBlockedLooseRawOverrideExtension(logicalPath))
             {
-                skipped.Add($"{logicalPath} uses an unsupported loose override extension (.kcl, .kmp, .slt).");
+                skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_UnsupportedLooseOverrideExtension, logicalPath)!);
                 continue;
             }
 
@@ -83,7 +90,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                     BuildTaggedPatchName(logicalPath, archiveTag),
                     logicalPath,
                     moddedEntry.ToArray(),
-                    baselineMember == null ? "New archive member" : "Modified archive member"
+                    baselineMember == null ? Phrases.Text_NewArchiveMember : Phrases.Text_ModifiedArchiveMember
                 )
             );
         }
@@ -91,11 +98,11 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         foreach (var logicalPath in baselineMembers.Keys)
         {
             if (!moddedU8.Files.ContainsKey(logicalPath))
-                skipped.Add($"{logicalPath} exists only in the original archive. File deletions are not exportable as loose patches.");
+                skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_FileDeletionNotExportable, logicalPath)!);
         }
 
         if (entries.Count == 0 && skipped.Count == 0)
-            warnings.Add("No SZS differences were found against the built-in game baseline.");
+            warnings.Add(Phrases.Warning_NoSzsDifferences);
 
         return new PatchConversionAnalysis
         {

@@ -45,7 +45,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             ))
         );
 
-    public string StoragePageTitle => "Patches";
+    public string StoragePageTitle => Common.PageTitle_Patches;
 
     private bool _hasMods;
 
@@ -142,14 +142,14 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         var selectedFiles = await FilePickerHelper.OpenFilePickerAsync(
             CustomFilePickerFileType.All,
             allowMultiple: true,
-            title: "Select Mod File"
+            title: Phrases.FilePicker_SelectModFile
         );
         if (selectedFiles.Count == 0)
             return;
 
         var modName = await new TextInputWindow()
-            .SetMainText("Mod name:")
-            .SetPlaceholderText("Enter mod name...")
+            .SetMainText(Phrases.Question_EnterModName_Title)
+            .SetPlaceholderText(Phrases.Placeholder_EnterModName)
             .SetValidation(ModManager.ValidateModName)
             .ShowDialog();
         if (string.IsNullOrWhiteSpace(modName))
@@ -164,8 +164,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
         new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Message)
-            .SetTitleText("Successfully installed mod!")
-            .SetInfoText($"Mod '{modName}' installed successfully.")
+            .SetTitleText(Phrases.MessageSuccess_ModInstalled_Title)
+            .SetInfoText(Humanizer.ReplaceDynamic(Phrases.MessageSuccess_ModInstalled_Extra, modName)!)
             .Show();
     }
 
@@ -177,10 +177,10 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
         var oldTitle = selectedMod.Mod.Title;
         var newTitle = await new TextInputWindow()
-            .SetMainText("Mod Name")
+            .SetMainText(Phrases.Question_EnterModName_Title)
             .SetInitialText(oldTitle)
-            .SetExtraText($"Changing name from: {oldTitle}")
-            .SetPlaceholderText("Enter mod name...")
+            .SetExtraText(Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, oldTitle)!)
+            .SetPlaceholderText(Phrases.Placeholder_EnterModName)
             .SetValidation(ModManager.ValidateRenameModName)
             .ShowDialog();
 
@@ -236,7 +236,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             var conversion = result.Value;
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Message)
-                .SetTitleText("Converted to patches")
+                .SetTitleText(Phrases.MessageSuccess_ModConvertedToPatches_Title)
                 .SetInfoText(BuildPatchConversionResultMessage(conversion))
                 .Show();
             return;
@@ -244,19 +244,23 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
         new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Warning)
-            .SetTitleText("Could not convert mod")
+            .SetTitleText(Phrases.MessageWarning_CouldNotConvertMod_Title)
             .SetInfoText(result.Error.Message)
             .Show();
     }
 
     private static string BuildPatchConversionResultMessage(ModPatchConversionResult conversion)
     {
-        var message = $"Converted {conversion.ConvertedFileCount} file(s) into {conversion.WrittenPatchCount} patch file(s).";
+        var message = Humanizer.ReplaceDynamic(
+            Phrases.MessageSuccess_PatchConversionResult,
+            conversion.ConvertedFileCount,
+            conversion.WrittenPatchCount
+        )!;
         if (conversion.Skipped.Count == 0)
             return message;
 
         return $"{message}{Environment.NewLine}{Environment.NewLine}"
-            + $"Left {conversion.Skipped.Count} file(s) unchanged because they could not be converted."
+            + Humanizer.ReplaceDynamic(Phrases.MessageSuccess_PatchConversionSkipped, conversion.Skipped.Count)!
             + $"{Environment.NewLine}{Environment.NewLine}"
             + string.Join(Environment.NewLine, conversion.Skipped.Take(8));
     }
