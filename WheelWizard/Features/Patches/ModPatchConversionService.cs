@@ -126,6 +126,9 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         foreach (var entry in conversion.Analysis.Entries)
                         {
                             var destination = Path.Combine(Path.GetDirectoryName(file)!, entry.ExportPath);
+                            var destinationDirectory = Path.GetDirectoryName(destination)!;
+                            if (!Directory.Exists(destinationDirectory))
+                                Directory.CreateDirectory(destinationDirectory);
                             File.WriteAllBytes(destination, entry.Bytes);
                             writtenPatchCount++;
                         }

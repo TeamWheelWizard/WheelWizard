@@ -12,7 +12,9 @@ public static class BigEndianBinaryHelper
 
     public static int BufferToInt32(byte[] data, int offset)
     {
-        if (offset < 0 || offset + 4 > data.Length)
+        ArgumentNullException.ThrowIfNull(data);
+
+        if (offset < 0 || offset > data.Length - sizeof(int))
             throw new InvalidDataException("Unexpected end of file.");
 
         return unchecked((int)BufferToUint32(data, offset));
