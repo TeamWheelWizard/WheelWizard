@@ -61,7 +61,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         var tempModDirectory = Path.Combine(tempRoot, mod.Title);
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var progressWindow = new ProgressWindow("Converting mod to patches")
-            .SetGoal($"Converting {sourceFiles.Count} archive file{(sourceFiles.Count == 1 ? string.Empty : "s")}")
+            .SetGoal($"Converting {sourceFiles.Count} file{(sourceFiles.Count == 1 ? string.Empty : "s")}")
             .SetCancellationTokenSource(cts);
         progressWindow.Show();
 
@@ -88,6 +88,20 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                             progressWindow.UpdateProgress((int)(index / (double)Math.Max(tempFiles.Count, 1) * 80));
                             progressWindow.SetExtraText($"Converting {fileName}");
                         });
+
+                        if (LooseBrsarPatchFileName.TryGetNormalizedFileName(fileName, out var normalizedPatchFileName))
+                        {
+                            var renameResult = RenameLooseBrsarPatchFile(file, normalizedPatchFileName);
+                            if (renameResult.IsFailure)
+                            {
+                                skipped.Add($"{fileName}: {renameResult.Error.Message}");
+                                continue;
+                            }
+
+                            convertedCount++;
+                            writtenPatchCount++;
+                            continue;
+                        }
 
                         var conversionResult = ConvertArchiveFile(file);
                         if (conversionResult.IsFailure)
@@ -216,6 +230,9 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
     private static bool IsConvertibleArchiveFile(string filePath)
     {
         var fileName = Path.GetFileName(filePath);
+        if (LooseBrsarPatchFileName.TryGetNormalizedFileName(fileName, out _))
+            return true;
+
         if (IsBrsarFileName(fileName))
             return true;
 
@@ -224,6 +241,16 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
     }
 
     private static bool IsBrsarFileName(string fileName) => fileName.Equals("revo_kart.brsar", StringComparison.OrdinalIgnoreCase);
+
+    private static OperationResult RenameLooseBrsarPatchFile(string file, string normalizedPatchFileName)
+    {
+        var destination = Path.Combine(Path.GetDirectoryName(file)!, normalizedPatchFileName);
+        if (File.Exists(destination) && !FileHelper.PathsEqual(file, destination))
+            return Fail($"{normalizedPatchFileName} already exists.");
+
+        File.Move(file, destination, overwrite: true);
+        return Ok();
+    }
 
     private static void CopyDirectory(string sourceDirectory, string destinationDirectory, CancellationToken cancellationToken)
     {

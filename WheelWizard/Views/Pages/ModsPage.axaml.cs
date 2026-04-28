@@ -251,7 +251,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private static string BuildPatchConversionResultMessage(ModPatchConversionResult conversion)
     {
-        var message = $"Converted {conversion.ConvertedFileCount} archive file(s) into {conversion.WrittenPatchCount} patch file(s).";
+        var message = $"Converted {conversion.ConvertedFileCount} file(s) into {conversion.WrittenPatchCount} patch file(s).";
         if (conversion.Skipped.Count == 0)
             return message;
 
