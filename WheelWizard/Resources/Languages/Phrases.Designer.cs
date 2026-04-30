@@ -518,6 +518,15 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("MessageSuccess_PatchConversionSkipped", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Note(s): {$1}.
+        /// </summary>
+        public static string MessageSuccess_PatchConversionNotes {
+            get {
+                return ResourceManager.GetString("MessageSuccess_PatchConversionNotes", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Retro Rewind is up to date..

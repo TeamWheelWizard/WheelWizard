@@ -98,7 +98,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         foreach (var logicalPath in baselineMembers.Keys)
         {
             if (!moddedU8.Files.ContainsKey(logicalPath))
-                skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_FileDeletionNotExportable, logicalPath)!);
+                warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_FileDeletionNotExportable, logicalPath)!);
         }
 
         if (entries.Count == 0 && skipped.Count == 0)

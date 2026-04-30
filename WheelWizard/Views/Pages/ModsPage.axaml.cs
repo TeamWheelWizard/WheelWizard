@@ -256,13 +256,26 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             conversion.ConvertedFileCount,
             conversion.WrittenPatchCount
         )!;
-        if (conversion.Skipped.Count == 0)
-            return message;
 
-        return $"{message}{Environment.NewLine}{Environment.NewLine}"
-            + Humanizer.ReplaceDynamic(Phrases.MessageSuccess_PatchConversionSkipped, conversion.Skipped.Count)!
-            + $"{Environment.NewLine}{Environment.NewLine}"
-            + string.Join(Environment.NewLine, conversion.Skipped.Take(8));
+        if (conversion.Skipped.Count > 0)
+        {
+            message +=
+                $"{Environment.NewLine}{Environment.NewLine}"
+                + Humanizer.ReplaceDynamic(Phrases.MessageSuccess_PatchConversionSkipped, conversion.Skipped.Count)!
+                + $"{Environment.NewLine}{Environment.NewLine}"
+                + string.Join(Environment.NewLine, conversion.Skipped.Take(8));
+        }
+
+        if (conversion.Warnings.Count > 0)
+        {
+            message +=
+                $"{Environment.NewLine}{Environment.NewLine}"
+                + Humanizer.ReplaceDynamic(Phrases.MessageSuccess_PatchConversionNotes, conversion.Warnings.Count)!
+                + $"{Environment.NewLine}{Environment.NewLine}"
+                + string.Join(Environment.NewLine, conversion.Warnings.Take(8));
+        }
+
+        return message;
     }
 
     private void ViewMod_Click(object sender, RoutedEventArgs e)

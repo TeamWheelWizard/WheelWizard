@@ -507,6 +507,9 @@ To join a specific room, you'll need to either join through a friend, or hope to
     <data name="MessageSuccess_PatchConversionSkipped" xml:space="preserve">
         <value>Left {$1} file(s) unchanged because they could not be converted.</value>
     </data>
+    <data name="MessageSuccess_PatchConversionNotes" xml:space="preserve">
+        <value>Note(s): {$1}</value>
+    </data>
     <data name="MessageWarning_CouldNotConvertMod_Title" xml:space="preserve">
         <value>Could not convert mod</value>
     </data>
