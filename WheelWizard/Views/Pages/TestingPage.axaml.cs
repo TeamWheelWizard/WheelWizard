@@ -4,6 +4,7 @@ using WheelWizard.Models.Enums;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages;
@@ -70,7 +71,9 @@ public partial class TestingPage : UserControlBase
         _isBusy = true;
         UpdateUi();
 
-        await LauncherService.Install();
+        var installResult = await LauncherService.Install();
+        if (installResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(installResult.Error);
 
         _isBusy = false;
         UpdateStatusAsync();
@@ -109,7 +112,9 @@ public partial class TestingPage : UserControlBase
 
         _isBusy = true;
         UpdateUi();
-        await LauncherService.Launch();
+        var launchResult = await LauncherService.Launch();
+        if (launchResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(launchResult.Error);
         _isBusy = false;
         UpdateUi();
     }

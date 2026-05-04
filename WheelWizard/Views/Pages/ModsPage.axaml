@@ -6,6 +6,7 @@
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             xmlns:patches="clr-namespace:WheelWizard.Features.Patches"
              mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="876"
              x:Class="WheelWizard.Views.Pages.ModsPage"
              x:DataType="pages:ModsPage">
@@ -26,10 +27,6 @@
 
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,12"
                     Orientation="Vertical" x:Name="TopBarButtons" Spacing="3">
-            <CheckBox Classes="Switch"
-                      VerticalAlignment="Center"
-                      Content="Use Patches"
-                      IsChecked="{Binding UsePatches, Mode=TwoWay}" />
             <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasMods}">
                 <components:Button Variant="Primary" 
                                    Text="{x:Static lang:Common.Action_Browse}" IconData="{StaticResource Search}"
@@ -102,6 +99,19 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Classes="BoxItemBackground" Height="50">
+                            <Border.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
+                                    <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
+                                    <Separator />
+                                    <MenuItem Header="{x:Static lang:Common.Action_ConvertToPatches}"
+                                              IsEnabled="{Binding Mod.HasIncompatibleFiles}"
+                                              Click="ConvertToPatches_Click" />
+                                    <Separator />
+                                    <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click" />
+                                    <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />
+                                </ContextMenu>
+                            </Border.ContextMenu>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="30" />
@@ -122,6 +132,26 @@
                                 <TextBlock Text="{Binding Mod.Title}" FontSize="14"
                                            Foreground="{StaticResource Neutral100}"
                                            Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0" />
+
+                                <Border Width="34"
+                                        Height="14"
+                                        CornerRadius="3"
+                                        Background="{StaticResource Danger500}"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        IsVisible="{Binding Mod.HasIncompatibleFiles}"
+                                        ToolTip.Placement="Top">
+                                    <ToolTip.Tip>
+                                        <StackPanel MaxWidth="300">
+                                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource Neutral50}" />
+                                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}"
+                                                       TextWrapping="Wrap"
+                                                       Foreground="{StaticResource Neutral100}" />
+                                        </StackPanel>
+                                    </ToolTip.Tip>
+                                </Border>
 
                                 <!-- Yes i know that it already works without any change event if we remove Mode=OneWay -->
                                 <!-- Removing that will make it so editing that will also edit the model -->
@@ -188,16 +218,6 @@
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-
-                <ListBox.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
-                        <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
-                        <Separator />
-                        <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click" />
-                        <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />
-                    </ContextMenu>
-                </ListBox.ContextMenu>
             </ListBox>
 
             <!-- Mods Grid (Rows / priority text mode) -->
@@ -218,6 +238,10 @@
                                     <ContextMenu>
                                         <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
                                         <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
+                                        <Separator />
+                                        <MenuItem Header="{x:Static lang:Common.Action_ConvertToPatches}"
+                                                  IsEnabled="{Binding Mod.HasIncompatibleFiles}"
+                                                  Click="ConvertToPatches_Click" />
                                         <Separator />
                                         <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click" />
                                         <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />

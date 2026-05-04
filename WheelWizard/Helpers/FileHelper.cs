@@ -139,6 +139,23 @@ public static class FileHelper
         return !relative.StartsWith("..", StringComparison.Ordinal) && !Path.IsPathRooted(relative);
     }
 
+    public static OperationResult<string[]> FindFilesByExtension(string folderPath, string searchPattern)
+    {
+        try
+        {
+            return Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories);
+        }
+        catch (Exception ex)
+        {
+            return new OperationError { Message = $"Failed to find files: {ex.Message}", Exception = ex };
+        }
+    }
+
+    public static OperationResult TryDeleteFile(string filePath)
+    {
+        return TryCatch(() => File.Delete(filePath), $"Failed to delete file: {filePath}");
+    }
+
     public static string ReadAllText(string path) => File.ReadAllText(path);
 
     public static string? ReadAllTextSafe(string path) => FileExists(path) ? ReadAllText(path) : null;
@@ -159,6 +176,21 @@ public static class FileHelper
         WriteAllText(path, contents);
     }
 
+    public static OperationResult DeleteDirectoryIfExists(string directory)
+    {
+        try
+        {
+            if (Directory.Exists(directory))
+                Directory.Delete(directory, true);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return new OperationError { Message = $"{ex.Message}", Exception = ex };
+        }
+    }
+
     public static void WriteAllLines(string path, IEnumerable<string> contents) => File.WriteAllLines(path, contents);
 
     public static void WriteAllLinesSafe(string path, IEnumerable<string> contents)
@@ -171,7 +203,10 @@ public static class FileHelper
         WriteAllLines(path, contents);
     }
 
-    public static void EnsureDirectory(string path) => Directory.CreateDirectory(path);
+    public static OperationResult EnsureDirectory(string path)
+    {
+        return TryCatch(() => Directory.CreateDirectory(path), "Failed to ensure directory exists: " + path);
+    }
 
     public static DirectoryMoveContentsResult MoveDirectoryContents(
         string sourcePath,
@@ -205,14 +240,38 @@ public static class FileHelper
                 verificationFailures
             );
 
+        DirectoryMoveContentsResult? CreateEnsureDirectoryFailureResult(OperationResult ensureDirectoryResult, bool copyAttempted = false)
+        {
+            if (ensureDirectoryResult.IsSuccess)
+                return null;
+
+            return CreateResult(
+                DirectoryMoveOutcome.CopyFailed,
+                copyAttempted: copyAttempted,
+                errorMessage: ensureDirectoryResult.Error.Message,
+                exception: ensureDirectoryResult.Error.Exception
+            );
+        }
+
         if (PathsEqual(normalizedSource, normalizedDestination))
         {
-            EnsureDirectory(normalizedDestination);
+            var ensureResult = CreateEnsureDirectoryFailureResult(EnsureDirectory(normalizedDestination));
+            if (ensureResult is not null)
+            {
+                progress?.Report(1.0);
+                return ensureResult;
+            }
+
             progress?.Report(1.0);
             return CreateResult(DirectoryMoveOutcome.NoOp, sourceDeletionSucceeded: true);
         }
 
-        EnsureDirectory(normalizedDestination);
+        var destinationEnsureResult = CreateEnsureDirectoryFailureResult(EnsureDirectory(normalizedDestination));
+        if (destinationEnsureResult is not null)
+        {
+            progress?.Report(1.0);
+            return destinationEnsureResult;
+        }
 
         if (!DirectoryExists(normalizedSource))
         {
@@ -248,7 +307,16 @@ public static class FileHelper
             foreach (var directory in directories)
             {
                 var relative = GetRelativePath(normalizedSource, directory);
-                EnsureDirectory(Path.Combine(normalizedDestination, relative));
+                var ensureResult = CreateEnsureDirectoryFailureResult(
+                    EnsureDirectory(Path.Combine(normalizedDestination, relative)),
+                    copyAttempted
+                );
+                if (ensureResult is not null)
+                {
+                    progress?.Report(1.0);
+                    return ensureResult;
+                }
+
                 processedSteps++;
                 ReportProgress();
             }
@@ -259,7 +327,14 @@ public static class FileHelper
                 var destinationFile = Path.Combine(normalizedDestination, relative);
                 var destinationDirectory = Path.GetDirectoryName(destinationFile);
                 if (!string.IsNullOrEmpty(destinationDirectory))
-                    EnsureDirectory(destinationDirectory);
+                {
+                    var ensureResult = CreateEnsureDirectoryFailureResult(EnsureDirectory(destinationDirectory), copyAttempted);
+                    if (ensureResult is not null)
+                    {
+                        progress?.Report(1.0);
+                        return ensureResult;
+                    }
+                }
 
                 if (FileExists(destinationFile))
                     File.Delete(destinationFile);

@@ -489,4 +489,127 @@ To join a specific room, you'll need to either join through a friend, or hope to
     <data name="Question_EnterNewName_Extra" xml:space="preserve">
         <value>Changing name from: {$1}</value>
     </data>
+    <data name="FilePicker_SelectModFile" xml:space="preserve">
+        <value>Select Mod File</value>
+    </data>
+    <data name="MessageSuccess_ModConvertedToPatches_Title" xml:space="preserve">
+        <value>Converted to patches</value>
+    </data>
+    <data name="MessageSuccess_ModInstalled_Extra" xml:space="preserve">
+        <value>Mod '{$1}' installed successfully.</value>
+    </data>
+    <data name="MessageSuccess_ModInstalled_Title" xml:space="preserve">
+        <value>Successfully installed mod!</value>
+    </data>
+    <data name="MessageSuccess_PatchConversionResult" xml:space="preserve">
+        <value>Converted {$1} file(s) into {$2} patch file(s).</value>
+    </data>
+    <data name="MessageSuccess_PatchConversionSkipped" xml:space="preserve">
+        <value>Left {$1} file(s) unchanged because they could not be converted.</value>
+    </data>
+    <data name="MessageSuccess_PatchConversionNotes" xml:space="preserve">
+        <value>Note(s): {$1}</value>
+    </data>
+    <data name="MessageWarning_CouldNotConvertMod_Title" xml:space="preserve">
+        <value>Could not convert mod</value>
+    </data>
+    <data name="Patch_IncompatibleMod_Message" xml:space="preserve">
+        <value>This mod is incompatible with other mods. Launching with this mod enabled may cause incorrect behavior or crashes. Consider converting it to patches by right-clicking the mod.</value>
+    </data>
+    <data name="Patch_IncompatibleMod_Title" xml:space="preserve">
+        <value>INCOMPATIBLE MOD</value>
+    </data>
+    <data name="Progress_ApplyingConvertedMod" xml:space="preserve">
+        <value>Applying converted mod</value>
+    </data>
+    <data name="Progress_CombiningFiles" xml:space="preserve">
+        <value>Combining files</value>
+    </data>
+    <data name="Progress_ConvertingFile" xml:space="preserve">
+        <value>Converting {$1}</value>
+    </data>
+    <data name="Progress_ConvertingFilesCount" xml:space="preserve">
+        <value>Converting {$1} file(s)</value>
+    </data>
+    <data name="Progress_ConvertingModToPatches" xml:space="preserve">
+        <value>Converting mod to patches</value>
+    </data>
+    <data name="Progress_DownloadingMod" xml:space="preserve">
+        <value>Downloading {$1}</value>
+    </data>
+    <data name="Progress_InstallingMod" xml:space="preserve">
+        <value>Installing Mod</value>
+    </data>
+    <data name="Progress_PreparingFilesCount" xml:space="preserve">
+        <value>Preparing {$1} file(s)</value>
+    </data>
+    <data name="Question_EnterModName_Title" xml:space="preserve">
+        <value>Mod name:</value>
+    </data>
+    <data name="Question_LaunchClearPatchesFound_Extra" xml:space="preserve">
+        <value>You are about to launch the game without mods. Do you want to clear your Patches folder? Launching your game anyways will launch it with the current patches folder still active!</value>
+    </data>
+    <data name="Text_BrsarEntry" xml:space="preserve">
+        <value>{$1} entry {$2}</value>
+    </data>
+    <data name="Text_BrsarEntryWithRwar" xml:space="preserve">
+        <value>{$1} entry {$2} + RWAR</value>
+    </data>
+    <data name="Text_ExternalReference" xml:space="preserve">
+        <value>External reference</value>
+    </data>
+    <data name="Text_ExternalReferenceWithPath" xml:space="preserve">
+        <value>External reference: {$1}</value>
+    </data>
+    <data name="Text_ModifiedArchiveMember" xml:space="preserve">
+        <value>Modified archive member</value>
+    </data>
+    <data name="Text_NewArchiveMember" xml:space="preserve">
+        <value>New archive member</value>
+    </data>
+    <data name="Text_WholeFileOverride" xml:space="preserve">
+        <value>Whole-file override</value>
+    </data>
+    <data name="Warning_BrsarExternalCount" xml:space="preserve">
+        <value>{$1} BRSAR file entries are external references and cannot be exported.</value>
+    </data>
+    <data name="Warning_BrsarFileIdExternal" xml:space="preserve">
+        <value>BRSAR fileId {$1} is an external file reference and cannot be exported.</value>
+    </data>
+    <data name="Warning_BrsarFileIdUnsupportedMagic" xml:space="preserve">
+        <value>BRSAR fileId {$1} changed, but it resolves to {$2} and Pulsar only supports RBNK/RSEQ/RWSD loose overrides.</value>
+    </data>
+    <data name="Warning_BrsarFileIdUnresolved" xml:space="preserve">
+        <value>BRSAR fileId {$1} could not be resolved to a supported embedded sound file.</value>
+    </data>
+    <data name="Warning_BrsarNoSupportedDifferences" xml:space="preserve">
+        <value>No supported RBNK/RSEQ/RWSD differences were found against the built-in game baseline.</value>
+    </data>
+    <data name="Warning_BrsarUnresolvedCount" xml:space="preserve">
+        <value>{$1} embedded BRSAR file entries could not be resolved confidently.</value>
+    </data>
+    <data name="Warning_BrsarUnsupportedSummary" xml:space="preserve">
+        <value>Only RBNK/RSEQ/RWSD entries can be exported. The scanned archive also contains {$1}.</value>
+    </data>
+    <data name="Warning_FileDeletionNotExportable" xml:space="preserve">
+        <value>{$1} exists only in the original archive. File deletions are not exportable as loose patches.</value>
+    </data>
+    <data name="Warning_FileNameDiffersFromArchiveTag" xml:space="preserve">
+        <value>The selected file name differs from the original archive tag "{$1}.szs".</value>
+    </data>
+    <data name="Warning_FileNotInBuiltInBaseline" xml:space="preserve">
+        <value>{$1} is not present in the built-in game baseline.</value>
+    </data>
+    <data name="Warning_NoSzsDifferences" xml:space="preserve">
+        <value>No SZS differences were found against the built-in game baseline.</value>
+    </data>
+    <data name="Warning_SzsMatchesBaseline" xml:space="preserve">
+        <value>The selected SZS matches the built-in game baseline exactly.</value>
+    </data>
+    <data name="Warning_UnsupportedLooseOverrideExtension" xml:space="preserve">
+        <value>{$1} uses an unsupported loose override extension (.kcl, .kmp, .slt).</value>
+    </data>
+    <data name="Warning_WholeFileBaseline" xml:space="preserve">
+        <value>This SZS is stored as a whole-file baseline. Exporting a whole-file override.</value>
+    </data>
 </root>

@@ -1,17 +1,16 @@
 ﻿using Avalonia.Platform.Storage;
+using WheelWizard.Resources.Languages;
 
 namespace WheelWizard.Services;
 
 public static class CustomFilePickerFileType
 {
-    public static FilePickerFileType Mods { get; } =
-        new("Mods")
+    public static FilePickerFileType All { get; } =
+        new(Common.Attribute_All)
         {
-            //i have just added .zip here because the mod loader can load mods from zip files, so it should be able to load them from the file picker too
-            //but just keep this in mind for in the future.
-            Patterns = ["*.szs", "*.arc", "*.brstm", "*.brsar", "*.thp", "*.zip"],
-            AppleUniformTypeIdentifiers = ["com.wheelwizard.mods"], // Honestly no idea how it works
-            MimeTypes = ["application/mods"], // Honestly no idea how it works
+            Patterns = ["*"],
+            AppleUniformTypeIdentifiers = ["public.data"],
+            MimeTypes = ["application/octet-stream"],
         };
     public static FilePickerFileType Miis { get; } =
         new("Miis")

@@ -3,6 +3,7 @@
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
              xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:patches="clr-namespace:WheelWizard.Features.Patches"
              x:Class="WheelWizard.Views.Patterns.GridModPanel"
              x:DataType="pages:ModListItem">
 
@@ -36,6 +37,27 @@
 
             <!-- Content -->
             <Grid RowDefinitions="*, Auto, Auto">
+                <Border Width="34"
+                        Height="14"
+                        CornerRadius="3"
+                        Background="{StaticResource Danger500}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="0,8,8,0"
+                        IsVisible="{Binding Mod.HasIncompatibleFiles}"
+                        ToolTip.Placement="Top">
+                    <ToolTip.Tip>
+                        <StackPanel MaxWidth="300">
+                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource Neutral50}" />
+                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource Neutral100}" />
+                        </StackPanel>
+                    </ToolTip.Tip>
+                </Border>
+
                 <!-- Title -->
                 <TextBlock Grid.Row="1" Text="{Binding Mod.Title}" FontSize="13" FontWeight="SemiBold"
                            Foreground="{StaticResource Neutral100}"

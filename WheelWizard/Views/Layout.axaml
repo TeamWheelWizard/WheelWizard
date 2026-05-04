@@ -127,7 +127,7 @@
                                            Text="{x:Static lang:Common.PageTitle_MyProfiles}" x:Name="MyProfilesButton" />
             <patterns:SidebarRadioButton IconData="{StaticResource CubesStacked}"
                                            PageType="{x:Type pages:ModsPage}"
-                                           Text="{x:Static lang:Common.PageTitle_Mods}" x:Name="ModsButton" />
+                                           Text="{x:Static lang:Common.PageTitle_Patches}" x:Name="ModsButton" />
             <patterns:SidebarRadioButton IconData="{StaticResource Shirt}"
                                            PageType="{x:Type pages:MiiListPage}"
                                            Text="{x:Static lang:Common.PageTitle_MyMiis}" />

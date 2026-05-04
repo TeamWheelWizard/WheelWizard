@@ -138,6 +138,10 @@
         <EmbeddedResource Include="Features\MiiRendering\Resources\*.rmdl" />
     </ItemGroup>
 
+    <ItemGroup Label="Patches Resources">
+        <EmbeddedResource Include="Features\Patches\Resources\*.json" />
+    </ItemGroup>
+
     <ItemGroup>
         <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorGeneralPage.axaml"/>
         <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorWindow.axaml"/>

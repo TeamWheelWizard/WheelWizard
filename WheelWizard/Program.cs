@@ -21,6 +21,7 @@ public class Program : IDesignerEntryPoint
 
         // Create a static logger instance for the application
         Logging.CreateStaticLogger();
+        RegisterGlobalExceptionLogging();
 
         try
         {
@@ -41,6 +42,26 @@ public class Program : IDesignerEntryPoint
     }
 
     public static AppBuilder BuildAvaloniaApp() => CreateWheelWizardApp(isDesigner: true);
+
+    private static void RegisterGlobalExceptionLogging()
+    {
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            if (e.ExceptionObject is Exception ex)
+            {
+                Log.Fatal(ex, "Unhandled application exception.");
+                return;
+            }
+
+            Log.Fatal("Unhandled application exception object: {ExceptionObject}", e.ExceptionObject);
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            Log.Error(e.Exception, "Unobserved task exception.");
+            e.SetObserved();
+        };
+    }
 
     /// <summary>
     /// Configures the WheelWizard application.

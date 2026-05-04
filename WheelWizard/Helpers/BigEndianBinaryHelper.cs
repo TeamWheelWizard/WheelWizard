@@ -10,6 +10,16 @@ public static class BigEndianBinaryHelper
         return (uint)((data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3]);
     }
 
+    public static int BufferToInt32(byte[] data, int offset)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+
+        if (offset < 0 || offset > data.Length - sizeof(int))
+            throw new InvalidDataException("Unexpected end of file.");
+
+        return unchecked((int)BufferToUint32(data, offset));
+    }
+
     public static uint BufferToUint16(byte[] data, int offset)
     {
         return (uint)((data[offset] << 8) | data[offset + 1]);

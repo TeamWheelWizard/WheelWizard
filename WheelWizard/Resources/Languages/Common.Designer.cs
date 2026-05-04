@@ -103,7 +103,16 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("Action_CopyFriendCode", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Convert to patches.
+        /// </summary>
+        public static string Action_ConvertToPatches {
+            get {
+                return ResourceManager.GetString("Action_ConvertToPatches", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
@@ -454,7 +463,16 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("Attribute_AverageRoomVr", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to All.
+        /// </summary>
+        public static string Attribute_All {
+            get {
+                return ResourceManager.GetString("Attribute_All", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to BR.
         /// </summary>
@@ -958,7 +976,7 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("Attribute_ModName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
@@ -1210,7 +1228,16 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("PageTitle_MyProfiles", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Patches.
+        /// </summary>
+        public static string PageTitle_Patches {
+            get {
+                return ResourceManager.GetString("PageTitle_Patches", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Room Details.
         /// </summary>
