@@ -67,6 +67,7 @@ public sealed class PatchConversionAnalysis
     public string CleanName { get; init; } = string.Empty;
     public string ModdedName { get; init; } = string.Empty;
     public string Mode { get; init; } = string.Empty;
+    public string? ArchiveTag { get; init; }
     public IReadOnlyList<PatchConversionEntry> Entries { get; init; } = [];
     public IReadOnlyList<string> Warnings { get; init; } = [];
     public IReadOnlyList<string> Skipped { get; init; } = [];

@@ -33,6 +33,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                     CleanName = baseline.RelativePath,
                     ModdedName = moddedName,
                     Mode = "whole-file",
+                    ArchiveTag = archiveTag,
                     Warnings = warnings,
                     Skipped = skipped,
                 };
@@ -45,6 +46,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                 CleanName = baseline.RelativePath,
                 ModdedName = moddedName,
                 Mode = "whole-file",
+                ArchiveTag = archiveTag,
                 Entries =
                 [
                     new PatchConversionEntry(
@@ -98,7 +100,10 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         foreach (var logicalPath in baselineMembers.Keys)
         {
             if (!moddedU8.Files.ContainsKey(logicalPath))
-                warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_FileDeletionNotExportable, logicalPath)!);
+            {
+                var deletionPath = $"{logicalPath}.delete";
+                entries.Add(new(BuildTaggedPatchName(deletionPath, archiveTag), deletionPath, [], "Deleted archive member"));
+            }
         }
 
         if (entries.Count == 0 && skipped.Count == 0)
@@ -109,6 +114,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
             CleanName = baseline.RelativePath,
             ModdedName = moddedName,
             Mode = "tagged-archive",
+            ArchiveTag = archiveTag,
             Entries = entries.OrderBy(entry => entry.ExportPath, StringComparer.OrdinalIgnoreCase).ToArray(),
             Warnings = warnings,
             Skipped = skipped,

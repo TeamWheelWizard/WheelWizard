@@ -84,6 +84,7 @@ public static class BrsarPatchConverter
             CleanName = baseline.RelativePath,
             ModdedName = moddedName,
             Mode = "brsar",
+            ArchiveTag = "revo_kart",
             Entries = entries.OrderBy(entry => entry.ExportPath, StringComparer.OrdinalIgnoreCase).ToArray(),
             Warnings = warnings,
             Skipped = skipped,

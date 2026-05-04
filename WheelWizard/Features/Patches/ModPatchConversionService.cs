@@ -1,5 +1,6 @@
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
+using WheelWizard.Features.Archives;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Resources.Languages;
@@ -76,6 +77,8 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                     var skipped = new List<string>();
                     var convertedCount = 0;
                     var writtenPatchCount = 0;
+                    var archiveBundles = new Dictionary<string, Dictionary<string, byte[]>>(StringComparer.OrdinalIgnoreCase);
+                    var archivePrefix = SanitizeArchivePrefix(mod.Title);
 
                     for (var index = 0; index < tempFiles.Count; index++)
                     {
@@ -91,15 +94,14 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
 
                         if (LooseBrsarPatchFileName.TryGetNormalizedFileName(fileName, out var normalizedPatchFileName))
                         {
-                            var renameResult = RenameLooseBrsarPatchFile(file, normalizedPatchFileName);
-                            if (renameResult.IsFailure)
-                            {
-                                skipped.Add($"{fileName}: {renameResult.Error.Message}");
-                                continue;
-                            }
-
+                            AddArchiveBundleEntry(
+                                archiveBundles,
+                                Path.Combine(Path.GetDirectoryName(file)!, $"{archivePrefix}.revo_kart.szs"),
+                                normalizedPatchFileName,
+                                File.ReadAllBytes(file)
+                            );
+                            File.Delete(file);
                             convertedCount++;
-                            writtenPatchCount++;
                             continue;
                         }
 
@@ -123,19 +125,44 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         if (conversion.Analysis.Skipped.Count > 0)
                             continue;
 
-                        foreach (var entry in conversion.Analysis.Entries)
+                        if (TryGetBundleTarget(conversion.Analysis, out var bundleTarget))
                         {
-                            var destination = Path.Combine(Path.GetDirectoryName(file)!, entry.ExportPath);
-                            var destinationDirectory = Path.GetDirectoryName(destination)!;
-                            if (!Directory.Exists(destinationDirectory))
-                                Directory.CreateDirectory(destinationDirectory);
-                            File.WriteAllBytes(destination, entry.Bytes);
-                            writtenPatchCount++;
+                            var bundleDestination = Path.Combine(Path.GetDirectoryName(file)!, $"{archivePrefix}.{bundleTarget}.szs");
+                            foreach (var entry in conversion.Analysis.Entries)
+                            {
+                                if (IsDeletionPatchEntry(entry))
+                                {
+                                    var deletionDestination = Path.Combine(Path.GetDirectoryName(file)!, entry.ExportPath);
+                                    Directory.CreateDirectory(Path.GetDirectoryName(deletionDestination)!);
+                                    File.WriteAllBytes(deletionDestination, entry.Bytes);
+                                    writtenPatchCount++;
+                                    continue;
+                                }
+
+                                var memberPath = string.Equals(conversion.Analysis.Mode, "brsar", StringComparison.OrdinalIgnoreCase)
+                                    ? entry.ExportPath
+                                    : entry.LogicalPath;
+                                AddArchiveBundleEntry(archiveBundles, bundleDestination, memberPath, entry.Bytes);
+                            }
+                        }
+                        else
+                        {
+                            foreach (var entry in conversion.Analysis.Entries)
+                            {
+                                var destination = Path.Combine(Path.GetDirectoryName(file)!, entry.ExportPath);
+                                var destinationDirectory = Path.GetDirectoryName(destination)!;
+                                if (!Directory.Exists(destinationDirectory))
+                                    Directory.CreateDirectory(destinationDirectory);
+                                File.WriteAllBytes(destination, entry.Bytes);
+                                writtenPatchCount++;
+                            }
                         }
 
                         File.Delete(file);
                         convertedCount++;
                     }
+
+                    writtenPatchCount += WriteArchiveBundles(archiveBundles, warnings);
 
                     Dispatcher.UIThread.Post(() =>
                     {
@@ -244,19 +271,96 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
             return true;
 
         return Path.GetExtension(filePath).Equals(".szs", StringComparison.OrdinalIgnoreCase)
+            && !IsModdingArchiveFile(fileName)
             && !KartSzsAllowList.IsAllowedFullCharacterOrKart(fileName);
     }
 
     private static bool IsBrsarFileName(string fileName) => fileName.Equals("revo_kart.brsar", StringComparison.OrdinalIgnoreCase);
 
-    private static OperationResult RenameLooseBrsarPatchFile(string file, string normalizedPatchFileName)
+    private static bool TryGetBundleTarget(PatchConversionAnalysis analysis, out string bundleTarget)
     {
-        var destination = Path.Combine(Path.GetDirectoryName(file)!, normalizedPatchFileName);
-        if (File.Exists(destination) && !FileHelper.PathsEqual(file, destination))
-            return Fail($"{normalizedPatchFileName} already exists.");
+        bundleTarget = string.Empty;
 
-        File.Move(file, destination, overwrite: true);
-        return Ok();
+        if (string.Equals(analysis.Mode, "brsar", StringComparison.OrdinalIgnoreCase))
+        {
+            bundleTarget = "revo_kart";
+            return true;
+        }
+
+        if (
+            !string.Equals(analysis.Mode, "tagged-archive", StringComparison.OrdinalIgnoreCase)
+            || string.IsNullOrWhiteSpace(analysis.ArchiveTag)
+        )
+        {
+            return false;
+        }
+
+        bundleTarget = SanitizeArchivePrefix(analysis.ArchiveTag);
+        return true;
+    }
+
+    private static bool IsDeletionPatchEntry(PatchConversionEntry entry) =>
+        entry.Bytes.Length == 0 && entry.LogicalPath.EndsWith(".delete", StringComparison.OrdinalIgnoreCase);
+
+    private static void AddArchiveBundleEntry(
+        Dictionary<string, Dictionary<string, byte[]>> archiveBundles,
+        string bundlePath,
+        string memberPath,
+        byte[] bytes
+    )
+    {
+        if (!archiveBundles.TryGetValue(bundlePath, out var members))
+        {
+            members = new Dictionary<string, byte[]>(StringComparer.Ordinal);
+            archiveBundles[bundlePath] = members;
+        }
+
+        if (members.TryGetValue(memberPath, out var existingBytes) && existingBytes.SequenceEqual(bytes))
+            return;
+
+        members[memberPath] = bytes;
+    }
+
+    private static int WriteArchiveBundles(Dictionary<string, Dictionary<string, byte[]>> archiveBundles, List<string> warnings)
+    {
+        var writtenCount = 0;
+
+        foreach (var (bundlePath, members) in archiveBundles.OrderBy(entry => entry.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            if (members.Count == 0)
+                continue;
+
+            Directory.CreateDirectory(Path.GetDirectoryName(bundlePath)!);
+            if (File.Exists(bundlePath))
+            {
+                warnings.Add($"{Path.GetFileName(bundlePath)} already existed and was replaced with the converted archive bundle.");
+                File.Delete(bundlePath);
+            }
+
+            File.WriteAllBytes(bundlePath, U8ArchiveBuilder.BuildYaz0(members));
+            writtenCount++;
+        }
+
+        return writtenCount;
+    }
+
+    private static bool IsModdingArchiveFile(string fileName)
+    {
+        if (!fileName.EndsWith(".szs", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+        var tagSeparator = nameWithoutExtension.LastIndexOf('.');
+        return tagSeparator > 0 && tagSeparator + 1 < nameWithoutExtension.Length;
+    }
+
+    private static string SanitizeArchivePrefix(string value)
+    {
+        var cleaned = new string(
+            value.Select(character => char.IsLetterOrDigit(character) || character is '_' or '-' ? character : '_').ToArray()
+        ).Trim('_');
+
+        return string.IsNullOrWhiteSpace(cleaned) ? "mod" : cleaned;
     }
 
     private static void CopyDirectory(string sourceDirectory, string destinationDirectory, CancellationToken cancellationToken)

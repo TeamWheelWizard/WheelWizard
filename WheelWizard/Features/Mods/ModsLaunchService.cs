@@ -47,8 +47,9 @@ public sealed class ModsLaunchService(IModManager modManager) : IModsLaunchServi
                 if (!ShouldCopyFile(mod, file))
                     continue;
 
-                var relativePath = Path.GetFileName(file);
-                // Since higher priority mods overwrite lower ones, we can overwrite entries in the dictionary
+                var relativePath = GetLaunchPatchFileName(mod, file);
+                // Since higher priority mods overwrite lower ones, we can overwrite entries in the dictionary.
+                // Modding archives keep separate filenames so Pulsar can resolve conflicts inside the archives.
                 finalFiles[relativePath] = file;
             }
         }
@@ -134,5 +135,33 @@ public sealed class ModsLaunchService(IModManager modManager) : IModsLaunchServi
             return false;
 
         return true;
+    }
+
+    private static string GetLaunchPatchFileName(Mod mod, string filePath)
+    {
+        var fileName = Path.GetFileName(filePath);
+        if (!IsModdingArchiveFile(fileName))
+            return fileName;
+
+        return $"{mod.Priority}.{StripExistingPriorityPrefix(fileName)}";
+    }
+
+    private static bool IsModdingArchiveFile(string fileName)
+    {
+        if (!fileName.EndsWith(".szs", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+        var tagSeparator = nameWithoutExtension.LastIndexOf('.');
+        return tagSeparator > 0 && tagSeparator + 1 < nameWithoutExtension.Length;
+    }
+
+    private static string StripExistingPriorityPrefix(string fileName)
+    {
+        var index = 0;
+        while (index < fileName.Length && char.IsDigit(fileName[index]))
+            index++;
+
+        return index > 0 && index < fileName.Length && fileName[index] == '.' ? fileName[(index + 1)..] : fileName;
     }
 }
