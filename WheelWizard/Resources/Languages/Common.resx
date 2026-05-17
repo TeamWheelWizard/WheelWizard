@@ -32,6 +32,9 @@
     <data name="PageTitle_Mods" xml:space="preserve">
         <value>My Stuff</value>
     </data>
+    <data name="PageTitle_Patches" xml:space="preserve">
+        <value>Patches</value>
+    </data>
     <data name="PageTitle_MyProfiles" xml:space="preserve">
         <value>My profiles</value>
     </data>
@@ -83,8 +86,14 @@
     <data name="Attribute_Title" xml:space="preserve">
         <value>Title</value>
     </data>
+    <data name="Attribute_All" xml:space="preserve">
+        <value>All</value>
+    </data>
     <data name="Action_Import" xml:space="preserve">
         <value>Import</value>
+    </data>
+    <data name="Action_ConvertToPatches" xml:space="preserve">
+        <value>Convert to patches</value>
     </data>
     <data name="Action_EnableAll" xml:space="preserve">
         <value>Enable All</value>

@@ -11,6 +11,7 @@ using WheelWizard.Services.Launcher;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Popups.Generic;
@@ -105,7 +106,12 @@ public partial class HomePage : UserControlBase
         DisableAllButtonsTemporarily();
     }
 
-    private void LaunchGame() => _ = CurrentLauncher.Launch();
+    private async void LaunchGame()
+    {
+        var launchResult = await CurrentLauncher.Launch();
+        if (launchResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(launchResult.Error);
+    }
 
     private bool ShouldShowAprilFirstLaunchPrompts() =>
         IsAprilFirst && _status is WheelWizardStatus.Ready or WheelWizardStatus.NoServerButInstalled;
@@ -131,16 +137,20 @@ public partial class HomePage : UserControlBase
     private async void Download()
     {
         ViewUtils.GetLayout().SetInteractable(false);
-        await CurrentLauncher.Install();
+        var installResult = await CurrentLauncher.Install();
         ViewUtils.GetLayout().SetInteractable(true);
+        if (installResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(installResult.Error);
         NavigationManager.NavigateTo<HomePage>();
     }
 
     private async void Update()
     {
         ViewUtils.GetLayout().SetInteractable(false);
-        await CurrentLauncher.Update();
+        var updateResult = await CurrentLauncher.Update();
         ViewUtils.GetLayout().SetInteractable(true);
+        if (updateResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(updateResult.Error);
         NavigationManager.NavigateTo<HomePage>();
     }
 

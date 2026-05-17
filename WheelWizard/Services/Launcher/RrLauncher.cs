@@ -1,13 +1,11 @@
-﻿using Avalonia.Threading;
-using WheelWizard.CustomDistributions;
+﻿using WheelWizard.CustomDistributions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
+using WheelWizard.Mods;
 using WheelWizard.Resources.Languages;
-using WheelWizard.Services.Installation;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.WiiManagement;
 using WheelWizard.Settings;
-using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Services.Launcher;
@@ -17,81 +15,85 @@ public class RrLauncher : ILauncher
     public string GameTitle { get; } = "Retro Rewind";
     private static string RrLaunchJsonFilePath => PathManager.RrLaunchJsonFilePath;
     private readonly ICustomDistributionSingletonService _customDistributionSingletonService;
+    private readonly IModsLaunchService _modsLaunchService;
     private readonly ISettingsManager _settingsManager;
 
-    public RrLauncher(ICustomDistributionSingletonService customDistributionSingletonService, ISettingsManager settingsManager)
+    public RrLauncher(
+        ICustomDistributionSingletonService customDistributionSingletonService,
+        IModsLaunchService modsLaunchService,
+        ISettingsManager settingsManager
+    )
     {
         _customDistributionSingletonService = customDistributionSingletonService;
+        _modsLaunchService = modsLaunchService;
         _settingsManager = settingsManager;
     }
 
-    public async Task Launch()
+    public async Task<OperationResult> Launch()
     {
         try
         {
+            //case SHOULD be impossible since launch button should be disabled
+            if (!File.Exists(PathManager.GameFilePath))
+                return Fail(Phrases.MessageWarning_NotFindGame_Extra);
+
             DolphinLaunchHelper.KillDolphin();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
-            var storageSystem = ModStorageSystemHelper.GetCurrent(_settingsManager);
-            await ModsLaunchHelper.PrepareModsForLaunch(
-                ModStorageSystemHelper.GetTargetFolderPath(storageSystem),
-                ModStorageSystemHelper.GetInactiveFolderPath(storageSystem),
-                storageSystem
-            );
-            if (!File.Exists(PathManager.GameFilePath))
+            var targetFolderPath = PathManager.PatchesFolderPath;
+            var clearTargetFolder = false;
+            if (_modsLaunchService.ShouldAskToClearTargetFolder(targetFolderPath))
             {
-                Dispatcher.UIThread.Post(() =>
-                {
-                    new MessageBoxWindow()
-                        .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                        .SetTitleText("Invalid game path")
-                        .SetInfoText(Phrases.MessageWarning_NotFindGame_Extra)
-                        .Show();
-                });
-                return;
+                clearTargetFolder = await new YesNoWindow()
+                    .SetButtonText(Common.Action_Delete, Common.Action_Keep)
+                    .SetMainText(Phrases.Question_LaunchClearModsFound_Title)
+                    .SetExtraText(Phrases.Question_LaunchClearPatchesFound_Extra)
+                    .AwaitAnswer();
             }
+
+            var modsLaunchResult = await _modsLaunchService.PrepareModsForLaunch(targetFolderPath, clearTargetFolder);
+            if (modsLaunchResult.IsFailure)
+                return modsLaunchResult.Error;
 
             RetroRewindLaunchHelper.GenerateLaunchJson();
             var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";
             DolphinLaunchHelper.LaunchDolphin(
                 $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
             );
+            return Ok();
         }
         catch (Exception ex)
         {
-            Dispatcher.UIThread.Post(() =>
-            {
-                new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Error)
-                    .SetTitleText("Failed to launch Retro Rewind")
-                    .SetInfoText($"Reason: {ex.Message}")
-                    .Show();
-            });
+            return new OperationError { Message = $"Failed to launch Retro Rewind: {ex.Message}", Exception = ex };
         }
     }
 
-    public async Task Install()
+    public async Task<OperationResult> Install()
     {
         var progressWindow = new ProgressWindow();
-        progressWindow.Show();
-        var installResult = await _customDistributionSingletonService.RetroRewind.InstallAsync(progressWindow);
-        progressWindow.Close();
-        if (installResult.IsFailure)
+        try
         {
-            await new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText("Unable to install RetroRewind")
-                .SetInfoText(installResult.Error.Message)
-                .ShowDialog();
+            progressWindow.Show();
+            return await _customDistributionSingletonService.RetroRewind.InstallAsync(progressWindow);
+        }
+        finally
+        {
+            progressWindow.Close();
         }
     }
 
-    public async Task Update()
+    public async Task<OperationResult> Update()
     {
         var progressWindow = new ProgressWindow();
-        progressWindow.Show();
-        await _customDistributionSingletonService.RetroRewind.UpdateAsync(progressWindow);
-        progressWindow.Close();
+        try
+        {
+            progressWindow.Show();
+            return await _customDistributionSingletonService.RetroRewind.UpdateAsync(progressWindow);
+        }
+        finally
+        {
+            progressWindow.Close();
+        }
     }
 
     public async Task<WheelWizardStatus> GetCurrentStatus()

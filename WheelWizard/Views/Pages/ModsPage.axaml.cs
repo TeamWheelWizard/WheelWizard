@@ -7,7 +7,11 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using WheelWizard.Features.Patches;
+using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
+using WheelWizard.Mods;
+using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
@@ -21,39 +25,27 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest);
 
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
-    private IDisposable? _settingsSignalSubscription;
-
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
 
     [Inject]
-    private ISettingsSignalBus SettingsSignalBus { get; set; } = null!;
+    private IModPatchConversionService ModPatchConversionService { get; set; } = null!;
 
-    public ModManager ModManager => ModManager.Instance;
+    [Inject]
+    private IModManager ModManagerService { get; set; } = null!;
+
+    public IModManager ModManager => ModManagerService;
 
     public ObservableCollection<ModListItem> Mods =>
         new(
             ModManager.Mods.Select(mod => new ModListItem(
                 mod,
-                mod.Priority == ModManager.Instance.GetLowestActivePriority(),
-                mod.Priority == ModManager.Instance.GetHighestActivePriority()
+                mod.Priority == ModManager.GetLowestActivePriority(),
+                mod.Priority == ModManager.GetHighestActivePriority()
             ))
         );
 
-    public bool UsePatches
-    {
-        get => SettingsService.Get<bool>(SettingsService.USE_PATCHES_SYSTEM);
-        set
-        {
-            if (UsePatches == value)
-                return;
-
-            SettingsService.Set(SettingsService.USE_PATCHES_SYSTEM, value);
-            RefreshStorageMode();
-        }
-    }
-
-    public string StoragePageTitle => ModStorageSystemHelper.GetDisplayName(ModStorageSystemHelper.GetCurrent(SettingsService));
+    public string StoragePageTitle => Common.PageTitle_Patches;
 
     private bool _hasMods;
 
@@ -90,10 +82,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         DataContext = this;
         Focusable = true;
         ModManager.PropertyChanged += OnModsChanged;
-        _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
-        ModManager.ReloadAsync();
+        _ = ReloadModsAndShowErrorsAsync();
         SetModsViewVariant();
-        RefreshStorageMode();
 
         // Apply priority edits as soon as the user clicks anywhere outside the textbox.
         AddHandler(PointerPressedEvent, OnPagePointerPressed, RoutingStrategies.Tunnel, true);
@@ -107,8 +97,6 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         ModManager.PropertyChanged -= OnModsChanged;
-        _settingsSignalSubscription?.Dispose();
-        _settingsSignalSubscription = null;
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -131,18 +119,6 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         UpdateEnableAllCheckboxState();
     }
 
-    private void OnSettingSignal(SettingChangedSignal signal)
-    {
-        if (signal.Setting == SettingsService.USE_PATCHES_SYSTEM)
-            RefreshStorageMode();
-    }
-
-    private void RefreshStorageMode()
-    {
-        OnPropertyChanged(nameof(UsePatches));
-        OnPropertyChanged(nameof(StoragePageTitle));
-    }
-
     private void UpdateEnableAllCheckboxState()
     {
         EnableAllCheckbox.IsChecked = !ModManager.Mods.Select(mod => mod.IsEnabled).Contains(false);
@@ -154,27 +130,83 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         modPopup.Show();
     }
 
-    private void ImportMod_Click(object sender, RoutedEventArgs e)
+    private async Task ReloadModsAndShowErrorsAsync()
     {
-        ModManager.ImportMods();
+        var reloadResult = await ModManager.ReloadAsync();
+        if (reloadResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(reloadResult.Error);
     }
 
-    private void RenameMod_Click(object sender, RoutedEventArgs e)
+    private async void ImportMod_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedFiles = await FilePickerHelper.OpenFilePickerAsync(
+            CustomFilePickerFileType.All,
+            allowMultiple: true,
+            title: Phrases.FilePicker_SelectModFile
+        );
+        if (selectedFiles.Count == 0)
+            return;
+
+        var modName = await new TextInputWindow()
+            .SetMainText(Phrases.Question_EnterModName_Title)
+            .SetPlaceholderText(Phrases.Placeholder_EnterModName)
+            .SetValidation(ModManager.ValidateModName)
+            .ShowDialog();
+        if (string.IsNullOrWhiteSpace(modName))
+            return;
+
+        var importResult = await ModManager.ImportModFilesAsync(selectedFiles.ToArray(), modName);
+        if (importResult.IsFailure)
+        {
+            MessageTranslationHelper.ShowMessage(importResult.Error);
+            return;
+        }
+
+        new MessageBoxWindow()
+            .SetMessageType(MessageBoxWindow.MessageType.Message)
+            .SetTitleText(Phrases.MessageSuccess_ModInstalled_Title)
+            .SetInfoText(Humanizer.ReplaceDynamic(Phrases.MessageSuccess_ModInstalled_Extra, modName)!)
+            .Show();
+    }
+
+    private async void RenameMod_Click(object sender, RoutedEventArgs e)
     {
         var selectedMod = GetContextModListItem(sender);
         if (selectedMod == null)
             return;
 
-        ModManager.RenameMod(selectedMod.Mod);
+        var oldTitle = selectedMod.Mod.Title;
+        var newTitle = await new TextInputWindow()
+            .SetMainText(Phrases.Question_EnterModName_Title)
+            .SetInitialText(oldTitle)
+            .SetExtraText(Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, oldTitle)!)
+            .SetPlaceholderText(Phrases.Placeholder_EnterModName)
+            .SetValidation(ModManager.ValidateRenameModName)
+            .ShowDialog();
+
+        if (newTitle == null || oldTitle == newTitle)
+            return;
+
+        var renameResult = await ModManager.RenameModAsync(selectedMod.Mod, newTitle);
+        if (renameResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(renameResult.Error);
     }
 
-    private void DeleteMod_Click(object sender, RoutedEventArgs e)
+    private async void DeleteMod_Click(object sender, RoutedEventArgs e)
     {
         var selectedMod = GetContextModListItem(sender);
         if (selectedMod == null)
             return;
 
-        ModManager.DeleteMod(selectedMod.Mod);
+        var areTheySure = await new YesNoWindow()
+            .SetMainText(Humanizer.ReplaceDynamic(Phrases.Question_SureDelete_Title, selectedMod.Mod.Title)!)
+            .AwaitAnswer();
+        if (!areTheySure)
+            return;
+
+        var deleteResult = await ModManager.DeleteModAsync(selectedMod.Mod);
+        if (deleteResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(deleteResult.Error);
     }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -183,7 +215,67 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (selectedMod == null)
             return;
 
-        ModManager.OpenModFolder(selectedMod.Mod);
+        var openResult = ModManager.OpenModFolder(selectedMod.Mod);
+        if (openResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(openResult.Error);
+    }
+
+    private async void ConvertToPatches_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedMod = GetContextModListItem(sender);
+        if (selectedMod == null)
+            return;
+        if (!selectedMod.Mod.HasIncompatibleFiles)
+            return;
+
+        var result = await ModPatchConversionService.ConvertToPatchesAsync(selectedMod.Mod, CancellationToken.None);
+        OnModsChanged();
+
+        if (result.IsSuccess)
+        {
+            var conversion = result.Value;
+            new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Message)
+                .SetTitleText(Phrases.MessageSuccess_ModConvertedToPatches_Title)
+                .SetInfoText(BuildPatchConversionResultMessage(conversion))
+                .Show();
+            return;
+        }
+
+        new MessageBoxWindow()
+            .SetMessageType(MessageBoxWindow.MessageType.Warning)
+            .SetTitleText(Phrases.MessageWarning_CouldNotConvertMod_Title)
+            .SetInfoText(result.Error.Message)
+            .Show();
+    }
+
+    private static string BuildPatchConversionResultMessage(ModPatchConversionResult conversion)
+    {
+        var message = Humanizer.ReplaceDynamic(
+            Phrases.MessageSuccess_PatchConversionResult,
+            conversion.ConvertedFileCount,
+            conversion.WrittenPatchCount
+        )!;
+
+        if (conversion.Skipped.Count > 0)
+        {
+            message +=
+                $"{Environment.NewLine}{Environment.NewLine}"
+                + Humanizer.ReplaceDynamic(Phrases.MessageSuccess_PatchConversionSkipped, conversion.Skipped.Count)!
+                + $"{Environment.NewLine}{Environment.NewLine}"
+                + string.Join(Environment.NewLine, conversion.Skipped.Take(8));
+        }
+
+        if (conversion.Warnings.Count > 0)
+        {
+            message +=
+                $"{Environment.NewLine}{Environment.NewLine}"
+                + Humanizer.ReplaceDynamic(Phrases.MessageSuccess_PatchConversionNotes, conversion.Warnings.Count)!
+                + $"{Environment.NewLine}{Environment.NewLine}"
+                + string.Join(Environment.NewLine, conversion.Warnings.Take(8));
+        }
+
+        return message;
     }
 
     private void ViewMod_Click(object sender, RoutedEventArgs e)
@@ -217,12 +309,14 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         return ModsListBox.SelectedItem as ModListItem;
     }
 
-    private void ToggleButton_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
+    private async void ToggleButton_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        ModManager.ToggleAllMods(EnableAllCheckbox.IsChecked == true);
+        var toggleResult = await ModManager.ToggleAllModsAsync(EnableAllCheckbox.IsChecked == true);
+        if (toggleResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(toggleResult.Error);
     }
 
-    private void PriorityText_OnLostFocus(object? sender, RoutedEventArgs e)
+    private async void PriorityText_OnLostFocus(object? sender, RoutedEventArgs e)
     {
         var mod = GetParentsMod(e);
         if (mod == null || e.Source is not TextBox textBox)
@@ -230,9 +324,15 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
         textBox.Classes.Remove("error"); // In case this class has been added, then we remove it again
         if (int.TryParse(textBox.Text, out var newPriority))
-            mod.Priority = newPriority;
+        {
+            var priorityResult = await ModManager.SetPriorityAsync(mod, newPriority);
+            if (priorityResult.IsFailure)
+                MessageTranslationHelper.ShowMessage(priorityResult.Error);
+        }
         else
+        {
             textBox.Text = mod.Priority.ToString();
+        }
     }
 
     private void PriorityText_OnTextChanged(object? sender, TextChangedEventArgs e)
@@ -256,22 +356,26 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         return null;
     }
 
-    private void ButtonUp_OnClick(object? sender, RoutedEventArgs e)
+    private async void ButtonUp_OnClick(object? sender, RoutedEventArgs e)
     {
         var mod = GetParentsMod(e);
         if (mod == null)
             return;
 
-        ModManager.DecreasePriority(mod);
+        var priorityResult = await ModManager.DecreasePriorityAsync(mod);
+        if (priorityResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(priorityResult.Error);
     }
 
-    private void ButtonDown_OnClick(object? sender, RoutedEventArgs e)
+    private async void ButtonDown_OnClick(object? sender, RoutedEventArgs e)
     {
         var mod = GetParentsMod(e);
         if (mod == null)
             return;
 
-        ModManager.IncreasePriority(mod);
+        var priorityResult = await ModManager.IncreasePriorityAsync(mod);
+        if (priorityResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(priorityResult.Error);
     }
 
     private void ToggleModsPageView_OnClick(object? sender, RoutedEventArgs e)
@@ -374,11 +478,11 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             UpdateDrag(e, currentPos);
     }
 
-    private void OnDragPointerReleased(object? sender, PointerReleasedEventArgs e)
+    private async void OnDragPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (_isDragging)
         {
-            EndDrag(commit: true);
+            await EndDragAsync(commit: true);
             e.Handled = true;
         }
         else if (_isDragPending)
@@ -625,7 +729,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         return -1;
     }
 
-    private void EndDrag(bool commit)
+    private async Task EndDragAsync(bool commit)
     {
         if (_draggedListBoxItem != null)
             _draggedListBoxItem.Opacity = 1.0;
@@ -638,7 +742,11 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         CleanupDrag();
 
         if (shouldCommit)
-            ModManager.MoveModToIndex(modToMove!, targetGapIndex);
+        {
+            var moveResult = await ModManager.MoveModToIndexAsync(modToMove!, targetGapIndex);
+            if (moveResult.IsFailure)
+                MessageTranslationHelper.ShowMessage(moveResult.Error);
+        }
     }
 
     private void CancelDrag()

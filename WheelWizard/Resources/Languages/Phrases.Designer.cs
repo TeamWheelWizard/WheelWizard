@@ -159,6 +159,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Mod File.
+        /// </summary>
+        public static string FilePicker_SelectModFile {
+            get {
+                return ResourceManager.GetString("FilePicker_SelectModFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Creator name must be less than 11 characters long..
         /// </summary>
         public static string HelperNote_CreatorNameLess11 {
@@ -466,6 +475,60 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Converted to patches.
+        /// </summary>
+        public static string MessageSuccess_ModConvertedToPatches_Title {
+            get {
+                return ResourceManager.GetString("MessageSuccess_ModConvertedToPatches_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod &apos;{$1}&apos; installed successfully..
+        /// </summary>
+        public static string MessageSuccess_ModInstalled_Extra {
+            get {
+                return ResourceManager.GetString("MessageSuccess_ModInstalled_Extra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully installed mod!.
+        /// </summary>
+        public static string MessageSuccess_ModInstalled_Title {
+            get {
+                return ResourceManager.GetString("MessageSuccess_ModInstalled_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Converted {$1} file(s) into {$2} patch file(s)..
+        /// </summary>
+        public static string MessageSuccess_PatchConversionResult {
+            get {
+                return ResourceManager.GetString("MessageSuccess_PatchConversionResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Left {$1} file(s) unchanged because they could not be converted..
+        /// </summary>
+        public static string MessageSuccess_PatchConversionSkipped {
+            get {
+                return ResourceManager.GetString("MessageSuccess_PatchConversionSkipped", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Note(s): {$1}.
+        /// </summary>
+        public static string MessageSuccess_PatchConversionNotes {
+            get {
+                return ResourceManager.GetString("MessageSuccess_PatchConversionNotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Retro Rewind is up to date..
         /// </summary>
         public static string MessageSuccess_RRUpToDate_Title {
@@ -525,6 +588,15 @@ namespace WheelWizard.Resources.Languages {
         public static string MessageWarning_CantViewMod_Title {
             get {
                 return ResourceManager.GetString("MessageWarning_CantViewMod_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not convert mod.
+        /// </summary>
+        public static string MessageWarning_CouldNotConvertMod_Title {
+            get {
+                return ResourceManager.GetString("MessageWarning_CouldNotConvertMod_Title", resourceCulture);
             }
         }
         
@@ -745,6 +817,24 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This mod is incompatible with other mods. Launching with this mod enabled may cause incorrect behavior or crashes. Consider converting it to patches by right-clicking the mod..
+        /// </summary>
+        public static string Patch_IncompatibleMod_Message {
+            get {
+                return ResourceManager.GetString("Patch_IncompatibleMod_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INCOMPATIBLE MOD.
+        /// </summary>
+        public static string Patch_IncompatibleMod_Title {
+            get {
+                return ResourceManager.GetString("Patch_IncompatibleMod_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enter Mii name....
         /// </summary>
         public static string Placeholder_EnterMiiName {
@@ -799,11 +889,65 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Applying converted mod.
+        /// </summary>
+        public static string Progress_ApplyingConvertedMod {
+            get {
+                return ResourceManager.GetString("Progress_ApplyingConvertedMod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Combining files.
+        /// </summary>
+        public static string Progress_CombiningFiles {
+            get {
+                return ResourceManager.GetString("Progress_CombiningFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Converting {$1}.
+        /// </summary>
+        public static string Progress_ConvertingFile {
+            get {
+                return ResourceManager.GetString("Progress_ConvertingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Converting {$1} file(s).
+        /// </summary>
+        public static string Progress_ConvertingFilesCount {
+            get {
+                return ResourceManager.GetString("Progress_ConvertingFilesCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Converting mod to patches.
+        /// </summary>
+        public static string Progress_ConvertingModToPatches {
+            get {
+                return ResourceManager.GetString("Progress_ConvertingModToPatches", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to downloading {$1} MB.
         /// </summary>
         public static string Progress_DownloadingMb {
             get {
                 return ResourceManager.GetString("Progress_DownloadingMb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading {$1}.
+        /// </summary>
+        public static string Progress_DownloadingMod {
+            get {
+                return ResourceManager.GetString("Progress_DownloadingMod", resourceCulture);
             }
         }
         
@@ -822,6 +966,15 @@ namespace WheelWizard.Resources.Languages {
         public static string Progress_InstallingDolphin {
             get {
                 return ResourceManager.GetString("Progress_InstallingDolphin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing Mod.
+        /// </summary>
+        public static string Progress_InstallingMod {
+            get {
+                return ResourceManager.GetString("Progress_InstallingMod", resourceCulture);
             }
         }
         
@@ -867,6 +1020,15 @@ namespace WheelWizard.Resources.Languages {
         public static string Progress_LatestWhWzGithub {
             get {
                 return ResourceManager.GetString("Progress_LatestWhWzGithub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preparing {$1} file(s).
+        /// </summary>
+        public static string Progress_PreparingFilesCount {
+            get {
+                return ResourceManager.GetString("Progress_PreparingFilesCount", resourceCulture);
             }
         }
         
@@ -961,6 +1123,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mod name:.
+        /// </summary>
+        public static string Question_EnterModName_Title {
+            get {
+                return ResourceManager.GetString("Question_EnterModName_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Changing name from: {$1}.
         /// </summary>
         public static string Question_EnterNewName_Extra {
@@ -1002,6 +1173,15 @@ namespace WheelWizard.Resources.Languages {
         public static string Question_LaunchClearModsFound_Title {
             get {
                 return ResourceManager.GetString("Question_LaunchClearModsFound_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are about to launch the game without mods. Do you want to clear your Patches folder? Launching your game anyways will launch it with the current patches folder still active!.
+        /// </summary>
+        public static string Question_LaunchClearPatchesFound_Extra {
+            get {
+                return ResourceManager.GetString("Question_LaunchClearPatchesFound_Extra", resourceCulture);
             }
         }
         
@@ -1339,6 +1519,42 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {$1} entry {$2}.
+        /// </summary>
+        public static string Text_BrsarEntry {
+            get {
+                return ResourceManager.GetString("Text_BrsarEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {$1} entry {$2} + RWAR.
+        /// </summary>
+        public static string Text_BrsarEntryWithRwar {
+            get {
+                return ResourceManager.GetString("Text_BrsarEntryWithRwar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to External reference.
+        /// </summary>
+        public static string Text_ExternalReference {
+            get {
+                return ResourceManager.GetString("Text_ExternalReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to External reference: {$1}.
+        /// </summary>
+        public static string Text_ExternalReferenceWithPath {
+            get {
+                return ResourceManager.GetString("Text_ExternalReferenceWithPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This language is translated by: {$1}.
         /// </summary>
         public static string Text_LanguageTranslatedBy {
@@ -1357,6 +1573,24 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modified archive member.
+        /// </summary>
+        public static string Text_ModifiedArchiveMember {
+            get {
+                return ResourceManager.GetString("Text_ModifiedArchiveMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New archive member.
+        /// </summary>
+        public static string Text_NewArchiveMember {
+            get {
+                return ResourceManager.GetString("Text_NewArchiveMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Powered By GameBanana.
         /// </summary>
         public static string Text_PoweredGamebanana {
@@ -1371,6 +1605,15 @@ namespace WheelWizard.Resources.Languages {
         public static string Text_ThanksTranslators {
             get {
                 return ResourceManager.GetString("Text_ThanksTranslators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whole-file override.
+        /// </summary>
+        public static string Text_WholeFileOverride {
+            get {
+                return ResourceManager.GetString("Text_WholeFileOverride", resourceCulture);
             }
         }
         
@@ -1452,6 +1695,132 @@ namespace WheelWizard.Resources.Languages {
         public static string Time_Seconds_x {
             get {
                 return ResourceManager.GetString("Time_Seconds_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {$1} BRSAR file entries are external references and cannot be exported..
+        /// </summary>
+        public static string Warning_BrsarExternalCount {
+            get {
+                return ResourceManager.GetString("Warning_BrsarExternalCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BRSAR fileId {$1} is an external file reference and cannot be exported..
+        /// </summary>
+        public static string Warning_BrsarFileIdExternal {
+            get {
+                return ResourceManager.GetString("Warning_BrsarFileIdExternal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BRSAR fileId {$1} could not be resolved to a supported embedded sound file..
+        /// </summary>
+        public static string Warning_BrsarFileIdUnresolved {
+            get {
+                return ResourceManager.GetString("Warning_BrsarFileIdUnresolved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BRSAR fileId {$1} changed, but it resolves to {$2} and Pulsar only supports RBNK/RSEQ/RWSD loose overrides..
+        /// </summary>
+        public static string Warning_BrsarFileIdUnsupportedMagic {
+            get {
+                return ResourceManager.GetString("Warning_BrsarFileIdUnsupportedMagic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No supported RBNK/RSEQ/RWSD differences were found against the built-in game baseline..
+        /// </summary>
+        public static string Warning_BrsarNoSupportedDifferences {
+            get {
+                return ResourceManager.GetString("Warning_BrsarNoSupportedDifferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {$1} embedded BRSAR file entries could not be resolved confidently..
+        /// </summary>
+        public static string Warning_BrsarUnresolvedCount {
+            get {
+                return ResourceManager.GetString("Warning_BrsarUnresolvedCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only RBNK/RSEQ/RWSD entries can be exported. The scanned archive also contains {$1}..
+        /// </summary>
+        public static string Warning_BrsarUnsupportedSummary {
+            get {
+                return ResourceManager.GetString("Warning_BrsarUnsupportedSummary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {$1} exists only in the original archive. File deletions are not exportable as loose patches..
+        /// </summary>
+        public static string Warning_FileDeletionNotExportable {
+            get {
+                return ResourceManager.GetString("Warning_FileDeletionNotExportable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The selected file name differs from the original archive tag &quot;{$1}.szs&quot;..
+        /// </summary>
+        public static string Warning_FileNameDiffersFromArchiveTag {
+            get {
+                return ResourceManager.GetString("Warning_FileNameDiffersFromArchiveTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {$1} is not present in the built-in game baseline..
+        /// </summary>
+        public static string Warning_FileNotInBuiltInBaseline {
+            get {
+                return ResourceManager.GetString("Warning_FileNotInBuiltInBaseline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No SZS differences were found against the built-in game baseline..
+        /// </summary>
+        public static string Warning_NoSzsDifferences {
+            get {
+                return ResourceManager.GetString("Warning_NoSzsDifferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The selected SZS matches the built-in game baseline exactly..
+        /// </summary>
+        public static string Warning_SzsMatchesBaseline {
+            get {
+                return ResourceManager.GetString("Warning_SzsMatchesBaseline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {$1} uses an unsupported loose override extension (.kcl, .kmp, .slt)..
+        /// </summary>
+        public static string Warning_UnsupportedLooseOverrideExtension {
+            get {
+                return ResourceManager.GetString("Warning_UnsupportedLooseOverrideExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This SZS is stored as a whole-file baseline. Exporting a whole-file override..
+        /// </summary>
+        public static string Warning_WholeFileBaseline {
+            get {
+                return ResourceManager.GetString("Warning_WholeFileBaseline", resourceCulture);
             }
         }
     }

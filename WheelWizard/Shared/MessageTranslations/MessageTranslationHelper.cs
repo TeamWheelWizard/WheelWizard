@@ -1,3 +1,4 @@
+using Serilog;
 using WheelWizard.Helpers;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
@@ -196,12 +197,31 @@ public static class MessageTranslationHelper
     public static void ShowMessage(MessageTranslation msg, object[]? titleReplacements = null, object[]? extraReplacements = null) =>
         CreateMessageBox(msg, titleReplacements, extraReplacements).Show();
 
-    public static void ShowMessage(OperationError error) => CreateMessageBox(error).Show();
+    public static void ShowMessage(OperationError error)
+    {
+        LogOperationError(error);
+        CreateMessageBox(error).Show();
+    }
 
     public static Task AwaitMessageAsync(MessageTranslation msg, object[]? titleReplacements = null, object[]? extraReplacements = null) =>
         CreateMessageBox(msg, titleReplacements, extraReplacements).ShowDialog();
 
-    public static Task AwaitMessageAsync(OperationError error) => CreateMessageBox(error).ShowDialog();
+    public static Task AwaitMessageAsync(OperationError error)
+    {
+        LogOperationError(error);
+        return CreateMessageBox(error).ShowDialog();
+    }
+
+    private static void LogOperationError(OperationError error)
+    {
+        if (error.Exception != null)
+        {
+            Log.Error(error.Exception, "Showing operation error: {Message}", error.Message);
+            return;
+        }
+
+        Log.Warning("Showing operation error: {Message}", error.Message);
+    }
 
     private static MessageBoxWindow CreateMessageBox(
         MessageTranslation msg,
