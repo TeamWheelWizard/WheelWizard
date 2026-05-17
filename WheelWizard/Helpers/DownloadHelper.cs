@@ -180,6 +180,7 @@ public static class DownloadHelper
                 }
                 catch (Exception ex)
                 {
+                    //todo: add logging or just dont show message on this fucking helper level
                     new MessageBoxWindow()
                         .SetMessageType(MessageBoxWindow.MessageType.Error)
                         .SetTitleText("Download error")

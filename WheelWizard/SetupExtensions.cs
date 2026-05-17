@@ -7,9 +7,12 @@ using WheelWizard.Branding;
 using WheelWizard.CustomCharacters;
 using WheelWizard.CustomDistributions;
 using WheelWizard.DolphinInstaller;
+using WheelWizard.Features.Archives;
+using WheelWizard.Features.Patches;
 using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
 using WheelWizard.MiiImages;
+using WheelWizard.Mods;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services.LiveData;
@@ -41,6 +44,9 @@ public static class SetupExtensions
         services.AddGameBanana();
         services.AddMiiImages();
         services.AddCustomDistributionService();
+        services.AddArchives();
+        services.AddPatches();
+        services.AddMods();
 
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();
