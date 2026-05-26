@@ -37,7 +37,6 @@ jobs:
           --configuration Release
           --output publish/win-x64
           --self-contained true
-          /p:AssemblyName=WheelWizardWindows
           /p:UseAppHost=true
           /p:PublishSingleFile=true
           /p:IncludeAllContentForSelfExtract=true
@@ -51,7 +50,6 @@ jobs:
           --configuration Release
           --output publish/linux-x64
           --self-contained true
-          /p:AssemblyName=WheelWizard_Linux
           /p:UseAppHost=true
           /p:PublishSingleFile=true
           /p:IncludeAllContentForSelfExtract=true
@@ -65,7 +63,6 @@ jobs:
           --configuration Release
           --output publish/linux-arm64
           --self-contained true
-          /p:AssemblyName=WheelWizard_arm64_Linux
           /p:UseAppHost=true
           /p:PublishSingleFile=true
           /p:IncludeAllContentForSelfExtract=true
@@ -75,9 +72,9 @@ jobs:
       - name: Stage release assets
         run: |
           mkdir -p artifacts
-          cp publish/win-x64/WheelWizardWindows.exe artifacts/WheelWizardWindows.exe
-          cp publish/linux-x64/WheelWizard_Linux artifacts/WheelWizard_Linux
-          cp publish/linux-arm64/WheelWizard_arm64_Linux artifacts/WheelWizard_arm64_Linux
+          cp publish/win-x64/WheelWizard.exe artifacts/WheelWizardWindows.exe
+          cp publish/linux-x64/WheelWizard artifacts/WheelWizard_Linux
+          cp publish/linux-arm64/WheelWizard artifacts/WheelWizard_arm64_Linux
           chmod +x artifacts/WheelWizard_Linux artifacts/WheelWizard_arm64_Linux
 
       - name: Create GitHub release
