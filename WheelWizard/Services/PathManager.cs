@@ -94,11 +94,32 @@ public static class PathManager
                 return null;
 
             var normalized = FileHelper.NormalizePath(storedPath);
-            return FileHelper.PathsEqual(normalized, DefaultWheelWizardAppdataPath) ? null : normalized;
+            if (FileHelper.PathsEqual(normalized, DefaultWheelWizardAppdataPath))
+                return null;
+
+            // If a previously selected custom location is no longer available (for example,
+            // when an external drive letter changes), fall back to the default path.
+            if (!TryEnsureWheelWizardAppdataPathAccessible(normalized))
+                return null;
+
+            return normalized;
         }
         catch
         {
             return null;
+        }
+    }
+
+    private static bool TryEnsureWheelWizardAppdataPathAccessible(string normalizedPath)
+    {
+        try
+        {
+            FileHelper.EnsureDirectory(normalizedPath);
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 
