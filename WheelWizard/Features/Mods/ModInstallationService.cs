@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using SharpCompress.Archives;
 using WheelWizard.Helpers;
@@ -116,9 +116,6 @@ public sealed class ModInstallationService : IModInstallationService
             using var archive = archiveResult.Value;
             var totalEntries = archive.Entries.Count(entry => !entry.IsDirectory);
             var processedEntries = 0;
-            var fullRoot = Path.GetFullPath(destinationDirectory);
-            if (!Path.EndsInDirectorySeparator(fullRoot))
-                fullRoot += Path.DirectorySeparatorChar;
 
             foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
             {
@@ -131,17 +128,7 @@ public sealed class ModInstallationService : IModInstallationService
                 });
 
                 var entryKey = entry.Key ?? string.Empty;
-                var sanitizedKey = string.Join(
-                    Path.DirectorySeparatorChar.ToString(),
-                    entryKey
-                        .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                        .Where(segment => !string.IsNullOrWhiteSpace(segment))
-                );
-
-                var entryDestinationPath = Path.Combine(destinationDirectory, sanitizedKey);
-                var fullEntry = Path.GetFullPath(entryDestinationPath);
-
-                if (!fullEntry.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase))
+                if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, entryKey, out var fullEntry))
                     return Fail("Archive entry is outside of the destination directory.");
 
                 var directoryPath = Path.GetDirectoryName(fullEntry);
@@ -172,7 +159,7 @@ public sealed class ModInstallationService : IModInstallationService
 
         try
         {
-            return Ok(ArchiveFactory.Open(filePath));
+            return Ok(ArchiveFactory.OpenArchive(filePath));
         }
         catch (Exception ex)
         {
