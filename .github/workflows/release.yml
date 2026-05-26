@@ -1,0 +1,92 @@
+name: Release Wheel Wizard
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore WheelWizard.sln
+
+      - name: Run tests
+        run: dotnet test WheelWizard.sln --configuration Release --no-restore --verbosity normal
+
+      - name: Publish Windows x64
+        run: >
+          dotnet publish WheelWizard/WheelWizard.csproj
+          --runtime win-x64
+          --configuration Release
+          --output publish/win-x64
+          --self-contained true
+          /p:AssemblyName=WheelWizardWindows
+          /p:UseAppHost=true
+          /p:PublishSingleFile=true
+          /p:IncludeAllContentForSelfExtract=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:EnableCompressionInSingleFile=true
+
+      - name: Publish Linux x64
+        run: >
+          dotnet publish WheelWizard/WheelWizard.csproj
+          --runtime linux-x64
+          --configuration Release
+          --output publish/linux-x64
+          --self-contained true
+          /p:AssemblyName=WheelWizard_Linux
+          /p:UseAppHost=true
+          /p:PublishSingleFile=true
+          /p:IncludeAllContentForSelfExtract=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:EnableCompressionInSingleFile=true
+
+      - name: Publish Linux ARM64
+        run: >
+          dotnet publish WheelWizard/WheelWizard.csproj
+          --runtime linux-arm64
+          --configuration Release
+          --output publish/linux-arm64
+          --self-contained true
+          /p:AssemblyName=WheelWizard_arm64_Linux
+          /p:UseAppHost=true
+          /p:PublishSingleFile=true
+          /p:IncludeAllContentForSelfExtract=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:EnableCompressionInSingleFile=true
+
+      - name: Stage release assets
+        run: |
+          mkdir -p artifacts
+          cp publish/win-x64/WheelWizardWindows.exe artifacts/WheelWizardWindows.exe
+          cp publish/linux-x64/WheelWizard_Linux artifacts/WheelWizard_Linux
+          cp publish/linux-arm64/WheelWizard_arm64_Linux artifacts/WheelWizard_arm64_Linux
+          chmod +x artifacts/WheelWizard_Linux artifacts/WheelWizard_arm64_Linux
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "${{ github.ref_name }}"
+          artifacts/WheelWizardWindows.exe
+          artifacts/WheelWizard_Linux
+          artifacts/WheelWizard_arm64_Linux
+          --title "${{ github.ref_name }}"
+          --generate-notes
