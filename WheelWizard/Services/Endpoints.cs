@@ -34,7 +34,7 @@ public static class Endpoints
 
     // Retro Rewind
     public const string OldRRUrl = "http://update.rwfc.net:8000/";
-    public const string RRUrl = "https://rwfc.net/updates/";
+    public const string RRUrl = "https://update.rwfc.net/";
     public const string RRZipUrl = RRUrl + "RetroRewind/zip/RetroRewind.zip";
     public const string RRTestersZipUrl = RRUrl + "RetroRewind/zip/Testers.zip";
     public const string RRVersionUrl = RRUrl + "RetroRewind/RetroRewindVersion.txt";
