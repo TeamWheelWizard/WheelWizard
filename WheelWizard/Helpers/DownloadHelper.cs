@@ -1,4 +1,4 @@
-﻿using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Helpers;
 
@@ -74,12 +74,17 @@ public static class DownloadHelper
 
                     if (!ForceGivenFilePath)
                     {
-                        var finalUrl = response.RequestMessage.RequestUri.ToString();
-
                         // Check for filename in Content-Disposition or fallback to URL
                         var contentDisposition = response.Content.Headers.ContentDisposition;
-                        var fileName = contentDisposition?.FileName?.Trim('"') ?? Path.GetFileName(new Uri(url).AbsolutePath);
-                        fileName = Path.ChangeExtension(fileName, Path.GetExtension(finalUrl));
+                        var fileName =
+                            contentDisposition?.FileNameStar ?? contentDisposition?.FileName ?? Path.GetFileName(new Uri(url).AbsolutePath);
+
+                        if (!PathSafetyHelper.TryGetSafeFileName(fileName, out fileName))
+                            throw new InvalidOperationException("The server returned an invalid download filename.");
+
+                        var finalExtension = Path.GetExtension(response.RequestMessage.RequestUri.AbsolutePath);
+                        if (!string.IsNullOrWhiteSpace(finalExtension))
+                            fileName = Path.ChangeExtension(fileName, finalExtension);
 
                         // Add extension if missing in file path
                         if (!Path.HasExtension(fileName))
@@ -92,7 +97,8 @@ public static class DownloadHelper
                         }
 
                         // Update resolvedFilePath with resolved fileName
-                        resolvedFilePath = Path.Combine(directory, fileName);
+                        if (!PathSafetyHelper.TryGetPathWithinDirectory(directory, fileName, out resolvedFilePath))
+                            throw new InvalidOperationException("The download path escaped the target directory.");
                     }
 
                     var totalBytes = response.Content.Headers.ContentLength ?? -1;
