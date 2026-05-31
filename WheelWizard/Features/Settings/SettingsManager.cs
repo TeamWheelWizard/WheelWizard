@@ -116,7 +116,7 @@ public class SettingsManager : ISettingsManager
 
         ENABLE_ANIMATIONS = RegisterWhWz("EnableAnimations", true);
         TESTING_MODE_ENABLED = RegisterWhWz("TestingModeEnabled", false);
-        SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, value => (double)(value ?? -1) >= 0.5 && (double)(value ?? -1) <= 2.0);
+        SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, SettingValues.IsValidWindowScale);
         REMOVE_BLUR = RegisterWhWz("REMOVE_BLUR", true);
         RR_REGION = RegisterWhWz("RR_Region", MarioKartWiiEnums.Regions.None);
         WW_LANGUAGE = RegisterWhWz("WW_Language", "en", value => SettingValues.WhWzLanguages.ContainsKey((string)value!));
@@ -155,11 +155,13 @@ public class SettingsManager : ISettingsManager
         #endregion
 
         #region Virtual settings
-        WINDOW_SCALE = new VirtualSetting(
+        var windowScale = new VirtualSetting(
             typeof(double),
             value => _internalScale = (double)value!,
             () => _internalScale == -1.0 ? SAVED_WINDOW_SCALE.Get() : _internalScale
-        ).SetDependencies(SAVED_WINDOW_SCALE);
+        );
+        windowScale.SetValidation(SettingValues.IsValidWindowScale);
+        WINDOW_SCALE = windowScale.SetDependencies(SAVED_WINDOW_SCALE);
 
         RECOMMENDED_SETTINGS = new VirtualSetting(
             typeof(bool),
