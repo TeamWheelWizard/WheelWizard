@@ -143,9 +143,31 @@ public static class MiiSerializer
         return data;
     }
 
-    public static OperationResult<Mii> Deserialize(string data) => Deserialize(Convert.FromBase64String(data));
+    public static OperationResult<Mii> Deserialize(string data)
+    {
+        try
+        {
+            return Deserialize(Convert.FromBase64String(data));
+        }
+        catch (Exception ex)
+        {
+            return InvalidDataExc(ex);
+        }
+    }
 
     public static OperationResult<Mii> Deserialize(byte[]? data)
+    {
+        try
+        {
+            return DeserializeCore(data);
+        }
+        catch (Exception ex)
+        {
+            return InvalidDataExc(ex);
+        }
+    }
+
+    private static OperationResult<Mii> DeserializeCore(byte[]? data)
     {
         if (data == null || data.Length != 74)
             return Fail("Invalid Mii data length.", MessageTranslation.Error_MiiSerializer_MiiDataLength);
@@ -341,5 +363,10 @@ public static class MiiSerializer
     private static OperationResult<Mii> InvalidDataExc(string data)
     {
         return Fail(new InvalidDataException($"Invalid {data}"), MessageTranslation.Error_MiiSerializer_InvalidMiiData, null, [data]);
+    }
+
+    private static OperationResult<Mii> InvalidDataExc(Exception exception)
+    {
+        return Fail(exception, MessageTranslation.Error_MiiSerializer_InvalidMiiData, null, [exception.Message]);
     }
 }

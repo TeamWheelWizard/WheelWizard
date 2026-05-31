@@ -125,4 +125,27 @@ public class MiiSerializerTests
         Assert.True(result.IsFailure);
         Assert.Equal("Invalid Mii data length.", result.Error.Message);
     }
+
+    [Fact]
+    public void Deserialize_InvalidCalendarDate_ShouldFailInsteadOfThrowing()
+    {
+        var data = Convert.FromBase64String(dataList[0]);
+        ushort header = (ushort)((data[0] << 8) | data[1]);
+        header = (ushort)((header & ~(0x0F << 10)) | (2 << 10));
+        header = (ushort)((header & ~(0x1F << 5)) | (31 << 5));
+        data[0] = (byte)(header >> 8);
+        data[1] = (byte)header;
+
+        var result = MiiSerializer.Deserialize(data);
+
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public void Deserialize_InvalidBase64_ShouldFailInsteadOfThrowing()
+    {
+        var result = MiiSerializer.Deserialize("not valid base64");
+
+        Assert.True(result.IsFailure);
+    }
 }
