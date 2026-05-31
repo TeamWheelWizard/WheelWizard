@@ -178,7 +178,7 @@ To join a specific room, you'll need to either join through a friend, or hope to
         <value>Dolphin Emulator Folder Not Found</value>
     </data>
     <data name="Question_DolphinFound_Extra" xml:space="preserve">
-        <value>If you dont know what all of this means, just click yes :) \nDolphin Emulator folder found. Would you like to use this folder?</value>
+        <value>If you don't know what this means, click Yes.\nWould you like to use this Dolphin Emulator folder?</value>
     </data>
     <data name="MessageWarning_DolphinNotFound_Extra" xml:space="preserve">
         <value>Dolphin Emulator folder not automatically found. Please try and find the folder manually, click 'help' for more information.</value>
