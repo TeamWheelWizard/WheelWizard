@@ -86,7 +86,7 @@ public partial class EditorEyebrows : MiiEditorBaseControl
             return;
 
         var current = Editor.Mii.MiiEyebrows;
-        if (index == current.Type)
+        if (index == (int)current.Color)
             return;
 
         var result = MiiEyebrow.Create(
