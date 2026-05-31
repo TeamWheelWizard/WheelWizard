@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using WheelWizard.Services.LiveData;
+using WheelWizard.Settings.Types;
 using WheelWizard.Utilities.RepeatedTasks;
 
 namespace WheelWizard.Views;
@@ -25,6 +26,22 @@ public static class ViewUtils
     public static void ShowSnackbar(string message, SnackbarType type = SnackbarType.Success) => GetLayout().ShowSnackbar(message, type);
 
     public static Layout GetLayout() => Layout.Instance;
+
+    public static double GetUsableWindowScale(double requestedScale, Size unscaledSize, Window window)
+    {
+        var maxScale = SettingValues.MaxWindowScale;
+        var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary;
+        if (screen != null)
+        {
+            var screenScale = screen.Scaling <= 0 ? 1 : screen.Scaling;
+            var availableWidth = screen.WorkingArea.Width / screenScale;
+            var availableHeight = screen.WorkingArea.Height / screenScale;
+            maxScale = Math.Min(maxScale, Math.Min(availableWidth / unscaledSize.Width, availableHeight / unscaledSize.Height));
+        }
+
+        maxScale = Math.Max(SettingValues.MinWindowScale, maxScale);
+        return Math.Clamp(requestedScale, SettingValues.MinWindowScale, maxScale);
+    }
 
     public static void RefreshWindow()
     {

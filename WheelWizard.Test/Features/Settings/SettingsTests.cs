@@ -43,6 +43,32 @@ public class SettingsManagerTests
         Assert.Equal(0, manager.Get<int>(manager.FOCUSED_USER));
     }
 
+    [Theory]
+    [InlineData(0.49)]
+    [InlineData(2.01)]
+    public void SavedWindowScale_RejectsValuesOutsideBounds(double scale)
+    {
+        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+
+        var result = manager.Set(manager.SAVED_WINDOW_SCALE, scale, skipSave: true);
+
+        Assert.False(result);
+        Assert.Equal(1.0, manager.Get<double>(manager.SAVED_WINDOW_SCALE));
+    }
+
+    [Theory]
+    [InlineData(0.49)]
+    [InlineData(2.01)]
+    public void WindowScalePreview_RejectsValuesOutsideBounds(double scale)
+    {
+        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+
+        var result = manager.Set(manager.WINDOW_SCALE, scale, skipSave: true);
+
+        Assert.False(result);
+        Assert.Equal(1.0, manager.Get<double>(manager.WINDOW_SCALE));
+    }
+
     [Fact]
     public void ValidateCorePathSettings_ReturnsAllExpectedIssues_WhenDefaultsAreInvalid()
     {
