@@ -27,6 +27,7 @@ public partial class WhWzSettings : UserControlBase
     private readonly bool _pageLoaded;
     private bool _editingScale;
     private bool _isMovingAppData;
+    private bool _updatingLanguageDropdown;
 
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
@@ -49,7 +50,6 @@ public partial class WhWzSettings : UserControlBase
         UpdateAppDataLocationUi();
         _pageLoaded = true;
 
-        MKGameFieldLabel.TipText = t("helper_text.end_with_x") + " .wbfs/.iso/.rvz";
         WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
     }
 
@@ -58,19 +58,8 @@ public partial class WhWzSettings : UserControlBase
         // -----------------
         // Wheel Wizard Language Dropdown
         // -----------------
-        WhWzLanguageDropdown.Items.Clear(); // Clear existing items
-        foreach (var (key, displayNameFactory) in SettingValues.WhWzLanguages)
-        {
-            WhWzLanguageDropdown.Items.Add(new LanguageDropdownItem(key, displayNameFactory()));
-        }
-
-        var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-        WhWzLanguageDropdown.SelectedItem = WhWzLanguageDropdown
-            .Items.OfType<LanguageDropdownItem>()
-            .FirstOrDefault(item => item.Key == currentWhWzLanguage);
-
-        TranslationsPercentageText.Text = t("text.language_translated_by", t("value.language.z_translators"));
-        TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
+        RefreshLanguageDropdown();
+        RefreshLocalizedCodeText();
 
         // -----------------
         // Window Scale settings
@@ -89,6 +78,35 @@ public partial class WhWzSettings : UserControlBase
         WindowScaleDropdown.SelectedItem = selectedItemText;
 
         EnableAnimations.IsChecked = (bool)SettingsService.ENABLE_ANIMATIONS.Get();
+    }
+
+    private void RefreshLanguageDropdown()
+    {
+        var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
+        _updatingLanguageDropdown = true;
+        try
+        {
+            WhWzLanguageDropdown.Items.Clear();
+            foreach (var (key, displayNameFactory) in SettingValues.WhWzLanguages)
+            {
+                WhWzLanguageDropdown.Items.Add(new LanguageDropdownItem(key, displayNameFactory()));
+            }
+
+            WhWzLanguageDropdown.SelectedItem = WhWzLanguageDropdown
+                .Items.OfType<LanguageDropdownItem>()
+                .FirstOrDefault(item => item.Key == currentWhWzLanguage);
+        }
+        finally
+        {
+            _updatingLanguageDropdown = false;
+        }
+    }
+
+    private void RefreshLocalizedCodeText()
+    {
+        MKGameFieldLabel.TipText = t("helper_text.end_with_x") + " .wbfs/.iso/.rvz";
+        TranslationsPercentageText.Text = t("text.language_translated_by", t("value.language.z_translators"));
+        TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
     }
 
     private static string ScaleToString(double scale)
@@ -721,6 +739,9 @@ public partial class WhWzSettings : UserControlBase
 
     private async void WhWzLanguageDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
+        if (_updatingLanguageDropdown)
+            return;
+
         if (WhWzLanguageDropdown.SelectedItem == null)
             return;
 
@@ -756,6 +777,8 @@ public partial class WhWzSettings : UserControlBase
         if (SettingsService.WW_LANGUAGE.Set(selectedLanguage.Key))
         {
             LocalizationService.ApplyCurrentLanguage();
+            RefreshLanguageDropdown();
+            RefreshLocalizedCodeText();
             ViewUtils.RefreshWindow();
         }
     }

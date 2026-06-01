@@ -5,6 +5,8 @@ public static class LocalizationProvider
     private static readonly object ServiceLock = new();
     private static ILocalizationService? _service;
 
+    public static event EventHandler? LanguageChanged;
+
     public static ILocalizationService Current
     {
         get
@@ -20,11 +22,19 @@ public static class LocalizationProvider
 
         lock (ServiceLock)
             _service = service;
+
+        NotifyLanguageChanged();
     }
 
     public static void SetLanguage(string languageCode)
     {
         Current.SetLanguage(languageCode);
+        NotifyLanguageChanged();
+    }
+
+    public static void NotifyLanguageChanged()
+    {
+        LanguageChanged?.Invoke(null, EventArgs.Empty);
     }
 
     public static string Translate(string key)

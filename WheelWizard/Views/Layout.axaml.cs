@@ -8,6 +8,7 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
+using WheelWizard.Localization;
 using WheelWizard.Mods;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
@@ -81,13 +82,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
 
-        var completeString = t("text.made_by_string", "Patchzy", "WantToBeeMe");
-        if (completeString != null && completeString.Contains("\\n"))
-        {
-            var split = completeString.Split("\\n");
-            MadeBy_Part1.Text = split[0];
-            MadeBy_Part2.Text = split[1];
-        }
+        UpdateMadeByText();
+        LocalizationProvider.LanguageChanged += OnLanguageChanged;
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
@@ -123,8 +119,26 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         _settingsSignalSubscription?.Dispose();
         _settingsSignalSubscription = null;
+        LocalizationProvider.LanguageChanged -= OnLanguageChanged;
         ModManagerService.PropertyChanged -= ModManager_PropertyChanged;
         base.OnClosed(e);
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        UpdateModsButtonText();
+        UpdateMadeByText();
+    }
+
+    private void UpdateMadeByText()
+    {
+        var completeString = t("text.made_by_string", "Patchzy", "WantToBeeMe");
+        if (!completeString.Contains("\\n"))
+            return;
+
+        var split = completeString.Split("\\n");
+        MadeBy_Part1.Text = split[0];
+        MadeBy_Part2.Text = split[1];
     }
 
     private void ModManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
