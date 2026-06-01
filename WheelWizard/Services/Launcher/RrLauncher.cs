@@ -3,6 +3,7 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Mods;
 using WheelWizard.Resources.Languages;
+using WheelWizard.Services.Input;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.WiiManagement;
 using WheelWizard.Settings;
@@ -38,6 +39,7 @@ public class RrLauncher : ILauncher
                 return Fail(Phrases.MessageWarning_NotFindGame_Extra);
 
             DolphinLaunchHelper.KillDolphin();
+            MarioKartInputConfigService.EnsureLaunchProfileIsApplied();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
             var targetFolderPath = PathManager.PatchesFolderPath;

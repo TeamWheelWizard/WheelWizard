@@ -20,12 +20,23 @@ public enum MarioKartInputCaptureKind
     DirectionalInput,
 }
 
+public enum MarioKartInputPresetKind
+{
+    CurrentDolphinSettings,
+    SavedDolphinProfile,
+}
+
 public sealed record MarioKartInputDefinition(
     MarioKartInputAction Action,
     string Title,
     string Description,
     MarioKartInputCaptureKind CaptureKind
 );
+
+public sealed record MarioKartInputPresetOption(MarioKartInputPresetKind Kind, string DisplayName, string Subtitle, string? FilePath)
+{
+    public override string ToString() => DisplayName;
+}
 
 public sealed class MarioKartInputProfile
 {
@@ -64,7 +75,9 @@ public sealed record ControllerDeviceOption(
     string DeviceExpression,
     SDL.GamepadType ControllerType,
     bool IsConnected,
-    bool IsSavedMapping = false
+    bool IsSavedMapping = false,
+    bool IsKeyboard = false,
+    bool IsGenericJoystick = false
 )
 {
     public override string ToString() => DisplayName;

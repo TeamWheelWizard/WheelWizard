@@ -45,7 +45,7 @@
                 <Grid Grid.Row="0"
                       ColumnDefinitions="90,*,Auto,Auto"
                       Margin="14,12">
-                    <TextBlock Text="Primary"
+                    <TextBlock Text="Main"
                                Classes="TitleText"
                                FontSize="17"
                                Foreground="{StaticResource Neutral100}" />
@@ -80,7 +80,7 @@
                 <Grid Grid.Row="1"
                       ColumnDefinitions="90,*,Auto,Auto"
                       Margin="14,12">
-                    <TextBlock Text="Secondary"
+                    <TextBlock Text="Extra"
                                Classes="TitleText"
                                FontSize="17"
                                Foreground="{StaticResource Neutral100}" />

@@ -1,3 +1,4 @@
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.Services.Input;
@@ -20,6 +21,7 @@ public partial class MultiBindingWindow : PopupContent
         : base(true, false, true, "Custom Bindings")
     {
         InitializeComponent();
+        AddHandler(KeyDownEvent, CaptureKeyboardBinding_OnKeyDown, RoutingStrategies.Tunnel);
         _captureTimer.Tick += CaptureTimer_OnTick;
     }
 
@@ -45,11 +47,8 @@ public partial class MultiBindingWindow : PopupContent
     {
         base.BeforeOpen();
 
-        TitleText.Text = _action == MarioKartInputAction.LookBehind ? "Look Behind Buttons" : "Custom Bindings";
-        SummaryText.Text =
-            _action == MarioKartInputAction.LookBehind
-                ? "Set up to two inputs for looking behind. If both are set, either one can trigger the action."
-                : "Set up to two inputs for this action.";
+        TitleText.Text = GetWindowTitle();
+        SummaryText.Text = GetSummaryText();
 
         LoadBindingSlots();
         _listeningIndex = null;
@@ -66,7 +65,11 @@ public partial class MultiBindingWindow : PopupContent
 
     private void CaptureTimer_OnTick(object? sender, EventArgs e)
     {
-        if (_listeningIndex is not int listeningIndex || _controller is not { IsConnected: true } controller || _profile == null)
+        if (
+            _listeningIndex is not int listeningIndex
+            || _controller is not { IsConnected: true, IsKeyboard: false } controller
+            || _profile == null
+        )
             return;
 
         if (!SdlControllerService.TryCaptureBinding(controller.InstanceId, MarioKartInputCaptureKind.SingleInput, out var binding))
@@ -85,16 +88,11 @@ public partial class MultiBindingWindow : PopupContent
         if (sender is not Button button || !TryGetSlotIndex(button.Tag, out var slotIndex))
             return;
 
-        if (_controller is not { IsConnected: true } controller)
-        {
-            _listeningIndex = null;
-            UpdateStatusText("Connect the selected controller before changing these bindings.");
-            UpdateRows();
-            return;
-        }
-
         _listeningIndex = slotIndex;
-        SdlControllerService.BeginCapture(controller.InstanceId);
+
+        if (_controller is { IsConnected: true, IsKeyboard: false } controller)
+            SdlControllerService.BeginCapture(controller.InstanceId);
+
         UpdateStatusText();
         UpdateRows();
     }
@@ -136,15 +134,15 @@ public partial class MultiBindingWindow : PopupContent
 
         if (_listeningIndex is int listeningIndex)
         {
-            StatusText.Text = _controller is { IsConnected: true }
-                ? $"Press the input you want to use for {ToSlotTitle(listeningIndex)}."
-                : "Connect the selected controller before changing these bindings.";
+            StatusText.Text = _controller is { IsConnected: true, IsKeyboard: false }
+                ? $"Press the controller input or keyboard key you want to use for {ToSlotTitle(listeningIndex)}."
+                : $"Press the keyboard key you want to use for {ToSlotTitle(listeningIndex)}.";
             return;
         }
 
-        StatusText.Text = _controller is { IsConnected: true }
-            ? $"{_controller.DisplayName} is ready. Pick a slot and press the input you want to use."
-            : "You can review the current bindings here. Connect the selected controller to change them.";
+        StatusText.Text = _controller is { IsConnected: true, IsKeyboard: false }
+            ? $"{_controller.DisplayName} is ready. Pick a slot and press a controller input or keyboard key."
+            : "Pick a slot and press the keyboard key you want to use.";
     }
 
     private void LoadBindingSlots()
@@ -169,6 +167,20 @@ public partial class MultiBindingWindow : PopupContent
         LoadBindingSlots();
     }
 
+    private void CaptureKeyboardBinding_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (_listeningIndex is not int listeningIndex || _profile == null || !KeyboardInputService.TryCreateBinding(e.Key, out var binding))
+            return;
+
+        e.Handled = true;
+        _bindingSlots[listeningIndex] = binding;
+        SaveBindingSlots();
+
+        _listeningIndex = null;
+        UpdateStatusText($"Saved {ToSlotTitle(listeningIndex)} as {MarioKartInputConfigService.DescribeSingleInputBinding(binding)}.");
+        UpdateRows();
+    }
+
     private static bool TryGetSlotIndex(object? tag, out int slotIndex)
     {
         slotIndex = -1;
@@ -182,7 +194,19 @@ public partial class MultiBindingWindow : PopupContent
         };
     }
 
-    private static string ToSlotTitle(int slotIndex) => slotIndex == 0 ? "Primary" : "Secondary";
+    private string GetWindowTitle()
+    {
+        var definition = MarioKartInputCatalog.GetDefinition(_action);
+        return $"{definition.Title} Buttons";
+    }
+
+    private string GetSummaryText()
+    {
+        var definition = MarioKartInputCatalog.GetDefinition(_action);
+        return $"Set up to two inputs for {definition.Title.ToLowerInvariant()}. Either input will trigger the action, so you can leave the extra slot empty if you only want one.";
+    }
+
+    private static string ToSlotTitle(int slotIndex) => slotIndex == 0 ? "Main" : "Extra";
 
     private void DoneButton_OnClick(object? sender, RoutedEventArgs e) => Close();
 }

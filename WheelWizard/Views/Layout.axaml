@@ -132,8 +132,8 @@
                                            PageType="{x:Type pages:MiiListPage}"
                                            Text="{x:Static lang:Common.PageTitle_MyMiis}" />
             <patterns:SidebarRadioButton IconData="{StaticResource FlatWheel}"
-                                         PageType="{x:Type pages:InputPage}"
-                                         Text="Input" />
+                                           PageType="{x:Type pages:InputPage}"
+                                           Text="Input" />
             <TextBlock Text="{x:Static lang:Common.Attribute_Status_Online}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from values -->
             <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}"

@@ -40,25 +40,46 @@
                                   x:Name="NoControllerInfo"
                                   IsVisible="False"
                                   Title="No controller connected"
-                                  BodyText="Please connect a controller to map controls and configure rumble." />
+                                  BodyText="Keyboard controls still work even when no controller is connected." />
 
         <ScrollViewer Grid.Row="1"
                       x:Name="InputContent"
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="10,10,10,16" Spacing="10">
-                <Grid ColumnDefinitions="*,Auto"
+                <Grid ColumnDefinitions="*,*"
                       RowDefinitions="Auto,Auto">
-                    <StackPanel Spacing="6" Margin="0,0,16,0">
-                        <TextBlock Text="Controller"
+                    <StackPanel Spacing="6" Margin="0,0,8,0">
+                        <TextBlock Text="Input Device"
                                    Classes="TitleText"
                                    FontSize="18"
                                    Foreground="{StaticResource Neutral100}" />
                         <ComboBox x:Name="ControllerDropdown"
-                                  MinWidth="320"
+                                  HorizontalAlignment="Stretch"
                                   SelectionChanged="ControllerDropdown_OnSelectionChanged">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate x:DataType="input:ControllerDeviceOption">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                        <TextBlock Text="{Binding Subtitle}"
+                                                   Classes="TinyText"
+                                                   Foreground="{StaticResource Neutral400}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="6" Margin="8,0,0,0">
+                        <TextBlock Text="Preset"
+                                   Classes="TitleText"
+                                   FontSize="18"
+                                   Foreground="{StaticResource Neutral100}" />
+                        <ComboBox x:Name="PresetDropdown"
+                                  HorizontalAlignment="Stretch"
+                                  SelectionChanged="PresetDropdown_OnSelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="input:MarioKartInputPresetOption">
                                     <StackPanel Spacing="2">
                                         <TextBlock Text="{Binding DisplayName}" />
                                         <TextBlock Text="{Binding Subtitle}"
@@ -105,6 +126,7 @@
                                                            Margin="0,0,10,0"
                                                            HorizontalAlignment="Right"
                                                            VerticalAlignment="Center"
+                                                           PointerPressed="BindingButton_OnPointerPressed"
                                                            Click="ChangeBinding_OnClick" />
 
                                         <components:Button Grid.Column="2"

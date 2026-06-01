@@ -57,7 +57,8 @@ public static class SdlControllerService
                 state.Subtitle,
                 state.DeviceExpression,
                 state.ControllerType,
-                IsConnected: true
+                IsConnected: true,
+                IsGenericJoystick: !state.IsGamepad
             ))
             .ToList();
     }
@@ -92,6 +93,9 @@ public static class SdlControllerService
         if (!OpenControllers.TryGetValue(instanceId, out var controller))
             return false;
 
+        if (!controller.IsGamepad)
+            return false;
+
         return SDL.RumbleGamepad(controller.GamepadHandle, ushort.MaxValue, ushort.MaxValue, 400);
     }
 
@@ -106,12 +110,19 @@ public static class SdlControllerService
         if (!OpenControllers.TryGetValue(instanceId, out var controller))
             return false;
 
-        preview = new(
-            NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftX)),
-            NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftY)),
-            NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightX)),
-            NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightY))
-        );
+        preview = controller.IsGamepad
+            ? new(
+                NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftX)),
+                NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftY)),
+                NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightX)),
+                NormalizeAxis(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightY))
+            )
+            : new(
+                NormalizeAxis(controller.CurrentJoystickAxes.GetValueOrDefault(0)),
+                NormalizeAxis(controller.CurrentJoystickAxes.GetValueOrDefault(1)),
+                NormalizeAxis(controller.CurrentJoystickAxes.GetValueOrDefault(2)),
+                NormalizeAxis(controller.CurrentJoystickAxes.GetValueOrDefault(3))
+            );
         return true;
     }
 
@@ -137,7 +148,7 @@ public static class SdlControllerService
 
         try
         {
-            if (!SDL.Init(SDL.InitFlags.Gamepad))
+            if (!SDL.Init(SDL.InitFlags.Gamepad | SDL.InitFlags.Joystick))
             {
                 _initializationError = SDL.GetError();
                 return false;
@@ -158,13 +169,14 @@ public static class SdlControllerService
     {
         SDL.PumpEvents();
         SDL.UpdateGamepads();
+        SDL.UpdateJoysticks();
 
-        var connectedIds = SDL.GetGamepads(out var count) ?? [];
+        var connectedIds = SDL.GetJoysticks(out var count) ?? [];
         var connectedIdSet = connectedIds.ToHashSet();
 
         foreach (var disconnectedId in OpenControllers.Keys.Where(id => !connectedIdSet.Contains(id)).ToList())
         {
-            SDL.CloseGamepad(OpenControllers[disconnectedId].GamepadHandle);
+            OpenControllers[disconnectedId].Close();
             OpenControllers.Remove(disconnectedId);
         }
 
@@ -173,11 +185,10 @@ public static class SdlControllerService
             var instanceId = connectedIds[index];
             if (!OpenControllers.TryGetValue(instanceId, out var controller))
             {
-                var gamepad = SDL.OpenGamepad(instanceId);
-                if (gamepad == IntPtr.Zero)
+                controller = CreateControllerState(instanceId, index);
+                if (controller == null)
                     continue;
 
-                controller = new(instanceId, index, gamepad);
                 OpenControllers[instanceId] = controller;
             }
 
@@ -186,8 +197,23 @@ public static class SdlControllerService
         }
     }
 
+    private static ControllerRuntimeState? CreateControllerState(uint instanceId, int dolphinDeviceIndex)
+    {
+        if (SDL.IsGamepad(instanceId))
+        {
+            var gamepad = SDL.OpenGamepad(instanceId);
+            return gamepad == IntPtr.Zero ? null : ControllerRuntimeState.ForGamepad(instanceId, dolphinDeviceIndex, gamepad);
+        }
+
+        var joystick = SDL.OpenJoystick(instanceId);
+        return joystick == IntPtr.Zero ? null : ControllerRuntimeState.ForJoystick(instanceId, dolphinDeviceIndex, joystick);
+    }
+
     private static string TryCaptureDirectionalBinding(ControllerRuntimeState controller)
     {
+        if (!controller.IsGamepad)
+            return TryCaptureGenericDirectionalBinding(controller);
+
         if (
             IsNewlyActiveSinceCaptureStart(controller, SDL.GamepadButton.DPadUp)
             || IsNewlyActiveSinceCaptureStart(controller, SDL.GamepadButton.DPadDown)
@@ -222,6 +248,9 @@ public static class SdlControllerService
 
     private static string TryCaptureSingleBinding(ControllerRuntimeState controller)
     {
+        if (!controller.IsGamepad)
+            return TryCaptureGenericSingleBinding(controller);
+
         foreach (var button in CapturableButtons)
         {
             if (!IsNewlyActiveSinceCaptureStart(controller, button))
@@ -241,6 +270,79 @@ public static class SdlControllerService
         {
             controller.ClearCaptureSession();
             return MarioKartInputConfigService.WrapToken("Trigger R");
+        }
+
+        return string.Empty;
+    }
+
+    private static string TryCaptureGenericDirectionalBinding(ControllerRuntimeState controller)
+    {
+        if (TryCaptureGenericHat(controller, out var hatBinding))
+        {
+            controller.ClearCaptureSession();
+            return MarioKartInputConfigService.CreateDirectionalBinding(
+                MarioKartInputAction.Steering,
+                new DirectionalBindingSet
+                {
+                    Up = MarioKartInputConfigService.WrapToken($"{hatBinding} N"),
+                    Down = MarioKartInputConfigService.WrapToken($"{hatBinding} S"),
+                    Left = MarioKartInputConfigService.WrapToken($"{hatBinding} W"),
+                    Right = MarioKartInputConfigService.WrapToken($"{hatBinding} E"),
+                }
+            );
+        }
+
+        for (var axisIndex = 0; axisIndex < controller.JoystickAxisCount; axisIndex++)
+        {
+            if (!HasJoystickAxisChangedSinceCaptureStart(controller, axisIndex))
+                continue;
+
+            var horizontalAxisIndex = axisIndex % 2 == 0 ? axisIndex : axisIndex - 1;
+            var verticalAxisIndex = horizontalAxisIndex + 1;
+            if (verticalAxisIndex >= controller.JoystickAxisCount)
+                return string.Empty;
+
+            controller.ClearCaptureSession();
+            return MarioKartInputConfigService.CreateDirectionalBinding(
+                MarioKartInputAction.Steering,
+                new DirectionalBindingSet
+                {
+                    Up = MarioKartInputConfigService.WrapToken($"Axis {verticalAxisIndex}-"),
+                    Down = MarioKartInputConfigService.WrapToken($"Axis {verticalAxisIndex}+"),
+                    Left = MarioKartInputConfigService.WrapToken($"Axis {horizontalAxisIndex}-"),
+                    Right = MarioKartInputConfigService.WrapToken($"Axis {horizontalAxisIndex}+"),
+                }
+            );
+        }
+
+        return string.Empty;
+    }
+
+    private static string TryCaptureGenericSingleBinding(ControllerRuntimeState controller)
+    {
+        for (var buttonIndex = 0; buttonIndex < controller.JoystickButtonCount; buttonIndex++)
+        {
+            if (!IsJoystickButtonNewlyActiveSinceCaptureStart(controller, buttonIndex))
+                continue;
+
+            controller.ClearCaptureSession();
+            return MarioKartInputConfigService.WrapToken($"Button {buttonIndex}");
+        }
+
+        if (TryCaptureGenericHat(controller, out var hatBinding))
+        {
+            controller.ClearCaptureSession();
+            return MarioKartInputConfigService.WrapToken(hatBinding);
+        }
+
+        for (var axisIndex = 0; axisIndex < controller.JoystickAxisCount; axisIndex++)
+        {
+            if (!IsJoystickAxisNewlyActivatedSinceCaptureStart(controller, axisIndex))
+                continue;
+
+            controller.ClearCaptureSession();
+            var axisValue = controller.CurrentJoystickAxes.GetValueOrDefault(axisIndex);
+            return MarioKartInputConfigService.WrapToken($"Axis {axisIndex}{(axisValue >= 0 ? "+" : "-")}");
         }
 
         return string.Empty;
@@ -275,6 +377,78 @@ public static class SdlControllerService
         var current = controller.CurrentAxes.GetValueOrDefault(axis);
         return Math.Abs(current - baseline) >= DirectionalAxisDeltaThreshold;
     }
+
+    private static bool IsJoystickButtonNewlyActiveSinceCaptureStart(ControllerRuntimeState controller, int buttonIndex)
+    {
+        if (!controller.HasCaptureSession)
+            controller.StartCaptureSession();
+
+        var baseline = controller.CaptureJoystickButtons.GetValueOrDefault(buttonIndex);
+        var current = controller.CurrentJoystickButtons.GetValueOrDefault(buttonIndex);
+        return current && !baseline;
+    }
+
+    private static bool IsJoystickAxisNewlyActivatedSinceCaptureStart(ControllerRuntimeState controller, int axisIndex)
+    {
+        if (!controller.HasCaptureSession)
+            controller.StartCaptureSession();
+
+        var baseline = controller.CaptureJoystickAxes.GetValueOrDefault(axisIndex);
+        var current = controller.CurrentJoystickAxes.GetValueOrDefault(axisIndex);
+        return IsAxisActivated(current) && !IsAxisActivated(baseline);
+    }
+
+    private static bool HasJoystickAxisChangedSinceCaptureStart(ControllerRuntimeState controller, int axisIndex)
+    {
+        if (!controller.HasCaptureSession)
+            controller.StartCaptureSession();
+
+        var baseline = controller.CaptureJoystickAxes.GetValueOrDefault(axisIndex);
+        var current = controller.CurrentJoystickAxes.GetValueOrDefault(axisIndex);
+        return Math.Abs(current - baseline) >= DirectionalAxisDeltaThreshold;
+    }
+
+    private static bool TryCaptureGenericHat(ControllerRuntimeState controller, out string binding)
+    {
+        binding = string.Empty;
+
+        if (!controller.HasCaptureSession)
+            controller.StartCaptureSession();
+
+        for (var hatIndex = 0; hatIndex < controller.JoystickHatCount; hatIndex++)
+        {
+            var baseline = controller.CaptureJoystickHats.GetValueOrDefault(hatIndex);
+            var current = controller.CurrentJoystickHats.GetValueOrDefault(hatIndex);
+            var newlyPressedDirection = GetNewlyPressedHatDirection(baseline, current);
+            if (newlyPressedDirection == null)
+                continue;
+
+            binding = $"Hat {hatIndex} {newlyPressedDirection}";
+            return true;
+        }
+
+        return false;
+    }
+
+    private static string? GetNewlyPressedHatDirection(SDL.JoystickHat baseline, SDL.JoystickHat current)
+    {
+        if (HasNewHatDirection(baseline, current, SDL.JoystickHat.Up))
+            return "N";
+
+        if (HasNewHatDirection(baseline, current, SDL.JoystickHat.Down))
+            return "S";
+
+        if (HasNewHatDirection(baseline, current, SDL.JoystickHat.Left))
+            return "W";
+
+        if (HasNewHatDirection(baseline, current, SDL.JoystickHat.Right))
+            return "E";
+
+        return null;
+    }
+
+    private static bool HasNewHatDirection(SDL.JoystickHat baseline, SDL.JoystickHat current, SDL.JoystickHat direction) =>
+        (current & direction) == direction && (baseline & direction) != direction;
 
     private static bool IsAxisActivated(short value) => Math.Abs(value) >= AxisCaptureThreshold;
 
@@ -323,33 +497,85 @@ public static class SdlControllerService
         };
     }
 
-    private sealed class ControllerRuntimeState(uint instanceId, int dolphinDeviceIndex, IntPtr gamepadHandle)
+    private sealed class ControllerRuntimeState
     {
-        public uint InstanceId { get; } = instanceId;
-        public IntPtr GamepadHandle { get; } = gamepadHandle;
-        public int DolphinDeviceIndex { get; set; } = dolphinDeviceIndex;
+        private ControllerRuntimeState(uint instanceId, int dolphinDeviceIndex, IntPtr handle, bool isGamepad)
+        {
+            InstanceId = instanceId;
+            DolphinDeviceIndex = dolphinDeviceIndex;
+            IsGamepad = isGamepad;
+            if (isGamepad)
+                GamepadHandle = handle;
+            else
+                JoystickHandle = handle;
+        }
+
+        public uint InstanceId { get; }
+        public bool IsGamepad { get; }
+        public IntPtr GamepadHandle { get; }
+        public IntPtr JoystickHandle { get; }
+        public int DolphinDeviceIndex { get; set; }
+        public int JoystickAxisCount { get; private set; }
+        public int JoystickButtonCount { get; private set; }
+        public int JoystickHatCount { get; private set; }
         public Dictionary<SDL.GamepadButton, bool> CurrentButtons { get; } = new();
         public Dictionary<SDL.GamepadButton, bool> PreviousButtons { get; } = new();
         public Dictionary<SDL.GamepadAxis, short> CurrentAxes { get; } = new();
         public Dictionary<SDL.GamepadAxis, short> PreviousAxes { get; } = new();
         public Dictionary<SDL.GamepadButton, bool> CaptureButtons { get; } = new();
         public Dictionary<SDL.GamepadAxis, short> CaptureAxes { get; } = new();
+        public Dictionary<int, bool> CurrentJoystickButtons { get; } = new();
+        public Dictionary<int, bool> PreviousJoystickButtons { get; } = new();
+        public Dictionary<int, short> CurrentJoystickAxes { get; } = new();
+        public Dictionary<int, short> PreviousJoystickAxes { get; } = new();
+        public Dictionary<int, SDL.JoystickHat> CurrentJoystickHats { get; } = new();
+        public Dictionary<int, SDL.JoystickHat> PreviousJoystickHats { get; } = new();
+        public Dictionary<int, bool> CaptureJoystickButtons { get; } = new();
+        public Dictionary<int, short> CaptureJoystickAxes { get; } = new();
+        public Dictionary<int, SDL.JoystickHat> CaptureJoystickHats { get; } = new();
         public string DeviceExpression => $"SDL/{DolphinDeviceIndex}/{DisplayName}";
-        public SDL.GamepadType ControllerType => SDL.GetGamepadType(GamepadHandle);
-        public string DisplayName => SDL.GetGamepadName(GamepadHandle);
-        public string Subtitle => DescribeControllerType(ControllerType);
+        public SDL.GamepadType ControllerType => IsGamepad ? SDL.GetGamepadType(GamepadHandle) : SDL.GamepadType.Unknown;
+        public string DisplayName =>
+            IsGamepad ? SDL.GetGamepadName(GamepadHandle) ?? "Gamepad" : SDL.GetJoystickName(JoystickHandle) ?? "Controller";
+        public string Subtitle => IsGamepad ? DescribeControllerType(ControllerType) : "Generic SDL controller";
         public bool HasCaptureSession { get; private set; }
+
+        public static ControllerRuntimeState ForGamepad(uint instanceId, int dolphinDeviceIndex, IntPtr gamepadHandle) =>
+            new(instanceId, dolphinDeviceIndex, gamepadHandle, isGamepad: true);
+
+        public static ControllerRuntimeState ForJoystick(uint instanceId, int dolphinDeviceIndex, IntPtr joystickHandle) =>
+            new(instanceId, dolphinDeviceIndex, joystickHandle, isGamepad: false);
+
+        public void Close()
+        {
+            if (IsGamepad)
+                SDL.CloseGamepad(GamepadHandle);
+            else
+                SDL.CloseJoystick(JoystickHandle);
+        }
 
         public void StartCaptureSession()
         {
             CaptureButtons.Clear();
             CaptureAxes.Clear();
+            CaptureJoystickButtons.Clear();
+            CaptureJoystickAxes.Clear();
+            CaptureJoystickHats.Clear();
 
             foreach (var button in CapturableButtons)
                 CaptureButtons[button] = CurrentButtons.GetValueOrDefault(button);
 
             foreach (var axis in CapturableAxes)
                 CaptureAxes[axis] = CurrentAxes.GetValueOrDefault(axis);
+
+            for (var buttonIndex = 0; buttonIndex < JoystickButtonCount; buttonIndex++)
+                CaptureJoystickButtons[buttonIndex] = CurrentJoystickButtons.GetValueOrDefault(buttonIndex);
+
+            for (var axisIndex = 0; axisIndex < JoystickAxisCount; axisIndex++)
+                CaptureJoystickAxes[axisIndex] = CurrentJoystickAxes.GetValueOrDefault(axisIndex);
+
+            for (var hatIndex = 0; hatIndex < JoystickHatCount; hatIndex++)
+                CaptureJoystickHats[hatIndex] = CurrentJoystickHats.GetValueOrDefault(hatIndex);
 
             HasCaptureSession = true;
         }
@@ -358,11 +584,20 @@ public static class SdlControllerService
         {
             CaptureButtons.Clear();
             CaptureAxes.Clear();
+            CaptureJoystickButtons.Clear();
+            CaptureJoystickAxes.Clear();
+            CaptureJoystickHats.Clear();
             HasCaptureSession = false;
         }
 
         public void Refresh()
         {
+            if (!IsGamepad)
+            {
+                RefreshJoystick();
+                return;
+            }
+
             foreach (var button in CapturableButtons)
             {
                 PreviousButtons[button] = CurrentButtons.GetValueOrDefault(button);
@@ -373,6 +608,31 @@ public static class SdlControllerService
             {
                 PreviousAxes[axis] = CurrentAxes.GetValueOrDefault(axis);
                 CurrentAxes[axis] = SDL.GetGamepadAxis(GamepadHandle, axis);
+            }
+        }
+
+        private void RefreshJoystick()
+        {
+            JoystickButtonCount = Math.Max(0, SDL.GetNumJoystickButtons(JoystickHandle));
+            JoystickAxisCount = Math.Max(0, SDL.GetNumJoystickAxes(JoystickHandle));
+            JoystickHatCount = Math.Max(0, SDL.GetNumJoystickHats(JoystickHandle));
+
+            for (var buttonIndex = 0; buttonIndex < JoystickButtonCount; buttonIndex++)
+            {
+                PreviousJoystickButtons[buttonIndex] = CurrentJoystickButtons.GetValueOrDefault(buttonIndex);
+                CurrentJoystickButtons[buttonIndex] = SDL.GetJoystickButton(JoystickHandle, buttonIndex);
+            }
+
+            for (var axisIndex = 0; axisIndex < JoystickAxisCount; axisIndex++)
+            {
+                PreviousJoystickAxes[axisIndex] = CurrentJoystickAxes.GetValueOrDefault(axisIndex);
+                CurrentJoystickAxes[axisIndex] = SDL.GetJoystickAxis(JoystickHandle, axisIndex);
+            }
+
+            for (var hatIndex = 0; hatIndex < JoystickHatCount; hatIndex++)
+            {
+                PreviousJoystickHats[hatIndex] = CurrentJoystickHats.GetValueOrDefault(hatIndex);
+                CurrentJoystickHats[hatIndex] = (SDL.JoystickHat)SDL.GetJoystickHat(JoystickHandle, hatIndex);
             }
         }
     }
