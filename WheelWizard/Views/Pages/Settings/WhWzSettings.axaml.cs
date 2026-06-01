@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using Serilog;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
+using WheelWizard.Localization;
 using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Settings;
@@ -738,14 +739,11 @@ public partial class WhWzSettings : UserControlBase
         if (selectedLanguage.Key == currentLanguage)
             return;
 
-        var currentCulture = new System.Globalization.CultureInfo(currentLanguage);
-        var targetCulture = new System.Globalization.CultureInfo(selectedLanguage.Key);
+        var titleCurrent = LocalizationProvider.TranslateForLanguage("question.apply_language_settings.title", currentLanguage);
+        var titleTarget = LocalizationProvider.TranslateForLanguage("question.apply_language_settings.title", selectedLanguage.Key);
 
-        var titleCurrent = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Title", currentCulture);
-        var titleTarget = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Title", targetCulture);
-
-        var extraCurrent = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Extra", currentCulture);
-        var extraTarget = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Extra", targetCulture);
+        var extraCurrent = LocalizationProvider.TranslateForLanguage("question.apply_language_settings.extra", currentLanguage);
+        var extraTarget = LocalizationProvider.TranslateForLanguage("question.apply_language_settings.extra", selectedLanguage.Key);
 
         // popup now shows its selection in both languages
         var yesNoWindow = await new YesNoWindow()
