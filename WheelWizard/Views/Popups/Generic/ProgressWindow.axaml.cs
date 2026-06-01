@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using WheelWizard.Helpers;
 using WheelWizard.Views.Popups.Base;
 
 namespace WheelWizard.Views.Popups.Generic;
@@ -50,7 +49,7 @@ public partial class ProgressWindow : PopupContent
         var elapsedSeconds = _stopwatch.Elapsed.TotalSeconds;
         var remainingSeconds = (100 - _progress) / (_progress / elapsedSeconds);
 
-        var remainingText = _progress <= 0 ? t("state.unknown") : Humanizer.HumanizeSeconds((int)remainingSeconds);
+        var remainingText = _progress <= 0 ? t("state.unknown") : tTime((int)remainingSeconds);
 
         var bottomText = $"{t("progress.estimated_time_remaining")} {remainingText}";
 

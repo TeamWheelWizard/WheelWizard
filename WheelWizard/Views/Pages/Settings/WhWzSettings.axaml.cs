@@ -665,9 +665,7 @@ public partial class WhWzSettings : UserControlBase
         }
         var seconds = 10;
 
-        string ExtraScaleText() =>
-            t("question.apply_scale.extra", Humanizer.HumanizeSeconds(seconds))
-            ?? $"This will apply the new scale in {Humanizer.HumanizeSeconds(seconds)} seconds. You can cancel this by clicking Revert.";
+        string ExtraScaleText() => t("question.apply_scale.extra", tTime(seconds));
 
         var yesNoWindow = new YesNoWindow()
             .SetButtonText(t("action.apply"), t("action.revert"))

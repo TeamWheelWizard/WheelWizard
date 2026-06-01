@@ -1,57 +1,7 @@
-namespace WheelWizard.Helpers;
+namespace WheelWizard.WiiManagement.GameLicense;
 
-public static class Humanizer
+public static class GameLicenseDisplay
 {
-    public static string? ReplaceDynamic(string? langString, params object[] replacements)
-    {
-        // any dynamic part should be as follows: {$1}, {$2}, etc.
-        for (var i = 0; i < replacements.Length; i++)
-        {
-            langString = langString?.Replace("{$" + (i + 1) + "}", replacements[i]?.ToString() ?? "");
-        }
-
-        return langString;
-    }
-
-    public static string HumanizeTimeSpan(TimeSpan timeSpan)
-    {
-        if (Math.Abs(timeSpan.TotalDays) >= 1)
-        {
-            var days = timeSpan.Days;
-            var hours = timeSpan.Hours;
-            var dayText = t("time.days.n", days);
-            if (hours == 0)
-                return dayText;
-            var hourText = t("time.hours.n", hours);
-            return $"{dayText} {hourText}";
-        }
-
-        if (Math.Abs(timeSpan.TotalHours) >= 1)
-        {
-            var hours = timeSpan.Hours;
-            var minutes = timeSpan.Minutes;
-            var hourText = t("time.hours.n", hours);
-            if (minutes == 0)
-                return hourText;
-            var minuteText = t("time.minutes.n", minutes);
-            return $"{hourText} {minuteText}";
-        }
-        if (Math.Abs(timeSpan.TotalMinutes) >= 1)
-        {
-            var minutes = timeSpan.Minutes;
-            var seconds = timeSpan.Seconds;
-            var minuteText = t("time.minutes.n", minutes);
-            if (seconds == 0)
-                return minuteText;
-            var secondText = t("time.seconds.n", seconds);
-            return $"{minuteText} {secondText}";
-        }
-
-        return t("time.seconds.n", timeSpan.Seconds);
-    }
-
-    public static string HumanizeSeconds(int seconds) => HumanizeTimeSpan(TimeSpan.FromSeconds(seconds));
-
     public static string GetRegionName(uint regionID)
     {
         return regionID switch

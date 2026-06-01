@@ -1,5 +1,4 @@
 using Serilog;
-using WheelWizard.Helpers;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Shared.MessageTranslations;
@@ -233,13 +232,11 @@ public static class MessageTranslationHelper
             (int)msg < 1000 ? MessageBoxWindow.MessageType.Message
             : (int)msg < 3000 ? MessageBoxWindow.MessageType.Warning
             : MessageBoxWindow.MessageType.Error;
-        var box = new MessageBoxWindow()
-            .SetMessageType(type)
-            .SetTitleText(Humanizer.ReplaceDynamic(title, titleReplacements ?? []) ?? title);
+        var box = new MessageBoxWindow().SetMessageType(type).SetTitleText(tFormat(title, titleReplacements ?? []));
         if (extraText == null)
-            box.SetInfoText(Humanizer.ReplaceDynamic(title, titleReplacements ?? []) ?? title);
+            box.SetInfoText(tFormat(title, titleReplacements ?? []));
         else
-            box.SetInfoText(Humanizer.ReplaceDynamic(extraText, extraReplacements ?? []) ?? extraText);
+            box.SetInfoText(tFormat(extraText, extraReplacements ?? []));
 
         if ((int)msg >= 2000)
             box.SetTag($"{(int)msg}");
