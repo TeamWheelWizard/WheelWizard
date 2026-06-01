@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings.Types;
@@ -62,8 +63,22 @@ public static class ViewUtils
             RRLiveRooms.Instance.Unsubscribe(oldListener);
         }
 
-        newWindow.Show();
-        oldWindow.Close();
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            var previousShutdownMode = desktop.ShutdownMode;
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            desktop.MainWindow = newWindow;
+            newWindow.Show();
+            oldWindow.Close();
+            desktop.ShutdownMode =
+                previousShutdownMode == ShutdownMode.OnMainWindowClose ? ShutdownMode.OnMainWindowClose : previousShutdownMode;
+        }
+        else
+        {
+            newWindow.Show();
+            oldWindow.Close();
+        }
+
         newWindow.UpdatePlayerAndRoomCount(RRLiveRooms.Instance);
     }
 

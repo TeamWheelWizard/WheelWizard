@@ -582,7 +582,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -.
+        ///   Looks up a localized string similar to Čeština.
         /// </summary>
         public static string Value_Language_CzechOg {
             get {
@@ -636,7 +636,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -.
+        ///   Looks up a localized string similar to Suomi.
         /// </summary>
         public static string Value_Language_FinnishOg {
             get {
@@ -762,7 +762,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -.
+        ///   Looks up a localized string similar to Português.
         /// </summary>
         public static string Value_Language_PortugueseOg {
             get {

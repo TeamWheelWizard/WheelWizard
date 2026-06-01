@@ -21,12 +21,20 @@ namespace WheelWizard.Views.Pages.Settings;
 
 public partial class WhWzSettings : UserControlBase
 {
+    private sealed record LanguageDropdownItem(string Key, string DisplayName)
+    {
+        public override string ToString() => DisplayName;
+    }
+
     private readonly bool _pageLoaded;
     private bool _editingScale;
     private bool _isMovingAppData;
 
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
+
+    [Inject]
+    private ISettingsLocalizationService LocalizationService { get; set; } = null!;
 
     [Inject]
     private IDolphinSettingManager DolphinSettingsService { get; set; } = null!;
@@ -53,14 +61,15 @@ public partial class WhWzSettings : UserControlBase
         // Wheel Wizard Language Dropdown
         // -----------------
         WhWzLanguageDropdown.Items.Clear(); // Clear existing items
-        foreach (var lang in SettingValues.WhWzLanguages.Values)
+        foreach (var (key, displayNameFactory) in SettingValues.WhWzLanguages)
         {
-            WhWzLanguageDropdown.Items.Add(lang());
+            WhWzLanguageDropdown.Items.Add(new LanguageDropdownItem(key, displayNameFactory()));
         }
 
         var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-        var whWzLanguageDisplayName = SettingValues.WhWzLanguages[currentWhWzLanguage];
-        WhWzLanguageDropdown.SelectedItem = whWzLanguageDisplayName();
+        WhWzLanguageDropdown.SelectedItem = WhWzLanguageDropdown
+            .Items.OfType<LanguageDropdownItem>()
+            .FirstOrDefault(item => item.Key == currentWhWzLanguage);
 
         TranslationsPercentageText.Text = Humanizer.ReplaceDynamic(
             Phrases.Text_LanguageTranslatedBy,
@@ -722,15 +731,15 @@ public partial class WhWzSettings : UserControlBase
         if (WhWzLanguageDropdown.SelectedItem == null)
             return;
 
-        var selectedLanguage = WhWzLanguageDropdown.SelectedItem.ToString();
-        var key = SettingValues.WhWzLanguages.FirstOrDefault(x => x.Value() == selectedLanguage).Key;
+        if (WhWzLanguageDropdown.SelectedItem is not LanguageDropdownItem selectedLanguage)
+            return;
 
         var currentLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-        if (key == null || key == currentLanguage)
+        if (selectedLanguage.Key == currentLanguage)
             return;
 
         var currentCulture = new System.Globalization.CultureInfo(currentLanguage);
-        var targetCulture = new System.Globalization.CultureInfo(key);
+        var targetCulture = new System.Globalization.CultureInfo(selectedLanguage.Key);
 
         var titleCurrent = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Title", currentCulture);
         var titleTarget = SettingsResource.ResourceManager.GetString("Question_ApplyLanguageSettings_Title", targetCulture);
@@ -748,13 +757,17 @@ public partial class WhWzSettings : UserControlBase
         if (!yesNoWindow)
         {
             var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-            var whWzLanguageDisplayName = SettingValues.WhWzLanguages[currentWhWzLanguage](); // gets the name of the current language back if the change was aborted
-            WhWzLanguageDropdown.SelectedItem = whWzLanguageDisplayName;
+            WhWzLanguageDropdown.SelectedItem = WhWzLanguageDropdown
+                .Items.OfType<LanguageDropdownItem>()
+                .FirstOrDefault(item => item.Key == currentWhWzLanguage);
             return; // We only want to change the setting if we really apply this change
         }
 
-        SettingsService.WW_LANGUAGE.Set(key);
-        ViewUtils.RefreshWindow();
+        if (SettingsService.WW_LANGUAGE.Set(selectedLanguage.Key))
+        {
+            LocalizationService.ApplyCurrentLanguage();
+            ViewUtils.RefreshWindow();
+        }
     }
 
     private void EnableAnimations_OnClick(object sender, RoutedEventArgs e) =>
