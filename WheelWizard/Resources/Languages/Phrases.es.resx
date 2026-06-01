@@ -384,4 +384,7 @@
     <data name="Placeholder_EnterPath" xml:space="preserve">
         <value>Ingrese la ruta deseada...</value>
     </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>El nombre del creador tiene que tener menos de 10 caracteres.</value>
+    </data>
 </root>

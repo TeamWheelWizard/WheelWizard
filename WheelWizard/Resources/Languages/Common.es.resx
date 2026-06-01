@@ -314,4 +314,151 @@
     <data name="Attribute_Gender_Male" xml:space="preserve">
         <value>Hombre</value>
     </data>
+    <data name="Action_DoManually" xml:space="preserve">
+        <value>Hacer manualmente</value>
+    </data>
+    <data name="Action_DownloadAndInstall" xml:space="preserve">
+        <value>Descargar e Instalar</value>
+    </data>
+    <data name="Action_GamebananaPage" xml:space="preserve">
+        <value>Página de Gamebanana</value>
+    </data>
+    <data name="Action_Report" xml:space="preserve">
+        <value>Reportar</value>
+    </data>
+    <data name="Action_Submit" xml:space="preserve">
+        <value>Enviar</value>
+    </data>
+    <data name="Action_UnInstall" xml:space="preserve">
+        <value>Desinstalar</value>
+    </data>
+    <data name="Action_ViewCustomChars" xml:space="preserve">
+        <value>Ver Personajes Custom</value>
+    </data>
+    <data name="Attribute_Description" xml:space="preserve">
+        <value>Descripción</value>
+    </data>
+    <data name="Attribute_Downloads" xml:space="preserve">
+        <value>Descargas</value>
+    </data>
+    <data name="Attribute_Images" xml:space="preserve">
+        <value>Imágenes</value>
+    </data>
+    <data name="Attribute_Likes" xml:space="preserve">
+        <value>Me Gustas</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
+        <value>Cejas</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyes" xml:space="preserve">
+        <value>Ojos</value>
+    </data>
+    <data name="Attribute_MiiSection_Face" xml:space="preserve">
+        <value>Cara</value>
+    </data>
+    <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
+        <value>Vello Facial</value>
+    </data>
+    <data name="Attribute_MiiSection_General" xml:space="preserve">
+        <value>General</value>
+    </data>
+    <data name="Attribute_MiiSection_Glasses" xml:space="preserve">
+        <value>Lentes</value>
+    </data>
+    <data name="Attribute_MiiSection_Hair" xml:space="preserve">
+        <value>Pelo</value>
+    </data>
+    <data name="Attribute_MiiSection_Lips" xml:space="preserve">
+        <value>Labios</value>
+    </data>
+    <data name="Attribute_MiiSection_Mole" xml:space="preserve">
+        <value>Lunar</value>
+    </data>
+    <data name="Attribute_MiiSection_Nose" xml:space="preserve">
+        <value>Nariz</value>
+    </data>
+    <data name="Attribute_Mii_BeardType" xml:space="preserve">
+        <value>Tipo de Barba</value>
+    </data>
+    <data name="Attribute_Mii_CreatorName" xml:space="preserve">
+        <value>Nombre de Creador</value>
+    </data>
+    <data name="Attribute_Mii_DefaultName" xml:space="preserve">
+        <value>Nuevo Mii</value>
+    </data>
+    <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
+        <value>Tipo de Cejas</value>
+    </data>
+    <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
+        <value>Rasgo Facial</value>
+    </data>
+    <data name="Attribute_Mii_FavColor" xml:space="preserve">
+        <value>Color Favorito</value>
+    </data>
+    <data name="Attribute_Mii_GlassesColor" xml:space="preserve">
+        <value>Color de Lentes</value>
+    </data>
+    <data name="Attribute_Mii_GlassesType" xml:space="preserve">
+        <value>Tipo de Lentes</value>
+    </data>
+    <data name="Attribute_Mii_HairColor" xml:space="preserve">
+        <value>Color del Pelo</value>
+    </data>
+    <data name="Attribute_Mii_HairType" xml:space="preserve">
+        <value>Tipo de Pelo</value>
+    </data>
+    <data name="Attribute_Mii_HeadShape" xml:space="preserve">
+        <value>Forma de la Cabeza</value>
+    </data>
+    <data name="Attribute_Mii_Height" xml:space="preserve">
+        <value>Altura</value>
+    </data>
+    <data name="Attribute_Mii_HorizontalPosition" xml:space="preserve">
+        <value>Posición Horizontal (Izq/Der)</value>
+    </data>
+    <data name="Attribute_Mii_IrishColor" xml:space="preserve">
+        <value>Color de los Ojos</value>
+    </data>
+    <data name="Attribute_Mii_MirrorHair" xml:space="preserve">
+        <value>Voltear Pelo</value>
+    </data>
+    <data name="Attribute_Mii_MouthType" xml:space="preserve">
+        <value>Tipo de Boca</value>
+    </data>
+    <data name="Attribute_Mii_MustacheSize" xml:space="preserve">
+        <value>Tamaño del Bigote</value>
+    </data>
+    <data name="Attribute_Mii_MustacheType" xml:space="preserve">
+        <value>Tipo de Bigote</value>
+    </data>
+    <data name="Attribute_Mii_MustacheVerticalPosition" xml:space="preserve">
+        <value>Posición Vertical del Bigote (Arriba/Abajo)</value>
+    </data>
+    <data name="Attribute_Mii_Name" xml:space="preserve">
+        <value>Nombre de Mii</value>
+    </data>
+    <data name="Attribute_Mii_NoseType" xml:space="preserve">
+        <value>Tipo de Nariz</value>
+    </data>
+    <data name="Attribute_Mii_Rotation" xml:space="preserve">
+        <value>Rotación (Rotar Izq/Der)</value>
+    </data>
+    <data name="Attribute_Mii_Size" xml:space="preserve">
+        <value>Tamaño</value>
+    </data>
+    <data name="Attribute_Mii_SkinColor" xml:space="preserve">
+        <value>Color de Piel</value>
+    </data>
+    <data name="Attribute_Mii_SpaceBetween" xml:space="preserve">
+        <value>Espacio intermedio</value>
+    </data>
+    <data name="Attribute_Mii_VerticalPosition" xml:space="preserve">
+        <value>Posición vertical (Arriba/Abajo)</value>
+    </data>
+    <data name="Attribute_Mii_Width" xml:space="preserve">
+        <value>Ancho</value>
+    </data>
+    <data name="Attribute_Views" xml:space="preserve">
+        <value>Visitas</value>
+    </data>
 </root>

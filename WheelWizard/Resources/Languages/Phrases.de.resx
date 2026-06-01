@@ -484,4 +484,7 @@ Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund treff
     <data name="Question_MoveData_Title" xml:space="preserve">
         <value>Wheel Wizard Daten verschieben?</value>
     </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>Name des Ersteller muss weniger als 10 Zeichen lang sein.</value>
+    </data>
 </root>

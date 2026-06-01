@@ -465,4 +465,7 @@ My Stuffフォルダーをクリアしますか？</value>
     <data name="Text_LanguageTranslatedBy" xml:space="preserve">
         <value>この言語はこれらの方が翻訳しました: {$1}</value>
     </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>作成者の名前の長さは10文字以下にしてください</value>
+    </data>
 </root>

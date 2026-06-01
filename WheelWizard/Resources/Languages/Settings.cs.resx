@@ -115,6 +115,69 @@
         <value>Turečtina</value>
     </data>
     <data name="Value_Language_CompletePercentage" xml:space="preserve">
-        <value>57</value>
+        <value>91</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>O tomto</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Ostatní</value>
+    </data>
+    <data name="HelperText_30FPS" xml:space="preserve">
+        <value>Toto nastavení donutí hru běžet za 30 FPS (výchozí je 60)</value>
+    </data>
+    <data name="HelperText_EnableAnimations" xml:space="preserve">
+        <value>To aktivuje animace v aplikaci Wheel Wizard</value>
+    </data>
+    <data name="HelperText_EndWithExe" xml:space="preserve">
+        <value>Cesta musí končit .exe</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>Cesta může končit:</value>
+    </data>
+    <data name="HelperText_LaunchWithDolphin" xml:space="preserve">
+        <value>Spustí hlavní okno Dolphin spolu s hrou</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Musíš nastavit tyto 3 cesty než začneš hrát Retro Rewind.</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>Volitelný</value>
+    </data>
+    <data name="HelperText_Topbar_LocationWarning" xml:space="preserve">
+        <value>Nastavení jsou vypnuté, nejprve dokonči nastavení umístění</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>Tím se změní pouze jazyk pro Wheel Wizard. Chceš-li změnit jazyk ve hře, musíš to udělat v nastavení hry.</value>
+    </data>
+    <data name="Option_DolphinEmulatorExe" xml:space="preserve">
+        <value>Spustitelný soubor Dolphin Emulator</value>
+    </data>
+    <data name="Option_DolphinUserPath" xml:space="preserve">
+        <value>Uživatelská Složka Dolphin</value>
+    </data>
+    <data name="Option_EnableAnimations" xml:space="preserve">
+        <value>Zapnout Animace</value>
+    </data>
+    <data name="Option_OpenConfig" xml:space="preserve">
+        <value>Otevřít Konfigurační Složku</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>Otevřít Složku Hry</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>Otevřít Složku Uložení</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Reinstalovat RR</value>
+    </data>
+    <data name="Section_Performance" xml:space="preserve">
+        <value>Nastavení Výkonu</value>
+    </data>
+    <data name="Section_Renderer" xml:space="preserve">
+        <value>Nastavení Vykreslování</value>
+    </data>
+    <data name="Section_WhWzAppearance" xml:space="preserve">
+        <value>Vzhled Wheel Wizard</value>
     </data>
 </root>

@@ -168,4 +168,236 @@
     <data name="Text_PoweredGamebanana" xml:space="preserve">
         <value>Poháněno společností GameBanana</value>
     </data>
+    <data name="EmptyContent_NoMiis" xml:space="preserve">
+        <value>Nemůžeme číst data Mii z tvého systému. Ujisti se, že jsi hru aspoň jednou spustil</value>
+    </data>
+    <data name="EmptyContent_NoMods" xml:space="preserve">
+        <value>Mody mohou změnit fungování hry. Začni importovat tvůj první mod kliknutím na tlačítko níže.</value>
+    </data>
+    <data name="EmptyContent_NoModSelected_Title" xml:space="preserve">
+        <value>Není vybrán žádný mod</value>
+    </data>
+    <data name="EmptyContent_NoMods_Title" xml:space="preserve">
+        <value>Nebyly nalezeny žádné mody</value>
+    </data>
+    <data name="EmptyContent_NoProfiles" xml:space="preserve">
+        <value>Hru musíš hrát aspoň jednou, abys viděl tvé profily zde uvedené</value>
+    </data>
+    <data name="EmptyContent_NoRooms_Title" xml:space="preserve">
+        <value>Nebyly nalezeny žádné místnosti</value>
+    </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>Jméno tvůrce musí být kratší než 10 znaků.</value>
+    </data>
+    <data name="Hover_FriendsOnline_0" xml:space="preserve">
+        <value>Právě nejsou žádní kamarádi online</value>
+    </data>
+    <data name="Hover_FriendsOnline_1" xml:space="preserve">
+        <value>Právě je 1 kamarád online</value>
+    </data>
+    <data name="Hover_FriendsOnline_x" xml:space="preserve">
+        <value>Právě jsou {$1} kamarádi online</value>
+    </data>
+    <data name="Hover_FriendsPageDisclaimer" xml:space="preserve">
+        <value>Chceš-li přidat kamarády, musíš je přidat ve hře.</value>
+    </data>
+    <data name="Hover_PlayersOnline_0" xml:space="preserve">
+        <value>Právě nejsou žádní hráči online</value>
+    </data>
+    <data name="Hover_PlayersOnline_1" xml:space="preserve">
+        <value>Právě je 1 hráč online</value>
+    </data>
+    <data name="Hover_PlayersOnline_x" xml:space="preserve">
+        <value>Právě jsou {$1} hráči online</value>
+    </data>
+    <data name="Hover_PrimaryProfile" xml:space="preserve">
+        <value>Primární profil se používá jako reference v klientovi Wheel Wizard</value>
+    </data>
+    <data name="Hover_RegionUserSelection" xml:space="preserve">
+        <value>To ukazuje pouze regiony, ve kterých TY jsi hrál</value>
+    </data>
+    <data name="Hover_RoomsPageDisclaimer" xml:space="preserve">
+        <value>Upozorňujeme, že tato stránka nenabízí žádnou funkci pro přímé připojení k místnosti.
+Chceš-li se připojit ke konkrétní místnosti, budeš se muset buď připojit prostřednictvím kamaráda, nebo doufat, že se k ní připojíš připojením k online serverům.</value>
+    </data>
+    <data name="MessageError_AbortRR_Extra_FailedUpdateApply" xml:space="preserve">
+        <value>Aktualizace aplikace se nezdařila. Přerušení.</value>
+    </data>
+    <data name="MessageError_AbortRR_Extra_FailedUpdateDelete" xml:space="preserve">
+        <value>Odstranění souborů pro aktualizaci se nezdařilo. Přerušení.</value>
+    </data>
+    <data name="MessageError_AbortRR_Title" xml:space="preserve">
+        <value>Přerušení Aktualizace RR</value>
+    </data>
+    <data name="MessageError_FailedChangeMii_Title" xml:space="preserve">
+        <value>Změna Mii se nezdařila</value>
+    </data>
+    <data name="MessageError_FailedChangeName_Title" xml:space="preserve">
+        <value>Změna jména se nezdařila</value>
+    </data>
+    <data name="MessageError_FailedCreateMiiDb_Title" xml:space="preserve">
+        <value>Vytvoření databáze Mii se nezdařilo</value>
+    </data>
+    <data name="MessageError_FailedInstallDolphin_Extra" xml:space="preserve">
+        <value>Instalace Dolphin Emulatoru se nezdařila. Zkus prosím ručně nainstalovat Flatpak Dolphin.</value>
+    </data>
+    <data name="MessageError_FailedInstallDolphin_Title" xml:space="preserve">
+        <value>Instalace Dolphinu se nezdařila</value>
+    </data>
+    <data name="MessageError_FailedRetrieveMod_Title" xml:space="preserve">
+        <value>Načtení informací o modu se nezdařilo</value>
+    </data>
+    <data name="MessageError_RestartAdminFail_Extra" xml:space="preserve">
+        <value>Restartování s právy administrátor se nezdařilo.</value>
+    </data>
+    <data name="MessageSuccess_MiiChanged" xml:space="preserve">
+        <value>Mii se úspěšně změnila</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Extra" xml:space="preserve">
+        <value>Jeden nebo více z vybraných Mii(y) je oblíbený. Miiy je možné smazat pouze v případě, že nejsou oblíbené, aby se zabránilo náhodnému smazání.</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Title" xml:space="preserve">
+        <value>Není možné odstranit oblíbené Mii(y)</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Extra_NotFromBrowser" xml:space="preserve">
+        <value>Není možné zobrazit mod, který nebyl nainstalován prostřednictvím prohlížeče modů.</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Extra_SomethingElse" xml:space="preserve">
+        <value>Při pokusu o otevření vybraného modu se něco pokazilo.</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Title" xml:space="preserve">
+        <value>Tento mod není možné zobrazit.</value>
+    </data>
+    <data name="MessageWarning_DolphinNotFound_Extra" xml:space="preserve">
+        <value>Složka Dolphin Emulator nebyla automaticky nalezena. Zkus prosím složku najít ručně, klikni na 'Pomoc' pro více informací.</value>
+    </data>
+    <data name="MessageWarning_DolphinNotFound_Title" xml:space="preserve">
+        <value>Složka Dolphin Emulator Nebyla Nalezena</value>
+    </data>
+    <data name="MessageWarning_FailCheckUpdates_Extra" xml:space="preserve">
+        <value>Aktualizace není možné právě teď zkontrolovat. Možná nejsi připojeni k internetu nebo server může být mimo provoz.</value>
+    </data>
+    <data name="MessageWarning_FailCheckUpdates_Title" xml:space="preserve">
+        <value>Kontrola aktualizací se nezdařila</value>
+    </data>
+    <data name="MessageWarning_InvalidName_Extra_ModNameExists" xml:space="preserve">
+        <value>Mod s jménem '{$1}' již existuje.</value>
+    </data>
+    <data name="MessageWarning_InvalidPaths_Title" xml:space="preserve">
+        <value>Neplatné Cesty.</value>
+    </data>
+    <data name="MessageWarning_MultipleFilesSelected_Title" xml:space="preserve">
+        <value>Vybráno Více Souborů</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Title" xml:space="preserve">
+        <value>Není možné stáhnout mod</value>
+    </data>
+    <data name="MessageWarning_UnableUpdateWhWz_Title" xml:space="preserve">
+        <value>Není možné aktualizovat Wheel Wizard</value>
+    </data>
+    <data name="Placeholder_EnterMiiName" xml:space="preserve">
+        <value>Zadej jméno Mii...</value>
+    </data>
+    <data name="Placeholder_EnterModName" xml:space="preserve">
+        <value>Zadej jméno modu...</value>
+    </data>
+    <data name="Placeholder_EnterPath" xml:space="preserve">
+        <value>Zadej požadovanou cestu zde...</value>
+    </data>
+    <data name="Placeholder_EnterTextHere" xml:space="preserve">
+        <value>Zadej text zde...</value>
+    </data>
+    <data name="Placeholder_SearchForPlayers" xml:space="preserve">
+        <value>Hledej hráči...</value>
+    </data>
+    <data name="Placeholder_SearchMod" xml:space="preserve">
+        <value>Hledej mody...</value>
+    </data>
+    <data name="Progress_EstimatedTimeRemaining" xml:space="preserve">
+        <value>Předpokládaný zbývající čas:</value>
+    </data>
+    <data name="Progress_InstallingDolphin" xml:space="preserve">
+        <value>Instalování Dolphin Emulator</value>
+    </data>
+    <data name="Question_DolphinFlatpack_Title" xml:space="preserve">
+        <value>Instalace Dolphin Flatpak</value>
+    </data>
+    <data name="Question_DolphinFound_Title" xml:space="preserve">
+        <value>Nalezena Složka Dolphin Emulator</value>
+    </data>
+    <data name="Question_EnterNewName_Extra" xml:space="preserve">
+        <value>Změna jména z: {$1}</value>
+    </data>
+    <data name="Question_EnterNewName_Title" xml:space="preserve">
+        <value>Zadej nové jméno</value>
+    </data>
+    <data name="Question_InstallMod_Title" xml:space="preserve">
+        <value>Chceš stáhnout a nainstalovat mod: {$1}?</value>
+    </data>
+    <data name="Question_LaunchClearModsFound_Extra" xml:space="preserve">
+        <value>Chystáš se spustit hru bez jakýchkoliv modů. Chceš vymazat složku my-stuff?</value>
+    </data>
+    <data name="Question_LaunchClearModsFound_Title" xml:space="preserve">
+        <value>Nalezené mody</value>
+    </data>
+    <data name="Question_OldRksysFound_Title" xml:space="preserve">
+        <value>Starý rksys.dat nalezen</value>
+    </data>
+    <data name="Question_ReinstallRR_Extra" xml:space="preserve">
+        <value>Opravdu chceš reinstalovat Retro Rewind?</value>
+    </data>
+    <data name="Question_RRNotDeterment_Extra" xml:space="preserve">
+        <value>Tvojí verzi Retro Rewind se nepodařilo určit. Chtěl bys si stáhnout Retro Rewind?</value>
+    </data>
+    <data name="Question_RRToOld_Extra" xml:space="preserve">
+        <value>Tvoje verze Retro Rewind je moc stará na aktualizaci. Chtěl bys znovu nainstalovat Retro Rewind?</value>
+    </data>
+    <data name="Question_SearchMod" xml:space="preserve">
+        <value>Hledej mody...</value>
+    </data>
+    <data name="Question_SureDelete_Extra" xml:space="preserve">
+        <value>Smazání je trvalé a není možné je vrátit zpět.</value>
+    </data>
+    <data name="Question_SureDelete_Title" xml:space="preserve">
+        <value>Opravdu chceš smazat {$1}?</value>
+    </data>
+    <data name="Question_SureDelete_Title_Miis" xml:space="preserve">
+        <value>Opravdu chceš smazat {$1} Miiy?</value>
+    </data>
+    <data name="Question_UpdateAdmin_Extra" xml:space="preserve">
+        <value>Někdy aktualizace vyžaduje administrátorská práva. Chceš je pro tuto aktualizaci aktivovat?</value>
+    </data>
+    <data name="Question_UpdateAdmin_Title" xml:space="preserve">
+        <value>Aktualizovat pomocí admin</value>
+    </data>
+    <data name="SnackbarSuccess_CopiedFC" xml:space="preserve">
+        <value>Zkopírovaný kód kamaráda do schránky</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted" xml:space="preserve">
+        <value>Smazáno '{$1}'</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted_Miis" xml:space="preserve">
+        <value>Smazáno {$1} Miiy</value>
+    </data>
+    <data name="SnackbarSuccess_MiiAdded" xml:space="preserve">
+        <value>Mii byl přidán do tvého Miiy</value>
+    </data>
+    <data name="SnackbarSuccess_NameChange" xml:space="preserve">
+        <value>Úspěšně změněn jméno na '{$1}'</value>
+    </data>
+    <data name="SnackbarSuccess_ProfileSetPrimary" xml:space="preserve">
+        <value>Nastavit profil jako primární</value>
+    </data>
+    <data name="SnackbarSuccess_SavedMii" xml:space="preserve">
+        <value>Uloženo Mii '{$1}' do souboru '{$2}'</value>
+    </data>
+    <data name="SnackbarWarning_CantSaveMii" xml:space="preserve">
+        <value>Mii není možné uložit</value>
+    </data>
+    <data name="SnackbarWarning_NoMiiDelete" xml:space="preserve">
+        <value>Zdá se, že tam nebyly žádné Miiy, které by bylo možné smazat</value>
+    </data>
+    <data name="SnackbarWarning_NoMiiExport" xml:space="preserve">
+        <value>Zdá se, že tam nebyly žádné Miiy, které by bylo možné exportovat</value>
+    </data>
 </root>

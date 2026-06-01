@@ -160,7 +160,7 @@
         <value>Norwegisch</value>
     </data>
     <data name="Value_Language_Portuguese" xml:space="preserve">
-        <value>Portugiesisch</value>
+        <value>Portugisisch</value>
     </data>
     <data name="Category_Other" xml:space="preserve">
         <value>Sonstiges</value>
@@ -169,7 +169,7 @@
         <value>Allgemein</value>
     </data>
     <data name="Category_About" xml:space="preserve">
-        <value>Über uns</value>
+        <value>Über</value>
     </data>
     <data name="Option_OpenGameFolder" xml:space="preserve">
         <value>Spielordner öffnen</value>

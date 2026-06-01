@@ -153,4 +153,340 @@
     <data name="State_NoProfiles" xml:space="preserve">
         <value>Sem perfil</value>
     </data>
+    <data name="Action_Back" xml:space="preserve">
+        <value>Voltar</value>
+    </data>
+    <data name="Action_DoManually" xml:space="preserve">
+        <value>Fazer manualmente</value>
+    </data>
+    <data name="Action_DownloadAndInstall" xml:space="preserve">
+        <value>Fazer Download e Instalar</value>
+    </data>
+    <data name="Action_Duplicate" xml:space="preserve">
+        <value>Duplicar</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>Adicionar aos favoritos</value>
+    </data>
+    <data name="Action_GamebananaPage" xml:space="preserve">
+        <value>Página do GameBanana</value>
+    </data>
+    <data name="Action_LaunchDolphin" xml:space="preserve">
+        <value>Iniciar o Dolphin</value>
+    </data>
+    <data name="Action_Link_Discord" xml:space="preserve">
+        <value>Fala connosco!</value>
+    </data>
+    <data name="Action_Link_Github" xml:space="preserve">
+        <value>Código-fonte</value>
+    </data>
+    <data name="Action_Link_Support" xml:space="preserve">
+        <value>Apoia-nos!</value>
+    </data>
+    <data name="Action_Randomize" xml:space="preserve">
+        <value>Aleatorizar</value>
+    </data>
+    <data name="Action_Report" xml:space="preserve">
+        <value>Reportar</value>
+    </data>
+    <data name="Action_SaveExternalMii" xml:space="preserve">
+        <value>Adicionar Mii aos "Meus Miis"</value>
+    </data>
+    <data name="Action_Submit" xml:space="preserve">
+        <value>Submeter</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>Tirar dos favoritos</value>
+    </data>
+    <data name="Action_UnInstall" xml:space="preserve">
+        <value>Desinstalar</value>
+    </data>
+    <data name="Action_ViewCustomChars" xml:space="preserve">
+        <value>Ver Personagens Customizadas</value>
+    </data>
+    <data name="Attribute_AverageRoomVr" xml:space="preserve">
+        <value>CV Médio</value>
+    </data>
+    <data name="Attribute_BrAbbreviation" xml:space="preserve">
+        <value>CB Médio</value>
+    </data>
+    <data name="Attribute_BrFull" xml:space="preserve">
+        <value>Classificação de Batalha</value>
+    </data>
+    <data name="Attribute_Description" xml:space="preserve">
+        <value>Descrição</value>
+    </data>
+    <data name="Attribute_Downloads" xml:space="preserve">
+        <value>Downloads</value>
+    </data>
+    <data name="Attribute_FriendCode" xml:space="preserve">
+        <value>Código de Amigo</value>
+    </data>
+    <data name="Attribute_Gender" xml:space="preserve">
+        <value>Género</value>
+    </data>
+    <data name="Attribute_Gender_Female" xml:space="preserve">
+        <value>Mulher</value>
+    </data>
+    <data name="Attribute_Gender_Male" xml:space="preserve">
+        <value>Homem</value>
+    </data>
+    <data name="Attribute_Images" xml:space="preserve">
+        <value>Imagens</value>
+    </data>
+    <data name="Attribute_IsOnline" xml:space="preserve">
+        <value>Está Online</value>
+    </data>
+    <data name="Attribute_Likes" xml:space="preserve">
+        <value>Gostos</value>
+    </data>
+    <data name="Attribute_Losses" xml:space="preserve">
+        <value>Derrotas</value>
+    </data>
+    <data name="Attribute_Message" xml:space="preserve">
+        <value>Mensagem</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
+        <value>Sobrancelhas</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyes" xml:space="preserve">
+        <value>Olhos</value>
+    </data>
+    <data name="Attribute_MiiSection_Face" xml:space="preserve">
+        <value>Cara</value>
+    </data>
+    <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
+        <value>Pelos Faciais</value>
+    </data>
+    <data name="Attribute_MiiSection_General" xml:space="preserve">
+        <value>Geral</value>
+    </data>
+    <data name="Attribute_MiiSection_Glasses" xml:space="preserve">
+        <value>Óculos</value>
+    </data>
+    <data name="Attribute_MiiSection_Hair" xml:space="preserve">
+        <value>Cabelo</value>
+    </data>
+    <data name="Attribute_MiiSection_Lips" xml:space="preserve">
+        <value>Lábios</value>
+    </data>
+    <data name="Attribute_MiiSection_Mole" xml:space="preserve">
+        <value>Verruga</value>
+    </data>
+    <data name="Attribute_MiiSection_Nose" xml:space="preserve">
+        <value>Nariz</value>
+    </data>
+    <data name="Attribute_Mii_BeardType" xml:space="preserve">
+        <value>Tipo de Barba</value>
+    </data>
+    <data name="Attribute_Mii_CreatorName" xml:space="preserve">
+        <value>Nome do Criador</value>
+    </data>
+    <data name="Attribute_Mii_DefaultName" xml:space="preserve">
+        <value>Novo Mii</value>
+    </data>
+    <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
+        <value>Tipo de Sobrancelhas</value>
+    </data>
+    <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
+        <value>Características Faciais</value>
+    </data>
+    <data name="Attribute_Mii_FavColor" xml:space="preserve">
+        <value>Cor Favorita</value>
+    </data>
+    <data name="Attribute_Mii_Gender" xml:space="preserve">
+        <value>Género</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Female" xml:space="preserve">
+        <value>Mulher</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Male" xml:space="preserve">
+        <value>Homem</value>
+    </data>
+    <data name="Attribute_Mii_GlassesColor" xml:space="preserve">
+        <value>Cor dos óculos</value>
+    </data>
+    <data name="Attribute_Mii_GlassesType" xml:space="preserve">
+        <value>Tipo de óculos</value>
+    </data>
+    <data name="Attribute_Mii_HairColor" xml:space="preserve">
+        <value>Cor de Cabelo</value>
+    </data>
+    <data name="Attribute_Mii_HairType" xml:space="preserve">
+        <value>Tipo de Cabelo</value>
+    </data>
+    <data name="Attribute_Mii_HeadShape" xml:space="preserve">
+        <value>Formato da Cabeça</value>
+    </data>
+    <data name="Attribute_Mii_Height" xml:space="preserve">
+        <value>Altura</value>
+    </data>
+    <data name="Attribute_Mii_HorizontalPosition" xml:space="preserve">
+        <value>Posição Horizontal (Esquerda/Direita)</value>
+    </data>
+    <data name="Attribute_Mii_IrishColor" xml:space="preserve">
+        <value>Cor dos olhos</value>
+    </data>
+    <data name="Attribute_Mii_MirrorHair" xml:space="preserve">
+        <value>Espelhar o Cabelo</value>
+    </data>
+    <data name="Attribute_Mii_MouthType" xml:space="preserve">
+        <value>Tipo de Boca</value>
+    </data>
+    <data name="Attribute_Mii_MustacheSize" xml:space="preserve">
+        <value>Tamanho de Bigode</value>
+    </data>
+    <data name="Attribute_Mii_MustacheType" xml:space="preserve">
+        <value>Tipo de Bigode</value>
+    </data>
+    <data name="Attribute_Mii_MustacheVerticalPosition" xml:space="preserve">
+        <value>Posição Vertical do Bigode (Cima/Baixo)</value>
+    </data>
+    <data name="Attribute_Mii_Name" xml:space="preserve">
+        <value>Nome do Mii</value>
+    </data>
+    <data name="Attribute_Mii_NoseType" xml:space="preserve">
+        <value>Tipo de Nariz</value>
+    </data>
+    <data name="Attribute_Mii_Rotation" xml:space="preserve">
+        <value>Rotação (Rodar Esquerda/Direita)</value>
+    </data>
+    <data name="Attribute_Mii_Size" xml:space="preserve">
+        <value>Tamanho </value>
+    </data>
+    <data name="Attribute_Mii_SkinColor" xml:space="preserve">
+        <value>Cor da Pele</value>
+    </data>
+    <data name="Attribute_Mii_SpaceBetween" xml:space="preserve">
+        <value>Espaçamento entre</value>
+    </data>
+    <data name="Attribute_Mii_VerticalPosition" xml:space="preserve">
+        <value>Posição Vertical (Cima/Baixo)</value>
+    </data>
+    <data name="Attribute_Mii_Width" xml:space="preserve">
+        <value>Largura</value>
+    </data>
+    <data name="Attribute_PlayerCount" xml:space="preserve">
+        <value>Jogadores</value>
+    </data>
+    <data name="Attribute_Priority" xml:space="preserve">
+        <value>Prioridade</value>
+    </data>
+    <data name="Attribute_RacesPlayed" xml:space="preserve">
+        <value>Corridas jogadas</value>
+    </data>
+    <data name="Attribute_SortBy" xml:space="preserve">
+        <value>Organizar por</value>
+    </data>
+    <data name="Attribute_Speed" xml:space="preserve">
+        <value>Velocidade</value>
+    </data>
+    <data name="Attribute_Status" xml:space="preserve">
+        <value>Estado</value>
+    </data>
+    <data name="Attribute_Status_Offline" xml:space="preserve">
+        <value>Offline</value>
+    </data>
+    <data name="Attribute_Status_Online" xml:space="preserve">
+        <value>Online</value>
+    </data>
+    <data name="Attribute_TimeOnline" xml:space="preserve">
+        <value>Tempo Online</value>
+    </data>
+    <data name="Attribute_TotalGamesPlayed" xml:space="preserve">
+        <value>Total de jogos jogados </value>
+    </data>
+    <data name="Attribute_TotalGamesWon" xml:space="preserve">
+        <value>Total de jogos ganhos</value>
+    </data>
+    <data name="Attribute_Views" xml:space="preserve">
+        <value>Visualizações</value>
+    </data>
+    <data name="Attribute_VrAbbreviation" xml:space="preserve">
+        <value>CV  </value>
+    </data>
+    <data name="Attribute_VrFull" xml:space="preserve">
+        <value>Classificação Versus</value>
+    </data>
+    <data name="Attribute_Wins" xml:space="preserve">
+        <value>Vitórias</value>
+    </data>
+    <data name="ListTitle_Miis" xml:space="preserve">
+        <value>Miis</value>
+    </data>
+    <data name="PageTitle_MyMiis" xml:space="preserve">
+        <value>Meus Miis</value>
+    </data>
+    <data name="PopupTitle_MiiCarousel" xml:space="preserve">
+        <value>Carrosel Mii</value>
+    </data>
+    <data name="PopupTitle_MiiEditor" xml:space="preserve">
+        <value>Editor Mii</value>
+    </data>
+    <data name="PopupTitle_MiiSelector" xml:space="preserve">
+        <value>Seletor Mii</value>
+    </data>
+    <data name="PopupTitle_ModBrowser" xml:space="preserve">
+        <value>Navegador de mods</value>
+    </data>
+    <data name="PopupTitle_ModDetails" xml:space="preserve">
+        <value>Detalhes do mod</value>
+    </data>
+    <data name="Region_America" xml:space="preserve">
+        <value>América</value>
+    </data>
+    <data name="Region_Australia" xml:space="preserve">
+        <value>Austrália</value>
+    </data>
+    <data name="Region_China" xml:space="preserve">
+        <value>China</value>
+    </data>
+    <data name="Region_Europe" xml:space="preserve">
+        <value>Europa </value>
+    </data>
+    <data name="Region_Japan" xml:space="preserve">
+        <value>Japão</value>
+    </data>
+    <data name="Region_SouthKorea" xml:space="preserve">
+        <value>Coreia do Sul</value>
+    </data>
+    <data name="Region_Taiwan" xml:space="preserve">
+        <value>Taiwan</value>
+    </data>
+    <data name="State_ConfigNotFinished" xml:space="preserve">
+        <value>Config Não Terminada</value>
+    </data>
+    <data name="State_Custom" xml:space="preserve">
+        <value>Personalizado</value>
+    </data>
+    <data name="State_Error" xml:space="preserve">
+        <value>Erro</value>
+    </data>
+    <data name="State_Extracting" xml:space="preserve">
+        <value>A extrair ficheiros...</value>
+    </data>
+    <data name="State_Installed" xml:space="preserve">
+        <value>Instalado</value>
+    </data>
+    <data name="State_Installing" xml:space="preserve">
+        <value>A instalar...</value>
+    </data>
+    <data name="State_Loading" xml:space="preserve">
+        <value>A carregar...</value>
+    </data>
+    <data name="State_NoServer" xml:space="preserve">
+        <value>Sem servidor</value>
+    </data>
+    <data name="State_Success" xml:space="preserve">
+        <value>Sucesso</value>
+    </data>
+    <data name="State_Unknown" xml:space="preserve">
+        <value>Desconhecido</value>
+    </data>
+    <data name="State_Updating" xml:space="preserve">
+        <value>A atualizar...</value>
+    </data>
+    <data name="State_Warning" xml:space="preserve">
+        <value>Aviso</value>
+    </data>
 </root>

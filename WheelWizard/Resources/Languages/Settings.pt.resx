@@ -91,9 +91,111 @@
         <value>Escala da janela</value>
     </data>
     <data name="Value_Language_CompletePercentage" xml:space="preserve">
-        <value>0</value>
+        <value>100</value>
     </data>
     <data name="Value_Language_zTranslators" xml:space="preserve">
         <value>JMM,  Gui_C__Tuga</value>
+    </data>
+    <data name="Category_About" xml:space="preserve">
+        <value>Acerca de </value>
+    </data>
+    <data name="Category_General" xml:space="preserve">
+        <value>Geral</value>
+    </data>
+    <data name="Category_Other" xml:space="preserve">
+        <value>Outro</value>
+    </data>
+    <data name="HelperText_EndWithX" xml:space="preserve">
+        <value>O caminho pode acabar com:</value>
+    </data>
+    <data name="HelperText_MustSetPaths" xml:space="preserve">
+        <value>Precisas de configurar estes 3 caminhos antes de começar a jogar Retro Rewind.</value>
+    </data>
+    <data name="HelperText_Optional" xml:space="preserve">
+        <value>Opcional</value>
+    </data>
+    <data name="HelperText_WhWzLanguage" xml:space="preserve">
+        <value>Isto só muda o idioma do Wheel Wizard. Para mudar o idioma dentro do jogo, precisas de fazer isso nas configurações do próprio jogo.</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>Abrir a Pasta do Jogo</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>Abrir a Pasta de Ficheiros de Gravação</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>Reinstalar RR</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>Instalação    </value>
+    </data>
+    <data name="Section_Language" xml:space="preserve">
+        <value>Linguagem</value>
+    </data>
+    <data name="Section_LocationPaths" xml:space="preserve">
+        <value>Definições da Localização</value>
+    </data>
+    <data name="Section_Performance" xml:space="preserve">
+        <value>Definições de Performance</value>
+    </data>
+    <data name="Section_Renderer" xml:space="preserve">
+        <value>Definições de Renderização</value>
+    </data>
+    <data name="Section_Resolution" xml:space="preserve">
+        <value>Resolução</value>
+    </data>
+    <data name="Section_WhWzAppearance" xml:space="preserve">
+        <value>Aparência do Wheel Wizard</value>
+    </data>
+    <data name="Section_Wii" xml:space="preserve">
+        <value>Definições da Wii</value>
+    </data>
+    <data name="Value_Language_Arabic" xml:space="preserve">
+        <value>Árabe</value>
+    </data>
+    <data name="Value_Language_Chinese" xml:space="preserve">
+        <value>Chinês</value>
+    </data>
+    <data name="Value_Language_Czech" xml:space="preserve">
+        <value>Checo</value>
+    </data>
+    <data name="Value_Language_Dutch" xml:space="preserve">
+        <value>Holandês</value>
+    </data>
+    <data name="Value_Language_English" xml:space="preserve">
+        <value>Inglês</value>
+    </data>
+    <data name="Value_Language_Finnish" xml:space="preserve">
+        <value>Finlandês</value>
+    </data>
+    <data name="Value_Language_France" xml:space="preserve">
+        <value>Francês</value>
+    </data>
+    <data name="Value_Language_German" xml:space="preserve">
+        <value>Alemão</value>
+    </data>
+    <data name="Value_Language_Italian" xml:space="preserve">
+        <value>Italiano</value>
+    </data>
+    <data name="Value_Language_Japanese" xml:space="preserve">
+        <value>Japonês</value>
+    </data>
+    <data name="Value_Language_Korean" xml:space="preserve">
+        <value>Coreano</value>
+    </data>
+    <data name="Value_Language_Norwegian" xml:space="preserve">
+        <value>Norueguês</value>
+    </data>
+    <data name="Value_Language_Portuguese" xml:space="preserve">
+        <value>Português</value>
+    </data>
+    <data name="Value_Language_Russian" xml:space="preserve">
+        <value>Russo</value>
+    </data>
+    <data name="Value_Language_Spanish" xml:space="preserve">
+        <value>Espanhol</value>
+    </data>
+    <data name="Value_Language_Turkish" xml:space="preserve">
+        <value>Turco</value>
     </data>
 </root>

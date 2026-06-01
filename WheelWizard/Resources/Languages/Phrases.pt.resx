@@ -22,7 +22,7 @@
         <value>Podes adicionar amigos dentro do jogo</value>
     </data>
     <data name="EmptyContent_NoFriends_Title" xml:space="preserve">
-        <value>Ainda não adicionaste amigos</value>
+        <value>Ainda não adicionaste amigos!</value>
     </data>
     <data name="EmptyContent_NoMods" xml:space="preserve">
         <value>Mods podem alterar o funcionamento do jogo.Começa a importar o teu primeiro mod clicando no botão abaixo</value>
@@ -37,7 +37,7 @@
         <value>Poderás estar sem conexão à internet, ou talvez ninguém esteja a jogar</value>
     </data>
     <data name="EmptyContent_NoRooms_Title" xml:space="preserve">
-        <value>Não se econtrarem salas</value>
+        <value>Não se encontraram salas.</value>
     </data>
     <data name="Hover_FriendsOnline_0" xml:space="preserve">
         <value>Não tens amigos online</value>
@@ -73,7 +73,7 @@
         <value>Gostarias de aplicar a nova escala?</value>
     </data>
     <data name="MessageWarning_NoConnectServer_Extra" xml:space="preserve">
-        <value>Falha a conectar ao servidor. Tente de novo mais tarde</value>
+        <value>Falha ao conectar ao servidor. Tente de novo mais tarde</value>
     </data>
     <data name="Question_DolphinFound_Title" xml:space="preserve">
         <value>Pasta Do Dolphin Emulator Encontrada</value>
@@ -91,7 +91,7 @@
         <value>Descarrega o Retro Rewind</value>
     </data>
     <data name="MessageWarning_InvalidPaths_Extra" xml:space="preserve">
-        <value>Por favor verifica que todos os percursos estão corretos e tenta outra vez-</value>
+        <value>Por favor verifica que todos os percursos estão corretos e tenta outra vez.</value>
     </data>
     <data name="Progress_EstimatedTimeRemaining" xml:space="preserve">
         <value>Tempo restante estimado:</value>
@@ -136,7 +136,7 @@
         <value>Versão {$1} do Wheel Wizard está disponível (de momento encontra-se na versão {$2}). Queres atualizar agora?</value>
     </data>
     <data name="MessageError_NoModFolder_Extra" xml:space="preserve">
-        <value>A pasta de mods não existe</value>
+        <value>A pasta do mod não existe</value>
     </data>
     <data name="MessageWarning_NotFindDolphin_Extra" xml:space="preserve">
         <value>O Dolphin Emulator não foi encontrado, por favor defina o caminho nas definições</value>
@@ -145,7 +145,7 @@
         <value>O jogo não foi encontrado, por favor defina o caminho nas definições</value>
     </data>
     <data name="Question_OldRksysFound_Title" xml:space="preserve">
-        <value>O antifo rksys.dat foi encontrado</value>
+        <value>O antigo rksys.dat foi encontrado</value>
     </data>
     <data name="Question_OldRksysFound_Extra" xml:space="preserve">
         <value>Foi encontrada uma gravação antiga. Queres usá-lá? (recomendado)</value>
@@ -181,7 +181,7 @@
         <value>Impossível verificar se o Wheel Wizard está atualizado. \nTalvez estejas a experienciar problemas de net</value>
     </data>
     <data name="Question_UpdateAdmin_Title" xml:space="preserve">
-        <value>Atualiza usando administrados</value>
+        <value>Atualiza usando administrador</value>
     </data>
     <data name="Question_UpdateAdmin_Extra" xml:space="preserve">
         <value>Às vezes uma atualização requere direitos de administrador. Desejas usar direitos de administrador para esteja atualização?</value>
@@ -199,12 +199,267 @@
         <value>A transferir {$1} MB</value>
     </data>
     <data name="MessageWarning_ModNameEmpty_Title" xml:space="preserve">
-        <value>Nome do mod não pode estar em branco</value>
+        <value>Nome do mod não pode estar em branco.</value>
     </data>
     <data name="Placeholder_SearchForPlayers" xml:space="preserve">
-        <value>Procura Por Jogadores...</value>
+        <value>Pesquisa Por Jogadores...</value>
     </data>
     <data name="Placeholder_EnterPath" xml:space="preserve">
         <value>Introduz aqui o caminho desejado...</value>
+    </data>
+    <data name="EmptyContent_NoMiis" xml:space="preserve">
+        <value>Não conseguimos ler os dados Mii do teu sistema. Certifica-te que já iniciaste o jogo pelo menos uma vez.</value>
+    </data>
+    <data name="EmptyContent_NoMiis_Title" xml:space="preserve">
+        <value>Sem Miis ainda!</value>
+    </data>
+    <data name="EmptyContent_NoModSelected" xml:space="preserve">
+        <value>Seleciona um modo na lista para ver os seus detalhes</value>
+    </data>
+    <data name="EmptyContent_NoModSelected_Title" xml:space="preserve">
+        <value>Nenhum mod selecionado</value>
+    </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>Nome de criador tem de ter menos de 10 caracteres.</value>
+    </data>
+    <data name="HelperNote_NameMustBetween" xml:space="preserve">
+        <value>Nomes tem de ter entre 3 a 10 caracteres.</value>
+    </data>
+    <data name="Hover_FriendsPageDisclaimer" xml:space="preserve">
+        <value>Para adicionar amigos precisas de adicioná-los dentro do jogo.</value>
+    </data>
+    <data name="Hover_PrimaryProfile" xml:space="preserve">
+        <value>O perfil primário é usado como referência no cliente do Wheel Wizard.</value>
+    </data>
+    <data name="Hover_RegionUserSelection" xml:space="preserve">
+        <value>Isto só mostra regiões onde TU já jogaste.</value>
+    </data>
+    <data name="MessageError_AbortRR_Extra_InvalidFilePath" xml:space="preserve">
+        <value>Caminho de arquivo inválido detectado. Entra em contato com os desenvolvedores.\nErro do servidor: {$1}</value>
+    </data>
+    <data name="MessageError_AbortRR_Title" xml:space="preserve">
+        <value>A abortar o Update do RR.</value>
+    </data>
+    <data name="MessageError_FailedChangeMii_Title" xml:space="preserve">
+        <value>Falha ao alterar o Mii</value>
+    </data>
+    <data name="MessageError_FailedChangeName_Title" xml:space="preserve">
+        <value>Falha ao alterar o nome</value>
+    </data>
+    <data name="MessageError_FailedCreateMiiDb_Title" xml:space="preserve">
+        <value>Falha ao criar a base de dados de Miis</value>
+    </data>
+    <data name="MessageError_FailedInstallDolphin_Extra" xml:space="preserve">
+        <value>A instalação do Dolphin Emulator falhou. Por favor tenta instalar manualmente o Flatpak Dolphin.</value>
+    </data>
+    <data name="MessageError_FailedInstallDolphin_Title" xml:space="preserve">
+        <value>Falha ao instalar o Dolphin</value>
+    </data>
+    <data name="MessageError_FailedRetrieveMod_Title" xml:space="preserve">
+        <value>Falha ao obter informações do mod</value>
+    </data>
+    <data name="MessageError_GenericError_Title" xml:space="preserve">
+        <value>Ocorreu um erro.</value>
+    </data>
+    <data name="MessageError_ModDownloadFail_Extra" xml:space="preserve">
+        <value>Ocorreu um erro durante o download: {$1} </value>
+    </data>
+    <data name="MessageError_ModDownloadFail_Title" xml:space="preserve">
+        <value>O download do mod falhou.</value>
+    </data>
+    <data name="MessageSuccess_MiiChanged" xml:space="preserve">
+        <value>Mii mudado com sucesso</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Extra" xml:space="preserve">
+        <value>Um ou mais dos Mii(s) selecionados é um favorito. Miis só podem ser apagados se não forem favoritos de forma a prevenir que sejam apagados por engano.</value>
+    </data>
+    <data name="MessageWarning_CannotDeleteFavMii_Title" xml:space="preserve">
+        <value>Não é possível apagar Mii(s) favoritos</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Extra_NotFromBrowser" xml:space="preserve">
+        <value>Não é possível ver um mod que não foi instalado a partir do navegador de mods.</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Extra_SomethingElse" xml:space="preserve">
+        <value>Algo correu mal ao tentar abrir o mod selecionado.</value>
+    </data>
+    <data name="MessageWarning_CantViewMod_Title" xml:space="preserve">
+        <value>Não é possível ver este mod.</value>
+    </data>
+    <data name="MessageWarning_FailCheckUpdates_Extra" xml:space="preserve">
+        <value>Não é possível verificar se há atualizações no momento. Pode não estar conectado à internet ou o servidor pode estar indisponível ou em baixo.</value>
+    </data>
+    <data name="MessageWarning_InvalidName_Title" xml:space="preserve">
+        <value>Nome não permitido.</value>
+    </data>
+    <data name="MessageWarning_InvalidPaths_Title" xml:space="preserve">
+        <value>Caminhos inválidos.</value>
+    </data>
+    <data name="MessageWarning_ModNameEmpty_Extra" xml:space="preserve">
+        <value>Indique um nome de mod.</value>
+    </data>
+    <data name="MessageWarning_ModNameInvalid_Extra" xml:space="preserve">
+        <value>Nome do mod contêm carateres inválidos.</value>
+    </data>
+    <data name="MessageWarning_ModNameInvalid_Title" xml:space="preserve">
+        <value>Nome do mod inválido.</value>
+    </data>
+    <data name="MessageWarning_NoConnectServer_Title" xml:space="preserve">
+        <value>Não é possível conectar ao servidor.</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Extra" xml:space="preserve">
+        <value>Os ficheiros não foram encontrados.</value>
+    </data>
+    <data name="MessageWarning_UnableDownloadMod_Title" xml:space="preserve">
+        <value>Não é possível descarregar o mod</value>
+    </data>
+    <data name="MessageWarning_UnableUpdateWhWz_Title" xml:space="preserve">
+        <value>Não é possível atualizar o Wheel Wizard</value>
+    </data>
+    <data name="Placeholder_EnterMiiName" xml:space="preserve">
+        <value>Introduzir nome do Mii...</value>
+    </data>
+    <data name="Placeholder_EnterModName" xml:space="preserve">
+        <value>Introduzir nome do mod...</value>
+    </data>
+    <data name="Placeholder_EnterTextHere" xml:space="preserve">
+        <value>Introduzir texto...</value>
+    </data>
+    <data name="Placeholder_SearchMod" xml:space="preserve">
+        <value>Pesquisa por mods...</value>
+    </data>
+    <data name="Progress_InstallingDolphin" xml:space="preserve">
+        <value>A instalar o Dolphin Emulator</value>
+    </data>
+    <data name="Progress_ThisMayTakeAWhile" xml:space="preserve">
+        <value>Isto pode demorar um pouco, dependendo na sua conexão de internet.</value>
+    </data>
+    <data name="Question_ApplyScale_Extra" xml:space="preserve">
+        <value>Esta alteração será revertida em {$1} a menos que decida manter a alteração.</value>
+    </data>
+    <data name="Question_DolphinFlatpack_Extra" xml:space="preserve">
+        <value>A versão Flatpak do Dolphin Emulator parece não estar instalada. Deseja que a instalemos (em todo o sistema)?</value>
+    </data>
+    <data name="Question_DolphinFlatpack_Title" xml:space="preserve">
+        <value>Instalação do Dolphin Flatpak</value>
+    </data>
+    <data name="Question_EnterNewName_Extra" xml:space="preserve">
+        <value>Alterando o nome de: {$1}</value>
+    </data>
+    <data name="Question_EnterNewName_Title" xml:space="preserve">
+        <value>Introduza um novo nome</value>
+    </data>
+    <data name="Question_InstallMod_Title" xml:space="preserve">
+        <value>Pretende transferir e instalar o mod: {$1}?</value>
+    </data>
+    <data name="Question_ReinstallRR_Extra" xml:space="preserve">
+        <value>Tem a certeza de que deseja reinstalar o Retro Rewind?</value>
+    </data>
+    <data name="Question_RRToOld_Title" xml:space="preserve">
+        <value>A versão do Retro Rewind é muito antiga.</value>
+    </data>
+    <data name="Question_SearchMod" xml:space="preserve">
+        <value>Procura por mods...</value>
+    </data>
+    <data name="Question_SureDelete_Extra" xml:space="preserve">
+        <value>A eliminação é permanente e não pode ser revertida.</value>
+    </data>
+    <data name="Question_SureDelete_Title_Miis" xml:space="preserve">
+        <value>Tem a certeza de que deseja apagar {$1} Miis?</value>
+    </data>
+    <data name="SnackbarError_MiiFailureCreate" xml:space="preserve">
+        <value>Falha ao criar o Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureDeserialize" xml:space="preserve">
+        <value>Falha ao desserializar o Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureDuplicate" xml:space="preserve">
+        <value>Falha ao duplicar Mii(s) '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureGet" xml:space="preserve">
+        <value>Falha ao obter Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureSave" xml:space="preserve">
+        <value>Falha ao guardar Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureSerialize" xml:space="preserve">
+        <value>Falha ao serializar o Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarError_MiiFailureUpdate" xml:space="preserve">
+        <value>Falha ao atualizar o Mii '{$1}'</value>
+    </data>
+    <data name="SnackbarSuccess_CopiedFC" xml:space="preserve">
+        <value>Código de amigo copiado para a área de transferência</value>
+    </data>
+    <data name="SnackbarSuccess_CreatedDuplicate" xml:space="preserve">
+        <value>Duplica de '{$1}' criada </value>
+    </data>
+    <data name="SnackbarSuccess_CreatedDuplicatesMiis" xml:space="preserve">
+        <value>Criados '{$1}' Miis duplicados</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted" xml:space="preserve">
+        <value>Apagado '{$1}'</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted_Miis" xml:space="preserve">
+        <value>{$1} Miis apagados</value>
+    </data>
+    <data name="SnackbarSuccess_MiiAdded" xml:space="preserve">
+        <value>Mii foi adicionado aos teus Miis</value>
+    </data>
+    <data name="SnackbarSuccess_NameChange" xml:space="preserve">
+        <value>Nome alterado com sucesso para '{$1}'</value>
+    </data>
+    <data name="SnackbarSuccess_ProfileSetPrimary" xml:space="preserve">
+        <value>Definir perfil como principal</value>
+    </data>
+    <data name="SnackbarSuccess_SavedMii" xml:space="preserve">
+        <value>Mii '{$1}' salvado para o ficheiro '{$2}'</value>
+    </data>
+    <data name="SnackbarWarning_CantSaveMii" xml:space="preserve">
+        <value>Não é possível guardar o Mii</value>
+    </data>
+    <data name="SnackbarWarning_NoMiiDelete" xml:space="preserve">
+        <value>Parece que não havia Miis para apagar </value>
+    </data>
+    <data name="SnackbarWarning_NoMiiExport" xml:space="preserve">
+        <value>Parece que não havia Miis para exportar</value>
+    </data>
+    <data name="Text_LanguageTranslatedBy" xml:space="preserve">
+        <value>Esta língua é traduzida por: {$1}</value>
+    </data>
+    <data name="Text_MadeByString" xml:space="preserve">
+        <value>Feito por: {$1} \n e {$2}</value>
+    </data>
+    <data name="Text_PoweredGamebanana" xml:space="preserve">
+        <value>Contribuido pelo GameBanana</value>
+    </data>
+    <data name="Text_ThanksTranslators" xml:space="preserve">
+        <value>Muito obrigado a todos os tradutores:</value>
+    </data>
+    <data name="Text_WhWzTranslationPercentage" xml:space="preserve">
+        <value>Traduções para esta língua estão {$1}% completas</value>
+    </data>
+    <data name="Time_Days_1" xml:space="preserve">
+        <value>1 dia</value>
+    </data>
+    <data name="Time_Days_x" xml:space="preserve">
+        <value>{$1} dias</value>
+    </data>
+    <data name="Time_Hours_1" xml:space="preserve">
+        <value>1 hora</value>
+    </data>
+    <data name="Time_Hours_x" xml:space="preserve">
+        <value>{$1} horas</value>
+    </data>
+    <data name="Time_Minutes_1" xml:space="preserve">
+        <value>1 minuto</value>
+    </data>
+    <data name="Time_Minutes_x" xml:space="preserve">
+        <value>{$1} minutos </value>
+    </data>
+    <data name="Time_Seconds_1" xml:space="preserve">
+        <value>1 segundo</value>
+    </data>
+    <data name="Time_Seconds_x" xml:space="preserve">
+        <value>{$1} segundos</value>
     </data>
 </root>
