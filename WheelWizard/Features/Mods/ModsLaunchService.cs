@@ -56,9 +56,7 @@ public sealed class ModsLaunchService(IModManager modManager) : IModsLaunchServi
         Directory.CreateDirectory(targetFolderPath);
 
         var totalFiles = finalFiles.Count;
-        var progressWindow = new ProgressWindow(t("progress.installing_mods")).SetGoal(
-            Humanizer.ReplaceDynamic(t("progress.installing_mods_count"), totalFiles)!
-        );
+        var progressWindow = new ProgressWindow(t("progress.installing_mods")).SetGoal(t("progress.installing_mods_count", totalFiles)!);
         progressWindow.Show();
 
         var copyResult = await Task.Run(() => CopyFinalFiles(targetFolderPath, finalFiles, progressWindow));

@@ -34,7 +34,7 @@ public class AutoUpdaterSingletonService(
             return;
 
         var latestVersion = SemVersion.Parse(latestRelease.TagName.TrimStart('v'), SemVersionStyles.Any);
-        var popupExtraText = Humanizer.ReplaceDynamic(t("question.new_version_wh_wz.extra"), latestVersion, CurrentVersion)!;
+        var popupExtraText = t("question.new_version_wh_wz.extra", latestVersion, CurrentVersion)!;
 
         var shouldUpdate = false;
         await Dispatcher.UIThread.InvokeAsync(async () =>

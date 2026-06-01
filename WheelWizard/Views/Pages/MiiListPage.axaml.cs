@@ -182,10 +182,7 @@ public partial class MiiListPage : UserControlBase
             var result = MiiSerializer.Deserialize(miiData);
             if (result.IsFailure)
             {
-                ViewUtils.ShowSnackbar(
-                    Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_deserialize"), result.Error.Message)!,
-                    ViewUtils.SnackbarType.Danger
-                );
+                ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_deserialize", result.Error.Message)!, ViewUtils.SnackbarType.Danger);
                 return;
             }
 
@@ -196,10 +193,7 @@ public partial class MiiListPage : UserControlBase
             var saveResult = MiiDbService.AddToDatabase(mii, macAddress);
             if (saveResult.IsFailure)
             {
-                ViewUtils.ShowSnackbar(
-                    Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_save"), saveResult.Error.Message)!,
-                    ViewUtils.SnackbarType.Danger
-                );
+                ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_save", saveResult.Error.Message)!, ViewUtils.SnackbarType.Danger);
                 return;
             }
         }
@@ -284,10 +278,7 @@ public partial class MiiListPage : UserControlBase
             var result = MiiDbService.Update(mii);
             if (result.IsFailure)
             {
-                ViewUtils.ShowSnackbar(
-                    Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_update"), result.Error.Message)!,
-                    ViewUtils.SnackbarType.Danger
-                );
+                ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_update", result.Error.Message)!, ViewUtils.SnackbarType.Danger);
                 return;
             }
         }
@@ -328,10 +319,7 @@ public partial class MiiListPage : UserControlBase
         var result = MiiDbService.GetByAvatarId(mii.MiiId);
         if (result.IsFailure)
         {
-            ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_get"), result.Error.Message)!,
-                ViewUtils.SnackbarType.Danger
-            );
+            ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_get", result.Error.Message)!, ViewUtils.SnackbarType.Danger);
             return;
         }
 
@@ -339,16 +327,11 @@ public partial class MiiListPage : UserControlBase
         var saveResult = SaveMiiToDisk(miiToExport, diaglog);
         if (saveResult.IsFailure)
         {
-            ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_save"), saveResult.Error.Message)!,
-                ViewUtils.SnackbarType.Danger
-            );
+            ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_save", saveResult.Error.Message)!, ViewUtils.SnackbarType.Danger);
             return;
         }
 
-        ViewUtils.ShowSnackbar(
-            Humanizer.ReplaceDynamic(t("snackbar_success.saved_mii"), miiToExport.Name, diaglog) ?? "Saved Mii successfully"
-        );
+        ViewUtils.ShowSnackbar(t("snackbar_success.saved_mii", miiToExport.Name, diaglog) ?? "Saved Mii successfully");
     }
 
     private OperationResult SaveMiiToDisk(Mii mii, string path)
@@ -356,10 +339,7 @@ public partial class MiiListPage : UserControlBase
         var miiData = MiiSerializer.Serialize(mii);
         if (miiData.IsFailure)
         {
-            ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_serialize"), miiData.Error.Message)!,
-                ViewUtils.SnackbarType.Danger
-            );
+            ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_serialize", miiData.Error.Message)!, ViewUtils.SnackbarType.Danger);
             return miiData;
         }
 
@@ -370,9 +350,7 @@ public partial class MiiListPage : UserControlBase
         writer.Flush();
         writer.Close();
         stream.Close();
-        ViewUtils.ShowSnackbar(
-            Humanizer.ReplaceDynamic(t("snackbar_success.saved_mii"), mii.Name, file.FullName) ?? "Saved Mii successfully"
-        );
+        ViewUtils.ShowSnackbar(t("snackbar_success.saved_mii", mii.Name, file.FullName) ?? "Saved Mii successfully");
         return Ok();
     }
 
@@ -393,12 +371,12 @@ public partial class MiiListPage : UserControlBase
             return;
         }
 
-        var mainText = Humanizer.ReplaceDynamic(t("question.sure_delete.title_miis"), miis.Length) ?? $"Delete {miis.Length}?";
-        var successMessage = Humanizer.ReplaceDynamic(t("snackbar_success.deleted_miis"), miis.Length) ?? $"Deleted {miis.Length}";
+        var mainText = t("question.sure_delete.title_miis", miis.Length) ?? $"Delete {miis.Length}?";
+        var successMessage = t("snackbar_success.deleted_miis", miis.Length) ?? $"Deleted {miis.Length}";
         if (miis.Length == 1)
         {
-            mainText = Humanizer.ReplaceDynamic(t("question.sure_delete.title"), miis[0].Name) ?? $"Delete {miis[0].Name}?";
-            successMessage = Humanizer.ReplaceDynamic(t("snackbar_success.deleted"), miis[0].Name) ?? $"Deleted {miis[0].Name}";
+            mainText = t("question.sure_delete.title", miis[0].Name) ?? $"Delete {miis[0].Name}?";
+            successMessage = t("snackbar_success.deleted", miis[0].Name) ?? $"Deleted {miis[0].Name}";
         }
 
         var result = await new YesNoWindow().SetMainText(mainText).SetExtraText(t("question.sure_delete.extra")).AwaitAnswer();
@@ -424,10 +402,7 @@ public partial class MiiListPage : UserControlBase
         var result = MiiDbService.Update(window.Mii);
         if (result.IsFailure)
         {
-            ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_update"), result.Error.Message)!,
-                ViewUtils.SnackbarType.Danger
-            );
+            ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_update", result.Error.Message)!, ViewUtils.SnackbarType.Danger);
             return;
         }
 
@@ -453,10 +428,7 @@ public partial class MiiListPage : UserControlBase
         var result = MiiDbService.AddToDatabase(window.Mii, SettingsService.Get<string>(SettingsService.MACADDRESS));
         if (result.IsFailure)
         {
-            ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_create"), result.Error.Message)!,
-                ViewUtils.SnackbarType.Danger
-            );
+            ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_create", result.Error.Message)!, ViewUtils.SnackbarType.Danger);
             return;
         }
 
@@ -473,16 +445,13 @@ public partial class MiiListPage : UserControlBase
             if (!result.IsFailure)
                 continue;
 
-            ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_duplicate"), result.Error.Message)!,
-                ViewUtils.SnackbarType.Danger
-            );
+            ViewUtils.ShowSnackbar(t("snackbar_error.mii_failure_duplicate", result.Error.Message)!, ViewUtils.SnackbarType.Danger);
             return;
         }
 
-        var successMessage = Humanizer.ReplaceDynamic(t("snackbar_success.created_duplicates_miis"), miis.Length)!;
+        var successMessage = t("snackbar_success.created_duplicates_miis", miis.Length)!;
         if (miis.Length == 1)
-            successMessage = Humanizer.ReplaceDynamic(t("snackbar_success.created_duplicate"), miis[0].Name)!;
+            successMessage = t("snackbar_success.created_duplicate", miis[0].Name)!;
 
         ReloadMiiList();
         ViewUtils.ShowSnackbar(successMessage);

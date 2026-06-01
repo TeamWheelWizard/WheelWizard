@@ -61,7 +61,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         var tempModDirectory = Path.Combine(tempRoot, mod.Title);
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var progressWindow = new ProgressWindow(t("progress.converting_mod_to_patches"))
-            .SetGoal(Humanizer.ReplaceDynamic(t("progress.converting_files_count"), sourceFiles.Count)!)
+            .SetGoal(t("progress.converting_files_count", sourceFiles.Count)!)
             .SetCancellationTokenSource(cts);
         progressWindow.Show();
 
@@ -88,7 +88,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         Dispatcher.UIThread.Post(() =>
                         {
                             progressWindow.UpdateProgress((int)(index / (double)Math.Max(tempFiles.Count, 1) * 80));
-                            progressWindow.SetExtraText(Humanizer.ReplaceDynamic(t("progress.converting_file"), fileName)!);
+                            progressWindow.SetExtraText(t("progress.converting_file", fileName)!);
                         });
 
                         if (LooseBrsarPatchFileName.TryGetNormalizedFileName(fileName, out var normalizedPatchFileName))
@@ -114,7 +114,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         var conversion = conversionResult.Value;
                         if (conversion.Baseline == null)
                         {
-                            skipped.Add(Humanizer.ReplaceDynamic(t("warning.file_not_in_built_in_baseline"), fileName)!);
+                            skipped.Add(t("warning.file_not_in_built_in_baseline", fileName)!);
                             continue;
                         }
 

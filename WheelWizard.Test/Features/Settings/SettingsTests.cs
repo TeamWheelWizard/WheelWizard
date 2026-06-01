@@ -216,6 +216,27 @@ public class SettingsLocalizationServiceTests
     }
 
     [Fact]
+    public void TranslationFunction_UsesSpecificNumberVariant_WhenItExists()
+    {
+        var originalLanguage = LocalizationProvider.Current.CurrentLanguage;
+        var localizationService = new EmbeddedYamlLocalizationService();
+        LocalizationProvider.Use(localizationService);
+
+        try
+        {
+            localizationService.SetLanguage("en");
+
+            Assert.Equal("1 day", TranslationFunctions.t("time.days.n", 1));
+            Assert.Equal("2 days", TranslationFunctions.t("time.days.n", 2));
+        }
+        finally
+        {
+            localizationService.SetLanguage(originalLanguage);
+            LocalizationProvider.Use(localizationService);
+        }
+    }
+
+    [Fact]
     public void Initialize_SetsCurrentCulture_FromLanguageSetting()
     {
         var originalCulture = CultureInfo.CurrentCulture;

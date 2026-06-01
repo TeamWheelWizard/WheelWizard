@@ -68,6 +68,12 @@ public sealed class EmbeddedYamlLocalizationService : ILocalizationService
         return key;
     }
 
+    public bool TryTranslateForLanguage(string key, string languageCode, out string value)
+    {
+        value = string.Empty;
+        return !string.IsNullOrWhiteSpace(key) && TryGetValue(NormalizeLanguage(languageCode), key, out value);
+    }
+
     public bool HasLanguage(string languageCode)
     {
         return _translations.ContainsKey(NormalizeLanguage(languageCode));

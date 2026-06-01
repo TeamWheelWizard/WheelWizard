@@ -69,7 +69,7 @@ public partial class WhWzSettings : UserControlBase
             .Items.OfType<LanguageDropdownItem>()
             .FirstOrDefault(item => item.Key == currentWhWzLanguage);
 
-        TranslationsPercentageText.Text = Humanizer.ReplaceDynamic(t("text.language_translated_by"), t("value.language.z_translators"));
+        TranslationsPercentageText.Text = t("text.language_translated_by", t("value.language.z_translators"));
         TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
 
         // -----------------
@@ -432,7 +432,7 @@ public partial class WhWzSettings : UserControlBase
             return false;
 
         var extraText =
-            Humanizer.ReplaceDynamic(t("question.move_data.extra"), normalizedTarget)
+            t("question.move_data.extra", normalizedTarget)
             ?? $"Wheel Wizard will move its files to:\n{normalizedTarget}\nThis may take a while depending on the amount of data.";
 
         var confirmed = await new YesNoWindow()
@@ -554,7 +554,7 @@ public partial class WhWzSettings : UserControlBase
         }
 
         var infoText =
-            Humanizer.ReplaceDynamic(t("message_success.data_folder_moved.extra"), PathManager.WheelWizardAppdataPath)
+            t("message_success.data_folder_moved.extra", PathManager.WheelWizardAppdataPath)
             ?? $"Wheel Wizard data is now stored in:\n{PathManager.WheelWizardAppdataPath}";
 
         if (!string.IsNullOrWhiteSpace(warningMessage))
@@ -666,7 +666,7 @@ public partial class WhWzSettings : UserControlBase
         var seconds = 10;
 
         string ExtraScaleText() =>
-            Humanizer.ReplaceDynamic(t("question.apply_scale.extra"), Humanizer.HumanizeSeconds(seconds))
+            t("question.apply_scale.extra", Humanizer.HumanizeSeconds(seconds))
             ?? $"This will apply the new scale in {Humanizer.HumanizeSeconds(seconds)} seconds. You can cancel this by clicking Revert.";
 
         var yesNoWindow = new YesNoWindow()

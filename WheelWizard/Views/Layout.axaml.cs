@@ -81,7 +81,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
 
-        var completeString = Humanizer.ReplaceDynamic(t("text.made_by_string"), "Patchzy", "WantToBeeMe");
+        var completeString = t("text.made_by_string", "Patchzy", "WantToBeeMe");
         if (completeString != null && completeString.Contains("\\n"))
         {
             var split = completeString.Split("\\n");
@@ -232,13 +232,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         var friends = GameLicenseService.ActiveCurrentFriends;
         FriendsButton.BoxText = $"{friends.Count(friend => friend.IsOnline)}/{friends.Count}";
-        FriendsButton.BoxTip = friends.Count(friend => friend.IsOnline) switch
-        {
-            1 => t("hover.friends_online.1"),
-            0 => t("hover.friends_online.0"),
-            _ => Humanizer.ReplaceDynamic(t("hover.friends_online.n"), friends.Count(friend => friend.IsOnline))
-                ?? $"There are currently {friends.Count(friend => friend.IsOnline)} friends online",
-        };
+        FriendsButton.BoxTip = t("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
     }
 
     public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
@@ -246,19 +240,9 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         var playerCount = sender.PlayerCount;
         var roomCount = sender.RoomCount;
         PlayerCountBox.Text = playerCount.ToString();
-        PlayerCountBox.TipText = playerCount switch
-        {
-            1 => t("hover.players_online.1"),
-            0 => t("hover.players_online.0"),
-            _ => Humanizer.ReplaceDynamic(t("hover.players_online.n"), playerCount) ?? $"There are currently {playerCount} players online",
-        };
+        PlayerCountBox.TipText = t("hover.players_online.n", playerCount);
         RoomCountBox.Text = roomCount.ToString();
-        RoomCountBox.TipText = roomCount switch
-        {
-            1 => t("hover.rooms_online.1"),
-            0 => t("hover.rooms_online.0"),
-            _ => Humanizer.ReplaceDynamic(t("hover.rooms_online.n"), roomCount) ?? $"There are currently {roomCount} rooms active",
-        };
+        RoomCountBox.TipText = t("hover.rooms_online.n", roomCount);
         UpdateFriendCount();
     }
 

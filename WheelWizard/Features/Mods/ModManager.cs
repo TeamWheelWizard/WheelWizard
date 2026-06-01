@@ -192,7 +192,7 @@ public sealed class ModManager : IModManager
             var totalFiles = filePaths.Length;
             //todo: this is supposed to be backend only, ProgressWindow should not be created here.
             progressWindow = new ProgressWindow(t("progress.combining_files"))
-                .SetGoal(Humanizer.ReplaceDynamic(t("progress.preparing_files_count"), totalFiles)!)
+                .SetGoal(t("progress.preparing_files_count", totalFiles)!)
                 .SetExtraText(t("state.loading"));
             progressWindow.Show();
 

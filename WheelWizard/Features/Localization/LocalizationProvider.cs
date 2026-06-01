@@ -37,6 +37,11 @@ public static class LocalizationProvider
         return Current.TranslateForLanguage(key, languageCode);
     }
 
+    public static bool TryTranslateForLanguage(string key, string languageCode, out string value)
+    {
+        return Current.TryTranslateForLanguage(key, languageCode, out value);
+    }
+
     public static string GetLanguageDisplayName(string languageCode)
     {
         var language = LocalizationLanguageCatalog.Find(languageCode);

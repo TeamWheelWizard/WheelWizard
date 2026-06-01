@@ -185,7 +185,7 @@ public partial class ModContent : UserControlBase
             return;
 
         var confirmation = await new YesNoWindow()
-            .SetMainText(Humanizer.ReplaceDynamic(t("question.install_mod.title"), CurrentMod.Name) ?? CurrentMod.Name)
+            .SetMainText(t("question.install_mod.title", CurrentMod.Name) ?? CurrentMod.Name)
             .AwaitAnswer();
         if (!confirmation)
             return;
@@ -200,7 +200,7 @@ public partial class ModContent : UserControlBase
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Message)
                 .SetTitleText(t("message_success.mod_installed.title"))
-                .SetInfoText(Humanizer.ReplaceDynamic(t("message_success.mod_installed.extra"), CurrentMod.Name)!)
+                .SetInfoText(t("message_success.mod_installed.extra", CurrentMod.Name)!)
                 .Show();
         }
 
@@ -220,7 +220,7 @@ public partial class ModContent : UserControlBase
         if (!downloadUrls.Any())
             return Fail("No downloadable files were found for this mod.");
 
-        var progressWindow = new ProgressWindow(Humanizer.ReplaceDynamic(t("progress.downloading_mod"), CurrentMod.Name)!);
+        var progressWindow = new ProgressWindow(t("progress.downloading_mod", CurrentMod.Name)!);
         progressWindow.Show();
         progressWindow.SetExtraText(t("state.loading"));
 

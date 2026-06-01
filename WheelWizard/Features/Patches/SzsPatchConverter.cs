@@ -16,7 +16,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         var archiveTag = baseline.ArchiveTag;
 
         if (!StripExtension(moddedName).Equals(archiveTag, StringComparison.OrdinalIgnoreCase))
-            warnings.Add(Humanizer.ReplaceDynamic(t("warning.file_name_differs_from_archive_tag"), archiveTag)!);
+            warnings.Add(t("warning.file_name_differs_from_archive_tag", archiveTag)!);
 
         var wholeFileHash = HashBytes64(moddedBytes);
         var wholeFileMatches = moddedBytes.Length == baseline.WholeFileSize && wholeFileHash == baseline.WholeFileHash;
@@ -74,7 +74,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
 
             if (IsBlockedLooseRawOverrideExtension(logicalPath))
             {
-                skipped.Add(Humanizer.ReplaceDynamic(t("warning.unsupported_loose_override_extension"), logicalPath)!);
+                skipped.Add(t("warning.unsupported_loose_override_extension", logicalPath)!);
                 continue;
             }
 

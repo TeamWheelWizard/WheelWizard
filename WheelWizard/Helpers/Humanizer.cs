@@ -15,19 +15,14 @@ public static class Humanizer
 
     public static string HumanizeTimeSpan(TimeSpan timeSpan)
     {
-        // we use language to do the words like t("time.days.1") or t("time.days.n")
-        // however, the one with x has to be put in the method: ReplaceDynamic(t("time.days.n"), 10);
-
-        // now e need to replace all the old with the new language versions
-
         if (Math.Abs(timeSpan.TotalDays) >= 1)
         {
             var days = timeSpan.Days;
             var hours = timeSpan.Hours;
-            var dayText = days == 1 ? t("time.days.1") : ReplaceDynamic(t("time.days.n"), days);
+            var dayText = t("time.days.n", days);
             if (hours == 0)
-                return dayText!;
-            var hourText = hours == 1 ? t("time.hours.1") : ReplaceDynamic(t("time.hours.n"), hours);
+                return dayText;
+            var hourText = t("time.hours.n", hours);
             return $"{dayText} {hourText}";
         }
 
@@ -35,24 +30,24 @@ public static class Humanizer
         {
             var hours = timeSpan.Hours;
             var minutes = timeSpan.Minutes;
-            var hourText = hours == 1 ? t("time.hours.1") : ReplaceDynamic(t("time.hours.n"), hours);
+            var hourText = t("time.hours.n", hours);
             if (minutes == 0)
-                return hourText!;
-            var minuteText = minutes == 1 ? t("time.minutes.1") : ReplaceDynamic(t("time.minutes.n"), minutes);
+                return hourText;
+            var minuteText = t("time.minutes.n", minutes);
             return $"{hourText} {minuteText}";
         }
         if (Math.Abs(timeSpan.TotalMinutes) >= 1)
         {
             var minutes = timeSpan.Minutes;
             var seconds = timeSpan.Seconds;
-            var minuteText = minutes == 1 ? t("time.minutes.1") : ReplaceDynamic(t("time.minutes.n"), minutes);
+            var minuteText = t("time.minutes.n", minutes);
             if (seconds == 0)
-                return minuteText!;
-            var secondText = seconds == 1 ? t("time.seconds.1") : ReplaceDynamic(t("time.seconds.n"), seconds);
+                return minuteText;
+            var secondText = t("time.seconds.n", seconds);
             return $"{minuteText} {secondText}";
         }
 
-        return ReplaceDynamic(t("time.seconds.n"), timeSpan.Seconds)!;
+        return t("time.seconds.n", timeSpan.Seconds);
     }
 
     public static string HumanizeSeconds(int seconds) => HumanizeTimeSpan(TimeSpan.FromSeconds(seconds));

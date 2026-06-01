@@ -164,7 +164,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Message)
             .SetTitleText(t("message_success.mod_installed.title"))
-            .SetInfoText(Humanizer.ReplaceDynamic(t("message_success.mod_installed.extra"), modName)!)
+            .SetInfoText(t("message_success.mod_installed.extra", modName)!)
             .Show();
     }
 
@@ -178,7 +178,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         var newTitle = await new TextInputWindow()
             .SetMainText(t("question.enter_mod_name.title"))
             .SetInitialText(oldTitle)
-            .SetExtraText(Humanizer.ReplaceDynamic(t("question.enter_new_name.extra"), oldTitle)!)
+            .SetExtraText(t("question.enter_new_name.extra", oldTitle)!)
             .SetPlaceholderText(t("placeholder.enter_mod_name"))
             .SetValidation(ModManager.ValidateRenameModName)
             .ShowDialog();
@@ -197,9 +197,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (selectedMod == null)
             return;
 
-        var areTheySure = await new YesNoWindow()
-            .SetMainText(Humanizer.ReplaceDynamic(t("question.sure_delete.title"), selectedMod.Mod.Title)!)
-            .AwaitAnswer();
+        var areTheySure = await new YesNoWindow().SetMainText(t("question.sure_delete.title", selectedMod.Mod.Title)!).AwaitAnswer();
         if (!areTheySure)
             return;
 
@@ -250,17 +248,13 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private static string BuildPatchConversionResultMessage(ModPatchConversionResult conversion)
     {
-        var message = Humanizer.ReplaceDynamic(
-            t("message_success.patch_conversion_result"),
-            conversion.ConvertedFileCount,
-            conversion.WrittenPatchCount
-        )!;
+        var message = t("message_success.patch_conversion_result", conversion.ConvertedFileCount, conversion.WrittenPatchCount);
 
         if (conversion.Skipped.Count > 0)
         {
             message +=
                 $"{Environment.NewLine}{Environment.NewLine}"
-                + Humanizer.ReplaceDynamic(t("message_success.patch_conversion_skipped"), conversion.Skipped.Count)!
+                + t("message_success.patch_conversion_skipped", conversion.Skipped.Count)!
                 + $"{Environment.NewLine}{Environment.NewLine}"
                 + string.Join(Environment.NewLine, conversion.Skipped.Take(8));
         }
@@ -269,7 +263,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         {
             message +=
                 $"{Environment.NewLine}{Environment.NewLine}"
-                + Humanizer.ReplaceDynamic(t("message_success.patch_conversion_notes"), conversion.Warnings.Count)!
+                + t("message_success.patch_conversion_notes", conversion.Warnings.Count)!
                 + $"{Environment.NewLine}{Environment.NewLine}"
                 + string.Join(Environment.NewLine, conversion.Warnings.Take(8));
         }

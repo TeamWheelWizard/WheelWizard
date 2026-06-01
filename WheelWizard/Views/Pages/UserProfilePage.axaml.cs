@@ -365,7 +365,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private async void RenameMii_OnClick(object? sender, EventArgs e)
     {
         var oldName = CurrentMii?.Name.ToString();
-        var extraText = Humanizer.ReplaceDynamic(t("question.enter_new_name.extra"), oldName ?? string.Empty) ?? string.Empty;
+        var extraText = t("question.enter_new_name.extra", oldName ?? string.Empty) ?? string.Empty;
         var renamePopup = new TextInputWindow()
             .SetMainText(t("question.enter_new_name.title"))
             .SetExtraText(extraText)
@@ -385,7 +385,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
                 .SetInfoText(changeNameResult.Error.Message)
                 .Show();
         else
-            ViewUtils.ShowSnackbar(Humanizer.ReplaceDynamic(t("snackbar_success.name_change"), newName) ?? "Name changed successfully");
+            ViewUtils.ShowSnackbar(t("snackbar_success.name_change", newName) ?? "Name changed successfully");
 
         //reload game data, since multiple licenses can use the same mii
         GameLicenseService.LoadLicense();
