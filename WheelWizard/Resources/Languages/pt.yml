@@ -176,15 +176,15 @@ pt:
     players_online:
       0: "Não há jogadores online"
       1: "Há 1 jogador online"
-      x: "Há {$1} jogadores online"
+      n: "Há {$1} jogadores online"
     rooms_online:
       0: "Não há salas ativas"
       1: "Há 1 sala ativa"
-      x: "Há {$1} salas ativas"
+      n: "Há {$1} salas ativas"
     friends_online:
       0: "Não tens amigos online"
       1: "Tens 1 amigo online"
-      x: "Tens {$1} amigos online"
+      n: "Tens {$1} amigos online"
     rooms_page_disclaimer: "Tem em conta que esta página não te oferece a funcionalidade de entrares  diretamente numa sala. Para entrares numa sala em específico, terás de entrar através de um amigo, ou então esperas que entres na sala ao entrares nos servers online"
     friends_page_disclaimer: "Para adicionar amigos precisas de adicioná-los dentro do jogo."
     region_user_selection: "Isto só mostra regiões onde TU já jogaste."
@@ -204,16 +204,16 @@ pt:
   time:
     days:
       1: "1 dia"
-      x: "{$1} dias"
+      n: "{$1} dias"
     hours:
       1: "1 hora"
-      x: "{$1} horas"
+      n: "{$1} horas"
     minutes:
       1: "1 minuto"
-      x: "{$1} minutos "
+      n: "{$1} minutos "
     seconds:
       1: "1 segundo"
-      x: "{$1} segundos"
+      n: "{$1} segundos"
   progress:
     estimated_time_remaining: "Tempo restante estimado:"
     downloading_mb: "A transferir {$1} MB"

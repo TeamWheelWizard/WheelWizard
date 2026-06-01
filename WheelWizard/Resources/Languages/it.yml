@@ -176,15 +176,15 @@ it:
     players_online:
       0: "Al momento non ci sono giocatori online"
       1: "Al momento c'è 1 giocatore online"
-      x: "Al momento ci sono {$1} giocatori online"
+      n: "Al momento ci sono {$1} giocatori online"
     rooms_online:
       0: "Al momento non ci sono stanze attive"
       1: "Al momento c'è 1 stanza attiva"
-      x: "Al momento ci sono {$1} stanze attive"
+      n: "Al momento ci sono {$1} stanze attive"
     friends_online:
       0: "Al momento non ci sono amici online"
       1: "Al momento c'è 1 amico online"
-      x: "Al momento ci sono {$1} amici online"
+      n: "Al momento ci sono {$1} amici online"
     rooms_page_disclaimer: |-
       Attenzione, questa pagina non offre alcuna funzionalità per unirsi ad una stanza direttamente.
       Per unirsi ad una specifica stanza, dovrai farlo tramite un amico oppure sperare di unirti tramite i server online.
@@ -206,16 +206,16 @@ it:
   time:
     days:
       1: "1 giorno"
-      x: "{$1} giorni"
+      n: "{$1} giorni"
     hours:
       1: "1 ora"
-      x: "{$1} ore"
+      n: "{$1} ore"
     minutes:
       1: "1 minuto"
-      x: "{$1} minuti"
+      n: "{$1} minuti"
     seconds:
       1: "1 secondo"
-      x: "{$1} secondi"
+      n: "{$1} secondi"
   progress:
     estimated_time_remaining: "Tempo stimato rimanente:"
     downloading_mb: "Scaricando {$1} MB"

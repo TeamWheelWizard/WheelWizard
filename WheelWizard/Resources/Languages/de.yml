@@ -176,15 +176,15 @@ de:
     players_online:
       0: "Zurzeit sind keine Spieler online"
       1: "Zurzeit ist nur 1 Spieler online"
-      x: "Zurzeit sind {$1} Spieler online"
+      n: "Zurzeit sind {$1} Spieler online"
     rooms_online:
       0: "Zurzeit gibt es keine aktiven Räume"
       1: "Zurzeit ist nur 1 Raum aktiv"
-      x: "Zurzeit gibt es {$1} aktive Räume"
+      n: "Zurzeit gibt es {$1} aktive Räume"
     friends_online:
       0: "Zurzeit sind keine Freunde online"
       1: "Zurzeit ist nur 1 Freund online"
-      x: "Zurzeit sind {$1} Freunde online"
+      n: "Zurzeit sind {$1} Freunde online"
     rooms_page_disclaimer: |-
       Bitte beachte, dass diese Seite keine Funktion bietet, um dich mit einem Raum direkt zu verbinden.
       Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund treffen oder hoffen, ihm beizutreten, indem du in den Online-Servern beitrittst.
@@ -206,16 +206,16 @@ de:
   time:
     days:
       1: "1 Tag"
-      x: "{$1} Tage"
+      n: "{$1} Tage"
     hours:
       1: "1 Stunde"
-      x: "{$1} Stunden"
+      n: "{$1} Stunden"
     minutes:
       1: "1 Minute"
-      x: "{$1} Minuten"
+      n: "{$1} Minuten"
     seconds:
       1: "1 Sekunde"
-      x: "{$1} Sekunden"
+      n: "{$1} Sekunden"
   progress:
     estimated_time_remaining: "Geschätzte verbleibende Zeit:"
     downloading_mb: "Herunterladen mit {$1} MB"

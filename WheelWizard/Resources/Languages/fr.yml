@@ -176,15 +176,15 @@ fr:
     players_online:
       0: "Il n'y a actuellement aucun joueurs en ligne"
       1: "Il y a actuellement 1 joueur en ligne"
-      x: "Il y a actuellement {$1} joueurs en ligne"
+      n: "Il y a actuellement {$1} joueurs en ligne"
     rooms_online:
       0: "Il n'y a actuellement aucune salles active"
       1: "Il y a actuellement 1 salle active"
-      x: "Il y a actuellement {$1} salles active"
+      n: "Il y a actuellement {$1} salles active"
     friends_online:
       0: "Il n'y a actuellement aucun amis en ligne"
       1: "Il y a actuellement 1 ami en ligne"
-      x: "Il y a actuellement {$1} amis en ligne"
+      n: "Il y a actuellement {$1} amis en ligne"
     rooms_page_disclaimer: |-
       Attention, cete page ne propose pas la possibilité de rejoindre la salle directement.
       Pour rejoindre une salle spécifique, vous devez soit la rejoindre via un ami ou espérer de la rejoindre via les serveur en ligne.
@@ -206,16 +206,16 @@ fr:
   time:
     days:
       1: "1 Jour "
-      x: "{$1} Jours"
+      n: "{$1} Jours"
     hours:
       1: "1 heure"
-      x: "{$1} heures"
+      n: "{$1} heures"
     minutes:
       1: "1 minute"
-      x: "{$1} minutes"
+      n: "{$1} minutes"
     seconds:
       1: "1 seconde"
-      x: "{$1} secondes"
+      n: "{$1} secondes"
   progress:
     estimated_time_remaining: "Temps restant estimé: "
     downloading_mb: "Téléchargement de {$1} MB"

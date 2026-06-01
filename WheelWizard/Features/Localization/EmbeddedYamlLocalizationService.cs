@@ -111,20 +111,6 @@ public sealed class EmbeddedYamlLocalizationService : ILocalizationService
             }
         }
 
-        if (!translations.TryGetValue(DefaultLanguage, out var englishTranslations))
-            return translations;
-
-        var canonicalKeys = englishTranslations.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        foreach (var (languageCode, languageTranslations) in translations.ToArray())
-        {
-            if (string.Equals(languageCode, DefaultLanguage, StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            translations[languageCode] = languageTranslations
-                .Where(pair => canonicalKeys.Contains(pair.Key))
-                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase);
-        }
-
         return translations;
     }
 

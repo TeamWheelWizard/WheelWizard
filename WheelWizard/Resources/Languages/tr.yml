@@ -176,15 +176,15 @@ tr:
     players_online:
       0: "Şu anda çevrimiçi oyuncu yok."
       1: "Şu anda çevrimiçi 1 oyuncu var"
-      x: "Şu anda çevrimiçi {$1} oyuncu var"
+      n: "Şu anda çevrimiçi {$1} oyuncu var"
     rooms_online:
       0: "Şu anda aktif oda yok"
       1: "Şu anda 1 aktif oda var"
-      x: "Şu anda {$1} aktif oda var"
+      n: "Şu anda {$1} aktif oda var"
     friends_online:
       0: "Şu anda çevrimiçi arkadaş yok"
       1: "Şu anda çevrimiçi 1 arkadaş var"
-      x: "Şu anda çevrimiçi {$1} arkadaş var"
+      n: "Şu anda çevrimiçi {$1} arkadaş var"
     rooms_page_disclaimer: |-
       Lütfen bu sayfanın doğrudan bir odaya katılma işlevi sunmadığını unutmayın.
       Belirli bir odaya katılmak için bir arkadaşınız aracılığıyla katılmanız veya çevrimiçi sunuculara katılarak bu odaya girmeyi ummanız gerekecek.
@@ -206,16 +206,16 @@ tr:
   time:
     days:
       1: "1 gün"
-      x: "{$1} gün"
+      n: "{$1} gün"
     hours:
       1: "1 saat"
-      x: "{$1} saat"
+      n: "{$1} saat"
     minutes:
       1: "1 dakika"
-      x: "{$1} dakika"
+      n: "{$1} dakika"
     seconds:
       1: "1 saniye"
-      x: "{$1} saniye"
+      n: "{$1} saniye"
   progress:
     estimated_time_remaining: "Kalan Tahmini Süre:"
     downloading_mb: "{$1} MB indiriliyor"

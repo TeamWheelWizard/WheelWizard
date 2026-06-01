@@ -173,7 +173,17 @@ def ordered_translation_keys(languages: dict[str, dict[str, str]]) -> list[str]:
     if "en" not in languages:
         raise RuntimeError("en.yml is required because it is the source of truth for translation keys.")
 
-    return list(languages["en"].keys())
+    keys: list[str] = []
+    seen: set[str] = set()
+    for language_code in ordered_language_codes(languages):
+        for key in languages[language_code]:
+            if key in seen:
+                continue
+
+            seen.add(key)
+            keys.append(key)
+
+    return keys
 
 
 def export_csv() -> Path:
@@ -221,8 +231,9 @@ def import_csv() -> None:
         return
 
     existing_languages = load_languages()
-    source_keys = ordered_translation_keys(existing_languages)
-    source_key_set = set(source_keys)
+    translation_keys = ordered_translation_keys(existing_languages)
+    translation_key_set = set(translation_keys)
+    changed_counts: dict[str, int] = {}
 
     with csv_path.open("r", encoding="utf-8-sig", newline="") as file:
         reader = csv.DictReader(file)
@@ -234,14 +245,15 @@ def import_csv() -> None:
             existing_languages[language_code] = {
                 key: value
                 for key, value in existing_languages.setdefault(language_code, {}).items()
-                if key in source_key_set and value != ""
+                if key in translation_key_set and value != ""
             }
+            changed_counts[language_code] = 0
 
         for row in reader:
             key = (row.get("key") or "").strip()
             if not key:
                 continue
-            if key not in source_key_set:
+            if key not in translation_key_set:
                 continue
 
             for language_code in language_codes:
@@ -257,21 +269,27 @@ def import_csv() -> None:
                 if language_code == "en" and value == "":
                     continue
 
-                existing_languages[language_code][key] = normalize_import_value(key, value)
+                value = normalize_import_value(key, value)
+                if existing_languages[language_code].get(key, "") != value:
+                    changed_counts[language_code] += 1
+
+                existing_languages[language_code][key] = value
 
     for language_code in ordered_language_codes(existing_languages):
         output_path = LANGUAGE_DIR / f"{language_code}.yml"
         canonical_values = {
             key: existing_languages[language_code][key]
-            for key in source_keys
+            for key in translation_keys
             if existing_languages[language_code].get(key, "") != ""
         }
-        if language_code == "en" and TRANSLATOR_KEY in source_key_set:
+        if language_code == "en" and TRANSLATOR_KEY in translation_key_set:
             canonical_values[TRANSLATOR_KEY] = "-"
 
         write_yaml_file(output_path, language_code, unflatten(canonical_values))
 
     print(f"Imported {csv_path}")
+    for language_code in sorted(changed_counts):
+        print(f"  {language_code}: {changed_counts[language_code]} changed")
 
 
 def ask_for_csv_path() -> Path | None:

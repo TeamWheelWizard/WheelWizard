@@ -162,15 +162,15 @@ es:
     players_online:
       0: "No hay jugadores en línea"
       1: "Hay 1 jugador en línea"
-      x: "Hay {$1} jugadores en línea"
+      n: "Hay {$1} jugadores en línea"
     rooms_online:
       0: "No hay salas activas"
       1: "Hay una sala activa"
-      x: "Hay {$1} salas activas"
+      n: "Hay {$1} salas activas"
     friends_online:
       0: "No hay amigos en línea"
       1: "Hay 1 amigo en línea"
-      x: "Hay {$1} amigos en línea"
+      n: "Hay {$1} amigos en línea"
     rooms_page_disclaimer: "Atención. Esta pagina no tiene la funcionalidad de unirte a una sala directamente. Para unirte a una sala en especifico, necesitará unirse mediante un amigo, o con suerte, encontrando la sala en VS Mundial."
     friends_page_disclaimer: "Para añadir a amigos necesitas añadirlos en el juego."
     region_user_selection: "Esto solo muestra las regiones en las que TÚ has jugado."
@@ -188,16 +188,16 @@ es:
   time:
     days:
       1: "1 día"
-      x: "{$1} días"
+      n: "{$1} días"
     hours:
       1: "1 hora"
-      x: "{$1} horas"
+      n: "{$1} horas"
     minutes:
       1: "1 minuto"
-      x: "{$1} minutos"
+      n: "{$1} minutos"
     seconds:
       1: "1 segundo"
-      x: "{$1} segundos"
+      n: "{$1} segundos"
   progress:
     estimated_time_remaining: "Tiempo restante estimado:"
     downloading_mb: "Descargando {$1} MB"

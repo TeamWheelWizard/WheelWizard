@@ -176,15 +176,15 @@ fi:
     players_online:
       0: "Ei pelaajia online-tilassa"
       1: "1 pelaaja on online-tilassa"
-      x: "{$1} pelaajaa on online-tilassa"
+      n: "{$1} pelaajaa on online-tilassa"
     rooms_online:
       0: "Ei aktiivisia huoneita"
       1: "1 aktiivinen huone"
-      x: "{$1} aktiivista huonetta"
+      n: "{$1} aktiivista huonetta"
     friends_online:
       0: "Ei kavereita online-tilassa"
       1: "1 kaveri on online-tilassa"
-      x: "{$1} kaveria on online-tilassa"
+      n: "{$1} kaveria on online-tilassa"
     rooms_page_disclaimer: |-
       Huomioi, että tältä sivulta ei voi liittyä huoneeseen suoraan.
       Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
@@ -206,16 +206,16 @@ fi:
   time:
     days:
       1: "1 pv"
-      x: "{$1} pv"
+      n: "{$1} pv"
     hours:
       1: "1 t"
-      x: "{$1} t"
+      n: "{$1} t"
     minutes:
       1: "1 min"
-      x: "{$1} min"
+      n: "{$1} min"
     seconds:
       1: "1 s"
-      x: "{$1} s"
+      n: "{$1} s"
   progress:
     estimated_time_remaining: "Arvioitu kestoaika:"
     downloading_mb: "Ladataan {$1} Mt"
