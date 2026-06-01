@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
@@ -29,7 +29,7 @@
                     Orientation="Vertical" x:Name="TopBarButtons" Spacing="3">
             <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasMods}">
                 <components:Button Variant="Primary" 
-                                   Text="{x:Static lang:Common.Action_Browse}" IconData="{StaticResource Search}"
+                                   Text="{loc:T action.browse}" IconData="{StaticResource Search}"
                                    Click="BrowseMod_Click" HorizontalAlignment="Center" />
                 <components:Button Variant="Default"
                                    IconData="{StaticResource FileImport}"
@@ -40,15 +40,15 @@
         <!-- Empty Mods Message -->
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="PageWithoutMods"
                     IsVisible="{Binding HasMods, Converter={x:Static BoolConverters.Not}}">
-            <components:EmptyPageInfo Title="{x:Static lang:Phrases.EmptyContent_NoMods_Title}"
-                                      BodyText="{x:Static lang:Phrases.EmptyContent_NoMods}"
+            <components:EmptyPageInfo Title="{loc:T empty_content.no_mods_title}"
+                                      BodyText="{loc:T empty_content.no_mods}"
                                       HorizontalAlignment="Center" />
             <UniformGrid Margin="0,12" Columns="2" Rows="1">
                 <components:Button Variant="Primary" Margin="3,0"
-                                   Text="{x:Static lang:Common.Action_Browse}" IconData="{StaticResource Search}"
+                                   Text="{loc:T action.browse}" IconData="{StaticResource Search}"
                                    Click="BrowseMod_Click" HorizontalAlignment="Stretch" />
                 <components:Button Variant="Default" Margin="3,0"
-                                   Text="{x:Static lang:Common.Action_Import}"
+                                   Text="{loc:T action.import}"
                                    IconData="{StaticResource FileImport}"
                                    Click="ImportMod_Click" HorizontalAlignment="Stretch" />
             </UniformGrid>
@@ -62,7 +62,7 @@
                     <CheckBox Classes="Switch" x:Name="EnableAllCheckbox"
                               VerticalAlignment="Center" Margin="0,5,30,5"
                               Click="ToggleButton_OnIsCheckedChanged"
-                              Content="{x:Static lang:Common.Action_EnableAll}" />
+                              Content="{loc:T action.enable_all}" />
 
                     <components:Button HorizontalAlignment="Right" VerticalAlignment="Center" IconSize="26"
                                        Click="ToggleModsPageView_OnClick" x:Name="ToggleButton"
@@ -101,15 +101,15 @@
                         <Border Classes="BoxItemBackground" Height="50">
                             <Border.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
-                                    <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
+                                    <MenuItem Header="{loc:T action.rename}" Click="RenameMod_Click" />
+                                    <MenuItem Header="{loc:T action.delete}" Click="DeleteMod_Click" />
                                     <Separator />
-                                    <MenuItem Header="{x:Static lang:Common.Action_ConvertToPatches}"
+                                    <MenuItem Header="{loc:T action.convert_to_patches}"
                                               IsEnabled="{Binding Mod.HasIncompatibleFiles}"
                                               Click="ConvertToPatches_Click" />
                                     <Separator />
-                                    <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click" />
-                                    <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />
+                                    <MenuItem Header="{loc:T action.view_mod}" Click="ViewMod_Click" />
+                                    <MenuItem Header="{loc:T action.open_folder}" Click="OpenFolder_Click" />
                                 </ContextMenu>
                             </Border.ContextMenu>
                             <Grid>
@@ -158,7 +158,7 @@
                                 <!-- however, it works really weird if you do that -->
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
                                             VerticalAlignment="Center">
-                                    <TextBlock Text="{x:Static lang:Common.Attribute_Priority}" FontSize="14"
+                                    <TextBlock Text="{loc:T attribute.priority}" FontSize="14"
                                                Foreground="{StaticResource Neutral100}"
                                                VerticalAlignment="Center" Margin="10,0,0,0" />
                                     <TextBlock Text=": " FontSize="14" Foreground="{StaticResource Neutral100}"
@@ -236,15 +236,15 @@
                                 <patterns:GridModPanel />
                                 <Border.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="{x:Static lang:Common.Action_Rename}" Click="RenameMod_Click" />
-                                        <MenuItem Header="{x:Static lang:Common.Action_Delete}" Click="DeleteMod_Click" />
+                                        <MenuItem Header="{loc:T action.rename}" Click="RenameMod_Click" />
+                                        <MenuItem Header="{loc:T action.delete}" Click="DeleteMod_Click" />
                                         <Separator />
-                                        <MenuItem Header="{x:Static lang:Common.Action_ConvertToPatches}"
+                                        <MenuItem Header="{loc:T action.convert_to_patches}"
                                                   IsEnabled="{Binding Mod.HasIncompatibleFiles}"
                                                   Click="ConvertToPatches_Click" />
                                         <Separator />
-                                        <MenuItem Header="{x:Static lang:Common.Action_ViewMod}" Click="ViewMod_Click" />
-                                        <MenuItem Header="{x:Static lang:Common.Action_OpenFolder}" Click="OpenFolder_Click" />
+                                        <MenuItem Header="{loc:T action.view_mod}" Click="ViewMod_Click" />
+                                        <MenuItem Header="{loc:T action.open_folder}" Click="OpenFolder_Click" />
                                     </ContextMenu>
                                 </Border.ContextMenu>
                             </Border>

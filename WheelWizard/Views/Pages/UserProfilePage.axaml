@@ -1,9 +1,9 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:animation="clr-namespace:Avalonia.Animation;assembly=Avalonia.Base"
@@ -46,7 +46,7 @@
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_MyProfiles}" HorizontalAlignment="Left"
+        <TextBlock Grid.Row="0" Text="{loc:T page_title.my_profiles}" HorizontalAlignment="Left"
                    VerticalAlignment="Top"
                    Classes="PageTitleText" />
 
@@ -57,26 +57,26 @@
                 <!-- WE ARE LAZY IN THE CODE, AND SO WE USE CHILD INDEXING TO GET THE RADIO BUTTONS -->
                 <RadioButton Classes="TopBar"
                              Click="TopBarRadio_OnClick" Tag="0"
-                             x:Name="Mii0" Content="{x:Static lang:Common.State_NoLicense}"
+                             x:Name="Mii0" Content="{loc:T state.no_license}"
                              IsChecked="True" IsEnabled="False" />
                 <RadioButton Classes="TopBar"
                              Click="TopBarRadio_OnClick" Tag="1"
-                             x:Name="Mii1" Content="{x:Static lang:Common.State_NoLicense}"
+                             x:Name="Mii1" Content="{loc:T state.no_license}"
                              IsEnabled="False" />
                 <RadioButton Classes="TopBar"
                              Click="TopBarRadio_OnClick" Tag="2"
-                             x:Name="Mii2" Content="{x:Static lang:Common.State_NoLicense}"
+                             x:Name="Mii2" Content="{loc:T state.no_license}"
                              IsEnabled="False" />
                 <RadioButton Classes="TopBar"
                              Click="TopBarRadio_OnClick" Tag="3"
-                             x:Name="Mii3" Content="{x:Static lang:Common.State_NoLicense}"
+                             x:Name="Mii3" Content="{loc:T state.no_license}"
                              IsEnabled="False" />
             </StackPanel>
         </ScrollViewer>
 
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
             <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="18" Height="18" Margin="10"
-                    ToolTip.Tip="{x:Static lang:Phrases.Hover_RegionUserSelection}" ToolTip.Placement="Top"
+                    ToolTip.Tip="{loc:T hover.region_user_selection}" ToolTip.Placement="Top"
                     ToolTip.ShowDelay="20">
                 <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
@@ -158,8 +158,8 @@
                             <RadioButton Margin="8,0,0,8" x:Name="PrimaryCheckBox"
                                          HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                          Checked="CheckBox_SetPrimaryUser" Classes="CheckBox">
-                                <components:FormFieldLabel Margin="0,2,0,0" Text="{x:Static lang:Settings.Option_MakePrimary}"
-                                                           TipText="{x:Static lang:Phrases.Hover_PrimaryProfile}" />
+                                <components:FormFieldLabel Margin="0,2,0,0" Text="{loc:T option.make_primary}"
+                                                           TipText="{loc:T hover.primary_profile}" />
                             </RadioButton>
 
                             <ScrollViewer HorizontalScrollBarVisibility="Auto" Margin="10,0,10,8"
@@ -213,30 +213,30 @@
                                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
                                     <Border Grid.Column="0" Grid.Row="0" Classes="profileStatCard" Margin="0,0,4,4">
                                         <StackPanel>
-                                            <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
-                                                                       TipText="{x:Static lang:Common.Attribute_VrFull}" />
+                                            <components:FormFieldLabel Text="{loc:T attribute.vr_abbreviation}"
+                                                                       TipText="{loc:T attribute.vr_full}" />
                                             <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribVr" />
                                         </StackPanel>
                                     </Border>
 
                                     <Border Grid.Column="1" Grid.Row="0" Classes="profileStatCard" Margin="4,0,0,4">
                                         <StackPanel>
-                                            <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_BrAbbreviation}"
-                                                                       TipText="{x:Static lang:Common.Attribute_BrFull}" />
+                                            <components:FormFieldLabel Text="{loc:T attribute.br_abbreviation}"
+                                                                       TipText="{loc:T attribute.br_full}" />
                                             <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribBr" />
                                         </StackPanel>
                                     </Border>
 
                                     <Border Grid.Column="0" Grid.Row="1" Classes="profileStatCard" Margin="0,4,4,0">
                                         <StackPanel>
-                                            <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_TotalGamesWon}" />
+                                            <components:FormFieldLabel Text="{loc:T attribute.total_games_won}" />
                                             <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribTotalWins" />
                                         </StackPanel>
                                     </Border>
 
                                     <Border Grid.Column="1" Grid.Row="1" Classes="profileStatCard" Margin="4,4,0,0">
                                         <StackPanel>
-                                            <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_TotalGamesPlayed}" />
+                                            <components:FormFieldLabel Text="{loc:T attribute.total_games_played}" />
                                             <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribTotalRaces" />
                                         </StackPanel>
                                     </Border>
@@ -258,8 +258,8 @@
             <!-- repurposing the common state text -->
             <components:EmptyPageInfo Grid.RowSpan="2" x:Name="NoProfilesInfo"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      Title="{x:Static lang:Common.State_NoProfiles}"
-                                      BodyText="{x:Static lang:Phrases.EmptyContent_NoProfiles}" />
+                                      Title="{loc:T state.no_profiles}"
+                                      BodyText="{loc:T empty_content.no_profiles}" />
         </Grid>
     </Grid>
 </UserControl>

@@ -4,15 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              x:Class="WheelWizard.Views.Popups.MiiManagement.MiiEditor.EditorFace">
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
         <!-- Updated Title -->
-        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_Face}" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{loc:T attribute.mii_section.face}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
-        <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}" IconData="{StaticResource ArrowLeft}"
+        <components:IconLabelButton Grid.Row="0" Text="{loc:T action.back}" IconData="{StaticResource ArrowLeft}"
                                     Click="BackButton_OnClick" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"
                                     Foreground="{StaticResource TitleTextColor}" FontSize="16"
                                     HoverForeground="{StaticResource Primary200}"/>
@@ -24,21 +24,21 @@
                 <!-- The list of elements you want to edit in this page -->
                 
                 <StackPanel> <!-- Skin Color -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_SkinColor}"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.skin_color}"/>
                     <UniformGrid Columns="6" x:Name="SkinColorGrid">
                         <!-- Generated elements -->
                     </UniformGrid>
                 </StackPanel>
                 
                 <StackPanel> <!-- Head Type -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_HeadShape}"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.head_shape}"/>
                     <UniformGrid Columns="5" x:Name="HeadTypesGrid">
                         <!-- Generated elements -->
                     </UniformGrid>
                 </StackPanel>
             
                 <StackPanel> <!-- Facial Feature (Blemishes) -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_FacialFeature}"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.facial_feature}"/>
                     <ComboBox
                         x:Name="FacialFeatureBox"
                         SelectionChanged="FacialFeatureBox_OnSelectionChanged"

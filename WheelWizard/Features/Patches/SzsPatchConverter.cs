@@ -1,6 +1,5 @@
 using WheelWizard.Features.Archives;
 using WheelWizard.Helpers;
-using WheelWizard.Resources.Languages;
 using static WheelWizard.Features.Patches.PatchConversionHelpers;
 
 namespace WheelWizard.Features.Patches;
@@ -17,7 +16,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         var archiveTag = baseline.ArchiveTag;
 
         if (!StripExtension(moddedName).Equals(archiveTag, StringComparison.OrdinalIgnoreCase))
-            warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_FileNameDiffersFromArchiveTag, archiveTag)!);
+            warnings.Add(Humanizer.ReplaceDynamic(t("warning.file_name_differs_from_archive_tag"), archiveTag)!);
 
         var wholeFileHash = HashBytes64(moddedBytes);
         var wholeFileMatches = moddedBytes.Length == baseline.WholeFileSize && wholeFileHash == baseline.WholeFileHash;
@@ -27,7 +26,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         {
             if (wholeFileMatches)
             {
-                warnings.Add(Phrases.Warning_SzsMatchesBaseline);
+                warnings.Add(t("warning.szs_matches_baseline"));
                 return new PatchConversionAnalysis
                 {
                     CleanName = baseline.RelativePath,
@@ -39,7 +38,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                 };
             }
 
-            warnings.Add(Phrases.Warning_WholeFileBaseline);
+            warnings.Add(t("warning.whole_file_baseline"));
 
             return new PatchConversionAnalysis
             {
@@ -53,7 +52,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                         $"{archiveTag}.szs",
                         baseline.RelativePath,
                         moddedBytes.ToArray(),
-                        Phrases.Text_WholeFileOverride
+                        t("text.whole_file_override")
                     ),
                 ],
                 Warnings = warnings,
@@ -75,7 +74,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
 
             if (IsBlockedLooseRawOverrideExtension(logicalPath))
             {
-                skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_UnsupportedLooseOverrideExtension, logicalPath)!);
+                skipped.Add(Humanizer.ReplaceDynamic(t("warning.unsupported_loose_override_extension"), logicalPath)!);
                 continue;
             }
 
@@ -92,7 +91,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
                     BuildTaggedPatchName(logicalPath, archiveTag),
                     logicalPath,
                     moddedEntry.ToArray(),
-                    baselineMember == null ? Phrases.Text_NewArchiveMember : Phrases.Text_ModifiedArchiveMember
+                    baselineMember == null ? t("text.new_archive_member") : t("text.modified_archive_member")
                 )
             );
         }
@@ -107,7 +106,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
         }
 
         if (entries.Count == 0 && skipped.Count == 0)
-            warnings.Add(Phrases.Warning_NoSzsDifferences);
+            warnings.Add(t("warning.no_szs_differences"));
 
         return new PatchConversionAnalysis
         {

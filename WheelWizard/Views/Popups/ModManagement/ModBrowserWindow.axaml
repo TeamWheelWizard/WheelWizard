@@ -1,10 +1,10 @@
-﻿<base:PopupContent x:Class="WheelWizard.Views.Popups.ModManagement.ModBrowserWindow"
+<base:PopupContent x:Class="WheelWizard.Views.Popups.ModManagement.ModBrowserWindow"
                      xmlns="https://github.com/avaloniaui"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                      ClipToBounds="False"
-                     xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+                     xmlns:loc="clr-namespace:WheelWizard.Localization"
                      xmlns:modManagement="clr-namespace:WheelWizard.Views.Popups.ModManagement"
                      xmlns:components="clr-namespace:WheelWizard.Views.Components"
                      xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
@@ -15,12 +15,12 @@
     <Grid ColumnDefinitions="2*,3*" Width="800" Height="750">
         <!-- Mod List -->
         <Grid Grid.Column="0" Margin="10" RowDefinitions="Auto,Auto,Auto,*">
-            <TextBlock Classes="TinyText" Text="{x:Static lang:Phrases.Text_PoweredGamebanana}"
+            <TextBlock Classes="TinyText" Text="{loc:T text.powered_gamebanana}"
                        HorizontalAlignment="Left" Grid.Row="0" />
 
             <!-- Search Bar -->
             <Grid Grid.Row="1" Margin="0,10,0,10" HorizontalAlignment="Stretch">
-                <TextBox Name="SearchTextBox" Watermark="{x:Static lang:Phrases.Placeholder_SearchMod}" Grid.Column="0"
+                <TextBox Name="SearchTextBox" Watermark="{loc:T placeholder.search_mod}" Grid.Column="0"
                          KeyDown="SearchTextBox_OnKeyDown"
                          Height="40" HorizontalAlignment="Stretch" Margin="0,0,60,5" />
 

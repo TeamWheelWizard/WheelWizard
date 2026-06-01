@@ -7,8 +7,6 @@ using Avalonia.Threading;
 using Serilog;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
-using WheelWizard.Localization;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
@@ -16,7 +14,6 @@ using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 using Button = WheelWizard.Views.Components.Button;
-using SettingsResource = WheelWizard.Resources.Languages.Settings;
 
 namespace WheelWizard.Views.Pages.Settings;
 
@@ -52,7 +49,7 @@ public partial class WhWzSettings : UserControlBase
         UpdateAppDataLocationUi();
         _pageLoaded = true;
 
-        MKGameFieldLabel.TipText = SettingsResource.HelperText_EndWithX + " .wbfs/.iso/.rvz";
+        MKGameFieldLabel.TipText = t("helper_text.end_with_x") + " .wbfs/.iso/.rvz";
         WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
     }
 
@@ -72,11 +69,8 @@ public partial class WhWzSettings : UserControlBase
             .Items.OfType<LanguageDropdownItem>()
             .FirstOrDefault(item => item.Key == currentWhWzLanguage);
 
-        TranslationsPercentageText.Text = Humanizer.ReplaceDynamic(
-            Phrases.Text_LanguageTranslatedBy,
-            SettingsResource.Value_Language_zTranslators
-        );
-        TranslationsPercentageText.IsVisible = SettingsResource.Value_Language_zTranslators != "-";
+        TranslationsPercentageText.Text = Humanizer.ReplaceDynamic(t("text.language_translated_by"), t("value.language.z_translators"));
+        TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
 
         // -----------------
         // Window Scale settings
@@ -103,7 +97,7 @@ public partial class WhWzSettings : UserControlBase
         if (SettingValues.WindowScales.Contains(scale))
             return percentageString;
 
-        return Common.State_Custom + ": " + percentageString;
+        return t("state.custom") + ": " + percentageString;
     }
 
     private void AutoFillPaths()
@@ -145,15 +139,15 @@ public partial class WhWzSettings : UserControlBase
             if (!EnvHelper.IsFlatpakSandboxed() && !IsFlatpakDolphinInstalled())
             {
                 var wantsAutomaticInstall = await new YesNoWindow()
-                    .SetMainText(Phrases.Question_DolphinFlatpack_Title)
-                    .SetExtraText(Phrases.Question_DolphinFlatpack_Extra)
-                    .SetButtonText(Common.Action_Install, Common.Action_DoManually)
+                    .SetMainText(t("question.dolphin_flatpack.title"))
+                    .SetExtraText(t("question.dolphin_flatpack.extra"))
+                    .SetButtonText(t("action.install"), t("action.do_manually"))
                     .AwaitAnswer();
                 if (wantsAutomaticInstall)
                 {
                     var progressWindow = new ProgressWindow()
-                        .SetGoal(Phrases.Progress_InstallingDolphin)
-                        .SetExtraText(Phrases.Progress_ThisMayTakeAWhile);
+                        .SetGoal(t("progress.installing_dolphin"))
+                        .SetExtraText(t("progress.this_may_take_a_while"));
                     TogglePathSettings(true);
                     progressWindow.Show();
                     var progress = new Progress<int>(progressWindow.UpdateProgress);
@@ -181,8 +175,8 @@ public partial class WhWzSettings : UserControlBase
             if (!string.IsNullOrEmpty(dolphinAppPath))
             {
                 var result = await new YesNoWindow()
-                    .SetMainText(Phrases.Question_DolphinFound_Title)
-                    .SetExtraText($"{Phrases.Question_DolphinFound_Extra}\n{dolphinAppPath}")
+                    .SetMainText(t("question.dolphin_found.title"))
+                    .SetExtraText($"{t("question.dolphin_found.extra")}\n{dolphinAppPath}")
                     .AwaitAnswer();
 
                 if (result)
@@ -256,8 +250,8 @@ public partial class WhWzSettings : UserControlBase
         {
             // Ask the user if they want to use the automatically found folder
             var result = await new YesNoWindow()
-                .SetMainText(Phrases.Question_DolphinFound_Title)
-                .SetExtraText($"{Phrases.Question_DolphinFound_Extra}\n{folderPath}")
+                .SetMainText(t("question.dolphin_found.title"))
+                .SetExtraText($"{t("question.dolphin_found.extra")}\n{folderPath}")
                 .AwaitAnswer();
 
             if (result)
@@ -390,9 +384,9 @@ public partial class WhWzSettings : UserControlBase
         ToolTip.SetTip(AppDataLocationInput, currentPath);
 
         var statusText =
-            _isMovingAppData ? SettingsResource.Status_DataFolder_Moving
-            : PathManager.IsUsingCustomWheelWizardAppdataPath ? SettingsResource.Status_DataFolder_Custom
-            : SettingsResource.Status_DataFolder_Default;
+            _isMovingAppData ? t("status.data_folder.moving")
+            : PathManager.IsUsingCustomWheelWizardAppdataPath ? t("status.data_folder.custom")
+            : t("status.data_folder.default");
 
         AppDataLocationStatus.Text = statusText;
         AppDataLocationBrowseButton.IsEnabled = !_isMovingAppData;
@@ -406,7 +400,7 @@ public partial class WhWzSettings : UserControlBase
         AppDataLocationBrowseButton.IsEnabled = !isBusy;
         AppDataLocationResetButton.IsEnabled = !isBusy && PathManager.IsUsingCustomWheelWizardAppdataPath;
         if (isBusy)
-            AppDataLocationStatus.Text = SettingsResource.Status_DataFolder_Moving;
+            AppDataLocationStatus.Text = t("status.data_folder.moving");
     }
 
     private async Task<bool> ConfirmAndMoveAppDataAsync(string targetPath)
@@ -428,7 +422,7 @@ public partial class WhWzSettings : UserControlBase
         {
             await new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText(Phrases.MessageError_DataFolderMove_Title)
+                .SetTitleText(t("message_error.data_folder_move.title"))
                 .SetInfoText(validationError)
                 .ShowDialog();
             return false;
@@ -438,13 +432,13 @@ public partial class WhWzSettings : UserControlBase
             return false;
 
         var extraText =
-            Humanizer.ReplaceDynamic(Phrases.Question_MoveData_Extra, normalizedTarget)
+            Humanizer.ReplaceDynamic(t("question.move_data.extra"), normalizedTarget)
             ?? $"Wheel Wizard will move its files to:\n{normalizedTarget}\nThis may take a while depending on the amount of data.";
 
         var confirmed = await new YesNoWindow()
-            .SetMainText(Phrases.Question_MoveData_Title)
+            .SetMainText(t("question.move_data.title"))
             .SetExtraText(extraText)
-            .SetButtonText(Common.Action_Yes, Common.Action_No)
+            .SetButtonText(t("action.yes"), t("action.no"))
             .AwaitAnswer();
 
         if (!confirmed)
@@ -459,9 +453,9 @@ public partial class WhWzSettings : UserControlBase
         SetAppDataLocationBusyState(true);
         Log.CloseAndFlush();
 
-        var progressWindow = new ProgressWindow(SettingsResource.Status_DataFolder_Moving)
-            .SetExtraText(SettingsResource.HelperText_WheelWizardDataFolder)
-            .SetGoal(SettingsResource.Status_DataFolder_Moving);
+        var progressWindow = new ProgressWindow(t("status.data_folder.moving"))
+            .SetExtraText(t("helper_text.wheel_wizard_data_folder"))
+            .SetGoal(t("status.data_folder.moving"));
         progressWindow.Show();
 
         var progress = new Progress<double>(value =>
@@ -488,7 +482,7 @@ public partial class WhWzSettings : UserControlBase
 
             await new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText(Phrases.MessageError_DataFolderMove_Title)
+                .SetTitleText(t("message_error.data_folder_move.title"))
                 .SetInfoText(ex.Message)
                 .ShowDialog();
             return;
@@ -542,7 +536,7 @@ public partial class WhWzSettings : UserControlBase
                 {
                     await new MessageBoxWindow()
                         .SetMessageType(MessageBoxWindow.MessageType.Error)
-                        .SetTitleText(Phrases.MessageError_DataFolderMove_Title)
+                        .SetTitleText(t("message_error.data_folder_move.title"))
                         .SetInfoText(revertError)
                         .ShowDialog();
                 }
@@ -560,7 +554,7 @@ public partial class WhWzSettings : UserControlBase
         }
 
         var infoText =
-            Humanizer.ReplaceDynamic(Phrases.MessageSuccess_DataFolderMoved_Extra, PathManager.WheelWizardAppdataPath)
+            Humanizer.ReplaceDynamic(t("message_success.data_folder_moved.extra"), PathManager.WheelWizardAppdataPath)
             ?? $"Wheel Wizard data is now stored in:\n{PathManager.WheelWizardAppdataPath}";
 
         if (!string.IsNullOrWhiteSpace(warningMessage))
@@ -568,7 +562,7 @@ public partial class WhWzSettings : UserControlBase
 
         await new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Message)
-            .SetTitleText(Phrases.MessageSuccess_DataFolderMoved_Title)
+            .SetTitleText(t("message_success.data_folder_moved.title"))
             .SetInfoText(infoText)
             .ShowDialog();
     }
@@ -579,7 +573,7 @@ public partial class WhWzSettings : UserControlBase
 
         await new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Error)
-            .SetTitleText(Phrases.MessageError_DataFolderMove_Title)
+            .SetTitleText(t("message_error.data_folder_move.title"))
             .SetInfoText(infoText)
             .ShowDialog();
 
@@ -672,12 +666,12 @@ public partial class WhWzSettings : UserControlBase
         var seconds = 10;
 
         string ExtraScaleText() =>
-            Humanizer.ReplaceDynamic(Phrases.Question_ApplyScale_Extra, Humanizer.HumanizeSeconds(seconds))
+            Humanizer.ReplaceDynamic(t("question.apply_scale.extra"), Humanizer.HumanizeSeconds(seconds))
             ?? $"This will apply the new scale in {Humanizer.HumanizeSeconds(seconds)} seconds. You can cancel this by clicking Revert.";
 
         var yesNoWindow = new YesNoWindow()
-            .SetButtonText(Common.Action_Apply, Common.Action_Revert)
-            .SetMainText(Phrases.Question_ApplyScale_Title)
+            .SetButtonText(t("action.apply"), t("action.revert"))
+            .SetMainText(t("question.apply_scale.title"))
             .SetExtraText(ExtraScaleText());
         // we want to now set up a timer every second to update the text, and at the last second close the window
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -722,7 +716,7 @@ public partial class WhWzSettings : UserControlBase
     {
         return new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Error)
-            .SetTitleText(Phrases.MessageError_DataFolderMove_Title)
+            .SetTitleText(t("message_error.data_folder_move.title"))
             .SetInfoText("Wheel Wizard couldn't resolve the selected folder. Please choose a different location.")
             .ShowDialog();
     }
@@ -739,17 +733,17 @@ public partial class WhWzSettings : UserControlBase
         if (selectedLanguage.Key == currentLanguage)
             return;
 
-        var titleCurrent = LocalizationProvider.TranslateForLanguage("question.apply_language_settings.title", currentLanguage);
-        var titleTarget = LocalizationProvider.TranslateForLanguage("question.apply_language_settings.title", selectedLanguage.Key);
+        var titleCurrent = t($"{currentLanguage}.question.apply_language_settings.title");
+        var titleTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.title");
 
-        var extraCurrent = LocalizationProvider.TranslateForLanguage("question.apply_language_settings.extra", currentLanguage);
-        var extraTarget = LocalizationProvider.TranslateForLanguage("question.apply_language_settings.extra", selectedLanguage.Key);
+        var extraCurrent = t($"{currentLanguage}.question.apply_language_settings.extra");
+        var extraTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.extra");
 
         // popup now shows its selection in both languages
         var yesNoWindow = await new YesNoWindow()
             .SetMainText($"{titleCurrent}\n\n{titleTarget}")
             .SetExtraText($"{extraCurrent}\n\n{extraTarget}")
-            .SetButtonText(Common.Action_Apply, Common.Action_Cancel)
+            .SetButtonText(t("action.apply"), t("action.cancel"))
             .AwaitAnswer();
 
         if (!yesNoWindow)

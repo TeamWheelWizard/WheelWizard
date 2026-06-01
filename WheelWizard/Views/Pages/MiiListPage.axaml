@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              mc:Ignorable="d" d:DesignWidth="456" d:DesignHeight="776"
              x:CompileBindings="False"
              x:Class="WheelWizard.Views.Pages.MiiListPage">
@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
-        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_MyMiis}" HorizontalAlignment="Left"
+        <TextBlock Grid.Row="0" Text="{loc:T page_title.my_miis}" HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
@@ -27,8 +27,8 @@
 
         <components:EmptyPageInfo Grid.Row="1" x:Name="VisibleWhenNoDb"
                                   HorizontalAlignment="Center" IsVisible="False"
-                                  Title="{x:Static lang:Phrases.EmptyContent_NoMiis_Title}"
-                                  BodyText="{x:Static lang:Phrases.EmptyContent_NoMiis}" />
+                                  Title="{loc:T empty_content.no_miis_title}"
+                                  BodyText="{loc:T empty_content.no_miis}" />
 
         <Grid x:Name="VisibleWhenDb" Grid.Row="1" RowDefinitions="54,*">
             <Grid Grid.Row="0" Margin="10,0">
@@ -40,11 +40,11 @@
                         <components:Button.Styles>
                             <Style Selector="components|Button">
                                 <Setter Property="IconData" Value="{StaticResource StarIcon}"/>
-                                <Setter Property="ToolTip.Tip" Value="{x:Static lang:Common.Action_Favorite}"/>
+                                <Setter Property="ToolTip.Tip" Value="{loc:T action.favorite}"/>
                             </Style>
                             <Style Selector="components|Button.UnFav">
                                 <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}"/>
-                                <Setter Property="ToolTip.Tip" Value="{x:Static lang:Common.Action_Unfavorite}"/>
+                                <Setter Property="ToolTip.Tip" Value="{loc:T action.unfavorite}"/>
                             </Style>
                         </components:Button.Styles>
                     </components:Button>
@@ -52,31 +52,31 @@
                                        IconData="{StaticResource Pen}"
                                        Variant="Default" Padding="10" IsVisible="False"
                                        ToolTip.ShowDelay="0" ToolTip.Placement="Top"
-                                       ToolTip.Tip="{x:Static lang:Common.Action_Edit}" />
+                                       ToolTip.Tip="{loc:T action.edit}" />
                     <components:Button Text="" Click="DuplicateMii_OnClick" x:Name="DuplicateMiisButton"
                                        IconData="{StaticResource Duplicate}"
                                        Variant="Default" Padding="10" IsVisible="False"
                                        ToolTip.ShowDelay="0" ToolTip.Placement="Top"
-                                       ToolTip.Tip="{x:Static lang:Common.Action_Duplicate}" />
+                                       ToolTip.Tip="{loc:T action.duplicate}" />
                     <components:Button Text="" Click="ExportMii_OnClick" x:Name="ExportMiisButton"
                                        IconData="{StaticResource FileExport}"
                                        Variant="Default" Padding="10" IsVisible="False"
                                        ToolTip.ShowDelay="0" ToolTip.Placement="Top"
-                                       ToolTip.Tip="{x:Static lang:Common.Action_Export}" />
+                                       ToolTip.Tip="{loc:T action.export}" />
                     <components:Button Text="" Click="DeleteMii_OnClick" x:Name="DeleteMiisButton"
                                        IconData="{StaticResource Trash}"
                                        Variant="Danger" Padding="10" IsVisible="False"
                                        ToolTip.ShowDelay="0" ToolTip.Placement="Top"
-                                       ToolTip.Tip="{x:Static lang:Common.Action_Delete}" />
+                                       ToolTip.Tip="{loc:T action.delete}" />
                     <components:Button Text="" Click="ImportMii_OnClick" x:Name="ImportMiiButton"
                                        IconData="{StaticResource FileImport}"
                                        Variant="Default" Padding="10"
                                        ToolTip.ShowDelay="0" ToolTip.Placement="Top"
-                                       ToolTip.Tip="{x:Static lang:Common.Action_Import}" />
+                                       ToolTip.Tip="{loc:T action.import}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Miis}" />
+                    <components:FormFieldLabel Text="{loc:T list_title.miis}" />
                     <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
@@ -111,16 +111,16 @@
                                                 <MenuItem Header="{Binding FavoriteActionHeader}"
                                                           CommandParameter="{Binding}" Click="FavoriteContextMenu_OnClick"
                                                           IsEnabled="{Binding HasMii}" />
-                                                <MenuItem Header="{x:Static lang:Common.Action_Edit}"
+                                                <MenuItem Header="{loc:T action.edit}"
                                                           CommandParameter="{Binding}" Click="EditContextMenu_OnClick"
                                                           IsEnabled="{Binding HasMii}" />
                                                 <MenuItem Header="Duplicate"
                                                           CommandParameter="{Binding}" Click="DuplicateContextMenu_OnClick"
                                                           IsEnabled="{Binding HasMii}" />
-                                                <MenuItem Header="{x:Static lang:Common.Action_Export}"
+                                                <MenuItem Header="{loc:T action.export}"
                                                           CommandParameter="{Binding}" Click="ExportContextMenu_OnClick"
                                                           IsEnabled="{Binding HasMii}" />
-                                                <MenuItem Header="{x:Static lang:Common.Action_Delete}"
+                                                <MenuItem Header="{loc:T action.delete}"
                                                           CommandParameter="{Binding}" Click="DeleteContextMenu_OnClick"
                                                           IsEnabled="{Binding HasMii}" />
                                             </ContextMenu>

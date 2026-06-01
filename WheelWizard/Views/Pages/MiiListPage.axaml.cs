@@ -8,7 +8,6 @@ using Avalonia.Interactivity;
 using Testably.Abstractions;
 using WheelWizard.CustomCharacters;
 using WheelWizard.Helpers;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
@@ -184,7 +183,7 @@ public partial class MiiListPage : UserControlBase
             if (result.IsFailure)
             {
                 ViewUtils.ShowSnackbar(
-                    Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureDeserialize, result.Error.Message)!,
+                    Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_deserialize"), result.Error.Message)!,
                     ViewUtils.SnackbarType.Danger
                 );
                 return;
@@ -198,7 +197,7 @@ public partial class MiiListPage : UserControlBase
             if (saveResult.IsFailure)
             {
                 ViewUtils.ShowSnackbar(
-                    Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureSave, saveResult.Error.Message)!,
+                    Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_save"), saveResult.Error.Message)!,
                     ViewUtils.SnackbarType.Danger
                 );
                 return;
@@ -286,7 +285,7 @@ public partial class MiiListPage : UserControlBase
             if (result.IsFailure)
             {
                 ViewUtils.ShowSnackbar(
-                    Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureUpdate, result.Error.Message)!,
+                    Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_update"), result.Error.Message)!,
                     ViewUtils.SnackbarType.Danger
                 );
                 return;
@@ -300,7 +299,7 @@ public partial class MiiListPage : UserControlBase
     {
         if (miis.Length == 0)
         {
-            ViewUtils.ShowSnackbar(Phrases.SnackbarWarning_NoMiiExport, ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.no_mii_export"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
@@ -330,7 +329,7 @@ public partial class MiiListPage : UserControlBase
         if (result.IsFailure)
         {
             ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureGet, result.Error.Message)!,
+                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_get"), result.Error.Message)!,
                 ViewUtils.SnackbarType.Danger
             );
             return;
@@ -341,14 +340,14 @@ public partial class MiiListPage : UserControlBase
         if (saveResult.IsFailure)
         {
             ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureSave, saveResult.Error.Message)!,
+                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_save"), saveResult.Error.Message)!,
                 ViewUtils.SnackbarType.Danger
             );
             return;
         }
 
         ViewUtils.ShowSnackbar(
-            Humanizer.ReplaceDynamic(Phrases.SnackbarSuccess_SavedMii, miiToExport.Name, diaglog) ?? "Saved Mii successfully"
+            Humanizer.ReplaceDynamic(t("snackbar_success.saved_mii"), miiToExport.Name, diaglog) ?? "Saved Mii successfully"
         );
     }
 
@@ -358,7 +357,7 @@ public partial class MiiListPage : UserControlBase
         if (miiData.IsFailure)
         {
             ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureSerialize, miiData.Error.Message)!,
+                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_serialize"), miiData.Error.Message)!,
                 ViewUtils.SnackbarType.Danger
             );
             return miiData;
@@ -372,7 +371,7 @@ public partial class MiiListPage : UserControlBase
         writer.Close();
         stream.Close();
         ViewUtils.ShowSnackbar(
-            Humanizer.ReplaceDynamic(Phrases.SnackbarSuccess_SavedMii, mii.Name, file.FullName) ?? "Saved Mii successfully"
+            Humanizer.ReplaceDynamic(t("snackbar_success.saved_mii"), mii.Name, file.FullName) ?? "Saved Mii successfully"
         );
         return Ok();
     }
@@ -381,7 +380,7 @@ public partial class MiiListPage : UserControlBase
     {
         if (miis.Length == 0)
         {
-            ViewUtils.ShowSnackbar(Phrases.SnackbarWarning_NoMiiDelete, ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.no_mii_delete"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
@@ -394,15 +393,15 @@ public partial class MiiListPage : UserControlBase
             return;
         }
 
-        var mainText = Humanizer.ReplaceDynamic(Phrases.Question_SureDelete_Title_Miis, miis.Length) ?? $"Delete {miis.Length}?";
-        var successMessage = Humanizer.ReplaceDynamic(Phrases.SnackbarSuccess_Deleted_Miis, miis.Length) ?? $"Deleted {miis.Length}";
+        var mainText = Humanizer.ReplaceDynamic(t("question.sure_delete.title_miis"), miis.Length) ?? $"Delete {miis.Length}?";
+        var successMessage = Humanizer.ReplaceDynamic(t("snackbar_success.deleted_miis"), miis.Length) ?? $"Deleted {miis.Length}";
         if (miis.Length == 1)
         {
-            mainText = Humanizer.ReplaceDynamic(Phrases.Question_SureDelete_Title, miis[0].Name) ?? $"Delete {miis[0].Name}?";
-            successMessage = Humanizer.ReplaceDynamic(Phrases.SnackbarSuccess_Deleted, miis[0].Name) ?? $"Deleted {miis[0].Name}";
+            mainText = Humanizer.ReplaceDynamic(t("question.sure_delete.title"), miis[0].Name) ?? $"Delete {miis[0].Name}?";
+            successMessage = Humanizer.ReplaceDynamic(t("snackbar_success.deleted"), miis[0].Name) ?? $"Deleted {miis[0].Name}";
         }
 
-        var result = await new YesNoWindow().SetMainText(mainText).SetExtraText(Phrases.Question_SureDelete_Extra).AwaitAnswer();
+        var result = await new YesNoWindow().SetMainText(mainText).SetExtraText(t("question.sure_delete.extra")).AwaitAnswer();
         if (!result)
             return;
 
@@ -426,7 +425,7 @@ public partial class MiiListPage : UserControlBase
         if (result.IsFailure)
         {
             ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureUpdate, result.Error.Message)!,
+                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_update"), result.Error.Message)!,
                 ViewUtils.SnackbarType.Danger
             );
             return;
@@ -439,9 +438,9 @@ public partial class MiiListPage : UserControlBase
     {
         Mii? mii = null;
         await new OptionsWindow()
-            .AddOption("Dice", Common.Action_Randomize, () => mii = MiiFactory.CreateRandomMii(Random.Random.Shared))
-            .AddOption("PersonMale", Common.Attribute_Mii_Gender_Male, () => mii = MiiFactory.CreateDefaultMale())
-            .AddOption("PersonFemale", Common.Attribute_Mii_Gender_Female, () => mii = MiiFactory.CreateDefaultFemale())
+            .AddOption("Dice", t("action.randomize"), () => mii = MiiFactory.CreateRandomMii(Random.Random.Shared))
+            .AddOption("PersonMale", t("attribute.mii.gender_male"), () => mii = MiiFactory.CreateDefaultMale())
+            .AddOption("PersonFemale", t("attribute.mii.gender_female"), () => mii = MiiFactory.CreateDefaultFemale())
             .AwaitAnswer();
         if (mii == null)
             return;
@@ -455,7 +454,7 @@ public partial class MiiListPage : UserControlBase
         if (result.IsFailure)
         {
             ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureCreate, result.Error.Message)!,
+                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_create"), result.Error.Message)!,
                 ViewUtils.SnackbarType.Danger
             );
             return;
@@ -475,15 +474,15 @@ public partial class MiiListPage : UserControlBase
                 continue;
 
             ViewUtils.ShowSnackbar(
-                Humanizer.ReplaceDynamic(Phrases.SnackbarError_MiiFailureDuplicate, result.Error.Message)!,
+                Humanizer.ReplaceDynamic(t("snackbar_error.mii_failure_duplicate"), result.Error.Message)!,
                 ViewUtils.SnackbarType.Danger
             );
             return;
         }
 
-        var successMessage = Humanizer.ReplaceDynamic(Phrases.SnackbarSuccess_CreatedDuplicatesMiis, miis.Length)!;
+        var successMessage = Humanizer.ReplaceDynamic(t("snackbar_success.created_duplicates_miis"), miis.Length)!;
         if (miis.Length == 1)
-            successMessage = Humanizer.ReplaceDynamic(Phrases.SnackbarSuccess_CreatedDuplicate, miis[0].Name)!;
+            successMessage = Humanizer.ReplaceDynamic(t("snackbar_success.created_duplicate"), miis[0].Name)!;
 
         ReloadMiiList();
         ViewUtils.ShowSnackbar(successMessage);
@@ -542,7 +541,7 @@ public partial class MiiListPage : UserControlBase
         public bool IsAddEntry { get; } = isAddEntry;
         public bool HasMii => Mii != null;
         public string SelectionGroup { get; } = Guid.NewGuid().ToString("N");
-        public string FavoriteActionHeader => Mii?.IsFavorite == true ? Common.Action_Unfavorite : Common.Action_Favorite;
+        public string FavoriteActionHeader => Mii?.IsFavorite == true ? t("action.unfavorite") : t("action.favorite");
 
         public bool IsSelected
         {

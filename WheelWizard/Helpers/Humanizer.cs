@@ -1,5 +1,3 @@
-using WheelWizard.Resources.Languages;
-
 namespace WheelWizard.Helpers;
 
 public static class Humanizer
@@ -17,8 +15,8 @@ public static class Humanizer
 
     public static string HumanizeTimeSpan(TimeSpan timeSpan)
     {
-        // we use language to do the words like Phrases.Time_Days_1 or Phrases.Time_Days_x
-        // however, the one with x has to be put in the method: ReplaceDynamic(Phrases.Time_Days_x, 10);
+        // we use language to do the words like t("time.days.1") or t("time.days.n")
+        // however, the one with x has to be put in the method: ReplaceDynamic(t("time.days.n"), 10);
 
         // now e need to replace all the old with the new language versions
 
@@ -26,10 +24,10 @@ public static class Humanizer
         {
             var days = timeSpan.Days;
             var hours = timeSpan.Hours;
-            var dayText = days == 1 ? Phrases.Time_Days_1 : ReplaceDynamic(Phrases.Time_Days_x, days);
+            var dayText = days == 1 ? t("time.days.1") : ReplaceDynamic(t("time.days.n"), days);
             if (hours == 0)
                 return dayText!;
-            var hourText = hours == 1 ? Phrases.Time_Hours_1 : ReplaceDynamic(Phrases.Time_Hours_x, hours);
+            var hourText = hours == 1 ? t("time.hours.1") : ReplaceDynamic(t("time.hours.n"), hours);
             return $"{dayText} {hourText}";
         }
 
@@ -37,24 +35,24 @@ public static class Humanizer
         {
             var hours = timeSpan.Hours;
             var minutes = timeSpan.Minutes;
-            var hourText = hours == 1 ? Phrases.Time_Hours_1 : ReplaceDynamic(Phrases.Time_Hours_x, hours);
+            var hourText = hours == 1 ? t("time.hours.1") : ReplaceDynamic(t("time.hours.n"), hours);
             if (minutes == 0)
                 return hourText!;
-            var minuteText = minutes == 1 ? Phrases.Time_Minutes_1 : ReplaceDynamic(Phrases.Time_Minutes_x, minutes);
+            var minuteText = minutes == 1 ? t("time.minutes.1") : ReplaceDynamic(t("time.minutes.n"), minutes);
             return $"{hourText} {minuteText}";
         }
         if (Math.Abs(timeSpan.TotalMinutes) >= 1)
         {
             var minutes = timeSpan.Minutes;
             var seconds = timeSpan.Seconds;
-            var minuteText = minutes == 1 ? Phrases.Time_Minutes_1 : ReplaceDynamic(Phrases.Time_Minutes_x, minutes);
+            var minuteText = minutes == 1 ? t("time.minutes.1") : ReplaceDynamic(t("time.minutes.n"), minutes);
             if (seconds == 0)
                 return minuteText!;
-            var secondText = seconds == 1 ? Phrases.Time_Seconds_1 : ReplaceDynamic(Phrases.Time_Seconds_x, seconds);
+            var secondText = seconds == 1 ? t("time.seconds.1") : ReplaceDynamic(t("time.seconds.n"), seconds);
             return $"{minuteText} {secondText}";
         }
 
-        return ReplaceDynamic(Phrases.Time_Seconds_x, timeSpan.Seconds)!;
+        return ReplaceDynamic(t("time.seconds.n"), timeSpan.Seconds)!;
     }
 
     public static string HumanizeSeconds(int seconds) => HumanizeTimeSpan(TimeSpan.FromSeconds(seconds));
@@ -63,14 +61,14 @@ public static class Humanizer
     {
         return regionID switch
         {
-            0 => Common.Region_Japan,
-            1 => Common.Region_America,
-            2 => Common.Region_Europe,
-            3 => Common.Region_Australia,
-            4 => Common.Region_Taiwan,
-            5 => Common.Region_SouthKorea,
-            6 => Common.Region_China,
-            _ => Common.State_Unknown,
+            0 => t("region.japan"),
+            1 => t("region.america"),
+            2 => t("region.europe"),
+            3 => t("region.australia"),
+            4 => t("region.taiwan"),
+            5 => t("region.south_korea"),
+            6 => t("region.china"),
+            _ => t("state.unknown"),
         };
     }
 
@@ -79,140 +77,140 @@ public static class Humanizer
         return countryId switch
         {
             // Japan
-            1 => "🇯🇵",
+            1 => "ðŸ‡¯ðŸ‡µ",
 
             // Americas
-            8 => "🇦🇮", // Anguilla
-            9 => "🇦🇬", // Antigua and Barbuda
-            10 => "🇦🇷", // Argentina
-            11 => "🇦🇲", // Aruba
-            12 => "🇧🇸", // Bahamas
-            13 => "🇧🇧", // Barbados
-            14 => "🇧🇿", // Belize
-            15 => "🇧🇴", // Bolivia
-            16 => "🇧🇷", // Brazil
-            17 => "🇻🇬", // British Virgin Islands
-            18 => "🇨🇦", // Canada
-            19 => "🇰🇾", // Cayman Islands
-            20 => "🇨🇱", // Chile
-            21 => "🇨🇴", // Colombia
-            22 => "🇨🇷", // Costa Rica
-            23 => "🇩🇲", // Dominica
-            24 => "🇩🇴", // Dominican Republic
-            25 => "🇪🇨", // Ecuador
-            26 => "🇸🇻", // El Salvador
-            27 => "🇫🇷", // French Guiana
-            28 => "🇬🇩", // Grenada
-            29 => "🇲🇶", // Guadeloupe
-            30 => "🇵🇪", // Guatemala
-            31 => "🇬🇾", // Guyana
-            32 => "🇭🇹", // Haiti
-            33 => "🇭🇳", // Honduras
-            34 => "🇯🇲", // Jamaica
-            35 => "🇲🇶", // Martinique
-            36 => "🇲🇽", // Mexico
-            37 => "🇲🇸", // Montserrat
-            38 => "🇳🇱", // Netherlands Antilles
-            39 => "🇳🇮", // Nicaragua
-            40 => "🇵🇦", // Panama
-            41 => "🇵🇾", // Paraguay
-            42 => "🇵🇪", // Peru
-            43 => "🇰🇳", // St. Kitts and Nevis
-            44 => "🇱🇨", // St. Lucia
-            45 => "🇻🇨", // St. Vincent and the Grenadines
-            46 => "🇸🇷", // Suriname
-            47 => "🇹🇹", // Trinidad and Tobago
-            48 => "🇹🇨", // Turks and Caicos Islands
-            49 => "🇺🇸", // United States
-            50 => "🇺🇾", // Uruguay
-            51 => "🇻🇮", // US Virgin Islands
-            52 => "🇻🇪", // Venezuela
+            8 => "ðŸ‡¦ðŸ‡®", // Anguilla
+            9 => "ðŸ‡¦ðŸ‡¬", // Antigua and Barbuda
+            10 => "ðŸ‡¦ðŸ‡·", // Argentina
+            11 => "ðŸ‡¦ðŸ‡²", // Aruba
+            12 => "ðŸ‡§ðŸ‡¸", // Bahamas
+            13 => "ðŸ‡§ðŸ‡§", // Barbados
+            14 => "ðŸ‡§ðŸ‡¿", // Belize
+            15 => "ðŸ‡§ðŸ‡´", // Bolivia
+            16 => "ðŸ‡§ðŸ‡·", // Brazil
+            17 => "ðŸ‡»ðŸ‡¬", // British Virgin Islands
+            18 => "ðŸ‡¨ðŸ‡¦", // Canada
+            19 => "ðŸ‡°ðŸ‡¾", // Cayman Islands
+            20 => "ðŸ‡¨ðŸ‡±", // Chile
+            21 => "ðŸ‡¨ðŸ‡´", // Colombia
+            22 => "ðŸ‡¨ðŸ‡·", // Costa Rica
+            23 => "ðŸ‡©ðŸ‡²", // Dominica
+            24 => "ðŸ‡©ðŸ‡´", // Dominican Republic
+            25 => "ðŸ‡ªðŸ‡¨", // Ecuador
+            26 => "ðŸ‡¸ðŸ‡»", // El Salvador
+            27 => "ðŸ‡«ðŸ‡·", // French Guiana
+            28 => "ðŸ‡¬ðŸ‡©", // Grenada
+            29 => "ðŸ‡²ðŸ‡¶", // Guadeloupe
+            30 => "ðŸ‡µðŸ‡ª", // Guatemala
+            31 => "ðŸ‡¬ðŸ‡¾", // Guyana
+            32 => "ðŸ‡­ðŸ‡¹", // Haiti
+            33 => "ðŸ‡­ðŸ‡³", // Honduras
+            34 => "ðŸ‡¯ðŸ‡²", // Jamaica
+            35 => "ðŸ‡²ðŸ‡¶", // Martinique
+            36 => "ðŸ‡²ðŸ‡½", // Mexico
+            37 => "ðŸ‡²ðŸ‡¸", // Montserrat
+            38 => "ðŸ‡³ðŸ‡±", // Netherlands Antilles
+            39 => "ðŸ‡³ðŸ‡®", // Nicaragua
+            40 => "ðŸ‡µðŸ‡¦", // Panama
+            41 => "ðŸ‡µðŸ‡¾", // Paraguay
+            42 => "ðŸ‡µðŸ‡ª", // Peru
+            43 => "ðŸ‡°ðŸ‡³", // St. Kitts and Nevis
+            44 => "ðŸ‡±ðŸ‡¨", // St. Lucia
+            45 => "ðŸ‡»ðŸ‡¨", // St. Vincent and the Grenadines
+            46 => "ðŸ‡¸ðŸ‡·", // Suriname
+            47 => "ðŸ‡¹ðŸ‡¹", // Trinidad and Tobago
+            48 => "ðŸ‡¹ðŸ‡¨", // Turks and Caicos Islands
+            49 => "ðŸ‡ºðŸ‡¸", // United States
+            50 => "ðŸ‡ºðŸ‡¾", // Uruguay
+            51 => "ðŸ‡»ðŸ‡®", // US Virgin Islands
+            52 => "ðŸ‡»ðŸ‡ª", // Venezuela
 
             // Europe & Africa
-            64 => "🇦🇱", // Albania
-            65 => "🇦🇺", // Australia
-            66 => "🇦🇹", // Austria
-            67 => "🇧🇪", // Belgium
-            68 => "🇧🇦", // Bosnia and Herzegovina
-            69 => "🇧🇼", // Botswana
-            70 => "🇧🇬", // Bulgaria
-            71 => "🇭🇷", // Croatia
-            72 => "🇨🇾", // Cyprus
-            73 => "🇨🇿", // Czech Republic
-            74 => "🇩🇰", // Denmark
-            75 => "🇪🇪", // Estonia
-            76 => "🇫🇮", // Finland
-            77 => "🇫🇷", // France
-            78 => "🇩🇪", // Germany
-            79 => "🇬🇷", // Greece
-            80 => "🇭🇺", // Hungary
-            81 => "🇮🇸", // Iceland
-            82 => "🇮🇪", // Ireland
-            83 => "🇮🇹", // Italy
-            84 => "🇱🇻", // Latvia
-            85 => "🇱🇸", // Lesotho
-            86 => "🇱🇮", // Liechtenstein
-            87 => "🇱🇹", // Lithuania
-            88 => "🇱🇺", // Luxembourg
-            89 => "🇲🇰", // North Macedonia
-            90 => "🇲🇹", // Malta
-            91 => "🇲🇪", // Montenegro
-            92 => "🇲🇿", // Mozambique
-            93 => "🇳🇦", // Namibia
-            94 => "🇳🇱", // Netherlands
-            95 => "🇳🇿", // New Zealand
-            96 => "🇳🇴", // Norway
-            97 => "🇵🇱", // Poland
-            98 => "🇵🇹", // Portugal
-            99 => "🇷🇴", // Romania
-            100 => "🇷🇺", // Russia
-            101 => "🇷🇸", // Serbia
-            102 => "🇸🇰", // Slovakia
-            103 => "🇸🇮", // Slovenia
-            104 => "🇿🇦", // South Africa
-            105 => "🇪🇸", // Spain
-            106 => "🇸🇿", // Eswatini
-            107 => "🇸🇪", // Sweden
-            108 => "🇨🇭", // Switzerland
-            109 => "🇹🇷", // Turkey
-            110 => "🇬🇧", // United Kingdom
-            111 => "🇿🇲", // Zambia
-            112 => "🇿🇼", // Zimbabwe
-            113 => "🇦🇿", // Azerbaijan
-            114 => "🇲🇷", // Mauritania
-            115 => "🇲🇱", // Mali
-            116 => "🇳🇪", // Niger
-            117 => "🇹🇩", // Chad
-            118 => "🇸🇩", // Sudan
-            119 => "🇪🇷", // Eritrea
-            120 => "🇩🇯", // Djibouti
-            121 => "🇸🇴", // Somalia
+            64 => "ðŸ‡¦ðŸ‡±", // Albania
+            65 => "ðŸ‡¦ðŸ‡º", // Australia
+            66 => "ðŸ‡¦ðŸ‡¹", // Austria
+            67 => "ðŸ‡§ðŸ‡ª", // Belgium
+            68 => "ðŸ‡§ðŸ‡¦", // Bosnia and Herzegovina
+            69 => "ðŸ‡§ðŸ‡¼", // Botswana
+            70 => "ðŸ‡§ðŸ‡¬", // Bulgaria
+            71 => "ðŸ‡­ðŸ‡·", // Croatia
+            72 => "ðŸ‡¨ðŸ‡¾", // Cyprus
+            73 => "ðŸ‡¨ðŸ‡¿", // Czech Republic
+            74 => "ðŸ‡©ðŸ‡°", // Denmark
+            75 => "ðŸ‡ªðŸ‡ª", // Estonia
+            76 => "ðŸ‡«ðŸ‡®", // Finland
+            77 => "ðŸ‡«ðŸ‡·", // France
+            78 => "ðŸ‡©ðŸ‡ª", // Germany
+            79 => "ðŸ‡¬ðŸ‡·", // Greece
+            80 => "ðŸ‡­ðŸ‡º", // Hungary
+            81 => "ðŸ‡®ðŸ‡¸", // Iceland
+            82 => "ðŸ‡®ðŸ‡ª", // Ireland
+            83 => "ðŸ‡®ðŸ‡¹", // Italy
+            84 => "ðŸ‡±ðŸ‡»", // Latvia
+            85 => "ðŸ‡±ðŸ‡¸", // Lesotho
+            86 => "ðŸ‡±ðŸ‡®", // Liechtenstein
+            87 => "ðŸ‡±ðŸ‡¹", // Lithuania
+            88 => "ðŸ‡±ðŸ‡º", // Luxembourg
+            89 => "ðŸ‡²ðŸ‡°", // North Macedonia
+            90 => "ðŸ‡²ðŸ‡¹", // Malta
+            91 => "ðŸ‡²ðŸ‡ª", // Montenegro
+            92 => "ðŸ‡²ðŸ‡¿", // Mozambique
+            93 => "ðŸ‡³ðŸ‡¦", // Namibia
+            94 => "ðŸ‡³ðŸ‡±", // Netherlands
+            95 => "ðŸ‡³ðŸ‡¿", // New Zealand
+            96 => "ðŸ‡³ðŸ‡´", // Norway
+            97 => "ðŸ‡µðŸ‡±", // Poland
+            98 => "ðŸ‡µðŸ‡¹", // Portugal
+            99 => "ðŸ‡·ðŸ‡´", // Romania
+            100 => "ðŸ‡·ðŸ‡º", // Russia
+            101 => "ðŸ‡·ðŸ‡¸", // Serbia
+            102 => "ðŸ‡¸ðŸ‡°", // Slovakia
+            103 => "ðŸ‡¸ðŸ‡®", // Slovenia
+            104 => "ðŸ‡¿ðŸ‡¦", // South Africa
+            105 => "ðŸ‡ªðŸ‡¸", // Spain
+            106 => "ðŸ‡¸ðŸ‡¿", // Eswatini
+            107 => "ðŸ‡¸ðŸ‡ª", // Sweden
+            108 => "ðŸ‡¨ðŸ‡­", // Switzerland
+            109 => "ðŸ‡¹ðŸ‡·", // Turkey
+            110 => "ðŸ‡¬ðŸ‡§", // United Kingdom
+            111 => "ðŸ‡¿ðŸ‡²", // Zambia
+            112 => "ðŸ‡¿ðŸ‡¼", // Zimbabwe
+            113 => "ðŸ‡¦ðŸ‡¿", // Azerbaijan
+            114 => "ðŸ‡²ðŸ‡·", // Mauritania
+            115 => "ðŸ‡²ðŸ‡±", // Mali
+            116 => "ðŸ‡³ðŸ‡ª", // Niger
+            117 => "ðŸ‡¹ðŸ‡©", // Chad
+            118 => "ðŸ‡¸ðŸ‡©", // Sudan
+            119 => "ðŸ‡ªðŸ‡·", // Eritrea
+            120 => "ðŸ‡©ðŸ‡¯", // Djibouti
+            121 => "ðŸ‡¸ðŸ‡´", // Somalia
 
             // Southeast Asia
-            128 => "🇹🇼", // Taiwan
-            136 => "🇰🇷", // South Korea
-            144 => "🇭🇰", // Hong Kong
-            145 => "🇲🇴", // Macao
-            152 => "🇮🇩", // Indonesia
-            153 => "🇸🇬", // Singapore
-            154 => "🇹🇭", // Thailand
-            155 => "🇵🇭", // Philippines
-            156 => "🇲🇾", // Malaysia
-            160 => "🇨🇳", // China
+            128 => "ðŸ‡¹ðŸ‡¼", // Taiwan
+            136 => "ðŸ‡°ðŸ‡·", // South Korea
+            144 => "ðŸ‡­ðŸ‡°", // Hong Kong
+            145 => "ðŸ‡²ðŸ‡´", // Macao
+            152 => "ðŸ‡®ðŸ‡©", // Indonesia
+            153 => "ðŸ‡¸ðŸ‡¬", // Singapore
+            154 => "ðŸ‡¹ðŸ‡­", // Thailand
+            155 => "ðŸ‡µðŸ‡­", // Philippines
+            156 => "ðŸ‡²ðŸ‡¾", // Malaysia
+            160 => "ðŸ‡¨ðŸ‡³", // China
 
             // Middle East
-            168 => "🇦🇪", // U.A.E.
-            169 => "🇮🇳", // India
-            170 => "🇪🇬", // Egypt
-            171 => "🇴🇲", // Oman
-            172 => "🇶🇦", // Qatar
-            173 => "🇰🇼", // Kuwait
-            174 => "🇸🇦", // Saudi Arabia
-            175 => "🇸🇾", // Syria
-            176 => "🇧🇭", // Bahrain
-            177 => "🇯🇴", // Jordan
+            168 => "ðŸ‡¦ðŸ‡ª", // U.A.E.
+            169 => "ðŸ‡®ðŸ‡³", // India
+            170 => "ðŸ‡ªðŸ‡¬", // Egypt
+            171 => "ðŸ‡´ðŸ‡²", // Oman
+            172 => "ðŸ‡¶ðŸ‡¦", // Qatar
+            173 => "ðŸ‡°ðŸ‡¼", // Kuwait
+            174 => "ðŸ‡¸ðŸ‡¦", // Saudi Arabia
+            175 => "ðŸ‡¸ðŸ‡¾", // Syria
+            176 => "ðŸ‡§ðŸ‡­", // Bahrain
+            177 => "ðŸ‡¯ðŸ‡´", // Jordan
 
-            _ => "🏳️",
+            _ => "ðŸ³ï¸",
         };
     }
 }

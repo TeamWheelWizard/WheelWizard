@@ -3,7 +3,7 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
-                   xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+                   xmlns:loc="clr-namespace:WheelWizard.Localization"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="WheelWizard.Views.Popups.Generic.YesNoWindow">
@@ -22,11 +22,11 @@
         <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                      x:Name="ButtonContainer">
             <components:Button x:Name="NoButton" Variant="Default"
-                               IsEnabled="True" Text="{x:Static lang:Common.Action_No}"
+                               IsEnabled="True" Text="{loc:T action.no}"
                                IconData="{StaticResource XMark}"
                                Click="noButton_Click" Margin="0,0,5,0"/>
             <components:Button x:Name="YesButton" Variant="Primary"
-                               IsEnabled="True" Text="{x:Static lang:Common.Action_Yes}"
+                               IsEnabled="True" Text="{loc:T action.yes}"
                                IconData="{StaticResource CheckMark}"
                                Click="yesButton_Click" Margin="5,0,0,0"/>
         </UniformGrid>

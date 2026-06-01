@@ -1,7 +1,6 @@
-﻿using Avalonia.Threading;
+using Avalonia.Threading;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Views.Popups.Generic;
 
@@ -57,8 +56,8 @@ public sealed class ModsLaunchService(IModManager modManager) : IModsLaunchServi
         Directory.CreateDirectory(targetFolderPath);
 
         var totalFiles = finalFiles.Count;
-        var progressWindow = new ProgressWindow(Phrases.Progress_InstallingMods).SetGoal(
-            Humanizer.ReplaceDynamic(Phrases.Progress_InstallingModsCount, totalFiles)!
+        var progressWindow = new ProgressWindow(t("progress.installing_mods")).SetGoal(
+            Humanizer.ReplaceDynamic(t("progress.installing_mods_count"), totalFiles)!
         );
         progressWindow.Show();
 
@@ -105,7 +104,7 @@ public sealed class ModsLaunchService(IModManager modManager) : IModsLaunchServi
                 Dispatcher.UIThread.Post(() =>
                 {
                     progressWindow.UpdateProgress(progress);
-                    progressWindow.SetExtraText($"{Common.State_Installing} {relativePath}");
+                    progressWindow.SetExtraText($"{t("state.installing")} {relativePath}");
                 });
 
                 if (File.Exists(destinationFile))

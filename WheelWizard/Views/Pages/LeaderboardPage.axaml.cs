@@ -4,7 +4,6 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
-using WheelWizard.Resources.Languages;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
@@ -433,7 +432,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             return;
 
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(player.FriendCode);
-        ViewUtils.ShowSnackbar(Phrases.SnackbarSuccess_CopiedFC);
+        ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
     }
 
     private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)

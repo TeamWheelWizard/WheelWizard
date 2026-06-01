@@ -4,15 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              x:Class="WheelWizard.Views.Popups.MiiManagement.MiiEditor.EditorFacialHair">
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
         <!-- Updated Title -->
-        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_FacialHair}" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{loc:T attribute.mii_section.facial_hair}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
-        <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}" IconData="{StaticResource ArrowLeft}"
+        <components:IconLabelButton Grid.Row="0" Text="{loc:T action.back}" IconData="{StaticResource ArrowLeft}"
                                     Click="BackButton_OnClick" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"
                                     Foreground="{StaticResource TitleTextColor}" FontSize="16"
                                     HoverForeground="{StaticResource Primary200}"/>
@@ -24,7 +24,7 @@
                 <!-- The list of elements you want to edit in this page -->
 
                 <StackPanel> <!-- Hair Color -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_HairColor}"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.hair_color}"/>
                     <UniformGrid Columns="5" x:Name="HairColorGrid">
                         <!-- Generated elements -->
                     </UniformGrid>
@@ -32,7 +32,7 @@
 
 
                 <StackPanel> <!-- Mustache Type -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_MustacheType}"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.mustache_type}"/>
                     <UniformGrid Columns="5" x:Name="MustacheTypesGrid">
                         <!-- Generated elements -->
                     </UniformGrid>
@@ -41,7 +41,7 @@
                 <StackPanel x:Name="MustacheTransformOptions">
                      <!-- Vertical Position (Up/Down) -->
                     <StackPanel>
-                        <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_MustacheVerticalPosition}"/>
+                        <components:FormFieldLabel Text="{loc:T attribute.mii.mustache_vertical_position}"/>
                         <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                 <components:Button x:Name="VerticalDecreaseButton" IconData="{StaticResource ArrowUp}" IconSize="14" Padding="4" Click="VerticalDecrease_Click" />
@@ -53,7 +53,7 @@
 
                     <!-- Size (Zoom In/Out) -->
                     <StackPanel>
-                        <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_MustacheSize}"/>
+                        <components:FormFieldLabel Text="{loc:T attribute.mii.mustache_size}"/>
                         <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                 <components:Button x:Name="SizeDecreaseButton" IconData="{StaticResource MinMark}" IconSize="14" Padding="4" Click="SizeDecrease_Click"/>
@@ -65,7 +65,7 @@
                 </StackPanel>
                 
                 <StackPanel> <!-- Beard Type -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_BeardType}"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.beard_type}"/>
                     <UniformGrid Columns="5" x:Name="BeardTypesGrid">
                         <!-- Generated elements -->
                     </UniformGrid>

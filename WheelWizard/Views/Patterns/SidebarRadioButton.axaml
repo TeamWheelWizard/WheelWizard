@@ -1,6 +1,6 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
+<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+        xmlns:loc="clr-namespace:WheelWizard.Localization"
         xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns">
@@ -8,23 +8,23 @@
     <Border Padding="2" Width="300" Background="{StaticResource Neutral600}">
       <StackPanel>
         <patterns:SidebarRadioButton IconData="{StaticResource Home}" 
-                                     Text="{x:Static lang:Common.PageTitle_Home}"
+                                     Text="{loc:T page_title.home}"
                                      PageType="{x:Type pages:HomePage}"/>
         
         <patterns:SidebarRadioButton  IsChecked="True"
                                    IconData="{StaticResource Settings}" 
-                                   Text="{x:Static lang:Common.PageTitle_Settings}"
+                                   Text="{loc:T page_title.settings}"
                                    PageType="{x:Type pages:HomePage}"/>
         
         <patterns:SidebarRadioButton IconData="{StaticResource Friends}" 
-                                  Text="{x:Static lang:Common.PageTitle_Friends}"
+                                  Text="{loc:T page_title.friends}"
                                   PageType="{x:Type pages:HomePage}"
                                   BoxText="0/0"/>  
         <patterns:SidebarRadioButton IconData="{StaticResource CubesStacked}" 
-                                  Text="{x:Static lang:Common.PageTitle_Mods}"
+                                  Text="{loc:T page_title.mods}"
                                   PageType="{x:Type pages:HomePage}"/>
         <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}" 
-                                  Text="{x:Static lang:Common.PageTitle_Rooms}"
+                                  Text="{loc:T page_title.rooms}"
                                   PageType="{x:Type pages:RoomsPage}"/>
                                   
       </StackPanel>

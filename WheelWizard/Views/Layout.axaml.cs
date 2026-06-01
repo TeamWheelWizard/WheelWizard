@@ -9,7 +9,6 @@ using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
 using WheelWizard.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
@@ -82,7 +81,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
 
-        var completeString = Humanizer.ReplaceDynamic(Phrases.Text_MadeByString, "Patchzy", "WantToBeeMe");
+        var completeString = Humanizer.ReplaceDynamic(t("text.made_by_string"), "Patchzy", "WantToBeeMe");
         if (completeString != null && completeString.Contains("\\n"))
         {
             var split = completeString.Split("\\n");
@@ -177,7 +176,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     private void UpdateModsButtonText()
     {
-        ModsButton.Text = Common.PageTitle_Patches;
+        ModsButton.Text = t("page_title.patches");
     }
 
     //todo: after patches is more stable, uncomment this
@@ -235,9 +234,9 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         FriendsButton.BoxText = $"{friends.Count(friend => friend.IsOnline)}/{friends.Count}";
         FriendsButton.BoxTip = friends.Count(friend => friend.IsOnline) switch
         {
-            1 => Phrases.Hover_FriendsOnline_1,
-            0 => Phrases.Hover_FriendsOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_FriendsOnline_x, friends.Count(friend => friend.IsOnline))
+            1 => t("hover.friends_online.1"),
+            0 => t("hover.friends_online.0"),
+            _ => Humanizer.ReplaceDynamic(t("hover.friends_online.n"), friends.Count(friend => friend.IsOnline))
                 ?? $"There are currently {friends.Count(friend => friend.IsOnline)} friends online",
         };
     }
@@ -249,17 +248,16 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         PlayerCountBox.Text = playerCount.ToString();
         PlayerCountBox.TipText = playerCount switch
         {
-            1 => Phrases.Hover_PlayersOnline_1,
-            0 => Phrases.Hover_PlayersOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_PlayersOnline_x, playerCount)
-                ?? $"There are currently {playerCount} players online",
+            1 => t("hover.players_online.1"),
+            0 => t("hover.players_online.0"),
+            _ => Humanizer.ReplaceDynamic(t("hover.players_online.n"), playerCount) ?? $"There are currently {playerCount} players online",
         };
         RoomCountBox.Text = roomCount.ToString();
         RoomCountBox.TipText = roomCount switch
         {
-            1 => Phrases.Hover_RoomsOnline_1,
-            0 => Phrases.Hover_RoomsOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_RoomsOnline_x, roomCount) ?? $"There are currently {roomCount} rooms active",
+            1 => t("hover.rooms_online.1"),
+            0 => t("hover.rooms_online.0"),
+            _ => Humanizer.ReplaceDynamic(t("hover.rooms_online.n"), roomCount) ?? $"There are currently {roomCount} rooms active",
         };
         UpdateFriendCount();
     }

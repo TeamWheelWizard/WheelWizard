@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -6,7 +6,6 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Testably.Abstractions;
 using WheelWizard.Models.Enums;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Settings;
@@ -54,10 +53,10 @@ public partial class HomePage : UserControlBase
     private MainButtonState GetButtonState(WheelWizardStatus status) =>
         status switch
         {
-            WheelWizardStatus.Loading => new(Common.State_Loading, Button.ButtonsVariantType.Default, "Spinner", null, false),
-            WheelWizardStatus.NoServer => new(Common.State_NoServer, Button.ButtonsVariantType.Danger, "RoadError", null, true),
+            WheelWizardStatus.Loading => new(t("state.loading"), Button.ButtonsVariantType.Default, "Spinner", null, false),
+            WheelWizardStatus.NoServer => new(t("state.no_server"), Button.ButtonsVariantType.Danger, "RoadError", null, true),
             WheelWizardStatus.NoServerButInstalled => new(
-                Common.Action_PlayOffline,
+                t("action.play_offline"),
                 Button.ButtonsVariantType.Warning,
                 "Play",
                 LaunchGame,
@@ -71,16 +70,16 @@ public partial class HomePage : UserControlBase
                 false
             ),
             WheelWizardStatus.ConfigNotFinished => new(
-                Common.State_ConfigNotFinished,
+                t("state.config_not_finished"),
                 Button.ButtonsVariantType.Warning,
                 "Settings",
                 NavigateToSettings,
                 true
             ),
-            WheelWizardStatus.NotInstalled => new(Common.Action_Install, Button.ButtonsVariantType.Warning, "Download", Download, true),
-            WheelWizardStatus.OutOfDate => new(Common.Action_Update, Button.ButtonsVariantType.Warning, "Download", Update, true),
-            WheelWizardStatus.Ready => new(Common.Action_Play, Button.ButtonsVariantType.Primary, "Play", LaunchGame, true),
-            _ => new(Common.State_Loading, Button.ButtonsVariantType.Default, "Spinner", null, false),
+            WheelWizardStatus.NotInstalled => new(t("action.install"), Button.ButtonsVariantType.Warning, "Download", Download, true),
+            WheelWizardStatus.OutOfDate => new(t("action.update"), Button.ButtonsVariantType.Warning, "Download", Update, true),
+            WheelWizardStatus.Ready => new(t("action.play"), Button.ButtonsVariantType.Primary, "Play", LaunchGame, true),
+            _ => new(t("state.loading"), Button.ButtonsVariantType.Default, "Spinner", null, false),
         };
 
     public HomePage()

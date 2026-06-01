@@ -1,6 +1,5 @@
 using System.Text;
 using WheelWizard.Helpers;
-using WheelWizard.Resources.Languages;
 using static WheelWizard.Features.Patches.PatchConversionHelpers;
 
 namespace WheelWizard.Features.Patches;
@@ -55,29 +54,29 @@ public static class BrsarPatchConverter
             if (moddedEntry.Kind == BrsarEntryKind.Unsupported)
             {
                 skipped.Add(
-                    Humanizer.ReplaceDynamic(Phrases.Warning_BrsarFileIdUnsupportedMagic, fileId, moddedEntry.Magic ?? string.Empty)!
+                    Humanizer.ReplaceDynamic(t("warning.brsar_file_id_unsupported_magic"), fileId, moddedEntry.Magic ?? string.Empty)!
                 );
                 continue;
             }
 
             if (moddedEntry.Kind == BrsarEntryKind.External)
             {
-                skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarFileIdExternal, fileId)!);
+                skipped.Add(Humanizer.ReplaceDynamic(t("warning.brsar_file_id_external"), fileId)!);
                 continue;
             }
 
-            skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarFileIdUnresolved, fileId)!);
+            skipped.Add(Humanizer.ReplaceDynamic(t("warning.brsar_file_id_unresolved"), fileId)!);
         }
 
         var unsupportedSummary = SummarizeUnsupportedBrsarCounts(moddedParse.UnsupportedCounts);
         if (unsupportedSummary != null)
-            warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarUnsupportedSummary, unsupportedSummary)!);
+            warnings.Add(Humanizer.ReplaceDynamic(t("warning.brsar_unsupported_summary"), unsupportedSummary)!);
         if (moddedParse.ExternalCount > 0)
-            warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarExternalCount, moddedParse.ExternalCount)!);
+            warnings.Add(Humanizer.ReplaceDynamic(t("warning.brsar_external_count"), moddedParse.ExternalCount)!);
         if (moddedParse.UnresolvedCount > 0)
-            warnings.Add(Humanizer.ReplaceDynamic(Phrases.Warning_BrsarUnresolvedCount, moddedParse.UnresolvedCount)!);
+            warnings.Add(Humanizer.ReplaceDynamic(t("warning.brsar_unresolved_count"), moddedParse.UnresolvedCount)!);
         if (entries.Count == 0 && skipped.Count == 0)
-            warnings.Add(Phrases.Warning_BrsarNoSupportedDifferences);
+            warnings.Add(t("warning.brsar_no_supported_differences"));
 
         return new()
         {
@@ -199,8 +198,8 @@ public static class BrsarPatchConverter
                     null,
                     null,
                     externalPath.Length > 0
-                        ? Humanizer.ReplaceDynamic(Phrases.Text_ExternalReferenceWithPath, externalPath)!
-                        : Phrases.Text_ExternalReference
+                        ? Humanizer.ReplaceDynamic(t("text.external_reference_with_path"), externalPath)!
+                        : t("text.external_reference")
                 );
                 continue;
             }
@@ -256,19 +255,19 @@ public static class BrsarPatchConverter
                     mainBytes,
                     null,
                     mainHeader.Magic,
-                    Humanizer.ReplaceDynamic(Phrases.Text_BrsarEntry, mainHeader.Magic, fileId)!
+                    Humanizer.ReplaceDynamic(t("text.brsar_entry"), mainHeader.Magic, fileId)!
                 );
                 continue;
             }
 
             var exportBytes = mainBytes;
-            var detail = Humanizer.ReplaceDynamic(Phrases.Text_BrsarEntry, mainHeader.Magic, fileId)!;
+            var detail = Humanizer.ReplaceDynamic(t("text.brsar_entry"), mainHeader.Magic, fileId)!;
             var waveHeader = FindNearestRwarHeader(rwarHeaders, waveGuess, declaredWaveSize, mainHeader.Offset - mainGuess);
             if (declaredWaveSize > 0 && waveHeader != null)
             {
                 var waveBytes = SliceBytes(bytes, waveHeader.Offset, waveHeader.Offset + waveHeader.Size);
                 exportBytes = JoinWithAlignment(mainBytes, waveBytes, 0x20);
-                detail = Humanizer.ReplaceDynamic(Phrases.Text_BrsarEntryWithRwar, mainHeader.Magic, fileId)!;
+                detail = Humanizer.ReplaceDynamic(t("text.brsar_entry_with_rwar"), mainHeader.Magic, fileId)!;
             }
 
             entries[fileId] = new(BrsarEntryKind.Supported, exportBytes, exportBytes, mainHeader.Magic, detail);

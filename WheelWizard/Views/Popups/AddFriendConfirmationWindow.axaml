@@ -6,7 +6,7 @@
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
                    xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
                    xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
-                   xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+                   xmlns:loc="clr-namespace:WheelWizard.Localization"
                    xmlns:popups="clr-namespace:WheelWizard.Views.Popups"
                    x:Class="WheelWizard.Views.Popups.AddFriendConfirmationWindow"
                    x:DataType="popups:AddFriendConfirmationWindow"
@@ -44,7 +44,7 @@
         <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" />
 
         <UniformGrid Grid.Row="3" Columns="2" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <components:Button Text="{x:Static lang:Common.Action_Cancel}"
+            <components:Button Text="{loc:T action.cancel}"
                                Variant="Default"
                                IconData="{StaticResource XMark}"
                                Margin="0,0,6,0"
