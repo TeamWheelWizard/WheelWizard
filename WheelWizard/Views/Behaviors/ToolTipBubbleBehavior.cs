@@ -264,8 +264,27 @@ public static class ToolTipBubbleBehavior
 
             PrepareToolTip(control);
             ToolTip.SetIsOpen(control, true);
+            PrepareToolTipAfterOpen(control, cancellationToken);
             ApplyBubbleAnimationClass(control, animateIn: true);
         });
+    }
+
+    private static void PrepareToolTipAfterOpen(Control control, CancellationToken cancellationToken)
+    {
+        // Avalonia creates the generated ToolTip lazily on the first open, so the pre-open
+        // PrepareToolTip pass can miss the instance that needs the pointer class.
+        PrepareToolTip(control);
+
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                if (cancellationToken.IsCancellationRequested || !ToolTip.GetIsOpen(control))
+                    return;
+
+                PrepareToolTip(control);
+            },
+            DispatcherPriority.Loaded
+        );
     }
 
     private static async Task DeferredCloseAsync(Control control, ToolTipState state, TimeSpan delay, CancellationToken cancellationToken)

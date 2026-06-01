@@ -16,7 +16,8 @@ public class GameBananaModPreview
     public required string Version { get; set; }
 
     [JsonPropertyName("_aTags")]
-    public required List<string> Tags { get; set; }
+    [JsonConverter(typeof(GameBananaTagListJsonConverter))]
+    public required List<GameBananaTag> Tags { get; set; }
 
     [JsonPropertyName("_sProfileUrl")]
     public required string ProfileUrl { get; set; }
@@ -52,4 +53,18 @@ public class GameBananaModPreview
     /// </summary>
     [JsonPropertyName("_sModelName")]
     public required string ModelName { get; set; }
+
+    [JsonIgnore]
+    public bool UsesPatches => Tags.Any(tag => IsPatchesTag(tag.Title));
+
+    private static bool IsPatchesTag(string? tagTitle)
+    {
+        var normalizedTitle = tagTitle?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedTitle))
+            return false;
+
+        var titleOnly = normalizedTitle.Split(':', 2)[0].Trim();
+        return titleOnly.Equals("patch", StringComparison.OrdinalIgnoreCase)
+            || titleOnly.Equals("patches", StringComparison.OrdinalIgnoreCase);
+    }
 }

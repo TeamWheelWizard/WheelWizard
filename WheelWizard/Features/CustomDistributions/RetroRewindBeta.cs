@@ -129,12 +129,10 @@ public class RetroRewindBeta : IDistribution
     public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
     {
         var rootPath = PathManager.RiivolutionWhWzFolderPath;
-        var rootFullPath = _fileSystem.Path.GetFullPath(rootPath + Path.AltDirectorySeparatorChar);
 
         foreach (var entry in LoadManifest())
         {
-            var fullPath = _fileSystem.Path.GetFullPath(_fileSystem.Path.Combine(rootPath, entry));
-            if (!fullPath.StartsWith(rootFullPath, StringComparison.Ordinal))
+            if (!PathSafetyHelper.TryGetPathWithinDirectory(rootPath, entry, out var fullPath))
                 continue;
 
             if (_fileSystem.File.Exists(fullPath))
@@ -195,7 +193,8 @@ public class RetroRewindBeta : IDistribution
         badPassword = false;
         try
         {
-            using var archive = ArchiveFactory.Open(zipPath, new ReaderOptions { Password = password });
+            using var archiveStream = _fileSystem.File.OpenRead(zipPath);
+            using var archive = ArchiveFactory.OpenArchive(archiveStream, new ReaderOptions { Password = password });
             var entries = archive.Entries.Where(entry => !entry.IsDirectory).ToList();
             if (entries.Count == 0)
                 return Ok();
@@ -205,20 +204,18 @@ public class RetroRewindBeta : IDistribution
                 progressWindow.SetExtraText(Common.State_Extracting).SetGoal($"Extracting {entries.Count} files");
             });
 
-            var absoluteDestinationPath = _fileSystem.Path.GetFullPath(destinationDirectory + Path.AltDirectorySeparatorChar);
-
             for (var i = 0; i < entries.Count; i++)
             {
                 var entry = entries[i];
-                var normalized = NormalizeEntryPath(entry.Key ?? string.Empty);
-                if (string.IsNullOrWhiteSpace(normalized))
+                if (!PathSafetyHelper.TryNormalizeRelativePath(entry.Key ?? string.Empty, out var normalized))
                     continue;
 
                 if (!TryGetRelativeExtractionPath(normalized, out var relativePath))
-                    return Fail("Unexpected file in the test archive. Please contact the developers.");
+                    return Fail(
+                        $"Unexpected file in the test archive: '{entry.Key}' (normalized: '{normalized}'). Please contact the developers."
+                    );
 
-                var destinationPath = _fileSystem.Path.GetFullPath(_fileSystem.Path.Combine(destinationDirectory, relativePath));
-                if (!destinationPath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal))
+                if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, relativePath, out var destinationPath))
                     return Fail("The file path is outside the destination directory. Please contact the developers.");
 
                 var destinationDir = _fileSystem.Path.GetDirectoryName(destinationPath);
@@ -256,38 +253,34 @@ public class RetroRewindBeta : IDistribution
         return ex.InnerException != null && IsBadPasswordException(ex.InnerException);
     }
 
-    private static string NormalizeEntryPath(string path) => path.Replace('\\', '/').TrimStart('/');
-
     private bool TryGetRelativeExtractionPath(string normalizedPath, out string relativePath)
     {
         relativePath = string.Empty;
+        var archivePath = normalizedPath.Replace(Path.DirectorySeparatorChar, '/').Replace(Path.AltDirectorySeparatorChar, '/');
 
-        if (normalizedPath.Equals(FolderName, StringComparison.OrdinalIgnoreCase))
+        if (archivePath.Equals(FolderName, StringComparison.OrdinalIgnoreCase))
         {
             relativePath = FolderName;
             return true;
         }
 
-        if (normalizedPath.StartsWith($"{FolderName}/", StringComparison.OrdinalIgnoreCase))
+        if (archivePath.StartsWith($"{FolderName}/", StringComparison.OrdinalIgnoreCase))
         {
-            relativePath = Path.Combine(
-                FolderName,
-                normalizedPath.Substring(FolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar)
-            );
+            relativePath = Path.Combine(FolderName, archivePath.Substring(FolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar));
             return true;
         }
 
-        if (normalizedPath.Equals(XMLFolderName, StringComparison.OrdinalIgnoreCase))
+        if (archivePath.Equals(XMLFolderName, StringComparison.OrdinalIgnoreCase))
         {
             relativePath = XMLFolderName;
             return true;
         }
 
-        if (normalizedPath.StartsWith($"{XMLFolderName}/", StringComparison.OrdinalIgnoreCase))
+        if (archivePath.StartsWith($"{XMLFolderName}/", StringComparison.OrdinalIgnoreCase))
         {
             relativePath = Path.Combine(
                 XMLFolderName,
-                normalizedPath.Substring(XMLFolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar)
+                archivePath.Substring(XMLFolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar)
             );
             return true;
         }
@@ -308,8 +301,6 @@ public class RetroRewindBeta : IDistribution
             .Directory.EnumerateFiles(betaFolderSource, "*", SearchOption.AllDirectories)
             .Concat(_fileSystem.Directory.EnumerateFiles(xmlFolderSource, "*", SearchOption.AllDirectories));
 
-        var absoluteDestinationRoot = _fileSystem.Path.GetFullPath(destinationRoot + Path.AltDirectorySeparatorChar);
-
         foreach (var file in sourceFiles)
         {
             var relativePath = _fileSystem.Path.GetRelativePath(tempExtractionPath, file);
@@ -319,9 +310,7 @@ public class RetroRewindBeta : IDistribution
                 continue;
             }
 
-            var destinationPath = _fileSystem.Path.Combine(destinationRoot, relativePath);
-            var fullDestinationPath = _fileSystem.Path.GetFullPath(destinationPath);
-            if (!fullDestinationPath.StartsWith(absoluteDestinationRoot, StringComparison.Ordinal))
+            if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationRoot, relativePath, out var destinationPath))
                 return Fail("The file path is outside the destination directory. Please contact the developers.");
 
             var destinationDirectory = _fileSystem.Path.GetDirectoryName(destinationPath);

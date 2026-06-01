@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Views;
 
 namespace WheelWizard.Views.Popups.Base;
 
@@ -147,7 +148,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
     public void SetWindowSize(Size size)
     {
-        var scaleFactor = SettingsService.Get<double>(SettingsService.WINDOW_SCALE);
+        var scaleFactor = ViewUtils.GetUsableWindowScale(SettingsService.Get<double>(SettingsService.WINDOW_SCALE), size, this);
         Width = size.Width * scaleFactor;
         Height = size.Height * scaleFactor;
         CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);

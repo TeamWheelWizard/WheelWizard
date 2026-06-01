@@ -116,7 +116,9 @@ public static class DolphinLaunchHelper
 
         if (!TryFixFlatpakPortalAccess(PathManager.GameFilePath, "-r"))
             AddFilesystemPerm(PathManager.GameFilePath, ":ro");
-        AddFilesystemPerm(PathManager.RrLaunchJsonFilePath, ":ro");
+        // We need to provide the directory where the `RR.json` is located in for portal access!
+        if (!TryFixFlatpakPortalAccess(Path.GetDirectoryName(PathManager.RrLaunchJsonFilePath) ?? "", "-r"))
+            AddFilesystemPerm(PathManager.RrLaunchJsonFilePath, ":ro");
 
         return fixedFlatpakDolphinLocation;
     }

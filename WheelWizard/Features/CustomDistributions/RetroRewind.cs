@@ -352,20 +352,14 @@ public class RetroRewind : IDistribution
             progressWindow.SetExtraText(Common.State_Extracting).SetGoal($"Extracting {total} files");
         });
 
-        // Absolute path of the destination directory
-        var absoluteDestinationPath = _fileSystem.Path.GetFullPath(destinationDirectory + Path.AltDirectorySeparatorChar);
-
         for (var i = 0; i < total; i++)
         {
             var entry = entries[i];
-            var destinationPath = _fileSystem.Path.GetFullPath(Path.Combine(destinationDirectory, entry.FullName));
-
-            // Directory traversal check
-            if (!destinationPath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal))
+            if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, entry.FullName, out var destinationPath))
                 return Fail("The file path is outside the destination directory. Please contact the developers.");
 
             // If it’s a directory, create it
-            if (entry.FullName.EndsWith(Path.AltDirectorySeparatorChar))
+            if (entry.FullName.EndsWith(Path.AltDirectorySeparatorChar) || entry.FullName.EndsWith(Path.DirectorySeparatorChar))
             {
                 _fileSystem.Directory.CreateDirectory(destinationPath);
             }
@@ -406,21 +400,15 @@ public class RetroRewind : IDistribution
 
             foreach (var file in deletionsToApply)
             {
-                var absoluteDestinationPath = _fileSystem.Path.GetFullPath(
-                    PathManager.RiivolutionWhWzFolderPath + _fileSystem.Path.AltDirectorySeparatorChar
-                );
-                var filePath = _fileSystem.Path.GetFullPath(_fileSystem.Path.Combine(absoluteDestinationPath, file.Path.TrimStart('/')));
-                //because we are actually getting the path from the server,
-                //we need to make sure we are not getting hacked, so we check if the path is in the riivolution folder
-                var resolvedPath = _fileSystem.Path.GetFullPath(new FileInfo(filePath).FullName);
+                // The deletion list is server-controlled, so keep every resolved path inside the riivolution folder.
                 if (
-                    !resolvedPath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal)
-                    || !filePath.StartsWith(absoluteDestinationPath, StringComparison.Ordinal)
-                    || file.Path.Contains("..")
+                    !PathSafetyHelper.TryGetPathWithinDirectory(
+                        PathManager.RiivolutionWhWzFolderPath,
+                        file.Path.TrimStart('/', '\\'),
+                        out var filePath
+                    )
                 )
-                {
-                    return Fail("Invalid file path detected. Please contact the developers.\n Server error: " + resolvedPath);
-                }
+                    return Fail("Invalid file path detected. Please contact the developers.\n Server error: " + file.Path);
 
                 if (_fileSystem.File.Exists(filePath))
                     _fileSystem.File.Delete(filePath);

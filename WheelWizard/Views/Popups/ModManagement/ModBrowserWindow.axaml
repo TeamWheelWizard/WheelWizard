@@ -14,7 +14,7 @@
                      mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800">
     <Grid ColumnDefinitions="2*,3*" Width="800" Height="750">
         <!-- Mod List -->
-        <Grid Grid.Column="0" Margin="10" RowDefinitions="Auto,Auto,*">
+        <Grid Grid.Column="0" Margin="10" RowDefinitions="Auto,Auto,Auto,*">
             <TextBlock Classes="TinyText" Text="{x:Static lang:Phrases.Text_PoweredGamebanana}"
                        HorizontalAlignment="Left" Grid.Row="0" />
 
@@ -29,8 +29,15 @@
                                    Click="Search_Click" Margin="10,0,0,5" />
             </Grid>
 
+            <CheckBox Grid.Row="2"
+                      x:Name="PatchesOnlyToggle"
+                      Classes="Switch"
+                      Margin="0,0,0,8"
+                      Content="Patches only"
+                      Click="PatchesOnlyToggle_Click" />
+
             <!-- Mod List -->
-            <ListBox Grid.Row="2" x:Name="ModListView" SelectionMode="Single"
+            <ListBox Grid.Row="3" x:Name="ModListView" SelectionMode="Single"
                      SelectionChanged="ModListView_SelectionChanged" Padding="0"
                      Background="Transparent" BorderThickness="0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -43,6 +50,7 @@
                                                        ModAuthor="{Binding Mod.Author.Name}"
                                                        ViewCount="{Binding Mod.ViewCount}"
                                                        LikeCount="{Binding Mod.LikeCount}"
+                                                       UsesPatches="{Binding Mod.UsesPatches}"
                                                        ImageUrl="{Binding PreviewImageUrl}"
                                                         />
                     </DataTemplate>

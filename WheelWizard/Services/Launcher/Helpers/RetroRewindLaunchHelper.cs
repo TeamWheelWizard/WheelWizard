@@ -104,8 +104,8 @@ public static class RetroRewindLaunchHelper
     {
         var fileName = Path.GetFileName(xmlFilePath);
         if (fileName.Equals("RRBeta.xml", StringComparison.OrdinalIgnoreCase))
-            return ("Retro Rewind Beta", 2, true);
+            return ("Retro Rewind Beta", 0, true);
 
-        return ("Retro Rewind", 2, false);
+        return ("Retro Rewind", 0, false);
     }
 }

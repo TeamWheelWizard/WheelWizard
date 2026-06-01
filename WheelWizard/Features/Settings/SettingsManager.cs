@@ -109,12 +109,14 @@ public class SettingsManager : ISettingsManager
         GAME_LOCATION = RegisterWhWz("GameLocation", "", value => _fileSystem.File.Exists(value as string ?? string.Empty));
         FORCE_WIIMOTE = RegisterWhWz("ForceWiimote", false);
         LAUNCH_WITH_DOLPHIN = RegisterWhWz("LaunchWithDolphin", false);
+        LAUNCH_RR_ON_STARTUP = RegisterWhWz("LaunchRrOnStartup", false);
         PREFERS_MODS_ROW_VIEW = RegisterWhWz("PrefersModsRowView", true);
+        USE_PATCHES_SYSTEM = RegisterWhWz("UsePatchesSystem", false);
         FOCUSED_USER = RegisterWhWz("FavoriteUser", 0, value => (int)(value ?? -1) >= 0 && (int)(value ?? -1) < 4);
 
         ENABLE_ANIMATIONS = RegisterWhWz("EnableAnimations", true);
         TESTING_MODE_ENABLED = RegisterWhWz("TestingModeEnabled", false);
-        SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, value => (double)(value ?? -1) >= 0.5 && (double)(value ?? -1) <= 2.0);
+        SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, SettingValues.IsValidWindowScale);
         REMOVE_BLUR = RegisterWhWz("REMOVE_BLUR", true);
         RR_REGION = RegisterWhWz("RR_Region", MarioKartWiiEnums.Regions.None);
         WW_LANGUAGE = RegisterWhWz("WW_Language", "en", value => SettingValues.WhWzLanguages.ContainsKey((string)value!));
@@ -153,11 +155,13 @@ public class SettingsManager : ISettingsManager
         #endregion
 
         #region Virtual settings
-        WINDOW_SCALE = new VirtualSetting(
+        var windowScale = new VirtualSetting(
             typeof(double),
             value => _internalScale = (double)value!,
             () => _internalScale == -1.0 ? SAVED_WINDOW_SCALE.Get() : _internalScale
-        ).SetDependencies(SAVED_WINDOW_SCALE);
+        );
+        windowScale.SetValidation(SettingValues.IsValidWindowScale);
+        WINDOW_SCALE = windowScale.SetDependencies(SAVED_WINDOW_SCALE);
 
         RECOMMENDED_SETTINGS = new VirtualSetting(
             typeof(bool),
@@ -195,7 +199,9 @@ public class SettingsManager : ISettingsManager
     public Setting GAME_LOCATION { get; }
     public Setting FORCE_WIIMOTE { get; }
     public Setting LAUNCH_WITH_DOLPHIN { get; }
+    public Setting LAUNCH_RR_ON_STARTUP { get; }
     public Setting PREFERS_MODS_ROW_VIEW { get; }
+    public Setting USE_PATCHES_SYSTEM { get; }
     public Setting FOCUSED_USER { get; }
     public Setting ENABLE_ANIMATIONS { get; }
     public Setting TESTING_MODE_ENABLED { get; }

@@ -8,11 +8,14 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
+using WheelWizard.Mods;
 using WheelWizard.Resources.Languages;
+using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
@@ -65,12 +68,16 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     [Inject]
     private ISettingsSignalBus SettingsSignalBus { get; set; } = null!;
 
+    [Inject]
+    private IModManager ModManagerService { get; set; } = null!;
+
     public Layout()
     {
         Instance = this;
         InitializeComponent();
         AddLayer();
 
+        ClampSavedWindowScaleToCurrentScreen();
         OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
@@ -96,6 +103,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         WhWzStatusManager.Instance.Subscribe(this);
         RRLiveRooms.Instance.Subscribe(this);
         GameLicenseService.Subscribe(this);
+        ModManagerService.PropertyChanged += ModManager_PropertyChanged;
+        _ = ReloadModsAndShowErrorsAsync();
 #if DEBUG
         KitchenSinkButton.IsVisible = true;
 #endif
@@ -105,6 +114,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         Title = BrandingService.Branding.DisplayName;
         TitleLabel.Text = BrandingService.Branding.DisplayName;
+        UpdateModsButtonText();
+        // UpdateModsActionIndicator();
 
         NavigationManager.NavigateTo<HomePage>();
     }
@@ -113,7 +124,22 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         _settingsSignalSubscription?.Dispose();
         _settingsSignalSubscription = null;
+        ModManagerService.PropertyChanged -= ModManager_PropertyChanged;
         base.OnClosed(e);
+    }
+
+    private void ModManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        //todo: after patches is more stable, uncomment this
+        // if (e.PropertyName == nameof(ModManager.Mods))
+        //     UpdateModsActionIndicator();
+    }
+
+    private async Task ReloadModsAndShowErrorsAsync()
+    {
+        var reloadResult = await ModManagerService.ReloadAsync();
+        if (reloadResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(reloadResult.Error);
     }
 
     private void OnSettingSignal(SettingChangedSignal signal) => OnSettingChanged(signal.Setting);
@@ -123,7 +149,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         // Note that this method will also be called whenever the setting changes
         if (setting == SettingsService.WINDOW_SCALE || setting == SettingsService.SAVED_WINDOW_SCALE)
         {
-            var scaleFactor = (double)setting.Get();
+            var scaleFactor = GetUsableWindowScale((double)setting.Get());
             Height = WindowHeight * scaleFactor;
             Width = WindowWidth * scaleFactor;
             CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
@@ -137,6 +163,29 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         if (setting == SettingsService.TESTING_MODE_ENABLED)
             UpdateTestingButtonVisibility();
     }
+
+    private void ClampSavedWindowScaleToCurrentScreen()
+    {
+        var savedScale = SettingsService.Get<double>(SettingsService.SAVED_WINDOW_SCALE);
+        var usableScale = GetUsableWindowScale(savedScale);
+        if (!savedScale.Equals(usableScale))
+            SettingsService.Set(SettingsService.SAVED_WINDOW_SCALE, usableScale);
+    }
+
+    private double GetUsableWindowScale(double requestedScale) =>
+        ViewUtils.GetUsableWindowScale(requestedScale, new Size(WindowWidth, WindowHeight), this);
+
+    private void UpdateModsButtonText()
+    {
+        ModsButton.Text = Common.PageTitle_Patches;
+    }
+
+    //todo: after patches is more stable, uncomment this
+    // private void UpdateModsActionIndicator()
+    // {
+    //     ModsButton.WarningVisible = ModManagerService.Mods.Any(mod => mod.HasIncompatibleFiles);
+    //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
+    // }
 
     public void NavigateToPage(UserControl page)
     {

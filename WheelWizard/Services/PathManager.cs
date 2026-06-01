@@ -72,7 +72,6 @@ public static class PathManager
     public static string WheelWizardConfigFilePath => Path.Combine(WheelWizardAppdataPath, "config.json");
     public static string RrLaunchJsonFilePath => Path.Combine(WheelWizardAppdataPath, "RR.json");
     public static string ModsFolderPath => Path.Combine(WheelWizardAppdataPath, "Mods");
-    public static string ModConfigFilePath => Path.Combine(ModsFolderPath, "modconfig.json");
     public static string TempModsFolderPath => Path.Combine(ModsFolderPath, "Temp");
     public static string RetroRewindTempFile => Path.Combine(TempModsFolderPath, "RetroRewind.zip");
     public static string RrBetaTempFolderPath => Path.Combine(TempModsFolderPath, "RRBetaTemp");
@@ -95,11 +94,32 @@ public static class PathManager
                 return null;
 
             var normalized = FileHelper.NormalizePath(storedPath);
-            return FileHelper.PathsEqual(normalized, DefaultWheelWizardAppdataPath) ? null : normalized;
+            if (FileHelper.PathsEqual(normalized, DefaultWheelWizardAppdataPath))
+                return null;
+
+            // If a previously selected custom location is no longer available (for example,
+            // when an external drive letter changes), fall back to the default path.
+            if (!TryEnsureWheelWizardAppdataPathAccessible(normalized))
+                return null;
+
+            return normalized;
         }
         catch
         {
             return null;
+        }
+    }
+
+    private static bool TryEnsureWheelWizardAppdataPathAccessible(string normalizedPath)
+    {
+        try
+        {
+            FileHelper.EnsureDirectory(normalizedPath);
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 
@@ -500,15 +520,14 @@ public static class PathManager
 
     #endregion
 
-    //In case it is unclear, the mods folder is a folder with mods that are desired to be installed (if enabled)
-    //When launching we want to move the mods from the Mods folder to the MyStuff folder since that is the folder the game uses
-    //Also remember that mods may not be in a subfolder, all mod files must be located in /MyStuff directly
+    // In case it is unclear, the mods folder is a folder with mods that are desired to be installed (if enabled).
+    // When launching, enabled mods are synced into the active Patches runtime folder.
 
     // Helper paths for folders used across multiple files
 
-    public static string MyStuffFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6", "MyStuff");
+    public static string PatchesFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RetroRewind6", "Patches");
     public static string RrBetaFolderPath => Path.Combine(RiivolutionWhWzFolderPath, "RRBeta");
-    public static string RrBetaMyStuffFolderPath => Path.Combine(RrBetaFolderPath, "MyStuff");
+    public static string RrBetaPatchesFolderPath => Path.Combine(RrBetaFolderPath, "Patches");
 
     public static string GetModDirectoryPath(string modName) => Path.Combine(ModsFolderPath, modName);
 
