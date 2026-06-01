@@ -211,7 +211,9 @@ public class RetroRewindBeta : IDistribution
                     continue;
 
                 if (!TryGetRelativeExtractionPath(normalized, out var relativePath))
-                    return Fail("Unexpected file in the test archive. Please contact the developers.");
+                    return Fail(
+                        $"Unexpected file in the test archive: '{entry.Key}' (normalized: '{normalized}'). Please contact the developers."
+                    );
 
                 if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, relativePath, out var destinationPath))
                     return Fail("The file path is outside the destination directory. Please contact the developers.");
@@ -254,33 +256,31 @@ public class RetroRewindBeta : IDistribution
     private bool TryGetRelativeExtractionPath(string normalizedPath, out string relativePath)
     {
         relativePath = string.Empty;
+        var archivePath = normalizedPath.Replace(Path.DirectorySeparatorChar, '/').Replace(Path.AltDirectorySeparatorChar, '/');
 
-        if (normalizedPath.Equals(FolderName, StringComparison.OrdinalIgnoreCase))
+        if (archivePath.Equals(FolderName, StringComparison.OrdinalIgnoreCase))
         {
             relativePath = FolderName;
             return true;
         }
 
-        if (normalizedPath.StartsWith($"{FolderName}/", StringComparison.OrdinalIgnoreCase))
+        if (archivePath.StartsWith($"{FolderName}/", StringComparison.OrdinalIgnoreCase))
         {
-            relativePath = Path.Combine(
-                FolderName,
-                normalizedPath.Substring(FolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar)
-            );
+            relativePath = Path.Combine(FolderName, archivePath.Substring(FolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar));
             return true;
         }
 
-        if (normalizedPath.Equals(XMLFolderName, StringComparison.OrdinalIgnoreCase))
+        if (archivePath.Equals(XMLFolderName, StringComparison.OrdinalIgnoreCase))
         {
             relativePath = XMLFolderName;
             return true;
         }
 
-        if (normalizedPath.StartsWith($"{XMLFolderName}/", StringComparison.OrdinalIgnoreCase))
+        if (archivePath.StartsWith($"{XMLFolderName}/", StringComparison.OrdinalIgnoreCase))
         {
             relativePath = Path.Combine(
                 XMLFolderName,
-                normalizedPath.Substring(XMLFolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar)
+                archivePath.Substring(XMLFolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar)
             );
             return true;
         }
