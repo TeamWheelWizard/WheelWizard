@@ -77,6 +77,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         InitializeComponent();
         AddLayer();
 
+        ClampSavedWindowScaleToCurrentScreen();
         OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
@@ -148,7 +149,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         // Note that this method will also be called whenever the setting changes
         if (setting == SettingsService.WINDOW_SCALE || setting == SettingsService.SAVED_WINDOW_SCALE)
         {
-            var scaleFactor = (double)setting.Get();
+            var scaleFactor = GetUsableWindowScale((double)setting.Get());
             Height = WindowHeight * scaleFactor;
             Width = WindowWidth * scaleFactor;
             CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
@@ -162,6 +163,17 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         if (setting == SettingsService.TESTING_MODE_ENABLED)
             UpdateTestingButtonVisibility();
     }
+
+    private void ClampSavedWindowScaleToCurrentScreen()
+    {
+        var savedScale = SettingsService.Get<double>(SettingsService.SAVED_WINDOW_SCALE);
+        var usableScale = GetUsableWindowScale(savedScale);
+        if (!savedScale.Equals(usableScale))
+            SettingsService.Set(SettingsService.SAVED_WINDOW_SCALE, usableScale);
+    }
+
+    private double GetUsableWindowScale(double requestedScale) =>
+        ViewUtils.GetUsableWindowScale(requestedScale, new Size(WindowWidth, WindowHeight), this);
 
     private void UpdateModsButtonText()
     {

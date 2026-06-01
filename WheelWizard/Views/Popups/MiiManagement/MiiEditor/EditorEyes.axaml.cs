@@ -83,7 +83,7 @@ public partial class EditorEyes : MiiEditorBaseControl
     private void SetEyeColor(int index)
     {
         var current = Editor.Mii.MiiEyes;
-        if (index == current.Type)
+        if (index == (int)current.Color)
             return;
 
         var result = MiiEye.Create(current.Type, current.Rotation, current.Vertical, (MiiEyeColor)index, current.Size, current.Spacing);

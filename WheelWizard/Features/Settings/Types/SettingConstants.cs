@@ -14,8 +14,15 @@ public static class SettingValues
     // you check for this value and replace it with its corresponding value in the language file
     public const string NoName = "no name";
     public const string NoLicense = "no license";
+    public const double MinWindowScale = 0.5;
+    public const double MaxWindowScale = 2.0;
 
     public static readonly double[] WindowScales = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2];
+
+    public static bool IsValidWindowScale(object? value)
+    {
+        return value is double scale && scale >= MinWindowScale && scale <= MaxWindowScale;
+    }
 
     public static readonly Dictionary<string, string> GFXRenderers = new() //Display name, value
     {

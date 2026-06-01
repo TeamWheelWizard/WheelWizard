@@ -647,8 +647,18 @@ public partial class WhWzSettings : UserControlBase
         _editingScale = true;
         var selectedScale = WindowScaleDropdown.SelectedItem?.ToString() ?? "1";
         var scale = double.Parse(selectedScale.Split(" ").Last().Replace("%", "")) / 100;
+        scale = ViewUtils.GetUsableWindowScale(scale, new Avalonia.Size(Layout.WindowWidth, Layout.WindowHeight), ViewUtils.GetLayout());
+        var selectedItemText = ScaleToString(scale);
+        if (!WindowScaleDropdown.Items.Contains(selectedItemText))
+            WindowScaleDropdown.Items.Add(selectedItemText);
+        WindowScaleDropdown.SelectedItem = selectedItemText;
 
-        SettingsService.WINDOW_SCALE.Set(scale);
+        if (!SettingsService.WINDOW_SCALE.Set(scale))
+        {
+            WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
+            _editingScale = false;
+            return;
+        }
         var seconds = 10;
 
         string ExtraScaleText() =>

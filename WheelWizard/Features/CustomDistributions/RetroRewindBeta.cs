@@ -193,7 +193,8 @@ public class RetroRewindBeta : IDistribution
         badPassword = false;
         try
         {
-            using var archive = ArchiveFactory.OpenArchive(zipPath, new ReaderOptions { Password = password });
+            using var archiveStream = _fileSystem.File.OpenRead(zipPath);
+            using var archive = ArchiveFactory.OpenArchive(archiveStream, new ReaderOptions { Password = password });
             var entries = archive.Entries.Where(entry => !entry.IsDirectory).ToList();
             if (entries.Count == 0)
                 return Ok();
