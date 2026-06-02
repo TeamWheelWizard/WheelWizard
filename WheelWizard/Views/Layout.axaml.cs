@@ -109,6 +109,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         Title = BrandingService.Branding.DisplayName;
         TitleLabel.Text = BrandingService.Branding.DisplayName;
+        VersionTagText.Text = $"v{BrandingService.Branding.Version}";
         UpdateModsButtonText();
         // UpdateModsActionIndicator();
 
@@ -252,11 +253,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
     {
         var playerCount = sender.PlayerCount;
-        var roomCount = sender.RoomCount;
-        PlayerCountBox.Text = playerCount.ToString();
-        PlayerCountBox.TipText = t("hover.players_online.n", playerCount);
-        RoomCountBox.Text = roomCount.ToString();
-        RoomCountBox.TipText = t("hover.rooms_online.n", roomCount);
+        RoomsButton.BoxText = playerCount.ToString();
+        RoomsButton.BoxTip = t("hover.players_online.n", playerCount);
         UpdateFriendCount();
     }
 
@@ -272,6 +270,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
         ToolTip.SetTip(LiveStatusBorder, sender.Status!.Message);
         LiveStatusBorder.Classes.Clear();
+        LiveStatusBorder.Classes.Add("BottomSidebarIcon");
 
         // If custom icon is provided, use it instead of variant
         if (hasCustomIcon)
@@ -362,15 +361,21 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         TestingButton.IsVisible = SettingsService.Get<bool>(SettingsService.TESTING_MODE_ENABLED);
     }
 
+    private void SidebarInfoButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        SidebarInfoContextMenu.Open();
+        e.Handled = true;
+    }
+
     private void CloseButton_Click(object? sender, RoutedEventArgs e) => Close();
 
     private void MinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-    private void Discord_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.DiscordUrl.ToString());
+    private void Discord_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.DiscordUrl.ToString());
 
-    private void Github_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
+    private void Github_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
 
-    private void Support_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+    private void Support_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
     private void CloseSnackbar_OnClick(object? sender, EventArgs e)
     {

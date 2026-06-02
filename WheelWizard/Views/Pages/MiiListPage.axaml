@@ -22,9 +22,6 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
 
-        <behaviorComponent:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
-                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
-
         <components:EmptyPageInfo Grid.Row="1" x:Name="VisibleWhenNoDb"
                                   HorizontalAlignment="Center" IsVisible="False"
                                   Title="{loc:T empty_content.no_miis_title}"
