@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:patches="clr-namespace:WheelWizard.Features.Patches"
              x:Class="WheelWizard.Views.Patterns.GridModPanel"
              x:DataType="pages:ModListItem">

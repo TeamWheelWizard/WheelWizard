@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              x:Class="WheelWizard.Views.Pages.SettingsPage">
@@ -16,7 +16,7 @@
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" 
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_Settings}" HorizontalAlignment="Left" VerticalAlignment="Top"
+        <TextBlock Grid.Row="0" Text="{loc:T page_title.settings}" HorizontalAlignment="Left" VerticalAlignment="Top"
                    Classes="PageTitleText" />
         
         <ScrollViewer Grid.Row="0"  HorizontalScrollBarVisibility="Auto">
@@ -24,11 +24,11 @@
                 <RadioButton Classes="TopBar" Tag="WhWzSettings" 
                              Click="TopBarRadio_OnClick" Content="Wheel Wizard" IsChecked="True" />
                 <RadioButton Classes="TopBar" Tag="VideoSettings" 
-                             Click="TopBarRadio_OnClick" Content="{x:Static lang:Settings.Category_Video}"/>
+                             Click="TopBarRadio_OnClick" Content="{loc:T category.video}"/>
                 <RadioButton Classes="TopBar" Tag="OtherSettings" 
-                             Click="TopBarRadio_OnClick" Content="{x:Static lang:Settings.Category_Other}" />
+                             Click="TopBarRadio_OnClick" Content="{loc:T category.other}" />
                 <RadioButton Classes="TopBar" Tag="AppInfo"
-                             Click="TopBarRadio_OnClick" Content="{x:Static lang:Settings.Category_About}" />
+                             Click="TopBarRadio_OnClick" Content="{loc:T category.about}" />
             </StackPanel>
         </ScrollViewer>
         

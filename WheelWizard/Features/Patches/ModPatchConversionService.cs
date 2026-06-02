@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using WheelWizard.Features.Archives;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Views.Popups.Generic;
 
@@ -11,8 +10,8 @@ namespace WheelWizard.Features.Patches;
 
 public static class ModPatchCompatibilityText
 {
-    public static string IncompatibleTitle => Phrases.Patch_IncompatibleMod_Title;
-    public static string IncompatibleMessage => Phrases.Patch_IncompatibleMod_Message;
+    public static string IncompatibleTitle => t("patch.incompatible_mod.title");
+    public static string IncompatibleMessage => t("patch.incompatible_mod.message");
 }
 
 public interface IModPatchConversionService
@@ -49,7 +48,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
     {
         var sourceDirectory = PathManager.GetModDirectoryPath(mod.Title);
         if (!Directory.Exists(sourceDirectory))
-            return Fail(Phrases.MessageError_NoModFolder_Extra);
+            return Fail(t("message_error.no_mod_folder.extra"));
 
         var sourceFiles = GetConvertibleArchiveFiles(mod);
         if (sourceFiles.Count == 0)
@@ -61,8 +60,8 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         var tempRoot = Path.Combine(Path.GetTempPath(), "WheelWizardPatchConversion", $"{mod.Title}-{Guid.NewGuid():N}");
         var tempModDirectory = Path.Combine(tempRoot, mod.Title);
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        var progressWindow = new ProgressWindow(Phrases.Progress_ConvertingModToPatches)
-            .SetGoal(Humanizer.ReplaceDynamic(Phrases.Progress_ConvertingFilesCount, sourceFiles.Count)!)
+        var progressWindow = new ProgressWindow(t("progress.converting_mod_to_patches"))
+            .SetGoal(t("progress.converting_files_count", sourceFiles.Count)!)
             .SetCancellationTokenSource(cts);
         progressWindow.Show();
 
@@ -89,7 +88,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         Dispatcher.UIThread.Post(() =>
                         {
                             progressWindow.UpdateProgress((int)(index / (double)Math.Max(tempFiles.Count, 1) * 80));
-                            progressWindow.SetExtraText(Humanizer.ReplaceDynamic(Phrases.Progress_ConvertingFile, fileName)!);
+                            progressWindow.SetExtraText(t("progress.converting_file", fileName)!);
                         });
 
                         if (LooseBrsarPatchFileName.TryGetNormalizedFileName(fileName, out var normalizedPatchFileName))
@@ -115,7 +114,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         var conversion = conversionResult.Value;
                         if (conversion.Baseline == null)
                         {
-                            skipped.Add(Humanizer.ReplaceDynamic(Phrases.Warning_FileNotInBuiltInBaseline, fileName)!);
+                            skipped.Add(t("warning.file_not_in_built_in_baseline", fileName)!);
                             continue;
                         }
 
@@ -167,7 +166,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                     Dispatcher.UIThread.Post(() =>
                     {
                         progressWindow.UpdateProgress(85);
-                        progressWindow.SetExtraText(Phrases.Progress_ApplyingConvertedMod);
+                        progressWindow.SetExtraText(t("progress.applying_converted_mod"));
                     });
 
                     ReplaceDirectory(sourceDirectory, tempModDirectory, cts.Token);

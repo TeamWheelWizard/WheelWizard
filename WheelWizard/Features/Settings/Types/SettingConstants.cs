@@ -1,6 +1,6 @@
 ﻿namespace WheelWizard.Settings.Types;
 
-using SettingsResource = WheelWizard.Resources.Languages.Settings;
+using WheelWizard.Localization;
 
 public enum DolphinShaderCompilationMode
 {
@@ -39,31 +39,8 @@ public static class SettingValues
         { "OpenGL", "OGL" },
     };
 
-    public static readonly Dictionary<string, Func<string>> WhWzLanguages = new()
-    {
-        { "en", () => CreateLanguageString("English") },
-        { "nl", () => CreateLanguageString("Dutch") },
-        { "fr", () => CreateLanguageString("France") },
-        { "de", () => CreateLanguageString("German") },
-        { "fi", () => CreateLanguageString("Finnish") },
-        { "cs", () => CreateLanguageString("Czech") },
-        { "ja", () => CreateLanguageString("Japanese") },
-        { "es", () => CreateLanguageString("Spanish") },
-        { "it", () => CreateLanguageString("Italian") },
-        { "pt", () => CreateLanguageString("Portuguese") },
-        { "ru", () => CreateLanguageString("Russian") },
-        { "ko", () => CreateLanguageString("Korean") },
-        { "tr", () => CreateLanguageString("Turkish") },
-    };
-
-    private static string CreateLanguageString(string language)
-    {
-        var culture = SettingsResource.Culture ?? System.Globalization.CultureInfo.CurrentUICulture;
-        var lang = SettingsResource.ResourceManager.GetString($"Value_Language_{language}", culture) ?? language;
-        var langOg = SettingsResource.ResourceManager.GetString($"Value_Language_{language}Og", culture);
-        if (lang == langOg || langOg == null || langOg == "-")
-            return lang;
-
-        return $"{lang} - ({langOg})";
-    }
+    public static readonly Dictionary<string, Func<string>> WhWzLanguages = LocalizationLanguageCatalog.SupportedLanguages.ToDictionary(
+        language => language.Code,
+        language => (Func<string>)(() => LocalizationProvider.GetLanguageDisplayName(language.Code))
+    );
 }

@@ -1,11 +1,10 @@
-﻿using Avalonia.Threading;
+using Avalonia.Threading;
 using Semver;
 using WheelWizard.AutoUpdating.Platforms;
 using WheelWizard.Branding;
 using WheelWizard.GitHub;
 using WheelWizard.GitHub.Domain;
 using WheelWizard.Helpers;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.AutoUpdating;
@@ -35,14 +34,14 @@ public class AutoUpdaterSingletonService(
             return;
 
         var latestVersion = SemVersion.Parse(latestRelease.TagName.TrimStart('v'), SemVersionStyles.Any);
-        var popupExtraText = Humanizer.ReplaceDynamic(Phrases.Question_NewVersionWhWz_Extra, latestVersion, CurrentVersion)!;
+        var popupExtraText = t("question.new_version_wh_wz.extra", latestVersion, CurrentVersion)!;
 
         var shouldUpdate = false;
         await Dispatcher.UIThread.InvokeAsync(async () =>
         {
             shouldUpdate = await new YesNoWindow()
-                .SetButtonText(Common.Action_Update, Common.Action_MaybeLater)
-                .SetMainText(Phrases.Question_NewVersionWhWz_Title)
+                .SetButtonText(t("action.update"), t("action.maybe_later"))
+                .SetMainText(t("question.new_version_wh_wz.title"))
                 .SetExtraText(popupExtraText)
                 .AwaitAnswer();
         });

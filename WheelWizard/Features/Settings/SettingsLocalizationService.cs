@@ -1,12 +1,13 @@
 using System.Globalization;
-using CommonResource = WheelWizard.Resources.Languages.Common;
-using PhrasesResource = WheelWizard.Resources.Languages.Phrases;
-using SettingsResource = WheelWizard.Resources.Languages.Settings;
+using WheelWizard.Localization;
 
 namespace WheelWizard.Settings;
 
-public sealed class SettingsLocalizationService(ISettingsManager settingsManager, ISettingsSignalBus settingsSignalBus)
-    : ISettingsLocalizationService
+public sealed class SettingsLocalizationService(
+    ISettingsManager settingsManager,
+    ISettingsSignalBus settingsSignalBus,
+    ILocalizationService localizationService
+) : ISettingsLocalizationService
 {
     private bool _initialized;
     private IDisposable? _subscription;
@@ -29,14 +30,14 @@ public sealed class SettingsLocalizationService(ISettingsManager settingsManager
 
     public void ApplyCurrentLanguage()
     {
-        var newCulture = new CultureInfo(settingsManager.Get<string>(settingsManager.WW_LANGUAGE));
+        var languageCode = settingsManager.Get<string>(settingsManager.WW_LANGUAGE);
+        var newCulture = new CultureInfo(languageCode);
         CultureInfo.DefaultThreadCurrentCulture = newCulture;
         CultureInfo.DefaultThreadCurrentUICulture = newCulture;
         CultureInfo.CurrentCulture = newCulture;
         CultureInfo.CurrentUICulture = newCulture;
 
-        CommonResource.Culture = newCulture;
-        PhrasesResource.Culture = newCulture;
-        SettingsResource.Culture = newCulture;
+        localizationService.SetLanguage(languageCode);
+        LocalizationProvider.Use(localizationService);
     }
 }

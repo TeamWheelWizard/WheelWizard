@@ -11,6 +11,7 @@ using WheelWizard.Features.Archives;
 using WheelWizard.Features.Patches;
 using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
+using WheelWizard.Localization;
 using WheelWizard.MiiImages;
 using WheelWizard.Mods;
 using WheelWizard.RrRooms;
@@ -33,6 +34,7 @@ public static class SetupExtensions
     {
         // Features
         services.AddDolphinInstaller();
+        services.AddLocalization();
         services.AddSettings();
         services.AddCustomCharacters();
         services.AddAutoUpdating();

@@ -1,7 +1,6 @@
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Base;
 
 namespace WheelWizard.Views.Popups.Generic;
@@ -15,8 +14,8 @@ public partial class YesNoWindow : PopupContent
         : base(true, false, true, "Wheel Wizard")
     {
         InitializeComponent();
-        YesButton.Text = Common.Action_Yes;
-        NoButton.Text = Common.Action_No;
+        YesButton.Text = t("action.yes");
+        NoButton.Text = t("action.no");
     }
 
     public YesNoWindow SetMainText(string mainText)

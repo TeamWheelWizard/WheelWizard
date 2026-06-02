@@ -1,6 +1,5 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Input;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Pages;
@@ -59,9 +58,9 @@ public partial class CurrentUserProfile : UserControlBase
 
         var name = currentUser.NameOfMii;
         if (name == SettingValues.NoName)
-            name = Common.State_NoName;
+            name = t("state.no_name");
         if (name == SettingValues.NoLicense)
-            name = Common.State_NoLicense;
+            name = t("state.no_license");
 
         UserName = name;
         FriendCode = currentUser.FriendCode;
