@@ -460,4 +460,7 @@ Om aan een specifieke kamer deel te nemen, moet je dit óf via een vriend óf vi
     <data name="Question_EnterNewName_Title" xml:space="preserve">
         <value>Vul een nieuwe naam in</value>
     </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>Naam moet korter dan 10 tekens zijn.</value>
+    </data>
 </root>

@@ -315,10 +315,10 @@
         <value>Geschlecht</value>
     </data>
     <data name="Attribute_Gender_Female" xml:space="preserve">
-        <value>Männlich</value>
+        <value>Weiblich</value>
     </data>
     <data name="Attribute_Gender_Male" xml:space="preserve">
-        <value>Weiblich</value>
+        <value>Männlich</value>
     </data>
     <data name="Action_DoManually" xml:space="preserve">
         <value>Manuell durchführen</value>

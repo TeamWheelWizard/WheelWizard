@@ -186,7 +186,7 @@
         <value>Finnish</value>
     </data>
     <data name="Value_Language_FinnishOg" xml:space="preserve">
-        <value>-</value>
+        <value>Suomi</value>
     </data>
     <data name="Option_RemoveBlur" xml:space="preserve">
         <value>Remove Blur</value>
@@ -219,7 +219,7 @@
         <value>Czech</value>
     </data>
     <data name="Value_Language_CzechOg" xml:space="preserve">
-        <value>-</value>
+        <value>Čeština</value>
     </data>
     <data name="Value_Language_Norwegian" xml:space="preserve">
         <value>Norwegian</value>
@@ -237,7 +237,7 @@
         <value>Portuguese</value>
     </data>
     <data name="Value_Language_PortugueseOg" xml:space="preserve">
-        <value>-</value>
+        <value>Português</value>
     </data>
     <data name="Section_Installation" xml:space="preserve">
         <value>Installation</value>

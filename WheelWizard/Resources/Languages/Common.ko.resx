@@ -99,7 +99,7 @@
         <value>ID</value>
     </data>
     <data name="Attribute_ModName" xml:space="preserve">
-        <value>MOD 이름</value>
+        <value>모드 이름</value>
     </data>
     <data name="Attribute_Name" xml:space="preserve">
         <value>이름</value>
@@ -318,7 +318,7 @@
         <value>다운로드 및 설치</value>
     </data>
     <data name="Action_GamebananaPage" xml:space="preserve">
-        <value>게임바나나 페이지</value>
+        <value>Gamebanana 페이지</value>
     </data>
     <data name="Action_Report" xml:space="preserve">
         <value>신고</value>
@@ -342,13 +342,13 @@
         <value>설명</value>
     </data>
     <data name="Attribute_Downloads" xml:space="preserve">
-        <value>다운로드수</value>
+        <value>다운로드</value>
     </data>
     <data name="Attribute_Images" xml:space="preserve">
         <value>이미지</value>
     </data>
     <data name="Attribute_Likes" xml:space="preserve">
-        <value>좋아요 수</value>
+        <value>좋아요</value>
     </data>
     <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
         <value>눈썹</value>
@@ -360,7 +360,7 @@
         <value>얼굴</value>
     </data>
     <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
-        <value>얼굴 털</value>
+        <value>수염</value>
     </data>
     <data name="Attribute_MiiSection_General" xml:space="preserve">
         <value>정보</value>
@@ -375,22 +375,22 @@
         <value>입술</value>
     </data>
     <data name="Attribute_MiiSection_Mole" xml:space="preserve">
-        <value>뾰루지</value>
+        <value>점</value>
     </data>
     <data name="Attribute_MiiSection_Nose" xml:space="preserve">
         <value>코</value>
     </data>
     <data name="Attribute_Mii_BeardType" xml:space="preserve">
-        <value>수염 종류</value>
+        <value>수염 타입</value>
     </data>
     <data name="Attribute_Mii_CreatorName" xml:space="preserve">
         <value>제작자 이름</value>
     </data>
     <data name="Attribute_Mii_DefaultName" xml:space="preserve">
-        <value>새 Mii</value>
+        <value>새로운 Mii</value>
     </data>
     <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
-        <value>눈썹 종류</value>
+        <value>눈썹 타입</value>
     </data>
     <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
         <value>얼굴 특징</value>
@@ -402,13 +402,13 @@
         <value>안경 색상</value>
     </data>
     <data name="Attribute_Mii_GlassesType" xml:space="preserve">
-        <value>안경 종류</value>
+        <value>안경 타입</value>
     </data>
     <data name="Attribute_Mii_HairColor" xml:space="preserve">
         <value>머리카락 색상</value>
     </data>
     <data name="Attribute_Mii_HairType" xml:space="preserve">
-        <value>머리카락 종류</value>
+        <value>머리카락 타입</value>
     </data>
     <data name="Attribute_Mii_HeadShape" xml:space="preserve">
         <value>얼굴형</value>
@@ -454,5 +454,44 @@
     </data>
     <data name="Attribute_VrFull" xml:space="preserve">
         <value>VS레이팅</value>
+    </data>
+    <data name="Attribute_Mii_Size" xml:space="preserve">
+        <value>사이즈</value>
+    </data>
+    <data name="Attribute_Mii_SkinColor" xml:space="preserve">
+        <value>피부 색</value>
+    </data>
+    <data name="Attribute_Mii_SpaceBetween" xml:space="preserve">
+        <value>간격</value>
+    </data>
+    <data name="Attribute_Mii_VerticalPosition" xml:space="preserve">
+        <value>수직 위치 (위/아래)</value>
+    </data>
+    <data name="Attribute_Mii_Width" xml:space="preserve">
+        <value>폭</value>
+    </data>
+    <data name="PageTitle_MyMiis" xml:space="preserve">
+        <value>나의 Mii</value>
+    </data>
+    <data name="PopupTitle_MiiCarousel" xml:space="preserve">
+        <value>Mii 슬라이더</value>
+    </data>
+    <data name="PopupTitle_MiiEditor" xml:space="preserve">
+        <value>Mii 에디터</value>
+    </data>
+    <data name="PopupTitle_MiiSelector" xml:space="preserve">
+        <value>Mii 셀렉터</value>
+    </data>
+    <data name="PopupTitle_ModBrowser" xml:space="preserve">
+        <value>모드 브라우저</value>
+    </data>
+    <data name="PopupTitle_ModDetails" xml:space="preserve">
+        <value>모드 세부사항</value>
+    </data>
+    <data name="State_Custom" xml:space="preserve">
+        <value>커스텀</value>
+    </data>
+    <data name="State_Installed" xml:space="preserve">
+        <value>설치 완료</value>
     </data>
 </root>

@@ -466,4 +466,7 @@ Voulez-vous réinstaller Retro Rewind ? </value>
     <data name="Text_PoweredGamebanana" xml:space="preserve">
         <value>Contribué par GameBanana</value>
     </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>Le nom de l'auteur doit faire moins de 10 caractères.</value>
+    </data>
 </root>

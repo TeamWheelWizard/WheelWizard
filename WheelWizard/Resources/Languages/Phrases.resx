@@ -63,7 +63,7 @@
         <value>No friends yet!</value>
     </data>
     <data name="EmptyContent_NoFriends" xml:space="preserve">
-        <value>Use the + button to add friends in Wheel Wizard</value>
+        <value>You can add friends in-game</value>
     </data>
     <data name="Text_WhWzTranslationPercentage" xml:space="preserve">
         <value>Translations for this language are {$1}% complete</value>
@@ -271,7 +271,7 @@ To join a specific room, you'll need to either join through a friend, or hope to
         <value>We can't read the Mii data from your system. Make sure you started the game at least once</value>
     </data>
     <data name="Hover_FriendsPageDisclaimer" xml:space="preserve">
-        <value>Add friends directly here, then launch the game to sync.</value>
+        <value>To add friends you need to add them in-game.</value>
     </data>
     <data name="Question_ApplyScale_Extra" xml:space="preserve">
         <value>This change will revert in {$1} unless you decide to keep the change.</value>
@@ -436,7 +436,7 @@ To join a specific room, you'll need to either join through a friend, or hope to
         <value>Search for mods...</value>
     </data>
     <data name="Question_InstallMod_Title" xml:space="preserve">
-        <value>Do you want to download and install the mod: {$1}?</value>
+        <value>Do you want to donwload and install the mod: {$1}?</value>
     </data>
     <data name="MessageError_FailedRetrieveMod_Title" xml:space="preserve">
         <value>Failed to retrieve mod info</value>
@@ -611,5 +611,8 @@ To join a specific room, you'll need to either join through a friend, or hope to
     </data>
     <data name="Warning_WholeFileBaseline" xml:space="preserve">
         <value>This SZS is stored as a whole-file baseline. Exporting a whole-file override.</value>
+    </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>Creator name must be less than 10 characters long.</value>
     </data>
 </root>

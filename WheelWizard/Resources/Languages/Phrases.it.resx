@@ -464,4 +464,7 @@ Vuoi svuotare la tua cartella My-Stuff?</value>
     <data name="Text_PoweredGamebanana" xml:space="preserve">
         <value>Offerto da GameBanana</value>
     </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>Il nome dell'autore deve essere lungo al massimo 10 caratteri.</value>
+    </data>
 </root>

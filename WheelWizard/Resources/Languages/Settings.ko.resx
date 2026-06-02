@@ -19,7 +19,7 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="Value_Language_CompletePercentage" xml:space="preserve">
-        <value>80</value>
+        <value>100</value>
     </data>
     <data name="Category_Video" xml:space="preserve">
         <value>비디오</value>
@@ -185,5 +185,17 @@
     </data>
     <data name="HelperText_WhWzLanguage" xml:space="preserve">
         <value>이 설정은 Wheel Wizard의 언어만 변경합니다. 게임의 언어를 변경하기 위해서는 게임 설정에서 변경해야 합니다.</value>
+    </data>
+    <data name="Option_OpenGameFolder" xml:space="preserve">
+        <value>게임 폴더 열기</value>
+    </data>
+    <data name="Option_OpenSaveFolder" xml:space="preserve">
+        <value>세이브 폴더 열기</value>
+    </data>
+    <data name="Option_Reinstall" xml:space="preserve">
+        <value>레트로 리와인드 재설치</value>
+    </data>
+    <data name="Section_Installation" xml:space="preserve">
+        <value>설치</value>
     </data>
 </root>

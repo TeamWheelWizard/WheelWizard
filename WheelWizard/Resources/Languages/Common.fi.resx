@@ -18,4 +18,475 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="Action_Apply" xml:space="preserve">
+        <value>Käytä</value>
+    </data>
+    <data name="Action_Back" xml:space="preserve">
+        <value>Takaisin</value>
+    </data>
+    <data name="Action_Browse" xml:space="preserve">
+        <value>Selaa</value>
+    </data>
+    <data name="Action_Cancel" xml:space="preserve">
+        <value>Peruuta</value>
+    </data>
+    <data name="Action_CopyFriendCode" xml:space="preserve">
+        <value>Kopioi kaverikoodi</value>
+    </data>
+    <data name="Action_Delete" xml:space="preserve">
+        <value>Poista</value>
+    </data>
+    <data name="Action_DisableAll" xml:space="preserve">
+        <value>Poista kaikki</value>
+    </data>
+    <data name="Action_DoManually" xml:space="preserve">
+        <value>Tee manuaalisesti</value>
+    </data>
+    <data name="Action_DownloadAndInstall" xml:space="preserve">
+        <value>Lataa ja asenna</value>
+    </data>
+    <data name="Action_Duplicate" xml:space="preserve">
+        <value>Monista</value>
+    </data>
+    <data name="Action_Edit" xml:space="preserve">
+        <value>Muokkaa</value>
+    </data>
+    <data name="Action_EnableAll" xml:space="preserve">
+        <value>Ota kaikki käyttöön</value>
+    </data>
+    <data name="Action_Export" xml:space="preserve">
+        <value>Vie</value>
+    </data>
+    <data name="Action_Favorite" xml:space="preserve">
+        <value>Suosikki</value>
+    </data>
+    <data name="Action_GamebananaPage" xml:space="preserve">
+        <value>Gamebanana-sivusto</value>
+    </data>
+    <data name="Action_Import" xml:space="preserve">
+        <value>Tuo</value>
+    </data>
+    <data name="Action_Install" xml:space="preserve">
+        <value>Asenna</value>
+    </data>
+    <data name="Action_Keep" xml:space="preserve">
+        <value>Säilytä</value>
+    </data>
+    <data name="Action_LaunchDolphin" xml:space="preserve">
+        <value>Käynnistä Dolphin</value>
+    </data>
+    <data name="Action_Link_Discord" xml:space="preserve">
+        <value>Puhu meille!</value>
+    </data>
+    <data name="Action_Link_Github" xml:space="preserve">
+        <value>Lähdekoodi</value>
+    </data>
+    <data name="Action_Link_Support" xml:space="preserve">
+        <value>Tue meitä!</value>
+    </data>
+    <data name="Action_MaybeLater" xml:space="preserve">
+        <value>Myöhemmin</value>
+    </data>
+    <data name="Action_No" xml:space="preserve">
+        <value>Ei</value>
+    </data>
+    <data name="Action_Ok" xml:space="preserve">
+        <value>Ok</value>
+    </data>
+    <data name="Action_OpenFolder" xml:space="preserve">
+        <value>Avaa kansio</value>
+    </data>
+    <data name="Action_Play" xml:space="preserve">
+        <value>Pelaa</value>
+    </data>
+    <data name="Action_PlayOffline" xml:space="preserve">
+        <value>Pelaa offline-tilassa</value>
+    </data>
+    <data name="Action_Randomize" xml:space="preserve">
+        <value>Satunnaista</value>
+    </data>
+    <data name="Action_Rename" xml:space="preserve">
+        <value>Nimeä uudelleen</value>
+    </data>
+    <data name="Action_Report" xml:space="preserve">
+        <value>Ilmoita</value>
+    </data>
+    <data name="Action_Revert" xml:space="preserve">
+        <value>Palauta</value>
+    </data>
+    <data name="Action_Save" xml:space="preserve">
+        <value>Tallenna</value>
+    </data>
+    <data name="Action_SaveExternalMii" xml:space="preserve">
+        <value>Lisää Mii omiin Mii-hahmoihin</value>
+    </data>
+    <data name="Action_Submit" xml:space="preserve">
+        <value>Lähetä</value>
+    </data>
+    <data name="Action_Unfavorite" xml:space="preserve">
+        <value>Poista suosikeista</value>
+    </data>
+    <data name="Action_UnInstall" xml:space="preserve">
+        <value>Poista asennus</value>
+    </data>
+    <data name="Action_Update" xml:space="preserve">
+        <value>Päivitä</value>
+    </data>
+    <data name="Action_ViewCustomChars" xml:space="preserve">
+        <value>Näytä mukautetut hahmot</value>
+    </data>
+    <data name="Action_ViewMii" xml:space="preserve">
+        <value>Näytä Mii</value>
+    </data>
+    <data name="Action_ViewMod" xml:space="preserve">
+        <value>Näytä modi</value>
+    </data>
+    <data name="Action_ViewRoom" xml:space="preserve">
+        <value>Näytä huone</value>
+    </data>
+    <data name="Action_Yes" xml:space="preserve">
+        <value>Kyllä</value>
+    </data>
+    <data name="Attribute_AverageRoomVr" xml:space="preserve">
+        <value>Keskiarvoinen KP</value>
+    </data>
+    <data name="Attribute_BrAbbreviation" xml:space="preserve">
+        <value>TP</value>
+    </data>
+    <data name="Attribute_BrFull" xml:space="preserve">
+        <value>Taistelupisteet</value>
+    </data>
+    <data name="Attribute_Description" xml:space="preserve">
+        <value>Kuvaus</value>
+    </data>
+    <data name="Attribute_Downloads" xml:space="preserve">
+        <value>Lataukset</value>
+    </data>
+    <data name="Attribute_Enabled" xml:space="preserve">
+        <value>Käytössä</value>
+    </data>
+    <data name="Attribute_FriendCode" xml:space="preserve">
+        <value>Kaverikoodi</value>
+    </data>
+    <data name="Attribute_Gender" xml:space="preserve">
+        <value>Sukupuoli</value>
+    </data>
+    <data name="Attribute_Gender_Female" xml:space="preserve">
+        <value>Nainen</value>
+    </data>
+    <data name="Attribute_Gender_Male" xml:space="preserve">
+        <value>Mies</value>
+    </data>
+    <data name="Attribute_Id" xml:space="preserve">
+        <value>ID</value>
+    </data>
+    <data name="Attribute_Images" xml:space="preserve">
+        <value>Kuvat</value>
+    </data>
+    <data name="Attribute_IsOnline" xml:space="preserve">
+        <value>Online-tilassa</value>
+    </data>
+    <data name="Attribute_Likes" xml:space="preserve">
+        <value>Tykkäykset</value>
+    </data>
+    <data name="Attribute_Losses" xml:space="preserve">
+        <value>Häviöt</value>
+    </data>
+    <data name="Attribute_Message" xml:space="preserve">
+        <value>Viesti</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyebrows" xml:space="preserve">
+        <value>Kulmakarvat</value>
+    </data>
+    <data name="Attribute_MiiSection_Eyes" xml:space="preserve">
+        <value>Silmät</value>
+    </data>
+    <data name="Attribute_MiiSection_Face" xml:space="preserve">
+        <value>Kasvot</value>
+    </data>
+    <data name="Attribute_MiiSection_FacialHair" xml:space="preserve">
+        <value>Naamakarvoitus</value>
+    </data>
+    <data name="Attribute_MiiSection_General" xml:space="preserve">
+        <value>Yleiset</value>
+    </data>
+    <data name="Attribute_MiiSection_Glasses" xml:space="preserve">
+        <value>Silmälasit</value>
+    </data>
+    <data name="Attribute_MiiSection_Hair" xml:space="preserve">
+        <value>Hiukset</value>
+    </data>
+    <data name="Attribute_MiiSection_Lips" xml:space="preserve">
+        <value>Huulet</value>
+    </data>
+    <data name="Attribute_MiiSection_Mole" xml:space="preserve">
+        <value>Luomi</value>
+    </data>
+    <data name="Attribute_MiiSection_Nose" xml:space="preserve">
+        <value>Nenä</value>
+    </data>
+    <data name="Attribute_Mii_BeardType" xml:space="preserve">
+        <value>Partatyyli</value>
+    </data>
+    <data name="Attribute_Mii_CreatorName" xml:space="preserve">
+        <value>Tekijän nimi</value>
+    </data>
+    <data name="Attribute_Mii_DefaultName" xml:space="preserve">
+        <value>Uusi Mii</value>
+    </data>
+    <data name="Attribute_Mii_EyebrowType" xml:space="preserve">
+        <value>Kulmakarvojen tyyli</value>
+    </data>
+    <data name="Attribute_Mii_FacialFeature" xml:space="preserve">
+        <value>Kasvojen ominaisuus</value>
+    </data>
+    <data name="Attribute_Mii_FavColor" xml:space="preserve">
+        <value>Lempiväri</value>
+    </data>
+    <data name="Attribute_Mii_Gender" xml:space="preserve">
+        <value>Sukupuoli</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Female" xml:space="preserve">
+        <value>Nainen</value>
+    </data>
+    <data name="Attribute_Mii_Gender_Male" xml:space="preserve">
+        <value>Mies</value>
+    </data>
+    <data name="Attribute_Mii_GlassesColor" xml:space="preserve">
+        <value>Silmälasien väri</value>
+    </data>
+    <data name="Attribute_Mii_GlassesType" xml:space="preserve">
+        <value>Silmälasien tyyli</value>
+    </data>
+    <data name="Attribute_Mii_HairColor" xml:space="preserve">
+        <value>Hiusväri</value>
+    </data>
+    <data name="Attribute_Mii_HairType" xml:space="preserve">
+        <value>Hiustyyli</value>
+    </data>
+    <data name="Attribute_Mii_HeadShape" xml:space="preserve">
+        <value>Pään muoto</value>
+    </data>
+    <data name="Attribute_Mii_Height" xml:space="preserve">
+        <value>Pituus</value>
+    </data>
+    <data name="Attribute_Mii_HorizontalPosition" xml:space="preserve">
+        <value>Vaakasuuntainen sijainti</value>
+    </data>
+    <data name="Attribute_Mii_IrishColor" xml:space="preserve">
+        <value>Silmien väri</value>
+    </data>
+    <data name="Attribute_Mii_MirrorHair" xml:space="preserve">
+        <value>Peilaa hiukset</value>
+    </data>
+    <data name="Attribute_Mii_MouthType" xml:space="preserve">
+        <value>Huulien tyyli</value>
+    </data>
+    <data name="Attribute_Mii_MustacheSize" xml:space="preserve">
+        <value>Viiksien koko</value>
+    </data>
+    <data name="Attribute_Mii_MustacheType" xml:space="preserve">
+        <value>Viiksityyli</value>
+    </data>
+    <data name="Attribute_Mii_MustacheVerticalPosition" xml:space="preserve">
+        <value>Viiksien pystysuuntainen sijainti</value>
+    </data>
+    <data name="Attribute_Mii_Name" xml:space="preserve">
+        <value>Miin nimi</value>
+    </data>
+    <data name="Attribute_Mii_NoseType" xml:space="preserve">
+        <value>Nenän tyyli</value>
+    </data>
+    <data name="Attribute_Mii_Rotation" xml:space="preserve">
+        <value>Kierto (vasen/oikea)</value>
+    </data>
+    <data name="Attribute_Mii_Size" xml:space="preserve">
+        <value>Koko</value>
+    </data>
+    <data name="Attribute_Mii_SkinColor" xml:space="preserve">
+        <value>Ihonväri</value>
+    </data>
+    <data name="Attribute_Mii_SpaceBetween" xml:space="preserve">
+        <value>Välitys</value>
+    </data>
+    <data name="Attribute_Mii_VerticalPosition" xml:space="preserve">
+        <value>Pystysuuntainen sijainti</value>
+    </data>
+    <data name="Attribute_Mii_Width" xml:space="preserve">
+        <value>Leveys</value>
+    </data>
+    <data name="Attribute_ModName" xml:space="preserve">
+        <value>Modin nimi</value>
+    </data>
+    <data name="Attribute_Name" xml:space="preserve">
+        <value>Nimi</value>
+    </data>
+    <data name="Attribute_PlayerCount" xml:space="preserve">
+        <value>Pelaajia</value>
+    </data>
+    <data name="Attribute_Priority" xml:space="preserve">
+        <value>Prioriteetti</value>
+    </data>
+    <data name="Attribute_RacesPlayed" xml:space="preserve">
+        <value>Kisoja pelattu</value>
+    </data>
+    <data name="Attribute_SortBy" xml:space="preserve">
+        <value>Järjestä</value>
+    </data>
+    <data name="Attribute_Speed" xml:space="preserve">
+        <value>Nopeus</value>
+    </data>
+    <data name="Attribute_Status" xml:space="preserve">
+        <value>Status</value>
+    </data>
+    <data name="Attribute_Status_Offline" xml:space="preserve">
+        <value>Offline</value>
+    </data>
+    <data name="Attribute_Status_Online" xml:space="preserve">
+        <value>Online</value>
+    </data>
+    <data name="Attribute_TimeOnline" xml:space="preserve">
+        <value>Aika online-tilassa</value>
+    </data>
+    <data name="Attribute_Title" xml:space="preserve">
+        <value>Otsikko</value>
+    </data>
+    <data name="Attribute_TotalGamesPlayed" xml:space="preserve">
+        <value>Kisoja pelattu yhteensä</value>
+    </data>
+    <data name="Attribute_TotalGamesWon" xml:space="preserve">
+        <value>Kisoja voitettu yhteensä</value>
+    </data>
+    <data name="Attribute_Type" xml:space="preserve">
+        <value>Tyyppi</value>
+    </data>
+    <data name="Attribute_Views" xml:space="preserve">
+        <value>Näyttökerrat</value>
+    </data>
+    <data name="Attribute_VrAbbreviation" xml:space="preserve">
+        <value>KP</value>
+    </data>
+    <data name="Attribute_VrFull" xml:space="preserve">
+        <value>Kilpailupisteet</value>
+    </data>
+    <data name="Attribute_Wins" xml:space="preserve">
+        <value>Voitot</value>
+    </data>
+    <data name="ListTitle_Friends" xml:space="preserve">
+        <value>Kaverit</value>
+    </data>
+    <data name="ListTitle_Miis" xml:space="preserve">
+        <value>Miit</value>
+    </data>
+    <data name="ListTitle_Players" xml:space="preserve">
+        <value>Pelaajat</value>
+    </data>
+    <data name="ListTitle_Rooms" xml:space="preserve">
+        <value>Huoneet</value>
+    </data>
+    <data name="PageTitle_Friends" xml:space="preserve">
+        <value>Kaverit</value>
+    </data>
+    <data name="PageTitle_Home" xml:space="preserve">
+        <value>Etusivu</value>
+    </data>
+    <data name="PageTitle_Mods" xml:space="preserve">
+        <value>My Stuff</value>
+    </data>
+    <data name="PageTitle_MyMiis" xml:space="preserve">
+        <value>Omat Miit</value>
+    </data>
+    <data name="PageTitle_MyProfiles" xml:space="preserve">
+        <value>Omat profiilit</value>
+    </data>
+    <data name="PageTitle_RoomDetails" xml:space="preserve">
+        <value>Huoneen tiedot</value>
+    </data>
+    <data name="PageTitle_Rooms" xml:space="preserve">
+        <value>Huoneet</value>
+    </data>
+    <data name="PageTitle_Settings" xml:space="preserve">
+        <value>Asetukset</value>
+    </data>
+    <data name="PopupTitle_MiiCarousel" xml:space="preserve">
+        <value>Miin katselu</value>
+    </data>
+    <data name="PopupTitle_MiiEditor" xml:space="preserve">
+        <value>Mii-editori</value>
+    </data>
+    <data name="PopupTitle_MiiSelector" xml:space="preserve">
+        <value>Miin valinta</value>
+    </data>
+    <data name="PopupTitle_ModBrowser" xml:space="preserve">
+        <value>Modiselain</value>
+    </data>
+    <data name="PopupTitle_ModDetails" xml:space="preserve">
+        <value>Modin tiedot</value>
+    </data>
+    <data name="Region_America" xml:space="preserve">
+        <value>Amerikka</value>
+    </data>
+    <data name="Region_Australia" xml:space="preserve">
+        <value>Australia</value>
+    </data>
+    <data name="Region_China" xml:space="preserve">
+        <value>Kiina</value>
+    </data>
+    <data name="Region_Europe" xml:space="preserve">
+        <value>Eurooppa</value>
+    </data>
+    <data name="Region_Japan" xml:space="preserve">
+        <value>Japani</value>
+    </data>
+    <data name="Region_SouthKorea" xml:space="preserve">
+        <value>Etelä-Korea</value>
+    </data>
+    <data name="Region_Taiwan" xml:space="preserve">
+        <value>Taiwan</value>
+    </data>
+    <data name="State_ConfigNotFinished" xml:space="preserve">
+        <value>Määritys kesken</value>
+    </data>
+    <data name="State_Custom" xml:space="preserve">
+        <value>Mukautettu</value>
+    </data>
+    <data name="State_Error" xml:space="preserve">
+        <value>Virhe</value>
+    </data>
+    <data name="State_Extracting" xml:space="preserve">
+        <value>Puretaan tiedostoja...</value>
+    </data>
+    <data name="State_Installed" xml:space="preserve">
+        <value>Asennettu</value>
+    </data>
+    <data name="State_Installing" xml:space="preserve">
+        <value>Asennetaan...</value>
+    </data>
+    <data name="State_Loading" xml:space="preserve">
+        <value>Ladataan...</value>
+    </data>
+    <data name="State_NoLicense" xml:space="preserve">
+        <value>Ei ajokorttia</value>
+    </data>
+    <data name="State_NoName" xml:space="preserve">
+        <value>Ei nimeä</value>
+    </data>
+    <data name="State_NoProfiles" xml:space="preserve">
+        <value>Ei profiileja</value>
+    </data>
+    <data name="State_NoServer" xml:space="preserve">
+        <value>Ei palvelinta</value>
+    </data>
+    <data name="State_Success" xml:space="preserve">
+        <value>Onnistui</value>
+    </data>
+    <data name="State_Unknown" xml:space="preserve">
+        <value>Tuntematon</value>
+    </data>
+    <data name="State_Updating" xml:space="preserve">
+        <value>Päivitetään...</value>
+    </data>
+    <data name="State_Warning" xml:space="preserve">
+        <value>Varoitus</value>
+    </data>
 </root>

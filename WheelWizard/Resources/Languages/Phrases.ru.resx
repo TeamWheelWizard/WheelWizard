@@ -348,4 +348,28 @@
     <data name="SnackbarSuccess_CreatedDuplicate" xml:space="preserve">
         <value>Создан дубликат '{$1}'</value>
     </data>
+    <data name="HelperNote_CreatorNameLess10" xml:space="preserve">
+        <value>Имя создателя должно быть длиной в меньше 10 символов.</value>
+    </data>
+    <data name="SnackbarSuccess_CreatedDuplicatesMiis" xml:space="preserve">
+        <value>Создано '{$1}' дубликатов Mii</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted" xml:space="preserve">
+        <value>{$1}' удалено</value>
+    </data>
+    <data name="SnackbarSuccess_Deleted_Miis" xml:space="preserve">
+        <value>Удалено '{$1}' Mii</value>
+    </data>
+    <data name="SnackbarSuccess_MiiAdded" xml:space="preserve">
+        <value>Mii добавлен в ваши Mii</value>
+    </data>
+    <data name="SnackbarSuccess_ProfileSetPrimary" xml:space="preserve">
+        <value>Сделать профиль основным</value>
+    </data>
+    <data name="SnackbarSuccess_SavedMii" xml:space="preserve">
+        <value>Mii '{$1}' сохранён в '{$2}'</value>
+    </data>
+    <data name="SnackbarWarning_CantSaveMii" xml:space="preserve">
+        <value>Нельзя сохранить Mii</value>
+    </data>
 </root>

@@ -121,16 +121,7 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("HelperText_EndWithExe", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Choose where Wheel Wizard stores its files. Moving may take a while..
-        /// </summary>
-        public static string HelperText_WheelWizardDataFolder {
-            get {
-                return ResourceManager.GetString("HelperText_WheelWizardDataFolder", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Path can end with:.
         /// </summary>
@@ -150,20 +141,20 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Will launch dolphins main window along with the game.
-        /// </summary>
-        public static string HelperText_LaunchWithDolphin {
-            get {
-                return ResourceManager.GetString("HelperText_LaunchWithDolphin", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Automatically launches Retro Rewind when Wheel Wizard starts.
         /// </summary>
         public static string HelperText_LaunchRrOnStartup {
             get {
                 return ResourceManager.GetString("HelperText_LaunchRrOnStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Will launch dolphins main window along with the game.
+        /// </summary>
+        public static string HelperText_LaunchWithDolphin {
+            get {
+                return ResourceManager.GetString("HelperText_LaunchWithDolphin", resourceCulture);
             }
         }
         
@@ -213,6 +204,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose where Wheel Wizard stores its files. Moving may take a while..
+        /// </summary>
+        public static string HelperText_WheelWizardDataFolder {
+            get {
+                return ResourceManager.GetString("HelperText_WheelWizardDataFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This only changes the language for Wheel Wizard. To change the in-game language, you’ll need to do that within the game settings..
         /// </summary>
         public static string HelperText_WhWzLanguage {
@@ -258,20 +258,20 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Launch Game With Dolphin Window.
-        /// </summary>
-        public static string Option_LaunchWithDolphin {
-            get {
-                return ResourceManager.GetString("Option_LaunchWithDolphin", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Launch Retro Rewind On Startup.
         /// </summary>
         public static string Option_LaunchRrOnStartup {
             get {
                 return ResourceManager.GetString("Option_LaunchRrOnStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Launch Game With Dolphin Window.
+        /// </summary>
+        public static string Option_LaunchWithDolphin {
+            get {
+                return ResourceManager.GetString("Option_LaunchWithDolphin", resourceCulture);
             }
         }
         
@@ -301,25 +301,7 @@ namespace WheelWizard.Resources.Languages {
                 return ResourceManager.GetString("Option_OpenConfig", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Wheel Wizard data folder.
-        /// </summary>
-        public static string Option_WheelWizardDataFolder {
-            get {
-                return ResourceManager.GetString("Option_WheelWizardDataFolder", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Use default location.
-        /// </summary>
-        public static string Option_ResetDataFolder {
-            get {
-                return ResourceManager.GetString("Option_ResetDataFolder", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Open Game Folder.
         /// </summary>
@@ -375,6 +357,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use default location.
+        /// </summary>
+        public static string Option_ResetDataFolder {
+            get {
+                return ResourceManager.GetString("Option_ResetDataFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show FPS.
         /// </summary>
         public static string Option_ShowFPS {
@@ -389,6 +380,15 @@ namespace WheelWizard.Resources.Languages {
         public static string Option_VSync {
             get {
                 return ResourceManager.GetString("Option_VSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wheel Wizard data folder.
+        /// </summary>
+        public static string Option_WheelWizardDataFolder {
+            get {
+                return ResourceManager.GetString("Option_WheelWizardDataFolder", resourceCulture);
             }
         }
         
@@ -501,6 +501,33 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Using custom location..
+        /// </summary>
+        public static string Status_DataFolder_Custom {
+            get {
+                return ResourceManager.GetString("Status_DataFolder_Custom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using default location..
+        /// </summary>
+        public static string Status_DataFolder_Default {
+            get {
+                return ResourceManager.GetString("Status_DataFolder_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Moving data, please wait....
+        /// </summary>
+        public static string Status_DataFolder_Moving {
+            get {
+                return ResourceManager.GetString("Status_DataFolder_Moving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Arabic.
         /// </summary>
         public static string Value_Language_Arabic {
@@ -555,7 +582,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -.
+        ///   Looks up a localized string similar to Čeština.
         /// </summary>
         public static string Value_Language_CzechOg {
             get {
@@ -609,7 +636,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -.
+        ///   Looks up a localized string similar to Suomi.
         /// </summary>
         public static string Value_Language_FinnishOg {
             get {
@@ -735,7 +762,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -.
+        ///   Looks up a localized string similar to Português.
         /// </summary>
         public static string Value_Language_PortugueseOg {
             get {
@@ -803,33 +830,6 @@ namespace WheelWizard.Resources.Languages {
         public static string Value_Language_zTranslators {
             get {
                 return ResourceManager.GetString("Value_Language_zTranslators", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Using custom location..
-        /// </summary>
-        public static string Status_DataFolder_Custom {
-            get {
-                return ResourceManager.GetString("Status_DataFolder_Custom", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Using default location..
-        /// </summary>
-        public static string Status_DataFolder_Default {
-            get {
-                return ResourceManager.GetString("Status_DataFolder_Default", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Moving data, please wait....
-        /// </summary>
-        public static string Status_DataFolder_Moving {
-            get {
-                return ResourceManager.GetString("Status_DataFolder_Moving", resourceCulture);
             }
         }
     }

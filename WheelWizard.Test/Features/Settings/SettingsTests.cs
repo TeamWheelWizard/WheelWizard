@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Testably.Abstractions;
 using Testably.Abstractions.Testing;
 using WheelWizard.DolphinInstaller;
+using WheelWizard.Resources.Languages;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 
@@ -179,10 +180,46 @@ public class SettingsSignalBusTests
 public class SettingsLocalizationServiceTests
 {
     [Fact]
+    public void LanguageDisplayNames_UseAppliedResourceCulture()
+    {
+        var originalSettingsCulture = WheelWizard.Resources.Languages.Settings.Culture;
+        var dutchCulture = new CultureInfo("nl");
+        var germanCulture = new CultureInfo("de");
+
+        try
+        {
+            WheelWizard.Resources.Languages.Settings.Culture = dutchCulture;
+            var englishInDutch = SettingValues.WhWzLanguages["en"]();
+
+            WheelWizard.Resources.Languages.Settings.Culture = germanCulture;
+            var englishInGerman = SettingValues.WhWzLanguages["en"]();
+
+            Assert.Contains(
+                WheelWizard.Resources.Languages.Settings.ResourceManager.GetString("Value_Language_English", dutchCulture)!,
+                englishInDutch
+            );
+            Assert.Contains(
+                WheelWizard.Resources.Languages.Settings.ResourceManager.GetString("Value_Language_English", germanCulture)!,
+                englishInGerman
+            );
+            Assert.NotEqual(englishInDutch, englishInGerman);
+        }
+        finally
+        {
+            WheelWizard.Resources.Languages.Settings.Culture = originalSettingsCulture;
+        }
+    }
+
+    [Fact]
     public void Initialize_SetsCurrentCulture_FromLanguageSetting()
     {
         var originalCulture = CultureInfo.CurrentCulture;
         var originalUiCulture = CultureInfo.CurrentUICulture;
+        var originalDefaultCulture = CultureInfo.DefaultThreadCurrentCulture;
+        var originalDefaultUiCulture = CultureInfo.DefaultThreadCurrentUICulture;
+        var originalCommonCulture = Common.Culture;
+        var originalPhrasesCulture = Phrases.Culture;
+        var originalSettingsCulture = WheelWizard.Resources.Languages.Settings.Culture;
         var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var settingsManager = Substitute.For<ISettingsManager>();
         var languageSetting = new WhWzSetting(typeof(string), "WW_Language", "fr");
@@ -196,11 +233,21 @@ public class SettingsLocalizationServiceTests
 
             Assert.Equal("fr", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             Assert.Equal("fr", CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+            Assert.Equal("fr", CultureInfo.DefaultThreadCurrentCulture?.TwoLetterISOLanguageName);
+            Assert.Equal("fr", CultureInfo.DefaultThreadCurrentUICulture?.TwoLetterISOLanguageName);
+            Assert.Equal("fr", Common.Culture.TwoLetterISOLanguageName);
+            Assert.Equal("fr", Phrases.Culture.TwoLetterISOLanguageName);
+            Assert.Equal("fr", WheelWizard.Resources.Languages.Settings.Culture.TwoLetterISOLanguageName);
         }
         finally
         {
             CultureInfo.CurrentCulture = originalCulture;
             CultureInfo.CurrentUICulture = originalUiCulture;
+            CultureInfo.DefaultThreadCurrentCulture = originalDefaultCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = originalDefaultUiCulture;
+            Common.Culture = originalCommonCulture;
+            Phrases.Culture = originalPhrasesCulture;
+            WheelWizard.Resources.Languages.Settings.Culture = originalSettingsCulture;
         }
     }
 
@@ -209,6 +256,11 @@ public class SettingsLocalizationServiceTests
     {
         var originalCulture = CultureInfo.CurrentCulture;
         var originalUiCulture = CultureInfo.CurrentUICulture;
+        var originalDefaultCulture = CultureInfo.DefaultThreadCurrentCulture;
+        var originalDefaultUiCulture = CultureInfo.DefaultThreadCurrentUICulture;
+        var originalCommonCulture = Common.Culture;
+        var originalPhrasesCulture = Phrases.Culture;
+        var originalSettingsCulture = WheelWizard.Resources.Languages.Settings.Culture;
         var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var settingsManager = Substitute.For<ISettingsManager>();
         var languageSetting = new WhWzSetting(typeof(string), "WW_Language", "en");
@@ -224,11 +276,21 @@ public class SettingsLocalizationServiceTests
 
             Assert.Equal("de", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             Assert.Equal("de", CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+            Assert.Equal("de", CultureInfo.DefaultThreadCurrentCulture?.TwoLetterISOLanguageName);
+            Assert.Equal("de", CultureInfo.DefaultThreadCurrentUICulture?.TwoLetterISOLanguageName);
+            Assert.Equal("de", Common.Culture.TwoLetterISOLanguageName);
+            Assert.Equal("de", Phrases.Culture.TwoLetterISOLanguageName);
+            Assert.Equal("de", WheelWizard.Resources.Languages.Settings.Culture.TwoLetterISOLanguageName);
         }
         finally
         {
             CultureInfo.CurrentCulture = originalCulture;
             CultureInfo.CurrentUICulture = originalUiCulture;
+            CultureInfo.DefaultThreadCurrentCulture = originalDefaultCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = originalDefaultUiCulture;
+            Common.Culture = originalCommonCulture;
+            Phrases.Culture = originalPhrasesCulture;
+            WheelWizard.Resources.Languages.Settings.Culture = originalSettingsCulture;
         }
     }
 }

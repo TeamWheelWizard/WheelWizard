@@ -491,4 +491,7 @@
     <data name="PopupTitle_ModDetails" xml:space="preserve">
         <value>Описание мода</value>
     </data>
+    <data name="State_Custom" xml:space="preserve">
+        <value>Кастом</value>
+    </data>
 </root>

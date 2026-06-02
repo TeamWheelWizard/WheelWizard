@@ -60,7 +60,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use the + button to add friends in Wheel Wizard.
+        ///   Looks up a localized string similar to You can add friends in-game.
         /// </summary>
         public static string EmptyContent_NoFriends {
             get {
@@ -168,6 +168,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Creator name must be less than 10 characters long..
+        /// </summary>
+        public static string HelperNote_CreatorNameLess10 {
+            get {
+                return ResourceManager.GetString("HelperNote_CreatorNameLess10", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Creator name must be less than 11 characters long..
         /// </summary>
         public static string HelperNote_CreatorNameLess11 {
@@ -213,7 +222,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add friends directly here, then launch the game to sync..
+        ///   Looks up a localized string similar to To add friends you need to add them in-game..
         /// </summary>
         public static string Hover_FriendsPageDisclaimer {
             get {
@@ -502,6 +511,15 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Note(s): {$1}.
+        /// </summary>
+        public static string MessageSuccess_PatchConversionNotes {
+            get {
+                return ResourceManager.GetString("MessageSuccess_PatchConversionNotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Converted {$1} file(s) into {$2} patch file(s)..
         /// </summary>
         public static string MessageSuccess_PatchConversionResult {
@@ -516,15 +534,6 @@ namespace WheelWizard.Resources.Languages {
         public static string MessageSuccess_PatchConversionSkipped {
             get {
                 return ResourceManager.GetString("MessageSuccess_PatchConversionSkipped", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Note(s): {$1}.
-        /// </summary>
-        public static string MessageSuccess_PatchConversionNotes {
-            get {
-                return ResourceManager.GetString("MessageSuccess_PatchConversionNotes", resourceCulture);
             }
         }
         
@@ -1150,7 +1159,7 @@ namespace WheelWizard.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to download and install the mod: {$1}?.
+        ///   Looks up a localized string similar to Do you want to donwload and install the mod: {$1}?.
         /// </summary>
         public static string Question_InstallMod_Title {
             get {

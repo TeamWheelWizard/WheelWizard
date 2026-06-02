@@ -401,4 +401,82 @@
     <data name="PageTitle_MyMiis" xml:space="preserve">
         <value>Moje Miiy</value>
     </data>
+    <data name="Action_Apply" xml:space="preserve">
+        <value>Použít</value>
+    </data>
+    <data name="Action_CopyFriendCode" xml:space="preserve">
+        <value>Kopírovat Kód Kamaráda</value>
+    </data>
+    <data name="Action_DisableAll" xml:space="preserve">
+        <value>Vypnout Vše</value>
+    </data>
+    <data name="Action_DoManually" xml:space="preserve">
+        <value>Udělat ručně</value>
+    </data>
+    <data name="Action_EnableAll" xml:space="preserve">
+        <value>Zapnout Vše</value>
+    </data>
+    <data name="Action_SaveExternalMii" xml:space="preserve">
+        <value>Přidat Mii do "Moje Miiy“</value>
+    </data>
+    <data name="Action_ViewCustomChars" xml:space="preserve">
+        <value>Zobrazit Vlastní Postavy</value>
+    </data>
+    <data name="Action_ViewRoom" xml:space="preserve">
+        <value>Zobrazit Místnost</value>
+    </data>
+    <data name="Attribute_AverageRoomVr" xml:space="preserve">
+        <value>Průměrný ZH</value>
+    </data>
+    <data name="Attribute_Enabled" xml:space="preserve">
+        <value>Zapnuto</value>
+    </data>
+    <data name="Attribute_FriendCode" xml:space="preserve">
+        <value>Kód Kamaráda</value>
+    </data>
+    <data name="Attribute_Mii_HorizontalPosition" xml:space="preserve">
+        <value>Horizontální Poloha (Vlevo/Vpravo)</value>
+    </data>
+    <data name="Attribute_Mii_MustacheVerticalPosition" xml:space="preserve">
+        <value>Vertikální Poloha Kníru (Nahoru/Dolů)</value>
+    </data>
+    <data name="Attribute_Mii_Rotation" xml:space="preserve">
+        <value>Rotace (Vleva/Vprava)</value>
+    </data>
+    <data name="Attribute_Mii_SpaceBetween" xml:space="preserve">
+        <value>Rozteč Mezi Nimi</value>
+    </data>
+    <data name="Attribute_Mii_VerticalPosition" xml:space="preserve">
+        <value>Vertikální Poloha (Nahoru/Dolů)</value>
+    </data>
+    <data name="Attribute_RacesPlayed" xml:space="preserve">
+        <value>Zahrané závody</value>
+    </data>
+    <data name="Attribute_TotalGamesPlayed" xml:space="preserve">
+        <value>Celkem zahraných her</value>
+    </data>
+    <data name="Attribute_TotalGamesWon" xml:space="preserve">
+        <value>Celkem vyhraných her</value>
+    </data>
+    <data name="PageTitle_RoomDetails" xml:space="preserve">
+        <value>Podrobnosti o Místnosti</value>
+    </data>
+    <data name="State_ConfigNotFinished" xml:space="preserve">
+        <value>Konfigurace Nedokončena</value>
+    </data>
+    <data name="State_Custom" xml:space="preserve">
+        <value>Vlastní</value>
+    </data>
+    <data name="State_Extracting" xml:space="preserve">
+        <value>Extrahování souborů...</value>
+    </data>
+    <data name="State_Installed" xml:space="preserve">
+        <value>Instalováno</value>
+    </data>
+    <data name="State_Success" xml:space="preserve">
+        <value>Úspěch</value>
+    </data>
+    <data name="State_Unknown" xml:space="preserve">
+        <value>Stav: Neznámý</value>
+    </data>
 </root>
