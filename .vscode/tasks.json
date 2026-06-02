@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build WheelWizard Debug-Windows",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/WheelWizard/WheelWizard.csproj",
+        "--configuration",
+        "Debug-Windows",
+        "--nologo"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "run WheelWizard Debug-Windows (logs)",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "${workspaceFolder}/WheelWizard/bin/Debug-Windows/net8.0/win-x64/WheelWizard.dll"
+      ],
+      "dependsOn": "build WheelWizard Debug-Windows",
+      "options": {
+        "cwd": "${workspaceFolder}/WheelWizard"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    }
+  ]
+}

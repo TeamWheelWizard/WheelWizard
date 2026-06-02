@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "WheelWizard: Debug-Windows",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build WheelWizard Debug-Windows",
+      "program": "${workspaceFolder}/WheelWizard/bin/Debug-Windows/net8.0/win-x64/WheelWizard.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/WheelWizard",
+      "console": "integratedTerminal",
+      "stopAtEntry": false,
+      "justMyCode": true
+    }
+  ]
+}
