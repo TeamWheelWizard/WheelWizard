@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignHeight="876" d:DesignWidth="656"
         x:Class="WheelWizard.Views.Layout"
-        xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+        xmlns:loc="clr-namespace:WheelWizard.Localization"
         xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
@@ -68,11 +68,11 @@
                     Margin="0,0,0,25">
             <components:StateBox x:Name="PlayerCountBox" Text="0" Variant="Dark"
                                  IconData="{StaticResource UserCouple}"
-                                 TipText="{x:Static lang:Phrases.Hover_PlayersOnline_0}"
+                                 TipText="{loc:T hover.players_online.0}"
                                  Margin="10,0,0,0" />
             <components:StateBox x:Name="RoomCountBox" Text="0" Variant="Dark"
                                  IconData="{StaticResource RoomUsers}"
-                                 TipText="{x:Static lang:Phrases.Hover_RoomsOnline_0}"
+                                 TipText="{loc:T hover.rooms_online.0}"
                                  Margin="10,0,0,0" />
         </StackPanel>
 
@@ -115,43 +115,43 @@
 
 
         <!-- Sidebar -->
-        <TextBlock Text="{x:Static lang:Settings.Category_General}" Classes="SidebarSectionText"
+        <TextBlock Text="{loc:T category.general}" Classes="SidebarSectionText"
                    VerticalAlignment="Bottom" Grid.Row="3" /> <!-- Repurposing this translation from settings -->
         <StackPanel x:Name="SidePanelButtons" Grid.Column="0" Grid.Row="4" Width="192" VerticalAlignment="Top">
             <patterns:SidebarRadioButton IconData="{StaticResource Home}"
-                                           Text="{x:Static lang:Common.PageTitle_Home}"
+                                           Text="{loc:T page_title.home}"
                                            PageType="{x:Type pages:HomePage}"
                                            IsChecked="True" />
             <patterns:SidebarRadioButton IconData="{StaticResource UserCircle}"
                                            PageType="{x:Type pages:UserProfilePage}"
-                                           Text="{x:Static lang:Common.PageTitle_MyProfiles}" x:Name="MyProfilesButton" />
+                                           Text="{loc:T page_title.my_profiles}" x:Name="MyProfilesButton" />
             <patterns:SidebarRadioButton IconData="{StaticResource CubesStacked}"
                                            PageType="{x:Type pages:ModsPage}"
-                                           Text="{x:Static lang:Common.PageTitle_Patches}" x:Name="ModsButton" />
+                                           Text="{loc:T page_title.patches}" x:Name="ModsButton" />
             <patterns:SidebarRadioButton IconData="{StaticResource Shirt}"
                                            PageType="{x:Type pages:MiiListPage}"
-                                           Text="{x:Static lang:Common.PageTitle_MyMiis}" />
+                                           Text="{loc:T page_title.my_miis}" />
             <patterns:SidebarRadioButton IconData="{StaticResource GamepadIcon}"
                                            PageType="{x:Type pages:InputPage}"
                                            Text="Input" />
-            <TextBlock Text="{x:Static lang:Common.Attribute_Status_Online}" Classes="SidebarSectionText" />
+            <TextBlock Text="{loc:T attribute.status_online}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from values -->
             <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}"
                                            PageType="{x:Type pages:RoomsPage}"
-                                           Text="{x:Static lang:Common.PageTitle_Rooms}" x:Name="RoomsButton" />
+                                           Text="{loc:T page_title.rooms}" x:Name="RoomsButton" />
             <patterns:SidebarRadioButton IconData="{StaticResource Award}"
                                            PageType="{x:Type pages:LeaderboardPage}"
-                                           Text="{x:Static lang:Common.PageTitle_Leaderboard}" />
+                                           Text="{loc:T page_title.leaderboard}" />
             <patterns:SidebarRadioButton IconData="{StaticResource Friends}"
-                                           Text="{x:Static lang:Common.PageTitle_Friends}" x:Name="FriendsButton"
+                                           Text="{loc:T page_title.friends}" x:Name="FriendsButton"
                                            PageType="{x:Type pages:FriendsPage}"
                                            BoxText="0/0" />
 
-            <TextBlock Text="{x:Static lang:Settings.Category_Other}" Classes="SidebarSectionText" />
+            <TextBlock Text="{loc:T category.other}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from settings -->
             <patterns:SidebarRadioButton IconData="{StaticResource Settings}"
                                            PageType="{x:Type pages:SettingsPage}"
-                                           Text="{x:Static lang:Common.PageTitle_Settings}" x:Name="SettingsButton" />
+                                           Text="{loc:T page_title.settings}" x:Name="SettingsButton" />
             <patterns:SidebarRadioButton IconData="{StaticResource Code}"
                                            PageType="{x:Type pages:TestingPage}"
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
@@ -163,7 +163,7 @@
         <Border Grid.Column="0" Grid.Row="5" Background="{StaticResource Neutral800}">
             <StackPanel VerticalAlignment="Center" Spacing="5">
                 <components:IconLabelButton IconData="{StaticResource DiscordIcon}"
-                                            Text="{x:Static lang:Common.Action_Link_Discord}"
+                                            Text="{loc:T action.link.discord}"
                                             Foreground="{StaticResource Neutral400}"
                                             HoverForeground="{StaticResource Primary300}"
                                             FontSize="13"
@@ -171,7 +171,7 @@
                                             Margin="10,0,0,0"
                                             IconSize="20" />
                 <components:IconLabelButton IconData="{StaticResource GithubIcon}"
-                                            Text="{x:Static lang:Common.Action_Link_Github}"
+                                            Text="{loc:T action.link.github}"
                                             Foreground="{StaticResource Neutral400}"
                                             HoverForeground="{StaticResource Primary300}"
                                             FontSize="13"
@@ -179,7 +179,7 @@
                                             Margin="10,0,0,0"
                                             IconSize="20" />
                 <components:IconLabelButton IconData="{StaticResource CoffeeIcon}"
-                                            Text="{x:Static lang:Common.Action_Link_Support}"
+                                            Text="{loc:T action.link.support}"
                                             Foreground="{StaticResource Neutral400}"
                                             HoverForeground="{StaticResource Primary300}"
                                             FontSize="13"

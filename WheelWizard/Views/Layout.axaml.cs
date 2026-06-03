@@ -8,8 +8,8 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
+using WheelWizard.Localization;
 using WheelWizard.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
@@ -82,13 +82,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
 
-        var completeString = Humanizer.ReplaceDynamic(Phrases.Text_MadeByString, "Patchzy", "WantToBeeMe");
-        if (completeString != null && completeString.Contains("\\n"))
-        {
-            var split = completeString.Split("\\n");
-            MadeBy_Part1.Text = split[0];
-            MadeBy_Part2.Text = split[1];
-        }
+        UpdateMadeByText();
+        LocalizationProvider.LanguageChanged += OnLanguageChanged;
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
@@ -124,8 +119,26 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         _settingsSignalSubscription?.Dispose();
         _settingsSignalSubscription = null;
+        LocalizationProvider.LanguageChanged -= OnLanguageChanged;
         ModManagerService.PropertyChanged -= ModManager_PropertyChanged;
         base.OnClosed(e);
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        UpdateModsButtonText();
+        UpdateMadeByText();
+    }
+
+    private void UpdateMadeByText()
+    {
+        var completeString = t("text.made_by_string", "Patchzy", "WantToBeeMe");
+        if (!completeString.Contains("\\n"))
+            return;
+
+        var split = completeString.Split("\\n");
+        MadeBy_Part1.Text = split[0];
+        MadeBy_Part2.Text = split[1];
     }
 
     private void ModManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -177,7 +190,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     private void UpdateModsButtonText()
     {
-        ModsButton.Text = Common.PageTitle_Patches;
+        ModsButton.Text = t("page_title.patches");
     }
 
     //todo: after patches is more stable, uncomment this
@@ -233,13 +246,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         var friends = GameLicenseService.ActiveCurrentFriends;
         FriendsButton.BoxText = $"{friends.Count(friend => friend.IsOnline)}/{friends.Count}";
-        FriendsButton.BoxTip = friends.Count(friend => friend.IsOnline) switch
-        {
-            1 => Phrases.Hover_FriendsOnline_1,
-            0 => Phrases.Hover_FriendsOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_FriendsOnline_x, friends.Count(friend => friend.IsOnline))
-                ?? $"There are currently {friends.Count(friend => friend.IsOnline)} friends online",
-        };
+        FriendsButton.BoxTip = t("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
     }
 
     public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
@@ -247,20 +254,9 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         var playerCount = sender.PlayerCount;
         var roomCount = sender.RoomCount;
         PlayerCountBox.Text = playerCount.ToString();
-        PlayerCountBox.TipText = playerCount switch
-        {
-            1 => Phrases.Hover_PlayersOnline_1,
-            0 => Phrases.Hover_PlayersOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_PlayersOnline_x, playerCount)
-                ?? $"There are currently {playerCount} players online",
-        };
+        PlayerCountBox.TipText = t("hover.players_online.n", playerCount);
         RoomCountBox.Text = roomCount.ToString();
-        RoomCountBox.TipText = roomCount switch
-        {
-            1 => Phrases.Hover_RoomsOnline_1,
-            0 => Phrases.Hover_RoomsOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_RoomsOnline_x, roomCount) ?? $"There are currently {roomCount} rooms active",
-        };
+        RoomCountBox.TipText = t("hover.rooms_online.n", roomCount);
         UpdateFriendCount();
     }
 

@@ -1,0 +1,453 @@
+ja:
+  page_title:
+    home: "ホーム"
+    settings: "設定"
+    mods: "My Stuff"
+    my_profiles: "プロフィール"
+    rooms: "ルーム"
+    friends: "フレンド"
+    room_details: "ルームの詳細"
+    my_miis: "自分のMii"
+  attribute:
+    status_online: "オンライン"
+    enabled: "有効"
+    title: "タイトル"
+    status_offline: "オフライン"
+    name: "名前"
+    id: "ID"
+    type: "種類"
+    speed: "速度"
+    mod_name: "Modの名前"
+    average_room_vr: "平均VR"
+    losses: "負け"
+    wins: "勝ち"
+    races_played: "プレイしたレース数"
+    friend_code: "フレンドコード"
+    player_count: "プレイヤー"
+    time_online: "オンライン時間"
+    message: "メッセージ"
+    is_online: "オンラインかどうか"
+    mii:
+      gender_male: "男"
+      gender: "性別"
+      gender_female: "女"
+      vertical_position: "縦の位置 (上/下)"
+      size: "大きさ"
+      nose_type: "鼻の種類"
+      horizontal_position: "横の位置 (左/右)"
+      mouth_type: "口の種類"
+      hair_color: "髪の色"
+      hair_type: "髪の種類"
+      mirror_hair: "髪型の反転"
+      glasses_type: "メガネの種類"
+      glasses_color: "メガネの色"
+      name: "Miiの名前"
+      creator_name: "作成者の名前"
+      height: "高さ"
+      width: "幅"
+      fav_color: "好きな色"
+      skin_color: "肌の色"
+      head_shape: "顔の形"
+      facial_feature: "顔立ち"
+      irish_color: "目の色"
+      space_between: "間隔"
+      rotation: "回転 (左/右に回転する)"
+      eyebrow_type: "眉毛の種類"
+      mustache_type: "口ひげの種類"
+      mustache_vertical_position: "口ひげの縦の位置 (上/下)"
+      mustache_size: "口ひげの大きさ"
+      beard_type: "ひげの種類"
+      default_name: "新しいMii"
+    status: "状態"
+    priority: "優先度"
+    sort_by: "並び替え"
+    total_games_won: "勝利した総回数"
+    total_games_played: "プレイした総回数"
+    vr_abbreviation: "VR"
+    br_abbreviation: "BR"
+    br_full: "バトルレーティング"
+    vr_full: "バーサスレーティング"
+    description: "説明"
+    images: "画像"
+    likes: "いいね"
+    views: "閲覧"
+    downloads: "ダウンロード"
+    mii_section:
+      general: "一般"
+      face: "顔"
+      hair: "髪"
+      eyebrows: "眉毛"
+      eyes: "目"
+      nose: "鼻"
+      lips: "口"
+      glasses: "メガネ"
+      facial_hair: "ひげ"
+      mole: "ホクロ"
+    gender: "性別"
+    gender_female: "女"
+    gender_male: "男"
+  state:
+    loading: "ロード中..."
+    installing: "インストール中..."
+    updating: "アップデート中..."
+    config_not_finished: "未設定"
+    no_server: "サーバーがありません"
+    unknown: "不明"
+    error: "エラー"
+    warning: "警告"
+    success: "成功"
+    extracting: "ファイル展開中..."
+    no_name: "Player"
+    no_license: "ライセンスなし"
+    no_profiles: "プロフィールなし"
+    custom: "カスタム"
+    installed: "インストール済み"
+  action:
+    play: "プレイ"
+    play_offline: "オフラインでプレイ"
+    install: "インストール"
+    update: "アップデート"
+    import: "インポート"
+    enable_all: "すべて有効"
+    disable_all: "すべて無効"
+    rename: "名前を変更する"
+    delete: "削除"
+    open_folder: "フォルダを開く"
+    edit: "編集"
+    cancel: "キャンセル"
+    save: "保存"
+    copy_friend_code: "フレンドコードをコピー"
+    export: "エクスポート"
+    apply: "適用"
+    yes: "はい"
+    no: "いいえ"
+    keep: "維持"
+    ok: "OK"
+    revert: "元に戻す"
+    maybe_later: "また後で"
+    browse: "探す"
+    view_mod: "Modを見る"
+    save_external_mii: "Miiを\"自分のMii\"に追加する"
+    view_mii: "Miiを見る"
+    duplicate: "コピー"
+    back: "戻る"
+    unfavorite: "お気に入り解除"
+    favorite: "お気に入り"
+    view_room: "ルームを見る"
+    link:
+      discord: "お問い合わせ"
+      github: "ソースコード"
+      support: "サポート"
+    launch_dolphin: "Dolphinを起動する"
+    randomize: "ランダム"
+    do_manually: "手動で行う"
+    gamebanana_page: "Gamebananaのページ"
+    report: "報告する"
+    un_install: "アンインストール"
+    download_and_install: "ダウンロードとインストール"
+    view_custom_chars: "特殊記号を見る"
+    submit: "提出"
+  region:
+    japan: "日本"
+    europe: "ヨーロッパ"
+    china: "中国"
+    south_korea: "韓国"
+    taiwan: "台湾"
+    america: "アメリカ合衆国"
+    australia: "オーストラリア"
+  list_title:
+    friends: "フレンド"
+    players: "プレイヤー"
+    rooms: "ルーム"
+    miis: "Mii"
+  popup_title:
+    mod_details: "Modの詳細"
+    mod_browser: "Modブラウザー"
+    mii_selector: "Miiセレクター"
+    mii_editor: "Miiエディター"
+    mii_carousel: "Miiスライダー"
+  text:
+    made_by_string: "作成者: {$1} \\nと {$2}"
+    thanks_translators: "すべての翻訳者さんに感謝します:"
+    wh_wz_translation_percentage: "この言語の翻訳は{$1}%完了しています"
+    powered_gamebanana: "GameBananaによって提供されています"
+    language_translated_by: "この言語はこれらの方が翻訳しました: {$1}"
+  hover:
+    players_online:
+      0: "現在 オンラインのプレイヤーがいません"
+      1: "現在 オンラインのプレイヤーが 1人います"
+      n: "現在 オンラインのプレイヤーが {$1}人います"
+    rooms_online:
+      0: "現在 開いているルームがありません"
+      1: "現在 開いているルームが 1部屋あります"
+      n: "現在 開いているルームが {$1}部屋あります"
+    friends_online:
+      0: "現在 オンラインのフレンドがいません"
+      1: "現在 オンラインのフレンドが 1人います"
+      n: "現在 オンラインのフレンドが {$1}人います"
+    rooms_page_disclaimer: |-
+      ルームに直接合流する機能はないことに注意してください。
+      特定のルームに参加するには、フレンドを通して合流するか、オンラインサーバーに参加して合流する必要があります。
+    friends_page_disclaimer: "フレンドを追加するためにはゲーム内で追加する必要があります"
+    region_user_selection: "これはあなたがプレイした地域のみを表示します"
+    primary_profile: "メインのプロファイルはWheel Wizardクライアントで参照されます"
+  empty_content:
+    no_profiles: "ここにプロフィールを載せるには一度プレイする必要があります"
+    no_friends_title: "まだフレンドがいません！"
+    no_friends: "ゲーム内でフレンドを追加できます"
+    no_mods: "Modでゲームを改変 (キャラクターの見た目など) できます。下のボタンを押してModのインポートを開始してください。"
+    no_mods_title: "Modが見つかりませんでした"
+    no_rooms: "インターネットに接続されていないか、誰もプレイしていない可能性があります。"
+    no_rooms_title: "ルームが見つかりませんでした"
+    no_miis_title: "まだMiiがありません！"
+    no_miis: "Miiのデータを読み込めません。必ず一度はゲームを起動してください。"
+    no_mod_selected_title: "Modが選択されていません"
+    no_mod_selected: "リスト内のModを選択して詳細を表示します"
+  time:
+    days:
+      1: "1日"
+      n: "{$1}日"
+    hours:
+      1: "1時間"
+      n: "{$1}時間"
+    minutes:
+      1: "1分"
+      n: "{$1}分"
+    seconds:
+      1: "1秒"
+      n: "{$1}秒"
+  progress:
+    estimated_time_remaining: "おおよその残り時間:"
+    downloading_mb: "{$1}MBをダウンロード中"
+    installing_mods: "Modをインストール"
+    installing_mods_count: "{$1}個のModをインストール"
+    processing_xof_y: "{$2}個中{$1} 個のファイルを処理しています..."
+    update_rr: "Retro Rewindをアップデート"
+    latest_wh_wz_github: "githubから最新のWheel Wizardを入手"
+    update_wh_wz: "Wheel Wizardをアップデート"
+    installing_rr: "Retro Rewindをインストール"
+    installing_rr_first_time: "Retro Rewindをインストール (初回)"
+    installing_dolphin: "Dolphinエミュレーターをインストール"
+    this_may_take_a_while: "インターネットの状況によっては時間がかかる場合があります"
+  question:
+    launch_clear_mods_found:
+      title: "Modが見つかりました"
+      extra: |-
+        Modなしでゲームを起動しようとしています。
+        My Stuffフォルダーをクリアしますか？
+    sure_delete:
+      title: "{$1}を削除してもよろしいですか？"
+      extra: "削除は永久的であり、元に戻すことはできません"
+      title_miis: "{$1}Miiを削除してもよろしいですか？"
+    apply_scale:
+      title: "新しいウィンドウサイズを適用しますか？"
+      extra: "変更の保存を選択しないと、この変更は{$1}で変更前に戻ります"
+    dolphin_found:
+      title: "Dolphinエミュレーターのフォルダーが見つかりました"
+      extra: "意味がよく分からなければ、「はい」をクリックしてください。\\nDolphinエミュレーターのフォルダーが見つかりました。このフォルダーを使用しますか？"
+    new_version_wh_wz:
+      title: "Wheel Wizardのアップデートがあります"
+      extra: "Wheel Wizardのバージョン{$1} (現在のバージョンは{$2}) が利用できます。すぐにアップデートしますか？"
+    update_admin:
+      title: "管理者権限で更新する"
+      extra: "アップデートには管理者権限が必要な場合があります。今回のアップデートで管理者権限を有効にしますか?"
+    reinstall_rr:
+      title: "Retro Rewindの再インストール"
+      extra: "Retro Rewindを再インストールしてもよろしいですか？"
+    old_rksys_found:
+      title: "古いrksys.datが見つかりました"
+      extra: "古いセーブデータが見つかりました。このセーブデータを使用しますか？(おすすめ)"
+    rr_to_old:
+      extra: "Retro Rewindのバージョンが古すぎるため更新できません。Retro Rewindを再インストールしますか？"
+      title: "Retro Rewindのバージョンが古すぎます"
+    rr_not_determent:
+      title: "Retro Rewindをダウンロードする"
+      extra: "Retro Rewindのバージョンを判別できませんでした。Retro Rewindを再インストールしますか？"
+    dolphin_flatpack:
+      title: "Dolphin flatpakバージョンのインストール"
+      extra: "Dolphinエミュレーターのflatpakバージョンがインストールされていないようです。システム全体にインストールしますか？"
+    install_mod:
+      title: "Modのダウンロードとインストールを行いますか: {$1}？"
+    search_mod: "Modを検索しています..."
+    enter_new_name:
+      title: "新しい名前を入力してください"
+      extra: "名前をこれから変更します: {$1}"
+  message_warning:
+    not_find_dolphin:
+      extra: "Dolphinエミュレーターが見つかりませんでした。設定でパスを設定してください。"
+    not_find_game:
+      extra: "ゲームファイルが見つかりませんでした。設定でパスを設定してください。"
+    multiple_files_selected:
+      title: "複数のファイルが選択されています"
+    invalid_name:
+      extra:
+        mod_name_exists: "「{$1}」というModは既に存在しています。"
+      title: "その名前にはできません"
+    invalid_paths:
+      extra: "すべてのパスが正しいことを確認して、もう一度お試しください。"
+      title: "無効なパスです"
+    dolphin_not_found:
+      title: "Dolphinエミュレーターのフォルダーが見つかりませんでした"
+      extra: |-
+        Dolphinエミュレーターのフォルダーが自動では見つかりませんでした。
+        フォルダーを手動で見つけてください。詳細については「help」をクリックしてください。
+    fail_check_updates:
+      title: "アップデートの確認に失敗しました"
+      extra: "現在アップデートを確認できません。インターネットに接続されていないか、サーバーがダウンしている可能性があります"
+    unable_update_wh_wz:
+      extra:
+        reason_network: "Wheel Wizardが最新かどうか確認できません。\\nネットワークの問題が発生している可能性があります。"
+        reason_location: "Wheel Wizardが更新できません。アプリが書き込み可能なフォルダーにあることを確認してください。\\n現在のフォルダーが見つかりません。"
+      title: "Wheel Wizardのアップデートを無効にする"
+    no_connect_server:
+      extra: "サーバーに接続できませんでした。後でもう一度試してください。"
+      title: "サーバーに接続できませんでした"
+    cant_view_mod:
+      title: "このModは閲覧できません"
+      extra:
+        something_else: "選択されたModを開こうとした際に問題が発生しました"
+        not_from_browser: "ModブラウザーでインストールしていないModは閲覧できません"
+    cannot_delete_fav_mii:
+      title: "お気に入りのMiiは削除できません"
+      extra: "選択したMiiのうち1体以上がお気に入りに設定されています。誤って削除してしまうのを防ぐため、お気に入りに設定されていないMiiのみ削除できます"
+    mod_name_invalid:
+      title: "Modの名前が無効です"
+      extra: "Modの名前に無効な文字が含まれています"
+    mod_name_empty:
+      title: "Modの名前は空にできません"
+      extra: "Modの名前を入力してください"
+    unable_download_mod:
+      title: "Modをダウンロードできません"
+      extra: "ファイルが見つかりませんでした"
+  placeholder:
+    enter_mod_name: "Modの名前を入力してください..."
+    search_mod: "Modを検索します..."
+    enter_mii_name: "Miiの名前を入力してください..."
+    enter_text_here: "ここにテキストを入力してください..."
+    search_for_players: "プレイヤーを検索します..."
+    enter_path: "希望のパスを入力してください..."
+  message_error:
+    no_mod_folder:
+      extra: "Modフォルダーがありません"
+    abort_rr:
+      extra:
+        failed_update_delete: "アップデートファイルの削除に失敗しました。中止しています。"
+        failed_update_apply: "アップデートの適用に失敗しました。中止しています。"
+        invalid_file_path: "無効なファイルパスが検知されました。開発者に連絡してください。\\n サーバーエラー:  {$1}"
+      title: "Retro Rewindのアップデートを中止"
+    restart_admin_fail:
+      extra: "管理者権限で再起動するのに失敗しました。"
+    generic_error:
+      title: "エラーが発生しました"
+    failed_create_mii_db:
+      title: "Miiの情報の作成に失敗しました"
+    failed_change_name:
+      title: "名前の変更に失敗しました"
+    failed_change_mii:
+      title: "Miiの変更に失敗しました"
+    failed_install_dolphin:
+      title: "Dolphinのインストールに失敗"
+      extra: "Dolphinエミュレーターのインストールに失敗しました。Dolphinのflatpakバージョンのインストールを手動で行ってみてください。"
+    failed_retrieve_mod:
+      title: "Modの情報取得に失敗"
+    mod_download_fail:
+      title: "Modのダウンロードに失敗しました"
+      extra: "ダウンロード中にエラーが発生しました: {$1}"
+  message_success:
+    settings_saved:
+      title: "設定が保存されました！"
+    rr_up_to_date:
+      title: "Retro Rewindは最新です。"
+    mii_changed: "Miiが正しく変更されました"
+  snackbar_warning:
+    cant_save_mii: "Miiを保存できません"
+    no_mii_export: "エクスポートできるMiiがなかったようです"
+    no_mii_delete: "削除するMiiが存在しないようです"
+  snackbar_success:
+    mii_added: "MiiはあなたのMiiに追加されました"
+    copied_fc: "クリップボードにフレンドコードをコピーしました"
+    name_change: "名前を'{$1}'に変更しました"
+    saved_mii: "Mii '{$1}'をファイル '{$2}'に保存しました"
+    deleted: "{$1}'を削除しました"
+    deleted_miis: "{$1}Miiを削除しました"
+    created_duplicate: "{$1}'のコピーを作成しました"
+    created_duplicates_miis: "{$1}Miiのコピーを作成しました"
+    profile_set_primary: "プロファイルをメインに設定する"
+  snackbar_error:
+    mii_failure_deserialize: "Mii '{$1}'の復元に失敗しました"
+    mii_failure_update: "Mii '{$1}'のアップデートに失敗しました"
+    mii_failure_save: "Mii '{$1}'の保存に失敗しました"
+    mii_failure_get: "Mii '{$1}'の取得に失敗しました"
+    mii_failure_serialize: "Mii '{$1}'の変換に失敗しました"
+    mii_failure_create: "Mii '{$1}'の作成に失敗しました"
+    mii_failure_duplicate: "Mii '{$1}'のコピーに失敗しました"
+  helper_note:
+    name_must_between: "名前の長さは3文字から10文字にしてください"
+    creator_name_less11: "作成者の名前の長さは10文字以下にしてください"
+    creator_name_less10: "作成者の名前の長さは10文字以下にしてください"
+  option:
+    wh_wz_language: "Wheel Wizardの言語"
+    force_disable_wiimote: "Wiiリモコンを強制的に無効にする"
+    launch_with_dolphin: "Dolphinウィンドウでゲームを起動する"
+    v_sync: "VSync(垂直同期)"
+    recommended: "推奨設定"
+    show_fps: "FPSの表示"
+    renderer: "レンダラー"
+    window_scale: "ウィンドウサイズ"
+    open_config: "設定フォルダーを開く"
+    dolphin_user_path: "Dolphinのユーザーフォルダー"
+    mario_kart_game: "マリオカートWiiのゲームファイル"
+    dolphin_emulator_exe: "Dolphinエミュレーターを実行可能にする"
+    make_primary: "このライセンスに切り替える"
+    remove_blur: "ブラー効果の無効化"
+    enable_animations: "アニメーションを有効にする"
+    reinstall: "Retro Rewindの再インストール"
+    open_game_folder: "ゲームフォルダーを開く"
+    open_save_folder: "セーブフォルダーを開く"
+  section:
+    language: "言語"
+    wii: "Wii設定"
+    resolution: "解像度"
+    performance: "パフォーマンス設定"
+    renderer: "レンダラー設定"
+    location_paths: "パス設定"
+    wh_wz_appearance: "Wheel Wizardの見た目"
+    installation: "インストール"
+  helper_text:
+    topbar:
+      location_warning: "設定が無効になっています。最初にパス設定を完了させてください"
+    launch_with_dolphin: "ゲームと一緒にDolphinのメインウィンドウを起動します"
+    force_disable_wiimote: "ゲーム内ではWiiリモコンを無効にしますが、Wiiチャンネルでは有効にします"
+    resolution_scale: "デフォルト解像度は1xです"
+    recommended: "スタッタリングやラグスパイクなどを軽減するために、特定のDolphinの設定を変更します"
+    30_fps: "ゲームが30FPSで動作するようになります(通常は60FPS)"
+    end_with_exe: "パスの拡張子は必ず .exe にしてください"
+    enable_animations: "Wheel Wizard内のアニメーションを有効にします"
+    end_with_x: "パスは次のもので終わります:"
+    wh_wz_language: "これはWheel Wizardの言語のみ変更します。ゲーム内の言語を変更したい場合、ゲーム設定内で変更する必要があります"
+    optional: "任意"
+    must_set_paths: "Retro Rewindをプレイする前に、これらの3つのパスを設定する必要があります"
+  category:
+    video: "映像"
+    about: "情報"
+    other: "その他"
+    general: "一般"
+  value:
+    language:
+      france: "フランス語"
+      dutch: "オランダ語"
+      english: "英語"
+      german: "ドイツ語"
+      italian: "イタリア語"
+      japanese: "日本語"
+      turkish: "トルコ語"
+      spanish: "スペイン語"
+      finnish: "フィンランド語"
+      korean: "韓国語"
+      russian: "ロシア語"
+      arabic: "アラビア語"
+      czech: "チェコ語"
+      norwegian: "ノルウェー語"
+      chinese: "中国語"
+      portuguese: "ポルトガル語"
+      z_translators: "Haru00007,  Mosgis,  Mossan"

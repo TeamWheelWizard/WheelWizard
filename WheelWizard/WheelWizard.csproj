@@ -65,52 +65,13 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Testably.Abstractions" Version="9.0.0"/>
+        <PackageReference Include="YamlDotNet" Version="17.1.0"/>
     </ItemGroup>
 
     <ItemGroup Label="Embedded Resources">
-        <EmbeddedResource Update="Resources\Languages\Common.resx">
-            <Generator>PublicResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Common.*.resx">
-            <DependentUpon>Common.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Online.*.resx">
-            <DependentUpon>Online.resx</DependentUpon>
-        </EmbeddedResource>
-
-        <EmbeddedResource Update="Resources\Languages\Phrases.resx">
-            <Generator>PublicResXFileCodeGenerator</Generator>
-            <LastGenOutput>Phrases.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Phrases.*.resx">
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </EmbeddedResource>
-
-        <EmbeddedResource Update="Resources\Languages\Settings.resx">
-            <Generator>PublicResXFileCodeGenerator</Generator>
-            <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Languages\Settings.*.resx">
-            <DependentUpon>Settings.resx</DependentUpon>
-        </EmbeddedResource>
+        <EmbeddedResource Include="Resources\Languages\*.yml" />
 
         <!-- Compile Items -->
-        <Compile Update="Resources\Languages\Common.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Common.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Languages\Phrases.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Phrases.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Languages\Settings.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Settings.resx</DependentUpon>
-        </Compile>
         <Compile Update="Views\Components\StandardLibrary\PopupListButton.axaml.cs">
             <DependentUpon>PopupListButton.axaml</DependentUpon>
             <SubType>Code</SubType>

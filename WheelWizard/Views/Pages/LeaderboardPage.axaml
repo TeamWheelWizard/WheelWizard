@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
@@ -205,9 +205,9 @@
                                                                   IsSuspicious="{Binding PodiumSecond.IsSuspicious}">
                                     <patterns:LeaderboardPodiumCard.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumSecond}">
-                                            <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
+                                            <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{x:Static lang:Common.Action_ViewMii}"
+                                            <MenuItem Header="{loc:T action.view_mii}"
                                                       Click="OpenCarousel_OnClick" />
                                             <MenuItem Header="Add Friend"
                                                       Click="AddFriend_OnClick" />
@@ -234,9 +234,9 @@
                                                                   IsSuspicious="{Binding PodiumFirst.IsSuspicious}">
                                     <patterns:LeaderboardPodiumCard.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumFirst}">
-                                            <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
+                                            <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{x:Static lang:Common.Action_ViewMii}"
+                                            <MenuItem Header="{loc:T action.view_mii}"
                                                       Click="OpenCarousel_OnClick" />
                                             <MenuItem Header="Add Friend"
                                                       Click="AddFriend_OnClick" />
@@ -262,9 +262,9 @@
                                                                   IsSuspicious="{Binding PodiumThird.IsSuspicious}">
                                     <patterns:LeaderboardPodiumCard.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumThird}">
-                                            <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
+                                            <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{x:Static lang:Common.Action_ViewMii}"
+                                            <MenuItem Header="{loc:T action.view_mii}"
                                                       Click="OpenCarousel_OnClick" />
                                             <MenuItem Header="Add Friend"
                                                       Click="AddFriend_OnClick" />
@@ -294,9 +294,9 @@
                                                            TopLabel="{Binding TopLabel}">
                                     <patterns:PlayerListItem.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}"
+                                            <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{x:Static lang:Common.Action_ViewMii}"
+                                            <MenuItem Header="{loc:T action.view_mii}"
                                                       Click="OpenCarousel_OnClick" />
                                             <MenuItem Header="Add Friend"
                                                       Click="AddFriend_OnClick" />

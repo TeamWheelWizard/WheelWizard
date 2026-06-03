@@ -1,10 +1,10 @@
-﻿<UserControl x:Class="WheelWizard.Views.Popups.ModManagement.ModContent"
+<UserControl x:Class="WheelWizard.Views.Popups.ModManagement.ModContent"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              ClipToBounds="False"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:html="clr-namespace:TheArtOfDev.HtmlRenderer.Avalonia;assembly=Avalonia.HtmlRenderer"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:modManagement="clr-namespace:WheelWizard.Views.Popups.ModManagement"
@@ -14,7 +14,7 @@
         <components:LoadingIcon x:Name="LoadingView" Width="90" Height="90" IsVisible="False" />
 
         <components:EmptyPageInfo x:Name="NoDetailsView" IsVisible="False"
-                                  Title="{x:Static lang:Phrases.EmptyContent_NoModSelected_Title}" BodyText="{x:Static lang:Phrases.EmptyContent_NoModSelected}"
+                                  Title="{loc:T empty_content.no_mod_selected_title}" BodyText="{loc:T empty_content.no_mod_selected}"
                                   IconData="{StaticResource Banana}" />
 
         <Grid x:Name="DetailsView"
@@ -42,13 +42,13 @@
                            Classes="PageTitleText" Margin="3" />
 
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
-                    <components:StateBox x:Name="LikesCountBox" Text="0" TipText="{x:Static lang:Common.Attribute_Likes}"
+                    <components:StateBox x:Name="LikesCountBox" Text="0" TipText="{loc:T attribute.likes}"
                                          IconData="{StaticResource Heart}"
                                          TipPlacement="Top" Margin="3" />
-                    <components:StateBox x:Name="ViewsCountBox" Text="0" TipText="{x:Static lang:Common.Attribute_Views}"
+                    <components:StateBox x:Name="ViewsCountBox" Text="0" TipText="{loc:T attribute.views}"
                                          IconData="{StaticResource Eye}"
                                          TipPlacement="Top" Margin="3" />
-                    <components:StateBox x:Name="DownloadsCountBox" Text="0" TipText="{x:Static lang:Common.Attribute_Downloads}"
+                    <components:StateBox x:Name="DownloadsCountBox" Text="0" TipText="{loc:T attribute.downloads}"
                                          IconData="{StaticResource Download}"
                                          TipPlacement="Top" Margin="3" />
                 </StackPanel>
@@ -68,7 +68,7 @@
                     <components:IconLabelButton Margin="10,0,0,0"
                                                 Foreground="{StaticResource Primary300}"
                                                 HoverForeground="{StaticResource Primary200}"
-                                                IsIconLeft="False" Text="{x:Static lang:Common.Action_GamebananaPage}"
+                                                IsIconLeft="False" Text="{loc:T action.gamebanana_page}"
                                                 IconData="{StaticResource ExternalLink}"
                                                 IconSize="16" FontSize="13" Click="GameBananaLink_Click" />
                 </StackPanel>
@@ -76,19 +76,19 @@
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom"
                             Orientation="Horizontal">
                     <components:Button
-                        x:Name="InstallButton" Text="{x:Static lang:Common.Action_Install}"
+                        x:Name="InstallButton" Text="{loc:T action.install}"
                         IconSize="0" Margin="3,0"
                         Click="Install_Click" />
                     <components:Button
                         Variant="Warning"
-                        x:Name="UnInstallButton" Text="{x:Static lang:Common.Action_UnInstall}"
+                        x:Name="UnInstallButton" Text="{loc:T action.un_install}"
                         IconSize="0" Margin="3,0"
                         Click="UnInstall_Click" />
                 </StackPanel>
 
                 <components:IconLabelButton Foreground="{StaticResource Danger400}"
                                             HoverForeground="{StaticResource Danger300}"
-                                            Text="{x:Static lang:Common.Action_Report}" x:Name="ReportButton"
+                                            Text="{loc:T action.report}" x:Name="ReportButton"
                                             HorizontalAlignment="Right" VerticalAlignment="Top" IsIconLeft="False"
                                             IconData="{StaticResource WarningTip}"
                                             IconSize="16" FontSize="13" Click="ReportLink_Click" />

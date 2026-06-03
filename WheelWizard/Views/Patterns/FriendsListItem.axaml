@@ -1,6 +1,6 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
+<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+        xmlns:loc="clr-namespace:WheelWizard.Localization"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
         xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
@@ -74,7 +74,7 @@
                                    Text="Pending"
                                    FontSize="12" Foreground="{StaticResource Warning400}" />
                         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom"
-                                   Text="{x:Static lang:Common.Attribute_Status_Online}"
+                                   Text="{loc:T attribute.status_online}"
                                    FontSize="12" Foreground="{StaticResource Neutral200}">
                             <TextBlock.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
@@ -85,7 +85,7 @@
                             </TextBlock.IsVisible>
                         </TextBlock>
                         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom"
-                                   Text="{x:Static lang:Common.Attribute_Status_Offline}"
+                                   Text="{loc:T attribute.status_offline}"
                                    FontSize="12"
                                    Foreground="{StaticResource Neutral200}">
                             <TextBlock.IsVisible>
@@ -159,13 +159,13 @@
 
                         <Grid Grid.Column="1" Margin="15,0,0,5" ColumnDefinitions="3*,4*" VerticalAlignment="Bottom">
                             <StackPanel Grid.Column="0">
-                                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
-                                                           TipText="{x:Static lang:Common.Attribute_VrFull}" />
+                                <components:FormFieldLabel Text="{loc:T attribute.vr_abbreviation}"
+                                                           TipText="{loc:T attribute.vr_full}" />
                                 <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding Vr}" />
                             </StackPanel>
                             <StackPanel Grid.Column="1">
-                                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_BrAbbreviation}"
-                                                           TipText="{x:Static lang:Common.Attribute_BrFull}" />
+                                <components:FormFieldLabel Text="{loc:T attribute.br_abbreviation}"
+                                                           TipText="{loc:T attribute.br_full}" />
                                 <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding Br}" />
                             </StackPanel>
                         </Grid>
@@ -188,16 +188,16 @@
                                            Variant="Primary"
                                            IsEnabled="{TemplateBinding IsOnline}"
                                            x:Name="ViewRoomButton"
-                                           Text="{x:Static lang:Common.Action_ViewRoom}"
+                                           Text="{loc:T action.view_room}"
                                            IconData="{StaticResource Road}" Margin="5,10" />
 
                         <Grid Grid.Column="2" Margin="15,0,0,5" ColumnDefinitions="3*,4*" VerticalAlignment="Bottom">
                             <StackPanel Grid.Column="0">
-                                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Wins}" />
+                                <components:FormFieldLabel Text="{loc:T attribute.wins}" />
                                 <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding TotalWon}" />
                             </StackPanel>
                             <StackPanel Grid.Column="1">
-                                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Losses}" />
+                                <components:FormFieldLabel Text="{loc:T attribute.losses}" />
                                 <SelectableTextBlock Classes="BodyText" Text="{TemplateBinding TotalLosses}" />
                             </StackPanel>
                         </Grid>

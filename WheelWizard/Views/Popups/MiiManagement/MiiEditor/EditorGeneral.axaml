@@ -5,14 +5,14 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              x:Class="WheelWizard.Views.Popups.MiiManagement.MiiEditor.EditorGeneral">
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
-        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_General}" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{loc:T attribute.mii_section.general}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1" />
-        <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}"
+        <components:IconLabelButton Grid.Row="0" Text="{loc:T action.back}"
                                     IconData="{StaticResource ArrowLeft}"
                                     Click="BackButton_OnClick" VerticalAlignment="Center" HorizontalAlignment="Left"
                                     Margin="10,0"
@@ -24,9 +24,9 @@
             <StackPanel Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Spacing="10">
 
                 <StackPanel> <!-- Mii Name -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Name}" />
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.name}" />
                     <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto" VerticalAlignment="Top">
-                        <behavior:FeedbackTextBox x:Name="MiiName" Watermark="{x:Static lang:Phrases.Placeholder_EnterMiiName}"
+                        <behavior:FeedbackTextBox x:Name="MiiName" Watermark="{loc:T placeholder.enter_mii_name}"
                                                   TextChanged="Name_TextChanged" VerticalAlignment="Top"/>
                         <components:Button Grid.Column="1" Variant="Default" Margin="10,0,0,0"
                                            Padding="10,5" IconSize="23" VerticalAlignment="Top"
@@ -36,8 +36,8 @@
                 </StackPanel>
 
                 <StackPanel> <!-- Creator Name -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_CreatorName}" />
-                    <behavior:FeedbackTextBox x:Name="CreatorName" Watermark="{x:Static lang:Settings.HelperText_Optional}"
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.creator_name}" />
+                    <behavior:FeedbackTextBox x:Name="CreatorName" Watermark="{loc:T helper_text.optional}"
                                               TextChanged="Name_TextChanged" />
                 </StackPanel>
 
@@ -48,23 +48,23 @@
                 </StackPanel>
 
                 <StackPanel> <!-- Gender -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Gender}" />
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.gender}" />
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <!-- Male is only for the fancy, but servers no real purpose -->
-                        <RadioButton Content="{x:Static lang:Common.Attribute_Mii_Gender_Male}" IsChecked="True" GroupName="GenderGroup" />
-                        <RadioButton Content="{x:Static lang:Common.Attribute_Mii_Gender_Female}" x:Name="GirlToggle" IsCheckedChanged="IsGirl_OnIsCheckedChanged"
+                        <RadioButton Content="{loc:T attribute.mii.gender_male}" IsChecked="True" GroupName="GenderGroup" />
+                        <RadioButton Content="{loc:T attribute.mii.gender_female}" x:Name="GirlToggle" IsCheckedChanged="IsGirl_OnIsCheckedChanged"
                                      GroupName="GenderGroup" />
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel>
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Height}" />
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.height}" />
                     <Slider x:Name="LengthSlider"
                             ValueChanged="Length_OnValueChanged"
                             Minimum="0" Maximum="127"
                             Width="220" HorizontalAlignment="Left" />
 
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_Width}" />
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.width}" />
                     <Slider x:Name="WidthSlider"
                             ValueChanged="Width_OnValueChanged"
                             Minimum="0" Maximum="127"
@@ -73,7 +73,7 @@
                 
                 
                 <StackPanel> <!-- Favorite Color -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_FavColor}"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.fav_color}"/>
                     <UniformGrid Columns="5" x:Name="FavoriteColorGrid">
                         <!-- Generated elements -->
                     </UniformGrid>

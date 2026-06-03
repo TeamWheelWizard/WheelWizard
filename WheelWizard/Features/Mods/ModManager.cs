@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Compression;
@@ -8,7 +8,6 @@ using Serilog;
 using WheelWizard.Features.Patches;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Views.Popups.Generic;
 
@@ -192,9 +191,9 @@ public sealed class ModManager : IModManager
         {
             var totalFiles = filePaths.Length;
             //todo: this is supposed to be backend only, ProgressWindow should not be created here.
-            progressWindow = new ProgressWindow(Phrases.Progress_CombiningFiles)
-                .SetGoal(Humanizer.ReplaceDynamic(Phrases.Progress_PreparingFilesCount, totalFiles)!)
-                .SetExtraText(Common.State_Loading);
+            progressWindow = new ProgressWindow(t("progress.combining_files"))
+                .SetGoal(t("progress.preparing_files_count", totalFiles)!)
+                .SetExtraText(t("state.loading"));
             progressWindow.Show();
 
             var zipResult = await CreateModArchiveAsync(tempZipPath, filePaths, totalFiles, progressWindow);
@@ -301,7 +300,7 @@ public sealed class ModManager : IModManager
         if (Directory.Exists(modDirectory))
             return OpenFolder(modDirectory);
 
-        return Fail(Phrases.MessageError_NoModFolder_Extra);
+        return Fail(t("message_error.no_mod_folder.extra"));
     }
 
     public async Task<OperationResult> InstallModFromFileAsync(string filePath, string givenModName, string author = "-1", int modID = -1)
@@ -393,7 +392,7 @@ public sealed class ModManager : IModManager
                     Dispatcher.UIThread.Post(() =>
                     {
                         progressWindow.UpdateProgress(progress);
-                        progressWindow.SetExtraText($"{Common.State_Installing} {entryName}");
+                        progressWindow.SetExtraText($"{t("state.installing")} {entryName}");
                     });
                 }
             });

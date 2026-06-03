@@ -1,4 +1,3 @@
-﻿using WheelWizard.Helpers;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Models.RRInfo;
@@ -14,7 +13,7 @@ public class RrRoom
 
     public int PlayerCount => Players.Count;
 
-    public string TimeOnline => Humanizer.HumanizeTimeSpan(DateTime.UtcNow - Created);
+    public string TimeOnline => tTime(DateTime.UtcNow - Created);
     public bool IsPublic => Type != "private";
 
     public string GameModeAbbrev =>

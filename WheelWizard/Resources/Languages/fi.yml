@@ -1,0 +1,452 @@
+fi:
+  page_title:
+    home: "Etusivu"
+    settings: "Asetukset"
+    mods: "My Stuff"
+    my_profiles: "Omat profiilit"
+    rooms: "Huoneet"
+    friends: "Kaverit"
+    room_details: "Huoneen tiedot"
+    my_miis: "Omat Miit"
+  attribute:
+    status_online: "Online"
+    enabled: "Käytössä"
+    title: "Otsikko"
+    status_offline: "Offline"
+    name: "Nimi"
+    id: "ID"
+    type: "Tyyppi"
+    speed: "Nopeus"
+    mod_name: "Modin nimi"
+    average_room_vr: "Keskiarvoinen KP"
+    losses: "Häviöt"
+    wins: "Voitot"
+    races_played: "Kisoja pelattu"
+    friend_code: "Kaverikoodi"
+    player_count: "Pelaajia"
+    time_online: "Aika online-tilassa"
+    message: "Viesti"
+    is_online: "Online-tilassa"
+    mii:
+      gender_male: "Mies"
+      gender: "Sukupuoli"
+      gender_female: "Nainen"
+      vertical_position: "Pystysuuntainen sijainti"
+      size: "Koko"
+      nose_type: "Nenän tyyli"
+      horizontal_position: "Vaakasuuntainen sijainti"
+      mouth_type: "Huulien tyyli"
+      hair_color: "Hiusväri"
+      hair_type: "Hiustyyli"
+      mirror_hair: "Peilaa hiukset"
+      glasses_type: "Silmälasien tyyli"
+      glasses_color: "Silmälasien väri"
+      name: "Miin nimi"
+      creator_name: "Tekijän nimi"
+      height: "Pituus"
+      width: "Leveys"
+      fav_color: "Lempiväri"
+      skin_color: "Ihonväri"
+      head_shape: "Pään muoto"
+      facial_feature: "Kasvojen ominaisuus"
+      irish_color: "Silmien väri"
+      space_between: "Välitys"
+      rotation: "Kierto (vasen/oikea)"
+      eyebrow_type: "Kulmakarvojen tyyli"
+      mustache_type: "Viiksityyli"
+      mustache_vertical_position: "Viiksien pystysuuntainen sijainti"
+      mustache_size: "Viiksien koko"
+      beard_type: "Partatyyli"
+      default_name: "Uusi Mii"
+    status: "Status"
+    priority: "Prioriteetti"
+    sort_by: "Järjestä"
+    total_games_won: "Kisoja voitettu yhteensä"
+    total_games_played: "Kisoja pelattu yhteensä"
+    vr_abbreviation: "KP"
+    br_abbreviation: "TP"
+    br_full: "Taistelupisteet"
+    vr_full: "Kilpailupisteet"
+    description: "Kuvaus"
+    images: "Kuvat"
+    likes: "Tykkäykset"
+    views: "Näyttökerrat"
+    downloads: "Lataukset"
+    mii_section:
+      general: "Yleiset"
+      face: "Kasvot"
+      hair: "Hiukset"
+      eyebrows: "Kulmakarvat"
+      eyes: "Silmät"
+      nose: "Nenä"
+      lips: "Huulet"
+      glasses: "Silmälasit"
+      facial_hair: "Naamakarvoitus"
+      mole: "Luomi"
+    gender: "Sukupuoli"
+    gender_female: "Nainen"
+    gender_male: "Mies"
+  state:
+    loading: "Ladataan..."
+    installing: "Asennetaan..."
+    updating: "Päivitetään..."
+    config_not_finished: "Määritys kesken"
+    no_server: "Ei palvelinta"
+    unknown: "Tuntematon"
+    error: "Virhe"
+    warning: "Varoitus"
+    success: "Onnistui"
+    extracting: "Puretaan tiedostoja..."
+    no_name: "Ei nimeä"
+    no_license: "Ei ajokorttia"
+    no_profiles: "Ei profiileja"
+    custom: "Mukautettu"
+    installed: "Asennettu"
+  action:
+    play: "Pelaa"
+    play_offline: "Pelaa offline-tilassa"
+    install: "Asenna"
+    update: "Päivitä"
+    import: "Tuo"
+    enable_all: "Ota kaikki käyttöön"
+    disable_all: "Poista kaikki"
+    rename: "Nimeä uudelleen"
+    delete: "Poista"
+    open_folder: "Avaa kansio"
+    edit: "Muokkaa"
+    cancel: "Peruuta"
+    save: "Tallenna"
+    copy_friend_code: "Kopioi kaverikoodi"
+    export: "Vie"
+    apply: "Käytä"
+    yes: "Kyllä"
+    no: "Ei"
+    keep: "Säilytä"
+    ok: "Ok"
+    revert: "Palauta"
+    maybe_later: "Myöhemmin"
+    browse: "Selaa"
+    view_mod: "Näytä modi"
+    save_external_mii: "Lisää Mii omiin Mii-hahmoihin"
+    view_mii: "Näytä Mii"
+    duplicate: "Monista"
+    back: "Takaisin"
+    unfavorite: "Poista suosikeista"
+    favorite: "Suosikki"
+    view_room: "Näytä huone"
+    link:
+      discord: "Puhu meille!"
+      github: "Lähdekoodi"
+      support: "Tue meitä!"
+    launch_dolphin: "Käynnistä Dolphin"
+    randomize: "Satunnaista"
+    do_manually: "Tee manuaalisesti"
+    gamebanana_page: "Gamebanana-sivusto"
+    report: "Ilmoita"
+    un_install: "Poista asennus"
+    download_and_install: "Lataa ja asenna"
+    view_custom_chars: "Näytä mukautetut hahmot"
+    submit: "Lähetä"
+  region:
+    japan: "Japani"
+    europe: "Eurooppa"
+    china: "Kiina"
+    south_korea: "Etelä-Korea"
+    taiwan: "Taiwan"
+    america: "Amerikka"
+    australia: "Australia"
+  list_title:
+    friends: "Kaverit"
+    players: "Pelaajat"
+    rooms: "Huoneet"
+    miis: "Miit"
+  popup_title:
+    mod_details: "Modin tiedot"
+    mod_browser: "Modiselain"
+    mii_selector: "Miin valinta"
+    mii_editor: "Mii-editori"
+    mii_carousel: "Miin katselu"
+  text:
+    made_by_string: "Tehnyt: {$1}\\n ja {$2}"
+    thanks_translators: "Suuret kiitokset kaikille kääntäjille:"
+    wh_wz_translation_percentage: "Tämän kielen käännökset ovat {$1} % valmiita."
+    powered_gamebanana: "Palvelun tarjoaa GameBanana"
+    language_translated_by: "Tämän kielen käännökset tarjoaa: {$1}"
+  hover:
+    players_online:
+      0: "Ei pelaajia online-tilassa"
+      1: "1 pelaaja on online-tilassa"
+      n: "{$1} pelaajaa on online-tilassa"
+    rooms_online:
+      0: "Ei aktiivisia huoneita"
+      1: "1 aktiivinen huone"
+      n: "{$1} aktiivista huonetta"
+    friends_online:
+      0: "Ei kavereita online-tilassa"
+      1: "1 kaveri on online-tilassa"
+      n: "{$1} kaveria on online-tilassa"
+    rooms_page_disclaimer: |-
+      Huomioi, että tältä sivulta ei voi liittyä huoneeseen suoraan.
+      Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
+    friends_page_disclaimer: "Kavereiden lisääminen täytyy tehdä pelin sisällä."
+    region_user_selection: "Näyttää vain alueet, joilla itse olet pelannut"
+    primary_profile: "Pääprofiilia käytetään referenssinä Wheel Wizardissa"
+  empty_content:
+    no_profiles: "Sinun on pelattava peliä vähintään kerran nähdäksesi profiilisi listalla"
+    no_friends_title: "Ei kavereita vielä."
+    no_friends: "Voit lisätä kavereita pelissä"
+    no_mods: "Modit voivat muuttaa pelin toimintoja. Tuo ensimmäinen modisi painamalla alla olevaa painiketta."
+    no_mods_title: "Modeja ei löytynyt"
+    no_rooms: "Sinulta joko puuttuu internet-yhteys tai kukaan ei ole pelaamassa tällä hetkellä."
+    no_rooms_title: "Huoneita ei löytynyt"
+    no_miis_title: "Ei Mii-hahmoja vielä."
+    no_miis: "Mii-tietojen lukeminen järjestelmältäsi epäonnistui. Varmista, että olet käynnistänyt pelin ainakin kerran."
+    no_mod_selected_title: "Ei modia valittuna"
+    no_mod_selected: "Valitse modi listalta nähdäksesi sen tiedot"
+  time:
+    days:
+      1: "1 pv"
+      n: "{$1} pv"
+    hours:
+      1: "1 t"
+      n: "{$1} t"
+    minutes:
+      1: "1 min"
+      n: "{$1} min"
+    seconds:
+      1: "1 s"
+      n: "{$1} s"
+  progress:
+    estimated_time_remaining: "Arvioitu kestoaika:"
+    downloading_mb: "Ladataan {$1} Mt"
+    installing_mods: "Asennetaan modeja"
+    installing_mods_count: "Asennetaan {$1} modia"
+    processing_xof_y: "Käsitellään {$1}/{$1} tiedostoa..."
+    update_rr: "Päivitetään Retro Rewindia"
+    latest_wh_wz_github: "Hankitaan uusinta Wheel Wizard -versiota GitHubista"
+    update_wh_wz: "Päivitetään Wheel Wizardia"
+    installing_rr: "Asennetaan Retro Rewindia"
+    installing_rr_first_time: "Asennetaan Retro Rewindia ensimmäistä kertaa"
+    installing_dolphin: "Asennetaan Dolphin-emulaattoria"
+    this_may_take_a_while: "Tässä voi kestää jonkin aikaa riippuen internet-yhteydestäsi."
+  question:
+    launch_clear_mods_found:
+      title: "Modeja löytyi"
+      extra: |-
+        Aiot käynnistää pelin ilman modeja.
+        Haluatko tyhjentää 'my-stuff'-kansiosi?
+    sure_delete:
+      title: "Haluatko varmasti poistaa '{$1}'?"
+      extra: "Poistaminen on pysyvää eikä sitä voi perua."
+      title_miis: "Haluatko varmasti poistaa {$1} Miitä?"
+    apply_scale:
+      title: "Haluatko ottaa uuden skaalan käyttöön?"
+      extra: "Muutos perutaan {$1} kuluttua, ellet aio pitää muutosta."
+    dolphin_found:
+      title: "Dolphin-emulaattorin kansio löytyi"
+      extra: "Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä' :)\\nDolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?"
+    new_version_wh_wz:
+      title: "Wheel Wizard -päivitys saatavilla"
+      extra: "Wheel Wizardin versio {$1} on saatavilla (nykyinen versio: {$2}). Haluatko päivittää heti?"
+    update_admin:
+      title: "Päivitä järjestelmänvalvojana"
+      extra: "Joskus päivitys vaatii järjestelmänvalvojan oikeuet. Haluatko aktivoida ne tätä päivitystä varten?"
+    reinstall_rr:
+      title: "Asenna Retro Rewind uudelleen"
+      extra: "Haluatko varmasti asentaa Retro Rewindin uudelleen?"
+    old_rksys_found:
+      title: "Vanha rksys.dat löytyi"
+      extra: "Vanhoja tallennustietoja löytyi. Haluatko käyttää sitä? (suositeltu)"
+    rr_to_old:
+      extra: |-
+        Retro Rewind -versiosi on liian vanha päivittämiseen. Haluatko asentaa Retro Rewindin uudelleen?
+        
+      title: "Retro Rewind -versio on liian vanha."
+    rr_not_determent:
+      title: "Lataa Retro Rewind"
+      extra: "Retro Rewind -versiotasi ei voitu määrittää. Haluatko ladata Retro Rewindin?"
+    dolphin_flatpack:
+      title: "Dolphin Flatpakin asennus"
+      extra: "Dolphin-emulaattorin Flatpak-versio ei näytä olevan asennettuna. Haluatko, että asennamme sen järjestelmällesi?"
+    install_mod:
+      title: "Haluatko ladata ja asentaa modin: {$1}?"
+    search_mod: "Haetaan modeja..."
+    enter_new_name:
+      title: "Anna uusi nimi"
+      extra: "Muutetaan nimeä: {$1}"
+  message_warning:
+    not_find_dolphin:
+      extra: "Dolphin-emulaattoria ei löytynyt. Määritä sijaintipolku asetuksissa."
+    not_find_game:
+      extra: "Peliä ei löytynyt. Määritä sijaintipolku asetuksissa."
+    multiple_files_selected:
+      title: "Usea tiedosto valittuna"
+    invalid_name:
+      extra:
+        mod_name_exists: "Modi nimellä '{$1}' on jo olemassa."
+      title: "Nimi ei kelpaa."
+    invalid_paths:
+      extra: "Varmista, että kaikki polut ovat oikein ja yritä uudelleen."
+      title: "Virheelliset polut."
+    dolphin_not_found:
+      title: "Dolphin-emulaattorin kansiota ei löytynyt"
+      extra: "Dolphin-emulaattorin kansiota ei löytynyt automaattisesti. Yritä etsiä kansio mauaalisesti. Lisätietoa saat napsauttamalla 'Ohje'."
+    fail_check_updates:
+      title: "Päivitysten tarkistus epäonnistui"
+      extra: "Päivityksiä ei voi tarkistaa juuri nyt. Internet-yhteyttä ei ole tai palvelimessa on ongelma."
+    unable_update_wh_wz:
+      extra:
+        reason_network: "Ei voitu tarkistaa, onko Wheel Wizard ajan tasalla.\\nSyynä saattaa olla verkkoyhteysongelmat."
+        reason_location: "Wheel Wizardia ei voi päivittää. Varmista, että sovellus sijaitsee kansiossa, johon voi kirjoittaa tietoja.\\nNykyistä kansiota ei löytynyt."
+      title: "Wheel Wizardia ei voi päivittää."
+    no_connect_server:
+      extra: "Yhdistäminen palvelimelle epäonnistui. Yritä myöhemmin uudelleen."
+      title: "Yhdistäminen palvelimelle epäonnistui."
+    cant_view_mod:
+      title: "Tätä modia ei voi näyttää"
+      extra:
+        something_else: "Jokin meni pieleen avatessa valittua modia."
+        not_from_browser: "Ei voida näyttää modia, jota ei ole asennettu modiselaimen kautta."
+    cannot_delete_fav_mii:
+      title: "Suosikki-Miitä ei voi poistaa"
+      extra: "Yksi tai useampi valituista Miistä on merkitty suosikiksi. Vahinkopoistojen välttämiseksi Miit voi poistaa vain, jos ne eivät ole suosikkeja."
+    mod_name_invalid:
+      title: "Modin nimi on virheellinen."
+      extra: "Modin nimi sisältää virheellisiä merkkejä."
+    mod_name_empty:
+      title: "Modin nimi ei voi olla tyhjä."
+      extra: "Anna modille nimi."
+    unable_download_mod:
+      title: "Modia ei voi ladata"
+      extra: "Tiedostoja ei löytynyt."
+  placeholder:
+    enter_mod_name: "Anna modin nimi..."
+    search_mod: "Hae modeja..."
+    enter_mii_name: "Anna Miin nimi..."
+    enter_text_here: "Kirjoita tähän..."
+    search_for_players: "Hae pelaajia..."
+    enter_path: "Anna haluttu polku tähän..."
+  message_error:
+    no_mod_folder:
+      extra: "Modikansiota ei ole olemassa"
+    abort_rr:
+      extra:
+        failed_update_delete: "Tiedostojen poistaminen päivitystä varten epäonnistui. Perutaan."
+        failed_update_apply: "Päivityksen käyttöönotto epäonnistui. Perutaan."
+        invalid_file_path: "Virheellinen polku. Ota yhteyttä kehittäjiin.\\n Palvelinvirhe: {$1}"
+      title: "Perutaan RR-päivitys"
+    restart_admin_fail:
+      extra: "Käynnistäminen järjestelmänvalvojan oikeuksilla epäonnistui."
+    generic_error:
+      title: "Tapahtui virhe."
+    failed_create_mii_db:
+      title: "Mii-tietokannan luominen epäonnistui"
+    failed_change_name:
+      title: "Nimen vaihtaminen epäonnistui"
+    failed_change_mii:
+      title: "Miin vaihtaminen epäonnistui"
+    failed_install_dolphin:
+      title: "Dolphinin asennus epäonnistui."
+      extra: "Dolphin-emulaattorin asennus epäonnistui. Kokeile asentaa Flatpak Dolphin manuaalisesti."
+    failed_retrieve_mod:
+      title: "Modin tietojen noutaminen epäonnistui"
+    mod_download_fail:
+      title: "Modin lataus epäonnistui."
+      extra: "Ladattaessa tapahtui virhe: {$1}"
+  message_success:
+    settings_saved:
+      title: "Asetukset tallennettu!"
+    rr_up_to_date:
+      title: "Retro Rewind on ajan tasalla."
+    mii_changed: "Mii vaihdettu!"
+  snackbar_warning:
+    cant_save_mii: "Miitä ei voi tallentaa"
+    no_mii_export: "Vietäviä Miitä ei ole"
+    no_mii_delete: "Poistettavia Miitä ei ole"
+  snackbar_success:
+    mii_added: "Mii on lisätty omiin Miihin"
+    copied_fc: "Kaverikoodi kopioitu leikepöydälle"
+    name_change: "Nimeksi vaihdettiin '{$1}'"
+    saved_mii: "Mii '{$1}' tallennettiin tiedostoon '{$2}'"
+    deleted: "{$1}' poistettu"
+    deleted_miis: "{$1} Miitä poistettu"
+    created_duplicate: "{$1}' kopioitu"
+    created_duplicates_miis: "{$1}' kopioitua Miitä luotu"
+    profile_set_primary: "Aseta profiili ensisijaiseksi"
+  snackbar_error:
+    mii_failure_deserialize: "Miin '{$1}' deserialisointi epäonnistui"
+    mii_failure_update: "Miin '{$1}' päivittäminen epäonnistui"
+    mii_failure_save: "Miin '{$1}' tallentaminen epäonnistui"
+    mii_failure_get: "Miin '{$1}' noutaminen epäonnistui"
+    mii_failure_serialize: "Miin '{$1}' serialistointi epäonnistui"
+    mii_failure_create: "Miin '{$1}' luominen epäonnistui"
+    mii_failure_duplicate: "Miin '{$1}' kopioiminen epäonnistui"
+  helper_note:
+    name_must_between: "Nimien täytyy olla 3–10 merkkiä pitkä."
+    creator_name_less10: "Tekijän nimen täytyy olla alle 10 merkkiä pitkä."
+  option:
+    wh_wz_language: "Wheel Wizardin kieli"
+    force_disable_wiimote: "Pakota Wiimote pois käytöstä"
+    launch_with_dolphin: "Käynnistä peli Dolphin-ikkunassa"
+    v_sync: "Pystytahdistus (V-Sync)"
+    recommended: "Suositellut asetukset"
+    show_fps: "Näytä kuvalaskuri"
+    renderer: "Renderöijä"
+    window_scale: "Ikkunan koko"
+    open_config: "Avaa asetuskansio"
+    dolphin_user_path: "Dolphin-käyttäjäkansio"
+    mario_kart_game: "Mario Kart Wii -pelitiedosto"
+    dolphin_emulator_exe: "Dolphin-emulaattorin käynnistystiedosto"
+    make_primary: "Aseta ensisijaiseksi"
+    remove_blur: "Poista sumennus"
+    enable_animations: "Animaatiot"
+    reinstall: "Asenna RR uudelleen"
+    open_game_folder: "Avaa pelikansio"
+    open_save_folder: "Avaa tallennuskansio"
+  section:
+    language: "Kieli"
+    wii: "Wii-asetukset"
+    resolution: "Resoluutio"
+    performance: "Suorituskyvyn asetukset"
+    renderer: "Renderöintiasetukset"
+    location_paths: "Sijaintiasetukset"
+    wh_wz_appearance: "Wheel Wizardin ulkoasu"
+    installation: "Asennus"
+  helper_text:
+    topbar:
+      location_warning: "Asetukset on lukittu, suorita sijaintipolkujen asetukset ensin"
+    launch_with_dolphin: "Käynnistää Dolphinin pääikkunan pelin mukana"
+    force_disable_wiimote: "Poistaa Wiimoten käytöstä pelissä, mutta ottaa sen käyttöön Wii-valikossa"
+    resolution_scale: "1x on alkuperäinen resoluutio"
+    recommended: "Muuttaa joitakin Dolphinin asetuksia pätkimisen ja lagipiikkien vähentämiseksi"
+    30_fps: "Pakottaa pelin toimimaan 30 FPS -tilassa (oletus on 60)"
+    end_with_exe: "Polun täytyy loppua päätteeseen .exe"
+    enable_animations: "Ottaa käyttöön animaatiot Wheel Wizard -sovelluksessa"
+    end_with_x: "Polku voi loppua:"
+    wh_wz_language: "Vaihtaa kielen vain Wheel Wizard -sovelluksessa. Pelin kielen saa vaihdettua itse pelin sisällä."
+    optional: "Valinnainen"
+    must_set_paths: "Nämä 3 polkua on määritettävä ennen kuin voit pelata Retro Rewindia"
+  category:
+    video: "Grafiikka"
+    about: "Tietoa"
+    other: "Muut"
+    general: "Yleiset"
+  value:
+    language:
+      france: "Ranska"
+      dutch: "Hollanti"
+      english: "Englanti"
+      german: "Saksa"
+      italian: "Italia"
+      japanese: "Japani"
+      turkish: "Turkki"
+      spanish: "Espanja"
+      finnish: "Suomi"
+      korean: "Korea"
+      russian: "Venäjä"
+      arabic: "Arabia"
+      czech: "Tšekki"
+      norwegian: "Norja"
+      chinese: "Kiina"
+      portuguese: "Portugali"
+      z_translators: "Clavey"

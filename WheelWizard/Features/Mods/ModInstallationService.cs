@@ -3,7 +3,6 @@ using Avalonia.Threading;
 using SharpCompress.Archives;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Views.Popups.Generic;
 
@@ -188,8 +187,8 @@ public sealed class ModInstallationService : IModInstallationService
         ProgressWindow? progressWindow = null;
         try
         {
-            progressWindow = new(Phrases.Progress_InstallingMod);
-            progressWindow.SetGoal(Common.State_Extracting);
+            progressWindow = new(t("progress.installing_mod"));
+            progressWindow.SetGoal(t("state.extracting"));
             progressWindow.Show();
 
             var modDirectory = PathManager.GetModDirectoryPath(givenModName);

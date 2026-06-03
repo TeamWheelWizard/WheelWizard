@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using WheelWizard.GitHub.Domain;
 using WheelWizard.Helpers;
-using WheelWizard.Resources.Languages;
 
 namespace WheelWizard.AutoUpdating.Platforms;
 
@@ -28,13 +27,13 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
     {
         var currentExecutablePath = Environment.ProcessPath;
         if (currentExecutablePath is null)
-            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
+            return Fail(t("message_warning.unable_update_wh_wz.extra.reason_location"));
 
         var currentExecutableName = fileSystem.Path.GetFileName(currentExecutablePath);
         var currentFolder = fileSystem.Path.GetDirectoryName(currentExecutablePath);
 
         if (currentFolder is null)
-            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
+            return Fail(t("message_warning.unable_update_wh_wz.extra.reason_location"));
 
         // Download the new executable to a temporary file.
         var newFilePath = fileSystem.Path.Combine(currentFolder, currentExecutableName + "_new");
@@ -44,8 +43,8 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(
             downloadUrl,
             newFilePath,
-            Phrases.Progress_UpdateWhWz,
-            Phrases.Progress_LatestWhWzGithub,
+            t("progress.update_wh_wz"),
+            t("progress.latest_wh_wz_github"),
             ForceGivenFilePath: true
         );
 
@@ -69,7 +68,7 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
     {
         var currentFolder = fileSystem.Path.GetDirectoryName(currentFilePath);
         if (currentFolder is null)
-            return Fail(Phrases.MessageWarning_UnableUpdateWhWz_Extra_ReasonLocation);
+            return Fail(t("message_warning.unable_update_wh_wz.extra.reason_location"));
 
         var scriptFilePath = fileSystem.Path.Combine(currentFolder, "update.sh");
         var originalFileName = fileSystem.Path.GetFileName(currentFilePath);

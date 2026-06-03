@@ -8,7 +8,6 @@ using SharpCompress.Archives;
 using SharpCompress.Readers;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Views.Popups.Generic;
@@ -71,7 +70,7 @@ public class RetroRewindBeta : IDistribution
                     _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
                 _fileSystem.Directory.CreateDirectory(tempExtractionPath);
 
-                progressWindow.SetExtraText(Common.State_Extracting);
+                progressWindow.SetExtraText(t("state.extracting"));
                 var badPassword = false;
                 var extractResult = await Task.Run(
                     () => ExtractZipFile(downloadedFile, tempExtractionPath, progressWindow, password, out badPassword)
@@ -201,7 +200,7 @@ public class RetroRewindBeta : IDistribution
 
             Dispatcher.UIThread.Post(() =>
             {
-                progressWindow.SetExtraText(Common.State_Extracting).SetGoal($"Extracting {entries.Count} files");
+                progressWindow.SetExtraText(t("state.extracting")).SetGoal($"Extracting {entries.Count} files");
             });
 
             for (var i = 0; i < entries.Count; i++)

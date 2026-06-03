@@ -1,0 +1,455 @@
+fr:
+  page_title:
+    home: "Accueil"
+    settings: "Paramètres"
+    mods: "My Stuff"
+    my_profiles: "Mes Licences"
+    rooms: "Salles"
+    friends: "Amis"
+    room_details: "Détail de la salle"
+    my_miis: "Mes Miis"
+  attribute:
+    status_online: "En Ligne "
+    enabled: "Activer"
+    title: "Titre"
+    status_offline: "Hors-Ligne"
+    name: "Nom"
+    id: "ID"
+    type: "Type"
+    speed: "Vitesse"
+    mod_name: "Nom du Mod"
+    average_room_vr: "Point Course en moyenne"
+    losses: "Défaites"
+    wins: "Victoire"
+    races_played: "Course Jouées"
+    friend_code: "Code Ami"
+    player_count: "Joueurs"
+    time_online: "Temps en ligne"
+    message: "Message"
+    is_online: "Est en ligne"
+    mii:
+      gender_male: "Homme"
+      gender: "Genre"
+      gender_female: "Femme"
+      vertical_position: "Position verticale"
+      size: "Taille   "
+      nose_type: "Type de nez"
+      horizontal_position: "Position horizontale"
+      mouth_type: "Type de bouches"
+      hair_color: "Couleur des cheveux"
+      hair_type: "Type des cheveux"
+      mirror_hair: "Cheveux en miroir"
+      glasses_type: "Type de lunettes"
+      glasses_color: "Couleur des lunettes"
+      name: "Nom du Mii"
+      creator_name: "Nom de l'auteur.rice"
+      height: "Taille"
+      width: "Largeur"
+      fav_color: "Couleur favorite"
+      skin_color: "Couleur de peau"
+      head_shape: "Forme du visage"
+      facial_feature: "Élément facial"
+      irish_color: "Couleur des yeux"
+      space_between: "Espace entre deux éléments"
+      rotation: "Rotation (Gauche / Droite)"
+      eyebrow_type: "Type de cils"
+      mustache_type: "Type de moustache"
+      mustache_vertical_position: "Position verticale de la moustache"
+      mustache_size: "Taille de la moustache"
+      beard_type: "Type de barbe"
+      default_name: "John Doe"
+    status: "Status"
+    priority: "Priorité"
+    sort_by: "Trier par"
+    total_games_won: "Nombre de courses gagnées "
+    total_games_played: "Nombre de courses faites"
+    vr_abbreviation: "PTS.C"
+    br_abbreviation: "PTS.B"
+    br_full: "Points Bataille"
+    vr_full: "Points Course"
+    description: "Description"
+    images: "Images"
+    likes: "J'aimes"
+    views: "Vues"
+    downloads: "Téléchargements"
+    mii_section:
+      general: "Général"
+      face: "Tête"
+      hair: "Cheveux"
+      eyebrows: "Cils"
+      eyes: "Oeil"
+      nose: "Nez"
+      lips: "Lèvres"
+      glasses: "Lunettes"
+      facial_hair: "Pillosité faciale"
+      mole: "Grain de beauté"
+    gender: "Genre"
+    gender_female: "Femme"
+    gender_male: "Homme"
+  state:
+    loading: "Chargement..."
+    installing: "Installation..."
+    updating: "Mise à jour..."
+    config_not_finished: "Configuration non terminée "
+    no_server: "Aucun Seveurs "
+    unknown: "Inconnu"
+    error: "Erreur"
+    warning: "Avertisemment"
+    success: "Succès "
+    extracting: "Extraction des fichers..."
+    no_name: "Aucun nom "
+    no_license: "Aucun Permis"
+    no_profiles: "Aucun Profil"
+    custom: "Personnalisé"
+    installed: "Installé"
+  action:
+    play: "Jouer"
+    play_offline: "Jouer en Hors-Ligne"
+    install: "Installer "
+    update: "Mettre à Jour"
+    import: "Importer"
+    enable_all: "Tous Activer"
+    disable_all: "Tous Désactiver"
+    rename: "Renommer"
+    delete: "Supprimer"
+    open_folder: "Ouvrir le dossier "
+    edit: "Modifer"
+    cancel: "Annuler"
+    save: "Sauvegarder"
+    copy_friend_code: "Copier le Code Ami"
+    export: "Exporter"
+    apply: "Appliquer"
+    yes: "Oui"
+    no: "Non"
+    keep: "Garder"
+    ok: "Ok"
+    revert: "Revenir en arrière "
+    maybe_later: "Peut être plus tard "
+    browse: "Chercher"
+    view_mod: "Détail du Mod"
+    save_external_mii: "Ajouter un Mii dans \"Mes Miis\""
+    view_mii: "Voir le Mii"
+    duplicate: "Dupliquer "
+    back: "Retour"
+    unfavorite: "Retirer des favoris"
+    favorite: "Favoris"
+    view_room: "Voir la salle"
+    link:
+      discord: "Parlez-nous-en !"
+      github: "Code Source"
+      support: "Supportez-nous !"
+    launch_dolphin: "Lancer Dolphin"
+    randomize: "Aléatoire"
+    do_manually: "Faire manuellement"
+    gamebanana_page: "Page Gamebanana"
+    report: "Signaler"
+    un_install: "Désinstaller"
+    download_and_install: "Télécharger et installer"
+    view_custom_chars: "Voir les caractères spéciaux"
+    submit: "Soumettre"
+  region:
+    japan: "Japon"
+    europe: "Europe"
+    china: "Chine"
+    south_korea: "Corée Du Sud"
+    taiwan: "Taiwan"
+    america: "Amérique"
+    australia: "Australie"
+  list_title:
+    friends: "Amis"
+    players: "Joueurs"
+    rooms: "Salles"
+    miis: "Miis"
+  popup_title:
+    mod_details: "Détails du mod"
+    mod_browser: "Navigateur des mods"
+    mii_selector: "Sélection de Mii"
+    mii_editor: "Éditeur de Mii"
+    mii_carousel: "Vue d'ensemble du Mii"
+  text:
+    made_by_string: "Fait par: {$1} \\n et {$2}"
+    thanks_translators: "Merci à tous les traducteurs:"
+    wh_wz_translation_percentage: "La traduction pour cette langue est fini à {$1}%"
+    powered_gamebanana: "Contribué par GameBanana"
+    language_translated_by: "Cette langue a été traduite par: {$1}"
+  hover:
+    players_online:
+      0: "Il n'y a actuellement aucun joueurs en ligne"
+      1: "Il y a actuellement 1 joueur en ligne"
+      n: "Il y a actuellement {$1} joueurs en ligne"
+    rooms_online:
+      0: "Il n'y a actuellement aucune salles active"
+      1: "Il y a actuellement 1 salle active"
+      n: "Il y a actuellement {$1} salles active"
+    friends_online:
+      0: "Il n'y a actuellement aucun amis en ligne"
+      1: "Il y a actuellement 1 ami en ligne"
+      n: "Il y a actuellement {$1} amis en ligne"
+    rooms_page_disclaimer: |-
+      Attention, cete page ne propose pas la possibilité de rejoindre la salle directement.
+      Pour rejoindre une salle spécifique, vous devez soit la rejoindre via un ami ou espérer de la rejoindre via les serveur en ligne.
+    friends_page_disclaimer: "Ajouter des amis que vous voulez dans le jeu."
+    region_user_selection: "Ceci montre les régions que VOUS avez jouez"
+    primary_profile: "Le profil principal est utilisé en tant que référence dans Wheel Wizard"
+  empty_content:
+    no_profiles: "Vous devez avoir lancé le jeu au moins une fois pour voir vos profils listé ici"
+    no_friends_title: "Pas d'amis pour le moment !"
+    no_friends: "Vous pouvez ajouter vos amis in-game"
+    no_mods: "Les mods permettent de modifer comment le jeu va se comporter. Commencez à importer votre premier mod en cliquant sur le bouton en dessous."
+    no_mods_title: "Pas de mods trouvés"
+    no_rooms: "Vous n'avez pas de connexion internet ou personne n'est en train de jouer."
+    no_rooms_title: "Aucune salles trouvées"
+    no_miis_title: "Aucun Mii!"
+    no_miis: "Nous ne pouvons pas lire les données du Mii de votre système. Veuillez vérifier que vous avez lancé le jeu au moins une fois"
+    no_mod_selected_title: "Aucun mod sélectionné"
+    no_mod_selected: "Sélectionner un mod dans la liste pour voir ces détails"
+  time:
+    days:
+      1: "1 Jour "
+      n: "{$1} Jours"
+    hours:
+      1: "1 heure"
+      n: "{$1} heures"
+    minutes:
+      1: "1 minute"
+      n: "{$1} minutes"
+    seconds:
+      1: "1 seconde"
+      n: "{$1} secondes"
+  progress:
+    estimated_time_remaining: "Temps restant estimé: "
+    downloading_mb: "Téléchargement de {$1} MB"
+    installing_mods: "Installation de mods"
+    installing_mods_count: "Installation de {$1} mods"
+    processing_xof_y: "Traitement de {$1} sur {$2} fichiers"
+    update_rr: "Mise à jour de Retro Rewind en cours..."
+    latest_wh_wz_github: "Obtenez la dernière version de Wheel Wizard depuis Github"
+    update_wh_wz: "Mise à jour de Wheel Wizard en cours..."
+    installing_rr: "Installation de Retro Rewind "
+    installing_rr_first_time: "Installation de Retro Rewind pour la première fois"
+    installing_dolphin: "Installation de Dolphin Emulator"
+    this_may_take_a_while: "Cela peut prendre plus de temps en fonction de votre connexion internet."
+  question:
+    launch_clear_mods_found:
+      title: "Mods trouvés "
+      extra: |-
+        Vous êtes sur le point de lancer le jeu sans aucun mods.
+        Voulez vous supprimer votre dossier My-Stuff ? 
+    sure_delete:
+      title: "Êtes-vous sûr de vouloir supprimer {$1} ?"
+      extra: "La suppresion est permanente et ne peut pas être inversée."
+      title_miis: "Êtes-vous sûr de vouloir supprimer {$1} Miis ?"
+    apply_scale:
+      title: "Voulez-vous appliquez la nouvelle échelle ? "
+      extra: "Cette modification va être rétablie dans {$1} sauf si vous choisissez de garder cette modification."
+    dolphin_found:
+      title: "Dossier Dolphin Emulator trouvé"
+      extra: "Si vous ne savez pas ce que tous cela veut dire, juste cliquez sur oui :) \\nDossier Dolphin Emulator trouvé. Voulez-vous utilser ce dossier ? "
+    new_version_wh_wz:
+      title: "Mise à jour Wheel Wizard disponible !"
+      extra: "La version {$1} de Wheel Wizard est disponible (Version actuelle: {$2}). Voulez-vous mettre à jour maintenant ? "
+    update_admin:
+      title: "Mettre à jour en Administrateur"
+      extra: "Des fois, une mise à jour demande les droits d'admin. Voulez-vous les activer pour cette mise à jour ? "
+    reinstall_rr:
+      title: "Réinstaller Retro Rewind "
+      extra: "Êtes-vous sûr de vouloir réinstaller Retro Rewind ?"
+    old_rksys_found:
+      title: "Ancien rksys.dat trouvé "
+      extra: "Une ancienne sauvegarde a été trouvée. Voulez-vous l'utiliser ? (Recommandé) "
+    rr_to_old:
+      extra: |-
+        Votre version de Retro Rewind est trop vieille pour être mis à jour.
+        Voulez-vous réinstaller Retro Rewind ? 
+      title: "Votre version de Retro Rewind est trop vieille."
+    rr_not_determent:
+      title: "Télécharger Retro Rewind "
+      extra: |-
+        Votre version de Retro Rewind n'a pas pu être déterminée.
+        Voulez-vous installer Retro Rewind ? 
+    dolphin_flatpack:
+      title: "Installation de Dolphin Flatpak..."
+      extra: "La version Flatpak de Dolphin Emulator ne semble pas être installée. Veuillez-vous qu'on vous l'installe ?"
+    install_mod:
+      title: "Voulez-vous télécharger et installer le mod suivant: {$1} ?"
+    search_mod: "Recherche de mods..."
+    enter_new_name:
+      title: "Entrez un nouveau nom"
+      extra: "Changer le nom actuel à: {$1}"
+  message_warning:
+    not_find_dolphin:
+      extra: "N'a pas pu trouver Dolphin Emulator, veuillez choisir le chemin dans les paramètres"
+    not_find_game:
+      extra: "N'a pas pu trouver le jeu, veuillez chosir le chemin dans les paramètres"
+    multiple_files_selected:
+      title: "Plusieurs fichers sélectionnés"
+    invalid_name:
+      extra:
+        mod_name_exists: "Un mod avec le nom \"{$1}\" existe déjà"
+      title: "Nom impossible."
+    invalid_paths:
+      extra: "Vérifiez bien si tous les chemins sont corrects et essayez à nouveau."
+      title: "Chemin invalide"
+    dolphin_not_found:
+      title: "Dossier Dolphin Emulator non trouvé "
+      extra: "Le dossier Dolphin Emulator n'a pas été automatiquement trouvé. Veuillez essayé de trouver le dossier manuellement, cliquez sur \"Aide\" pour plus d'information."
+    fail_check_updates:
+      title: "Échec de la vérification des mises à jour"
+      extra: "Impossibilité de vérifier les mises à jour actuellement. Vous n'êtes probablement pas connecté à internet ou le serveur est probablement en maintenance"
+    unable_update_wh_wz:
+      extra:
+        reason_network: "Impossible de vérifier si Wheel Wizard est mis à jour. \\nVous pourrez expérimenter des problèmes d'internet."
+        reason_location: "Impossible de mettre à jour Wheel Wizard. Veuillez bien vérifier que l'application se trouve dans un dossier qui peut être écrit. \\n N'a pas pu trouver le dossier actuel."
+      title: "Impossible de mettre à jour Wheel Wizard.   "
+    no_connect_server:
+      extra: "N'a pas pu de se connecter au serveur. Veuillez réessayer plus tard."
+      title: "N'a pas pu se connecter au serveur"
+    cant_view_mod:
+      title: "Impossibilité de voir ce mod."
+      extra:
+        something_else: "Quelque chose a échoué en essayant d'ouvrir le mod choisi."
+        not_from_browser: "Impossibilité de voir un mod qui n'a pas été installé depuis GameBanana"
+    cannot_delete_fav_mii:
+      title: "Impossibilité de supprimer des Mii en favoris."
+      extra: "Un ou plusieurs des Miis choisis sont en favoris. Les Miis peuvent être supprimés seulement s'ils ne sont pas en favoris pour éviter une suppression involontaire."
+    mod_name_invalid:
+      title: "Nom du mod invalide."
+      extra: "Le nom du mod contient des caractères invalides."
+    mod_name_empty:
+      title: "Le nom du mod ne peut pas être vide"
+      extra: "Veuillez écrire un nom pour le mod."
+    unable_download_mod:
+      title: "Impossibilité de télécharger le mod"
+      extra: "Les fichiers n'ont pas été trouvés."
+  placeholder:
+    enter_mod_name: "Entrez le nom du mod..."
+    search_mod: "Recherche de mods..."
+    enter_mii_name: "Entrez le nom du mii..."
+    enter_text_here: "Entrez un texte ici..."
+    search_for_players: "Recherche de joueurs..."
+    enter_path: "Choisissez le chemin désiré ici..."
+  message_error:
+    no_mod_folder:
+      extra: "Le dossier du mod n'existe pas"
+    abort_rr:
+      extra:
+        failed_update_delete: "Échec de la désinstallation de fichiers pour la mise à jour. Annulation"
+        failed_update_apply: "Échec d'application de la mise à jour. Annulation."
+        invalid_file_path: "Chemin vers un fichier incorrect. Veuillez contacter les développeurs de Wheel Wizard.\\n Erreur Serveur:  {$1}"
+      title: "Anuller la mise à jour de RR"
+    restart_admin_fail:
+      extra: "Échec du redémarrage avec les droits d'administrateur."
+    generic_error:
+      title: "Une erreur s'est produite."
+    failed_create_mii_db:
+      title: "Échec de la création de la base de donnée des Miis"
+    failed_change_name:
+      title: "Échec du changement de nom"
+    failed_change_mii:
+      title: "Échec du changement de Mii "
+    failed_install_dolphin:
+      title: "Échec de l'installation de Dolphin"
+      extra: "L'installation de Dolphin Emulator a échoué. Veuillez essayer d'installer Flatpak Dolphin."
+    failed_retrieve_mod:
+      title: "Échec d'obtention des informations du mod"
+    mod_download_fail:
+      title: "Échec du téléchargement du mod."
+      extra: "Une erreur s'est produite pendant le téléchargement du mod suivant: {$1}"
+  message_success:
+    settings_saved:
+      title: "Paramètre sauvegarder avec succès !"
+    rr_up_to_date:
+      title: "Retro Rewind est bien à jour."
+    mii_changed: "Changement du Mii avec succès"
+  snackbar_warning:
+    cant_save_mii: "Impossible de savegarder le Mii"
+    no_mii_export: "Il semblerait qu'aucun Miis peuvent être exporter"
+    no_mii_delete: "Il semblerait qu'aucun Miis peuvent être supprimer "
+  snackbar_success:
+    mii_added: "Le Mii a été ajouté a vos Miis "
+    copied_fc: "Code Ami copié dans le presse-papier"
+    name_change: "Changement du nom en '{$1}' avec succès"
+    saved_mii: "Mii '{$1}' sauvegardé au chemin suivant '{$2}'"
+    deleted: "Suppression de '{$1}' "
+    deleted_miis: "Suppression de {$1} Miis"
+    created_duplicate: "Clonage de '{$1}'"
+    created_duplicates_miis: "Clonage de {$1} Miis"
+    profile_set_primary: "Choisir ce profil en profil principal"
+  snackbar_error:
+    mii_failure_deserialize: "Échec de la désérialisation du Mii '{$1}'"
+    mii_failure_update: "Échec de mise à jour du Mii '{$1}'"
+    mii_failure_save: "Échec de savegarde du Mii '{$1}'"
+    mii_failure_get: "Échec d'obtention du Mii '{$1}'"
+    mii_failure_serialize: "Échec de la sérialisation du Mii '{$1}'"
+    mii_failure_create: "Échec de la création du Mii '{$1}'"
+    mii_failure_duplicate: "Échec du clonage des Miis '{$1}'"
+  helper_note:
+    name_must_between: "Les noms doivent être composés de 3 à 10 caractères."
+    creator_name_less11: "Le nom de l'auteur doit faire moins de 11 caractères."
+    creator_name_less10: "Le nom de l'auteur doit faire moins de 10 caractères."
+  option:
+    wh_wz_language: "Langue de Wheel Wizard"
+    force_disable_wiimote: "Forcer la désactivation des Wiimotes"
+    launch_with_dolphin: "Lancer le jeu avec la fennêtre de Dolphin "
+    v_sync: "Synchronisation Verticale"
+    recommended: "Paramètres Recommandés"
+    show_fps: "Montrer les FPS"
+    renderer: "Rendu"
+    window_scale: "Taille de la fennêtre"
+    open_config: "Ouvrir le dossier de configuration"
+    dolphin_user_path: "Dossier d'utilisateur Dolphin"
+    mario_kart_game: "ISO Mario Kart Wii"
+    dolphin_emulator_exe: "Éxécutable Dolphin Emulator"
+    make_primary: "Défini par défaut"
+    remove_blur: "Retirer le Blur"
+    enable_animations: "Activer les animations"
+    reinstall: "Réinstaller Retro Rewind "
+    open_game_folder: "Ouvrir le dossier du jeu"
+    open_save_folder: "Ouvrir le dossier de sauvegarde"
+  section:
+    language: "Langue"
+    wii: "Paramètres Wii"
+    resolution: "Résolution"
+    performance: "Paramètres de perfomance"
+    renderer: "Paramètres de rendu "
+    location_paths: "Paramètres de localisation"
+    wh_wz_appearance: "Apparence de Wheel Wizard"
+    installation: "Installation"
+  helper_text:
+    topbar:
+      location_warning: "Les paramètres sont désactivés, complétez d'abord les paramètres de localisation"
+    launch_with_dolphin: "Ira lancer la fenêtre d'accueil de Dolphin en plus du jeu"
+    force_disable_wiimote: "Ce paramètre ira désactiver les Wiimotes dans le jeu, mais les activés dans le menu Wii"
+    resolution_scale: "1x est la résolution native"
+    recommended: "Ce paramètre va changer certain paramètre Dolphin pour réduire les saccades et lag spikes "
+    30_fps: "Ce paramètre va forcer le jeu à tourner en 30 FPS (60 est par défaut)"
+    end_with_exe: "Le chemin doit se finir en .exe"
+    enable_animations: "Ceci active les animations dans l'application Wheel Wizard"
+    end_with_x: "Le chemin doit se finir avec:"
+    wh_wz_language: "Ceci change uniquement la langue dans Wheel Wizard. Pour changer la langue dans le jeu. Veuillez le faire depuis les paramètres de Retro Rewind."
+    optional: "Optionnel"
+    must_set_paths: "Vous devez impérativement définir ces 3 chemins afin de jouer à Retro Rewind"
+  category:
+    video: "Vidéo"
+    about: "À propos"
+    other: "Autre"
+    general: "Général"
+  value:
+    language:
+      france: "Français"
+      dutch: "Néerlandais"
+      english: "Anglais"
+      german: "Allemand"
+      italian: "Italien"
+      japanese: "Japonais"
+      turkish: "Turc"
+      spanish: "Espagnol"
+      finnish: "Finlandais"
+      korean: "Coréen"
+      russian: "Russe"
+      arabic: "Arabe"
+      czech: "Tchèque"
+      norwegian: "Norvégien"
+      chinese: "Chinois "
+      portuguese: "Portugais"
+      z_translators: "Eppe, Yawshi"

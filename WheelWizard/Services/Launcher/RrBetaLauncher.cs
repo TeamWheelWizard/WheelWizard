@@ -2,7 +2,6 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services.Input;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.WiiManagement;
@@ -43,9 +42,9 @@ public class RrBetaLauncher : ILauncher
             if (_modsLaunchService.ShouldAskToClearTargetFolder(targetFolderPath))
             {
                 clearTargetFolder = await new YesNoWindow()
-                    .SetButtonText(Common.Action_Delete, Common.Action_Keep)
-                    .SetMainText(Phrases.Question_LaunchClearModsFound_Title)
-                    .SetExtraText(Phrases.Question_LaunchClearPatchesFound_Extra)
+                    .SetButtonText(t("action.delete"), t("action.keep"))
+                    .SetMainText(t("question.launch_clear_mods_found.title"))
+                    .SetExtraText(t("question.launch_clear_patches_found.extra"))
                     .AwaitAnswer();
             }
 
@@ -54,7 +53,7 @@ public class RrBetaLauncher : ILauncher
                 return modsLaunchResult.Error;
 
             if (!File.Exists(PathManager.GameFilePath))
-                return Fail(Phrases.MessageWarning_NotFindGame_Extra);
+                return Fail(t("message_warning.not_find_game.extra"));
 
             RetroRewindLaunchHelper.GenerateLaunchJson(PathManager.RrBetaXmlFilePath);
             var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";

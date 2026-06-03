@@ -1,6 +1,4 @@
 using Serilog;
-using WheelWizard.Helpers;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Shared.MessageTranslations;
@@ -96,8 +94,8 @@ public static class MessageTranslationHelper
 
             MessageTranslation.Success_StanderdSuccess => ("Success", "Completed successfully!"),
             MessageTranslation.Success_PathSettingsSaved => (
-                Phrases.MessageSuccess_SettingsSaved_Title,
-                Phrases.MessageSuccess_SettingsSaved_Title
+                t("message_success.settings_saved.title"),
+                t("message_success.settings_saved.title")
             ),
 
             #endregion
@@ -106,8 +104,8 @@ public static class MessageTranslationHelper
 
             MessageTranslation.Warning_StanderdWarning => ("Warning", "Something went wrong!"),
             MessageTranslation.Warning_InvalidPathSettings => (
-                Phrases.MessageWarning_InvalidPaths_Title,
-                Phrases.MessageWarning_InvalidPaths_Extra
+                t("message_warning.invalid_paths.title"),
+                t("message_warning.invalid_paths.extra")
             ),
             MessageTranslation.Warning_UnkownRendererSelected => ("Unknown renderer selected", "Unknown renderer selected: {$1}"),
             MessageTranslation.Warning_CouldNotFindRoom => (
@@ -115,38 +113,38 @@ public static class MessageTranslationHelper
                 "Whoops, could not find the room that this player is supposedly playing in"
             ),
             MessageTranslation.Warning_CantDeleteFavMii => (
-                Phrases.MessageWarning_CannotDeleteFavMii_Title,
-                Phrases.MessageWarning_CannotDeleteFavMii_Extra
+                t("message_warning.cannot_delete_fav_mii.title"),
+                t("message_warning.cannot_delete_fav_mii.extra")
             ),
 
             MessageTranslation.Warning_CantViewMod_SomethingWrong => (
-                Phrases.MessageWarning_CantViewMod_Title,
-                Phrases.MessageWarning_CantViewMod_Extra_SomethingElse
+                t("message_warning.cant_view_mod.title"),
+                t("message_warning.cant_view_mod.extra.something_else")
             ),
             MessageTranslation.Warning_CantViewMod_NotFromBrowser => (
-                Phrases.MessageWarning_CantViewMod_Title,
-                Phrases.MessageWarning_CantViewMod_Extra_NotFromBrowser
+                t("message_warning.cant_view_mod.title"),
+                t("message_warning.cant_view_mod.extra.not_from_browser")
             ),
             MessageTranslation.Warning_NoMiisFound => ("No Miis Found", "There are no other Miis available to select."),
             MessageTranslation.Warning_DolphinNotFound => (
-                Phrases.MessageWarning_DolphinNotFound_Title,
-                Phrases.MessageWarning_DolphinNotFound_Extra
+                t("message_warning.dolphin_not_found.title"),
+                t("message_warning.dolphin_not_found.extra")
             ),
             MessageTranslation.Warning_DolphinToolSelected => (
-                Phrases.MessageWarning_DolphinToolSelected_Title,
-                Phrases.MessageWarning_DolphinToolSelected_Extra
+                t("message_warning.dolphin_tool_selected.title"),
+                t("message_warning.dolphin_tool_selected.extra")
             ),
             MessageTranslation.Warning_ModNameCantEmpty => (
-                Phrases.MessageWarning_ModNameEmpty_Title,
-                Phrases.MessageWarning_ModNameEmpty_Extra
+                t("message_warning.mod_name_empty.title"),
+                t("message_warning.mod_name_empty.extra")
             ),
             MessageTranslation.Warning_ModNameInvalid => (
-                Phrases.MessageWarning_ModNameInvalid_Title,
-                Phrases.MessageWarning_ModNameInvalid_Extra
+                t("message_warning.mod_name_invalid.title"),
+                t("message_warning.mod_name_invalid.extra")
             ),
             MessageTranslation.Warning_UnableToDownloadMod_Files => (
-                Phrases.MessageWarning_UnableDownloadMod_Title,
-                Phrases.MessageWarning_UnableDownloadMod_Extra
+                t("message_warning.unable_download_mod.title"),
+                t("message_warning.unable_download_mod.extra")
             ),
 
             #endregion
@@ -155,11 +153,11 @@ public static class MessageTranslationHelper
 
             MessageTranslation.Error_StanderdError => ("Standard Error", "Something went wrong!"),
             MessageTranslation.Error_ModDownloadFailed => (
-                Phrases.MessageError_ModDownloadFail_Title,
-                Phrases.MessageError_ModDownloadFail_Extra
+                t("message_error.mod_download_fail.title"),
+                t("message_error.mod_download_fail.extra")
             ),
             MessageTranslation.Error_FailedCopyMii => ("Failed to copy Mii", "{$1}"),
-            MessageTranslation.Error_MiiDBAlreadyExists => (Phrases.MessageError_FailedCreateMiiDb_Title, "Database already exists."),
+            MessageTranslation.Error_MiiDBAlreadyExists => (t("message_error.failed_create_mii_db.title"), "Database already exists."),
             MessageTranslation.Error_UpdateMiiDb_InvalidClId => ("Invalid Client ID.", "The client ID attached to this Mii is invalid."),
             MessageTranslation.Error_UpdateMiiDb_BlockSizeInvalid => ("Mii block size invalid.", null),
             MessageTranslation.Error_UpdateMiiDb_NoBlockFound => ("Mii block not found.", null),
@@ -179,8 +177,8 @@ public static class MessageTranslationHelper
             MessageTranslation.Error_MiiEditor_CantOpenEditor => ("Cant open Mii Editor", "{$1}"),
 
             MessageTranslation.Error_FailedInstallDolphin => (
-                Phrases.MessageError_FailedInstallDolphin_Title,
-                Phrases.MessageError_FailedInstallDolphin_Extra
+                t("message_error.failed_install_dolphin.title"),
+                t("message_error.failed_install_dolphin.extra")
             ),
 
             #endregion
@@ -234,13 +232,11 @@ public static class MessageTranslationHelper
             (int)msg < 1000 ? MessageBoxWindow.MessageType.Message
             : (int)msg < 3000 ? MessageBoxWindow.MessageType.Warning
             : MessageBoxWindow.MessageType.Error;
-        var box = new MessageBoxWindow()
-            .SetMessageType(type)
-            .SetTitleText(Humanizer.ReplaceDynamic(title, titleReplacements ?? []) ?? title);
+        var box = new MessageBoxWindow().SetMessageType(type).SetTitleText(tFormat(title, titleReplacements ?? []));
         if (extraText == null)
-            box.SetInfoText(Humanizer.ReplaceDynamic(title, titleReplacements ?? []) ?? title);
+            box.SetInfoText(tFormat(title, titleReplacements ?? []));
         else
-            box.SetInfoText(Humanizer.ReplaceDynamic(extraText, extraReplacements ?? []) ?? extraText);
+            box.SetInfoText(tFormat(extraText, extraReplacements ?? []));
 
         if ((int)msg >= 2000)
             box.SetTag($"{(int)msg}");
@@ -256,7 +252,7 @@ public static class MessageTranslationHelper
         return new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Error)
             .SetTag("Unk")
-            .SetTitleText(Phrases.MessageError_GenericError_Title)
+            .SetTitleText(t("message_error.generic_error.title"))
             .SetInfoText(error.Message);
     }
 
