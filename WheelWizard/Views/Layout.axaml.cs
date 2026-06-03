@@ -250,6 +250,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         FriendsButton.BoxTip = t("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
     }
 
+    public void UpdateSidebarProfile() => SidebarCurrentUserProfile.Refresh();
+
     public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
     {
         var playerCount = sender.PlayerCount;

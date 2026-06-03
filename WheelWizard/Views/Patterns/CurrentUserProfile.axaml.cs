@@ -51,6 +51,11 @@ public partial class CurrentUserProfile : UserControlBase
         InitializeComponent();
         DataContext = this;
 
+        Refresh();
+    }
+
+    public void Refresh()
+    {
         GameLicenseService.RefreshOnlineStatus();
         GameLicenseService.LoadLicense();
 
