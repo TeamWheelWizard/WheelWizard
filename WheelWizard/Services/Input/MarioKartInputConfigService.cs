@@ -128,6 +128,71 @@ public static class MarioKartInputConfigService
 
     public static string GetProfilesFolderPath() => Path.Combine(PathManager.ConfigFolderPath, ProfileFolderName, GcPadProfileFolderName);
 
+    public static OperationResult ValidatePresetName(string presetName)
+    {
+        var normalizedName = NormalizePresetName(presetName);
+        if (string.IsNullOrWhiteSpace(normalizedName))
+            return Fail("Enter a preset name.");
+
+        if (normalizedName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            return Fail("Preset names cannot contain file path characters.");
+
+        if (string.Equals($"{normalizedName}.ini", ActiveProfileFileName, StringComparison.OrdinalIgnoreCase))
+            return Fail("That name is reserved for Wheel Wizard's active profile.");
+
+        if (File.Exists(GetNamedPresetPath(normalizedName)))
+            return Fail("A preset with this name already exists.");
+
+        return Ok();
+    }
+
+    public static OperationResult<string> SaveNamedPreset(MarioKartInputProfile profile, string presetName)
+    {
+        var validationResult = ValidatePresetName(presetName);
+        if (validationResult.IsFailure)
+            return validationResult.Error;
+
+        var normalizedName = NormalizePresetName(presetName);
+        var profilePath = GetNamedPresetPath(normalizedName);
+        var savedProfile = profile.Clone();
+        savedProfile.Bindings[MarioKartInputAction.TrickWheelie] = NormalizeTrickWheelieBinding(
+            savedProfile.Bindings.GetValueOrDefault(MarioKartInputAction.TrickWheelie, string.Empty)
+        );
+
+        try
+        {
+            WriteProfilePreset(savedProfile, profilePath);
+            return profilePath;
+        }
+        catch (Exception ex)
+        {
+            return Fail(ex);
+        }
+    }
+
+    public static OperationResult DeletePreset(MarioKartInputPresetOption preset)
+    {
+        if (preset.Kind != MarioKartInputPresetKind.SavedDolphinProfile || string.IsNullOrWhiteSpace(preset.FilePath))
+            return Fail("Choose a saved preset to delete.");
+
+        var fullPath = Path.GetFullPath(preset.FilePath);
+        if (!IsPathInProfilesFolder(fullPath))
+            return Fail("Preset path is outside Dolphin's GameCube profile folder.");
+
+        if (!File.Exists(fullPath))
+            return Fail("That preset no longer exists.");
+
+        try
+        {
+            File.Delete(fullPath);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Fail(ex);
+        }
+    }
+
     private static MarioKartInputProfile LoadProfileFromSection(KeyDataCollection section, string sourceSection)
     {
         var profile = new MarioKartInputProfile
@@ -303,6 +368,30 @@ public static class MarioKartInputConfigService
         var tokens = rawTokens.Select(HumanizeToken).Where(token => !string.IsNullOrWhiteSpace(token)).ToList();
 
         return tokens.Count == 0 ? "Not set" : string.Join(" or ", tokens);
+    }
+
+    public static bool DoesBindingMatchActiveInputs(MarioKartInputAction action, string binding, IReadOnlySet<string> activeInputs)
+    {
+        if (string.IsNullOrWhiteSpace(binding) || activeInputs.Count == 0)
+            return false;
+
+        var normalizedBinding = binding.Trim();
+        if (activeInputs.Contains(normalizedBinding))
+            return true;
+
+        if (action == MarioKartInputAction.Steering && IsDirectionalBindingActive(normalizedBinding, activeInputs))
+            return true;
+
+        if (action == MarioKartInputAction.TrickWheelie)
+        {
+            if (normalizedBinding == FullDPadBinding && activeInputs.Contains(FullDPadBinding))
+                return true;
+
+            if (IsDirectionalBindingActive(normalizedBinding, activeInputs))
+                return true;
+        }
+
+        return SplitBinding(normalizedBinding).Any(token => activeInputs.Contains(token.Trim()));
     }
 
     public static bool SupportsStickSettings(MarioKartInputAction action, string binding) =>
@@ -878,11 +967,11 @@ public static class MarioKartInputConfigService
         };
     }
 
-    private static void SaveProfilePreset(MarioKartInputProfile profile)
+    private static void SaveProfilePreset(MarioKartInputProfile profile) => WriteProfilePreset(profile, GetActiveProfilePath());
+
+    private static void WriteProfilePreset(MarioKartInputProfile profile, string profilePath)
     {
-        var profileFolder = GetProfilesFolderPath();
-        FileHelper.EnsureDirectory(profileFolder);
-        var profilePath = GetActiveProfilePath();
+        FileHelper.EnsureDirectory(Path.GetDirectoryName(profilePath) ?? GetProfilesFolderPath());
 
         var profileData = new IniData();
         var profileSection = EnsureSection(profileData, "Profile");
@@ -921,6 +1010,37 @@ public static class MarioKartInputConfigService
         );
 
         WriteIniFile(profilePath, profileData);
+    }
+
+    private static bool IsDirectionalBindingActive(string binding, IReadOnlySet<string> activeInputs)
+    {
+        if ((binding is LeftStickBinding or RightStickBinding or DPadBinding) && activeInputs.Contains(binding))
+            return true;
+
+        if (!IsCustomDirectionalBinding(binding))
+            return false;
+
+        var bindingSet = GetDirectionalBindingSet(MarioKartInputAction.Steering, binding);
+        return SplitBinding(bindingSet.Up)
+            .Concat(SplitBinding(bindingSet.Down))
+            .Concat(SplitBinding(bindingSet.Left))
+            .Concat(SplitBinding(bindingSet.Right))
+            .Any(token => activeInputs.Contains(token.Trim()));
+    }
+
+    private static string NormalizePresetName(string presetName)
+    {
+        var trimmedName = (presetName ?? string.Empty).Trim();
+        return trimmedName.EndsWith(".ini", StringComparison.OrdinalIgnoreCase) ? trimmedName[..^".ini".Length].Trim() : trimmedName;
+    }
+
+    private static string GetNamedPresetPath(string normalizedName) => Path.Combine(GetProfilesFolderPath(), $"{normalizedName}.ini");
+
+    private static bool IsPathInProfilesFolder(string path)
+    {
+        var profilesFolder = Path.GetFullPath(GetProfilesFolderPath());
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        return path.StartsWith($"{profilesFolder}{Path.DirectorySeparatorChar}", comparison);
     }
 
     private static bool TryLoadLaunchProfile(out MarioKartInputProfile profile)

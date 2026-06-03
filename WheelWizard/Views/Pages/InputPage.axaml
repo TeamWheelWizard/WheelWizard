@@ -47,8 +47,7 @@
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="10,10,10,16" Spacing="10">
-                <Grid ColumnDefinitions="*,*"
-                      RowDefinitions="Auto,Auto">
+                <Grid ColumnDefinitions="*,*">
                     <StackPanel Spacing="6" Margin="0,0,8,0">
                         <TextBlock Text="Input Device"
                                    Classes="TitleText"
@@ -75,28 +74,42 @@
                                    Classes="TitleText"
                                    FontSize="18"
                                    Foreground="{StaticResource Neutral100}" />
-                        <ComboBox x:Name="PresetDropdown"
-                                  HorizontalAlignment="Stretch"
-                                  SelectionChanged="PresetDropdown_OnSelectionChanged">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate x:DataType="input:MarioKartInputPresetOption">
-                                    <StackPanel Spacing="2">
-                                        <TextBlock Text="{Binding DisplayName}" />
-                                        <TextBlock Text="{Binding Subtitle}"
-                                                   Classes="TinyText"
-                                                   Foreground="{StaticResource Neutral400}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <ComboBox x:Name="PresetDropdown"
+                                      HorizontalAlignment="Stretch"
+                                      SelectionChanged="PresetDropdown_OnSelectionChanged">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="input:MarioKartInputPresetOption">
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Text="{Binding DisplayName}" />
+                                            <TextBlock Text="{Binding Subtitle}"
+                                                       Classes="TinyText"
+                                                       Foreground="{StaticResource Neutral400}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
 
-                    <TextBlock Grid.Row="1"
-                               Grid.ColumnSpan="2"
-                               x:Name="ControllerStatusText"
-                               Margin="0,10,0,0"
-                               TextWrapping="Wrap"
-                               Foreground="{StaticResource Neutral300}" />
+                            <StackPanel Grid.Column="1" Spacing="3" Margin="6,0,0,0">
+                                <components:Button x:Name="AddPresetButton"
+                                                   Text="+"
+                                                   Width="28"
+                                                   Height="20"
+                                                   Padding="0"
+                                                   FontSize="13"
+                                                   ToolTip.Tip="Add preset"
+                                                   Click="AddPresetButton_OnClick" />
+                                <components:Button x:Name="DeletePresetButton"
+                                                   Text="-"
+                                                   Width="28"
+                                                   Height="20"
+                                                   Padding="0"
+                                                   FontSize="13"
+                                                   ToolTip.Tip="Delete preset"
+                                                   Click="DeletePresetButton_OnClick" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
                 </Grid>
 
                 <Border Background="{StaticResource Neutral900}"
@@ -105,6 +118,14 @@
                         CornerRadius="{StaticResource GlobalCornerRadius}"
                         Padding="0">
                     <ItemsControl x:Name="BindingsList">
+                        <ItemsControl.Styles>
+                            <Style Selector="TextBlock.bindingTitle">
+                                <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
+                            </Style>
+                            <Style Selector="TextBlock.bindingTitle.pressed">
+                                <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+                            </Style>
+                        </ItemsControl.Styles>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="pages:InputBindingRow">
                                 <Border BorderBrush="{StaticResource Neutral700}"
@@ -113,9 +134,9 @@
                                     <Grid ColumnDefinitions="170,*,Auto"
                                           VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Title}"
-                                                   Classes="TitleText"
+                                                   Classes.pressed="{Binding IsPressed}"
+                                                   Classes="TitleText bindingTitle"
                                                    FontSize="17"
-                                                   Foreground="{StaticResource Neutral100}"
                                                    Margin="0,0,14,0"
                                                    VerticalAlignment="Center" />
 

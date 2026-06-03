@@ -527,6 +527,73 @@ public sealed class MarioKartInputConfigServiceTests
     }
 
     [Fact]
+    public void SaveNamedPreset_ShouldPersistCurrentProfileAsNamedProfile()
+    {
+        var userFolder = CreateTempUserFolder();
+        var profilesFolder = Path.Combine(userFolder, "Config", "Profiles", "GCPad");
+
+        try
+        {
+            SettingsTestUtils.InitializeSettingsRuntime(userFolder);
+
+            var profile = new MarioKartInputProfile { DeviceExpression = "SDL/0/Test Controller" };
+            profile.Bindings[MarioKartInputAction.Steering] = "left-stick";
+            profile.Bindings[MarioKartInputAction.Accelerate] = "`Button A`";
+
+            var result = MarioKartInputConfigService.SaveNamedPreset(profile, "Arcade Pad");
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(Path.Combine(profilesFolder, "Arcade Pad.ini"), result.Value);
+            Assert.Contains("Buttons/A = `Button A`", File.ReadAllText(result.Value));
+        }
+        finally
+        {
+            SettingsTestUtils.ResetSettingsRuntime();
+            SettingsTestUtils.ResetSignalRuntime();
+            Directory.Delete(userFolder, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void DeletePreset_ShouldRemoveSavedPresetFile()
+    {
+        var userFolder = CreateTempUserFolder();
+        var profilesFolder = Path.Combine(userFolder, "Config", "Profiles", "GCPad");
+        Directory.CreateDirectory(profilesFolder);
+        var presetPath = Path.Combine(profilesFolder, "Arcade Pad.ini");
+
+        try
+        {
+            File.WriteAllText(presetPath, "[Profile]\nDevice = SDL/1/Arcade Pad\n");
+            SettingsTestUtils.InitializeSettingsRuntime(userFolder);
+
+            var preset = MarioKartInputConfigService.GetPresetOptions().Single(option => option.DisplayName == "Arcade Pad");
+            var result = MarioKartInputConfigService.DeletePreset(preset);
+
+            Assert.True(result.IsSuccess);
+            Assert.False(File.Exists(presetPath));
+        }
+        finally
+        {
+            SettingsTestUtils.ResetSettingsRuntime();
+            SettingsTestUtils.ResetSignalRuntime();
+            Directory.Delete(userFolder, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void DoesBindingMatchActiveInputs_WhenMappedButtonIsPressed_ShouldReturnTrue()
+    {
+        var isActive = MarioKartInputConfigService.DoesBindingMatchActiveInputs(
+            MarioKartInputAction.Accelerate,
+            "`Button A`",
+            new HashSet<string>(StringComparer.Ordinal) { "`Button A`" }
+        );
+
+        Assert.True(isActive);
+    }
+
+    [Fact]
     public void EnsureLaunchProfileIsApplied_WhenNoConfiguredProfileExists_ShouldNotCreateControllerFiles()
     {
         var userFolder = CreateTempUserFolder();

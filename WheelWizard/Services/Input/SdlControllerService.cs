@@ -126,6 +126,25 @@ public static class SdlControllerService
         return true;
     }
 
+    public static IReadOnlySet<string> GetActiveInputBindings(uint instanceId)
+    {
+        var bindings = new HashSet<string>(StringComparer.Ordinal);
+
+        if (!EnsureInitialized())
+            return bindings;
+
+        RefreshControllers();
+        if (!OpenControllers.TryGetValue(instanceId, out var controller))
+            return bindings;
+
+        if (controller.IsGamepad)
+            AddActiveGamepadBindings(controller, bindings);
+        else
+            AddActiveJoystickBindings(controller, bindings);
+
+        return bindings;
+    }
+
     public static void BeginCapture(uint instanceId)
     {
         if (!EnsureInitialized())
@@ -207,6 +226,85 @@ public static class SdlControllerService
 
         var joystick = SDL.OpenJoystick(instanceId);
         return joystick == IntPtr.Zero ? null : ControllerRuntimeState.ForJoystick(instanceId, dolphinDeviceIndex, joystick);
+    }
+
+    private static void AddActiveGamepadBindings(ControllerRuntimeState controller, ISet<string> bindings)
+    {
+        foreach (var button in CapturableButtons)
+        {
+            if (!controller.CurrentButtons.GetValueOrDefault(button))
+                continue;
+
+            var binding = MapButtonToDolphinExpression(button);
+            bindings.Add(binding);
+
+            if (
+                button
+                is SDL.GamepadButton.DPadUp
+                    or SDL.GamepadButton.DPadDown
+                    or SDL.GamepadButton.DPadLeft
+                    or SDL.GamepadButton.DPadRight
+            )
+            {
+                bindings.Add("dpad");
+                bindings.Add("full-dpad");
+            }
+        }
+
+        if (IsAxisActivated(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftTrigger)))
+            bindings.Add(MarioKartInputConfigService.WrapToken("Trigger L"));
+
+        if (IsAxisActivated(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightTrigger)))
+            bindings.Add(MarioKartInputConfigService.WrapToken("Trigger R"));
+
+        if (
+            IsDirectionalAxisActive(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftX))
+            || IsDirectionalAxisActive(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.LeftY))
+        )
+            bindings.Add("left-stick");
+
+        if (
+            IsDirectionalAxisActive(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightX))
+            || IsDirectionalAxisActive(controller.CurrentAxes.GetValueOrDefault(SDL.GamepadAxis.RightY))
+        )
+            bindings.Add("right-stick");
+    }
+
+    private static void AddActiveJoystickBindings(ControllerRuntimeState controller, ISet<string> bindings)
+    {
+        for (var buttonIndex = 0; buttonIndex < controller.JoystickButtonCount; buttonIndex++)
+        {
+            if (controller.CurrentJoystickButtons.GetValueOrDefault(buttonIndex))
+                bindings.Add(MarioKartInputConfigService.WrapToken($"Button {buttonIndex}"));
+        }
+
+        for (var axisIndex = 0; axisIndex < controller.JoystickAxisCount; axisIndex++)
+        {
+            var axisValue = controller.CurrentJoystickAxes.GetValueOrDefault(axisIndex);
+            if (IsAxisActivated(axisValue))
+                bindings.Add(MarioKartInputConfigService.WrapToken($"Axis {axisIndex}{(axisValue >= 0 ? "+" : "-")}"));
+        }
+
+        for (var hatIndex = 0; hatIndex < controller.JoystickHatCount; hatIndex++)
+        {
+            var hat = controller.CurrentJoystickHats.GetValueOrDefault(hatIndex);
+            AddActiveHatBinding(bindings, hatIndex, hat, SDL.JoystickHat.Up, "N");
+            AddActiveHatBinding(bindings, hatIndex, hat, SDL.JoystickHat.Down, "S");
+            AddActiveHatBinding(bindings, hatIndex, hat, SDL.JoystickHat.Left, "W");
+            AddActiveHatBinding(bindings, hatIndex, hat, SDL.JoystickHat.Right, "E");
+        }
+    }
+
+    private static void AddActiveHatBinding(
+        ISet<string> bindings,
+        int hatIndex,
+        SDL.JoystickHat currentHat,
+        SDL.JoystickHat direction,
+        string dolphinDirection
+    )
+    {
+        if ((currentHat & direction) == direction)
+            bindings.Add(MarioKartInputConfigService.WrapToken($"Hat {hatIndex} {dolphinDirection}"));
     }
 
     private static string TryCaptureDirectionalBinding(ControllerRuntimeState controller)
@@ -451,6 +549,8 @@ public static class SdlControllerService
         (current & direction) == direction && (baseline & direction) != direction;
 
     private static bool IsAxisActivated(short value) => Math.Abs(value) >= AxisCaptureThreshold;
+
+    private static bool IsDirectionalAxisActive(short value) => Math.Abs(value) >= DirectionalAxisDeltaThreshold;
 
     private static double NormalizeAxis(short value)
     {

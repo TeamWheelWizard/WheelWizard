@@ -8,6 +8,7 @@ using WheelWizard.Services.Input;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views;
+using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.Input;
 using Button = WheelWizard.Views.Components.Button;
 
@@ -17,6 +18,7 @@ public partial class InputPage : UserControlBase
 {
     private readonly DispatcherTimer _controllerTimer = new() { Interval = TimeSpan.FromMilliseconds(40) };
     private readonly List<InputBindingRow> _bindingRows;
+    private readonly HashSet<string> _pressedKeyboardBindings = new(StringComparer.Ordinal);
 
     private MarioKartInputProfile _profile = new();
     private MarioKartInputAction? _listeningAction;
@@ -36,6 +38,7 @@ public partial class InputPage : UserControlBase
     {
         InitializeComponent();
         AddHandler(KeyDownEvent, CaptureKeyboardBinding_OnKeyDown, RoutingStrategies.Tunnel);
+        AddHandler(KeyUpEvent, TrackKeyboardBinding_OnKeyUp, RoutingStrategies.Tunnel);
 
         _bindingRows = MarioKartInputCatalog
             .Definitions.Select(definition => new InputBindingRow(definition.Action, definition.Title))
@@ -58,6 +61,9 @@ public partial class InputPage : UserControlBase
     {
         base.OnDetachedFromVisualTree(e);
         _controllerTimer.Stop();
+        _pressedKeyboardBindings.Clear();
+        foreach (var row in _bindingRows)
+            row.IsPressed = false;
     }
 
     private void ControllerTimer_OnTick(object? sender, EventArgs e)
@@ -66,6 +72,7 @@ public partial class InputPage : UserControlBase
             return;
 
         RefreshControllerOptions();
+        UpdatePressedBindingRows();
 
         if (_listeningAction == null || _selectedController is not { IsConnected: true, IsKeyboard: false })
             return;
@@ -117,6 +124,7 @@ public partial class InputPage : UserControlBase
         if (optionsChanged || selectionChanged)
             PresetDropdown.SelectedItem = _selectedPreset;
         _suppressPresetChange = false;
+        UpdatePresetButtonState();
     }
 
     private void RefreshControllerOptions()
@@ -182,8 +190,6 @@ public partial class InputPage : UserControlBase
 
         if (!string.IsNullOrWhiteSpace(SdlControllerService.InitializationError))
         {
-            ControllerStatusText.Text =
-                $"Controller support could not start: {SdlControllerService.InitializationError} Keyboard bindings still work.";
             AutoMapButton.IsEnabled = _selectedController is { IsGenericJoystick: false };
             RumbleToggle.IsEnabled = false;
             return;
@@ -191,7 +197,6 @@ public partial class InputPage : UserControlBase
 
         if (_selectedController == null)
         {
-            ControllerStatusText.Text = "Choose Keyboard or a controller to start mapping your controls.";
             AutoMapButton.IsEnabled = false;
             RumbleToggle.IsEnabled = false;
             return;
@@ -199,8 +204,6 @@ public partial class InputPage : UserControlBase
 
         if (_selectedController.IsKeyboard)
         {
-            ControllerStatusText.Text =
-                "Keyboard is active. Click any single-input action and press a key, or hold Shift while clicking to open the extra-input editor. Steering and Trick / Wheelie open the four-direction editor.";
             AutoMapButton.IsEnabled = true;
             RumbleToggle.IsEnabled = false;
             return;
@@ -208,8 +211,6 @@ public partial class InputPage : UserControlBase
 
         if (_selectedController is { IsConnected: true, IsGenericJoystick: true })
         {
-            ControllerStatusText.Text =
-                $"{_selectedController.DisplayName} is connected as a generic controller. Click each binding and press the exact button, axis, or hat direction you want to use.";
             AutoMapButton.IsEnabled = false;
             RumbleToggle.IsEnabled = false;
             return;
@@ -217,15 +218,11 @@ public partial class InputPage : UserControlBase
 
         if (_selectedController.IsConnected)
         {
-            ControllerStatusText.Text =
-                $"{_selectedController.DisplayName} is connected. Click any binding to remap it, press a keyboard key while listening if you want a keyboard bind, or hold Shift while clicking to open the extra-input editor.";
             AutoMapButton.IsEnabled = true;
             RumbleToggle.IsEnabled = true;
             return;
         }
 
-        ControllerStatusText.Text =
-            $"{_selectedController.DisplayName} is saved in Dolphin but not connected right now. You can still bind keyboard keys, or connect it again to capture controller inputs and test rumble.";
         AutoMapButton.IsEnabled = true;
         RumbleToggle.IsEnabled = false;
     }
@@ -235,6 +232,12 @@ public partial class InputPage : UserControlBase
         _suppressRumbleToggleChange = true;
         RumbleToggle.IsChecked = MarioKartInputConfigService.IsRumbleEnabled(_profile);
         _suppressRumbleToggleChange = false;
+    }
+
+    private void UpdatePresetButtonState()
+    {
+        AddPresetButton.IsEnabled = _inputConfigAvailable;
+        DeletePresetButton.IsEnabled = _inputConfigAvailable && _selectedPreset?.Kind == MarioKartInputPresetKind.SavedDolphinProfile;
     }
 
     private void UpdateBindingRows()
@@ -253,6 +256,29 @@ public partial class InputPage : UserControlBase
                     && (row.Action is MarioKartInputAction.Steering or MarioKartInputAction.TrickWheelie)
                 );
         }
+
+        UpdatePressedBindingRows();
+    }
+
+    private void UpdatePressedBindingRows()
+    {
+        var activeInputs = GetActiveInputBindings();
+
+        foreach (var row in _bindingRows)
+        {
+            var binding = _profile.Bindings.GetValueOrDefault(row.Action, string.Empty);
+            row.IsPressed = MarioKartInputConfigService.DoesBindingMatchActiveInputs(row.Action, binding, activeInputs);
+        }
+    }
+
+    private IReadOnlySet<string> GetActiveInputBindings()
+    {
+        var activeInputs = new HashSet<string>(_pressedKeyboardBindings, StringComparer.Ordinal);
+
+        if (_selectedController is { IsConnected: true, IsKeyboard: false } controller)
+            activeInputs.UnionWith(SdlControllerService.GetActiveInputBindings(controller.InstanceId));
+
+        return activeInputs;
     }
 
     private void PresetDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -261,6 +287,7 @@ public partial class InputPage : UserControlBase
             return;
 
         _selectedPreset = preset;
+        UpdatePresetButtonState();
         _listeningAction = null;
         _profile = MarioKartInputConfigService.LoadProfile(preset);
         EnsureAllBindingsExist();
@@ -278,6 +305,53 @@ public partial class InputPage : UserControlBase
         UpdateBindingRows();
         RefreshControllerOptions();
         ShowSnackbar($"{preset.DisplayName} is loaded and ready for launch.", ViewUtils.SnackbarType.Success);
+    }
+
+    private async void AddPresetButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var presetName = await new TextInputWindow()
+            .SetMainText("Add preset")
+            .SetPlaceholderText("Preset name")
+            .SetButtonText("Cancel", "Add")
+            .SetValidation((_, name) => MarioKartInputConfigService.ValidatePresetName(name))
+            .ShowDialog();
+
+        if (string.IsNullOrWhiteSpace(presetName))
+            return;
+
+        var saveResult = MarioKartInputConfigService.SaveNamedPreset(_profile, presetName);
+        if (saveResult.IsFailure)
+        {
+            ShowSnackbar(saveResult.Error.Message, ViewUtils.SnackbarType.Danger);
+            return;
+        }
+
+        var options = MarioKartInputConfigService.GetPresetOptions();
+        var savedPreset = options.FirstOrDefault(option => string.Equals(option.FilePath, saveResult.Value, StringComparison.Ordinal));
+        RefreshPresetOptions(savedPreset);
+        ShowSnackbar($"{savedPreset?.DisplayName ?? presetName.Trim()} saved as a preset.", ViewUtils.SnackbarType.Success);
+    }
+
+    private void DeletePresetButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_selectedPreset is not { Kind: MarioKartInputPresetKind.SavedDolphinProfile } preset)
+        {
+            ShowSnackbar("Choose a saved preset to delete.", ViewUtils.SnackbarType.Warning);
+            return;
+        }
+
+        var deletedName = preset.DisplayName;
+        var deleteResult = MarioKartInputConfigService.DeletePreset(preset);
+        if (deleteResult.IsFailure)
+        {
+            ShowSnackbar(deleteResult.Error.Message, ViewUtils.SnackbarType.Danger);
+            return;
+        }
+
+        _selectedPreset = null;
+        RefreshPresetOptions();
+        UpdateBindingRows();
+        ShowSnackbar($"{deletedName} deleted. Current settings are still on this screen.", ViewUtils.SnackbarType.Success);
     }
 
     private void ControllerDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -350,14 +424,18 @@ public partial class InputPage : UserControlBase
 
     private void CaptureKeyboardBinding_OnKeyDown(object? sender, KeyEventArgs e)
     {
+        var hasKeyboardBinding = KeyboardInputService.TryCreateBinding(e.Key, out var binding);
+        if (hasKeyboardBinding)
+        {
+            _pressedKeyboardBindings.Add(binding);
+            UpdatePressedBindingRows();
+        }
+
         if (_listeningAction is not { } action)
             return;
 
         var definition = MarioKartInputCatalog.GetDefinition(action);
-        if (
-            definition.CaptureKind != MarioKartInputCaptureKind.SingleInput
-            || !KeyboardInputService.TryCreateBinding(e.Key, out var binding)
-        )
+        if (definition.CaptureKind != MarioKartInputCaptureKind.SingleInput || !hasKeyboardBinding)
             return;
 
         e.Handled = true;
@@ -375,6 +453,15 @@ public partial class InputPage : UserControlBase
         UpdateBindingRows();
         RefreshPresetOptions();
         ShowSnackbar($"{actionTitle} is now set to {bindingDescription}.", ViewUtils.SnackbarType.Success);
+    }
+
+    private void TrackKeyboardBinding_OnKeyUp(object? sender, KeyEventArgs e)
+    {
+        if (!KeyboardInputService.TryCreateBinding(e.Key, out var binding))
+            return;
+
+        _pressedKeyboardBindings.Remove(binding);
+        UpdatePressedBindingRows();
     }
 
     private void BindingButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -532,6 +619,8 @@ public partial class InputPage : UserControlBase
         NoControllerInfo.BodyText = "Set your Dolphin user folder in Settings before editing input.";
         ReloadButton.IsEnabled = false;
         AutoMapButton.IsEnabled = false;
+        AddPresetButton.IsEnabled = false;
+        DeletePresetButton.IsEnabled = false;
         RumbleToggle.IsEnabled = false;
     }
 
