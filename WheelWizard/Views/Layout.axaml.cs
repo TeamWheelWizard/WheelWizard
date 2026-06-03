@@ -367,6 +367,34 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         e.Handled = true;
     }
 
+    private void SidebarProfileBlock_OnPointerEntered(object? sender, PointerEventArgs e)
+    {
+        SidebarProfileBlock.Background = GetResourceBrush("Neutral800");
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Primary400");
+        SidebarProfileHoverEffect.IsVisible = true;
+    }
+
+    private void SidebarProfileBlock_OnPointerExited(object? sender, PointerEventArgs e)
+    {
+        SidebarProfileBlock.Background = Brushes.Transparent;
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Neutral600");
+        SidebarProfileHoverEffect.IsVisible = false;
+    }
+
+    private void SidebarProfileBlock_OnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        var position = e.GetPosition(sender as Control);
+        SidebarProfileHoverEffect.Margin = new(
+            position.X - (SidebarProfileHoverEffect.Width / 2),
+            position.Y - (SidebarProfileHoverEffect.Height / 2),
+            0,
+            0
+        );
+    }
+
+    private static IBrush GetResourceBrush(string resourceName) =>
+        new SolidColorBrush((Color)Application.Current!.FindResource(resourceName)!);
+
     private void CloseButton_Click(object? sender, RoutedEventArgs e) => Close();
 
     private void MinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
