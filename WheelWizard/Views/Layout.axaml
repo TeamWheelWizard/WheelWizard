@@ -196,27 +196,52 @@
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center" />
                 <Border.ContextMenu>
-                    <ContextMenu x:Name="SidebarInfoContextMenu" Placement="Top">
-                        <MenuItem IsEnabled="False">
+                    <ContextMenu x:Name="SidebarInfoContextMenu"
+                                 Placement="Pointer"
+                                 PlacementAnchor="TopLeft"
+                                 PlacementGravity="TopRight"
+                                 MinWidth="120">
+                        <ContextMenu.Styles>
+                            <Style Selector="MenuItem.MenuTextHeader">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="MenuItem">
+                                            <ContentPresenter Content="{TemplateBinding Header}"
+                                                              HorizontalAlignment="Left"
+                                                              Margin="8,6,8,4" />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ContextMenu.Styles>
+                        <MenuItem Classes="MenuTextHeader"
+                                  IsHitTestVisible="False"
+                                  Focusable="False">
                             <MenuItem.Header>
-                                <StackPanel Margin="4,2,4,4" HorizontalAlignment="Left">
-                                    <TextBlock Classes="TinyText" x:Name="MadeBy_Part1" Text="Made by: Patchzy" HorizontalAlignment="Left" />
-                                    <TextBlock Classes="TinyText" x:Name="MadeBy_Part2" Text="And WantToBeeMe" HorizontalAlignment="Left" />
+                                <StackPanel MinWidth="104"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Classes="TinyText" x:Name="MadeBy_Part1" Text="Made by: Patchzy" HorizontalAlignment="Left" TextAlignment="Left" />
+                                    <TextBlock Classes="TinyText" x:Name="MadeBy_Part2" Text="And WantToBeeMe" HorizontalAlignment="Left" TextAlignment="Left" />
                                 </StackPanel>
                             </MenuItem.Header>
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="{loc:T action.link.discord}" Click="Discord_Click">
+                        <MenuItem Header="{loc:T category.about}" Click="About_Click" MinWidth="120">
+                            <MenuItem.Icon>
+                                <PathIcon Data="{StaticResource InfoTip}" Width="16" Height="16" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="{loc:T action.link.discord}" Click="Discord_Click" MinWidth="120">
                             <MenuItem.Icon>
                                 <PathIcon Data="{StaticResource DiscordIcon}" Width="16" Height="16" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="{loc:T action.link.github}" Click="Github_Click">
+                        <MenuItem Header="{loc:T action.link.github}" Click="Github_Click" MinWidth="120">
                             <MenuItem.Icon>
                                 <PathIcon Data="{StaticResource GithubIcon}" Width="16" Height="16" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="{loc:T action.link.support}" Click="Support_Click">
+                        <MenuItem Header="{loc:T action.link.support}" Click="Support_Click" MinWidth="120">
                             <MenuItem.Icon>
                                 <PathIcon Data="{StaticResource CoffeeIcon}" Width="16" Height="16" />
                             </MenuItem.Icon>

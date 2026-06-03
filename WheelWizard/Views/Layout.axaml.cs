@@ -19,6 +19,7 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
+using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData.Domain;
@@ -129,6 +130,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         UpdateModsButtonText();
         UpdateMadeByText();
+        UpdateLiveAlert();
     }
 
     private void UpdateMadeByText()
@@ -259,6 +261,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         RoomsButton.BoxTip = t("hover.players_online.n", playerCount);
         UpdateFriendCount();
     }
+
+    public void UpdateLiveAlert() => UpdateLiveAlert(WhWzStatusManager.Instance);
 
     private void UpdateLiveAlert(WhWzStatusManager sender)
     {
@@ -406,6 +410,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     private void Github_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
 
     private void Support_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+
+    private void About_Click(object? sender, RoutedEventArgs e) => NavigationManager.NavigateTo<SettingsPage>(new AppInfo());
 
     private void CloseSnackbar_OnClick(object? sender, EventArgs e)
     {

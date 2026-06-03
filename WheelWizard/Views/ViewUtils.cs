@@ -80,6 +80,7 @@ public static class ViewUtils
         }
 
         newWindow.UpdatePlayerAndRoomCount(RRLiveRooms.Instance);
+        newWindow.UpdateLiveAlert();
     }
 
     public static T? FindParent<T>(object? child, int maxSearchDepth = 10)
