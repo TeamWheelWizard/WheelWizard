@@ -191,6 +191,7 @@
                     Classes="BottomSidebarIcon"
                     PointerPressed="SidebarInfoButton_OnPointerPressed">
                 <PathIcon Data="{StaticResource InfoTip}"
+                          x:Name="SidebarInfoIcon"
                           Width="24" Height="24"
                           Margin="-2"
                           HorizontalAlignment="Center"
@@ -215,7 +216,7 @@
                             </Style>
                         </ContextMenu.Styles>
                         <MenuItem Classes="MenuTextHeader"
-                                  IsHitTestVisible="False"
+                                  IsEnabled="False"
                                   Focusable="False">
                             <MenuItem.Header>
                                 <StackPanel MinWidth="104"
@@ -273,10 +274,13 @@
                 <Style Selector="Border.BottomSidebarIcon">
                     <Setter Property="Cursor" Value="Hand" />
                 </Style>
-                <Style Selector="Border#SidebarInfoButton PathIcon">
+                <Style Selector="PathIcon#SidebarInfoIcon">
                     <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
                 </Style>
-                <Style Selector="Border.BottomSidebarIcon:pointerover PathIcon">
+                <Style Selector="Border#SidebarInfoButton:pointerover PathIcon#SidebarInfoIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+                </Style>
+                <Style Selector="Border#LiveStatusBorder:pointerover PathIcon">
                     <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
                 </Style>
             </Grid.Styles>
