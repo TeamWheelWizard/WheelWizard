@@ -25,6 +25,7 @@ namespace WheelWizard.Views.Pages;
 public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 {
     private const int ProfileCarouselPageCount = 2;
+    private const int ProfileSelectorMaxCharacters = 12;
 
     private LicenseProfile? currentPlayer;
     private Mii? _currentMii;
@@ -187,15 +188,24 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             var noLicense = miiName == SettingValues.NoLicense;
 
             radioButton.IsEnabled = !noLicense;
-            radioButton.Content = miiName switch
+            var displayName = miiName switch
             {
                 SettingValues.NoName => t("state.no_name"),
                 SettingValues.NoLicense => t("state.no_license"),
                 _ => miiName,
             };
+            radioButton.Content = TrimProfileSelectorText(displayName);
         }
 
         UpdateCarouselIndicators();
+    }
+
+    private static string TrimProfileSelectorText(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length < ProfileSelectorMaxCharacters)
+            return text ?? string.Empty;
+
+        return $"{text[..(ProfileSelectorMaxCharacters - 1)]}...";
     }
 
     private void UpdatePage()
