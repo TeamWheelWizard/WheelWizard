@@ -77,26 +77,10 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
-            <StackPanel Orientation="Horizontal"
-                        VerticalAlignment="Bottom"
-                        Spacing="8">
-                <TextBlock Text="Leaderboard"
-                           Classes="PageTitleText" />
-                <PathIcon Data="{StaticResource Award}"
-                          Width="16"
-                          Height="16"
-                          VerticalAlignment="Center"
-                          Foreground="{StaticResource Warning500}" />
-            </StackPanel>
-            <components:StateBox Grid.Column="1"
-                                 VerticalAlignment="Bottom"
-                                 Margin="0,0,6,10"
-                                 IconData="{StaticResource UserCouple}"
-                                 Variant="Dark"
-                                 Text="{Binding TotalPlayerCountText}"
-                                 TipText="Top 50 players" />
-        </Grid>
+        <TextBlock Grid.Row="0"
+                   Text="Leaderboard"
+                   VerticalAlignment="Bottom"
+                   Classes="PageTitleText" />
 
         <Grid Grid.Row="1">
             <StackPanel IsVisible="{Binding IsLoading}"

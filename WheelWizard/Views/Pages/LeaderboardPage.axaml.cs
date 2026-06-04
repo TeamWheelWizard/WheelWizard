@@ -78,7 +78,6 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     private bool _hasNoData;
     private bool _hasData;
     private string _errorMessage = string.Empty;
-    private int _loadedPlayerCount;
     private LeaderboardPlayerItem? _podiumFirst;
     private LeaderboardPlayerItem? _podiumSecond;
     private LeaderboardPlayerItem? _podiumThird;
@@ -144,8 +143,6 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             OnPropertyChanged(nameof(ErrorMessage));
         }
     }
-
-    public string TotalPlayerCountText => _loadedPlayerCount.ToString();
 
     public string RemainingCountText => $"{RemainingPlayers.Count} players";
 
@@ -267,9 +264,6 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
         if (cancellationToken.IsCancellationRequested)
             return;
-
-        _loadedPlayerCount = mappedPlayers.Count;
-        OnPropertyChanged(nameof(TotalPlayerCountText));
 
         PodiumFirst = mappedPlayers.ElementAtOrDefault(0);
         PodiumSecond = mappedPlayers.ElementAtOrDefault(1);
@@ -409,9 +403,6 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         PodiumSecond = null;
         PodiumThird = null;
         RemainingPlayers.Clear();
-        _loadedPlayerCount = 0;
-
-        OnPropertyChanged(nameof(TotalPlayerCountText));
         OnPropertyChanged(nameof(RemainingCountText));
     }
 

@@ -19,6 +19,7 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
+using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData.Domain;
@@ -109,6 +110,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         Title = BrandingService.Branding.DisplayName;
         TitleLabel.Text = BrandingService.Branding.DisplayName;
+        VersionTagText.Text = $"v{BrandingService.Branding.Version}";
         UpdateModsButtonText();
         // UpdateModsActionIndicator();
 
@@ -128,6 +130,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         UpdateModsButtonText();
         UpdateMadeByText();
+        UpdateLiveAlert();
     }
 
     private void UpdateMadeByText()
@@ -249,16 +252,17 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         FriendsButton.BoxTip = t("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
     }
 
+    public void UpdateSidebarProfile() => SidebarCurrentUserProfile.Refresh();
+
     public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
     {
         var playerCount = sender.PlayerCount;
-        var roomCount = sender.RoomCount;
-        PlayerCountBox.Text = playerCount.ToString();
-        PlayerCountBox.TipText = t("hover.players_online.n", playerCount);
-        RoomCountBox.Text = roomCount.ToString();
-        RoomCountBox.TipText = t("hover.rooms_online.n", roomCount);
+        RoomsButton.BoxText = playerCount.ToString();
+        RoomsButton.BoxTip = t("hover.players_online.n", playerCount);
         UpdateFriendCount();
     }
+
+    public void UpdateLiveAlert() => UpdateLiveAlert(WhWzStatusManager.Instance);
 
     private void UpdateLiveAlert(WhWzStatusManager sender)
     {
@@ -272,6 +276,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
         ToolTip.SetTip(LiveStatusBorder, sender.Status!.Message);
         LiveStatusBorder.Classes.Clear();
+        LiveStatusBorder.Classes.Add("BottomSidebarIcon");
 
         // If custom icon is provided, use it instead of variant
         if (hasCustomIcon)
@@ -362,15 +367,51 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         TestingButton.IsVisible = SettingsService.Get<bool>(SettingsService.TESTING_MODE_ENABLED);
     }
 
+    private void SidebarInfoButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        SidebarInfoContextMenu.Open();
+        e.Handled = true;
+    }
+
+    private void SidebarProfileBlock_OnPointerEntered(object? sender, PointerEventArgs e)
+    {
+        SidebarProfileBlock.Background = GetResourceBrush("Neutral800");
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Primary400");
+        SidebarProfileHoverEffect.IsVisible = true;
+    }
+
+    private void SidebarProfileBlock_OnPointerExited(object? sender, PointerEventArgs e)
+    {
+        SidebarProfileBlock.Background = Brushes.Transparent;
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Neutral600");
+        SidebarProfileHoverEffect.IsVisible = false;
+    }
+
+    private void SidebarProfileBlock_OnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        var position = e.GetPosition(sender as Control);
+        SidebarProfileHoverEffect.Margin = new(
+            position.X - (SidebarProfileHoverEffect.Width / 2),
+            position.Y - (SidebarProfileHoverEffect.Height / 2),
+            0,
+            0
+        );
+    }
+
+    private static IBrush GetResourceBrush(string resourceName) =>
+        new SolidColorBrush((Color)Application.Current!.FindResource(resourceName)!);
+
     private void CloseButton_Click(object? sender, RoutedEventArgs e) => Close();
 
     private void MinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-    private void Discord_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.DiscordUrl.ToString());
+    private void Discord_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.DiscordUrl.ToString());
 
-    private void Github_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
+    private void Github_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
 
-    private void Support_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+    private void Support_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+
+    private void About_Click(object? sender, RoutedEventArgs e) => NavigationManager.NavigateTo<SettingsPage>(new AppInfo());
 
     private void CloseSnackbar_OnClick(object? sender, EventArgs e)
     {

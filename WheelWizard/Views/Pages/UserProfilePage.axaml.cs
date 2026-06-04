@@ -25,6 +25,7 @@ namespace WheelWizard.Views.Pages;
 public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 {
     private const int ProfileCarouselPageCount = 2;
+    private const int ProfileSelectorMaxCharacters = 12;
 
     private LicenseProfile? currentPlayer;
     private Mii? _currentMii;
@@ -187,15 +188,24 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             var noLicense = miiName == SettingValues.NoLicense;
 
             radioButton.IsEnabled = !noLicense;
-            radioButton.Content = miiName switch
+            var displayName = miiName switch
             {
                 SettingValues.NoName => t("state.no_name"),
                 SettingValues.NoLicense => t("state.no_license"),
                 _ => miiName,
             };
+            radioButton.Content = TrimProfileSelectorText(displayName);
         }
 
         UpdateCarouselIndicators();
+    }
+
+    private static string TrimProfileSelectorText(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length < ProfileSelectorMaxCharacters)
+            return text ?? string.Empty;
+
+        return $"{text[..(ProfileSelectorMaxCharacters - 1)]}...";
     }
 
     private void UpdatePage()
@@ -250,7 +260,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         // since Avalonia has some weird ass cashing, It might just be that that is because this method is actually deprecated
 
         //now we refresh the sidebar friend amount
-        ViewUtils.GetLayout().UpdateFriendCount();
+        var layout = ViewUtils.GetLayout();
+        layout.UpdateFriendCount();
+        layout.UpdateSidebarProfile();
         ViewUtils.ShowSnackbar(t("snackbar_success.profile_set_primary"));
     }
 
@@ -275,7 +287,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         ViewMii(0); // Just in case you have current user set as 4. and you change to a region where there are only 3 users.
         SetUserAsPrimary();
         UpdatePage();
-        ViewUtils.GetLayout().UpdateFriendCount();
+        var layout = ViewUtils.GetLayout();
+        layout.UpdateFriendCount();
+        layout.UpdateSidebarProfile();
     }
 
     private void TopBarRadio_OnClick(object? sender, RoutedEventArgs e)
@@ -325,6 +339,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         CurrentMii = selectedMii;
         GameLicenseService.LoadLicense();
         UpdatePage();
+        UpdateSidebarProfileIfCurrentUser();
         ViewUtils.ShowSnackbar(t("message_success.mii_changed"));
     }
 
@@ -390,6 +405,15 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         //reload game data, since multiple licenses can use the same mii
         GameLicenseService.LoadLicense();
         UpdatePage();
+        UpdateSidebarProfileIfCurrentUser();
+    }
+
+    private void UpdateSidebarProfileIfCurrentUser()
+    {
+        if (FocusedUser != _currentUserIndex)
+            return;
+
+        ViewUtils.GetLayout().UpdateSidebarProfile();
     }
 
     private void MoveCarouselPage(int offset)
