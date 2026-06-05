@@ -4,7 +4,7 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
-                   xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+                   xmlns:loc="clr-namespace:WheelWizard.Localization"
                    xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    xmlns:popups="clr-namespace:WheelWizard.Views.Popups"
@@ -60,8 +60,8 @@
 
                 <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
                     <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,12,8">
-                        <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
-                                                   TipText="{x:Static lang:Common.Attribute_VrFull}" />
+                        <components:FormFieldLabel Text="{loc:T attribute.vr_abbreviation}"
+                                                   TipText="{loc:T attribute.vr_full}" />
                         <TextBlock Text="{Binding Profile.Vr, StringFormat='{}{0:N0}'}" Classes="BodyText" FontSize="14" />
                     </StackPanel>
 

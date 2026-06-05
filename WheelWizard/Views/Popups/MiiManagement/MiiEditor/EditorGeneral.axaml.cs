@@ -3,7 +3,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using WheelWizard.Helpers;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain;
@@ -83,7 +82,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
     {
         var trimmedName = newName?.Trim() ?? string.Empty;
         if (trimmedName.Length is > 10 or < 3)
-            return Fail(Phrases.HelperNote_NameMustBetween);
+            return Fail(t("helper_note.name_must_between"));
 
         return Ok();
     }
@@ -92,7 +91,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
     {
         var trimmedName = newName?.Trim() ?? string.Empty;
         if (trimmedName.Length > 10)
-            return Fail(Phrases.HelperNote_CreatorNameLess11);
+            return Fail(t("helper_note.creator_name_less11"));
 
         return Ok();
     }
@@ -140,12 +139,12 @@ public partial class EditorGeneral : MiiEditorBaseControl
     private async void ComplexName_OnClick(object? sender, RoutedEventArgs e)
     {
         var textPopup = new TextInputWindow()
-            .SetMainText(Phrases.Question_EnterNewName_Title)
-            .SetExtraText(Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, MiiName.Text ?? string.Empty) ?? string.Empty)
+            .SetMainText(t("question.enter_new_name.title"))
+            .SetExtraText(t("question.enter_new_name.extra", MiiName.Text ?? string.Empty) ?? string.Empty)
             .SetAllowCustomChars(true, true)
             .SetValidation(ValidateMiiName)
             .SetInitialText(MiiName.Text ?? string.Empty)
-            .SetPlaceholderText(Phrases.Placeholder_EnterMiiName);
+            .SetPlaceholderText(t("placeholder.enter_mii_name"));
         var newName = await textPopup.ShowDialog();
 
         if (string.IsNullOrWhiteSpace(newName))

@@ -61,6 +61,26 @@ public partial class TestingPage : UserControlBase
             WheelWizardStatus.OutOfDate => "Update available",
             _ => "Checking status...",
         };
+
+        StatusPill.Classes.Remove("ready");
+        StatusPill.Classes.Remove("warning");
+        StatusPill.Classes.Remove("danger");
+
+        switch (_status)
+        {
+            case WheelWizardStatus.Ready:
+                StatusPill.Classes.Add("ready");
+                break;
+            case WheelWizardStatus.ConfigNotFinished:
+            case WheelWizardStatus.OutOfDate:
+            case WheelWizardStatus.Loading:
+                StatusPill.Classes.Add("warning");
+                break;
+            case WheelWizardStatus.NoServer:
+            case WheelWizardStatus.NoServerButInstalled:
+                StatusPill.Classes.Add("danger");
+                break;
+        }
     }
 
     private async void InstallButton_OnClick(object? sender, RoutedEventArgs e)

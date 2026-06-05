@@ -19,6 +19,7 @@ public partial class SettingsPage : UserControlBase
 #endif
 
         SettingsContent.Content = initialSettingsPage;
+        SetCheckedTopBarButton(initialSettingsPage);
     }
 
     private void TopBarRadio_OnClick(object? sender, RoutedEventArgs e)
@@ -37,6 +38,17 @@ public partial class SettingsPage : UserControlBase
             return;
 
         SettingsContent.Content = instance;
+    }
+
+    private void SetCheckedTopBarButton(UserControl settingsPage)
+    {
+        foreach (var child in SettingPages.Children)
+        {
+            if (child is not RadioButton radioButton)
+                continue;
+
+            radioButton.IsChecked = radioButton.Tag?.ToString() == settingsPage.GetType().Name;
+        }
     }
 
     private void DevButton_OnClick(object? sender, RoutedEventArgs e) => new DevToolWindow().Show();

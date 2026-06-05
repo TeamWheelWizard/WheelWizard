@@ -1,5 +1,4 @@
-﻿using Testably.Abstractions.RandomSystem;
-using WheelWizard.Resources.Languages;
+using Testably.Abstractions.RandomSystem;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
@@ -10,7 +9,7 @@ public static class MiiFactory
     {
         return new Mii
         {
-            Name = new(Common.Attribute_Mii_DefaultName),
+            Name = new(t("attribute.mii.default_name")),
             CreatorName = new(""),
             IsFavorite = false,
             MiiFavoriteColor = MiiFavoriteColor.Red,

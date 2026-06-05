@@ -8,8 +8,8 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using WheelWizard.Branding;
 using WheelWizard.Helpers;
+using WheelWizard.Localization;
 using WheelWizard.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
@@ -19,6 +19,7 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
+using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData.Domain;
@@ -82,13 +83,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
 
-        var completeString = Humanizer.ReplaceDynamic(Phrases.Text_MadeByString, "Patchzy", "WantToBeeMe");
-        if (completeString != null && completeString.Contains("\\n"))
-        {
-            var split = completeString.Split("\\n");
-            MadeBy_Part1.Text = split[0];
-            MadeBy_Part2.Text = split[1];
-        }
+        UpdateMadeByText();
+        LocalizationProvider.LanguageChanged += OnLanguageChanged;
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
@@ -108,12 +104,14 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 #if DEBUG
         KitchenSinkButton.IsVisible = true;
 #endif
+        UpdateOtherSectionVisibility();
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
         Title = BrandingService.Branding.DisplayName;
         TitleLabel.Text = BrandingService.Branding.DisplayName;
+        VersionTagText.Text = $"v{BrandingService.Branding.Version}";
         UpdateModsButtonText();
         // UpdateModsActionIndicator();
 
@@ -124,8 +122,27 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         _settingsSignalSubscription?.Dispose();
         _settingsSignalSubscription = null;
+        LocalizationProvider.LanguageChanged -= OnLanguageChanged;
         ModManagerService.PropertyChanged -= ModManager_PropertyChanged;
         base.OnClosed(e);
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        UpdateModsButtonText();
+        UpdateMadeByText();
+        UpdateLiveAlert();
+    }
+
+    private void UpdateMadeByText()
+    {
+        var completeString = t("text.made_by_string", "Patchzy", "WantToBeeMe");
+        if (!completeString.Contains("\\n"))
+            return;
+
+        var split = completeString.Split("\\n");
+        MadeBy_Part1.Text = split[0];
+        MadeBy_Part2.Text = split[1];
     }
 
     private void ModManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -177,7 +194,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     private void UpdateModsButtonText()
     {
-        ModsButton.Text = Common.PageTitle_Patches;
+        ModsButton.Text = t("page_title.patches");
     }
 
     //todo: after patches is more stable, uncomment this
@@ -233,36 +250,20 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         var friends = GameLicenseService.ActiveCurrentFriends;
         FriendsButton.BoxText = $"{friends.Count(friend => friend.IsOnline)}/{friends.Count}";
-        FriendsButton.BoxTip = friends.Count(friend => friend.IsOnline) switch
-        {
-            1 => Phrases.Hover_FriendsOnline_1,
-            0 => Phrases.Hover_FriendsOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_FriendsOnline_x, friends.Count(friend => friend.IsOnline))
-                ?? $"There are currently {friends.Count(friend => friend.IsOnline)} friends online",
-        };
+        FriendsButton.BoxTip = t("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
     }
+
+    public void UpdateSidebarProfile() => SidebarCurrentUserProfile.Refresh();
 
     public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
     {
         var playerCount = sender.PlayerCount;
-        var roomCount = sender.RoomCount;
-        PlayerCountBox.Text = playerCount.ToString();
-        PlayerCountBox.TipText = playerCount switch
-        {
-            1 => Phrases.Hover_PlayersOnline_1,
-            0 => Phrases.Hover_PlayersOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_PlayersOnline_x, playerCount)
-                ?? $"There are currently {playerCount} players online",
-        };
-        RoomCountBox.Text = roomCount.ToString();
-        RoomCountBox.TipText = roomCount switch
-        {
-            1 => Phrases.Hover_RoomsOnline_1,
-            0 => Phrases.Hover_RoomsOnline_0,
-            _ => Humanizer.ReplaceDynamic(Phrases.Hover_RoomsOnline_x, roomCount) ?? $"There are currently {roomCount} rooms active",
-        };
+        RoomsButton.BoxText = playerCount.ToString();
+        RoomsButton.BoxTip = t("hover.players_online.n", playerCount);
         UpdateFriendCount();
     }
+
+    public void UpdateLiveAlert() => UpdateLiveAlert(WhWzStatusManager.Instance);
 
     private void UpdateLiveAlert(WhWzStatusManager sender)
     {
@@ -276,6 +277,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
         ToolTip.SetTip(LiveStatusBorder, sender.Status!.Message);
         LiveStatusBorder.Classes.Clear();
+        LiveStatusBorder.Classes.Add("BottomSidebarIcon");
 
         // If custom icon is provided, use it instead of variant
         if (hasCustomIcon)
@@ -364,17 +366,65 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     private void UpdateTestingButtonVisibility()
     {
         TestingButton.IsVisible = SettingsService.Get<bool>(SettingsService.TESTING_MODE_ENABLED);
+        UpdateOtherSectionVisibility();
     }
+
+    private void UpdateOtherSectionVisibility()
+    {
+        OtherSectionText.IsVisible = TestingButton.IsVisible || KitchenSinkButton.IsVisible;
+    }
+
+    private void SidebarInfoButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        SidebarInfoContextMenu.Open();
+        e.Handled = true;
+    }
+
+    private void SidebarSettingsButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        NavigationManager.NavigateTo<SettingsPage>();
+        e.Handled = true;
+    }
+
+    private void SidebarProfileBlock_OnPointerEntered(object? sender, PointerEventArgs e)
+    {
+        SidebarProfileBlock.Background = GetResourceBrush("Neutral800");
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Primary400");
+        SidebarProfileHoverEffect.IsVisible = true;
+    }
+
+    private void SidebarProfileBlock_OnPointerExited(object? sender, PointerEventArgs e)
+    {
+        SidebarProfileBlock.Background = Brushes.Transparent;
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Neutral600");
+        SidebarProfileHoverEffect.IsVisible = false;
+    }
+
+    private void SidebarProfileBlock_OnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        var position = e.GetPosition(sender as Control);
+        SidebarProfileHoverEffect.Margin = new(
+            position.X - (SidebarProfileHoverEffect.Width / 2),
+            position.Y - (SidebarProfileHoverEffect.Height / 2),
+            0,
+            0
+        );
+    }
+
+    private static IBrush GetResourceBrush(string resourceName) =>
+        new SolidColorBrush((Color)Application.Current!.FindResource(resourceName)!);
 
     private void CloseButton_Click(object? sender, RoutedEventArgs e) => Close();
 
     private void MinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-    private void Discord_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.DiscordUrl.ToString());
+    private void Discord_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.DiscordUrl.ToString());
 
-    private void Github_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
+    private void Github_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
 
-    private void Support_Click(object sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+    private void Support_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+
+    private void About_Click(object? sender, RoutedEventArgs e) => NavigationManager.NavigateTo<SettingsPage>(new AppInfo());
 
     private void CloseSnackbar_OnClick(object? sender, EventArgs e)
     {

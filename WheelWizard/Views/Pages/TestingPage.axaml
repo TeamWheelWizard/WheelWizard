@@ -3,108 +3,223 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
              mc:Ignorable="d" d:DesignWidth="370" d:DesignHeight="520"
              x:Class="WheelWizard.Views.Pages.TestingPage">
 
     <UserControl.Styles>
-        <Style Selector="Border.HeroCard">
+        <Style Selector="Border.ExclusivePanel">
             <Setter Property="Transitions">
                 <Transitions>
                     <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.250" Easing="CircularEaseOut" />
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.250" Easing="CircularEaseOut" />
                     <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.250" Easing="CircularEaseOut" />
                 </Transitions>
             </Setter>
         </Style>
-        <Style Selector="Border.HeroCard:pointerover">
-            <Setter Property="RenderTransform" Value="scale(1.02)" />
-            <Setter Property="BoxShadow" Value="0 20 60 0 #40000000" />
+
+        <Style Selector="Border.ExclusivePanel:pointerover">
+            <Setter Property="RenderTransform" Value="scale(1.01)" />
+            <Setter Property="BoxShadow" Value="0 20 48 0 #36000000" />
+        </Style>
+
+        <Style Selector="Border#StatusPill">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+        </Style>
+
+        <Style Selector="Border#StatusPill.ready">
+            <Setter Property="Background" Value="{StaticResource Primary950}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Primary500}" />
+        </Style>
+
+        <Style Selector="Border#StatusPill.warning">
+            <Setter Property="Background" Value="{StaticResource Warning950}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Warning600}" />
+        </Style>
+
+        <Style Selector="Border#StatusPill.danger">
+            <Setter Property="Background" Value="{StaticResource Danger950}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Danger600}" />
+        </Style>
+
+        <Style Selector="PathIcon#StatusIcon">
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+        </Style>
+
+        <Style Selector="Border#StatusPill.ready PathIcon#StatusIcon">
+            <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+        </Style>
+
+        <Style Selector="Border#StatusPill.warning PathIcon#StatusIcon">
+            <Setter Property="Foreground" Value="{StaticResource Warning500}" />
+        </Style>
+
+        <Style Selector="Border#StatusPill.danger PathIcon#StatusIcon">
+            <Setter Property="Foreground" Value="{StaticResource Danger400}" />
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto, *, Auto" Margin="24">
-        
-        <!-- Header -->
-        <Grid ColumnDefinitions="*, Auto" Height="40">
-             <!-- Title Section -->
-             <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                 <Border Background="{StaticResource Primary400}" Width="4" Height="24" CornerRadius="2" />
-                 <TextBlock Text="TESTING MODE" Classes="PageTitleText" FontSize="16" FontWeight="Bold" Foreground="{StaticResource Neutral300}" VerticalAlignment="Center" LetterSpacing="1" />
-             </StackPanel>
-             
-             <!-- Uninstall Button (Visible only when installed) -->
-             <components:Button x:Name="DeleteButton" 
-                                Grid.Column="1" 
-                                Variant="Danger" 
-                                Text="Uninstall" 
-                                IconData="{StaticResource Trash}" 
-                                Click="DeleteButton_OnClick" 
-                                Height="36" 
-                                FontSize="12" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                    VerticalAlignment="Bottom" />
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                <TextBlock Text="Testing Mode" Classes="PageTitleText" />
+                <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2,0,0,0"
+                        Width="22" Height="22"
+                        Background="{StaticResource Primary950}"
+                        BorderBrush="{StaticResource Primary700}"
+                        BorderThickness="1"
+                        CornerRadius="999">
+                    <PathIcon Data="{StaticResource StarIcon}"
+                              Width="12" Height="12"
+                              Foreground="{StaticResource Primary300}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" />
+                </Border>
+            </StackPanel>
+
+            <components:Button x:Name="DeleteButton"
+                               Variant="Danger"
+                               Text="Uninstall"
+                               IconData="{StaticResource Trash}"
+                               Click="DeleteButton_OnClick"
+                               Height="36"
+                               Padding="13,8"
+                               FontSize="12"
+                               VerticalAlignment="Bottom"
+                               HorizontalAlignment="Right"
+                               Margin="0,0,0,10" />
         </Grid>
-        
-        <!-- Main Content -->
-        <Border Grid.Row="1" Classes="HeroCard" Margin="0,20" CornerRadius="28" ClipToBounds="True" BoxShadow="0 20 50 0 #30000000">
-             <Border.Background>
-                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                     <GradientStop Color="{StaticResource Primary900}" Offset="0" />
-                     <GradientStop Color="#080808" Offset="1" />
-                 </LinearGradientBrush>
-             </Border.Background>
-             
-             <Panel>
-                 <!-- Background Decorations -->
-                 <PathIcon Data="{StaticResource WheelIcon}" Width="350" Height="350" Opacity="0.04" Margin="-120,-80,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="White"/>
-                 <PathIcon Data="{StaticResource WheelIcon}" Width="250" Height="250" Opacity="0.04" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-80,-80" Foreground="White"/>
-                 
-                 <!-- Card Center Content -->
-                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="24">
-                     
-                     <!-- Icon -->
-                     <Border Width="90" Height="90" CornerRadius="45" Background="#1AFFFFFF" BoxShadow="0 8 20 0 #40000000" HorizontalAlignment="Center">
-                         <PathIcon Data="{StaticResource WheelIcon}" Width="40" Height="40" Foreground="{StaticResource Primary200}" />
-                     </Border>
-                     
-                     <!-- Title Information -->
-                     <StackPanel Spacing="8">
-                         <TextBlock Text="RETRO REWIND" Classes="TitleText" FontSize="26" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" TextAlignment="Center" LetterSpacing="0.5"/>
-                         <Border Background="{StaticResource Primary500}" CornerRadius="16" Padding="16,6" HorizontalAlignment="Center" BoxShadow="0 4 10 0 #20000000">
-                             <TextBlock Text="BETA ACCESS" FontSize="11" FontWeight="Bold" Foreground="White" LetterSpacing="2"/>
-                         </Border>
-                     </StackPanel>
-                     
-                     <!-- Status Indicator -->
-                     <Border Background="#15FFFFFF" CornerRadius="14" Padding="16,10" HorizontalAlignment="Center" Margin="0,10,0,0" BorderBrush="#10FFFFFF" BorderThickness="1">
-                         <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                             <PathIcon Data="{StaticResource InfoTip}" Width="14" Height="14" Foreground="{StaticResource Neutral400}" />
-                             <TextBlock x:Name="StatusText" Text="Checking status..." Foreground="{StaticResource Neutral200}" FontSize="13" FontWeight="SemiBold" />
-                         </StackPanel>
-                     </Border>
-                 </StackPanel>
-             </Panel>
-        </Border>
-        
-        <!-- Bottom Action Section -->
-        <Grid Grid.Row="2" Margin="0,5,0,0">
-             <Panel>
-                 <components:Button x:Name="InstallButton" 
-                                    Variant="Warning" 
-                                    Text="INSTALL BETA VERSION" 
-                                    IconData="{StaticResource Download}" 
-                                    Click="InstallButton_OnClick" 
-                                    Height="54" 
-                                    FontSize="15" />
-                                    
-                 <components:Button x:Name="LaunchButton" 
-                                    Variant="Primary" 
-                                    Text="LAUNCH BETA" 
-                                    IconData="{StaticResource Play}" 
-                                    Click="LaunchButton_OnClick" 
-                                    Height="58"
-                                    FontSize="16" />
-             </Panel>
+
+        <Grid Grid.Row="1" RowDefinitions="*,Auto" Margin="10,0">
+            <Border Grid.Row="0" Classes="ExclusivePanel" CornerRadius="{StaticResource GlobalCornerRadius}"
+                    ClipToBounds="True" BorderBrush="{StaticResource Neutral700}" BorderThickness="1"
+                    BoxShadow="0 16 36 0 #28000000" Margin="0,14,0,10">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="{StaticResource Neutral900}" Offset="0" />
+                        <GradientStop Color="{StaticResource Primary950}" Offset="0.58" />
+                        <GradientStop Color="{StaticResource Black}" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <Panel>
+                    <PathIcon Data="{StaticResource WheelIcon}" Width="310" Height="310"
+                              Opacity="0.055" Margin="-118,-82,0,0"
+                              VerticalAlignment="Top" HorizontalAlignment="Left"
+                              Foreground="{StaticResource Neutral50}" />
+                    <PathIcon Data="{StaticResource WheelIcon}" Width="210" Height="210"
+                              Opacity="0.045" Margin="0,0,-66,-64"
+                              VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                              Foreground="{StaticResource Primary200}" />
+
+                    <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+                        <Grid ColumnDefinitions="Auto,14,*" RowDefinitions="Auto,Auto">
+                            <Border Grid.RowSpan="2" Width="46" Height="46" CornerRadius="999"
+                                    Background="{StaticResource Neutral800}"
+                                    BorderBrush="{StaticResource Primary700}"
+                                    BorderThickness="1">
+                                <PathIcon Data="{StaticResource Code}" Width="21" Height="21"
+                                          Foreground="{StaticResource Primary300}" />
+                            </Border>
+
+                            <TextBlock Grid.Column="2" Text="Retro Rewind"
+                                       Classes="TitleText"
+                                       FontSize="24"
+                                       Foreground="{StaticResource Neutral50}"
+                                       VerticalAlignment="Bottom" />
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Private beta build"
+                                       Classes="TinyText"
+                                       Foreground="{StaticResource Neutral300}"
+                                       FontSize="13" />
+                        </Grid>
+
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+                            <Border HorizontalAlignment="Center"
+                                    Background="{StaticResource Warning800}"
+                                    BorderBrush="{StaticResource Warning500}"
+                                    BorderThickness="1"
+                                    CornerRadius="999"
+                                    Padding="18,7"
+                                    BoxShadow="0 8 22 0 #22000000">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource Award}" Width="14" Height="14"
+                                              Foreground="{StaticResource Warning200}" />
+                                    <TextBlock Text="EXCLUSIVE ACCESS"
+                                               FontSize="12"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource Warning100}" />
+                                </StackPanel>
+                            </Border>
+
+                            <PathIcon Data="{StaticResource WheelIcon}"
+                                      Width="106" Height="106"
+                                      Foreground="{StaticResource Neutral500}"
+                                      Opacity="0.72" />
+
+                            <TextBlock Text="Test the next build before everyone else."
+                                       Classes="BodyText"
+                                       FontSize="15"
+                                       Foreground="{StaticResource Neutral300}"
+                                       TextAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       MaxWidth="280" />
+                        </StackPanel>
+
+                        <Border Grid.Row="2" x:Name="StatusPill"
+                                CornerRadius="{StaticResource GlobalCornerRadius}"
+                                BorderThickness="1"
+                                Padding="12,10"
+                                HorizontalAlignment="Stretch">
+                            <Grid ColumnDefinitions="Auto,10,*">
+                                <PathIcon x:Name="StatusIcon" Data="{StaticResource InfoTip}"
+                                          Width="16" Height="16"
+                                          VerticalAlignment="Center" />
+                                <TextBlock x:Name="StatusText" Grid.Column="2"
+                                           Text="Checking status..."
+                                           Classes="TinyText"
+                                           Foreground="{StaticResource Neutral200}"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Panel>
+            </Border>
+
+            <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
         </Grid>
-        
+
+        <Grid Grid.Row="2" Margin="10,10,10,0">
+            <Panel>
+                <components:Button x:Name="InstallButton"
+                                   Variant="Warning"
+                                   Text="Install Beta"
+                                   IconData="{StaticResource Download}"
+                                   Click="InstallButton_OnClick"
+                                   Height="48"
+                                   HorizontalAlignment="Stretch"
+                                   FontSize="14" />
+
+                <components:Button x:Name="LaunchButton"
+                                   Variant="Primary"
+                                   Text="Launch Beta"
+                                   IconData="{StaticResource Play}"
+                                   Click="LaunchButton_OnClick"
+                                   Height="48"
+                                   HorizontalAlignment="Stretch"
+                                   FontSize="14" />
+            </Panel>
+        </Grid>
     </Grid>
 </UserControl>

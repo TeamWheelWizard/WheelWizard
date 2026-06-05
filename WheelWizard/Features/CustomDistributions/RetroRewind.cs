@@ -7,7 +7,6 @@ using Semver;
 using WheelWizard.CustomDistributions.Domain;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Services;
@@ -54,8 +53,8 @@ public class RetroRewind : IDistribution
         if (HasOldRksys())
         {
             var rksysQuestion = new YesNoWindow()
-                .SetMainText(Phrases.Question_OldRksysFound_Title)
-                .SetExtraText(Phrases.Question_OldRksysFound_Extra);
+                .SetMainText(t("question.old_rksys_found.title"))
+                .SetExtraText(t("question.old_rksys_found.extra"));
             if (await rksysQuestion.AwaitAnswer())
                 await BackupOldrksys();
         }
@@ -79,7 +78,7 @@ public class RetroRewind : IDistribution
 
     private async Task<OperationResult> DownloadAndExtractRetroRewind(ProgressWindow progressWindow)
     {
-        progressWindow.SetExtraText(Phrases.Progress_InstallingRRFirstTime);
+        progressWindow.SetExtraText(t("progress.installing_rr_first_time"));
         var downloadedZipPath = PathManager.RetroRewindTempFile;
         // where we'll do the extraction
         var tempExtractionPath = PathManager.TempModsFolderPath;
@@ -103,7 +102,7 @@ public class RetroRewind : IDistribution
             downloadedZipPath = downloadedFilePath;
 
             // 2) Extract
-            progressWindow.SetExtraText(Common.State_Extracting);
+            progressWindow.SetExtraText(t("state.extracting"));
 
             var extractResult = await Task.Run(() => ExtractZipFile(downloadedZipPath, tempExtractionPath, progressWindow));
 
@@ -273,7 +272,7 @@ public class RetroRewind : IDistribution
         // Step 2: Apply file deletions for versions between current and targetVersion
         var deleteSuccess = await ApplyFileDeletionsBetweenVersions(currentVersion, targetVersion);
         if (deleteSuccess.IsFailure)
-            return Fail(Phrases.MessageError_AbortRR_Extra_FailedUpdateDelete);
+            return Fail(t("message_error.abort_rr.extra.failed_update_delete"));
 
         // Step 3: Download and apply the updates (if any)
         for (var i = 0; i < updatesToApply.Count; i++)
@@ -285,7 +284,7 @@ public class RetroRewind : IDistribution
                 return Ok();
 
             if (success.IsFailure)
-                return Fail(Phrases.MessageError_AbortRR_Extra_FailedUpdateApply);
+                return Fail(t("message_error.abort_rr.extra.failed_update_apply"));
 
             // Update the version file after each successful update
             UpdateVersionFile(update.Version);
@@ -309,14 +308,14 @@ public class RetroRewind : IDistribution
         var tempZipPath = _fileSystem.Path.Combine(_fileSystem.Path.GetTempPath(), _fileSystem.Path.GetRandomFileName());
         try
         {
-            popupWindow.SetExtraText($"{Common.Action_Update} {currentUpdateIndex}/{totalUpdates}: {update.Description}");
+            popupWindow.SetExtraText($"{t("action.update")} {currentUpdateIndex}/{totalUpdates}: {update.Description}");
             var finalFile = await DownloadHelper.DownloadToLocationAsync(update.Url, tempZipPath, popupWindow);
 
             if (finalFile == null)
                 return Fail("Failed to download update file");
 
             popupWindow.UpdateProgress(100);
-            popupWindow.SetExtraText(Common.State_Extracting);
+            popupWindow.SetExtraText(t("state.extracting"));
             var destinationDirectoryPath = PathManager.RiivolutionWhWzFolderPath;
             _fileSystem.Directory.CreateDirectory(destinationDirectoryPath);
             var extractResult = ExtractZipFile(finalFile, destinationDirectoryPath, popupWindow);
@@ -339,17 +338,17 @@ public class RetroRewind : IDistribution
     {
         using var archive = ZipFile.OpenRead(path);
 
-        // 1) Compute total work units (we’ll treat each entry as one “unit”)
+        // 1) Compute total work units (weâ€™ll treat each entry as one â€œunitâ€)
         var entries = archive.Entries.Where(e => !e.FullName.EndsWith("desktop.ini", StringComparison.OrdinalIgnoreCase)).ToList();
         var total = entries.Count;
         if (total == 0)
             return Ok();
 
-        // Tell the UI what we’re doing, and set a “goal” so it can estimate MB or items
+        // Tell the UI what weâ€™re doing, and set a â€œgoalâ€ so it can estimate MB or items
 
         Dispatcher.UIThread.Post(() =>
         {
-            progressWindow.SetExtraText(Common.State_Extracting).SetGoal($"Extracting {total} files");
+            progressWindow.SetExtraText(t("state.extracting")).SetGoal($"Extracting {total} files");
         });
 
         for (var i = 0; i < total; i++)
@@ -358,7 +357,7 @@ public class RetroRewind : IDistribution
             if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, entry.FullName, out var destinationPath))
                 return Fail("The file path is outside the destination directory. Please contact the developers.");
 
-            // If it’s a directory, create it
+            // If itâ€™s a directory, create it
             if (entry.FullName.EndsWith(Path.AltDirectorySeparatorChar) || entry.FullName.EndsWith(Path.DirectorySeparatorChar))
             {
                 _fileSystem.Directory.CreateDirectory(destinationPath);
@@ -376,7 +375,7 @@ public class RetroRewind : IDistribution
                 entry.ExtractToFile(destinationPath, overwrite: true);
             }
 
-            // Report incremental progress (0–100)
+            // Report incremental progress (0â€“100)
             var percent = (int)(((i + 1) / (double)total) * 100);
             Dispatcher.UIThread.Post(() =>
             {

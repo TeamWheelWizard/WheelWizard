@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using WheelWizard.Helpers;
+using System.ComponentModel;
 using WheelWizard.Services.LiveData;
 using WheelWizard.WheelWizardData.Domain;
+using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.GameLicense.Domain;
@@ -14,7 +14,7 @@ public abstract class PlayerProfileBase : INotifyPropertyChanged
     public required uint RegionId { get; init; }
     public required Mii? Mii { get; set; }
 
-    public string RegionName => Humanizer.GetRegionName(RegionId);
+    public string RegionName => GameLicenseDisplay.GetRegionName(RegionId);
 
     public bool IsOnline
     {

@@ -1,10 +1,9 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.Models.RRInfo;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
@@ -103,7 +102,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
             return;
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(selectedPlayer.FriendCode);
-        ViewUtils.ShowSnackbar(Phrases.SnackbarSuccess_CopiedFC);
+        ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
     }
 
     private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)

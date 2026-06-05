@@ -4,14 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              x:Class="WheelWizard.Views.Popups.MiiManagement.MiiEditor.EditorEmpty">
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
         <TextBlock Classes="BodyText" Margin="10" Text="EMPTY!!!" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
-        <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}" IconData="{StaticResource ArrowLeft}" 
+        <components:IconLabelButton Grid.Row="0" Text="{loc:T action.back}" IconData="{StaticResource ArrowLeft}" 
                                     Click="BackButton_OnClick" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"
                                     Foreground="{StaticResource TitleTextColor}" FontSize="16"
                                     HoverForeground="{StaticResource Primary200}"/>

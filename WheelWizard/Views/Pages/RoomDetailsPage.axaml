@@ -1,9 +1,9 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignHeight="876" d:DesignWidth="456"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
@@ -21,7 +21,7 @@
         <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
 
-        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_RoomDetails}"
+        <TextBlock Grid.Row="0" Text="{loc:T page_title.room_details}"
                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
         
@@ -34,7 +34,7 @@
      
         <components:IconLabelButton Grid.Row="0"
                                     IconData="{StaticResource ArrowLeft}"
-                                    Text="{x:Static lang:Common.PageTitle_Rooms}"
+                                    Text="{loc:T page_title.rooms}"
                                     Foreground="{StaticResource TitleTextColor}"
                                     HoverForeground="{StaticResource Primary200}"
                                     VerticalAlignment="Top" HorizontalAlignment="Left"
@@ -43,23 +43,23 @@
         <Grid Grid.Row="1" ColumnDefinitions="*,*" RowDefinitions="*,*" Margin="10,0">
             <StackPanel
                 Grid.Column="0">
-                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Id}" Margin="0,0,2,0" />
+                <components:FormFieldLabel Text="{loc:T attribute.id}" Margin="0,0,2,0" />
                 <SelectableTextBlock Text="{Binding Room.Id}" Classes="BodyText" />
             </StackPanel>
 
             <StackPanel Grid.Column="1">
-                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_TimeOnline}" Margin="0,0,2,0" />
+                <components:FormFieldLabel Text="{loc:T attribute.time_online}" Margin="0,0,2,0" />
                 <SelectableTextBlock Text="{Binding Room.TimeOnline}" Classes="BodyText" />
             </StackPanel>
 
             <StackPanel Grid.Column="0" Grid.Row="1">
-                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Type}" Margin="0,0,2,0" />
+                <components:FormFieldLabel Text="{loc:T attribute.type}" Margin="0,0,2,0" />
                 <SelectableTextBlock Text="{Binding Room.GameMode}" Classes="BodyText" />
             </StackPanel>
 
 
             <StackPanel Grid.Column="1" Grid.Row="1">
-                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_AverageRoomVr}" Margin="0,0,2,0" />
+                <components:FormFieldLabel Text="{loc:T attribute.average_room_vr}" Margin="0,0,2,0" />
                 <components:StateBox IconSize="0" Text="{Binding Room.AverageVr}" HorizontalAlignment="Left" />
             </StackPanel>
         </Grid>
@@ -67,12 +67,12 @@
         <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0">
             <Grid Grid.Row="0">
                 <Grid ColumnDefinitions="9*,6*,6*">
-                    <components:FormFieldLabel Grid.Column="1" Text="{x:Static lang:Common.Attribute_VrAbbreviation}"
-                                               TipText="{x:Static lang:Common.Attribute_VrFull}"
+                    <components:FormFieldLabel Grid.Column="1" Text="{loc:T attribute.vr_abbreviation}"
+                                               TipText="{loc:T attribute.vr_full}"
                                                Margin="10,0,0,0" />
                 </Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Players}" />
+                    <components:FormFieldLabel Text="{loc:T list_title.players}" />
                     <components:StateBox Text="{Binding Room.PlayerCount}" IconSize="0" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
@@ -101,8 +101,8 @@
 
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
-                        <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
+                        <MenuItem Header="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" />
+                        <MenuItem Header="{loc:T action.view_mii}" Click="OpenCarousel_OnClick" />
                         <MenuItem Header="Add Friend" Click="AddFriend_OnClick" />
                         <Separator />
                         <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />

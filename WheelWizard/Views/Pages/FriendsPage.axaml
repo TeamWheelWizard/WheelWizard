@@ -1,9 +1,9 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:domain="clr-namespace:WheelWizard.WiiManagement.GameLicense.Domain"
@@ -22,7 +22,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                     Spacing="6">
-            <TextBlock Text="{x:Static lang:Common.PageTitle_Friends}" Classes="PageTitleText" />
+            <TextBlock Text="{loc:T page_title.friends}" Classes="PageTitleText" />
             <components:Button Text=""
                                x:Name="TopAddFriendButton"
                                Width="30"
@@ -36,7 +36,7 @@
                                ToolTip.Placement="Top"
                                ToolTip.ShowDelay="20" />
             <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6,0,0,0"
-                    ToolTip.Tip="{x:Static lang:Phrases.Hover_FriendsPageDisclaimer}"
+                    ToolTip.Tip="{loc:T hover.friends_page_disclaimer}"
                     ToolTip.Placement="Top" ToolTip.ShowDelay="20"
                     Width="18" Height="18">
                 <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
@@ -44,15 +44,11 @@
             </Border>
         </StackPanel>
 
-        <patterns:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
-                                     HorizontalAlignment="Right" VerticalAlignment="Top" />
-
-
         <Grid Grid.Row="1" x:Name="VisibleWhenFriends" RowDefinitions="*, 12*">
             <Grid Grid.Row="0" Margin="10,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6"
                             HorizontalAlignment="Right">
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_SortBy}"
+                    <components:FormFieldLabel Text="{loc:T attribute.sort_by}"
                                                VerticalAlignment="Center" />
                     <components:FormFieldLabel Text=":" VerticalAlignment="Center" />
                     <ComboBox x:Name="SortByDropdown"
@@ -61,7 +57,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="{x:Static lang:Common.ListTitle_Friends}" />
+                    <components:FormFieldLabel Text="{loc:T list_title.friends}" />
                     <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
@@ -91,12 +87,12 @@
                 </ListBox.ItemTemplate>
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{x:Static lang:Common.Action_CopyFriendCode}" Click="CopyFriendCode_OnClick" />
-                        <MenuItem Header="{x:Static lang:Common.Action_ViewMii}" Click="OpenCarousel_OnClick" />
+                        <MenuItem Header="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" />
+                        <MenuItem Header="{loc:T action.view_mii}" Click="OpenCarousel_OnClick" />
                         <Separator />
                         <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />
                         <MenuItem Header="Remove Friend" Click="RemoveFriend_OnClick" />
-                        <!-- <MenuItem Header="{x:Static lang:Common.Action_SaveExternalMii}" Click="SaveMii_OnClick" /> -->
+                        <!-- <MenuItem Header="{loc:T action.save_external_mii}" Click="SaveMii_OnClick" /> -->
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
@@ -105,8 +101,8 @@
         <StackPanel Grid.Row="1" x:Name="VisibleWhenNoFriends"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
             <components:EmptyPageInfo HorizontalAlignment="Center"
-                                      Title="{x:Static lang:Phrases.EmptyContent_NoFriends_Title}"
-                                      BodyText="{x:Static lang:Phrases.EmptyContent_NoFriends}" />
+                                      Title="{loc:T empty_content.no_friends_title}"
+                                      BodyText="{loc:T empty_content.no_friends}" />
             <components:Button Text="Add friend"
                                MinWidth="170"
                                Margin="0,12,0,0"

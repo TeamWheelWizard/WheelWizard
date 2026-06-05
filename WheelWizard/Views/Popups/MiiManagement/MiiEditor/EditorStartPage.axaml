@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:editor="clr-namespace:WheelWizard.Views.Popups.MiiManagement.MiiEditor"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              x:Class="WheelWizard.Views.Popups.MiiManagement.MiiEditor.EditorStartPage">
     <Grid RowDefinitions="40,*,60">
@@ -39,34 +39,34 @@
                            IconData="{StaticResource Dice}" Click="RandomizeMii_OnClick" />
         <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="10"
                     VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="10">
-            <components:Button Text="{x:Static lang:Common.Action_Cancel}" Variant="Warning"
+            <components:Button Text="{loc:T action.cancel}" Variant="Warning"
                                IconData="{StaticResource XMark}" Click="CancelButton_OnClick" />
-            <components:Button Text="{x:Static lang:Common.Action_Save}" Variant="Primary"
+            <components:Button Text="{loc:T action.save}" Variant="Primary"
                                x:Name="SaveButton"
                                IconData="{StaticResource CheckMark}" Click="SaveButton_OnClick" />
         </StackPanel>
         
         <ScrollViewer Grid.Row="1">
             <StackPanel>
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_General}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.general}"
                                             Type="{x:Type editor:EditorGeneral}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Face}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.face}"
                                             Type="{x:Type editor:EditorFace}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Hair}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.hair}"
                                             Type="{x:Type editor:EditorHair}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Eyebrows}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.eyebrows}"
                                             Type="{x:Type editor:EditorEyebrows}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Eyes}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.eyes}"
                                             Type="{x:Type editor:EditorEyes}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Nose}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.nose}"
                                             Type="{x:Type editor:EditorNose}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Lips}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.lips}"
                                             Type="{x:Type editor:EditorLips}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Glasses}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.glasses}"
                                             Type="{x:Type editor:EditorGlasses}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_FacialHair}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.facial_hair}"
                                             Type="{x:Type editor:EditorFacialHair}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{x:Static lang:Common.Attribute_MiiSection_Mole}"
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.mole}"
                                             Type="{x:Type editor:EditorMole}" />
             </StackPanel>
         </ScrollViewer>

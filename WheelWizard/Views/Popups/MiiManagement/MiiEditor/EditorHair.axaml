@@ -4,15 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              x:Class="WheelWizard.Views.Popups.MiiManagement.MiiEditor.EditorHair">
     <!-- FOR EVERY EDITOR PAGE -->
     <Grid RowDefinitions="40,*">
         <!-- Updated Title -->
-        <TextBlock Classes="BodyText" Margin="10" Text="{x:Static lang:Common.Attribute_MiiSection_Hair}" HorizontalAlignment="Right" />
+        <TextBlock Classes="BodyText" Margin="10" Text="{loc:T attribute.mii_section.hair}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
-        <components:IconLabelButton Grid.Row="0" Text="{x:Static lang:Common.Action_Back}" IconData="{StaticResource ArrowLeft}"
+        <components:IconLabelButton Grid.Row="0" Text="{loc:T action.back}" IconData="{StaticResource ArrowLeft}"
                                     Click="BackButton_OnClick" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"
                                     Foreground="{StaticResource TitleTextColor}" FontSize="16"
                                     HoverForeground="{StaticResource Primary200}"/>
@@ -25,7 +25,7 @@
 
                     
                 <StackPanel> <!-- Hair Color -->
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_HairColor}"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.hair_color}"/>
                     <UniformGrid Columns="5" x:Name="HairColorGrid">
                         <!-- Generated elements -->
                     </UniformGrid>
@@ -38,10 +38,10 @@
                         IsCheckedChanged="HairFlippedCheck_OnIsCheckedChanged"
                         VerticalAlignment="Center"
                         />
-                    <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_MirrorHair}" VerticalAlignment="Center"/>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.mirror_hair}" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <components:FormFieldLabel Text="{x:Static lang:Common.Attribute_Mii_HairType}"/>
+                <components:FormFieldLabel Text="{loc:T attribute.mii.hair_type}"/>
                 <UniformGrid Columns="5" x:Name="HairTypesGrid">
                     <!-- Generated elements -->
                 </UniformGrid>

@@ -1,10 +1,9 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
 using WheelWizard.Settings;
@@ -26,6 +25,7 @@ namespace WheelWizard.Views.Pages;
 public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 {
     private const int ProfileCarouselPageCount = 2;
+    private const int ProfileSelectorMaxCharacters = 12;
 
     private LicenseProfile? currentPlayer;
     private Mii? _currentMii;
@@ -139,11 +139,11 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
             var name = region switch
             {
-                MarioKartWiiEnums.Regions.Europe => Common.Region_Europe,
-                MarioKartWiiEnums.Regions.America => Common.Region_America,
-                MarioKartWiiEnums.Regions.Korea => Common.Region_SouthKorea,
-                MarioKartWiiEnums.Regions.Japan => Common.Region_Japan,
-                _ => Common.State_Unknown,
+                MarioKartWiiEnums.Regions.Europe => t("region.europe"),
+                MarioKartWiiEnums.Regions.America => t("region.america"),
+                MarioKartWiiEnums.Regions.Korea => t("region.south_korea"),
+                MarioKartWiiEnums.Regions.Japan => t("region.japan"),
+                _ => t("state.unknown"),
             };
             var itemForRegionDropdown = new ComboBoxItem
             {
@@ -188,15 +188,24 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             var noLicense = miiName == SettingValues.NoLicense;
 
             radioButton.IsEnabled = !noLicense;
-            radioButton.Content = miiName switch
+            var displayName = miiName switch
             {
-                SettingValues.NoName => Common.State_NoName,
-                SettingValues.NoLicense => Common.State_NoLicense,
+                SettingValues.NoName => t("state.no_name"),
+                SettingValues.NoLicense => t("state.no_license"),
                 _ => miiName,
             };
+            radioButton.Content = TrimProfileSelectorText(displayName);
         }
 
         UpdateCarouselIndicators();
+    }
+
+    private static string TrimProfileSelectorText(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length < ProfileSelectorMaxCharacters)
+            return text ?? string.Empty;
+
+        return $"{text[..(ProfileSelectorMaxCharacters - 1)]}...";
     }
 
     private void UpdatePage()
@@ -251,8 +260,10 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         // since Avalonia has some weird ass cashing, It might just be that that is because this method is actually deprecated
 
         //now we refresh the sidebar friend amount
-        ViewUtils.GetLayout().UpdateFriendCount();
-        ViewUtils.ShowSnackbar(Phrases.SnackbarSuccess_ProfileSetPrimary);
+        var layout = ViewUtils.GetLayout();
+        layout.UpdateFriendCount();
+        layout.UpdateSidebarProfile();
+        ViewUtils.ShowSnackbar(t("snackbar_success.profile_set_primary"));
     }
 
     private void RegionDropdown_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -276,7 +287,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         ViewMii(0); // Just in case you have current user set as 4. and you change to a region where there are only 3 users.
         SetUserAsPrimary();
         UpdatePage();
-        ViewUtils.GetLayout().UpdateFriendCount();
+        var layout = ViewUtils.GetLayout();
+        layout.UpdateFriendCount();
+        layout.UpdateSidebarProfile();
     }
 
     private void TopBarRadio_OnClick(object? sender, RoutedEventArgs e)
@@ -316,7 +329,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         if (result.IsFailure)
         {
             new MessageBoxWindow()
-                .SetTitleText(Phrases.MessageError_FailedChangeMii_Title)
+                .SetTitleText(t("message_error.failed_change_mii.title"))
                 .SetInfoText(result.Error!.Message)
                 .SetMessageType(MessageBoxWindow.MessageType.Error)
                 .Show();
@@ -326,7 +339,8 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         CurrentMii = selectedMii;
         GameLicenseService.LoadLicense();
         UpdatePage();
-        ViewUtils.ShowSnackbar(Phrases.MessageSuccess_MiiChanged);
+        UpdateSidebarProfileIfCurrentUser();
+        ViewUtils.ShowSnackbar(t("message_success.mii_changed"));
     }
 
     private void ViewRoom_OnClick(object? sender, RoutedEventArgs e)
@@ -349,7 +363,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             return;
 
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(currentPlayer.FriendCode);
-        ViewUtils.ShowSnackbar(Phrases.SnackbarSuccess_CopiedFC);
+        ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
     }
 
     // This is intentionally a separate validation method besides the true name validation. That name validation allows less than 3.
@@ -358,7 +372,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     {
         newName = (newName ?? string.Empty).Trim();
         if (newName.Length is > 10 or < 3)
-            return Fail(Phrases.HelperNote_NameMustBetween);
+            return Fail(t("helper_note.name_must_between"));
 
         return Ok();
     }
@@ -366,9 +380,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private async void RenameMii_OnClick(object? sender, EventArgs e)
     {
         var oldName = CurrentMii?.Name.ToString();
-        var extraText = Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, oldName ?? string.Empty) ?? string.Empty;
+        var extraText = t("question.enter_new_name.extra", oldName ?? string.Empty) ?? string.Empty;
         var renamePopup = new TextInputWindow()
-            .SetMainText(Phrases.Question_EnterNewName_Title)
+            .SetMainText(t("question.enter_new_name.title"))
             .SetExtraText(extraText)
             .SetAllowCustomChars(true)
             .SetValidation(ValidateMiiName)
@@ -382,15 +396,24 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         if (changeNameResult.IsFailure)
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText(Phrases.MessageError_FailedChangeName_Title)
+                .SetTitleText(t("message_error.failed_change_name.title"))
                 .SetInfoText(changeNameResult.Error.Message)
                 .Show();
         else
-            ViewUtils.ShowSnackbar(Humanizer.ReplaceDynamic(Phrases.SnackbarSuccess_NameChange, newName) ?? "Name changed successfully");
+            ViewUtils.ShowSnackbar(t("snackbar_success.name_change", newName) ?? "Name changed successfully");
 
         //reload game data, since multiple licenses can use the same mii
         GameLicenseService.LoadLicense();
         UpdatePage();
+        UpdateSidebarProfileIfCurrentUser();
+    }
+
+    private void UpdateSidebarProfileIfCurrentUser()
+    {
+        if (FocusedUser != _currentUserIndex)
+            return;
+
+        ViewUtils.GetLayout().UpdateSidebarProfile();
     }
 
     private void MoveCarouselPage(int offset)

@@ -1,8 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              mc:Ignorable="d" d:DesignWidth="490" d:DesignHeight="830"
@@ -111,14 +111,11 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
-        <TextBlock Grid.Row="0" Text="{x:Static lang:Common.PageTitle_Home}" HorizontalAlignment="Left"
+        <TextBlock Grid.Row="0" Text="{loc:T page_title.home}" HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
-
-        <behaviorComponent:CurrentUserProfile Grid.Row="0" x:Name="CurrentUserProfile" Margin="10,0"
-                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,6"
                     HorizontalAlignment="Right"
@@ -177,7 +174,7 @@
                                Click="DolphinButton_OnClick"
                                Width="100" Margin="0,6,0,0" />
             <!-- removed tooltip for dolphin startup button as this doesn't look so nice, and I think everyone knows it by the dolphin icon -->
-            <!-- ToolTip.Tip="{x:Static lang:Common.Action_LaunchDolphin}"
+            <!-- ToolTip.Tip="{loc:T action.launch_dolphin}"
                                ToolTip.Placement="Top"
                                ToolTip.ShowDelay="50"  -->
         </StackPanel>

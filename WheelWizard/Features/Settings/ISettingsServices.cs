@@ -63,4 +63,5 @@ public interface ISettingsStartupInitializer
 public interface ISettingsLocalizationService
 {
     void Initialize();
+    void ApplyCurrentLanguage();
 }

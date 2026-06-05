@@ -1,7 +1,6 @@
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.WiiManagement;
@@ -16,11 +15,11 @@ public partial class MiiSelectorWindow : PopupContent
     private TaskCompletionSource<Mii?>? _tcs;
 
     public MiiSelectorWindow()
-        : base(true, false, false, Common.PopupTitle_MiiSelector)
+        : base(true, false, false, t("popup_title.mii_selector"))
     {
         InitializeComponent();
-        SaveButton.Text = Common.Action_Save;
-        CancelButton.Text = Common.Action_Cancel;
+        SaveButton.Text = t("action.save");
+        CancelButton.Text = t("action.cancel");
     }
 
     public MiiSelectorWindow SetButtonText(string saveText, string cancelText)

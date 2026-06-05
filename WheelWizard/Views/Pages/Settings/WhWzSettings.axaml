@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components1="clr-namespace:WheelWizard.Views.Components"
              mc:Ignorable="d" d:DesignWidth="444" d:DesignHeight="716"
              x:Class="WheelWizard.Views.Pages.Settings.WhWzSettings">
@@ -13,9 +13,9 @@
             <!-- File location settings -->
             <StackPanel Margin="0,10,0,0">
                 <StackPanel Orientation="Horizontal">
-                    <components1:FormFieldLabel Text="{x:Static lang:Settings.Section_LocationPaths}" />
+                    <components1:FormFieldLabel Text="{loc:T section.location_paths}" />
                     <Border x:Name="LocationWarningIcon"
-                            ToolTip.Tip="{x:Static lang:Settings.HelperText_MustSetPaths}"
+                            ToolTip.Tip="{loc:T helper_text.must_set_paths}"
                             ToolTip.Placement="Top" ToolTip.ShowDelay="50">
                         <PathIcon x:Name="WarningIcon" Foreground="{StaticResource Warning600}"
                                   Data="{StaticResource WarningTriangle}"
@@ -57,11 +57,11 @@
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <components1:FormFieldLabel
-                                        Text="{x:Static lang:Settings.Option_DolphinEmulatorExe}"
-                                        TipText="{x:Static lang:Settings.HelperText_EndWithExe}" />
+                                        Text="{loc:T option.dolphin_emulator_exe}"
+                                        TipText="{loc:T helper_text.end_with_exe}" />
     
                                     <TextBox Classes="dark" Grid.Row="1" Grid.Column="0" Height="40"
-                                             Watermark="{x:Static lang:Phrases.Placeholder_EnterPath}"
+                                             Watermark="{loc:T placeholder.enter_path}"
                                              HorizontalAlignment="Stretch"
                                              x:Name="DolphinExeInput" />
     
@@ -80,10 +80,10 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_MarioKartGame}"
+                                    <components1:FormFieldLabel Text="{loc:T option.mario_kart_game}"
                                                                 Margin="0,6,0,0" x:Name="MKGameFieldLabel" />
                                     <TextBox Classes="dark" Grid.Row="1" Grid.Column="0" Height="40"
-                                             Watermark="{x:Static lang:Phrases.Placeholder_EnterPath}"
+                                             Watermark="{loc:T placeholder.enter_path}"
                                              HorizontalAlignment="Stretch"
                                              x:Name="MarioKartInput" />
                                     <components1:Button Grid.Row="1" Grid.Column="1"
@@ -102,11 +102,11 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_DolphinUserPath}"
+                                    <components1:FormFieldLabel Text="{loc:T option.dolphin_user_path}"
                                                                 Margin="0,6,0,0" />
                                     <TextBox Classes="dark" Grid.Row="1" Grid.Column="0"
                                              HorizontalAlignment="Stretch" Height="40"
-                                             Watermark="{x:Static lang:Phrases.Placeholder_EnterPath}"
+                                             Watermark="{loc:T placeholder.enter_path}"
                                              x:Name="DolphinUserPathInput" />
                                     <components1:Button Grid.Row="1" Grid.Column="1"
                                                         FontSize="16" Height="40"
@@ -117,16 +117,16 @@
     
                             <StackPanel Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
                                 <components1:Button Variant="Primary" x:Name="LocationEditButton"
-                                                    Text="{x:Static lang:Common.Action_Edit}"
+                                                    Text="{loc:T action.edit}"
                                                     Click="EditButton_OnClick" Height="40"
                                                     IconData="{StaticResource Pen}"
                                                     Margin="3" />
                                 <components1:Button Variant="Warning"
                                                     x:Name="LocationCancelButton" Height="40"
                                                     IsVisible="False" Click="CancelButton_OnClick"
-                                                    Text="{x:Static lang:Common.Action_Cancel}" Margin="3" />
+                                                    Text="{loc:T action.cancel}" Margin="3" />
                                 <components1:Button Variant="Primary"
-                                                    Text="{x:Static lang:Common.Action_Save}"
+                                                    Text="{loc:T action.save}"
                                                     x:Name="LocationSaveButton"
                                                     Click="SaveButton_OnClick"
                                                     IsVisible="False" Height="40"
@@ -138,8 +138,8 @@
                 
                 <Border Classes="SettingsBlockStyle" Margin="0,8,0,0">
                     <StackPanel>
-                        <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_WheelWizardDataFolder}"
-                                                    TipText="{x:Static lang:Settings.HelperText_WheelWizardDataFolder}" />
+                        <components1:FormFieldLabel Text="{loc:T option.wheel_wizard_data_folder}"
+                                                    TipText="{loc:T helper_text.wheel_wizard_data_folder}" />
                         <TextBox Classes="dark"
                                  Margin="0,4,0,0"
                                  x:Name="AppDataLocationInput"
@@ -149,13 +149,13 @@
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                             <components1:Button x:Name="AppDataLocationBrowseButton"
                                                 Variant="Default"
-                                                Text="{x:Static lang:Common.Action_Browse}"
+                                                Text="{loc:T action.browse}"
                                                 IconData="{StaticResource Folder}"
                                                 Height="40"
                                                 Click="AppDataLocationBrowse_OnClick" />
                             <components1:Button x:Name="AppDataLocationResetButton"
                                                 Variant="Default"
-                                                Text="{x:Static lang:Settings.Option_ResetDataFolder}"
+                                                Text="{loc:T option.reset_data_folder}"
                                                 Height="40"
                                                 Margin="6,0,0,0"
                                                 Click="AppDataLocationReset_OnClick" />
@@ -171,7 +171,7 @@
                                         IsEnabled="True"
                                         IconData="{StaticResource Folder}"
                                         HorizontalAlignment="Stretch"
-                                        Text="{x:Static lang:Settings.Option_OpenConfig}"
+                                        Text="{loc:T option.open_config}"
                                         Click="WhWzFolder_Click"
                                         Margin="3" />
                     <components1:Button Grid.Column="1" Variant="Default"
@@ -179,23 +179,23 @@
                                         IsEnabled="True"
                                         IconData="{StaticResource Folder}"
                                         HorizontalAlignment="Stretch"
-                                        Text="{x:Static lang:Settings.Option_OpenGameFolder}"
+                                        Text="{loc:T option.open_game_folder}"
                                         Click="GameFileFolder_Click"
                                         Margin="3" />
                 </Grid>
             </StackPanel>
     
-            <components1:FormFieldLabel Text="{x:Static lang:Settings.Section_WhWzAppearance}" Margin="0,10,0,0" />
+            <components1:FormFieldLabel Text="{loc:T section.wh_wz_appearance}" Margin="0,10,0,0" />
             <Border Classes="SettingsBlockStyle" x:Name="WhWzAppearance">
                 <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
                     <CheckBox Margin="0,2,0,6"
                               IsChecked="True" Classes="Switch"
                               x:Name="EnableAnimations"
                               Click="EnableAnimations_OnClick">
-                        <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_EnableAnimations}"
-                                                    TipText="{x:Static lang:Settings.HelperText_EnableAnimations}" />
+                        <components1:FormFieldLabel Text="{loc:T option.enable_animations}"
+                                                    TipText="{loc:T helper_text.enable_animations}" />
                     </CheckBox>
-                    <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_WindowScale}" />
+                    <components1:FormFieldLabel Text="{loc:T option.window_scale}" />
                     <ComboBox
                         x:Name="WindowScaleDropdown"
                         SelectionChanged="WindowScaleDropdown_OnSelectionChanged"
@@ -203,7 +203,7 @@
                         Margin="0,0,0,5"
                         VerticalAlignment="Top" />
                     
-                    <components1:FormFieldLabel Text="{x:Static lang:Settings.Option_WhWzLanguage}" TipText="{x:Static lang:Settings.HelperText_WhWzLanguage}" />
+                    <components1:FormFieldLabel Text="{loc:T option.wh_wz_language}" TipText="{loc:T helper_text.wh_wz_language}" />
                     <ComboBox x:Name="WhWzLanguageDropdown"
                               HorizontalAlignment="Stretch"
                               Margin="0,0,0,5"

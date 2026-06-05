@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
@@ -11,7 +11,6 @@ using WheelWizard.Features.Patches;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Mods;
-using WheelWizard.Resources.Languages;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
@@ -45,7 +44,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             ))
         );
 
-    public string StoragePageTitle => Common.PageTitle_Patches;
+    public string StoragePageTitle => t("page_title.patches");
 
     private bool _hasMods;
 
@@ -142,14 +141,14 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         var selectedFiles = await FilePickerHelper.OpenFilePickerAsync(
             CustomFilePickerFileType.All,
             allowMultiple: true,
-            title: Phrases.FilePicker_SelectModFile
+            title: t("file_picker.select_mod_file")
         );
         if (selectedFiles.Count == 0)
             return;
 
         var modName = await new TextInputWindow()
-            .SetMainText(Phrases.Question_EnterModName_Title)
-            .SetPlaceholderText(Phrases.Placeholder_EnterModName)
+            .SetMainText(t("question.enter_mod_name.title"))
+            .SetPlaceholderText(t("placeholder.enter_mod_name"))
             .SetValidation(ModManager.ValidateModName)
             .ShowDialog();
         if (string.IsNullOrWhiteSpace(modName))
@@ -164,8 +163,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
         new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Message)
-            .SetTitleText(Phrases.MessageSuccess_ModInstalled_Title)
-            .SetInfoText(Humanizer.ReplaceDynamic(Phrases.MessageSuccess_ModInstalled_Extra, modName)!)
+            .SetTitleText(t("message_success.mod_installed.title"))
+            .SetInfoText(t("message_success.mod_installed.extra", modName)!)
             .Show();
     }
 
@@ -177,10 +176,10 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
         var oldTitle = selectedMod.Mod.Title;
         var newTitle = await new TextInputWindow()
-            .SetMainText(Phrases.Question_EnterModName_Title)
+            .SetMainText(t("question.enter_mod_name.title"))
             .SetInitialText(oldTitle)
-            .SetExtraText(Humanizer.ReplaceDynamic(Phrases.Question_EnterNewName_Extra, oldTitle)!)
-            .SetPlaceholderText(Phrases.Placeholder_EnterModName)
+            .SetExtraText(t("question.enter_new_name.extra", oldTitle)!)
+            .SetPlaceholderText(t("placeholder.enter_mod_name"))
             .SetValidation(ModManager.ValidateRenameModName)
             .ShowDialog();
 
@@ -198,9 +197,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (selectedMod == null)
             return;
 
-        var areTheySure = await new YesNoWindow()
-            .SetMainText(Humanizer.ReplaceDynamic(Phrases.Question_SureDelete_Title, selectedMod.Mod.Title)!)
-            .AwaitAnswer();
+        var areTheySure = await new YesNoWindow().SetMainText(t("question.sure_delete.title", selectedMod.Mod.Title)!).AwaitAnswer();
         if (!areTheySure)
             return;
 
@@ -236,7 +233,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             var conversion = result.Value;
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Message)
-                .SetTitleText(Phrases.MessageSuccess_ModConvertedToPatches_Title)
+                .SetTitleText(t("message_success.mod_converted_to_patches.title"))
                 .SetInfoText(BuildPatchConversionResultMessage(conversion))
                 .Show();
             return;
@@ -244,24 +241,20 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
         new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Warning)
-            .SetTitleText(Phrases.MessageWarning_CouldNotConvertMod_Title)
+            .SetTitleText(t("message_warning.could_not_convert_mod.title"))
             .SetInfoText(result.Error.Message)
             .Show();
     }
 
     private static string BuildPatchConversionResultMessage(ModPatchConversionResult conversion)
     {
-        var message = Humanizer.ReplaceDynamic(
-            Phrases.MessageSuccess_PatchConversionResult,
-            conversion.ConvertedFileCount,
-            conversion.WrittenPatchCount
-        )!;
+        var message = t("message_success.patch_conversion_result", conversion.ConvertedFileCount, conversion.WrittenPatchCount);
 
         if (conversion.Skipped.Count > 0)
         {
             message +=
                 $"{Environment.NewLine}{Environment.NewLine}"
-                + Humanizer.ReplaceDynamic(Phrases.MessageSuccess_PatchConversionSkipped, conversion.Skipped.Count)!
+                + t("message_success.patch_conversion_skipped", conversion.Skipped.Count)!
                 + $"{Environment.NewLine}{Environment.NewLine}"
                 + string.Join(Environment.NewLine, conversion.Skipped.Take(8));
         }
@@ -270,7 +263,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         {
             message +=
                 $"{Environment.NewLine}{Environment.NewLine}"
-                + Humanizer.ReplaceDynamic(Phrases.MessageSuccess_PatchConversionNotes, conversion.Warnings.Count)!
+                + t("message_success.patch_conversion_notes", conversion.Warnings.Count)!
                 + $"{Environment.NewLine}{Environment.NewLine}"
                 + string.Join(Environment.NewLine, conversion.Warnings.Take(8));
         }

@@ -53,6 +53,26 @@ public partial class SidebarRadioButton : RadioButton
         set => SetValue(BoxTipProperty, value);
     }
 
+    public static readonly StyledProperty<Geometry> BoxIconDataProperty = AvaloniaProperty.Register<SidebarRadioButton, Geometry>(
+        nameof(BoxIconData)
+    );
+
+    public Geometry BoxIconData
+    {
+        get => GetValue(BoxIconDataProperty);
+        set => SetValue(BoxIconDataProperty, value);
+    }
+
+    public static readonly StyledProperty<double> BoxIconSizeProperty = AvaloniaProperty.Register<SidebarRadioButton, double>(
+        nameof(BoxIconSize)
+    );
+
+    public double BoxIconSize
+    {
+        get => GetValue(BoxIconSizeProperty);
+        set => SetValue(BoxIconSizeProperty, value);
+    }
+
     //todo: after patches is more stable, uncomment this
 
     // public static readonly StyledProperty<bool> WarningVisibleProperty = AvaloniaProperty.Register<SidebarRadioButton, bool>(

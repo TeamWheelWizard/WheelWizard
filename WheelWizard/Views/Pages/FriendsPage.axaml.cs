@@ -3,7 +3,6 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
-using WheelWizard.Resources.Languages;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
@@ -121,13 +120,13 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             var name = type switch
             {
                 // TODO: Should be replaced with actual translations
-                ListOrderCondition.VR => Common.Attribute_VrFull,
-                ListOrderCondition.BR => Common.Attribute_BrFull,
-                ListOrderCondition.NAME => Common.Attribute_Name,
-                ListOrderCondition.WINS => Common.Attribute_Wins,
-                ListOrderCondition.TOTAL_RACES => Common.Attribute_RacesPlayed,
-                ListOrderCondition.IS_ONLINE => Common.Attribute_IsOnline,
-                _ => Common.State_Unknown,
+                ListOrderCondition.VR => t("attribute.vr_full"),
+                ListOrderCondition.BR => t("attribute.br_full"),
+                ListOrderCondition.NAME => t("attribute.name"),
+                ListOrderCondition.WINS => t("attribute.wins"),
+                ListOrderCondition.TOTAL_RACES => t("attribute.races_played"),
+                ListOrderCondition.IS_ONLINE => t("attribute.is_online"),
+                _ => t("state.unknown"),
             };
 
             SortByDropdown.Items.Add(name);
@@ -168,7 +167,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             .SetMainText("Add Friend")
             .SetExtraText("Enter a 12-digit friend code.")
             .SetPlaceholderText("0000-0000-0000")
-            .SetButtonText(Common.Action_Cancel, Common.Action_Submit)
+            .SetButtonText(t("action.cancel"), t("action.submit"))
             .SetValidation((_, newText) => ValidateFriendCodeInput(newText))
             .SetWarningValidation((_, newText) => ValidateFriendCodeWarning(newText))
             .ShowDialog();
@@ -302,7 +301,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
             return;
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(selectedPlayer.FriendCode);
-        ViewUtils.ShowSnackbar(Phrases.SnackbarSuccess_CopiedFC);
+        ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
     }
 
     private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)
@@ -367,7 +366,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     {
         if (!MiiDbService.Exists())
         {
-            ViewUtils.ShowSnackbar(Phrases.SnackbarWarning_CantSaveMii, ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.cant_save_mii"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
@@ -389,7 +388,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             return;
         }
 
-        ViewUtils.ShowSnackbar(Phrases.SnackbarSuccess_MiiAdded);
+        ViewUtils.ShowSnackbar(t("snackbar_success.mii_added"));
     }
 
     #region PropertyChanged

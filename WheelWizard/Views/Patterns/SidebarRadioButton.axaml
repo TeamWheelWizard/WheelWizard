@@ -1,6 +1,6 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
+<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:lang="clr-namespace:WheelWizard.Resources.Languages"
+        xmlns:loc="clr-namespace:WheelWizard.Localization"
         xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns">
@@ -8,23 +8,23 @@
     <Border Padding="2" Width="300" Background="{StaticResource Neutral600}">
       <StackPanel>
         <patterns:SidebarRadioButton IconData="{StaticResource Home}" 
-                                     Text="{x:Static lang:Common.PageTitle_Home}"
+                                     Text="{loc:T page_title.home}"
                                      PageType="{x:Type pages:HomePage}"/>
         
         <patterns:SidebarRadioButton  IsChecked="True"
                                    IconData="{StaticResource Settings}" 
-                                   Text="{x:Static lang:Common.PageTitle_Settings}"
+                                   Text="{loc:T page_title.settings}"
                                    PageType="{x:Type pages:HomePage}"/>
         
         <patterns:SidebarRadioButton IconData="{StaticResource Friends}" 
-                                  Text="{x:Static lang:Common.PageTitle_Friends}"
+                                  Text="{loc:T page_title.friends}"
                                   PageType="{x:Type pages:HomePage}"
                                   BoxText="0/0"/>  
         <patterns:SidebarRadioButton IconData="{StaticResource CubesStacked}" 
-                                  Text="{x:Static lang:Common.PageTitle_Mods}"
+                                  Text="{loc:T page_title.mods}"
                                   PageType="{x:Type pages:HomePage}"/>
         <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}" 
-                                  Text="{x:Static lang:Common.PageTitle_Rooms}"
+                                  Text="{loc:T page_title.rooms}"
                                   PageType="{x:Type pages:RoomsPage}"/>
                                   
       </StackPanel>
@@ -34,7 +34,7 @@
   <Style Selector="patterns|SidebarRadioButton">
     <Setter Property="Background" Value="{DynamicResource Neutral900}" />
     <Setter Property="Foreground" Value="{DynamicResource Neutral400}" />
-    <Setter Property="Height" Value="50" />
+    <Setter Property="Height" Value="46" />
     <Setter Property="GroupName" Value="SidebarRadioButton"/> <!-- Because its a radio button, they have to be in the same group to work -->
     <Setter Property="HorizontalAlignment" Value="Stretch"/>
     <Setter Property="Template">
@@ -42,10 +42,16 @@
         <Border Background="{TemplateBinding Background}"
                 BorderThickness="0" >
           <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+            <Border x:Name="PART_SelectionIndicator"
+                    Width="5"
+                    CornerRadius="0"
+                    Background="Transparent"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Stretch" />
             
             <Border CornerRadius="99999" IsVisible="False" Opacity="0.3" Name="PART_HoverEffect"
                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                    Background="{StaticResource Primary200}" Height="50" Width="50" Effect="blur(150)">
+                    Background="{StaticResource Primary200}" Height="46" Width="46" Effect="blur(150)">
               
               <Border.Styles>
                 <Style Selector="Border">
@@ -63,12 +69,12 @@
               </Border.Styles>
             </Border>
             
-            <components:IconLabel x:Name="RadioIcon" IconSize="25" FontSize="20"
+            <components:IconLabel x:Name="RadioIcon" IconSize="25" FontSize="19"
                              IconData="{TemplateBinding IconData}"
                              Text="{TemplateBinding Text}"
                              Foreground="{TemplateBinding Foreground}"
                              HorizontalAlignment="Left" VerticalAlignment="Center"
-                             Margin="10,0,10,0" />
+                             Margin="16,0,10,0" />
 
             <components:StateBox IsVisible="{TemplateBinding BoxText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                             x:Name="StateBox" Classes="Dark"
@@ -76,7 +82,8 @@
                             VerticalAlignment="Center" HorizontalAlignment="Right"
                             Text="{TemplateBinding BoxText}"
                             TipPlacement="Top"
-                            IconSize="0"
+                            IconData="{TemplateBinding BoxIconData}"
+                            IconSize="{TemplateBinding BoxIconSize}"
                             TipText="{TemplateBinding BoxTip}"
             />
             <!-- This will be added at a future date after patches is more stable this will turn on -->
@@ -110,6 +117,9 @@
     <Setter Property="Foreground" Value="{StaticResource Primary300}" />
     <Style Selector="^ /template/ Border#PART_HoverEffect">
       <Setter Property="IsVisible" Value="False"/>
+    </Style>
+    <Style Selector="^ /template/ Border#PART_SelectionIndicator">
+      <Setter Property="Background" Value="{StaticResource Primary400}"/>
     </Style>
   </Style>
 </Styles>
