@@ -129,11 +129,9 @@
                                            PageType="{x:Type pages:FriendsPage}"
                                            BoxText="0/0" />
 
-            <TextBlock Text="{loc:T category.other}" Classes="SidebarSectionText" />
+            <TextBlock Text="{loc:T category.other}" Classes="SidebarSectionText"
+                       x:Name="OtherSectionText" IsVisible="False" />
             <!-- Repurposing this translation from settings -->
-            <patterns:SidebarRadioButton IconData="{StaticResource Settings}"
-                                           PageType="{x:Type pages:SettingsPage}"
-                                           Text="{loc:T page_title.settings}" x:Name="SettingsButton" />
             <patterns:SidebarRadioButton IconData="{StaticResource Code}"
                                            PageType="{x:Type pages:TestingPage}"
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
@@ -142,7 +140,7 @@
                                            Text="Kitchen Sink" x:Name="KitchenSinkButton" />
         </StackPanel>
 
-        <Grid Grid.Column="0" Grid.Row="5" ColumnDefinitions="28,8,28,8,*"
+        <Grid Grid.Column="0" Grid.Row="5" ColumnDefinitions="28,8,28,8,28,8,*"
               VerticalAlignment="Bottom" Margin="10,0,13,12" x:Name="SidebarBottomBar">
             <Border Grid.Column="0"
                     ToolTip.Tip="This only shows regions YOU have played on"
@@ -252,6 +250,22 @@
             </Border>
 
             <Border Grid.Column="4"
+                    x:Name="SidebarSettingsButton"
+                    Width="28" Height="28"
+                    Classes="BottomSidebarIcon"
+                    ToolTip.Tip="{loc:T page_title.settings}"
+                    ToolTip.Placement="Top"
+                    ToolTip.ShowDelay="20"
+                    PointerPressed="SidebarSettingsButton_OnPointerPressed">
+                <PathIcon Data="{StaticResource Gear}"
+                          x:Name="SidebarSettingsIcon"
+                          Width="22" Height="22"
+                          Margin="-1"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center" />
+            </Border>
+
+            <Border Grid.Column="6"
                     Height="26"
                     BorderThickness="1"
                     BorderBrush="{StaticResource Neutral600}"
@@ -277,7 +291,13 @@
                 <Style Selector="PathIcon#SidebarInfoIcon">
                     <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
                 </Style>
+                <Style Selector="PathIcon#SidebarSettingsIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+                </Style>
                 <Style Selector="Border#SidebarInfoButton:pointerover PathIcon#SidebarInfoIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+                </Style>
+                <Style Selector="Border#SidebarSettingsButton:pointerover PathIcon#SidebarSettingsIcon">
                     <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
                 </Style>
                 <Style Selector="Border#LiveStatusBorder:pointerover PathIcon">

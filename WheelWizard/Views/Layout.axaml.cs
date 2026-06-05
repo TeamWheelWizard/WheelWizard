@@ -104,6 +104,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 #if DEBUG
         KitchenSinkButton.IsVisible = true;
 #endif
+        UpdateOtherSectionVisibility();
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
@@ -365,11 +366,23 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     private void UpdateTestingButtonVisibility()
     {
         TestingButton.IsVisible = SettingsService.Get<bool>(SettingsService.TESTING_MODE_ENABLED);
+        UpdateOtherSectionVisibility();
+    }
+
+    private void UpdateOtherSectionVisibility()
+    {
+        OtherSectionText.IsVisible = TestingButton.IsVisible || KitchenSinkButton.IsVisible;
     }
 
     private void SidebarInfoButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         SidebarInfoContextMenu.Open();
+        e.Handled = true;
+    }
+
+    private void SidebarSettingsButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        NavigationManager.NavigateTo<SettingsPage>();
         e.Handled = true;
     }
 
