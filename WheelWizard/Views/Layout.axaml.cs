@@ -207,8 +207,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     public void NavigateToPage(UserControl page)
     {
         var oldPage = ContentArea.Content as Control;
-        var isRoomsToDetails = oldPage is RoomsPage && page is RoomDetailsPage;
-        var isDetailsToRooms = oldPage is RoomDetailsPage && page is RoomsPage;
+        var isRoomsToDetails = oldPage is OnlinePage && page is RoomDetailsPage;
+        var isDetailsToRooms = oldPage is RoomDetailsPage && page is OnlinePage;
 
         ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms ? RoomsPageTransition : null;
         ContentArea.IsTransitionReversed = isDetailsToRooms;
@@ -228,7 +228,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
             button.IsChecked = buttonPageType == page.GetType();
 
             // TODO: make a better way to have these type of exceptions
-            if (button.PageType == typeof(RoomsPage) && typeof(RoomDetailsPage) == page.GetType())
+            if (button.PageType == typeof(OnlinePage) && typeof(RoomDetailsPage) == page.GetType())
                 button.IsChecked = true;
         }
     }
@@ -258,8 +258,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
     {
         var playerCount = sender.PlayerCount;
-        RoomsButton.BoxText = playerCount.ToString();
-        RoomsButton.BoxTip = t("hover.players_online.n", playerCount);
+        OnlineButton.BoxText = playerCount.ToString();
+        OnlineButton.BoxTip = t("hover.players_online.n", playerCount);
         UpdateFriendCount();
     }
 

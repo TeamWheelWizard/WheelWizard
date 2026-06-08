@@ -115,15 +115,12 @@
             <TextBlock Text="{loc:T attribute.status_online}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from values -->
             <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}"
-                                           PageType="{x:Type pages:RoomsPage}"
-                                           Text="{loc:T page_title.rooms}" x:Name="RoomsButton"
+                                           PageType="{x:Type pages:OnlinePage}"
+                                           Text="Online" x:Name="OnlineButton"
                                            BoxText="0"
                                            BoxIconData="{StaticResource UserCouple}"
                                            BoxIconSize="14"
                                            BoxTip="{loc:T hover.players_online.0}" />
-            <patterns:SidebarRadioButton IconData="{StaticResource Award}"
-                                           PageType="{x:Type pages:LeaderboardPage}"
-                                           Text="{loc:T page_title.leaderboard}" />
             <patterns:SidebarRadioButton IconData="{StaticResource Friends}"
                                            Text="{loc:T page_title.friends}" x:Name="FriendsButton"
                                            PageType="{x:Type pages:FriendsPage}"

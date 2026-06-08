@@ -25,7 +25,7 @@
                                   PageType="{x:Type pages:HomePage}"/>
         <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}" 
                                   Text="{loc:T page_title.rooms}"
-                                  PageType="{x:Type pages:RoomsPage}"/>
+                                  PageType="{x:Type pages:OnlinePage}"/>
                                   
       </StackPanel>
     </Border>

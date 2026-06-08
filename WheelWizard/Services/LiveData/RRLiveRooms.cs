@@ -98,7 +98,8 @@ public class RRLiveRooms : RepeatedTaskManager
             Created = room.Created,
             Type = room.Type,
             Suspend = room.Suspend,
-            Rk = room.Rk,
+            RoomType = room.RoomType,
+            CurrentTrackName = room.Race?.TrackName,
             Players = room
                 .Players.Select(p => MapPlayer(p, whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
                 .ToList(),
@@ -260,7 +261,9 @@ public class RRLiveRooms : RepeatedTaskManager
                         Created = room.Created,
                         Host = room.Host,
                         Rk = room.Rk,
+                        RoomType = room.RoomType,
                         Suspend = room.Suspend,
+                        Race = room.Race,
                         Players = comp.Select(idx => room.Players[idx]).ToList(),
                     })
                 );

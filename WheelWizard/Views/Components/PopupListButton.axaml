@@ -15,7 +15,7 @@
         <components:PopupListButton Text="{loc:T page_title.mods}"
                                     Type="{x:Type pages:HomePage}"/>
         <components:PopupListButton Text="{loc:T page_title.rooms}"
-                                    Type="{x:Type pages:RoomsPage}"/>
+                                    Type="{x:Type pages:OnlinePage}"/>
                                   
       </StackPanel>
     </Border>

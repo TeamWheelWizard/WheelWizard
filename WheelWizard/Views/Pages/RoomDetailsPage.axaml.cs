@@ -83,7 +83,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         if (room == null)
         {
             // Reason we do this incase room gets disbanded or something idk
-            NavigationManager.NavigateTo<RoomsPage>();
+            NavigationManager.NavigateTo<OnlinePage>();
             return;
         }
 
@@ -95,7 +95,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         }
     }
 
-    private void GoBackClick(object? sender, EventArgs eventArgs) => NavigationManager.NavigateTo<RoomsPage>();
+    private void GoBackClick(object? sender, EventArgs eventArgs) => NavigationManager.NavigateTo<OnlinePage>();
 
     private void CopyFriendCode_OnClick(object sender, RoutedEventArgs e)
     {

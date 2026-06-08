@@ -1,5 +1,5 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Auto detect text files, keep repository blobs normalized, and use CRLF locally.
+* text=auto eol=crlf
 
 *.metainfo.xml text eol=lf
 *.desktop text eol=lf

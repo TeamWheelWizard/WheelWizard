@@ -25,7 +25,7 @@ public class RrRoomFactory : MockingDataFactory<RrRoom, RrRoomFactory>
             Created = DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(30)),
             Type = isPrivate ? "private" : "public",
             Suspend = false,
-            Rk = "vs_10",
+            RoomType = "Retro Tracks",
             Players = players,
         };
     }

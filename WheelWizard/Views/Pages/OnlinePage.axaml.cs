@@ -4,11 +4,13 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
+using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.Generators;
+using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
@@ -19,6 +21,10 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Pages;
 
+/// <summary>
+/// Data record for leaderboard player items displayed in the remaining-players list.
+/// Moved here from the deleted LeaderboardPage.
+/// </summary>
 public sealed record LeaderboardPlayerItem
 {
     public required int Rank { get; init; }
@@ -43,8 +49,79 @@ public sealed record LeaderboardPlayerItem
     public bool IsOpenHost => false;
 }
 
-public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
+public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
 {
+    // ═══════════════════════════════════════════
+    // Injected services
+    // ═══════════════════════════════════════════
+
+    [Inject]
+    private IRrLeaderboardSingletonService LeaderboardService { get; set; } = null!;
+
+    [Inject]
+    private IWhWzDataSingletonService BadgeService { get; set; } = null!;
+
+    [Inject]
+    private IGameLicenseSingletonService GameDataService { get; set; } = null!;
+
+    [Inject]
+    private ISettingsManager SettingsManager { get; set; } = null!;
+
+    // ═══════════════════════════════════════════
+    // Tab state
+    // ═══════════════════════════════════════════
+
+    private bool _isRoomsTabActive = true;
+
+    public bool IsRoomsTabActive
+    {
+        get => _isRoomsTabActive;
+        private set
+        {
+            if (_isRoomsTabActive == value)
+                return;
+            _isRoomsTabActive = value;
+            OnPropertyChanged(nameof(IsRoomsTabActive));
+            OnPropertyChanged(nameof(IsLeaderboardTabActive));
+        }
+    }
+
+    public bool IsLeaderboardTabActive => !_isRoomsTabActive;
+
+    // ═══════════════════════════════════════════
+    // Rooms tab state
+    // ═══════════════════════════════════════════
+
+    private string? _searchQuery;
+
+    private readonly ObservableCollection<RrRoom> _rooms = [];
+
+    public ObservableCollection<RrRoom> Rooms
+    {
+        get => _rooms;
+        init
+        {
+            _rooms = value;
+            OnPropertyChanged(nameof(Rooms));
+        }
+    }
+
+    private readonly ObservableCollection<RrPlayer> _players = [];
+
+    public ObservableCollection<RrPlayer> Players
+    {
+        get => _players;
+        init
+        {
+            _players = value;
+            OnPropertyChanged(nameof(Players));
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // Leaderboard tab state
+    // ═══════════════════════════════════════════
+
     private static readonly LeaderboardPlayerItem EmptyPodiumPlayer = new()
     {
         Rank = 0,
@@ -59,20 +136,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     };
 
     private CancellationTokenSource? _loadCts;
-
-    [Inject]
-    private IRrLeaderboardSingletonService LeaderboardService { get; set; } = null!;
-
-    [Inject]
-    private IWhWzDataSingletonService BadgeService { get; set; } = null!;
-
-    [Inject]
-    private IGameLicenseSingletonService GameDataService { get; set; } = null!;
-
-    [Inject]
-    private ISettingsManager SettingsManager { get; set; } = null!;
-
-    private bool _hasLoadedOnce;
+    private bool _hasLoadedLeaderboard;
     private bool _isLoading;
     private bool _hasError;
     private bool _hasNoData;
@@ -168,34 +232,159 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     public bool HasPodiumSecond => _podiumSecond != null;
     public bool HasPodiumThird => _podiumThird != null;
 
-    public LeaderboardPage()
+    // ═══════════════════════════════════════════
+    // Constructor / lifecycle
+    // ═══════════════════════════════════════════
+
+    public OnlinePage()
     {
         InitializeComponent();
         DataContext = this;
+
         RemainingPlayers.CollectionChanged += RemainingPlayers_OnCollectionChanged;
 
-        Loaded += LeaderboardPage_Loaded;
-        Unloaded += LeaderboardPage_Unloaded;
+        // Subscribe to live room updates
+        RRLiveRooms.Instance.Subscribe(this);
+        OnUpdate(RRLiveRooms.Instance);
+
+        Loaded += OnlinePage_Loaded;
+        Unloaded += OnlinePage_Unloaded;
     }
 
-    private async void LeaderboardPage_Loaded(object? sender, RoutedEventArgs e)
+    private async void OnlinePage_Loaded(object? sender, RoutedEventArgs e)
     {
-        if (_hasLoadedOnce)
-            return;
-
-        _hasLoadedOnce = true;
-        await ReloadLeaderboardAsync();
+        if (!_hasLoadedLeaderboard)
+        {
+            _hasLoadedLeaderboard = true;
+            await ReloadLeaderboardAsync();
+        }
     }
 
-    private void LeaderboardPage_Unloaded(object? sender, RoutedEventArgs e)
+    private void OnlinePage_Unloaded(object? sender, RoutedEventArgs e)
     {
+        RRLiveRooms.Instance.Unsubscribe(this);
         CancelCurrentLoad();
     }
 
-    private void RemainingPlayers_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    // ═══════════════════════════════════════════
+    // Tab switching
+    // ═══════════════════════════════════════════
+
+    private void RoomsTab_Checked(object? sender, RoutedEventArgs e)
     {
-        OnPropertyChanged(nameof(RemainingCountText));
+        IsRoomsTabActive = true;
     }
+
+    private async void LeaderboardTab_Checked(object? sender, RoutedEventArgs e)
+    {
+        IsRoomsTabActive = false;
+
+        // Load leaderboard on first switch if not already loaded
+        if (!_hasLoadedLeaderboard)
+        {
+            _hasLoadedLeaderboard = true;
+            await ReloadLeaderboardAsync();
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // Live room updates (IRepeatedTaskListener)
+    // ═══════════════════════════════════════════
+
+    public void OnUpdate(RepeatedTaskManager sender)
+    {
+        if (sender is not RRLiveRooms liveRooms)
+            return;
+
+        Rooms.Clear();
+        var count = liveRooms.RoomCount;
+        EmptyRoomsView.IsVisible = count == 0;
+        RoomsListViewContainer.IsVisible = count != 0;
+        if (count == 0)
+            return;
+
+        foreach (var room in liveRooms.CurrentRooms.OrderByDescending(room => room.AverageVr))
+            Rooms.Add(room);
+
+        RoomsListItemCount.Text = liveRooms.CurrentRooms.Count.ToString();
+        PerformSearch(_searchQuery);
+    }
+
+    // ═══════════════════════════════════════════
+    // Rooms tab — search
+    // ═══════════════════════════════════════════
+
+    private void PerformSearch(string? query)
+    {
+        var isStringEmpty = string.IsNullOrWhiteSpace(query);
+        RoomsListViewContainer.IsVisible = isStringEmpty;
+        PlayerListViewContainer.IsVisible = !isStringEmpty;
+
+        if (isStringEmpty)
+            return;
+
+        var safeQuery = query ?? string.Empty;
+        Players.Clear();
+        var matchingPlayers = Rooms
+            .SelectMany(r => r.Players)
+            .Where(p =>
+                (p.Name?.Contains(safeQuery, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (p.FriendCode?.Contains(safeQuery, StringComparison.OrdinalIgnoreCase) ?? false)
+            )
+            .Distinct()
+            .ToList();
+
+        foreach (var player in matchingPlayers)
+            Players.Add(player);
+
+        PlayerListItemCount.Text = matchingPlayers.Count.ToString();
+    }
+
+    private void PlayerSearchField_OnTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (e.Source is not TextBox textBox)
+            return;
+        _searchQuery = textBox.Text;
+        PerformSearch(textBox.Text);
+    }
+
+    // ═══════════════════════════════════════════
+    // Rooms tab — navigation
+    // ═══════════════════════════════════════════
+
+    private void RoomsView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.Source is not ListBox listBox)
+            return;
+        if (listBox.SelectedItem is not RrRoom selectedRoom)
+            return;
+
+        NavigationManager.NavigateTo<RoomDetailsPage>(selectedRoom);
+        listBox.SelectedItem = null;
+        // Deselect the item immediately after navigating. This is important
+        // for a good user experience. Otherwise, the item stays selected,
+        // and if you navigate back, you can't re-select the same item.
+    }
+
+    private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.Source is not ListBox listBox)
+            return;
+        if (listBox.SelectedItem is not RrPlayer selectedRoom)
+            return;
+
+        var room = Rooms.FirstOrDefault(r => r.Players.Any(p => p.Equals(selectedRoom)));
+
+        NavigationManager.NavigateTo<RoomDetailsPage>(room);
+        listBox.SelectedItem = null;
+        // Deselect the item immediately after navigating. This is important
+        // for a good user experience. Otherwise, the item stays selected,
+        // and if you navigate back, you can't re-select the same item.
+    }
+
+    // ═══════════════════════════════════════════
+    // Leaderboard tab — loading
+    // ═══════════════════════════════════════════
 
     private async void RetryButton_OnClick(object? sender, RoutedEventArgs e)
     {
@@ -348,6 +537,10 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         return result.IsSuccess ? result.Value : null;
     }
 
+    // ═══════════════════════════════════════════
+    // Leaderboard — state management
+    // ═══════════════════════════════════════════
+
     private void SetPodiumPlayer(
         ref LeaderboardPlayerItem? field,
         LeaderboardPlayerItem? value,
@@ -415,6 +608,15 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         _loadCts.Dispose();
         _loadCts = null;
     }
+
+    private void RemainingPlayers_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(RemainingCountText));
+    }
+
+    // ═══════════════════════════════════════════
+    // Leaderboard — context menu actions
+    // ═══════════════════════════════════════════
 
     private void CopyFriendCode_OnClick(object sender, RoutedEventArgs e)
     {
@@ -567,10 +769,14 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         return formatted;
     }
 
+    #region PropertyChanged
+
     public new event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new(propertyName));
     }
+
+    #endregion
 }

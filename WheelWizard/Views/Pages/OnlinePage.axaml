@@ -2,16 +2,52 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
              xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
-             mc:Ignorable="d"
-             d:DesignWidth="477"
-             d:DesignHeight="700"
-             x:Class="WheelWizard.Views.Pages.LeaderboardPage"
-             x:DataType="pages:LeaderboardPage">
+             x:Class="WheelWizard.Views.Pages.OnlinePage"
+             x:DataType="pages:OnlinePage">
+
     <UserControl.Styles>
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- Tab strip buttons                                  -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <Style Selector="RadioButton.TabButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="14,7" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="GroupName" Value="OnlineTabs" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <ControlTemplate TargetType="RadioButton">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="RadioButton.TabButton:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+        </Style>
+        <Style Selector="RadioButton.TabButton:checked">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- Leaderboard podium styles (carried from old page)  -->
+        <!-- ═══════════════════════════════════════════════════ -->
         <Style Selector="Border.PodiumStep">
             <Setter Property="CornerRadius" Value="8,8,0,0" />
             <Setter Property="BorderThickness" Value="1,1,1,0" />
@@ -46,7 +82,7 @@
             </Setter>
         </Style>
 
-        <!-- Match RoomDetailsPage entry background treatment for PlayerListItem -->
+        <!-- Match RoomDetailsPage entry background treatment for PlayerListItem in leaderboard -->
         <Style Selector="patterns|PlayerListItem /template/ Border.BoxItemBackground">
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Margin" Value="0,3" />
@@ -69,20 +105,175 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <Border Grid.Row="0"
-                Background="{StaticResource BackgroundLineColor}"
-                Height="1"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Bottom" />
 
-        <TextBlock Grid.Row="0"
-                   Text="Leaderboard"
-                   VerticalAlignment="Bottom"
-                   Classes="PageTitleText" />
+        <!-- Top row divider -->
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
 
-        <Grid Grid.Row="1">
+        <!-- Page title -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <TextBlock Text="Online" Classes="PageTitleText" />
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6,0,0,0"
+                    ToolTip.Tip="{loc:T hover.rooms_page_disclaimer}"
+                    ToolTip.Placement="Top" ToolTip.ShowDelay="20"
+                    Width="18" Height="18">
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
+            </Border>
+        </StackPanel>
+
+        <!-- Tab strip row -->
+        <Grid Grid.Row="1" Margin="10,8,10,6">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <RadioButton Classes="TabButton" IsChecked="True"
+                             Checked="RoomsTab_Checked" x:Name="RoomsTabButton">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource RoomUsers}" Width="14" Height="14" />
+                        <TextBlock Text="{loc:T page_title.rooms}" FontSize="14" FontWeight="SemiBold" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton Classes="TabButton"
+                             Checked="LeaderboardTab_Checked" x:Name="LeaderboardTabButton">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource Award}" Width="14" Height="14" />
+                        <TextBlock Text="{loc:T page_title.leaderboard}" FontSize="14" FontWeight="SemiBold" />
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+
+            <!-- Player search (rooms tab only) -->
+            <TextBox Width="200"
+                     Watermark="{loc:T placeholder.search_for_players}"
+                     VerticalAlignment="Center"
+                     TextChanged="PlayerSearchField_OnTextChanged"
+                     HorizontalAlignment="Right"
+                     IsVisible="{Binding IsRoomsTabActive}"
+                     x:Name="PlayerSearchField" />
+        </Grid>
+
+        <!-- Divider below tabs -->
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- ROOMS TAB CONTENT                                      -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="2" IsVisible="{Binding IsRoomsTabActive}">
+            <!-- Empty state -->
+            <components:EmptyPageInfo x:Name="EmptyRoomsView"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                                     Title="{loc:T empty_content.no_rooms_title}"
+                                     BodyText="{loc:T empty_content.no_rooms}" />
+
+            <!-- Room list view -->
+            <Grid RowDefinitions="*, 16*" Margin="10,0" x:Name="RoomsListViewContainer">
+                <Grid Grid.Row="0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
+                        <components:FormFieldLabel Text="{loc:T list_title.rooms}" />
+                        <components:MemeNumberState Text="0" IconSize="0" x:Name="RoomsListItemCount"
+                                                    IconData="{StaticResource Dice}" />
+                    </StackPanel>
+                    <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                            VerticalAlignment="Bottom" />
+                </Grid>
+
+                <ListBox SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
+                         Background="Transparent" BorderThickness="0" Grid.Row="1"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         SelectionChanged="RoomsView_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Classes="BoxItemBackground">
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                    <PathIcon Data="{StaticResource Road}" Width="50" Height="50" Classes="RoadIcon"
+                                              Margin="0,3" IsVisible="{Binding IsPublic }"
+                                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" />
+                                    <PathIcon Data="{StaticResource RoadLocked}" Width="50" Height="50" Classes="RoadIcon"
+                                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0"
+                                              Margin="0,3"
+                                              IsVisible="{Binding IsPublic, Converter={x:Static BoolConverters.Not}}" />
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <components:FormFieldLabel Text="{Binding RoomStatusText}" Margin="10,0,0,0" />
+                                        <TextBlock Text="{Binding GameMode}" FontSize="14"
+                                                   Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                   Margin="10,0,0,0" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center"
+                                                HorizontalAlignment="Right">
+                                        <components:FormFieldLabel Text="{loc:T attribute.average_room_vr}"
+                                                                   Margin="20,0,0,0" />
+                                        <TextBlock Text="{Binding AverageVr}" FontSize="14"
+                                                   Classes="TinyText" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                   Margin="20,0,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal"
+                                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                Margin="12,0,10,0">
+                                        <components:StateBox IconData="{StaticResource UserCouple}"
+                                                             Text="{Binding PlayerCount}" VerticalAlignment="Center"
+                                                             Variant="Dark" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border.Styles>
+                                    <Style Selector="ListBoxItem Border.BoxItemBackground PathIcon.RoadIcon">
+                                        <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+                                    </Style>
+                                    <Style Selector="ListBoxItem Border.BoxItemBackground:pointerover PathIcon.RoadIcon">
+                                        <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+                                    </Style>
+                                </Border.Styles>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <!-- Player search results (shown when searching) -->
+            <Grid RowDefinitions="*, 16*" Margin="10,0" x:Name="PlayerListViewContainer">
+                <Grid Grid.Row="0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
+                        <components:FormFieldLabel Text="{loc:T list_title.players}" />
+                        <components:MemeNumberState Text="0" IconSize="0" x:Name="PlayerListItemCount" />
+                    </StackPanel>
+                    <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                            VerticalAlignment="Bottom" />
+                </Grid>
+
+                <ListBox Grid.Row="1" SelectionMode="Single" BorderThickness="0"
+                         Padding="0" Margin="0" Background="Transparent" ItemsSource="{Binding Players}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         SelectionChanged="PlayerView_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <patterns:PlayerListItem
+                                UserName="{Binding Name}"
+                                FriendCode="{Binding FriendCode}"
+                                Vr="{Binding VrDisplay}"
+                                Mii="{Binding FirstMii}"
+                                IsOpenHost="{Binding IsOpenHost}"
+                                HasBadges="{Binding HasBadges}"
+                                IsTopPlayer="{Binding IsTopLeaderboardPlayer}"
+                                TopLabel="{Binding TopLabel}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- LEADERBOARD TAB CONTENT                                -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="2" IsVisible="{Binding IsLeaderboardTabActive}">
+            <!-- Loading state -->
             <StackPanel IsVisible="{Binding IsLoading}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
@@ -98,6 +289,7 @@
                            HorizontalAlignment="Center" />
             </StackPanel>
 
+            <!-- Error state -->
             <StackPanel IsVisible="{Binding HasError}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
@@ -125,6 +317,7 @@
                                    Click="RetryButton_OnClick" />
             </StackPanel>
 
+            <!-- Empty state -->
             <StackPanel IsVisible="{Binding HasNoData}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
@@ -140,6 +333,7 @@
                                    Click="RetryButton_OnClick" />
             </StackPanel>
 
+            <!-- Leaderboard data -->
             <ScrollViewer IsVisible="{Binding HasData}"
                           Margin="10,10,10,0"
                           HorizontalScrollBarVisibility="Disabled"
