@@ -68,25 +68,40 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
     private ISettingsManager SettingsManager { get; set; } = null!;
 
     // ═══════════════════════════════════════════
-    // Tab state
+    // Page focus state
     // ═══════════════════════════════════════════
 
-    private bool _isRoomsTabActive = true;
+    private bool _isLeaderboardExpanded;
+    private bool _isRoomsExpanded;
 
-    public bool IsRoomsTabActive
+    public bool IsLeaderboardExpanded
     {
-        get => _isRoomsTabActive;
+        get => _isLeaderboardExpanded;
         private set
         {
-            if (_isRoomsTabActive == value)
+            if (_isLeaderboardExpanded == value)
                 return;
-            _isRoomsTabActive = value;
-            OnPropertyChanged(nameof(IsRoomsTabActive));
-            OnPropertyChanged(nameof(IsLeaderboardTabActive));
+            _isLeaderboardExpanded = value;
+            OnPropertyChanged(nameof(IsLeaderboardExpanded));
+            OnPropertyChanged(nameof(IsNormalOnlineMode));
+            RefreshLeaderboardRows();
         }
     }
 
-    public bool IsLeaderboardTabActive => !_isRoomsTabActive;
+    public bool IsRoomsExpanded
+    {
+        get => _isRoomsExpanded;
+        private set
+        {
+            if (_isRoomsExpanded == value)
+                return;
+            _isRoomsExpanded = value;
+            OnPropertyChanged(nameof(IsRoomsExpanded));
+            OnPropertyChanged(nameof(IsNormalOnlineMode));
+        }
+    }
+
+    public bool IsNormalOnlineMode => !IsLeaderboardExpanded && !IsRoomsExpanded;
 
     // ═══════════════════════════════════════════
     // Rooms tab state
@@ -147,6 +162,8 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
     private LeaderboardPlayerItem? _podiumThird;
 
     public ObservableCollection<LeaderboardPlayerItem> RemainingPlayers { get; } = [];
+    public ObservableCollection<LeaderboardPlayerItem> PodiumPlayers { get; } = [];
+    public ObservableCollection<LeaderboardPlayerItem> LeaderboardRows { get; } = [];
 
     public bool HasError
     {
@@ -267,27 +284,6 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
     }
 
     // ═══════════════════════════════════════════
-    // Tab switching
-    // ═══════════════════════════════════════════
-
-    private void RoomsTab_Checked(object? sender, RoutedEventArgs e)
-    {
-        IsRoomsTabActive = true;
-    }
-
-    private async void LeaderboardTab_Checked(object? sender, RoutedEventArgs e)
-    {
-        IsRoomsTabActive = false;
-
-        // Load leaderboard on first switch if not already loaded
-        if (!_hasLoadedLeaderboard)
-        {
-            _hasLoadedLeaderboard = true;
-            await ReloadLeaderboardAsync();
-        }
-    }
-
-    // ═══════════════════════════════════════════
     // Live room updates (IRepeatedTaskListener)
     // ═══════════════════════════════════════════
 
@@ -299,7 +295,7 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
         Rooms.Clear();
         var count = liveRooms.RoomCount;
         EmptyRoomsView.IsVisible = count == 0;
-        RoomsListViewContainer.IsVisible = count != 0;
+        RoomsListViewContainer.IsVisible = count != 0 && string.IsNullOrWhiteSpace(_searchQuery);
         if (count == 0)
             return;
 
@@ -317,7 +313,7 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
     private void PerformSearch(string? query)
     {
         var isStringEmpty = string.IsNullOrWhiteSpace(query);
-        RoomsListViewContainer.IsVisible = isStringEmpty;
+        RoomsListViewContainer.IsVisible = isStringEmpty && Rooms.Count != 0;
         PlayerListViewContainer.IsVisible = !isStringEmpty;
 
         if (isStringEmpty)
@@ -336,8 +332,6 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
 
         foreach (var player in matchingPlayers)
             Players.Add(player);
-
-        PlayerListItemCount.Text = matchingPlayers.Count.ToString();
     }
 
     private void PlayerSearchField_OnTextChanged(object? sender, TextChangedEventArgs e)
@@ -457,6 +451,9 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
         PodiumFirst = mappedPlayers.ElementAtOrDefault(0);
         PodiumSecond = mappedPlayers.ElementAtOrDefault(1);
         PodiumThird = mappedPlayers.ElementAtOrDefault(2);
+        PodiumPlayers.Clear();
+        foreach (var player in mappedPlayers.Take(3))
+            PodiumPlayers.Add(player);
 
         if (cancellationToken.IsCancellationRequested)
             return;
@@ -466,6 +463,7 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
             RemainingPlayers.Add(player);
         }
 
+        RefreshLeaderboardRows();
         SetDataState();
     }
 
@@ -595,7 +593,9 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
         PodiumFirst = null;
         PodiumSecond = null;
         PodiumThird = null;
+        PodiumPlayers.Clear();
         RemainingPlayers.Clear();
+        LeaderboardRows.Clear();
         OnPropertyChanged(nameof(RemainingCountText));
     }
 
@@ -612,6 +612,39 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
     private void RemainingPlayers_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(RemainingCountText));
+        RefreshLeaderboardRows();
+    }
+
+    private void RefreshLeaderboardRows()
+    {
+        LeaderboardRows.Clear();
+        var takeCount = IsLeaderboardExpanded ? 47 : 2;
+        foreach (var player in RemainingPlayers.Take(takeCount))
+            LeaderboardRows.Add(player);
+    }
+
+    private async void ShowMoreLeaderboard_OnClick(object? sender, EventArgs e)
+    {
+        RoomsPreviewSection.Opacity = 0;
+        await Task.Delay(170);
+        IsRoomsExpanded = false;
+        IsLeaderboardExpanded = true;
+        RoomsPreviewSection.Opacity = 1;
+    }
+
+    private async void ShowMoreRooms_OnClick(object? sender, EventArgs e)
+    {
+        LeaderboardPreviewSection.Opacity = 0;
+        await Task.Delay(170);
+        IsLeaderboardExpanded = false;
+        IsRoomsExpanded = true;
+        LeaderboardPreviewSection.Opacity = 1;
+    }
+
+    private void ViewLess_OnClick(object? sender, EventArgs e)
+    {
+        IsLeaderboardExpanded = false;
+        IsRoomsExpanded = false;
     }
 
     // ═══════════════════════════════════════════

@@ -7,85 +7,59 @@
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
              x:Class="WheelWizard.Views.Pages.OnlinePage"
              x:DataType="pages:OnlinePage">
 
     <UserControl.Styles>
-        <!-- ═══════════════════════════════════════════════════ -->
-        <!-- Tab strip buttons                                  -->
-        <!-- ═══════════════════════════════════════════════════ -->
-        <Style Selector="RadioButton.TabButton">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Padding" Value="14,7" />
-            <Setter Property="Margin" Value="0,0,4,0" />
+        <Style Selector="Border.OnlineSection">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CircularEaseOut" />
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.22" Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.LeaderboardTopCard">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="GroupName" Value="OnlineTabs" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="Template">
-                <ControlTemplate TargetType="RadioButton">
-                    <Border Background="{TemplateBinding Background}"
-                            CornerRadius="{TemplateBinding CornerRadius}"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                    </Border>
-                </ControlTemplate>
-            </Setter>
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="MinHeight" Value="120" />
         </Style>
-        <Style Selector="RadioButton.TabButton:pointerover">
-            <Setter Property="Background" Value="{StaticResource Neutral800}" />
-            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
-        </Style>
-        <Style Selector="RadioButton.TabButton:checked">
-            <Setter Property="Background" Value="{StaticResource Neutral800}" />
-            <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+        <Style Selector="Border.LeaderboardTopCard:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
 
-        <!-- ═══════════════════════════════════════════════════ -->
-        <!-- Leaderboard podium styles (carried from old page)  -->
-        <!-- ═══════════════════════════════════════════════════ -->
-        <Style Selector="Border.PodiumStep">
-            <Setter Property="CornerRadius" Value="8,8,0,0" />
-            <Setter Property="BorderThickness" Value="1,1,1,0" />
-            <Setter Property="VerticalAlignment" Value="Bottom" />
-            <Setter Property="BoxShadow" Value="0 8 18 0 #18000000" />
+        <Style Selector="Border.RoomGridItem">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="MinHeight" Value="70" />
         </Style>
-        <Style Selector="Border.PodiumStep.GoldStep">
-            <Setter Property="BorderBrush" Value="#90D8A443" />
-            <Setter Property="Background">
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#A86D5423" Offset="0" />
-                    <GradientStop Color="#1E1A1A1A" Offset="1" />
-                </LinearGradientBrush>
-            </Setter>
-        </Style>
-        <Style Selector="Border.PodiumStep.SilverStep">
-            <Setter Property="BorderBrush" Value="#7E8EA5D8" />
-            <Setter Property="Background">
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#805C6E8B" Offset="0" />
-                    <GradientStop Color="#1E1A1A1A" Offset="1" />
-                </LinearGradientBrush>
-            </Setter>
-        </Style>
-        <Style Selector="Border.PodiumStep.BronzeStep">
-            <Setter Property="BorderBrush" Value="#988D6A4A" />
-            <Setter Property="Background">
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#97594839" Offset="0" />
-                    <GradientStop Color="#1E1A1A1A" Offset="1" />
-                </LinearGradientBrush>
-            </Setter>
+        <Style Selector="Border.RoomGridItem:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
 
-        <!-- Match RoomDetailsPage entry background treatment for PlayerListItem in leaderboard -->
+        <Style Selector="PathIcon.RoadIcon">
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+        </Style>
+        <Style Selector="Border.RoomGridItem:pointerover PathIcon.RoadIcon">
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+        </Style>
+
+        <Style Selector="components|IconLabelButton.OnlineTextButton">
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+            <Setter Property="HoverForeground" Value="{StaticResource Primary400}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="IconSize" Value="13" />
+        </Style>
+
         <Style Selector="patterns|PlayerListItem /template/ Border.BoxItemBackground">
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Margin" Value="0,3" />
+            <Setter Property="Margin" Value="3" />
             <Setter Property="Padding" Value="7,0" />
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
         </Style>
@@ -105,15 +79,12 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
-            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <!-- Top row divider -->
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
 
-        <!-- Page title -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
             <TextBlock Text="Online" Classes="PageTitleText" />
             <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6,0,0,0"
@@ -125,370 +96,457 @@
             </Border>
         </StackPanel>
 
-        <!-- Tab strip row -->
-        <Grid Grid.Row="1" Margin="10,8,10,6">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <RadioButton Classes="TabButton" IsChecked="True"
-                             Checked="RoomsTab_Checked" x:Name="RoomsTabButton">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <PathIcon Data="{StaticResource RoomUsers}" Width="14" Height="14" />
-                        <TextBlock Text="{loc:T page_title.rooms}" FontSize="14" FontWeight="SemiBold" />
-                    </StackPanel>
-                </RadioButton>
-                <RadioButton Classes="TabButton"
-                             Checked="LeaderboardTab_Checked" x:Name="LeaderboardTabButton">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <PathIcon Data="{StaticResource Award}" Width="14" Height="14" />
-                        <TextBlock Text="{loc:T page_title.leaderboard}" FontSize="14" FontWeight="SemiBold" />
-                    </StackPanel>
-                </RadioButton>
-            </StackPanel>
+        <TextBox Grid.Row="0"
+                 Width="220"
+                 Watermark="{loc:T placeholder.search_for_players}"
+                 VerticalAlignment="Bottom"
+                 HorizontalAlignment="Right"
+                 Margin="10,12"
+                 TextChanged="PlayerSearchField_OnTextChanged"
+                 x:Name="PlayerSearchField" />
 
-            <!-- Player search (rooms tab only) -->
-            <TextBox Width="200"
-                     Watermark="{loc:T placeholder.search_for_players}"
-                     VerticalAlignment="Center"
-                     TextChanged="PlayerSearchField_OnTextChanged"
-                     HorizontalAlignment="Right"
-                     IsVisible="{Binding IsRoomsTabActive}"
-                     x:Name="PlayerSearchField" />
-        </Grid>
+        <Grid Grid.Row="1" Margin="10,8,10,0">
+            <Grid IsVisible="{Binding IsNormalOnlineMode}"
+                  RowDefinitions="Auto,*">
+                <Border Classes="OnlineSection" x:Name="LeaderboardPreviewSection">
+                    <Grid RowDefinitions="Auto,Auto,Auto">
+                        <StackPanel Grid.Row="0" IsVisible="{Binding IsLoading}"
+                                    HorizontalAlignment="Center" Margin="20,10" Spacing="10">
+                            <components:LoadingIcon Width="54"
+                                                    Height="54"
+                                                    Foreground="{StaticResource Neutral700}"
+                                                    HorizontalAlignment="Center" />
+                            <TextBlock Text="Loading leaderboard..."
+                                       Classes="BodyText"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
 
-        <!-- Divider below tabs -->
-        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
-                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+                        <StackPanel Grid.Row="0" IsVisible="{Binding HasError}"
+                                    HorizontalAlignment="Center" Margin="20,10" Spacing="10">
+                            <TextBlock Text="Could not load leaderboard."
+                                       Classes="TitleText"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       Classes="BodyText"
+                                       Width="310"
+                                       TextAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <components:Button Text="Retry"
+                                               Variant="Primary"
+                                               IconData="{StaticResource Refresh}"
+                                               Width="160"
+                                               HorizontalAlignment="Center"
+                                               Click="RetryButton_OnClick" />
+                        </StackPanel>
 
-        <!-- ═══════════════════════════════════════════════════════ -->
-        <!-- ROOMS TAB CONTENT                                      -->
-        <!-- ═══════════════════════════════════════════════════════ -->
-        <Grid Grid.Row="2" IsVisible="{Binding IsRoomsTabActive}">
-            <!-- Empty state -->
-            <components:EmptyPageInfo x:Name="EmptyRoomsView"
-                                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                                     Title="{loc:T empty_content.no_rooms_title}"
-                                     BodyText="{loc:T empty_content.no_rooms}" />
+                        <components:EmptyPageInfo Grid.Row="0"
+                                                  IsVisible="{Binding HasNoData}"
+                                                  Title="No leaderboard data"
+                                                  BodyText="There are no ranked players available right now."
+                                                  IconData="{StaticResource Award}" />
 
-            <!-- Room list view -->
-            <Grid RowDefinitions="*, 16*" Margin="10,0" x:Name="RoomsListViewContainer">
-                <Grid Grid.Row="0">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                        <components:FormFieldLabel Text="{loc:T list_title.rooms}" />
-                        <components:MemeNumberState Text="0" IconSize="0" x:Name="RoomsListItemCount"
-                                                    IconData="{StaticResource Dice}" />
-                    </StackPanel>
-                    <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-                            VerticalAlignment="Bottom" />
+                        <Grid Grid.Row="0" IsVisible="{Binding HasData}" RowDefinitions="Auto,Auto">
+                            <ItemsControl ItemsSource="{Binding PodiumPlayers}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="3" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
+                                        <Border Classes="LeaderboardTopCard">
+                                            <Grid RowDefinitions="Auto,*,Auto">
+                                                <Border HorizontalAlignment="Left" Padding="9,4"
+                                                        Background="{StaticResource Neutral800}"
+                                                        BorderBrush="{StaticResource Neutral600}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="8">
+                                                    <TextBlock Text="{Binding TopLabel}"
+                                                               FontSize="13"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource Neutral100}" />
+                                                </Border>
+
+                                                <Grid Grid.Row="1" Margin="0,5" HorizontalAlignment="Center">
+                                                    <Border Width="58" Height="58"
+                                                            CornerRadius="9999"
+                                                            ClipToBounds="True"
+                                                            Background="{StaticResource Neutral950}">
+                                                        <patterns:MiiImageLoader HorizontalAlignment="Stretch"
+                                                                                 VerticalAlignment="Stretch"
+                                                                                 LoadingColor="{StaticResource Neutral600}"
+                                                                                 Mii="{Binding Mii}"
+                                                                                 FallBackColor="{StaticResource Neutral600}"
+                                                                                 ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
+                                                    </Border>
+                                                    <Border HorizontalAlignment="Right"
+                                                            VerticalAlignment="Bottom"
+                                                            Margin="0,0,-5,-3"
+                                                            IsVisible="{Binding HasBadge}"
+                                                            Width="25"
+                                                            Height="25"
+                                                            CornerRadius="9999"
+                                                            Background="{StaticResource Neutral950}"
+                                                            BorderBrush="{StaticResource Neutral700}"
+                                                            BorderThickness="1">
+                                                        <components:Badge Variant="{Binding PrimaryBadge}"
+                                                                          Width="18"
+                                                                          Height="18"
+                                                                          HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center" />
+                                                    </Border>
+                                                </Grid>
+
+                                                <StackPanel Grid.Row="2" HorizontalAlignment="Stretch">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               FontWeight="Bold"
+                                                               FontSize="15"
+                                                               Foreground="{StaticResource Neutral50}"
+                                                               HorizontalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding VrDisplay}"
+                                                               Classes="TinyText"
+                                                               FontSize="13"
+                                                               HorizontalAlignment="Center" />
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <Border.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                              Click="CopyFriendCode_OnClick" />
+                                                    <MenuItem Header="{loc:T action.view_mii}"
+                                                              Click="OpenCarousel_OnClick" />
+                                                    <MenuItem Header="Add Friend"
+                                                              Click="AddFriend_OnClick" />
+                                                    <Separator />
+                                                    <MenuItem Header="View Profile"
+                                                              Click="ViewProfile_OnClick" />
+                                                </ContextMenu>
+                                            </Border.ContextMenu>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding LeaderboardRows}" Margin="0,2,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
+                                        <patterns:PlayerListItem UserName="{Binding Name}"
+                                                                 FriendCode="{Binding FriendCode}"
+                                                                 Vr="{Binding VrDisplay}"
+                                                                 Mii="{Binding FirstMii}"
+                                                                 IsOnline="{Binding IsOnline}"
+                                                                 ShowJoinRoomButton="True"
+                                                                 JoinRoomAction="JoinRoom_OnClick"
+                                                                 IsOpenHost="{Binding IsOpenHost}"
+                                                                 HasBadges="{Binding HasBadges}"
+                                                                 IsTopPlayer="True"
+                                                                 TopLabel="{Binding TopLabel}">
+                                            <patterns:PlayerListItem.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                              Click="CopyFriendCode_OnClick" />
+                                                    <MenuItem Header="{loc:T action.view_mii}"
+                                                              Click="OpenCarousel_OnClick" />
+                                                    <MenuItem Header="Add Friend"
+                                                              Click="AddFriend_OnClick" />
+                                                    <Separator />
+                                                    <MenuItem Header="View Profile"
+                                                              Click="ViewProfile_OnClick" />
+                                                </ContextMenu>
+                                            </patterns:PlayerListItem.ContextMenu>
+                                        </patterns:PlayerListItem>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+
+                        <components:IconLabelButton Grid.Row="2"
+                                                    Classes="OnlineTextButton"
+                                                    Text="Show more"
+                                                    IconData="{StaticResource ChevronDown}"
+                                                    IsIconLeft="False"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="3,4,0,10"
+                                                    IsVisible="{Binding HasData}"
+                                                    Click="ShowMoreLeaderboard_OnClick" />
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="1" RowDefinitions="Auto,*" x:Name="RoomsPreviewSection">
+                    <Grid.Transitions>
+                        <Transitions>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CircularEaseOut" />
+                        </Transitions>
+                    </Grid.Transitions>
+                    <components:EmptyPageInfo x:Name="EmptyRoomsView"
+                                              Grid.Row="1"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Title="{loc:T empty_content.no_rooms_title}"
+                                              BodyText="{loc:T empty_content.no_rooms}" />
+
+                    <Grid Grid.Row="0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="3,0,0,6">
+                            <components:FormFieldLabel Text="{loc:T list_title.rooms}" />
+                            <components:MemeNumberState Text="0" IconSize="0" x:Name="RoomsListItemCount"
+                                                        IconData="{StaticResource Dice}" />
+                        </StackPanel>
+                        <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                                VerticalAlignment="Bottom" />
+                    </Grid>
+
+                    <ListBox Grid.Row="1" SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
+                             Background="Transparent" BorderThickness="0" x:Name="RoomsListViewContainer"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             SelectionChanged="RoomsView_SelectionChanged">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="2" VerticalAlignment="Top" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Classes="RoomGridItem">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                        <PathIcon Data="{StaticResource Road}" Width="42" Height="42" Classes="RoadIcon"
+                                                  IsVisible="{Binding IsPublic }"
+                                                  HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="2" />
+                                        <PathIcon Data="{StaticResource RoadLocked}" Width="42" Height="42" Classes="RoadIcon"
+                                                  HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="2"
+                                                  IsVisible="{Binding IsPublic, Converter={x:Static BoolConverters.Not}}" />
+
+                                        <components:FormFieldLabel Grid.Column="1" Text="{Binding RoomStatusText}"
+                                                                   Margin="10,0,0,0" />
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding GameMode}" FontSize="13"
+                                                   Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                   Margin="10,0,0,0" TextTrimming="CharacterEllipsis" />
+
+                                        <components:StateBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                                                             IconData="{StaticResource UserCouple}"
+                                                             Text="{Binding PlayerCount}" VerticalAlignment="Center"
+                                                             Variant="Dark" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Row="1" x:Name="PlayerListViewContainer" IsVisible="False">
+                        <ListBox SelectionMode="Single" BorderThickness="0"
+                                 Padding="0" Margin="0" Background="Transparent" ItemsSource="{Binding Players}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 SelectionChanged="PlayerView_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <patterns:PlayerListItem
+                                        UserName="{Binding Name}"
+                                        FriendCode="{Binding FriendCode}"
+                                        Vr="{Binding VrDisplay}"
+                                        Mii="{Binding FirstMii}"
+                                        IsOpenHost="{Binding IsOpenHost}"
+                                        HasBadges="{Binding HasBadges}"
+                                        IsTopPlayer="{Binding IsTopLeaderboardPlayer}"
+                                        TopLabel="{Binding TopLabel}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+
+                    <components:IconLabelButton Grid.Row="1"
+                                                Classes="OnlineTextButton"
+                                                Text="Show more"
+                                                IconData="{StaticResource ChevronDown}"
+                                                IsIconLeft="False"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                Margin="3,0,0,10"
+                                                Click="ShowMoreRooms_OnClick" />
                 </Grid>
+            </Grid>
 
-                <ListBox SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
-                         Background="Transparent" BorderThickness="0" Grid.Row="1"
+            <Grid IsVisible="{Binding IsLeaderboardExpanded}"
+                  RowDefinitions="*,Auto">
+                <ScrollViewer Grid.Row="0"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding PodiumPlayers}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
+                                    <Border Classes="LeaderboardTopCard">
+                                        <Grid RowDefinitions="Auto,*,Auto">
+                                            <Border HorizontalAlignment="Left" Padding="9,4"
+                                                    Background="{StaticResource Neutral800}"
+                                                    BorderBrush="{StaticResource Neutral600}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8">
+                                                <TextBlock Text="{Binding TopLabel}"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource Neutral100}" />
+                                            </Border>
+
+                                            <Grid Grid.Row="1" Margin="0,5" HorizontalAlignment="Center">
+                                                <Border Width="58" Height="58"
+                                                        CornerRadius="9999"
+                                                        ClipToBounds="True"
+                                                        Background="{StaticResource Neutral950}">
+                                                    <patterns:MiiImageLoader HorizontalAlignment="Stretch"
+                                                                             VerticalAlignment="Stretch"
+                                                                             LoadingColor="{StaticResource Neutral600}"
+                                                                             Mii="{Binding Mii}"
+                                                                             FallBackColor="{StaticResource Neutral600}"
+                                                                             ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
+                                                </Border>
+                                                <Border HorizontalAlignment="Right"
+                                                        VerticalAlignment="Bottom"
+                                                        Margin="0,0,-5,-3"
+                                                        IsVisible="{Binding HasBadge}"
+                                                        Width="25"
+                                                        Height="25"
+                                                        CornerRadius="9999"
+                                                        Background="{StaticResource Neutral950}"
+                                                        BorderBrush="{StaticResource Neutral700}"
+                                                        BorderThickness="1">
+                                                    <components:Badge Variant="{Binding PrimaryBadge}"
+                                                                      Width="18"
+                                                                      Height="18"
+                                                                      HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center" />
+                                                </Border>
+                                            </Grid>
+
+                                            <StackPanel Grid.Row="2" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontWeight="Bold"
+                                                           FontSize="15"
+                                                           Foreground="{StaticResource Neutral50}"
+                                                           HorizontalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding VrDisplay}"
+                                                           Classes="TinyText"
+                                                           FontSize="13"
+                                                           HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Border.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                          Click="CopyFriendCode_OnClick" />
+                                                <MenuItem Header="{loc:T action.view_mii}"
+                                                          Click="OpenCarousel_OnClick" />
+                                                <MenuItem Header="Add Friend"
+                                                          Click="AddFriend_OnClick" />
+                                                <Separator />
+                                                <MenuItem Header="View Profile"
+                                                          Click="ViewProfile_OnClick" />
+                                            </ContextMenu>
+                                        </Border.ContextMenu>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <ItemsControl ItemsSource="{Binding LeaderboardRows}" Margin="0,2,0,44">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
+                                    <patterns:PlayerListItem UserName="{Binding Name}"
+                                                             FriendCode="{Binding FriendCode}"
+                                                             Vr="{Binding VrDisplay}"
+                                                             Mii="{Binding FirstMii}"
+                                                             IsOnline="{Binding IsOnline}"
+                                                             ShowJoinRoomButton="True"
+                                                             JoinRoomAction="JoinRoom_OnClick"
+                                                             IsOpenHost="{Binding IsOpenHost}"
+                                                             HasBadges="{Binding HasBadges}"
+                                                             IsTopPlayer="True"
+                                                             TopLabel="{Binding TopLabel}">
+                                        <patterns:PlayerListItem.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                          Click="CopyFriendCode_OnClick" />
+                                                <MenuItem Header="{loc:T action.view_mii}"
+                                                          Click="OpenCarousel_OnClick" />
+                                                <MenuItem Header="Add Friend"
+                                                          Click="AddFriend_OnClick" />
+                                                <Separator />
+                                                <MenuItem Header="View Profile"
+                                                          Click="ViewProfile_OnClick" />
+                                            </ContextMenu>
+                                        </patterns:PlayerListItem.ContextMenu>
+                                    </patterns:PlayerListItem>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <components:IconLabelButton Grid.Row="1"
+                                            Classes="OnlineTextButton"
+                                            Text="View less"
+                                            IconData="{StaticResource ChevronUp}"
+                                            HorizontalAlignment="Left"
+                                            Margin="3,0,0,10"
+                                            Click="ViewLess_OnClick" />
+            </Grid>
+
+            <Grid IsVisible="{Binding IsRoomsExpanded}"
+                  RowDefinitions="*,Auto">
+                <ListBox Grid.Row="0" SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
+                         Background="Transparent" BorderThickness="0"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                          SelectionChanged="RoomsView_SelectionChanged">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="2" VerticalAlignment="Top" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border Classes="BoxItemBackground">
-                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                                    <PathIcon Data="{StaticResource Road}" Width="50" Height="50" Classes="RoadIcon"
-                                              Margin="0,3" IsVisible="{Binding IsPublic }"
-                                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" />
-                                    <PathIcon Data="{StaticResource RoadLocked}" Width="50" Height="50" Classes="RoadIcon"
-                                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0"
-                                              Margin="0,3"
+                            <Border Classes="RoomGridItem">
+                                <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                    <PathIcon Data="{StaticResource Road}" Width="42" Height="42" Classes="RoadIcon"
+                                              IsVisible="{Binding IsPublic }"
+                                              HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="2" />
+                                    <PathIcon Data="{StaticResource RoadLocked}" Width="42" Height="42" Classes="RoadIcon"
+                                              HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="2"
                                               IsVisible="{Binding IsPublic, Converter={x:Static BoolConverters.Not}}" />
 
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <components:FormFieldLabel Text="{Binding RoomStatusText}" Margin="10,0,0,0" />
-                                        <TextBlock Text="{Binding GameMode}" FontSize="14"
-                                                   Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                                   Margin="10,0,0,0" TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
+                                    <components:FormFieldLabel Grid.Column="1" Text="{Binding RoomStatusText}"
+                                                               Margin="10,0,0,0" />
+                                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding GameMode}" FontSize="13"
+                                               Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                               Margin="10,0,0,0" TextTrimming="CharacterEllipsis" />
 
-                                    <StackPanel Grid.Column="2" VerticalAlignment="Center"
-                                                HorizontalAlignment="Right">
-                                        <components:FormFieldLabel Text="{loc:T attribute.average_room_vr}"
-                                                                   Margin="20,0,0,0" />
-                                        <TextBlock Text="{Binding AverageVr}" FontSize="14"
-                                                   Classes="TinyText" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                   Margin="20,0,0,0" />
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="3" Orientation="Horizontal"
-                                                HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                Margin="12,0,10,0">
-                                        <components:StateBox IconData="{StaticResource UserCouple}"
-                                                             Text="{Binding PlayerCount}" VerticalAlignment="Center"
-                                                             Variant="Dark" />
-                                    </StackPanel>
+                                    <components:StateBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                                                         IconData="{StaticResource UserCouple}"
+                                                         Text="{Binding PlayerCount}" VerticalAlignment="Center"
+                                                         Variant="Dark" />
                                 </Grid>
-
-                                <Border.Styles>
-                                    <Style Selector="ListBoxItem Border.BoxItemBackground PathIcon.RoadIcon">
-                                        <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
-                                    </Style>
-                                    <Style Selector="ListBoxItem Border.BoxItemBackground:pointerover PathIcon.RoadIcon">
-                                        <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
-                                    </Style>
-                                </Border.Styles>
                             </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+
+                <components:IconLabelButton Grid.Row="1"
+                                            Classes="OnlineTextButton"
+                                            Text="View less"
+                                            IconData="{StaticResource ChevronUp}"
+                                            HorizontalAlignment="Left"
+                                            Margin="3,0,0,10"
+                                            Click="ViewLess_OnClick" />
             </Grid>
-
-            <!-- Player search results (shown when searching) -->
-            <Grid RowDefinitions="*, 16*" Margin="10,0" x:Name="PlayerListViewContainer">
-                <Grid Grid.Row="0">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                        <components:FormFieldLabel Text="{loc:T list_title.players}" />
-                        <components:MemeNumberState Text="0" IconSize="0" x:Name="PlayerListItemCount" />
-                    </StackPanel>
-                    <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-                            VerticalAlignment="Bottom" />
-                </Grid>
-
-                <ListBox Grid.Row="1" SelectionMode="Single" BorderThickness="0"
-                         Padding="0" Margin="0" Background="Transparent" ItemsSource="{Binding Players}"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         SelectionChanged="PlayerView_SelectionChanged">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <patterns:PlayerListItem
-                                UserName="{Binding Name}"
-                                FriendCode="{Binding FriendCode}"
-                                Vr="{Binding VrDisplay}"
-                                Mii="{Binding FirstMii}"
-                                IsOpenHost="{Binding IsOpenHost}"
-                                HasBadges="{Binding HasBadges}"
-                                IsTopPlayer="{Binding IsTopLeaderboardPlayer}"
-                                TopLabel="{Binding TopLabel}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Grid>
-        </Grid>
-
-        <!-- ═══════════════════════════════════════════════════════ -->
-        <!-- LEADERBOARD TAB CONTENT                                -->
-        <!-- ═══════════════════════════════════════════════════════ -->
-        <Grid Grid.Row="2" IsVisible="{Binding IsLeaderboardTabActive}">
-            <!-- Loading state -->
-            <StackPanel IsVisible="{Binding IsLoading}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Margin="20"
-                        Spacing="10">
-                <components:LoadingIcon Width="68"
-                                        Height="68"
-                                        Foreground="{StaticResource Neutral700}"
-                                        HorizontalAlignment="Center" />
-                <TextBlock Text="Loading leaderboard..."
-                           Classes="BodyText"
-                           FontSize="14"
-                           HorizontalAlignment="Center" />
-            </StackPanel>
-
-            <!-- Error state -->
-            <StackPanel IsVisible="{Binding HasError}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Margin="20"
-                        Spacing="10">
-                <PathIcon Data="{StaticResource WarningTriangle}"
-                          Width="56"
-                          Height="56"
-                          Foreground="{StaticResource Danger500}"
-                          HorizontalAlignment="Center" />
-                <TextBlock Text="Could not load leaderboard."
-                           Classes="TitleText"
-                           FontSize="18"
-                           HorizontalAlignment="Center" />
-                <TextBlock Text="{Binding ErrorMessage}"
-                           Classes="BodyText"
-                           Width="310"
-                           TextAlignment="Center"
-                           HorizontalAlignment="Center" />
-                <components:Button Text="Retry"
-                                   Variant="Primary"
-                                   IconData="{StaticResource Refresh}"
-                                   Width="160"
-                                   HorizontalAlignment="Center"
-                                   Click="RetryButton_OnClick" />
-            </StackPanel>
-
-            <!-- Empty state -->
-            <StackPanel IsVisible="{Binding HasNoData}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Spacing="10">
-                <components:EmptyPageInfo Title="No leaderboard data"
-                                          BodyText="There are no ranked players available right now."
-                                          IconData="{StaticResource Award}" />
-                <components:Button Text="Refresh"
-                                   Variant="Primary"
-                                   IconData="{StaticResource Refresh}"
-                                   Width="170"
-                                   HorizontalAlignment="Center"
-                                   Click="RetryButton_OnClick" />
-            </StackPanel>
-
-            <!-- Leaderboard data -->
-            <ScrollViewer IsVisible="{Binding HasData}"
-                          Margin="10,10,10,0"
-                          HorizontalScrollBarVisibility="Disabled"
-                          VerticalScrollBarVisibility="Auto"
-                          IsScrollInertiaEnabled="True">
-                <StackPanel Spacing="10"
-                            Margin="0,0,0,12">
-                    <Border>
-                        <Grid RowDefinitions="Auto,Auto,Auto"
-                              ClipToBounds="False">
-                            <StackPanel Orientation="Horizontal"
-                                        Spacing="7"
-                                        VerticalAlignment="Center">
-                                <PathIcon Data="{StaticResource StarIcon}"
-                                          Width="14"
-                                          Height="14"
-                                          Foreground="{StaticResource Warning500}" />
-                                <TextBlock Text="Top 3 Podium"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Foreground="White" />
-                            </StackPanel>
-
-                            <TextBlock Grid.Row="1"
-                                       Margin="0,4,0,0"
-                                       Text="Live from RWFC"
-                                       Classes="TinyText"
-                                       Foreground="{StaticResource Neutral300}" />
-
-                            <Grid Grid.Row="2"
-                                  Margin="0,12,0,0"
-                                  RowDefinitions="Auto,16"
-                                  VerticalAlignment="Center"
-                                  ColumnDefinitions="*,1.1*,*">
-                                <patterns:LeaderboardPodiumCard Grid.Column="0"
-                                                                  Grid.Row="0"
-                                                                  Margin="4,16,4,0"
-                                                                  IsVisible="{Binding HasPodiumSecond}"
-                                                                  Classes="Silver EntrySecond FloatB"
-                                                                  Rank="{Binding PodiumSecond.Rank}"
-                                                                  PlacementLabel="{Binding PodiumSecond.PlacementLabel}"
-                                                                  PlayerName="{Binding PodiumSecond.Name}"
-                                                                  VrText="{Binding PodiumSecond.VrText}"
-                                                                  Mii="{Binding PodiumSecond.Mii}"
-                                                                  ShowBadge="{Binding PodiumSecond.HasBadge}"
-                                                                  BadgeVariant="{Binding PodiumSecond.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumSecond.IsSuspicious}">
-                                    <patterns:LeaderboardPodiumCard.ContextMenu>
-                                        <ContextMenu DataContext="{Binding PodiumSecond}">
-                                            <MenuItem Header="{loc:T action.copy_friend_code}"
-                                                      Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{loc:T action.view_mii}"
-                                                      Click="OpenCarousel_OnClick" />
-                                            <MenuItem Header="Add Friend"
-                                                      Click="AddFriend_OnClick" />
-                                            <Separator />
-                                            <MenuItem Header="View Profile"
-                                                      Click="ViewProfile_OnClick" />
-                                        </ContextMenu>
-                                    </patterns:LeaderboardPodiumCard.ContextMenu>
-                                </patterns:LeaderboardPodiumCard>
-
-                                <patterns:LeaderboardPodiumCard Grid.Column="1"
-                                                                  Grid.Row="0"
-                                                                  Margin="4,0,4,0"
-                                                                  IsVisible="{Binding HasPodiumFirst}"
-                                                                  Classes="Gold EntryFirst FloatA"
-                                                                  AvatarSize="122"
-                                                                  Rank="{Binding PodiumFirst.Rank}"
-                                                                  PlacementLabel="{Binding PodiumFirst.PlacementLabel}"
-                                                                  PlayerName="{Binding PodiumFirst.Name}"
-                                                                  VrText="{Binding PodiumFirst.VrText}"
-                                                                  Mii="{Binding PodiumFirst.Mii}"
-                                                                  ShowBadge="{Binding PodiumFirst.HasBadge}"
-                                                                  BadgeVariant="{Binding PodiumFirst.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumFirst.IsSuspicious}">
-                                    <patterns:LeaderboardPodiumCard.ContextMenu>
-                                        <ContextMenu DataContext="{Binding PodiumFirst}">
-                                            <MenuItem Header="{loc:T action.copy_friend_code}"
-                                                      Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{loc:T action.view_mii}"
-                                                      Click="OpenCarousel_OnClick" />
-                                            <MenuItem Header="Add Friend"
-                                                      Click="AddFriend_OnClick" />
-                                            <Separator />
-                                            <MenuItem Header="View Profile"
-                                                      Click="ViewProfile_OnClick" />
-                                        </ContextMenu>
-                                    </patterns:LeaderboardPodiumCard.ContextMenu>
-                                </patterns:LeaderboardPodiumCard>
-
-                                <patterns:LeaderboardPodiumCard Grid.Column="2"
-                                                                  Grid.Row="0"
-                                                                  Margin="4,16,4,0"
-                                                                  IsVisible="{Binding HasPodiumThird}"
-                                                                  Classes="Bronze EntryThird FloatC"
-                                                                  Rank="{Binding PodiumThird.Rank}"
-                                                                  PlacementLabel="{Binding PodiumThird.PlacementLabel}"
-                                                                  PlayerName="{Binding PodiumThird.Name}"
-                                                                  VrText="{Binding PodiumThird.VrText}"
-                                                                  Mii="{Binding PodiumThird.Mii}"
-                                                                  ShowBadge="{Binding PodiumThird.HasBadge}"
-                                                                  BadgeVariant="{Binding PodiumThird.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumThird.IsSuspicious}">
-                                    <patterns:LeaderboardPodiumCard.ContextMenu>
-                                        <ContextMenu DataContext="{Binding PodiumThird}">
-                                            <MenuItem Header="{loc:T action.copy_friend_code}"
-                                                      Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{loc:T action.view_mii}"
-                                                      Click="OpenCarousel_OnClick" />
-                                            <MenuItem Header="Add Friend"
-                                                      Click="AddFriend_OnClick" />
-                                            <Separator />
-                                            <MenuItem Header="View Profile"
-                                                      Click="ViewProfile_OnClick" />
-                                        </ContextMenu>
-                                    </patterns:LeaderboardPodiumCard.ContextMenu>
-                                </patterns:LeaderboardPodiumCard>
-                            </Grid>
-                        </Grid>
-                    </Border>
-
-                    <ItemsControl ItemsSource="{Binding RemainingPlayers}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
-                                <patterns:PlayerListItem UserName="{Binding Name}"
-                                                           FriendCode="{Binding FriendCode}"
-                                                           Vr="{Binding VrDisplay}"
-                                                           Mii="{Binding FirstMii}"
-                                                           IsOnline="{Binding IsOnline}"
-                                                           ShowJoinRoomButton="True"
-                                                           JoinRoomAction="JoinRoom_OnClick"
-                                                           IsOpenHost="{Binding IsOpenHost}"
-                                                           HasBadges="{Binding HasBadges}"
-                                                           IsTopPlayer="True"
-                                                           TopLabel="{Binding TopLabel}">
-                                    <patterns:PlayerListItem.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="{loc:T action.copy_friend_code}"
-                                                      Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{loc:T action.view_mii}"
-                                                      Click="OpenCarousel_OnClick" />
-                                            <MenuItem Header="Add Friend"
-                                                      Click="AddFriend_OnClick" />
-                                            <Separator />
-                                            <MenuItem Header="View Profile"
-                                                      Click="ViewProfile_OnClick" />
-                                        </ContextMenu>
-                                    </patterns:PlayerListItem.ContextMenu>
-                                </patterns:PlayerListItem>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>
