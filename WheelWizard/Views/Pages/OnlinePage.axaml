@@ -24,9 +24,12 @@
         <Style Selector="Border.LeaderboardTopCard">
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Padding" Value="10" />
+            <Setter Property="Padding" Value="0" />
             <Setter Property="Margin" Value="3" />
-            <Setter Property="MinHeight" Value="120" />
+            <Setter Property="Height" Value="104" />
+            <Setter Property="MinHeight" Value="104" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="ClipToBounds" Value="True" />
         </Style>
         <Style Selector="Border.LeaderboardTopCard:pointerover">
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
@@ -41,6 +44,14 @@
         </Style>
         <Style Selector="Border.RoomGridItem:pointerover">
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+
+        <Style Selector="Grid.LeaderboardRevealCover">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Height" Duration="0:0:0.32" Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
         </Style>
 
         <Style Selector="PathIcon.RoadIcon">
@@ -83,6 +94,9 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                ZIndex="10"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
@@ -147,7 +161,7 @@
                                                   BodyText="There are no ranked players available right now."
                                                   IconData="{StaticResource Award}" />
 
-                        <Grid Grid.Row="0" IsVisible="{Binding HasData}" RowDefinitions="Auto,Auto">
+                        <Grid Grid.Row="0" IsVisible="{Binding HasData}" RowDefinitions="Auto,Auto,Auto">
                             <ItemsControl ItemsSource="{Binding PodiumPlayers}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -156,11 +170,40 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
-                                        <Border Classes="LeaderboardTopCard">
-                                            <Grid RowDefinitions="Auto,*,Auto">
-                                                <Border HorizontalAlignment="Left" Padding="9,4"
-                                                        Background="{StaticResource Neutral800}"
-                                                        BorderBrush="{StaticResource Neutral600}"
+                                        <Border Classes="LeaderboardTopCard"
+                                                BorderBrush="{Binding LeaderboardAccentBrush}">
+                                            <Grid ColumnDefinitions="78,*">
+                                                <Border Grid.Column="0"
+                                                        Grid.ColumnSpan="2"
+                                                        CornerRadius="99999"
+                                                        Opacity="0.76"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Bottom"
+                                                        Margin="0,0,22,-84"
+                                                        Height="170"
+                                                        Width="112"
+                                                        Background="{Binding LeaderboardGlowBrush}"
+                                                        Effect="blur(250)" />
+
+                                                <patterns:MiiImageLoader Grid.Column="0"
+                                                                         Grid.ColumnSpan="2"
+                                                                         Width="116"
+                                                                         Height="116"
+                                                                         Margin="-50,0,0,1"
+                                                                         HorizontalAlignment="Left"
+                                                                         VerticalAlignment="Bottom"
+                                                                         LoadingColor="Transparent"
+                                                                         Mii="{Binding Mii}"
+                                                                         FallBackColor="{StaticResource Neutral600}"
+                                                                         ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
+
+                                                <Border Grid.Column="1"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Top"
+                                                        Padding="8,3"
+                                                        Margin="0,8,12,0"
+                                                        Background="{StaticResource Neutral950}"
+                                                        BorderBrush="{Binding LeaderboardAccentBrush}"
                                                         BorderThickness="1"
                                                         CornerRadius="8">
                                                     <TextBlock Text="{Binding TopLabel}"
@@ -169,48 +212,43 @@
                                                                Foreground="{StaticResource Neutral100}" />
                                                 </Border>
 
-                                                <Grid Grid.Row="1" Margin="0,5" HorizontalAlignment="Center">
-                                                    <Border Width="58" Height="58"
-                                                            CornerRadius="9999"
-                                                            ClipToBounds="True"
-                                                            Background="{StaticResource Neutral950}">
-                                                        <patterns:MiiImageLoader HorizontalAlignment="Stretch"
-                                                                                 VerticalAlignment="Stretch"
-                                                                                 LoadingColor="{StaticResource Neutral600}"
-                                                                                 Mii="{Binding Mii}"
-                                                                                 FallBackColor="{StaticResource Neutral600}"
-                                                                                 ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
-                                                    </Border>
-                                                    <Border HorizontalAlignment="Right"
+                                                <StackPanel Grid.Column="1"
+                                                            HorizontalAlignment="Right"
                                                             VerticalAlignment="Bottom"
-                                                            Margin="0,0,-5,-3"
-                                                            IsVisible="{Binding HasBadge}"
-                                                            Width="25"
-                                                            Height="25"
-                                                            CornerRadius="9999"
-                                                            Background="{StaticResource Neutral950}"
-                                                            BorderBrush="{StaticResource Neutral700}"
-                                                            BorderThickness="1">
-                                                        <components:Badge Variant="{Binding PrimaryBadge}"
-                                                                          Width="18"
-                                                                          Height="18"
-                                                                          HorizontalAlignment="Center"
-                                                                          VerticalAlignment="Center" />
-                                                    </Border>
-                                                </Grid>
-
-                                                <StackPanel Grid.Row="2" HorizontalAlignment="Stretch">
+                                                            Width="104"
+                                                            Margin="6,0,10,10">
                                                     <TextBlock Text="{Binding Name}"
                                                                FontWeight="Bold"
                                                                FontSize="15"
                                                                Foreground="{StaticResource Neutral50}"
-                                                               HorizontalAlignment="Center"
+                                                               HorizontalAlignment="Right"
+                                                               TextAlignment="Right"
                                                                TextTrimming="CharacterEllipsis" />
                                                     <TextBlock Text="{Binding VrDisplay}"
                                                                Classes="TinyText"
                                                                FontSize="13"
-                                                               HorizontalAlignment="Center" />
+                                                               Foreground="{Binding LeaderboardAccentBrush}"
+                                                               HorizontalAlignment="Right"
+                                                               TextAlignment="Right" />
                                                 </StackPanel>
+
+                                                <Border Grid.Column="1"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Bottom"
+                                                        Margin="6,0,0,7"
+                                                        IsVisible="{Binding HasBadge}"
+                                                        Width="25"
+                                                        Height="25"
+                                                        CornerRadius="9999"
+                                                        Background="{StaticResource Neutral950}"
+                                                        BorderBrush="{StaticResource Neutral700}"
+                                                        BorderThickness="1">
+                                                    <components:Badge Variant="{Binding PrimaryBadge}"
+                                                                      Width="18"
+                                                                      Height="18"
+                                                                      HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center" />
+                                                </Border>
                                             </Grid>
 
                                             <Border.ContextMenu>
@@ -231,52 +269,69 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <ItemsControl Grid.Row="1" ItemsSource="{Binding LeaderboardRows}" Margin="0,2,0,0">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
-                                        <patterns:PlayerListItem UserName="{Binding Name}"
-                                                                 FriendCode="{Binding FriendCode}"
-                                                                 Vr="{Binding VrDisplay}"
-                                                                 Mii="{Binding FirstMii}"
-                                                                 IsOnline="{Binding IsOnline}"
-                                                                 ShowJoinRoomButton="True"
-                                                                 JoinRoomAction="JoinRoom_OnClick"
-                                                                 IsOpenHost="{Binding IsOpenHost}"
-                                                                 HasBadges="{Binding HasBadges}"
-                                                                 IsTopPlayer="True"
-                                                                 TopLabel="{Binding TopLabel}">
-                                            <patterns:PlayerListItem.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Header="{loc:T action.copy_friend_code}"
-                                                              Click="CopyFriendCode_OnClick" />
-                                                    <MenuItem Header="{loc:T action.view_mii}"
-                                                              Click="OpenCarousel_OnClick" />
-                                                    <MenuItem Header="Add Friend"
-                                                              Click="AddFriend_OnClick" />
-                                                    <Separator />
-                                                    <MenuItem Header="View Profile"
-                                                              Click="ViewProfile_OnClick" />
-                                                </ContextMenu>
-                                            </patterns:PlayerListItem.ContextMenu>
-                                        </patterns:PlayerListItem>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Grid>
+                            <Grid Grid.Row="1">
+                                <ItemsControl ItemsSource="{Binding LeaderboardRows}" Margin="0,0,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
+                                            <patterns:PlayerListItem UserName="{Binding Name}"
+                                                                     FriendCode="{Binding FriendCode}"
+                                                                     Vr="{Binding VrDisplay}"
+                                                                     Mii="{Binding FirstMii}"
+                                                                     IsOnline="{Binding IsOnline}"
+                                                                     ShowJoinRoomButton="True"
+                                                                     JoinRoomAction="JoinRoom_OnClick"
+                                                                     IsOpenHost="{Binding IsOpenHost}"
+                                                                     HasBadges="{Binding HasBadges}"
+                                                                     IsTopPlayer="True"
+                                                                     TopLabel="{Binding TopLabel}"
+                                                                     LeaderboardAccentBrush="{Binding LeaderboardAccentBrush}"
+                                                                     LeaderboardGlowBrush="{Binding LeaderboardGlowBrush}"
+                                                                     LeaderboardBorderThickness="{Binding LeaderboardBorderThickness}">
+                                                <patterns:PlayerListItem.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                                  Click="CopyFriendCode_OnClick" />
+                                                        <MenuItem Header="{loc:T action.view_mii}"
+                                                                  Click="OpenCarousel_OnClick" />
+                                                        <MenuItem Header="Add Friend"
+                                                                  Click="AddFriend_OnClick" />
+                                                        <Separator />
+                                                        <MenuItem Header="View Profile"
+                                                                  Click="ViewProfile_OnClick" />
+                                                    </ContextMenu>
+                                                </patterns:PlayerListItem.ContextMenu>
+                                            </patterns:PlayerListItem>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
-                        <components:IconLabelButton Grid.Row="2"
-                                                    Classes="OnlineTextButton"
-                                                    Text="Show more"
-                                                    IconData="{StaticResource ChevronDown}"
-                                                    IsIconLeft="False"
-                                                    HorizontalAlignment="Left"
-                                                    Margin="3,4,0,10"
-                                                    IsVisible="{Binding HasData}"
-                                                    Click="ShowMoreLeaderboard_OnClick" />
+                                <Border VerticalAlignment="Bottom"
+                                        Height="82"
+                                        IsHitTestVisible="False"
+                                        IsVisible="{Binding HasData}">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
+                                            <GradientStop Color="{StaticResource Neutral950}" Offset="0" />
+                                            <GradientStop Color="#0024252D" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                            </Grid>
+
+                            <components:IconLabelButton Grid.Row="2"
+                                                        Classes="OnlineTextButton"
+                                                        Text="Show more"
+                                                        IconData="{StaticResource ChevronDown}"
+                                                        IsIconLeft="False"
+                                                        HorizontalAlignment="Left"
+                                                        Margin="3,-2,0,10"
+                                                        IsVisible="{Binding HasData}"
+                                                        Click="ShowMoreLeaderboard_OnClick" />
+                        </Grid>
                     </Grid>
                 </Border>
 
-                <Grid Grid.Row="1" RowDefinitions="Auto,*" x:Name="RoomsPreviewSection">
+                <Grid Grid.Row="1" RowDefinitions="*,Auto,Auto" x:Name="RoomsPreviewSection">
                     <Grid.Transitions>
                         <Transitions>
                             <DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CircularEaseOut" />
@@ -288,7 +343,7 @@
                                               Title="{loc:T empty_content.no_rooms_title}"
                                               BodyText="{loc:T empty_content.no_rooms}" />
 
-                    <Grid Grid.Row="0">
+                    <Grid Grid.Row="1">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="3,0,0,6">
                             <components:FormFieldLabel Text="{loc:T list_title.rooms}" />
                             <components:MemeNumberState Text="0" IconSize="0" x:Name="RoomsListItemCount"
@@ -298,44 +353,74 @@
                                 VerticalAlignment="Bottom" />
                     </Grid>
 
-                    <ListBox Grid.Row="1" SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
-                             Background="Transparent" BorderThickness="0" x:Name="RoomsListViewContainer"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"
-                             SelectionChanged="RoomsView_SelectionChanged">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="2" VerticalAlignment="Top" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Classes="RoomGridItem">
-                                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
-                                        <PathIcon Data="{StaticResource Road}" Width="42" Height="42" Classes="RoadIcon"
-                                                  IsVisible="{Binding IsPublic }"
-                                                  HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="2" />
-                                        <PathIcon Data="{StaticResource RoadLocked}" Width="42" Height="42" Classes="RoadIcon"
-                                                  HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="2"
-                                                  IsVisible="{Binding IsPublic, Converter={x:Static BoolConverters.Not}}" />
+                    <Grid Grid.Row="2"
+                          VerticalAlignment="Bottom"
+                          MaxHeight="304"
+                          x:Name="RoomsListViewContainer">
+                        <ListBox SelectionMode="Single"
+                                 Padding="0"
+                                 ItemsSource="{Binding PreviewRooms}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                 SelectionChanged="RoomsView_SelectionChanged">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="2" VerticalAlignment="Top" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Classes="RoomGridItem">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                            <PathIcon Data="{StaticResource Road}" Width="42" Height="42" Classes="RoadIcon"
+                                                      IsVisible="{Binding IsPublic }"
+                                                      HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="2" />
+                                            <PathIcon Data="{StaticResource RoadLocked}" Width="42" Height="42" Classes="RoadIcon"
+                                                      HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="2"
+                                                      IsVisible="{Binding IsPublic, Converter={x:Static BoolConverters.Not}}" />
 
-                                        <components:FormFieldLabel Grid.Column="1" Text="{Binding RoomStatusText}"
-                                                                   Margin="10,0,0,0" />
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding GameMode}" FontSize="13"
-                                                   Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                                   Margin="10,0,0,0" TextTrimming="CharacterEllipsis" />
+                                            <components:FormFieldLabel Grid.Column="1" Text="{Binding RoomStatusText}"
+                                                                       Margin="10,0,0,0" />
+                                            <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding GameMode}" FontSize="13"
+                                                       Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                       Margin="10,0,0,0" TextTrimming="CharacterEllipsis" />
 
-                                        <components:StateBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
-                                                             IconData="{StaticResource UserCouple}"
-                                                             Text="{Binding PlayerCount}" VerticalAlignment="Center"
-                                                             Variant="Dark" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                                            <components:StateBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                                                                 IconData="{StaticResource UserCouple}"
+                                                                 Text="{Binding PlayerCount}" VerticalAlignment="Center"
+                                                                 Variant="Dark" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
-                    <Grid Grid.Row="1" x:Name="PlayerListViewContainer" IsVisible="False">
+                        <Border VerticalAlignment="Bottom"
+                                Height="152"
+                                IsHitTestVisible="False"
+                                IsVisible="{Binding HasMoreRooms}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
+                                    <GradientStop Color="{StaticResource Neutral950}" Offset="0" />
+                                    <GradientStop Color="#0024252D" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+
+                        <components:IconLabelButton Classes="OnlineTextButton"
+                                                    Text="Show more"
+                                                    IconData="{StaticResource ChevronDown}"
+                                                    IsIconLeft="False"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Bottom"
+                                                    Margin="3,0,0,10"
+                                                    ZIndex="2"
+                                                    Click="ShowMoreRooms_OnClick" />
+                    </Grid>
+
+                    <Grid Grid.Row="1" Grid.RowSpan="2" x:Name="PlayerListViewContainer" IsVisible="False">
                         <ListBox SelectionMode="Single" BorderThickness="0"
                                  Padding="0" Margin="0" Background="Transparent" ItemsSource="{Binding Players}"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -357,22 +442,11 @@
                         </ListBox>
                     </Grid>
 
-                    <components:IconLabelButton Grid.Row="1"
-                                                Classes="OnlineTextButton"
-                                                Text="Show more"
-                                                IconData="{StaticResource ChevronDown}"
-                                                IsIconLeft="False"
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Bottom"
-                                                Margin="3,0,0,10"
-                                                Click="ShowMoreRooms_OnClick" />
                 </Grid>
             </Grid>
 
-            <Grid IsVisible="{Binding IsLeaderboardExpanded}"
-                  RowDefinitions="*,Auto">
-                <ScrollViewer Grid.Row="0"
-                              HorizontalScrollBarVisibility="Disabled"
+            <Grid IsVisible="{Binding IsLeaderboardExpanded}">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <ItemsControl ItemsSource="{Binding PodiumPlayers}">
@@ -383,11 +457,40 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
-                                    <Border Classes="LeaderboardTopCard">
-                                        <Grid RowDefinitions="Auto,*,Auto">
-                                            <Border HorizontalAlignment="Left" Padding="9,4"
-                                                    Background="{StaticResource Neutral800}"
-                                                    BorderBrush="{StaticResource Neutral600}"
+                                    <Border Classes="LeaderboardTopCard"
+                                            BorderBrush="{Binding LeaderboardAccentBrush}">
+                                        <Grid ColumnDefinitions="78,*">
+                                            <Border Grid.Column="0"
+                                                    Grid.ColumnSpan="2"
+                                                    CornerRadius="99999"
+                                                    Opacity="0.76"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Bottom"
+                                                    Margin="0,0,22,-84"
+                                                    Height="170"
+                                                    Width="112"
+                                                    Background="{Binding LeaderboardGlowBrush}"
+                                                    Effect="blur(250)" />
+
+                                            <patterns:MiiImageLoader Grid.Column="0"
+                                                                     Grid.ColumnSpan="2"
+                                                                     Width="116"
+                                                                     Height="116"
+                                                                     Margin="-50,0,0,1"
+                                                                     HorizontalAlignment="Left"
+                                                                     VerticalAlignment="Bottom"
+                                                                     LoadingColor="Transparent"
+                                                                     Mii="{Binding Mii}"
+                                                                     FallBackColor="{StaticResource Neutral600}"
+                                                                     ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
+
+                                            <Border Grid.Column="1"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Top"
+                                                    Padding="8,3"
+                                                    Margin="0,8,12,0"
+                                                    Background="{StaticResource Neutral950}"
+                                                    BorderBrush="{Binding LeaderboardAccentBrush}"
                                                     BorderThickness="1"
                                                     CornerRadius="8">
                                                 <TextBlock Text="{Binding TopLabel}"
@@ -396,48 +499,43 @@
                                                            Foreground="{StaticResource Neutral100}" />
                                             </Border>
 
-                                            <Grid Grid.Row="1" Margin="0,5" HorizontalAlignment="Center">
-                                                <Border Width="58" Height="58"
-                                                        CornerRadius="9999"
-                                                        ClipToBounds="True"
-                                                        Background="{StaticResource Neutral950}">
-                                                    <patterns:MiiImageLoader HorizontalAlignment="Stretch"
-                                                                             VerticalAlignment="Stretch"
-                                                                             LoadingColor="{StaticResource Neutral600}"
-                                                                             Mii="{Binding Mii}"
-                                                                             FallBackColor="{StaticResource Neutral600}"
-                                                                             ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
-                                                </Border>
-                                                <Border HorizontalAlignment="Right"
+                                            <StackPanel Grid.Column="1"
+                                                        HorizontalAlignment="Right"
                                                         VerticalAlignment="Bottom"
-                                                        Margin="0,0,-5,-3"
-                                                        IsVisible="{Binding HasBadge}"
-                                                        Width="25"
-                                                        Height="25"
-                                                        CornerRadius="9999"
-                                                        Background="{StaticResource Neutral950}"
-                                                        BorderBrush="{StaticResource Neutral700}"
-                                                        BorderThickness="1">
-                                                    <components:Badge Variant="{Binding PrimaryBadge}"
-                                                                      Width="18"
-                                                                      Height="18"
-                                                                      HorizontalAlignment="Center"
-                                                                      VerticalAlignment="Center" />
-                                                </Border>
-                                            </Grid>
-
-                                            <StackPanel Grid.Row="2" HorizontalAlignment="Stretch">
+                                                        Width="104"
+                                                        Margin="6,0,10,10">
                                                 <TextBlock Text="{Binding Name}"
                                                            FontWeight="Bold"
                                                            FontSize="15"
                                                            Foreground="{StaticResource Neutral50}"
-                                                           HorizontalAlignment="Center"
+                                                           HorizontalAlignment="Right"
+                                                           TextAlignment="Right"
                                                            TextTrimming="CharacterEllipsis" />
                                                 <TextBlock Text="{Binding VrDisplay}"
                                                            Classes="TinyText"
                                                            FontSize="13"
-                                                           HorizontalAlignment="Center" />
+                                                           Foreground="{Binding LeaderboardAccentBrush}"
+                                                           HorizontalAlignment="Right"
+                                                           TextAlignment="Right" />
                                             </StackPanel>
+
+                                            <Border Grid.Column="1"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Bottom"
+                                                    Margin="6,0,0,7"
+                                                    IsVisible="{Binding HasBadge}"
+                                                    Width="25"
+                                                    Height="25"
+                                                    CornerRadius="9999"
+                                                    Background="{StaticResource Neutral950}"
+                                                    BorderBrush="{StaticResource Neutral700}"
+                                                    BorderThickness="1">
+                                                <components:Badge Variant="{Binding PrimaryBadge}"
+                                                                  Width="18"
+                                                                  Height="18"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center" />
+                                            </Border>
                                         </Grid>
                                         <Border.ContextMenu>
                                             <ContextMenu>
@@ -457,7 +555,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <ItemsControl ItemsSource="{Binding LeaderboardRows}" Margin="0,2,0,44">
+                        <ItemsControl ItemsSource="{Binding LeaderboardRows}" Margin="0,0,0,44">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="pages:LeaderboardPlayerItem">
                                     <patterns:PlayerListItem UserName="{Binding Name}"
@@ -470,7 +568,10 @@
                                                              IsOpenHost="{Binding IsOpenHost}"
                                                              HasBadges="{Binding HasBadges}"
                                                              IsTopPlayer="True"
-                                                             TopLabel="{Binding TopLabel}">
+                                                             TopLabel="{Binding TopLabel}"
+                                                             LeaderboardAccentBrush="{Binding LeaderboardAccentBrush}"
+                                                             LeaderboardGlowBrush="{Binding LeaderboardGlowBrush}"
+                                                             LeaderboardBorderThickness="{Binding LeaderboardBorderThickness}">
                                         <patterns:PlayerListItem.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="{loc:T action.copy_friend_code}"
@@ -491,18 +592,48 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <components:IconLabelButton Grid.Row="1"
-                                            Classes="OnlineTextButton"
+                <Grid x:Name="LeaderboardRevealCover"
+                      Classes="LeaderboardRevealCover"
+                      Height="0"
+                      VerticalAlignment="Bottom"
+                      IsHitTestVisible="False"
+                      ZIndex="2"
+                      RowDefinitions="100,*">
+                    <Border Grid.Row="0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                <GradientStop Color="#0024252D" Offset="0" />
+                                <GradientStop Color="{StaticResource Neutral950}" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                    <Border Grid.Row="1" Background="{StaticResource Neutral950}" />
+                </Grid>
+
+                <Border VerticalAlignment="Bottom"
+                        Height="120"
+                        IsHitTestVisible="False"
+                        ZIndex="1">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                            <GradientStop Color="#0024252D" Offset="0" />
+                            <GradientStop Color="{StaticResource Neutral950}" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+
+                <components:IconLabelButton Classes="OnlineTextButton"
                                             Text="View less"
                                             IconData="{StaticResource ChevronUp}"
                                             HorizontalAlignment="Left"
+                                            VerticalAlignment="Bottom"
                                             Margin="3,0,0,10"
+                                            ZIndex="3"
                                             Click="ViewLess_OnClick" />
             </Grid>
 
-            <Grid IsVisible="{Binding IsRoomsExpanded}"
-                  RowDefinitions="*,Auto">
-                <ListBox Grid.Row="0" SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
+            <Grid IsVisible="{Binding IsRoomsExpanded}">
+                <ListBox SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
                          Background="Transparent" BorderThickness="0"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -539,12 +670,25 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <components:IconLabelButton Grid.Row="1"
-                                            Classes="OnlineTextButton"
+                <Border VerticalAlignment="Bottom"
+                        Height="120"
+                        IsHitTestVisible="False"
+                        ZIndex="1">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                            <GradientStop Color="#0024252D" Offset="0" />
+                            <GradientStop Color="{StaticResource Neutral950}" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+
+                <components:IconLabelButton Classes="OnlineTextButton"
                                             Text="View less"
                                             IconData="{StaticResource ChevronUp}"
                                             HorizontalAlignment="Left"
+                                            VerticalAlignment="Bottom"
                                             Margin="3,0,0,10"
+                                            ZIndex="3"
                                             Click="ViewLess_OnClick" />
             </Grid>
         </Grid>

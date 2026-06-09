@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 using Badge = WheelWizard.Views.Components.Badge;
@@ -11,6 +12,7 @@ namespace WheelWizard.Views.Patterns;
 public class PlayerListItem : TemplatedControl
 {
     private Avalonia.Controls.Button? _joinRoomButton;
+    private static readonly IBrush TransparentBrush = Brushes.Transparent;
 
     public static readonly StyledProperty<bool> IsOnlineProperty = AvaloniaProperty.Register<PlayerListItem, bool>(nameof(IsOnline));
     public static readonly StyledProperty<bool> ShowJoinRoomButtonProperty = AvaloniaProperty.Register<PlayerListItem, bool>(
@@ -62,6 +64,39 @@ public class PlayerListItem : TemplatedControl
     {
         get => GetValue(TopLabelProperty);
         set => SetValue(TopLabelProperty, value);
+    }
+
+    public static readonly StyledProperty<IBrush> LeaderboardAccentBrushProperty = AvaloniaProperty.Register<PlayerListItem, IBrush>(
+        nameof(LeaderboardAccentBrush),
+        TransparentBrush
+    );
+
+    public IBrush LeaderboardAccentBrush
+    {
+        get => GetValue(LeaderboardAccentBrushProperty);
+        set => SetValue(LeaderboardAccentBrushProperty, value);
+    }
+
+    public static readonly StyledProperty<IBrush> LeaderboardGlowBrushProperty = AvaloniaProperty.Register<PlayerListItem, IBrush>(
+        nameof(LeaderboardGlowBrush),
+        TransparentBrush
+    );
+
+    public IBrush LeaderboardGlowBrush
+    {
+        get => GetValue(LeaderboardGlowBrushProperty);
+        set => SetValue(LeaderboardGlowBrushProperty, value);
+    }
+
+    public static readonly StyledProperty<Thickness> LeaderboardBorderThicknessProperty = AvaloniaProperty.Register<
+        PlayerListItem,
+        Thickness
+    >(nameof(LeaderboardBorderThickness), new Thickness(0));
+
+    public Thickness LeaderboardBorderThickness
+    {
+        get => GetValue(LeaderboardBorderThicknessProperty);
+        set => SetValue(LeaderboardBorderThicknessProperty, value);
     }
 
     public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<PlayerListItem, Mii?>(nameof(Mii));

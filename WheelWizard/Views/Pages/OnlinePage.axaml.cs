@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using WheelWizard.Models;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
@@ -39,6 +41,25 @@ public sealed record LeaderboardPlayerItem
     public bool IsEvenRow { get; init; }
     public bool IsFriend { get; init; }
     public bool IsOnline { get; init; }
+    public IBrush LeaderboardAccentBrush =>
+        Rank switch
+        {
+            1 => SolidColorBrush.Parse("#EEC21E"),
+            2 => SolidColorBrush.Parse("#F2FFFFFF"),
+            3 => SolidColorBrush.Parse("#D77E47"),
+            4 or 5 => SolidColorBrush.Parse("#8EDBFF"),
+            _ => Brushes.Transparent,
+        };
+    public IBrush LeaderboardGlowBrush =>
+        Rank switch
+        {
+            1 => SolidColorBrush.Parse("#D19200"),
+            2 => SolidColorBrush.Parse("#FFFFFF"),
+            3 => SolidColorBrush.Parse("#B66A35"),
+            4 or 5 => SolidColorBrush.Parse("#38BDF8"),
+            _ => Brushes.Transparent,
+        };
+    public Thickness LeaderboardBorderThickness => Rank is >= 1 and <= 5 ? new Thickness(1) : new Thickness(0);
 
     // Keep parity with RoomDetailsPage player template bindings.
     public string VrDisplay => VrText;
@@ -110,6 +131,7 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
     private string? _searchQuery;
 
     private readonly ObservableCollection<RrRoom> _rooms = [];
+    private readonly ObservableCollection<RrRoom> _previewRooms = [];
 
     public ObservableCollection<RrRoom> Rooms
     {
@@ -120,6 +142,18 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
             OnPropertyChanged(nameof(Rooms));
         }
     }
+
+    public ObservableCollection<RrRoom> PreviewRooms
+    {
+        get => _previewRooms;
+        init
+        {
+            _previewRooms = value;
+            OnPropertyChanged(nameof(PreviewRooms));
+        }
+    }
+
+    public bool HasMoreRooms => Rooms.Count > PreviewRooms.Count;
 
     private readonly ObservableCollection<RrPlayer> _players = [];
 
@@ -293,16 +327,24 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
             return;
 
         Rooms.Clear();
+        PreviewRooms.Clear();
         var count = liveRooms.RoomCount;
+        RoomsListItemCount.Text = liveRooms.CurrentRooms.Count.ToString();
         EmptyRoomsView.IsVisible = count == 0;
         RoomsListViewContainer.IsVisible = count != 0 && string.IsNullOrWhiteSpace(_searchQuery);
         if (count == 0)
+        {
+            OnPropertyChanged(nameof(HasMoreRooms));
             return;
+        }
 
         foreach (var room in liveRooms.CurrentRooms.OrderByDescending(room => room.AverageVr))
             Rooms.Add(room);
 
-        RoomsListItemCount.Text = liveRooms.CurrentRooms.Count.ToString();
+        foreach (var room in Rooms.Take(8))
+            PreviewRooms.Add(room);
+
+        OnPropertyChanged(nameof(HasMoreRooms));
         PerformSearch(_searchQuery);
     }
 
@@ -618,7 +660,7 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
     private void RefreshLeaderboardRows()
     {
         LeaderboardRows.Clear();
-        var takeCount = IsLeaderboardExpanded ? 47 : 2;
+        var takeCount = IsLeaderboardExpanded ? 47 : 3;
         foreach (var player in RemainingPlayers.Take(takeCount))
             LeaderboardRows.Add(player);
     }
@@ -626,19 +668,24 @@ public partial class OnlinePage : UserControlBase, INotifyPropertyChanged, IRepe
     private async void ShowMoreLeaderboard_OnClick(object? sender, EventArgs e)
     {
         RoomsPreviewSection.Opacity = 0;
-        await Task.Delay(170);
+        await Task.Delay(90);
+        LeaderboardRevealCover.Height = Math.Max(Bounds.Height, 720);
         IsRoomsExpanded = false;
         IsLeaderboardExpanded = true;
+        await Task.Delay(40);
+        LeaderboardRevealCover.Height = 0;
         RoomsPreviewSection.Opacity = 1;
     }
 
     private async void ShowMoreRooms_OnClick(object? sender, EventArgs e)
     {
+        RoomsPreviewSection.RenderTransform = new TranslateTransform(0, -90);
         LeaderboardPreviewSection.Opacity = 0;
         await Task.Delay(170);
         IsLeaderboardExpanded = false;
         IsRoomsExpanded = true;
         LeaderboardPreviewSection.Opacity = 1;
+        RoomsPreviewSection.RenderTransform = new TranslateTransform(0, 0);
     }
 
     private void ViewLess_OnClick(object? sender, EventArgs e)

@@ -47,8 +47,29 @@
     <Style Selector="patterns|PlayerListItem">
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Classes="BoxItemBackground">
+                <Border Classes="BoxItemBackground"
+                        ClipToBounds="True">
                     <Grid ColumnDefinitions="Auto,130,80,*">
+                        <Grid Grid.Column="0"
+                              Grid.ColumnSpan="4"
+                              Margin="-7,0,-7,0"
+                              IsHitTestVisible="False">
+                            <Canvas Margin="7,0,7,0">
+                                <Border Canvas.Right="28"
+                                        Canvas.Bottom="-78"
+                                        CornerRadius="99999"
+                                        Opacity="0.68"
+                                        Height="160"
+                                        Width="105"
+                                        Background="{TemplateBinding LeaderboardGlowBrush}"
+                                        Effect="blur(250)" />
+                            </Canvas>
+
+                            <Border BorderBrush="{TemplateBinding LeaderboardAccentBrush}"
+                                    BorderThickness="{TemplateBinding LeaderboardBorderThickness}"
+                                    CornerRadius="6" />
+                        </Grid>
+
                         <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True"
                                 Background="{StaticResource Neutral950}" Width="50" Height="50" Margin="0,3">
                             <behaviorComponent:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
