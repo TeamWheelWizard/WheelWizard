@@ -1,0 +1,204 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             mc:Ignorable="d"
+             d:DesignWidth="477"
+             d:DesignHeight="700"
+             x:Class="WheelWizard.Views.Pages.PlayerSearchPage"
+             x:DataType="pages:PlayerSearchPage">
+    <UserControl.Styles>
+        <Style Selector="Border.SearchPanel">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="10" />
+        </Style>
+        <Style Selector="Border.SearchSummaryCard">
+            <Setter Property="Background" Value="{StaticResource Neutral950}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="9,7" />
+        </Style>
+        <Style Selector="patterns|PlayerListItem /template/ Border.BoxItemBackground">
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Margin" Value="0,3" />
+            <Setter Property="Padding" Value="7,0" />
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+        </Style>
+        <Style Selector="patterns|PlayerListItem:pointerover /template/ Border.BoxItemBackground">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0"
+                Background="{StaticResource BackgroundLineColor}"
+                Height="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <TextBlock Grid.Row="0"
+                   Text="Find Players"
+                   VerticalAlignment="Bottom"
+                   Classes="PageTitleText" />
+
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto,*"
+              Margin="10,10,10,0">
+            <Border Grid.Row="0"
+                    Classes="SearchPanel">
+                <Grid RowDefinitions="Auto,10,Auto">
+                    <Grid Grid.Row="0"
+                          ColumnDefinitions="*,Auto">
+                        <TextBox x:Name="SearchTextBox"
+                                 Watermark="Name or friend code"
+                                 TextChanged="SearchTextBox_OnTextChanged"
+                                 MinHeight="36"
+                                 VerticalAlignment="Center" />
+                        <components:Button Grid.Column="1"
+                                           Margin="8,0,0,0"
+                                           Width="38"
+                                           Height="36"
+                                           Padding="0"
+                                           IconData="{StaticResource Search}"
+                                           IconSize="14"
+                                           Text=""
+                                           Click="SearchButton_OnClick"
+                                           ToolTip.Tip="Search players"
+                                           ToolTip.Placement="Top"
+                                           ToolTip.ShowDelay="20" />
+                    </Grid>
+
+                    <Grid Grid.Row="2"
+                          ColumnDefinitions="*,8,*,8,*">
+                        <Border Grid.Column="0"
+                                Classes="SearchSummaryCard">
+                            <StackPanel>
+                                <components:FormFieldLabel Text="Results" />
+                                <TextBlock Text="{Binding ResultCountText}"
+                                           Classes="TinyText"
+                                           FontSize="12" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2"
+                                Classes="SearchSummaryCard">
+                            <StackPanel>
+                                <components:FormFieldLabel Text="Page" />
+                                <TextBlock Text="{Binding PageText}"
+                                           Classes="TinyText"
+                                           FontSize="12" />
+                            </StackPanel>
+                        </Border>
+                        <Grid Grid.Column="4"
+                              ColumnDefinitions="*,8,*">
+                            <components:Button Grid.Column="0"
+                                               Width="38"
+                                               Height="38"
+                                               Padding="0"
+                                               Variant="UglyLight"
+                                               IconData="{StaticResource ArrowLeft}"
+                                               IconSize="12"
+                                               Text=""
+                                               IsEnabled="{Binding CanGoPrevious}"
+                                               Click="PreviousPage_OnClick" />
+                            <components:Button Grid.Column="2"
+                                               Width="38"
+                                               Height="38"
+                                               Padding="0"
+                                               Variant="UglyLight"
+                                               IconData="{StaticResource ArrowRight}"
+                                               IconSize="12"
+                                               Text=""
+                                               IsEnabled="{Binding CanGoNext}"
+                                               Click="NextPage_OnClick" />
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1"
+                  Margin="0,10,0,0">
+                <StackPanel IsVisible="{Binding IsLoading}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="10">
+                    <components:LoadingIcon Width="68"
+                                            Height="68"
+                                            Foreground="{StaticResource Neutral700}" />
+                    <TextBlock Text="Searching players..."
+                               Classes="BodyText"
+                               FontSize="14"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel IsVisible="{Binding HasError}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="10">
+                    <components:EmptyPageInfo Title="Could not search players"
+                                              BodyText="{Binding ErrorMessage}"
+                                              IconData="{StaticResource WarningTriangle}" />
+                    <components:Button Text="Retry"
+                                       Width="150"
+                                       Variant="Primary"
+                                       IconData="{StaticResource Refresh}"
+                                       Click="RetryButton_OnClick" />
+                </StackPanel>
+
+                <components:EmptyPageInfo IsVisible="{Binding HasNoResults}"
+                                          Title="No players found"
+                                          BodyText="Try a different name, friend code, or activity filter."
+                                          IconData="{StaticResource Search}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+
+                <ScrollViewer IsVisible="{Binding HasResults}"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              IsScrollInertiaEnabled="True">
+                    <ItemsControl ItemsSource="{Binding Players}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="pages:PlayerSearchResultItem">
+                                <patterns:PlayerListItem UserName="{Binding Name}"
+                                                           FriendCode="{Binding FriendCode}"
+                                                           Vr="{Binding VrDisplay}"
+                                                           Mii="{Binding Mii}"
+                                                           IsOnline="{Binding IsOnline}"
+                                                           ShowJoinRoomButton="True"
+                                                           JoinRoomAction="JoinRoom_OnClick"
+                                                           HasBadges="{Binding HasBadge}"
+                                                           IsTopPlayer="{Binding HasRank}"
+                                                           TopLabel="{Binding RankText}"
+                                                           PointerPressed="PlayerItem_OnPointerPressed">
+                                    <patterns:PlayerListItem.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="View Profile"
+                                                      Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="Add Friend"
+                                                      Click="AddFriend_OnClick" />
+                                            <Separator />
+                                            <MenuItem Header="Copy Friend Code"
+                                                      Click="CopyFriendCode_OnClick" />
+                                            <MenuItem Header="View Mii"
+                                                      Click="OpenCarousel_OnClick" />
+                                        </ContextMenu>
+                                    </patterns:PlayerListItem.ContextMenu>
+                                </patterns:PlayerListItem>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

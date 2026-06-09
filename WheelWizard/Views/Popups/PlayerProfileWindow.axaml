@@ -8,88 +8,420 @@
                    xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    xmlns:popups="clr-namespace:WheelWizard.Views.Popups"
-                   xmlns:conv="clr-namespace:WheelWizard.Views.Converters"
-                   mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="700" ClipToBounds="False"
+                   xmlns:animation="clr-namespace:Avalonia.Animation;assembly=Avalonia.Base"
+                   mc:Ignorable="d"
+                   d:DesignWidth="600"
+                   d:DesignHeight="760"
+                   ClipToBounds="False"
                    x:Class="WheelWizard.Views.Popups.PlayerProfileWindow"
                    x:DataType="popups:PlayerProfileWindow">
-    <Grid Width="540" MinHeight="400" MaxHeight="760">
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20"
+    <base:PopupContent.Styles>
+        <Style Selector="Border.profileStatCard">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10" />
+        </Style>
+        <Style Selector="Border.favoriteCard">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="12" />
+        </Style>
+        <Style Selector="Border.carouselDot">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="CornerRadius" Value="9999" />
+            <Setter Property="Background" Value="{StaticResource Neutral500}" />
+            <Setter Property="Opacity" Value="0.75" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Width" Duration="0:0:0.2" Easing="CircularEaseOut" />
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2" Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.carouselDot.active">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="Background" Value="{StaticResource Primary300}" />
+        </Style>
+    </base:PopupContent.Styles>
+
+    <Grid Width="580"
+          MinHeight="450"
+          MaxHeight="780">
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="20"
                     IsVisible="{Binding IsLoading}">
-            <components:LoadingIcon Width="72" Height="72" Foreground="{StaticResource Neutral700}" />
-            <TextBlock Text="Loading profile..." Classes="BodyText" FontSize="14" HorizontalAlignment="Center" />
+            <components:LoadingIcon Width="72"
+                                    Height="72"
+                                    Foreground="{StaticResource Neutral700}" />
+            <TextBlock Text="Loading profile..."
+                       Classes="BodyText"
+                       FontSize="14"
+                       HorizontalAlignment="Center" />
         </StackPanel>
 
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14"
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="14"
                     IsVisible="{Binding HasError}">
-            <PathIcon Data="{StaticResource WarningTriangle}" Width="54" Height="54"
+            <PathIcon Data="{StaticResource WarningTriangle}"
+                      Width="54"
+                      Height="54"
                       Foreground="{StaticResource Danger600}" />
-            <TextBlock Text="{Binding ErrorMessage}" Classes="BodyText" FontSize="14" HorizontalAlignment="Center"
-                       TextWrapping="Wrap" Foreground="{StaticResource Danger600}" />
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Classes="BodyText"
+                       FontSize="14"
+                       Width="380"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource Danger600}" />
         </StackPanel>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                      IsVisible="{Binding Profile, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <StackPanel Spacing="12" Margin="0,8,0,4">
-                <Grid ColumnDefinitions="Auto,*">
-                    <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True"
-                            Background="{StaticResource Neutral950}" Width="84" Height="84" Margin="0,0,14,0">
-                        <behavior:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+        <Grid IsVisible="{Binding HasProfile}"
+              RowDefinitions="Auto,Auto,*,Auto"
+              Margin="0,6,0,0">
+            <Border Grid.Row="0"
+                    Background="{StaticResource Neutral900}"
+                    BorderBrush="{StaticResource Neutral800}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="12"
+                    ClipToBounds="True">
+                <Grid ColumnDefinitions="Auto,*,Auto"
+                      RowDefinitions="Auto,Auto">
+                    <Border Grid.Column="0"
+                            Grid.RowSpan="2"
+                            CornerRadius="999999"
+                            ClipToBounds="True"
+                            Background="{StaticResource Neutral950}"
+                            BorderBrush="{StaticResource Primary500}"
+                            BorderThickness="1"
+                            Width="92"
+                            Height="92"
+                            Margin="0,0,14,0">
+                        <behavior:MiiImageLoader HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Stretch"
                                                  LoadingColor="{StaticResource Neutral600}"
                                                  Mii="{Binding DisplayMii}"
                                                  FallBackColor="{StaticResource Neutral600}"
                                                  ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
                     </Border>
 
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
-                        <TextBlock Text="{Binding Profile.Name}" Classes="TitleText" FontSize="20"
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="0"
+                                VerticalAlignment="Center"
+                                Spacing="3">
+                        <TextBlock Text="{Binding Profile.Name}"
+                                   Classes="TitleText"
+                                   FontSize="22"
+                                   TextTrimming="CharacterEllipsis"
                                    Foreground="{StaticResource FormFieldLabelColor}" />
-                        <TextBlock Text="{Binding Profile.FriendCode}" Classes="BodyText" FontSize="12"
-                                   Foreground="{StaticResource Neutral400}" />
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <components:StateBox Text="{Binding Profile.Rank, StringFormat='Rank #{0}'}"
-                                                 Variant="Success" IconSize="0" HorizontalAlignment="Left"
-                                                 IsVisible="{Binding Profile.Rank, Converter={x:Static conv:NumberConverters.GreaterThan0}}" />
-                            <components:StateBox Text="Suspicious" Variant="Danger" IconSize="0"
+                        <SelectableTextBlock Text="{Binding Profile.FriendCode}"
+                                             Classes="BodyText"
+                                             FontSize="12"
+                                             Foreground="{StaticResource Neutral400}" />
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="6">
+                            <components:StateBox Text="{Binding RankText}"
+                                                 Variant="Success"
+                                                 IconSize="0"
+                                                 HorizontalAlignment="Left" />
+                            <components:StateBox Text="Suspicious"
+                                                 Variant="Danger"
+                                                 IconSize="0"
                                                  HorizontalAlignment="Left"
                                                  IsVisible="{Binding Profile.IsSuspicious}" />
                         </StackPanel>
                     </StackPanel>
+
+                    <Grid Grid.Column="2"
+                          Grid.RowSpan="2"
+                          Width="150"
+                          RowDefinitions="*,8,*"
+                          VerticalAlignment="Stretch"
+                          Margin="10,0,0,0">
+                        <Border Grid.Row="0"
+                                Classes="profileStatCard">
+                            <StackPanel>
+                                <components:FormFieldLabel Text="{loc:T attribute.vr_abbreviation}"
+                                                           TipText="{loc:T attribute.vr_full}" />
+                                <TextBlock Text="{Binding CurrentVrText}"
+                                           Classes="TitleText"
+                                           FontSize="18" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Row="2"
+                                Classes="profileStatCard">
+                            <StackPanel>
+                                <components:FormFieldLabel Text="Week Gain" />
+                                <TextBlock Text="{Binding VrWeekText}"
+                                           Classes="TitleText"
+                                           FontSize="18"
+                                           Foreground="{StaticResource Primary300}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </Grid>
+            </Border>
 
-                <Border Background="{StaticResource BackgroundLineColor}" Height="1" />
-
-                <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
-                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,12,8">
-                        <components:FormFieldLabel Text="{loc:T attribute.vr_abbreviation}"
-                                                   TipText="{loc:T attribute.vr_full}" />
-                        <TextBlock Text="{Binding Profile.Vr, StringFormat='{}{0:N0}'}" Classes="BodyText" FontSize="14" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,12,8">
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,8,*,8,*"
+                  Margin="0,10,0,10">
+                <Border Grid.Column="0"
+                        Classes="profileStatCard">
+                    <StackPanel>
                         <components:FormFieldLabel Text="Last Seen" />
-                        <TextBlock Text="{Binding LastSeenText}" Classes="BodyText" FontSize="12" />
+                        <TextBlock Text="{Binding LastSeenText}"
+                                   Classes="BodyText"
+                                   FontSize="13" />
                     </StackPanel>
-
-                    <StackPanel Grid.Column="2" Grid.Row="0" Margin="0,0,0,8">
-                        <components:FormFieldLabel Text="VR (24h)" />
-                        <TextBlock Text="{Binding Vr24HoursText}" Classes="BodyText" FontSize="12" />
+                </Border>
+                <Border Grid.Column="2"
+                        Classes="profileStatCard">
+                    <StackPanel>
+                        <components:FormFieldLabel Text="24h VR" />
+                        <TextBlock Text="{Binding Vr24HoursText}"
+                                   Classes="BodyText"
+                                   FontSize="13" />
                     </StackPanel>
-
-                    <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,0,12,0">
-                        <components:FormFieldLabel Text="VR (Week)" />
-                        <TextBlock Text="{Binding VrWeekText}" Classes="BodyText" FontSize="12" />
+                </Border>
+                <Border Grid.Column="4"
+                        Classes="profileStatCard">
+                    <StackPanel>
+                        <components:FormFieldLabel Text="Month VR" />
+                        <TextBlock Text="{Binding VrMonthText}"
+                                   Classes="BodyText"
+                                   FontSize="13" />
                     </StackPanel>
+                </Border>
+            </Grid>
 
-                    <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,12,0">
-                        <components:FormFieldLabel Text="VR (Month)" />
-                        <TextBlock Text="{Binding VrMonthText}" Classes="BodyText" FontSize="12" />
-                    </StackPanel>
-                </Grid>
+            <Carousel Grid.Row="2"
+                      x:Name="ProfileInfoCarousel"
+                      SelectedIndex="{Binding ActiveInfoSlideIndex, Mode=TwoWay}">
+                <Carousel.PageTransition>
+                    <animation:CompositePageTransition>
+                        <animation:PageSlide Duration="0:0:0.25" Orientation="Horizontal" />
+                        <animation:CrossFade Duration="0:0:0.25" />
+                    </animation:CompositePageTransition>
+                </Carousel.PageTransition>
+                <Carousel.Items>
+                    <Border Background="Transparent"
+                            BorderThickness="0">
+                        <behavior:VrHistoryGraph HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Stretch"
+                                                 FriendCode="{Binding Profile.FriendCode}" />
+                    </Border>
 
-                <Border Background="{StaticResource BackgroundLineColor}" Height="1" />
+                    <Border Background="Transparent"
+                            BorderThickness="0">
+                        <Grid>
+                            <components:EmptyPageInfo IsVisible="{Binding HasNoRaceStats}"
+                                                      Title="No race stats yet"
+                                                      BodyText="This player has not appeared in tracked race results yet."
+                                                      IconData="{StaticResource Chart}"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center" />
+                            <StackPanel IsVisible="{Binding HasRaceStats}"
+                                        Spacing="10">
+                                <Grid ColumnDefinitions="*,8,*"
+                                      RowDefinitions="Auto,8,Auto">
+                                    <Border Grid.Column="0"
+                                            Grid.Row="0"
+                                            Classes="favoriteCard">
+                                        <StackPanel Spacing="3">
+                                            <components:FormFieldLabel Text="Favorite Character" />
+                                            <TextBlock Text="{Binding FavoriteCharacterText}"
+                                                       Classes="TitleText"
+                                                       FontSize="18"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding FavoriteCharacterMetaText}"
+                                                       Classes="TinyText"
+                                                       FontSize="12" />
+                                        </StackPanel>
+                                    </Border>
 
-                <behavior:VrHistoryGraph FriendCode="{Binding Profile.FriendCode}" />
-            </StackPanel>
-        </ScrollViewer>
+                                    <Border Grid.Column="2"
+                                            Grid.Row="0"
+                                            Classes="favoriteCard">
+                                        <StackPanel Spacing="3">
+                                            <components:FormFieldLabel Text="Favorite Vehicle" />
+                                            <TextBlock Text="{Binding FavoriteVehicleText}"
+                                                       Classes="TitleText"
+                                                       FontSize="18"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding FavoriteVehicleMetaText}"
+                                                       Classes="TinyText"
+                                                       FontSize="12" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="0"
+                                            Grid.Row="2"
+                                            Classes="favoriteCard">
+                                        <StackPanel Spacing="3">
+                                            <components:FormFieldLabel Text="Favorite Track" />
+                                            <TextBlock Text="{Binding FavoriteTrackText}"
+                                                       Classes="TitleText"
+                                                       FontSize="18"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding FavoriteTrackMetaText}"
+                                                       Classes="TinyText"
+                                                       FontSize="12" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="2"
+                                            Grid.Row="2"
+                                            Classes="favoriteCard">
+                                        <StackPanel Spacing="3">
+                                            <components:FormFieldLabel Text="Favorite Combo" />
+                                            <TextBlock Text="{Binding FavoriteComboText}"
+                                                       Classes="TitleText"
+                                                       FontSize="18"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding FavoriteComboMetaText}"
+                                                       Classes="TinyText"
+                                                       FontSize="12" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <Border Classes="favoriteCard">
+                                    <StackPanel Spacing="3">
+                                        <components:FormFieldLabel Text="Latest Tracked Race" />
+                                        <TextBlock Text="{Binding RecentRaceText}"
+                                                   Classes="TitleText"
+                                                   FontSize="17"
+                                                   TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding RecentRaceMetaText}"
+                                                   Classes="TinyText"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Background="Transparent"
+                            BorderThickness="0">
+                        <Grid>
+                            <components:EmptyPageInfo IsVisible="{Binding HasNoRaceStats}"
+                                                      Title="No race record yet"
+                                                      BodyText="Race records appear after this player is seen in tracked results."
+                                                      IconData="{StaticResource Award}"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center" />
+                            <StackPanel IsVisible="{Binding HasRaceStats}"
+                                        Spacing="10">
+                                <Grid ColumnDefinitions="*,8,*,8,*">
+                                    <Border Grid.Column="0"
+                                            Classes="profileStatCard">
+                                        <StackPanel>
+                                            <components:FormFieldLabel Text="Tracked Races" />
+                                            <TextBlock Text="{Binding TotalRacesText}"
+                                                       Classes="TitleText"
+                                                       FontSize="18" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Grid.Column="2"
+                                            Classes="profileStatCard">
+                                        <StackPanel>
+                                            <components:FormFieldLabel Text="Tracked Since" />
+                                            <TextBlock Text="{Binding TrackedSinceText}"
+                                                       Classes="BodyText"
+                                                       FontSize="13" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Grid.Column="4"
+                                            Classes="profileStatCard">
+                                        <StackPanel>
+                                            <components:FormFieldLabel Text="Time In 1st" />
+                                            <TextBlock Text="{Binding TimeInFirstText}"
+                                                       Classes="BodyText"
+                                                       FontSize="13" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <Border Classes="favoriteCard">
+                                    <StackPanel Spacing="3">
+                                        <components:FormFieldLabel Text="Best Character Win Rate" />
+                                        <TextBlock Text="{Binding BestCharacterText}"
+                                                   Classes="TitleText"
+                                                   FontSize="18"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding BestCharacterMetaText}"
+                                                   Classes="TinyText"
+                                                   FontSize="12" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="favoriteCard">
+                                    <StackPanel Spacing="3">
+                                        <components:FormFieldLabel Text="Best Vehicle Win Rate" />
+                                        <TextBlock Text="{Binding BestVehicleText}"
+                                                   Classes="TitleText"
+                                                   FontSize="18"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding BestVehicleMetaText}"
+                                                   Classes="TinyText"
+                                                   FontSize="12" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Carousel.Items>
+            </Carousel>
+
+            <Grid Grid.Row="3"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Center"
+                  Margin="0,10,0,0"
+                  ColumnDefinitions="Auto,Auto,Auto">
+                <components:Button Grid.Column="0"
+                                   IconData="{StaticResource ArrowLeft}"
+                                   IconSize="12"
+                                   Width="28"
+                                   Height="28"
+                                   Padding="0"
+                                   Variant="UglyLight"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"
+                                   Click="PrevCarouselPage_OnClick" />
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="6">
+                    <Border x:Name="CarouselDot0"
+                            Classes="carouselDot active" />
+                    <Border x:Name="CarouselDot1"
+                            Classes="carouselDot" />
+                    <Border x:Name="CarouselDot2"
+                            Classes="carouselDot" />
+                </StackPanel>
+
+                <components:Button Grid.Column="2"
+                                   IconData="{StaticResource ArrowRight}"
+                                   IconSize="12"
+                                   Width="28"
+                                   Height="28"
+                                   Padding="0"
+                                   Variant="UglyLight"
+                                   VerticalAlignment="Center"
+                                   Margin="8,0,0,0"
+                                   Click="NextCarouselPage_OnClick" />
+            </Grid>
+        </Grid>
     </Grid>
 </base:PopupContent>

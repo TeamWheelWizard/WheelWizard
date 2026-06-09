@@ -124,6 +124,9 @@
             <patterns:SidebarRadioButton IconData="{StaticResource Award}"
                                            PageType="{x:Type pages:LeaderboardPage}"
                                            Text="{loc:T page_title.leaderboard}" />
+            <patterns:SidebarRadioButton IconData="{StaticResource Search}"
+                                           PageType="{x:Type pages:PlayerSearchPage}"
+                                           Text="Find Players" />
             <patterns:SidebarRadioButton IconData="{StaticResource Friends}"
                                            Text="{loc:T page_title.friends}" x:Name="FriendsButton"
                                            PageType="{x:Type pages:FriendsPage}"
