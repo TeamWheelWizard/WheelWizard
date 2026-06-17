@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Serilog;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
 #if WINDOWS
@@ -849,7 +850,9 @@ public static class PathManager
         return null;
     }
 
-    public static string? TryFindUserFolderPath()
+    public static string? TryFindUserFolderPath() => TryFindUserFolderPath(DolphinFilePath);
+
+    public static string? TryFindUserFolderPath(string dolphinFilePath)
     {
         var portableUserFolderPath = TryFindPortableUserFolderPath();
         if (!string.IsNullOrWhiteSpace(portableUserFolderPath))
@@ -880,7 +883,7 @@ public static class PathManager
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            if (IsFlatpakDolphinFilePath())
+            if (IsFlatpakDolphinFilePath(dolphinFilePath))
             {
                 return TryFindLinuxFlatpakUserFolderPath();
             }
