@@ -3,6 +3,7 @@ namespace WheelWizard.DolphinInstaller;
 public interface ILinuxDolphinInstaller
 {
     bool IsDolphinInstalledInFlatpak();
+    bool IsDolphinInstalledNative();
     bool IsFlatpakInstalled();
     Task<OperationResult> InstallFlatpak(IProgress<int>? progress = null);
     Task<OperationResult> InstallFlatpakDolphin(IProgress<int>? progress = null);
@@ -15,6 +16,11 @@ public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnviro
     {
         var processResult = processService.Run("flatpak", "info org.DolphinEmu.dolphin-emu");
         return processResult.IsSuccess && processResult.Value == 0;
+    }
+
+    public bool IsDolphinInstalledNative()
+    {
+        return commandEnvironment.IsCommandAvailable("dolphin-emu");
     }
 
     public bool IsFlatpakInstalled()
