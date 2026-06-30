@@ -3,23 +3,24 @@
 # WheelWizard macOS Build Script
 # =============================================================================
 # Builds WheelWizard for macOS and creates a .app bundle.
-# Works on macOS, Linux, and Windows (Git Bash / MSYS2).
+# Designed to run on macOS CI runners (GitHub Actions).
 #
-# Environment variables (optional):
-#   BUILD_ARCH   - Target architecture: "arm64" or "x64" (default: auto-detect)
-#   SKIP_BUILD   - Set to "true" to skip the dotnet build step
+# Environment variables:
+#   BUILD_ARCH   - "arm64" or "x64" (default: auto-detect)
+#   SKIP_BUILD   - Set to "true" to skip dotnet build
 #   OUTPUT_DIR   - Output directory (default: ./release)
-#   APP_VERSION  - Version string (default: from csproj or "dev")
 #
 # No codesigning, no notarization, no DMG creation.
+# DMG is created by the GitHub Actions workflow using create-dmg action.
 # =============================================================================
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WW_DIR="$SCRIPT_DIR"
-MAC_DIRS="$SCRIPT_DIR/MacAppTemplate"
-DEFAULT_OUTPUT="$SCRIPT_DIR/release"
+MACOS_DIR="$SCRIPT_DIR"
+WW_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+MAC_DIRS="$MACOS_DIR/MacAppTemplate"
+DEFAULT_OUTPUT="$WW_DIR/release"
 
 # ---- Detect architecture ----
 ARCH="$(uname -m)"
@@ -37,16 +38,6 @@ echo "[INFO] Building for RID: $RID (arch: $BUILD_ARCH)"
 echo "[INFO] Output: $OUTPUT_DIR"
 
 mkdir -p "$OUTPUT_DIR"
-
-# ---- Extract version from csproj ----
-if [ -z "${APP_VERSION:-}" ]; then
-    if [ -f "$WW_DIR/WheelWizard/WheelWizard.csproj" ]; then
-        APP_VERSION=$(grep -oP '<Version>\K[^<]+' "$WW_DIR/WheelWizard/WheelWizard.csproj" || echo "dev")
-    else
-        APP_VERSION="dev"
-    fi
-fi
-echo "[INFO] App version: $APP_VERSION"
 
 # =============================================================================
 # STEP 1: Build

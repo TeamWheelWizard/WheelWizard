@@ -107,8 +107,8 @@ jobs:
 
       - name: Build .app bundle for macOS ${{ matrix.arch }}
         run: |
-          chmod +x WheelWizard/release-macos.sh
-          ./WheelWizard/release-macos.sh
+          chmod +x WheelWizard/macos/release-macos.sh
+          ./WheelWizard/macos/release-macos.sh
         env:
           BUILD_ARCH: ${{ matrix.arch }}
 
@@ -118,7 +118,7 @@ jobs:
         with:
           dmg_name: WheelWizard-${{ github.ref_name }}-macOS-${{ matrix.arch }}
           src_dir: WheelWizard/release/WheelWizard.app
-          background: backgr.png
+          background: WheelWizard/macos/backgr.png
           window_size: 650 376
           icon_size: 128
           icon_position: 200 150
