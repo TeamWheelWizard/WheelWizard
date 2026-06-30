@@ -77,13 +77,96 @@ jobs:
           cp publish/linux-arm64/WheelWizard artifacts/WheelWizard_arm64_Linux
           chmod +x artifacts/WheelWizard_Linux artifacts/WheelWizard_arm64_Linux
 
+      - name: Upload Linux + Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-linux-windows
+          path: artifacts/
+          retention-days: 1
+
+  # ──────────────────────────────────────────────────────────────
+  # macOS builds (native on macOS runner)
+  # ──────────────────────────────────────────────────────────────
+  macos:
+    name: Build macOS
+    strategy:
+      matrix:
+        arch: [arm64, x64]
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build .app bundle for macOS ${{ matrix.arch }}
+        run: |
+          chmod +x WheelWizard/release-macos.sh
+          ./WheelWizard/release-macos.sh
+        env:
+          BUILD_ARCH: ${{ matrix.arch }}
+
+      - name: Create DMG
+        id: create-dmg
+        uses: L-Super/create-dmg-actions@v1
+        with:
+          dmg_name: WheelWizard-${{ github.ref_name }}-macOS-${{ matrix.arch }}
+          src_dir: WheelWizard/release/WheelWizard.app
+          background: backgr.png
+          window_size: 650 376
+          icon_size: 128
+          icon_position: 200 150
+          app_drop_link: 450 150
+
+      - name: Upload macOS DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-macos-${{ matrix.arch }}
+          path: ${{ steps.create-dmg.outputs.dmg_path }}
+          retention-days: 1
+
+  # ──────────────────────────────────────────────────────────────
+  # Create GitHub release with all assets
+  # ──────────────────────────────────────────────────────────────
+  create-release:
+    name: Create GitHub Release
+    needs: [release, macos]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p final-artifacts
+
+          # Linux & Windows
+          cp artifacts-linux-windows/WheelWizardWindows.exe final-artifacts/
+          cp artifacts-linux-windows/WheelWizard_Linux final-artifacts/
+          cp artifacts-linux-windows/WheelWizard_arm64_Linux final-artifacts/
+
+          # macOS DMGs
+          cp artifacts-macos-arm64/*.dmg final-artifacts/ 2>/dev/null || true
+          cp artifacts-macos-x64/*.dmg final-artifacts/ 2>/dev/null || true
+
+          chmod +x final-artifacts/WheelWizard_Linux final-artifacts/WheelWizard_arm64_Linux 2>/dev/null || true
+          ls -la final-artifacts/
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >
-          gh release create "${{ github.ref_name }}"
-          artifacts/WheelWizardWindows.exe
-          artifacts/WheelWizard_Linux
-          artifacts/WheelWizard_arm64_Linux
-          --title "${{ github.ref_name }}"
-          --generate-notes
+        run: |
+          ASSETS=""
+          for f in final-artifacts/*; do
+            ASSETS="$ASSETS \"$f\""
+          done
+          eval gh release create "${{ github.ref_name }}" $ASSETS \
+            --title "${{ github.ref_name }}" \
+            --generate-notes
