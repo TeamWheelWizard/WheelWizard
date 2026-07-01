@@ -242,13 +242,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          REPO="${{ github.repository }}"
           ASSETS=""
           for f in final-artifacts/*; do
             ASSETS="$ASSETS \"$f\""
           done
           eval gh release create "${{ github.ref_name }}" $ASSETS \
+            --repo "$REPO" \
             --title "${{ github.ref_name }}" \
             --generate-notes
+
 
   # ──────────────────────────────────────────────────────────────
   # Update Homebrew tap with new version and SHA256
