@@ -87,16 +87,9 @@ jobs:
   # ──────────────────────────────────────────────────────────────
   # macOS builds (native on macOS runner)
   # ──────────────────────────────────────────────────────────────
-  macos:
-    name: Build macOS (${{ matrix.arch }})
-    strategy:
-      matrix:
-        include:
-          - arch: arm64
-            runner: macos-latest
-          - arch: x64
-            runner: macos-13
-    runs-on: ${{ matrix.runner }}
+  macos-arm64:
+    name: Build macOS (arm64)
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
@@ -109,18 +102,18 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: Build .app bundle for macOS ${{ matrix.arch }}
+      - name: Build .app bundle for macOS arm64
         run: |
           chmod +x macos/release-macos.sh
           ./macos/release-macos.sh
         env:
-          BUILD_ARCH: ${{ matrix.arch }}
+          BUILD_ARCH: arm64
 
       - name: Create DMG
         id: create-dmg
         uses: L-Super/create-dmg-actions@v1
         with:
-          dmg_name: WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}
+          dmg_name: WheelWizard-macOSarm64
           src_dir: release/WheelWizard.app
           background: macos/backgr.png
           window_size: 650 376
@@ -136,28 +129,91 @@ jobs:
         run: |
           ditto -c -k --sequesterRsrc --keepParent \
             release/WheelWizard.app \
-            WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.zip
+            WheelWizard-macOSarm64.zip
 
       - name: Compute SHA256
         id: sha
         run: |
-          echo "sha256=$(shasum -a 256 WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(shasum -a 256 WheelWizard-macOSarm64.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-macos-${{ matrix.arch }}
+          name: artifacts-macos-arm64
           path: |
-            WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.dmg
-            WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.zip
+            WheelWizard-macOSarm64.dmg
+            WheelWizard-macOSarm64.zip
           retention-days: 1
+
+  macos-x64:
+    name: Build macOS (x64)
+    # Cross-compile x64 on an arm64 runner since macos-13 (Intel) is deprecated.
+    # .NET handles cross-compilation via the runtime identifier (osx-x64).
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build .app bundle for macOS x64
+        run: |
+          chmod +x macos/release-macos.sh
+          ./macos/release-macos.sh
+        env:
+          BUILD_ARCH: x64
+
+      - name: Create DMG
+        id: create-dmg
+        uses: L-Super/create-dmg-actions@v1
+        with:
+          dmg_name: WheelWizard-macOSintel
+          src_dir: release/WheelWizard.app
+          background: macos/backgr.png
+          window_size: 650 376
+          icon_size: 128
+          icon_position: 200 150
+          app_drop_link: 450 150
+
+      - name: Ad-hoc sign the .app bundle
+        run: |
+          codesign --force --deep -s - "release/WheelWizard.app"
+
+      - name: Create .app zip for Homebrew
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            release/WheelWizard.app \
+            WheelWizard-macOSintel.zip
+
+      - name: Compute SHA256
+        id: sha
+        run: |
+          echo "sha256=$(shasum -a 256 WheelWizard-macOSintel.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload macOS DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-macos-x64
+          path: |
+            WheelWizard-macOSintel.dmg
+            WheelWizard-macOSintel.zip
+          retention-days: 1
+
+
 
   # ──────────────────────────────────────────────────────────────
   # Create GitHub release with all assets
   # ──────────────────────────────────────────────────────────────
   create-release:
     name: Create GitHub Release
-    needs: [release, macos]
+    needs: [release, macos-arm64, macos-x64]
+
     runs-on: ubuntu-latest
 
     steps:
