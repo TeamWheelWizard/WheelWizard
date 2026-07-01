@@ -263,7 +263,7 @@ jobs:
 
     steps:
       - name: Bump cask version and SHA256
-        uses: macauley/action-homebrew-bump-cask@v1
+        uses: LanikSJ/homebrew-bump-cask@v1
         with:
           token: ${{ secrets.TAP_TOKEN }}
           tap: gdmagana/tap
