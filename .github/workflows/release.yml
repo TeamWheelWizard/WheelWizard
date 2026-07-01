@@ -109,6 +109,10 @@ jobs:
         env:
           BUILD_ARCH: arm64
 
+      - name: Ad-hoc sign the .app bundle
+        run: |
+          codesign --force --deep -s - "release/WheelWizard.app"
+
       - name: Create DMG
         id: create-dmg
         uses: L-Super/create-dmg-actions@v1
@@ -120,10 +124,6 @@ jobs:
           icon_size: 128
           icon_position: 200 150
           app_drop_link: 450 150
-
-      - name: Ad-hoc sign the .app bundle
-        run: |
-          codesign --force --deep -s - "release/WheelWizard.app"
 
       - name: Create .app zip for Homebrew
         run: |
@@ -169,6 +169,10 @@ jobs:
         env:
           BUILD_ARCH: x64
 
+      - name: Ad-hoc sign the .app bundle
+        run: |
+          codesign --force --deep -s - "release/WheelWizard.app"
+
       - name: Create DMG
         id: create-dmg
         uses: L-Super/create-dmg-actions@v1
@@ -180,10 +184,6 @@ jobs:
           icon_size: 128
           icon_position: 200 150
           app_drop_link: 450 150
-
-      - name: Ad-hoc sign the .app bundle
-        run: |
-          codesign --force --deep -s - "release/WheelWizard.app"
 
       - name: Create .app zip for Homebrew
         run: |
@@ -204,8 +204,6 @@ jobs:
             WheelWizard-macOSintel.dmg
             WheelWizard-macOSintel.zip
           retention-days: 1
-
-
 
   # ──────────────────────────────────────────────────────────────
   # Create GitHub release with all assets
