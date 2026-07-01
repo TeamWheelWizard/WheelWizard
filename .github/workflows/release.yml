@@ -259,7 +259,7 @@ jobs:
   update-tap:
     name: Update Homebrew Tap
     needs: [create-release]
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - name: Bump cask version and SHA256
@@ -268,5 +268,5 @@ jobs:
           token: ${{ secrets.TAP_TOKEN }}
           tap: gdmagana/tap
           cask: wheelwizard
-          version: ${{ github.ref_name }}
+          tag: ${{ github.ref }}
           livecheck: false
