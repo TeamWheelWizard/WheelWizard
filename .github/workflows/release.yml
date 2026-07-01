@@ -262,6 +262,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Trust Homebrew tap
+        run: brew trust gdmagana/tap
+
       - name: Bump cask version and SHA256
         uses: LanikSJ/homebrew-bump-cask@v1
         with:
