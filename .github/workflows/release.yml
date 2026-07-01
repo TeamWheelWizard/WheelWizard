@@ -128,11 +128,28 @@ jobs:
           icon_position: 200 150
           app_drop_link: 450 150
 
+      - name: Ad-hoc sign the .app bundle
+        run: |
+          codesign --force --deep -s - "release/WheelWizard.app"
+
+      - name: Create .app zip for Homebrew
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            release/WheelWizard.app \
+            WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.zip
+
+      - name: Compute SHA256
+        id: sha
+        run: |
+          echo "sha256=$(shasum -a 256 WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4
         with:
           name: artifacts-macos-${{ matrix.arch }}
-          path: WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.dmg
+          path: |
+            WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.dmg
+            WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.zip
           retention-days: 1
 
   # ──────────────────────────────────────────────────────────────
@@ -160,6 +177,10 @@ jobs:
           cp artifacts-macos-arm64/WheelWizard-macOSarm64.dmg final-artifacts/ 2>/dev/null || true
           cp artifacts-macos-x64/WheelWizard-macOSintel.dmg final-artifacts/ 2>/dev/null || true
 
+          # macOS .app zips (for Homebrew)
+          cp artifacts-macos-arm64/WheelWizard-macOSarm64.zip final-artifacts/ 2>/dev/null || true
+          cp artifacts-macos-x64/WheelWizard-macOSintel.zip final-artifacts/ 2>/dev/null || true
+
           chmod +x final-artifacts/WheelWizard_Linux final-artifacts/WheelWizard_arm64_Linux 2>/dev/null || true
           ls -la final-artifacts/
 
@@ -174,3 +195,21 @@ jobs:
           eval gh release create "${{ github.ref_name }}" $ASSETS \
             --title "${{ github.ref_name }}" \
             --generate-notes
+
+  # ──────────────────────────────────────────────────────────────
+  # Update Homebrew tap with new version and SHA256
+  # ──────────────────────────────────────────────────────────────
+  update-tap:
+    name: Update Homebrew Tap
+    needs: [create-release]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Bump cask version and SHA256
+        uses: macauley/action-homebrew-bump-cask@v1
+        with:
+          token: ${{ secrets.TAP_TOKEN }}
+          tap: gdmagana/tap
+          cask: wheelwizard
+          version: ${{ github.ref_name }}
+          livecheck: false
