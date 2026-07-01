@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
@@ -88,20 +88,24 @@ jobs:
   # macOS builds (native on macOS runner)
   # ──────────────────────────────────────────────────────────────
   macos:
-    name: Build macOS
+    name: Build macOS (${{ matrix.arch }})
     strategy:
       matrix:
-        arch: [arm64, x64]
-    runs-on: macos-latest
+        include:
+          - arch: arm64
+            runner: macos-latest
+          - arch: x64
+            runner: macos-13
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 

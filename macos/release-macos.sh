@@ -22,20 +22,33 @@ WW_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 MAC_DIRS="$MACOS_DIR/MacAppTemplate"
 DEFAULT_OUTPUT="$WW_DIR/release"
 
-# ---- Detect architecture ----
-ARCH="$(uname -m)"
-case "$ARCH" in
-    arm64|aarch64) DEFAULT_BUILD_ARCH="arm64" ;;
-    x86_64|amd64)  DEFAULT_BUILD_ARCH="x64" ;;
-    *)             DEFAULT_BUILD_ARCH="x64" ;;
+# ---- Detect host architecture ----
+HOST_ARCH="$(uname -m)"
+case "$HOST_ARCH" in
+    arm64|aarch64) HOST_BUILD_ARCH="arm64" ;;
+    x86_64|amd64)  HOST_BUILD_ARCH="x64" ;;
+    *)             HOST_BUILD_ARCH="x64" ;;
 esac
 
-BUILD_ARCH="${BUILD_ARCH:-$DEFAULT_BUILD_ARCH}"
+# Use BUILD_ARCH if set, otherwise default to host architecture
+BUILD_ARCH="${BUILD_ARCH:-$HOST_BUILD_ARCH}"
 RID="osx-$BUILD_ARCH"
 OUTPUT_DIR="${OUTPUT_DIR:-$DEFAULT_OUTPUT}"
 
+echo "[INFO] Host architecture: $HOST_BUILD_ARCH"
 echo "[INFO] Building for RID: $RID (arch: $BUILD_ARCH)"
 echo "[INFO] Output: $OUTPUT_DIR"
+
+# If cross-compiling (e.g., building x64 on arm64 host), set the appropriate architecture flag
+if [ "$BUILD_ARCH" != "$HOST_BUILD_ARCH" ]; then
+    echo "[INFO] Cross-compiling: $HOST_BUILD_ARCH -> $BUILD_ARCH"
+    case "$BUILD_ARCH" in
+        x64)  ARCH_FLAG="-arch x86_64" ;;
+        arm64) ARCH_FLAG="-arch arm64" ;;
+    esac
+else
+    ARCH_FLAG=""
+fi
 
 mkdir -p "$OUTPUT_DIR"
 
