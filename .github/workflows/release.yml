@@ -111,8 +111,8 @@ jobs:
 
       - name: Build .app bundle for macOS ${{ matrix.arch }}
         run: |
-          chmod +x WheelWizard/macos/release-macos.sh
-          ./WheelWizard/macos/release-macos.sh
+          chmod +x macos/release-macos.sh
+          ./macos/release-macos.sh
         env:
           BUILD_ARCH: ${{ matrix.arch }}
 
@@ -121,8 +121,8 @@ jobs:
         uses: L-Super/create-dmg-actions@v1
         with:
           dmg_name: WheelWizard-${{ github.ref_name }}-macOS-${{ matrix.arch }}
-          src_dir: WheelWizard/release/WheelWizard.app
-          background: WheelWizard/macos/backgr.png
+          src_dir: release/WheelWizard.app
+          background: macos/backgr.png
           window_size: 650 376
           icon_size: 128
           icon_position: 200 150
