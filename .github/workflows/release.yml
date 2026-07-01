@@ -120,7 +120,7 @@ jobs:
         id: create-dmg
         uses: L-Super/create-dmg-actions@v1
         with:
-          dmg_name: WheelWizard-${{ github.ref_name }}-macOS-${{ matrix.arch }}
+          dmg_name: WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}
           src_dir: release/WheelWizard.app
           background: macos/backgr.png
           window_size: 650 376
@@ -132,7 +132,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifacts-macos-${{ matrix.arch }}
-          path: ${{ steps.create-dmg.outputs.dmg_path }}
+          path: WheelWizard-macOS${{ matrix.arch == 'arm64' && 'arm64' || 'intel' }}.dmg
           retention-days: 1
 
   # ──────────────────────────────────────────────────────────────
@@ -157,8 +157,8 @@ jobs:
           cp artifacts-linux-windows/WheelWizard_arm64_Linux final-artifacts/
 
           # macOS DMGs
-          cp artifacts-macos-arm64/*.dmg final-artifacts/ 2>/dev/null || true
-          cp artifacts-macos-x64/*.dmg final-artifacts/ 2>/dev/null || true
+          cp artifacts-macos-arm64/WheelWizard-macOSarm64.dmg final-artifacts/ 2>/dev/null || true
+          cp artifacts-macos-x64/WheelWizard-macOSintel.dmg final-artifacts/ 2>/dev/null || true
 
           chmod +x final-artifacts/WheelWizard_Linux final-artifacts/WheelWizard_arm64_Linux 2>/dev/null || true
           ls -la final-artifacts/
