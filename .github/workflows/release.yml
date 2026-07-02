@@ -263,13 +263,13 @@ jobs:
 
     steps:
       - name: Trust Homebrew tap
-        run: brew trust gdmagana/tap
+        run: brew trust TeamWheelWizard/tap
 
       - name: Bump cask version and SHA256
         uses: LanikSJ/homebrew-bump-cask@v1
         with:
           token: ${{ secrets.TAP_TOKEN }}
-          tap: gdmagana/tap
+          tap: TeamWheelWizard/tap
           cask: wheelwizard
           tag: ${{ github.ref }}
           livecheck: false
