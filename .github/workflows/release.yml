@@ -136,6 +136,17 @@ jobs:
         run: |
           echo "sha256=$(shasum -a 256 WheelWizard-macOSarm64.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
 
+      - name: Save SHA256 for tap update
+        run: |
+          echo "${{ steps.sha.outputs.sha256 }}" > sha256-arm64.txt
+
+      - name: Upload SHA256 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sha256-arm64
+          path: sha256-arm64.txt
+          retention-days: 1
+
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4
         with:
@@ -195,6 +206,17 @@ jobs:
         id: sha
         run: |
           echo "sha256=$(shasum -a 256 WheelWizard-macOSintel.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Save SHA256 for tap update
+        run: |
+          echo "${{ steps.sha.outputs.sha256 }}" > sha256-intel.txt
+
+      - name: Upload SHA256 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sha256-intel
+          path: sha256-intel.txt
+          retention-days: 1
 
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4
@@ -258,18 +280,49 @@ jobs:
   # ──────────────────────────────────────────────────────────────
   update-tap:
     name: Update Homebrew Tap
-    needs: [create-release]
-    runs-on: macos-latest
+    needs: [create-release, macos-arm64, macos-x64]
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Trust Homebrew tap
-        run: brew trust TeamWheelWizard/tap
-
-      - name: Bump cask version and SHA256
-        uses: LanikSJ/homebrew-bump-cask@v1
+      - name: Download SHA256 artifacts
+        uses: actions/download-artifact@v4
         with:
+          pattern: sha256-*
+          merge-multiple: true
+
+      - name: Read SHA256 values
+        id: shas
+        run: |
+          echo "arm64=$(cat sha256-arm64.txt)" >> "$GITHUB_OUTPUT"
+          echo "intel=$(cat sha256-intel.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout homebrew-tap repository
+        uses: actions/checkout@v4
+        with:
+          repository: TeamWheelWizard/homebrew-tap
           token: ${{ secrets.TAP_TOKEN }}
-          tap: TeamWheelWizard/tap
-          cask: wheelwizard
-          tag: ${{ github.ref }}
-          livecheck: false
+          path: homebrew-tap
+
+      - name: Update cask with real SHA256 values
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          CASK_FILE="homebrew-tap/Casks/wheelwizard.rb"
+
+          # Replace version
+          sed -i "s/version \".*\"/version \"$VERSION\"/" "$CASK_FILE"
+
+          # Replace SHA256 placeholders with real values
+          sed -i "s/REPLACE_ME_ARM64/${{ steps.shas.outputs.arm64 }}/" "$CASK_FILE"
+          sed -i "s/REPLACE_ME_INTEL/${{ steps.shas.outputs.intel }}/" "$CASK_FILE"
+
+          echo "=== Updated $CASK_FILE ==="
+          cat "$CASK_FILE"
+
+      - name: Commit and push to homebrew-tap
+        run: |
+          cd homebrew-tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/wheelwizard.rb
+          git commit -m "chore: update wheelwizard to v${GITHUB_REF_NAME#v}"
+          git push
