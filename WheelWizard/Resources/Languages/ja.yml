@@ -167,7 +167,9 @@ ja:
     mii_editor: "Miiエディター"
     mii_carousel: "Miiスライダー"
   text:
-    made_by_string: "作成者: {$1} \\nと {$2}"
+    made_by_string: |
+      作成者: {$1}
+      と {$2}
     thanks_translators: "すべての翻訳者さんに感謝します:"
     wh_wz_translation_percentage: "この言語の翻訳は{$1}%完了しています"
     powered_gamebanana: "GameBananaによって提供されています"
@@ -244,7 +246,10 @@ ja:
       extra: "変更の保存を選択しないと、この変更は{$1}で変更前に戻ります"
     dolphin_found:
       title: "Dolphinエミュレーターのフォルダーが見つかりました"
-      extra: "意味がよく分からなければ、「はい」をクリックしてください。\\nDolphinエミュレーターのフォルダーが見つかりました。このフォルダーを使用しますか？"
+      extra: |
+        意味がよく分からなければ、「はい」をクリックしてください。
+
+        Dolphinエミュレーターのフォルダーが見つかりました。このフォルダーを使用しますか？
     new_version_wh_wz:
       title: "Wheel Wizardのアップデートがあります"
       extra: "Wheel Wizardのバージョン{$1} (現在のバージョンは{$2}) が利用できます。すぐにアップデートしますか？"
@@ -260,12 +265,12 @@ ja:
     rr_to_old:
       extra: "Retro Rewindのバージョンが古すぎるため更新できません。Retro Rewindを再インストールしますか？"
       title: "Retro Rewindのバージョンが古すぎます"
-    rr_not_determent:
+    rr_not_determined:
       title: "Retro Rewindをダウンロードする"
       extra: "Retro Rewindのバージョンを判別できませんでした。Retro Rewindを再インストールしますか？"
-    dolphin_flatpack:
+    dolphin_flatpak:
       title: "Dolphin flatpakバージョンのインストール"
-      extra: "Dolphinエミュレーターのflatpakバージョンがインストールされていないようです。システム全体にインストールしますか？"
+      extra: "Dolphinエミュレーターのflatpakバージョンがインストールされていないようです。私たちが（あなたのアカウントのみに）インストールしてもよろしいですか？"
     install_mod:
       title: "Modのダウンロードとインストールを行いますか: {$1}？"
     search_mod: "Modを検索しています..."
@@ -296,8 +301,14 @@ ja:
       extra: "現在アップデートを確認できません。インターネットに接続されていないか、サーバーがダウンしている可能性があります"
     unable_update_wh_wz:
       extra:
-        reason_network: "Wheel Wizardが最新かどうか確認できません。\\nネットワークの問題が発生している可能性があります。"
-        reason_location: "Wheel Wizardが更新できません。アプリが書き込み可能なフォルダーにあることを確認してください。\\n現在のフォルダーが見つかりません。"
+        reason_network: |
+          Wheel Wizardが最新かどうか確認できません。
+
+          ネットワークの問題が発生している可能性があります。
+        reason_location: |
+          Wheel Wizardが更新できません。アプリが書き込み可能なフォルダーにあることを確認してください。
+
+          現在のフォルダーが見つかりません。
       title: "Wheel Wizardのアップデートを無効にする"
     no_connect_server:
       extra: "サーバーに接続できませんでした。後でもう一度試してください。"
@@ -333,7 +344,10 @@ ja:
       extra:
         failed_update_delete: "アップデートファイルの削除に失敗しました。中止しています。"
         failed_update_apply: "アップデートの適用に失敗しました。中止しています。"
-        invalid_file_path: "無効なファイルパスが検知されました。開発者に連絡してください。\\n サーバーエラー:  {$1}"
+        invalid_file_path: |
+          無効なファイルパスが検知されました。開発者に連絡してください。
+
+          サーバーエラー: {$1}
       title: "Retro Rewindのアップデートを中止"
     restart_admin_fail:
       extra: "管理者権限で再起動するのに失敗しました。"

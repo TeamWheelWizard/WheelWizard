@@ -20,7 +20,7 @@ public class SettingsManagerTests
     [Fact]
     public void Get_Throws_WhenRequestedTypeDoesNotMatchSettingType()
     {
-        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+        var manager = CreateManager(new MockFileSystem(), out _, out _);
 
         Assert.Throws<InvalidOperationException>(() => manager.Get<int>(manager.WW_LANGUAGE));
     }
@@ -28,7 +28,7 @@ public class SettingsManagerTests
     [Fact]
     public void Set_Throws_WhenProvidedValueIsNull()
     {
-        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+        var manager = CreateManager(new MockFileSystem(), out _, out _);
 
         Assert.Throws<ArgumentNullException>(() => manager.Set<string>(manager.WW_LANGUAGE, null!));
     }
@@ -36,7 +36,7 @@ public class SettingsManagerTests
     [Fact]
     public void Set_ReturnsFalse_WhenValidationFails()
     {
-        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+        var manager = CreateManager(new MockFileSystem(), out _, out _);
 
         var result = manager.Set(manager.FOCUSED_USER, 99, skipSave: true);
 
@@ -49,7 +49,7 @@ public class SettingsManagerTests
     [InlineData(2.01)]
     public void SavedWindowScale_RejectsValuesOutsideBounds(double scale)
     {
-        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+        var manager = CreateManager(new MockFileSystem(), out _, out _);
 
         var result = manager.Set(manager.SAVED_WINDOW_SCALE, scale, skipSave: true);
 
@@ -62,7 +62,7 @@ public class SettingsManagerTests
     [InlineData(2.01)]
     public void WindowScalePreview_RejectsValuesOutsideBounds(double scale)
     {
-        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+        var manager = CreateManager(new MockFileSystem(), out _, out _);
 
         var result = manager.Set(manager.WINDOW_SCALE, scale, skipSave: true);
 
@@ -73,7 +73,7 @@ public class SettingsManagerTests
     [Fact]
     public void ValidateCorePathSettings_ReturnsAllExpectedIssues_WhenDefaultsAreInvalid()
     {
-        var manager = CreateManager(new RealFileSystem(), out _, out _, out _);
+        var manager = CreateManager(new RealFileSystem(), out _, out _);
 #pragma warning disable CS0618
         SettingsRuntime.Initialize(manager);
 #pragma warning restore CS0618
@@ -91,7 +91,7 @@ public class SettingsManagerTests
     public void PathsSetupCorrectly_ReturnsTrue_WhenCorePathsAreValid()
     {
         var fileSystem = new MockFileSystem();
-        var manager = CreateManager(fileSystem, out _, out _, out _);
+        var manager = CreateManager(fileSystem, out _, out _);
         var userFolderPath = $"/wheelwizard-user-{Guid.NewGuid():N}";
         var gameFilePath = Path.Combine(userFolderPath, "game.iso");
         var dolphinLocation = SettingsTestUtils.GetValidDolphinLocation(fileSystem);
@@ -110,7 +110,7 @@ public class SettingsManagerTests
     [Fact]
     public void LoadSettings_CallsUnderlyingManagersOnlyOnce()
     {
-        var manager = CreateManager(new MockFileSystem(), out var whWzManager, out var dolphinManager, out _);
+        var manager = CreateManager(new MockFileSystem(), out var whWzManager, out var dolphinManager);
 
         manager.LoadSettings();
         manager.LoadSettings();
@@ -122,16 +122,13 @@ public class SettingsManagerTests
     private static SettingsManager CreateManager(
         IFileSystem fileSystem,
         out IWhWzSettingManager whWzSettingManager,
-        out IDolphinSettingManager dolphinSettingManager,
-        out ILinuxDolphinInstaller linuxDolphinInstaller
+        out IDolphinSettingManager dolphinSettingManager
     )
     {
         whWzSettingManager = Substitute.For<IWhWzSettingManager>();
         dolphinSettingManager = Substitute.For<IDolphinSettingManager>();
-        linuxDolphinInstaller = Substitute.For<ILinuxDolphinInstaller>();
-        linuxDolphinInstaller.IsDolphinInstalledInFlatpak().Returns(true);
 
-        return new SettingsManager(whWzSettingManager, dolphinSettingManager, linuxDolphinInstaller, fileSystem);
+        return new SettingsManager(whWzSettingManager, dolphinSettingManager, fileSystem);
     }
 }
 

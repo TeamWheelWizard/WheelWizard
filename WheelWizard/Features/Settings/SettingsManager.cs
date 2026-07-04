@@ -12,7 +12,6 @@ public class SettingsManager : ISettingsManager
 {
     private readonly IWhWzSettingManager _whWzSettingManager;
     private readonly IDolphinSettingManager _dolphinSettingManager;
-    private readonly ILinuxDolphinInstaller _linuxDolphinInstaller;
     private readonly IFileSystem _fileSystem;
 
     private readonly Setting _dolphinCompilationMode;
@@ -27,13 +26,11 @@ public class SettingsManager : ISettingsManager
     public SettingsManager(
         IWhWzSettingManager whWzSettingManager,
         IDolphinSettingManager dolphinSettingManager,
-        ILinuxDolphinInstaller linuxDolphinInstaller,
         IFileSystem fileSystem
     )
     {
         _whWzSettingManager = whWzSettingManager;
         _dolphinSettingManager = dolphinSettingManager;
-        _linuxDolphinInstaller = linuxDolphinInstaller;
         _fileSystem = fileSystem;
 
         #region WhWz settings
@@ -48,12 +45,6 @@ public class SettingsManager : ISettingsManager
 
                 if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
                 {
-                    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                        return EnvHelper.IsValidUnixCommand(pathOrCommand);
-
-                    if (PathManager.IsFlatpakDolphinFilePath(pathOrCommand) && !_linuxDolphinInstaller.IsDolphinInstalledInFlatpak())
-                        return false;
-
                     return EnvHelper.IsValidUnixCommand(pathOrCommand);
                 }
 
@@ -99,7 +90,7 @@ public class SettingsManager : ISettingsManager
                     return false;
 
                 // `~/.dolphin-emu` would be used if it exists
-                if (!PathManager.IsFlatpakDolphinFilePath() && _fileSystem.Directory.Exists(PathManager.LinuxDolphinLegacyFolderPath))
+                if (!PathManager.IsFlatpakDolphinFilePath(dolphinLocation) && _fileSystem.Directory.Exists(PathManager.LinuxDolphinLegacyFolderPath))
                     return false;
 
                 return true;
