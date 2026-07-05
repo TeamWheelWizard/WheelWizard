@@ -87,7 +87,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
         }
 
         var metadata = result.Value.MetaData;
-        var newMods = result.Value.Records.Where(mod => mod.ModelName == "Mod").ToList();
+        var newMods = result.Value.Records.Where(mod => mod.ModelName == "Mod" && !mod.HasContentRatings).ToList();
 
         foreach (var mod in newMods)
         {
