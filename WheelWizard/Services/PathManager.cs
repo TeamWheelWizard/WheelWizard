@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Serilog;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
 #if WINDOWS
@@ -603,7 +604,7 @@ public static class PathManager
     {
         get
         {
-            if (IsFlatpakDolphinFilePath())
+            if (IsFlatpakDolphinFilePath(DolphinFilePath))
             {
                 if (LinuxDolphinFlatpakDataDir.Equals(Path.GetFullPath(UserFolderPath), StringComparison.Ordinal))
                     return LinuxDolphinFlatpakConfigDir;
@@ -675,28 +676,9 @@ public static class PathManager
             // Prioritize Flatpak Dolphin installation if no file path has been saved yet, so return true
             return true;
         }
+        // Because we need this prefix for the permission workarounds, we just expect it to start with "flatpak run"
         var flatpakRunCommand = "flatpak run";
-        var dolphinAppId = "org.DolphinEmu.dolphin-emu";
-        string[] possibleFlatpakDolphinCommands =
-        [
-            $"{flatpakRunCommand} {dolphinAppId}",
-            $"{flatpakRunCommand} --system {dolphinAppId}",
-            $"{flatpakRunCommand} --user {dolphinAppId}",
-            $"{flatpakRunCommand} -p {dolphinAppId}",
-            $"{flatpakRunCommand} --system -p {dolphinAppId}",
-            $"{flatpakRunCommand} --user -p {dolphinAppId}",
-        ];
-        foreach (var possibleFlatpakDolphinCommand in possibleFlatpakDolphinCommands)
-        {
-            if (possibleFlatpakDolphinCommand.Equals(filePath, StringComparison.Ordinal))
-                return true;
-        }
-        return false;
-    }
-
-    public static bool IsFlatpakDolphinFilePath()
-    {
-        return IsFlatpakDolphinFilePath(DolphinFilePath);
+        return filePath.StartsWith(flatpakRunCommand, StringComparison.Ordinal);
     }
 
     private static string GetContainingBaseDirectorySafe(string path)
@@ -849,7 +831,9 @@ public static class PathManager
         return null;
     }
 
-    public static string? TryFindUserFolderPath()
+    public static string? TryFindUserFolderPath() => TryFindUserFolderPath(DolphinFilePath);
+
+    public static string? TryFindUserFolderPath(string dolphinFilePath)
     {
         var portableUserFolderPath = TryFindPortableUserFolderPath();
         if (!string.IsNullOrWhiteSpace(portableUserFolderPath))
@@ -880,7 +864,7 @@ public static class PathManager
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            if (IsFlatpakDolphinFilePath())
+            if (IsFlatpakDolphinFilePath(dolphinFilePath))
             {
                 return TryFindLinuxFlatpakUserFolderPath();
             }

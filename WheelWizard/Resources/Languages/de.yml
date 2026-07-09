@@ -167,7 +167,9 @@ de:
     mii_editor: "Mii Maker"
     mii_carousel: "Mii Preview"
   text:
-    made_by_string: "Erstellt von: {$1} \\n und {$2}"
+    made_by_string: |
+      Erstellt von: {$1}
+      und {$2}
     thanks_translators: "Vielen Dank an alle Übersetzer:"
     wh_wz_translation_percentage: "Übersetzungen für diese Sprache sind {$1}% abgeschlossen"
     powered_gamebanana: "Von GameBanana unterstützt"
@@ -242,10 +244,24 @@ de:
       extra: "Diese Änderung wird in {$1} zurückgesetzt, außer du wendest die Änderung an."
     move_data:
       title: "Wheel Wizard Daten verschieben?"
-      extra: "Wheel Wizard wird seine Datein nach\\n{$1}\\nverschieben. Das könnte eine Weile dauern."
+      extra: |
+        Wheel Wizard wird seine Dateien nach
+
+        {$1}
+
+        verschieben. Das könnte eine Weile dauern.
     dolphin_found:
       title: "Dolphin Emulator Ordner gefunden"
-      extra: "Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :) \\nDolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?"
+      extra: |
+        Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
+
+        Dolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?
+    dolphin_program_found:
+      title: "Dolphin Emulator gefunden"
+      extra: |
+        Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
+
+        Dolphin Emulator gefunden. Möchtest du Folgendes verwenden?
     new_version_wh_wz:
       title: "Wheel Wizard Update verfügbar"
       extra: "Version {$1} von Wheel Wizard ist verfügbar (derzeit für {$2}). Möchtest du jetzt updaten?"
@@ -261,12 +277,12 @@ de:
     rr_to_old:
       extra: "Deine Version von Retro Rewind ist zu alt zum Aktualisieren. Möchtest du Retro Rewind neu installieren?"
       title: "Retro Rewind-Version ist zu alt."
-    rr_not_determent:
+    rr_not_determined:
       title: "Installiere Retro Rewind"
       extra: "Deine Version von Retro Rewind konnte nicht ermittelt werden. Möchtest du Retro Rewind herunterladen?"
-    dolphin_flatpack:
+    dolphin_flatpak:
       title: "Dolphin Flatpak Installation"
-      extra: "Die Flatpak Dolphin Version scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (ganzes System)?"
+      extra: "Die Flatpak Dolphin Version scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (für deinen eigenen Benutzer)?"
     install_mod:
       title: "Du bist dabei das Spiel ohne Mods zu starten. Möchtest du deinen My-Stuff Ordner leeren?"
     search_mod: "Nach Mods suchen..."
@@ -301,8 +317,14 @@ de:
       extra: "Es ist nicht möglich gerade nach Updates zu suchen. Du bist vielleicht nicht mit dem Internet verbunden oder der Server hat gerade Schwierigkeiten."
     unable_update_wh_wz:
       extra:
-        reason_network: "Es kann nicht überprüft werden, ob Wheel Wizard auf dem neuesten Stand ist. \\nMöglicherweise treten derzeit Netzwerkprobleme auf."
-        reason_location: "Wheel Wizard kann nicht aktualisiert werden. Bitte stelle sicher, dass sich die Anwendung in einem Ordner befindet, in den geschrieben werden kann.\\n Der aktuelle Ordner konnte nicht gefunden werden."
+        reason_network: |
+          Es kann nicht überprüft werden, ob Wheel Wizard auf dem neuesten Stand ist.
+
+          Möglicherweise treten derzeit Netzwerkprobleme auf.
+        reason_location: |
+          Wheel Wizard kann nicht aktualisiert werden. Bitte stelle sicher, dass sich die Anwendung in einem Ordner befindet, in den geschrieben werden kann.
+
+          Der aktuelle Ordner konnte nicht gefunden werden.
       title: "Wheel Wizard konnte nicht aktualisiert werden."
     no_connect_server:
       extra: "Es konnte keine Verbindung zum Server hergestellt werden. Bitte versuche es später noch einmal."
@@ -340,7 +362,10 @@ de:
       extra:
         failed_update_delete: "Dateien für das Update konnten nicht gelöscht werden. Abbruch."
         failed_update_apply: "Das Update konnte nicht installiert werden. Abbruch."
-        invalid_file_path: "Ungültiger Dateipfad wurde erkannt. Bitte kontaktiere die Entwickler. \\n Server-Fehler: {$1}"
+        invalid_file_path: |
+          Ungültiger Dateipfad wurde erkannt. Bitte kontaktiere die Entwickler.
+
+          Server-Fehler: {$1}
       title: "Über das RR Update"
     restart_admin_fail:
       extra: "Neustart mit Admin-Rechten fehlgeschlagen."
@@ -365,7 +390,10 @@ de:
       title: "Einstellungen erfolgreich gespeichert!"
     data_folder_moved:
       title: "Datenordner aktualisiert."
-      extra: "Wheel WIzard's Daten sind jetzt gespeichert in:\\n{$1}"
+      extra: |
+        Wheel Wizard's Daten sind jetzt gespeichert in:
+
+        {$1}
     rr_up_to_date:
       title: "Retro Rewind ist auf dem neuesten Stand."
     mii_changed: "Mii erfolgreich geändert."

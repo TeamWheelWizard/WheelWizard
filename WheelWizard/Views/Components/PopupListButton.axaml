@@ -59,7 +59,7 @@
                              HorizontalAlignment="Left" VerticalAlignment="Center"
                              Margin="10,0,10,0" />
               
-              <components:IconLabel x:Name="PART_ArrowIcon" IconSize="20" FontSize="0"
+              <components:IconLabel x:Name="PART_ArrowIcon" IconSize="20"
                                     IsVisible="False"
                                     IconData="{StaticResource ArrowRight}"
                                     Foreground="{TemplateBinding Foreground}"

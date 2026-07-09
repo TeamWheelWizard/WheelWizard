@@ -5,6 +5,7 @@ namespace WheelWizard.DolphinInstaller;
 
 public interface ILinuxProcessService
 {
+    OperationResult<int> Run(string fileName, string arguments, out string stdOut, out string stdErr);
     OperationResult<int> Run(string fileName, string arguments);
     Task<OperationResult<int>> RunWithProgressAsync(string fileName, string arguments, IProgress<int>? progress = null);
     Task<OperationResult> LaunchAndStopAsync(string fileName, string arguments, TimeSpan duration);
@@ -12,9 +13,11 @@ public interface ILinuxProcessService
 
 public sealed class LinuxProcessService : ILinuxProcessService
 {
-    public OperationResult<int> Run(string fileName, string arguments)
+    public OperationResult<int> Run(string fileName, string arguments, out string stdOut, out string stdErr)
     {
-        return TryCatch(
+        var localStdOut = "";
+        var localStdErr = "";
+        var result = TryCatch(
             () =>
             {
                 var processInfo = new ProcessStartInfo
@@ -31,11 +34,22 @@ public sealed class LinuxProcessService : ILinuxProcessService
                 if (process == null)
                     return -1;
 
+                localStdOut = process.StandardOutput.ReadToEnd();
+                localStdErr = process.StandardError.ReadToEnd();
                 process.WaitForExit();
                 return process.ExitCode;
             },
             $"Failed to run process: {fileName} {arguments}"
         );
+
+        stdOut = localStdOut;
+        stdErr = localStdErr;
+        return result;
+    }
+
+    public OperationResult<int> Run(string fileName, string arguments)
+    {
+        return Run(fileName, arguments, out _, out _);
     }
 
     public async Task<OperationResult<int>> RunWithProgressAsync(string fileName, string arguments, IProgress<int>? progress = null)

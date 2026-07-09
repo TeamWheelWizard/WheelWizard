@@ -161,7 +161,9 @@ cs:
     rooms: "Místnosti"
     miis: "Miiy"
   text:
-    made_by_string: "Vytvořili: {$1} \\n a {$2}"
+    made_by_string: |
+      Vytvořili: {$1}
+      a {$2}
     thanks_translators: "Díky moc všem překladatelům:"
     wh_wz_translation_percentage: "Překlady pro tento jazyk jsou z {$1}% kompletní"
     powered_gamebanana: "Poháněno společností GameBanana"
@@ -241,10 +243,10 @@ cs:
     rr_to_old:
       extra: "Tvoje verze Retro Rewind je moc stará na aktualizaci. Chtěl bys znovu nainstalovat Retro Rewind?"
       title: "Verze Retro Rewind je moc stará."
-    rr_not_determent:
+    rr_not_determined:
       title: "Stáhnout Retro Rewind"
       extra: "Tvojí verzi Retro Rewind se nepodařilo určit. Chtěl bys si stáhnout Retro Rewind?"
-    dolphin_flatpack:
+    dolphin_flatpak:
       title: "Instalace Dolphin Flatpak"
     install_mod:
       title: "Chceš stáhnout a nainstalovat mod: {$1}?"

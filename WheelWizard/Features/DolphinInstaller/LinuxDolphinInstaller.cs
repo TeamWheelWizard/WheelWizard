@@ -3,6 +3,7 @@ namespace WheelWizard.DolphinInstaller;
 public interface ILinuxDolphinInstaller
 {
     bool IsDolphinInstalledInFlatpak();
+    bool IsDolphinInstalledNative();
     bool IsFlatpakInstalled();
     Task<OperationResult> InstallFlatpak(IProgress<int>? progress = null);
     Task<OperationResult> InstallFlatpakDolphin(IProgress<int>? progress = null);
@@ -13,7 +14,21 @@ public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnviro
 {
     public bool IsDolphinInstalledInFlatpak()
     {
-        var processResult = processService.Run("flatpak", "info org.DolphinEmu.dolphin-emu");
+        const string dolphinAppId = "org.DolphinEmu.dolphin-emu";
+        var processResult = processService.Run("flatpak", "list --app --columns=application", out var stdOut, out _);
+
+        return processResult.IsSuccess && processResult.Value == 0 && stdOut
+                .Split('\n')
+                .Any(line => line == dolphinAppId);
+    }
+
+    public bool IsDolphinInstalledNative()
+    {
+        if (!commandEnvironment.IsCommandAvailable("dolphin-emu"))
+        {
+            return false;
+        }
+        var processResult = processService.Run("dolphin-emu", "--version");
         return processResult.IsSuccess && processResult.Value == 0;
     }
 
@@ -56,16 +71,33 @@ public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnviro
                 return installFlatpakResult;
         }
 
+        var addRemoteResult = processService.Run(
+            "flatpak",
+            "remote-add --if-not-exists --user dolphin https://flatpak.dolphin-emu.org/releases.flatpakrepo"
+        );
+        if (addRemoteResult.IsFailure)
+            return addRemoteResult.Error;
+
+        if (addRemoteResult.Value != 0)
+            return Fail($"Adding the Dolphin Flatpak remote failed with exit code {addRemoteResult.Value}.");
+
+        addRemoteResult = processService.Run(
+            "flatpak",
+            "remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo"
+        );
+        if (addRemoteResult.IsFailure)
+            return addRemoteResult.Error;
+
+        if (addRemoteResult.Value != 0)
+            return Fail($"Adding the Flathub Flatpak remote failed with exit code {addRemoteResult.Value}.");
+
         var installDolphinResult = await processService.RunWithProgressAsync(
-            "pkexec",
-            "flatpak --system install -y org.DolphinEmu.dolphin-emu",
+            "flatpak",
+            "install --user -y dolphin org.DolphinEmu.dolphin-emu",
             progress
         );
         if (installDolphinResult.IsFailure)
             return installDolphinResult.Error;
-
-        if (installDolphinResult.Value is 126 or 127)
-            return Fail("You need to be an administrator to install Dolphin via Flatpak.");
 
         if (installDolphinResult.Value != 0)
             return Fail($"Dolphin installation failed with exit code {installDolphinResult.Value}.");

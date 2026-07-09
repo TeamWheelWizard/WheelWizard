@@ -148,17 +148,35 @@ public partial class WhWzSettings : UserControlBase
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            if (IsFlatpakDolphinInstalled() && DolphinExeInput.Text == "")
+            // Made this more extensible for future support for e.g. snap
+            var dolphinPaths = new (Func<bool> IsInstalled, string Path)[]
             {
-                DolphinExeInput.Text = "flatpak run org.DolphinEmu.dolphin-emu";
-                return;
+                (IsFlatpakDolphinInstalled, "flatpak run org.DolphinEmu.dolphin-emu"),
+                (IsNativeDolphinInstalled, "dolphin-emu"),
+            };
+
+            foreach (var (isInstalled, path) in dolphinPaths)
+            {
+                if (isInstalled())
+                {
+                    var result = await new YesNoWindow()
+                        .SetMainText(t("question.dolphin_program_found.title"))
+                        .SetExtraText($"{t("question.dolphin_program_found.extra")}\n{path}")
+                        .AwaitAnswer();
+
+                    if (result)
+                    {
+                        DolphinExeInput.Text = path;
+                        return;
+                    }
+                }
             }
 
-            if (!EnvHelper.IsFlatpakSandboxed() && !IsFlatpakDolphinInstalled())
+            if (!IsFlatpakDolphinInstalled())
             {
                 var wantsAutomaticInstall = await new YesNoWindow()
-                    .SetMainText(t("question.dolphin_flatpack.title"))
-                    .SetExtraText(t("question.dolphin_flatpack.extra"))
+                    .SetMainText(t("question.dolphin_flatpak.title"))
+                    .SetExtraText(t("question.dolphin_flatpak.extra"))
                     .SetButtonText(t("action.install"), t("action.do_manually"))
                     .AwaitAnswer();
                 if (wantsAutomaticInstall)
@@ -185,6 +203,12 @@ public partial class WhWzSettings : UserControlBase
                     return;
                 }
             }
+        }
+
+        if (EnvHelper.IsFlatpakSandboxed())
+        {
+            // Having a picker does not make sense if Wheel Wizard is sandboxed.
+            return;
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -249,6 +273,11 @@ public partial class WhWzSettings : UserControlBase
         return LinuxDolphinInstallerService.IsDolphinInstalledInFlatpak();
     }
 
+    private bool IsNativeDolphinInstalled()
+    {
+        return LinuxDolphinInstallerService.IsDolphinInstalledNative();
+    }
+
     private async void GameLocationBrowse_OnClick(object sender, RoutedEventArgs e)
     {
         var fileType = new FilePickerFileType("Game files") { Patterns = ["*.iso", "*.wbfs", "*.rvz"] };
@@ -262,8 +291,13 @@ public partial class WhWzSettings : UserControlBase
 
     private async void DolphinUserPathBrowse_OnClick(object sender, RoutedEventArgs e)
     {
-        // Attempt to find Dolphin's default path if no valid folder is set
-        var folderPath = PathManager.TryFindUserFolderPath();
+        // Detect Data folder based on the Dolphin path currently in the input field
+        // (which may have been edited but not yet saved)
+        var currentDolphinPath = DolphinExeInput.Text;
+        var folderPath = string.IsNullOrWhiteSpace(currentDolphinPath)
+            ? PathManager.TryFindUserFolderPath()
+            : PathManager.TryFindUserFolderPath(currentDolphinPath);
+
         if (!string.IsNullOrEmpty(folderPath))
         {
             // Ask the user if they want to use the automatically found folder

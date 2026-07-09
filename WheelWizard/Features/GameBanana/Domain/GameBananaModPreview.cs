@@ -25,6 +25,9 @@ public class GameBananaModPreview
     [JsonPropertyName("_aPreviewMedia")]
     public required GameBananaPreviewMedia PreviewMedia { get; set; }
 
+    [JsonPropertyName("_bHasContentRatings")]
+    public required bool HasContentRatings { get; set; }
+
     [JsonPropertyName("_nLikeCount")]
     public int LikeCount { get; set; }
 

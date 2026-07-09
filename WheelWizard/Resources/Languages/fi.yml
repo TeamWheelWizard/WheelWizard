@@ -167,7 +167,9 @@ fi:
     mii_editor: "Mii-editori"
     mii_carousel: "Miin katselu"
   text:
-    made_by_string: "Tehnyt: {$1}\\n ja {$2}"
+    made_by_string: |
+      Tehnyt: {$1}
+      ja {$2}
     thanks_translators: "Suuret kiitokset kaikille kääntäjille:"
     wh_wz_translation_percentage: "Tämän kielen käännökset ovat {$1} % valmiita."
     powered_gamebanana: "Palvelun tarjoaa GameBanana"
@@ -244,7 +246,10 @@ fi:
       extra: "Muutos perutaan {$1} kuluttua, ellet aio pitää muutosta."
     dolphin_found:
       title: "Dolphin-emulaattorin kansio löytyi"
-      extra: "Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä' :)\\nDolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?"
+      extra: |
+        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä' :)
+
+        Dolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?
     new_version_wh_wz:
       title: "Wheel Wizard -päivitys saatavilla"
       extra: "Wheel Wizardin versio {$1} on saatavilla (nykyinen versio: {$2}). Haluatko päivittää heti?"
@@ -260,14 +265,14 @@ fi:
     rr_to_old:
       extra: |-
         Retro Rewind -versiosi on liian vanha päivittämiseen. Haluatko asentaa Retro Rewindin uudelleen?
-        
+
       title: "Retro Rewind -versio on liian vanha."
-    rr_not_determent:
+    rr_not_determined:
       title: "Lataa Retro Rewind"
       extra: "Retro Rewind -versiotasi ei voitu määrittää. Haluatko ladata Retro Rewindin?"
-    dolphin_flatpack:
+    dolphin_flatpak:
       title: "Dolphin Flatpakin asennus"
-      extra: "Dolphin-emulaattorin Flatpak-versio ei näytä olevan asennettuna. Haluatko, että asennamme sen järjestelmällesi?"
+      extra: "Dolphin-emulaattorin Flatpak-versio ei näytä olevan asennettuna. Haluatko, että asennamme sen vain omalle käyttäjätilillesi?"
     install_mod:
       title: "Haluatko ladata ja asentaa modin: {$1}?"
     search_mod: "Haetaan modeja..."
@@ -296,8 +301,14 @@ fi:
       extra: "Päivityksiä ei voi tarkistaa juuri nyt. Internet-yhteyttä ei ole tai palvelimessa on ongelma."
     unable_update_wh_wz:
       extra:
-        reason_network: "Ei voitu tarkistaa, onko Wheel Wizard ajan tasalla.\\nSyynä saattaa olla verkkoyhteysongelmat."
-        reason_location: "Wheel Wizardia ei voi päivittää. Varmista, että sovellus sijaitsee kansiossa, johon voi kirjoittaa tietoja.\\nNykyistä kansiota ei löytynyt."
+        reason_network: |
+          Ei voitu tarkistaa, onko Wheel Wizard ajan tasalla.
+
+          Syynä saattaa olla verkkoyhteysongelmat.
+        reason_location: |
+          Wheel Wizardia ei voi päivittää. Varmista, että sovellus sijaitsee kansiossa, johon voi kirjoittaa tietoja.
+
+          Nykyistä kansiota ei löytynyt.
       title: "Wheel Wizardia ei voi päivittää."
     no_connect_server:
       extra: "Yhdistäminen palvelimelle epäonnistui. Yritä myöhemmin uudelleen."
@@ -333,7 +344,10 @@ fi:
       extra:
         failed_update_delete: "Tiedostojen poistaminen päivitystä varten epäonnistui. Perutaan."
         failed_update_apply: "Päivityksen käyttöönotto epäonnistui. Perutaan."
-        invalid_file_path: "Virheellinen polku. Ota yhteyttä kehittäjiin.\\n Palvelinvirhe: {$1}"
+        invalid_file_path: |
+          Virheellinen polku. Ota yhteyttä kehittäjiin.
+
+          Palvelinvirhe: {$1}
       title: "Perutaan RR-päivitys"
     restart_admin_fail:
       extra: "Käynnistäminen järjestelmänvalvojan oikeuksilla epäonnistui."

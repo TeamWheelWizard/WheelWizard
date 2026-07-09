@@ -15,7 +15,7 @@ public static class Endpoints
     /// <summary>
     /// The base address for accessing the GameBanana API
     /// </summary>
-    public const string GameBananaBaseAddress = "https://gamebanana.com/apiv11";
+    public const string GameBananaBaseAddress = "https://gamebanana.com/apiv12";
 
     /// <summary>
     /// The address for the GitHub API
@@ -48,7 +48,4 @@ public static class Endpoints
 
     // Other
     public const string MiiChannelWAD = "-";
-
-    //GameBanana
-    public const string GameBananaBaseUrl = "https://gamebanana.com/apiv11";
 }
