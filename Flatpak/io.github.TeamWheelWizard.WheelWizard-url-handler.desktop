@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Icon=io.github.TeamWheelWizard.WheelWizard
+Exec=WheelWizard %U
+Terminal=false
+NoDisplay=true
+StartupNotify=true
+Type=Application
+Categories=Game;
+StartupWMClass=WheelWizard
+MimeType=x-scheme-handler/wheelwizard;
+Name=Wheel Wizard – URL Handler
+GenericName=Mario Kart Wii Mod Manager
+Comment=Mario Kart Wii Mod Manager & Retro Rewind Auto Updater
