@@ -137,12 +137,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     private void UpdateMadeByText()
     {
         var completeString = t("text.made_by_string", "Patchzy", "WantToBeeMe");
-        if (!completeString.Contains("\\n"))
-            return;
-
-        var split = completeString.Split("\\n");
-        MadeBy_Part1.Text = split[0];
-        MadeBy_Part2.Text = split[1];
+        MadeBy.Text = completeString;
     }
 
     private void ModManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

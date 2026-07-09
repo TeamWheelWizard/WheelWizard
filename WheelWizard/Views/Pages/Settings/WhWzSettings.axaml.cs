@@ -160,8 +160,8 @@ public partial class WhWzSettings : UserControlBase
                 if (isInstalled())
                 {
                     var result = await new YesNoWindow()
-                        .SetMainText(t("question.dolphin_found.title"))
-                        .SetExtraText($"{t("question.dolphin_found.extra")}\n{path}")
+                        .SetMainText(t("question.dolphin_program_found.title"))
+                        .SetExtraText($"{t("question.dolphin_program_found.extra")}\n{path}")
                         .AwaitAnswer();
 
                     if (result)
@@ -172,11 +172,11 @@ public partial class WhWzSettings : UserControlBase
                 }
             }
 
-            if (!EnvHelper.IsFlatpakSandboxed() && !IsFlatpakDolphinInstalled())
+            if (!IsFlatpakDolphinInstalled())
             {
                 var wantsAutomaticInstall = await new YesNoWindow()
-                    .SetMainText(t("question.dolphin_flatpack.title"))
-                    .SetExtraText(t("question.dolphin_flatpack.extra"))
+                    .SetMainText(t("question.dolphin_flatpak.title"))
+                    .SetExtraText(t("question.dolphin_flatpak.extra"))
                     .SetButtonText(t("action.install"), t("action.do_manually"))
                     .AwaitAnswer();
                 if (wantsAutomaticInstall)
@@ -203,6 +203,12 @@ public partial class WhWzSettings : UserControlBase
                     return;
                 }
             }
+        }
+
+        if (EnvHelper.IsFlatpakSandboxed())
+        {
+            // Having a picker does not make sense if Wheel Wizard is sandboxed.
+            return;
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))

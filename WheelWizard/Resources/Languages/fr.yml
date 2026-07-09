@@ -167,7 +167,9 @@ fr:
     mii_editor: "Éditeur de Mii"
     mii_carousel: "Vue d'ensemble du Mii"
   text:
-    made_by_string: "Fait par: {$1} \\n et {$2}"
+    made_by_string: |
+      Fait par: {$1}
+      et {$2}
     thanks_translators: "Merci à tous les traducteurs:"
     wh_wz_translation_percentage: "La traduction pour cette langue est fini à {$1}%"
     powered_gamebanana: "Contribué par GameBanana"
@@ -244,7 +246,10 @@ fr:
       extra: "Cette modification va être rétablie dans {$1} sauf si vous choisissez de garder cette modification."
     dolphin_found:
       title: "Dossier Dolphin Emulator trouvé"
-      extra: "Si vous ne savez pas ce que tous cela veut dire, juste cliquez sur oui :) \\nDossier Dolphin Emulator trouvé. Voulez-vous utilser ce dossier ? "
+      extra: |
+        Si vous ne savez pas ce que tous cela veut dire, juste cliquez sur oui :)
+
+        Dossier Dolphin Emulator trouvé. Voulez-vous utilser ce dossier ?
     new_version_wh_wz:
       title: "Mise à jour Wheel Wizard disponible !"
       extra: "La version {$1} de Wheel Wizard est disponible (Version actuelle: {$2}). Voulez-vous mettre à jour maintenant ? "
@@ -262,12 +267,12 @@ fr:
         Votre version de Retro Rewind est trop vieille pour être mis à jour.
         Voulez-vous réinstaller Retro Rewind ? 
       title: "Votre version de Retro Rewind est trop vieille."
-    rr_not_determent:
+    rr_not_determined:
       title: "Télécharger Retro Rewind "
       extra: |-
         Votre version de Retro Rewind n'a pas pu être déterminée.
         Voulez-vous installer Retro Rewind ? 
-    dolphin_flatpack:
+    dolphin_flatpak:
       title: "Installation de Dolphin Flatpak..."
       extra: "La version Flatpak de Dolphin Emulator ne semble pas être installée. Veuillez-vous qu'on vous l'installe ?"
     install_mod:
@@ -298,8 +303,14 @@ fr:
       extra: "Impossibilité de vérifier les mises à jour actuellement. Vous n'êtes probablement pas connecté à internet ou le serveur est probablement en maintenance"
     unable_update_wh_wz:
       extra:
-        reason_network: "Impossible de vérifier si Wheel Wizard est mis à jour. \\nVous pourrez expérimenter des problèmes d'internet."
-        reason_location: "Impossible de mettre à jour Wheel Wizard. Veuillez bien vérifier que l'application se trouve dans un dossier qui peut être écrit. \\n N'a pas pu trouver le dossier actuel."
+        reason_network: |
+          Impossible de vérifier si Wheel Wizard est mis à jour.
+
+          Vous pourrez expérimenter des problèmes d'internet.
+        reason_location: |
+          Impossible de mettre à jour Wheel Wizard. Veuillez bien vérifier que l'application se trouve dans un dossier qui peut être écrit.
+
+          N'a pas pu trouver le dossier actuel.
       title: "Impossible de mettre à jour Wheel Wizard.   "
     no_connect_server:
       extra: "N'a pas pu de se connecter au serveur. Veuillez réessayer plus tard."
@@ -335,7 +346,10 @@ fr:
       extra:
         failed_update_delete: "Échec de la désinstallation de fichiers pour la mise à jour. Annulation"
         failed_update_apply: "Échec d'application de la mise à jour. Annulation."
-        invalid_file_path: "Chemin vers un fichier incorrect. Veuillez contacter les développeurs de Wheel Wizard.\\n Erreur Serveur:  {$1}"
+        invalid_file_path: |
+          Chemin vers un fichier incorrect. Veuillez contacter les développeurs de Wheel Wizard.
+
+          Erreur Serveur: {$1}
       title: "Anuller la mise à jour de RR"
     restart_admin_fail:
       extra: "Échec du redémarrage avec les droits d'administrateur."

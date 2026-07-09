@@ -56,7 +56,7 @@
                                          x:Name="ContentArea"
                                          Margin="{StaticResource EdgeGap}" />
         </Grid>
-        
+
         <!-- Sidebar -->
         <Grid Grid.Column="0" Grid.Row="3"
               Height="60"
@@ -219,8 +219,7 @@
                             <MenuItem.Header>
                                 <StackPanel MinWidth="104"
                                             HorizontalAlignment="Left">
-                                    <TextBlock Classes="TinyText" x:Name="MadeBy_Part1" Text="Made by: Patchzy" HorizontalAlignment="Left" TextAlignment="Left" />
-                                    <TextBlock Classes="TinyText" x:Name="MadeBy_Part2" Text="And WantToBeeMe" HorizontalAlignment="Left" TextAlignment="Left" />
+                                    <TextBlock Classes="TinyText" x:Name="MadeBy" Text="Made by: Patchzy\nand WantToBeeMe" HorizontalAlignment="Left" TextAlignment="Left" />
                                 </StackPanel>
                             </MenuItem.Header>
                         </MenuItem>

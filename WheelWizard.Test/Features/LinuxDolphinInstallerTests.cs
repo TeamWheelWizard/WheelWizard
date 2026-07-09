@@ -17,9 +17,9 @@ public class LinuxDolphinInstallerTests
     }
 
     [Fact]
-    public void IsDolphinInstalledInFlatpak_ReturnsTrue_WhenFlatpakInfoExitCodeIsZero()
+    public void IsDolphinInstalledInFlatpak_ReturnsTrue_WhenFlatpakListHasDolphin()
     {
-        _processService.Run("flatpak", "info org.DolphinEmu.dolphin-emu").Returns(Ok(0));
+        _processService.Run("flatpak", "list --app --columns=application", out var stdOut, out _).Returns(Ok(0)).AndDoes(callInfo => callInfo[2] = "Application ID\norg.DolphinEmu.dolphin-emu\n");
 
         var result = _installer.IsDolphinInstalledInFlatpak();
 
@@ -27,9 +27,19 @@ public class LinuxDolphinInstallerTests
     }
 
     [Fact]
-    public void IsDolphinInstalledInFlatpak_ReturnsFalse_WhenFlatpakInfoExitCodeIsNonZero()
+    public void IsDolphinInstalledInFlatpak_ReturnsFalse_WhenFlatpakListHasNoDolphin()
     {
-        _processService.Run("flatpak", "info org.DolphinEmu.dolphin-emu").Returns(Ok(1));
+        _processService.Run("flatpak", "list --app --columns=application", out var stdOut, out _).Returns(Ok(0)).AndDoes(callInfo => callInfo[2] = "Application ID\n");
+
+        var result = _installer.IsDolphinInstalledInFlatpak();
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsDolphinInstalledInFlatpak_ReturnsFalse_WhenFlatpakListFails()
+    {
+        _processService.Run("flatpak", "list --app --columns=application", out _, out _).Returns(Ok(1));
 
         var result = _installer.IsDolphinInstalledInFlatpak();
 
@@ -78,12 +88,52 @@ public class LinuxDolphinInstallerTests
     }
 
     [Fact]
+    public async Task InstallFlatpakDolphin_ReturnsFailure_WhenDolphinRemoteCommandFails()
+    {
+        _commandEnvironment.IsCommandAvailable("flatpak").Returns(true);
+        _processService
+            .Run("flatpak", "remote-add --if-not-exists --user dolphin https://flatpak.dolphin-emu.org/releases.flatpakrepo")
+            .Returns(Ok(1));
+        _processService
+            .Run("flatpak", "remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo")
+            .Returns(Ok(0));
+
+        var result = await _installer.InstallFlatpakDolphin();
+
+        Assert.True(result.IsFailure);
+        Assert.Contains("exit code 1", result.Error.Message);
+    }
+
+    [Fact]
+    public async Task InstallFlatpakDolphin_ReturnsFailure_WhenFlathubRemoteCommandFails()
+    {
+        _commandEnvironment.IsCommandAvailable("flatpak").Returns(true);
+        _processService
+            .Run("flatpak", "remote-add --if-not-exists --user dolphin https://flatpak.dolphin-emu.org/releases.flatpakrepo")
+            .Returns(Ok(0));
+        _processService
+            .Run("flatpak", "remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo")
+            .Returns(Ok(1));
+
+        var result = await _installer.InstallFlatpakDolphin();
+
+        Assert.True(result.IsFailure);
+        Assert.Contains("exit code 1", result.Error.Message);
+    }
+
+    [Fact]
     public async Task InstallFlatpakDolphin_ReturnsFailure_WhenDolphinInstallCommandFails()
     {
         _commandEnvironment.IsCommandAvailable("flatpak").Returns(true);
         _processService
-            .RunWithProgressAsync("pkexec", "flatpak --system install -y org.DolphinEmu.dolphin-emu", Arg.Any<IProgress<int>?>())
-            .Returns(Task.FromResult<OperationResult<int>>(Ok(1)));
+            .Run("flatpak", "remote-add --if-not-exists --user dolphin https://flatpak.dolphin-emu.org/releases.flatpakrepo")
+            .Returns(Ok(0));
+        _processService
+            .Run("flatpak", "remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo")
+            .Returns(Ok(0));
+        _processService
+            .RunWithProgressAsync("flatpak", "install --user -y dolphin org.DolphinEmu.dolphin-emu", Arg.Any<IProgress<int>?>())
+            .Returns(Task.FromResult(Ok(1)));
 
         var result = await _installer.InstallFlatpakDolphin();
 
@@ -96,8 +146,14 @@ public class LinuxDolphinInstallerTests
     {
         _commandEnvironment.IsCommandAvailable("flatpak").Returns(true);
         _processService
-            .RunWithProgressAsync("pkexec", "flatpak --system install -y org.DolphinEmu.dolphin-emu", Arg.Any<IProgress<int>?>())
-            .Returns(Task.FromResult<OperationResult<int>>(Ok(0)));
+            .Run("flatpak", "remote-add --if-not-exists --user dolphin https://flatpak.dolphin-emu.org/releases.flatpakrepo")
+            .Returns(Ok(0));
+        _processService
+            .Run("flatpak", "remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo")
+            .Returns(Ok(0));
+        _processService
+            .RunWithProgressAsync("flatpak", "install --user -y dolphin org.DolphinEmu.dolphin-emu", Arg.Any<IProgress<int>?>())
+            .Returns(Task.FromResult(Ok(0)));
         _processService
             .LaunchAndStopAsync("flatpak", "run org.DolphinEmu.dolphin-emu", TimeSpan.FromSeconds(4))
             .Returns(Task.FromResult<OperationResult>(Fail("Launch failed")));
@@ -113,11 +169,17 @@ public class LinuxDolphinInstallerTests
     {
         _commandEnvironment.IsCommandAvailable("flatpak").Returns(true);
         _processService
-            .RunWithProgressAsync("pkexec", "flatpak --system install -y org.DolphinEmu.dolphin-emu", Arg.Any<IProgress<int>?>())
-            .Returns(Task.FromResult<OperationResult<int>>(Ok(0)));
+            .Run("flatpak", "remote-add --if-not-exists --user dolphin https://flatpak.dolphin-emu.org/releases.flatpakrepo")
+            .Returns(Ok(0));
+        _processService
+            .Run("flatpak", "remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo")
+            .Returns(Ok(0));
+        _processService
+            .RunWithProgressAsync("flatpak", "install --user -y dolphin org.DolphinEmu.dolphin-emu", Arg.Any<IProgress<int>?>())
+            .Returns(Task.FromResult(Ok(0)));
         _processService
             .LaunchAndStopAsync("flatpak", "run org.DolphinEmu.dolphin-emu", TimeSpan.FromSeconds(4))
-            .Returns(Task.FromResult<OperationResult>(Ok()));
+            .Returns(Task.FromResult(Ok()));
 
         var result = await _installer.InstallFlatpakDolphin();
 
