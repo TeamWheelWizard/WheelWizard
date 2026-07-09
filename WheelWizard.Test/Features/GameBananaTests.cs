@@ -212,6 +212,7 @@ namespace WheelWizard.Test.Features
                 },
                 ModelName = "Mod",
                 PreviewMedia = new(),
+                HasContentRatings = false,
             };
         }
 

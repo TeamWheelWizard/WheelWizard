@@ -63,5 +63,8 @@ public class GameBananaModDetails
     public required int DownloadCount { get; set; }
 
     [JsonPropertyName("_aFiles")]
-    public required List<GameBananaModFiles> Files { get; set; }
+    public List<GameBananaModFiles>? Files { get; set; }
+
+    [JsonPropertyName("_aArchivedFiles")]
+    public List<GameBananaModFiles>? ArchivedFiles { get; set; }
 }

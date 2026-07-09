@@ -70,6 +70,7 @@ public class GameBananaSingletonService(IApiCaller<IGameBananaApi> apiService) :
                 AvatarUrl = "",
             },
             PreviewMedia = new(),
+            HasContentRatings = false,
         };
     }
 }

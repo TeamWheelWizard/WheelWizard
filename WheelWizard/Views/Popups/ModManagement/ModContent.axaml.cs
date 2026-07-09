@@ -1,4 +1,4 @@
-using Avalonia.Interactivity;
+﻿using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
@@ -216,8 +216,13 @@ public partial class ModContent : UserControlBase
         if (prepareResult.IsFailure)
             return prepareResult.Error;
 
-        var downloadUrls = OverrideDownloadUrl != null ? [OverrideDownloadUrl] : CurrentMod.Files.Select(f => f.DownloadUrl).ToList();
-        if (!downloadUrls.Any())
+        var downloadUrls =
+            OverrideDownloadUrl != null
+                ? [OverrideDownloadUrl]
+                : CurrentMod.Files?.Select(f => f.DownloadUrl).ToList()
+                    ?? CurrentMod.ArchivedFiles?.Select(f => f.DownloadUrl).ToList()
+                    ?? [];
+        if (downloadUrls.Count == 0)
             return Fail("No downloadable files were found for this mod.");
 
         var progressWindow = new ProgressWindow(t("progress.downloading_mod", CurrentMod.Name)!);
