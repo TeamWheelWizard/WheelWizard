@@ -114,12 +114,24 @@ jobs:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
         run: |
+          # Write the certificate from the secret
           echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+
+          # Create a temporary keychain
           security create-keychain -p temp build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p temp build.keychain
-          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+
+          # Import the certificate
+          security import certificate.p12 -k build.keychain \
+            -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+
+          # Allow codesign to access the keychain
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temp build.keychain
+
+          # Verify the import
+          echo "[INFO] Available signing identities:"
+          security find-identity -v -p basic
           rm certificate.p12
 
       - name: Sign the .app bundle with Developer ID
@@ -127,6 +139,10 @@ jobs:
           ENTITLEMENTS="${{ github.workspace }}/macos/certs/WheelWizardEntitlements.entitlements"
           APP_PATH="release/WheelWizard.app"
           SIGNING_IDENTITY="Developer ID Application: Gabriel Magaña (Z4D7MUNZ97)"
+
+          # List available identities for debugging
+          echo "[INFO] Checking signing identities..."
+          security find-identity -v -p codesign
 
           # Sign all executables inside the bundle first
           find "$APP_PATH/Contents/MacOS" -type f | while read fname; do
@@ -185,35 +201,11 @@ jobs:
             --wait
           xcrun stapler staple WheelWizard-macOSarm64.dmg
 
-      - name: Create .app zip for Homebrew
-        run: |
-          ditto -c -k --sequesterRsrc --keepParent \
-            release/WheelWizard.app \
-            WheelWizard-macOSarm64.zip
-
-      - name: Compute SHA256
-        id: sha
-        run: |
-          echo "sha256=$(shasum -a 256 WheelWizard-macOSarm64.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-
-      - name: Save SHA256 for tap update
-        run: |
-          echo "${{ steps.sha.outputs.sha256 }}" > sha256-arm64.txt
-
-      - name: Upload SHA256 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sha256-arm64
-          path: sha256-arm64.txt
-          retention-days: 1
-
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4
         with:
           name: artifacts-macos-arm64
-          path: |
-            WheelWizard-macOSarm64.dmg
-            WheelWizard-macOSarm64.zip
+          path: WheelWizard-macOSarm64.dmg
           retention-days: 1
 
   macos-x64:
@@ -316,35 +308,11 @@ jobs:
             --wait
           xcrun stapler staple WheelWizard-macOSintel.dmg
 
-      - name: Create .app zip for Homebrew
-        run: |
-          ditto -c -k --sequesterRsrc --keepParent \
-            release/WheelWizard.app \
-            WheelWizard-macOSintel.zip
-
-      - name: Compute SHA256
-        id: sha
-        run: |
-          echo "sha256=$(shasum -a 256 WheelWizard-macOSintel.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-
-      - name: Save SHA256 for tap update
-        run: |
-          echo "${{ steps.sha.outputs.sha256 }}" > sha256-intel.txt
-
-      - name: Upload SHA256 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sha256-intel
-          path: sha256-intel.txt
-          retention-days: 1
-
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4
         with:
           name: artifacts-macos-x64
-          path: |
-            WheelWizard-macOSintel.dmg
-            WheelWizard-macOSintel.zip
+          path: WheelWizard-macOSintel.dmg
           retention-days: 1
 
   # ──────────────────────────────────────────────────────────────
@@ -373,10 +341,6 @@ jobs:
           cp artifacts-macos-arm64/WheelWizard-macOSarm64.dmg final-artifacts/ 2>/dev/null || true
           cp artifacts-macos-x64/WheelWizard-macOSintel.dmg final-artifacts/ 2>/dev/null || true
 
-          # macOS .app zips (for Homebrew)
-          cp artifacts-macos-arm64/WheelWizard-macOSarm64.zip final-artifacts/ 2>/dev/null || true
-          cp artifacts-macos-x64/WheelWizard-macOSintel.zip final-artifacts/ 2>/dev/null || true
-
           chmod +x final-artifacts/WheelWizard_Linux final-artifacts/WheelWizard_arm64_Linux 2>/dev/null || true
           ls -la final-artifacts/
 
@@ -397,52 +361,53 @@ jobs:
 
   # ──────────────────────────────────────────────────────────────
   # Update Homebrew tap with new version and SHA256
+  # (Disabled for now — will be re-enabled later)
   # ──────────────────────────────────────────────────────────────
-  update-tap:
-    name: Update Homebrew Tap
-    needs: [create-release, macos-arm64, macos-x64]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download SHA256 artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: sha256-*
-          merge-multiple: true
-
-      - name: Read SHA256 values
-        id: shas
-        run: |
-          echo "arm64=$(cat sha256-arm64.txt)" >> "$GITHUB_OUTPUT"
-          echo "intel=$(cat sha256-intel.txt)" >> "$GITHUB_OUTPUT"
-
-      - name: Checkout homebrew-tap repository
-        uses: actions/checkout@v4
-        with:
-          repository: TeamWheelWizard/homebrew-tap
-          token: ${{ secrets.TAP_TOKEN }}
-          path: homebrew-tap
-
-      - name: Update cask with real SHA256 values
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          CASK_FILE="homebrew-tap/Casks/wheelwizard.rb"
-
-          # Replace version
-          sed -i "s/version \".*\"/version \"$VERSION\"/" "$CASK_FILE"
-
-          # Replace SHA256 placeholders with real values
-          sed -i "s/REPLACE_ME_ARM64/${{ steps.shas.outputs.arm64 }}/" "$CASK_FILE"
-          sed -i "s/REPLACE_ME_INTEL/${{ steps.shas.outputs.intel }}/" "$CASK_FILE"
-
-          echo "=== Updated $CASK_FILE ==="
-          cat "$CASK_FILE"
-
-      - name: Commit and push to homebrew-tap
-        run: |
-          cd homebrew-tap
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Casks/wheelwizard.rb
-          git commit -m "chore: update wheelwizard to v${GITHUB_REF_NAME#v}"
-          git push
+  # update-tap:
+  #   name: Update Homebrew Tap
+  #   needs: [create-release, macos-arm64, macos-x64]
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Download SHA256 artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: sha256-*
+  #         merge-multiple: true
+  #
+  #     - name: Read SHA256 values
+  #       id: shas
+  #       run: |
+  #         echo "arm64=$(cat sha256-arm64.txt)" >> "$GITHUB_OUTPUT"
+  #         echo "intel=$(cat sha256-intel.txt)" >> "$GITHUB_OUTPUT"
+  #
+  #     - name: Checkout homebrew-tap repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: TeamWheelWizard/homebrew-tap
+  #         token: ${{ secrets.TAP_TOKEN }}
+  #         path: homebrew-tap
+  #
+  #     - name: Update cask with real SHA256 values
+  #       run: |
+  #         VERSION="${GITHUB_REF_NAME#v}"
+  #         CASK_FILE="homebrew-tap/Casks/wheelwizard.rb"
+  #
+  #         # Replace version
+  #         sed -i "s/version \".*\"/version \"$VERSION\"/" "$CASK_FILE"
+  #
+  #         # Replace SHA256 placeholders with real values
+  #         sed -i "s/REPLACE_ME_ARM64/${{ steps.shas.outputs.arm64 }}/" "$CASK_FILE"
+  #         sed -i "s/REPLACE_ME_INTEL/${{ steps.shas.outputs.intel }}/" "$CASK_FILE"
+  #
+  #         echo "=== Updated $CASK_FILE ==="
+  #         cat "$CASK_FILE"
+  #
+  #     - name: Commit and push to homebrew-tap
+  #       run: |
+  #         cd homebrew-tap
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "github-actions[bot]@users.noreply.github.com"
+  #         git add Casks/wheelwizard.rb
+  #         git commit -m "chore: update wheelwizard to v${GITHUB_REF_NAME#v}"
+  #         git push
