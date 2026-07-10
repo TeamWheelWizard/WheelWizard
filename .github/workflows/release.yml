@@ -142,7 +142,7 @@ jobs:
 
           # List available identities for debugging
           echo "[INFO] Checking signing identities..."
-          security find-identity -v -p codesign
+          security find-identity -v -p codesigning
 
           # Sign all executables inside the bundle first
           find "$APP_PATH/Contents/MacOS" -type f | while read fname; do
