@@ -1,0 +1,86 @@
+<base:PopupContent xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
+                   mc:Ignorable="d"
+                   x:Class="WheelWizard.Views.Popups.Generic.FirstTimeSetupPopup">
+    <Grid Width="520" MinHeight="360" MaxHeight="560" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
+        <TextBlock Classes="TitleText"
+                   Text="Welcome to Wheel Wizard" />
+
+        <TextBlock Grid.Row="1"
+                   Margin="0,14,0,0"
+                   TextWrapping="Wrap"
+                   Classes="BodyText"
+                   Text="Let's get you set up. Wheel Wizard needs to know which Dolphin Emulator installation to use. We've scanned the usual locations for your system below." />
+
+        <Border Grid.Row="2"
+                Margin="0,18,0,0"
+                Padding="14"
+                Background="#12000000"
+                BorderBrush="{StaticResource Neutral700}"
+                BorderThickness="1"
+                CornerRadius="10">
+            <StackPanel Spacing="6">
+                <TextBlock Classes="BodyText"
+                           FontWeight="SemiBold"
+                           Text="Dolphin Emulator" />
+                <TextBlock x:Name="PlatformTextBlock"
+                           Classes="BodyText"
+                           Opacity="0.75"
+                           Text="Detecting installations..." />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="3"
+                      Margin="0,12,0,0"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="DetectedLocationsPanel" Spacing="8" />
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="4" Margin="0,14,0,0" Spacing="8">
+            <TextBlock Classes="BodyText"
+                       FontWeight="SemiBold"
+                       Text="Or select it manually" />
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox x:Name="ManualPathTextBox"
+                         Classes="dark"
+                         Grid.Column="0"
+                         Height="40"
+                         Margin="0,0,8,0"
+                         VerticalContentAlignment="Center"
+                         Watermark="No path selected"
+                         IsReadOnly="True" />
+                <components:Button x:Name="BrowseButton"
+                                   Grid.Column="1"
+                                   Variant="Default"
+                                   Text="Browse..."
+                                   Click="BrowseButton_OnClick" />
+            </Grid>
+            <TextBlock x:Name="ErrorTextBlock"
+                       Classes="BodyText"
+                       Foreground="{StaticResource Danger400}"
+                       TextWrapping="Wrap"
+                       IsVisible="False" />
+        </StackPanel>
+
+        <UniformGrid Grid.Row="5"
+                     Columns="2"
+                     Margin="0,24,0,0">
+            <components:Button x:Name="CloseButton"
+                               Margin="0,0,6,0"
+                               Variant="Default"
+                               Text="Close and Exit"
+                               Click="CloseButton_OnClick" />
+            <components:Button x:Name="ContinueButton"
+                               Margin="6,0,0,0"
+                               Variant="Primary"
+                               Text="Continue"
+                               IsEnabled="False"
+                               Click="ContinueButton_OnClick" />
+        </UniformGrid>
+    </Grid>
+</base:PopupContent>

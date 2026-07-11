@@ -197,6 +197,18 @@ public class App : Application
     {
         try
         {
+            var settingsManager = Services.GetRequiredService<ISettingsManager>();
+            if (!settingsManager.PathsSetupCorrectly())
+            {
+                var firstTimeSetup = new FirstTimeSetupPopup();
+                var setupCompleted = await firstTimeSetup.ShowAndAwaitCompletionAsync();
+                if (!setupCompleted)
+                {
+                    desktop.Shutdown();
+                    return;
+                }
+            }
+
             var resourceInstaller = Services.GetRequiredService<IMiiRenderingResourceInstaller>();
             if (resourceInstaller.GetResolvedResourcePath().IsFailure)
             {
