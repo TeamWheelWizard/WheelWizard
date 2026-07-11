@@ -47,7 +47,7 @@ public static class FilePickerHelper
         if (storageProvider == null)
             return null;
 
-        var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
+        var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);  // Makes file picker popup not work when called from popup
         if (topLevel?.StorageProvider == null)
             return null;
 
