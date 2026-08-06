@@ -1,6 +1,6 @@
-using WheelWizard.DolphinManagent.Abstractions;
+using WheelWizard.DolphinManagement.Abstractions;
 
-namespace WheelWizard.DolphinManagent.Linux;
+namespace WheelWizard.DolphinManagement.Linux;
 
 public sealed class LinuxDolphinLocator(ILinuxCommandEnvironment commandEnvironment, ILinuxProcessService processService) : IDolphinLocator
 {

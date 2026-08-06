@@ -1,7 +1,7 @@
-using WheelWizard.DolphinManagent.Abstractions;
-using WheelWizard.DolphinManagent.Linux;
+using WheelWizard.DolphinManagement.Abstractions;
+using WheelWizard.DolphinManagement.Linux;
 
-namespace WheelWizard.DolphinManagent;
+namespace WheelWizard.DolphinManagement;
 
 public static class DolphinManagmentExtensions
 {
@@ -10,7 +10,7 @@ public static class DolphinManagmentExtensions
 #if LINUX
         services.AddSingleton<ILinuxCommandEnvironment, LinuxCommandEnvironment>();
         services.AddSingleton<ILinuxProcessService, LinuxProcessService>();
-        //services.AddSingleton<IDolphinInstaller, LinuxDolphinInstaller>();
+        services.AddSingleton<IDolphinInstaller, LinuxDolphinInstaller>();
         services.AddSingleton<IDolphinLocator, LinuxDolphinLocator>();
 #endif
         return services;
