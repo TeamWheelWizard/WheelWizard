@@ -1,6 +1,6 @@
 using WheelWizard.Helpers;
 
-namespace WheelWizard.DolphinManagent.Linux;
+namespace WheelWizard.DolphinManagement.Linux;
 
 public interface ILinuxCommandEnvironment
 {

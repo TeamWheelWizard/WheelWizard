@@ -1,11 +1,13 @@
 using System.Runtime.InteropServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Microsoft.Extensions.Logging;
-using WheelWizard.DolphinManagent.Abstractions;
+using WheelWizard.DolphinManagement.Abstractions;
+using WheelWizard.Helpers;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
@@ -29,14 +31,18 @@ public partial class FirstTimeSetupPopup : PopupContent
     private IDolphinLocator DolphinLocator { get; set; } = null!;
 
     [Inject]
+    private IDolphinInstaller DolphinInstaller { get; set; } = null!;
+
+    [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
 
     public FirstTimeSetupPopup()
-        : base(true, false, true, "Wheel Wizard")
+        : base(true, false, false, "Wheel Wizard")
     {
         InitializeComponent();
 
         PlatformTextBlock.Text = $"Detected platform: {GetPlatformName()}";
+        //BrowseButton.IsEnabled = EnvHelper.IsFlatpakSandboxed(); Not sure how to check for flatpak installation because this doesnt really work
         PopulateDetectedLocations();
     }
 
@@ -80,7 +86,7 @@ public partial class FirstTimeSetupPopup : PopupContent
             DetectedLocationsPanel.Children.Add(CreateCandidateRow(candidate));
     }
 
-    private RadioButton CreateCandidateRow(DolphinInstallation candidate)
+    private Grid CreateCandidateRow(DolphinInstallation candidate)
     {
         var subtitle = candidate.Found ? candidate.LaunchTarget ?? string.Empty : "Not found on this system";
 
@@ -112,8 +118,61 @@ public partial class FirstTimeSetupPopup : PopupContent
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
         };
         radio.IsCheckedChanged += DetectedLocation_OnChecked;
-        return radio;
+
+        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+        row.Children.Add(radio);
+
+        if (!candidate.Found && candidate.DisplayName.Contains("flatpak", StringComparison.OrdinalIgnoreCase))
+        {
+            var installButton = new Components.Button
+            {
+                Variant = Components.Button.ButtonsVariantType.Default,
+                Text = "Install",
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(8, 0, 0, 0),
+            };
+            installButton.Click += InstallFlatpakButton_OnClick;
+            Grid.SetColumn(installButton, 1);
+            row.Children.Add(installButton);
+        }
+
+        return row;
     }
+
+    private async void InstallFlatpakButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var progressWindow = new ProgressWindow()
+            .SetGoal(t("progress.installing_dolphin"))
+            .SetExtraText(t("progress.this_may_take_a_while"));
+        progressWindow.Show();
+        var progress = new Progress<int>(progressWindow.UpdateProgress);
+        var installResult = await DolphinInstaller.InstallDolphin(progress);
+        progressWindow.Close();
+        if (installResult.IsFailure)
+        {
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText("Failed to install Dolphin")
+                .SetInfoText(installResult.Error.Message)
+                .ShowDialog();
+            return;
+        }
+
+        // Reload all radio buttons
+        var candidates = DolphinLocator.DetectInstallations();
+        foreach (var radio in DetectedLocationsPanel.Children.SelectMany(GetRadioButtons))
+        {
+            if (radio?.Tag is null)
+                continue;
+            var match = candidates.FirstOrDefault(c => radio.Tag.Equals(c.LaunchTarget));
+            if (match != null)
+            {
+                radio.IsEnabled = match.Found;
+            }
+        }
+    }
+
+    private static IEnumerable<RadioButton> GetRadioButtons(Control row) => row is Panel panel ? panel.Children.OfType<RadioButton>() : [];
 
     private void DetectedLocation_OnChecked(object? sender, RoutedEventArgs e)
     {
@@ -128,17 +187,14 @@ public partial class FirstTimeSetupPopup : PopupContent
     {
         try
         {
-            var path = await OpenDolphinFilePickerAsync();
+            var path = await OpenDolphinFilePickerAsync(this);
             Logger.LogInformation(path);
             if (string.IsNullOrWhiteSpace(path))
                 return;
 
             // A manual pick wins: clear any detected radio selection.
-            foreach (var child in DetectedLocationsPanel.Children)
-            {
-                if (child is RadioButton radio)
-                    radio.IsChecked = false;
-            }
+            foreach (var radio in DetectedLocationsPanel.Children.SelectMany(GetRadioButtons))
+                radio.IsChecked = false;
 
             ManualPathTextBox.Text = path;
             SetSelectedTarget(path);
@@ -182,7 +238,7 @@ public partial class FirstTimeSetupPopup : PopupContent
         ErrorTextBlock.IsVisible = true;
     }
 
-    private static async Task<string?> OpenDolphinFilePickerAsync()
+    private static async Task<string?> OpenDolphinFilePickerAsync(Visual owner)
     {
         var executableFileType = new FilePickerFileType("Executable files")
         {
@@ -194,7 +250,7 @@ public partial class FirstTimeSetupPopup : PopupContent
                 _ => new[] { "*" }, // Fallback
             },
         };
-        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select the Dolphin executable", [executableFileType]);
+        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select the Dolphin executable", [executableFileType], owner);
         return filePath;
     }
 }

@@ -1,4 +1,4 @@
-namespace WheelWizard.DolphinManagent.Abstractions;
+namespace WheelWizard.DolphinManagement.Abstractions;
 
 public interface IDolphinLocator
 {

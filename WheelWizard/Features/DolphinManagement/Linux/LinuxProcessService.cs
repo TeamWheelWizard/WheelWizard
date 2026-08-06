@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-namespace WheelWizard.DolphinManagent.Linux;
+namespace WheelWizard.DolphinManagement.Linux;
 
 public interface ILinuxProcessService
 {
