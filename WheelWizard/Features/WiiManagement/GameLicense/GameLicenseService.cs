@@ -758,18 +758,16 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     {
         if (_rksysData == null || !_settingsManager.PathsSetupCorrectly())
             return Fail("Invalid save data or config is not setup properly.");
+
+        // Never write a save file with a wrong size, that would corrupt every license on it.
+        if (_rksysData.Length != RksysSize)
+            return Fail($"Refusing to save rksys.dat: expected {RksysSize} bytes but got {_rksysData.Length}.");
+
         FixRksysCrc(_rksysData);
         var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
         var saveFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, RRRegionManager.ConvertRegionToGameId(currentRegion));
-        var trySaveRksys = TryCatch(() =>
-        {
-            _fileSystem.Directory.CreateDirectory(saveFolder);
-            var path = _fileSystem.Path.Combine(saveFolder, "rksys.dat");
-            _fileSystem.File.WriteAllBytes(path, _rksysData);
-        });
-        if (trySaveRksys.IsFailure)
-            return trySaveRksys.Error;
-        return Ok();
+        var path = _fileSystem.Path.Combine(saveFolder, "rksys.dat");
+        return _fileSystem.WriteAllBytesAtomic(path, _rksysData, "Failed to save rksys.dat.");
     }
 
     protected override Task ExecuteTaskAsync()
