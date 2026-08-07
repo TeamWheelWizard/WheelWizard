@@ -3,7 +3,7 @@
         <!-- Program Config -->
         <StartupObject>WheelWizard.Program</StartupObject>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <RootNamespace>WheelWizard</RootNamespace>
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
@@ -33,12 +33,12 @@
 
     <ItemGroup>
         <!-- Everything specifically for Avalonia -->
-        <PackageReference Include="Avalonia" Version="11.2.5"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.2.5"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.5"/>
-        <PackageReference Include="Avalonia.HtmlRenderer" Version="11.0.0"/>
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.5"/>
+        <PackageReference Include="Avalonia" Version="11.3.19"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.19"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.19"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.19"/>
+        <PackageReference Include="Avalonia.HtmlRenderer" Version="11.3.0"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.19"/>
 
         <!-- Code analyzers -->
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
@@ -48,9 +48,9 @@
 
         <!-- Everything from the OG Wheel wizard project -->
         <PackageReference Include="ini-parser" Version="2.5.2" NoWarn="NU1701"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0-preview.3.25171.5"/>
-        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.3.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0"/>
         <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
         <PackageReference Include="Semver" Version="3.0.0"/>
         <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0"/>
