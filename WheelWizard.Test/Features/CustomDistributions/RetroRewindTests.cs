@@ -71,7 +71,7 @@ public class RetroRewindTests
     public async Task RemoveAsync_ReturnsFailure_WhenTheInstallCannotBeDeleted()
     {
         CreateExistingInstall();
-        using var lockedFile = _fileSystem.File.Open(VersionFilePath, FileMode.Open, FileAccess.Read, FileShare.None);
+        _fileSystem.Intercept.Event(_ => throw new IOException("The install is in use."));
 
         var result = await _distribution.RemoveAsync(null!);
 
