@@ -41,15 +41,47 @@ public class RetroRewind : IDistribution
     public string XMLFolderName => "riivolution";
     public string XMLFileName => "RetroRewind6";
 
+    //where the RR distribution lives
+    private string DistributionDataPath => _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName);
+
+    //where the RR wiiDisc xml file lives
+    private string RiivolutionDiscXmlPath =>
+        _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, XMLFolderName, $"{XMLFileName}.xml");
+
+    //where the previous install is kept while we install a new one
+    private string BackupDataPath => $"{DistributionDataPath}.old";
+    private string BackupDiscXmlPath => $"{RiivolutionDiscXmlPath}.old";
+
     public async Task<OperationResult> InstallAsync(ProgressWindow progressWindow)
     {
-        if (GetCurrentVersion() is not null)
+        // Instead of deleting the current install, we keep it around until the new install succeeded.
+        // That way a failed install does not take the users install (including their patches) with it.
+        var backupResult = BackupCurrentInstall();
+        if (backupResult.IsFailure)
+            return backupResult;
+
+        var installResult = await PerformInstallAsync(progressWindow);
+        // A cancelled install is not a failure, but it also did not finish, so we keep the old install.
+        if (installResult.IsFailure || progressWindow.WasCancellationRequested)
         {
-            var removeResult = await RemoveAsync(progressWindow);
-            if (removeResult.IsFailure)
-                return removeResult;
+            if (backupResult.Value)
+            {
+                var restoreResult = RestoreBackup();
+                if (restoreResult.IsFailure)
+                    _logger.LogError("Failed to restore the previous {Title} install: {Error}", Title, restoreResult.Error.Message);
+            }
+            return installResult;
         }
 
+        var cleanupResult = TryCatch(DeleteBackup);
+        if (cleanupResult.IsFailure)
+            _logger.LogWarning("Failed to delete the previous {Title} install: {Error}", Title, cleanupResult.Error.Message);
+
+        return installResult;
+    }
+
+    private async Task<OperationResult> PerformInstallAsync(ProgressWindow progressWindow)
+    {
         if (HasOldRksys())
         {
             var rksysQuestion = new YesNoWindow()
@@ -543,28 +575,80 @@ public class RetroRewind : IDistribution
 
     public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
     {
-        //where the RR distribution lives
-        var distributionDataDestination = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName);
-        //where the RR wiiDisc xml file lives
-        var riivolutionDiscXMLFile = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, XMLFolderName, $"{XMLFileName}.xml");
+        var result = TryCatch(
+            () =>
+            {
+                if (_fileSystem.Directory.Exists(DistributionDataPath))
+                    _fileSystem.Directory.Delete(DistributionDataPath, recursive: true);
+                if (_fileSystem.File.Exists(RiivolutionDiscXmlPath))
+                    _fileSystem.File.Delete(RiivolutionDiscXmlPath);
+            },
+            $"Failed to remove the current {Title} install"
+        );
 
-        if (_fileSystem.Directory.Exists(distributionDataDestination))
-            _fileSystem.Directory.Delete(distributionDataDestination, recursive: true);
-        if (_fileSystem.File.Exists(riivolutionDiscXMLFile))
-            _fileSystem.File.Delete(riivolutionDiscXMLFile);
-
-        return Task.FromResult(Ok());
+        return Task.FromResult(result);
     }
 
-    public async Task<OperationResult> ReinstallAsync(ProgressWindow progressWindow)
+    /// <summary>
+    /// Moves the current install (and its wiiDisc xml file) aside so it can be restored when the install fails.
+    /// </summary>
+    /// <returns>Whether there actually was something to back up.</returns>
+    private OperationResult<bool> BackupCurrentInstall() =>
+        TryCatch(
+            () =>
+            {
+                // A backup can still be there when a previous install was interrupted, that one is of no use to us anymore.
+                DeleteBackup();
+
+                var hasBackup = false;
+                if (_fileSystem.Directory.Exists(DistributionDataPath))
+                {
+                    _fileSystem.Directory.Move(DistributionDataPath, BackupDataPath);
+                    hasBackup = true;
+                }
+                if (_fileSystem.File.Exists(RiivolutionDiscXmlPath))
+                {
+                    _fileSystem.File.Move(RiivolutionDiscXmlPath, BackupDiscXmlPath, overwrite: true);
+                    hasBackup = true;
+                }
+
+                return hasBackup;
+            },
+            $"Failed to back up the current {Title} install"
+        );
+
+    private OperationResult RestoreBackup() =>
+        TryCatch(
+            () =>
+            {
+                if (_fileSystem.Directory.Exists(BackupDataPath))
+                {
+                    // Whatever the failed install left behind is worthless, the backup is the real install.
+                    if (_fileSystem.Directory.Exists(DistributionDataPath))
+                        _fileSystem.Directory.Delete(DistributionDataPath, recursive: true);
+                    _fileSystem.Directory.Move(BackupDataPath, DistributionDataPath);
+                }
+                if (_fileSystem.File.Exists(BackupDiscXmlPath))
+                {
+                    var xmlFolder = _fileSystem.Path.GetDirectoryName(RiivolutionDiscXmlPath);
+                    if (!string.IsNullOrEmpty(xmlFolder))
+                        _fileSystem.Directory.CreateDirectory(xmlFolder);
+                    _fileSystem.File.Move(BackupDiscXmlPath, RiivolutionDiscXmlPath, overwrite: true);
+                }
+            },
+            $"Failed to restore the previous {Title} install"
+        );
+
+    private void DeleteBackup()
     {
-        //Remove and install
-        var removeResult = await RemoveAsync(progressWindow);
-        if (removeResult.IsFailure)
-            return removeResult;
-
-        return await InstallAsync(progressWindow);
+        if (_fileSystem.Directory.Exists(BackupDataPath))
+            _fileSystem.Directory.Delete(BackupDataPath, recursive: true);
+        if (_fileSystem.File.Exists(BackupDiscXmlPath))
+            _fileSystem.File.Delete(BackupDiscXmlPath);
     }
+
+    // Installing already replaces the current install (and restores it when the install fails), so there is nothing extra to do here.
+    public Task<OperationResult> ReinstallAsync(ProgressWindow progressWindow) => InstallAsync(progressWindow);
 
     public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync()
     {
