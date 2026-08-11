@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Serilog;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
@@ -679,6 +680,20 @@ public static class PathManager
         // Because we need this prefix for the permission workarounds, we just expect it to start with "flatpak run"
         var flatpakRunCommand = "flatpak run";
         return filePath.StartsWith(flatpakRunCommand, StringComparison.Ordinal);
+    }
+
+    public const string DefaultDolphinFlatpakAppId = "org.DolphinEmu.dolphin-emu";
+
+    /// <summary>
+    /// Pulls the app ID out of a "flatpak run ..." command, so custom or forked Dolphin Flatpaks keep working.
+    /// </summary>
+    public static string ExtractDolphinFlatpakAppId(string flatpakDolphinLocation)
+    {
+        if (string.IsNullOrWhiteSpace(flatpakDolphinLocation))
+            return DefaultDolphinFlatpakAppId;
+
+        var matches = Regex.Matches(flatpakDolphinLocation, @"(?i)\b[a-z][a-z0-9]*(?:\.[a-z_][a-z0-9_]*){1,}\.[a-z_][a-z0-9_-]*\b");
+        return matches.Count == 0 ? DefaultDolphinFlatpakAppId : matches[^1].Value;
     }
 
     private static string GetContainingBaseDirectorySafe(string path)

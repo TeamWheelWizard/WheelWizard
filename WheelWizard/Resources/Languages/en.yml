@@ -108,6 +108,7 @@ en:
   action:
     play: "Play"
     play_offline: "Play Offline"
+    play_anyway: "Play anyway"
     install: "Install"
     update: "Update"
     import: "Import"
@@ -241,6 +242,7 @@ en:
     installing_rr: "Installing Retro Rewind"
     installing_rr_first_time: "Installing Retro Rewind for the first time"
     installing_dolphin: "Installing Dolphin Emulator"
+    updating_dolphin: "Updating Dolphin Emulator"
     this_may_take_a_while: "This may take a while depending on your internet connection."
     applying_converted_mod: "Applying converted mod"
     combining_files: "Combining files"
@@ -275,6 +277,12 @@ en:
         If you don't know what all of this means, just click yes :)
 
         Dolphin Emulator folder found. Would you like to use this folder?
+    dolphin_outdated:
+      title: "Your Dolphin Emulator is out of date"
+      extra: |
+        This version of Dolphin ({$1}) has a known security issue where malicious game files, mods, or cheating online players can infect your PC with malware.
+
+        Update to {$2} or newer to be safe.
     dolphin_program_found:
       title: "Dolphin Emulator Found"
       extra: |
@@ -444,6 +452,7 @@ en:
     created_duplicate: "Created duplicate of '{$1}'"
     created_duplicates_miis: "Created {$1} duplicate Miis"
     profile_set_primary: "Set profile as primary"
+    dolphin_updated: "Dolphin Emulator has been updated"
   snackbar_error:
     mii_failure_deserialize: "Failed to deserialize Mii '{$1}'"
     mii_failure_update: "Failed to update Mii '{$1}'"

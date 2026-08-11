@@ -35,6 +35,6 @@ public static class MiiChannelLaunchHelper
         }
 
         if (miiChannelExists)
-            DolphinLaunchHelper.LaunchDolphin($"-b {EnvHelper.QuotePath(Path.GetFullPath(MiiChannelPath))}");
+            await DolphinLaunchHelper.LaunchDolphin($"-b {EnvHelper.QuotePath(Path.GetFullPath(MiiChannelPath))}");
     }
 }

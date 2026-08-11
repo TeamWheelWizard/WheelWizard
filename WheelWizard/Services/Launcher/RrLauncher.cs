@@ -56,7 +56,7 @@ public class RrLauncher : ILauncher
 
             RetroRewindLaunchHelper.GenerateLaunchJson();
             var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";
-            DolphinLaunchHelper.LaunchDolphin(
+            await DolphinLaunchHelper.LaunchDolphin(
                 $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
             );
             return Ok();
