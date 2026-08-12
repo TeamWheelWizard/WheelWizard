@@ -26,7 +26,7 @@ public static class DolphinVersion
     /// <summary>The oldest builds that carry the fix: release 2606a, or dev build 2606-235.</summary>
     private const int MinimumYearMonth = 2606;
     private const char MinimumRevision = 'a';
-    private const int MinimumDevBuild = 235;
+    private const int MinimumDevBuild = 300;
 
     /// <summary>The minimum, formatted the way the release notes write it, for use in user-facing text.</summary>
     public const string MinimumDisplayText = "2606a";
