@@ -27,9 +27,8 @@ public class DolphinVersionTests
     [InlineData("2603a")]
     [InlineData("2503")]
     [InlineData("2412")]
-    // The strings found inside the official 2606 Windows binary.
+    // What the official 2606 release reports itself as.
     [InlineData("Dolphin 2606")]
-    [InlineData("Dolphin/2606")]
     // The old scheme is always older, even though its build numbers are much larger.
     // Notably "5.0-21460" must not be mined for a four-digit "2146".
     [InlineData("5.0-21460")]

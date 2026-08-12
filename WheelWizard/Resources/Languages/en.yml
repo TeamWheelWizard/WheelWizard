@@ -340,6 +340,12 @@ en:
     dolphin_not_found:
       title: "Dolphin Emulator Folder Not Found"
       extra: "Dolphin Emulator folder not automatically found. Please try and find the folder manually, click 'help' for more information."
+    dolphin_version_unverified:
+      title: "Could not verify your Dolphin Emulator version"
+      extra: |
+        Wheel Wizard could not read the version of the Dolphin Emulator you have configured, so it cannot tell whether it has the security fixes.
+
+        Please check yourself that you are on {$1} or newer. Older versions have a known security issue where malicious game files, mods, or cheating online players can infect your PC with malware.
     dolphin_tool_selected:
       title: "Wrong Dolphin executable selected"
       extra: "You selected DolphinTool.exe. Please choose Dolphin.exe (the Dolphin emulator executable) instead."

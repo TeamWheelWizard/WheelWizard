@@ -45,9 +45,8 @@ public static class DolphinVersion
     private static readonly Regex LegacyPattern = new(@"(?<![\w.])[0-5]\.\d+(?:\.\d+)*(?:-\d+)?(?![\w])", RegexOptions.Compiled);
 
     /// <summary>
-    /// Judges any version text Dolphin hands us, be it a bare "2606a", the "Dolphin 2606-235" that
-    /// <c>--version</c> prints, or a Windows ProductVersion string. Also returns the version as found
-    /// in the text, for showing to the user.
+    /// Judges any version text Dolphin hands us, be it a bare "2606a" or the "Dolphin 2606-235" that
+    /// <c>--version</c> prints. Also returns the version as found in the text, for showing to the user.
     /// </summary>
     public static DolphinVersionStatus GetStatus(string? text, out string? foundVersion)
     {

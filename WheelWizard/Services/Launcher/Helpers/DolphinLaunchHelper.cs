@@ -135,8 +135,20 @@ public static class DolphinLaunchHelper
 
         // Reading the version can mean spawning a process, so keep it off the UI thread.
         var (status, version) = await Task.Run(versionService.CheckConfiguredDolphin);
-        if (status != DolphinVersionStatus.Outdated)
+        if (status == DolphinVersionStatus.Supported)
             return true;
+
+        if (status == DolphinVersionStatus.Unknown)
+        {
+            // We could not read a version, so we have nothing to accuse them of. Say exactly that,
+            // hand the check over to them, and let them play.
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Warning)
+                .SetTitleText(t("message_warning.dolphin_version_unverified.title"))
+                .SetInfoText(t("message_warning.dolphin_version_unverified.extra", DolphinVersion.MinimumDisplayText))
+                .ShowDialog();
+            return true;
+        }
 
         var popup = new YesNoWindow()
             .SetButtonVariants(Button.ButtonsVariantType.Primary, Button.ButtonsVariantType.Danger)
