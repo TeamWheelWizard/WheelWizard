@@ -7,6 +7,7 @@ using WheelWizard.Branding;
 using WheelWizard.CustomCharacters;
 using WheelWizard.CustomDistributions;
 using WheelWizard.DolphinInstaller;
+using WheelWizard.DolphinManagement;
 using WheelWizard.Features.Archives;
 using WheelWizard.Features.Patches;
 using WheelWizard.GameBanana;
@@ -33,7 +34,7 @@ public static class SetupExtensions
     public static void AddWheelWizardServices(this IServiceCollection services)
     {
         // Features
-        services.AddDolphinInstaller();
+        services.AddDolphinManagement();
         services.AddLocalization();
         services.AddSettings();
         services.AddCustomCharacters();

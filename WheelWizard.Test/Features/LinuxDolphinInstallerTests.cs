@@ -19,7 +19,10 @@ public class LinuxDolphinInstallerTests
     [Fact]
     public void IsDolphinInstalledInFlatpak_ReturnsTrue_WhenFlatpakListHasDolphin()
     {
-        _processService.Run("flatpak", "list --app --columns=application", out var stdOut, out _).Returns(Ok(0)).AndDoes(callInfo => callInfo[2] = "Application ID\norg.DolphinEmu.dolphin-emu\n");
+        _processService
+            .Run("flatpak", "list --app --columns=application", out var stdOut, out _)
+            .Returns(Ok(0))
+            .AndDoes(callInfo => callInfo[2] = "Application ID\norg.DolphinEmu.dolphin-emu\n");
 
         var result = _installer.IsDolphinInstalledInFlatpak();
 
@@ -29,7 +32,10 @@ public class LinuxDolphinInstallerTests
     [Fact]
     public void IsDolphinInstalledInFlatpak_ReturnsFalse_WhenFlatpakListHasNoDolphin()
     {
-        _processService.Run("flatpak", "list --app --columns=application", out var stdOut, out _).Returns(Ok(0)).AndDoes(callInfo => callInfo[2] = "Application ID\n");
+        _processService
+            .Run("flatpak", "list --app --columns=application", out var stdOut, out _)
+            .Returns(Ok(0))
+            .AndDoes(callInfo => callInfo[2] = "Application ID\n");
 
         var result = _installer.IsDolphinInstalledInFlatpak();
 

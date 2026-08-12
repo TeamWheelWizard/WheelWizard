@@ -1,0 +1,154 @@
+<base:PopupContent xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
+                   mc:Ignorable="d"
+                   x:Class="WheelWizard.Views.Popups.Generic.FirstTimeSetupPopup">
+    <Grid Width="520" MinHeight="360" MaxHeight="560" RowDefinitions="*,Auto,Auto">
+        <!-- Step 1: pick the Dolphin installation -->
+        <Grid x:Name="DolphinStepPanel" RowDefinitions="Auto,Auto,Auto,*,Auto">
+            <TextBlock Classes="TitleText"
+                       Text="Welcome to Wheel Wizard" />
+
+            <TextBlock Grid.Row="1"
+                       Margin="0,14,0,0"
+                       TextWrapping="Wrap"
+                       Classes="BodyText"
+                       Text="Let's get you set up. Wheel Wizard needs to know which Dolphin Emulator installation to use. We've scanned the usual locations for your system below." />
+
+            <Border Grid.Row="2"
+                    Margin="0,18,0,0"
+                    Padding="14"
+                    Background="#12000000"
+                    BorderBrush="{StaticResource Neutral700}"
+                    BorderThickness="1"
+                    CornerRadius="10">
+                <StackPanel Spacing="6">
+                    <TextBlock Classes="BodyText"
+                               FontWeight="SemiBold"
+                               Text="Dolphin Emulator" />
+                    <TextBlock x:Name="PlatformTextBlock"
+                               Classes="BodyText"
+                               Opacity="0.75"
+                               Text="Detecting installations..." />
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer Grid.Row="3"
+                          Margin="0,12,0,0"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="DetectedLocationsPanel" Spacing="8" />
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="4" Margin="0,14,0,0" Spacing="8">
+                <TextBlock Classes="BodyText"
+                           FontWeight="SemiBold"
+                           Text="Or select it manually" />
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox x:Name="ManualPathTextBox"
+                             Classes="dark"
+                             Grid.Column="0"
+                             Height="40"
+                             Margin="0,0,8,0"
+                             VerticalContentAlignment="Center"
+                             Watermark="No path selected"
+                             IsReadOnly="True" />
+                    <components:Button x:Name="BrowseButton"
+                                       Grid.Column="1"
+                                       Variant="Default"
+                                       Text="Browse..."
+                                       Click="BrowseButton_OnClick" />
+                </Grid>
+            </StackPanel>
+        </Grid>
+
+        <!-- Step 2: pick the user folder and the game file -->
+        <Grid x:Name="GamePathsStepPanel" RowDefinitions="Auto,Auto,Auto,Auto,*" IsVisible="False">
+            <TextBlock Classes="TitleText"
+                       Text="Almost there" />
+
+            <TextBlock Grid.Row="1"
+                       Margin="0,14,0,0"
+                       TextWrapping="Wrap"
+                       Classes="BodyText"
+                       Text="Wheel Wizard still needs your Dolphin user (data) folder and your Mario Kart Wii disc image." />
+
+            <StackPanel Grid.Row="2" Margin="0,18,0,0" Spacing="8">
+                <TextBlock Classes="BodyText"
+                           FontWeight="SemiBold"
+                           Text="Dolphin user folder" />
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox x:Name="UserFolderTextBox"
+                             Classes="dark"
+                             Grid.Column="0"
+                             Height="40"
+                             Margin="0,0,8,0"
+                             VerticalContentAlignment="Center"
+                             Watermark="No folder selected"
+                             IsReadOnly="True" />
+                    <components:Button x:Name="BrowseUserFolderButton"
+                                       Grid.Column="1"
+                                       Variant="Default"
+                                       Text="Browse..."
+                                       Click="BrowseUserFolderButton_OnClick" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Margin="0,18,0,0" Spacing="8">
+                <TextBlock Classes="BodyText"
+                           FontWeight="SemiBold"
+                           Text="Mario Kart Wii game file" />
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox x:Name="GameFileTextBox"
+                             Classes="dark"
+                             Grid.Column="0"
+                             Height="40"
+                             Margin="0,0,8,0"
+                             VerticalContentAlignment="Center"
+                             Watermark="No file selected"
+                             IsReadOnly="True" />
+                    <components:Button x:Name="BrowseGameFileButton"
+                                       Grid.Column="1"
+                                       Variant="Default"
+                                       Text="Browse..."
+                                       Click="BrowseGameFileButton_OnClick" />
+                </Grid>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock x:Name="ErrorTextBlock"
+                   Grid.Row="1"
+                   Margin="0,14,0,0"
+                   Classes="BodyText"
+                   Foreground="{StaticResource Danger400}"
+                   TextWrapping="Wrap"
+                   IsVisible="False" />
+
+        <Grid Grid.Row="2" Margin="0,24,0,0" ColumnDefinitions="Auto,*,Auto">
+            <components:Button x:Name="CloseButton"
+                               Variant="Default"
+                               Text="Close and Exit"
+                               Click="CloseButton_OnClick" />
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12">
+                <components:Button x:Name="BackButton"
+                                   Variant="Default"
+                                   Text="Back"
+                                   IsVisible="False"
+                                   Click="BackButton_OnClick" />
+                <components:Button x:Name="SkipButton"
+                                   Variant="Default"
+                                   Text="Skip for now"
+                                   IsVisible="False"
+                                   Click="SkipButton_OnClick" />
+                <components:Button x:Name="ContinueButton"
+                                   Variant="Primary"
+                                   Text="Continue"
+                                   IsEnabled="False"
+                                   Click="ContinueButton_OnClick" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</base:PopupContent>

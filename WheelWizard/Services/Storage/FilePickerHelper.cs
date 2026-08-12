@@ -9,6 +9,18 @@ namespace WheelWizard.Services;
 
 public static class FilePickerHelper
 {
+    private static TopLevel? ResolveTopLevel(Visual? owner)
+    {
+        if (owner != null && TopLevel.GetTopLevel(owner) is { } ownerTopLevel)
+            return ownerTopLevel;
+
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
+            return null;
+
+        // During first time setup there is no main window yet, so fall back to whatever window is currently open
+        return desktop.MainWindow ?? desktop.Windows.FirstOrDefault(window => window.IsActive) ?? desktop.Windows.FirstOrDefault();
+    }
+
     /// <summary>
     /// Opens a file picker with the specified options.
     /// </summary>
@@ -19,13 +31,12 @@ public static class FilePickerHelper
     public static async Task<List<string>> OpenFilePickerAsync(
         FilePickerFileType fileType,
         bool allowMultiple = true,
-        string title = "Select Files"
+        string title = "Select Files",
+        Visual? owner = null
     )
     {
-        var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        if (storageProvider == null)
-            return [];
-        if (storageProvider.MainWindow?.StorageProvider == null)
+        var topLevel = ResolveTopLevel(owner);
+        if (topLevel?.StorageProvider == null)
             return [];
 
         var options = new FilePickerOpenOptions
@@ -35,19 +46,15 @@ public static class FilePickerHelper
             FileTypeFilter = new List<FilePickerFileType> { fileType },
         };
 
-        var selectedFiles = await storageProvider.MainWindow.StorageProvider.OpenFilePickerAsync(options);
+        var selectedFiles = await topLevel.StorageProvider.OpenFilePickerAsync(options);
 
         return selectedFiles?.Select(TryResolveLocalPath).Where(path => !string.IsNullOrWhiteSpace(path)).Select(path => path!).ToList()
             ?? [];
     }
 
-    public static async Task<string?> OpenSingleFileAsync(string title, IEnumerable<FilePickerFileType> fileTypes)
+    public static async Task<string?> OpenSingleFileAsync(string title, IEnumerable<FilePickerFileType> fileTypes, Visual? owner = null)
     {
-        var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        if (storageProvider == null)
-            return null;
-
-        var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
+        var topLevel = ResolveTopLevel(owner);
         if (topLevel?.StorageProvider == null)
             return null;
 
@@ -73,13 +80,13 @@ public static class FilePickerHelper
         return null;
     }
 
-    public static async Task<IReadOnlyList<IStorageFolder?>> SelectFolderAsync(string title, IStorageFolder? suggestedStartLocation = null)
+    public static async Task<IReadOnlyList<IStorageFolder?>> SelectFolderAsync(
+        string title,
+        IStorageFolder? suggestedStartLocation = null,
+        Visual? owner = null
+    )
     {
-        var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        if (storageProvider == null)
-            return [];
-
-        var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
+        var topLevel = ResolveTopLevel(owner);
         if (topLevel?.StorageProvider == null)
             return [];
 
@@ -128,14 +135,11 @@ public static class FilePickerHelper
         string title,
         IEnumerable<FilePickerFileType> fileTypes,
         string defaultFileName = "untitled",
-        IStorageFolder? suggestedStartLocation = null
+        IStorageFolder? suggestedStartLocation = null,
+        Visual? owner = null
     )
     {
-        var storageProvider = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        if (storageProvider == null)
-            return null;
-
-        var topLevel = TopLevel.GetTopLevel(storageProvider.MainWindow);
+        var topLevel = ResolveTopLevel(owner);
         if (topLevel?.StorageProvider == null)
             return null;
 

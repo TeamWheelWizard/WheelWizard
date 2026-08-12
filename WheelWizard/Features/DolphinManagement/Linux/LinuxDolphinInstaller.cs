@@ -1,41 +1,16 @@
-namespace WheelWizard.DolphinInstaller;
+using WheelWizard.DolphinManagement.Abstractions;
 
-public interface ILinuxDolphinInstaller
-{
-    bool IsDolphinInstalledInFlatpak();
-    bool IsDolphinInstalledNative();
-    bool IsFlatpakInstalled();
-    Task<OperationResult> InstallFlatpak(IProgress<int>? progress = null);
-    Task<OperationResult> InstallFlatpakDolphin(IProgress<int>? progress = null);
-}
+namespace WheelWizard.DolphinManagement.Linux;
 
 public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnvironment, ILinuxProcessService processService)
-    : ILinuxDolphinInstaller
+    : IDolphinInstaller
 {
-    public bool IsDolphinInstalledInFlatpak()
-    {
-        const string dolphinAppId = "org.DolphinEmu.dolphin-emu";
-        var processResult = processService.Run("flatpak", "list --app --columns=application", out var stdOut, out _);
-
-        return processResult.IsSuccess && processResult.Value == 0 && stdOut.Split('\n').Any(line => line == dolphinAppId);
-    }
-
-    public bool IsDolphinInstalledNative()
-    {
-        if (!commandEnvironment.IsCommandAvailable("dolphin-emu"))
-        {
-            return false;
-        }
-        var processResult = processService.Run("dolphin-emu", "--version");
-        return processResult.IsSuccess && processResult.Value == 0;
-    }
-
-    public bool IsFlatpakInstalled()
+    private bool IsFlatpakInstalled()
     {
         return commandEnvironment.IsCommandAvailable("flatpak");
     }
 
-    public async Task<OperationResult> InstallFlatpak(IProgress<int>? progress = null)
+    private async Task<OperationResult> InstallFlatpak(IProgress<int>? progress = null)
     {
         if (IsFlatpakInstalled())
             return Ok();
@@ -60,7 +35,7 @@ public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnviro
         return Ok();
     }
 
-    public async Task<OperationResult> InstallFlatpakDolphin(IProgress<int>? progress = null)
+    public async Task<OperationResult> InstallDolphin(IProgress<int>? progress = null)
     {
         if (!IsFlatpakInstalled())
         {
