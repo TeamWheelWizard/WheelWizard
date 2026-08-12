@@ -36,6 +36,11 @@ public class RrLauncher : ILauncher
             if (!File.Exists(PathManager.GameFilePath))
                 return Fail(t("message_warning.not_find_game.extra"));
 
+            // Check first so a blocked launch does not kill Dolphin or prepare patches.
+            var preflightResult = await DolphinLaunchHelper.PreflightDolphinVersionAsync();
+            if (preflightResult.IsFailure)
+                return preflightResult.Error;
+
             DolphinLaunchHelper.KillDolphin();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
@@ -56,9 +61,13 @@ public class RrLauncher : ILauncher
 
             RetroRewindLaunchHelper.GenerateLaunchJson();
             var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";
-            await DolphinLaunchHelper.LaunchDolphin(
-                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
+            var dolphinLaunchResult = await DolphinLaunchHelper.LaunchDolphin(
+                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False",
+                versionPreflightResult: preflightResult
             );
+            if (dolphinLaunchResult.IsFailure)
+                return dolphinLaunchResult.Error;
+
             return Ok();
         }
         catch (Exception ex)

@@ -125,18 +125,22 @@ public static class DolphinLaunchHelper
         return fixedFlatpakDolphinLocation;
     }
 
-    /// <summary>
-    /// Blocks the launch when the configured Dolphin is known to be older than the version that fixed
-    /// the disc-image parsing vulnerabilities, and returns whether we should carry on launching.
-    /// </summary>
-    private static async Task<bool> ConfirmDolphinVersionAsync()
+    private static async Task<(DolphinVersionStatus Status, string? Version)> CheckDolphinVersionAsync()
     {
         var versionService = App.Services.GetRequiredService<IDolphinVersionService>();
 
         // Reading the version can mean spawning a process, so keep it off the UI thread.
-        var (status, version) = await Task.Run(versionService.CheckConfiguredDolphin);
+        return await Task.Run(versionService.CheckConfiguredDolphin);
+    }
+
+    /// <summary>
+    /// Checks whether the configured Dolphin can be used before callers perform launch preparation.
+    /// </summary>
+    public static async Task<OperationResult> PreflightDolphinVersionAsync()
+    {
+        var (status, version) = await CheckDolphinVersionAsync();
         if (status == DolphinVersionStatus.Supported)
-            return true;
+            return Ok();
 
         if (status == DolphinVersionStatus.Unknown)
         {
@@ -147,7 +151,7 @@ public static class DolphinLaunchHelper
                 .SetTitleText(t("message_warning.dolphin_version_unverified.title"))
                 .SetInfoText(t("message_warning.dolphin_version_unverified.extra", DolphinVersion.MinimumDisplayText))
                 .ShowDialog();
-            return true;
+            return Ok();
         }
 
         var popup = new YesNoWindow()
@@ -159,12 +163,12 @@ public static class DolphinLaunchHelper
         if (await popup.AwaitAnswer())
         {
             await StartDolphinUpdateAsync();
-            return false;
+            return Fail("Dolphin launch did not proceed because an update was requested.");
         }
 
         // Dismissing the popup is not the same as choosing to play anyway, so only an explicit
         // click on the red button gets through.
-        return popup.NoButtonClicked;
+        return popup.NoButtonClicked ? Ok() : Fail("Dolphin launch was cancelled.");
     }
 
     /// <summary>
@@ -208,10 +212,15 @@ public static class DolphinLaunchHelper
     }
 
     // Make sure all file arguments are absolute paths
-    public static async Task LaunchDolphin(string arguments = "", bool shellExecute = false)
+    public static async Task<OperationResult> LaunchDolphin(
+        string arguments = "",
+        bool shellExecute = false,
+        OperationResult? versionPreflightResult = null
+    )
     {
-        if (!await ConfirmDolphinVersionAsync())
-            return;
+        versionPreflightResult ??= await PreflightDolphinVersionAsync();
+        if (versionPreflightResult.IsFailure)
+            return versionPreflightResult;
 
         try
         {
@@ -247,6 +256,7 @@ public static class DolphinLaunchHelper
             }
 
             Process.Start(startInfo);
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -255,6 +265,7 @@ public static class DolphinLaunchHelper
                 .SetTitleText("Failed to launch Dolphin")
                 .SetInfoText($"Reason: {ex.Message}")
                 .Show();
+            return new OperationError { Message = $"Failed to launch Dolphin: {ex.Message}", Exception = ex };
         }
     }
 }
