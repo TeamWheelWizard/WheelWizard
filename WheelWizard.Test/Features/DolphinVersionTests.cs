@@ -5,15 +5,15 @@ namespace WheelWizard.Test.Features;
 public class DolphinVersionTests
 {
     [Theory]
-    // The two patched builds, and anything past them.
+    // The patched point release and dev-build cutoff, and anything past them.
     [InlineData("2606a")]
     [InlineData("2606b")]
-    [InlineData("2606-235")]
-    [InlineData("2606-274")]
+    [InlineData("2606-300")]
+    [InlineData("2606-301")]
     [InlineData("2607")]
     [InlineData("2701a")]
     // The shapes we get from the actual probes rather than from a bare setting.
-    [InlineData("Dolphin 2606-274")]
+    [InlineData("Dolphin 2606-300")]
     [InlineData("  2606a\n")]
     public void GetStatus_AcceptsThePatchedBuilds(string text)
     {
@@ -23,7 +23,7 @@ public class DolphinVersionTests
     [Theory]
     // The initial 2606 release predates the point release that carries the fix.
     [InlineData("2606")]
-    [InlineData("2606-234")]
+    [InlineData("2606-299")]
     [InlineData("2603a")]
     [InlineData("2503")]
     [InlineData("2412")]

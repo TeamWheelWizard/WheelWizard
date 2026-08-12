@@ -16,14 +16,14 @@ public enum DolphinVersionStatus
 
 /// <summary>
 /// Understands Dolphin's YYMM version scheme, e.g. "2606" (release), "2606a" (point release) or
-/// "2606-235" (dev build, 235 commits after the 2606 release).
+/// "2606-300" (dev build, 300 commits after the 2606 release).
 /// </summary>
 public static class DolphinVersion
 {
     /// <summary>Dolphin moved from the old "5.0" style to YYMM releases with 2412.</summary>
     private const int FirstYearMonthRelease = 2412;
 
-    /// <summary>The oldest builds that carry the fix: release 2606a, or dev build 2606-235.</summary>
+    /// <summary>The oldest builds that carry the fix: release 2606a, or dev build 2606-300.</summary>
     private const int MinimumYearMonth = 2606;
     private const char MinimumRevision = 'a';
     private const int MinimumDevBuild = 300;
@@ -45,7 +45,7 @@ public static class DolphinVersion
     private static readonly Regex LegacyPattern = new(@"(?<![\w.])[0-5]\.\d+(?:\.\d+)*(?:-\d+)?(?![\w])", RegexOptions.Compiled);
 
     /// <summary>
-    /// Judges any version text Dolphin hands us, be it a bare "2606a" or the "Dolphin 2606-235" that
+    /// Judges any version text Dolphin hands us, be it a bare "2606a" or the "Dolphin 2606-300" that
     /// <c>--version</c> prints. Also returns the version as found in the text, for showing to the user.
     /// </summary>
     public static DolphinVersionStatus GetStatus(string? text, out string? foundVersion)
