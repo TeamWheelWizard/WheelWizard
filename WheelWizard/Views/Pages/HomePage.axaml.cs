@@ -99,9 +99,9 @@ public partial class HomePage : UserControlBase
         UpdateActionButton();
     }
 
-    private void DolphinButton_OnClick(object? sender, RoutedEventArgs e)
+    private async void DolphinButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        DolphinLaunchHelper.LaunchDolphin();
+        await DolphinLaunchHelper.LaunchDolphin();
         DisableAllButtonsTemporarily();
     }
 

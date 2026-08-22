@@ -1,6 +1,7 @@
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.Popups.Base;
 
 namespace WheelWizard.Views.Popups.Generic;
@@ -8,6 +9,13 @@ namespace WheelWizard.Views.Popups.Generic;
 public partial class YesNoWindow : PopupContent
 {
     public bool Result { get; private set; } = false;
+
+    /// <summary>
+    /// Whether the user actually picked "no", as opposed to dismissing the window. Both leave
+    /// <see cref="Result"/> false, but a caller that treats "no" as a deliberate choice needs to tell them apart.
+    /// </summary>
+    public bool NoButtonClicked { get; private set; } = false;
+
     private TaskCompletionSource<bool>? _tcs;
 
     public YesNoWindow()
@@ -41,6 +49,13 @@ public partial class YesNoWindow : PopupContent
         return this;
     }
 
+    public YesNoWindow SetButtonVariants(Button.ButtonsVariantType yesVariant, Button.ButtonsVariantType noVariant)
+    {
+        YesButton.Variant = yesVariant;
+        NoButton.Variant = noVariant;
+        return this;
+    }
+
     private void yesButton_Click(object sender, RoutedEventArgs e)
     {
         Result = true;
@@ -48,7 +63,11 @@ public partial class YesNoWindow : PopupContent
         Close();
     }
 
-    private void noButton_Click(object sender, RoutedEventArgs e) => Close();
+    private void noButton_Click(object sender, RoutedEventArgs e)
+    {
+        NoButtonClicked = true;
+        Close();
+    }
 
     protected override void BeforeClose()
     {

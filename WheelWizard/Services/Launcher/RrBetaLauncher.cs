@@ -32,6 +32,11 @@ public class RrBetaLauncher : ILauncher
     {
         try
         {
+            // Check first so a blocked launch does not kill Dolphin or prepare patches.
+            var preflightResult = await DolphinLaunchHelper.PreflightDolphinVersionAsync();
+            if (preflightResult.IsFailure)
+                return preflightResult.Error;
+
             DolphinLaunchHelper.KillDolphin();
             if (WiiMoteSettings.IsForceSettingsEnabled())
                 WiiMoteSettings.DisableVirtualWiiMote();
@@ -55,9 +60,13 @@ public class RrBetaLauncher : ILauncher
 
             RetroRewindLaunchHelper.GenerateLaunchJson(PathManager.RrBetaXmlFilePath);
             var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";
-            DolphinLaunchHelper.LaunchDolphin(
-                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False"
+            var dolphinLaunchResult = await DolphinLaunchHelper.LaunchDolphin(
+                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False",
+                versionPreflightResult: preflightResult
             );
+            if (dolphinLaunchResult.IsFailure)
+                return dolphinLaunchResult.Error;
+
             return Ok();
         }
         catch (Exception ex)

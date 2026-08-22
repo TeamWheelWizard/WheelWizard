@@ -23,11 +23,7 @@ public class SettingsManager : ISettingsManager
     private double _internalScale = -1.0;
 
     #region Constructor
-    public SettingsManager(
-        IWhWzSettingManager whWzSettingManager,
-        IDolphinSettingManager dolphinSettingManager,
-        IFileSystem fileSystem
-    )
+    public SettingsManager(IWhWzSettingManager whWzSettingManager, IDolphinSettingManager dolphinSettingManager, IFileSystem fileSystem)
     {
         _whWzSettingManager = whWzSettingManager;
         _dolphinSettingManager = dolphinSettingManager;
@@ -90,7 +86,10 @@ public class SettingsManager : ISettingsManager
                     return false;
 
                 // `~/.dolphin-emu` would be used if it exists
-                if (!PathManager.IsFlatpakDolphinFilePath(dolphinLocation) && _fileSystem.Directory.Exists(PathManager.LinuxDolphinLegacyFolderPath))
+                if (
+                    !PathManager.IsFlatpakDolphinFilePath(dolphinLocation)
+                    && _fileSystem.Directory.Exists(PathManager.LinuxDolphinLegacyFolderPath)
+                )
                     return false;
 
                 return true;

@@ -10,6 +10,11 @@ public static class MiiChannelLaunchHelper
 
     public static async Task LaunchMiiChannel()
     {
+        // Check first so a blocked launch does not enable the virtual Wii Remote.
+        var preflightResult = await DolphinLaunchHelper.PreflightDolphinVersionAsync();
+        if (preflightResult.IsFailure)
+            return;
+
         WiiMoteSettings.EnableVirtualWiiMote();
         var miiChannelExists = File.Exists(MiiChannelPath);
         ;
@@ -35,6 +40,9 @@ public static class MiiChannelLaunchHelper
         }
 
         if (miiChannelExists)
-            DolphinLaunchHelper.LaunchDolphin($"-b {EnvHelper.QuotePath(Path.GetFullPath(MiiChannelPath))}");
+            await DolphinLaunchHelper.LaunchDolphin(
+                $"-b {EnvHelper.QuotePath(Path.GetFullPath(MiiChannelPath))}",
+                versionPreflightResult: preflightResult
+            );
     }
 }
