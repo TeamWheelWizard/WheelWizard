@@ -12,6 +12,7 @@ public class SettingsManager : ISettingsManager
 {
     private readonly IWhWzSettingManager _whWzSettingManager;
     private readonly IDolphinSettingManager _dolphinSettingManager;
+    private readonly IRecompSettingManager _recompSettingManager;
     private readonly IFileSystem _fileSystem;
 
     private readonly Setting _dolphinCompilationMode;
@@ -23,13 +24,28 @@ public class SettingsManager : ISettingsManager
     private double _internalScale = -1.0;
 
     #region Constructor
-    public SettingsManager(IWhWzSettingManager whWzSettingManager, IDolphinSettingManager dolphinSettingManager, IFileSystem fileSystem)
+    public SettingsManager(
+        IWhWzSettingManager whWzSettingManager,
+        IDolphinSettingManager dolphinSettingManager,
+        IRecompSettingManager recompSettingManager,
+        IFileSystem fileSystem
+    )
     {
         _whWzSettingManager = whWzSettingManager;
         _dolphinSettingManager = dolphinSettingManager;
+        _recompSettingManager = recompSettingManager;
         _fileSystem = fileSystem;
 
         #region WhWz settings
+        // Register this first because the path validators use the active frontend mode when deciding
+        // whether Dolphin-only locations may be left blank.
+        ENABLE_RECOMP = RegisterWhWz("EnableRecomp", false);
+        // A recomp install should continue using the Dolphin NAND Wheel Wizard already manages.
+        // Users can still opt out in Recomp Settings when they deliberately want private data.
+        RECOMP_USE_DOLPHIN_DATA = RegisterWhWz("RecompUseDolphinData", true);
+        // Dolphin advises against other programs touching its NAND in place, so the first install
+        // offers to copy it instead; this remembers that the user chose the copy.
+        RECOMP_COPY_DOLPHIN_NAND = RegisterWhWz("RecompCopyDolphinNand", false);
         DOLPHIN_LOCATION = RegisterWhWz(
             "DolphinLocation",
             "",
@@ -37,7 +53,7 @@ public class SettingsManager : ISettingsManager
             {
                 var pathOrCommand = value as string ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(pathOrCommand))
-                    return false;
+                    return IsRecompModeActive();
 
                 if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
                 {
@@ -54,6 +70,8 @@ public class SettingsManager : ISettingsManager
             value =>
             {
                 var userFolderPath = value as string ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(userFolderPath))
+                    return IsRecompModeActive();
                 if (!_fileSystem.Directory.Exists(userFolderPath))
                     return false;
 
@@ -144,6 +162,18 @@ public class SettingsManager : ISettingsManager
         MACADDRESS = RegisterDolphin(("Dolphin.ini", "General", "WirelessMac"), "02:01:02:03:04:05");
         #endregion
 
+        #region Recomp settings
+        // Stored in the recomp's own Config.toml, which the in-game settings bar also writes.
+        // Defaults mirror the runtime's own fallbacks, so an absent key reads the same here as in game.
+        RECOMP_RESOLUTION_MULTIPLIER = RegisterRecomp(("video", "resolution_multiplier"), 1.0);
+        RECOMP_GRAPHICS_API = RegisterRecomp(("video", "graphics_api"), "auto");
+        RECOMP_SHOW_FPS = RegisterRecomp(("video", "show_fps"), true);
+        RECOMP_PREVENT_STUTTERS = RegisterRecomp(("video", "skip_unready_pipelines"), true);
+        // The Wii data folder the runtime should use, written by RecompDolphinDataService after an
+        // install and whenever the sharing choice changes. Empty/absent means the runtime's private NAND.
+        RECOMP_NAND_ROOT = RegisterRecomp(("paths", "nand_root"), "");
+        #endregion
+
         #region Virtual settings
         var windowScale = new VirtualSetting(
             typeof(double),
@@ -190,6 +220,9 @@ public class SettingsManager : ISettingsManager
     public Setting FORCE_WIIMOTE { get; }
     public Setting LAUNCH_WITH_DOLPHIN { get; }
     public Setting LAUNCH_RR_ON_STARTUP { get; }
+    public Setting ENABLE_RECOMP { get; }
+    public Setting RECOMP_USE_DOLPHIN_DATA { get; }
+    public Setting RECOMP_COPY_DOLPHIN_NAND { get; }
     public Setting PREFERS_MODS_ROW_VIEW { get; }
     public Setting USE_PATCHES_SYSTEM { get; }
     public Setting FOCUSED_USER { get; }
@@ -209,6 +242,11 @@ public class SettingsManager : ISettingsManager
     public Setting MACADDRESS { get; }
     public Setting WINDOW_SCALE { get; }
     public Setting RECOMMENDED_SETTINGS { get; }
+    public Setting RECOMP_RESOLUTION_MULTIPLIER { get; }
+    public Setting RECOMP_GRAPHICS_API { get; }
+    public Setting RECOMP_SHOW_FPS { get; }
+    public Setting RECOMP_PREVENT_STUTTERS { get; }
+    public Setting RECOMP_NAND_ROOT { get; }
     #endregion
 
     #region Public API
@@ -235,16 +273,31 @@ public class SettingsManager : ISettingsManager
         return reportResult.IsSuccess && reportResult.Value.IsValid;
     }
 
+    public bool DolphinPathsSetupCorrectly()
+    {
+        var reportResult = ValidateDolphinPathSettings();
+        return reportResult.IsSuccess && reportResult.Value.IsValid;
+    }
+
     public OperationResult<SettingsValidationReport> ValidateCorePathSettings()
+    {
+        return ValidatePathSettings(requireDolphin: !IsRecompModeActive());
+    }
+
+    private OperationResult<SettingsValidationReport> ValidateDolphinPathSettings() => ValidatePathSettings(requireDolphin: true);
+
+    public bool IsRecompModeActive() => OperatingSystem.IsWindows() && Get<bool>(ENABLE_RECOMP);
+
+    private OperationResult<SettingsValidationReport> ValidatePathSettings(bool requireDolphin)
     {
         try
         {
             var issues = new List<SettingsValidationIssue>();
 
-            if (!USER_FOLDER_PATH.IsValid())
+            if (requireDolphin && (string.IsNullOrWhiteSpace(Get<string>(USER_FOLDER_PATH)) || !USER_FOLDER_PATH.IsValid()))
                 issues.Add(new(SettingsValidationCode.InvalidUserFolderPath, USER_FOLDER_PATH.Name, "User folder path is invalid."));
 
-            if (!DOLPHIN_LOCATION.IsValid())
+            if (requireDolphin && (string.IsNullOrWhiteSpace(Get<string>(DOLPHIN_LOCATION)) || !DOLPHIN_LOCATION.IsValid()))
                 issues.Add(
                     new(SettingsValidationCode.InvalidDolphinLocation, DOLPHIN_LOCATION.Name, "Dolphin path or command is invalid.")
                 );
@@ -267,6 +320,7 @@ public class SettingsManager : ISettingsManager
 
         _whWzSettingManager.LoadSettings();
         _dolphinSettingManager.LoadSettings();
+        _recompSettingManager.LoadSettings();
         _hasLoadedSettings = true;
     }
     #endregion
@@ -289,6 +343,16 @@ public class SettingsManager : ISettingsManager
             setting.SetValidation(validation);
 
         _dolphinSettingManager.RegisterSetting(setting);
+        return setting;
+    }
+
+    private RecompSetting RegisterRecomp<T>((string, string) location, T defaultValue, Func<object?, bool>? validation = null)
+    {
+        var setting = new RecompSetting(typeof(T), location, defaultValue!, _recompSettingManager.SaveSettings);
+        if (validation != null)
+            setting.SetValidation(validation);
+
+        _recompSettingManager.RegisterSetting(setting);
         return setting;
     }
     #endregion

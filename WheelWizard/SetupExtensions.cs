@@ -14,6 +14,7 @@ using WheelWizard.GitHub;
 using WheelWizard.Localization;
 using WheelWizard.MiiImages;
 using WheelWizard.Mods;
+using WheelWizard.Recomp;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services.LiveData;
@@ -49,6 +50,7 @@ public static class SetupExtensions
         services.AddArchives();
         services.AddPatches();
         services.AddMods();
+        services.AddRecomp();
 
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();
@@ -64,6 +66,7 @@ public static class SetupExtensions
         services.AddTransient(typeof(IApiCaller<>), typeof(ApiCaller<>));
         services.AddTransient<RrLauncher>();
         services.AddTransient<RrBetaLauncher>();
+        services.AddSingleton<ILauncherProvider, LauncherProvider>();
         services.AddSingleton<WhWzStatusManager>();
         services.AddSingleton<RRLiveRooms>();
     }

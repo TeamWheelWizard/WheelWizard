@@ -20,25 +20,26 @@ public partial class OtherSettings : UserControlBase
     public OtherSettings()
     {
         InitializeComponent();
-        _settingsAreDisabled = !SettingsService.PathsSetupCorrectly();
+        _settingsAreDisabled = !SettingsService.DolphinPathsSetupCorrectly();
         DisabledWarningText.IsVisible = _settingsAreDisabled;
 
-        DolphinBorder.IsEnabled = !_settingsAreDisabled;
+        // Recomp can be enabled with only a game image configured. Disable the Dolphin-only
+        // controls individually so the recomp switch never becomes trapped behind Dolphin setup.
+        LaunchRrOnStartup.IsEnabled = !_settingsAreDisabled;
+        DolphinReinstallButton.IsEnabled = !_settingsAreDisabled;
+        OpenSaveFolderButton.IsEnabled = !_settingsAreDisabled;
         if (!_settingsAreDisabled)
             LoadSettings();
         ForceLoadSettings();
 
         // Attach event handlers after loading settings to avoid unwanted triggers
-        DisableForce.IsCheckedChanged += ClickForceWiimote;
-        LaunchWithDolphin.IsCheckedChanged += ClickLaunchWithDolphinWindow;
         LaunchRrOnStartup.IsCheckedChanged += ClickLaunchRrOnStartup;
+        EnableRecomp.IsCheckedChanged += ClickEnableRecomp;
     }
 
     private void LoadSettings()
     {
         // Only loads when the settings are not disabled (aka when the paths are set up correctly)
-        DisableForce.IsChecked = SettingsService.Get<bool>(SettingsService.FORCE_WIIMOTE);
-        LaunchWithDolphin.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_WITH_DOLPHIN);
         LaunchRrOnStartup.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_RR_ON_STARTUP);
         OpenSaveFolderButton.IsEnabled = Directory.Exists(PathManager.SaveFolderPath);
     }
@@ -46,21 +47,23 @@ public partial class OtherSettings : UserControlBase
     private void ForceLoadSettings()
     {
         // Always loads
-    }
 
-    private void ClickForceWiimote(object? sender, RoutedEventArgs e)
-    {
-        SettingsService.Set(SettingsService.FORCE_WIIMOTE, DisableForce.IsChecked == true);
-    }
-
-    private void ClickLaunchWithDolphinWindow(object? sender, RoutedEventArgs e)
-    {
-        SettingsService.Set(SettingsService.LAUNCH_WITH_DOLPHIN, LaunchWithDolphin.IsChecked == true);
+        // The recomp only ships for Windows, so on every other platform the whole section stays hidden.
+        var recompSupported = OperatingSystem.IsWindows();
+        RecompSectionLabel.IsVisible = recompSupported;
+        RecompBorder.IsVisible = recompSupported;
+        if (recompSupported)
+            EnableRecomp.IsChecked = SettingsService.Get<bool>(SettingsService.ENABLE_RECOMP);
     }
 
     private void ClickLaunchRrOnStartup(object? sender, RoutedEventArgs e)
     {
         SettingsService.Set(SettingsService.LAUNCH_RR_ON_STARTUP, LaunchRrOnStartup.IsChecked == true);
+    }
+
+    private void ClickEnableRecomp(object? sender, RoutedEventArgs e)
+    {
+        SettingsService.Set(SettingsService.ENABLE_RECOMP, EnableRecomp.IsChecked == true);
     }
 
     private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e)

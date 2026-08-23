@@ -128,7 +128,7 @@ public class SettingsManagerTests
         whWzSettingManager = Substitute.For<IWhWzSettingManager>();
         dolphinSettingManager = Substitute.For<IDolphinSettingManager>();
 
-        return new SettingsManager(whWzSettingManager, dolphinSettingManager, fileSystem);
+        return new SettingsManager(whWzSettingManager, dolphinSettingManager, Substitute.For<IRecompSettingManager>(), fileSystem);
     }
 }
 

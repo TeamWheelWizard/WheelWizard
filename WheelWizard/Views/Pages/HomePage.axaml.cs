@@ -34,7 +34,7 @@ public partial class HomePage : UserControlBase
     private ISettingsManager SettingsService { get; set; } = null!;
 
     [Inject]
-    private RrLauncher RrLauncher { get; set; } = null!;
+    private ILauncherProvider LauncherProvider { get; set; } = null!;
 
     [Inject]
     private IRandomSystem RandomSystem { get; set; } = null!;
@@ -42,7 +42,7 @@ public partial class HomePage : UserControlBase
     private ILauncher CurrentLauncher => _launcherTypes[_launcherIndex];
     private int _launcherIndex; // Make sure this index never goes over the list index
 
-    private WheelTrail[] _trails; // also used as a lock
+    private readonly WheelTrail[] _trails; // also used as a lock
     private WheelTrailState _currentTrailState = WheelTrailState.Static_None;
 
     private readonly List<ILauncher> _launcherTypes = [];
@@ -85,12 +85,43 @@ public partial class HomePage : UserControlBase
     public HomePage()
     {
         InitializeComponent();
-        _launcherTypes.Add(RrLauncher);
-        PopulateGameModeDropdown();
-        UpdatePage();
 
+        // The trails double as the animation lock, so they have to exist before anything that can
+        // reach an animation runs. UpdatePage() ends in a status read that is allowed to complete
+        // synchronously (a launcher that already knows it is Ready never yields), and a synchronous
+        // Ready draws the button and starts the entrance animation inside this constructor.
         _trails = [HomeTrail1, HomeTrail2, HomeTrail3, HomeTrail4, HomeTrail5];
         RandomSystem.Random.Shared.Shuffle(_trails);
+
+        _launcherTypes.Add(LauncherProvider.GetActiveLauncher());
+        if (SettingsService.IsRecompModeActive())
+            DolphinButton.IsVisible = false;
+        else
+            ApplyDolphinTrailColors();
+        PopulateGameModeDropdown();
+        UpdatePage();
+    }
+
+    /// <summary>
+    /// The wheel trails tell you what Play will start: blue for a Dolphin session, and the default
+    /// primary color for WiiCompiled. The XAML defaults are the WiiCompiled palette, so only the
+    /// Dolphin frontend recolors anything.
+    /// </summary>
+    private void ApplyDolphinTrailColors()
+    {
+        RecolorTrail(HomeTrail1, "Blue400", "Blue700");
+        RecolorTrail(HomeTrail2, "Blue600", "Blue800");
+        RecolorTrail(HomeTrail3, "Blue200", "Blue600");
+        RecolorTrail(HomeTrail4, "Blue400", "Blue700");
+        RecolorTrail(HomeTrail5, "Blue600", "Blue800");
+    }
+
+    private void RecolorTrail(WheelTrail trail, string backgroundKey, string foregroundKey)
+    {
+        if (this.FindResource(backgroundKey) is Color background)
+            trail.Background = new SolidColorBrush(background);
+        if (this.FindResource(foregroundKey) is Color foreground)
+            trail.Foreground = new SolidColorBrush(foreground);
     }
 
     private void UpdatePage()

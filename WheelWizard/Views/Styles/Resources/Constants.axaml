@@ -209,6 +209,19 @@
         <Color x:Key="Warning900">#74420F</Color>
         <Color x:Key="Warning950">#442204</Color>
 
+        <!-- Blue Scale -->
+        <Color x:Key="Blue50">#EDF6FF</Color>
+        <Color x:Key="Blue100">#D6EAFF</Color>
+        <Color x:Key="Blue200">#ADD6FF</Color>
+        <Color x:Key="Blue300">#79BAFF</Color>
+        <Color x:Key="Blue400">#3D96F5</Color>
+        <Color x:Key="Blue500">#1D7DE0</Color>
+        <Color x:Key="Blue600">#0E63C4</Color>
+        <Color x:Key="Blue700">#0B4E9C</Color>
+        <Color x:Key="Blue800">#0D427E</Color>
+        <Color x:Key="Blue900">#103A69</Color>
+        <Color x:Key="Blue950">#0A2547</Color>
+
         <!-- Primary Scale -->
         <Color x:Key="Primary50">#EEFFFA</Color>
         <Color x:Key="Primary100">#C7FFF0</Color>
