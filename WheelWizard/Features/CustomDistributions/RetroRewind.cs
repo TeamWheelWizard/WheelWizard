@@ -94,8 +94,16 @@ public class RetroRewind : IDistribution
                 _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
             _fileSystem.Directory.CreateDirectory(tempExtractionPath);
 
+            var installUrlResult = await _api.CallApiAsync(api => api.GetInstallUrl());
+            if (installUrlResult.IsFailure || string.IsNullOrWhiteSpace(installUrlResult.Value))
+                return Fail("Failed to get Retro Rewind download URL.");
+
             //todo, service
-            var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(Endpoints.RRZipUrl, downloadedZipPath, progressWindow);
+            var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(
+                installUrlResult.Value.Trim(),
+                downloadedZipPath,
+                progressWindow
+            );
             if (string.IsNullOrWhiteSpace(downloadedFilePath) || !_fileSystem.File.Exists(downloadedFilePath))
                 return progressWindow.WasCancellationRequested ? Ok() : Fail("Failed to download Retro Rewind files.");
 

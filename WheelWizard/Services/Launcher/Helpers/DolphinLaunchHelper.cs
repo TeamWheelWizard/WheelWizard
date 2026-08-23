@@ -1,14 +1,19 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
+using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
+using Button = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Services.Launcher.Helpers;
 
 public static class DolphinLaunchHelper
 {
+    private const string DolphinDownloadUrl = "https://dolphin-emu.org/download/";
+
     private static ISettingsManager Settings => SettingsRuntime.Current;
 
     public static void KillDolphin() //dont tell PETA
@@ -81,22 +86,9 @@ public static class DolphinLaunchHelper
         return false;
     }
 
-    private static string ExtractDolphinAppId(string flatpakDolphinLocation)
-    {
-        var defaultAppId = "org.DolphinEmu.dolphin-emu";
-
-        if (string.IsNullOrWhiteSpace(flatpakDolphinLocation))
-        {
-            return defaultAppId;
-        }
-
-        var matches = Regex.Matches(flatpakDolphinLocation, @"(?i)\b[a-z][a-z0-9]*(?:\.[a-z_][a-z0-9_]*){1,}\.[a-z_][a-z0-9_-]*\b");
-        return matches.Count == 0 ? defaultAppId : matches[^1].Value;
-    }
-
     private static string FixFlatpakDolphinPermissions(string flatpakDolphinLocation)
     {
-        var dolphinAppId = ExtractDolphinAppId(flatpakDolphinLocation);
+        var dolphinAppId = PathManager.ExtractDolphinFlatpakAppId(flatpakDolphinLocation);
         var fixedFlatpakDolphinLocation = flatpakDolphinLocation;
         void AddFilesystemPerm(string newFilesystemPerm, string mode = "")
         {
@@ -133,9 +125,103 @@ public static class DolphinLaunchHelper
         return fixedFlatpakDolphinLocation;
     }
 
-    // Make sure all file arguments are absolute paths
-    public static void LaunchDolphin(string arguments = "", bool shellExecute = false)
+    private static async Task<(DolphinVersionStatus Status, string? Version)> CheckDolphinVersionAsync()
     {
+        var versionService = App.Services.GetRequiredService<IDolphinVersionService>();
+
+        // Reading the version can mean spawning a process, so keep it off the UI thread.
+        return await Task.Run(versionService.CheckConfiguredDolphin);
+    }
+
+    /// <summary>
+    /// Checks whether the configured Dolphin can be used before callers perform launch preparation.
+    /// </summary>
+    public static async Task<OperationResult> PreflightDolphinVersionAsync()
+    {
+        var (status, version) = await CheckDolphinVersionAsync();
+        if (status == DolphinVersionStatus.Supported)
+            return Ok();
+
+        if (status == DolphinVersionStatus.Unknown)
+        {
+            // We could not read a version, so we have nothing to accuse them of. Say exactly that,
+            // hand the check over to them, and let them play.
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Warning)
+                .SetTitleText(t("message_warning.dolphin_version_unverified.title"))
+                .SetInfoText(t("message_warning.dolphin_version_unverified.extra", DolphinVersion.MinimumDisplayText))
+                .ShowDialog();
+            return Ok();
+        }
+
+        var popup = new YesNoWindow()
+            .SetButtonVariants(Button.ButtonsVariantType.Primary, Button.ButtonsVariantType.Danger)
+            .SetButtonText(t("action.update"), t("action.play_anyway"))
+            .SetMainText(t("question.dolphin_outdated.title"))
+            .SetExtraText(t("question.dolphin_outdated.extra", version ?? t("state.unknown"), DolphinVersion.MinimumDisplayText));
+
+        if (await popup.AwaitAnswer())
+        {
+            await StartDolphinUpdateAsync();
+            return Fail("Dolphin launch did not proceed because an update was requested.");
+        }
+
+        // Dismissing the popup is not the same as choosing to play anyway, so only an explicit
+        // click on the red button gets through.
+        return popup.NoButtonClicked ? Ok() : Fail("Dolphin launch was cancelled.");
+    }
+
+    /// <summary>
+    /// Updates a Flatpak Dolphin in place, because there we actually can. Every other install shape
+    /// just gets pointed at the download page.
+    /// </summary>
+    private static async Task StartDolphinUpdateAsync()
+    {
+        var dolphinLocation = Settings.Get<string>(Settings.DOLPHIN_LOCATION);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || !PathManager.IsFlatpakDolphinFilePath(dolphinLocation))
+        {
+            ViewUtils.OpenLink(DolphinDownloadUrl);
+            return;
+        }
+
+        var installer = App.Services.GetRequiredService<ILinuxDolphinInstaller>();
+        var progressWindow = new ProgressWindow(t("progress.updating_dolphin"));
+        progressWindow.Show();
+
+        OperationResult updateResult;
+        try
+        {
+            var progress = new Progress<int>(percentage => progressWindow.UpdateProgress(percentage));
+            updateResult = await installer.UpdateFlatpakDolphin(PathManager.ExtractDolphinFlatpakAppId(dolphinLocation), progress);
+        }
+        finally
+        {
+            progressWindow.Close();
+        }
+
+        if (updateResult.IsSuccess)
+        {
+            ViewUtils.ShowSnackbar(t("snackbar_success.dolphin_updated"));
+        }
+        else
+        {
+            // Nothing we can do about it from here, so hand them the manual route.
+            ViewUtils.ShowSnackbar(updateResult.Error.Message, ViewUtils.SnackbarType.Danger);
+            ViewUtils.OpenLink(DolphinDownloadUrl);
+        }
+    }
+
+    // Make sure all file arguments are absolute paths
+    public static async Task<OperationResult> LaunchDolphin(
+        string arguments = "",
+        bool shellExecute = false,
+        OperationResult? versionPreflightResult = null
+    )
+    {
+        versionPreflightResult ??= await PreflightDolphinVersionAsync();
+        if (versionPreflightResult.IsFailure)
+            return versionPreflightResult;
+
         try
         {
             var startInfo = new ProcessStartInfo();
@@ -170,6 +256,7 @@ public static class DolphinLaunchHelper
             }
 
             Process.Start(startInfo);
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -178,6 +265,7 @@ public static class DolphinLaunchHelper
                 .SetTitleText("Failed to launch Dolphin")
                 .SetInfoText($"Reason: {ex.Message}")
                 .Show();
+            return new OperationError { Message = $"Failed to launch Dolphin: {ex.Message}", Exception = ex };
         }
     }
 }

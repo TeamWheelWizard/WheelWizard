@@ -59,7 +59,8 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
 
     private void ClearCache_OnClick(object sender, RoutedEventArgs e) => ((MemoryCache)Cache).Clear();
 
-    private void MiiChannel_OnClick(object? sender, RoutedEventArgs e) => DolphinLaunchHelper.LaunchDolphin(" -b -n 0001000248414341");
+    private async void MiiChannel_OnClick(object? sender, RoutedEventArgs e) =>
+        await DolphinLaunchHelper.LaunchDolphin(" -b -n 0001000248414341");
 
     #region Popup Tests
 

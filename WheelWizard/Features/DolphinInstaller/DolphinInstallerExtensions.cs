@@ -13,6 +13,7 @@ public static class DolphinInstallerExtensions
         services.AddSingleton<ILinuxCommandEnvironment, LinuxCommandEnvironment>();
         services.AddSingleton<ILinuxProcessService, LinuxProcessService>();
         services.AddSingleton<ILinuxDolphinInstaller, LinuxDolphinInstaller>();
+        services.AddSingleton<IDolphinVersionService, DolphinVersionService>();
         return services;
     }
 }

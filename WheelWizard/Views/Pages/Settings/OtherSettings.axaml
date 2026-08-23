@@ -24,28 +24,29 @@
                 <StackPanel>
                     <CheckBox Margin="0,2" IsChecked="False"
                               Classes="SwitchDark"
-                              x:Name="DisableForce">
-                        <components1:FormFieldLabel Text="{loc:T option.force_disable_wiimote}"
-                                                   TipText="{loc:T helper_text.force_disable_wiimote}" />
-                    </CheckBox>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark"
-                              x:Name="LaunchWithDolphin">
-                        <components1:FormFieldLabel Text="{loc:T option.launch_with_dolphin}"
-                                                   TipText="{loc:T helper_text.launch_with_dolphin}" />
-                    </CheckBox>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark"
                               x:Name="LaunchRrOnStartup">
                         <components1:FormFieldLabel Text="{loc:T option.launch_rr_on_startup}"
                                                    TipText="{loc:T helper_text.launch_rr_on_startup}" />
                     </CheckBox>
                 </StackPanel>
             </Border>
-            
+
+            <components1:FormFieldLabel x:Name="RecompSectionLabel" Text="{loc:T section.recomp}" />
+            <Border Classes="SettingsBlockStyle" x:Name="RecompBorder">
+                <StackPanel>
+                    <CheckBox Margin="0,2" IsChecked="False"
+                              Classes="SwitchDark"
+                              x:Name="EnableRecomp">
+                        <components1:FormFieldLabel Text="{loc:T option.enable_recomp}"
+                                                   TipText="{loc:T helper_text.enable_recomp}" />
+                    </CheckBox>
+                </StackPanel>
+            </Border>
+
             <components1:FormFieldLabel Text="{loc:T section.installation}" />
             <StackPanel>
-                <components1:Button Variant="Warning" IsEnabled="True" HorizontalAlignment="Left"
+                <components1:Button x:Name="DolphinReinstallButton"
+                                    Variant="Warning" IsEnabled="True" HorizontalAlignment="Left"
                                     IconData="{StaticResource Download}"
                                     Text="{loc:T option.reinstall}"
                                     Click="Reinstall_RetroRewind" Margin="3" />

@@ -6,6 +6,7 @@ namespace WheelWizard.DolphinInstaller;
 public interface ILinuxProcessService
 {
     OperationResult<int> Run(string fileName, string arguments, out string stdOut, out string stdErr);
+    OperationResult<int> Run(string fileName, IEnumerable<string> argumentList, out string stdOut, out string stdErr);
     OperationResult<int> Run(string fileName, string arguments);
     Task<OperationResult<int>> RunWithProgressAsync(string fileName, string arguments, IProgress<int>? progress = null);
     Task<OperationResult> LaunchAndStopAsync(string fileName, string arguments, TimeSpan duration);
@@ -15,20 +16,30 @@ public sealed class LinuxProcessService : ILinuxProcessService
 {
     public OperationResult<int> Run(string fileName, string arguments, out string stdOut, out string stdErr)
     {
+        var processInfo = new ProcessStartInfo { FileName = fileName, Arguments = arguments };
+        return Run(processInfo, $"{fileName} {arguments}", out stdOut, out stdErr);
+    }
+
+    public OperationResult<int> Run(string fileName, IEnumerable<string> argumentList, out string stdOut, out string stdErr)
+    {
+        var processInfo = new ProcessStartInfo { FileName = fileName };
+        foreach (var argument in argumentList)
+            processInfo.ArgumentList.Add(argument);
+
+        return Run(processInfo, $"{fileName} {string.Join(' ', processInfo.ArgumentList)}", out stdOut, out stdErr);
+    }
+
+    private static OperationResult<int> Run(ProcessStartInfo processInfo, string commandText, out string stdOut, out string stdErr)
+    {
         var localStdOut = "";
         var localStdErr = "";
         var result = TryCatch(
             () =>
             {
-                var processInfo = new ProcessStartInfo
-                {
-                    FileName = fileName,
-                    Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                };
+                processInfo.RedirectStandardOutput = true;
+                processInfo.RedirectStandardError = true;
+                processInfo.UseShellExecute = false;
+                processInfo.CreateNoWindow = true;
 
                 using var process = Process.Start(processInfo);
                 if (process == null)
@@ -39,7 +50,7 @@ public sealed class LinuxProcessService : ILinuxProcessService
                 process.WaitForExit();
                 return process.ExitCode;
             },
-            $"Failed to run process: {fileName} {arguments}"
+            $"Failed to run process: {commandText}"
         );
 
         stdOut = localStdOut;

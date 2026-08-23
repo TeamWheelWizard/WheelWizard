@@ -3,6 +3,7 @@
 ## Setting Types
 - **WheelWizard:** Our own settings, we save them in a JSON file.
 - **Dolphin:** Settings from the Dolphin emulator. they store them in INI files. this implementation allows us to also modify them=
+- **Recomp:** Settings from WiiCompiled, stored in its own `Config.toml`. The in-game settings bar writes that file too, so both writers only touch their own keys; register defaults that mirror the runtime's own fallbacks so an absent key reads the same everywhere.
 - **Virtual:** Settings that are not saved. These are used for managing for computing state and managing side effect. For instance, if you want to control 3 settings with 1 toggle, virtual settings is perfect for that.
 
 ## Adding settings
@@ -32,6 +33,14 @@ MY_DOLPHIN_SETTING = RegisterDolphin(
     ("GFX.ini", "Settings", "MyDolphinKey"),
     0,
     value => (int)(value ?? -1) >= 0
+);
+```
+
+### Recomp
+```csharp
+MY_RECOMP_SETTING = RegisterRecomp(
+    ("video", "my_config_key"),
+    1.0
 );
 ```
 

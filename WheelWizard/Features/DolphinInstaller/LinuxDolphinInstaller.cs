@@ -7,6 +7,7 @@ public interface ILinuxDolphinInstaller
     bool IsFlatpakInstalled();
     Task<OperationResult> InstallFlatpak(IProgress<int>? progress = null);
     Task<OperationResult> InstallFlatpakDolphin(IProgress<int>? progress = null);
+    Task<OperationResult> UpdateFlatpakDolphin(string appId, IProgress<int>? progress = null);
 }
 
 public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnvironment, ILinuxProcessService processService)
@@ -17,9 +18,7 @@ public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnviro
         const string dolphinAppId = "org.DolphinEmu.dolphin-emu";
         var processResult = processService.Run("flatpak", "list --app --columns=application", out var stdOut, out _);
 
-        return processResult.IsSuccess && processResult.Value == 0 && stdOut
-                .Split('\n')
-                .Any(line => line == dolphinAppId);
+        return processResult.IsSuccess && processResult.Value == 0 && stdOut.Split('\n').Any(line => line == dolphinAppId);
     }
 
     public bool IsDolphinInstalledNative()
@@ -104,5 +103,23 @@ public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnviro
 
         var launchResult = await processService.LaunchAndStopAsync("flatpak", "run org.DolphinEmu.dolphin-emu", TimeSpan.FromSeconds(4));
         return launchResult.IsFailure ? launchResult.Error : Ok();
+    }
+
+    public async Task<OperationResult> UpdateFlatpakDolphin(string appId, IProgress<int>? progress = null)
+    {
+        if (!IsFlatpakInstalled())
+            return Fail("Flatpak is not available, so Dolphin cannot be updated automatically.");
+
+        // No installation scope flag on purpose: Flatpak resolves whichever installation actually
+        // holds the app. A system-wide install may still refuse without elevation, which surfaces
+        // as a non-zero exit code and lets the caller fall back to the download page.
+        var updateResult = await processService.RunWithProgressAsync("flatpak", $"update -y {appId}", progress);
+        if (updateResult.IsFailure)
+            return updateResult.Error;
+
+        if (updateResult.Value != 0)
+            return Fail($"Dolphin update failed with exit code {updateResult.Value}.");
+
+        return Ok();
     }
 }

@@ -44,6 +44,7 @@ public partial class WhWzSettings : UserControlBase
     public WhWzSettings()
     {
         InitializeComponent();
+        ConfigureLocationFieldsForActiveFrontend();
         AutoFillPaths();
         TogglePathSettings(false);
         LoadSettings();
@@ -51,6 +52,16 @@ public partial class WhWzSettings : UserControlBase
         _pageLoaded = true;
 
         WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
+    }
+
+    private void ConfigureLocationFieldsForActiveFrontend()
+    {
+        var recompEnabled = SettingsService.IsRecompModeActive();
+        DolphinExecutableField.IsVisible = !recompEnabled;
+        DolphinUserFolderLabel.Text = recompEnabled
+            ? $"{t("option.dolphin_user_path")} ({t("helper_text.optional")})"
+            : t("option.dolphin_user_path");
+        ToolTip.SetTip(LocationWarningIcon, recompEnabled ? t("helper_text.must_set_game_path") : t("helper_text.must_set_paths"));
     }
 
     private void LoadSettings()
@@ -104,7 +115,7 @@ public partial class WhWzSettings : UserControlBase
 
     private void RefreshLocalizedCodeText()
     {
-        MKGameFieldLabel.TipText = t("helper_text.end_with_x") + " .wbfs/.iso/.rvz";
+        MKGameFieldLabel.TipText = t("helper_text.end_with_x") + " .iso/.gcm/.gcz/.ciso/.wbfs/.wia/.rvz";
         TranslationsPercentageText.Text = t("text.language_translated_by", t("value.language.z_translators"));
         TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
     }
@@ -120,6 +131,11 @@ public partial class WhWzSettings : UserControlBase
 
     private void AutoFillPaths()
     {
+        // Recomp first-install owns Dolphin-data discovery so it can ask before sharing saves.
+        // Dolphin mode keeps the existing convenience auto-fill behavior.
+        if (SettingsService.IsRecompModeActive())
+            return;
+
         if (DolphinExeInput.Text != "")
             return;
 
@@ -280,7 +296,10 @@ public partial class WhWzSettings : UserControlBase
 
     private async void GameLocationBrowse_OnClick(object sender, RoutedEventArgs e)
     {
-        var fileType = new FilePickerFileType("Game files") { Patterns = ["*.iso", "*.wbfs", "*.rvz"] };
+        var fileType = new FilePickerFileType("Game files")
+        {
+            Patterns = ["*.iso", "*.gcm", "*.gcz", "*.ciso", "*.wbfs", "*.wia", "*.rvz"],
+        };
 
         var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Mario Kart Wii Game File", [fileType]);
         if (!string.IsNullOrEmpty(filePath))

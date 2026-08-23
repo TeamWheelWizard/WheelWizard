@@ -23,7 +23,7 @@
       "type": "process",
       "command": "dotnet",
       "args": [
-        "${workspaceFolder}/WheelWizard/bin/Debug-Windows/net8.0/win-x64/WheelWizard.dll"
+        "${workspaceFolder}/WheelWizard/bin/Debug-Windows/net10.0/win-x64/WheelWizard.dll"
       ],
       "dependsOn": "build WheelWizard Debug-Windows",
       "options": {
