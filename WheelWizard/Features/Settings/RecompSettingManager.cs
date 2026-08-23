@@ -6,11 +6,7 @@ namespace WheelWizard.Settings;
 
 /// <summary>
 /// Reads and writes the recomp's <c>Config.toml</c> the same way <see cref="DolphinSettingManager"/>
-/// handles Dolphin's ini files. The file has two writers — Wheel Wizard and the in-game settings
-/// bar — so every write edits only its own key and preserves everything else: comments, ordering,
-/// and every section Wheel Wizard does not own. The backend creates the file; when it does not
-/// exist yet, the registered defaults (which mirror the runtime's own fallbacks) apply and nothing
-/// is written.
+/// handles Dolphin's ini files. The file has two writers
 /// </summary>
 public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManager
 {

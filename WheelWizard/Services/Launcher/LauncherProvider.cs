@@ -15,8 +15,6 @@ public interface ILauncherProvider
 
 public class LauncherProvider(ISettingsManager settings, IServiceProvider serviceProvider) : ILauncherProvider
 {
-    // Resolved per call instead of once: the active frontend can change while the app runs, and the
-    // recomp launcher is only registered on Windows — which IsRecompModeActive() already guards.
     public ILauncher GetActiveLauncher() =>
         settings.IsRecompModeActive()
             ? serviceProvider.GetRequiredService<RecompLauncher>()

@@ -111,7 +111,7 @@ public class RecompLauncher(
     public async Task<WheelWizardStatus> GetCurrentStatus()
     {
         // While a launch or setup operation is running, the session only got this far by being
-        // ready — don't let a busy backend read replace the Play button with an error button.
+        // ready
         if (installService.OperationInFlight)
             return WheelWizardStatus.Ready;
 
