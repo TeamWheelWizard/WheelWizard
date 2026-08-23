@@ -139,6 +139,8 @@ en:
     unfavorite: "Unfavorite"
     favorite: "Favorite"
     view_room: "View Room"
+    recomp_nand_copy: "Make a copy"
+    recomp_nand_share: "Use directly"
     link:
       discord: "Talk to us!"
       github: "Source code"
@@ -252,7 +254,25 @@ en:
     downloading_mod: "Downloading {$1}"
     installing_mod: "Installing Mod"
     preparing_files_count: "Preparing {$1} file(s)"
+    installing_recomp: "Installing WiiCompiled"
+    updating_recomp: "Updating WiiCompiled"
+    recomp_checking_release: "Looking for the latest WiiCompiled release"
+    recomp_downloading_setup: "Downloading the WiiCompiled installer"
+    recomp_running_setup: "Running the WiiCompiled installer"
+    recomp_finished: "WiiCompiled is ready to play"
+    recomp_copying_nand: "Copying your Dolphin data"
   question:
+    recomp_uninstall:
+      title: "Uninstall WiiCompiled?"
+      extra_shared: "This removes the WiiCompiled installation. Your saves stay in Dolphin's Wii folder, and Retro Rewind stays installed."
+      extra_private: "This removes the WiiCompiled installation, including its private Wii save data. Retro Rewind stays installed."
+      extra_copy: "This removes the WiiCompiled installation, including its copy of your Dolphin data. Your original Dolphin data is untouched, and Retro Rewind stays installed."
+    recomp_use_dolphin_nand:
+      title: "Use your Dolphin save data?"
+      extra: "WiiCompiled can play with the saves, Miis and friend codes you already use in Dolphin. If not, it starts fresh with its own Wii data."
+    recomp_nand_mode:
+      title: "Copy your Dolphin data, or use it directly?"
+      extra: "Dolphin recommends against other programs using its Wii data (NAND) directly, since two programs writing to it at once can corrupt it. A copy keeps WiiCompiled completely separate, but progress made in one will not appear in the other."
     launch_clear_mods_found:
       title: "Mods found"
       extra: "You are about to launch the game without any mods. Do you want to clear your my-stuff folder?"
@@ -514,6 +534,11 @@ en:
     reinstall: "Reinstall RR"
     open_game_folder: "Open Game Folder"
     open_save_folder: "Open Save Folder"
+    enable_recomp: "Enable WiiCompiled (beta)"
+    recomp_use_dolphin_data: "Share Dolphin save data"
+    recomp_resolution: "Resolution"
+    recomp_graphics_api: "Graphics API"
+    recomp_prevent_stutters: "Prevent stutters"
   section:
     language: "Language"
     wii: "Wii Settings"
@@ -523,9 +548,17 @@ en:
     location_paths: "Location Settings"
     wh_wz_appearance: "Wheel Wizard appearance"
     installation: "Installation"
+    recomp: "WiiCompiled (beta)"
+    recomp_dolphin_data: "Dolphin Data"
+    recomp_video: "Video"
   helper_text:
     topbar:
       location_warning: "Settings are disabled, complete the location settings first"
+    enable_recomp: "Uses WiiCompiled as the home-page launcher. Turn this off to use Dolphin and Retro Rewind instead. Windows only."
+    recomp_use_dolphin_data: "Use Dolphin's existing Wii folder in place so WiiCompiled shares saves, Miis, and Wii settings. A change takes effect the next time WiiCompiled launches."
+    recomp_graphics_api: "Only DirectX 12 and Vulkan run WiiCompiled reliably, so nothing else is offered."
+    recomp_dolphin_data_not_found: "Set an existing Dolphin User Folder in Location Settings first. It must contain a Wii folder."
+    recomp_prevent_stutters: "While a shader is still compiling, the objects that need it are skipped for a few frames instead of the whole game stalling until it is ready. You get a tiny bit of pop-in instead of a stutter."
     launch_with_dolphin: "Will launch dolphins main window along with the game"
     launch_rr_on_startup: "Automatically launches Retro Rewind when Wheel Wizard starts"
     force_disable_wiimote: "This setting disables Wiimote ingame, but enables it for the Wii channel"
@@ -539,12 +572,19 @@ en:
     wh_wz_language: "This only changes the language for Wheel Wizard. To change the in-game language, you’ll need to do that within the game settings."
     optional: "Optional"
     must_set_paths: "You must set these 3 paths before you can start playing Retro Rewind"
+    must_set_game_path: "You must select your Mario Kart Wii game file before you can start playing WiiCompiled"
   category:
-    video: "Video"
+    dolphin: "Dolphin"
     about: "About"
     other: "Other"
     general: "General"
   status:
+    recomp_dolphin_data_not_linked: "Not linked. WiiCompiled will use its private Wii data."
+    recomp_dolphin_data_linked: "Sharing Dolphin data from {$1}"
+    recomp_dolphin_data_copied: "Using a copy of your Dolphin data at {$1}"
+    recomp_dolphin_data_not_found: "Dolphin data not found"
+    recomp_not_installed: "WiiCompiled is not installed yet. Install it from the home page first."
+    recomp_uninstalled: "WiiCompiled has been uninstalled"
     data_folder:
       default: "Using default location."
       custom: "Using custom location."

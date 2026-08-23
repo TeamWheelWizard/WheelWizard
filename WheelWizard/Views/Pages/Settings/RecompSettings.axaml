@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="444" d:DesignHeight="716"
+             x:Class="WheelWizard.Views.Pages.Settings.RecompSettings">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,15,0,0">
+            <Border Padding="4" Margin="0,-10,0,10" x:Name="NotInstalledText" IsVisible="False"
+                    CornerRadius="{StaticResource GlobalCornerRadius}"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                    Background="{StaticResource Warning600}">
+                <TextBlock HorizontalAlignment="Center" Classes="BodyText" TextWrapping="Wrap"
+                           FontWeight="SemiBold" Text="{loc:T status.recomp_not_installed}"
+                           Foreground="{StaticResource BackgroundColor}" />
+            </Border>
+
+            <components:FormFieldLabel x:Name="VideoSectionLabel" Text="{loc:T section.recomp_video}" />
+            <Border Classes="SettingsBlockStyle" x:Name="VideoBorder">
+                <StackPanel>
+                    <components:FormFieldLabel Text="{loc:T option.recomp_resolution}" />
+                    <ComboBox x:Name="ResolutionDropdown" HorizontalAlignment="Stretch"
+                              Margin="0,0,0,10" VerticalAlignment="Top" />
+
+                    <components:FormFieldLabel Text="{loc:T option.recomp_graphics_api}"
+                                               TipText="{loc:T helper_text.recomp_graphics_api}" />
+                    <ComboBox x:Name="GraphicsApiDropdown" HorizontalAlignment="Stretch"
+                              Margin="0,0,0,10" VerticalAlignment="Top" />
+
+                    <CheckBox x:Name="ShowFps" Classes="SwitchDark" Margin="0,2">
+                        <components:FormFieldLabel Text="{loc:T option.show_fps}" />
+                    </CheckBox>
+                    <CheckBox x:Name="PreventStutters" Classes="SwitchDark" Margin="0,2">
+                        <components:FormFieldLabel Text="{loc:T option.recomp_prevent_stutters}"
+                                                   TipText="{loc:T helper_text.recomp_prevent_stutters}" />
+                    </CheckBox>
+                </StackPanel>
+            </Border>
+
+            <components:FormFieldLabel Text="{loc:T section.recomp_dolphin_data}" Margin="0,10,0,0" />
+            <Border Classes="SettingsBlockStyle">
+                <StackPanel>
+                    <CheckBox x:Name="UseDolphinData" Classes="SwitchDark" Margin="0,2">
+                        <components:FormFieldLabel Text="{loc:T option.recomp_use_dolphin_data}"
+                                                   TipText="{loc:T helper_text.recomp_use_dolphin_data}" />
+                    </CheckBox>
+                    <TextBlock x:Name="DolphinDataStatus" Classes="TinyText" Margin="0,4,0,0"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <components:FormFieldLabel x:Name="InstallationSectionLabel"
+                                       Text="{loc:T section.installation}" Margin="0,10,0,0" />
+            <Border Classes="SettingsBlockStyle" x:Name="InstallationBorder">
+                <StackPanel>
+                    <TextBox x:Name="InstallLocation" Classes="dark" Height="40" IsReadOnly="True" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <components:Button x:Name="OpenInstallFolder"
+                                           HorizontalAlignment="Left"
+                                           IconData="{StaticResource Folder}"
+                                           Text="{loc:T action.open_folder}"
+                                           Click="OpenInstallFolder_OnClick" />
+                        <components:Button x:Name="UninstallButton" Margin="6,0,0,0"
+                                           Variant="Danger" HorizontalAlignment="Left"
+                                           IconData="{StaticResource Trash}"
+                                           Text="{loc:T action.un_install}"
+                                           Click="Uninstall_OnClick" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -14,6 +14,7 @@ public static class SettingsExtensions
         services.AddSingleton<ISettingsSignalBus, SettingsSignalBus>();
         services.AddSingleton<IWhWzSettingManager, WhWzSettingManager>();
         services.AddSingleton<IDolphinSettingManager, DolphinSettingManager>();
+        services.AddSingleton<IRecompSettingManager, RecompSettingManager>();
         services.AddSingleton<ISettingsManager, SettingsManager>();
         services.AddSingleton<ISettingsLocalizationService, SettingsLocalizationService>();
         services.AddSingleton<ISettingsStartupInitializer, SettingsStartupInitializer>();

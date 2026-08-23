@@ -17,7 +17,7 @@ public partial class VideoSettings : UserControlBase
     public VideoSettings()
     {
         InitializeComponent();
-        _settingsAreDisabled = !SettingsService.PathsSetupCorrectly();
+        _settingsAreDisabled = !SettingsService.DolphinPathsSetupCorrectly();
         DisabledWarningText.IsVisible = _settingsAreDisabled;
         VideoBorder.IsEnabled = !_settingsAreDisabled;
 
@@ -36,6 +36,18 @@ public partial class VideoSettings : UserControlBase
         ShowFPSButton.IsCheckedChanged += ShowFPS_OnClick;
         RemoveBlurButton.IsCheckedChanged += RemoveBlur_OnClick;
         RendererDropdown.SelectionChanged += RendererDropdown_OnSelectionChanged;
+        DisableForce.IsCheckedChanged += ClickForceWiimote;
+        LaunchWithDolphin.IsCheckedChanged += ClickLaunchWithDolphinWindow;
+    }
+
+    private void ClickForceWiimote(object? sender, RoutedEventArgs e)
+    {
+        SettingsService.Set(SettingsService.FORCE_WIIMOTE, DisableForce.IsChecked == true);
+    }
+
+    private void ClickLaunchWithDolphinWindow(object? sender, RoutedEventArgs e)
+    {
+        SettingsService.Set(SettingsService.LAUNCH_WITH_DOLPHIN, LaunchWithDolphin.IsChecked == true);
     }
 
     private void LoadSettings()
@@ -45,6 +57,8 @@ public partial class VideoSettings : UserControlBase
         RecommendedButton.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMMENDED_SETTINGS);
         ShowFPSButton.IsChecked = SettingsService.Get<bool>(SettingsService.SHOW_FPS);
         RemoveBlurButton.IsChecked = SettingsService.Get<bool>(SettingsService.REMOVE_BLUR);
+        DisableForce.IsChecked = SettingsService.Get<bool>(SettingsService.FORCE_WIIMOTE);
+        LaunchWithDolphin.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_WITH_DOLPHIN);
 
         var finalResolution = SettingsService.Get<int>(SettingsService.INTERNAL_RESOLUTION);
         foreach (RadioButton radioButton in ResolutionStackPanel.Children)

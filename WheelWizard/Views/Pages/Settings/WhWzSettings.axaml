@@ -47,7 +47,7 @@
     
                         <StackPanel>
                             <StackPanel x:Name="LocationInputFields">
-                                <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                                <Grid x:Name="DolphinExecutableField" VerticalAlignment="Top" HorizontalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
@@ -102,7 +102,8 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <components1:FormFieldLabel Text="{loc:T option.dolphin_user_path}"
+                                    <components1:FormFieldLabel x:Name="DolphinUserFolderLabel"
+                                                                Text="{loc:T option.dolphin_user_path}"
                                                                 Margin="0,6,0,0" />
                                     <TextBox Classes="dark" Grid.Row="1" Grid.Column="0"
                                              HorizontalAlignment="Stretch" Height="40"
