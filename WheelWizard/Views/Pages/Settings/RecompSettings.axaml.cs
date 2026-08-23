@@ -203,6 +203,7 @@ public partial class RecompSettings : UserControlBase
         if (result.IsFailure)
         {
             DolphinData.SetEnabled(false);
+            await ApplyNandSettingAsync();
             await new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Error)
                 .SetTitleText(t("status.recomp_dolphin_data_not_found"))

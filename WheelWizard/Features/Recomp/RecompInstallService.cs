@@ -876,7 +876,8 @@ public sealed class RecompInstallService : IRecompInstallService
         if (Interlocked.Exchange(ref _disposed, 1) != 0)
             return;
 
-        _operationGate.Dispose();
+        // The gate is deliberately left undisposed: an in-flight operation still has to Release() it,
+        // and a SemaphoreSlim whose wait handle was never touched holds no OS resources anyway.
         GC.SuppressFinalize(this);
     }
 

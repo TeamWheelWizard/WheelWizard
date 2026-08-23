@@ -42,9 +42,11 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             cancellationToken.ThrowIfCancellationRequested();
 
             var cancellationEventName = $@"Local\MKWCompiled.WheelWizard.Cancel.{Guid.NewGuid():N}";
-            using var cancellationEvent = cancellationToken.CanBeCanceled
-                ? new EventWaitHandle(initialState: false, EventResetMode.ManualReset, cancellationEventName)
-                : null;
+            // Named wait handles only exist on Windows; elsewhere the constructor throws.
+            using var cancellationEvent =
+                OperatingSystem.IsWindows() && cancellationToken.CanBeCanceled
+                    ? new EventWaitHandle(initialState: false, EventResetMode.ManualReset, cancellationEventName)
+                    : null;
             var startInfo = CreateStartInfo(fileName, arguments, workingDirectory);
             if (cancellationEvent is not null)
                 startInfo.Environment[CancellationEventEnvironmentVariable] = cancellationEventName;

@@ -555,7 +555,7 @@ en:
     topbar:
       location_warning: "Settings are disabled, complete the location settings first"
     enable_recomp: "Uses WiiCompiled as the home-page launcher. Turn this off to use Dolphin and Retro Rewind instead. Windows only."
-    recomp_use_dolphin_data: "Use Dolphin's existing Wii folder in place so WiiCompiled shares saves, Miis, and Wii settings. A change takes effect the next time WiiCompiled installs or updates."
+    recomp_use_dolphin_data: "Use Dolphin's existing Wii folder in place so WiiCompiled shares saves, Miis, and Wii settings. A change takes effect the next time WiiCompiled launches."
     recomp_graphics_api: "Only DirectX 12 and Vulkan run WiiCompiled reliably, so nothing else is offered."
     recomp_dolphin_data_not_found: "Set an existing Dolphin User Folder in Location Settings first. It must contain a Wii folder."
     recomp_prevent_stutters: "While a shader is still compiling, the objects that need it are skipped for a few frames instead of the whole game stalling until it is ready. You get a tiny bit of pop-in instead of a stutter."
