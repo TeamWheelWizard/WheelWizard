@@ -572,9 +572,8 @@ public static class PathManager
     {
         get
         {
-            var loadFolderPath = LoadFolderPath;
-            if (!string.IsNullOrWhiteSpace(loadFolderPath) && Path.IsPathRooted(loadFolderPath))
-                return Path.Combine(loadFolderPath, "Riivolution", "WheelWizard");
+            if (Settings.LOAD_PATH.IsValid() || !string.IsNullOrWhiteSpace(UserFolderPath))
+                return Path.Combine(LoadFolderPath, "Riivolution", "WheelWizard");
 
             return Path.Combine(WheelWizardAppdataPath, "RetroRewind");
         }
