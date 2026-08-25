@@ -171,7 +171,9 @@ fi:
     mii_editor: "Mii-editori"
     mii_carousel: "Miin katselu"
   text:
-    made_by_string: "Tehnyt: {$1}\\n ja {$2}"
+    made_by_string: |-
+      Tehnyt: {$1}
+      ja {$2}
     thanks_translators: "Suuret kiitokset kaikille kääntäjille:"
     wh_wz_translation_percentage: "Tämän kielen käännökset ovat {$1} % valmiita."
     powered_gamebanana: "Palvelun tarjoaa GameBanana"
@@ -258,10 +260,15 @@ fi:
       extra: "Muutos perutaan {$1} kuluttua, ellet aio pitää muutosta."
     move_data:
       title: "Siirretäänkö Wheel Wizardin tiedot?"
-      extra: "Wheel Wizardin tiedostot siirretään sijaintiin:\\n{$1}\\nTässä saattaa mennä hetki riippuen tietojen määrästä."
+      extra: |-
+        Wheel Wizardin tiedostot siirretään sijaintiin:
+        {$1}
+        Tässä saattaa mennä hetki riippuen tietojen määrästä.
     dolphin_found:
       title: "Dolphin-emulaattorin kansio löytyi"
-      extra: "Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä' :)\\nDolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?"
+      extra: |-
+        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä' :)
+        Dolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?
     new_version_wh_wz:
       title: "Wheel Wizard -päivitys saatavilla"
       extra: "Wheel Wizardin versio {$1} on saatavilla (nykyinen versio: {$2}). Haluatko päivittää heti?"
@@ -323,8 +330,12 @@ fi:
       extra: "Päivityksiä ei voi tarkistaa juuri nyt. Internet-yhteyttä ei ole tai palvelimessa on ongelma."
     unable_update_wh_wz:
       extra:
-        reason_network: "Ei voitu tarkistaa, onko Wheel Wizard ajan tasalla.\\nSyynä saattaa olla verkkoyhteysongelmat."
-        reason_location: "Wheel Wizardia ei voi päivittää. Varmista, että sovellus sijaitsee kansiossa, johon voi kirjoittaa tietoja.\\nNykyistä kansiota ei löytynyt."
+        reason_network: |-
+          Ei voitu tarkistaa, onko Wheel Wizard ajan tasalla.
+          Syynä saattaa olla verkkoyhteysongelmat.
+        reason_location: |-
+          Wheel Wizardia ei voi päivittää. Varmista, että sovellus sijaitsee kansiossa, johon voi kirjoittaa tietoja.
+          Nykyistä kansiota ei löytynyt.
       title: "Wheel Wizardia ei voi päivittää."
     no_connect_server:
       extra: "Yhdistäminen palvelimelle epäonnistui. Yritä myöhemmin uudelleen."
@@ -364,7 +375,9 @@ fi:
       extra:
         failed_update_delete: "Tiedostojen poistaminen päivitystä varten epäonnistui. Perutaan."
         failed_update_apply: "Päivityksen käyttöönotto epäonnistui. Perutaan."
-        invalid_file_path: "Virheellinen polku. Ota yhteyttä kehittäjiin.\\n Palvelinvirhe: {$1}"
+        invalid_file_path: |-
+          Virheellinen polku. Ota yhteyttä kehittäjiin.
+          Palvelinvirhe: {$1}
       title: "Perutaan RR-päivitys"
     restart_admin_fail:
       extra: "Käynnistäminen järjestelmänvalvojan oikeuksilla epäonnistui."
@@ -389,7 +402,9 @@ fi:
       title: "Asetukset tallennettu!"
     data_folder_moved:
       title: "Tietokansio päivitetty"
-      extra: "Wheel Wizardin tiedot sijaitsevat nyt kohteessa:\\n{$1}"
+      extra: |-
+        Wheel Wizardin tiedot sijaitsevat nyt kohteessa:
+        {$1}
     rr_up_to_date:
       title: "Retro Rewind on ajan tasalla."
     mii_changed: "Mii vaihdettu!"
@@ -478,7 +493,6 @@ fi:
     end_with_exe: "Polun täytyy loppua päätteeseen .exe"
     enable_animations: "Ottaa käyttöön animaatiot Wheel Wizard -sovelluksessa"
     end_with_x: "Polku voi loppua:"
-    wh_wz_language: "Vaihtaa kielen vain Wheel Wizard -sovelluksessa. Pelin kielen saa vaihdettua itse pelin sisällä."
     optional: "Valinnainen"
     must_set_paths: "Nämä 3 polkua on määritettävä ennen kuin voit pelata Retro Rewindia"
   category:

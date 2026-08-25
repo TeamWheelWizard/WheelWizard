@@ -19,37 +19,81 @@
                            Foreground="{StaticResource BackgroundColor}" />
             </Border>
 
-            <components1:FormFieldLabel Text="{loc:T section.wii}" />
+            <components1:FormFieldLabel Text="{loc:T section.retro_rewind}" />
             <Border Classes="SettingsBlockStyle">
                 <StackPanel>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark"
-                              x:Name="LaunchRrOnStartup">
-                        <components1:FormFieldLabel Text="{loc:T option.launch_rr_on_startup}"
-                                                   TipText="{loc:T helper_text.launch_rr_on_startup}" />
-                    </CheckBox>
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.launch_rr_on_startup}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.launch_rr_on_startup}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="LaunchRrOnStartup"
+                                  Classes="SwitchDark"
+                                  IsChecked="False"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.retro_rewind_installation}" />
+                            <TextBlock x:Name="RetroRewindVersionText"
+                                       Classes="TinyText"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components1:Button Grid.Column="1"
+                                            x:Name="DolphinReinstallButton"
+                                            Variant="Warning"
+                                            IsEnabled="True"
+                                            IconData="{StaticResource Download}"
+                                            Text="{loc:T option.reinstall}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Click="Reinstall_RetroRewind" />
+                    </Grid>
                 </StackPanel>
             </Border>
 
             <components1:FormFieldLabel x:Name="RecompSectionLabel" Text="{loc:T section.recomp}" />
             <Border Classes="SettingsBlockStyle" x:Name="RecompBorder">
-                <StackPanel>
-                    <CheckBox Margin="0,2" IsChecked="False"
+                <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                    <StackPanel Grid.Column="0"
+                                Margin="0,0,16,0"
+                                Spacing="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                        <components1:FormFieldLabel Text="{loc:T option.enable_recomp}" />
+                        <TextBlock Classes="TinyText"
+                                   Text="{loc:T helper_text.enable_recomp}"
+                                   TextAlignment="Left"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <CheckBox Grid.Column="1"
+                              x:Name="EnableRecomp"
                               Classes="SwitchDark"
-                              x:Name="EnableRecomp">
-                        <components1:FormFieldLabel Text="{loc:T option.enable_recomp}"
-                                                   TipText="{loc:T helper_text.enable_recomp}" />
-                    </CheckBox>
-                </StackPanel>
+                              IsChecked="False"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center" />
+                </Grid>
             </Border>
 
             <components1:FormFieldLabel Text="{loc:T section.installation}" />
             <StackPanel>
-                <components1:Button x:Name="DolphinReinstallButton"
-                                    Variant="Warning" IsEnabled="True" HorizontalAlignment="Left"
-                                    IconData="{StaticResource Download}"
-                                    Text="{loc:T option.reinstall}"
-                                    Click="Reinstall_RetroRewind" Margin="3" />
                 <components1:Button x:Name="OpenSaveFolderButton"
                                     Variant="Default" IsEnabled="True" HorizontalAlignment="Left"
                                     IconData="{StaticResource Folder}"

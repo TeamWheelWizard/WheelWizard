@@ -188,28 +188,67 @@
     
             <components1:FormFieldLabel Text="{loc:T section.wh_wz_appearance}" Margin="0,10,0,0" />
             <Border Classes="SettingsBlockStyle" x:Name="WhWzAppearance">
-                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                    <CheckBox Margin="0,2,0,6"
-                              IsChecked="True" Classes="Switch"
-                              x:Name="EnableAnimations"
-                              Click="EnableAnimations_OnClick">
-                        <components1:FormFieldLabel Text="{loc:T option.enable_animations}"
-                                                    TipText="{loc:T helper_text.enable_animations}" />
-                    </CheckBox>
-                    <components1:FormFieldLabel Text="{loc:T option.window_scale}" />
-                    <ComboBox
-                        x:Name="WindowScaleDropdown"
-                        SelectionChanged="WindowScaleDropdown_OnSelectionChanged"
-                        HorizontalAlignment="Stretch"
-                        Margin="0,0,0,5"
-                        VerticalAlignment="Top" />
-                    
-                    <components1:FormFieldLabel Text="{loc:T option.wh_wz_language}" TipText="{loc:T helper_text.wh_wz_language}" />
-                    <ComboBox x:Name="WhWzLanguageDropdown"
-                              HorizontalAlignment="Stretch"
-                              Margin="0,0,0,5"
-                              VerticalAlignment="Top" ZIndex="2"/>
-                    <TextBlock Classes="TinyText" x:Name="TranslationsPercentageText" />
+                <StackPanel>
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.enable_animations}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.enable_animations}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="EnableAnimations"
+                                  Classes="SwitchDark"
+                                  IsChecked="True"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  Click="EnableAnimations_OnClick" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <components1:FormFieldLabel Grid.Column="0"
+                                                    Margin="0,0,16,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Text="{loc:T option.window_scale}" />
+                        <ComboBox Grid.Column="1"
+                                  x:Name="WindowScaleDropdown"
+                                  SelectionChanged="WindowScaleDropdown_OnSelectionChanged"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.wh_wz_language}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.wh_wz_language}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Classes="TinyText"
+                                       x:Name="TranslationsPercentageText"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1"
+                                  x:Name="WhWzLanguageDropdown"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  ZIndex="2" />
+                    </Grid>
                 </StackPanel>
             </Border>
         </StackPanel>

@@ -169,7 +169,9 @@ pl:
     mii_selector: "Selektor Mii"
     mii_editor: "Edytor Mii"
   text:
-    made_by_string: "Stworzone przez: {$1} \\n i {$2}"
+    made_by_string: |-
+      Stworzone przez: {$1}
+      i {$2}
     thanks_translators: "Dziękujemy bardzo wszystkim tłumaczą:"
     wh_wz_translation_percentage: "Tłumaczenie dla tego języka jest skończone w {$1}%"
     powered_gamebanana: "Wsparci Przez Gamebanana"
@@ -248,10 +250,15 @@ pl:
       extra: "Ta zmiana zostanie cofnięta za {$1} może, że postanowisz ją zastosować."
     move_data:
       title: "Przenieść dane z Wheel Wizard?"
-      extra: "Wheel Wizard przeniesie swoje pliki do:\\n{$1}\\n to może zająć chwile zależnie od ilości danych."
+      extra: |-
+        Wheel Wizard przeniesie swoje pliki do:
+        {$1}
+        to może zająć chwile zależnie od ilości danych.
     dolphin_found:
       title: "Znaleziono folder Emulatora Dolphin"
-      extra: "Jeżeli nie wiesz co to wszystko znaczy poprostu naciśnij tak :) \\nZnaleziono folder Emulatora Dolphin. Chciałbyś użyć ten folder?"
+      extra: |-
+        Jeżeli nie wiesz co to wszystko znaczy poprostu naciśnij tak :)
+        Znaleziono folder Emulatora Dolphin. Chciałbyś użyć ten folder?
     new_version_wh_wz:
       title: "Aktualizacja do Wheel Wizard dostępna"
       extra: "Wersja {$1} Wheel Wizard jest dostępna (obecnie na {$2}). Chcesz aktualizować teraz?"
@@ -305,8 +312,12 @@ pl:
       extra: "Nie udało się sprawdzić dostępności aktualizacji w tej chwili. Możesz nie być podłączony do internetu lub serwer może teraz nie działać."
     unable_update_wh_wz:
       extra:
-        reason_network: "Nie można sprawdzić czy Wheel Wizard jest na najnowszej wersji. \\nMożesz mieć problem z internetem."
-        reason_location: "Nie można zaktualizować Wheel Wizard. Proszę upewnij się, że aplikacja jest zlokalizowana w folderze, który ma możliwość zapisu.\\n Nie można znaleść obecnego folderu."
+        reason_network: |-
+          Nie można sprawdzić czy Wheel Wizard jest na najnowszej wersji.
+          Możesz mieć problem z internetem.
+        reason_location: |-
+          Nie można zaktualizować Wheel Wizard. Proszę upewnij się, że aplikacja jest zlokalizowana w folderze, który ma możliwość zapisu.
+          Nie można znaleść obecnego folderu.
       title: "Nie można zaktualizować Wheel Wizard."
     no_connect_server:
       extra: "Nie można połączyć się ze serwerem. Spróbuj ponownie później."
@@ -346,7 +357,9 @@ pl:
       extra:
         failed_update_delete: "Nie udało się usunąć plików dla aktualizacji. Abortowanie."
         failed_update_apply: "Nie udało się zastosować aktualizacji. Abortowanie"
-        invalid_file_path: "Wykryto nieprawidłową ścieżkę do pliku. Proszę skontaktuj się z deweloperami.\\n Błąd Serwera: {$1}"
+        invalid_file_path: |-
+          Wykryto nieprawidłową ścieżkę do pliku. Proszę skontaktuj się z deweloperami.
+          Błąd Serwera: {$1}
       title: "Abortowanie aktualizacji Retro Rewind"
     restart_admin_fail:
       extra: "Nie udało się zrestartować z uprawnieniami administracyjnymi."
@@ -371,7 +384,9 @@ pl:
       title: "Ustawienia zapisane pomyślnie!"
     data_folder_moved:
       title: "Zaktualizowano folder danych"
-      extra: "Dane Wheel Wizard są teraz przechowywane w:\\n{$1}"
+      extra: |-
+        Dane Wheel Wizard są teraz przechowywane w:
+        {$1}
     rr_up_to_date:
       title: "Retro Rewind jest na najnowszej wersji."
     mii_changed: "Zmieniono Mii pomyślnie"

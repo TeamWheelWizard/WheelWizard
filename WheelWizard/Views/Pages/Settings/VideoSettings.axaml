@@ -46,11 +46,17 @@
                     <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
-                        <components1:FormFieldLabel Grid.Column="0"
-                                                    Margin="0,0,16,0"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Text="{loc:T option.renderer}" />
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.renderer}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.renderer}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
                         <ComboBox Grid.Column="1"
                                   x:Name="RendererDropdown"
                                   HorizontalAlignment="Right"
@@ -60,11 +66,17 @@
                     <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
-                        <components1:FormFieldLabel Grid.Column="0"
-                                                    Margin="0,0,16,0"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Text="{loc:T option.v_sync}" />
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.v_sync}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.v_sync}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
                         <CheckBox Grid.Column="1"
                                   x:Name="VSyncButton"
                                   Classes="SwitchDark"

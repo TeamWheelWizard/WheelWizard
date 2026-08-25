@@ -31,6 +31,7 @@ public partial class OtherSettings : UserControlBase
         if (!_settingsAreDisabled)
             LoadSettings();
         ForceLoadSettings();
+        RefreshRetroRewindVersion();
 
         // Attach event handlers after loading settings to avoid unwanted triggers
         LaunchRrOnStartup.IsCheckedChanged += ClickLaunchRrOnStartup;
@@ -56,6 +57,12 @@ public partial class OtherSettings : UserControlBase
             EnableRecomp.IsChecked = SettingsService.Get<bool>(SettingsService.ENABLE_RECOMP);
     }
 
+    private void RefreshRetroRewindVersion()
+    {
+        var version = CustomDistributionSingletonService.RetroRewind.GetCurrentVersion()?.ToString() ?? t("state.unknown");
+        RetroRewindVersionText.Text = t("helper_text.retro_rewind_version", version);
+    }
+
     private void ClickLaunchRrOnStartup(object? sender, RoutedEventArgs e)
     {
         SettingsService.Set(SettingsService.LAUNCH_RR_ON_STARTUP, LaunchRrOnStartup.IsChecked == true);
@@ -72,6 +79,7 @@ public partial class OtherSettings : UserControlBase
         progressWindow.Show();
         await CustomDistributionSingletonService.RetroRewind.ReinstallAsync(progressWindow);
         progressWindow.Close();
+        RefreshRetroRewindVersion();
     }
 
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)

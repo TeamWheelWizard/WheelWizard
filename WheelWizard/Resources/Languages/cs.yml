@@ -161,7 +161,9 @@ cs:
     rooms: "Místnosti"
     miis: "Miiy"
   text:
-    made_by_string: "Vytvořili: {$1} \\n a {$2}"
+    made_by_string: |-
+      Vytvořili: {$1}
+      a {$2}
     thanks_translators: "Díky moc všem překladatelům:"
     wh_wz_translation_percentage: "Překlady pro tento jazyk jsou z {$1}% kompletní"
     powered_gamebanana: "Poháněno společností GameBanana"
@@ -383,7 +385,6 @@ cs:
     end_with_exe: "Cesta musí končit .exe"
     enable_animations: "To aktivuje animace v aplikaci Wheel Wizard"
     end_with_x: "Cesta může končit:"
-    wh_wz_language: "Tím se změní pouze jazyk pro Wheel Wizard. Chceš-li změnit jazyk ve hře, musíš to udělat v nastavení hry."
     optional: "Volitelný"
     must_set_paths: "Musíš nastavit tyto 3 cesty než začneš hrát Retro Rewind."
   category:
