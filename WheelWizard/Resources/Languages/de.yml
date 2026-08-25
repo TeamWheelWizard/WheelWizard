@@ -172,7 +172,6 @@ de:
     wh_wz_translation_percentage: "Übersetzungen für diese Sprache sind {$1}% abgeschlossen"
     powered_gamebanana: "Von GameBanana unterstützt"
     language_translated_by: "Diese Sprache wurde übersetzt von: {$1}"
-    Erstellt von: "{$1}"
   hover:
     players_online:
       0: "Zurzeit sind keine Spieler online"
@@ -247,11 +246,12 @@ de:
     dolphin_found:
       title: "Dolphin Emulator Ordner gefunden"
       extra: "Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :) \\nDolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?"
-      Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“: ")"
     dolphin_program_found:
       title: "Dolphin Emulator gefunden"
-      extra: "|"
-      Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“: ")"
+      extra: |-
+        Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
+
+        Dolphin Emulator gefunden. Möchtest du Folgendes verwenden?
     new_version_wh_wz:
       title: "Wheel Wizard Update verfügbar"
       extra: "Version {$1} von Wheel Wizard ist verfügbar (derzeit für {$2}). Möchtest du jetzt updaten?"
@@ -273,8 +273,6 @@ de:
     dolphin_flatpak:
       title: "Dolphin Flatpak Installation"
       extra: "Die Flatpak Dolphin Version scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (für deinen eigenen Benutzer)?"
-    install_mod:
-      title: "Du bist dabei das Spiel ohne Mods zu starten. Möchtest du deinen My-Stuff Ordner leeren?"
     search_mod: "Nach Mods suchen..."
     enter_new_name:
       title: "Einen neuen Namen eingeben"
@@ -347,7 +345,6 @@ de:
         failed_update_delete: "Dateien für das Update konnten nicht gelöscht werden. Abbruch."
         failed_update_apply: "Das Update konnte nicht installiert werden. Abbruch."
         invalid_file_path: "Ungültiger Dateipfad wurde erkannt. Bitte kontaktiere die Entwickler. \\n Server-Fehler: {$1}"
-        Server-Fehler: "{$1}"
       title: "Über das RR Update"
     restart_admin_fail:
       extra: "Neustart mit Admin-Rechten fehlgeschlagen."
@@ -366,7 +363,7 @@ de:
       title: "Es ist ein Fehler beim abrufen der Mod-Informationen aufgetreten."
     mod_download_fail:
       title: "Mod Download ist schiefgelaufen."
-      extra: "Ein Fehler ist während dem Dowload aufgetreten."
+      extra: "Ein Fehler ist während dem Dowload aufgetreten: {$1}"
   message_success:
     settings_saved:
       title: "Einstellungen erfolgreich gespeichert!"

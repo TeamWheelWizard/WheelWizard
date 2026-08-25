@@ -243,7 +243,6 @@ nl:
     dolphin_found:
       title: "Dolphin-emulator-map gevonden"
       extra: "Als je niet weet wat dit allemaal betekent, druk op ja :) \\nDolphin-emulator-map gevonden. Wil je deze gebruiken?"
-      Als je niet weet wat dit allemaal betekent, druk op ja: ")"
     new_version_wh_wz:
       title: "Wheel Wizard-update beschikbaar"
       extra: "Versie {$1} van Wheel Wizard is beschikbaar (momenteel op {$2}). Wil je nu updaten?"
@@ -331,7 +330,6 @@ nl:
         failed_update_delete: "Het is niet gelukt om bestanden te verwijderen voor de update. Proces word afgebroken."
         failed_update_apply: "Het is niet gelukt om te updaten. Proces word afgebroken."
         invalid_file_path: "Ongeldige bestandslocatie gedetecteerd. Neem contact op met de ontwikkelaars.\\n Serverfout: {$1}"
-        Serverfout: "{$1}"
       title: "RR-update afgebroken."
     restart_admin_fail:
       extra: "Het is niet gelukt om opnieuw op te starten met administratorrechten."

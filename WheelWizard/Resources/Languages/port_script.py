@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import datetime as dt
+import re
 import sys
 from pathlib import Path
 
@@ -10,6 +11,7 @@ LANGUAGE_DIR = Path(__file__).resolve().parent
 TRANSLATOR_KEY = "value.language.z_translators"
 TRANSLATOR_EXPORT_HINT = "Put your name here if you contributed."
 NEWLINE_NORMALIZED_IMPORT_KEYS = {"hover.rooms_page_disclaimer"}
+TRANSLATION_KEY_PATTERN = re.compile(r"^[a-z0-9_]+(?:\.[a-z0-9_]+)*$")
 
 
 def parse_yaml_file(path: Path) -> tuple[str, dict]:
@@ -46,7 +48,7 @@ def parse_yaml_file(path: Path) -> tuple[str, dict]:
                 root_code = key
             continue
 
-        if raw_value == "|-":
+        if raw_value in {"|", "|-", "|+"}:
             block_lines: list[str] = []
             block_indent = indent + 2
             while index < len(lines):
@@ -178,6 +180,8 @@ def ordered_translation_keys(languages: dict[str, dict[str, str]]) -> list[str]:
     for language_code in ordered_language_codes(languages):
         for key in languages[language_code]:
             if key in seen:
+                continue
+            if not TRANSLATION_KEY_PATTERN.fullmatch(key):
                 continue
 
             seen.add(key)

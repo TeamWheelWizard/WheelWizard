@@ -172,7 +172,6 @@ ja:
     wh_wz_translation_percentage: "この言語の翻訳は{$1}%完了しています"
     powered_gamebanana: "GameBananaによって提供されています"
     language_translated_by: "この言語はこれらの方が翻訳しました: {$1}"
-    作成者: "{$1}"
   hover:
     players_online:
       0: "現在 オンラインのプレイヤーがいません"
@@ -335,7 +334,6 @@ ja:
         failed_update_delete: "アップデートファイルの削除に失敗しました。中止しています。"
         failed_update_apply: "アップデートの適用に失敗しました。中止しています。"
         invalid_file_path: "無効なファイルパスが検知されました。開発者に連絡してください。\\n サーバーエラー:  {$1}"
-        サーバーエラー: "{$1}"
       title: "Retro Rewindのアップデートを中止"
     restart_admin_fail:
       extra: "管理者権限で再起動するのに失敗しました。"

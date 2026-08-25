@@ -172,7 +172,6 @@ fr:
     wh_wz_translation_percentage: "La traduction pour cette langue est fini à {$1}%"
     powered_gamebanana: "Contribué par GameBanana"
     language_translated_by: "Cette langue a été traduite par: {$1}"
-    Fait par: "{$1}"
   hover:
     players_online:
       0: "Il n'y a actuellement aucun joueurs en ligne"
@@ -246,7 +245,6 @@ fr:
     dolphin_found:
       title: "Dossier Dolphin Emulator trouvé"
       extra: "Si vous ne savez pas ce que tous cela veut dire, juste cliquez sur oui :) \\nDossier Dolphin Emulator trouvé. Voulez-vous utilser ce dossier ? "
-      Si vous ne savez pas ce que tous cela veut dire, juste cliquez sur oui: ")"
     new_version_wh_wz:
       title: "Mise à jour Wheel Wizard disponible !"
       extra: "La version {$1} de Wheel Wizard est disponible (Version actuelle: {$2}). Voulez-vous mettre à jour maintenant ?"
@@ -338,7 +336,6 @@ fr:
         failed_update_delete: "Échec de la désinstallation de fichiers pour la mise à jour. Annulation"
         failed_update_apply: "Échec d'application de la mise à jour. Annulation."
         invalid_file_path: "Chemin vers un fichier incorrect. Veuillez contacter les développeurs de Wheel Wizard.\\n Erreur Serveur:  {$1}"
-        Erreur Serveur: "{$1}"
       title: "Anuller la mise à jour de RR"
     restart_admin_fail:
       extra: "Échec du redémarrage avec les droits d'administrateur."

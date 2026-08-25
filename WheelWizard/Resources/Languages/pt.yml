@@ -183,7 +183,6 @@ pt:
     modified_archive_member: "Item do arquivo modificado"
     new_archive_member: "Novo item do arquivo modificado"
     whole_file_override: "Substituição do arquivo inteiro"
-    Feito por: "{$1}"
   hover:
     players_online:
       0: "Não há jogadores online"
@@ -252,7 +251,7 @@ pt:
       title: "Mods não encontrados"
       extra: "Tu estás prestes a abrir o jogo sem nenhum mod. Queres limpar a pasta my-stuff?"
     sure_delete:
-      title: "Tens a certeza que desejas apagar ($1)?"
+      title: "Tens a certeza que desejas apagar {$1}?"
       extra: "A eliminação é permanente e não pode ser revertida."
       title_miis: "Tem a certeza de que deseja apagar {$1} Miis?"
     apply_scale:
@@ -264,7 +263,6 @@ pt:
     dolphin_found:
       title: "Pasta Do Dolphin Emulator Encontrada"
       extra: "Se não sabes o que isto significa, clica só que sim :) \\nPasta do Dolphin Emulator encontrada. Gostarias de usar esta pasta?"
-      Se não sabes o que isto significa, clica só que sim: ")"
     new_version_wh_wz:
       title: "Atualização do Wheel Wizard Disponível"
       extra: "Versão {$1} do Wheel Wizard está disponível (de momento encontra-se na versão {$2}). Queres atualizar agora?"
@@ -366,7 +364,6 @@ pt:
         failed_update_delete: "Falha a apagar ficheiros para a atualização. Abortando."
         failed_update_apply: "Falha a aplicar a atualização. Abortando."
         invalid_file_path: "Caminho de arquivo inválido detectado. Entra em contato com os desenvolvedores.\\nErro do servidor: {$1}"
-        Erro do servidor: "{$1}"
       title: "A abortar o Update do RR."
     restart_admin_fail:
       extra: "Falha ao reiniciar com direitos de administrador"
@@ -400,7 +397,7 @@ pt:
     mod_installed:
       extra: "Mod '{$1}' instalado com sucesso."
       title: "Mod instalado com sucesso!"
-    patch_conversion_result: "{$1} Ficheiro(s) convertidos para {$1} ficheiro(s) de patch."
+    patch_conversion_result: "{$1} Ficheiro(s) convertidos para {$2} ficheiro(s) de patch."
     patch_conversion_skipped: "{$1} Ficheiro(s) inalterados pois não era possível serem convertidos."
     patch_conversion_notes: "Nota(s): {$1}"
   snackbar_warning:

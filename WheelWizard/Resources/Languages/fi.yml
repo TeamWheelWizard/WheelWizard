@@ -178,7 +178,6 @@ fi:
     language_translated_by: "Tämän kielen käännökset tarjoaa: {$1}"
     external_reference: "Ulkoinen viite"
     external_reference_with_path: "Ulkoinen viite: {$1}"
-    Tehnyt: "{$1}"
   hover:
     players_online:
       0: "Ei pelaajia online-tilassa"
@@ -228,7 +227,7 @@ fi:
     downloading_mb: "Ladataan {$1} Mt"
     installing_mods: "Asennetaan modeja"
     installing_mods_count: "Asennetaan {$1} modia"
-    processing_xof_y: "Käsitellään {$1}/{$1} tiedostoa..."
+    processing_xof_y: "Käsitellään {$1}/{$2} tiedostoa..."
     update_rr: "Päivitetään Retro Rewindia"
     latest_wh_wz_github: "Hankitaan uusinta Wheel Wizard -versiota GitHubista"
     update_wh_wz: "Päivitetään Wheel Wizardia"
@@ -263,7 +262,6 @@ fi:
     dolphin_found:
       title: "Dolphin-emulaattorin kansio löytyi"
       extra: "Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä' :)\\nDolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?"
-      Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä': ")"
     new_version_wh_wz:
       title: "Wheel Wizard -päivitys saatavilla"
       extra: "Wheel Wizardin versio {$1} on saatavilla (nykyinen versio: {$2}). Haluatko päivittää heti?"
@@ -366,7 +364,6 @@ fi:
         failed_update_delete: "Tiedostojen poistaminen päivitystä varten epäonnistui. Perutaan."
         failed_update_apply: "Päivityksen käyttöönotto epäonnistui. Perutaan."
         invalid_file_path: "Virheellinen polku. Ota yhteyttä kehittäjiin.\\n Palvelinvirhe: {$1}"
-        Palvelinvirhe: "{$1}"
       title: "Perutaan RR-päivitys"
     restart_admin_fail:
       extra: "Käynnistäminen järjestelmänvalvojan oikeuksilla epäonnistui."
@@ -400,9 +397,9 @@ fi:
     mod_installed:
       extra: "Modi '{$1}' asennettu."
       title: "Modi asennettu!"
-    patch_conversion_result: "{$1} tiedostoa muunnettu {$1} paikkaustiedostoksi."
+    patch_conversion_result: "{$1} tiedostoa muunnettu {$2} paikkaustiedostoksi."
     patch_conversion_skipped: "{$1} tiedostoa ei muutettu, koska niitä ei voitu muuntaa."
-    patch_conversion_notes: "Huomautus:"
+    patch_conversion_notes: "Huomautus: {$1}"
   snackbar_warning:
     cant_save_mii: "Miitä ei voi tallentaa"
     no_mii_export: "Vietäviä Miitä ei ole"

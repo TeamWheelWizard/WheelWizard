@@ -172,7 +172,6 @@ tr:
     wh_wz_translation_percentage: "Bu dilin çevirileri {$1}% tamamlandı"
     powered_gamebanana: "GameBanana tarafından"
     language_translated_by: "Bu dili çevirenler: {$1}"
-    Yapımcı: "{$1}"
   hover:
     players_online:
       0: "Şu anda çevrimiçi oyuncu yok."
@@ -244,7 +243,6 @@ tr:
     dolphin_found:
       title: "Dolphin Emulator Klasörü Bulundu"
       extra: "Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz :) \\nDolphin Emulator klasörü bulundu. Bu klasörü kullanmak ister misiniz?"
-      Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz: ")"
     new_version_wh_wz:
       title: "Wheel Wizard Güncellemesi Mevcut"
       extra: "Wheel Wizard'ın {$1} sürümü mevcut (şu anda {$2}'de). Şimdi güncellemek ister misiniz?"
@@ -332,7 +330,6 @@ tr:
         failed_update_delete: "Güncelleme dosyalarını silmek başarısız oldu. İşlem iptal ediliyor."
         failed_update_apply: "Güncellemeyi uygulamak başarısız oldu. İşlem iptal ediliyor."
         invalid_file_path: "Yanlış dosya yolu tespit edildi. Lütfen geliştiricilere bildirin.\\n Sunucu hatası: {$1}"
-        Sunucu hatası: "{$1}"
       title: "Retro Rewind güncellemesi iptal ediliyor"
     restart_admin_fail:
       extra: "Yöneticilik haklarıyla yeniden başlatılamadı."

@@ -172,7 +172,6 @@ it:
     wh_wz_translation_percentage: "Traduzioni per questa lingua sono complete al {$1}%"
     powered_gamebanana: "Offerto da GameBanana"
     language_translated_by: "Questa lingua è stata tradotta da: {$1}"
-    Fatto da: "{$1}"
   hover:
     players_online:
       0: "Al momento non ci sono giocatori online"
@@ -246,7 +245,6 @@ it:
     dolphin_found:
       title: "Cartella dell'Emulatore Dolphin trovata"
       extra: "Se non sai cosa ciò vuol dire, clicca su sì :) \\nCartella dell'Emulatore Dolphin trovata. Vuoi usare questa cartella?"
-      Se non sai cosa ciò vuol dire, clicca su sì: ")"
     new_version_wh_wz:
       title: "Aggiornamento di Wheel Wizard disponibile"
       extra: "La versione {$1} di Wheel Wizard è disponibile (al momento è {$2}). Vuoi aggiornare ora?"
@@ -334,7 +332,6 @@ it:
         failed_update_delete: "Fallito il cancellamento dei file dell'aggiornamento. Annullamento."
         failed_update_apply: "Fallita l'applicazione di un aggiornamento. Annullamento."
         invalid_file_path: "Incontrato un percorso file invalido. Contatta gli sviluppatori.\\n Errore server: {$1}"
-        Errore server: "{$1}"
       title: "Annullando l'aggiornamento di RR"
     restart_admin_fail:
       extra: "Errore riavviando con diritti di amministratore."

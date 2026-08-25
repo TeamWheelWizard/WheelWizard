@@ -172,7 +172,6 @@ ko:
     wh_wz_translation_percentage: "해당 언어의 번역은 {$1}% 완료됐습니다."
     powered_gamebanana: "GameBanana 제공"
     language_translated_by: "해당 언어는 다음 분들이 번역하셨습니다: {$1}"
-    만든이: "{$1}"
   hover:
     players_online:
       0: "모두 오프라인이네요..."
@@ -237,7 +236,7 @@ ko:
     sure_delete:
       title: "{$1}을/를 지우시겠습니까?"
       extra: "삭제는 영구적이며, 되돌릴 수 없습니다"
-      title_miis: "{1}Mii를 삭제하시겠습니까?"
+      title_miis: "{$1}Mii를 삭제하시겠습니까?"
     apply_scale:
       title: "새로운 해상도를 적용하시겠습니까?"
       extra: "변경 사항 저장을 선택하지 않으면 변경 전인 {$1}로 돌아갑니다"
@@ -331,7 +330,6 @@ ko:
         failed_update_delete: "업데이트 파일 삭제 실패, 중단합니다."
         failed_update_apply: "업데이트 적용 실패, 중단합니다."
         invalid_file_path: "잘못된 파일 경로가 감지됐습니다. 개발자에게 연락하세요.\\n 서버 에러:  {$1}"
-        서버 에러: "{$1}"
       title: "레트로 리와인드 업데이트 중단"
     restart_admin_fail:
       extra: "관리자 권한으로 재시작하는 데 실패했습니다."
@@ -350,7 +348,7 @@ ko:
       title: "모드 정보 불러오기 실패"
     mod_download_fail:
       title: "모드 다운로드 실패"
-      extra: "다운로드 중 오류가 발생했습니다: ($1)"
+      extra: "다운로드 중 오류가 발생했습니다: {$1}"
   message_success:
     settings_saved:
       title: "설정을 저장했습니다!"

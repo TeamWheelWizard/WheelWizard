@@ -166,7 +166,6 @@ cs:
     wh_wz_translation_percentage: "Překlady pro tento jazyk jsou z {$1}% kompletní"
     powered_gamebanana: "Poháněno společností GameBanana"
     language_translated_by: "Tento jazyk překládá: {$1}"
-    Vytvořili: "{$1}"
   hover:
     players_online:
       0: "Právě nejsou žádní hráči online"
@@ -201,16 +200,16 @@ cs:
   time:
     days:
       1: "1 den"
-      n: "($1) dny"
+      n: "{$1} dny"
     hours:
       1: "1 hodina"
-      n: "($1) hodiny"
+      n: "{$1} hodiny"
     minutes:
       1: "1 minuta"
-      n: "($1) minuty"
+      n: "{$1} minuty"
     seconds:
       1: "1 sekunda"
-      n: "($1) sekundy"
+      n: "{$1} sekundy"
   progress:
     estimated_time_remaining: "Předpokládaný zbývající čas:"
     downloading_mb: "Stahování {$1} MB"

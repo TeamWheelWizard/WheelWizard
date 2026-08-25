@@ -158,7 +158,6 @@ es:
     made_by_string: "Hecho por: {$1} y {$2}"
     thanks_translators: "Muchas gracias a todos los traductores:"
     wh_wz_translation_percentage: "La traducción de este idioma está a un {$1}%."
-    Hecho por: "{$1}"
   hover:
     players_online:
       0: "No hay jugadores en línea"
@@ -291,7 +290,6 @@ es:
         failed_update_delete: "Error al borrar archivos para la actualización. Cancelando"
         failed_update_apply: "Error al aplicar una actualización. Cancelando."
         invalid_file_path: "Se detectó una ruta de archivo no válida. Contacte a los desarrolladores.\\n Error del servidor: {$1}"
-        Error del servidor: "{$1}"
       title: "Abortando actualización de RR"
     restart_admin_fail:
       extra: "Error al reinstalar con derechos de administrador."

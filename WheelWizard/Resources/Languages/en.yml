@@ -175,7 +175,6 @@ en:
     mii_carousel: "Mii Carousel"
   text:
     made_by_string: "Made by: {$1} \\n And {$2}"
-    Made by: "{$1}"
     thanks_translators: "Thanks a lot to all the translators:"
     wh_wz_translation_percentage: "Translations for this language are {$1}% complete"
     powered_gamebanana: "Powered By GameBanana"
@@ -288,14 +287,18 @@ en:
     dolphin_found:
       title: "Dolphin Emulator Folder Found"
       extra: "If you dont know what all of this means, just click yes :) \\nDolphin Emulator folder found. Would you like to use this folder?"
-      If you don't know what all of this means, just click yes: ")"
     dolphin_outdated:
       title: "Your Dolphin Emulator is out of date"
-      extra: "|"
+      extra: |-
+        This version of Dolphin ({$1}) has a known security issue where malicious game files, mods, or cheating online players can infect your PC with malware.
+
+        Update to {$2} or newer to be safe.
     dolphin_program_found:
       title: "Dolphin Emulator Found"
-      extra: "|"
-      If you don't know what all of this means, just click yes: ")"
+      extra: |-
+        If you don't know what all of this means, just click yes :)
+
+        Dolphin Emulator found. Would you like to use this?
     new_version_wh_wz:
       title: "Wheel Wizard Update Available"
       extra: "Version {$1} of Wheel Wizard is available (currently on {$2}). Do you want to update now?"
@@ -349,7 +352,10 @@ en:
       extra: "Dolphin Emulator folder not automatically found. Please try and find the folder manually, click 'help' for more information."
     dolphin_version_unverified:
       title: "Could not verify your Dolphin Emulator version"
-      extra: "|"
+      extra: |-
+        Wheel Wizard could not read the version of the Dolphin Emulator you have configured, so it cannot tell whether it has the security fixes.
+
+        Please check yourself that you are on {$1} or newer. Older versions have a known security issue where malicious game files, mods, or cheating online players can infect your PC with malware.
     dolphin_tool_selected:
       title: "Wrong Dolphin executable selected"
       extra: "You selected DolphinTool.exe. Please choose Dolphin.exe (the Dolphin emulator executable) instead."
@@ -400,7 +406,6 @@ en:
         failed_update_delete: "Failed to delete files for the update. Aborting."
         failed_update_apply: "Failed to apply an update. Aborting."
         invalid_file_path: "Invalid file path detected. Please contact the developers.\\n Server error:  {$1}"
-        Server error: "{$1}"
       title: "Aborting RR Update"
     restart_admin_fail:
       extra: "Failed to restart with administrator rights."

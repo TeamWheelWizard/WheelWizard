@@ -172,7 +172,6 @@ ru:
     wh_wz_translation_percentage: "Перевод на этот язык завершён на {$1}%"
     powered_gamebanana: "Моды из GameBanana"
     language_translated_by: "Авторы перевода: {$1}"
-    Создатели: "{$1}"
   hover:
     players_online:
       0: "Игроков в сети: 0"
@@ -216,7 +215,7 @@ ru:
     estimated_time_remaining: "Осталось примерно:"
     downloading_mb: "Загружено {$1} МБ"
     installing_mods: "Устанавливаем моды"
-    installing_mods_count: "Устанавливаем {$!} модов"
+    installing_mods_count: "Устанавливаем {$1} модов"
     processing_xof_y: "Обработка {$1} из {$2} файлов..."
     update_rr: "Обновляем Retro Rewind"
     latest_wh_wz_github: "Получаем последнюю версию Wheel Wizard из GitHub"
@@ -237,7 +236,6 @@ ru:
     dolphin_found:
       title: "Папка эмулятора Dolphin найдена"
       extra: "Если ты понятия не имеешь что это значит, просто нажми да :D \\nПапка эмулятора Dolphin найдена. Хотите её использовать?"
-      Если ты понятия не имеешь что это значит, просто нажми да: "D"
     new_version_wh_wz:
       title: "Доступно обновление Wheel Wizard"
       extra: "Версия {$1} Wheel Wizard'а доступна (прямо сейчас. вы на {$2}). Хотите произвести обновление?"
