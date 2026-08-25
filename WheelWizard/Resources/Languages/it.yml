@@ -167,13 +167,12 @@ it:
     mii_editor: "Creatore Mii"
     mii_carousel: "Visualizzatore Mii"
   text:
-    made_by_string: |
-      Fatto da: {$1}
-      e {$2}
+    made_by_string: "Fatto da: {$1} \\n e {$2}"
     thanks_translators: "Grazie a tutti i traduttori:"
     wh_wz_translation_percentage: "Traduzioni per questa lingua sono complete al {$1}%"
     powered_gamebanana: "Offerto da GameBanana"
     language_translated_by: "Questa lingua è stata tradotta da: {$1}"
+    Fatto da: "{$1}"
   hover:
     players_online:
       0: "Al momento non ci sono giocatori online"
@@ -246,10 +245,8 @@ it:
       extra: "Questa modifica si ripristinerà in {$1} a meno che tu decida di mantenerla."
     dolphin_found:
       title: "Cartella dell'Emulatore Dolphin trovata"
-      extra: |
-        Se non sai cosa ciò vuol dire, clicca su sì :)
-
-        Cartella dell'Emulatore Dolphin trovata. Vuoi usare questa cartella?
+      extra: "Se non sai cosa ciò vuol dire, clicca su sì :) \\nCartella dell'Emulatore Dolphin trovata. Vuoi usare questa cartella?"
+      Se non sai cosa ciò vuol dire, clicca su sì: ")"
     new_version_wh_wz:
       title: "Aggiornamento di Wheel Wizard disponibile"
       extra: "La versione {$1} di Wheel Wizard è disponibile (al momento è {$2}). Vuoi aggiornare ora?"
@@ -299,14 +296,8 @@ it:
       extra: "Impossibile verificare gli aggiornamenti in questo momento. Potresti non avere una connessione ad internet oppure il server potrebbe essere offline."
     unable_update_wh_wz:
       extra:
-        reason_network: |
-          Impossibile verificare se Wheel Wizard è aggiornato.
-
-          Potresti avere problemi di connessione.
-        reason_location: |
-          Impossibile aggiornare Wheel Wizard. Assicurati che l'applicazione si trovi in una cartella con diritti di scrittura.
-
-          Non è possibile trovare la cartella attuale.
+        reason_network: "Impossibile verificare se Wheel Wizard è aggiornato. \\nPotresti avere problemi di connessione."
+        reason_location: "Impossibile aggiornare Wheel Wizard. Assicurati che l'applicazione si trovi in una cartella con diritti di scrittura. \\nNon è possibile trovare la cartella attuale."
       title: "Impossibile aggiornare Wheel Wizard."
     no_connect_server:
       extra: "Impossibile connettersi al server. Riprova più tardi."
@@ -342,10 +333,8 @@ it:
       extra:
         failed_update_delete: "Fallito il cancellamento dei file dell'aggiornamento. Annullamento."
         failed_update_apply: "Fallita l'applicazione di un aggiornamento. Annullamento."
-        invalid_file_path: |
-          Incontrato un percorso file invalido. Contatta gli sviluppatori.
-
-          Errore server: {$1}
+        invalid_file_path: "Incontrato un percorso file invalido. Contatta gli sviluppatori.\\n Errore server: {$1}"
+        Errore server: "{$1}"
       title: "Annullando l'aggiornamento di RR"
     restart_admin_fail:
       extra: "Errore riavviando con diritti di amministratore."
@@ -441,10 +430,10 @@ it:
     optional: "Opzionale"
     must_set_paths: "Devi impostare questi 3 indirizzi prima di poter iniziare a giocare a Retro Rewind"
   category:
-    video: "Video"
     about: "A riguardo"
     other: "Altro"
     general: "Generale"
+    video: "Video"
   value:
     language:
       france: "Francese"

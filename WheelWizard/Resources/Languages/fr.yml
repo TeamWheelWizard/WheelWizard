@@ -9,7 +9,7 @@ fr:
     room_details: "Détail de la salle"
     my_miis: "Mes Miis"
   attribute:
-    status_online: "En Ligne "
+    status_online: "En Ligne"
     enabled: "Activer"
     title: "Titre"
     status_offline: "Hors-Ligne"
@@ -32,7 +32,7 @@ fr:
       gender: "Genre"
       gender_female: "Femme"
       vertical_position: "Position verticale"
-      size: "Taille   "
+      size: "Taille"
       nose_type: "Type de nez"
       horizontal_position: "Position horizontale"
       mouth_type: "Type de bouches"
@@ -61,7 +61,7 @@ fr:
     status: "Status"
     priority: "Priorité"
     sort_by: "Trier par"
-    total_games_won: "Nombre de courses gagnées "
+    total_games_won: "Nombre de courses gagnées"
     total_games_played: "Nombre de courses faites"
     vr_abbreviation: "PTS.C"
     br_abbreviation: "PTS.B"
@@ -90,14 +90,14 @@ fr:
     loading: "Chargement..."
     installing: "Installation..."
     updating: "Mise à jour..."
-    config_not_finished: "Configuration non terminée "
-    no_server: "Aucun Seveurs "
+    config_not_finished: "Configuration non terminée"
+    no_server: "Aucun Seveurs"
     unknown: "Inconnu"
     error: "Erreur"
     warning: "Avertisemment"
-    success: "Succès "
+    success: "Succès"
     extracting: "Extraction des fichers..."
-    no_name: "Aucun nom "
+    no_name: "Aucun nom"
     no_license: "Aucun Permis"
     no_profiles: "Aucun Profil"
     custom: "Personnalisé"
@@ -105,14 +105,14 @@ fr:
   action:
     play: "Jouer"
     play_offline: "Jouer en Hors-Ligne"
-    install: "Installer "
+    install: "Installer"
     update: "Mettre à Jour"
     import: "Importer"
     enable_all: "Tous Activer"
     disable_all: "Tous Désactiver"
     rename: "Renommer"
     delete: "Supprimer"
-    open_folder: "Ouvrir le dossier "
+    open_folder: "Ouvrir le dossier"
     edit: "Modifer"
     cancel: "Annuler"
     save: "Sauvegarder"
@@ -123,13 +123,13 @@ fr:
     no: "Non"
     keep: "Garder"
     ok: "Ok"
-    revert: "Revenir en arrière "
-    maybe_later: "Peut être plus tard "
+    revert: "Revenir en arrière"
+    maybe_later: "Peut être plus tard"
     browse: "Chercher"
     view_mod: "Détail du Mod"
     save_external_mii: "Ajouter un Mii dans \"Mes Miis\""
     view_mii: "Voir le Mii"
-    duplicate: "Dupliquer "
+    duplicate: "Dupliquer"
     back: "Retour"
     unfavorite: "Retirer des favoris"
     favorite: "Favoris"
@@ -167,13 +167,12 @@ fr:
     mii_editor: "Éditeur de Mii"
     mii_carousel: "Vue d'ensemble du Mii"
   text:
-    made_by_string: |
-      Fait par: {$1}
-      et {$2}
+    made_by_string: "Fait par: {$1} \\n et {$2}"
     thanks_translators: "Merci à tous les traducteurs:"
     wh_wz_translation_percentage: "La traduction pour cette langue est fini à {$1}%"
     powered_gamebanana: "Contribué par GameBanana"
     language_translated_by: "Cette langue a été traduite par: {$1}"
+    Fait par: "{$1}"
   hover:
     players_online:
       0: "Il n'y a actuellement aucun joueurs en ligne"
@@ -207,7 +206,7 @@ fr:
     no_mod_selected: "Sélectionner un mod dans la liste pour voir ces détails"
   time:
     days:
-      1: "1 Jour "
+      1: "1 Jour"
       n: "{$1} Jours"
     hours:
       1: "1 heure"
@@ -219,7 +218,7 @@ fr:
       1: "1 seconde"
       n: "{$1} secondes"
   progress:
-    estimated_time_remaining: "Temps restant estimé: "
+    estimated_time_remaining: "Temps restant estimé:"
     downloading_mb: "Téléchargement de {$1} MB"
     installing_mods: "Installation de mods"
     installing_mods_count: "Installation de {$1} mods"
@@ -227,13 +226,13 @@ fr:
     update_rr: "Mise à jour de Retro Rewind en cours..."
     latest_wh_wz_github: "Obtenez la dernière version de Wheel Wizard depuis Github"
     update_wh_wz: "Mise à jour de Wheel Wizard en cours..."
-    installing_rr: "Installation de Retro Rewind "
+    installing_rr: "Installation de Retro Rewind"
     installing_rr_first_time: "Installation de Retro Rewind pour la première fois"
     installing_dolphin: "Installation de Dolphin Emulator"
     this_may_take_a_while: "Cela peut prendre plus de temps en fonction de votre connexion internet."
   question:
     launch_clear_mods_found:
-      title: "Mods trouvés "
+      title: "Mods trouvés"
       extra: |-
         Vous êtes sur le point de lancer le jeu sans aucun mods.
         Voulez vous supprimer votre dossier My-Stuff ? 
@@ -242,26 +241,24 @@ fr:
       extra: "La suppresion est permanente et ne peut pas être inversée."
       title_miis: "Êtes-vous sûr de vouloir supprimer {$1} Miis ?"
     apply_scale:
-      title: "Voulez-vous appliquez la nouvelle échelle ? "
+      title: "Voulez-vous appliquez la nouvelle échelle ?"
       extra: "Cette modification va être rétablie dans {$1} sauf si vous choisissez de garder cette modification."
     dolphin_found:
       title: "Dossier Dolphin Emulator trouvé"
-      extra: |
-        Si vous ne savez pas ce que tous cela veut dire, juste cliquez sur oui :)
-
-        Dossier Dolphin Emulator trouvé. Voulez-vous utilser ce dossier ?
+      extra: "Si vous ne savez pas ce que tous cela veut dire, juste cliquez sur oui :) \\nDossier Dolphin Emulator trouvé. Voulez-vous utilser ce dossier ? "
+      Si vous ne savez pas ce que tous cela veut dire, juste cliquez sur oui: ")"
     new_version_wh_wz:
       title: "Mise à jour Wheel Wizard disponible !"
-      extra: "La version {$1} de Wheel Wizard est disponible (Version actuelle: {$2}). Voulez-vous mettre à jour maintenant ? "
+      extra: "La version {$1} de Wheel Wizard est disponible (Version actuelle: {$2}). Voulez-vous mettre à jour maintenant ?"
     update_admin:
       title: "Mettre à jour en Administrateur"
       extra: "Des fois, une mise à jour demande les droits d'admin. Voulez-vous les activer pour cette mise à jour ? "
     reinstall_rr:
-      title: "Réinstaller Retro Rewind "
+      title: "Réinstaller Retro Rewind"
       extra: "Êtes-vous sûr de vouloir réinstaller Retro Rewind ?"
     old_rksys_found:
-      title: "Ancien rksys.dat trouvé "
-      extra: "Une ancienne sauvegarde a été trouvée. Voulez-vous l'utiliser ? (Recommandé) "
+      title: "Ancien rksys.dat trouvé"
+      extra: "Une ancienne sauvegarde a été trouvée. Voulez-vous l'utiliser ? (Recommandé)"
     rr_to_old:
       extra: |-
         Votre version de Retro Rewind est trop vieille pour être mis à jour.
@@ -296,22 +293,16 @@ fr:
       extra: "Vérifiez bien si tous les chemins sont corrects et essayez à nouveau."
       title: "Chemin invalide"
     dolphin_not_found:
-      title: "Dossier Dolphin Emulator non trouvé "
+      title: "Dossier Dolphin Emulator non trouvé"
       extra: "Le dossier Dolphin Emulator n'a pas été automatiquement trouvé. Veuillez essayé de trouver le dossier manuellement, cliquez sur \"Aide\" pour plus d'information."
     fail_check_updates:
       title: "Échec de la vérification des mises à jour"
       extra: "Impossibilité de vérifier les mises à jour actuellement. Vous n'êtes probablement pas connecté à internet ou le serveur est probablement en maintenance"
     unable_update_wh_wz:
       extra:
-        reason_network: |
-          Impossible de vérifier si Wheel Wizard est mis à jour.
-
-          Vous pourrez expérimenter des problèmes d'internet.
-        reason_location: |
-          Impossible de mettre à jour Wheel Wizard. Veuillez bien vérifier que l'application se trouve dans un dossier qui peut être écrit.
-
-          N'a pas pu trouver le dossier actuel.
-      title: "Impossible de mettre à jour Wheel Wizard.   "
+        reason_network: "Impossible de vérifier si Wheel Wizard est mis à jour. \\nVous pourrez expérimenter des problèmes d'internet."
+        reason_location: "Impossible de mettre à jour Wheel Wizard. Veuillez bien vérifier que l'application se trouve dans un dossier qui peut être écrit. \\n N'a pas pu trouver le dossier actuel."
+      title: "Impossible de mettre à jour Wheel Wizard."
     no_connect_server:
       extra: "N'a pas pu de se connecter au serveur. Veuillez réessayer plus tard."
       title: "N'a pas pu se connecter au serveur"
@@ -346,10 +337,8 @@ fr:
       extra:
         failed_update_delete: "Échec de la désinstallation de fichiers pour la mise à jour. Annulation"
         failed_update_apply: "Échec d'application de la mise à jour. Annulation."
-        invalid_file_path: |
-          Chemin vers un fichier incorrect. Veuillez contacter les développeurs de Wheel Wizard.
-
-          Erreur Serveur: {$1}
+        invalid_file_path: "Chemin vers un fichier incorrect. Veuillez contacter les développeurs de Wheel Wizard.\\n Erreur Serveur:  {$1}"
+        Erreur Serveur: "{$1}"
       title: "Anuller la mise à jour de RR"
     restart_admin_fail:
       extra: "Échec du redémarrage avec les droits d'administrateur."
@@ -360,7 +349,7 @@ fr:
     failed_change_name:
       title: "Échec du changement de nom"
     failed_change_mii:
-      title: "Échec du changement de Mii "
+      title: "Échec du changement de Mii"
     failed_install_dolphin:
       title: "Échec de l'installation de Dolphin"
       extra: "L'installation de Dolphin Emulator a échoué. Veuillez essayer d'installer Flatpak Dolphin."
@@ -378,13 +367,13 @@ fr:
   snackbar_warning:
     cant_save_mii: "Impossible de savegarder le Mii"
     no_mii_export: "Il semblerait qu'aucun Miis peuvent être exporter"
-    no_mii_delete: "Il semblerait qu'aucun Miis peuvent être supprimer "
+    no_mii_delete: "Il semblerait qu'aucun Miis peuvent être supprimer"
   snackbar_success:
-    mii_added: "Le Mii a été ajouté a vos Miis "
+    mii_added: "Le Mii a été ajouté a vos Miis"
     copied_fc: "Code Ami copié dans le presse-papier"
     name_change: "Changement du nom en '{$1}' avec succès"
     saved_mii: "Mii '{$1}' sauvegardé au chemin suivant '{$2}'"
-    deleted: "Suppression de '{$1}' "
+    deleted: "Suppression de '{$1}'"
     deleted_miis: "Suppression de {$1} Miis"
     created_duplicate: "Clonage de '{$1}'"
     created_duplicates_miis: "Clonage de {$1} Miis"
@@ -404,7 +393,7 @@ fr:
   option:
     wh_wz_language: "Langue de Wheel Wizard"
     force_disable_wiimote: "Forcer la désactivation des Wiimotes"
-    launch_with_dolphin: "Lancer le jeu avec la fennêtre de Dolphin "
+    launch_with_dolphin: "Lancer le jeu avec la fennêtre de Dolphin"
     v_sync: "Synchronisation Verticale"
     recommended: "Paramètres Recommandés"
     show_fps: "Montrer les FPS"
@@ -416,7 +405,7 @@ fr:
     dolphin_emulator_exe: "Éxécutable Dolphin Emulator"
     make_primary: "Défini par défaut"
     enable_animations: "Activer les animations"
-    reinstall: "Réinstaller Retro Rewind "
+    reinstall: "Réinstaller Retro Rewind"
     open_game_folder: "Ouvrir le dossier du jeu"
     open_save_folder: "Ouvrir le dossier de sauvegarde"
   section:
@@ -426,7 +415,7 @@ fr:
     wii: "Paramètres Wii"
     resolution: "Résolution"
     performance: "Paramètres de perfomance"
-    renderer: "Paramètres de rendu "
+    renderer: "Paramètres de rendu"
     location_paths: "Paramètres de localisation"
     wh_wz_appearance: "Apparence de Wheel Wizard"
     installation: "Installation"
@@ -436,7 +425,7 @@ fr:
     launch_with_dolphin: "Ira lancer la fenêtre d'accueil de Dolphin en plus du jeu"
     force_disable_wiimote: "Ce paramètre ira désactiver les Wiimotes dans le jeu, mais les activés dans le menu Wii"
     resolution_scale: "1x est la résolution native"
-    recommended: "Ce paramètre va changer certain paramètre Dolphin pour réduire les saccades et lag spikes "
+    recommended: "Ce paramètre va changer certain paramètre Dolphin pour réduire les saccades et lag spikes"
     30_fps: "Ce paramètre va forcer le jeu à tourner en 30 FPS (60 est par défaut)"
     end_with_exe: "Le chemin doit se finir en .exe"
     enable_animations: "Ceci active les animations dans l'application Wheel Wizard"
@@ -445,10 +434,10 @@ fr:
     optional: "Optionnel"
     must_set_paths: "Vous devez impérativement définir ces 3 chemins afin de jouer à Retro Rewind"
   category:
-    video: "Vidéo"
     about: "À propos"
     other: "Autre"
     general: "Général"
+    video: "Vidéo"
   value:
     language:
       france: "Français"
@@ -465,6 +454,6 @@ fr:
       arabic: "Arabe"
       czech: "Tchèque"
       norwegian: "Norvégien"
-      chinese: "Chinois "
+      chinese: "Chinois"
       portuguese: "Portugais"
       z_translators: "Eppe, Yawshi"

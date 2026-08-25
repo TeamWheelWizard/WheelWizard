@@ -101,7 +101,7 @@ de:
     no_license: "Keine Lizenz"
     no_profiles: "Keine Profile"
     custom: "Benutzerdefiniert"
-    installed: "Installiert "
+    installed: "Installiert"
   action:
     play: "Spielen"
     play_offline: "Offline spielen"
@@ -167,13 +167,12 @@ de:
     mii_editor: "Mii Maker"
     mii_carousel: "Mii Preview"
   text:
-    made_by_string: |
-      Erstellt von: {$1}
-      und {$2}
+    made_by_string: "Erstellt von: {$1} \\n und {$2}"
     thanks_translators: "Vielen Dank an alle Übersetzer:"
     wh_wz_translation_percentage: "Übersetzungen für diese Sprache sind {$1}% abgeschlossen"
     powered_gamebanana: "Von GameBanana unterstützt"
     language_translated_by: "Diese Sprache wurde übersetzt von: {$1}"
+    Erstellt von: "{$1}"
   hover:
     players_online:
       0: "Zurzeit sind keine Spieler online"
@@ -244,24 +243,15 @@ de:
       extra: "Diese Änderung wird in {$1} zurückgesetzt, außer du wendest die Änderung an."
     move_data:
       title: "Wheel Wizard Daten verschieben?"
-      extra: |
-        Wheel Wizard wird seine Dateien nach
-
-        {$1}
-
-        verschieben. Das könnte eine Weile dauern.
+      extra: "Wheel Wizard wird seine Datein nach\\n{$1}\\nverschieben. Das könnte eine Weile dauern."
     dolphin_found:
       title: "Dolphin Emulator Ordner gefunden"
-      extra: |
-        Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
-
-        Dolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?
+      extra: "Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :) \\nDolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?"
+      Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“: ")"
     dolphin_program_found:
       title: "Dolphin Emulator gefunden"
-      extra: |
-        Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
-
-        Dolphin Emulator gefunden. Möchtest du Folgendes verwenden?
+      extra: "|"
+      Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“: ")"
     new_version_wh_wz:
       title: "Wheel Wizard Update verfügbar"
       extra: "Version {$1} von Wheel Wizard ist verfügbar (derzeit für {$2}). Möchtest du jetzt updaten?"
@@ -317,14 +307,8 @@ de:
       extra: "Es ist nicht möglich gerade nach Updates zu suchen. Du bist vielleicht nicht mit dem Internet verbunden oder der Server hat gerade Schwierigkeiten."
     unable_update_wh_wz:
       extra:
-        reason_network: |
-          Es kann nicht überprüft werden, ob Wheel Wizard auf dem neuesten Stand ist.
-
-          Möglicherweise treten derzeit Netzwerkprobleme auf.
-        reason_location: |
-          Wheel Wizard kann nicht aktualisiert werden. Bitte stelle sicher, dass sich die Anwendung in einem Ordner befindet, in den geschrieben werden kann.
-
-          Der aktuelle Ordner konnte nicht gefunden werden.
+        reason_network: "Es kann nicht überprüft werden, ob Wheel Wizard auf dem neuesten Stand ist. \\nMöglicherweise treten derzeit Netzwerkprobleme auf."
+        reason_location: "Wheel Wizard kann nicht aktualisiert werden. Bitte stelle sicher, dass sich die Anwendung in einem Ordner befindet, in den geschrieben werden kann.\\n Der aktuelle Ordner konnte nicht gefunden werden."
       title: "Wheel Wizard konnte nicht aktualisiert werden."
     no_connect_server:
       extra: "Es konnte keine Verbindung zum Server hergestellt werden. Bitte versuche es später noch einmal."
@@ -362,10 +346,8 @@ de:
       extra:
         failed_update_delete: "Dateien für das Update konnten nicht gelöscht werden. Abbruch."
         failed_update_apply: "Das Update konnte nicht installiert werden. Abbruch."
-        invalid_file_path: |
-          Ungültiger Dateipfad wurde erkannt. Bitte kontaktiere die Entwickler.
-
-          Server-Fehler: {$1}
+        invalid_file_path: "Ungültiger Dateipfad wurde erkannt. Bitte kontaktiere die Entwickler. \\n Server-Fehler: {$1}"
+        Server-Fehler: "{$1}"
       title: "Über das RR Update"
     restart_admin_fail:
       extra: "Neustart mit Admin-Rechten fehlgeschlagen."
@@ -390,10 +372,7 @@ de:
       title: "Einstellungen erfolgreich gespeichert!"
     data_folder_moved:
       title: "Datenordner aktualisiert."
-      extra: |
-        Wheel Wizard's Daten sind jetzt gespeichert in:
-
-        {$1}
+      extra: "Wheel WIzard's Daten sind jetzt gespeichert in:\\n{$1}"
     rr_up_to_date:
       title: "Retro Rewind ist auf dem neuesten Stand."
     mii_changed: "Mii erfolgreich geändert."
@@ -470,10 +449,10 @@ de:
     optional: "Optional"
     must_set_paths: "Du musst erst diese 3 Dateipfade bestimmen um Retro Rewind spielen zu können."
   category:
-    video: "Video"
     about: "Über"
     other: "Sonstiges"
     general: "Allgemein"
+    video: "Video"
   status:
     data_folder:
       default: "Standard-Speicherort wird verwendet."

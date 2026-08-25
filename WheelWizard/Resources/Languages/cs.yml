@@ -161,13 +161,12 @@ cs:
     rooms: "Místnosti"
     miis: "Miiy"
   text:
-    made_by_string: |
-      Vytvořili: {$1}
-      a {$2}
+    made_by_string: "Vytvořili: {$1} \\n a {$2}"
     thanks_translators: "Díky moc všem překladatelům:"
     wh_wz_translation_percentage: "Překlady pro tento jazyk jsou z {$1}% kompletní"
     powered_gamebanana: "Poháněno společností GameBanana"
     language_translated_by: "Tento jazyk překládá: {$1}"
+    Vytvořili: "{$1}"
   hover:
     players_online:
       0: "Právě nejsou žádní hráči online"
@@ -389,10 +388,10 @@ cs:
     optional: "Volitelný"
     must_set_paths: "Musíš nastavit tyto 3 cesty než začneš hrát Retro Rewind."
   category:
-    video: "Video"
     about: "O tomto"
     other: "Ostatní"
     general: "Obecný"
+    video: "Video"
   value:
     language:
       france: "Francouzština"

@@ -174,9 +174,8 @@ en:
     mii_editor: "Mii Editor"
     mii_carousel: "Mii Carousel"
   text:
-    made_by_string: |
-      Made by: {$1}
-      and {$2}
+    made_by_string: "Made by: {$1} \\n And {$2}"
+    Made by: "{$1}"
     thanks_translators: "Thanks a lot to all the translators:"
     wh_wz_translation_percentage: "Translations for this language are {$1}% complete"
     powered_gamebanana: "Powered By GameBanana"
@@ -285,30 +284,18 @@ en:
       extra: "This change will revert in {$1} unless you decide to keep the change."
     move_data:
       title: "Move Wheel Wizard data?"
-      extra: |
-        Wheel Wizard will move its files to:
-
-        {$1}
-
-        This may take a while depending on the amount of data.
+      extra: "Wheel Wizard will move its files to:\\n{$1}\\nThis may take a while depending on the amount of data."
     dolphin_found:
       title: "Dolphin Emulator Folder Found"
-      extra: |
-        If you don't know what all of this means, just click yes :)
-
-        Dolphin Emulator folder found. Would you like to use this folder?
+      extra: "If you dont know what all of this means, just click yes :) \\nDolphin Emulator folder found. Would you like to use this folder?"
+      If you don't know what all of this means, just click yes: ")"
     dolphin_outdated:
       title: "Your Dolphin Emulator is out of date"
-      extra: |
-        This version of Dolphin ({$1}) has a known security issue where malicious game files, mods, or cheating online players can infect your PC with malware.
-
-        Update to {$2} or newer to be safe.
+      extra: "|"
     dolphin_program_found:
       title: "Dolphin Emulator Found"
-      extra: |
-        If you don't know what all of this means, just click yes :)
-
-        Dolphin Emulator found. Would you like to use this?
+      extra: "|"
+      If you don't know what all of this means, just click yes: ")"
     new_version_wh_wz:
       title: "Wheel Wizard Update Available"
       extra: "Version {$1} of Wheel Wizard is available (currently on {$2}). Do you want to update now?"
@@ -362,10 +349,7 @@ en:
       extra: "Dolphin Emulator folder not automatically found. Please try and find the folder manually, click 'help' for more information."
     dolphin_version_unverified:
       title: "Could not verify your Dolphin Emulator version"
-      extra: |
-        Wheel Wizard could not read the version of the Dolphin Emulator you have configured, so it cannot tell whether it has the security fixes.
-
-        Please check yourself that you are on {$1} or newer. Older versions have a known security issue where malicious game files, mods, or cheating online players can infect your PC with malware.
+      extra: "|"
     dolphin_tool_selected:
       title: "Wrong Dolphin executable selected"
       extra: "You selected DolphinTool.exe. Please choose Dolphin.exe (the Dolphin emulator executable) instead."
@@ -374,14 +358,8 @@ en:
       extra: "Can't check for updates right now. You might not be connected to the internet or the server might be down."
     unable_update_wh_wz:
       extra:
-        reason_network: |
-          Unable to check if Wheel Wizard is up to date.
-
-          You might be experiencing network issues.
-        reason_location: |
-          Unable to update Wheel Wizard. Please ensure the application is located in a folder that can be written to.
-
-          Could not find current folder.
+        reason_network: "Unable to check if Wheel Wizard is up to date. \\nYou might be experiencing network issues."
+        reason_location: "Unable to update Wheel Wizard. Please ensure the application is located in a folder that can be written to.\\n Could not find current folder."
       title: "Unable to update Wheel Wizard."
     no_connect_server:
       extra: "Could not connect to the server. Please try again later."
@@ -421,10 +399,8 @@ en:
       extra:
         failed_update_delete: "Failed to delete files for the update. Aborting."
         failed_update_apply: "Failed to apply an update. Aborting."
-        invalid_file_path: |
-          Invalid file path detected. Please contact the developers.
-
-          Server error: {$1}
+        invalid_file_path: "Invalid file path detected. Please contact the developers.\\n Server error:  {$1}"
+        Server error: "{$1}"
       title: "Aborting RR Update"
     restart_admin_fail:
       extra: "Failed to restart with administrator rights."
@@ -449,10 +425,7 @@ en:
       title: "Settings saved successfully!"
     data_folder_moved:
       title: "Data folder updated"
-      extra: |
-        Wheel Wizard data is now stored in:
-
-        {$1}
+      extra: "Wheel Wizard data is now stored in:\\n{$1}"
     rr_up_to_date:
       title: "Retro Rewind is up to date."
     mii_changed: "Mii changed successfully"
@@ -579,6 +552,7 @@ en:
     about: "About"
     other: "Other"
     general: "General"
+    video: "Video"
   status:
     recomp_dolphin_data_not_linked: "Not linked. WiiCompiled will use its private Wii data."
     recomp_dolphin_data_linked: "Sharing Dolphin data from {$1}"
@@ -607,5 +581,6 @@ en:
       czech: "Czech"
       norwegian: "Norwegian"
       chinese: "Chinese"
+      polish: "Polish"
       portuguese: "Portuguese"
       z_translators: "-"

@@ -3,15 +3,18 @@ pt:
     home: "Casa"
     settings: "Definições"
     mods: "My stuff"
+    patches: "Patches"
     my_profiles: "Os meus perfis"
     rooms: "Salas"
     friends: "Amigos"
+    leaderboard: "Tabela de Ranking"
     room_details: "Detalhes da sala"
     my_miis: "Meus Miis"
   attribute:
     status_online: "Online"
     enabled: "Ativado"
     title: "Título"
+    all: "Tudo"
     status_offline: "Offline"
     name: "Nome"
     id: "ID"
@@ -32,7 +35,7 @@ pt:
       gender: "Género"
       gender_female: "Mulher"
       vertical_position: "Posição Vertical (Cima/Baixo)"
-      size: "Tamanho "
+      size: "Tamanho"
       nose_type: "Tipo de Nariz"
       horizontal_position: "Posição Horizontal (Esquerda/Direita)"
       mouth_type: "Tipo de Boca"
@@ -62,8 +65,8 @@ pt:
     priority: "Prioridade"
     sort_by: "Organizar por"
     total_games_won: "Total de jogos ganhos"
-    total_games_played: "Total de jogos jogados "
-    vr_abbreviation: "CV  "
+    total_games_played: "Total de jogos jogados"
+    vr_abbreviation: "CV"
     br_abbreviation: "CB Médio"
     br_full: "Classificação de Batalha"
     vr_full: "Classificação Versus"
@@ -108,6 +111,7 @@ pt:
     install: "Instalar"
     update: "Atualizar"
     import: "Importar"
+    convert_to_patches: "Converter para patches"
     enable_all: "Ativar tudo"
     disable_all: "Desativar tudo"
     rename: "Mudar o nome"
@@ -149,7 +153,7 @@ pt:
     submit: "Submeter"
   region:
     japan: "Japão"
-    europe: "Europa "
+    europe: "Europa"
     china: "China"
     south_korea: "Coreia do Sul"
     taiwan: "Taiwan"
@@ -167,13 +171,19 @@ pt:
     mii_editor: "Editor Mii"
     mii_carousel: "Carrosel Mii"
   text:
-    made_by_string: |
-      Feito por: {$1}
-      e {$2}
+    made_by_string: "Feito por: {$1} \\n e {$2}"
     thanks_translators: "Muito obrigado a todos os tradutores:"
     wh_wz_translation_percentage: "Traduções para esta língua estão {$1}% completas"
     powered_gamebanana: "Contribuido pelo GameBanana"
     language_translated_by: "Esta língua é traduzida por: {$1}"
+    brsar_entry: "{$1} entrada {$2}"
+    brsar_entry_with_rwar: "{$1} entrada {$2} + RWAR"
+    external_reference: "Referência externa"
+    external_reference_with_path: "Referência externa: {$1}"
+    modified_archive_member: "Item do arquivo modificado"
+    new_archive_member: "Novo item do arquivo modificado"
+    whole_file_override: "Substituição do arquivo inteiro"
+    Feito por: "{$1}"
   hover:
     players_online:
       0: "Não há jogadores online"
@@ -212,7 +222,7 @@ pt:
       n: "{$1} horas"
     minutes:
       1: "1 minuto"
-      n: "{$1} minutos "
+      n: "{$1} minutos"
     seconds:
       1: "1 segundo"
       n: "{$1} segundos"
@@ -229,6 +239,14 @@ pt:
     installing_rr_first_time: "Instalando Retro Rewind pela primeira vez"
     installing_dolphin: "A instalar o Dolphin Emulator"
     this_may_take_a_while: "Isto pode demorar um pouco, dependendo na sua conexão de internet."
+    applying_converted_mod: "A aplicar o mod convertido"
+    combining_files: "Combinando ficheiros"
+    converting_file: "A converter {$1}"
+    converting_files_count: "A converter {$1} ficheiro(s)"
+    converting_mod_to_patches: "A converter o mod para patches"
+    downloading_mod: "A descarregar {$1}"
+    installing_mod: "A instalar o mod"
+    preparing_files_count: "A preparar {$1} ficheiro(s)"
   question:
     launch_clear_mods_found:
       title: "Mods não encontrados"
@@ -240,12 +258,13 @@ pt:
     apply_scale:
       title: "Gostarias de aplicar a nova escala?"
       extra: "Esta alteração será revertida em {$1} a menos que decida manter a alteração."
+    move_data:
+      title: "Mover a data do Wheel Wizard?"
+      extra: "O Wheel Wizard vai mover os seus ficheiros para :\\n{$1}\\nPode demorar bastante tempo, dependendo da quantidade de dados."
     dolphin_found:
       title: "Pasta Do Dolphin Emulator Encontrada"
-      extra: |
-        Se não sabes o que isto significa, clica só que sim :)
-
-        Pasta do Dolphin Emulator encontrada. Gostarias de usar esta pasta?
+      extra: "Se não sabes o que isto significa, clica só que sim :) \\nPasta do Dolphin Emulator encontrada. Gostarias de usar esta pasta?"
+      Se não sabes o que isto significa, clica só que sim: ")"
     new_version_wh_wz:
       title: "Atualização do Wheel Wizard Disponível"
       extra: "Versão {$1} do Wheel Wizard está disponível (de momento encontra-se na versão {$2}). Queres atualizar agora?"
@@ -273,6 +292,13 @@ pt:
     enter_new_name:
       title: "Introduza um novo nome"
       extra: "Alterando o nome de: {$1}"
+    enter_mod_name:
+      title: "Nome do mod:"
+    launch_clear_patches_found:
+      extra: "Está prestes a iniciar o jogo sem mods. Pretende limpar a pasta de Patches? Iniciar o jogo assim vai iniciá-lo com a atual pasta de patches ainda ativa!"
+    apply_language_settings:
+      title: "Isto vai fechar a janela atual e abrir uma nova com as novas definições de linguagem."
+      extra: "Pretende aplicar as novas definições de linguagem?"
   message_warning:
     not_find_dolphin:
       extra: "O Dolphin Emulator não foi encontrado, por favor defina o caminho nas definições"
@@ -288,21 +314,18 @@ pt:
       extra: "Por favor verifica que todos os percursos estão corretos e tenta outra vez."
       title: "Caminhos inválidos."
     dolphin_not_found:
-      title: "Pasta Do Emulador Dolphin Não Encontrada "
+      title: "Pasta Do Emulador Dolphin Não Encontrada"
       extra: "A pasta Do Emulador Dolphin não foi automáticamente encontrada. Por favor tente encontrar a pasta manualmente, clica em 'ajuda' para obter mais informação-"
+    dolphin_tool_selected:
+      title: "Executável incorreto do Dolphin selecionado."
+      extra: "Selecionou DolphinTool.exe. Por favor escolha Dolphin.exe (o executável do Dolphin Emulator)."
     fail_check_updates:
       title: "Falha ao procurar atualizações"
       extra: "Não é possível verificar se há atualizações no momento. Pode não estar conectado à internet ou o servidor pode estar indisponível ou em baixo."
     unable_update_wh_wz:
       extra:
-        reason_network: |
-          Impossível verificar se o Wheel Wizard está atualizado.
-
-          Talvez estejas a experienciar problemas de net.
-        reason_location: |
-          Incapaz de atualizar o Wheel Wizard. Garante que a aplicação se encontra numa pasta que pode ser localizada.
-
-          Falha a encontar a pasta atual.
+        reason_network: "Impossível verificar se o Wheel Wizard está atualizado. \\nTalvez estejas a experienciar problemas de net"
+        reason_location: "Incapaz de atualizar o Wheel Wizard. Garante que a aplicação se encontra numa pasta que pode ser localizada.\\n Falha a encontar a pasta atual"
       title: "Não é possível atualizar o Wheel Wizard"
     no_connect_server:
       extra: "Falha ao conectar ao servidor. Tente de novo mais tarde"
@@ -324,6 +347,8 @@ pt:
     unable_download_mod:
       title: "Não é possível descarregar o mod"
       extra: "Os ficheiros não foram encontrados."
+    could_not_convert_mod:
+      title: "Não foi possível converter o mod."
   placeholder:
     enter_mod_name: "Introduzir nome do mod..."
     search_mod: "Pesquisa por mods..."
@@ -334,14 +359,14 @@ pt:
   message_error:
     no_mod_folder:
       extra: "A pasta do mod não existe"
+    data_folder_move:
+      title: "Não foi possível mover os dados"
     abort_rr:
       extra:
         failed_update_delete: "Falha a apagar ficheiros para a atualização. Abortando."
         failed_update_apply: "Falha a aplicar a atualização. Abortando."
-        invalid_file_path: |
-          Caminho de arquivo inválido detectado. Entra em contato com os desenvolvedores.
-
-          Erro do servidor: {$1}
+        invalid_file_path: "Caminho de arquivo inválido detectado. Entra em contato com os desenvolvedores.\\nErro do servidor: {$1}"
+        Erro do servidor: "{$1}"
       title: "A abortar o Update do RR."
     restart_admin_fail:
       extra: "Falha ao reiniciar com direitos de administrador"
@@ -360,17 +385,28 @@ pt:
       title: "Falha ao obter informações do mod"
     mod_download_fail:
       title: "O download do mod falhou."
-      extra: "Ocorreu um erro durante o download: {$1} "
+      extra: "Ocorreu um erro durante o download: {$1}"
   message_success:
     settings_saved:
       title: "Definições guardadas com sucesso"
+    data_folder_moved:
+      title: "Pasta de dados atualizada."
+      extra: "Dados do Wheel Wizard são agora guardados em:\\n{$1}"
     rr_up_to_date:
       title: "A tua versão do Retro Rewind é a mais recente"
     mii_changed: "Mii mudado com sucesso"
+    mod_converted_to_patches:
+      title: "Convertido para patches"
+    mod_installed:
+      extra: "Mod '{$1}' instalado com sucesso."
+      title: "Mod instalado com sucesso!"
+    patch_conversion_result: "{$1} Ficheiro(s) convertidos para {$1} ficheiro(s) de patch."
+    patch_conversion_skipped: "{$1} Ficheiro(s) inalterados pois não era possível serem convertidos."
+    patch_conversion_notes: "Nota(s): {$1}"
   snackbar_warning:
     cant_save_mii: "Não é possível guardar o Mii"
     no_mii_export: "Parece que não havia Miis para exportar"
-    no_mii_delete: "Parece que não havia Miis para apagar "
+    no_mii_delete: "Parece que não havia Miis para apagar"
   snackbar_success:
     mii_added: "Mii foi adicionado aos teus Miis"
     copied_fc: "Código de amigo copiado para a área de transferência"
@@ -378,7 +414,7 @@ pt:
     saved_mii: "Mii '{$1}' salvado para o ficheiro '{$2}'"
     deleted: "Apagado '{$1}'"
     deleted_miis: "{$1} Miis apagados"
-    created_duplicate: "Duplica de '{$1}' criada "
+    created_duplicate: "Duplica de '{$1}' criada"
     created_duplicates_miis: "Criados '{$1}' Miis duplicados"
     profile_set_primary: "Definir perfil como principal"
   snackbar_error:
@@ -420,7 +456,7 @@ pt:
     renderer: "Definições de Renderização"
     location_paths: "Definições da Localização"
     wh_wz_appearance: "Aparência do Wheel Wizard"
-    installation: "Instalação    "
+    installation: "Instalação"
   helper_text:
     topbar:
       location_warning: "As definições estão desativadas, completa as definições de localização primeiro"
@@ -436,10 +472,13 @@ pt:
     optional: "Opcional"
     must_set_paths: "Precisas de configurar estes 3 caminhos antes de começar a jogar Retro Rewind."
   category:
-    video: "Video "
-    about: "Acerca de "
+    about: "Acerca de"
     other: "Outro"
     general: "Geral"
+    video: "Video"
+  status:
+    data_folder:
+      moving: "A mover dados, por favor aguarde..."
   value:
     language:
       france: "Francês"
@@ -458,4 +497,4 @@ pt:
       norwegian: "Norueguês"
       chinese: "Chinês"
       portuguese: "Português"
-      z_translators: "JMM,  Gui_C__Tuga"
+      z_translators: "JMM,  Gui_C__Tuga, bubble"

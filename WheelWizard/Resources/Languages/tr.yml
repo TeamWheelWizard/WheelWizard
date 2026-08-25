@@ -167,13 +167,12 @@ tr:
     mii_editor: "Mii Düzenleyicisi"
     mii_carousel: "Mii Görüntüleyicisi"
   text:
-    made_by_string: |
-      Yapımcı: {$1}
-      ve {$2}
+    made_by_string: "Yapımcı: {$1} \\n Ve {$2}"
     thanks_translators: "Tüm çevirmenlere çok teşekkür ederiz:"
     wh_wz_translation_percentage: "Bu dilin çevirileri {$1}% tamamlandı"
     powered_gamebanana: "GameBanana tarafından"
     language_translated_by: "Bu dili çevirenler: {$1}"
+    Yapımcı: "{$1}"
   hover:
     players_online:
       0: "Şu anda çevrimiçi oyuncu yok."
@@ -244,10 +243,8 @@ tr:
       extra: "Bu değişiklik onaylamadığınız takdirde {$1} içinde eski haline dönecek."
     dolphin_found:
       title: "Dolphin Emulator Klasörü Bulundu"
-      extra: |
-        Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz :)
-
-        Dolphin Emulator klasörü bulundu. Bu klasörü kullanmak ister misiniz?
+      extra: "Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz :) \\nDolphin Emulator klasörü bulundu. Bu klasörü kullanmak ister misiniz?"
+      Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz: ")"
     new_version_wh_wz:
       title: "Wheel Wizard Güncellemesi Mevcut"
       extra: "Wheel Wizard'ın {$1} sürümü mevcut (şu anda {$2}'de). Şimdi güncellemek ister misiniz?"
@@ -297,14 +294,8 @@ tr:
       extra: "Şu an güncellemeler kontrol edilemiyor. İnternete bağlı olmayabilirsiniz veya sunucular çalışmıyor olabilir."
     unable_update_wh_wz:
       extra:
-        reason_network: |
-          Wheel Wizard'ın güncel olup olmadığını kontrol edilemedi.
-
-          Ağ sorunları yaşıyor olabilirsiniz.
-        reason_location: |
-          Wheel Wizard güncellenemedi. Uygulamanın erişilebilir bir klasörde bulunduğundan emin olun.
-
-          İstenilen klasör bulunamadı.
+        reason_network: "Wheel Wizard'ın güncel olup olmadığını kontrol edilemedi. \\nAğ sorunları yaşıyor olabilirsiniz."
+        reason_location: "Wheel Wizard güncellenemedi. Uygulamanın erişilebilir bir klasörde bulunduğundan emin olun. \\n İstenilen klasör bulunamadı."
       title: "Wheel Wizard güncellenemedi."
     no_connect_server:
       extra: "Sunucuya bağlanılamadı. Lütfen daha sonra tekrar deneyin."
@@ -340,10 +331,8 @@ tr:
       extra:
         failed_update_delete: "Güncelleme dosyalarını silmek başarısız oldu. İşlem iptal ediliyor."
         failed_update_apply: "Güncellemeyi uygulamak başarısız oldu. İşlem iptal ediliyor."
-        invalid_file_path: |
-          Yanlış dosya yolu tespit edildi. Lütfen geliştiricilere bildirin.
-
-          Sunucu hatası: {$1}
+        invalid_file_path: "Yanlış dosya yolu tespit edildi. Lütfen geliştiricilere bildirin.\\n Sunucu hatası: {$1}"
+        Sunucu hatası: "{$1}"
       title: "Retro Rewind güncellemesi iptal ediliyor"
     restart_admin_fail:
       extra: "Yöneticilik haklarıyla yeniden başlatılamadı."
@@ -439,10 +428,10 @@ tr:
     optional: "Opsiyonel"
     must_set_paths: "Retro Rewind'ı oynayabilmek için önce bu üç yolu ayarlamanız gerekiyor"
   category:
-    video: "Video"
     about: "Hakkında"
     other: "Diğer"
     general: "Genel"
+    video: "Video"
   value:
     language:
       france: "Fransızca"
