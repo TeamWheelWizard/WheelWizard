@@ -277,6 +277,7 @@ fi:
     rr_to_old:
       extra: |-
         Retro Rewind -versiosi on liian vanha päivittämiseen. Haluatko asentaa Retro Rewindin uudelleen?
+
       title: "Retro Rewind -versio on liian vanha."
     rr_not_determined:
       title: "Lataa Retro Rewind"

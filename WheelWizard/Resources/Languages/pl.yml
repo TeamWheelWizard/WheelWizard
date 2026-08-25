@@ -428,6 +428,8 @@ pl:
     open_game_folder: "Otwórz Folder Gry"
     open_save_folder: "Otwórz Folder Zapisów"
   section:
+    graphics: "Grafika"
+    general: "Ogólne"
     language: "Język"
     wii: "Ustawienia Wii"
     resolution: "Rezolucja"

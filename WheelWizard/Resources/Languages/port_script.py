@@ -114,7 +114,7 @@ def append_yaml_dict(lines: list[str], values: dict, indent: int) -> None:
         if "\n" in text or "\r" in text:
             lines.append(f"{prefix}{key}: |-")
             for block_line in text.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
-                lines.append(" " * (indent + 2) + block_line)
+                lines.append(" " * (indent + 2) + block_line if block_line else "")
             continue
 
         lines.append(f'{prefix}{key}: "{quote_yaml_value(text)}"')
