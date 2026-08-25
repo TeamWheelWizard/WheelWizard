@@ -42,7 +42,7 @@
                                   VerticalAlignment="Center" />
                     </Grid>
 
-                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
@@ -59,12 +59,33 @@
                         <components1:Button Grid.Column="1"
                                             x:Name="DolphinReinstallButton"
                                             Variant="Warning"
+                                            ButtonSize="Compact"
                                             IsEnabled="True"
                                             IconData="{StaticResource Download}"
                                             Text="{loc:T option.reinstall}"
                                             HorizontalAlignment="Right"
                                             VerticalAlignment="Center"
                                             Click="Reinstall_RetroRewind" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <components1:FormFieldLabel Grid.Column="0"
+                                                    Margin="0,0,16,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Text="{loc:T option.save_folder}" />
+                        <components1:Button Grid.Column="1"
+                                            x:Name="OpenSaveFolderButton"
+                                            Variant="Default"
+                                            ButtonSize="Compact"
+                                            IsEnabled="True"
+                                            IconData="{StaticResource Folder}"
+                                            Text="{loc:T action.open}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Click="OpenSaveFolder_OnClick" />
                     </Grid>
                 </StackPanel>
             </Border>
@@ -92,14 +113,7 @@
                 </Grid>
             </Border>
 
-            <components1:FormFieldLabel Text="{loc:T section.installation}" />
-            <StackPanel>
-                <components1:Button x:Name="OpenSaveFolderButton"
-                                    Variant="Default" IsEnabled="True" HorizontalAlignment="Left"
-                                    IconData="{StaticResource Folder}"
-                                    Text="{loc:T option.open_save_folder}"
-                                    Click="OpenSaveFolder_OnClick" Margin="3" />
-            </StackPanel>
+            <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
     </Grid>
 </UserControl>

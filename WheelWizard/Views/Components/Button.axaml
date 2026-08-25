@@ -9,6 +9,7 @@
                 <components1:Button Width="150" Text="Ugly Light" Variant="UglyLight"/>
                 <!-- Ugly light is not ugly actually, its just because i don't want you to use it unless strictly necessary-->
                 <components1:Button Width="150" Text="Primary" Variant="Primary"/>
+                <components1:Button Width="150" Text="Compact" Variant="Primary" ButtonSize="Compact"/>
                 <components1:Button Width="150" Text="Secondary" Variant="Warning" />
                 <components1:Button Width="150" Text="Danger" Variant="Danger" FontSize="30"/>
                 <components1:Button x:Name="PlayButton"
@@ -55,6 +56,13 @@
                 </Border>
             </ControlTemplate>
         </Setter>
+    </Style>
+
+    <Style Selector="components1|Button.Compact">
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="IconSize" Value="16" />
+        <Setter Property="FontSize" Value="13" />
     </Style>
     
     <!-- ================

@@ -10,6 +10,11 @@ public class Button : Avalonia.Controls.Button // Change to TemplatedControl
         ButtonsVariantType.Default
     );
 
+    public static readonly StyledProperty<ButtonsSizeType> ButtonSizeProperty = AvaloniaProperty.Register<Button, ButtonsSizeType>(
+        nameof(ButtonSize),
+        ButtonsSizeType.Regular
+    );
+
     public static readonly StyledProperty<Geometry> IconDataProperty = AvaloniaProperty.Register<Button, Geometry>(nameof(IconData));
 
     public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<Button, double>(nameof(IconSize), 20.0);
@@ -25,12 +30,19 @@ public class Button : Avalonia.Controls.Button // Change to TemplatedControl
         UglyLight,
     }
 
+    public enum ButtonsSizeType
+    {
+        Regular,
+        Compact,
+    }
+
     // Constructor
     public Button()
     {
         FontSize = 14;
         // No need for InitializeComponent() in code-behind for TemplatedControl
         UpdateStyleClasses(Variant);
+        UpdateSizeClass(ButtonSize);
     }
 
     // Properties remain the same
@@ -38,6 +50,12 @@ public class Button : Avalonia.Controls.Button // Change to TemplatedControl
     {
         get => GetValue(VariantProperty);
         set => SetValue(VariantProperty, value);
+    }
+
+    public ButtonsSizeType ButtonSize
+    {
+        get => GetValue(ButtonSizeProperty);
+        set => SetValue(ButtonSizeProperty, value);
     }
 
     public Geometry IconData
@@ -69,11 +87,23 @@ public class Button : Avalonia.Controls.Button // Change to TemplatedControl
         Classes.Add(variant.ToString());
     }
 
+    private void UpdateSizeClass(ButtonsSizeType size)
+    {
+        var sizes = Enum.GetValues<ButtonsSizeType>();
+        foreach (var enumSize in sizes)
+        {
+            Classes.Remove(enumSize.ToString());
+        }
+        Classes.Add(size.ToString());
+    }
+
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
         if (change.Property == VariantProperty)
             UpdateStyleClasses(change.GetNewValue<ButtonsVariantType>());
+        else if (change.Property == ButtonSizeProperty)
+            UpdateSizeClass(change.GetNewValue<ButtonsSizeType>());
     }
 }

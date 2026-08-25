@@ -15,6 +15,11 @@
         <Setter Property="BorderBrush" Value="{StaticResource Neutral900}" />
         <Setter Property="BorderThickness" Value="1" />
     </Style>
+
+    <Style Selector="Border.SettingsBottomSpacer">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
     
     <Style Selector="Border.AboutBlockStyle">
         <Setter Property="Background" Value="Transparent" />

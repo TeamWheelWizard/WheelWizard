@@ -43,7 +43,7 @@
                                   VerticalAlignment="Center" />
                     </Grid>
 
-                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
@@ -63,7 +63,7 @@
                                   VerticalAlignment="Center" />
                     </Grid>
 
-                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
@@ -85,7 +85,7 @@
                                   VerticalAlignment="Center" />
                     </Grid>
 
-                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <components1:FormFieldLabel Grid.Column="0"
@@ -127,7 +127,7 @@
                                   VerticalAlignment="Center" />
                     </Grid>
 
-                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
@@ -149,7 +149,7 @@
                                   VerticalAlignment="Center" />
                     </Grid>
 
-                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
@@ -173,6 +173,7 @@
                 </StackPanel>
             </Border>
 
+            <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
     </Grid>
 </UserControl>

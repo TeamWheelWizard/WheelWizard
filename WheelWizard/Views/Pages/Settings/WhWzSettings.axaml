@@ -8,8 +8,7 @@
              x:Class="WheelWizard.Views.Pages.Settings.WhWzSettings">
 
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <!-- the margin -5 won't change anything visually, but in calculations its 10 pix shorter, just to make sure that the scrollbar won't trigger to early -->
-        <StackPanel Margin="0,0,0,-5">
+        <StackPanel>
             <!-- File location settings -->
             <StackPanel Margin="0,10,0,0">
                 <StackPanel Orientation="Horizontal">
@@ -210,7 +209,7 @@
                                   Click="EnableAnimations_OnClick" />
                     </Grid>
 
-                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <components1:FormFieldLabel Grid.Column="0"
@@ -225,7 +224,7 @@
                                   VerticalAlignment="Center" />
                     </Grid>
 
-                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
@@ -251,6 +250,7 @@
                     </Grid>
                 </StackPanel>
             </Border>
+            <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

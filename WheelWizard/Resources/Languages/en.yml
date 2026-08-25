@@ -107,6 +107,7 @@ en:
     installed: "Installed"
   action:
     play: "Play"
+    open: "Open"
     play_offline: "Play Offline"
     play_anyway: "Play anyway"
     install: "Install"
@@ -511,6 +512,7 @@ en:
     launch_with_dolphin: "Launch Game With Dolphin Window"
     launch_rr_on_startup: "Launch Retro Rewind On Startup"
     retro_rewind_installation: "Retro Rewind Installation"
+    save_folder: "Save Folder"
     v_sync: "VSync"
     recommended: "Recommended Settings"
     show_fps: "Show FPS"

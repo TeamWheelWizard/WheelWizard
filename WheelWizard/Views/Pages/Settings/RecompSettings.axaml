@@ -70,6 +70,7 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+            <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

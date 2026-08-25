@@ -134,8 +134,7 @@
                     </StackPanel>
                 </Grid>
             </Border>
-            
-         
+            <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
         
         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom">
