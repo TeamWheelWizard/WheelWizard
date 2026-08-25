@@ -138,51 +138,69 @@
                 
                 <Border Classes="SettingsBlockStyle" Margin="0,8,0,0">
                     <StackPanel>
-                        <components1:FormFieldLabel Text="{loc:T option.wheel_wizard_data_folder}"
-                                                    TipText="{loc:T helper_text.wheel_wizard_data_folder}" />
-                        <TextBox Classes="dark"
-                                 Margin="0,4,0,0"
-                                 x:Name="AppDataLocationInput"
-                                 IsReadOnly="True"
-                                 HorizontalAlignment="Stretch"
-                                 Height="40"/>
-                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                            <components1:Button x:Name="AppDataLocationBrowseButton"
+                        <components1:FormFieldLabel Text="{loc:T option.wheel_wizard_data_folder}" />
+                        <TextBlock Classes="TinyText"
+                                   Margin="0,3,0,0"
+                                   Text="{loc:T helper_text.wheel_wizard_data_folder}"
+                                   TextAlignment="Left"
+                                   TextWrapping="Wrap" />
+                        <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,8,0,0">
+                            <TextBox Grid.Column="0"
+                                     Classes="dark"
+                                     x:Name="AppDataLocationInput"
+                                     IsReadOnly="True"
+                                     HorizontalAlignment="Stretch"
+                                     Height="28" />
+                            <components1:Button Grid.Column="1"
+                                                x:Name="AppDataLocationBrowseButton"
                                                 Variant="Default"
+                                                ButtonSize="Compact"
                                                 Text="{loc:T action.browse}"
                                                 IconData="{StaticResource Folder}"
-                                                Height="40"
+                                                Margin="6,0,0,0"
                                                 Click="AppDataLocationBrowse_OnClick" />
-                            <components1:Button x:Name="AppDataLocationResetButton"
+                            <components1:Button Grid.Column="2"
+                                                x:Name="AppDataLocationResetButton"
                                                 Variant="Default"
-                                                Text="{loc:T option.reset_data_folder}"
-                                                Height="40"
+                                                ButtonSize="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Refresh}"
+                                                ToolTip.Tip="{loc:T option.reset_data_folder}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
                                                 Margin="6,0,0,0"
                                                 Click="AppDataLocationReset_OnClick" />
-                        </StackPanel>
+                        </Grid>
                         <TextBlock Classes="TinyText"
                                    Margin="0,4,0,0"
                                    x:Name="AppDataLocationStatus" />
+
+                        <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
+
+                        <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                            <StackPanel Grid.Column="0"
+                                        Margin="0,0,16,0"
+                                        Spacing="3"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+                                <components1:FormFieldLabel Text="{loc:T option.wheel_wizard_folder}" />
+                                <TextBlock Classes="TinyText"
+                                           Text="{loc:T helper_text.wheel_wizard_folder}"
+                                           TextAlignment="Left"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                            <components1:Button Grid.Column="1"
+                                                Variant="Default"
+                                                ButtonSize="Compact"
+                                                IsEnabled="True"
+                                                IconData="{StaticResource Folder}"
+                                                Text="{loc:T action.open}"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Click="WhWzFolder_Click" />
+                        </Grid>
                     </StackPanel>
                 </Border>
-    
-                <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,*">
-                    <components1:Button Variant="Default"
-                                        IsEnabled="True"
-                                        IconData="{StaticResource Folder}"
-                                        HorizontalAlignment="Stretch"
-                                        Text="{loc:T option.open_config}"
-                                        Click="WhWzFolder_Click"
-                                        Margin="3" />
-                    <components1:Button Grid.Column="1" Variant="Default"
-                                        x:Name="OpenGameFolderButton"
-                                        IsEnabled="True"
-                                        IconData="{StaticResource Folder}"
-                                        HorizontalAlignment="Stretch"
-                                        Text="{loc:T option.open_game_folder}"
-                                        Click="GameFileFolder_Click"
-                                        Margin="3" />
-                </Grid>
             </StackPanel>
     
             <components1:FormFieldLabel Text="{loc:T section.wh_wz_appearance}" Margin="0,10,0,0" />

@@ -71,6 +71,32 @@
                     <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.retro_rewind_folder}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.retro_rewind_folder}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components1:Button Grid.Column="1"
+                                            x:Name="OpenGameFolderButton"
+                                            Variant="Default"
+                                            ButtonSize="Compact"
+                                            IsEnabled="True"
+                                            IconData="{StaticResource Folder}"
+                                            Text="{loc:T action.open}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Click="GameFileFolder_Click" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <components1:FormFieldLabel Grid.Column="0"
                                                     Margin="0,0,16,0"
                                                     HorizontalAlignment="Left"

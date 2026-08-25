@@ -406,13 +406,6 @@ public partial class WhWzSettings : UserControlBase
         FilePickerHelper.OpenFolderInFileManager(PathManager.WheelWizardAppdataPath);
     }
 
-    private void GameFileFolder_Click(object? sender, RoutedEventArgs e)
-    {
-        if (!Directory.Exists(PathManager.RiivolutionWhWzFolderPath))
-            return; //Button should be disabled
-        FilePickerHelper.OpenFolderInFileManager(PathManager.RiivolutionWhWzFolderPath);
-    }
-
     private void TogglePathSettings(bool enable)
     {
         if (enable)
@@ -443,7 +436,6 @@ public partial class WhWzSettings : UserControlBase
         DolphinExeInput.Text = PathManager.DolphinFilePath;
         MarioKartInput.Text = PathManager.GameFilePath;
         DolphinUserPathInput.Text = PathManager.UserFolderPath;
-        OpenGameFolderButton.IsEnabled = Directory.Exists(PathManager.RiivolutionWhWzFolderPath);
         UpdateAppDataLocationUi();
     }
 

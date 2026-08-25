@@ -27,6 +27,7 @@ public partial class OtherSettings : UserControlBase
         // controls individually so the recomp switch never becomes trapped behind Dolphin setup.
         LaunchRrOnStartup.IsEnabled = !_settingsAreDisabled;
         DolphinReinstallButton.IsEnabled = !_settingsAreDisabled;
+        OpenGameFolderButton.IsEnabled = !_settingsAreDisabled && Directory.Exists(PathManager.RiivolutionWhWzFolderPath);
         OpenSaveFolderButton.IsEnabled = !_settingsAreDisabled;
         if (!_settingsAreDisabled)
             LoadSettings();
@@ -42,6 +43,7 @@ public partial class OtherSettings : UserControlBase
     {
         // Only loads when the settings are not disabled (aka when the paths are set up correctly)
         LaunchRrOnStartup.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_RR_ON_STARTUP);
+        OpenGameFolderButton.IsEnabled = Directory.Exists(PathManager.RiivolutionWhWzFolderPath);
         OpenSaveFolderButton.IsEnabled = Directory.Exists(PathManager.SaveFolderPath);
     }
 
@@ -85,5 +87,13 @@ public partial class OtherSettings : UserControlBase
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)
     {
         FilePickerHelper.OpenFolderInFileManager(PathManager.SaveFolderPath);
+    }
+
+    private void GameFileFolder_Click(object? sender, RoutedEventArgs e)
+    {
+        if (!Directory.Exists(PathManager.RiivolutionWhWzFolderPath))
+            return;
+
+        FilePickerHelper.OpenFolderInFileManager(PathManager.RiivolutionWhWzFolderPath);
     }
 }
