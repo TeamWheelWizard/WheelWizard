@@ -125,7 +125,6 @@ public class SettingsManager : ISettingsManager
         ENABLE_ANIMATIONS = RegisterWhWz("EnableAnimations", true);
         TESTING_MODE_ENABLED = RegisterWhWz("TestingModeEnabled", false);
         SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, SettingValues.IsValidWindowScale);
-        REMOVE_BLUR = RegisterWhWz("REMOVE_BLUR", true);
         RR_REGION = RegisterWhWz("RR_Region", MarioKartWiiEnums.Regions.None);
         WW_LANGUAGE = RegisterWhWz("WW_Language", "en", value => SettingValues.WhWzLanguages.ContainsKey((string)value!));
         #endregion
@@ -229,7 +228,6 @@ public class SettingsManager : ISettingsManager
     public Setting ENABLE_ANIMATIONS { get; }
     public Setting TESTING_MODE_ENABLED { get; }
     public Setting SAVED_WINDOW_SCALE { get; }
-    public Setting REMOVE_BLUR { get; }
     public Setting RR_REGION { get; }
     public Setting WW_LANGUAGE { get; }
 

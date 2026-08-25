@@ -21,96 +21,143 @@
                 </TextBlock>
             </Border>
 
-            <!-- Resolution Section -->
-            <components1:FormFieldLabel Text="{loc:T section.resolution}" />
-            <Border Classes="SettingsBlockStyle" x:Name="ResolutionBorder">
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                    <UniformGrid Columns="2" x:Name="ResolutionStackPanel" Rows="4">
-                        <RadioButton Margin="0,2" GroupName="ResolutionGroup"
-                                     IsChecked="True" Tag="1">
-                            <components1:FormFieldLabel Text="1x (640x528)" TipText="{loc:T helper_text.resolution_scale}"/>
-                        </RadioButton>
-                        <RadioButton Margin="0,2" GroupName="ResolutionGroup"
-                                      Tag="5">
-                            5x (3200x2640)
-                        </RadioButton>
-                        <RadioButton Margin="0,2" GroupName="ResolutionGroup"
-                                     IsChecked="False" Tag="2">
-                            2x (1280x1056)
-                        </RadioButton>
-                        <RadioButton Margin="0,2" GroupName="ResolutionGroup"
-                                     IsChecked="False" Tag="6">
-                            6x (3840x3168)
-                        </RadioButton>
-                        <RadioButton Margin="0,2" GroupName="ResolutionGroup"
-                                     IsChecked="False" Tag="3">
-                            3x (1920x1584)
-                        </RadioButton>
-                        <RadioButton Margin="0,2" GroupName="ResolutionGroup"
-                                     IsChecked="False" Tag="7">
-                            7x (4480x3696)
-                        </RadioButton>
-                        <RadioButton Margin="0,2" GroupName="ResolutionGroup"
-                                     IsChecked="False" Tag="4">
-                            4x (2560x2112)
-                        </RadioButton>
-                        <RadioButton Margin="0,2" GroupName="ResolutionGroup"
-                                     IsChecked="False" Tag="8">
-                            8x (5120x4224)
-                        </RadioButton>
-                    </UniformGrid>
-                </Grid>
-            </Border>
-
-            <!-- Performance Settings Section -->
-            <components1:FormFieldLabel Text="{loc:T section.performance}"/>
-            <Border Classes="SettingsBlockStyle" x:Name="PerformanceBorder">
+            <!-- Graphics Section -->
+            <components1:FormFieldLabel Text="{loc:T section.graphics}" />
+            <Border Classes="SettingsBlockStyle" x:Name="GraphicsBorder">
                 <StackPanel>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark" x:Name="VSyncButton">
-                        <components1:FormFieldLabel Text="{loc:T option.v_sync}" />
-                    </CheckBox>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark" x:Name="RecommendedButton">
-                        <components1:FormFieldLabel Text="{loc:T option.recommended}"
-                                                   TipText="{loc:T helper_text.recommended}"/>
-                    </CheckBox>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark" x:Name="ShowFPSButton">
-                        <components1:FormFieldLabel Text="{loc:T option.show_fps}" />
-                    </CheckBox>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark" x:Name="RemoveBlurButton">
-                        <components1:FormFieldLabel Text="{loc:T option.remove_blur}" />
-                    </CheckBox>
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T section.resolution}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.resolution_scale}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1"
+                                  x:Name="ResolutionDropdown"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <components1:FormFieldLabel Grid.Column="0"
+                                                    Margin="0,0,16,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Text="{loc:T option.renderer}" />
+                        <ComboBox Grid.Column="1"
+                                  x:Name="RendererDropdown"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <components1:FormFieldLabel Grid.Column="0"
+                                                    Margin="0,0,16,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Text="{loc:T option.v_sync}" />
+                        <CheckBox Grid.Column="1"
+                                  x:Name="VSyncButton"
+                                  Classes="SwitchDark"
+                                  IsChecked="False"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <components1:FormFieldLabel Grid.Column="0"
+                                                    Margin="0,0,16,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Text="{loc:T option.show_fps}" />
+                        <CheckBox Grid.Column="1"
+                                  x:Name="ShowFPSButton"
+                                  Classes="SwitchDark"
+                                  IsChecked="False"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
                 </StackPanel>
             </Border>
 
-            <!-- Renderer Section -->
-            <components1:FormFieldLabel Text="{loc:T section.renderer}" />
-            <Border Classes="SettingsBlockStyle" x:Name="RendererBorder">
+            <!-- General Section -->
+            <components1:FormFieldLabel Text="{loc:T section.general}" />
+            <Border Classes="SettingsBlockStyle" x:Name="GeneralBorder">
                 <StackPanel>
-                    <components1:FormFieldLabel Text="{loc:T option.renderer}" />
-                    <ComboBox x:Name="RendererDropdown"
-                              HorizontalAlignment="Stretch" Margin="0,0,0,10"
-                              VerticalAlignment="Top"/>
-                </StackPanel>
-            </Border>
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.recommended}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.recommended}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="RecommendedButton"
+                                  Classes="SwitchDark"
+                                  IsChecked="False"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
 
-            <!-- Wii Section -->
-            <components1:FormFieldLabel Text="{loc:T section.wii}" />
-            <Border Classes="SettingsBlockStyle" x:Name="WiiBorder">
-                <StackPanel>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark" x:Name="DisableForce">
-                        <components1:FormFieldLabel Text="{loc:T option.force_disable_wiimote}"
-                                                    TipText="{loc:T helper_text.force_disable_wiimote}" />
-                    </CheckBox>
-                    <CheckBox Margin="0,2" IsChecked="False"
-                              Classes="SwitchDark" x:Name="LaunchWithDolphin">
-                        <components1:FormFieldLabel Text="{loc:T option.launch_with_dolphin}"
-                                                    TipText="{loc:T helper_text.launch_with_dolphin}" />
-                    </CheckBox>
+                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.force_disable_wiimote}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.force_disable_wiimote}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="DisableForce"
+                                  Classes="SwitchDark"
+                                  IsChecked="False"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+
+                    <Border Height="1" Margin="-10,4" Background="{StaticResource Neutral950}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.launch_with_dolphin}" />
+                            <TextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.launch_with_dolphin}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="LaunchWithDolphin"
+                                  Classes="SwitchDark"
+                                  IsChecked="False"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
                 </StackPanel>
             </Border>
 

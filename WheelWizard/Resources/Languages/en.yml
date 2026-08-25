@@ -529,7 +529,6 @@ en:
     mario_kart_game: "Mario Kart Wii Game File"
     dolphin_emulator_exe: "Dolphin Emulator executable"
     make_primary: "Make Primary"
-    remove_blur: "Remove Blur"
     enable_animations: "Enable Animations"
     reinstall: "Reinstall RR"
     open_game_folder: "Open Game Folder"
@@ -540,6 +539,8 @@ en:
     recomp_graphics_api: "Graphics API"
     recomp_prevent_stutters: "Prevent stutters"
   section:
+    graphics: "Graphics"
+    general: "General"
     language: "Language"
     wii: "Wii Settings"
     resolution: "Resolution"
