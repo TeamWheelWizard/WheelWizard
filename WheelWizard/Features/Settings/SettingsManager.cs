@@ -40,11 +40,10 @@ public class SettingsManager : ISettingsManager
         // Register this first because the path validators use the active frontend mode when deciding
         // whether Dolphin-only locations may be left blank.
         ENABLE_RECOMP = RegisterWhWz("EnableRecomp", false);
-        // A recomp install should continue using the Dolphin NAND Wheel Wizard already manages.
-        // Users can still opt out in Recomp Settings when they deliberately want private data.
-        RECOMP_USE_DOLPHIN_DATA = RegisterWhWz("RecompUseDolphinData", true);
-        // Dolphin advises against other programs touching its NAND in place, so the first install
-        // offers to copy it instead; this remembers that the user chose the copy.
+        // Whether WiiCompiled directly shares Dolphin's live NAND. Disabled means private mode;
+        // private mode uses the imported clone below when one exists, otherwise the runtime default.
+        RECOMP_USE_DOLPHIN_DATA = RegisterWhWz("RecompUseDolphinData", false);
+        // Whether private mode was initialized from the Wheel Wizard-owned Dolphin clone.
         RECOMP_COPY_DOLPHIN_NAND = RegisterWhWz("RecompCopyDolphinNand", false);
         DOLPHIN_LOCATION = RegisterWhWz(
             "DolphinLocation",

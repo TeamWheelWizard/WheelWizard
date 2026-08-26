@@ -162,6 +162,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         if (setting == SettingsService.WINDOW_SCALE || setting == SettingsService.SAVED_WINDOW_SCALE)
         {
             var scaleFactor = GetUsableWindowScale((double)setting.Get());
+            CompleteGrid.Resources["SettingsRowGap"] = 2d / scaleFactor;
             Height = WindowHeight * scaleFactor;
             Width = WindowWidth * scaleFactor;
             CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);

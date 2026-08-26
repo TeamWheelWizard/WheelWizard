@@ -16,6 +16,23 @@
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
+    <Style Selector="Border.SettingsRowStyle">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="10,5" />
+    </Style>
+    <Style Selector="Border.SettingsRowTop">
+        <Setter Property="CornerRadius" Value="12,12,5,5" />
+    </Style>
+    <Style Selector="Border.SettingsRowMiddle">
+        <Setter Property="CornerRadius" Value="5" />
+    </Style>
+    <Style Selector="Border.SettingsRowBottom">
+        <Setter Property="CornerRadius" Value="5,5,12,12" />
+    </Style>
+    <Style Selector="Border.SettingsRowSingle">
+        <Setter Property="CornerRadius" Value="12" />
+    </Style>
+
     <Style Selector="Border.SettingsBottomSpacer">
         <Setter Property="Height" Value="32" />
         <Setter Property="IsHitTestVisible" Value="False" />

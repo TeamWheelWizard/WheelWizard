@@ -466,7 +466,6 @@ de:
     video: "Video"
   status:
     data_folder:
-      default: "Standard-Speicherort wird verwendet."
       custom: "Verwendet benutzerdefinierten Speicherort"
       moving: "Dateien werden verschoben, bitte warten..."
   value:

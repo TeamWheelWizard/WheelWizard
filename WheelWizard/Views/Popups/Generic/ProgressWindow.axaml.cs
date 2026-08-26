@@ -7,11 +7,19 @@ namespace WheelWizard.Views.Popups.Generic;
 
 public partial class ProgressWindow : PopupContent
 {
-    private Stopwatch _stopwatch = new();
+    private const double EtaWarmupSeconds = 5;
+    private const double EtaIncreaseSmoothingSeconds = 5;
+    private const double EtaDecreaseSmoothingSeconds = 30;
+    private const double InitialSecondsPerRemainingPercent = 2;
+
+    private readonly Stopwatch _stopwatch = new();
+    private readonly object _progressLock = new();
     private int _progress = 0;
     private double? _totalMb = null;
-    private DispatcherTimer _updateTimer;
+    private readonly DispatcherTimer _updateTimer;
     private CancellationTokenSource? _downloadCancellationTokenSource;
+    private double? _smoothedRemainingSeconds;
+    private double _lastEstimateUpdateSeconds;
 
     public bool WasCancellationRequested { get; private set; }
 
@@ -29,7 +37,13 @@ public partial class ProgressWindow : PopupContent
 
     protected override void BeforeOpen()
     {
-        _stopwatch.Start();
+        lock (_progressLock)
+        {
+            _smoothedRemainingSeconds = null;
+            _lastEstimateUpdateSeconds = 0;
+        }
+
+        _stopwatch.Restart();
         _updateTimer.Start();
     }
 
@@ -47,20 +61,26 @@ public partial class ProgressWindow : PopupContent
     private void InternalUpdate()
     {
         var elapsedSeconds = _stopwatch.Elapsed.TotalSeconds;
-        var remainingSeconds = (100 - _progress) / (_progress / elapsedSeconds);
+        int progress;
+        double? remainingSeconds;
+        lock (_progressLock)
+        {
+            remainingSeconds = EstimateRemainingSeconds(elapsedSeconds);
+            progress = _progress;
+        }
 
-        var remainingText = _progress <= 0 ? t("state.unknown") : tTime((int)remainingSeconds);
+        var remainingText = remainingSeconds is null ? t("state.unknown") : tTime((int)Math.Ceiling(remainingSeconds.Value));
 
         var bottomText = $"{t("progress.estimated_time_remaining")} {remainingText}";
 
-        if (_totalMb != null)
+        if (_totalMb != null && elapsedSeconds > 0)
         {
-            var downloadedMb = (_progress / 100.0) * (double)_totalMb;
+            var downloadedMb = (progress / 100.0) * (double)_totalMb;
             bottomText = $"{t("attribute.speed")}: {downloadedMb / elapsedSeconds:F2} MB/s | {bottomText}";
         }
 
         LiveTextBlock.Text = bottomText;
-        ProgressBar.Value = _progress;
+        ProgressBar.Value = progress;
     }
 
     public ProgressWindow SetExtraText(string mainText)
@@ -83,10 +103,52 @@ public partial class ProgressWindow : PopupContent
         return this;
     }
 
+    public ProgressWindow SetIndeterminate(bool isIndeterminate = true)
+    {
+        ProgressBar.IsIndeterminate = isIndeterminate;
+        LiveTextBlock.IsVisible = !isIndeterminate;
+        return this;
+    }
+
     public void UpdateProgress(int progress)
     {
-        _progress = progress;
+        var clampedProgress = Math.Clamp(progress, 0, 100);
+        lock (_progressLock)
+            _progress = clampedProgress;
         // No need to call InternalUpdate directly, it's handled by the timer
+    }
+
+    private double? EstimateRemainingSeconds(double elapsedSeconds)
+    {
+        if (_progress >= 100)
+            return 0;
+        if (elapsedSeconds < EtaWarmupSeconds || _progress <= 0)
+            return null;
+
+        // Whole-operation progress remains useful when a backend reports only a few, unevenly
+        // spaced updates. The small uncertainty floor prevents an early jump to a few seconds when
+        // a setup phase begins at an already-weighted percentage.
+        var remainingProgress = 100 - _progress;
+        var averageRemainingSeconds = elapsedSeconds * remainingProgress / _progress;
+        var rawRemainingSeconds = Math.Max(averageRemainingSeconds, remainingProgress * InitialSecondsPerRemainingPercent);
+        if (!double.IsFinite(rawRemainingSeconds) || rawRemainingSeconds < 0)
+            return null;
+
+        if (_smoothedRemainingSeconds is null)
+        {
+            _smoothedRemainingSeconds = rawRemainingSeconds;
+        }
+        else
+        {
+            var updateSeconds = Math.Max(0, elapsedSeconds - _lastEstimateUpdateSeconds);
+            var smoothingSeconds =
+                rawRemainingSeconds > _smoothedRemainingSeconds ? EtaIncreaseSmoothingSeconds : EtaDecreaseSmoothingSeconds;
+            var weight = 1 - Math.Exp(-updateSeconds / smoothingSeconds);
+            _smoothedRemainingSeconds += weight * (rawRemainingSeconds - _smoothedRemainingSeconds.Value);
+        }
+
+        _lastEstimateUpdateSeconds = elapsedSeconds;
+        return _smoothedRemainingSeconds;
     }
 
     public ProgressWindow SetCancellationTokenSource(CancellationTokenSource? cancellationTokenSource)

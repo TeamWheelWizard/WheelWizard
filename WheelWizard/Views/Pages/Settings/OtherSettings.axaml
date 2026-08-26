@@ -14,14 +14,14 @@
                     CornerRadius="{StaticResource GlobalCornerRadius}"
                     HorizontalAlignment="Stretch" VerticalAlignment="Top"
                     Background="{StaticResource Warning600}">
-                <TextBlock HorizontalAlignment="Center" Classes="BodyText"
+                <SelectableTextBlock HorizontalAlignment="Center" Classes="BodyText"
                            FontWeight="SemiBold" Text="{loc:T helper_text.topbar.location_warning}"
                            Foreground="{StaticResource BackgroundColor}" />
             </Border>
 
-            <components1:FormFieldLabel Text="{loc:T section.retro_rewind}" />
-            <Border Classes="SettingsBlockStyle">
-                <StackPanel>
+            <components1:FormFieldLabel Text="{loc:T section.retro_rewind}" Margin="0,0,0,4" />
+            <StackPanel Spacing="{DynamicResource SettingsRowGap}" Margin="0,0,0,7">
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,16,0"
@@ -29,7 +29,7 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
                             <components1:FormFieldLabel Text="{loc:T option.launch_rr_on_startup}" />
-                            <TextBlock Classes="TinyText"
+                            <SelectableTextBlock Classes="TinyText"
                                        Text="{loc:T helper_text.launch_rr_on_startup}"
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
@@ -41,9 +41,9 @@
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
                     </Grid>
+                </Border>
 
-                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
-
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,16,0"
@@ -51,7 +51,7 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
                             <components1:FormFieldLabel Text="{loc:T option.retro_rewind_installation}" />
-                            <TextBlock x:Name="RetroRewindVersionText"
+                            <SelectableTextBlock x:Name="RetroRewindVersionText"
                                        Classes="TinyText"
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
@@ -67,9 +67,9 @@
                                             VerticalAlignment="Center"
                                             Click="Reinstall_RetroRewind" />
                     </Grid>
+                </Border>
 
-                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
-
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,16,0"
@@ -77,7 +77,7 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
                             <components1:FormFieldLabel Text="{loc:T option.retro_rewind_folder}" />
-                            <TextBlock Classes="TinyText"
+                            <SelectableTextBlock Classes="TinyText"
                                        Text="{loc:T helper_text.retro_rewind_folder}"
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
@@ -93,9 +93,9 @@
                                             VerticalAlignment="Center"
                                             Click="GameFileFolder_Click" />
                     </Grid>
+                </Border>
 
-                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
-
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <components1:FormFieldLabel Grid.Column="0"
                                                     Margin="0,0,16,0"
@@ -113,11 +113,13 @@
                                             VerticalAlignment="Center"
                                             Click="OpenSaveFolder_OnClick" />
                     </Grid>
-                </StackPanel>
-            </Border>
+                </Border>
+            </StackPanel>
 
-            <components1:FormFieldLabel x:Name="RecompSectionLabel" Text="{loc:T section.recomp}" />
-            <Border Classes="SettingsBlockStyle" x:Name="RecompBorder">
+            <components1:FormFieldLabel x:Name="RecompSectionLabel"
+                                        Text="{loc:T section.recomp}"
+                                        Margin="0,0,0,4" />
+            <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowSingle" x:Name="RecompBorder">
                 <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                     <StackPanel Grid.Column="0"
                                 Margin="0,0,16,0"
@@ -125,7 +127,7 @@
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
                         <components1:FormFieldLabel Text="{loc:T option.enable_recomp}" />
-                        <TextBlock Classes="TinyText"
+                        <SelectableTextBlock Classes="TinyText"
                                    Text="{loc:T helper_text.enable_recomp}"
                                    TextAlignment="Left"
                                    TextWrapping="Wrap" />

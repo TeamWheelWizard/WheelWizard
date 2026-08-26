@@ -502,7 +502,6 @@ fi:
     video: "Grafiikka"
   status:
     data_folder:
-      default: "Käytetään oletussijaintia."
       custom: "Käytetään mukautettua sijaintia."
       moving: "Siirretään tietoja, odota hetki..."
   value:

@@ -7,11 +7,26 @@
              mc:Ignorable="d" d:DesignWidth="444" d:DesignHeight="716"
              x:Class="WheelWizard.Views.Pages.Settings.WhWzSettings">
 
+    <UserControl.Styles>
+        <Style Selector="Border.LocationRowBlur">
+            <Style.Animations>
+                <Animation Duration="0:0:5" IterationCount="INFINITE">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="RotateTransform.Angle" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="RotateTransform.Angle" Value="360" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </UserControl.Styles>
+
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <!-- File location settings -->
             <StackPanel Margin="0,10,0,0">
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                     <components1:FormFieldLabel Text="{loc:T section.location_paths}" />
                     <Border x:Name="LocationWarningIcon"
                             ToolTip.Tip="{loc:T helper_text.must_set_paths}"
@@ -22,144 +37,186 @@
                     </Border>
                 </StackPanel>
     
-                <Border Classes="SettingsBlockStyle" x:Name="LocationBorder" ClipToBounds="True">
-                    <Grid>
-                        <Border CornerRadius="99999" x:Name="LocationBorderBlur"
-                                HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0.5"
-                                Margin="0,0,30,-80" Height="170" Width="110"
-                                Background="Transparent" Effect="blur(250)">
-                            <Border.Styles>
-                                <Style Selector="Border">
-                                    <Style.Animations>
-                                        <Animation Duration="0:0:5" IterationCount="INFINITE">
-                                            <KeyFrame Cue="0%">
-                                                <Setter Property="RotateTransform.Angle" Value="0" />
-                                            </KeyFrame>
-                                            <KeyFrame Cue="100%">
-                                                <Setter Property="RotateTransform.Angle" Value="360" />
-                                            </KeyFrame>
-                                        </Animation>
-                                    </Style.Animations>
-                                </Style>
-                            </Border.Styles>
-                        </Border>
-    
-                        <StackPanel>
-                            <StackPanel x:Name="LocationInputFields">
-                                <Grid x:Name="DolphinExecutableField" VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <components1:FormFieldLabel
-                                        Text="{loc:T option.dolphin_emulator_exe}"
-                                        TipText="{loc:T helper_text.end_with_exe}" />
-    
-                                    <TextBox Classes="dark" Grid.Row="1" Grid.Column="0" Height="40"
-                                             Watermark="{loc:T placeholder.enter_path}"
-                                             HorizontalAlignment="Stretch"
-                                             x:Name="DolphinExeInput" />
-    
-                                    <components1:Button Grid.Row="1" Grid.Column="1"
-                                                        FontSize="16" Height="40"
-                                                        IconData="{StaticResource Folder}"
-                                                        Click="DolphinExeBrowse_OnClick" Margin="10,0,0,0" />
-                                </Grid>
-    
-                                <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <components1:FormFieldLabel Text="{loc:T option.mario_kart_game}"
-                                                                Margin="0,6,0,0" x:Name="MKGameFieldLabel" />
-                                    <TextBox Classes="dark" Grid.Row="1" Grid.Column="0" Height="40"
-                                             Watermark="{loc:T placeholder.enter_path}"
-                                             HorizontalAlignment="Stretch"
-                                             x:Name="MarioKartInput" />
-                                    <components1:Button Grid.Row="1" Grid.Column="1"
-                                                        FontSize="16" Height="40"
-                                                        IconData="{StaticResource Folder}"
-                                                        Click="GameLocationBrowse_OnClick"
-                                                        Margin="10,0,0,0" />
-                                </Grid>
-    
-                                <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <components1:FormFieldLabel x:Name="DolphinUserFolderLabel"
-                                                                Text="{loc:T option.dolphin_user_path}"
-                                                                Margin="0,6,0,0" />
-                                    <TextBox Classes="dark" Grid.Row="1" Grid.Column="0"
-                                             HorizontalAlignment="Stretch" Height="40"
-                                             Watermark="{loc:T placeholder.enter_path}"
-                                             x:Name="DolphinUserPathInput" />
-                                    <components1:Button Grid.Row="1" Grid.Column="1"
-                                                        FontSize="16" Height="40"
-                                                        IconData="{StaticResource Folder}"
-                                                        Click="DolphinUserPathBrowse_OnClick" Margin="10,0,0,0" />
-                                </Grid>
+                <StackPanel Spacing="{DynamicResource SettingsRowGap}" Margin="0,0,0,7">
+                    <Border Classes="SettingsBlockStyle"
+                            x:Name="DolphinExecutableField"
+                            Margin="0"
+                            Padding="10,5"
+                            CornerRadius="12,12,5,5"
+                            ClipToBounds="True">
+                        <Grid ColumnDefinitions="*,Auto,Auto" MinHeight="40">
+                            <Border Classes="LocationRowBlur"
+                                    x:Name="DolphinExecutableBlur"
+                                    Grid.ColumnSpan="3"
+                                    CornerRadius="99999"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Opacity="0.25"
+                                    Margin="30,0,0,-55"
+                                    Height="120"
+                                    Width="80"
+                                    Background="Transparent"
+                                    Effect="blur(180)" />
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                                <components1:FormFieldLabel Text="{loc:T option.dolphin_emulator_exe}" />
+                                <SelectableTextBlock Classes="TinyText"
+                                                     Text="{loc:T helper_text.end_with_exe}"
+                                                     TextWrapping="Wrap" />
                             </StackPanel>
-    
-                            <StackPanel Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
-                                <components1:Button Variant="Primary" x:Name="LocationEditButton"
-                                                    Text="{loc:T action.edit}"
-                                                    Click="EditButton_OnClick" Height="40"
-                                                    IconData="{StaticResource Pen}"
-                                                    Margin="3" />
-                                <components1:Button Variant="Warning"
-                                                    x:Name="LocationCancelButton" Height="40"
-                                                    IsVisible="False" Click="CancelButton_OnClick"
-                                                    Text="{loc:T action.cancel}" Margin="3" />
-                                <components1:Button Variant="Primary"
-                                                    Text="{loc:T action.save}"
-                                                    x:Name="LocationSaveButton"
-                                                    Click="SaveButton_OnClick"
-                                                    IsVisible="False" Height="40"
-                                                    Margin="3" />
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-                
-                <Border Classes="SettingsBlockStyle" Margin="0,8,0,0">
-                    <StackPanel>
-                        <components1:FormFieldLabel Text="{loc:T option.wheel_wizard_data_folder}" />
-                        <TextBlock Classes="TinyText"
-                                   Margin="0,3,0,0"
-                                   Text="{loc:T helper_text.wheel_wizard_data_folder}"
-                                   TextAlignment="Left"
-                                   TextWrapping="Wrap" />
-                        <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,8,0,0">
-                            <TextBox Grid.Column="0"
-                                     Classes="dark"
-                                     x:Name="AppDataLocationInput"
-                                     IsReadOnly="True"
-                                     HorizontalAlignment="Stretch"
-                                     Height="28" />
                             <components1:Button Grid.Column="1"
-                                                x:Name="AppDataLocationBrowseButton"
+                                                x:Name="DolphinExecutableChangeButton"
                                                 Variant="Default"
                                                 ButtonSize="Compact"
-                                                Text="{loc:T action.browse}"
-                                                IconData="{StaticResource Folder}"
-                                                Margin="6,0,0,0"
-                                                Click="AppDataLocationBrowse_OnClick" />
+                                                Text="{loc:T action.change}"
+                                                IconData="{StaticResource Pen}"
+                                                VerticalAlignment="Center"
+                                                Click="DolphinExeBrowse_OnClick" />
                             <components1:Button Grid.Column="2"
+                                                x:Name="DolphinExecutableOpenButton"
+                                                Variant="Default"
+                                                ButtonSize="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Folder}"
+                                                ToolTip.Tip="{loc:T action.open}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="DolphinExecutableOpen_OnClick" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="SettingsBlockStyle"
+                            x:Name="GameLocationBorder"
+                            Margin="0"
+                            Padding="10,5"
+                            CornerRadius="5"
+                            ClipToBounds="True">
+                        <Grid ColumnDefinitions="*,Auto,Auto" MinHeight="40">
+                            <Border Classes="LocationRowBlur"
+                                    x:Name="GameLocationBlur"
+                                    Grid.ColumnSpan="3"
+                                    CornerRadius="99999"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Opacity="0.25"
+                                    Margin="30,0,0,-55"
+                                    Height="120"
+                                    Width="80"
+                                    Background="Transparent"
+                                    Effect="blur(180)" />
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                                <components1:FormFieldLabel Text="{loc:T option.mario_kart_game}" />
+                                <SelectableTextBlock Classes="TinyText"
+                                                     x:Name="MarioKartHelperText"
+                                                     TextWrapping="Wrap" />
+                            </StackPanel>
+                            <components1:Button Grid.Column="1"
+                                                x:Name="GameLocationChangeButton"
+                                                Variant="Default"
+                                                ButtonSize="Compact"
+                                                Text="{loc:T action.change}"
+                                                IconData="{StaticResource Pen}"
+                                                VerticalAlignment="Center"
+                                                Click="GameLocationBrowse_OnClick" />
+                            <components1:Button Grid.Column="2"
+                                                x:Name="GameLocationOpenButton"
+                                                Variant="Default"
+                                                ButtonSize="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Folder}"
+                                                ToolTip.Tip="{loc:T action.open}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="GameLocationOpen_OnClick" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="SettingsBlockStyle"
+                            x:Name="DolphinUserFolderBorder"
+                            Margin="0"
+                            Padding="10,5"
+                            CornerRadius="5,5,12,12"
+                            ClipToBounds="True">
+                        <Grid ColumnDefinitions="*,Auto,Auto" MinHeight="40">
+                            <Border Classes="LocationRowBlur"
+                                    x:Name="DolphinUserFolderBlur"
+                                    Grid.ColumnSpan="3"
+                                    CornerRadius="99999"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Opacity="0.25"
+                                    Margin="30,0,0,-55"
+                                    Height="120"
+                                    Width="80"
+                                    Background="Transparent"
+                                    Effect="blur(180)" />
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                                <components1:FormFieldLabel x:Name="DolphinUserFolderLabel"
+                                                            Text="{loc:T option.dolphin_user_path}" />
+                            </StackPanel>
+                            <components1:Button Grid.Column="1"
+                                                x:Name="DolphinUserFolderChangeButton"
+                                                Variant="Default"
+                                                ButtonSize="Compact"
+                                                Text="{loc:T action.change}"
+                                                IconData="{StaticResource Pen}"
+                                                VerticalAlignment="Center"
+                                                Click="DolphinUserPathBrowse_OnClick" />
+                            <components1:Button Grid.Column="2"
+                                                x:Name="DolphinUserFolderOpenButton"
+                                                Variant="Default"
+                                                ButtonSize="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Folder}"
+                                                ToolTip.Tip="{loc:T action.open}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="DolphinUserFolderOpen_OnClick" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowSingle" Margin="0,8,0,0">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.wheel_wizard_data_folder}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.wheel_wizard_data_folder}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       x:Name="AppDataLocationStatus" />
+                        </StackPanel>
+                        <components1:Button Grid.Column="1"
+                                                x:Name="AppDataLocationChangeButton"
+                                                Variant="Default"
+                                                ButtonSize="Compact"
+                                                Text="{loc:T action.change}"
+                                                IconData="{StaticResource Pen}"
+                                                VerticalAlignment="Center"
+                                                Click="AppDataLocationChange_OnClick" />
+                        <components1:Button Grid.Column="2"
+                                                x:Name="AppDataLocationOpenButton"
+                                                Variant="Default"
+                                                ButtonSize="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Folder}"
+                                                ToolTip.Tip="{loc:T action.open}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="AppDataLocationOpen_OnClick" />
+                        <components1:Button Grid.Column="3"
                                                 x:Name="AppDataLocationResetButton"
                                                 Variant="Default"
                                                 ButtonSize="Compact"
@@ -169,43 +226,17 @@
                                                 ToolTip.Placement="Top"
                                                 ToolTip.ShowDelay="50"
                                                 Margin="6,0,0,0"
-                                                Click="AppDataLocationReset_OnClick" />
-                        </Grid>
-                        <TextBlock Classes="TinyText"
-                                   Margin="0,4,0,0"
-                                   x:Name="AppDataLocationStatus" />
-
-                        <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
-
-                        <Grid ColumnDefinitions="*,Auto" MinHeight="40">
-                            <StackPanel Grid.Column="0"
-                                        Margin="0,0,16,0"
-                                        Spacing="3"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Center">
-                                <components1:FormFieldLabel Text="{loc:T option.wheel_wizard_folder}" />
-                                <TextBlock Classes="TinyText"
-                                           Text="{loc:T helper_text.wheel_wizard_folder}"
-                                           TextAlignment="Left"
-                                           TextWrapping="Wrap" />
-                            </StackPanel>
-                            <components1:Button Grid.Column="1"
-                                                Variant="Default"
-                                                ButtonSize="Compact"
-                                                IsEnabled="True"
-                                                IconData="{StaticResource Folder}"
-                                                Text="{loc:T action.open}"
-                                                HorizontalAlignment="Right"
                                                 VerticalAlignment="Center"
-                                                Click="WhWzFolder_Click" />
-                        </Grid>
-                    </StackPanel>
+                                                Click="AppDataLocationReset_OnClick" />
+                    </Grid>
                 </Border>
             </StackPanel>
     
-            <components1:FormFieldLabel Text="{loc:T section.wh_wz_appearance}" Margin="0,10,0,0" />
-            <Border Classes="SettingsBlockStyle" x:Name="WhWzAppearance">
-                <StackPanel>
+            <components1:FormFieldLabel Text="{loc:T section.wh_wz_appearance}" Margin="0,10,0,4" />
+            <StackPanel x:Name="WhWzAppearance"
+                        Spacing="{DynamicResource SettingsRowGap}"
+                        Margin="0,0,0,7">
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,16,0"
@@ -213,7 +244,7 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
                             <components1:FormFieldLabel Text="{loc:T option.enable_animations}" />
-                            <TextBlock Classes="TinyText"
+                            <SelectableTextBlock Classes="TinyText"
                                        Text="{loc:T helper_text.enable_animations}"
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
@@ -226,9 +257,9 @@
                                   VerticalAlignment="Center"
                                   Click="EnableAnimations_OnClick" />
                     </Grid>
+                </Border>
 
-                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
-
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <components1:FormFieldLabel Grid.Column="0"
                                                     Margin="0,0,16,0"
@@ -241,9 +272,9 @@
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
                     </Grid>
+                </Border>
 
-                    <Border Height="1" Margin="-10,10" Background="{StaticResource Neutral950}" />
-
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,16,0"
@@ -251,11 +282,11 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
                             <components1:FormFieldLabel Text="{loc:T option.wh_wz_language}" />
-                            <TextBlock Classes="TinyText"
+                            <SelectableTextBlock Classes="TinyText"
                                        Text="{loc:T helper_text.wh_wz_language}"
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
-                            <TextBlock Classes="TinyText"
+                            <SelectableTextBlock Classes="TinyText"
                                        x:Name="TranslationsPercentageText"
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
@@ -266,8 +297,8 @@
                                   VerticalAlignment="Center"
                                   ZIndex="2" />
                     </Grid>
-                </StackPanel>
-            </Border>
+                </Border>
+            </StackPanel>
             <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
     </ScrollViewer>

@@ -68,26 +68,26 @@
                     
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Roboto Classic Font" Margin="0,0,0,2"/>
-                        <TextBlock Classes="TinyText" Text="Wheel Wizard uses the Roboto font. This Font Software is "/>
+                        <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard uses the Roboto font. This Font Software is "/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Classes="TinyText" Text="licensed under the"/>
+                            <SelectableTextBlock Classes="TinyText" Text="licensed under the"/>
                             <components:IconLabelButton Text=" SIL Open Font License, Version 1.1" FontSize="12"
                                                         Foreground="{StaticResource Primary300}"
                                                         HoverForeground="{StaticResource Primary200}"
                                                         IsUnderlined="True"  Tag="https://openfontlicense.org/open-font-license-official-text/" 
                                                         Click="OpenLick_OnClick"
                                                         />
-                            <TextBlock Classes="TinyText" Text="."/>
+                            <SelectableTextBlock Classes="TinyText" Text="."/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Classes="TinyText" Text="Copyright 2011 The Roboto Project Authors ("/>
+                            <SelectableTextBlock Classes="TinyText" Text="Copyright 2011 The Roboto Project Authors ("/>
                             <components:IconLabelButton Text="source code" FontSize="12"
                                                         Foreground="{StaticResource Primary300}"
                                                         HoverForeground="{StaticResource Primary200}"
                                                         IsUnderlined="True" Tag="https://github.com/googlefonts/roboto-classic" 
                                                         Click="OpenLick_OnClick"
                             />
-                            <TextBlock Classes="TinyText" Text=")"/>
+                            <SelectableTextBlock Classes="TinyText" Text=")"/>
                         </StackPanel>
                     
                     </StackPanel>
@@ -113,7 +113,7 @@
                                                         IsUnderlined="True"  Tag="https://game-icons.net/about.html" 
                                                         Click="OpenLick_OnClick"
                             />
-                            <TextBlock Classes="TinyText" Text=". Specifically the"/>
+                            <SelectableTextBlock Classes="TinyText" Text=". Specifically the"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <components:IconLabelButton Text=" Car Wheel icon" FontSize="12"
@@ -129,7 +129,7 @@
                                                         IsUnderlined="True"  Tag="https://game-icons.net/1x1/delapouite/flat-tire.html" 
                                                         Click="OpenLick_OnClick"
                             />
-                            <TextBlock Classes="TinyText" Text=", both created by Delapouite"/>
+                            <SelectableTextBlock Classes="TinyText" Text=", both created by Delapouite"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -138,9 +138,9 @@
         </StackPanel>
         
         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <TextBlock x:Name="ReleaseText" HorizontalAlignment="Right" Classes="TinyText" Text="DEV BUILD"/>
-            <TextBlock x:Name="WhWzVersionText" HorizontalAlignment="Right" Classes="TinyText" Text="Example WhWz version 1.0.0" />
-            <TextBlock x:Name="RrVersionText" HorizontalAlignment="Right" Classes="TinyText" Text="Example RR version 1.0.0" />
+            <SelectableTextBlock x:Name="ReleaseText" HorizontalAlignment="Right" Classes="TinyText" Text="DEV BUILD"/>
+            <SelectableTextBlock x:Name="WhWzVersionText" HorizontalAlignment="Right" Classes="TinyText" Text="Example WhWz version 1.0.0" />
+            <SelectableTextBlock x:Name="RrVersionText" HorizontalAlignment="Right" Classes="TinyText" Text="Example RR version 1.0.0" />
         </StackPanel>
     </Grid>
 </UserControl>

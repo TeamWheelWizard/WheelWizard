@@ -38,7 +38,7 @@ public partial class RecompSettings : UserControlBase
         LoadSettings();
 
         // Attached after loading, so populating a control never writes it straight back.
-        UseDolphinData.IsCheckedChanged += UseDolphinData_OnChanged;
+        ShareDolphinData.IsCheckedChanged += ShareDolphinData_OnChanged;
         ResolutionDropdown.SelectionChanged += Resolution_OnChanged;
         GraphicsApiDropdown.SelectionChanged += GraphicsApi_OnChanged;
         ShowFps.IsCheckedChanged += ShowFps_OnChanged;
@@ -60,23 +60,33 @@ public partial class RecompSettings : UserControlBase
             InstallationBorder.IsVisible = installed;
 
             var installFolder = RecompEnvironment?.InstallFolderPath ?? PathManager.RecompInstallFolderPath;
-            InstallLocation.Text = installFolder;
+            InstallLocationText.Text = installFolder;
             OpenInstallFolder.IsEnabled = Directory.Exists(installFolder);
+            WiiCompiledVersionText.Text = t("helper_text.installed_version", t("state.loading"));
+            if (installed)
+                _ = RefreshWiiCompiledVersionAsync();
 
             LoadVideoSettings();
 
-            // The sharing state the next install/launch will actually use, not just the preference flag.
-            var nandFolder = DolphinData?.NandFolderPath;
-            UseDolphinData.IsChecked = DolphinData is { IsEnabled: true } && nandFolder is not null;
-            DolphinDataStatus.Text =
-                nandFolder is null ? t("status.recomp_dolphin_data_not_linked")
-                : DolphinData is { CopyEnabled: true } ? t("status.recomp_dolphin_data_copied", nandFolder)
-                : t("status.recomp_dolphin_data_linked", nandFolder);
+            var sharingDolphinData = DolphinData is { IsSharingEnabled: true, SourceNandFolderPath: not null };
+            ShareDolphinData.IsChecked = sharingDolphinData;
+            SharedNandWarningIcon.IsVisible = sharingDolphinData;
+
+            var cloneFolder = PathManager.RecompNandCopyFolderPath;
+            DolphinCloneStatus.Text = Directory.Exists(cloneFolder)
+                ? t("status.recomp_dolphin_clone_available", cloneFolder)
+                : t("status.recomp_dolphin_clone_missing");
         }
         finally
         {
             _loading = false;
         }
+    }
+
+    private async Task RefreshWiiCompiledVersionAsync()
+    {
+        var version = RecompInstallService is null ? null : await RecompInstallService.GetInstalledVersionAsync();
+        WiiCompiledVersionText.Text = t("helper_text.installed_version", version ?? t("state.unknown"));
     }
 
     #region WiiCompiled video settings
@@ -166,14 +176,14 @@ public partial class RecompSettings : UserControlBase
 
     #endregion
 
-    private async void UseDolphinData_OnChanged(object? sender, RoutedEventArgs e)
+    private async void ShareDolphinData_OnChanged(object? sender, RoutedEventArgs e)
     {
         if (_loading || DolphinData is null)
             return;
 
-        if (UseDolphinData.IsChecked != true)
+        if (ShareDolphinData.IsChecked != true)
         {
-            DolphinData.SetEnabled(false);
+            DolphinData.SetSharingEnabled(false);
             await ApplyNandSettingAsync();
             LoadSettings();
             return;
@@ -182,7 +192,7 @@ public partial class RecompSettings : UserControlBase
         var userFolder = DolphinData.LinkedUserFolderPath ?? await Task.Run(DolphinData.FindCandidateUserFolder);
         if (userFolder is null)
         {
-            DolphinData.SetEnabled(false);
+            DolphinData.SetSharingEnabled(false);
             await ApplyNandSettingAsync();
             LoadSettings();
             await new MessageBoxWindow()
@@ -193,16 +203,25 @@ public partial class RecompSettings : UserControlBase
             return;
         }
 
-        var result = DolphinData.Link(userFolder);
-        if (result.IsSuccess && DolphinData.CopyEnabled && DolphinData.NandFolderPath is null)
+        var confirmed = await new YesNoWindow()
+            .SetMainText(t("question.recomp_share_dolphin_data.title"))
+            .SetExtraText(t("question.recomp_share_dolphin_data.extra"))
+            .SetButtonText(t("action.recomp_nand_share"), t("action.cancel"))
+            .SetButtonVariants(
+                WheelWizard.Views.Components.Button.ButtonsVariantType.Warning,
+                WheelWizard.Views.Components.Button.ButtonsVariantType.Default
+            )
+            .AwaitAnswer();
+        if (!confirmed)
         {
-            // The copy this install once made is gone (for example after an uninstall), so turning
-            // sharing back on falls back to the in-place link the toggle describes.
-            DolphinData.SetCopyEnabled(false);
+            LoadSettings();
+            return;
         }
+
+        var result = DolphinData.Link(userFolder);
         if (result.IsFailure)
         {
-            DolphinData.SetEnabled(false);
+            DolphinData.SetSharingEnabled(false);
             await ApplyNandSettingAsync();
             await new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Error)
@@ -215,6 +234,65 @@ public partial class RecompSettings : UserControlBase
             await ApplyNandSettingAsync();
         }
         LoadSettings();
+    }
+
+    private async void CloneDolphinData_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (DolphinData is null)
+            return;
+
+        var sourceNand = await Task.Run(() => DolphinData.SourceNandFolderPath);
+        if (sourceNand is null)
+        {
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Warning)
+                .SetTitleText(t("status.recomp_dolphin_data_not_found"))
+                .SetInfoText(t("helper_text.recomp_dolphin_data_not_found"))
+                .ShowDialog();
+            return;
+        }
+
+        var cloneFolder = PathManager.RecompNandCopyFolderPath;
+        if (Directory.Exists(cloneFolder))
+        {
+            var overwrite = await new YesNoWindow()
+                .SetMainText(t("question.recomp_overwrite_dolphin_clone.title"))
+                .SetExtraText(t("question.recomp_overwrite_dolphin_clone.extra"))
+                .SetButtonText(t("action.clone"), t("action.cancel"))
+                .SetButtonVariants(
+                    WheelWizard.Views.Components.Button.ButtonsVariantType.Warning,
+                    WheelWizard.Views.Components.Button.ButtonsVariantType.Default
+                )
+                .AwaitAnswer();
+            if (!overwrite)
+                return;
+        }
+
+        var progressText = t("progress.recomp_copying_nand");
+        var progressWindow = new ProgressWindow(progressText).SetGoal(progressText).SetIndeterminate();
+        IsEnabled = false;
+        progressWindow.Show();
+        try
+        {
+            var copyResult = await Task.Run(DolphinData.CopyNandForRecomp);
+            if (copyResult.IsFailure)
+            {
+                MessageTranslationHelper.ShowMessage(copyResult.Error);
+                return;
+            }
+
+            // A clone is private data, so completing one also leaves direct sharing mode.
+            DolphinData.SetCopyEnabled(true);
+            DolphinData.SetSharingEnabled(false);
+            await ApplyNandSettingAsync();
+            ViewUtils.ShowSnackbar(t("status.recomp_dolphin_data_cloned"));
+        }
+        finally
+        {
+            progressWindow.Close();
+            IsEnabled = true;
+            LoadSettings();
+        }
     }
 
     /// <summary>
@@ -246,10 +324,9 @@ public partial class RecompSettings : UserControlBase
 
         // Shared Dolphin data lives in Dolphin's own Wii folder and survives; a copied or private
         // NAND belongs to the recomp and is removed with it, which the user must know upfront.
-        var extraText = DolphinData is { IsEnabled: true, NandFolderPath: not null }
-            ? DolphinData.CopyEnabled
-                ? t("question.recomp_uninstall.extra_copy")
-                : t("question.recomp_uninstall.extra_shared")
+        var extraText =
+            DolphinData is { IsSharingEnabled: true, SourceNandFolderPath: not null } ? t("question.recomp_uninstall.extra_shared")
+            : DolphinData is { CopyEnabled: true, NandFolderPath: not null } ? t("question.recomp_uninstall.extra_copy")
             : t("question.recomp_uninstall.extra_private");
         var confirmed = await new YesNoWindow()
             .SetMainText(t("question.recomp_uninstall.title"))
@@ -259,7 +336,11 @@ public partial class RecompSettings : UserControlBase
         if (!confirmed)
             return;
 
+        var progressText = t("progress.uninstalling_recomp");
+        var progressWindow = new ProgressWindow(progressText).SetGoal(progressText).SetIndeterminate();
+
         IsEnabled = false;
+        progressWindow.Show();
         try
         {
             var result = await RecompInstallService.UninstallAsync();
@@ -273,6 +354,7 @@ public partial class RecompSettings : UserControlBase
         }
         finally
         {
+            progressWindow.Close();
             IsEnabled = true;
             LoadSettings();
         }

@@ -23,6 +23,12 @@ public interface IRecompInstallService : IDisposable
     bool IsInstalled { get; }
 
     /// <summary>
+    /// Runs the installed <c>WiiCompiled-Setup.exe --version</c> host and returns its semantic version.
+    /// WiiCompiled is Windows-only, so other platforms return <see langword="null"/>.
+    /// </summary>
+    Task<string?> GetInstalledVersionAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Reads <c>install-state.json</c>, compares it against the latest GitHub release, and asks
     /// <c>--check-products</c> whether the installed executables are still fresh.
     /// </summary>
@@ -123,6 +129,27 @@ public sealed class RecompInstallService : IRecompInstallService
     public bool OperationInFlight => _operationGate.CurrentCount == 0;
 
     public bool IsInstalled => fileSystem.File.Exists(environment.InstalledSetupFilePath);
+
+    public async Task<string?> GetInstalledVersionAsync(CancellationToken cancellationToken = default)
+    {
+        if (!OperatingSystem.IsWindows() || !IsInstalled)
+            return null;
+
+        string? versionText = null;
+        var runResult = await processRunner.RunAsync(
+            environment.InstalledSetupFilePath,
+            RecompSetupCommandBuilder.BuildVersionArguments(),
+            workingDirectory: null,
+            line =>
+            {
+                if (RecompVersion.TryParse(line, out var version))
+                    versionText = version.ToString();
+            },
+            cancellationToken
+        );
+
+        return runResult.IsSuccess && runResult.Value == 0 ? versionText : null;
+    }
 
     public async Task<WheelWizardStatus> GetCurrentStatusAsync(CancellationToken cancellationToken = default)
     {
