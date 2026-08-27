@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -139,6 +139,19 @@
                                            PageType="{x:Type pages:KitchenSinkPage}"
                                            Text="Kitchen Sink" x:Name="KitchenSinkButton" />
         </StackPanel>
+
+        <components:IconLabelButton Grid.Column="0" Grid.Row="5"
+                                    x:Name="SupportUsButton"
+                                    IconData="{StaticResource CoffeeIcon}"
+                                    Text="{loc:T action.link.support}"
+                                    Foreground="{StaticResource Neutral400}"
+                                    HoverForeground="{StaticResource Primary300}"
+                                    FontSize="13"
+                                    IconSize="20"
+                                    Click="SupportUs_OnClick"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Margin="15,0,0,52" />
 
         <Grid Grid.Column="0" Grid.Row="5" ColumnDefinitions="28,8,28,8,28,8,*"
               VerticalAlignment="Bottom" Margin="10,0,13,12" x:Name="SidebarBottomBar">
