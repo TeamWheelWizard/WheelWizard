@@ -12,7 +12,7 @@
   <content_rating type="oars-1.0"/>
 
   <recommends>
-    <id version="2503" compare="ge">org.DolphinEmu.dolphin-emu</id>
+    <id version="2606a" compare="ge">org.DolphinEmu.dolphin-emu</id>
     <internet>always</internet>
   </recommends>
 
@@ -55,7 +55,7 @@
   </provides>
 
   <releases>
-    <release version="2.5.2" date="2026-08-27"/>>
+    <release version="2.5.2" date="2026-08-27"/>
     <release version="2.5.1" date="2026-08-24"/>
     <release version="2.5.0" date="2026-08-23"/>
     <release version="2.4.11" date="2026-07-09"/>
