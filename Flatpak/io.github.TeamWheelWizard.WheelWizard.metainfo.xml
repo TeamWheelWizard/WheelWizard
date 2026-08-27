@@ -55,8 +55,7 @@
   </provides>
 
   <releases>
-    <release version="2.5.2" date="2026-08-27"/>
-    <release version="2.5.1" date="2026-08-24"/>
+    <release version="2.5.2" date="2026-08-27"/>>
     <release version="2.5.1" date="2026-08-24"/>
     <release version="2.5.0" date="2026-08-23"/>
     <release version="2.4.11" date="2026-07-09"/>
