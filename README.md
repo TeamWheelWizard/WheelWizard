@@ -22,9 +22,9 @@ Wheel Wizard, our mod manager, is created for the sole purpose of convenience. T
 
 In order to play, a Mario Kart Wii game backup, dumped by you, is required. Accepted formats are .iso, .gcm, .gcz, .ciso, .wbfs, .wia and .rvz. Depending on what you like to play, a specific game version may be required.
 
-| Vanilla Mario Kart Wii in Dolphin | Retro Rewind in Dolphin | Wiicompiled (with or without Retro Rewind) |
-|-----------------------------------|-------------------------|--------------------------------------------|
-| Any region                        | Any region              | PAL RMCP01                                 |
+| Retro Rewind in Dolphin | Wiicompiled (with or without Retro Rewind) |
+|-------------------------|--------------------------------------------|
+| Any region              | PAL RMCP01                                 |
 
 
 ## Free and Open Source
