@@ -58,7 +58,7 @@ mkdir -p "$OUTPUT_DIR"
 if [ "${SKIP_BUILD:-}" != "true" ]; then
     echo "[INFO] Building WheelWizard for $RID..."
     cd "$WW_DIR"
-    dotnet publish -r "$RID" -c Release \
+    dotnet publish -r "$RID" -c Release-macOS \
         /p:PublishSingleFile=true \
         /p:IncludeAllContentForSelfExtract=true \
         /p:IncludeNativeLibrariesForSelfExtract=true \
@@ -105,6 +105,21 @@ cp "$EXE_DIR/WheelWizard" "$APP_BUNDLE/Contents/MacOS/WheelWizard"
 if [ -f "$MAC_DIRS/Contents/Resources/WheelWizard.icns" ]; then
     mkdir -p "$APP_BUNDLE/Contents/Resources"
     cp "$MAC_DIRS/Contents/Resources/WheelWizard.icns" "$APP_BUNDLE/Contents/Resources/WheelWizard.icns"
+fi
+
+# Set the bundle version from the release tag (e.g. "v2.5.1" -> "2.5.1"),
+# falling back to the version declared in the project file.
+if [ -n "${GITHUB_REF_NAME:-}" ]; then
+    BUNDLE_VERSION="${GITHUB_REF_NAME#v}"
+else
+    BUNDLE_VERSION="$(sed -n 's/.*<Version>\(.*\)<\/Version>.*/\1/p' "$WW_DIR/WheelWizard/WheelWizard.csproj" | head -n1)"
+fi
+if [ -z "$BUNDLE_VERSION" ]; then
+    echo "[WARN] Could not determine version; leaving Info.plist version unchanged."
+else
+    echo "[INFO] Setting bundle version to $BUNDLE_VERSION"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP_BUNDLE/Contents/Info.plist"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $BUNDLE_VERSION" "$APP_BUNDLE/Contents/Info.plist"
 fi
 
 echo "[INFO] .app bundle created successfully"

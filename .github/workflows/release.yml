@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: "10.0.x"
 
@@ -78,7 +78,7 @@ jobs:
           chmod +x artifacts/WheelWizard_Linux artifacts/WheelWizard_arm64_Linux
 
       - name: Upload Linux + Windows artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: artifacts-linux-windows
           path: artifacts/
@@ -93,14 +93,14 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Build .app bundle for macOS arm64
         run: |
@@ -160,7 +160,7 @@ jobs:
 
       - name: Create DMG
         id: create-dmg
-        uses: L-Super/create-dmg-actions@v1
+        uses: L-Super/create-dmg-actions@8c59360de7ec731bfa03ce3bd2ad5ae650169864 # v1
         with:
           dmg_name: WheelWizard-macOSarm64
           src_dir: release/WheelWizard.app
@@ -202,7 +202,7 @@ jobs:
           xcrun stapler staple WheelWizard-macOSarm64.dmg
 
       - name: Upload macOS DMG
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: artifacts-macos-arm64
           path: WheelWizard-macOSarm64.dmg
@@ -216,14 +216,14 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Build .app bundle for macOS x64
         run: |
@@ -267,7 +267,7 @@ jobs:
 
       - name: Create DMG
         id: create-dmg
-        uses: L-Super/create-dmg-actions@v1
+        uses: L-Super/create-dmg-actions@8c59360de7ec731bfa03ce3bd2ad5ae650169864 # v1
         with:
           dmg_name: WheelWizard-macOSintel
           src_dir: release/WheelWizard.app
@@ -309,7 +309,7 @@ jobs:
           xcrun stapler staple WheelWizard-macOSintel.dmg
 
       - name: Upload macOS DMG
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: artifacts-macos-x64
           path: WheelWizard-macOSintel.dmg
@@ -326,7 +326,7 @@ jobs:
 
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
 
       - name: Prepare release assets
         run: |
@@ -338,10 +338,10 @@ jobs:
           cp artifacts-linux-windows/WheelWizard_arm64_Linux final-artifacts/
 
           # macOS DMGs
-          cp artifacts-macos-arm64/WheelWizard-macOSarm64.dmg final-artifacts/ 2>/dev/null || true
-          cp artifacts-macos-x64/WheelWizard-macOSintel.dmg final-artifacts/ 2>/dev/null || true
+          cp artifacts-macos-arm64/WheelWizard-macOSarm64.dmg final-artifacts/
+          cp artifacts-macos-x64/WheelWizard-macOSintel.dmg final-artifacts/
 
-          chmod +x final-artifacts/WheelWizard_Linux final-artifacts/WheelWizard_arm64_Linux 2>/dev/null || true
+          chmod +x final-artifacts/WheelWizard_Linux final-artifacts/WheelWizard_arm64_Linux
           ls -la final-artifacts/
 
       - name: Create GitHub release
@@ -349,13 +349,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           REPO="${{ github.repository }}"
-          ASSETS=""
-          for f in final-artifacts/*; do
-            ASSETS="$ASSETS \"$f\""
-          done
-          eval gh release create "${{ github.ref_name }}" $ASSETS \
+          TAG_NAME="${GITHUB_REF_NAME}"
+          ASSETS=(final-artifacts/*)
+          gh release create "$TAG_NAME" "${ASSETS[@]}" \
             --repo "$REPO" \
-            --title "${{ github.ref_name }}" \
+            --title "$TAG_NAME" \
             --generate-notes
 
 
