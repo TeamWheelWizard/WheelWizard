@@ -329,6 +329,10 @@ de:
     enter_new_name:
       title: "Einen neuen Namen eingeben"
       extra: "Name von {$1} ändern"
+    enter_mod_name:
+      title: "Mod-Name:"
+    launch_clear_patches_found:
+      extra: "Du bist dabei, das Spiel ohne Mods zu starten. Möchtest du deinen \"Patches\"-Ordner leeren? Startest du das Spiel trotzdem, bleiben die Patches aktiv!"
     apply_language_settings:
       title: "Das jetzige Fenster wird sich schließen und ein neues wird sich mit den neuen Spracheinstellungen öffnen."
       extra: "Neue Spracheinstellungen anwenden?"
