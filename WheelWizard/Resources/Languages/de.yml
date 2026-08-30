@@ -3,15 +3,18 @@ de:
     home: "Startseite"
     settings: "Einstellungen"
     mods: "My Stuff"
+    patches: "Patches"
     my_profiles: "Mein Profil"
     rooms: "Räume"
     friends: "Freunde"
+    leaderboard: "Rangliste"
     room_details: "Raumdetails"
     my_miis: "Meine Miis"
   attribute:
     status_online: "Online"
     enabled: "Aktiviert"
     title: "Titel"
+    all: "Alle"
     status_offline: "Offline"
     name: "Name"
     id: "ID"
@@ -105,9 +108,11 @@ de:
   action:
     play: "Spielen"
     play_offline: "Offline spielen"
+    play_anyway: "Trotzdem spielen"
     install: "Installieren"
     update: "Aktualisieren"
     import: "Importieren"
+    convert_to_patches: "Zu Patches konvertieren"
     enable_all: "Alle aktivieren"
     disable_all: "Alle deaktivieren"
     rename: "Umbenennen"
@@ -134,6 +139,8 @@ de:
     unfavorite: "Entfavorisieren"
     favorite: "Favorisieren"
     view_room: "Raum anzeigen"
+    recomp_nand_copy: "Kopie erstellen"
+    recomp_nand_share: "Direkt verwenden"
     link:
       discord: "Rede mit uns!"
       github: "Quellcode"
@@ -353,6 +360,12 @@ de:
     dolphin_not_found:
       title: "Dolphin Emulator-Ordner nicht gefunden."
       extra: "Der Ordner „Dolphin Emulator“ wurde nicht automatisch gefunden. Versuche bitte, den Ordner manuell zu finden. Für weitere Informationen auf „Hilfe“ klicken."
+    dolphin_version_unverified:
+      title: "Die verwendete Dolphin Emulator-Version konnte nicht verifiziert werdn"
+      extra: |
+        Wheel Wizard konnte die Version des eingerichteten Dolphin Emulator nicht lesen und kann daher nicht feststellen, ob die Sicherheitsupdates installiert sind.
+
+        Bitte verifiziere manuell, dass du Version {$1} oder neuer verwendest. Ältere Versionen haben eine bekannte Sicherheitslücke, mit welcher schädliche Spieldateien, Mods, oder cheatende Online-Spieler deinen PC mit Malware infizieren können.
     dolphin_tool_selected:
       title: "Falsche Dolphin-Anwendung ausgewählt."
       extra: "Du hast \"DolphinTool.exe\" ausgewählt. Bitte wähle stattdessen \"Dolphin.exe\" (die Dolphin Anwendung)."
@@ -443,6 +456,14 @@ de:
     rr_up_to_date:
       title: "Retro Rewind ist auf dem neuesten Stand."
     mii_changed: "Mii erfolgreich geändert."
+    mod_converted_to_patches:
+      title: "Zu Patches konvertiert"
+    mod_installed:
+      extra: "Mod '{$1}' erfolgreich installiert."
+      title: "Mod erfolgreich installiert!"
+    patch_conversion_result: "{$1} Datei(en) in {$2} Patch-Datei(en) konvertiert."
+    patch_conversion_skipped: "{$1} Datei(en) wurden nicht gändert, da sie nicht konvertiert werden konnten."
+    patch_conversion_notes: "Hinweis(e): {$1}"
   snackbar_warning:
     cant_save_mii: "Mii konnte nicht gespeichert werden."
     no_mii_export: "Es gab keine Miis zum Exportieren."
@@ -495,6 +516,7 @@ de:
     wh_wz_language: "Wheel Wizard-Sprache"
     force_disable_wiimote: "Wiimote ausschalten erzwingen"
     launch_with_dolphin: "Starte das Spiel zusammen mit dem Dolphin-Fenster"
+    launch_rr_on_startup: "Starte Retro Rewind beim Starten von Wheel Wizard"
     v_sync: "VSync"
     recommended: "Empfohlene Einstellungen"
     show_fps: "FPS anzeigen"
@@ -512,6 +534,11 @@ de:
     reinstall: "RR neu installieren"
     open_game_folder: "Spielordner öffnen"
     open_save_folder: "Speicherdatenordner öffnen"
+    enable_recomp: "Aktiviere WiiCompiled (Beta)"
+    recomp_use_dolphin_data: "Verwende Dolphin-Speicherdaten"
+    recomp_resolution: "Auflösung"
+    recomp_graphics_api: "Grafik-API"
+    recomp_prevent_stutters: "Verhindere Ruckler"
   section:
     language: "Sprache"
     wii: "Wii-Einstellungen"
@@ -521,6 +548,9 @@ de:
     location_paths: "Dateispeicherort-Einstellungen"
     wh_wz_appearance: "Wheel Wizard Aussehen"
     installation: "Installation"
+    recomp: "WiiCompiled (Beta)"
+    recomp_dolphin_data: "Dolphin-Daten"
+    recomp_video: "Video"
   helper_text:
     topbar:
       location_warning: "Einstellungen sind deaktiviert, vervollständige erst die Dateispeicherorte."
