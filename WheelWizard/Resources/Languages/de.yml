@@ -172,7 +172,7 @@ de:
       und {$2}
     thanks_translators: "Vielen Dank an alle Übersetzer:"
     wh_wz_translation_percentage: "Übersetzungen für diese Sprache sind {$1}% abgeschlossen"
-    powered_gamebanana: "Von GameBanana unterstützt"
+    powered_gamebanana: "Inhalte von GameBanana"
     language_translated_by: "Diese Sprache wurde übersetzt von: {$1}"
   hover:
     players_online:
