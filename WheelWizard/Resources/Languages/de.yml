@@ -268,7 +268,7 @@ de:
       extra: "Dolphin rät davon ab, andere Programme direkten Zugriff auf die Wii-Daten (NAND) zu geben, da es zu Datenverlusten kommen kann, wenn zwei Programme gleichzeitig darauf schreiben. Durch eine Kopie bleibt WiiCompiled vollständig getrennt, allerdings werden die in einem Programm erzielten Fortschritte nicht im anderen angezeigt."
     launch_clear_mods_found:
       title: "Mods gefunden"
-      extra: "Du bist dabei, das Spiel ohne Mods zu starten. Möchtest du deinen My Stuff ordner leeren?"
+      extra: "Du bist dabei, das Spiel ohne Mods zu starten. Möchtest du deinen \"My Stuff\"-Ordner leeren?"
     sure_delete:
       title: "Bist du sicher, dass du {$1} löschen möchtest?"
       extra: "Löschen ist permanent und kann nicht rückgängig gemacht werden"
@@ -285,7 +285,7 @@ de:
 
         verschieben. Das könnte eine Weile dauern.
     dolphin_found:
-      title: "Dolphin Emulator Ordner gefunden"
+      title: "Dolphin Emulator-Ordner gefunden"
       extra: |
         Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
 
@@ -304,7 +304,7 @@ de:
         Dolphin Emulator gefunden. Möchtest du Folgendes verwenden?
     new_version_wh_wz:
       title: "Wheel Wizard Update verfügbar"
-      extra: "Version {$1} von Wheel Wizard ist verfügbar (derzeit für {$2}). Möchtest du jetzt updaten?"
+      extra: "Version {$1} von Wheel Wizard ist verfügbar (die derzeitige Version ist {$2}). Möchtest du jetzt updaten?"
     update_admin:
       title: "Update mit Admin"
       extra: "Manchmal erfordert ein Update Adminrechte. Möchtest du sie für dieses Update aktivieren?"
@@ -313,16 +313,16 @@ de:
       extra: "Bist du dir sicher, dass du Retro Rewind neu installieren möchtest?"
     old_rksys_found:
       title: "Alte rksys.dat gefunden"
-      extra: "Alte Speicherdaten wurden gefunden. Möchtest Du sie benutzen? (Empfohlen)"
+      extra: "Alte Speicherdaten wurden gefunden. Möchtest du sie benutzen? (Empfohlen)"
     rr_to_old:
-      extra: "Deine Version von Retro Rewind ist zu alt zum Aktualisieren. Möchtest du Retro Rewind neu installieren?"
       title: "Retro Rewind-Version ist zu alt."
+      extra: "Deine Version von Retro Rewind ist zu alt, um sie aktualisieren zu können. Möchtest du stattdessen Retro Rewind neu installieren?"
     rr_not_determined:
       title: "Installiere Retro Rewind"
       extra: "Deine Version von Retro Rewind konnte nicht ermittelt werden. Möchtest du Retro Rewind herunterladen?"
     dolphin_flatpak:
-      title: "Dolphin Flatpak Installation"
-      extra: "Die Flatpak Dolphin Version scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (für deinen eigenen Benutzer)?"
+      title: "Installation des Dolphin Flatpak"
+      extra: "Das Dolphin Flatpak scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (für deinen eigenen Benutzer)?"
     install_mod:
       title: "Möchtest du den Mod {$1} herunterladen und installieren?"
     search_mod: "Nach Mods suchen..."
@@ -334,7 +334,7 @@ de:
     launch_clear_patches_found:
       extra: "Du bist dabei, das Spiel ohne Mods zu starten. Möchtest du deinen \"Patches\"-Ordner leeren? Startest du das Spiel trotzdem, bleiben die Patches aktiv!"
     apply_language_settings:
-      title: "Das jetzige Fenster wird sich schließen und ein neues wird sich mit den neuen Spracheinstellungen öffnen."
+      title: "Das aktuelle Fenster wird sich schließen und ein neues Fenster mit den aktualisierten Spracheinstellungen wird sich öffnen."
       extra: "Neue Spracheinstellungen anwenden?"
   message_warning:
     not_find_dolphin:
