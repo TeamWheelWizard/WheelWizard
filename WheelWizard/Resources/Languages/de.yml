@@ -352,13 +352,13 @@ de:
       title: "Ungültige Pfade"
     dolphin_not_found:
       title: "Dolphin Emulator-Ordner nicht gefunden."
-      extra: "Der Ordner „Dolphin Emulator“ wurde nicht automatisch gefunden. Versuche bitte, den Ordner manuell zu finden. Für weitere Informationen einfach auf „Hilfe“ klicken."
+      extra: "Der Ordner „Dolphin Emulator“ wurde nicht automatisch gefunden. Versuche bitte, den Ordner manuell zu finden. Für weitere Informationen auf „Hilfe“ klicken."
     dolphin_tool_selected:
-      title: "Falsche Dolphin executable ausgewählt."
+      title: "Falsche Dolphin-Anwendung ausgewählt."
       extra: "Du hast \"DolphinTool.exe\" ausgewählt. Bitte wähle stattdessen \"Dolphin.exe\" (die Dolphin Anwendung)."
     fail_check_updates:
       title: "Die Suche nach Updates ist fehlgeschlagen."
-      extra: "Es ist nicht möglich gerade nach Updates zu suchen. Du bist vielleicht nicht mit dem Internet verbunden oder der Server hat gerade Schwierigkeiten."
+      extra: "Es ist gerade nicht möglich, nach Updates zu suchen. Du bist vielleicht nicht mit dem Internet verbunden oder der Server hat gerade Schwierigkeiten."
     unable_update_wh_wz:
       extra:
         reason_network: |
@@ -379,14 +379,14 @@ de:
         something_else: "Etwas ist schief gelaufen beim Ansehen dieser Mod."
         not_from_browser: "Diese Mod kann nicht angesehen werden, da sie nicht über den Mod Browser heruntergeladen wurde."
     cannot_delete_fav_mii:
-      title: "Mii(s) die als Favorit markiert sind, sind nicht löschbar."
-      extra: "Ein oder mehrere der ausgewählten Mii(s) ist ein Favorit. Miis die als Favorit makiert wurden können nur gelöscht werden wenn sie nicht mehr Favorit sind um zu verhindern dass aus Versehen Löschungen geschehen."
+      title: "Als Favorit markierte Miis können nicht gelöscht werden."
+      extra: "Ein oder mehrere der ausgewählten Mii(s) ist ein Favorit. Miis, die als Favorit makiert wurden, müssen zuerst entfavorisiert werden, um versehentlichen Löschungen vorzubeugen."
     mod_name_invalid:
-      title: "Mod Name nicht gültig."
-      extra: "Mod Name kann keine ungültigen Zeichen beinhalten."
+      title: "Mod-Name nicht gültig."
+      extra: "Mod-Name kann keine ungültigen Zeichen beinhalten."
     mod_name_empty:
       title: "Mod-Name darf nicht leer sein."
-      extra: "Bitte gib einen Namn für die Mod ein."
+      extra: "Bitte gib einen Namen für die Mod ein."
     unable_download_mod:
       title: "Konnte die Mod nicht herunterladen."
       extra: "Dateien konnten nicht gefunden werden."
