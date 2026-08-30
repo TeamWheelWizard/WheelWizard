@@ -424,13 +424,13 @@ de:
     failed_change_mii:
       title: "Fehler beim Ändern des Miis."
     failed_install_dolphin:
-      title: "Die Installation von Dolphin ist schiefgelaufen."
-      extra: "Die Installation von Dolphin ist schiefgelaufen. Versuche manuell eine Flatpak Dolphin Version herunterzuladen."
+      title: "Die Installation von Dolphin ist fehlgeschlagen."
+      extra: "Die Installation von Dolphin ist fehlgeschlagen. Bitte versuche, das Dolphin Flatpak manuell zu installieren."
     failed_retrieve_mod:
-      title: "Es ist ein Fehler beim abrufen der Mod-Informationen aufgetreten."
+      title: "Es ist ein Fehler beim Abrufen der Mod-Informationen aufgetreten."
     mod_download_fail:
-      title: "Mod Download ist schiefgelaufen."
-      extra: "Ein Fehler ist während dem Dowload aufgetreten."
+      title: "Mod Download ist fehlgeschlagen."
+      extra: "Ein Fehler ist während dem Dowload aufgetreten: {$1}"
   message_success:
     settings_saved:
       title: "Einstellungen erfolgreich gespeichert!"
