@@ -259,7 +259,7 @@ de:
     recomp_checking_release: "Prüfe die aktuelle Version von WiiCompiled"
     recomp_downloading_setup: "Den WiiCompiled Installer herunterladen"
     recomp_running_setup: "Den WiiCompiled Installer ausführen"
-    recomp_finished: "WiiCompiled ist bereit zum spielen"
+    recomp_finished: "WiiCompiled ist bereit zum Spielen"
     recomp_copying_nand: "Kopiere deine Dolphin-Speicherdaten"
   question:
     recomp_uninstall:
@@ -361,7 +361,7 @@ de:
       title: "Dolphin Emulator-Ordner nicht gefunden."
       extra: "Der Ordner „Dolphin Emulator“ wurde nicht automatisch gefunden. Versuche bitte, den Ordner manuell zu finden. Für weitere Informationen auf „Hilfe“ klicken."
     dolphin_version_unverified:
-      title: "Die verwendete Dolphin Emulator-Version konnte nicht verifiziert werdn"
+      title: "Die verwendete Dolphin Emulator-Version konnte nicht verifiziert werden"
       extra: |
         Wheel Wizard konnte die Version des eingerichteten Dolphin Emulator nicht lesen und kann daher nicht feststellen, ob die Sicherheitsupdates installiert sind.
 
@@ -393,7 +393,7 @@ de:
         not_from_browser: "Diese Mod kann nicht angesehen werden, da sie nicht über den Mod Browser heruntergeladen wurde."
     cannot_delete_fav_mii:
       title: "Als Favorit markierte Miis können nicht gelöscht werden."
-      extra: "Ein oder mehrere der ausgewählten Mii(s) ist ein Favorit. Miis, die als Favorit makiert wurden, müssen zuerst entfavorisiert werden, um versehentlichen Löschungen vorzubeugen."
+      extra: "Ein oder mehrere der ausgewählten Mii(s) ist ein Favorit. Miis, die als Favorit markiert wurden, müssen zuerst entfavorisiert werden, um versehentlichen Löschungen vorzubeugen."
     mod_name_invalid:
       title: "Mod-Name nicht gültig."
       extra: "Mod-Name kann keine ungültigen Zeichen beinhalten."
@@ -443,7 +443,7 @@ de:
       title: "Es ist ein Fehler beim Abrufen der Mod-Informationen aufgetreten."
     mod_download_fail:
       title: "Mod Download ist fehlgeschlagen."
-      extra: "Ein Fehler ist während dem Dowload aufgetreten: {$1}"
+      extra: "Während dem Download ist ein Fehler aufgetreten: {$1}"
   message_success:
     settings_saved:
       title: "Einstellungen erfolgreich gespeichert!"
@@ -462,7 +462,7 @@ de:
       extra: "Mod '{$1}' erfolgreich installiert."
       title: "Mod erfolgreich installiert!"
     patch_conversion_result: "{$1} Datei(en) in {$2} Patch-Datei(en) konvertiert."
-    patch_conversion_skipped: "{$1} Datei(en) wurden nicht gändert, da sie nicht konvertiert werden konnten."
+    patch_conversion_skipped: "{$1} Datei(en) wurden nicht geändert, da sie nicht konvertiert werden konnten."
     patch_conversion_notes: "Hinweis(e): {$1}"
   snackbar_warning:
     cant_save_mii: "Mii konnte nicht gespeichert werden."
