@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: "10.0.x"
 
@@ -77,13 +77,335 @@ jobs:
           cp publish/linux-arm64/WheelWizard artifacts/WheelWizard_arm64_Linux
           chmod +x artifacts/WheelWizard_Linux artifacts/WheelWizard_arm64_Linux
 
+      - name: Upload Linux + Windows artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: artifacts-linux-windows
+          path: artifacts/
+          retention-days: 1
+
+  # ──────────────────────────────────────────────────────────────
+  # macOS builds (native on macOS runner)
+  # ──────────────────────────────────────────────────────────────
+  macos-arm64:
+    name: Build macOS (arm64)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build .app bundle for macOS arm64
+        run: |
+          chmod +x macos/release-macos.sh
+          ./macos/release-macos.sh
+        env:
+          BUILD_ARCH: arm64
+
+      - name: Import signing certificate
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          # Write the certificate from the secret
+          echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+
+          # Create a temporary keychain
+          security create-keychain -p temp build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp build.keychain
+
+          # Import the certificate
+          security import certificate.p12 -k build.keychain \
+            -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+
+          # Allow codesign to access the keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temp build.keychain
+
+          # Verify the import
+          echo "[INFO] Available signing identities:"
+          security find-identity -v -p basic
+          rm certificate.p12
+
+      - name: Sign the .app bundle with Developer ID
+        run: |
+          ENTITLEMENTS="${{ github.workspace }}/macos/certs/WheelWizardEntitlements.entitlements"
+          APP_PATH="release/WheelWizard.app"
+          SIGNING_IDENTITY="Developer ID Application: Gabriel Magaña (Z4D7MUNZ97)"
+
+          # List available identities for debugging
+          echo "[INFO] Checking signing identities..."
+          security find-identity -v -p codesigning
+
+          # Sign all executables inside the bundle first
+          find "$APP_PATH/Contents/MacOS" -type f | while read fname; do
+            echo "[INFO] Signing $fname"
+            codesign --force --timestamp --options=runtime \
+              --entitlements "$ENTITLEMENTS" \
+              --sign "$SIGNING_IDENTITY" "$fname"
+          done
+
+          # Sign the .app bundle itself
+          echo "[INFO] Signing .app bundle"
+          codesign --force --timestamp --options=runtime \
+            --entitlements "$ENTITLEMENTS" \
+            --sign "$SIGNING_IDENTITY" "$APP_PATH"
+
+      - name: Create DMG
+        id: create-dmg
+        uses: L-Super/create-dmg-actions@8c59360de7ec731bfa03ce3bd2ad5ae650169864 # v1
+        with:
+          dmg_name: WheelWizard-macOSarm64
+          src_dir: release/WheelWizard.app
+          background: macos/backgr.png
+          window_size: 650 376
+          icon_size: 128
+          icon_position: 200 150
+          app_drop_link: 450 150
+
+      - name: Notarize and staple the .app
+        env:
+          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+          MACOS_NOTARY_TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
+          MACOS_NOTARY_APP_PASSWORD: ${{ secrets.MACOS_NOTARY_APP_PASSWORD }}
+        run: |
+          # Notarize the .app bundle
+          ditto -c -k --sequesterRsrc --keepParent \
+            release/WheelWizard.app \
+            WheelWizard-app-notarize.zip
+          xcrun notarytool submit WheelWizard-app-notarize.zip \
+            --apple-id "$MACOS_NOTARY_APPLE_ID" \
+            --team-id "$MACOS_NOTARY_TEAM_ID" \
+            --password "$MACOS_NOTARY_APP_PASSWORD" \
+            --wait
+          rm WheelWizard-app-notarize.zip
+          xcrun stapler staple release/WheelWizard.app
+
+      - name: Notarize the DMG
+        env:
+          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+          MACOS_NOTARY_TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
+          MACOS_NOTARY_APP_PASSWORD: ${{ secrets.MACOS_NOTARY_APP_PASSWORD }}
+        run: |
+          xcrun notarytool submit WheelWizard-macOSarm64.dmg \
+            --apple-id "$MACOS_NOTARY_APPLE_ID" \
+            --team-id "$MACOS_NOTARY_TEAM_ID" \
+            --password "$MACOS_NOTARY_APP_PASSWORD" \
+            --wait
+          xcrun stapler staple WheelWizard-macOSarm64.dmg
+
+      - name: Upload macOS DMG
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: artifacts-macos-arm64
+          path: WheelWizard-macOSarm64.dmg
+          retention-days: 1
+
+  macos-x64:
+    name: Build macOS (x64)
+    # Cross-compile x64 on an arm64 runner since macos-13 (Intel) is deprecated.
+    # .NET handles cross-compilation via the runtime identifier (osx-x64).
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build .app bundle for macOS x64
+        run: |
+          chmod +x macos/release-macos.sh
+          ./macos/release-macos.sh
+        env:
+          BUILD_ARCH: x64
+
+      - name: Import signing certificate
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+          security create-keychain -p temp build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp build.keychain
+          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temp build.keychain
+          rm certificate.p12
+
+      - name: Sign the .app bundle with Developer ID
+        run: |
+          ENTITLEMENTS="${{ github.workspace }}/macos/certs/WheelWizardEntitlements.entitlements"
+          APP_PATH="release/WheelWizard.app"
+          SIGNING_IDENTITY="Developer ID Application: Gabriel Magaña (Z4D7MUNZ97)"
+
+          # Sign all executables inside the bundle first
+          find "$APP_PATH/Contents/MacOS" -type f | while read fname; do
+            echo "[INFO] Signing $fname"
+            codesign --force --timestamp --options=runtime \
+              --entitlements "$ENTITLEMENTS" \
+              --sign "$SIGNING_IDENTITY" "$fname"
+          done
+
+          # Sign the .app bundle itself
+          echo "[INFO] Signing .app bundle"
+          codesign --force --timestamp --options=runtime \
+            --entitlements "$ENTITLEMENTS" \
+            --sign "$SIGNING_IDENTITY" "$APP_PATH"
+
+      - name: Create DMG
+        id: create-dmg
+        uses: L-Super/create-dmg-actions@8c59360de7ec731bfa03ce3bd2ad5ae650169864 # v1
+        with:
+          dmg_name: WheelWizard-macOSintel
+          src_dir: release/WheelWizard.app
+          background: macos/backgr.png
+          window_size: 650 376
+          icon_size: 128
+          icon_position: 200 150
+          app_drop_link: 450 150
+
+      - name: Notarize and staple the .app
+        env:
+          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+          MACOS_NOTARY_TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
+          MACOS_NOTARY_APP_PASSWORD: ${{ secrets.MACOS_NOTARY_APP_PASSWORD }}
+        run: |
+          # Notarize the .app bundle
+          ditto -c -k --sequesterRsrc --keepParent \
+            release/WheelWizard.app \
+            WheelWizard-app-notarize.zip
+          xcrun notarytool submit WheelWizard-app-notarize.zip \
+            --apple-id "$MACOS_NOTARY_APPLE_ID" \
+            --team-id "$MACOS_NOTARY_TEAM_ID" \
+            --password "$MACOS_NOTARY_APP_PASSWORD" \
+            --wait
+          rm WheelWizard-app-notarize.zip
+          xcrun stapler staple release/WheelWizard.app
+
+      - name: Notarize the DMG
+        env:
+          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+          MACOS_NOTARY_TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
+          MACOS_NOTARY_APP_PASSWORD: ${{ secrets.MACOS_NOTARY_APP_PASSWORD }}
+        run: |
+          xcrun notarytool submit WheelWizard-macOSintel.dmg \
+            --apple-id "$MACOS_NOTARY_APPLE_ID" \
+            --team-id "$MACOS_NOTARY_TEAM_ID" \
+            --password "$MACOS_NOTARY_APP_PASSWORD" \
+            --wait
+          xcrun stapler staple WheelWizard-macOSintel.dmg
+
+      - name: Upload macOS DMG
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: artifacts-macos-x64
+          path: WheelWizard-macOSintel.dmg
+          retention-days: 1
+
+  # ──────────────────────────────────────────────────────────────
+  # Create GitHub release with all assets
+  # ──────────────────────────────────────────────────────────────
+  create-release:
+    name: Create GitHub Release
+    needs: [release, macos-arm64, macos-x64]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p final-artifacts
+
+          # Linux & Windows
+          cp artifacts-linux-windows/WheelWizardWindows.exe final-artifacts/
+          cp artifacts-linux-windows/WheelWizard_Linux final-artifacts/
+          cp artifacts-linux-windows/WheelWizard_arm64_Linux final-artifacts/
+
+          # macOS DMGs
+          cp artifacts-macos-arm64/WheelWizard-macOSarm64.dmg final-artifacts/
+          cp artifacts-macos-x64/WheelWizard-macOSintel.dmg final-artifacts/
+
+          chmod +x final-artifacts/WheelWizard_Linux final-artifacts/WheelWizard_arm64_Linux
+          ls -la final-artifacts/
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >
-          gh release create "${{ github.ref_name }}"
-          artifacts/WheelWizardWindows.exe
-          artifacts/WheelWizard_Linux
-          artifacts/WheelWizard_arm64_Linux
-          --title "${{ github.ref_name }}"
-          --generate-notes
+        run: |
+          REPO="${{ github.repository }}"
+          TAG_NAME="${GITHUB_REF_NAME}"
+          ASSETS=(final-artifacts/*)
+          gh release create "$TAG_NAME" "${ASSETS[@]}" \
+            --repo "$REPO" \
+            --title "$TAG_NAME" \
+            --generate-notes
+
+
+  # ──────────────────────────────────────────────────────────────
+  # Update Homebrew tap with new version and SHA256
+  # (Disabled for now — will be re-enabled later)
+  # ──────────────────────────────────────────────────────────────
+  # update-tap:
+  #   name: Update Homebrew Tap
+  #   needs: [create-release, macos-arm64, macos-x64]
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Download SHA256 artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: sha256-*
+  #         merge-multiple: true
+  #
+  #     - name: Read SHA256 values
+  #       id: shas
+  #       run: |
+  #         echo "arm64=$(cat sha256-arm64.txt)" >> "$GITHUB_OUTPUT"
+  #         echo "intel=$(cat sha256-intel.txt)" >> "$GITHUB_OUTPUT"
+  #
+  #     - name: Checkout homebrew-tap repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: TeamWheelWizard/homebrew-tap
+  #         token: ${{ secrets.TAP_TOKEN }}
+  #         path: homebrew-tap
+  #
+  #     - name: Update cask with real SHA256 values
+  #       run: |
+  #         VERSION="${GITHUB_REF_NAME#v}"
+  #         CASK_FILE="homebrew-tap/Casks/wheelwizard.rb"
+  #
+  #         # Replace version
+  #         sed -i "s/version \".*\"/version \"$VERSION\"/" "$CASK_FILE"
+  #
+  #         # Replace SHA256 placeholders with real values
+  #         sed -i "s/REPLACE_ME_ARM64/${{ steps.shas.outputs.arm64 }}/" "$CASK_FILE"
+  #         sed -i "s/REPLACE_ME_INTEL/${{ steps.shas.outputs.intel }}/" "$CASK_FILE"
+  #
+  #         echo "=== Updated $CASK_FILE ==="
+  #         cat "$CASK_FILE"
+  #
+  #     - name: Commit and push to homebrew-tap
+  #       run: |
+  #         cd homebrew-tap
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "github-actions[bot]@users.noreply.github.com"
+  #         git add Casks/wheelwizard.rb
+  #         git commit -m "chore: update wheelwizard to v${GITHUB_REF_NAME#v}"
+  #         git push
