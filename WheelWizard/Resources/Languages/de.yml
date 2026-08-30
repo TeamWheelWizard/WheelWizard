@@ -539,7 +539,8 @@ de:
     end_with_x: "Pfad kann enden mit:"
     wh_wz_language: "Dies ändert nur die Sprache innerhalb von Wheel Wizard. Um die Sprache innerhalb des Spiels anzupassen, musst du das in den Spieleinstellungen ändern."
     optional: "Optional"
-    must_set_paths: "Du musst erst diese 3 Dateipfade bestimmen um Retro Rewind spielen zu können."
+    must_set_paths: "Du musst erst diese 3 Dateipfade setzen, um Retro Rewind spielen zu können."
+    must_set_game_path: "Du musst deine Mario Kart Wii-Spieldatei auswählen, um WiiCompiled spielen zu können."
   category:
     video: "Video"
     about: "Über"
