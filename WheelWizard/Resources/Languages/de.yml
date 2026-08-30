@@ -290,6 +290,12 @@ de:
         Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
 
         Dolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?
+    dolphin_outdated:
+      title: "Die Dolphin Emulator-Version ist veraltet"
+      extra: |
+        Diese Dolphin-Version ({$1}) hat eine bekannte Sicherheitslücke, mit welcher schädliche Spieldateien, Mods, oder cheatende Online-Spieler deinen PC mit Malware infizieren können.
+
+        Update Dolphin auf die Version {$2} oder neuer, um sicher zu sein.
     dolphin_program_found:
       title: "Dolphin Emulator gefunden"
       extra: |
