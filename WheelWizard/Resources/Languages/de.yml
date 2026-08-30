@@ -324,7 +324,7 @@ de:
       title: "Dolphin Flatpak Installation"
       extra: "Die Flatpak Dolphin Version scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (für deinen eigenen Benutzer)?"
     install_mod:
-      title: "Du bist dabei das Spiel ohne Mods zu starten. Möchtest du deinen My-Stuff Ordner leeren?"
+      title: "Möchtest du den Mod {$1} herunterladen und installieren?"
     search_mod: "Nach Mods suchen..."
     enter_new_name:
       title: "Einen neuen Namen eingeben"
