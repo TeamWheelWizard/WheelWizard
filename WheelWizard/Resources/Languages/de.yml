@@ -92,7 +92,7 @@ de:
   state:
     loading: "Lädt..."
     installing: "Installiert..."
-    updating: "Aktualisiert..."
+    updating: "Aktualisieren..."
     config_not_finished: "Installation nicht abgeschlossen"
     no_server: "Kein Server"
     unknown: "Unbekannt"
