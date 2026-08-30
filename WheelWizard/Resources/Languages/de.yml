@@ -523,8 +523,11 @@ de:
     installation: "Installation"
   helper_text:
     topbar:
-      location_warning: "Einstellungen sind deaktiviert, komplettiere erst den Dateispeicherort"
-    launch_with_dolphin: "Wird Dolphins Hauptfenster mit dem Spiel starten"
+    enable_recomp: "Verwende WiiCompiled, um das Spiel zu starten. Ist diese Option deaktiviert, wird Dolphin und Retro Rewind verwendet. Nur auf Windows."
+    recomp_use_dolphin_data: "Verwende Dolphin's \"Wii\"-Ordner, damit WiiCompiled Speicherdaten, Miis und Wii-Einstellungen von Dolphin verwenden kann. Die Änderung wird beim nächsten Start von WiiCompiled übernommen."
+    recomp_graphics_api: "WiiCompiled funktioniert nur mit DirectX 12 und Vulkan zuverlässig, deswegen werden keine anderen Optionen angeboten."
+    recomp_dolphin_data_not_found: "Setze zuerst einen existierenden Dolphin-Benutzerordner in den Wheel Wizard-Einstellungen. Der Ordner muss einen \"Wii\"-Ordner enthalten."
+    recomp_prevent_stutters: "Während ein Shader noch kompiliert wird, werden die Objekte, die ihn benötigen, für einige Frames übersprungen, anstatt dass das gesamte Spiel ins Stocken gerät, bis er fertig ist. So kommt es zu einem winzigen Pop-in statt zu Rucklern."
     force_disable_wiimote: "Diese Einstellung deaktiviert die Wiimote im Spiel, aber nutzt sie für den Wii-Kanal"
     resolution_scale: "1x ist die native Auflösung"
     recommended: "Diese Einstellung wird bestimmte Dolphin Einstellungen verändern, um Ruckeln und Lagspikes zu vermindern"
