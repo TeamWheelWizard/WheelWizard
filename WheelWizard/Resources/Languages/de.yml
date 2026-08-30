@@ -545,6 +545,12 @@ de:
     other: "Sonstiges"
     general: "Allgemein"
   status:
+    recomp_dolphin_data_not_linked: "Nicht verknüpft. WiiCompiled wird seine privaten Wii-Daten nutzen."
+    recomp_dolphin_data_linked: "Verwendet verknüpfte Dolphin-Daten von {$1}"
+    recomp_dolphin_data_copied: "Verwendet eine Kopie der Dolphin-Daten von {$1}"
+    recomp_dolphin_data_not_found: "Dolphin-Daten nicht gefunden."
+    recomp_not_installed: "WiiCompiled noch nicht installiert. Installiere es zuerst von der Startseite."
+    recomp_uninstalled: "WiiCompiled wurde deinstalliert."
     data_folder:
       default: "Standard-Speicherort wird verwendet."
       custom: "Verwendet benutzerdefinierten Speicherort"
