@@ -393,9 +393,9 @@ de:
     could_not_convert_mod:
       title: "Konnte Mod nicht konvertieren."
   placeholder:
-    enter_mod_name: "Gib Mod Namen ein..."
+    enter_mod_name: "Mod-Namen eingeben..."
     search_mod: "Suche nach Mods..."
-    enter_mii_name: "Gib Mii Namen ein..."
+    enter_mii_name: "Mii-Namen eingeben..."
     enter_text_here: "Gib Text ein..."
     search_for_players: "Suche nach Spielern..."
     enter_path: "Gewünschten Pfad hier eingeben..."
