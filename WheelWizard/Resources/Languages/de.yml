@@ -195,11 +195,11 @@ de:
       1: "Zurzeit ist nur 1 Freund online"
       n: "Zurzeit sind {$1} Freunde online"
     rooms_page_disclaimer: |-
-      Bitte beachte, dass diese Seite keine Funktion bietet, um dich mit einem Raum direkt zu verbinden.
-      Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund treffen oder hoffen, ihm beizutreten, indem du in den Online-Servern beitrittst.
-    friends_page_disclaimer: "Um Freunde hinzuzufügen musst du sie innerhalb des Spiels registrieren"
-    region_user_selection: "Dies zeigt dir Regionen, in denen DU gespielt hast."
-    primary_profile: "Dein Hauptprofil wird als Vergleich im Wheel Wizard Client verwendet."
+      Bitte beachte, dass diese Seite keine Funktion bietet, um dich direkt mit einem Raum zu verbinden.
+      Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund beitreten oder hoffen, dass du ihm über das normale Beitreten zum Server beitreten kannst.
+    friends_page_disclaimer: "Um Freunde hinzuzufügen, musst du sie im Spiel registrieren."
+    region_user_selection: "Dies zeigt dir nur Regionen an, in denen DU gespielt hast."
+    primary_profile: "Dein Hauptprofil wird als Referenz im Wheel Wizard Client verwendet."
   empty_content:
     no_profiles: "Du musst das Spiel mindestens ein Mal gespielt haben, um deine Profile hier aufgelistet zu sehen."
     no_friends_title: "Noch keine Freunde!"
