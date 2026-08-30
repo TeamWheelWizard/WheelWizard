@@ -444,7 +444,7 @@ de:
       title: "Retro Rewind ist auf dem neuesten Stand."
     mii_changed: "Mii erfolgreich geändert."
   snackbar_warning:
-    cant_save_mii: "Mii konnte nicht gespeichert werden"
+    cant_save_mii: "Mii konnte nicht gespeichert werden."
     no_mii_export: "Es gab keine Miis zum Exportieren."
     no_mii_delete: "Es gab keine Miis zum Löschen."
   snackbar_success:
@@ -452,17 +452,18 @@ de:
     copied_fc: "Freundescode wurde in die Zwischenablage kopiert"
     name_change: "Name erfolgreich zu '{$1}' geändert"
     saved_mii: "Mii '{$1}' wurde als Datei '{$2}' gespeichert"
-    deleted: "{$1}' wurde gelöscht"
+    deleted: "'{$1}' wurde gelöscht"
     deleted_miis: "{$1} Miis wurden gelöscht"
     created_duplicate: "{$1} wurde dupliziert"
     created_duplicates_miis: "{$1} duplizierte Miis erstellt"
     profile_set_primary: "Profil als Hauptprofil festlegen"
+    dolphin_updated: "Dolphin Emulator wurde aktualisiert"
   snackbar_error:
-    mii_failure_deserialize: "Daten von Mii '{$1}' konnten nicht verarbeitet werden."
+    mii_failure_deserialize: "Daten von Mii '{$1}' konnten nicht deserialisiert werden."
     mii_failure_update: "Mii '{$1}' konnte nicht aktualisiert werden."
     mii_failure_save: "Mii '{$1}' konnte nicht gespeichert werden."
     mii_failure_get: "Mii '{$1}' konnte nicht abgerufen werden."
-    mii_failure_serialize: "Daten von Mii '{$1}' konnten nicht verarbeitet werden."
+    mii_failure_serialize: "Daten von Mii '{$1}' konnten nicht serialisiert werden."
     mii_failure_create: "Mii '{$1}' konnte nicht erstellt werden."
     mii_failure_duplicate: "Mii '{$1}' konnte nicht dupliziert werden."
   helper_note:
