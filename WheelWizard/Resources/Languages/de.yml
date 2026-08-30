@@ -390,6 +390,8 @@ de:
     unable_download_mod:
       title: "Konnte die Mod nicht herunterladen."
       extra: "Dateien konnten nicht gefunden werden."
+    could_not_convert_mod:
+      title: "Konnte Mod nicht konvertieren."
   placeholder:
     enter_mod_name: "Gib Mod Namen ein..."
     search_mod: "Suche nach Mods..."
