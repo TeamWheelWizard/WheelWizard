@@ -101,7 +101,7 @@ de:
     no_license: "Keine Lizenz"
     no_profiles: "Keine Profile"
     custom: "Benutzerdefiniert"
-    installed: "Installiert "
+    installed: "Installiert"
   action:
     play: "Spielen"
     play_offline: "Offline spielen"
