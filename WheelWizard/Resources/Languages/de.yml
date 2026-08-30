@@ -470,6 +470,27 @@ de:
     name_must_between: "Namen müssen zwischen 3 und 10 Zeichen lang sein."
     creator_name_less11: "Name des Ersteller muss weniger als 11 Zeichen lang sein."
     creator_name_less10: "Name des Ersteller muss weniger als 10 Zeichen lang sein."
+  file_picker:
+    select_mod_file: "Wähle Mod-Datei"
+  patch:
+    incompatible_mod:
+      message: "Dieser Mod ist nicht mit anderen Mods kompatibel. Wird das Spiel mit dieser Mod gestartet, kann es zu Fehlfunktionen oder Abstürzen kommen. Idealerweise sollte der Mod in einen Patch umgewandelt werden, indem mit der rechten Maustaste daraufgeklickt wird."
+      title: "Inkompatibler Mod"
+  warning:
+    brsar_external_count: "{$1} BRSAR-Dateieinträge sind externe Referenzen und können nicht exportiert werden."
+    brsar_file_id_external: "BRSAR fileId {$1} ist eine externe Dateireferenz und kann nicht exportiert werden."
+    brsar_file_id_unsupported_magic: "BRSAR fileId {$1} wurde geändert. Sie zeigt nun auf {$2} und Pulsar unterstützt nur RBNK/RSEQ/RWSD loose overrides."
+    brsar_file_id_unresolved: "BRSAR fileId {$1} konnte nicht zu einer unterstützten eingebetteten Sound-Datei aufgelöst werden."
+    brsar_no_supported_differences: "Gegenüber dem Basisspiel wurden keine unterstützten RBNK-/RSEQ-/RWSD-Änderungen gefunden."
+    brsar_unresolved_count: "{$1} eingebettete BRSAR-Dateieinträge konnten nicht erfolgreich aufgelöst werden."
+    brsar_unsupported_summary: "Nur RBNK/RSEQ/RWSD-Einträge können exportiert werden. Das gescannte Archiv enthält auch {$1}."
+    file_deletion_not_exportable: "{$1} existiert nur im Original-Archiv. Dateilöschungen können nicht als einzelne Patches exportiert werden."
+    file_name_differs_from_archive_tag: "Der ausgewählte Dateiname weicht vom ursprünglichen Tag im Archiv ab: \"{$1}.szs\"."
+    file_not_in_built_in_baseline: "{$1} ist im Basisspiel nicht vorhanden."
+    no_szs_differences: "Es wurden keine SZS-Änderungen gegenüber dem Basisspiel gefunden."
+    szs_matches_baseline: "Die ausgewählte SZS ist identisch gegenüber dem Basisspiel."
+    unsupported_loose_override_extension: "{$1} verwendet eine nicht unterstützte Dateiendung (.kcl, .kmp, .slt)."
+    whole_file_baseline: "Diese SZS ist als Überschreibung einer gesamten Datei gespeichert. Exportiere eine Überschreibung der gesamten Datei"
   option:
     wh_wz_language: "Wheel Wizard Sprache"
     force_disable_wiimote: "Wiimote ausschalten erzwingen"
