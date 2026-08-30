@@ -377,7 +377,7 @@ de:
       title: "Du kannst diese Mod nicht ansehen."
       extra:
         something_else: "Etwas ist schief gelaufen beim Ansehen dieser Mod."
-        not_from_browser: "Die Mod die über den Mod Browser heruntergeladen wurde kann nicht angesehen werden."
+        not_from_browser: "Diese Mod kann nicht angesehen werden, da sie nicht über den Mod Browser heruntergeladen wurde."
     cannot_delete_fav_mii:
       title: "Mii(s) die als Favorit markiert sind, sind nicht löschbar."
       extra: "Ein oder mehrere der ausgewählten Mii(s) ist ein Favorit. Miis die als Favorit makiert wurden können nur gelöscht werden wenn sie nicht mehr Favorit sind um zu verhindern dass aus Versehen Löschungen geschehen."
