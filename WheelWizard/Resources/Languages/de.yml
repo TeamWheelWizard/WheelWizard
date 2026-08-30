@@ -161,11 +161,11 @@ de:
     rooms: "Räume"
     miis: "Miis"
   popup_title:
-    mod_details: "Details zur Mod"
+    mod_details: "Mod-Details"
     mod_browser: "Mod Browser"
-    mii_selector: "Mii Auswähler"
+    mii_selector: "Mii auswählen"
     mii_editor: "Mii Maker"
-    mii_carousel: "Mii Preview"
+    mii_carousel: "Mii-Vorschau"
   text:
     made_by_string: |
       Erstellt von: {$1}
