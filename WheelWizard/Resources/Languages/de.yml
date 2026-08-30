@@ -523,6 +523,7 @@ de:
     installation: "Installation"
   helper_text:
     topbar:
+      location_warning: "Einstellungen sind deaktiviert, vervollständige erst die Dateispeicherorte."
     enable_recomp: "Verwende WiiCompiled, um das Spiel zu starten. Ist diese Option deaktiviert, wird Dolphin und Retro Rewind verwendet. Nur auf Windows."
     recomp_use_dolphin_data: "Verwende Dolphin's \"Wii\"-Ordner, damit WiiCompiled Speicherdaten, Miis und Wii-Einstellungen von Dolphin verwenden kann. Die Änderung wird beim nächsten Start von WiiCompiled übernommen."
     recomp_graphics_api: "WiiCompiled funktioniert nur mit DirectX 12 und Vulkan zuverlässig, deswegen werden keine anderen Optionen angeboten."
@@ -542,7 +543,7 @@ de:
     must_set_paths: "Du musst erst diese 3 Dateipfade setzen, um Retro Rewind spielen zu können."
     must_set_game_path: "Du musst deine Mario Kart Wii-Spieldatei auswählen, um WiiCompiled spielen zu können."
   category:
-    video: "Video"
+    dolphin: "Dolphin"
     about: "Über"
     other: "Sonstiges"
     general: "Allgemein"
