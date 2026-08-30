@@ -255,6 +255,17 @@ de:
     recomp_finished: "WiiCompiled ist bereit zum spielen"
     recomp_copying_nand: "Kopiere deine Dolphin-Speicherdaten"
   question:
+    recomp_uninstall:
+      title: "WiiCompiled deinstallieren?"
+      extra_shared: "Dies entfernt die WiiCompiled-Installation. Die Speicherdaten bleiben in Dolphin's \"Wii\"-Ordner und Retro Rewind bleibt weiterhin installiert."
+      extra_private: "Dies entfernt die WiiCompiled-Installation inklusive den privaten Wii-Speicherdaten. Retro Rewind bleibt weiterhin installiert."
+      extra_copy: "Dies entfernt die WiiCompiled-Installation inklusive ihrer Kopie der Dolphin-Speicherdaten. Die Original-Dolphin-Speicherdaten werden nicht gelöscht und Retro Rewind bleibt weiterhin installiert."
+    recomp_use_dolphin_nand:
+      title: "Sollen die Dolphin-Speicherdaten verwendet werden?"
+      extra: "WiiCompiled kann mit den Speicherdaten, Miis und Freundescodes, die bereits in Dolphin genutzt werden, verwendet werden. Wenn nicht, werden diese Wii-Daten neu angelegt."
+    recomp_nand_mode:
+      title: "Sollen die Dolphin-Speicherdaten direkt verwendet werden?"
+      extra: "Dolphin rät davon ab, andere Programme direkten Zugriff auf die Wii-Daten (NAND) zu geben, da es zu Datenverlusten kommen kann, wenn zwei Programme gleichzeitig darauf schreiben. Durch eine Kopie bleibt WiiCompiled vollständig getrennt, allerdings werden die in einem Programm erzielten Fortschritte nicht im anderen angezeigt."
     launch_clear_mods_found:
       title: "Mods gefunden"
       extra: "Du bist dabei, das Spiel ohne Mods zu starten. Möchtest du deinen My Stuff ordner leeren?"
