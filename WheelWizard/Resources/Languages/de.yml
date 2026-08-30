@@ -174,6 +174,13 @@ de:
     wh_wz_translation_percentage: "Übersetzungen für diese Sprache sind {$1}% abgeschlossen"
     powered_gamebanana: "Inhalte von GameBanana"
     language_translated_by: "Diese Sprache wurde übersetzt von: {$1}"
+    brsar_entry: "{$1} Eintrag {$2}"
+    brsar_entry_with_rwar: "{$1} Eintrag {$2} + RWAR"
+    external_reference: "Externe Referenz"
+    external_reference_with_path: "Externe Referenz: {$1}"
+    modified_archive_member: "Bearbeitete Archiv-Inhalte"
+    new_archive_member: "Neue Archiv-Inhalte"
+    whole_file_override: "Gesamte Datei überschreiben"
   hover:
     players_online:
       0: "Zurzeit sind keine Spieler online"
