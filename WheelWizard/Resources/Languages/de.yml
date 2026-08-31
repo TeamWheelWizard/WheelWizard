@@ -27,6 +27,10 @@ de:
     time_online: "Zeit online"
     message: "Nachricht"
     is_online: "Ist Online"
+    vr_history: "R-Punkte Verlauf"
+    start_vr: "R-Punkte zu Beginn"
+    end_vr: "R-Punkte am Ende"
+    net_change: "Nettoveränderung"
     mii:
       gender_male: "Weiblich"
       gender: "Geschlecht"
@@ -61,6 +65,7 @@ de:
     status: "Status"
     priority: "Priorität"
     sort_by: "Sortieren nach"
+    matches: "Filtern"
     total_games_won: "Gesamte verlorene Rennen"
     total_games_played: "Gesamte gewonnene Rennen"
     vr_abbreviation: "RP"
@@ -205,6 +210,8 @@ de:
     no_miis: "Die Mii-Daten können nicht von deinem System aus geladen werden. Stelle sicher dass du dein Spiel mind. 1 Mal neu startest."
     no_mod_selected_title: "Keine Mod ausgewähltt."
     no_mod_selected: "Wähle eine Mod aus der Liste um mehr Details zu sehen."
+    no_vr_history_title: "Kein R-Punkte Verlauf"
+    no_vr_history: "Ein Freundescode wird benötigt, um den R-Punkte Verlauf zu laden."
   time:
     days:
       1: "1 Tag"
@@ -218,6 +225,11 @@ de:
     seconds:
       1: "1 Sekunde"
       n: "{$1} Sekunden"
+    last_24_hours: "Letzte 24 Stunden"
+    last_7_days: "Letzte 7 Tage"
+    last_30_days: "Letzte 30 Tage"
+    last_60_days: "Letzte 60 Tage"
+    lifetime: "Insgesamt"
   progress:
     estimated_time_remaining: "Geschätzte verbleibende Zeit:"
     downloading_mb: "Herunterladen mit {$1} MB"
