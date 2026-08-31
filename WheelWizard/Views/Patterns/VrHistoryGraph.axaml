@@ -70,7 +70,7 @@
                     <components:LoadingIcon Margin="3,3,6,3" VerticalAlignment="Center" IsVisible="{Binding IsLoading}" Width="18" Height="18" Foreground="{StaticResource Neutral500}" />
                     
                     <CheckBox Classes="Switch" 
-                              Content="{loc:T attribute.enable_matching}"
+                              Content="{loc:T attribute.enable_matches}"
                               IsChecked="{Binding UseMatchesAsXAxis}"
                               FontSize="12"
                               VerticalAlignment="Center"/>

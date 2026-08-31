@@ -69,7 +69,7 @@ en:
     priority: "Priority"
     sort_by: "Sort by"
     match: "Match"
-    enable_matching: "Matches"
+    enable_matches: "Matches"
     total_games_won: "Total games won"
     total_games_played: "Total games played"
     vr_abbreviation: "VR"
