@@ -300,11 +300,11 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
     {
         _isInitializingDaysDropdown = true;
         HistoryDaysDropdown.Items.Clear();
-        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(1, "Last 24 hours"));
-        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(7, "Last 7 days"));
-        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(30, "Last 30 days"));
-        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(60, "Last 60 days"));
-        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(999, "Lifetime")); // i think this option could make sense
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(1, t("time.last_24_hours")));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(7, t("time.last_7_days")));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(30, t("time.last_30_days")));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(60, t("time.last_60_days")));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(999, t("time.lifetime"))); // i think this option could make sense
 
         foreach (var item in HistoryDaysDropdown.Items.OfType<HistoryDaysOption>())
         {
@@ -377,7 +377,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
         IsLoading = false;
         ErrorMessage = string.Empty;
         HasData = false;
-        EmptyStateText = "Friend code is required to load VR history.";
+        EmptyStateText = t("empty_content.no_vr_history");
         DateRangeText = string.Empty;
         StartingVr = 0;
         EndingVr = 0;
