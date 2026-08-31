@@ -57,8 +57,9 @@ mkdir -p "$OUTPUT_DIR"
 # =============================================================================
 if [ "${SKIP_BUILD:-}" != "true" ]; then
     echo "[INFO] Building WheelWizard for $RID..."
-    cd "$WW_DIR"
-    dotnet publish -r "$RID" -c Release-macOS \
+    # Publish the project, not the solution: WheelWizard.sln only has
+    # Debug|Any CPU and Release|Any CPU, so -c Release-macOS fails against the .sln.
+    dotnet publish "$WW_DIR/WheelWizard/WheelWizard.csproj" -r "$RID" -c Release-macOS \
         /p:PublishSingleFile=true \
         /p:IncludeAllContentForSelfExtract=true \
         /p:IncludeNativeLibrariesForSelfExtract=true \
@@ -67,7 +68,6 @@ if [ "${SKIP_BUILD:-}" != "true" ]; then
         -p:UseAppHost=true \
         --self-contained true \
         -o "$OUTPUT_DIR/compiled/$RID"
-    cd "$SCRIPT_DIR"
 else
     echo "[INFO] Skipping build (SKIP_BUILD=true)"
 fi
