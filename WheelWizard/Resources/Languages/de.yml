@@ -232,7 +232,7 @@ de:
     last_30_days: "Letzte 30 Tage"
     last_60_days: "Letzte 60 Tage"
     lifetime: "Insgesamt"
-    lifetime_history: "Insgesamter Verlauf"
+    lifetime_history: "Gesamter Verlauf"
     past_n_days_with_range: "Vergangene {$1} Tage ({$2} bis {$3})"
   progress:
     estimated_time_remaining: "Geschätzte verbleibende Zeit:"
