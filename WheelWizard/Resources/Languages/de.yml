@@ -65,7 +65,8 @@ de:
     status: "Status"
     priority: "Priorität"
     sort_by: "Sortieren nach"
-    matches: "Filtern"
+    match: "Treffer"
+    enable_matching: "Filtern"
     total_games_won: "Gesamte verlorene Rennen"
     total_games_played: "Gesamte gewonnene Rennen"
     vr_abbreviation: "RP"
@@ -212,6 +213,7 @@ de:
     no_mod_selected: "Wähle eine Mod aus der Liste um mehr Details zu sehen."
     no_vr_history_title: "Kein R-Punkte Verlauf"
     no_vr_history: "Ein Freundescode wird benötigt, um den R-Punkte Verlauf zu laden."
+    no_vr_history_range: "Noch kein R-Punkte Verlauf für diese Zeitspanne."
   time:
     days:
       1: "1 Tag"
@@ -230,6 +232,8 @@ de:
     last_30_days: "Letzte 30 Tage"
     last_60_days: "Letzte 60 Tage"
     lifetime: "Insgesamt"
+    lifetime_history: "Insgesamter Verlauf"
+    past_n_days_with_range: "Vergangene {$1} Tage ({$2} bis {$3})"
   progress:
     estimated_time_remaining: "Geschätzte verbleibende Zeit:"
     downloading_mb: "Herunterladen mit {$1} MB"
@@ -397,6 +401,7 @@ de:
     mod_download_fail:
       title: "Mod Download ist schiefgelaufen."
       extra: "Ein Fehler ist während dem Dowload aufgetreten."
+    failed_vr_history: "Konnte R-Punkte Verlauf nicht laden."
   message_success:
     settings_saved:
       title: "Einstellungen erfolgreich gespeichert!"

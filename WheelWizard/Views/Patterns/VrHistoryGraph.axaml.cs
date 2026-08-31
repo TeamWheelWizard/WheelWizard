@@ -365,7 +365,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
             {
                 HasData = false;
                 ResetGraph();
-                ErrorMessage = result.Error?.Message ?? "Failed to load VR history";
+                ErrorMessage = result.Error?.Message ?? t("message_error.failed_vr_history");
             }
 
             IsLoading = false;
@@ -391,7 +391,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
     private void ApplyHistoryData(RwfcPlayerVrHistoryResponse historyResponse, int days)
     {
         _lastHistoryResponse = historyResponse;
-        EmptyStateText = "No VR history found for this range yet.";
+        EmptyStateText = t("empty_content.no_vr_history_range");
         StartingVr = historyResponse.StartingVr;
         EndingVr = historyResponse.EndingVr;
         TotalChange = historyResponse.TotalVrChange;
@@ -407,7 +407,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
         string dateFormat = (historyResponse.FromDate.Year != historyResponse.ToDate.Year) ? "MMM d, yyyy" : "MMM d"; // to consider if you want to show the year if it goes over
         var fromDate = historyResponse.FromDate.ToLocalTime().ToString(dateFormat);
         var toDate = historyResponse.ToDate.ToLocalTime().ToString("MMM d"); // also if you wanna only show the year from the old date since the current one is always now
-        DateRangeText = days == lifetimeDays ? $"Lifetime history" : $"Past {days} days ({fromDate} to {toDate})";
+        DateRangeText = days == lifetimeDays ? t("time.lifetime_history") : t("time.past_n_days_with_range", days, fromDate, toDate);
         // also suggestion to add a vr peak
 
         if (orderedByDate.Count == 0)
@@ -430,9 +430,10 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
 
         if (UseMatchesAsXAxis)
         {
-            GraphStartLabel = "Match 1";
-            GraphMidLabel = $"Match {(orderedByDate.Count / 2) + 1}";
-            GraphEndLabel = $"Match {orderedByDate.Count}";
+            var match = t("attribute.match");
+            GraphStartLabel = $"{match} 1";
+            GraphMidLabel = $"{match} {(orderedByDate.Count / 2) + 1}";
+            GraphEndLabel = $"{match} {orderedByDate.Count}";
         }
         else
         {

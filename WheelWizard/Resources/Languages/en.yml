@@ -68,7 +68,8 @@ en:
     status: "Status"
     priority: "Priority"
     sort_by: "Sort by"
-    matches: "Matches"
+    match: "Match"
+    enable_matching: "Matches"
     total_games_won: "Total games won"
     total_games_played: "Total games played"
     vr_abbreviation: "VR"
@@ -226,6 +227,7 @@ en:
     no_mod_selected: "Select a mod in the list to view its details"
     no_vr_history_title: "No VR history"
     no_vr_history: "Friend code is required to load VR history."
+    no_vr_history_range: "No VR history found for this range yet."
   time:
     days:
       1: "1 day"
@@ -244,6 +246,8 @@ en:
     last_30_days: "Last 30 days"
     last_60_days: "Last 60 days"
     lifetime: "Lifetime"
+    lifetime_history: "Lifetime history"
+    past_n_days_with_range: "Past {$1} days ({$2} to {$3})"
   progress:
     estimated_time_remaining: "Estimated time remaining:"
     downloading_mb: "downloading {$1} MB"
@@ -456,6 +460,7 @@ en:
     mod_download_fail:
       title: "Mod download failed."
       extra: "An error occurred during download: {$1}"
+    failed_vr_history: "Failed to load VR history"
   message_success:
     settings_saved:
       title: "Settings saved successfully!"
