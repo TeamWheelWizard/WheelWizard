@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 
@@ -54,6 +55,15 @@ public class BundleExtractionCleanupService(IFileSystem fileSystem, ILogger<Bund
                 }
 
                 logger.LogInformation("Running from single-file extraction folder: {Directory}", currentExtractionDirectory);
+
+                // Another (possibly older) WheelWizard instance might still be loading native libraries from its own
+                // extraction folder. Deleting that folder from under it could break it, so leave the cleanup to a later start.
+                if (IsAnotherInstanceRunning(processPath!))
+                {
+                    logger.LogDebug("Another WheelWizard instance is running, skipping extraction cleanup");
+                    return;
+                }
+
                 var removedCount = CleanupStaleExtractions(currentExtractionDirectory);
                 if (removedCount > 0)
                     logger.LogInformation("Removed {Count} stale single-file extraction folder(s)", removedCount);
@@ -140,6 +150,43 @@ public class BundleExtractionCleanupService(IFileSystem fileSystem, ILogger<Bund
         }
 
         return removedCount;
+    }
+
+    /// <summary>
+    /// Checks whether another process with the name of this executable (or its <c>_new</c> update counterpart) is running.
+    /// When the processes cannot be enumerated, this errs on the side of caution and reports <c>true</c>.
+    /// </summary>
+    private bool IsAnotherInstanceRunning(string processPath)
+    {
+        var appName = fileSystem.Path.GetFileNameWithoutExtension(processPath);
+        var currentProcessId = Environment.ProcessId;
+
+        foreach (var processName in new[] { appName, appName + UpdateExecutableSuffix })
+        {
+            Process[] processes;
+            try
+            {
+                processes = Process.GetProcessesByName(processName);
+            }
+            catch (Exception e)
+            {
+                logger.LogDebug(e, "Could not enumerate running processes named {ProcessName}", processName);
+                return true;
+            }
+
+            try
+            {
+                if (processes.Any(process => process.Id != currentProcessId))
+                    return true;
+            }
+            finally
+            {
+                foreach (var process in processes)
+                    process.Dispose();
+            }
+        }
+
+        return false;
     }
 
     private bool TryDeleteDirectory(string directory)
