@@ -7,6 +7,7 @@ public static class AutoUpdatingExtensions
     public static IServiceCollection AddAutoUpdating(this IServiceCollection services)
     {
         services.AddSingleton<IAutoUpdaterSingletonService, AutoUpdaterSingletonService>();
+        services.AddSingleton<IBundleExtractionCleanupService, BundleExtractionCleanupService>();
 
         var implementationType = typeof(FallbackUpdatePlatform);
 #if WINDOWS
