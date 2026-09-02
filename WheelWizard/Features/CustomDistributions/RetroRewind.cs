@@ -58,18 +58,21 @@ public class RetroRewind : IDistribution
         // That way a failed install does not take the users install (including their patches) with it.
         var backupResult = BackupCurrentInstall();
         if (backupResult.IsFailure)
+        {
+            // The backup can have moved part of the install aside before it failed, that part only lives in the backup now.
+            var rollbackResult = TryCatch(RestoreMissingFromBackup);
+            if (rollbackResult.IsFailure)
+                _logger.LogError("Failed to roll back the {Title} backup: {Error}", Title, rollbackResult.Error.Message);
             return backupResult;
+        }
 
         var installResult = await PerformInstallAsync(progressWindow);
         // A cancelled install is not a failure, but it also did not finish, so we keep the old install.
         if (installResult.IsFailure || progressWindow.WasCancellationRequested)
         {
-            if (backupResult.Value)
-            {
-                var restoreResult = RestoreBackup();
-                if (restoreResult.IsFailure)
-                    _logger.LogError("Failed to restore the previous {Title} install: {Error}", Title, restoreResult.Error.Message);
-            }
+            var restoreResult = RestoreBackup();
+            if (restoreResult.IsFailure)
+                _logger.LogError("Failed to restore the previous {Title} install: {Error}", Title, restoreResult.Error.Message);
             return installResult;
         }
 
@@ -592,52 +595,65 @@ public class RetroRewind : IDistribution
     /// <summary>
     /// Moves the current install (and its wiiDisc xml file) aside so it can be restored when the install fails.
     /// </summary>
-    /// <returns>Whether there actually was something to back up.</returns>
-    private OperationResult<bool> BackupCurrentInstall() =>
+    private OperationResult BackupCurrentInstall() =>
         TryCatch(
             () =>
             {
-                // A backup can still be there when a previous install was interrupted, that one is of no use to us anymore.
+                // A backup can still be there when a previous install was interrupted. Whatever it holds that the
+                // current install is missing is the only copy of it left, so that has to go back before we replace it.
+                RestoreMissingFromBackup();
                 DeleteBackup();
 
-                var hasBackup = false;
                 if (_fileSystem.Directory.Exists(DistributionDataPath))
-                {
                     _fileSystem.Directory.Move(DistributionDataPath, BackupDataPath);
-                    hasBackup = true;
-                }
                 if (_fileSystem.File.Exists(RiivolutionDiscXmlPath))
-                {
                     _fileSystem.File.Move(RiivolutionDiscXmlPath, BackupDiscXmlPath, overwrite: true);
-                    hasBackup = true;
-                }
-
-                return hasBackup;
             },
             $"Failed to back up the current {Title} install"
         );
 
+    /// <summary>
+    /// Puts back the parts of the backup that the current install is missing,
+    /// which is what an interrupted or half finished backup leaves behind.
+    /// </summary>
+    private void RestoreMissingFromBackup()
+    {
+        if (!_fileSystem.Directory.Exists(DistributionDataPath) && _fileSystem.Directory.Exists(BackupDataPath))
+            _fileSystem.Directory.Move(BackupDataPath, DistributionDataPath);
+        if (!_fileSystem.File.Exists(RiivolutionDiscXmlPath) && _fileSystem.File.Exists(BackupDiscXmlPath))
+            MoveDiscXmlBackupBack();
+    }
+
+    /// <summary>
+    /// Restores the install exactly as it was before it was moved aside,
+    /// so whatever the failed install added is removed as well.
+    /// </summary>
     private OperationResult RestoreBackup() =>
         TryCatch(
             () =>
             {
+                // Whatever the failed install left behind is worthless, only the backup is a real install.
+                if (_fileSystem.Directory.Exists(DistributionDataPath))
+                    _fileSystem.Directory.Delete(DistributionDataPath, recursive: true);
+                if (_fileSystem.File.Exists(RiivolutionDiscXmlPath))
+                    _fileSystem.File.Delete(RiivolutionDiscXmlPath);
+
+                // Only the parts that were there before have a backup, so this restores that exact state.
                 if (_fileSystem.Directory.Exists(BackupDataPath))
-                {
-                    // Whatever the failed install left behind is worthless, the backup is the real install.
-                    if (_fileSystem.Directory.Exists(DistributionDataPath))
-                        _fileSystem.Directory.Delete(DistributionDataPath, recursive: true);
                     _fileSystem.Directory.Move(BackupDataPath, DistributionDataPath);
-                }
                 if (_fileSystem.File.Exists(BackupDiscXmlPath))
-                {
-                    var xmlFolder = _fileSystem.Path.GetDirectoryName(RiivolutionDiscXmlPath);
-                    if (!string.IsNullOrEmpty(xmlFolder))
-                        _fileSystem.Directory.CreateDirectory(xmlFolder);
-                    _fileSystem.File.Move(BackupDiscXmlPath, RiivolutionDiscXmlPath, overwrite: true);
-                }
+                    MoveDiscXmlBackupBack();
             },
             $"Failed to restore the previous {Title} install"
         );
+
+    private void MoveDiscXmlBackupBack()
+    {
+        var xmlFolder = _fileSystem.Path.GetDirectoryName(RiivolutionDiscXmlPath);
+        if (!string.IsNullOrEmpty(xmlFolder))
+            _fileSystem.Directory.CreateDirectory(xmlFolder);
+        _fileSystem.File.Move(BackupDiscXmlPath, RiivolutionDiscXmlPath, overwrite: true);
+    }
 
     private void DeleteBackup()
     {

@@ -56,6 +56,42 @@ public class RetroRewindTests
     }
 
     [Fact]
+    public async Task ReinstallAsync_RecoversTheBackupOfAPreviousInterruptedInstall_WhenThereIsNoInstallLeft()
+    {
+        CreateExistingInstall();
+        // An install that got interrupted right after it moved the previous install aside.
+        _fileSystem.Directory.Move(InstallPath, BackupPath);
+        _fileSystem.File.Move(DiscXmlFilePath, BackupDiscXmlFilePath);
+        ServerIsUnreachable();
+
+        var result = await _distribution.ReinstallAsync(null!);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("6.0.0", _fileSystem.File.ReadAllText(VersionFilePath));
+        Assert.True(_fileSystem.File.Exists(DiscXmlFilePath));
+        Assert.False(_fileSystem.Directory.Exists(BackupPath));
+        Assert.False(_fileSystem.File.Exists(BackupDiscXmlFilePath));
+    }
+
+    [Fact]
+    public async Task ReinstallAsync_KeepsInstallAndPatches_WhenOnlyPartOfItCouldBeBackedUp()
+    {
+        CreateExistingInstall();
+        // A folder in the place the disc xml backup has to go makes moving that file aside fail,
+        // which only happens after the install folder already moved.
+        _fileSystem.Directory.CreateDirectory(BackupDiscXmlFilePath);
+
+        var result = await _distribution.ReinstallAsync(null!);
+
+        Assert.True(result.IsFailure);
+        Assert.Contains("Failed to back up", result.Error.Message);
+        Assert.Equal("6.0.0", _fileSystem.File.ReadAllText(VersionFilePath));
+        Assert.Equal("patch", _fileSystem.File.ReadAllText(PatchFilePath));
+        Assert.True(_fileSystem.File.Exists(DiscXmlFilePath));
+        Assert.False(_fileSystem.Directory.Exists(BackupPath));
+    }
+
+    [Fact]
     public async Task RemoveAsync_DeletesTheInstallAndItsDiscXmlFile()
     {
         CreateExistingInstall();
@@ -85,6 +121,7 @@ public class RetroRewindTests
     private static string VersionFilePath => Path.Combine(InstallPath, "version.txt");
     private static string PatchFilePath => Path.Combine(PathManager.PatchesFolderPath, "MyPatch.szs");
     private static string DiscXmlFilePath => Path.Combine(PathManager.RiivolutionXmlFolderPath, "RetroRewind6.xml");
+    private static string BackupDiscXmlFilePath => $"{DiscXmlFilePath}.old";
 
     private void InitializeUserFolder()
     {
