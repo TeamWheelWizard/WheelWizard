@@ -41,5 +41,5 @@ public class FallbackUpdatePlatform(IBrandingSingletonService brandingService) :
         return null;
     }
 
-    public Task<OperationResult> ExecuteUpdateAsync(string downloadUrl) => Task.FromResult(Ok());
+    public Task<OperationResult> ExecuteUpdateAsync(string downloadUrl, bool restartApplication = true) => Task.FromResult(Ok());
 }
