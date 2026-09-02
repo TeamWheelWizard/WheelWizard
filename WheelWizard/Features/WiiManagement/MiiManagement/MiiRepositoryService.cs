@@ -126,8 +126,7 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
             db[CrcOffset + 1] = (byte)(crc & 0xFF);
         }
 
-        fileSystem.File.WriteAllBytes(_miiDbFilePath, db);
-        return Ok();
+        return fileSystem.WriteAllBytesAtomic(_miiDbFilePath, db, "Failed to save RFL_DB.dat.");
     }
 
     public byte[]? GetRawBlockByAvatarId(uint clientId)
@@ -156,12 +155,6 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         if (fileSystem.File.Exists(_miiDbFilePath))
             return Fail("Database already exists.", MessageTranslation.Error_MiiDBAlreadyExists);
 
-        var directory = Path.GetDirectoryName(_miiDbFilePath);
-        if (!string.IsNullOrEmpty(directory) && !fileSystem.Directory.Exists(directory))
-        {
-            fileSystem.Directory.CreateDirectory(directory);
-        }
-
         var db = new byte[779_968];
         // first 4 bytes should be the RNOD magic "RNOD"
         db[0] = 0x52;
@@ -184,9 +177,8 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         var crc = CrcHelper.ComputeCrc16Ccitt(db, 0, CrcOffset);
         db[CrcOffset] = (byte)(crc >> 8);
         db[CrcOffset + 1] = (byte)(crc & 0xFF);
-        fileSystem.File.WriteAllBytes(_miiDbFilePath, db);
 
-        return Ok();
+        return fileSystem.WriteAllBytesAtomic(_miiDbFilePath, db, "Failed to create RFL_DB.dat.");
     }
 
     public OperationResult UpdateBlockByClientId(uint clientId, byte[] newBlock)
