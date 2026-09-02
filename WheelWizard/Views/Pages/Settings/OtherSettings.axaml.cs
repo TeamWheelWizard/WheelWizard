@@ -3,6 +3,7 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages.Settings;
@@ -70,8 +71,11 @@ public partial class OtherSettings : UserControlBase
     {
         var progressWindow = new ProgressWindow();
         progressWindow.Show();
-        await CustomDistributionSingletonService.RetroRewind.ReinstallAsync(progressWindow);
+        var reinstallResult = await CustomDistributionSingletonService.RetroRewind.ReinstallAsync(progressWindow);
         progressWindow.Close();
+
+        if (reinstallResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(reinstallResult.Error);
     }
 
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)
