@@ -25,9 +25,14 @@ public class RecompInstallState
     public string? SetupVersion { get; set; }
     public string? InstallDir { get; set; }
 
+    /// <summary>Whether the setup host has produced the Retro Rewind product, as opposed to only the base game.</summary>
+    public bool RetroRewindInstalled { get; set; }
+
     /// <summary>
     /// How the installed Retro Rewind product was built: <c>downloaded</c> when it embeds a Retro-WFC
     /// payload, <c>skipped</c> when it was deliberately built without one, or empty for a base-only install.
+    /// A state written before this field existed leaves it <see langword="null"/>; see
+    /// <see cref="RecompRetroWfcPayloadPolicy"/> for how that is read.
     /// </summary>
     public string? RetroWfcPayloadMode { get; set; }
 

@@ -23,7 +23,10 @@ public sealed class RecompRetroWfcPayloadProbe(IHttpClientFactory httpClientFact
     /// <summary>
     /// The fixed payload endpoint the setup host downloads from. It must stay identical to the value pinned
     /// in the recomp's <c>RetroWfcPayload.CurrentRetroWfcPayloadUri</c>, since probing anything else says
-    /// nothing about whether the host's own download will succeed.
+    /// nothing about whether the host's own download will succeed. Plain HTTP is what the service offers
+    /// and what the host pins; that is safe here because this probe decides nothing about trust. The host
+    /// verifies the payload's RSA signature itself, so a forged answer can at worst make the host attempt
+    /// a download that its own verification then rejects.
     /// </summary>
     public const string PayloadUri = "http://nas.play.rwfc.net/payload?g=RMCPD00";
 

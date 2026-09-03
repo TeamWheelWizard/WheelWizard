@@ -192,10 +192,8 @@ public sealed class RecompInstallService : IRecompInstallService
         state is { IsRetroWfcPayloadSkipped: true } && await payloadProbe.IsReachableAsync(cancellationToken);
 
     /// <summary>
-    /// Decides which payload option the next setup operation receives. An installation that already embeds
-    /// a payload always asks the host to download: the host falls back to its own verified copy when the
-    /// service is down. A skipped installation upgrades when the service is back and otherwise stays as
-    /// it is. Only a fresh Retro Rewind build has nothing to fall back to, which is when the user decides.
+    /// Decides which payload option the next setup operation receives. The rules live in
+    /// <see cref="RecompRetroWfcPayloadPolicy"/>; this only supplies the probe and the user's answer.
     /// </summary>
     private async Task<OperationResult<RecompRetroWfcPayloadMode>> ResolveRetroWfcPayloadModeAsync(
         RecompInstallState? state,
@@ -203,24 +201,24 @@ public sealed class RecompInstallService : IRecompInstallService
         CancellationToken cancellationToken
     )
     {
-        if (string.IsNullOrWhiteSpace(environment.RetroRewindFolderPath))
-            return Ok(RecompRetroWfcPayloadMode.Download);
+        var hasRetroRewindSource = !string.IsNullOrWhiteSpace(environment.RetroRewindFolderPath);
+        var serviceReachable =
+            !RecompRetroWfcPayloadPolicy.NeedsServiceProbe(state, hasRetroRewindSource)
+            || await payloadProbe.IsReachableAsync(cancellationToken);
 
-        var installedMode = state?.RetroWfcPayloadMode;
-        if (string.Equals(installedMode, "downloaded", StringComparison.OrdinalIgnoreCase))
-            return Ok(RecompRetroWfcPayloadMode.Download);
+        switch (RecompRetroWfcPayloadPolicy.Decide(state, hasRetroRewindSource, serviceReachable))
+        {
+            case RecompRetroWfcPayloadDecision.Download:
+                return Ok(RecompRetroWfcPayloadMode.Download);
+            case RecompRetroWfcPayloadDecision.Skip:
+                return Ok(RecompRetroWfcPayloadMode.Skip);
+            default:
+                if (confirmOfflineInstall is null || !await confirmOfflineInstall())
+                    return Fail(RetroWfcUnavailableMessage);
 
-        if (await payloadProbe.IsReachableAsync(cancellationToken))
-            return Ok(RecompRetroWfcPayloadMode.Download);
-
-        if (state is { IsRetroWfcPayloadSkipped: true })
-            return Ok(RecompRetroWfcPayloadMode.Skip);
-
-        if (confirmOfflineInstall is null || !await confirmOfflineInstall())
-            return Fail(RetroWfcUnavailableMessage);
-
-        logger.LogInformation("The Retro-WFC payload service is unreachable; installing WiiCompiled without online play");
-        return Ok(RecompRetroWfcPayloadMode.Skip);
+                logger.LogInformation("The Retro-WFC payload service is unreachable; installing WiiCompiled without online play");
+                return Ok(RecompRetroWfcPayloadMode.Skip);
+        }
     }
 
     /// <summary>
