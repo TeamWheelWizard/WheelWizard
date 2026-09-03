@@ -24,6 +24,28 @@ public class RecompInstallState
     public int? SchemaVersion { get; set; }
     public string? SetupVersion { get; set; }
     public string? InstallDir { get; set; }
+
+    /// <summary>
+    /// How the installed Retro Rewind product was built: <c>downloaded</c> when it embeds a Retro-WFC
+    /// payload, <c>skipped</c> when it was deliberately built without one, or empty for a base-only install.
+    /// </summary>
+    public string? RetroWfcPayloadMode { get; set; }
+
+    /// <summary>Whether the installed Retro Rewind product was built without a Retro-WFC payload.</summary>
+    public bool IsRetroWfcPayloadSkipped => string.Equals(RetroWfcPayloadMode, "skipped", StringComparison.OrdinalIgnoreCase);
+}
+
+/// <summary>
+/// The Retro-WFC payload choice handed to the setup executable. The contract requires exactly one whenever a
+/// Retro Rewind source directory is passed.
+/// </summary>
+public enum RecompRetroWfcPayloadMode
+{
+    /// <summary>Let the setup host download the shared payload (<c>--download-retro-wfc-payload</c>).</summary>
+    Download,
+
+    /// <summary>Build Retro Rewind without the payload (<c>--skip-retro-wfc-payload</c>); online play is unavailable.</summary>
+    Skip,
 }
 
 /// <summary>
@@ -47,4 +69,10 @@ public sealed record RecompInstallRequest
     /// an installation that predates portable mode keeps its machine-local layout.
     /// </summary>
     public bool Portable { get; init; }
+
+    /// <summary>
+    /// The Retro-WFC payload choice for the Retro Rewind product. Only meaningful together with
+    /// <see cref="RetroRewindFolderPath"/>.
+    /// </summary>
+    public RecompRetroWfcPayloadMode RetroWfcPayloadMode { get; init; } = RecompRetroWfcPayloadMode.Download;
 }

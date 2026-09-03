@@ -32,6 +32,48 @@ public class RecompTests
     }
 
     [Fact]
+    public void SilentInstall_SkipsThePayloadOnlyWhenAskedTo()
+    {
+        var arguments = RecompSetupCommandBuilder.BuildSilentInstallArguments(
+            new()
+            {
+                GameFilePath = @"D:\Games\Mario Kart Wii.rvz",
+                InstallFolderPath = @"D:\WheelWizard\Recomp\Install",
+                RetroRewindFolderPath = @"D:\WheelWizard\RetroRewind6",
+                RetroWfcPayloadMode = RecompRetroWfcPayloadMode.Skip,
+            }
+        );
+
+        Assert.EndsWith("--retro-dir \"D:\\WheelWizard\\RetroRewind6\" --skip-retro-wfc-payload", arguments);
+        Assert.DoesNotContain("--download-retro-wfc-payload", arguments);
+    }
+
+    [Fact]
+    public void RepairProducts_PassesExactlyOnePayloadOption()
+    {
+        Assert.Equal(
+            "--repair-products --install-dir \"D:\\Recomp\" --retro-dir \"D:\\RetroRewind6\" --download-retro-wfc-payload --progress-json",
+            RecompSetupCommandBuilder.BuildRepairProductsArguments(@"D:\Recomp", @"D:\RetroRewind6")
+        );
+        Assert.Equal(
+            "--repair-products --install-dir \"D:\\Recomp\" --retro-dir \"D:\\RetroRewind6\" --skip-retro-wfc-payload --progress-json",
+            RecompSetupCommandBuilder.BuildRepairProductsArguments(@"D:\Recomp", @"D:\RetroRewind6", RecompRetroWfcPayloadMode.Skip)
+        );
+    }
+
+    [Fact]
+    public void InstallState_ReadsThePayloadModeTheSetupHostWrites()
+    {
+        var state = System.Text.Json.JsonSerializer.Deserialize<RecompInstallState>(
+            """{"SchemaVersion":1,"SetupVersion":"0.3.0","InstallDir":"D:\\Recomp","RetroWfcPayloadMode":"skipped"}""",
+            new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
+
+        Assert.NotNull(state);
+        Assert.True(state.IsRetroWfcPayloadSkipped);
+    }
+
+    [Fact]
     public void ProductsLine_IsReadBackAsTheProductStateItReports()
     {
         var parsed = RecompSetupOutputParser.Parse(
