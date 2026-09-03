@@ -18,6 +18,15 @@
 
 Wheel Wizard, our mod manager, is created for the sole purpose of convenience. Technically, these mods and Retro Rewind are all doable without this app, but this app makes it possible with just a few clicks. It still has a lot of features in the planning stage and is fully in development, so keep an eye out for updates.
 
+## Requirements
+
+In order to play, a Mario Kart Wii game backup, dumped by you, is required. Accepted formats are .iso, .gcm, .gcz, .ciso, .wbfs, .wia and .rvz. Depending on what you like to play, a specific game version may be required.
+
+| Retro Rewind in Dolphin | Wiicompiled (with or without Retro Rewind) |
+|-------------------------|--------------------------------------------|
+| Any region              | PAL only                                   |
+
+
 ## Free and Open Source
 
 Wheel Wizard was made by [patchzy](https://github.com/patchzyy) and [wanttobeeme](https://github.com/wanttobeeme). This application is completely free to use. You can go to the [latest releases](https://github.com/TeamWheelWizard/WheelWizard/releases) and download the executable there. Once installed, the app will automatically notify you when updates are available.
