@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
              mc:Ignorable="d"
              d:DesignWidth="560"
              d:DesignHeight="390"
@@ -27,21 +28,21 @@
                   Margin="0,0,0,8">
                 <Border Grid.Column="0" Classes="profileStatCard" Margin="0,0,4,0">
                     <StackPanel Spacing="1">
-                        <components:FormFieldLabel Text="Start VR" />
+                        <components:FormFieldLabel Text="{loc:T attribute.start_vr}" />
                         <SelectableTextBlock Classes="BodyText" Text="{Binding StartingVr, StringFormat='{}{0:N0}'}" />
                     </StackPanel>
                 </Border>
 
                 <Border Grid.Column="1" Classes="profileStatCard" Margin="4,0,4,0">
                     <StackPanel Spacing="1">
-                        <components:FormFieldLabel Text="End VR" />
+                        <components:FormFieldLabel Text="{loc:T attribute.end_vr}" />
                         <SelectableTextBlock Classes="BodyText" Text="{Binding EndingVr, StringFormat='{}{0:N0}'}" />
                     </StackPanel>
                 </Border>
 
                 <Border Grid.Column="2" Classes="profileStatCard" Margin="4,0,0,0">
                     <StackPanel Spacing="1">
-                        <components:FormFieldLabel Text="Net Change" />
+                        <components:FormFieldLabel Text="{loc:T attribute.net_change}" />
                         <SelectableTextBlock Classes="BodyText" 
                                              Foreground="{StaticResource Primary400}"
                                              IsVisible="{Binding IsTotalChangeGain}" 
@@ -61,7 +62,7 @@
                   ColumnDefinitions="*,Auto"
                   Margin="0,0,0,8">
                 <StackPanel Grid.Column="0">
-                    <components:FormFieldLabel Text="VR History" />
+                    <components:FormFieldLabel Text="{loc:T attribute.vr_history}" />
                     <TextBlock Classes="TinyText" FontSize="11" Text="{Binding DateRangeText}" />
                 </StackPanel>
 
@@ -69,7 +70,7 @@
                     <components:LoadingIcon Margin="3,3,6,3" VerticalAlignment="Center" IsVisible="{Binding IsLoading}" Width="18" Height="18" Foreground="{StaticResource Neutral500}" />
                     
                     <CheckBox Classes="Switch" 
-                              Content="Matches" 
+                              Content="{loc:T attribute.enable_matches}"
                               IsChecked="{Binding UseMatchesAsXAxis}"
                               FontSize="12"
                               VerticalAlignment="Center"/>
@@ -135,14 +136,14 @@
                 </Border>
                 
                 <components:EmptyPageInfo IsVisible="{Binding HasError}"
-                                          Title="No VR history"
+                                          Title="{loc:T empty_content.no_vr_history_title}"
                                           IconData="{StaticResource Chart}"
                                           BodyText="{Binding ErrorMessage}"
                                           VerticalAlignment="Center"
                                           HorizontalAlignment="Center" />
                 
                 <components:EmptyPageInfo IsVisible="{Binding ShowNoDataState}"
-                                          Title="No VR history"
+                                          Title="{loc:T empty_content.no_vr_history_title}"
                                           IconData="{StaticResource Chart}"
                                           BodyText="{Binding EmptyStateText}"
                                           VerticalAlignment="Center"
