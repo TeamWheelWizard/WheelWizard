@@ -321,6 +321,12 @@ jobs:
   create-release:
     name: Create GitHub Release
     needs: [release, macos-arm64, macos-x64]
+    # The Windows/Linux build is the one that must succeed. A failed macOS job (signing,
+    # notarization) must not hold the other platforms hostage: the release goes out without the
+    # DMGs, and the in-app updater already picks the newest release that has an asset for the
+    # user's platform, so macOS users simply stay on their current version until a later release
+    # carries DMGs again.
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
 
     runs-on: ubuntu-latest
 
@@ -332,14 +338,19 @@ jobs:
         run: |
           mkdir -p final-artifacts
 
-          # Linux & Windows
+          # Linux & Windows: required.
           cp artifacts-linux-windows/WheelWizardWindows.exe final-artifacts/
           cp artifacts-linux-windows/WheelWizard_Linux final-artifacts/
           cp artifacts-linux-windows/WheelWizard_arm64_Linux final-artifacts/
 
-          # macOS DMGs
-          cp artifacts-macos-arm64/WheelWizard-macOSarm64.dmg final-artifacts/
-          cp artifacts-macos-x64/WheelWizard-macOSintel.dmg final-artifacts/
+          # macOS DMGs: attached when their job produced them, skipped with a warning otherwise.
+          for dmg in artifacts-macos-arm64/WheelWizard-macOSarm64.dmg artifacts-macos-x64/WheelWizard-macOSintel.dmg; do
+            if [ -f "$dmg" ]; then
+              cp "$dmg" final-artifacts/
+            else
+              echo "::warning::$(basename "$dmg") was not produced; publishing this release without it."
+            fi
+          done
 
           chmod +x final-artifacts/WheelWizard_Linux final-artifacts/WheelWizard_arm64_Linux
           ls -la final-artifacts/
