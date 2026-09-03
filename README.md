@@ -24,7 +24,7 @@ In order to play, a Mario Kart Wii game backup, dumped by you, is required. Acce
 
 | Retro Rewind in Dolphin | Wiicompiled (with or without Retro Rewind) |
 |-------------------------|--------------------------------------------|
-| Any region              | PAL RMCP01                                 |
+| Any region              | PAL only                                   |
 
 
 ## Free and Open Source
