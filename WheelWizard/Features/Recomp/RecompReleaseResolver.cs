@@ -6,7 +6,7 @@ namespace WheelWizard.Recomp;
 /// <summary>
 /// Picks the newest usable recomp release out of a GitHub releases listing.
 /// A release is only usable when it is not a prerelease, has a parseable <c>v*</c> tag,
-/// and actually carries the setup executable.
+/// and actually carries the setup asset for this platform.
 /// </summary>
 public static class RecompReleaseResolver
 {
@@ -21,9 +21,9 @@ public static class RecompReleaseResolver
     public const string RepositoryName = "Wiicompiled";
 
     /// <summary>
-    /// Returns the newest usable release, or <see langword="null"/> when the listing contains none.
+    /// Returns the newest release carrying <paramref name="setupFileName"/>, or <see langword="null"/> when the listing contains none.
     /// </summary>
-    public static RecompRelease? FindLatest(IEnumerable<GithubRelease>? releases)
+    public static RecompRelease? FindLatest(IEnumerable<GithubRelease>? releases, string setupFileName)
     {
         if (releases is null)
             return null;
@@ -38,7 +38,7 @@ public static class RecompReleaseResolver
                 continue;
 
             var asset = release.Assets.FirstOrDefault(candidate =>
-                string.Equals(candidate.Name, RecompSetupCommandBuilder.SetupFileName, StringComparison.OrdinalIgnoreCase)
+                string.Equals(candidate.Name, setupFileName, StringComparison.OrdinalIgnoreCase)
             );
             if (asset is null || string.IsNullOrWhiteSpace(asset.BrowserDownloadUrl))
                 continue;

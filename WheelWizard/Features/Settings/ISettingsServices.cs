@@ -78,7 +78,7 @@ public interface ISettingsManager : ISettingsProperties
 
     /// <summary>
     /// Whether WiiCompiled is the active frontend instead of Dolphin/Retro Rewind. This is the single
-    /// definition of that mode: it carries the Windows-only guard, so a stale <c>EnableRecomp</c>
+    /// definition of that mode: it carries the platform guard, so a stale <c>EnableRecomp</c>
     /// flag can never activate recomp behavior on a platform the recomp does not run on.
     /// </summary>
     bool IsRecompModeActive();

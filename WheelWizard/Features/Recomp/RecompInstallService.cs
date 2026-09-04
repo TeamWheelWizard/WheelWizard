@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System.Collections.Concurrent;
+using System.IO.Abstractions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using WheelWizard.GitHub;
@@ -86,7 +87,14 @@ public sealed class RecompInstallService : IRecompInstallService
     // installation is probed by pattern rather than by recomputing the backend's own path.
     private const string OperationLockSearchPattern = ".mkwc-operation-*.lock";
 
-    private static readonly JsonSerializerOptions InstallStateJsonOptions = new() { PropertyNameCaseInsensitive = true };
+    private static readonly JsonSerializerOptions InstallStateJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
+
+    private static readonly RecompHostPlatform Platform = RecompPlatform.Current;
+    private static bool IsWindowsHost => Platform == RecompHostPlatform.Windows;
 
     private readonly IRecompEnvironment environment;
     private readonly IRecompProcessRunner processRunner;
@@ -230,22 +238,33 @@ public sealed class RecompInstallService : IRecompInstallService
             return Fail("WiiCompiled requires a current install-state.json for its fixed installation path.");
 
         var products = new EventHolder<RecompProductsEvent>();
+        var plainLines = new ConcurrentQueue<string>();
         var runResult = await processRunner.RunAsync(
             environment.InstalledSetupFilePath,
             // Every retro operation passes the Retro Rewind source, so the check answers about the
             // installation that the launch will actually read from.
-            RecompSetupCommandBuilder.BuildCheckProductsArguments(environment.InstallFolderPath, environment.RetroRewindFolderPath),
+            RecompSetupCommandBuilder.BuildCheckProductsArguments(
+                Platform,
+                environment.InstallFolderPath,
+                environment.RetroRewindFolderPath
+            ),
             environment.InstallFolderPath,
             line =>
             {
                 if (RecompSetupOutputParser.Parse(line) is RecompProductsEvent productsEvent)
                     products.Value = productsEvent;
+                else
+                    plainLines.Enqueue(line);
             },
             cancellationToken
         );
 
         if (runResult.IsFailure)
             return runResult.Error;
+
+        // The Linux host answers with a plain-text table instead of a products record.
+        if (!IsWindowsHost)
+            products.Value ??= RecompSetupOutputParser.ParseProductsText(plainLines, state.SetupVersion);
 
         // Exit 0 means nothing needs repairing and exit 2 means something does; both are real answers.
         if (runResult.Value is not (0 or 2))
@@ -284,7 +303,7 @@ public sealed class RecompInstallService : IRecompInstallService
     private async Task<OperationResult> InstallCoreAsync(IProgress<RecompInstallProgress>? progress, CancellationToken cancellationToken)
     {
         // No platform guard here on purpose: AddRecomp() is the single gate, so this service only ever
-        // exists on Windows in the first place.
+        // exists on a platform with a setup host in the first place.
         if (!IsGameFileConfigured())
             return Fail(t("message_warning.not_find_game.extra"));
 
@@ -298,13 +317,13 @@ public sealed class RecompInstallService : IRecompInstallService
         if (release is null)
         {
             if (hasInstalledHost && await InstalledHostCanRepairAsync(installedVersion, cancellationToken))
-                return await RepairWhatTheCheckDemandsAsync(progress, cancellationToken);
+                return await RepairInstalledHostAsync(progress, cancellationToken);
 
             return Fail("Could not verify a current WiiCompiled setup release or installed repair host.");
         }
 
         if (hasInstalledHost && await InstalledHostCanRepairAsync(release.TagName, cancellationToken))
-            return await RepairWhatTheCheckDemandsAsync(progress, cancellationToken);
+            return await RepairInstalledHostAsync(progress, cancellationToken);
 
         var setupResult = await EnsureSetupDownloadedAsync(release, progress, cancellationToken);
         if (setupResult.IsFailure)
@@ -395,7 +414,7 @@ public sealed class RecompInstallService : IRecompInstallService
 
         var launchResult = await processRunner.RunAsync(
             environment.InstalledSetupFilePath,
-            RecompSetupCommandBuilder.BuildLaunchArguments(retroRewind: true),
+            RecompSetupCommandBuilder.BuildLaunchArguments(Platform, retroRewind: true),
             environment.InstallFolderPath,
             onStandardOutputLine: null,
             cancellationToken
@@ -412,6 +431,18 @@ public sealed class RecompInstallService : IRecompInstallService
 
         try
         {
+            // The Linux host also owns desktop entries and a base-game product outside these folders.
+            if (!IsWindowsHost && fileSystem.File.Exists(environment.InstalledSetupFilePath))
+            {
+                await processRunner.RunAsync(
+                    environment.InstalledSetupFilePath,
+                    RecompSetupCommandBuilder.BuildUninstallArguments(),
+                    workingDirectory: null,
+                    onStandardOutputLine: null,
+                    cancellationToken
+                );
+            }
+
             return await Task.Run(UninstallCore, cancellationToken);
         }
         finally
@@ -433,8 +464,9 @@ public sealed class RecompInstallService : IRecompInstallService
                 DeleteFolderIfPresent(environment.UserDataFolderPath);
                 DeleteFolderIfPresent(environment.CacheFolderPath);
                 DeleteFolderIfPresent(environment.NandCopyFolderPath);
-                if (fileSystem.File.Exists(environment.PortableMarkerFilePath))
-                    fileSystem.File.Delete(environment.PortableMarkerFilePath);
+                DeleteFileIfPresent(environment.PortableMarkerFilePath);
+                DeleteFileIfPresent(environment.InstalledSetupFilePath);
+                DeleteFileIfPresent(environment.InstallStateFilePath);
                 logger.LogInformation("Uninstalled WiiCompiled from {InstallFolder}", environment.InstallFolderPath);
             },
             errorMessage: "Could not remove the WiiCompiled installation."
@@ -445,6 +477,12 @@ public sealed class RecompInstallService : IRecompInstallService
     {
         if (!string.IsNullOrWhiteSpace(folderPath) && fileSystem.Directory.Exists(folderPath))
             fileSystem.Directory.Delete(folderPath, recursive: true);
+    }
+
+    private void DeleteFileIfPresent(string filePath)
+    {
+        if (!string.IsNullOrWhiteSpace(filePath) && fileSystem.File.Exists(filePath))
+            fileSystem.File.Delete(filePath);
     }
 
     private async Task<OperationResult<string>> EnsureSetupDownloadedAsync(
@@ -474,6 +512,7 @@ public sealed class RecompInstallService : IRecompInstallService
         if (!IsUsableFile(cachedSetupPath))
             return Fail("The downloaded WiiCompiled setup is missing or empty.");
 
+        MarkExecutable(cachedSetupPath);
         if (!await SetupMatchesVersionAsync(cachedSetupPath, release.TagName, cancellationToken))
         {
             var removed = DeleteInvalidSetup(cachedSetupPath);
@@ -498,7 +537,8 @@ public sealed class RecompInstallService : IRecompInstallService
         {
             if (!fileSystem.Directory.Exists(environment.CacheFolderPath))
                 return;
-            foreach (var candidate in fileSystem.Directory.EnumerateFiles(environment.CacheFolderPath, "WiiCompiled-Setup-*.exe"))
+            var pattern = "WiiCompiled-Setup-*" + RecompPlatform.SetupFileExtension;
+            foreach (var candidate in fileSystem.Directory.EnumerateFiles(environment.CacheFolderPath, pattern))
             {
                 if (string.Equals(candidate, keepFilePath, StringComparison.OrdinalIgnoreCase))
                     continue;
@@ -565,6 +605,57 @@ public sealed class RecompInstallService : IRecompInstallService
         && RecompVersion.TryParse(second, out var parsedSecond)
         && parsedFirst.ComparePrecedenceTo(parsedSecond) == 0;
 
+    /// <summary>
+    /// The Linux host keeps its state per user and never copies itself anywhere, so Wheel Wizard keeps
+    /// the host it installed with and records what it installed, mirroring the Windows layout.
+    /// </summary>
+    private OperationResult RecordInstalledHost(string setupFilePath, string? reportedVersion)
+    {
+        if (!RecompVersion.TryParse(reportedVersion, out var version))
+            return Fail("The recomp installer did not report its version.");
+
+        return TryCatch(
+            () =>
+            {
+                var hostFilePath = environment.InstalledSetupFilePath;
+                if (!PathsMatch(setupFilePath, hostFilePath))
+                {
+                    fileSystem.Directory.CreateDirectory(fileSystem.Path.GetDirectoryName(hostFilePath)!);
+                    fileSystem.File.Copy(setupFilePath, hostFilePath, overwrite: true);
+                    MarkExecutable(hostFilePath);
+                }
+
+                var state = new RecompInstallState
+                {
+                    SchemaVersion = CurrentInstallStateSchemaVersion,
+                    SetupVersion = version.ToString(),
+                    InstallDir = environment.InstallFolderPath,
+                };
+                fileSystem.File.WriteAllText(environment.InstallStateFilePath, JsonSerializer.Serialize(state, InstallStateJsonOptions));
+            },
+            errorMessage: "Could not record the WiiCompiled installation."
+        );
+    }
+
+    private void MarkExecutable(string filePath)
+    {
+        if (OperatingSystem.IsWindows())
+            return;
+
+        try
+        {
+            var mode = fileSystem.File.GetUnixFileMode(filePath);
+            fileSystem.File.SetUnixFileMode(
+                filePath,
+                mode | UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute
+            );
+        }
+        catch (Exception exception)
+        {
+            logger.LogWarning(exception, "Could not mark the recomp setup at {Path} as executable", filePath);
+        }
+    }
+
     private bool DeleteInvalidSetup(string setupFilePath)
     {
         try
@@ -583,7 +674,8 @@ public sealed class RecompInstallService : IRecompInstallService
     private async Task<OperationResult> RunSilentInstallAsync(
         string setupFilePath,
         IProgress<RecompInstallProgress>? progress,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken,
+        bool reportCompletion = true
     )
     {
         var request = new RecompInstallRequest
@@ -594,7 +686,7 @@ public sealed class RecompInstallService : IRecompInstallService
             Portable = environment.IsPortableInstall,
         };
 
-        var arguments = RecompSetupCommandBuilder.BuildSilentInstallArguments(request);
+        var arguments = RecompSetupCommandBuilder.BuildSilentInstallArguments(Platform, request);
         logger.LogInformation("Running the recomp setup: {Setup} {Arguments}", setupFilePath, arguments);
 
         Report(progress, t("progress.recomp_running_setup"), SetupPercentFloor);
@@ -611,8 +703,33 @@ public sealed class RecompInstallService : IRecompInstallService
             cancellationToken
         );
 
-        return FinishSetupRun(runResult, resultHolder, progress);
+        var setupResult = FinishSetupRun(runResult, resultHolder, progress, reportCompletion: false);
+        if (setupResult.IsFailure)
+            return setupResult;
+
+        if (!IsWindowsHost)
+        {
+            var recorded = RecordInstalledHost(setupFilePath, resultHolder.Value?.Version);
+            if (recorded.IsFailure)
+                return recorded;
+        }
+
+        if (reportCompletion)
+            Report(progress, t("progress.recomp_finished"), 100);
+        return Ok();
     }
+
+    /// <summary>
+    /// Brings an installation whose host is already current up to date. The Windows host repairs only
+    /// what its own check demands; the Linux host has no repair verb, so it runs its incremental install again.
+    /// </summary>
+    private Task<OperationResult> RepairInstalledHostAsync(
+        IProgress<RecompInstallProgress>? progress,
+        CancellationToken cancellationToken
+    ) =>
+        IsWindowsHost
+            ? RepairWhatTheCheckDemandsAsync(progress, cancellationToken)
+            : RunSilentInstallAsync(environment.InstalledSetupFilePath, progress, cancellationToken);
 
     /// <summary>
     /// Contract steps 2-4: ask the installed host what is stale, repair only when it says so, then
@@ -675,6 +792,23 @@ public sealed class RecompInstallService : IRecompInstallService
         var retroRewindFolderPath = environment.RetroRewindFolderPath;
         if (string.IsNullOrWhiteSpace(retroRewindFolderPath))
             return Fail("Retro Rewind must be installed before WiiCompiled can repair or launch.");
+
+        if (!IsWindowsHost)
+        {
+            try
+            {
+                return await RunSilentInstallAsync(
+                    environment.InstalledSetupFilePath,
+                    progress,
+                    cancellationToken,
+                    reportCompletion: false
+                );
+            }
+            finally
+            {
+                _launchReconciled = false;
+            }
+        }
 
         var arguments = RecompSetupCommandBuilder.BuildRepairProductsArguments(environment.InstallFolderPath, retroRewindFolderPath);
 
@@ -781,7 +915,7 @@ public sealed class RecompInstallService : IRecompInstallService
             return null;
         }
 
-        return RecompReleaseResolver.FindLatest(releasesResult.Value);
+        return RecompReleaseResolver.FindLatest(releasesResult.Value, RecompPlatform.SetupFileName);
     }
 
     private string? ReadInstalledVersion()
@@ -865,7 +999,7 @@ public sealed class RecompInstallService : IRecompInstallService
     private static string BuildCachedSetupFileName(string tagName)
     {
         var sanitized = new string(tagName.Select(character => char.IsLetterOrDigit(character) ? character : '-').ToArray());
-        return $"WiiCompiled-Setup-{sanitized}.exe";
+        return $"WiiCompiled-Setup-{sanitized}{RecompPlatform.SetupFileExtension}";
     }
 
     private static void Report(IProgress<RecompInstallProgress>? progress, string message, int percent) =>

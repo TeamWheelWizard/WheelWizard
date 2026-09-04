@@ -48,8 +48,8 @@ public partial class OtherSettings : UserControlBase
     {
         // Always loads
 
-        // The recomp only ships for Windows, so on every other platform the whole section stays hidden.
-        var recompSupported = OperatingSystem.IsWindows();
+        // Without a setup host for this platform the whole section stays hidden.
+        var recompSupported = Recomp.RecompPlatform.IsSupported;
         RecompSectionLabel.IsVisible = recompSupported;
         RecompBorder.IsVisible = recompSupported;
         if (recompSupported)

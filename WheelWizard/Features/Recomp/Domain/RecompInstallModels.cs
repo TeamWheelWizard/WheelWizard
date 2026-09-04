@@ -12,7 +12,7 @@ public sealed record RecompInstallProgress(string Message, int Percent);
 /// </summary>
 /// <param name="TagName">The raw release tag (e.g. <c>v0.3.0</c>).</param>
 /// <param name="Version">The parsed semantic version of <paramref name="TagName"/>.</param>
-/// <param name="SetupDownloadUrl">Direct download URL of the <c>WiiCompiled-Setup.exe</c> asset.</param>
+/// <param name="SetupDownloadUrl">Direct download URL of this platform's setup asset.</param>
 public sealed record RecompRelease(string TagName, SemVersion Version, string SetupDownloadUrl);
 
 /// <summary>

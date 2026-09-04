@@ -92,15 +92,29 @@ public static class PathManager
     /// <summary>The backend install directory inside Wheel Wizard's portable recomp root.</summary>
     public static string RecompInstallFolderPath => PortableRecompInstallFolderPath;
 
-    /// <summary>Whether the recomp uses the portable layout, which is what earns the setup's <c>--portable</c> flag.</summary>
-    public static bool IsRecompInstallPortable => true;
+    /// <summary>Whether the recomp uses the portable layout, which is what earns the setup's <c>--portable</c> flag. The Linux host has no portable layout.</summary>
+    public static bool IsRecompInstallPortable => OperatingSystem.IsWindows();
 
     public static string RecompCacheFolderPath => Path.Combine(RecompFolderPath, "Cache");
-    public static string RecompInstallStateFilePath => Path.Combine(RecompInstallFolderPath, RecompInstallStateFileName);
-    public static string RecompSetupFilePath => Path.Combine(RecompInstallFolderPath, "WiiCompiled-Setup.exe");
 
-    /// <summary>The backend-owned runtime user state (Config.toml, private NAND, caches) inside the portable root.</summary>
-    public static string RecompUserDataFolderPath => Path.Combine(RecompFolderPath, "UserData");
+    // The Windows setup copies itself and its install-state.json into the install directory. The Linux
+    // host does neither, so Wheel Wizard keeps both beside the backend-owned install directory instead.
+    public static string RecompInstallStateFilePath =>
+        Path.Combine(OperatingSystem.IsWindows() ? RecompInstallFolderPath : RecompFolderPath, RecompInstallStateFileName);
+    public static string RecompSetupFilePath =>
+        Path.Combine(
+            OperatingSystem.IsWindows() ? RecompInstallFolderPath : RecompFolderPath,
+            "WiiCompiled-Setup" + Recomp.RecompPlatform.SetupFileExtension
+        );
+
+    /// <summary>
+    /// The backend-owned runtime user state (Config.toml, private NAND, caches): inside the portable root
+    /// on Windows, the per-user data directory the runtime and its setup host share everywhere else.
+    /// </summary>
+    public static string RecompUserDataFolderPath =>
+        OperatingSystem.IsWindows()
+            ? Path.Combine(RecompFolderPath, "UserData")
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WiiCompiled");
 
     /// <summary>The recomp's own settings file, shared between Wheel Wizard and the in-game settings bar.</summary>
     public static string RecompConfigFilePath => Path.Combine(RecompUserDataFolderPath, "Config.toml");

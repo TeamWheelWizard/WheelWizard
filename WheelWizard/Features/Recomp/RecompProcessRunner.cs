@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 
 namespace WheelWizard.Recomp;
@@ -26,6 +27,7 @@ public interface IRecompProcessRunner
 public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : IRecompProcessRunner
 {
     private const string CancellationEventEnvironmentVariable = "MKWCOMPILED_CANCEL_EVENT";
+    private const int SigTerm = 15;
     private static readonly TimeSpan CancellationGracePeriod = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan ForcedExitGracePeriod = TimeSpan.FromSeconds(5);
 
@@ -79,9 +81,7 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             }
             catch (OperationCanceledException)
             {
-                var exited = cancellationEvent is not null
-                    ? await CancelAndWaitForExitAsync(process, cancellationEvent)
-                    : await KillAndWaitForExitAsync(process);
+                var exited = await CancelAndWaitForExitAsync(process, cancellationEvent);
                 if (!exited)
                     throw;
 
@@ -118,11 +118,20 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             RedirectStandardError = true,
         };
 
-    private async Task<bool> CancelAndWaitForExitAsync(Process process, EventWaitHandle cancellationEvent)
+    /// <summary>
+    /// The Windows host watches the named event it was handed; the Linux host cancels on SIGTERM.
+    /// Either way the host gets a grace period to roll back before its process tree is stopped.
+    /// </summary>
+    private async Task<bool> CancelAndWaitForExitAsync(Process process, EventWaitHandle? cancellationEvent)
     {
         try
         {
-            cancellationEvent.Set();
+            if (cancellationEvent is not null)
+                cancellationEvent.Set();
+            else if (!OperatingSystem.IsWindows() && !process.HasExited)
+                SendSignal(process.Id, SigTerm);
+            else
+                return await KillAndWaitForExitAsync(process);
         }
         catch (Exception exception)
         {
@@ -182,4 +191,7 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             return false;
         }
     }
+
+    [DllImport("libc", EntryPoint = "kill")]
+    private static extern int SendSignal(int processId, int signal);
 }

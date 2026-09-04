@@ -47,6 +47,50 @@ public static class RecompSetupOutputParser
         }
     }
 
+    /// <summary>
+    /// Reads the plain-text table the Linux host prints for <c>check-products</c>: one
+    /// <c>profile  status  installDir</c> row per product, or <c>Nothing installed.</c>. That table
+    /// carries no setup version, so the caller supplies the one it recorded at install time.
+    /// </summary>
+    public static RecompProductsEvent ParseProductsText(IEnumerable<string> lines, string? setupVersion)
+    {
+        var absent = new RecompProductStatus(RecompProductState.Absent, "not installed");
+        var @base = absent;
+        var retroRewind = absent;
+        string? installDir = null;
+
+        foreach (var line in lines)
+        {
+            var columns = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (columns.Length < 2 || columns[0] is not ("base" or "retro-rewind"))
+                continue;
+
+            var state = columns[1] switch
+            {
+                "current" => RecompProductState.Current,
+                "MISSING" => RecompProductState.Absent,
+                "STALE" => RecompProductState.CompileInputsChanged,
+                _ => RecompProductState.Unknown,
+            };
+
+            // The row is "{profile,-14} {status,-45} {installDir}", so the directory starts at column 61.
+            var hasFixedColumns = line.Length > PlainInstallDirColumn;
+            var status = new RecompProductStatus(state, hasFixedColumns ? line[15..PlainInstallDirColumn].Trim() : columns[1]);
+            if (columns[0] == "base")
+            {
+                @base = status;
+                continue;
+            }
+
+            retroRewind = status;
+            installDir = hasFixedColumns ? line[PlainInstallDirColumn..].Trim() : columns[^1];
+        }
+
+        return new(setupVersion, installDir, RebuildRequired: false, @base, retroRewind);
+    }
+
+    private const int PlainInstallDirColumn = 61;
+
     private static RecompSetupProgressEvent ParseProgress(JsonElement root) =>
         new(GetString(root, "stage") ?? string.Empty, GetString(root, "message") ?? string.Empty, GetPercent(root, "percent"));
 
