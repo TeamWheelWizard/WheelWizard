@@ -3,15 +3,18 @@ de:
     home: "Startseite"
     settings: "Einstellungen"
     mods: "My Stuff"
+    patches: "Patches"
     my_profiles: "Mein Profil"
     rooms: "Räume"
     friends: "Freunde"
+    leaderboard: "Rangliste"
     room_details: "Raumdetails"
     my_miis: "Meine Miis"
   attribute:
     status_online: "Online"
     enabled: "Aktiviert"
     title: "Titel"
+    all: "Alle"
     status_offline: "Offline"
     name: "Name"
     id: "ID"
@@ -61,12 +64,12 @@ de:
     status: "Status"
     priority: "Priorität"
     sort_by: "Sortieren nach"
-    total_games_won: "Gesamte verlorene Rennen"
-    total_games_played: "Gesamte gewonnene Rennen"
-    vr_abbreviation: "RP"
+    total_games_won: "Gesamte gewonnene Spiele"
+    total_games_played: "Gesamte verlorene Spiele"
+    vr_abbreviation: "R-Punkte"
     br_abbreviation: "W-Punkte"
-    br_full: "Wettkampf-Rang"
-    vr_full: "R-Punkte"
+    br_full: "Wettkampf-Punkte"
+    vr_full: "Renn-Punkte"
     description: "Beschreibung"
     images: "Bilder"
     likes: "Likes"
@@ -75,7 +78,7 @@ de:
     mii_section:
       general: "Allgemein"
       face: "Gesicht"
-      hair: "Haare"
+      hair: "Frisur"
       eyebrows: "Augenbrauen"
       eyes: "Augen"
       nose: "Nase"
@@ -101,13 +104,15 @@ de:
     no_license: "Keine Lizenz"
     no_profiles: "Keine Profile"
     custom: "Benutzerdefiniert"
-    installed: "Installiert "
+    installed: "Installiert"
   action:
     play: "Spielen"
     play_offline: "Offline spielen"
+    play_anyway: "Trotzdem spielen"
     install: "Installieren"
     update: "Aktualisieren"
     import: "Importieren"
+    convert_to_patches: "Zu Patches konvertieren"
     enable_all: "Alle aktivieren"
     disable_all: "Alle deaktivieren"
     rename: "Umbenennen"
@@ -123,7 +128,7 @@ de:
     no: "Nein"
     keep: "Behalten"
     ok: "Ok"
-    revert: "Rückgängig machen"
+    revert: "Rückgängig"
     maybe_later: "Vielleicht später"
     browse: "Durchsuchen"
     view_mod: "Mod ansehen"
@@ -134,17 +139,19 @@ de:
     unfavorite: "Entfavorisieren"
     favorite: "Favorisieren"
     view_room: "Raum anzeigen"
+    recomp_nand_copy: "Kopie erstellen"
+    recomp_nand_share: "Direkt verwenden"
     link:
       discord: "Rede mit uns!"
       github: "Quellcode"
-      support: "Unterstützt uns!"
+      support: "Unterstütze uns!"
     launch_dolphin: "Dolphin starten"
     randomize: "Zufällig"
     do_manually: "Manuell durchführen"
     gamebanana_page: "Gamebanana-Seite"
     report: "Melden"
     un_install: "Deinstallieren"
-    download_and_install: "Herunterladen und Installieren"
+    download_and_install: "Herunterladen und installieren"
     view_custom_chars: "Benutzerdefinierte Charaktere ansehen"
     submit: "Senden"
   region:
@@ -161,19 +168,26 @@ de:
     rooms: "Räume"
     miis: "Miis"
   popup_title:
-    mod_details: "Details zur Mod"
+    mod_details: "Mod-Details"
     mod_browser: "Mod Browser"
-    mii_selector: "Mii Auswähler"
+    mii_selector: "Mii auswählen"
     mii_editor: "Mii Maker"
-    mii_carousel: "Mii Preview"
+    mii_carousel: "Mii-Vorschau"
   text:
     made_by_string: |
       Erstellt von: {$1}
       und {$2}
     thanks_translators: "Vielen Dank an alle Übersetzer:"
     wh_wz_translation_percentage: "Übersetzungen für diese Sprache sind {$1}% abgeschlossen"
-    powered_gamebanana: "Von GameBanana unterstützt"
+    powered_gamebanana: "Inhalte von GameBanana"
     language_translated_by: "Diese Sprache wurde übersetzt von: {$1}"
+    brsar_entry: "{$1} Eintrag {$2}"
+    brsar_entry_with_rwar: "{$1} Eintrag {$2} + RWAR"
+    external_reference: "Externe Referenz"
+    external_reference_with_path: "Externe Referenz: {$1}"
+    modified_archive_member: "Bearbeitete Archiv-Inhalte"
+    new_archive_member: "Neue Archiv-Inhalte"
+    whole_file_override: "Gesamte Datei überschreiben"
   hover:
     players_online:
       0: "Zurzeit sind keine Spieler online"
@@ -188,23 +202,23 @@ de:
       1: "Zurzeit ist nur 1 Freund online"
       n: "Zurzeit sind {$1} Freunde online"
     rooms_page_disclaimer: |-
-      Bitte beachte, dass diese Seite keine Funktion bietet, um dich mit einem Raum direkt zu verbinden.
-      Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund treffen oder hoffen, ihm beizutreten, indem du in den Online-Servern beitrittst.
-    friends_page_disclaimer: "Um Freunde hinzuzufügen musst du sie innerhalb des Spiels registrieren"
-    region_user_selection: "Dies zeigt dir Regionen, in denen DU gespielt hast."
-    primary_profile: "Dein Hauptprofil wird als Vergleich im Wheel Wizard Client verwendet."
+      Bitte beachte, dass diese Seite keine Funktion bietet, um dich direkt mit einem Raum zu verbinden.
+      Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund beitreten oder hoffen, dass du ihm über das normale Beitreten zum Server beitreten kannst.
+    friends_page_disclaimer: "Um Freunde hinzuzufügen, musst du sie im Spiel registrieren."
+    region_user_selection: "Dies zeigt dir nur Regionen an, in denen DU gespielt hast."
+    primary_profile: "Dein Hauptprofil wird als Referenz im Wheel Wizard Client verwendet."
   empty_content:
     no_profiles: "Du musst das Spiel mindestens ein Mal gespielt haben, um deine Profile hier aufgelistet zu sehen."
     no_friends_title: "Noch keine Freunde!"
     no_friends: "Du kannst Freunde im Spiel hinzufügen"
-    no_mods: "Mods können die Funktionsweise des Spiels verändern. Beginne mit dem Importieren deines ersten Mods, indem du auf die Schaltfläche unten klickst."
+    no_mods: "Mods können die Funktionsweise des Spiels verändern. Beginne mit dem Importieren deines ersten Mods, indem du auf den Knopf unten klickst."
     no_mods_title: "Keine Mods gefunden."
-    no_rooms: "Möglicherweise hast du keine Internetverbindung oder es spielt niemand."
+    no_rooms: "Möglicherweise hast du keine Internetverbindung oder es spielt gerade niemand."
     no_rooms_title: "Keine Räume gefunden."
     no_miis_title: "Noch keine Miis erstellt!"
-    no_miis: "Die Mii-Daten können nicht von deinem System aus geladen werden. Stelle sicher dass du dein Spiel mind. 1 Mal neu startest."
-    no_mod_selected_title: "Keine Mod ausgewähltt."
-    no_mod_selected: "Wähle eine Mod aus der Liste um mehr Details zu sehen."
+    no_miis: "Die Mii-Daten können nicht von deinem System geladen werden. Stelle sicher, dass du dein Spiel mindestens einmal gestartet hast."
+    no_mod_selected_title: "Keine Mod ausgewählt."
+    no_mod_selected: "Wähle eine Mod aus der Liste, um mehr Details zu sehen."
   time:
     days:
       1: "1 Tag"
@@ -225,16 +239,43 @@ de:
     installing_mods_count: "Installiere {$1} Mods"
     processing_xof_y: "{$1} von {$2} Dateien werden verarbeitet..."
     update_rr: "Retro Rewind wird aktualisiert"
-    latest_wh_wz_github: "Beziehe die neueste Wheel Wizard-Version vom Github"
+    latest_wh_wz_github: "Lade die neueste Wheel Wizard-Version von GitHub herunter"
     update_wh_wz: "Wheel Wizard wird aktualisiert"
     installing_rr: "Installiere Retro Rewind"
     installing_rr_first_time: "Installiere Retro Rewind zum ersten Mal"
     installing_dolphin: "Installiere Dolphin Emulator"
-    this_may_take_a_while: "Dies könnte eine Weile dauern je nach dem wie schnell dein Internet ist."
+    updating_dolphin: "Aktualisiere Dolphin Emulator"
+    this_may_take_a_while: "Je nach Internetgeschwindigkeit kann dies eine Weile dauern."
+    applying_converted_mod: "Konvertierter Mod anwenden"
+    combining_files: "Dateien kombinieren"
+    converting_file: "Konvertiere {$1}"
+    converting_files_count: "Konvertiere {$1} Datei(en)"
+    converting_mod_to_patches: "Konvertiere Mod zu Patches"
+    downloading_mod: "{$1} herunterladen"
+    installing_mod: "Installiere Mod"
+    preparing_files_count: "{$1} Datei(en) vorbereiten"
+    installing_recomp: "Installiere WiiCompiled"
+    updating_recomp: "Aktualisiere WiiCompiled"
+    recomp_checking_release: "Prüfe die aktuelle Version von WiiCompiled"
+    recomp_downloading_setup: "Den WiiCompiled Installer herunterladen"
+    recomp_running_setup: "Den WiiCompiled Installer ausführen"
+    recomp_finished: "WiiCompiled ist bereit zum Spielen"
+    recomp_copying_nand: "Kopiere deine Dolphin-Speicherdaten"
   question:
+    recomp_uninstall:
+      title: "WiiCompiled deinstallieren?"
+      extra_shared: "Dies entfernt die WiiCompiled-Installation. Die Speicherdaten bleiben in Dolphin's \"Wii\"-Ordner und Retro Rewind bleibt weiterhin installiert."
+      extra_private: "Dies entfernt die WiiCompiled-Installation inklusive den privaten Wii-Speicherdaten. Retro Rewind bleibt weiterhin installiert."
+      extra_copy: "Dies entfernt die WiiCompiled-Installation inklusive ihrer Kopie der Dolphin-Speicherdaten. Die Original-Dolphin-Speicherdaten werden nicht gelöscht und Retro Rewind bleibt weiterhin installiert."
+    recomp_use_dolphin_nand:
+      title: "Sollen die Dolphin-Speicherdaten verwendet werden?"
+      extra: "WiiCompiled kann mit den Speicherdaten, Miis und Freundescodes, die bereits in Dolphin genutzt werden, verwendet werden. Wenn nicht, werden diese Wii-Daten neu angelegt."
+    recomp_nand_mode:
+      title: "Sollen die Dolphin-Speicherdaten direkt verwendet werden?"
+      extra: "Dolphin rät davon ab, andere Programme direkten Zugriff auf die Wii-Daten (NAND) zu geben, da es zu Datenverlusten kommen kann, wenn zwei Programme gleichzeitig darauf schreiben. Durch eine Kopie bleibt WiiCompiled vollständig getrennt, allerdings werden die in einem Programm erzielten Fortschritte nicht im anderen angezeigt."
     launch_clear_mods_found:
       title: "Mods gefunden"
-      extra: "Du bist dabei, das Spiel ohne Mods zu starten. Möchtest du deinen My Stuff ordner leeren?"
+      extra: "Du bist dabei, das Spiel ohne Mods zu starten. Möchtest du deinen \"My Stuff\"-Ordner leeren?"
     sure_delete:
       title: "Bist du sicher, dass du {$1} löschen möchtest?"
       extra: "Löschen ist permanent und kann nicht rückgängig gemacht werden"
@@ -251,11 +292,17 @@ de:
 
         verschieben. Das könnte eine Weile dauern.
     dolphin_found:
-      title: "Dolphin Emulator Ordner gefunden"
+      title: "Dolphin Emulator-Ordner gefunden"
       extra: |
         Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
 
         Dolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?
+    dolphin_outdated:
+      title: "Die Dolphin Emulator-Version ist veraltet"
+      extra: |
+        Diese Dolphin-Version ({$1}) hat eine bekannte Sicherheitslücke, mit welcher schädliche Spieldateien, Mods, oder cheatende Online-Spieler deinen PC mit Malware infizieren können.
+
+        Update Dolphin auf die Version {$2} oder neuer, um sicher zu sein.
     dolphin_program_found:
       title: "Dolphin Emulator gefunden"
       extra: |
@@ -264,7 +311,7 @@ de:
         Dolphin Emulator gefunden. Möchtest du Folgendes verwenden?
     new_version_wh_wz:
       title: "Wheel Wizard Update verfügbar"
-      extra: "Version {$1} von Wheel Wizard ist verfügbar (derzeit für {$2}). Möchtest du jetzt updaten?"
+      extra: "Version {$1} von Wheel Wizard ist verfügbar (die derzeitige Version ist {$2}). Möchtest du jetzt updaten?"
     update_admin:
       title: "Update mit Admin"
       extra: "Manchmal erfordert ein Update Adminrechte. Möchtest du sie für dieses Update aktivieren?"
@@ -273,24 +320,28 @@ de:
       extra: "Bist du dir sicher, dass du Retro Rewind neu installieren möchtest?"
     old_rksys_found:
       title: "Alte rksys.dat gefunden"
-      extra: "Alte Speicherdaten wurden gefunden. Möchtest Du sie benutzen? (Empfohlen)"
+      extra: "Alte Speicherdaten wurden gefunden. Möchtest du sie benutzen? (Empfohlen)"
     rr_to_old:
-      extra: "Deine Version von Retro Rewind ist zu alt zum Aktualisieren. Möchtest du Retro Rewind neu installieren?"
       title: "Retro Rewind-Version ist zu alt."
+      extra: "Deine Version von Retro Rewind ist zu alt, um sie aktualisieren zu können. Möchtest du stattdessen Retro Rewind neu installieren?"
     rr_not_determined:
       title: "Installiere Retro Rewind"
       extra: "Deine Version von Retro Rewind konnte nicht ermittelt werden. Möchtest du Retro Rewind herunterladen?"
     dolphin_flatpak:
-      title: "Dolphin Flatpak Installation"
-      extra: "Die Flatpak Dolphin Version scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (für deinen eigenen Benutzer)?"
+      title: "Installation des Dolphin Flatpak"
+      extra: "Das Dolphin Flatpak scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (für deinen eigenen Benutzer)?"
     install_mod:
-      title: "Du bist dabei das Spiel ohne Mods zu starten. Möchtest du deinen My-Stuff Ordner leeren?"
+      title: "Möchtest du den Mod {$1} herunterladen und installieren?"
     search_mod: "Nach Mods suchen..."
     enter_new_name:
       title: "Einen neuen Namen eingeben"
       extra: "Name von {$1} ändern"
+    enter_mod_name:
+      title: "Mod-Name:"
+    launch_clear_patches_found:
+      extra: "Du bist dabei, das Spiel ohne Mods zu starten. Möchtest du deinen \"Patches\"-Ordner leeren? Startest du das Spiel trotzdem, bleiben die Patches aktiv!"
     apply_language_settings:
-      title: "Das jetzige Fenster wird sich schließen und ein neues wird sich mit den neuen Spracheinstellungen öffnen."
+      title: "Das aktuelle Fenster wird sich schließen und ein neues Fenster mit den aktualisierten Spracheinstellungen wird sich öffnen."
       extra: "Neue Spracheinstellungen anwenden?"
   message_warning:
     not_find_dolphin:
@@ -308,13 +359,19 @@ de:
       title: "Ungültige Pfade"
     dolphin_not_found:
       title: "Dolphin Emulator-Ordner nicht gefunden."
-      extra: "Der Ordner „Dolphin Emulator“ wurde nicht automatisch gefunden. Versuche bitte, den Ordner manuell zu finden. Für weitere Informationen einfach auf „Hilfe“ klicken."
+      extra: "Der Ordner „Dolphin Emulator“ wurde nicht automatisch gefunden. Versuche bitte, den Ordner manuell zu finden. Für weitere Informationen auf „Hilfe“ klicken."
+    dolphin_version_unverified:
+      title: "Die verwendete Dolphin Emulator-Version konnte nicht verifiziert werden"
+      extra: |
+        Wheel Wizard konnte die Version des eingerichteten Dolphin Emulator nicht lesen und kann daher nicht feststellen, ob die Sicherheitsupdates installiert sind.
+
+        Bitte verifiziere manuell, dass du Version {$1} oder neuer verwendest. Ältere Versionen haben eine bekannte Sicherheitslücke, mit welcher schädliche Spieldateien, Mods, oder cheatende Online-Spieler deinen PC mit Malware infizieren können.
     dolphin_tool_selected:
-      title: "Falsche Dolphin executable ausgewählt."
+      title: "Falsche Dolphin-Anwendung ausgewählt."
       extra: "Du hast \"DolphinTool.exe\" ausgewählt. Bitte wähle stattdessen \"Dolphin.exe\" (die Dolphin Anwendung)."
     fail_check_updates:
       title: "Die Suche nach Updates ist fehlgeschlagen."
-      extra: "Es ist nicht möglich gerade nach Updates zu suchen. Du bist vielleicht nicht mit dem Internet verbunden oder der Server hat gerade Schwierigkeiten."
+      extra: "Es ist gerade nicht möglich, nach Updates zu suchen. Du bist vielleicht nicht mit dem Internet verbunden oder der Server hat gerade Schwierigkeiten."
     unable_update_wh_wz:
       extra:
         reason_network: |
@@ -333,23 +390,25 @@ de:
       title: "Du kannst diese Mod nicht ansehen."
       extra:
         something_else: "Etwas ist schief gelaufen beim Ansehen dieser Mod."
-        not_from_browser: "Die Mod die über den Mod Browser heruntergeladen wurde kann nicht angesehen werden."
+        not_from_browser: "Diese Mod kann nicht angesehen werden, da sie nicht über den Mod Browser heruntergeladen wurde."
     cannot_delete_fav_mii:
-      title: "Mii(s) die als Favorit markiert sind, sind nicht löschbar."
-      extra: "Ein oder mehrere der ausgewählten Mii(s) ist ein Favorit. Miis die als Favorit makiert wurden können nur gelöscht werden wenn sie nicht mehr Favorit sind um zu verhindern dass aus Versehen Löschungen geschehen."
+      title: "Als Favorit markierte Miis können nicht gelöscht werden."
+      extra: "Ein oder mehrere der ausgewählten Mii(s) ist ein Favorit. Miis, die als Favorit markiert wurden, müssen zuerst entfavorisiert werden, um versehentlichen Löschungen vorzubeugen."
     mod_name_invalid:
-      title: "Mod Name nicht gültig."
-      extra: "Mod Name kann keine ungültigen Zeichen beinhalten."
+      title: "Mod-Name nicht gültig."
+      extra: "Mod-Name kann keine ungültigen Zeichen beinhalten."
     mod_name_empty:
       title: "Mod-Name darf nicht leer sein."
-      extra: "Bitte gib einen Namn für die Mod ein."
+      extra: "Bitte gib einen Namen für die Mod ein."
     unable_download_mod:
       title: "Konnte die Mod nicht herunterladen."
       extra: "Dateien konnten nicht gefunden werden."
+    could_not_convert_mod:
+      title: "Konnte Mod nicht konvertieren."
   placeholder:
-    enter_mod_name: "Gib Mod Namen ein..."
+    enter_mod_name: "Mod-Namen eingeben..."
     search_mod: "Suche nach Mods..."
-    enter_mii_name: "Gib Mii Namen ein..."
+    enter_mii_name: "Mii-Namen eingeben..."
     enter_text_here: "Gib Text ein..."
     search_for_players: "Suche nach Spielern..."
     enter_path: "Gewünschten Pfad hier eingeben..."
@@ -378,13 +437,13 @@ de:
     failed_change_mii:
       title: "Fehler beim Ändern des Miis."
     failed_install_dolphin:
-      title: "Die Installation von Dolphin ist schiefgelaufen."
-      extra: "Die Installation von Dolphin ist schiefgelaufen. Versuche manuell eine Flatpak Dolphin Version herunterzuladen."
+      title: "Die Installation von Dolphin ist fehlgeschlagen."
+      extra: "Die Installation von Dolphin ist fehlgeschlagen. Bitte versuche, das Dolphin Flatpak manuell zu installieren."
     failed_retrieve_mod:
-      title: "Es ist ein Fehler beim abrufen der Mod-Informationen aufgetreten."
+      title: "Es ist ein Fehler beim Abrufen der Mod-Informationen aufgetreten."
     mod_download_fail:
-      title: "Mod Download ist schiefgelaufen."
-      extra: "Ein Fehler ist während dem Dowload aufgetreten."
+      title: "Mod Download ist fehlgeschlagen."
+      extra: "Während dem Download ist ein Fehler aufgetreten: {$1}"
   message_success:
     settings_saved:
       title: "Einstellungen erfolgreich gespeichert!"
@@ -397,8 +456,16 @@ de:
     rr_up_to_date:
       title: "Retro Rewind ist auf dem neuesten Stand."
     mii_changed: "Mii erfolgreich geändert."
+    mod_converted_to_patches:
+      title: "Zu Patches konvertiert"
+    mod_installed:
+      extra: "Mod '{$1}' erfolgreich installiert."
+      title: "Mod erfolgreich installiert!"
+    patch_conversion_result: "{$1} Datei(en) in {$2} Patch-Datei(en) konvertiert."
+    patch_conversion_skipped: "{$1} Datei(en) wurden nicht geändert, da sie nicht konvertiert werden konnten."
+    patch_conversion_notes: "Hinweis(e): {$1}"
   snackbar_warning:
-    cant_save_mii: "Mii konnte nicht gespeichert werden"
+    cant_save_mii: "Mii konnte nicht gespeichert werden."
     no_mii_export: "Es gab keine Miis zum Exportieren."
     no_mii_delete: "Es gab keine Miis zum Löschen."
   snackbar_success:
@@ -406,74 +473,117 @@ de:
     copied_fc: "Freundescode wurde in die Zwischenablage kopiert"
     name_change: "Name erfolgreich zu '{$1}' geändert"
     saved_mii: "Mii '{$1}' wurde als Datei '{$2}' gespeichert"
-    deleted: "{$1}' wurde gelöscht"
+    deleted: "'{$1}' wurde gelöscht"
     deleted_miis: "{$1} Miis wurden gelöscht"
     created_duplicate: "{$1} wurde dupliziert"
     created_duplicates_miis: "{$1} duplizierte Miis erstellt"
     profile_set_primary: "Profil als Hauptprofil festlegen"
+    dolphin_updated: "Dolphin Emulator wurde aktualisiert"
   snackbar_error:
-    mii_failure_deserialize: "Daten von Mii '{$1}' konnten nicht verarbeitet werden."
+    mii_failure_deserialize: "Daten von Mii '{$1}' konnten nicht deserialisiert werden."
     mii_failure_update: "Mii '{$1}' konnte nicht aktualisiert werden."
     mii_failure_save: "Mii '{$1}' konnte nicht gespeichert werden."
     mii_failure_get: "Mii '{$1}' konnte nicht abgerufen werden."
-    mii_failure_serialize: "Daten von Mii '{$1}' konnten nicht verarbeitet werden."
+    mii_failure_serialize: "Daten von Mii '{$1}' konnten nicht serialisiert werden."
     mii_failure_create: "Mii '{$1}' konnte nicht erstellt werden."
     mii_failure_duplicate: "Mii '{$1}' konnte nicht dupliziert werden."
   helper_note:
     name_must_between: "Namen müssen zwischen 3 und 10 Zeichen lang sein."
     creator_name_less11: "Name des Ersteller muss weniger als 11 Zeichen lang sein."
     creator_name_less10: "Name des Ersteller muss weniger als 10 Zeichen lang sein."
+  file_picker:
+    select_mod_file: "Wähle Mod-Datei"
+  patch:
+    incompatible_mod:
+      message: "Dieser Mod ist nicht mit anderen Mods kompatibel. Wird das Spiel mit dieser Mod gestartet, kann es zu Fehlfunktionen oder Abstürzen kommen. Idealerweise sollte der Mod in einen Patch umgewandelt werden, indem mit der rechten Maustaste daraufgeklickt wird."
+      title: "Inkompatibler Mod"
+  warning:
+    brsar_external_count: "{$1} BRSAR-Dateieinträge sind externe Referenzen und können nicht exportiert werden."
+    brsar_file_id_external: "BRSAR fileId {$1} ist eine externe Dateireferenz und kann nicht exportiert werden."
+    brsar_file_id_unsupported_magic: "BRSAR fileId {$1} wurde geändert. Sie zeigt nun auf {$2} und Pulsar unterstützt nur RBNK/RSEQ/RWSD loose overrides."
+    brsar_file_id_unresolved: "BRSAR fileId {$1} konnte nicht zu einer unterstützten eingebetteten Sound-Datei aufgelöst werden."
+    brsar_no_supported_differences: "Gegenüber dem Basisspiel wurden keine unterstützten RBNK-/RSEQ-/RWSD-Änderungen gefunden."
+    brsar_unresolved_count: "{$1} eingebettete BRSAR-Dateieinträge konnten nicht erfolgreich aufgelöst werden."
+    brsar_unsupported_summary: "Nur RBNK/RSEQ/RWSD-Einträge können exportiert werden. Das gescannte Archiv enthält auch {$1}."
+    file_deletion_not_exportable: "{$1} existiert nur im Original-Archiv. Dateilöschungen können nicht als einzelne Patches exportiert werden."
+    file_name_differs_from_archive_tag: "Der ausgewählte Dateiname weicht vom ursprünglichen Tag im Archiv ab: \"{$1}.szs\"."
+    file_not_in_built_in_baseline: "{$1} ist im Basisspiel nicht vorhanden."
+    no_szs_differences: "Es wurden keine SZS-Änderungen gegenüber dem Basisspiel gefunden."
+    szs_matches_baseline: "Die ausgewählte SZS ist identisch gegenüber dem Basisspiel."
+    unsupported_loose_override_extension: "{$1} verwendet eine nicht unterstützte Dateiendung (.kcl, .kmp, .slt)."
+    whole_file_baseline: "Diese SZS ist als Überschreibung einer gesamten Datei gespeichert. Exportiere eine Überschreibung der gesamten Datei"
   option:
-    wh_wz_language: "Wheel Wizard Sprache"
+    wh_wz_language: "Wheel Wizard-Sprache"
     force_disable_wiimote: "Wiimote ausschalten erzwingen"
-    launch_with_dolphin: "Starte das Spiel mit dem Dolphin Fenster zusammen"
+    launch_with_dolphin: "Starte das Spiel zusammen mit dem Dolphin-Fenster"
+    launch_rr_on_startup: "Starte Retro Rewind beim Starten von Wheel Wizard"
     v_sync: "VSync"
     recommended: "Empfohlene Einstellungen"
     show_fps: "FPS anzeigen"
     renderer: "Renderer"
     window_scale: "Fenstergröße"
     open_config: "Konfigurationsordner öffnen"
-    wheel_wizard_data_folder: "Ordner für Wheel Wizard Daten"
+    wheel_wizard_data_folder: "Wheel Wizard-Datenordner"
     reset_data_folder: "Standard-Speicherort verwenden"
     dolphin_user_path: "Dolphin Benutzer-Ordner"
     mario_kart_game: "Mario Kart Wii Spiel-Datei"
-    dolphin_emulator_exe: "Dolphin Emulator Programm-Datei"
-    make_primary: "Hauptprofil"
+    dolphin_emulator_exe: "Dolphin Emulator Programmdatei"
+    make_primary: "Als Hauptprofil verwenden"
     remove_blur: "Unschärfe entfernen"
-    enable_animations: "Aktiviere Animationen"
+    enable_animations: "Animationen aktivieren"
     reinstall: "RR neu installieren"
     open_game_folder: "Spielordner öffnen"
     open_save_folder: "Speicherdatenordner öffnen"
+    enable_recomp: "Aktiviere WiiCompiled (Beta)"
+    recomp_use_dolphin_data: "Verwende Dolphin-Speicherdaten"
+    recomp_resolution: "Auflösung"
+    recomp_graphics_api: "Grafik-API"
+    recomp_prevent_stutters: "Verhindere Ruckler"
   section:
     language: "Sprache"
-    wii: "Wii Einstellungen"
+    wii: "Wii-Einstellungen"
     resolution: "Auflösung"
     performance: "Leistungseinstellungen"
-    renderer: "Renderer Einstellungen"
-    location_paths: "Dateispeicherort Einstellungen"
+    renderer: "Renderer-Einstellungen"
+    location_paths: "Dateispeicherort-Einstellungen"
     wh_wz_appearance: "Wheel Wizard Aussehen"
     installation: "Installation"
+    recomp: "WiiCompiled (Beta)"
+    recomp_dolphin_data: "Dolphin-Daten"
+    recomp_video: "Video"
   helper_text:
     topbar:
-      location_warning: "Einstellungen sind deaktiviert, komplettiere erst den Dateispeicherort"
-    launch_with_dolphin: "Wird Dolphins Hauptfenster mit dem Spiel starten"
-    force_disable_wiimote: "Diese Einstellung deaktiviert die Wiimote im Spiel, aber nutzt sie für den Wii-Kanal"
+      location_warning: "Einstellungen sind deaktiviert, vervollständige erst die Dateispeicherorte."
+    enable_recomp: "Verwende WiiCompiled, um das Spiel zu starten. Ist diese Option deaktiviert, wird Dolphin und Retro Rewind verwendet. Nur auf Windows."
+    recomp_use_dolphin_data: "Verwende Dolphin's \"Wii\"-Ordner, damit WiiCompiled Speicherdaten, Miis und Wii-Einstellungen von Dolphin verwenden kann. Die Änderung wird beim nächsten Start von WiiCompiled übernommen."
+    recomp_graphics_api: "WiiCompiled funktioniert nur mit DirectX 12 und Vulkan zuverlässig, deswegen werden keine anderen Optionen angeboten."
+    recomp_dolphin_data_not_found: "Setze zuerst einen existierenden Dolphin-Benutzerordner in den Wheel Wizard-Einstellungen. Der Ordner muss einen \"Wii\"-Ordner enthalten."
+    recomp_prevent_stutters: "Während ein Shader noch kompiliert wird, werden die Objekte, die ihn benötigen, für einige Frames übersprungen, anstatt dass das gesamte Spiel ins Stocken gerät, bis er fertig ist. So kommt es zu einem winzigen Pop-in statt zu Rucklern."
+    launch_with_dolphin: "Öffne Dolphins Hauptfenster zusammen mit dem Spiel."
+    force_disable_wiimote: "Diese Einstellung deaktiviert die Wiimote im Spiel, sie kann aber weiterhin für den Wii-Kanal verwendet werden."
     resolution_scale: "1x ist die native Auflösung"
-    recommended: "Diese Einstellung wird bestimmte Dolphin Einstellungen verändern, um Ruckeln und Lagspikes zu vermindern"
+    recommended: "Diese Einstellung wird bestimmte Dolphin-Einstellungen verändern, um Ruckeln und Lagspikes zu vermindern."
     30_fps: "Diese Einstellung erzwingt, dass das Spiel mit 30 FPS läuft (Standard ist 60)."
     wheel_wizard_data_folder: "Wähle aus, wo Wheel Wizard seine Dateien speichert. Das Verschieben könnte eine Weile dauern."
     end_with_exe: "Dateipfad muss mit .exe enden."
     enable_animations: "Dies aktiviert die Animationen in der Wheel Wizard App."
     end_with_x: "Pfad kann enden mit:"
-    wh_wz_language: "Dies ändert nur die Sprache innerhalb von Wheel Wizard. Um die Sprache innerhalb des Spiels zu ändern musst du das in den Spieleinstellungen vornehmen"
+    wh_wz_language: "Dies ändert nur die Sprache innerhalb von Wheel Wizard. Um die Sprache innerhalb des Spiels anzupassen, musst du das in den Spieleinstellungen ändern."
     optional: "Optional"
-    must_set_paths: "Du musst erst diese 3 Dateipfade bestimmen um Retro Rewind spielen zu können."
+    must_set_paths: "Du musst erst diese 3 Dateipfade setzen, um Retro Rewind spielen zu können."
+    must_set_game_path: "Du musst deine Mario Kart Wii-Spieldatei auswählen, um WiiCompiled spielen zu können."
   category:
-    video: "Video"
+    dolphin: "Dolphin"
     about: "Über"
     other: "Sonstiges"
     general: "Allgemein"
   status:
+    recomp_dolphin_data_not_linked: "Nicht verknüpft. WiiCompiled wird seine privaten Wii-Daten nutzen."
+    recomp_dolphin_data_linked: "Verwendet verknüpfte Dolphin-Daten von {$1}"
+    recomp_dolphin_data_copied: "Verwendet eine Kopie der Dolphin-Daten von {$1}"
+    recomp_dolphin_data_not_found: "Dolphin-Daten nicht gefunden."
+    recomp_not_installed: "WiiCompiled noch nicht installiert. Installiere es zuerst von der Startseite."
+    recomp_uninstalled: "WiiCompiled wurde deinstalliert."
     data_folder:
       default: "Standard-Speicherort wird verwendet."
       custom: "Verwendet benutzerdefinierten Speicherort"
@@ -496,4 +606,4 @@ de:
       norwegian: "Norwegisch"
       chinese: "Chinesisch"
       portuguese: "Portugisisch"
-      z_translators: "Weebo, kytronix, Gab, ToadetteHackFan"
+      z_translators: "Weebo, kytronix, Gab, ToadetteHackFan, TheJanzap"
