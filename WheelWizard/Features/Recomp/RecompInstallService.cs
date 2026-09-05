@@ -352,7 +352,7 @@ public sealed class RecompInstallService : IRecompInstallService
     )
     {
         // No platform guard here on purpose: AddRecomp() is the single gate, so this service only ever
-        // exists on Windows in the first place.
+        // exists only on supported platforms.
         if (!IsGameFileConfigured())
             return Fail(t("message_warning.not_find_game.extra"));
 
@@ -515,12 +515,22 @@ public sealed class RecompInstallService : IRecompInstallService
     private OperationResult UninstallCore()
     {
         _launchReconciled = false;
+        if (IsInstallationBusy())
+            return Fail(InstallationBusyMessage);
 
         // Only the recomp's own directories are removed. The shared Retro Rewind installation lives
         // outside them and survives on purpose: it belongs to WheelWizard's Dolphin frontend just as much.
         return TryCatch(
             () =>
             {
+                // Mac publication can leave these owned siblings after a cancelled build.
+                if (OperatingSystem.IsMacOS())
+                {
+                    DeleteFolderIfPresent(environment.InstallFolderPath + ".staging");
+                    DeleteFolderIfPresent(environment.InstallFolderPath + ".previous");
+                    if (fileSystem.File.Exists(environment.InstallFolderPath + ".config-backup"))
+                        fileSystem.File.Delete(environment.InstallFolderPath + ".config-backup");
+                }
                 DeleteFolderIfPresent(environment.InstallFolderPath);
                 DeleteFolderIfPresent(environment.UserDataFolderPath);
                 DeleteFolderIfPresent(environment.CacheFolderPath);
@@ -545,6 +555,12 @@ public sealed class RecompInstallService : IRecompInstallService
         CancellationToken cancellationToken
     )
     {
+        if (OperatingSystem.IsMacOS() && release.SetupDownloadUrl == new Uri(RecompPlatform.BundledSetupPath).AbsoluteUri)
+        {
+            return await SetupMatchesVersionAsync(RecompPlatform.BundledSetupPath, release.TagName, cancellationToken)
+                ? Ok(RecompPlatform.BundledSetupPath)
+                : Fail("The bundled Mac setup has an unexpected version.");
+        }
         var cachedSetupPath = fileSystem.Path.Combine(environment.CacheFolderPath, BuildCachedSetupFileName(release.TagName));
         if (IsUsableFile(cachedSetupPath) && await SetupMatchesVersionAsync(cachedSetupPath, release.TagName, cancellationToken))
         {
@@ -590,7 +606,12 @@ public sealed class RecompInstallService : IRecompInstallService
         {
             if (!fileSystem.Directory.Exists(environment.CacheFolderPath))
                 return;
-            foreach (var candidate in fileSystem.Directory.EnumerateFiles(environment.CacheFolderPath, "WiiCompiled-Setup-*.exe"))
+            foreach (
+                var candidate in fileSystem.Directory.EnumerateFiles(
+                    environment.CacheFolderPath,
+                    OperatingSystem.IsMacOS() ? "WiiCompiled-Setup-*.run" : "WiiCompiled-Setup-*.exe"
+                )
+            )
             {
                 if (string.Equals(candidate, keepFilePath, StringComparison.OrdinalIgnoreCase))
                     continue;
@@ -879,18 +900,35 @@ public sealed class RecompInstallService : IRecompInstallService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        // A locally built WheelWizard may ship a setup before its fork publishes a release.
+        RecompRelease? bundled = null;
+        if (OperatingSystem.IsMacOS() && fileSystem.File.Exists(RecompPlatform.BundledSetupPath))
+        {
+            await processRunner.RunAsync(
+                RecompPlatform.BundledSetupPath,
+                "--version",
+                null,
+                line =>
+                {
+                    if (RecompVersion.TryParse(line, out var version))
+                        bundled = new("v" + version, version, new Uri(RecompPlatform.BundledSetupPath).AbsoluteUri);
+                },
+                cancellationToken
+            );
+        }
         var releasesResult = await gitHubService.GetReleasesAsync(
-            RecompReleaseResolver.RepositoryOwner,
+            RecompPlatform.RepositoryOwner,
             RecompReleaseResolver.RepositoryName,
             count: 100
         );
         if (releasesResult.IsFailure)
         {
             logger.LogWarning("Could not retrieve the recomp releases: {Message}", releasesResult.Error.Message);
-            return null;
+            return bundled;
         }
 
-        return RecompReleaseResolver.FindLatest(releasesResult.Value);
+        var remote = RecompReleaseResolver.FindLatest(releasesResult.Value, RecompPlatform.ReleaseAssetName);
+        return bundled is not null && (remote is null || bundled.Version.ComparePrecedenceTo(remote.Version) >= 0) ? bundled : remote;
     }
 
     private RecompInstallState? ReadInstalledState()
@@ -968,7 +1006,7 @@ public sealed class RecompInstallService : IRecompInstallService
     private static string BuildCachedSetupFileName(string tagName)
     {
         var sanitized = new string(tagName.Select(character => char.IsLetterOrDigit(character) ? character : '-').ToArray());
-        return $"WiiCompiled-Setup-{sanitized}.exe";
+        return $"WiiCompiled-Setup-{sanitized}{(OperatingSystem.IsMacOS() ? ".run" : ".exe")}";
     }
 
     private static void Report(IProgress<RecompInstallProgress>? progress, string message, int percent) =>

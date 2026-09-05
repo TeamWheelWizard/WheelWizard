@@ -62,6 +62,11 @@ public class RecompLauncher(
             if (progressWindow.WasCancellationRequested || cancellationTokenSource.IsCancellationRequested)
                 return Fail("WiiCompiled launch preparation was cancelled.");
 
+            // Apply the current save-data preference even after an external install or a relink.
+            var nandResult = dolphinData.ApplyNandToRecompConfig();
+            if (nandResult.IsFailure)
+                return nandResult;
+
             // Reconciliation is the only cancellable progress phase. The launch call is
             // awaited through game exit.
             progressWindow.SetCancellationTokenSource(null);

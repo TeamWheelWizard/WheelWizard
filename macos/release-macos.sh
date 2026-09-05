@@ -9,6 +9,7 @@
 #   BUILD_ARCH   - "arm64" or "x64" (default: auto-detect)
 #   SKIP_BUILD   - Set to "true" to skip dotnet build
 #   OUTPUT_DIR   - Output directory (default: ./release)
+#   RECOMP_SETUP - Optional game-code-free WiiCompiled-Setup-macos-arm64.run to bundle
 #
 # No codesigning, no notarization, no DMG creation.
 # DMG is created by the GitHub Actions workflow using create-dmg action.
@@ -107,6 +108,14 @@ if [ -f "$MAC_DIRS/Contents/Resources/WheelWizard.icns" ]; then
     cp "$MAC_DIRS/Contents/Resources/WheelWizard.icns" "$APP_BUNDLE/Contents/Resources/WheelWizard.icns"
 fi
 
+# Bundle the native installer so local builds are usable before a GitHub release exists.
+if [ -n "${RECOMP_SETUP:-}" ]; then
+    [ "$BUILD_ARCH" = arm64 ] || { echo "RECOMP_SETUP requires BUILD_ARCH=arm64" >&2; exit 1; }
+    [ -s "$RECOMP_SETUP" ] || { echo "RECOMP_SETUP does not exist: $RECOMP_SETUP" >&2; exit 1; }
+    mkdir -p "$APP_BUNDLE/Contents/Resources"
+    cp "$RECOMP_SETUP" "$APP_BUNDLE/Contents/Resources/WiiCompiled-Setup-macos-arm64.run"
+fi
+
 # Set the bundle version from the release tag (e.g. "v2.5.1" -> "2.5.1"),
 # falling back to the version declared in the project file.
 if [ -n "${GITHUB_REF_NAME:-}" ]; then
@@ -122,6 +131,9 @@ else
     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $BUNDLE_VERSION" "$APP_BUNDLE/Contents/Info.plist"
 fi
 
+chmod +x "$APP_BUNDLE/Contents/MacOS/WheelWizard"
+codesign --force --deep --sign - "$APP_BUNDLE"
+codesign --verify --deep --strict "$APP_BUNDLE"
 echo "[INFO] .app bundle created successfully"
 
 # =============================================================================

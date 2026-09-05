@@ -4,7 +4,7 @@ using WheelWizard.Settings;
 namespace WheelWizard.Services.Launcher;
 
 /// <summary>
-/// Resolves the launcher the Home page should drive. The recomp is a Windows-only beta that, when
+/// Resolves the launcher the Home page should drive. The recomp is a native beta that, when
 /// opted into, replaces the Dolphin/Retro Rewind frontend entirely; which launcher that decision
 /// selects lives here, so no view has to re-derive it.
 /// </summary>

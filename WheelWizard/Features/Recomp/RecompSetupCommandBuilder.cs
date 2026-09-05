@@ -115,18 +115,13 @@ public static class RecompSetupCommandBuilder
     private static string RetroWfcPayloadArgument(RecompRetroWfcPayloadMode mode) =>
         mode == RecompRetroWfcPayloadMode.Skip ? "--skip-retro-wfc-payload" : "--download-retro-wfc-payload";
 
-    // The recomp is Windows only, so quoting is always Windows quoting (never the POSIX form EnvHelper would pick).
-    private static string Quote(string path)
+    // ProcessStartInfo uses double-quoted arguments on every platform; these are not shell commands.
+    internal static string Quote(string path)
     {
-        var value = path.Trim();
-
-        // A trailing backslash would escape the closing quote for CommandLineToArgvW, so drop redundant
-        // separators and double the one that has to stay (a drive root such as "D:\").
-        while (value.Length > 1 && value[^1] == '\\' && !value.EndsWith(@":\", StringComparison.Ordinal))
-            value = value[..^1];
-        if (value.EndsWith('\\'))
-            value += '\\';
-
-        return $"\"{value}\"";
+        // Match ProcessStartInfo's argv parser: backslashes are literal except immediately
+        // before quotes or the closing delimiter. No shell ever interprets this string.
+        var value = System.Text.RegularExpressions.Regex.Replace(path, @"(\\*)""", "$1$1\\\"");
+        value = System.Text.RegularExpressions.Regex.Replace(value, @"(\\+)$", "$1$1");
+        return "\"" + value + "\"";
     }
 }
