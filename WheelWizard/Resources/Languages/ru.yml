@@ -167,7 +167,7 @@ ru:
     mii_editor: "Редактор Mii"
     mii_carousel: "Карусель Mii"
   text:
-    made_by_string: |
+    made_by_string: |-
       Создатели: {$1}
       и {$2}
     thanks_translators: "Низкий поклон и спасибо переводчикам:"
@@ -217,7 +217,7 @@ ru:
     estimated_time_remaining: "Осталось примерно:"
     downloading_mb: "Загружено {$1} МБ"
     installing_mods: "Устанавливаем моды"
-    installing_mods_count: "Устанавливаем {$!} модов"
+    installing_mods_count: "Устанавливаем {$1} модов"
     processing_xof_y: "Обработка {$1} из {$2} файлов..."
     update_rr: "Обновляем Retro Rewind"
     latest_wh_wz_github: "Получаем последнюю версию Wheel Wizard из GitHub"
@@ -237,9 +237,8 @@ ru:
       title: "Хотите применить новый масштаб?"
     dolphin_found:
       title: "Папка эмулятора Dolphin найдена"
-      extra: |
+      extra: |-
         Если ты понятия не имеешь что это значит, просто нажми да :D
-
         Папка эмулятора Dolphin найдена. Хотите её использовать?
     new_version_wh_wz:
       title: "Доступно обновление Wheel Wizard"
@@ -283,13 +282,11 @@ ru:
       title: "Не удалось проверить обновления"
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Не удалось проверить, обновлён ли Wheel Wizard до последней версии?
-
           Вы возможно испытываете проблемы с подключеним.
-        reason_location: |
+        reason_location: |-
           Не удалось обновить Wheel Wizard. Пожалуйста убедитесь, что исполняемый файл находится в папке куда можно добавлять файлы.
-
           Не удалось найти текущую папку.
       title: "Не удалось обновить Wheel Wizard."
     no_connect_server:
@@ -365,12 +362,13 @@ ru:
     mario_kart_game: "Файл Mario Kart Wii"
     dolphin_emulator_exe: "Исполняемый файл (.exe) эмулятора Dolphin"
     make_primary: "Сделать основным"
-    remove_blur: "Отключить блюр"
     enable_animations: "Включить анимации"
     reinstall: "Переустановить Retro Rewind"
     open_game_folder: "Открыть папку с игрой"
     open_save_folder: "Открыть папку сохранения"
   section:
+    graphics: "Графика"
+    general: "Общие"
     language: "Язык"
     wii: "Настройки Wii"
     resolution: "Разрешение"
@@ -391,10 +389,10 @@ ru:
     enable_animations: "Эта настройка включает анимации в лаунчере Wheel Wizard."
     end_with_x: "Путь может заканчиваться на:"
   category:
-    video: "Видео"
     about: "О нас"
     other: "Другое"
     general: "Основное"
+    video: "Видео"
   value:
     language:
       france: "Французский"

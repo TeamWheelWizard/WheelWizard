@@ -16,10 +16,10 @@
             <ControlTemplate>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
                     
-                    <TextBlock Text="{TemplateBinding Text}"
-                                   VerticalAlignment="Center" FontSize="14" FontWeight="Bold"
-                                   Foreground="{TemplateBinding Foreground}"
-                                   Margin="0,2,5,2"/>
+                    <SelectableTextBlock Text="{TemplateBinding Text}"
+                                         VerticalAlignment="Center" FontSize="14" FontWeight="Bold"
+                                         Foreground="{TemplateBinding Foreground}"
+                                         Margin="0,2,5,2"/>
                     
                     
                      <Border Background="Transparent" Width="14" Height="14" 

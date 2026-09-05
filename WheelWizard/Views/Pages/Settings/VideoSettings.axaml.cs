@@ -9,6 +9,18 @@ namespace WheelWizard.Views.Pages.Settings;
 
 public partial class VideoSettings : UserControlBase
 {
+    private static readonly string[] ResolutionOptions =
+    [
+        "1x (640x528)",
+        "2x (1280x1056)",
+        "3x (1920x1584)",
+        "4x (2560x2112)",
+        "5x (3200x2640)",
+        "6x (3840x3168)",
+        "7x (4480x3696)",
+        "8x (5120x4224)",
+    ];
+
     private readonly bool _settingsAreDisabled;
 
     [Inject]
@@ -21,20 +33,18 @@ public partial class VideoSettings : UserControlBase
         DisabledWarningText.IsVisible = _settingsAreDisabled;
         VideoBorder.IsEnabled = !_settingsAreDisabled;
 
+        foreach (var resolution in ResolutionOptions)
+            ResolutionDropdown.Items.Add(resolution);
+
         if (!_settingsAreDisabled)
             LoadSettings();
         ForceLoadSettings();
 
         // Attach event handlers after loading settings to avoid unwanted triggers
-        foreach (RadioButton rb in ResolutionStackPanel.Children)
-        {
-            rb.Checked += UpdateResolution;
-        }
-
+        ResolutionDropdown.SelectionChanged += ResolutionDropdown_OnSelectionChanged;
         VSyncButton.IsCheckedChanged += VSync_OnClick;
         RecommendedButton.IsCheckedChanged += Recommended_OnClick;
         ShowFPSButton.IsCheckedChanged += ShowFPS_OnClick;
-        RemoveBlurButton.IsCheckedChanged += RemoveBlur_OnClick;
         RendererDropdown.SelectionChanged += RendererDropdown_OnSelectionChanged;
         DisableForce.IsCheckedChanged += ClickForceWiimote;
         LaunchWithDolphin.IsCheckedChanged += ClickLaunchWithDolphinWindow;
@@ -56,16 +66,11 @@ public partial class VideoSettings : UserControlBase
         VSyncButton.IsChecked = SettingsService.Get<bool>(SettingsService.VSYNC);
         RecommendedButton.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMMENDED_SETTINGS);
         ShowFPSButton.IsChecked = SettingsService.Get<bool>(SettingsService.SHOW_FPS);
-        RemoveBlurButton.IsChecked = SettingsService.Get<bool>(SettingsService.REMOVE_BLUR);
         DisableForce.IsChecked = SettingsService.Get<bool>(SettingsService.FORCE_WIIMOTE);
         LaunchWithDolphin.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_WITH_DOLPHIN);
 
-        var finalResolution = SettingsService.Get<int>(SettingsService.INTERNAL_RESOLUTION);
-        foreach (RadioButton radioButton in ResolutionStackPanel.Children)
-        {
-            var tag = radioButton.Tag?.ToString();
-            radioButton.IsChecked = string.Equals(tag, finalResolution.ToString(), StringComparison.Ordinal);
-        }
+        var resolution = SettingsService.Get<int>(SettingsService.INTERNAL_RESOLUTION);
+        ResolutionDropdown.SelectedIndex = resolution is >= 1 and <= 8 ? resolution - 1 : -1;
     }
 
     private void ForceLoadSettings()
@@ -84,13 +89,10 @@ public partial class VideoSettings : UserControlBase
         }
     }
 
-    private void UpdateResolution(object? sender, RoutedEventArgs e)
+    private void ResolutionDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is RadioButton radioButton && radioButton.IsChecked == true)
-        {
-            if (int.TryParse(radioButton.Tag?.ToString(), out var resolution))
-                SettingsService.Set(SettingsService.INTERNAL_RESOLUTION, resolution);
-        }
+        if (ResolutionDropdown.SelectedIndex >= 0)
+            SettingsService.Set(SettingsService.INTERNAL_RESOLUTION, ResolutionDropdown.SelectedIndex + 1);
     }
 
     private void VSync_OnClick(object? sender, RoutedEventArgs e)
@@ -106,11 +108,6 @@ public partial class VideoSettings : UserControlBase
     private void ShowFPS_OnClick(object? sender, RoutedEventArgs e)
     {
         SettingsService.Set(SettingsService.SHOW_FPS, ShowFPSButton.IsChecked == true);
-    }
-
-    private void RemoveBlur_OnClick(object? sender, RoutedEventArgs e)
-    {
-        SettingsService.Set(SettingsService.REMOVE_BLUR, RemoveBlurButton.IsChecked == true);
     }
 
     private void RendererDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)

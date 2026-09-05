@@ -43,6 +43,7 @@ public enum MessageTranslation
     Warning_ModNameInvalid = 1010,
     Warning_UnableToDownloadMod_Files = 1011,
     Warning_DolphinToolSelected = 1012,
+    Warning_RecompOperationCancelled = 2013,
 
     #endregion
 
@@ -145,6 +146,10 @@ public static class MessageTranslationHelper
             MessageTranslation.Warning_UnableToDownloadMod_Files => (
                 t("message_warning.unable_download_mod.title"),
                 t("message_warning.unable_download_mod.extra")
+            ),
+            MessageTranslation.Warning_RecompOperationCancelled => (
+                t("message_warning.recomp_operation_cancelled.title"),
+                t("message_warning.recomp_operation_cancelled.extra")
             ),
 
             #endregion
