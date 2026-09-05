@@ -250,7 +250,7 @@ pt:
     preparing_files_count: "A preparar {$1} ficheiro(s)"
   question:
     launch_clear_mods_found:
-      title: "Mods não encontrados"
+      title: "Mods encontrados"
       extra: "Tu estás prestes a abrir o jogo sem nenhum mod. Queres limpar a pasta my-stuff?"
     sure_delete:
       title: "Tens a certeza que desejas apagar {$1}?"

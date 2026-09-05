@@ -37,6 +37,7 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="CornerRadius" Value="{DynamicResource GlobalCornerRadius}" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="Padding" Value="16,10" />
         <Setter Property="Template">
             <ControlTemplate>

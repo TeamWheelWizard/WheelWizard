@@ -39,7 +39,6 @@ public class Button : Avalonia.Controls.Button // Change to TemplatedControl
     // Constructor
     public Button()
     {
-        FontSize = 14;
         // No need for InitializeComponent() in code-behind for TemplatedControl
         UpdateStyleClasses(Variant);
         UpdateSizeClass(ButtonSize);

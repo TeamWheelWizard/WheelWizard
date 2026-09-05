@@ -85,6 +85,8 @@ public partial class RecompSettings : UserControlBase
     private async Task RefreshWiiCompiledVersionAsync()
     {
         var version = RecompInstallService is null ? null : await RecompInstallService.GetInstalledVersionAsync();
+        if (!IsInstalled)
+            return;
         WiiCompiledVersionText.Text = t("helper_text.installed_version", version ?? t("state.unknown"));
     }
 

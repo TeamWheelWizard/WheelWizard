@@ -179,7 +179,6 @@ public class RecompLauncher(
             return Ok();
         }
 
-        dolphinData.SetSharingEnabled(true);
         var copyNand = await new YesNoWindow()
             .SetMainText(t("question.recomp_nand_mode.title"))
             .SetExtraText(t("question.recomp_nand_mode.extra"))
@@ -188,6 +187,7 @@ public class RecompLauncher(
         if (!copyNand)
         {
             dolphinData.SetCopyEnabled(false);
+            dolphinData.SetSharingEnabled(true);
             return Ok();
         }
 
