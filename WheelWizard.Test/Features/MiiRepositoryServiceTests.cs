@@ -46,6 +46,7 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         var sourceBytes = _fileSystem.File.ReadAllBytes(DbPath(_sourceNand));
         Assert.True(_dolphinData.CopyNandForRecomp().IsSuccess);
         _copyEnabled = true;
+        _useDolphinData = false;
         _recompEnabled = true;
 
         Assert.NotNull(_repository.GetRawBlockByAvatarId(1));
@@ -55,6 +56,7 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         Assert.Equal(sourceBytes, _fileSystem.File.ReadAllBytes(DbPath(_sourceNand)));
 
         _copyEnabled = false;
+        _useDolphinData = true;
         Assert.NotNull(_repository.GetRawBlockByAvatarId(1));
         Assert.Null(_repository.GetRawBlockByAvatarId(2));
 
@@ -112,7 +114,7 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         var sourceBytes = _fileSystem.File.ReadAllBytes(DbPath(_sourceNand));
         _recompEnabled = true;
         _copyEnabled = missingCopy;
-        _useDolphinData = missingCopy;
+        _useDolphinData = false;
 
         Assert.False(_repository.Exists());
         Assert.Empty(_repository.LoadAllBlocks());
