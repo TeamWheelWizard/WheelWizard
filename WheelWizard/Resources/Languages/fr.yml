@@ -257,6 +257,7 @@ fr:
     preparing_files_count: "Préparation de {$1} fichier(s)"
     installing_recomp: "Installation de WiiCompiled"
     updating_recomp: "Mise à jour WiiCompiled"
+    uninstalling_recomp: "Désinstallation de WiiCompiled"
     recomp_checking_release: "Recherche de la dernière version de WiiCompiled"
     recomp_downloading_setup: "Téléchargement de l'installateur de WiiCompiled"
     recomp_running_setup: "Exécution de l'installateur WiiCompiled"
