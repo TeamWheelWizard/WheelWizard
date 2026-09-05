@@ -110,8 +110,16 @@ public static class PathManager
 
     /// <summary>The marker file whose presence makes <see cref="RecompFolderPath"/> a portable root.</summary>
     public static string RecompPortableMarkerFilePath => Path.Combine(RecompFolderPath, "portable.txt");
-    public static string WiiDbFolder => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib");
-    public static string MiiDbFile => Path.Combine(WiiDbFolder, "RFL_DB.dat");
+
+    /// <summary>The recomp runtime's private NAND, used when no Dolphin NAND is linked.</summary>
+    public static string RecompPrivateNandFolderPath => Path.Combine(RecompUserDataFolderPath, "NAND");
+
+    public static string GetWiiDbFolderPath(string nandFolderPath) => Path.Combine(nandFolderPath, "shared2", "menu", "FaceLib");
+
+    public static string GetMiiDbFilePath(string nandFolderPath) => Path.Combine(GetWiiDbFolderPath(nandFolderPath), "RFL_DB.dat");
+
+    public static string WiiDbFolder => GetWiiDbFolderPath(WiiFolderPath);
+    public static string MiiDbFile => GetMiiDbFilePath(WiiFolderPath);
     public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRRating.pul");
 
     /// <summary>The file the recomp setup writes to mark a directory as one of its installations.</summary>
