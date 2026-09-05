@@ -1,6 +1,8 @@
 ﻿using System.IO.Abstractions;
 using WheelWizard.Helpers;
+using WheelWizard.Recomp;
 using WheelWizard.Services;
+using WheelWizard.Settings;
 using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
@@ -52,14 +54,31 @@ public interface IMiiRepositoryService
     OperationResult ForceCreateDatabase();
 }
 
-public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositoryService
+public class MiiRepositoryServiceService(
+    IFileSystem fileSystem,
+    ISettingsManager settings,
+    IRecompDolphinDataService? recompDolphinData = null
+) : IMiiRepositoryService
 {
     private const int MiiLength = 74;
     private const int MaxMiiSlots = 100;
     private const int CrcOffset = 0x1F1DE;
     private const int HeaderOffset = 0x04;
     private static readonly byte[] EmptyMii = Enumerable.Repeat((byte)0x00, MiiLength).ToArray();
-    private string _miiDbFilePath => PathManager.MiiDbFile;
+    private string _miiDbFilePath
+    {
+        get
+        {
+            if (!settings.IsRecompModeActive())
+                return PathManager.MiiDbFile;
+
+            // Resolve on every operation: the repository is a singleton and NAND choices can change.
+            // Match the launcher's selection, including the runtime's private NAND when no linked
+            // NAND is available. A missing copy must never send Mii edits to Dolphin's source NAND.
+            var nandFolder = recompDolphinData?.NandFolderPath ?? Path.Combine(PathManager.RecompUserDataFolderPath, "NAND");
+            return Path.Combine(nandFolder, "shared2", "menu", "FaceLib", "RFL_DB.dat");
+        }
+    }
 
     public List<byte[]> LoadAllBlocks()
     {
