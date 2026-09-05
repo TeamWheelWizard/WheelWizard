@@ -75,8 +75,8 @@ public class MiiRepositoryServiceService(
             // Resolve on every operation: the repository is a singleton and NAND choices can change.
             // Match the launcher's selection, including the runtime's private NAND when no linked
             // NAND is available. A missing copy must never send Mii edits to Dolphin's source NAND.
-            var nandFolder = recompDolphinData?.NandFolderPath ?? Path.Combine(PathManager.RecompUserDataFolderPath, "NAND");
-            return Path.Combine(nandFolder, "shared2", "menu", "FaceLib", "RFL_DB.dat");
+            var nandFolder = recompDolphinData?.NandFolderPath ?? PathManager.RecompPrivateNandFolderPath;
+            return PathManager.GetMiiDbFilePath(nandFolder);
         }
     }
 
