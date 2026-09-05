@@ -31,6 +31,7 @@ public static class RecompExtensions
         services.AddSingleton<IRecompEnvironment, RecompEnvironment>();
         services.AddSingleton<IRecompProcessRunner, RecompProcessRunner>();
         services.AddSingleton<IRecompSetupDownloader, RecompSetupDownloader>();
+        services.AddSingleton<IRecompRetroWfcPayloadProbe, RecompRetroWfcPayloadProbe>();
         services.AddSingleton<IRecompInstallService, RecompInstallService>();
         services.AddTransient<RecompLauncher>();
 

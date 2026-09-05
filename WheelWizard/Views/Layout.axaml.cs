@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -419,6 +419,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     private void Github_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
 
     private void Support_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+
+    private void SupportUs_OnClick(object? sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
     private void About_Click(object? sender, RoutedEventArgs e) => NavigationManager.NavigateTo<SettingsPage>(new AppInfo());
 
