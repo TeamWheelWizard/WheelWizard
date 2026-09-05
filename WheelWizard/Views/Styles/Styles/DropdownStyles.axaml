@@ -16,9 +16,9 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="MaxDropDownHeight" Value="230"/>
-        <Setter Property="FontSize" Value="16"/>
-        <Setter Property="Height" Value="35"/>
-        <Setter Property="Padding" Value="8" />
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Padding" Value="6" />
         <Setter Property="BorderThickness" Value="3" />
         
         <Style Selector="^:pointerover /template/ Border#Background">
@@ -65,9 +65,9 @@
     <Style Selector="ComboBoxItem">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        <Setter Property="FontSize" Value="16"/>
-        <Setter Property="Height" Value="35"/>
-        <Setter Property="Padding" Value="8" />
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Padding" Value="6" />
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Background" Value="{StaticResource Neutral700}" />
         <Setter Property="Foreground" Value="{StaticResource Neutral200}" />

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.Helpers;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.LiveData;
+using WheelWizard.Shared;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities;
@@ -58,6 +59,14 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
     private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
 
     private void ClearCache_OnClick(object sender, RoutedEventArgs e) => ((MemoryCache)Cache).Clear();
+
+    private void HideDevelopmentFeatures_OnClick(object sender, RoutedEventArgs e)
+    {
+        DevelopmentMode.Hide();
+        HttpClientHelper.FakeConnectionToInternet = true;
+        ViewUtils.GetLayout().HideDevelopmentFeatures();
+        Close();
+    }
 
     private async void MiiChannel_OnClick(object? sender, RoutedEventArgs e) =>
         await DolphinLaunchHelper.LaunchDolphin(" -b -n 0001000248414341");

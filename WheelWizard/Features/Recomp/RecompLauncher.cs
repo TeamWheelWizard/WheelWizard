@@ -4,6 +4,7 @@ using WheelWizard.Mods;
 using WheelWizard.Recomp.Domain;
 using WheelWizard.Services;
 using WheelWizard.Services.Launcher;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Recomp;
@@ -57,10 +58,12 @@ public class RecompLauncher(
             progressWindow.Show();
             var reconciliation = await installService.ReconcileForLaunchAsync(progress, cancellationTokenSource.Token);
             if (reconciliation.IsFailure)
-                return reconciliation;
+                return IsCancellationRequested(progressWindow, cancellationTokenSource)
+                    ? CancellationWarning("WiiCompiled launch preparation was cancelled.")
+                    : reconciliation;
 
-            if (progressWindow.WasCancellationRequested || cancellationTokenSource.IsCancellationRequested)
-                return Fail("WiiCompiled launch preparation was cancelled.");
+            if (IsCancellationRequested(progressWindow, cancellationTokenSource))
+                return CancellationWarning("WiiCompiled launch preparation was cancelled.");
 
             // Reconciliation is the only cancellable progress phase. The launch call is
             // awaited through game exit.
@@ -70,7 +73,7 @@ public class RecompLauncher(
         }
         catch (OperationCanceledException)
         {
-            return Fail("WiiCompiled launch preparation was cancelled.");
+            return CancellationWarning("WiiCompiled launch preparation was cancelled.");
         }
         finally
         {
@@ -160,7 +163,7 @@ public class RecompLauncher(
         if (sourceNand is null)
         {
             // There is no Dolphin data to offer, so the recomp simply starts with its own.
-            dolphinData.SetEnabled(false);
+            dolphinData.SetSharingEnabled(false);
             dolphinData.SetCopyEnabled(false);
             return Ok();
         }
@@ -171,12 +174,11 @@ public class RecompLauncher(
             .AwaitAnswer();
         if (!useDolphinData)
         {
-            dolphinData.SetEnabled(false);
+            dolphinData.SetSharingEnabled(false);
             dolphinData.SetCopyEnabled(false);
             return Ok();
         }
 
-        dolphinData.SetEnabled(true);
         var copyNand = await new YesNoWindow()
             .SetMainText(t("question.recomp_nand_mode.title"))
             .SetExtraText(t("question.recomp_nand_mode.extra"))
@@ -185,6 +187,7 @@ public class RecompLauncher(
         if (!copyNand)
         {
             dolphinData.SetCopyEnabled(false);
+            dolphinData.SetSharingEnabled(true);
             return Ok();
         }
 
@@ -204,6 +207,7 @@ public class RecompLauncher(
         // Flipped only after the copy durably exists, so a failed copy can never leave the settings
         // pointing at a NAND that is not there.
         dolphinData.SetCopyEnabled(true);
+        dolphinData.SetSharingEnabled(false);
         return Ok();
     }
 
@@ -229,11 +233,13 @@ public class RecompLauncher(
 
             var retroRewindResult = await EnsureRetroRewindCurrentAsync(progressWindow, cancellationTokenSource.Token);
             if (retroRewindResult.IsFailure)
-                return retroRewindResult.Error;
+                return IsCancellationRequested(progressWindow, cancellationTokenSource)
+                    ? CancellationWarning("WiiCompiled installation was cancelled.")
+                    : retroRewindResult.Error;
 
             var retroRewindCommitted = retroRewindResult.Value;
-            if (!retroRewindCommitted && (progressWindow.WasCancellationRequested || cancellationTokenSource.IsCancellationRequested))
-                return Fail("WiiCompiled update was cancelled.");
+            if (!retroRewindCommitted && IsCancellationRequested(progressWindow, cancellationTokenSource))
+                return CancellationWarning("WiiCompiled installation was cancelled.");
 
             if (retroRewindCommitted)
             {
@@ -247,21 +253,32 @@ public class RecompLauncher(
             // The Retro Rewind commit is a barrier: once it is durable, the matching recomp
             // check (and any repair it demands) must run to completion, so it is deliberately
             // handed an uncancellable token. Whatever the backend reports is the truth.
-            return await installService.InstallAsync(
+            var installResult = await installService.InstallAsync(
                 progress,
                 ConfirmOfflineInstallAsync,
                 retroRewindCommitted ? CancellationToken.None : cancellationTokenSource.Token
             );
+
+            // A successful terminal result wins a race with Cancel. Otherwise, a cancellation that
+            // was still allowed at this point is a user-controlled warning, not an unknown error.
+            return installResult.IsFailure && !retroRewindCommitted && IsCancellationRequested(progressWindow, cancellationTokenSource)
+                ? CancellationWarning("WiiCompiled installation was cancelled.")
+                : installResult;
         }
         catch (OperationCanceledException)
         {
-            return Fail("WiiCompiled update was cancelled.");
+            return CancellationWarning("WiiCompiled installation was cancelled.");
         }
         finally
         {
             progressWindow.Close();
         }
     }
+
+    private static bool IsCancellationRequested(ProgressWindow progressWindow, CancellationTokenSource cancellationTokenSource) =>
+        progressWindow.WasCancellationRequested || cancellationTokenSource.IsCancellationRequested;
+
+    private static OperationError CancellationWarning(string message) => Fail(message, MessageTranslation.Warning_RecompOperationCancelled);
 
     /// <summary>
     /// Asked by the install service only when a Retro Rewind build is needed and the Retro-WFC payload

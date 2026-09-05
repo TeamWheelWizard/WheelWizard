@@ -55,14 +55,10 @@ public static class Logging
     private static void LogPlatformInformation()
     {
         // ReSharper disable once RedundantAssignment
-        var modeCheck = "release";
+        var modeCheck = Shared.DevelopmentMode.IsEnabled ? "debug" : "release";
 
         // ReSharper disable once ConvertToConstant.Local
         var osCheck = "unknown";
-
-#if DEBUG
-        modeCheck = "debug";
-#endif
 
 #if WINDOWS
         osCheck = "windows";

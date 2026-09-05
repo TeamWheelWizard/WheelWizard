@@ -167,9 +167,9 @@ tr:
     mii_editor: "Mii Düzenleyicisi"
     mii_carousel: "Mii Görüntüleyicisi"
   text:
-    made_by_string: |
+    made_by_string: |-
       Yapımcı: {$1}
-      ve {$2}
+      Ve {$2}
     thanks_translators: "Tüm çevirmenlere çok teşekkür ederiz:"
     wh_wz_translation_percentage: "Bu dilin çevirileri {$1}% tamamlandı"
     powered_gamebanana: "GameBanana tarafından"
@@ -244,9 +244,8 @@ tr:
       extra: "Bu değişiklik onaylamadığınız takdirde {$1} içinde eski haline dönecek."
     dolphin_found:
       title: "Dolphin Emulator Klasörü Bulundu"
-      extra: |
+      extra: |-
         Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz :)
-
         Dolphin Emulator klasörü bulundu. Bu klasörü kullanmak ister misiniz?
     new_version_wh_wz:
       title: "Wheel Wizard Güncellemesi Mevcut"
@@ -297,13 +296,11 @@ tr:
       extra: "Şu an güncellemeler kontrol edilemiyor. İnternete bağlı olmayabilirsiniz veya sunucular çalışmıyor olabilir."
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Wheel Wizard'ın güncel olup olmadığını kontrol edilemedi.
-
           Ağ sorunları yaşıyor olabilirsiniz.
-        reason_location: |
+        reason_location: |-
           Wheel Wizard güncellenemedi. Uygulamanın erişilebilir bir klasörde bulunduğundan emin olun.
-
           İstenilen klasör bulunamadı.
       title: "Wheel Wizard güncellenemedi."
     no_connect_server:
@@ -340,9 +337,8 @@ tr:
       extra:
         failed_update_delete: "Güncelleme dosyalarını silmek başarısız oldu. İşlem iptal ediliyor."
         failed_update_apply: "Güncellemeyi uygulamak başarısız oldu. İşlem iptal ediliyor."
-        invalid_file_path: |
+        invalid_file_path: |-
           Yanlış dosya yolu tespit edildi. Lütfen geliştiricilere bildirin.
-
           Sunucu hatası: {$1}
       title: "Retro Rewind güncellemesi iptal ediliyor"
     restart_admin_fail:
@@ -409,12 +405,13 @@ tr:
     mario_kart_game: "Mario Kart Wii Oyun Dosyası"
     dolphin_emulator_exe: "Dolphin Emulator yürütülebilir dosyası"
     make_primary: "Birincil Yap"
-    remove_blur: "Bulanıklığı Kaldır"
     enable_animations: "Animasyonları Etkinleştir"
     reinstall: "Retro Rewind'ı Tekrar Kur"
     open_game_folder: "Oyun Klasörünü Aç"
     open_save_folder: "Kayıt Klasörünü Aç"
   section:
+    graphics: "Grafik"
+    general: "Genel"
     language: "Dil"
     wii: "Wii Ayarları"
     resolution: "Çözünürlük"
@@ -434,14 +431,13 @@ tr:
     end_with_exe: "Yol, .exe ile bitmelidir."
     enable_animations: "Bu, Wheel Wizard uygulamasındaki animasyonları etkinleştirir."
     end_with_x: "Yol, bunlar ile bitebilir:"
-    wh_wz_language: "Bu sadece Wheel Wizard'ın dilini değiştirir. Oyun içi dili değiştirmek için oyundaki ayarları kullanın."
     optional: "Opsiyonel"
     must_set_paths: "Retro Rewind'ı oynayabilmek için önce bu üç yolu ayarlamanız gerekiyor"
   category:
-    video: "Video"
     about: "Hakkında"
     other: "Diğer"
     general: "Genel"
+    video: "Video"
   value:
     language:
       france: "Fransızca"

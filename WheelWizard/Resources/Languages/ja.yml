@@ -167,7 +167,7 @@ ja:
     mii_editor: "Miiエディター"
     mii_carousel: "Miiスライダー"
   text:
-    made_by_string: |
+    made_by_string: |-
       作成者: {$1}
       と {$2}
     thanks_translators: "すべての翻訳者さんに感謝します:"
@@ -246,9 +246,8 @@ ja:
       extra: "変更の保存を選択しないと、この変更は{$1}で変更前に戻ります"
     dolphin_found:
       title: "Dolphinエミュレーターのフォルダーが見つかりました"
-      extra: |
+      extra: |-
         意味がよく分からなければ、「はい」をクリックしてください。
-
         Dolphinエミュレーターのフォルダーが見つかりました。このフォルダーを使用しますか？
     new_version_wh_wz:
       title: "Wheel Wizardのアップデートがあります"
@@ -301,13 +300,11 @@ ja:
       extra: "現在アップデートを確認できません。インターネットに接続されていないか、サーバーがダウンしている可能性があります"
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Wheel Wizardが最新かどうか確認できません。
-
           ネットワークの問題が発生している可能性があります。
-        reason_location: |
+        reason_location: |-
           Wheel Wizardが更新できません。アプリが書き込み可能なフォルダーにあることを確認してください。
-
           現在のフォルダーが見つかりません。
       title: "Wheel Wizardのアップデートを無効にする"
     no_connect_server:
@@ -344,10 +341,9 @@ ja:
       extra:
         failed_update_delete: "アップデートファイルの削除に失敗しました。中止しています。"
         failed_update_apply: "アップデートの適用に失敗しました。中止しています。"
-        invalid_file_path: |
+        invalid_file_path: |-
           無効なファイルパスが検知されました。開発者に連絡してください。
-
-          サーバーエラー: {$1}
+          サーバーエラー:  {$1}
       title: "Retro Rewindのアップデートを中止"
     restart_admin_fail:
       extra: "管理者権限で再起動するのに失敗しました。"
@@ -413,12 +409,13 @@ ja:
     mario_kart_game: "マリオカートWiiのゲームファイル"
     dolphin_emulator_exe: "Dolphinエミュレーターを実行可能にする"
     make_primary: "このライセンスに切り替える"
-    remove_blur: "ブラー効果の無効化"
     enable_animations: "アニメーションを有効にする"
     reinstall: "Retro Rewindの再インストール"
     open_game_folder: "ゲームフォルダーを開く"
     open_save_folder: "セーブフォルダーを開く"
   section:
+    graphics: "グラフィックス"
+    general: "一般"
     language: "言語"
     wii: "Wii設定"
     resolution: "解像度"
@@ -438,14 +435,13 @@ ja:
     end_with_exe: "パスの拡張子は必ず .exe にしてください"
     enable_animations: "Wheel Wizard内のアニメーションを有効にします"
     end_with_x: "パスは次のもので終わります:"
-    wh_wz_language: "これはWheel Wizardの言語のみ変更します。ゲーム内の言語を変更したい場合、ゲーム設定内で変更する必要があります"
     optional: "任意"
     must_set_paths: "Retro Rewindをプレイする前に、これらの3つのパスを設定する必要があります"
   category:
-    video: "映像"
     about: "情報"
     other: "その他"
     general: "一般"
+    video: "映像"
   value:
     language:
       france: "フランス語"

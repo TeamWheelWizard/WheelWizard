@@ -48,7 +48,6 @@ public interface ISettingsProperties
     Setting ENABLE_ANIMATIONS { get; }
     Setting TESTING_MODE_ENABLED { get; }
     Setting SAVED_WINDOW_SCALE { get; }
-    Setting REMOVE_BLUR { get; }
     Setting RR_REGION { get; }
     Setting WW_LANGUAGE { get; }
     Setting NAND_ROOT_PATH { get; }

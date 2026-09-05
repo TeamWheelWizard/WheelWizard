@@ -1,6 +1,7 @@
 using Avalonia.Controls.Primitives;
 using WheelWizard.Branding;
 using WheelWizard.CustomDistributions;
+using WheelWizard.Shared;
 using WheelWizard.Shared.DependencyInjection;
 
 namespace WheelWizard.Views.Pages.Settings;
@@ -19,11 +20,8 @@ public partial class AppInfo : UserControlBase
 
         RrVersionText.Text = "RR: " + CustomDistributionSingletonService.RetroRewind.GetCurrentVersion();
 
-        var part1 = "Release";
+        var part1 = DevelopmentMode.IsEnabled ? "Dev" : "Release";
         var part2 = "Unknown OS";
-#if DEBUG
-        part1 = "Dev";
-#endif
         // We intentionally use preprocessor directives (#if, #elif, #endif) instead of Environment.OSVersion
         // because 'part2' represents the OS this code was built for, not the OS it is currently running on.
 #if WINDOWS

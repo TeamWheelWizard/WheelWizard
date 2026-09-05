@@ -161,7 +161,7 @@ cs:
     rooms: "Místnosti"
     miis: "Miiy"
   text:
-    made_by_string: |
+    made_by_string: |-
       Vytvořili: {$1}
       a {$2}
     thanks_translators: "Díky moc všem překladatelům:"
@@ -202,16 +202,16 @@ cs:
   time:
     days:
       1: "1 den"
-      n: "($1) dny"
+      n: "{$1} dny"
     hours:
       1: "1 hodina"
-      n: "($1) hodiny"
+      n: "{$1} hodiny"
     minutes:
       1: "1 minuta"
-      n: "($1) minuty"
+      n: "{$1} minuty"
     seconds:
       1: "1 sekunda"
-      n: "($1) sekundy"
+      n: "{$1} sekundy"
   progress:
     estimated_time_remaining: "Předpokládaný zbývající čas:"
     downloading_mb: "Stahování {$1} MB"
@@ -362,12 +362,13 @@ cs:
     dolphin_user_path: "Uživatelská Složka Dolphin"
     mario_kart_game: "Soubor Hry Mario Kart Wii"
     dolphin_emulator_exe: "Spustitelný soubor Dolphin Emulator"
-    remove_blur: "Odstranit Rozmazání"
     enable_animations: "Zapnout Animace"
     reinstall: "Reinstalovat RR"
     open_game_folder: "Otevřít Složku Hry"
     open_save_folder: "Otevřít Složku Uložení"
   section:
+    graphics: "Grafika"
+    general: "Obecné"
     language: "Jazyk"
     wii: "Nastavení Wii"
     resolution: "Rozlišení"
@@ -384,14 +385,13 @@ cs:
     end_with_exe: "Cesta musí končit .exe"
     enable_animations: "To aktivuje animace v aplikaci Wheel Wizard"
     end_with_x: "Cesta může končit:"
-    wh_wz_language: "Tím se změní pouze jazyk pro Wheel Wizard. Chceš-li změnit jazyk ve hře, musíš to udělat v nastavení hry."
     optional: "Volitelný"
     must_set_paths: "Musíš nastavit tyto 3 cesty než začneš hrát Retro Rewind."
   category:
-    video: "Video"
     about: "O tomto"
     other: "Ostatní"
     general: "Obecný"
+    video: "Video"
   value:
     language:
       france: "Francouzština"

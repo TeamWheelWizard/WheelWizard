@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import datetime as dt
+import re
 import sys
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from pathlib import Path
 LANGUAGE_DIR = Path(__file__).resolve().parent
 TRANSLATOR_KEY = "value.language.z_translators"
 TRANSLATOR_EXPORT_HINT = "Put your name here if you contributed."
-NEWLINE_NORMALIZED_IMPORT_KEYS = {"hover.rooms_page_disclaimer"}
+TRANSLATION_KEY_PATTERN = re.compile(r"^[a-z0-9_]+(?:\.[a-z0-9_]+)*$")
 
 
 def parse_yaml_file(path: Path) -> tuple[str, dict]:
@@ -46,7 +47,7 @@ def parse_yaml_file(path: Path) -> tuple[str, dict]:
                 root_code = key
             continue
 
-        if raw_value == "|-":
+        if raw_value in {"|", "|-", "|+"}:
             block_lines: list[str] = []
             block_indent = indent + 2
             while index < len(lines):
@@ -61,7 +62,7 @@ def parse_yaml_file(path: Path) -> tuple[str, dict]:
                 else:
                     block_lines.append("")
 
-            current[key] = "\n".join(block_lines)
+            current[key] = normalize_newlines("\n".join(block_lines))
             continue
 
         current[key] = unquote_yaml_value(raw_value)
@@ -91,7 +92,7 @@ def unquote_yaml_value(value: str) -> str:
         result.append(char)
         index += 1
 
-    return "".join(result)
+    return normalize_newlines("".join(result))
 
 
 def write_yaml_file(path: Path, language_code: str, values: dict) -> None:
@@ -112,7 +113,7 @@ def append_yaml_dict(lines: list[str], values: dict, indent: int) -> None:
         if "\n" in text or "\r" in text:
             lines.append(f"{prefix}{key}: |-")
             for block_line in text.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
-                lines.append(" " * (indent + 2) + block_line)
+                lines.append(" " * (indent + 2) + block_line if block_line else "")
             continue
 
         lines.append(f'{prefix}{key}: "{quote_yaml_value(text)}"')
@@ -179,6 +180,8 @@ def ordered_translation_keys(languages: dict[str, dict[str, str]]) -> list[str]:
         for key in languages[language_code]:
             if key in seen:
                 continue
+            if not TRANSLATION_KEY_PATTERN.fullmatch(key):
+                continue
 
             seen.add(key)
             keys.append(key)
@@ -203,7 +206,7 @@ def export_csv() -> Path:
                 if code == "en" and key == TRANSLATOR_KEY:
                     row_values.append(TRANSLATOR_EXPORT_HINT)
                 else:
-                    row_values.append(languages[code].get(key, ""))
+                    row_values.append(normalize_export_value(languages[code].get(key, "")))
 
             writer.writerow([key, *row_values])
 
@@ -322,10 +325,23 @@ def ask_for_csv_path() -> Path | None:
 
 
 def normalize_import_value(key: str, value: str) -> str:
-    if key not in NEWLINE_NORMALIZED_IMPORT_KEYS:
-        return value
+    return normalize_newlines(value)
 
-    return value.replace("\\r\\n", "\n").replace("\\n", "\n")
+
+def normalize_export_value(value: str) -> str:
+    normalized = value.replace("\r\n", "\n").replace("\r", "\n")
+    return normalized.replace("\n", "\\n")
+
+
+def normalize_newlines(value: str) -> str:
+    normalized = value.replace("\\r\\n", "\n").replace("\\n", "\n")
+    return "\n".join(line.strip() for line in normalized.split("\n"))
+
+
+def normalize_yaml_files() -> None:
+    for path in sorted(LANGUAGE_DIR.glob("*.yml")):
+        language_code, values = parse_yaml_file(path)
+        write_yaml_file(path, language_code, values)
 
 
 def ask_mode() -> str:
@@ -348,6 +364,11 @@ def main() -> int:
 
         if mode in {"2", "i", "import"}:
             import_csv()
+            return 0
+
+        if mode in {"n", "normalize"}:
+            normalize_yaml_files()
+            print("Normalized translation YAML files")
             return 0
 
         print("Nothing selected.")
