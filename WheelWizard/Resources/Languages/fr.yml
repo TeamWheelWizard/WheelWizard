@@ -113,7 +113,7 @@ fr:
     install: "Installer"
     update: "Mettre à Jour"
     import: "Importer"
-    clone: "Cloner"
+    clone: "Copier"
     convert_to_patches: "Convertir en Patchs"
     enable_all: "Tout Activer"
     disable_all: "Tout Désactiver"
