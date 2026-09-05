@@ -12,6 +12,7 @@ using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
+using SettingsButton = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Pages.Settings;
 
@@ -400,14 +401,21 @@ public partial class WhWzSettings : UserControlBase
         SetLocationRowState(
             DolphinExecutableCompleteIcon,
             DolphinExecutableWarningIcon,
+            DolphinExecutableChangeButton,
             SettingsService.DOLPHIN_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(PathManager.DolphinFilePath)
         );
         SetLocationRowState(
             GameLocationCompleteIcon,
             GameLocationWarningIcon,
+            GameLocationChangeButton,
             SettingsService.GAME_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(PathManager.GameFilePath)
         );
-        SetLocationRowState(DolphinUserFolderCompleteIcon, DolphinUserFolderWarningIcon, SettingsService.USER_FOLDER_PATH.IsValid());
+        SetLocationRowState(
+            DolphinUserFolderCompleteIcon,
+            DolphinUserFolderWarningIcon,
+            DolphinUserFolderChangeButton,
+            SettingsService.USER_FOLDER_PATH.IsValid()
+        );
 
         LocationWarningIcon.IsVisible = !SettingsService.PathsSetupCorrectly();
         DolphinExecutableOpenButton.IsEnabled = CanOpenContainingFolder(PathManager.DolphinFilePath);
@@ -415,10 +423,11 @@ public partial class WhWzSettings : UserControlBase
         DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(PathManager.UserFolderPath);
     }
 
-    private static void SetLocationRowState(PathIcon completeIcon, PathIcon warningIcon, bool isValid)
+    private static void SetLocationRowState(PathIcon completeIcon, PathIcon warningIcon, SettingsButton changeButton, bool isValid)
     {
         completeIcon.IsVisible = isValid;
         warningIcon.IsVisible = !isValid;
+        changeButton.Variant = isValid ? SettingsButton.ButtonsVariantType.Default : SettingsButton.ButtonsVariantType.Warning;
     }
 
     private static bool CanOpenContainingFolder(string filePath)

@@ -14,6 +14,7 @@ using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
+using WheelWizard.Shared;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities.RepeatedTasks;
@@ -101,9 +102,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         GameLicenseService.Subscribe(this);
         ModManagerService.PropertyChanged += ModManager_PropertyChanged;
         _ = ReloadModsAndShowErrorsAsync();
-#if DEBUG
-        KitchenSinkButton.IsVisible = true;
-#endif
+        KitchenSinkButton.IsVisible = DevelopmentMode.IsEnabled;
         UpdateOtherSectionVisibility();
     }
 
@@ -368,6 +367,14 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     private void UpdateOtherSectionVisibility()
     {
         OtherSectionText.IsVisible = TestingButton.IsVisible || KitchenSinkButton.IsVisible;
+    }
+
+    public void HideDevelopmentFeatures()
+    {
+        KitchenSinkButton.IsVisible = false;
+        UpdateOtherSectionVisibility();
+        if (ContentArea.Content is SettingsPage settingsPage)
+            settingsPage.HideDevelopmentFeatures();
     }
 
     private void SidebarInfoButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
