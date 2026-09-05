@@ -37,6 +37,10 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
         CancellationToken cancellationToken = default
     )
     {
+        var cancellationFile =
+            OperatingSystem.IsMacOS() && cancellationToken.CanBeCanceled
+                ? Path.Combine(Path.GetTempPath(), "mkwc-cancel-" + Guid.NewGuid().ToString("N"))
+                : null;
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -50,6 +54,9 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             var startInfo = CreateStartInfo(fileName, arguments, workingDirectory);
             if (cancellationEvent is not null)
                 startInfo.Environment[CancellationEventEnvironmentVariable] = cancellationEventName;
+
+            if (cancellationFile is not null)
+                startInfo.Environment["MKWCOMPILED_CANCEL_FILE"] = cancellationFile;
 
             using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
@@ -79,9 +86,10 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             }
             catch (OperationCanceledException)
             {
-                var exited = cancellationEvent is not null
-                    ? await CancelAndWaitForExitAsync(process, cancellationEvent)
-                    : await KillAndWaitForExitAsync(process);
+                var exited =
+                    cancellationEvent is not null || cancellationFile is not null
+                        ? await CancelAndWaitForExitAsync(process, cancellationEvent, cancellationFile)
+                        : await KillAndWaitForExitAsync(process);
                 if (!exited)
                     throw;
 
@@ -102,13 +110,30 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             logger.LogError(exception, "Failed to run '{FileName}'", fileName);
             return Fail(exception);
         }
+        finally
+        {
+            if (cancellationFile is not null)
+            {
+                try
+                {
+                    File.Delete(cancellationFile);
+                }
+                catch (IOException exception)
+                {
+                    logger.LogDebug(exception, "Could not remove cancellation signal");
+                }
+            }
+        }
     }
 
     private static ProcessStartInfo CreateStartInfo(string fileName, string arguments, string? workingDirectory) =>
         new()
         {
-            FileName = fileName,
-            Arguments = arguments,
+            FileName = OperatingSystem.IsMacOS() && fileName.EndsWith(".run", StringComparison.Ordinal) ? "/bin/bash" : fileName,
+            Arguments =
+                OperatingSystem.IsMacOS() && fileName.EndsWith(".run", StringComparison.Ordinal)
+                    ? RecompSetupCommandBuilder.Quote(fileName) + " " + arguments
+                    : arguments,
             WorkingDirectory = string.IsNullOrWhiteSpace(workingDirectory) ? string.Empty : workingDirectory,
             UseShellExecute = false,
             // The recomp setup is CLI-only. Wheel Wizard supplies the UI, including during launch,
@@ -118,11 +143,13 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             RedirectStandardError = true,
         };
 
-    private async Task<bool> CancelAndWaitForExitAsync(Process process, EventWaitHandle cancellationEvent)
+    private async Task<bool> CancelAndWaitForExitAsync(Process process, EventWaitHandle? cancellationEvent, string? cancellationFile)
     {
         try
         {
-            cancellationEvent.Set();
+            cancellationEvent?.Set();
+            if (cancellationFile is not null)
+                await File.WriteAllTextAsync(cancellationFile, "cancel");
         }
         catch (Exception exception)
         {

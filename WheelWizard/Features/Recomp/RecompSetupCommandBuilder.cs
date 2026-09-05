@@ -45,7 +45,7 @@ public static class RecompSetupCommandBuilder
         {
             arguments.Add("--retro-dir");
             arguments.Add(Quote(request.RetroRewindFolderPath));
-            arguments.Add(RetroWfcPayloadArgument);
+            arguments.Add(RetroWfcPayloadArgument(request.RetroWfcPayloadMode));
         }
 
         return string.Join(' ', arguments);
@@ -56,7 +56,11 @@ public static class RecompSetupCommandBuilder
     /// toolkit the installation already owns instead of an embedded payload. Every repair receives the
     /// Retro Rewind source and exactly one Retro-WFC payload option, as the contract requires.
     /// </summary>
-    public static string BuildRepairProductsArguments(string installFolderPath, string retroRewindFolderPath)
+    public static string BuildRepairProductsArguments(
+        string installFolderPath,
+        string retroRewindFolderPath,
+        RecompRetroWfcPayloadMode retroWfcPayloadMode = RecompRetroWfcPayloadMode.Download
+    )
     {
         if (string.IsNullOrWhiteSpace(installFolderPath))
             throw new ArgumentException("An install directory is required.", nameof(installFolderPath));
@@ -70,7 +74,7 @@ public static class RecompSetupCommandBuilder
             Quote(installFolderPath),
             "--retro-dir",
             Quote(retroRewindFolderPath),
-            RetroWfcPayloadArgument,
+            RetroWfcPayloadArgument(retroWfcPayloadMode),
             "--progress-json"
         );
     }
@@ -106,22 +110,18 @@ public static class RecompSetupCommandBuilder
     /// </summary>
     public static string BuildVersionArguments() => "--version";
 
-    // The contract requires exactly one payload option (--download-retro-wfc-payload or
-    // --skip-retro-wfc-payload) whenever --retro-dir is passed; WheelWizard always downloads.
-    private const string RetroWfcPayloadArgument = "--download-retro-wfc-payload";
+    // The contract requires exactly one payload option whenever --retro-dir is passed. WheelWizard
+    // downloads unless the payload service is unreachable and the user chose an offline-only build.
+    private static string RetroWfcPayloadArgument(RecompRetroWfcPayloadMode mode) =>
+        mode == RecompRetroWfcPayloadMode.Skip ? "--skip-retro-wfc-payload" : "--download-retro-wfc-payload";
 
-    // The recomp is Windows only, so quoting is always Windows quoting (never the POSIX form EnvHelper would pick).
-    private static string Quote(string path)
+    // ProcessStartInfo uses double-quoted arguments on every platform; these are not shell commands.
+    internal static string Quote(string path)
     {
-        var value = path.Trim();
-
-        // A trailing backslash would escape the closing quote for CommandLineToArgvW, so drop redundant
-        // separators and double the one that has to stay (a drive root such as "D:\").
-        while (value.Length > 1 && value[^1] == '\\' && !value.EndsWith(@":\", StringComparison.Ordinal))
-            value = value[..^1];
-        if (value.EndsWith('\\'))
-            value += '\\';
-
-        return $"\"{value}\"";
+        // Match ProcessStartInfo's argv parser: backslashes are literal except immediately
+        // before quotes or the closing delimiter. No shell ever interprets this string.
+        var value = System.Text.RegularExpressions.Regex.Replace(path, @"(\\*)""", "$1$1\\\"");
+        value = System.Text.RegularExpressions.Regex.Replace(value, @"(\\+)$", "$1$1");
+        return "\"" + value + "\"";
     }
 }

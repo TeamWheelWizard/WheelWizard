@@ -39,7 +39,17 @@ public interface IRecompInstallService : IDisposable
     /// Installs a missing/newer setup release, or asks the installed setup host what needs doing and
     /// repairs only that. An asset-only Retro Rewind change reports <c>current</c> and does no work.
     /// </summary>
-    Task<OperationResult> InstallAsync(IProgress<RecompInstallProgress>? progress = null, CancellationToken cancellationToken = default);
+    /// <param name="confirmOfflineInstall">
+    /// Consulted only when a fresh Retro Rewind build is needed and the Retro-WFC payload service is
+    /// unreachable. Returning true builds without online play; false or <see langword="null"/> fails the
+    /// install with an explanation instead. An installation that already embeds a payload never asks: the
+    /// setup host falls back to its own verified copy.
+    /// </param>
+    Task<OperationResult> InstallAsync(
+        IProgress<RecompInstallProgress>? progress = null,
+        Func<Task<bool>>? confirmOfflineInstall = null,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Verifies product health immediately before launch and repairs only what the check demands.
@@ -86,11 +96,15 @@ public sealed class RecompInstallService : IRecompInstallService
     // installation is probed by pattern rather than by recomputing the backend's own path.
     private const string OperationLockSearchPattern = ".mkwc-operation-*.lock";
 
+    private const string RetroWfcUnavailableMessage =
+        "The Retro WFC servers are not responding, so WiiCompiled cannot set up online play right now. Try again later, or install without online play.";
+
     private static readonly JsonSerializerOptions InstallStateJsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     private readonly IRecompEnvironment environment;
     private readonly IRecompProcessRunner processRunner;
     private readonly IRecompSetupDownloader downloader;
+    private readonly IRecompRetroWfcPayloadProbe payloadProbe;
     private readonly IGitHubSingletonService gitHubService;
     private readonly IFileSystem fileSystem;
     private readonly ILogger<RecompInstallService> logger;
@@ -105,6 +119,7 @@ public sealed class RecompInstallService : IRecompInstallService
         IRecompEnvironment environment,
         IRecompProcessRunner processRunner,
         IRecompSetupDownloader downloader,
+        IRecompRetroWfcPayloadProbe payloadProbe,
         IGitHubSingletonService gitHubService,
         IFileSystem fileSystem,
         ILogger<RecompInstallService> logger
@@ -113,6 +128,7 @@ public sealed class RecompInstallService : IRecompInstallService
         this.environment = environment;
         this.processRunner = processRunner;
         this.downloader = downloader;
+        this.payloadProbe = payloadProbe;
         this.gitHubService = gitHubService;
         this.fileSystem = fileSystem;
         this.logger = logger;
@@ -149,13 +165,60 @@ public sealed class RecompInstallService : IRecompInstallService
         if (installationBusy)
             logger.LogInformation("The WiiCompiled product check could not run because the installation is busy");
 
-        return RecompStatusResolver.Resolve(
+        var status = RecompStatusResolver.Resolve(
             IsGameFileConfigured(),
             hasInstalledHost ? installedVersion : null,
             latestRelease?.TagName,
             products?.IsSuccess == true ? products.Value : null,
             installationBusy
         );
+
+        // A build that skipped the payload is healthy as far as the host is concerned, but it cannot
+        // play online. Once the payload service is back, that is an update worth offering.
+        if (
+            status is (WheelWizardStatus.Ready or WheelWizardStatus.NoServerButInstalled)
+            && await RetroWfcUpgradeAvailableAsync(state, cancellationToken)
+        )
+            return WheelWizardStatus.OutOfDate;
+
+        return status;
+    }
+
+    /// <summary>
+    /// Whether the installed Retro Rewind product was built without a Retro-WFC payload while the payload
+    /// service is reachable again. Only a skipped installation ever probes, so a normal one costs nothing.
+    /// </summary>
+    private async Task<bool> RetroWfcUpgradeAvailableAsync(RecompInstallState? state, CancellationToken cancellationToken) =>
+        state is { IsRetroWfcPayloadSkipped: true } && await payloadProbe.IsReachableAsync(cancellationToken);
+
+    /// <summary>
+    /// Decides which payload option the next setup operation receives. The rules live in
+    /// <see cref="RecompRetroWfcPayloadPolicy"/>; this only supplies the probe and the user's answer.
+    /// </summary>
+    private async Task<OperationResult<RecompRetroWfcPayloadMode>> ResolveRetroWfcPayloadModeAsync(
+        RecompInstallState? state,
+        Func<Task<bool>>? confirmOfflineInstall,
+        CancellationToken cancellationToken
+    )
+    {
+        var hasRetroRewindSource = !string.IsNullOrWhiteSpace(environment.RetroRewindFolderPath);
+        var serviceReachable =
+            !RecompRetroWfcPayloadPolicy.NeedsServiceProbe(state, hasRetroRewindSource)
+            || await payloadProbe.IsReachableAsync(cancellationToken);
+
+        switch (RecompRetroWfcPayloadPolicy.Decide(state, hasRetroRewindSource, serviceReachable))
+        {
+            case RecompRetroWfcPayloadDecision.Download:
+                return Ok(RecompRetroWfcPayloadMode.Download);
+            case RecompRetroWfcPayloadDecision.Skip:
+                return Ok(RecompRetroWfcPayloadMode.Skip);
+            default:
+                if (confirmOfflineInstall is null || !await confirmOfflineInstall())
+                    return Fail(RetroWfcUnavailableMessage);
+
+                logger.LogInformation("The Retro-WFC payload service is unreachable; installing WiiCompiled without online play");
+                return Ok(RecompRetroWfcPayloadMode.Skip);
+        }
     }
 
     /// <summary>
@@ -265,6 +328,7 @@ public sealed class RecompInstallService : IRecompInstallService
 
     public async Task<OperationResult> InstallAsync(
         IProgress<RecompInstallProgress>? progress = null,
+        Func<Task<bool>>? confirmOfflineInstall = null,
         CancellationToken cancellationToken = default
     )
     {
@@ -273,7 +337,7 @@ public sealed class RecompInstallService : IRecompInstallService
 
         try
         {
-            return await InstallCoreAsync(progress, cancellationToken);
+            return await InstallCoreAsync(progress, confirmOfflineInstall, cancellationToken);
         }
         finally
         {
@@ -281,36 +345,52 @@ public sealed class RecompInstallService : IRecompInstallService
         }
     }
 
-    private async Task<OperationResult> InstallCoreAsync(IProgress<RecompInstallProgress>? progress, CancellationToken cancellationToken)
+    private async Task<OperationResult> InstallCoreAsync(
+        IProgress<RecompInstallProgress>? progress,
+        Func<Task<bool>>? confirmOfflineInstall,
+        CancellationToken cancellationToken
+    )
     {
         // No platform guard here on purpose: AddRecomp() is the single gate, so this service only ever
-        // exists on Windows in the first place.
+        // exists only on supported platforms.
         if (!IsGameFileConfigured())
             return Fail(t("message_warning.not_find_game.extra"));
 
         Report(progress, t("progress.recomp_checking_release"), 0);
-        var installedVersion = ReadInstalledVersion();
+        var state = ReadInstalledState();
+        var installedVersion = string.IsNullOrWhiteSpace(state?.SetupVersion) ? null : state.SetupVersion;
         var hasInstalledHost = fileSystem.File.Exists(environment.InstalledSetupFilePath);
         var release = await TryGetLatestReleaseAsync(cancellationToken);
+
+        // Decided up front, before any download or build, so the user is asked while nothing has started
+        // yet rather than after a multi-minute build has already failed on the payload.
+        var payloadModeResult = await ResolveRetroWfcPayloadModeAsync(state, confirmOfflineInstall, cancellationToken);
+        if (payloadModeResult.IsFailure)
+            return payloadModeResult.Error;
+        var payloadMode = payloadModeResult.Value;
+
+        // A skipped installation that can download again is an update in its own right: the host only
+        // rebuilds when told the payload choice changed, and --check-products alone never says so.
+        var forceRetroRebuild = state is { IsRetroWfcPayloadSkipped: true } && payloadMode == RecompRetroWfcPayloadMode.Download;
 
         // A repair is deliberately independent of GitHub: once a setup host has been installed,
         // it owns the installed toolkit/workspace and can bring changed compile inputs current offline.
         if (release is null)
         {
             if (hasInstalledHost && await InstalledHostCanRepairAsync(installedVersion, cancellationToken))
-                return await RepairWhatTheCheckDemandsAsync(progress, cancellationToken);
+                return await RepairWhatTheCheckDemandsAsync(progress, payloadMode, forceRetroRebuild, cancellationToken);
 
             return Fail("Could not verify a current WiiCompiled setup release or installed repair host.");
         }
 
         if (hasInstalledHost && await InstalledHostCanRepairAsync(release.TagName, cancellationToken))
-            return await RepairWhatTheCheckDemandsAsync(progress, cancellationToken);
+            return await RepairWhatTheCheckDemandsAsync(progress, payloadMode, forceRetroRebuild, cancellationToken);
 
         var setupResult = await EnsureSetupDownloadedAsync(release, progress, cancellationToken);
         if (setupResult.IsFailure)
             return setupResult.Error;
 
-        return await RunSilentInstallAsync(setupResult.Value, progress, cancellationToken);
+        return await RunSilentInstallAsync(setupResult.Value, payloadMode, progress, cancellationToken);
     }
 
     public async Task<OperationResult> ReconcileForLaunchAsync(
@@ -346,7 +426,19 @@ public sealed class RecompInstallService : IRecompInstallService
         if (!await SetupMatchesVersionAsync(environment.InstalledSetupFilePath, state.SetupVersion, cancellationToken))
             return Fail("The installed WiiCompiled host does not match its current install state.");
 
-        var repairResult = await RepairWhatTheCheckDemandsCoreAsync(progress, reportCompletion: false, cancellationToken);
+        // A launch never asks about offline play and never forces the payload upgrade: the user pressed
+        // Play, not Update. A repair the check demands anyway still gains the payload when it is reachable.
+        var payloadModeResult = await ResolveRetroWfcPayloadModeAsync(state, confirmOfflineInstall: null, cancellationToken);
+        if (payloadModeResult.IsFailure)
+            return payloadModeResult.Error;
+
+        var repairResult = await RepairWhatTheCheckDemandsCoreAsync(
+            progress,
+            payloadModeResult.Value,
+            forceRetroRebuild: false,
+            reportCompletion: false,
+            cancellationToken
+        );
         if (repairResult.IsFailure)
             return repairResult;
 
@@ -423,12 +515,22 @@ public sealed class RecompInstallService : IRecompInstallService
     private OperationResult UninstallCore()
     {
         _launchReconciled = false;
+        if (IsInstallationBusy())
+            return Fail(InstallationBusyMessage);
 
         // Only the recomp's own directories are removed. The shared Retro Rewind installation lives
         // outside them and survives on purpose: it belongs to WheelWizard's Dolphin frontend just as much.
         return TryCatch(
             () =>
             {
+                // Mac publication can leave these owned siblings after a cancelled build.
+                if (OperatingSystem.IsMacOS())
+                {
+                    DeleteFolderIfPresent(environment.InstallFolderPath + ".staging");
+                    DeleteFolderIfPresent(environment.InstallFolderPath + ".previous");
+                    if (fileSystem.File.Exists(environment.InstallFolderPath + ".config-backup"))
+                        fileSystem.File.Delete(environment.InstallFolderPath + ".config-backup");
+                }
                 DeleteFolderIfPresent(environment.InstallFolderPath);
                 DeleteFolderIfPresent(environment.UserDataFolderPath);
                 DeleteFolderIfPresent(environment.CacheFolderPath);
@@ -453,6 +555,12 @@ public sealed class RecompInstallService : IRecompInstallService
         CancellationToken cancellationToken
     )
     {
+        if (OperatingSystem.IsMacOS() && release.SetupDownloadUrl == new Uri(RecompPlatform.BundledSetupPath).AbsoluteUri)
+        {
+            return await SetupMatchesVersionAsync(RecompPlatform.BundledSetupPath, release.TagName, cancellationToken)
+                ? Ok(RecompPlatform.BundledSetupPath)
+                : Fail("The bundled Mac setup has an unexpected version.");
+        }
         var cachedSetupPath = fileSystem.Path.Combine(environment.CacheFolderPath, BuildCachedSetupFileName(release.TagName));
         if (IsUsableFile(cachedSetupPath) && await SetupMatchesVersionAsync(cachedSetupPath, release.TagName, cancellationToken))
         {
@@ -498,7 +606,12 @@ public sealed class RecompInstallService : IRecompInstallService
         {
             if (!fileSystem.Directory.Exists(environment.CacheFolderPath))
                 return;
-            foreach (var candidate in fileSystem.Directory.EnumerateFiles(environment.CacheFolderPath, "WiiCompiled-Setup-*.exe"))
+            foreach (
+                var candidate in fileSystem.Directory.EnumerateFiles(
+                    environment.CacheFolderPath,
+                    OperatingSystem.IsMacOS() ? "WiiCompiled-Setup-*.run" : "WiiCompiled-Setup-*.exe"
+                )
+            )
             {
                 if (string.Equals(candidate, keepFilePath, StringComparison.OrdinalIgnoreCase))
                     continue;
@@ -582,6 +695,7 @@ public sealed class RecompInstallService : IRecompInstallService
 
     private async Task<OperationResult> RunSilentInstallAsync(
         string setupFilePath,
+        RecompRetroWfcPayloadMode payloadMode,
         IProgress<RecompInstallProgress>? progress,
         CancellationToken cancellationToken
     )
@@ -592,6 +706,7 @@ public sealed class RecompInstallService : IRecompInstallService
             InstallFolderPath = environment.InstallFolderPath,
             RetroRewindFolderPath = environment.RetroRewindFolderPath,
             Portable = environment.IsPortableInstall,
+            RetroWfcPayloadMode = payloadMode,
         };
 
         var arguments = RecompSetupCommandBuilder.BuildSilentInstallArguments(request);
@@ -621,11 +736,20 @@ public sealed class RecompInstallService : IRecompInstallService
     /// </summary>
     private async Task<OperationResult> RepairWhatTheCheckDemandsAsync(
         IProgress<RecompInstallProgress>? progress,
+        RecompRetroWfcPayloadMode payloadMode,
+        bool forceRetroRebuild,
         CancellationToken cancellationToken
-    ) => await RepairWhatTheCheckDemandsCoreAsync(progress, reportCompletion: true, cancellationToken);
+    ) => await RepairWhatTheCheckDemandsCoreAsync(progress, payloadMode, forceRetroRebuild, reportCompletion: true, cancellationToken);
 
+    /// <param name="forceRetroRebuild">
+    /// Runs the repair even when the check reports every product current. The host decides for itself
+    /// what that repair rebuilds; this exists so a payload choice that changed, which the check does
+    /// not see, still reaches it.
+    /// </param>
     private async Task<OperationResult> RepairWhatTheCheckDemandsCoreAsync(
         IProgress<RecompInstallProgress>? progress,
+        RecompRetroWfcPayloadMode payloadMode,
+        bool forceRetroRebuild,
         bool reportCompletion,
         CancellationToken cancellationToken
     )
@@ -634,7 +758,7 @@ public sealed class RecompInstallService : IRecompInstallService
         if (checkResult.IsFailure)
             return checkResult.Error;
 
-        if (!NeedsRepair(checkResult.Value))
+        if (!NeedsRepair(checkResult.Value) && !forceRetroRebuild)
         {
             if (reportCompletion)
                 Report(progress, t("progress.recomp_finished"), 100);
@@ -642,13 +766,14 @@ public sealed class RecompInstallService : IRecompInstallService
         }
 
         logger.LogInformation(
-            "Repairing WiiCompiled products (base: {BaseStatus}, retro: {RetroStatus}, compile required: {CompileRequired})",
+            "Repairing WiiCompiled products (base: {BaseStatus}, retro: {RetroStatus}, compile required: {CompileRequired}, payload: {PayloadMode})",
             checkResult.Value.Base.State,
             checkResult.Value.RetroRewind.State,
-            checkResult.Value.Base.RequiresCompile || checkResult.Value.RetroRewind.RequiresCompile
+            checkResult.Value.Base.RequiresCompile || checkResult.Value.RetroRewind.RequiresCompile,
+            payloadMode
         );
 
-        var repairResult = await RunTargetedRepairAsync(progress, cancellationToken);
+        var repairResult = await RunTargetedRepairAsync(progress, payloadMode, cancellationToken);
         if (repairResult.IsFailure)
             return repairResult;
 
@@ -667,6 +792,7 @@ public sealed class RecompInstallService : IRecompInstallService
 
     private async Task<OperationResult> RunTargetedRepairAsync(
         IProgress<RecompInstallProgress>? progress,
+        RecompRetroWfcPayloadMode payloadMode,
         CancellationToken cancellationToken
     )
     {
@@ -676,7 +802,11 @@ public sealed class RecompInstallService : IRecompInstallService
         if (string.IsNullOrWhiteSpace(retroRewindFolderPath))
             return Fail("Retro Rewind must be installed before WiiCompiled can repair or launch.");
 
-        var arguments = RecompSetupCommandBuilder.BuildRepairProductsArguments(environment.InstallFolderPath, retroRewindFolderPath);
+        var arguments = RecompSetupCommandBuilder.BuildRepairProductsArguments(
+            environment.InstallFolderPath,
+            retroRewindFolderPath,
+            payloadMode
+        );
 
         Report(progress, t("progress.recomp_running_setup"), SetupPercentFloor);
         var resultHolder = new EventHolder<RecompSetupResultEvent>();
@@ -770,24 +900,35 @@ public sealed class RecompInstallService : IRecompInstallService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        // A locally built WheelWizard may ship a setup before its fork publishes a release.
+        RecompRelease? bundled = null;
+        if (OperatingSystem.IsMacOS() && fileSystem.File.Exists(RecompPlatform.BundledSetupPath))
+        {
+            await processRunner.RunAsync(
+                RecompPlatform.BundledSetupPath,
+                "--version",
+                null,
+                line =>
+                {
+                    if (RecompVersion.TryParse(line, out var version))
+                        bundled = new("v" + version, version, new Uri(RecompPlatform.BundledSetupPath).AbsoluteUri);
+                },
+                cancellationToken
+            );
+        }
         var releasesResult = await gitHubService.GetReleasesAsync(
-            RecompReleaseResolver.RepositoryOwner,
+            RecompPlatform.RepositoryOwner,
             RecompReleaseResolver.RepositoryName,
             count: 100
         );
         if (releasesResult.IsFailure)
         {
             logger.LogWarning("Could not retrieve the recomp releases: {Message}", releasesResult.Error.Message);
-            return null;
+            return bundled;
         }
 
-        return RecompReleaseResolver.FindLatest(releasesResult.Value);
-    }
-
-    private string? ReadInstalledVersion()
-    {
-        var state = ReadInstalledState();
-        return string.IsNullOrWhiteSpace(state?.SetupVersion) ? null : state.SetupVersion;
+        var remote = RecompReleaseResolver.FindLatest(releasesResult.Value, RecompPlatform.ReleaseAssetName);
+        return bundled is not null && (remote is null || bundled.Version.ComparePrecedenceTo(remote.Version) >= 0) ? bundled : remote;
     }
 
     private RecompInstallState? ReadInstalledState()
@@ -865,7 +1006,7 @@ public sealed class RecompInstallService : IRecompInstallService
     private static string BuildCachedSetupFileName(string tagName)
     {
         var sanitized = new string(tagName.Select(character => char.IsLetterOrDigit(character) ? character : '-').ToArray());
-        return $"WiiCompiled-Setup-{sanitized}.exe";
+        return $"WiiCompiled-Setup-{sanitized}{(OperatingSystem.IsMacOS() ? ".run" : ".exe")}";
     }
 
     private static void Report(IProgress<RecompInstallProgress>? progress, string message, int percent) =>

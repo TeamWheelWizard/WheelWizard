@@ -62,6 +62,11 @@ public class RecompLauncher(
             if (progressWindow.WasCancellationRequested || cancellationTokenSource.IsCancellationRequested)
                 return Fail("WiiCompiled launch preparation was cancelled.");
 
+            // Apply the current save-data preference even after an external install or a relink.
+            var nandResult = dolphinData.ApplyNandToRecompConfig();
+            if (nandResult.IsFailure)
+                return nandResult;
+
             // Reconciliation is the only cancellable progress phase. The launch call is
             // awaited through game exit.
             progressWindow.SetCancellationTokenSource(null);
@@ -249,6 +254,7 @@ public class RecompLauncher(
             // handed an uncancellable token. Whatever the backend reports is the truth.
             return await installService.InstallAsync(
                 progress,
+                ConfirmOfflineInstallAsync,
                 retroRewindCommitted ? CancellationToken.None : cancellationTokenSource.Token
             );
         }
@@ -261,6 +267,18 @@ public class RecompLauncher(
             progressWindow.Close();
         }
     }
+
+    /// <summary>
+    /// Asked by the install service only when a Retro Rewind build is needed and the Retro-WFC payload
+    /// service is down. Offline-only is a real choice, not a silent downgrade: the game plays, online
+    /// does not, and the next update after the service returns rebuilds with online play automatically.
+    /// </summary>
+    private static Task<bool> ConfirmOfflineInstallAsync() =>
+        new YesNoWindow()
+            .SetButtonText(t("action.recomp_install_offline"), t("action.cancel"))
+            .SetMainText(t("question.recomp_retro_wfc_unavailable.title"))
+            .SetExtraText(t("question.recomp_retro_wfc_unavailable.extra"))
+            .AwaitAnswer();
 
     private async Task<OperationResult<bool>> EnsureRetroRewindCurrentAsync(
         ProgressWindow progressWindow,

@@ -84,3 +84,36 @@ Retro Rewind was made by ZPL. More information about Retro Rewind can be found o
 Huge parts from the mii renderer were inspired and ported from [ariankordi's branch](https://github.com/ariankordi/FFL-Testing) of abood's [FFL-Testing](https://github.com/aboood40091/FFL-Testing) project. You can find their website [here](https://mii-unsecure.ariankordi.net/).
 Some of the icons used in Wheel Wizard are from [Game Icons](https://game-icons.net/about.html). Specifically, the [car wheel icon](https://game-icons.net/1x1/delapouite/car-wheel.html) and the [flat tire icon](https://game-icons.net/1x1/delapouite/flat-tire.html), both created by Delapouite.
 Also thanks Chadderz' for the specials icons in ["Chadderz' Terrible Mario Kart Font"](https://wiki.tockdom.com/wiki/CTMKF)
+
+### Native WiiCompiled on Apple Silicon
+
+On macOS 14 or later, the Apple Silicon build supports **Settings → Other → WiiCompiled (beta)**.
+Choose a clean **PAL RMCP01** Mario Kart Wii disc image in Settings, then use the Home page to install
+and play Retro Rewind natively. The installer verifies the disc, translates the game on your Mac,
+and builds ARM64 apps using Metal. Dolphin is optional; its existing Retro Rewind files and NAND
+settings can still be used. Intel Macs continue to use Dolphin.
+
+The Mac integration supports install/update, product checks and repair before launch, progress and
+cancellation, online/offline payload choices, video settings, and portable uninstallation. Game apps,
+source/tooling, build cache, and settings live under WheelWizard's `Recomp` directory. Asset-only
+Retro Rewind updates are read live; changed `Code.pul` or mod directory topology triggers compilation.
+The setup holds an installation lock while a game it launched is running. Directly opening a game
+app bypasses that lock, so close standalone game instances before installing or repairing.
+
+To build from adjacent `WheelWizard` and `Wiicompiled` checkouts:
+
+```sh
+./build-native-mac.sh
+```
+
+This requires .NET 10, Xcode Command Line Tools, and the native redistributable tools from
+`WiiCompiled Setup.app` in Applications. Override `WIICOMPILED_REPO` or `WIICOMPILED_TOOLS_ROOT`
+if they are elsewhere. The result is `release/WheelWizard.app`, with a game-code-free setup bundled
+so first installation works before a fork release is published. For an existing setup asset, use
+`RECOMP_SETUP=/absolute/path/WiiCompiled-Setup-macos-arm64.run ./build-mac.sh`.
+
+Mac updates select `WiiCompiled-Setup-macos-arm64.run` from `DarthMDev/Wiicompiled` releases.
+Windows retains its existing repository and `.exe` contract. The local bundle is used when it is at
+least as new as the available Mac release. A release package contains source and redistributable tools
+only; your disc image, translated game, and Retro Rewind data are never included. Local builds are
+ad-hoc signed; distributing them publicly still requires the normal signing/notarization process.
