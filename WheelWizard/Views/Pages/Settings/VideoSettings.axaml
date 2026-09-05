@@ -11,18 +11,32 @@
     <Grid x:Name="VideoBorder">
         <StackPanel Margin="0,15,0,0">
 
-            <Border Padding="4" Margin="0,-10,0,10"  x:Name="DisabledWarningText"
-                    CornerRadius="{StaticResource GlobalCornerRadius}"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Top"
-                    Background="{StaticResource Warning600}">
-                <SelectableTextBlock HorizontalAlignment="Center" Classes="BodyText"
-                                     FontWeight="SemiBold" Text="{loc:T helper_text.topbar.location_warning}"
-                                     Foreground="{StaticResource BackgroundColor}" />
-            </Border>
+            <Grid Margin="0,-10,0,10" MinHeight="40" x:Name="DisabledWarningText">
+                <Border Background="{StaticResource Warning600}"
+                        CornerRadius="9999"
+                        Effect="blur(150)"
+                        Opacity="0.1" />
+                <Border Background="{StaticResource Neutral700}"
+                        BorderBrush="{StaticResource Warning500}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource GlobalCornerRadius}">
+                    <Grid ColumnDefinitions="40,*">
+                        <PathIcon Data="{StaticResource WarningTip}"
+                                  Foreground="{StaticResource Warning500}"
+                                  Width="20" />
+                        <SelectableTextBlock Grid.Column="1"
+                                             Margin="0,6,10,6"
+                                             Classes="BodyText"
+                                             VerticalAlignment="Center"
+                                             Text="{loc:T helper_text.topbar.location_warning}"
+                                             Foreground="{StaticResource Neutral200}" />
+                    </Grid>
+                </Border>
+            </Grid>
 
             <!-- Graphics Section -->
             <components1:FormFieldLabel Text="{loc:T section.graphics}" Margin="0,0,0,4" />
-            <StackPanel Spacing="{DynamicResource SettingsRowGap}" Margin="0,0,0,7">
+            <StackPanel Spacing="4" Margin="0,0,0,7">
                 <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
@@ -104,7 +118,7 @@
 
             <!-- General Section -->
             <components1:FormFieldLabel Text="{loc:T section.general}" Margin="0,0,0,4" />
-            <StackPanel Spacing="{DynamicResource SettingsRowGap}" Margin="0,0,0,7">
+            <StackPanel Spacing="4" Margin="0,0,0,7">
                 <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"

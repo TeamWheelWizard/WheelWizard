@@ -261,7 +261,6 @@
         <CornerRadius x:Key="WindowCornerRadiusLeftRightTwix">6,0,0,0</CornerRadius>
 
         <!-- Margins and Padding -->
-        <x:Double x:Key="SettingsRowGap">2</x:Double>
         <Thickness x:Key="EdgeGap">10</Thickness>
         <Thickness x:Key="NegativeEdgeGap">-10</Thickness>
         <Thickness x:Key="LeftEdgeGap">10,0,0,0</Thickness>

@@ -7,21 +7,6 @@
              mc:Ignorable="d" d:DesignWidth="444" d:DesignHeight="716"
              x:Class="WheelWizard.Views.Pages.Settings.WhWzSettings">
 
-    <UserControl.Styles>
-        <Style Selector="Border.LocationRowBlur">
-            <Style.Animations>
-                <Animation Duration="0:0:5" IterationCount="INFINITE">
-                    <KeyFrame Cue="0%">
-                        <Setter Property="RotateTransform.Angle" Value="0" />
-                    </KeyFrame>
-                    <KeyFrame Cue="100%">
-                        <Setter Property="RotateTransform.Angle" Value="360" />
-                    </KeyFrame>
-                </Animation>
-            </Style.Animations>
-        </Style>
-    </UserControl.Styles>
-
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <!-- File location settings -->
@@ -31,39 +16,40 @@
                     <Border x:Name="LocationWarningIcon"
                             ToolTip.Tip="{loc:T helper_text.must_set_paths}"
                             ToolTip.Placement="Top" ToolTip.ShowDelay="50">
-                        <PathIcon x:Name="WarningIcon" Foreground="{StaticResource Warning600}"
+                        <PathIcon x:Name="WarningIcon" Foreground="{StaticResource Warning400}"
                                   Data="{StaticResource WarningTriangle}"
                                   Width="16" Height="16" />
                     </Border>
                 </StackPanel>
     
-                <StackPanel Spacing="{DynamicResource SettingsRowGap}" Margin="0,0,0,7">
-                    <Border Classes="SettingsBlockStyle"
+                <StackPanel Spacing="4" Margin="0,0,0,7">
+                    <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop"
                             x:Name="DolphinExecutableField"
-                            Margin="0"
-                            Padding="10,5"
-                            CornerRadius="12,12,5,5"
                             ClipToBounds="True">
-                        <Grid ColumnDefinitions="*,Auto,Auto" MinHeight="40">
-                            <Border Classes="LocationRowBlur"
-                                    x:Name="DolphinExecutableBlur"
-                                    Grid.ColumnSpan="3"
-                                    CornerRadius="99999"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Bottom"
-                                    Opacity="0.25"
-                                    Margin="30,0,0,-55"
-                                    Height="120"
-                                    Width="80"
-                                    Background="Transparent"
-                                    Effect="blur(180)" />
-                            <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="40">
+                            <PathIcon Grid.Column="0"
+                                      x:Name="DolphinExecutableCompleteIcon"
+                                      Data="{StaticResource SuccessTip}"
+                                      Foreground="{StaticResource Primary300}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <PathIcon Grid.Column="0"
+                                      x:Name="DolphinExecutableWarningIcon"
+                                      Data="{StaticResource WarningTip}"
+                                      Foreground="{StaticResource Warning400}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
                                 <components1:FormFieldLabel Text="{loc:T option.dolphin_emulator_exe}" />
                                 <SelectableTextBlock Classes="TinyText"
                                                      Text="{loc:T helper_text.end_with_exe}"
                                                      TextWrapping="Wrap" />
                             </StackPanel>
-                            <components1:Button Grid.Column="1"
+                            <components1:Button Grid.Column="2"
                                                 x:Name="DolphinExecutableChangeButton"
                                                 Variant="Default"
                                                 ButtonSize="Compact"
@@ -71,7 +57,7 @@
                                                 IconData="{StaticResource Pen}"
                                                 VerticalAlignment="Center"
                                                 Click="DolphinExeBrowse_OnClick" />
-                            <components1:Button Grid.Column="2"
+                            <components1:Button Grid.Column="3"
                                                 x:Name="DolphinExecutableOpenButton"
                                                 Variant="Default"
                                                 ButtonSize="Compact"
@@ -86,32 +72,33 @@
                         </Grid>
                     </Border>
 
-                    <Border Classes="SettingsBlockStyle"
+                    <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle"
                             x:Name="GameLocationBorder"
-                            Margin="0"
-                            Padding="10,5"
-                            CornerRadius="5"
                             ClipToBounds="True">
-                        <Grid ColumnDefinitions="*,Auto,Auto" MinHeight="40">
-                            <Border Classes="LocationRowBlur"
-                                    x:Name="GameLocationBlur"
-                                    Grid.ColumnSpan="3"
-                                    CornerRadius="99999"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Bottom"
-                                    Opacity="0.25"
-                                    Margin="30,0,0,-55"
-                                    Height="120"
-                                    Width="80"
-                                    Background="Transparent"
-                                    Effect="blur(180)" />
-                            <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="40">
+                            <PathIcon Grid.Column="0"
+                                      x:Name="GameLocationCompleteIcon"
+                                      Data="{StaticResource SuccessTip}"
+                                      Foreground="{StaticResource Primary300}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <PathIcon Grid.Column="0"
+                                      x:Name="GameLocationWarningIcon"
+                                      Data="{StaticResource WarningTip}"
+                                      Foreground="{StaticResource Warning400}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
                                 <components1:FormFieldLabel Text="{loc:T option.mario_kart_game}" />
                                 <SelectableTextBlock Classes="TinyText"
                                                      x:Name="MarioKartHelperText"
                                                      TextWrapping="Wrap" />
                             </StackPanel>
-                            <components1:Button Grid.Column="1"
+                            <components1:Button Grid.Column="2"
                                                 x:Name="GameLocationChangeButton"
                                                 Variant="Default"
                                                 ButtonSize="Compact"
@@ -119,7 +106,7 @@
                                                 IconData="{StaticResource Pen}"
                                                 VerticalAlignment="Center"
                                                 Click="GameLocationBrowse_OnClick" />
-                            <components1:Button Grid.Column="2"
+                            <components1:Button Grid.Column="3"
                                                 x:Name="GameLocationOpenButton"
                                                 Variant="Default"
                                                 ButtonSize="Compact"
@@ -134,30 +121,31 @@
                         </Grid>
                     </Border>
 
-                    <Border Classes="SettingsBlockStyle"
+                    <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom"
                             x:Name="DolphinUserFolderBorder"
-                            Margin="0"
-                            Padding="10,5"
-                            CornerRadius="5,5,12,12"
                             ClipToBounds="True">
-                        <Grid ColumnDefinitions="*,Auto,Auto" MinHeight="40">
-                            <Border Classes="LocationRowBlur"
-                                    x:Name="DolphinUserFolderBlur"
-                                    Grid.ColumnSpan="3"
-                                    CornerRadius="99999"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Bottom"
-                                    Opacity="0.25"
-                                    Margin="30,0,0,-55"
-                                    Height="120"
-                                    Width="80"
-                                    Background="Transparent"
-                                    Effect="blur(180)" />
-                            <StackPanel Grid.Column="0" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="40">
+                            <PathIcon Grid.Column="0"
+                                      x:Name="DolphinUserFolderCompleteIcon"
+                                      Data="{StaticResource SuccessTip}"
+                                      Foreground="{StaticResource Primary300}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <PathIcon Grid.Column="0"
+                                      x:Name="DolphinUserFolderWarningIcon"
+                                      Data="{StaticResource WarningTip}"
+                                      Foreground="{StaticResource Warning400}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
                                 <components1:FormFieldLabel x:Name="DolphinUserFolderLabel"
                                                             Text="{loc:T option.dolphin_user_path}" />
                             </StackPanel>
-                            <components1:Button Grid.Column="1"
+                            <components1:Button Grid.Column="2"
                                                 x:Name="DolphinUserFolderChangeButton"
                                                 Variant="Default"
                                                 ButtonSize="Compact"
@@ -165,7 +153,7 @@
                                                 IconData="{StaticResource Pen}"
                                                 VerticalAlignment="Center"
                                                 Click="DolphinUserPathBrowse_OnClick" />
-                            <components1:Button Grid.Column="2"
+                            <components1:Button Grid.Column="3"
                                                 x:Name="DolphinUserFolderOpenButton"
                                                 Variant="Default"
                                                 ButtonSize="Compact"
@@ -234,7 +222,7 @@
     
             <components1:FormFieldLabel Text="{loc:T section.wh_wz_appearance}" Margin="0,10,0,4" />
             <StackPanel x:Name="WhWzAppearance"
-                        Spacing="{DynamicResource SettingsRowGap}"
+                        Spacing="4"
                         Margin="0,0,0,7">
                 <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">

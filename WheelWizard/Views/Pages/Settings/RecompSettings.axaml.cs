@@ -54,15 +54,14 @@ public partial class RecompSettings : UserControlBase
         {
             var installed = IsInstalled;
             NotInstalledText.IsVisible = !installed;
-            VideoSectionLabel.IsVisible = installed;
-            VideoBorder.IsVisible = installed;
-            InstallationSectionLabel.IsVisible = installed;
-            InstallationBorder.IsVisible = installed;
+            VideoBorder.IsEnabled = installed;
+            InstallationBorder.IsEnabled = installed;
 
             var installFolder = RecompEnvironment?.InstallFolderPath ?? PathManager.RecompInstallFolderPath;
             InstallLocationText.Text = installFolder;
-            OpenInstallFolder.IsEnabled = Directory.Exists(installFolder);
-            WiiCompiledVersionText.Text = t("helper_text.installed_version", t("state.loading"));
+            OpenInstallFolder.IsEnabled = installed && Directory.Exists(installFolder);
+            UninstallButton.IsEnabled = installed;
+            WiiCompiledVersionText.Text = t("helper_text.installed_version", installed ? t("state.loading") : t("state.unknown"));
             if (installed)
                 _ = RefreshWiiCompiledVersionAsync();
 

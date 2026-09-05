@@ -1,7 +1,6 @@
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Serilog;
@@ -399,16 +398,16 @@ public partial class WhWzSettings : UserControlBase
     private void UpdateLocationRows()
     {
         SetLocationRowState(
-            DolphinExecutableField,
-            DolphinExecutableBlur,
+            DolphinExecutableCompleteIcon,
+            DolphinExecutableWarningIcon,
             SettingsService.DOLPHIN_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(PathManager.DolphinFilePath)
         );
         SetLocationRowState(
-            GameLocationBorder,
-            GameLocationBlur,
+            GameLocationCompleteIcon,
+            GameLocationWarningIcon,
             SettingsService.GAME_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(PathManager.GameFilePath)
         );
-        SetLocationRowState(DolphinUserFolderBorder, DolphinUserFolderBlur, SettingsService.USER_FOLDER_PATH.IsValid());
+        SetLocationRowState(DolphinUserFolderCompleteIcon, DolphinUserFolderWarningIcon, SettingsService.USER_FOLDER_PATH.IsValid());
 
         LocationWarningIcon.IsVisible = !SettingsService.PathsSetupCorrectly();
         DolphinExecutableOpenButton.IsEnabled = CanOpenContainingFolder(PathManager.DolphinFilePath);
@@ -416,10 +415,10 @@ public partial class WhWzSettings : UserControlBase
         DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(PathManager.UserFolderPath);
     }
 
-    private static void SetLocationRowState(Border row, Border blur, bool isValid)
+    private static void SetLocationRowState(PathIcon completeIcon, PathIcon warningIcon, bool isValid)
     {
-        row.BorderBrush = new SolidColorBrush(isValid ? ViewUtils.Colors.Primary400 : ViewUtils.Colors.Warning400);
-        blur.Background = new SolidColorBrush(isValid ? ViewUtils.Colors.Primary600 : ViewUtils.Colors.Warning600);
+        completeIcon.IsVisible = isValid;
+        warningIcon.IsVisible = !isValid;
     }
 
     private static bool CanOpenContainingFolder(string filePath)
