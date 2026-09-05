@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 
 namespace WheelWizard.Recomp;
@@ -26,8 +27,17 @@ public interface IRecompProcessRunner
 public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : IRecompProcessRunner
 {
     private const string CancellationEventEnvironmentVariable = "MKWCOMPILED_CANCEL_EVENT";
+
+    // The AppImage runtime honours this by unpacking itself to a temporary directory instead of
+    // mounting through FUSE, which is what makes it run on machines without libfuse2.
+    private const string AppImageExtractAndRunEnvironmentVariable = "APPIMAGE_EXTRACT_AND_RUN";
+
     private static readonly TimeSpan CancellationGracePeriod = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan ForcedExitGracePeriod = TimeSpan.FromSeconds(5);
+
+    // Once FUSE has failed on this machine it will keep failing, so every later run goes straight to
+    // extraction instead of paying for a failed attempt first.
+    private static volatile bool _appImageNeedsExtraction;
 
     public async Task<OperationResult<int>> RunAsync(
         string fileName,
@@ -37,6 +47,34 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
         CancellationToken cancellationToken = default
     )
     {
+        var isAppImage = !OperatingSystem.IsWindows() && fileName.EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase);
+        var extractAndRun = isAppImage && _appImageNeedsExtraction;
+
+        var result = await RunOnceAsync(fileName, arguments, workingDirectory, onStandardOutputLine, extractAndRun, cancellationToken);
+
+        // A FUSE failure happens before the AppImage's payload gets to run, so nothing has been done yet
+        // and the same command can simply be retried in extraction mode.
+        if (isAppImage && !extractAndRun && result.FailedToMount)
+        {
+            logger.LogInformation("The WiiCompiled AppImage could not mount through FUSE; running it extracted instead");
+            _appImageNeedsExtraction = true;
+            result = await RunOnceAsync(fileName, arguments, workingDirectory, onStandardOutputLine, extractAndRun: true, cancellationToken);
+        }
+
+        return result.Outcome;
+    }
+
+    private async Task<RunOutcome> RunOnceAsync(
+        string fileName,
+        string arguments,
+        string? workingDirectory,
+        Action<string>? onStandardOutputLine,
+        bool extractAndRun,
+        CancellationToken cancellationToken
+    )
+    {
+        var sawStandardOutput = false;
+        var sawFuseError = false;
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -50,22 +88,29 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             var startInfo = CreateStartInfo(fileName, arguments, workingDirectory);
             if (cancellationEvent is not null)
                 startInfo.Environment[CancellationEventEnvironmentVariable] = cancellationEventName;
+            if (extractAndRun)
+                startInfo.Environment[AppImageExtractAndRunEnvironmentVariable] = "1";
 
             using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
             process.OutputDataReceived += (_, eventArgs) =>
             {
-                if (eventArgs.Data is not null)
-                    onStandardOutputLine?.Invoke(eventArgs.Data);
+                if (eventArgs.Data is null)
+                    return;
+                sawStandardOutput = true;
+                onStandardOutputLine?.Invoke(eventArgs.Data);
             };
             process.ErrorDataReceived += (_, eventArgs) =>
             {
-                if (!string.IsNullOrWhiteSpace(eventArgs.Data))
-                    logger.LogDebug("Recomp setup stderr: {Line}", eventArgs.Data);
+                if (string.IsNullOrWhiteSpace(eventArgs.Data))
+                    return;
+                if (eventArgs.Data.Contains("fuse", StringComparison.OrdinalIgnoreCase))
+                    sawFuseError = true;
+                logger.LogDebug("Recomp setup stderr: {Line}", eventArgs.Data);
             };
 
             if (!process.Start())
-                return Fail($"Failed to start '{fileName}'.");
+                return new(Fail($"Failed to start '{fileName}'."), FailedToMount: false);
 
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -81,17 +126,22 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             {
                 var exited = cancellationEvent is not null
                     ? await CancelAndWaitForExitAsync(process, cancellationEvent)
-                    : await KillAndWaitForExitAsync(process);
+                    : OperatingSystem.IsWindows()
+                        ? await KillAndWaitForExitAsync(process)
+                        : await TerminateAndWaitForExitAsync(process);
                 if (!exited)
                     throw;
 
                 // Cooperative cancellation is a request, not proof that the backend abandoned its
                 // transaction. Once it exits, the drained terminal output and actual exit code say
                 // whether cancellation won before commit (failure) or commit won the race (success).
-                return Ok(process.ExitCode);
+                return new(Ok(process.ExitCode), FailedToMount: false);
             }
 
-            return Ok(process.ExitCode);
+            // The AppImage runtime exits non-zero without ever reaching its payload when FUSE is missing;
+            // any stdout at all proves the payload ran and the failure is its own.
+            var failedToMount = process.ExitCode != 0 && !sawStandardOutput && sawFuseError;
+            return new(Ok(process.ExitCode), failedToMount);
         }
         catch (OperationCanceledException)
         {
@@ -100,7 +150,7 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
         catch (Exception exception)
         {
             logger.LogError(exception, "Failed to run '{FileName}'", fileName);
-            return Fail(exception);
+            return new(Fail(exception), FailedToMount: false);
         }
     }
 
@@ -129,6 +179,30 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             logger.LogWarning(exception, "Failed to signal cooperative cancellation to the recomp setup process");
         }
 
+        return await WaitForCooperativeExitAsync(process);
+    }
+
+    /// <summary>
+    /// The Unix equivalent of the named event: the AppImage's setup handles SIGTERM by stopping the
+    /// build it spawned and writing its terminal result line, so it gets the same grace period.
+    /// </summary>
+    private async Task<bool> TerminateAndWaitForExitAsync(Process process)
+    {
+        try
+        {
+            if (!process.HasExited && Kill(process.Id, Sigterm) != 0)
+                logger.LogWarning("Failed to send SIGTERM to the recomp setup process (errno {Errno})", Marshal.GetLastPInvokeError());
+        }
+        catch (Exception exception)
+        {
+            logger.LogWarning(exception, "Failed to signal cooperative cancellation to the recomp setup process");
+        }
+
+        return await WaitForCooperativeExitAsync(process);
+    }
+
+    private async Task<bool> WaitForCooperativeExitAsync(Process process)
+    {
         try
         {
             await process.WaitForExitAsync().WaitAsync(CancellationGracePeriod);
@@ -182,4 +256,12 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             return false;
         }
     }
+
+    private const int Sigterm = 15;
+
+    // .NET offers no way to send a specific signal to another process, so this goes to libc directly.
+    [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
+    private static extern int Kill(int pid, int signal);
+
+    private sealed record RunOutcome(OperationResult<int> Outcome, bool FailedToMount);
 }

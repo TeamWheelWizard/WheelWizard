@@ -141,7 +141,8 @@
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center">
                         <components1:FormFieldLabel Text="{loc:T option.enable_recomp}" />
-                        <SelectableTextBlock Classes="TinyText"
+                        <SelectableTextBlock x:Name="EnableRecompHelpText"
+                                   Classes="TinyText"
                                    Text="{loc:T helper_text.enable_recomp}"
                                    TextAlignment="Left"
                                    TextWrapping="Wrap" />

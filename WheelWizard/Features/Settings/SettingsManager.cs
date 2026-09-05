@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
+using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings.Types;
 
@@ -283,7 +284,7 @@ public class SettingsManager : ISettingsManager
 
     private OperationResult<SettingsValidationReport> ValidateDolphinPathSettings() => ValidatePathSettings(requireDolphin: true);
 
-    public bool IsRecompModeActive() => OperatingSystem.IsWindows() && Get<bool>(ENABLE_RECOMP);
+    public bool IsRecompModeActive() => RecompPlatform.IsSupported && Get<bool>(ENABLE_RECOMP);
 
     private OperationResult<SettingsValidationReport> ValidatePathSettings(bool requireDolphin)
     {
