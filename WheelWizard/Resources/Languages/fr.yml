@@ -558,8 +558,8 @@ fr:
   helper_text:
     topbar:
       location_warning: "Les paramètres sont désactivés, finissez d'abord les paramètres de localisation"
-    enable_recomp: "Utilise Wiicompiled comme launcher. Désactivez pour utiliser Dolphin et Retro Rewind à la place. Windows uniquement."
-    recomp_use_dolphin_data: "Utilise le dossier Wii existant de Dolphin afin que WiiCompiled puisse partager les sauvegardes, Miis, et paramètres Wii. Les changements prennent effet au prochain lancement de Wiicompiled."
+    enable_recomp: "Utilise WiiCompiled comme lanceur. Désactivez pour utiliser Dolphin et Retro Rewind à la place. Windows uniquement."
+    recomp_use_dolphin_data: "Utilise le dossier Wii existant de Dolphin afin que WiiCompiled puisse partager les sauvegardes, Miis, et paramètres Wii. Les changements prennent effet au prochain lancement de WiiCompiled."
     recomp_graphics_api: "Seuls DirectX 12 et Vulkan font tourner WiiCompiled fiablement, donc rien d'autre n'est proposé."
     recomp_dolphin_data_not_found: "Définissez un chemin vers le dossier utilisateur Dolphin dans les paramètres de localisation. Il doit contenir un dossier Wii."
     recomp_prevent_stutters: "Lors de la compilation d'un shader, les objets qui ont en besoin sont ignorés pendant quelques frames au lieu de bloquer le jeu jusqu'a ce que la compilation soit terminée, provoquant un léger effet de \"pop-in\" au lieu d'un ralentissement"
