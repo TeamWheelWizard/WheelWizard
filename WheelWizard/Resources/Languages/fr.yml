@@ -502,7 +502,7 @@ fr:
       message: "Ce mod est incompatible avec d'autres. Lancer en le gardant activé peut provoquer des crashs ou des comportements inattendus. Pensez à le convertir en patchs en faisant un clic droit sur le mod."
       title: "MOD INCOMPATIBLE"
   warning:
-    brsar_external_count: "{$1} Les entrées de fichier BRSAR sont des références externes et ne peuvent pas être exportées."
+    brsar_external_count: "{$1} entrées de fichier BRSAR sont des références externes et ne peuvent pas être exportées."
     brsar_file_id_external: "Le fileID BRSAR {$1} est une référence externe de fichier et ne peut pas être exporté."
     brsar_file_id_unsupported_magic: "Le fileID BRSAR {$1} a changé, mais il correspond à {$2} et Pulsar ne prend en charge que les remplacements \"en loose\" de fichiers RBNK/RSEQ/RWSD."
     brsar_file_id_unresolved: "Le fileID BRSAR {$1} ne correspond à aucun fichier audio intégré pris en charge."
