@@ -37,7 +37,8 @@
                     <CheckBox Margin="0,2" IsChecked="False"
                               Classes="SwitchDark"
                               x:Name="EnableRecomp">
-                        <components1:FormFieldLabel Text="{loc:T option.enable_recomp}"
+                        <components1:FormFieldLabel x:Name="EnableRecompLabel"
+                                                   Text="{loc:T option.enable_recomp}"
                                                    TipText="{loc:T helper_text.enable_recomp}" />
                     </CheckBox>
                 </StackPanel>

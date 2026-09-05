@@ -30,8 +30,15 @@ public interface IRecompEnvironment
     /// <summary>The <c>portable.txt</c> marker that makes the recomp folder a portable root.</summary>
     string PortableMarkerFilePath { get; }
 
-    /// <summary>The <c>install-state.json</c> the recomp writes to mark itself installed.</summary>
+    /// <summary>The <c>install-state.json</c> Wheel Wizard reads to know which setup release is installed.</summary>
     string InstallStateFilePath { get; }
+
+    /// <summary>
+    /// The backend's own <c>install-state.json</c>. On Windows the setup writes the same file Wheel Wizard
+    /// reads, so this equals <see cref="InstallStateFilePath"/>. On Linux the AppImage keeps its own record,
+    /// in its own schema, in its own directory, and Wheel Wizard writes <see cref="InstallStateFilePath"/> itself.
+    /// </summary>
+    string BackendStateFilePath { get; }
 
     /// <summary>The launcher copy of the setup executable inside the install directory.</summary>
     string InstalledSetupFilePath { get; }
@@ -63,6 +70,8 @@ public sealed class RecompEnvironment(IFileSystem fileSystem) : IRecompEnvironme
 
     public string InstallStateFilePath => PathManager.RecompInstallStateFilePath;
 
+    public string BackendStateFilePath => PathManager.RecompInstallStateFilePath;
+
     public string InstalledSetupFilePath => PathManager.RecompSetupFilePath;
 
     public string? RetroRewindFolderPath => ExistingFolderOrNull(PathManager.RetroRewind6FolderPath);
@@ -76,4 +85,36 @@ public sealed class RecompEnvironment(IFileSystem fileSystem) : IRecompEnvironme
 
         return fileSystem.Directory.Exists(path) ? path : null;
     }
+}
+
+/// <summary>
+/// The Linux layout. The AppImage owns <see cref="PathManager.RecompLinuxBackendFolderPath"/> (products,
+/// state, Config.toml, workspace); Wheel Wizard's own <c>Recomp</c> folder only holds the download cache,
+/// the installed copy of the AppImage and the state file Wheel Wizard writes about it.
+/// </summary>
+public sealed class RecompLinuxEnvironment(IFileSystem fileSystem) : IRecompEnvironment
+{
+    public string GameFilePath => PathManager.GameFilePath;
+
+    public string InstallFolderPath => PathManager.RecompLinuxBackendFolderPath;
+
+    public bool IsPortableInstall => false;
+
+    public string CacheFolderPath => PathManager.RecompCacheFolderPath;
+
+    // Config.toml, logs and the private NAND all live in the backend folder on Linux.
+    public string UserDataFolderPath => PathManager.RecompLinuxBackendFolderPath;
+
+    public string PortableMarkerFilePath => PathManager.RecompPortableMarkerFilePath;
+
+    public string InstallStateFilePath => PathManager.RecompInstallStateFilePath;
+
+    public string BackendStateFilePath => PathManager.RecompLinuxBackendStateFilePath;
+
+    public string InstalledSetupFilePath => PathManager.RecompSetupFilePath;
+
+    public string? RetroRewindFolderPath =>
+        fileSystem.Directory.Exists(PathManager.RetroRewind6FolderPath) ? PathManager.RetroRewind6FolderPath : null;
+
+    public string NandCopyFolderPath => PathManager.RecompNandCopyFolderPath;
 }
