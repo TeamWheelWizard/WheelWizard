@@ -114,11 +114,9 @@ public static class PathManager
     /// <summary>The recomp runtime's private NAND, used when no Dolphin NAND is linked.</summary>
     public static string RecompPrivateNandFolderPath => Path.Combine(RecompUserDataFolderPath, "NAND");
 
-    public static string GetWiiDbFolderPath(string nandFolderPath) =>
-        Path.Combine(nandFolderPath, "shared2", "menu", "FaceLib");
+    public static string GetWiiDbFolderPath(string nandFolderPath) => Path.Combine(nandFolderPath, "shared2", "menu", "FaceLib");
 
-    public static string GetMiiDbFilePath(string nandFolderPath) =>
-        Path.Combine(GetWiiDbFolderPath(nandFolderPath), "RFL_DB.dat");
+    public static string GetMiiDbFilePath(string nandFolderPath) => Path.Combine(GetWiiDbFolderPath(nandFolderPath), "RFL_DB.dat");
 
     public static string WiiDbFolder => GetWiiDbFolderPath(WiiFolderPath);
     public static string MiiDbFile => GetMiiDbFilePath(WiiFolderPath);

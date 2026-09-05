@@ -77,6 +77,31 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         Assert.NotNull(_repository.GetRawBlockByAvatarId(3));
     }
 
+    [Fact]
+    public void UpdateBlockByClientId_UsesOneResolvedPathForReadAndWrite()
+    {
+        Assert.True(_repository.ForceCreateDatabase().IsSuccess);
+        Assert.True(_repository.AddMiiToBlocks(Block(1)).IsSuccess);
+
+        _recompEnabled = true;
+        var alternateNand = Path.GetFullPath("MiiTests/Alternate/Wii");
+        var alternateData = Substitute.For<IRecompDolphinDataService>();
+        alternateData.NandFolderPath.Returns(alternateNand);
+        var alternateRepository = new MiiRepositoryServiceService(_fileSystem, _settings, alternateData);
+        Assert.True(alternateRepository.ForceCreateDatabase().IsSuccess);
+        Assert.True(alternateRepository.AddMiiToBlocks(Block(2)).IsSuccess);
+
+        // If the repository resolves the property again while loading, it will see the alternate
+        // NAND and miss Mii 1 before it gets a chance to write anything.
+        var changingData = Substitute.For<IRecompDolphinDataService>();
+        changingData.NandFolderPath.Returns(_sourceNand, alternateNand, _sourceNand);
+        var repository = new MiiRepositoryServiceService(_fileSystem, _settings, changingData);
+
+        Assert.True(repository.UpdateBlockByClientId(1, Block(3)).IsSuccess);
+        Assert.Equal(3, _fileSystem.File.ReadAllBytes(DbPath(_sourceNand))[0x04 + 0x1B]);
+        Assert.Equal(2, _fileSystem.File.ReadAllBytes(DbPath(alternateNand))[0x04 + 0x1B]);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
