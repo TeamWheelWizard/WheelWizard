@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Serilog;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
+using WheelWizard.Recomp;
 #if WINDOWS
 using Microsoft.Win32;
 #endif
@@ -92,18 +93,35 @@ public static class PathManager
     /// <summary>The backend install directory inside Wheel Wizard's portable recomp root.</summary>
     public static string RecompInstallFolderPath => PortableRecompInstallFolderPath;
 
-    /// <summary>Whether the recomp uses the portable layout, which is what earns the setup's <c>--portable</c> flag.</summary>
-    public static bool IsRecompInstallPortable => true;
+    /// <summary>
+    /// Whether the recomp uses the portable layout, which is what earns the setup's <c>--portable</c> flag.
+    /// The Linux AppImage has no portable mode: it always installs into the user's XDG data directory.
+    /// </summary>
+    public static bool IsRecompInstallPortable => !RecompPlatform.IsLinux;
 
     public static string RecompCacheFolderPath => Path.Combine(RecompFolderPath, "Cache");
     public static string RecompInstallStateFilePath => Path.Combine(RecompInstallFolderPath, RecompInstallStateFileName);
-    public static string RecompSetupFilePath => Path.Combine(RecompInstallFolderPath, "WiiCompiled-Setup.exe");
+    public static string RecompSetupFilePath => Path.Combine(RecompInstallFolderPath, RecompPlatform.SetupFileName);
 
     /// <summary>The backend-owned runtime user state (Config.toml, private NAND, caches) inside the portable root.</summary>
     public static string RecompUserDataFolderPath => Path.Combine(RecompFolderPath, "UserData");
 
+    /// <summary>
+    /// On Linux the AppImage owns this directory under <c>$XDG_DATA_HOME</c> (the same value .NET reports as
+    /// local application data): its <c>install-state.json</c>, the built products under <c>Install/</c>,
+    /// <c>Config.toml</c>, logs and the multi-gigabyte build workspace. Wheel Wizard reads it and removes it
+    /// on uninstall, but never chooses it: a manual AppImage run installs to the very same place.
+    /// </summary>
+    public static string RecompLinuxBackendFolderPath => Path.Combine(LocalAppDataFolder, "WiiCompiled");
+
+    /// <summary>The AppImage's own record of what it installed and where. Not the same schema as the Windows state file.</summary>
+    public static string RecompLinuxBackendStateFilePath => Path.Combine(RecompLinuxBackendFolderPath, RecompInstallStateFileName);
+
     /// <summary>The recomp's own settings file, shared between Wheel Wizard and the in-game settings bar.</summary>
-    public static string RecompConfigFilePath => Path.Combine(RecompUserDataFolderPath, "Config.toml");
+    public static string RecompConfigFilePath =>
+        RecompPlatform.IsLinux
+            ? Path.Combine(RecompLinuxBackendFolderPath, "Config.toml")
+            : Path.Combine(RecompUserDataFolderPath, "Config.toml");
 
     /// <summary>The Wheel Wizard-owned copy of the Dolphin NAND, used when the user chose copying over sharing it in place.</summary>
     public static string RecompNandCopyFolderPath => Path.Combine(RecompFolderPath, "Nand");

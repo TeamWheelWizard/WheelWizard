@@ -1,7 +1,6 @@
 ﻿using System.IO.Abstractions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using WheelWizard.GitHub;
 using WheelWizard.Models.Enums;
 using WheelWizard.Recomp.Domain;
 
@@ -77,9 +76,8 @@ public interface IRecompInstallService : IDisposable
 /// <inheritdoc />
 public sealed class RecompInstallService : IRecompInstallService
 {
-    // How the three phases of an install divide up the 0-100 progress bar.
-    private const int DownloadPercentFloor = 5;
-    private const int SetupPercentFloor = 35;
+    // Where the setup phase starts on the 0-100 progress bar; the download phase before it lives in the acquirer.
+    private const int SetupPercentFloor = RecompSetupHostAcquirer.SetupPercentFloor;
 
     private const int CurrentInstallStateSchemaVersion = 1;
 
@@ -103,9 +101,8 @@ public sealed class RecompInstallService : IRecompInstallService
 
     private readonly IRecompEnvironment environment;
     private readonly IRecompProcessRunner processRunner;
-    private readonly IRecompSetupDownloader downloader;
+    private readonly RecompSetupHostAcquirer hosts;
     private readonly IRecompRetroWfcPayloadProbe payloadProbe;
-    private readonly IGitHubSingletonService gitHubService;
     private readonly IFileSystem fileSystem;
     private readonly ILogger<RecompInstallService> logger;
 
@@ -118,18 +115,16 @@ public sealed class RecompInstallService : IRecompInstallService
     public RecompInstallService(
         IRecompEnvironment environment,
         IRecompProcessRunner processRunner,
-        IRecompSetupDownloader downloader,
+        RecompSetupHostAcquirer hosts,
         IRecompRetroWfcPayloadProbe payloadProbe,
-        IGitHubSingletonService gitHubService,
         IFileSystem fileSystem,
         ILogger<RecompInstallService> logger
     )
     {
         this.environment = environment;
         this.processRunner = processRunner;
-        this.downloader = downloader;
+        this.hosts = hosts;
         this.payloadProbe = payloadProbe;
-        this.gitHubService = gitHubService;
         this.fileSystem = fileSystem;
         this.logger = logger;
     }
@@ -386,7 +381,7 @@ public sealed class RecompInstallService : IRecompInstallService
         if (hasInstalledHost && await InstalledHostCanRepairAsync(release.TagName, cancellationToken))
             return await RepairWhatTheCheckDemandsAsync(progress, payloadMode, forceRetroRebuild, cancellationToken);
 
-        var setupResult = await EnsureSetupDownloadedAsync(release, progress, cancellationToken);
+        var setupResult = await hosts.EnsureSetupDownloadedAsync(release, environment.CacheFolderPath, progress, cancellationToken);
         if (setupResult.IsFailure)
             return setupResult.Error;
 
@@ -539,78 +534,6 @@ public sealed class RecompInstallService : IRecompInstallService
             fileSystem.Directory.Delete(folderPath, recursive: true);
     }
 
-    private async Task<OperationResult<string>> EnsureSetupDownloadedAsync(
-        RecompRelease release,
-        IProgress<RecompInstallProgress>? progress,
-        CancellationToken cancellationToken
-    )
-    {
-        var cachedSetupPath = fileSystem.Path.Combine(environment.CacheFolderPath, BuildCachedSetupFileName(release.TagName));
-        if (IsUsableFile(cachedSetupPath) && await SetupMatchesVersionAsync(cachedSetupPath, release.TagName, cancellationToken))
-        {
-            PruneCachedSetupsExcept(cachedSetupPath);
-            return Ok(cachedSetupPath);
-        }
-
-        var downloadMessage = t("progress.recomp_downloading_setup");
-        Report(progress, downloadMessage, DownloadPercentFloor);
-
-        var downloadProgress = new DelegateProgress<int>(percent =>
-            Report(progress, downloadMessage, DownloadPercentFloor + (percent * (SetupPercentFloor - DownloadPercentFloor) / 100))
-        );
-
-        var downloadResult = await downloader.DownloadAsync(release.SetupDownloadUrl, cachedSetupPath, downloadProgress, cancellationToken);
-        if (downloadResult.IsFailure)
-            return downloadResult.Error;
-
-        if (!IsUsableFile(cachedSetupPath))
-            return Fail("The downloaded WiiCompiled setup is missing or empty.");
-
-        if (!await SetupMatchesVersionAsync(cachedSetupPath, release.TagName, cancellationToken))
-        {
-            var removed = DeleteInvalidSetup(cachedSetupPath);
-            return removed
-                ? Fail($"The downloaded WiiCompiled setup did not report release {release.TagName}.")
-                : Fail($"The downloaded WiiCompiled setup did not report release {release.TagName} and could not be removed.");
-        }
-
-        PruneCachedSetupsExcept(cachedSetupPath);
-        return Ok(cachedSetupPath);
-    }
-
-    /// <summary>
-    /// Drops setup executables cached for other releases. Each one is around 380 MB and the cache is
-    /// only ever read for the release currently being installed, so keeping them meant every update
-    /// permanently cost the user another installer's worth of disk. Failure here is deliberately
-    /// silent: it is disk hygiene, never a reason to fail an install that has already succeeded.
-    /// </summary>
-    private void PruneCachedSetupsExcept(string keepFilePath)
-    {
-        try
-        {
-            if (!fileSystem.Directory.Exists(environment.CacheFolderPath))
-                return;
-            foreach (var candidate in fileSystem.Directory.EnumerateFiles(environment.CacheFolderPath, "WiiCompiled-Setup-*.exe"))
-            {
-                if (string.Equals(candidate, keepFilePath, StringComparison.OrdinalIgnoreCase))
-                    continue;
-                try
-                {
-                    fileSystem.File.Delete(candidate);
-                    logger.LogInformation("Removed the superseded cached WiiCompiled setup {Path}", candidate);
-                }
-                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
-                {
-                    logger.LogDebug(exception, "Could not remove the cached WiiCompiled setup {Path}", candidate);
-                }
-            }
-        }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
-        {
-            logger.LogDebug(exception, "Could not enumerate the WiiCompiled setup cache for pruning.");
-        }
-    }
-
     private async Task<bool> InstalledHostCanRepairAsync(string? expectedVersion, CancellationToken cancellationToken)
     {
         if (!fileSystem.File.Exists(environment.InstalledSetupFilePath))
@@ -628,49 +551,10 @@ public sealed class RecompInstallService : IRecompInstallService
         return await SetupMatchesVersionAsync(environment.InstalledSetupFilePath, state.SetupVersion, cancellationToken);
     }
 
-    private async Task<bool> SetupMatchesVersionAsync(string setupFilePath, string? expectedVersion, CancellationToken cancellationToken)
-    {
-        if (!RecompVersion.TryParse(expectedVersion, out var expected))
-            return false;
+    private Task<bool> SetupMatchesVersionAsync(string setupFilePath, string? expectedVersion, CancellationToken cancellationToken) =>
+        hosts.SetupMatchesVersionAsync(setupFilePath, expectedVersion, cancellationToken);
 
-        string? versionText = null;
-        var runResult = await processRunner.RunAsync(
-            setupFilePath,
-            RecompSetupCommandBuilder.BuildVersionArguments(),
-            workingDirectory: null,
-            line =>
-            {
-                if (RecompVersion.TryParse(line, out var version))
-                    versionText = version.ToString();
-            },
-            cancellationToken
-        );
-
-        return runResult.IsSuccess
-            && runResult.Value == 0
-            && RecompVersion.TryParse(versionText, out var cachedVersion)
-            && cachedVersion.ComparePrecedenceTo(expected) == 0;
-    }
-
-    private bool VersionsMatch(string? first, string? second) =>
-        RecompVersion.TryParse(first, out var parsedFirst)
-        && RecompVersion.TryParse(second, out var parsedSecond)
-        && parsedFirst.ComparePrecedenceTo(parsedSecond) == 0;
-
-    private bool DeleteInvalidSetup(string setupFilePath)
-    {
-        try
-        {
-            if (fileSystem.File.Exists(setupFilePath))
-                fileSystem.File.Delete(setupFilePath);
-            return true;
-        }
-        catch (Exception exception)
-        {
-            logger.LogError(exception, "Could not remove invalid recomp setup at {Path}", setupFilePath);
-            return false;
-        }
-    }
+    private static bool VersionsMatch(string? first, string? second) => RecompSetupHostAcquirer.VersionsMatch(first, second);
 
     private async Task<OperationResult> RunSilentInstallAsync(
         string setupFilePath,
@@ -875,23 +759,8 @@ public sealed class RecompInstallService : IRecompInstallService
         return Ok();
     }
 
-    private async Task<RecompRelease?> TryGetLatestReleaseAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var releasesResult = await gitHubService.GetReleasesAsync(
-            RecompReleaseResolver.RepositoryOwner,
-            RecompReleaseResolver.RepositoryName,
-            count: 100
-        );
-        if (releasesResult.IsFailure)
-        {
-            logger.LogWarning("Could not retrieve the recomp releases: {Message}", releasesResult.Error.Message);
-            return null;
-        }
-
-        return RecompReleaseResolver.FindLatest(releasesResult.Value);
-    }
+    private Task<RecompRelease?> TryGetLatestReleaseAsync(CancellationToken cancellationToken) =>
+        hosts.TryGetLatestReleaseAsync(cancellationToken);
 
     private RecompInstallState? ReadInstalledState()
     {
@@ -952,27 +821,8 @@ public sealed class RecompInstallService : IRecompInstallService
         return !string.IsNullOrWhiteSpace(gameFilePath) && fileSystem.File.Exists(gameFilePath);
     }
 
-    private bool IsUsableFile(string filePath)
-    {
-        try
-        {
-            return fileSystem.File.Exists(filePath) && fileSystem.FileInfo.New(filePath).Length > 0;
-        }
-        catch (Exception exception)
-        {
-            logger.LogWarning(exception, "Failed to inspect the cached recomp setup at {Path}", filePath);
-            return false;
-        }
-    }
-
-    private static string BuildCachedSetupFileName(string tagName)
-    {
-        var sanitized = new string(tagName.Select(character => char.IsLetterOrDigit(character) ? character : '-').ToArray());
-        return $"WiiCompiled-Setup-{sanitized}.exe";
-    }
-
     private static void Report(IProgress<RecompInstallProgress>? progress, string message, int percent) =>
-        progress?.Report(new(message, Math.Clamp(percent, 0, 100)));
+        RecompSetupHostAcquirer.Report(progress, message, percent);
 
     public void Dispose()
     {
@@ -984,34 +834,27 @@ public sealed class RecompInstallService : IRecompInstallService
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>
-    /// Forwards progress synchronously, so the single <see cref="Progress{T}"/> the launcher owns stays the
-    /// only place where marshalling to the UI thread happens.
-    /// </summary>
-    private sealed class DelegateProgress<T>(Action<T> handler) : IProgress<T>
-    {
-        public void Report(T value) => handler(value);
-    }
+}
 
-    /// <summary>
-    /// NDJSON lines arrive on a process output thread, so publish the ones we keep with a memory barrier.
-    /// </summary>
-    private sealed class EventHolder<T>
-        where T : class
-    {
-        private T? _value;
+/// <summary>
+/// NDJSON lines arrive on a process output thread, so publish the ones we keep with a memory barrier.
+/// Shared by both platform install services.
+/// </summary>
+internal sealed class EventHolder<T>
+    where T : class
+{
+    private T? _value;
 
-        public T? Value
+    public T? Value
+    {
+        get => Volatile.Read(ref _value);
+        set
         {
-            get => Volatile.Read(ref _value);
-            set
-            {
-                Volatile.Write(ref _value, value);
-                Interlocked.Increment(ref _count);
-            }
+            Volatile.Write(ref _value, value);
+            Interlocked.Increment(ref _count);
         }
-
-        private int _count;
-        public int Count => Volatile.Read(ref _count);
     }
+
+    private int _count;
+    public int Count => Volatile.Read(ref _count);
 }
