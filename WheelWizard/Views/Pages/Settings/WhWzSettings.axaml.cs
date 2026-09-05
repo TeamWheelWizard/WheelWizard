@@ -4,7 +4,6 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Serilog;
-using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Services;
 using WheelWizard.Settings;
@@ -36,9 +35,6 @@ public partial class WhWzSettings : UserControlBase
 
     [Inject]
     private IDolphinSettingManager DolphinSettingsService { get; set; } = null!;
-
-    [Inject]
-    private ILinuxDolphinInstaller LinuxDolphinInstallerService { get; set; } = null!;
 
     public WhWzSettings()
     {
@@ -143,60 +139,22 @@ public partial class WhWzSettings : UserControlBase
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            // Made this more extensible for future support for e.g. snap
-            var dolphinPaths = new (Func<bool> IsInstalled, string Path)[]
-            {
-                (IsFlatpakDolphinInstalled, "flatpak run org.DolphinEmu.dolphin-emu"),
-                (IsNativeDolphinInstalled, "dolphin-emu"),
-            };
+            const string selectFile = "Select executable file";
+            const string enterCommand = "Enter launch command";
+            var choice = await new OptionsWindow()
+                .SetWindowTitle("Change Dolphin executable")
+                .AddOption("FileImport", selectFile, () => { })
+                .AddOption("Code", enterCommand, () => { })
+                .AwaitAnswer();
 
-            foreach (var (isInstalled, path) in dolphinPaths)
+            if (choice == enterCommand)
             {
-                if (isInstalled())
-                {
-                    var result = await new YesNoWindow()
-                        .SetMainText(t("question.dolphin_program_found.title"))
-                        .SetExtraText($"{t("question.dolphin_program_found.extra")}\n{path}")
-                        .AwaitAnswer();
-
-                    if (result)
-                    {
-                        await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, path);
-                        return;
-                    }
-                }
+                await EnterLinuxDolphinCommandAsync();
+                return;
             }
 
-            if (!IsFlatpakDolphinInstalled())
-            {
-                var wantsAutomaticInstall = await new YesNoWindow()
-                    .SetMainText(t("question.dolphin_flatpak.title"))
-                    .SetExtraText(t("question.dolphin_flatpak.extra"))
-                    .SetButtonText(t("action.install"), t("action.do_manually"))
-                    .AwaitAnswer();
-                if (wantsAutomaticInstall)
-                {
-                    var progressWindow = new ProgressWindow()
-                        .SetGoal(t("progress.installing_dolphin"))
-                        .SetExtraText(t("progress.this_may_take_a_while"));
-                    progressWindow.Show();
-                    var progress = new Progress<int>(progressWindow.UpdateProgress);
-                    var installResult = await LinuxDolphinInstallerService.InstallFlatpakDolphin(progress);
-                    progressWindow.Close();
-                    if (installResult.IsFailure)
-                    {
-                        await new MessageBoxWindow()
-                            .SetMessageType(MessageBoxWindow.MessageType.Error)
-                            .SetTitleText("Failed to install Dolphin")
-                            .SetInfoText(installResult.Error.Message)
-                            .ShowDialog();
-                        return;
-                    }
-
-                    await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, "flatpak run org.DolphinEmu.dolphin-emu");
-                    return;
-                }
-            }
+            if (choice != selectFile)
+                return;
         }
 
         if (EnvHelper.IsFlatpakSandboxed())
@@ -262,14 +220,20 @@ public partial class WhWzSettings : UserControlBase
         }
     }
 
-    private bool IsFlatpakDolphinInstalled()
+    private async Task EnterLinuxDolphinCommandAsync()
     {
-        return LinuxDolphinInstallerService.IsDolphinInstalledInFlatpak();
-    }
+        var currentValue = PathManager.DolphinFilePath;
+        var command = await new TextInputWindow()
+            .SetMainText("Enter Dolphin launch command")
+            .SetExtraText("Enter the terminal command Wheel Wizard should use to launch Dolphin.")
+            .SetPlaceholderText("Example: flatpak run org.DolphinEmu.dolphin-emu")
+            .SetInitialText(IsConfiguredExecutableFile(currentValue) ? string.Empty : currentValue)
+            .SetButtonText(t("action.cancel"), t("action.save"))
+            .SetValidation((_, value) => string.IsNullOrWhiteSpace(value) ? Fail("Enter a launch command.") : Ok())
+            .ShowDialog();
 
-    private bool IsNativeDolphinInstalled()
-    {
-        return LinuxDolphinInstallerService.IsDolphinInstalledNative();
+        if (command != null)
+            await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, command.Trim());
     }
 
     private async void GameLocationBrowse_OnClick(object sender, RoutedEventArgs e)
@@ -418,7 +382,12 @@ public partial class WhWzSettings : UserControlBase
         );
 
         LocationWarningIcon.IsVisible = !SettingsService.PathsSetupCorrectly();
-        DolphinExecutableOpenButton.IsEnabled = CanOpenContainingFolder(PathManager.DolphinFilePath);
+        DolphinExecutableValueText.Text = string.IsNullOrWhiteSpace(PathManager.DolphinFilePath)
+            ? t("helper_text.end_with_exe")
+            : PathManager.DolphinFilePath;
+        DolphinExecutableOpenButton.IsVisible = !OperatingSystem.IsLinux() || IsConfiguredExecutableFile(PathManager.DolphinFilePath);
+        DolphinExecutableOpenButton.IsEnabled =
+            DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(PathManager.DolphinFilePath);
         GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(PathManager.GameFilePath);
         DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(PathManager.UserFolderPath);
     }
@@ -443,6 +412,8 @@ public partial class WhWzSettings : UserControlBase
             return false;
         }
     }
+
+    private static bool IsConfiguredExecutableFile(string value) => File.Exists(value.Trim().Trim('\'', '"'));
 
     private void UpdateAppDataLocationUi()
     {

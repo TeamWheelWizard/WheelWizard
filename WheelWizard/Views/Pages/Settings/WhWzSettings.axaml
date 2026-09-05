@@ -45,7 +45,8 @@
                                       IsVisible="False" />
                             <StackPanel Grid.Column="1" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
                                 <components1:FormFieldLabel Text="{loc:T option.dolphin_emulator_exe}" />
-                                <SelectableTextBlock Classes="TinyText"
+                                <SelectableTextBlock x:Name="DolphinExecutableValueText"
+                                                     Classes="TinyText"
                                                      Text="{loc:T helper_text.end_with_exe}"
                                                      TextWrapping="Wrap" />
                             </StackPanel>
