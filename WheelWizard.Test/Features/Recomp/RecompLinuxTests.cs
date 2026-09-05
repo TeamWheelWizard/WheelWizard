@@ -164,6 +164,19 @@ public class RecompLinuxTests
     }
 
     [Fact]
+    public void Inspector_ReadsANullProductListAsNothingBuilt()
+    {
+        var fixture = new BackendFixture();
+        fixture.FileSystem.File.WriteAllText(fixture.StateFile, """{"SchemaVersion":1,"Workspace":"w","Products":null}""");
+
+        var products = fixture.Inspect();
+
+        Assert.True(products.ProtocolValid);
+        Assert.Equal(RecompProductState.Absent, products.Base.State);
+        Assert.Equal(RecompProductState.Absent, products.RetroRewind.State);
+    }
+
+    [Fact]
     public void Inspector_TreatsAMalformedStateAsUnverifiable()
     {
         var fixture = new BackendFixture();

@@ -7,9 +7,17 @@ namespace WheelWizard.Recomp.Domain;
 /// </summary>
 public sealed class RecompLinuxBackendState
 {
+    private List<RecompLinuxProductRecord> _products = [];
+
     public int? SchemaVersion { get; set; }
     public string? Workspace { get; set; }
-    public List<RecompLinuxProductRecord> Products { get; set; } = [];
+
+    /// <summary>Never null: an explicit JSON <c>null</c> reads as "no products built".</summary>
+    public List<RecompLinuxProductRecord> Products
+    {
+        get => _products;
+        set => _products = value ?? [];
+    }
 }
 
 /// <summary>One product the AppImage built. <c>Profile</c> is <c>base</c> or <c>retro-rewind</c>.</summary>
