@@ -591,6 +591,8 @@ en:
     wheel_wizard_data_folder: "Choose where Wheel Wizard stores its files. Moving may take a while."
     retro_rewind_folder: "Opens the folder containing the installed Retro Rewind files."
     end_with_exe: "Path must end with .exe"
+    select_dolphin_linux: "Select a Dolphin executable or enter a launch command"
+    select_dolphin_macos: "Select Dolphin.app"
     enable_animations: "This enables the animations in the Wheel Wizard app"
     end_with_x: "Path can end with:"
     wh_wz_language: "Changes the language used by Wheel Wizard, not the in-game language."
