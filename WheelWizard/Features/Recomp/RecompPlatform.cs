@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using WheelWizard.Helpers;
 
 namespace WheelWizard.Recomp;
 
@@ -13,17 +12,11 @@ namespace WheelWizard.Recomp;
 public static class RecompPlatform
 {
     /// <summary>
-    /// Whether this is a Linux build that can run the AppImage. A Flatpak sandbox cannot: it has no FUSE,
-    /// no compiler prerequisites, and no view of the XDG data directory the AppImage installs into. That
-    /// needs a host-spawn and a manifest change, so the option is shown disabled there for now.
+    /// Whether this is a Linux build on an architecture the recomp publishes an AppImage for. The AppImage
+    /// is always run unpacked (see <see cref="RecompProcessRunner"/>), so this holds inside a Flatpak
+    /// sandbox too: the AppImage then installs into the sandbox's own XDG data directory.
     /// </summary>
-    public static bool IsLinux { get; } =
-        OperatingSystem.IsLinux()
-        && !EnvHelper.IsFlatpakSandboxed()
-        && LinuxReleaseAssetName(RuntimeInformation.OSArchitecture) is not null;
-
-    /// <summary>A Linux build running inside a Flatpak sandbox: the one Linux where the option exists but cannot be turned on.</summary>
-    public static bool IsLinuxFlatpak { get; } = OperatingSystem.IsLinux() && EnvHelper.IsFlatpakSandboxed();
+    public static bool IsLinux { get; } = OperatingSystem.IsLinux() && LinuxReleaseAssetName(RuntimeInformation.OSArchitecture) is not null;
 
     public static bool IsSupported => OperatingSystem.IsWindows() || IsLinux;
 

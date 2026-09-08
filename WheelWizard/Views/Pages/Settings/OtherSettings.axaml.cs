@@ -52,16 +52,10 @@ public partial class OtherSettings : UserControlBase
     {
         // Always loads
 
-        // The recomp only runs where a setup backend exists for it, so elsewhere the whole section stays
-        // hidden. The one exception is a Linux Flatpak: Linux is supported, the sandbox is what is not,
-        // and a Steam Deck user looking for the option deserves to be told that rather than shown nothing.
+        // The recomp only runs where a setup backend exists for it, so elsewhere the whole section stays hidden.
         var recompSupported = RecompPlatform.IsSupported;
-        var recompBlockedBySandbox = RecompPlatform.IsLinuxFlatpak;
-        RecompSectionLabel.IsVisible = recompSupported || recompBlockedBySandbox;
-        RecompBorder.IsVisible = recompSupported || recompBlockedBySandbox;
-        EnableRecomp.IsEnabled = recompSupported;
-        if (recompBlockedBySandbox)
-            EnableRecompHelpText.Text = t("helper_text.enable_recomp_flatpak");
+        RecompSectionLabel.IsVisible = recompSupported;
+        RecompBorder.IsVisible = recompSupported;
         if (recompSupported)
             EnableRecomp.IsChecked = SettingsService.Get<bool>(SettingsService.ENABLE_RECOMP);
     }
