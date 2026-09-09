@@ -15,8 +15,11 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         return release.Assets.FirstOrDefault(asset => asset.BrowserDownloadUrl.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task<OperationResult> ExecuteUpdateAsync(string downloadUrl)
+    public async Task<OperationResult> ExecuteUpdateAsync(string downloadUrl, bool restartApplication = true)
     {
+        if (!restartApplication)
+            return await UpdateAsync(downloadUrl, restartApplication: false);
+
         // If running as administrator, update immediately.
         if (IsAdministrator())
             return await UpdateAsync(downloadUrl);
@@ -63,7 +66,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         return principal.IsInRole(WindowsBuiltInRole.Administrator);
     }
 
-    private async Task<OperationResult> UpdateAsync(string downloadUrl)
+    private async Task<OperationResult> UpdateAsync(string downloadUrl, bool restartApplication = true)
     {
         var currentExecutablePath = Environment.ProcessPath;
         if (currentExecutablePath is null)
@@ -95,7 +98,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         await Task.Delay(200);
 
         // Create and run the PowerShell script to perform the update.
-        var scriptResult = CreateAndRunPowerShellScript(currentExecutablePath, newFilePath);
+        var scriptResult = CreateAndRunPowerShellScript(currentExecutablePath, newFilePath, restartApplication);
         if (scriptResult.IsFailure)
             return scriptResult;
 
@@ -104,7 +107,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         return Ok();
     }
 
-    private OperationResult CreateAndRunPowerShellScript(string currentFilePath, string newFilePath)
+    private OperationResult CreateAndRunPowerShellScript(string currentFilePath, string newFilePath, bool restartApplication)
     {
         var currentFolder = fileSystem.Path.GetDirectoryName(currentFilePath);
         if (currentFolder is null)
@@ -113,6 +116,10 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         var scriptFilePath = fileSystem.Path.Combine(currentFolder, "update.ps1");
         var originalFileName = fileSystem.Path.GetFileName(currentFilePath);
         var newFileName = fileSystem.Path.GetFileName(newFilePath);
+
+        var restartCommand = restartApplication
+            ? $"Start-Process -FilePath {EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))}"
+            : string.Empty;
 
         var scriptContent = $$"""
 
@@ -161,7 +168,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
             }
 
             Write-Output 'Starting the updated application...'
-            Start-Process -FilePath {{EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))}}
+            {{restartCommand}}
 
             Write-Output 'Cleaning up...'
             Remove-Item -Path {{EnvHelper.SingleQuotePath(scriptFilePath)}} -Force

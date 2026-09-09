@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
 using WheelWizard.AutoUpdating;
+using WheelWizard.CustomDistributions;
 using WheelWizard.MiiRendering.Services;
 using WheelWizard.Mods;
 using WheelWizard.Services;
@@ -117,6 +118,9 @@ public class App : Application
         return StartupLaunchTarget.None;
     }
 
+    private static bool IsUpdateOnlyRequested() =>
+        Environment.GetCommandLineArgs().Skip(1).Any(argument => argument.Equals("--updateonly", StringComparison.OrdinalIgnoreCase));
+
     private static async Task<bool> OpenGameBananaModWindowAsync()
     {
         var protocolArgument = GetLaunchProtocolArgument();
@@ -197,6 +201,12 @@ public class App : Application
     {
         try
         {
+            if (IsUpdateOnlyRequested())
+            {
+                await RunUpdateOnlyAsync(desktop);
+                return;
+            }
+
             var resourceInstaller = Services.GetRequiredService<IMiiRenderingResourceInstaller>();
             if (resourceInstaller.GetResolvedResourcePath().IsFailure)
             {
@@ -224,5 +234,21 @@ public class App : Application
             logger.LogError(e, "Failed to initialize desktop application: {Message}", e.Message);
             desktop.Shutdown();
         }
+    }
+
+    private static async Task RunUpdateOnlyAsync(IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        var logger = Services.GetRequiredService<ILogger<App>>();
+        var distributions = Services.GetRequiredService<ICustomDistributionSingletonService>();
+
+        if (distributions.RetroRewind.GetCurrentVersion() is not null)
+        {
+            var updateResult = await Services.GetRequiredService<RrLauncher>().Update();
+            if (updateResult.IsFailure)
+                logger.LogError(updateResult.Error.Exception, "Failed to update Retro Rewind: {Message}", updateResult.Error.Message);
+        }
+
+        await Services.GetRequiredService<IAutoUpdaterSingletonService>().CheckForUpdatesAsync(updateAutomatically: true);
+        desktop.Shutdown();
     }
 }

@@ -11,7 +11,7 @@ namespace WheelWizard.AutoUpdating;
 
 public interface IAutoUpdaterSingletonService
 {
-    public Task CheckForUpdatesAsync();
+    public Task CheckForUpdatesAsync(bool updateAutomatically = false);
 }
 
 public class AutoUpdaterSingletonService(
@@ -22,10 +22,10 @@ public class AutoUpdaterSingletonService(
 {
     private string CurrentVersion => brandingService.Branding.Version;
 
-    public async Task CheckForUpdatesAsync()
+    public async Task CheckForUpdatesAsync(bool updateAutomatically = false)
     {
         // TODO: How to run this in a background thread?
-        var latestRelease = await GetLatestReleaseAsync();
+        var latestRelease = await GetLatestReleaseAsync(showErrors: !updateAutomatically);
         if (latestRelease?.TagName is null)
             return;
 
@@ -36,22 +36,25 @@ public class AutoUpdaterSingletonService(
         var latestVersion = SemVersion.Parse(latestRelease.TagName.TrimStart('v'), SemVersionStyles.Any);
         var popupExtraText = t("question.new_version_wh_wz.extra", latestVersion, CurrentVersion)!;
 
-        var shouldUpdate = false;
-        await Dispatcher.UIThread.InvokeAsync(async () =>
+        var shouldUpdate = updateAutomatically;
+        if (!updateAutomatically)
         {
-            shouldUpdate = await new YesNoWindow()
-                .SetButtonText(t("action.update"), t("action.maybe_later"))
-                .SetMainText(t("question.new_version_wh_wz.title"))
-                .SetExtraText(popupExtraText)
-                .AwaitAnswer();
-        });
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                shouldUpdate = await new YesNoWindow()
+                    .SetButtonText(t("action.update"), t("action.maybe_later"))
+                    .SetMainText(t("question.new_version_wh_wz.title"))
+                    .SetExtraText(popupExtraText)
+                    .AwaitAnswer();
+            });
+        }
 
         if (!shouldUpdate)
             return;
 
-        var updateResult = await updatePlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl);
+        var updateResult = await updatePlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl, restartApplication: !updateAutomatically);
 
-        if (updateResult.IsFailure)
+        if (updateResult.IsFailure && !updateAutomatically)
         {
             await new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Warning)
@@ -61,23 +64,26 @@ public class AutoUpdaterSingletonService(
         }
     }
 
-    private async Task<GithubRelease?> GetLatestReleaseAsync()
+    private async Task<GithubRelease?> GetLatestReleaseAsync(bool showErrors)
     {
         var releasesResult = await gitHubService.GetReleasesAsync();
         if (releasesResult.IsFailure)
         {
-            await Dispatcher.UIThread.InvokeAsync(async () =>
+            if (showErrors)
             {
-                await new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Error)
-                    .SetTitleText("Failed to check for updates")
-                    .SetInfoText(
-                        "An error occurred while checking for updates. Please try again later. "
-                            + "\nError: "
-                            + releasesResult.Error.Message
-                    )
-                    .ShowDialog();
-            });
+                await Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await new MessageBoxWindow()
+                        .SetMessageType(MessageBoxWindow.MessageType.Error)
+                        .SetTitleText("Failed to check for updates")
+                        .SetInfoText(
+                            "An error occurred while checking for updates. Please try again later. "
+                                + "\nError: "
+                                + releasesResult.Error.Message
+                        )
+                        .ShowDialog();
+                });
+            }
 
             return null;
         }

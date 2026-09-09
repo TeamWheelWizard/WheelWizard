@@ -15,5 +15,5 @@ public interface IUpdatePlatform
     /// <summary>
     /// Executes the update logic for the current platform.
     /// </summary>
-    Task<OperationResult> ExecuteUpdateAsync(string downloadUrl);
+    Task<OperationResult> ExecuteUpdateAsync(string downloadUrl, bool restartApplication = true);
 }

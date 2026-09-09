@@ -23,7 +23,7 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         return release.Assets.FirstOrDefault(asset => asset.BrowserDownloadUrl.Contains(identifier, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task<OperationResult> ExecuteUpdateAsync(string downloadUrl)
+    public async Task<OperationResult> ExecuteUpdateAsync(string downloadUrl, bool restartApplication = true)
     {
         var currentExecutablePath = Environment.ProcessPath;
         if (currentExecutablePath is null)
@@ -55,7 +55,7 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         await Task.Delay(201);
 
         // Create and run the shell script to perform the update.
-        var scriptResult = CreateAndRunShellScript(currentExecutablePath, newFilePath);
+        var scriptResult = CreateAndRunShellScript(currentExecutablePath, newFilePath, restartApplication);
         if (scriptResult.IsFailure)
             return scriptResult;
 
@@ -64,7 +64,7 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         return Ok();
     }
 
-    private OperationResult CreateAndRunShellScript(string currentFilePath, string newFilePath)
+    private OperationResult CreateAndRunShellScript(string currentFilePath, string newFilePath, bool restartApplication)
     {
         var currentFolder = fileSystem.Path.GetDirectoryName(currentFilePath);
         if (currentFolder is null)
@@ -73,6 +73,10 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         var scriptFilePath = fileSystem.Path.Combine(currentFolder, "update.sh");
         var originalFileName = fileSystem.Path.GetFileName(currentFilePath);
         var newFileName = fileSystem.Path.GetFileName(newFilePath);
+
+        var restartCommand = restartApplication
+            ? $"nohup {EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))} > /dev/null 2>&1 &"
+            : string.Empty;
 
         var scriptContent = $"""
             #!/usr/bin/env sh
@@ -89,7 +93,7 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
             chmod +x {EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))}
 
             echo 'Starting the updated application...'
-            nohup {EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))} > /dev/null 2>&1 &
+            {restartCommand}
 
             echo 'Cleaning up...'
             rm -- {EnvHelper.SingleQuotePath(scriptFilePath)}
