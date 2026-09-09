@@ -6,9 +6,9 @@ namespace WheelWizard.Recomp;
 
 public interface IRecompDolphinDataService
 {
-    bool IsEnabled { get; }
+    bool IsSharingEnabled { get; }
 
-    /// <summary>Whether the recomp uses a copy of the Dolphin NAND instead of sharing it in place.</summary>
+    /// <summary>Whether private mode uses a copy originally imported from Dolphin.</summary>
     bool CopyEnabled { get; }
 
     string? LinkedUserFolderPath { get; }
@@ -20,7 +20,7 @@ public interface IRecompDolphinDataService
 
     string? FindCandidateUserFolder();
     OperationResult Link(string userFolderPath);
-    void SetEnabled(bool enabled);
+    void SetSharingEnabled(bool enabled);
     void SetCopyEnabled(bool enabled);
 
     OperationResult CopyNandForRecomp();
@@ -31,7 +31,7 @@ public interface IRecompDolphinDataService
 public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompSettingManager recompSettings, IFileSystem fileSystem)
     : IRecompDolphinDataService
 {
-    public bool IsEnabled => settings.Get<bool>(settings.RECOMP_USE_DOLPHIN_DATA);
+    public bool IsSharingEnabled => settings.Get<bool>(settings.RECOMP_USE_DOLPHIN_DATA);
 
     public bool CopyEnabled => settings.Get<bool>(settings.RECOMP_COPY_DOLPHIN_NAND);
 
@@ -41,15 +41,17 @@ public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompS
     {
         get
         {
-            if (!IsEnabled)
-                return null;
+            // Sharing always means Dolphin's live NAND, even when a private clone is kept for the
+            // next time sharing is disabled.
+            if (IsSharingEnabled)
+                return SourceNandFolderPath;
 
             // A missing copy never falls back to the Dolphin NAND: the user chose the copy exactly
             // so that Dolphin's own data is left alone, and a private NAND is the safe default.
             if (CopyEnabled)
                 return ValidateNandFolder(PathManager.RecompNandCopyFolderPath);
 
-            return SourceNandFolderPath;
+            return null;
         }
     }
 
@@ -84,7 +86,7 @@ public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompS
         return Ok();
     }
 
-    public void SetEnabled(bool enabled) => settings.Set(settings.RECOMP_USE_DOLPHIN_DATA, enabled);
+    public void SetSharingEnabled(bool enabled) => settings.Set(settings.RECOMP_USE_DOLPHIN_DATA, enabled);
 
     public void SetCopyEnabled(bool enabled) => settings.Set(settings.RECOMP_COPY_DOLPHIN_NAND, enabled);
 

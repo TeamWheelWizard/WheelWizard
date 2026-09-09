@@ -167,7 +167,7 @@ nl:
     mii_editor: "Mii-editor"
     mii_carousel: "Mii-carrousel"
   text:
-    made_by_string: |
+    made_by_string: |-
       Gemaakt door {$1}
       en {$2}
     thanks_translators: "Hartelijk dank aan alle vertalers:"
@@ -244,9 +244,8 @@ nl:
       extra: "Deze wijziging wordt over {$1} teruggedraaid, tenzij je ervoor kiest om de wijziging te behouden."
     dolphin_found:
       title: "Dolphin-emulator-map gevonden"
-      extra: |
+      extra: |-
         Als je niet weet wat dit allemaal betekent, druk op ja :)
-
         Dolphin-emulator-map gevonden. Wil je deze gebruiken?
     new_version_wh_wz:
       title: "Wheel Wizard-update beschikbaar"
@@ -297,13 +296,11 @@ nl:
       extra: "Kan momenteel niet op updates controleren. Mogelijk heb je geen internetverbinding of de server is offline."
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Kan niet controleren of Wheel Wizard up-to-date is.
-
           Er zijn mogelijk netwerkproblemen.
-        reason_location: |
+        reason_location: |-
           Wheel Wizard kan niet worden geüpdatet. Zorg ervoor dat de applicatie zich in een map bevindt waarnaar kan worden geschreven.
-
           Kan de huidige map niet vinden.
       title: "Wheel Wizard kan niet worden geüpdatet."
     no_connect_server:
@@ -340,9 +337,8 @@ nl:
       extra:
         failed_update_delete: "Het is niet gelukt om bestanden te verwijderen voor de update. Proces word afgebroken."
         failed_update_apply: "Het is niet gelukt om te updaten. Proces word afgebroken."
-        invalid_file_path: |
+        invalid_file_path: |-
           Ongeldige bestandslocatie gedetecteerd. Neem contact op met de ontwikkelaars.
-
           Serverfout: {$1}
       title: "RR-update afgebroken."
     restart_admin_fail:
@@ -409,12 +405,13 @@ nl:
     mario_kart_game: "Mario Kart Wii-spelbestand"
     dolphin_emulator_exe: "Dolphin-emulator-executable"
     make_primary: "Maak hoofdprofiel"
-    remove_blur: "Verwijder waas"
     enable_animations: "Animaties inschakelen"
     reinstall: "Herinstalleer RR"
     open_game_folder: "Open spelmap"
     open_save_folder: "Open opslagmap"
   section:
+    graphics: "Grafisch"
+    general: "Algemeen"
     language: "Taal"
     wii: "Wii-Instellingen"
     resolution: "Resolutie"
@@ -434,14 +431,13 @@ nl:
     end_with_exe: "Locatie moet eindigen met \".exe\"."
     enable_animations: "Dit schakelt de animaties in de Wheel Wizard-app in."
     end_with_x: "Locatie kan eindigen met:"
-    wh_wz_language: "Dit verandert alleen de taal van Wheel Wizard. Om de taal in het spel zelf te wijzigen, moet je dit doen via de instellingen van het spel."
     optional: "Optioneel"
     must_set_paths: "Je moet deze 3 locaties instellen voordat je Retro Rewind kunt spelen."
   category:
-    video: "Video"
     about: "Over"
     other: "Overig"
     general: "Algemeen"
+    video: "Video"
   value:
     language:
       france: "Frans"

@@ -1,6 +1,8 @@
 ﻿using System.IO.Abstractions;
 using WheelWizard.Helpers;
+using WheelWizard.Recomp;
 using WheelWizard.Services;
+using WheelWizard.Settings;
 using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
@@ -52,20 +54,40 @@ public interface IMiiRepositoryService
     OperationResult ForceCreateDatabase();
 }
 
-public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositoryService
+public class MiiRepositoryServiceService(
+    IFileSystem fileSystem,
+    ISettingsManager settings,
+    IRecompDolphinDataService? recompDolphinData = null
+) : IMiiRepositoryService
 {
     private const int MiiLength = 74;
     private const int MaxMiiSlots = 100;
     private const int CrcOffset = 0x1F1DE;
     private const int HeaderOffset = 0x04;
     private static readonly byte[] EmptyMii = Enumerable.Repeat((byte)0x00, MiiLength).ToArray();
-    private string _miiDbFilePath => PathManager.MiiDbFile;
+
+    private string ResolveMiiDbFilePath()
+    {
+        if (!settings.IsRecompModeActive())
+            return PathManager.MiiDbFile;
+
+        // Match the launcher's selection, including the runtime's private NAND when no linked
+        // NAND is available. A missing copy must never send Mii edits to Dolphin's source NAND.
+        var nandFolder = recompDolphinData?.NandFolderPath ?? PathManager.RecompPrivateNandFolderPath;
+        return PathManager.GetMiiDbFilePath(nandFolder);
+    }
 
     public List<byte[]> LoadAllBlocks()
     {
+        var databasePath = ResolveMiiDbFilePath();
+        return LoadAllBlocks(databasePath);
+    }
+
+    private List<byte[]> LoadAllBlocks(string databasePath)
+    {
         var result = new List<byte[]>();
 
-        var database = ReadDatabase();
+        var database = ReadDatabase(databasePath);
         if (database.Length < HeaderOffset)
             return result;
 
@@ -87,10 +109,16 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
 
     public OperationResult SaveAllBlocks(List<byte[]> blocks)
     {
-        if (!fileSystem.File.Exists(_miiDbFilePath))
+        var databasePath = ResolveMiiDbFilePath();
+        return SaveAllBlocks(blocks, databasePath);
+    }
+
+    private OperationResult SaveAllBlocks(List<byte[]> blocks, string databasePath)
+    {
+        if (!fileSystem.File.Exists(databasePath))
             return Fail("RFL_DB.dat not found.", MessageTranslation.Error_UpdateMiiDb_RFLdbNotFound);
 
-        var db = ReadDatabase();
+        var db = ReadDatabase(databasePath);
         if (db.Length >= CrcOffset + 2)
         {
             // compute CRC over everything before CrcOffset
@@ -126,15 +154,16 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
             db[CrcOffset + 1] = (byte)(crc & 0xFF);
         }
 
-        return fileSystem.WriteAllBytesAtomic(_miiDbFilePath, db, "Failed to save RFL_DB.dat.");
+        return fileSystem.WriteAllBytesAtomic(databasePath, db, "Failed to save RFL_DB.dat.");
     }
 
     public byte[]? GetRawBlockByAvatarId(uint clientId)
     {
+        var databasePath = ResolveMiiDbFilePath();
         if (clientId == 0)
             return null;
 
-        var blocks = LoadAllBlocks();
+        var blocks = LoadAllBlocks(databasePath);
         foreach (var block in blocks)
         {
             if (block.Length != MiiLength)
@@ -148,11 +177,16 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         return null;
     }
 
-    public bool Exists() => fileSystem.File.Exists(_miiDbFilePath);
+    public bool Exists()
+    {
+        var databasePath = ResolveMiiDbFilePath();
+        return fileSystem.File.Exists(databasePath);
+    }
 
     public OperationResult ForceCreateDatabase()
     {
-        if (fileSystem.File.Exists(_miiDbFilePath))
+        var databasePath = ResolveMiiDbFilePath();
+        if (fileSystem.File.Exists(databasePath))
             return Fail("Database already exists.", MessageTranslation.Error_MiiDBAlreadyExists);
 
         var db = new byte[779_968];
@@ -178,19 +212,20 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
         db[CrcOffset] = (byte)(crc >> 8);
         db[CrcOffset + 1] = (byte)(crc & 0xFF);
 
-        return fileSystem.WriteAllBytesAtomic(_miiDbFilePath, db, "Failed to create RFL_DB.dat.");
+        return fileSystem.WriteAllBytesAtomic(databasePath, db, "Failed to create RFL_DB.dat.");
     }
 
     public OperationResult UpdateBlockByClientId(uint clientId, byte[] newBlock)
     {
+        var databasePath = ResolveMiiDbFilePath();
         if (clientId == 0)
             return Fail("Invalid Client ID.", MessageTranslation.Error_UpdateMiiDb_InvalidClId);
         if (newBlock.Length != MiiLength)
             return Fail("Mii block size invalid.", MessageTranslation.Error_UpdateMiiDb_BlockSizeInvalid);
-        if (!fileSystem.File.Exists(_miiDbFilePath))
+        if (!fileSystem.File.Exists(databasePath))
             return Fail("RFL_DB.dat not found.", MessageTranslation.Error_UpdateMiiDb_RFLdbNotFound);
 
-        var allBlocks = LoadAllBlocks();
+        var allBlocks = LoadAllBlocks(databasePath);
         var updated = false;
 
         foreach (var t in allBlocks)
@@ -208,14 +243,14 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
             break;
         }
 
-        return !updated ? Fail("Mii not found.", MessageTranslation.Error_UpdateMiiDb_MiiNotFound) : SaveAllBlocks(allBlocks);
+        return !updated ? Fail("Mii not found.", MessageTranslation.Error_UpdateMiiDb_MiiNotFound) : SaveAllBlocks(allBlocks, databasePath);
     }
 
-    private byte[] ReadDatabase()
+    private byte[] ReadDatabase(string databasePath)
     {
         try
         {
-            return Exists() ? fileSystem.File.ReadAllBytes(_miiDbFilePath) : [];
+            return fileSystem.File.Exists(databasePath) ? fileSystem.File.ReadAllBytes(databasePath) : [];
         }
         catch
         {
@@ -225,11 +260,12 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
 
     public OperationResult AddMiiToBlocks(byte[]? rawMiiData)
     {
+        var databasePath = ResolveMiiDbFilePath();
         if (rawMiiData is not { Length: MiiLength })
             return Fail("Invalid Mii block size.");
 
         // Load all 100 blocks.
-        var blocks = LoadAllBlocks();
+        var blocks = LoadAllBlocks(databasePath);
         var inserted = false;
 
         // Look for an empty slot.
@@ -243,6 +279,6 @@ public class MiiRepositoryServiceService(IFileSystem fileSystem) : IMiiRepositor
             break;
         }
 
-        return !inserted ? Fail("No empty Mii slot available.") : SaveAllBlocks(blocks);
+        return !inserted ? Fail("No empty Mii slot available.") : SaveAllBlocks(blocks, databasePath);
     }
 }

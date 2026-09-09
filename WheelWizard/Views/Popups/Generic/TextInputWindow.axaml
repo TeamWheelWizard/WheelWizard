@@ -12,12 +12,13 @@
         <StackPanel Grid.Row="0" HorizontalAlignment="Stretch"
                     VerticalAlignment="Top" Margin="0,10">
 
-            <TextBlock Classes="TitleText" x:Name="MainTextBlock"
-                       HorizontalAlignment="Left" TextWrapping="Wrap"
-                       Foreground="{StaticResource FormFieldLabelColor}"
-                       FontSize="18" />
-            <TextBlock Classes="BodyText" x:Name="ExtraTextBlock" FontSize="14"
-                       HorizontalAlignment="Left" Margin="0,10,0,0" />
+            <SelectableTextBlock Classes="TitleText" x:Name="MainTextBlock"
+                                 HorizontalAlignment="Left" TextWrapping="Wrap"
+                                 Foreground="{StaticResource FormFieldLabelColor}"
+                                 FontSize="18" />
+            <SelectableTextBlock Classes="BodyText" x:Name="ExtraTextBlock" FontSize="14"
+                                 TextWrapping="Wrap"
+                                 HorizontalAlignment="Left" Margin="0,10,0,0" />
 
             <behaviorComp:FeedbackTextBox x:Name="InputField" Watermark="{loc:T placeholder.enter_text_here}"
                                           ErrorMessage="hey hello"

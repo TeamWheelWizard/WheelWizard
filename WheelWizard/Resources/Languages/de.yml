@@ -101,7 +101,7 @@ de:
     no_license: "Keine Lizenz"
     no_profiles: "Keine Profile"
     custom: "Benutzerdefiniert"
-    installed: "Installiert "
+    installed: "Installiert"
   action:
     play: "Spielen"
     play_offline: "Offline spielen"
@@ -167,7 +167,7 @@ de:
     mii_editor: "Mii Maker"
     mii_carousel: "Mii Preview"
   text:
-    made_by_string: |
+    made_by_string: |-
       Erstellt von: {$1}
       und {$2}
     thanks_translators: "Vielen Dank an alle Übersetzer:"
@@ -244,21 +244,18 @@ de:
       extra: "Diese Änderung wird in {$1} zurückgesetzt, außer du wendest die Änderung an."
     move_data:
       title: "Wheel Wizard Daten verschieben?"
-      extra: |
-        Wheel Wizard wird seine Dateien nach
-
+      extra: |-
+        Wheel Wizard wird seine Datein nach
         {$1}
-
         verschieben. Das könnte eine Weile dauern.
     dolphin_found:
       title: "Dolphin Emulator Ordner gefunden"
-      extra: |
+      extra: |-
         Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
-
         Dolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?
     dolphin_program_found:
       title: "Dolphin Emulator gefunden"
-      extra: |
+      extra: |-
         Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
 
         Dolphin Emulator gefunden. Möchtest du Folgendes verwenden?
@@ -283,8 +280,6 @@ de:
     dolphin_flatpak:
       title: "Dolphin Flatpak Installation"
       extra: "Die Flatpak Dolphin Version scheint nicht installiert zu sein. Möchtest du sie von uns installieren lassen (für deinen eigenen Benutzer)?"
-    install_mod:
-      title: "Du bist dabei das Spiel ohne Mods zu starten. Möchtest du deinen My-Stuff Ordner leeren?"
     search_mod: "Nach Mods suchen..."
     enter_new_name:
       title: "Einen neuen Namen eingeben"
@@ -317,13 +312,11 @@ de:
       extra: "Es ist nicht möglich gerade nach Updates zu suchen. Du bist vielleicht nicht mit dem Internet verbunden oder der Server hat gerade Schwierigkeiten."
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Es kann nicht überprüft werden, ob Wheel Wizard auf dem neuesten Stand ist.
-
           Möglicherweise treten derzeit Netzwerkprobleme auf.
-        reason_location: |
+        reason_location: |-
           Wheel Wizard kann nicht aktualisiert werden. Bitte stelle sicher, dass sich die Anwendung in einem Ordner befindet, in den geschrieben werden kann.
-
           Der aktuelle Ordner konnte nicht gefunden werden.
       title: "Wheel Wizard konnte nicht aktualisiert werden."
     no_connect_server:
@@ -362,9 +355,8 @@ de:
       extra:
         failed_update_delete: "Dateien für das Update konnten nicht gelöscht werden. Abbruch."
         failed_update_apply: "Das Update konnte nicht installiert werden. Abbruch."
-        invalid_file_path: |
+        invalid_file_path: |-
           Ungültiger Dateipfad wurde erkannt. Bitte kontaktiere die Entwickler.
-
           Server-Fehler: {$1}
       title: "Über das RR Update"
     restart_admin_fail:
@@ -384,15 +376,14 @@ de:
       title: "Es ist ein Fehler beim abrufen der Mod-Informationen aufgetreten."
     mod_download_fail:
       title: "Mod Download ist schiefgelaufen."
-      extra: "Ein Fehler ist während dem Dowload aufgetreten."
+      extra: "Ein Fehler ist während dem Dowload aufgetreten: {$1}"
   message_success:
     settings_saved:
       title: "Einstellungen erfolgreich gespeichert!"
     data_folder_moved:
       title: "Datenordner aktualisiert."
-      extra: |
-        Wheel Wizard's Daten sind jetzt gespeichert in:
-
+      extra: |-
+        Wheel WIzard's Daten sind jetzt gespeichert in:
         {$1}
     rr_up_to_date:
       title: "Retro Rewind ist auf dem neuesten Stand."
@@ -439,12 +430,13 @@ de:
     mario_kart_game: "Mario Kart Wii Spiel-Datei"
     dolphin_emulator_exe: "Dolphin Emulator Programm-Datei"
     make_primary: "Hauptprofil"
-    remove_blur: "Unschärfe entfernen"
     enable_animations: "Aktiviere Animationen"
     reinstall: "RR neu installieren"
     open_game_folder: "Spielordner öffnen"
     open_save_folder: "Speicherdatenordner öffnen"
   section:
+    graphics: "Grafik"
+    general: "Allgemein"
     language: "Sprache"
     wii: "Wii Einstellungen"
     resolution: "Auflösung"
@@ -465,17 +457,15 @@ de:
     end_with_exe: "Dateipfad muss mit .exe enden."
     enable_animations: "Dies aktiviert die Animationen in der Wheel Wizard App."
     end_with_x: "Pfad kann enden mit:"
-    wh_wz_language: "Dies ändert nur die Sprache innerhalb von Wheel Wizard. Um die Sprache innerhalb des Spiels zu ändern musst du das in den Spieleinstellungen vornehmen"
     optional: "Optional"
     must_set_paths: "Du musst erst diese 3 Dateipfade bestimmen um Retro Rewind spielen zu können."
   category:
-    video: "Video"
     about: "Über"
     other: "Sonstiges"
     general: "Allgemein"
+    video: "Video"
   status:
     data_folder:
-      default: "Standard-Speicherort wird verwendet."
       custom: "Verwendet benutzerdefinierten Speicherort"
       moving: "Dateien werden verschoben, bitte warten..."
   value:

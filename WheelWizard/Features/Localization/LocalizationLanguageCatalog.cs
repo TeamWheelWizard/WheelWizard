@@ -15,6 +15,7 @@ public static class LocalizationLanguageCatalog
             new("ja", "value.language.japanese"),
             new("es", "value.language.spanish"),
             new("it", "value.language.italian"),
+            new("pl", "value.language.polish"),
             new("pt", "value.language.portuguese"),
             new("ru", "value.language.russian"),
             new("ko", "value.language.korean"),

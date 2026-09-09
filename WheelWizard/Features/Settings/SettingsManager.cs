@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
+using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings.Types;
 
@@ -40,11 +41,10 @@ public class SettingsManager : ISettingsManager
         // Register this first because the path validators use the active frontend mode when deciding
         // whether Dolphin-only locations may be left blank.
         ENABLE_RECOMP = RegisterWhWz("EnableRecomp", false);
-        // A recomp install should continue using the Dolphin NAND Wheel Wizard already manages.
-        // Users can still opt out in Recomp Settings when they deliberately want private data.
-        RECOMP_USE_DOLPHIN_DATA = RegisterWhWz("RecompUseDolphinData", true);
-        // Dolphin advises against other programs touching its NAND in place, so the first install
-        // offers to copy it instead; this remembers that the user chose the copy.
+        // Whether WiiCompiled directly shares Dolphin's live NAND. Disabled means private mode;
+        // private mode uses the imported clone below when one exists, otherwise the runtime default.
+        RECOMP_USE_DOLPHIN_DATA = RegisterWhWz("RecompUseDolphinData", false);
+        // Whether private mode was initialized from the Wheel Wizard-owned Dolphin clone.
         RECOMP_COPY_DOLPHIN_NAND = RegisterWhWz("RecompCopyDolphinNand", false);
         DOLPHIN_LOCATION = RegisterWhWz(
             "DolphinLocation",
@@ -125,7 +125,6 @@ public class SettingsManager : ISettingsManager
         ENABLE_ANIMATIONS = RegisterWhWz("EnableAnimations", true);
         TESTING_MODE_ENABLED = RegisterWhWz("TestingModeEnabled", false);
         SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, SettingValues.IsValidWindowScale);
-        REMOVE_BLUR = RegisterWhWz("REMOVE_BLUR", true);
         RR_REGION = RegisterWhWz("RR_Region", MarioKartWiiEnums.Regions.None);
         WW_LANGUAGE = RegisterWhWz("WW_Language", "en", value => SettingValues.WhWzLanguages.ContainsKey((string)value!));
         #endregion
@@ -229,7 +228,6 @@ public class SettingsManager : ISettingsManager
     public Setting ENABLE_ANIMATIONS { get; }
     public Setting TESTING_MODE_ENABLED { get; }
     public Setting SAVED_WINDOW_SCALE { get; }
-    public Setting REMOVE_BLUR { get; }
     public Setting RR_REGION { get; }
     public Setting WW_LANGUAGE { get; }
 
@@ -286,7 +284,7 @@ public class SettingsManager : ISettingsManager
 
     private OperationResult<SettingsValidationReport> ValidateDolphinPathSettings() => ValidatePathSettings(requireDolphin: true);
 
-    public bool IsRecompModeActive() => OperatingSystem.IsWindows() && Get<bool>(ENABLE_RECOMP);
+    public bool IsRecompModeActive() => RecompPlatform.IsSupported && Get<bool>(ENABLE_RECOMP);
 
     private OperationResult<SettingsValidationReport> ValidatePathSettings(bool requireDolphin)
     {

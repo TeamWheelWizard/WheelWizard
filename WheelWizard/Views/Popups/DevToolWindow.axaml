@@ -47,6 +47,9 @@
                 <components:Button Variant="Default" Text="Clear Cache"
                                    IconSize="0" HorizontalAlignment="Left" Margin="0,2"
                                    Click="ClearCache_OnClick" />
+                <components:Button Variant="Warning" Text="Hide all dev things"
+                                   IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                                   Click="HideDevelopmentFeatures_OnClick" />
                 <Border Background="{StaticResource BackgroundLineColor}" Margin="-10,10" Height="1"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
                 
