@@ -61,7 +61,6 @@ if [ "${SKIP_BUILD:-}" != "true" ]; then
     # Debug|Any CPU and Release|Any CPU, so -c Release-macOS fails against the .sln.
     dotnet publish "$WW_DIR/WheelWizard/WheelWizard.csproj" -r "$RID" -c Release-macOS \
         /p:PublishSingleFile=true \
-        /p:IncludeAllContentForSelfExtract=true \
         /p:IncludeNativeLibrariesForSelfExtract=true \
         /p:EnableCompressionInSingleFile=true \
         /p:PublishReadyToRun=true \
