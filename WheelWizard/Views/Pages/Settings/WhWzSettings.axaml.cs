@@ -51,7 +51,7 @@ public partial class WhWzSettings : UserControlBase
     private void ConfigureLocationFieldsForActiveFrontend()
     {
         var recompEnabled = SettingsService.IsRecompModeActive();
-        DolphinExecutableField.IsVisible = !recompEnabled;
+        DolphinExecutableField.IsVisible = !recompEnabled && !EnvHelper.IsFlatpakSandboxed();
         GameLocationBorder.CornerRadius = recompEnabled ? new Avalonia.CornerRadius(12, 12, 5, 5) : new Avalonia.CornerRadius(5);
         DolphinUserFolderLabel.Text = recompEnabled
             ? $"{t("option.dolphin_user_path")} ({t("helper_text.optional")})"

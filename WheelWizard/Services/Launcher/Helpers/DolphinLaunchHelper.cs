@@ -14,6 +14,8 @@ public static class DolphinLaunchHelper
 {
     private const string DolphinDownloadUrl = "https://dolphin-emu.org/download/";
 
+    private const string WheelWizardFlathubUrl = "https://flathub.org/apps/io.github.TeamWheelWizard.WheelWizard";
+
     private static ISettingsManager Settings => SettingsRuntime.Current;
 
     public static void KillDolphin() //dont tell PETA
@@ -162,8 +164,19 @@ public static class DolphinLaunchHelper
 
         if (await popup.AwaitAnswer())
         {
-            await StartDolphinUpdateAsync();
-            return Fail("Dolphin launch did not proceed because an update was requested.");
+            if (!EnvHelper.IsFlatpakSandboxed())
+            {
+                await StartDolphinUpdateAsync();
+                return Fail("Dolphin launch did not proceed because an update was requested.");
+            }
+            else
+            {
+                // Direct the users to the Flathub URL which has other links to the GitHub repositories.
+                // As the Dolphin should be provided by the Wheel Wizard Flatpak now, this should not
+                // be happening.
+                ViewUtils.OpenLink(WheelWizardFlathubUrl);
+                return Fail("Dolphin launch did not proceed because the Flathub update information button was pressed.");
+            }
         }
 
         // Dismissing the popup is not the same as choosing to play anyway, so only an explicit
@@ -177,6 +190,10 @@ public static class DolphinLaunchHelper
     /// </summary>
     private static async Task StartDolphinUpdateAsync()
     {
+        if (EnvHelper.IsFlatpakSandboxed())
+        {
+            return;
+        }
         var dolphinLocation = Settings.Get<string>(Settings.DOLPHIN_LOCATION);
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || !PathManager.IsFlatpakDolphinFilePath(dolphinLocation))
         {
@@ -226,11 +243,12 @@ public static class DolphinLaunchHelper
         {
             var startInfo = new ProcessStartInfo();
 
-            var cannotPassUserFolder = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && PathManager.IsLinuxDolphinConfigSplit();
+            // The Flatpak sandbox always uses the Dolphin wrapper to launch the bundled Dolphin version.
+            var cannotPassUserFolder = EnvHelper.IsFlatpakSandboxed() || OperatingSystem.IsLinux() && PathManager.IsLinuxDolphinConfigSplit();
             var userFolderArgument = cannotPassUserFolder ? "" : $"-u {EnvHelper.QuotePath(Path.GetFullPath(PathManager.UserFolderPath))}";
             var dolphinLaunchArguments = $"{arguments} {userFolderArgument}";
 
-            var dolphinLocation = Settings.Get<string>(Settings.DOLPHIN_LOCATION);
+            var dolphinLocation = PathManager.DolphinFilePath;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Windows builds
@@ -246,10 +264,23 @@ public static class DolphinLaunchHelper
                 startInfo.ArgumentList.Add("--");
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
-                    if (PathManager.IsFlatpakDolphinFilePath(dolphinLocation))
+                    if (!EnvHelper.IsFlatpakSandboxed() && PathManager.IsFlatpakDolphinFilePath(dolphinLocation))
                         dolphinLocation = FixFlatpakDolphinPermissions(dolphinLocation);
                     else
                         startInfo.EnvironmentVariables["QT_QPA_PLATFORM"] = "xcb";
+
+                    if (EnvHelper.IsFlatpakSandboxed())
+                    {
+                        // The bundled `dolphin-emu-wrapper` changes XDG_CONFIG_HOME and XDG_DATA_HOME to these folders.
+                        // We need to ensure they point to the correct folders before launching Dolphin.
+                        FileHelper.EnsureRelativeSymlink(
+                            PathManager.LinuxFlatpakBundledDolphinXdgConfigDir,
+                            PathManager.ConfigFolderPath,
+                            createTarget: true);
+                        FileHelper.EnsureRelativeSymlink(
+                            PathManager.LinuxFlatpakBundledDolphinXdgDataDir,
+                            PathManager.UserFolderPath);
+                    }
                 }
                 startInfo.ArgumentList.Add($"{dolphinLocation} {dolphinLaunchArguments}");
                 startInfo.UseShellExecute = false;

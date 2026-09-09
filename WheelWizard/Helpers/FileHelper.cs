@@ -68,13 +68,33 @@ public static class FileHelper
 
     public static string Combine(params string[] paths) => Path.Combine(paths);
 
+    /// <summary>
+    /// Normalizes a path to an absolute path and trims as many trailing directory separators as possible.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public static string NormalizePath(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException("Path cannot be empty.", nameof(path));
 
         var fullPath = Path.GetFullPath(path);
-        return Path.TrimEndingDirectorySeparator(fullPath);
+        var root = Path.GetPathRoot(fullPath) ?? "";
+
+        while (fullPath.Length > root.Length)
+        {
+            var trimmedPath = Path.TrimEndingDirectorySeparator(fullPath);
+
+            if (trimmedPath.Equals(fullPath, StringComparison.Ordinal))
+            {
+                break;
+            }
+
+            fullPath = trimmedPath;
+        }
+
+        return fullPath;
     }
 
     public static bool IsRootDirectory(string path)
@@ -123,6 +143,43 @@ public static class FileHelper
     {
         var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         return string.Equals(NormalizePath(pathA), NormalizePath(pathB), comparison);
+    }
+
+    public static bool IsSymlink(string path)
+    {
+        var file = new FileInfo(path);
+        return file.LinkTarget != null;
+    }
+
+    public static void EnsureRelativeSymlink(string symlinkPath, string targetDirectoryPath, bool createTarget = false)
+    {
+        symlinkPath = NormalizePath(symlinkPath);
+        targetDirectoryPath = NormalizePath(targetDirectoryPath);
+        if (createTarget)
+        {
+            Directory.CreateDirectory(targetDirectoryPath);
+        }
+
+        var symlinkParentDirectoryPath = Path.GetDirectoryName(symlinkPath) ?? throw new ArgumentException($"Symlink must have a valid parent directory: '{symlinkPath}'");
+
+        Directory.CreateDirectory(symlinkParentDirectoryPath);
+
+        var relativeTargetDirectoryPath = Path.GetRelativePath(symlinkParentDirectoryPath, targetDirectoryPath);
+
+        if (IsSymlink(symlinkPath))
+        {
+            File.Delete(symlinkPath);
+        }
+        else if (FileExists(symlinkPath))
+        {
+            throw new IOException($"Should have created a symlink at '{symlinkPath}', but a file already existed at this path!");
+        }
+        else if (DirectoryExists(symlinkPath))
+        {
+            throw new IOException($"Should have created a symlink at '{symlinkPath}', but a directory already existed at this path!");
+        }
+
+        Directory.CreateSymbolicLink(symlinkPath, relativeTargetDirectoryPath);
     }
 
     public static bool IsDescendantPath(string potentialDescendant, string potentialAncestor)
