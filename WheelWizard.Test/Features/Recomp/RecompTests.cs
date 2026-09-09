@@ -25,8 +25,18 @@ public class RecompTests
         );
 
         Assert.Equal(
-            "--silent --game \"D:\\Games\\Mario Kart Wii.rvz\" --install-dir \"D:\\WheelWizard\\Recomp\\Install\" --portable "
-                + "--progress-json --retro-dir \"D:\\WheelWizard\\RetroRewind6\" --download-retro-wfc-payload",
+            [
+                "--silent",
+                "--game",
+                @"D:\Games\Mario Kart Wii.rvz",
+                "--install-dir",
+                @"D:\WheelWizard\Recomp\Install",
+                "--portable",
+                "--progress-json",
+                "--retro-dir",
+                @"D:\WheelWizard\RetroRewind6",
+                "--download-retro-wfc-payload",
+            ],
             arguments
         );
     }
@@ -44,7 +54,7 @@ public class RecompTests
             }
         );
 
-        Assert.EndsWith("--retro-dir \"D:\\WheelWizard\\RetroRewind6\" --skip-retro-wfc-payload", arguments);
+        Assert.Equal(["--retro-dir", @"D:\WheelWizard\RetroRewind6", "--skip-retro-wfc-payload"], arguments.TakeLast(3));
         Assert.DoesNotContain("--download-retro-wfc-payload", arguments);
     }
 
@@ -52,11 +62,27 @@ public class RecompTests
     public void RepairProducts_PassesExactlyOnePayloadOption()
     {
         Assert.Equal(
-            "--repair-products --install-dir \"D:\\Recomp\" --retro-dir \"D:\\RetroRewind6\" --download-retro-wfc-payload --progress-json",
+            [
+                "--repair-products",
+                "--install-dir",
+                @"D:\Recomp",
+                "--retro-dir",
+                @"D:\RetroRewind6",
+                "--download-retro-wfc-payload",
+                "--progress-json",
+            ],
             RecompSetupCommandBuilder.BuildRepairProductsArguments(@"D:\Recomp", @"D:\RetroRewind6")
         );
         Assert.Equal(
-            "--repair-products --install-dir \"D:\\Recomp\" --retro-dir \"D:\\RetroRewind6\" --skip-retro-wfc-payload --progress-json",
+            [
+                "--repair-products",
+                "--install-dir",
+                @"D:\Recomp",
+                "--retro-dir",
+                @"D:\RetroRewind6",
+                "--skip-retro-wfc-payload",
+                "--progress-json",
+            ],
             RecompSetupCommandBuilder.BuildRepairProductsArguments(@"D:\Recomp", @"D:\RetroRewind6", RecompRetroWfcPayloadMode.Skip)
         );
     }

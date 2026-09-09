@@ -39,7 +39,11 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
     private const string RetroWfcUnavailableMessage =
         "The Retro WFC servers are not responding, so WiiCompiled cannot set up online play right now. Try again later, or install without online play.";
 
-    private static readonly JsonSerializerOptions InstallStateJsonOptions = new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
+    private static readonly JsonSerializerOptions InstallStateJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+    };
 
     private readonly IRecompEnvironment environment;
     private readonly IRecompProcessRunner processRunner;
@@ -165,7 +169,12 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
             return Fail(StaleStateMessage);
 
         return Ok(
-            inspector.Inspect(environment.BackendStateFilePath, state.SetupVersion, environment.InstallFolderPath, environment.RetroRewindFolderPath)
+            inspector.Inspect(
+                environment.BackendStateFilePath,
+                state.SetupVersion,
+                environment.InstallFolderPath,
+                environment.RetroRewindFolderPath
+            )
         );
     }
 
@@ -214,7 +223,13 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
 
         // The installed host repairs on its own, offline included, as long as no newer release exists.
         if (await InstalledHostIsCurrentAsync(state, release, cancellationToken))
-            return await RepairWhatTheCheckDemandsAsync(progress, payloadMode, forceRetroRebuild, reportCompletion: true, cancellationToken);
+            return await RepairWhatTheCheckDemandsAsync(
+                progress,
+                payloadMode,
+                forceRetroRebuild,
+                reportCompletion: true,
+                cancellationToken
+            );
 
         if (release is null)
             return Fail("Could not verify a current WiiCompiled setup release or installed repair host.");
@@ -230,7 +245,11 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
     /// Whether the installed AppImage is the release to keep using: its state is current, it is the newest
     /// release (or GitHub is unreachable), and the file itself still reports that version.
     /// </summary>
-    private async Task<bool> InstalledHostIsCurrentAsync(RecompInstallState? state, RecompRelease? release, CancellationToken cancellationToken)
+    private async Task<bool> InstalledHostIsCurrentAsync(
+        RecompInstallState? state,
+        RecompRelease? release,
+        CancellationToken cancellationToken
+    )
     {
         if (!HasInstalledHost || !IsCurrentInstallState(state))
             return false;
@@ -253,7 +272,7 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
             environment.RetroRewindFolderPath,
             payloadMode
         );
-        logger.LogInformation("Running the recomp setup: {Setup} {Arguments}", setupFilePath, arguments);
+        logger.LogInformation("Running the recomp setup: {Setup} {Arguments}", setupFilePath, string.Join(' ', arguments));
         Report(progress, t("progress.recomp_running_setup"), SetupPercentFloor);
 
         var resultHolder = new EventHolder<RecompSetupResultEvent>();
@@ -278,7 +297,9 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
             return setupOutcome;
 
         // The AppImage reports the version it actually is; the release tag is only the fallback.
-        var installedVersion = RecompVersion.TryParse(resultHolder.Value?.Version, out var reported) ? reported.ToString() : release.Version.ToString();
+        var installedVersion = RecompVersion.TryParse(resultHolder.Value?.Version, out var reported)
+            ? reported.ToString()
+            : release.Version.ToString();
         var recordResult = RecordInstalledHost(setupFilePath, installedVersion, payloadMode);
         if (recordResult.IsFailure)
             return recordResult;
@@ -538,7 +559,11 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
             return Fail("Retro Rewind must be installed before WiiCompiled can repair or launch.");
 
         var arguments = RecompLinuxSetupCommandBuilder.BuildInstallArguments(gameFilePath: null, retroRewindFolderPath, payloadMode);
-        logger.LogInformation("Running the recomp setup: {Setup} {Arguments}", environment.InstalledSetupFilePath, arguments);
+        logger.LogInformation(
+            "Running the recomp setup: {Setup} {Arguments}",
+            environment.InstalledSetupFilePath,
+            string.Join(' ', arguments)
+        );
         Report(progress, t("progress.recomp_running_setup"), SetupPercentFloor);
 
         var resultHolder = new EventHolder<RecompSetupResultEvent>();
@@ -672,7 +697,8 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
     }
 
     // The same spellings the Windows setup writes, so RecompRetroWfcPayloadPolicy reads both alike.
-    private static string PayloadModeName(RecompRetroWfcPayloadMode mode) => mode == RecompRetroWfcPayloadMode.Skip ? "skipped" : "downloaded";
+    private static string PayloadModeName(RecompRetroWfcPayloadMode mode) =>
+        mode == RecompRetroWfcPayloadMode.Skip ? "skipped" : "downloaded";
 
     private RecompInstallState? ReadInstalledState()
     {

@@ -13,10 +13,11 @@ public interface IRecompProcessRunner
     /// <summary>
     /// Runs a process to completion, forwarding every stdout line to <paramref name="onStandardOutputLine"/>.
     /// Stderr is captured for diagnostics only, since the contract keeps it out of the NDJSON stream.
+    /// <paramref name="arguments"/> are passed as separate values, never through a shell or a quoted string.
     /// </summary>
     Task<OperationResult<int>> RunAsync(
         string fileName,
-        string arguments,
+        IReadOnlyList<string> arguments,
         string? workingDirectory,
         Action<string>? onStandardOutputLine,
         CancellationToken cancellationToken = default
@@ -29,8 +30,9 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
     private const string CancellationEventEnvironmentVariable = "MKWCOMPILED_CANCEL_EVENT";
 
     // The AppImage runtime honours this by unpacking itself to a temporary directory instead of
-    // mounting through FUSE. It is always set: FUSE is not something to rely on (it is missing on
-    // many distributions and inside a Flatpak sandbox), and the unpack costs well under a second.
+    // mounting through FUSE. It is always set for an AppImage: FUSE is not something to rely on (it
+    // is missing on many distributions and inside a Flatpak sandbox), and the unpack costs well under
+    // a second.
     private const string AppImageExtractAndRunEnvironmentVariable = "APPIMAGE_EXTRACT_AND_RUN";
 
     private static readonly TimeSpan CancellationGracePeriod = TimeSpan.FromSeconds(10);
@@ -38,7 +40,7 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
 
     public async Task<OperationResult<int>> RunAsync(
         string fileName,
-        string arguments,
+        IReadOnlyList<string> arguments,
         string? workingDirectory,
         Action<string>? onStandardOutputLine,
         CancellationToken cancellationToken = default
@@ -57,7 +59,7 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             var startInfo = CreateStartInfo(fileName, arguments, workingDirectory);
             if (cancellationEvent is not null)
                 startInfo.Environment[CancellationEventEnvironmentVariable] = cancellationEventName;
-            if (!OperatingSystem.IsWindows())
+            if (fileName.EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase))
                 startInfo.Environment[AppImageExtractAndRunEnvironmentVariable] = "1";
 
             using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
@@ -114,11 +116,11 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
         }
     }
 
-    private static ProcessStartInfo CreateStartInfo(string fileName, string arguments, string? workingDirectory) =>
-        new()
+    private static ProcessStartInfo CreateStartInfo(string fileName, IReadOnlyList<string> arguments, string? workingDirectory)
+    {
+        var startInfo = new ProcessStartInfo
         {
             FileName = fileName,
-            Arguments = arguments,
             WorkingDirectory = string.IsNullOrWhiteSpace(workingDirectory) ? string.Empty : workingDirectory,
             UseShellExecute = false,
             // The recomp setup is CLI-only. Wheel Wizard supplies the UI, including during launch,
@@ -127,6 +129,14 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             RedirectStandardOutput = true,
             RedirectStandardError = true,
         };
+
+        // ArgumentList hands each value over as one argv entry: verbatim on Unix, and quoted the way
+        // CommandLineToArgvW expects on Windows. Neither builder has to know about quoting.
+        foreach (var argument in arguments)
+            startInfo.ArgumentList.Add(argument);
+
+        return startInfo;
+    }
 
     private async Task<bool> CancelAndWaitForExitAsync(Process process, EventWaitHandle cancellationEvent)
     {
@@ -147,26 +157,16 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
     /// build it spawned and writing its terminal result line, so it gets the same grace period.
     /// The process Wheel Wizard started is the AppImage runtime, which runs the setup in a child and
     /// does not forward signals to it, so every descendant is signalled, not just the root. The list is
-    /// taken before signalling: once the runtime dies its children are reparented and no longer found.
+    /// taken before signalling: once the runtime dies its children are reparented and no longer found,
+    /// which is also why the forced stop below cannot rely on <see cref="Process.Kill(bool)"/> alone.
     /// </summary>
     private async Task<bool> TerminateAndWaitForExitAsync(Process process)
     {
-        var processIds = ProcessTreeIds(process);
-        try
+        var processIds = await ProcessTreeIdsAsync(process);
+        foreach (var processId in processIds)
         {
-            foreach (var processId in processIds)
-            {
-                if (Kill(processId, Sigterm) != 0)
-                    logger.LogDebug(
-                        "Failed to send SIGTERM to recomp process {Pid} (errno {Errno})",
-                        processId,
-                        Marshal.GetLastPInvokeError()
-                    );
-            }
-        }
-        catch (Exception exception)
-        {
-            logger.LogWarning(exception, "Failed to signal cooperative cancellation to the recomp setup process");
+            if (Kill(processId, Sigterm) != 0)
+                logger.LogDebug("Failed to send SIGTERM to recomp process {Pid} (errno {Errno})", processId, Marshal.GetLastPInvokeError());
         }
 
         try
@@ -185,35 +185,52 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
             );
         }
 
-        foreach (var processId in processIds)
-            Kill(processId, Sigkill);
+        // Descendants the runtime has already orphaned are out of reach of Kill(entireProcessTree),
+        // so they are stopped by the ids recorded above; the root's own tree is handled the usual way.
+        foreach (var processId in processIds.Skip(1))
+        {
+            try
+            {
+                using var descendant = Process.GetProcessById(processId);
+                descendant.Kill();
+            }
+            catch (Exception)
+            {
+                // Already gone, or reused by an unrelated process that is not ours to stop.
+            }
+        }
+
         return await KillAndWaitForExitAsync(process);
     }
 
-    /// <summary>The started process and all of its descendants, from <c>/proc</c>, root first.</summary>
-    private List<int> ProcessTreeIds(Process root)
+    /// <summary>
+    /// The started process and all of its descendants, root first. .NET exposes no parent process id,
+    /// so the tree is read through <c>ps</c>, which prints it the same way on Linux and macOS.
+    /// </summary>
+    private async Task<List<int>> ProcessTreeIdsAsync(Process root)
     {
         var childrenByParent = new Dictionary<int, List<int>>();
         try
         {
-            foreach (var directory in Directory.EnumerateDirectories("/proc"))
+            var startInfo = new ProcessStartInfo("ps")
             {
-                if (!int.TryParse(Path.GetFileName(directory), out var processId))
+                ArgumentList = { "-e", "-o", "pid=,ppid=" },
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            using var ps = Process.Start(startInfo) ?? throw new InvalidOperationException("ps did not start");
+            var output = await ps.StandardOutput.ReadToEndAsync();
+            await ps.WaitForExitAsync();
+
+            foreach (var line in output.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var fields = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (fields.Length < 2 || !int.TryParse(fields[0], out var processId) || !int.TryParse(fields[1], out var parentId))
                     continue;
-                try
-                {
-                    // "<pid> (<comm>) <state> <ppid> ...": comm may contain spaces, so split after its closing parenthesis.
-                    var stat = File.ReadAllText(Path.Combine(directory, "stat"));
-                    var fields = stat[(stat.LastIndexOf(')') + 2)..].Split(' ');
-                    var parentId = int.Parse(fields[1]);
-                    if (!childrenByParent.TryGetValue(parentId, out var children))
-                        childrenByParent[parentId] = children = [];
-                    children.Add(processId);
-                }
-                catch (Exception)
-                {
-                    // The process vanished between the listing and the read, or /proc is not readable.
-                }
+                if (!childrenByParent.TryGetValue(parentId, out var children))
+                    childrenByParent[parentId] = children = [];
+                children.Add(processId);
             }
         }
         catch (Exception exception)
@@ -288,9 +305,8 @@ public sealed class RecompProcessRunner(ILogger<RecompProcessRunner> logger) : I
     }
 
     private const int Sigterm = 15;
-    private const int Sigkill = 9;
 
-    // .NET offers no way to send a specific signal to another process, so this goes to libc directly.
+    // .NET can only SIGKILL another process; SIGTERM, the cooperative request, has to go to libc directly.
     [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
     private static extern int Kill(int pid, int signal);
 }

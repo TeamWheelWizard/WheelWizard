@@ -28,8 +28,15 @@ public class RecompLinuxTests
         );
 
         Assert.Equal(
-            "install --game \"/home/user/Games/Mario Kart Wii.rvz\" "
-                + "--retro-dir \"/home/user/.local/share/WheelWizard/RiivolutionWW/RetroRewind6\" --download-retro-wfc-payload --progress-json",
+            [
+                "install",
+                "--game",
+                "/home/user/Games/Mario Kart Wii.rvz",
+                "--retro-dir",
+                "/home/user/.local/share/WheelWizard/RiivolutionWW/RetroRewind6",
+                "--download-retro-wfc-payload",
+                "--progress-json",
+            ],
             arguments
         );
     }
@@ -39,24 +46,17 @@ public class RecompLinuxTests
     {
         var arguments = RecompLinuxSetupCommandBuilder.BuildInstallArguments(null, "/rr/RetroRewind6", RecompRetroWfcPayloadMode.Skip);
 
-        Assert.Equal("install --retro-dir \"/rr/RetroRewind6\" --skip-retro-wfc-payload --progress-json", arguments);
+        Assert.Equal(["install", "--retro-dir", "/rr/RetroRewind6", "--skip-retro-wfc-payload", "--progress-json"], arguments);
         Assert.DoesNotContain("--game", arguments);
     }
 
     [Fact]
     public void Install_BaseOnlyPassesNoPayloadOption()
     {
-        Assert.Equal("install --game \"/g.iso\" --progress-json", RecompLinuxSetupCommandBuilder.BuildInstallArguments("/g.iso", null));
-    }
-
-    [Theory]
-    [InlineData("/plain/path", "\"/plain/path\"")]
-    [InlineData("/with \"quotes\"/x", "\"/with \\\"quotes\\\"/x\"")]
-    [InlineData("/back\\slash\\", "\"/back\\slash\\\\\"")]
-    [InlineData("/odd\\\"mix", "\"/odd\\\\\\\"mix\"")]
-    public void Quote_MatchesTheDotnetArgumentParser(string path, string expected)
-    {
-        Assert.Equal(expected, RecompLinuxSetupCommandBuilder.Quote(path));
+        Assert.Equal(
+            ["install", "--game", "/g.iso", "--progress-json"],
+            RecompLinuxSetupCommandBuilder.BuildInstallArguments("/g.iso", null)
+        );
     }
 
     [Fact]

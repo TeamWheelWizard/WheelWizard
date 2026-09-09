@@ -600,7 +600,7 @@ public sealed class RecompInstallService : IRecompInstallService
         };
 
         var arguments = RecompSetupCommandBuilder.BuildSilentInstallArguments(request);
-        logger.LogInformation("Running the recomp setup: {Setup} {Arguments}", setupFilePath, arguments);
+        logger.LogInformation("Running the recomp setup: {Setup} {Arguments}", setupFilePath, string.Join(' ', arguments));
 
         Report(progress, t("progress.recomp_running_setup"), SetupPercentFloor);
 
