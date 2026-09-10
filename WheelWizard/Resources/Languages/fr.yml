@@ -4,7 +4,7 @@ fr:
     settings: "Paramètres"
     mods: "My Stuff"
     patches: "Patchs"
-    my_profiles: "Mes Profils"
+    my_profiles: "Mes Permis"
     rooms: "Salles"
     friends: "Amis"
     leaderboard: "Classements"
@@ -99,7 +99,7 @@ fr:
     error: "Erreur"
     warning: "Avertissement"
     success: "Succès"
-    extracting: "Extraction des fichers..."
+    extracting: "Extraction des fichiers..."
     no_name: "Aucun nom"
     no_license: "Aucun Permis"
     no_profiles: "Aucun Profil"
@@ -130,7 +130,7 @@ fr:
     no: "Non"
     keep: "Garder"
     ok: "OK"
-    revert: "Annuler"
+    revert: "Rétablir"
     maybe_later: "Peut-être plus tard"
     browse: "Chercher"
     change: "Changer"
@@ -143,7 +143,7 @@ fr:
     favorite: "Favoris"
     view_room: "Voir la salle"
     recomp_nand_copy: "Faire une copie"
-    recomp_nand_share: "Utiliser directement"
+    recomp_nand_share: "Partager directement"
     recomp_install_offline: "Installer en mode hors ligne"
     link:
       discord: "Parlez-nous !"
@@ -208,14 +208,14 @@ fr:
     rooms_page_disclaimer: |-
       Attention, cette page ne permet pas de rejoindre une salle directement.
       Pour rejoindre une salle spécifique, vous devez soit la rejoindre via un ami, soit espérer la rejoindre via les serveurs en ligne.
-    friends_page_disclaimer: "Pour ajouter des amis rendez vous en jeu."
+    friends_page_disclaimer: "Pour ajouter des amis, rendez-vous en jeu."
     region_user_selection: "Ceci montre les régions dans lesquelles VOUS avez joué"
     primary_profile: "Le profil principal est utilisé en tant que référence dans Wheel Wizard"
   empty_content:
     no_profiles: "Vous devez lancer le jeu au moins une fois pour voir vos profils apparaître ici"
     no_friends_title: "Pas d'amis pour le moment !"
     no_friends: "Vous pouvez ajouter vos amis en jeu."
-    no_mods: "Les mods permettent de modifer le fonctionnement du jeu. Commencez à importer votre premier mod en cliquant sur le bouton en-dessous."
+    no_mods: "Les mods permettent de modifier le fonctionnement du jeu. Commencez à importer votre premier mod en cliquant sur le bouton ci-dessous."
     no_mods_title: "Pas de mods trouvés"
     no_rooms: "Soit vous n'êtes pas connecté(e) à Internet, soit personne ne joue."
     no_rooms_title: "Aucune salle trouvée"
@@ -237,7 +237,7 @@ fr:
       1: "1 seconde"
       n: "{$1} secondes"
   progress:
-    estimated_time_remaining: "Temps restant: "
+    estimated_time_remaining: "Temps restant estimé : "
     downloading_mb: "téléchargement de {$1} MB"
     installing_mods: "Installation de mods"
     installing_mods_count: "Installation de {$1} mods"
@@ -270,11 +270,11 @@ fr:
     recomp_uninstall:
       title: "Désinstaller WiiCompiled ?"
       extra_shared: "Cela supprime WiiCompiled. Vos sauvegardes resteront dans le dossier Wii de Dolphin, et Retro Rewind reste installé."
-      extra_private: "Cela supprime WiiCompiled, mais aussi les données de sauvegarde Wii, et Retro Rewind reste installé."
+      extra_private: "Cela supprime WiiCompiled, mais aussi ses données de sauvegarde Wii privées, et Retro Rewind reste installé."
       extra_copy: "Cela supprime WiiCompiled, mais aussi la copie de vos données Dolphin. Les données originales restent intactes, et Retro Rewind reste installé."
     recomp_use_dolphin_nand:
       title: "Utiliser vos données de sauvegarde Dolphin ?"
-      extra: "WiiCompiled peut démarrer avec les sauvegardes, Miis et codes ami que vous utilisiez déjà avec Dolphin. Sinon, il démarrera avec ses propres données vierges."
+      extra: "WiiCompiled peut démarrer avec les sauvegardes, Miis et codes amis que vous utilisez déjà avec Dolphin. Sinon, il démarrera avec ses propres données vierges."
     recomp_retro_wfc_unavailable:
       title: "Impossible de communiquer avec Retro WFC"
       extra: "WiiCompiled a besoin des serveurs Retro WFC pour préparer les services en ligne, mais ils ne répondent pas. Vous pouvez installer sans les fonctionnalités en ligne; et WiiCompiled les ajoutera automatiquement lors de la prochaine mise à jour, une fois les serveurs en ligne."
@@ -283,7 +283,7 @@ fr:
       extra: "Dolphin ne recommande pas l'utilisation directe de ses données Wii (NAND), car l'écriture de données par deux programmes en simultané peut provoquer leur corruption. Une copie isolera complètement WiiCompiled, mais la progression effectuée dans l'une des copies ne sera pas dans l'autre."
     recomp_share_dolphin_data:
       title: "Partager les données de la NAND avec Dolphin ?"
-      extra: "La copiage permet à WiiCompiled d'utiliser les mêmes sauvegardes, Miis, et paramètres Wii, mais garde sa copie isolée et est plus sûr. Le partage direct permet à Dolphin et WiiCompiled d'écrire sur la même NAND, ce qui peut la corrompre si les deux tournent en même temps. Continuez seulement si vous êtes conscient des risques."  
+      extra: "La copie permet à WiiCompiled d'utiliser les mêmes sauvegardes, Miis, et paramètres Wii, mais garde sa copie isolée et est plus sûr. Le partage direct permet à Dolphin et WiiCompiled d'écrire sur la même NAND, ce qui peut la corrompre si les deux tournent en même temps. Continuez seulement si vous êtes conscient des risques."
     recomp_overwrite_dolphin_clone:
       title: "Remplacer la copie isolée de Dolphin ?"
       extra: "Cette option remplace la copie actuelle avec les données de Dolphin. Les sauvegardes, Miis, et paramètres Wii modifiés seulement sur WiiCompiled seront perdus."
@@ -310,13 +310,13 @@ fr:
         Dossier de l'émulateur Dolphin trouvé. Voulez-vous utiliser ce dossier ?
     dolphin_outdated:
       title: "Votre émulateur Dolphin est obsolète"
-      extra: |
-        Cette version de Dolphin ({$1}) a une faille de sécurité connue qui permet aux fichiers de jeu, mods, ou tricheurs en ligne d'infecter votre PC avec des logiciels malveillants.
+      extra: |-
+        Cette version de Dolphin ({$1}) a une faille de sécurité connue qui permet à des fichiers de jeu, mods ou joueurs en ligne malveillants d'infecter votre PC.
 
-        Mettez à jour vers la version {$2} ou ultérieure pour être sûr.
+        Mettez à jour vers la version {$2} ou ultérieure pour être en sécurité.
     dolphin_program_found:
       title: "Émulateur Dolphin trouvé"
-      extra: |
+      extra: |-
         Si vous ne savez pas ce que cela veut dire, cliquez juste sur oui :)
 
         Émulateur Dolphin trouvé. Voulez-vous l'utiliser ?
@@ -363,7 +363,7 @@ fr:
     not_find_game:
       extra: "Nous n'avons pas pu trouver le jeu, veuillez définir le chemin dans les paramètres"
     multiple_files_selected:
-      title: "Plusieurs fichers sélectionnés"
+      title: "Plusieurs fichiers sélectionnés"
     invalid_name:
       extra:
         mod_name_exists: "Un mod avec le nom \"{$1}\" existe déjà"
@@ -382,7 +382,7 @@ fr:
         Vérifiez que vous êtes sur la version {$1} ou ultérieure. Les anciennes versions ont une faille de sécurité connue qui permet aux fichiers de jeu, mods, ou tricheurs en ligne d'infecter votre PC avec des logiciels malveillants.
     dolphin_tool_selected:
       title: "Mauvais exécutable Dolphin sélectionné"
-      extra: "Vous avez sélectionné DolphinTool.exe. Choisissez Dolphin.exe (l'éxecutable de l'émulateur Dolphin) à la place."
+      extra: "Vous avez sélectionné DolphinTool.exe. Choisissez Dolphin.exe (l'exécutable de l'émulateur Dolphin) à la place."
     fail_check_updates:
       title: "Échec de la vérification des mises à jour"
       extra: "Impossibilité de vérifier les mises à jour actuellement. Soit vous n'êtes pas connecté à internet soit le serveur est peut-être en maintenance"
@@ -390,7 +390,7 @@ fr:
       extra:
         reason_network: |-
           Impossible de vérifier si Wheel Wizard est mis à jour.
-          Vous avez sûrement des problèmes de connexion.
+          Vous avez peut-être des problèmes de connexion.
         reason_location: |-
           Impossible de mettre à jour Wheel Wizard. Veuillez bien vérifier que l'application se trouve dans un dossier dans lequel on peut écrire.
           Nous n'avons pas pu trouver le dossier actuel.
@@ -515,7 +515,7 @@ fr:
     brsar_no_supported_differences: "Aucune différence RBNK/RSEQ/RWSD prise en charge n’a été trouvée par rapport à la base de références intégrée du jeu."
     brsar_unresolved_count: "{$1} entrées de fichiers BRSAR intégrées n’ont pas pu être résolues avec certitude."
     brsar_unsupported_summary: "Seules les entrées RBNK/RSEQ/RWSD peuvent être exportées. L’archive analysée contient également {$1}."
-    file_deletion_not_exportable: "{$1} existe uniquement dans l’archive d’origine. Les suppressions de fichiers ne peuvent pas être exportées sous forme de patchs \" en loose.\""
+    file_deletion_not_exportable: "{$1} existe uniquement dans l’archive d’origine. Les suppressions de fichiers ne peuvent pas être exportées sous forme de patchs \"en loose\"."
     file_name_differs_from_archive_tag: "Le nom du fichier sélectionné diffère du tag de l'archive d’origine \"{$1}.szs\"."
     file_not_in_built_in_baseline: "{$1} n’est pas présent dans la base de références intégrée du jeu."
     no_szs_differences: "Aucune différence SZS n’a été trouvée par rapport à la base de références intégrée du jeu."
@@ -523,7 +523,7 @@ fr:
     unsupported_loose_override_extension: "{$1} utilise une extension de remplacement loose non prise en charge (.kcl, .kmp, .slt)."
     whole_file_baseline: "Ce SZS est stocké comme base de références du fichier complet. Exportation d’un remplacement du fichier complet."
   option:
-    wh_wz_language: "Langage de Wheel Wizard"
+    wh_wz_language: "Langue de Wheel Wizard"
     force_disable_wiimote: "Forcer la désactivation des Wiimotes"
     launch_with_dolphin: "Lancer le jeu avec la fenêtre de Dolphin"
     launch_rr_on_startup: "Lancer Retro Rewind au démarrage"
@@ -558,7 +558,7 @@ fr:
     graphics: "Graphismes"
     general: "Général"
     retro_rewind: "Retro Rewind"
-    language: "Langage"
+    language: "Langue"
     wii: "Paramètres Wii"
     resolution: "Résolution"
     performance: "Paramètres de performance"
@@ -566,7 +566,7 @@ fr:
     location_paths: "Paramètres de localisation"
     wh_wz_appearance: "Apparence de Wheel Wizard"
     installation: "Installation"
-    setup: "Installation"
+    setup: "Configuration"
     recomp: "WiiCompiled (bêta)"
     recomp_video: "Vidéo"
   helper_text:
@@ -576,7 +576,7 @@ fr:
     recomp_share_dolphin_data: "WiiCompiled et Dolphin utilisent les mêmes sauvegardes, Miis, et paramètres Wii."
     recomp_shared_nand_warning: "N'exécutez pas Dolphin et WiiCompiled en même temps pendant le partage des données de NAND."
     recomp_clone_dolphin_data: "Copie les sauvegardes, Miis, et paramètres Wii de Dolphin dans les données isolées de WiiCompiled."
-    recomp_graphics_api: "Seuls DirectX 12 et Vulkan font tourner WiiCompiled fiablement, donc rien d'autre n'est proposé."
+    recomp_graphics_api: "WiiCompiled fonctionne de manière fiable avec DirectX 12 et Vulkan."
     recomp_dolphin_data_not_found: "Définissez un chemin vers le dossier utilisateur Dolphin dans les paramètres de localisation. Il doit contenir un dossier Wii."
     recomp_prevent_stutters: "Lors de la compilation d'un shader, les objets qui en ont besoin sont ignorés pendant quelques frames au lieu de bloquer le jeu jusqu'à ce que la compilation soit terminée, provoquant un léger effet de \"pop-in\" au lieu d'un ralentissement"
     launch_with_dolphin: "Affichera la fenêtre d'accueil de Dolphin en plus de celle du jeu"
@@ -585,7 +585,7 @@ fr:
     force_disable_wiimote: "Ce paramètre désactivera les Wiimotes en jeu, mais les activera dans le menu Wii"
     resolution_scale: "1x est la résolution native"
     renderer: "Sélectionne le moteur de rendu que Dolphin utilise pour le rendu du jeu."
-    v_sync: "Synchronise la fréquence d'images par secondes (FPS) avec votre écran pour empêcher les déchirements d'écran."
+    v_sync: "Synchronise la fréquence d'images par seconde (FPS) avec votre écran pour empêcher les déchirements d'écran."
     recommended: "Ce paramètre changera certains paramètres Dolphin pour réduire les saccades et les pics de lag"
     30_fps: "Ce paramètre forcera le jeu à tourner en 30 FPS (au lieu de 60)"
     wheel_wizard_data_folder: "Choisissez là où Wheel Wizard stocke ses fichiers. Le déplacement peut prendre un moment."
@@ -593,7 +593,7 @@ fr:
     end_with_exe: "Le chemin doit se finir en .exe"
     enable_animations: "Cette option active les animations dans l'application Wheel Wizard"
     end_with_x: "Le chemin doit se finir avec:"
-    wh_wz_language: "Cette option change uniquement la langue de Wheel Wizard. Pour changer la langue dans le jeu. Veuillez-le faire depuis les paramètres de Retro Rewind."
+    wh_wz_language: "Change uniquement la langue de Wheel Wizard, pas celle du jeu"
     optional: "Optionnel"
     must_set_paths: "Vous devez impérativement définir ces 3 chemins afin de jouer à Retro Rewind"
     must_set_game_path: "Vous devez sélectionner votre fichier de jeu Mario Kart Wii avant de pouvoir jouer à WiiCompiled"
@@ -604,9 +604,9 @@ fr:
     general: "Général"
     video: "Vidéo"
   status:
-    recomp_dolphin_data_not_linked: "Non liées. WiiCompiled utilisera ses propres données Wii."
-    recomp_dolphin_data_linked: "Partage des données de Dolphin depuis {$1}"
-    recomp_dolphin_data_copied: "Utilisation d'une copie de vos données de Dolphin dans {$1}"
+    recomp_dolphin_clone_available: "Copie privée : {$1}"
+    recomp_dolphin_clone_missing: "Aucune copie privée n'a été créée."
+    recomp_dolphin_data_cloned: "Données de Dolphin copiées pour WiiCompiled"
     recomp_dolphin_data_not_found: "Données de Dolphin introuvables"
     recomp_not_installed: "WiiCompiled n'est pas encore installé. Installez-le d'abord depuis l'accueil"
     recomp_uninstalled: "WiiCompiled a été désinstallé"
