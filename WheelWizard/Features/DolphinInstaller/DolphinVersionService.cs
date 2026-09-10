@@ -46,9 +46,8 @@ public sealed class DolphinVersionService(ILinuxProcessService processService) :
         }
 
         // a broken Qt platform configuration should not be what stops us from reading the version.
-        // + flatpak dolphin runs in its own environment, so passing it here should not reach it anyway.
         List<string> arguments = [];
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !PathManager.IsFlatpakDolphinFilePath(dolphinLocation))
+        if (Helpers.EnvHelper.IsFlatpakSandboxed() || OperatingSystem.IsLinux() && !PathManager.IsFlatpakDolphinFilePath(dolphinLocation))
             arguments.Add("QT_QPA_PLATFORM=xcb");
 
         arguments.AddRange(["sh", "-c", "--", $"{dolphinLocation} --version"]);
