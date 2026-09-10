@@ -197,6 +197,10 @@ public class App : Application
     {
         try
         {
+            // Fire and forget: removing the extraction folders of previous versions can take a while
+            // and must never block (or fail) the startup of the application.
+            _ = Services.GetRequiredService<IBundleExtractionCleanupService>().CleanupStaleExtractionsAsync();
+
             var resourceInstaller = Services.GetRequiredService<IMiiRenderingResourceInstaller>();
             if (resourceInstaller.GetResolvedResourcePath().IsFailure)
             {

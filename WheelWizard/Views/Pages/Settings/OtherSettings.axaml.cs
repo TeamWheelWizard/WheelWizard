@@ -1,5 +1,6 @@
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
+using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
@@ -51,8 +52,8 @@ public partial class OtherSettings : UserControlBase
     {
         // Always loads
 
-        // The recomp only ships for Windows, so on every other platform the whole section stays hidden.
-        var recompSupported = OperatingSystem.IsWindows();
+        // The recomp only runs where a setup backend exists for it, so elsewhere the whole section stays hidden.
+        var recompSupported = RecompPlatform.IsSupported;
         RecompSectionLabel.IsVisible = recompSupported;
         RecompBorder.IsVisible = recompSupported;
         if (recompSupported)

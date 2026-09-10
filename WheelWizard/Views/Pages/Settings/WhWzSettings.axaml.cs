@@ -51,7 +51,7 @@ public partial class WhWzSettings : UserControlBase
     private void ConfigureLocationFieldsForActiveFrontend()
     {
         var recompEnabled = SettingsService.IsRecompModeActive();
-        DolphinExecutableField.IsVisible = !recompEnabled;
+        DolphinExecutableField.IsVisible = !recompEnabled && !EnvHelper.IsFlatpakSandboxed();
         GameLocationBorder.CornerRadius = recompEnabled ? new Avalonia.CornerRadius(12, 12, 5, 5) : new Avalonia.CornerRadius(5);
         DolphinUserFolderLabel.Text = recompEnabled
             ? $"{t("option.dolphin_user_path")} ({t("helper_text.optional")})"
@@ -111,8 +111,21 @@ public partial class WhWzSettings : UserControlBase
     private void RefreshLocalizedCodeText()
     {
         MarioKartHelperText.Text = t("helper_text.end_with_x") + " .iso/.gcm/.gcz/.ciso/.wbfs/.wia/.rvz";
+        if (string.IsNullOrWhiteSpace(PathManager.DolphinFilePath))
+            DolphinExecutableValueText.Text = GetDolphinExecutableHelperText();
         TranslationsPercentageText.Text = t("text.language_translated_by", t("value.language.z_translators"));
         TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
+    }
+
+    private static string GetDolphinExecutableHelperText()
+    {
+        if (OperatingSystem.IsWindows())
+            return t("helper_text.end_with_exe");
+        if (OperatingSystem.IsLinux())
+            return t("helper_text.select_dolphin_linux");
+        if (OperatingSystem.IsMacOS())
+            return t("helper_text.select_dolphin_macos");
+        return t("helper_text.select_dolphin_linux");
     }
 
     private static string ScaleToString(double scale)
@@ -383,7 +396,7 @@ public partial class WhWzSettings : UserControlBase
 
         LocationWarningIcon.IsVisible = !SettingsService.PathsSetupCorrectly();
         DolphinExecutableValueText.Text = string.IsNullOrWhiteSpace(PathManager.DolphinFilePath)
-            ? t("helper_text.end_with_exe")
+            ? GetDolphinExecutableHelperText()
             : PathManager.DolphinFilePath;
         DolphinExecutableOpenButton.IsVisible = !OperatingSystem.IsLinux() || IsConfiguredExecutableFile(PathManager.DolphinFilePath);
         DolphinExecutableOpenButton.IsEnabled =

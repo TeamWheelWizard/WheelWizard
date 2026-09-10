@@ -510,10 +510,9 @@ public sealed class ModManager : IModManager
     {
         try
         {
-            var modsRoot = Path.GetFullPath(PathManager.ModsFolderPath)
-                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var modsRoot = FileHelper.NormalizePath(PathManager.ModsFolderPath);
 
-            var target = Path.GetFullPath(modDirectory).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var target = FileHelper.NormalizePath(modDirectory);
 
             var relativePath = Path.GetRelativePath(modsRoot, target);
 
