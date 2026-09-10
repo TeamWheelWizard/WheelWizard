@@ -52,7 +52,7 @@ public static class EnvHelper
     {
         if (IsFlatpakSandboxed())
         {
-            return "dolphin-emu-wrapper";
+            return "/app/bin/dolphin-emu-wrapper";
         }
         return null;
     }
