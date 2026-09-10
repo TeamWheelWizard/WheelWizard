@@ -243,8 +243,8 @@ public static class DolphinLaunchHelper
         {
             var startInfo = new ProcessStartInfo();
 
-            // The Flatpak sandbox always uses the Dolphin wrapper to launch the bundled Dolphin version.
-            var cannotPassUserFolder = EnvHelper.IsFlatpakSandboxed() || OperatingSystem.IsLinux() && PathManager.IsLinuxDolphinConfigSplit();
+            // The Flatpak sandbox always uses the Dolphin wrapper to launch the bundled Dolphin version with a split config.
+            var cannotPassUserFolder = OperatingSystem.IsLinux() && PathManager.IsLinuxDolphinConfigSplit();
             var userFolderArgument = cannotPassUserFolder ? "" : $"-u {EnvHelper.QuotePath(Path.GetFullPath(PathManager.UserFolderPath))}";
             var dolphinLaunchArguments = $"{arguments} {userFolderArgument}";
 

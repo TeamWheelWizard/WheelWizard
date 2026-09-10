@@ -706,7 +706,8 @@ public static partial class PathManager
 
     public static bool IsLinuxDolphinConfigSplit()
     {
-        return !string.IsNullOrWhiteSpace(SplitLinuxDolphinConfigDir);
+        // Our Flatpak will always use split config/data directories internally.
+        return IsFlatpakSandboxed() || !string.IsNullOrWhiteSpace(SplitLinuxDolphinConfigDir);
     }
 
     public static string LoadFolderPath
