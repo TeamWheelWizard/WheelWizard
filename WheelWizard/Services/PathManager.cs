@@ -908,6 +908,12 @@ public static partial class PathManager
 
     private static string TryFindPortableUserFolderPath()
     {
+        if (IsFlatpakSandboxed())
+        {
+            // It does not make sense to check portable folders, so return early for the WheelWizard Flatpak
+            return string.Empty;
+        }
+
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             // In this case, Dolphin would use `EMBEDDED_USER_DIR` which is the portable `user` directory
@@ -916,12 +922,6 @@ public static partial class PathManager
             var embeddedUserPath = Path.GetFullPath("user");
             if (FileHelper.DirectoryExists(embeddedUserPath))
                 return embeddedUserPath;
-        }
-
-        if (IsFlatpakSandboxed())
-        {
-            // It does not make sense to check the executable directory, so return early for the WheelWizard Flatpak
-            return string.Empty;
         }
 
         var portableUserPath = PortableUserFolderPath;
