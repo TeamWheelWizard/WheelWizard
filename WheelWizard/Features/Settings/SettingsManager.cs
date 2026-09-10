@@ -131,19 +131,46 @@ public class SettingsManager : ISettingsManager
                 }
 
                 // `~/.dolphin-emu` would be used if it exists
-                if (
-                    _fileSystem.Directory.Exists(PathManager.LinuxDolphinLegacyFolderPath) &&
-                    (
-                        EnvHelper.IsFlatpakSandboxed() && !string.IsNullOrWhiteSpace(PathManager.SplitLinuxDolphinConfigDir) &&
-                        PathManager.SplitLinuxDolphinConfigDir.Equals(
-                            PathManager.SplitLinuxDolphinNativeConfigDir,
-                            StringComparison.Ordinal)
-                            ||
-                        !EnvHelper.IsFlatpakSandboxed() && // The official Dolphin Flatpak ignores the `~/.dolphin-emu` folder
-                        !PathManager.IsFlatpakDolphinFilePath(dolphinLocation)
-                    )
-                )
-                    return false;
+                var legacyFolderPath = PathManager.LinuxDolphinLegacyFolderPath;
+                if (_fileSystem.Directory.Exists(legacyFolderPath))
+                {
+                    if (EnvHelper.IsFlatpakSandboxed())
+                    {
+                        if (!string.IsNullOrWhiteSpace(PathManager.SplitLinuxDolphinConfigDir) &&
+                            PathManager.SplitLinuxDolphinConfigDir.Equals(
+                                PathManager.SplitLinuxDolphinNativeConfigDir,
+                                StringComparison.Ordinal))
+                        {
+                            // In this case, the user requested native Dolphin's split config/user folders (not `~/.dolphin-emu`).
+                            // Since Flatpak may leave an empty `~/.dolphin-emu` folder around, we need to check
+                            // if it is empty and remove it, so our bundled Dolphin does not use it.
+                            if (!FileHelper.IsDirectoryEmpty(legacyFolderPath))
+                            {
+                                return false;
+                            }
+
+                            try
+                            {
+                                // Remove the offending empty directory
+                                _fileSystem.Directory.Delete(legacyFolderPath);
+                            }
+                            catch (DirectoryNotFoundException)
+                            {
+                                // We let this pass
+                            }
+                            catch (Exception)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    else if (!PathManager.IsFlatpakDolphinFilePath(dolphinLocation))
+                    {
+                        // The official Dolphin Flatpak ignores the `~/.dolphin-emu` folder, so only return
+                        // false if it is not a Flatpak Dolphin executable
+                        return false;
+                    }
+                }
 
                 return true;
             }
