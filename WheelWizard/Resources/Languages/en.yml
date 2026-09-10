@@ -141,6 +141,7 @@ en:
     view_room: "View Room"
     recomp_nand_copy: "Make a copy"
     recomp_nand_share: "Use directly"
+    recomp_install_offline: "Install offline-only"
     link:
       discord: "Talk to us!"
       github: "Source code"
@@ -270,6 +271,9 @@ en:
     recomp_use_dolphin_nand:
       title: "Use your Dolphin save data?"
       extra: "WiiCompiled can play with the saves, Miis and friend codes you already use in Dolphin. If not, it starts fresh with its own Wii data."
+    recomp_retro_wfc_unavailable:
+      title: "Retro WFC is unreachable"
+      extra: "WiiCompiled needs the Retro WFC servers to set up online play, and they are not responding right now. You can install without online play now; WiiCompiled will add it automatically the next time you update once the servers are back."
     recomp_nand_mode:
       title: "Copy your Dolphin data, or use it directly?"
       extra: "Dolphin recommends against other programs using its Wii data (NAND) directly, since two programs writing to it at once can corrupt it. A copy keeps WiiCompiled completely separate, but progress made in one will not appear in the other."

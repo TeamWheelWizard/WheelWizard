@@ -97,7 +97,7 @@ public static class PathManager
 
     public static string RecompCacheFolderPath => Path.Combine(RecompFolderPath, "Cache");
     public static string RecompInstallStateFilePath => Path.Combine(RecompInstallFolderPath, RecompInstallStateFileName);
-    public static string RecompSetupFilePath => Path.Combine(RecompInstallFolderPath, "WiiCompiled-Setup.exe");
+    public static string RecompSetupFilePath => Path.Combine(RecompInstallFolderPath, WheelWizard.Recomp.RecompPlatform.SetupFileName);
 
     /// <summary>The backend-owned runtime user state (Config.toml, private NAND, caches) inside the portable root.</summary>
     public static string RecompUserDataFolderPath => Path.Combine(RecompFolderPath, "UserData");

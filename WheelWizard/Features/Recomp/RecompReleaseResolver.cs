@@ -23,7 +23,7 @@ public static class RecompReleaseResolver
     /// <summary>
     /// Returns the newest usable release, or <see langword="null"/> when the listing contains none.
     /// </summary>
-    public static RecompRelease? FindLatest(IEnumerable<GithubRelease>? releases)
+    public static RecompRelease? FindLatest(IEnumerable<GithubRelease>? releases, string? assetName = null)
     {
         if (releases is null)
             return null;
@@ -38,7 +38,7 @@ public static class RecompReleaseResolver
                 continue;
 
             var asset = release.Assets.FirstOrDefault(candidate =>
-                string.Equals(candidate.Name, RecompSetupCommandBuilder.SetupFileName, StringComparison.OrdinalIgnoreCase)
+                string.Equals(candidate.Name, assetName ?? RecompSetupCommandBuilder.SetupFileName, StringComparison.OrdinalIgnoreCase)
             );
             if (asset is null || string.IsNullOrWhiteSpace(asset.BrowserDownloadUrl))
                 continue;

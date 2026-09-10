@@ -286,7 +286,7 @@ public class SettingsManager : ISettingsManager
 
     private OperationResult<SettingsValidationReport> ValidateDolphinPathSettings() => ValidatePathSettings(requireDolphin: true);
 
-    public bool IsRecompModeActive() => OperatingSystem.IsWindows() && Get<bool>(ENABLE_RECOMP);
+    public bool IsRecompModeActive() => WheelWizard.Recomp.RecompPlatform.IsSupported && Get<bool>(ENABLE_RECOMP);
 
     private OperationResult<SettingsValidationReport> ValidatePathSettings(bool requireDolphin)
     {

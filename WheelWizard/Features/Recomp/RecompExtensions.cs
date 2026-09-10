@@ -7,12 +7,12 @@ public static class RecompExtensions
 {
     /// <summary>
     /// Registers the Mario Kart Wii recomp frontend.
-    /// The recomp only ships for Windows, so on every other platform nothing is registered at all;
-    /// <c>ISettingsManager.IsRecompModeActive()</c> is false there, so nothing ever resolves these.
+    /// Register only on Windows and supported Apple Silicon Macs.
+    /// <c>ISettingsManager.IsRecompModeActive()</c> is false elsewhere, so nothing ever resolves these.
     /// </summary>
     public static IServiceCollection AddRecomp(this IServiceCollection services)
     {
-        if (!OperatingSystem.IsWindows())
+        if (!RecompPlatform.IsSupported)
             return services;
 
         services
@@ -31,6 +31,7 @@ public static class RecompExtensions
         services.AddSingleton<IRecompEnvironment, RecompEnvironment>();
         services.AddSingleton<IRecompProcessRunner, RecompProcessRunner>();
         services.AddSingleton<IRecompSetupDownloader, RecompSetupDownloader>();
+        services.AddSingleton<IRecompRetroWfcPayloadProbe, RecompRetroWfcPayloadProbe>();
         services.AddSingleton<IRecompInstallService, RecompInstallService>();
         services.AddTransient<RecompLauncher>();
 
