@@ -134,7 +134,7 @@ public class SettingsManager : ISettingsManager
                 if (
                     _fileSystem.Directory.Exists(PathManager.LinuxDolphinLegacyFolderPath) &&
                     (
-                        EnvHelper.IsFlatpakSandboxed() &&
+                        EnvHelper.IsFlatpakSandboxed() && !string.IsNullOrWhiteSpace(PathManager.SplitLinuxDolphinConfigDir) &&
                         PathManager.SplitLinuxDolphinConfigDir.Equals(
                             PathManager.SplitLinuxDolphinNativeConfigDir,
                             StringComparison.Ordinal)
