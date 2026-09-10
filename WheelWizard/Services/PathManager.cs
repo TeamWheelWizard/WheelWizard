@@ -787,7 +787,7 @@ public static partial class PathManager
         return matches.Count == 0 ? DefaultDolphinFlatpakAppId : matches[^1].Value;
     }
 
-    [GeneratedRegex(@"(?i)^/home/[^/]+/\.var/app/(?<AppId>[a-z][a-z0-9]*(?:\.[a-z_][a-z0-9_]*){1,}\.[a-z_][a-z0-9_-]*)/data/dolphin-emu/?$", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"(?i)^\.var/app/(?<AppId>[a-z][a-z0-9]*(?:\.[a-z_][a-z0-9_]*){1,}\.[a-z_][a-z0-9_-]*)/data/dolphin-emu/?$", RegexOptions.IgnoreCase)]
     private static partial Regex DolphinFlatpakAppIdInUserFolderRegex { get; }
 
     /// <summary>
@@ -802,12 +802,17 @@ public static partial class PathManager
             return DefaultDolphinFlatpakAppId;
         }
 
-        if (!Path.GetFullPath(flatpakUserFolder).StartsWith(FileHelper.NormalizePath(HomeFolderPath) + '/'))
+        var fullFlatpakUserFolderPath = FileHelper.NormalizePath(flatpakUserFolder);
+        var fullHomePath = FileHelper.NormalizePath(HomeFolderPath);
+
+        if (!fullFlatpakUserFolderPath.StartsWith(fullHomePath + '/', StringComparison.Ordinal))
         {
             return DefaultDolphinFlatpakAppId;
         }
 
-        var match = DolphinFlatpakAppIdInUserFolderRegex.Match(flatpakUserFolder);
+        var homeDirRelativeFlatpakUserFolderPath = Path.GetRelativePath(fullHomePath, fullFlatpakUserFolderPath);
+
+        var match = DolphinFlatpakAppIdInUserFolderRegex.Match(homeDirRelativeFlatpakUserFolderPath);
 
         return match.Success ? match.Groups["AppId"].Value : DefaultDolphinFlatpakAppId;
     }
