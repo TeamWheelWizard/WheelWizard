@@ -89,7 +89,8 @@ public class SettingsManager : ISettingsManager
 
                 // If we want to use a split XDG dolphin config,
                 // this only really works as expected if certain conditions are met.
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || !PathManager.IsLinuxDolphinConfigSplit())
+                // Note that the Wheel Wizard Flatpak always uses the split config internally, so it cannot return early here.
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || !EnvHelper.IsFlatpakSandboxed() && !PathManager.IsLinuxDolphinConfigSplit())
                     return true;
 
                 if (EnvHelper.IsFlatpakSandboxed())
