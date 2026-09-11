@@ -237,7 +237,7 @@ fr:
       1: "1 seconde"
       n: "{$1} secondes"
   progress:
-    estimated_time_remaining: "Temps restant estimé : "
+    estimated_time_remaining: "Temps restant estimé :"
     downloading_mb: "téléchargement de {$1} MB"
     installing_mods: "Installation de mods"
     installing_mods_count: "Installation de {$1} mods"
@@ -572,12 +572,12 @@ fr:
   helper_text:
     topbar:
       location_warning: "Les paramètres sont désactivés, finissez d'abord les paramètres de localisation"
-    enable_recomp: "Utilise WiiCompiled comme lanceur. Désactivez pour utiliser Dolphin et Retro Rewind à la place. Windows uniquement."
+    enable_recomp: "Utilise WiiCompiled comme lanceur. Désactivez pour utiliser Dolphin et Retro Rewind à la place. Seulement sur Windows et Linux."
     recomp_share_dolphin_data: "WiiCompiled et Dolphin utilisent les mêmes sauvegardes, Miis, et paramètres Wii."
     recomp_shared_nand_warning: "N'exécutez pas Dolphin et WiiCompiled en même temps pendant le partage des données de NAND."
     recomp_clone_dolphin_data: "Copie les sauvegardes, Miis, et paramètres Wii de Dolphin dans les données isolées de WiiCompiled."
-    recomp_graphics_api: "WiiCompiled fonctionne de manière fiable avec DirectX 12 et Vulkan."
-    recomp_dolphin_data_not_found: "Définissez un chemin vers le dossier utilisateur Dolphin dans les paramètres de localisation. Il doit contenir un dossier Wii."
+    recomp_graphics_api: "WiiCompiled fonctionne de manière fiable avec DirectX 12 et Vulkan. Sur Linux seul Vulkan est disponible."
+    recomp_dolphin_data_not_found: "Définissez un chemin vers le dossier utilisateur de Dolphin dans les paramètres de localisation. Il doit contenir un dossier Wii."
     recomp_prevent_stutters: "Lors de la compilation d'un shader, les objets qui en ont besoin sont ignorés pendant quelques frames au lieu de bloquer le jeu jusqu'à ce que la compilation soit terminée, provoquant un léger effet de \"pop-in\" au lieu d'un ralentissement"
     launch_with_dolphin: "Affichera la fenêtre d'accueil de Dolphin en plus de celle du jeu"
     launch_rr_on_startup: "Démarre automatiquement Retro Rewind quand Wheel Wizard se lance"
