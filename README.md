@@ -31,6 +31,12 @@ In order to play, a Mario Kart Wii game backup, dumped by you, is required. Acce
 
 Wheel Wizard was made by [patchzy](https://github.com/patchzyy) and [wanttobeeme](https://github.com/wanttobeeme). This application is completely free to use. You can go to the [latest releases](https://github.com/TeamWheelWizard/WheelWizard/releases) and download the executable there. Once installed, the app will automatically notify you when updates are available.
 
+<p align="center">
+  <a href="https://flathub.org/apps/io.github.TeamWheelWizard.WheelWizard">
+    <img src="https://flathub.org/api/badge?locale=en" alt="Get it on Flathub" width="240" />
+  </a>
+</p>
+
 Feel free to join our community on [Discord](https://discord.gg/vZ7T2wJnsq) for support and discussions! If you see any bugs, this is also the place to be :P
 
 
