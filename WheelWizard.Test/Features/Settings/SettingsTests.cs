@@ -164,6 +164,8 @@ public class SettingsManagerTests
         whWzSettingManager = Substitute.For<IWhWzSettingManager>();
         dolphinSettingManager = Substitute.For<IDolphinSettingManager>();
         recompSettingManager = Substitute.For<IRecompSettingManager>();
+        var commands = Substitute.For<IUnixCommandService>();
+        commands.IsCommandAvailable("/usr/bin/env").Returns(true);
 
         return new SettingsManager(
             whWzSettingManager,
@@ -175,7 +177,7 @@ public class SettingsManagerTests
             SettingsTestUtils.CreateApplicationDataLocation(),
             SettingsTestUtils.CreateRecompPaths(),
             new RuntimeEnvironment(),
-            Substitute.For<IUnixCommandService>()
+            commands
         );
     }
 }
