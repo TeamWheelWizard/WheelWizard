@@ -4,13 +4,14 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.Models.RRInfo;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
+using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
@@ -20,6 +21,9 @@ namespace WheelWizard.Views.Pages;
 
 public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
 {
+    [Inject]
+    private LiveRoomsService LiveRooms { get; set; } = null!;
+
     [Inject]
     private IGameLicenseSingletonService GameDataService { get; set; } = null!;
 
@@ -69,13 +73,13 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
 
         PlayersList = new(Room.Players);
 
-        RRLiveRooms.Instance.Subscribe(this);
+        LiveRooms.Subscribe(this);
         Unloaded += RoomsDetailPage_Unloaded;
     }
 
     public void OnUpdate(RepeatedTaskManager sender)
     {
-        if (sender is not RRLiveRooms liveRooms)
+        if (sender is not LiveRoomsService liveRooms)
             return;
 
         var room = liveRooms.CurrentRooms.Find(r => r.Id == Room.Id);
@@ -228,7 +232,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
 
     private void RoomsDetailPage_Unloaded(object? sender, RoutedEventArgs e)
     {
-        RRLiveRooms.Instance.Unsubscribe(this);
+        LiveRooms.Unsubscribe(this);
     }
 
     private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)

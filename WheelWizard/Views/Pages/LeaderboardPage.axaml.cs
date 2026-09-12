@@ -5,7 +5,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
-using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups;
@@ -59,6 +58,9 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     };
 
     private CancellationTokenSource? _loadCts;
+
+    [Inject]
+    private LiveRoomsService LiveRooms { get; set; } = null!;
 
     [Inject]
     private IRrLeaderboardSingletonService LeaderboardService { get; set; } = null!;
@@ -232,8 +234,8 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             .ActiveCurrentFriends.Select(friend => FriendCode.FriendCodeToProfileId(friend.FriendCode))
             .Where(profileId => profileId != 0)
             .ToHashSet();
-        var onlineProfileIds = RRLiveRooms
-            .Instance.CurrentRooms.SelectMany(room => room.Players)
+        var onlineProfileIds = LiveRooms
+            .CurrentRooms.SelectMany(room => room.Players)
             .Select(player => FriendCode.FriendCodeToProfileId(player.FriendCode))
             .Where(profileId => profileId != 0)
             .ToHashSet();
@@ -531,7 +533,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(friendCode))
             return;
 
-        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        foreach (var room in LiveRooms.CurrentRooms)
         {
             if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;

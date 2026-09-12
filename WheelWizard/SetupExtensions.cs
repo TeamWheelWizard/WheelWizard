@@ -18,7 +18,6 @@ using WheelWizard.Mods;
 using WheelWizard.Recomp;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.Launcher;
-using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.IO;
@@ -79,7 +78,5 @@ public static class SetupExtensions
         services.AddTransient<RrLauncher>();
         services.AddTransient<RrBetaLauncher>();
         services.AddSingleton<ILauncherProvider, LauncherProvider>();
-        services.AddSingleton<WhWzStatusManager>();
-        services.AddSingleton<RRLiveRooms>();
     }
 }

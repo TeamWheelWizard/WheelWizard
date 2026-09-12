@@ -3,9 +3,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings.Types;
 using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views;
 
@@ -54,14 +55,7 @@ public static class ViewUtils
         // Creating a new one will also set re-assign `Layout.Instance` right away, and this `GetLayout()`
         Layout newWindow = new();
         newWindow.Position = oldWindow.Position;
-        if (oldWindow is IRepeatedTaskListener oldListener)
-        {
-            // Unsubscribing is not really necessary. But i guess it prevents memory leaks when
-            // someone is refreshing the window a lot (happens when changing the language e.g.
-            // So they would have to change the language like 1000 of times in a row)
-            WhWzStatusManager.Instance.Unsubscribe(oldListener);
-            RRLiveRooms.Instance.Unsubscribe(oldListener);
-        }
+        oldWindow.DetachLiveSubscriptions();
 
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -79,7 +73,7 @@ public static class ViewUtils
             oldWindow.Close();
         }
 
-        newWindow.UpdatePlayerAndRoomCount(RRLiveRooms.Instance);
+        newWindow.UpdatePlayerAndRoomCount();
         newWindow.UpdateLiveAlert();
     }
 

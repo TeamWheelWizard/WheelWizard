@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
-using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
@@ -13,6 +12,7 @@ using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
+using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
@@ -28,6 +28,9 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     private static ListOrderCondition CurrentOrder = ListOrderCondition.IS_ONLINE;
 
     private ObservableCollection<FriendProfile> _friendlist = [];
+
+    [Inject]
+    private LiveRoomsService LiveRooms { get; set; } = null!;
 
     [Inject]
     private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
@@ -350,7 +353,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     private void ViewRoom_OnClick(string friendCode)
     {
-        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        foreach (var room in LiveRooms.CurrentRooms)
         {
             if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;

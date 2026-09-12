@@ -5,7 +5,7 @@ using Avalonia.Media;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
@@ -34,6 +34,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private bool _hasProfileInfo;
     private string _currentFriendCode = string.Empty;
     private int _activeInfoSlideIndex;
+
+    [Inject]
+    private LiveRoomsService LiveRooms { get; set; } = null!;
 
     [Inject]
     private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
@@ -351,7 +354,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void ViewRoom_OnClick(object? sender, RoutedEventArgs e)
     {
-        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        foreach (var room in LiveRooms.CurrentRooms)
         {
             if (room.Players.All(player => player.FriendCode != currentPlayer?.FriendCode))
                 continue;
@@ -447,12 +450,12 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             dot.Classes.Remove("active");
     }
 
-    private static bool IsUserInLiveRoom(string? friendCode)
+    private bool IsUserInLiveRoom(string? friendCode)
     {
         if (string.IsNullOrWhiteSpace(friendCode))
             return false;
 
-        return RRLiveRooms.Instance.CurrentRooms.Any(room => room.Players.Any(player => player.FriendCode == friendCode));
+        return LiveRooms.CurrentRooms.Any(room => room.Players.Any(player => player.FriendCode == friendCode));
     }
 
     private void UpdateOnlineBorders()
