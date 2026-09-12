@@ -2,7 +2,6 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Mods;
 using WheelWizard.Recomp.Domain;
-using WheelWizard.Services;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
@@ -19,7 +18,8 @@ public class RecompLauncher(
     IRecompInstallService installService,
     ICustomDistributionSingletonService customDistributions,
     IModsLaunchService modsLaunchService,
-    IRecompDolphinDataService dolphinData
+    IRecompDolphinDataService dolphinData,
+    ICustomDistributionPaths distributionPaths
 ) : ILauncher
 {
     public string GameTitle { get; } = "WiiCompiled";
@@ -40,7 +40,7 @@ public class RecompLauncher(
 
         try
         {
-            var targetFolderPath = PathManager.PatchesFolderPath;
+            var targetFolderPath = distributionPaths.PatchesFolderPath;
             var clearTargetFolder = false;
             if (modsLaunchService.ShouldAskToClearTargetFolder(targetFolderPath))
             {
