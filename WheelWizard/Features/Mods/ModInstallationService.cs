@@ -3,7 +3,6 @@ using System.IO.Abstractions;
 using Avalonia.Threading;
 using SharpCompress.Archives;
 using WheelWizard.Models.Mods;
-using WheelWizard.Services;
 using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
@@ -26,17 +25,17 @@ public interface IModInstallationService
     );
 }
 
-public sealed class ModInstallationService(IFileSystem fileSystem) : IModInstallationService
+public sealed class ModInstallationService(IFileSystem fileSystem, IModPaths paths) : IModInstallationService
 {
-    private readonly string _modsFolderPath = PathManager.ModsFolderPath;
+    private string ModsFolderPath => paths.RootFolderPath;
 
     public async Task<OperationResult<ObservableCollection<Mod>>> LoadModsAsync()
     {
-        var modsFolderResult = fileSystem.EnsureDirectory(_modsFolderPath);
+        var modsFolderResult = fileSystem.EnsureDirectory(ModsFolderPath);
         if (modsFolderResult.IsFailure)
             return modsFolderResult.Error;
 
-        var iniFilesResult = fileSystem.FindFilesByExtension(_modsFolderPath, "*.ini");
+        var iniFilesResult = fileSystem.FindFilesByExtension(ModsFolderPath, "*.ini");
         if (iniFilesResult.IsFailure)
             return iniFilesResult.Error;
 
@@ -58,7 +57,7 @@ public sealed class ModInstallationService(IFileSystem fileSystem) : IModInstall
     {
         foreach (var mod in mods)
         {
-            var modDirectory = PathManager.GetModDirectoryPath(mod.Title);
+            var modDirectory = paths.GetModDirectoryPath(mod.Title);
             var directoryResult = fileSystem.EnsureDirectory(modDirectory);
             if (directoryResult.IsFailure)
                 return directoryResult.Error;
@@ -192,7 +191,7 @@ public sealed class ModInstallationService(IFileSystem fileSystem) : IModInstall
             progressWindow.SetGoal(t("state.extracting"));
             progressWindow.Show();
 
-            var modDirectory = PathManager.GetModDirectoryPath(givenModName);
+            var modDirectory = paths.GetModDirectoryPath(givenModName);
             if (!Directory.Exists(modDirectory))
                 Directory.CreateDirectory(modDirectory);
 

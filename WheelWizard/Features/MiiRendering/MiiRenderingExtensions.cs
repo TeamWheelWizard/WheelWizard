@@ -26,7 +26,8 @@ public static class MiiRenderingExtensions
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*", 0.8));
             })
             .AddStandardResilienceHandler();
-        services.AddSingleton(_ => MiiRenderingConfiguration.CreateDefault());
+        services.AddSingleton<MiiRenderingConfiguration>();
+        services.AddSingleton<IMiiRenderingPaths, MiiRenderingPaths>();
         services.AddSingleton<IMiiRenderingResourceLocator, MiiRenderingResourceLocator>();
         services.AddSingleton<IMiiRenderingResourceInstaller, MiiRenderingResourceInstaller>();
         services.AddSingleton<IMiiNativeRenderer, NativeMiiRenderer>();
