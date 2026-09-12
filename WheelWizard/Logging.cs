@@ -1,6 +1,5 @@
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
-using WheelWizard.Services;
 
 namespace WheelWizard;
 
@@ -13,11 +12,11 @@ public static class Logging
     /// Do not call this method multiple times. It is intended to be called once at application startup.
     /// Do not use the static logger instance other than for the application startup.
     /// </remarks>
-    public static void CreateStaticLogger(bool logStartup = true)
+    public static void CreateStaticLogger(string applicationDataDirectory, bool logStartup = true)
     {
         try
         {
-            var logsDirectory = Path.Combine(PathManager.WheelWizardAppdataPath, "logs");
+            var logsDirectory = Path.Combine(applicationDataDirectory, "logs");
             Directory.CreateDirectory(logsDirectory);
 
             Log.Logger = new LoggerConfiguration()
@@ -43,10 +42,10 @@ public static class Logging
     /// <summary>
     /// Recreates the static logger instance, flushing any existing loggers first.
     /// </summary>
-    public static void RecreateStaticLogger()
+    public static void RecreateStaticLogger(string applicationDataDirectory)
     {
         Log.CloseAndFlush();
-        CreateStaticLogger(logStartup: false);
+        CreateStaticLogger(applicationDataDirectory, logStartup: false);
     }
 
     /// <summary>

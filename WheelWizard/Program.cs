@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Logging;
 using Serilog;
+using WheelWizard.ApplicationData;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
@@ -20,13 +21,17 @@ public class Program : IDesignerEntryPoint
         SetupWorkingDirectory();
 
         // Create a static logger instance for the application
-        Logging.CreateStaticLogger();
+        var applicationData = ApplicationDataComposition.CreateLocation(
+            new Testably.Abstractions.RealFileSystem(),
+            new WheelWizard.Shared.Platform.RuntimeEnvironment()
+        );
+        Logging.CreateStaticLogger(applicationData.DirectoryPath);
         RegisterGlobalExceptionLogging();
 
         try
         {
             // Initialize the Avalonia application
-            var builder = CreateWheelWizardApp(isDesigner: false);
+            var builder = CreateWheelWizardApp(isDesigner: false, applicationData);
 
             // Start the application
             builder.StartWithClassicDesktopLifetime(args);
@@ -66,12 +71,12 @@ public class Program : IDesignerEntryPoint
     /// <summary>
     /// Configures the WheelWizard application.
     /// </summary>
-    private static AppBuilder CreateWheelWizardApp(bool isDesigner)
+    private static AppBuilder CreateWheelWizardApp(bool isDesigner, IApplicationDataLocation? applicationData = null)
     {
         var builder = AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
 
         var services = new ServiceCollection();
-        services.AddWheelWizardServices();
+        services.AddWheelWizardServices(applicationData);
 
         var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
 

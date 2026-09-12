@@ -17,6 +17,9 @@ public record ModItem(Bitmap FullImageUrl);
 public partial class ModContent : UserControlBase
 {
     [Inject]
+    private IModPaths ModPaths { get; set; } = null!;
+
+    [Inject]
     private IGameBananaMediaService Media { get; set; } = null!;
 
     [Inject]
@@ -234,7 +237,7 @@ public partial class ModContent : UserControlBase
 
         var url = downloadUrls.First();
         var fileName = GetFileNameFromUrl(url);
-        var filePath = Path.Combine(PathManager.TempModsFolderPath, fileName);
+        var filePath = Path.Combine(ModPaths.DownloadFolderPath, fileName);
         var downloadResult = await DownloadModFileAsync(url, filePath, progressWindow);
         progressWindow.Close();
 
@@ -286,11 +289,11 @@ public partial class ModContent : UserControlBase
     /// <summary>
     /// Prepares the temporary folder for downloading files.
     /// </summary>
-    private static async Task<OperationResult> PrepareToDownloadFile()
+    private async Task<OperationResult> PrepareToDownloadFile()
     {
         try
         {
-            var tempFolder = PathManager.TempModsFolderPath;
+            var tempFolder = ModPaths.DownloadFolderPath;
             if (Directory.Exists(tempFolder))
                 Directory.Delete(tempFolder, true);
 
@@ -304,12 +307,12 @@ public partial class ModContent : UserControlBase
         }
     }
 
-    private static OperationResult TryDeleteTempModsFolder()
+    private OperationResult TryDeleteTempModsFolder()
     {
         try
         {
-            if (Directory.Exists(PathManager.TempModsFolderPath))
-                Directory.Delete(PathManager.TempModsFolderPath, true);
+            if (Directory.Exists(ModPaths.DownloadFolderPath))
+                Directory.Delete(ModPaths.DownloadFolderPath, true);
 
             return Ok();
         }
