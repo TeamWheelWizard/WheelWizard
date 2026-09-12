@@ -1,6 +1,7 @@
-using System.Diagnostics;
 using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
+using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.AutoUpdating;
 
@@ -20,8 +21,13 @@ public interface IBundleExtractionCleanupService
 /// The updater also downloads the new executable as <c>WheelWizard_new</c>, which gets its own extraction folder.
 /// This service deletes those stale folders while leaving the one used by the running process untouched.
 /// </summary>
-public class BundleExtractionCleanupService(IFileSystem fileSystem, ILogger<BundleExtractionCleanupService> logger)
-    : IBundleExtractionCleanupService
+public class BundleExtractionCleanupService(
+    IFileSystem fileSystem,
+    ILogger<BundleExtractionCleanupService> logger,
+    IApplicationProcess application,
+    IProcessLauncher processes,
+    IRuntimeEnvironment environment
+) : IBundleExtractionCleanupService
 {
     /// <summary>
     /// Suffix the updaters append to the downloaded executable (e.g. <c>WheelWizard_new.exe</c>).
@@ -33,20 +39,14 @@ public class BundleExtractionCleanupService(IFileSystem fileSystem, ILogger<Bund
     /// </summary>
     internal const string ExtractionRootName = ".net";
 
-    /// <summary>
-    /// The runtime property that contains the directories used to resolve native libraries. For a single-file
-    /// bundle with extracted native libraries, this includes the extraction directory of the running process.
-    /// </summary>
-    private const string NativeSearchDirectoriesProperty = "NATIVE_DLL_SEARCH_DIRECTORIES";
-
     public Task CleanupStaleExtractionsAsync()
     {
         return Task.Run(() =>
         {
             try
             {
-                var processPath = Environment.ProcessPath;
-                var nativeSearchDirectories = AppContext.GetData(NativeSearchDirectoriesProperty) as string;
+                var processPath = application.ExecutablePath;
+                var nativeSearchDirectories = application.NativeLibrarySearchDirectories;
                 var currentExtractionDirectory = ResolveExtractionDirectory(processPath, nativeSearchDirectories);
                 if (currentExtractionDirectory is null)
                 {
@@ -89,7 +89,7 @@ public class BundleExtractionCleanupService(IFileSystem fileSystem, ILogger<Bund
         if (string.IsNullOrWhiteSpace(appName) || string.IsNullOrWhiteSpace(executableDirectory))
             return null;
 
-        foreach (var searchDirectory in nativeSearchDirectories.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var searchDirectory in nativeSearchDirectories.Split(fileSystem.Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
         {
             var candidate = NormalizePath(searchDirectory);
             if (candidate is null || PathEquals(candidate, executableDirectory))
@@ -159,30 +159,17 @@ public class BundleExtractionCleanupService(IFileSystem fileSystem, ILogger<Bund
     private bool IsAnotherInstanceRunning(string processPath)
     {
         var appName = fileSystem.Path.GetFileNameWithoutExtension(processPath);
-        var currentProcessId = Environment.ProcessId;
-
         foreach (var processName in new[] { appName, appName + UpdateExecutableSuffix })
         {
-            Process[] processes;
             try
             {
-                processes = Process.GetProcessesByName(processName);
+                if (processes.GetProcessIds(processName).Any(id => id != application.Id))
+                    return true;
             }
             catch (Exception e)
             {
                 logger.LogDebug(e, "Could not enumerate running processes named {ProcessName}", processName);
                 return true;
-            }
-
-            try
-            {
-                if (processes.Any(process => process.Id != currentProcessId))
-                    return true;
-            }
-            finally
-            {
-                foreach (var process in processes)
-                    process.Dispose();
             }
         }
 
@@ -227,9 +214,9 @@ public class BundleExtractionCleanupService(IFileSystem fileSystem, ILogger<Bund
         return normalizedLeft is not null && normalizedRight is not null && NameEquals(normalizedLeft, normalizedRight);
     }
 
-    private static bool NameEquals(string left, string right)
+    private bool NameEquals(string left, string right)
     {
-        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        var comparison = environment.IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         return string.Equals(left, right, comparison);
     }
 }
