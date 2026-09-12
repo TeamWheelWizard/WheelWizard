@@ -59,7 +59,7 @@ public class LaunchPathTests
     [InlineData(true)]
     public async Task BlockedDistributionPreflight_DoesNotKillPrepareOrWrite(bool beta)
     {
-        var fs = new MockFileSystem();
+        var fs = new MockFileSystem(options => options.SimulatingOperatingSystem(SimulationMode.Linux));
         var settings = CreateSettings();
         fs.File.WriteAllText("/game.iso", "game");
         var dolphin = Substitute.For<IDolphinLaunchService>();
