@@ -3,6 +3,7 @@ using WheelWizard.Dolphin.Paths;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.Test.Features.Settings;
 
@@ -67,6 +68,8 @@ public sealed class SettingsSignalOwnershipTests
             bus,
             new DolphinPathResolver(new MockFileSystem(), new RuntimeEnvironment()),
             SettingsTestUtils.CreateApplicationDataLocation(),
-            SettingsTestUtils.CreateRecompPaths()
+            SettingsTestUtils.CreateRecompPaths(),
+            new RuntimeEnvironment(),
+            Substitute.For<IUnixCommandService>()
         );
 }

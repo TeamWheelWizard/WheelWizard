@@ -1,5 +1,4 @@
 using WheelWizard.Features.Archives;
-using WheelWizard.Helpers;
 using static WheelWizard.Features.Patches.PatchConversionHelpers;
 
 namespace WheelWizard.Features.Patches;

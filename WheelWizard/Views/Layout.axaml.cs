@@ -7,7 +7,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform;
 using WheelWizard.Branding;
-using WheelWizard.Helpers;
 using WheelWizard.Localization;
 using WheelWizard.Mods;
 using WheelWizard.RrRooms;
