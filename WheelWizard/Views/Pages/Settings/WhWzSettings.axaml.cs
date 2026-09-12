@@ -334,7 +334,7 @@ public partial class WhWzSettings : UserControlBase
 
         UpdateLocationRows();
         if (!string.Equals(previousPath, normalizedPath, StringComparison.Ordinal) && SettingsService.PathsSetupCorrectly())
-            DolphinSettingsService.ReloadSettings();
+            DolphinSettingsService.ReloadSettings(PathManager.ConfigFolderPath);
 
         await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Success_PathSettingsSaved);
         return true;

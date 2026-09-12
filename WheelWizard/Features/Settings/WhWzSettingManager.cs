@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using WheelWizard.Services;
 using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Settings;
@@ -31,7 +30,7 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
         }
     }
 
-    public void SaveSettings(WhWzSetting invokingSetting)
+    public void SaveSettings(string configPath, WhWzSetting invokingSetting)
     {
         Dictionary<string, WhWzSetting> settingsSnapshot;
         lock (_syncRoot)
@@ -52,7 +51,6 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
         var jsonString = JsonSerializer.Serialize(settingsToSave, new JsonSerializerOptions { WriteIndented = true });
         lock (_fileIoSync)
         {
-            var configPath = PathManager.WheelWizardConfigFilePath;
             try
             {
                 var directoryPath = fileSystem.Path.GetDirectoryName(configPath);
@@ -68,7 +66,7 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
         }
     }
 
-    public void LoadSettings()
+    public void LoadSettings(string configPath)
     {
         Dictionary<string, WhWzSetting> settingsSnapshot;
         lock (_syncRoot)
@@ -84,7 +82,6 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
         string? jsonString;
         lock (_fileIoSync)
         {
-            var configPath = PathManager.WheelWizardConfigFilePath;
             try
             {
                 jsonString = fileSystem.File.Exists(configPath) ? fileSystem.File.ReadAllText(configPath) : null;

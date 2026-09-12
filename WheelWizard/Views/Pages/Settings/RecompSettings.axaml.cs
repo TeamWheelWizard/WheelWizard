@@ -34,7 +34,7 @@ public partial class RecompSettings : UserControlBase
 
         // Config.toml is also written by the in-game settings bar, so opening the page rereads the
         // file rather than trusting whatever was loaded at startup.
-        RecompSettingsFile.ReloadSettings();
+        RecompSettingsFile.ReloadSettings(PathManager.RecompConfigFilePath);
         LoadSettings();
 
         // Attached after loading, so populating a control never writes it straight back.

@@ -5,30 +5,30 @@ namespace WheelWizard.Settings;
 public interface IWhWzSettingManager
 {
     void RegisterSetting(WhWzSetting setting);
-    void SaveSettings(WhWzSetting invokingSetting);
-    void LoadSettings();
+    void SaveSettings(string configPath, WhWzSetting invokingSetting);
+    void LoadSettings(string configPath);
 }
 
 public interface IDolphinSettingManager
 {
     void RegisterSetting(DolphinSetting setting);
-    void SaveSettings(DolphinSetting invokingSetting);
-    void ReloadSettings();
-    void LoadSettings();
+    void SaveSettings(string configDirectory, DolphinSetting invokingSetting);
+    void ReloadSettings(string configDirectory);
+    void LoadSettings(string configDirectory);
 }
 
 public interface IRecompSettingManager
 {
     void RegisterSetting(RecompSetting setting);
-    void SaveSettings(RecompSetting invokingSetting);
-    void ReloadSettings();
-    void LoadSettings();
+    void SaveSettings(string configPath, RecompSetting invokingSetting);
+    void ReloadSettings(string configPath);
+    void LoadSettings(string configPath);
 
     /// <summary>
     /// Deletes one key from one section of the recomp's <c>Config.toml</c>, leaving every other key,
     /// comment, and ordering untouched. A missing file or key is a no-op.
     /// </summary>
-    void RemoveTomlSetting(string section, string settingToRemove);
+    void RemoveTomlSetting(string configPath, string section, string settingToRemove);
 }
 
 public interface ISettingsProperties
