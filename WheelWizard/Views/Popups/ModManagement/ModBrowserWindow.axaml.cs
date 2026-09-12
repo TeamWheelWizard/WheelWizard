@@ -7,7 +7,6 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Popups.Base;
@@ -20,15 +19,15 @@ public record ModSearchResult(GameBananaModPreview Mod, string PreviewImageUrl);
 
 public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 {
-    [Inject]
-    private INavigationService Navigation { get; set; } = null!;
+    private ModContent ModDetailViewer { get; }
+
+    private IGameBananaSingletonService GameBananaService { get; }
+
+    private INavigationService Navigation { get; }
 
     // Collection to hold the mods
     private ObservableCollection<ModSearchResult> Mods { get; } = [];
     private List<ModSearchResult> LoadedMods { get; } = [];
-
-    [Inject]
-    private IGameBananaSingletonService GameBananaService { get; set; } = null!;
 
     // Pagination variables
     private int _currentPage = 1;
@@ -42,10 +41,14 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 
     private string _currentSearchTerm = "";
 
-    public ModBrowserWindow()
+    public ModBrowserWindow(ModContent modDetailViewer, IGameBananaSingletonService gameBananaService, INavigationService navigation)
         : base(true, false, false, t("popup_title.mod_browser"))
     {
+        ModDetailViewer = modDetailViewer;
+        GameBananaService = gameBananaService;
+        Navigation = navigation;
         InitializeComponent();
+        ModDetailHost.Content = ModDetailViewer;
         DataContext = this;
         ModListView.ItemsSource = Mods;
         Loaded += ModPopupWindow_Loaded;

@@ -13,6 +13,7 @@ using WheelWizard.Mods;
 using WheelWizard.Settings;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.ModManagement;
+using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.ModManagement;
 using WheelWizard.Views.Storage;
@@ -23,6 +24,8 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest, ModPreviewView
 
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
+    private IPopupFactory Popups { get; }
+
     private Func<int, ModPreviewViewModel> CreatePreview { get; }
     private readonly Dictionary<int, ModPreviewViewModel> _previews = [];
 
@@ -87,6 +90,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     private const double DragThreshold = 5.0;
 
     public ModsPage(
+        IPopupFactory popups,
         Func<int, ModPreviewViewModel> createPreview,
         IModOperationPresentation modPresentation,
         IFilePickerService filePicker,
@@ -95,6 +99,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         IModManager modManagerService
     )
     {
+        Popups = popups;
         CreatePreview = createPreview;
         ModPresentation = modPresentation;
         FilePicker = filePicker;
@@ -152,7 +157,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void BrowseMod_Click(object sender, RoutedEventArgs e)
     {
-        var modPopup = new ModBrowserWindow();
+        var modPopup = Popups.Create<ModBrowserWindow>();
         modPopup.Show();
     }
 
@@ -319,7 +324,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        var modPopup = new ModIndependentWindow();
+        var modPopup = Popups.Create<ModIndependentWindow>();
         _ = modPopup.LoadModAsync(selectedMod.Mod.ModID);
         modPopup.ShowDialog();
     }

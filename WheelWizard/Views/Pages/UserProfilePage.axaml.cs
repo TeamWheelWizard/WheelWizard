@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using WheelWizard.CustomCharacters;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Models.Enums;
 using WheelWizard.RrRooms;
@@ -23,6 +24,8 @@ namespace WheelWizard.Views.Pages;
 
 public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 {
+    private ICustomCharactersService CustomCharacters { get; }
+
     private INavigationService Navigation { get; }
 
     private const int ProfileCarouselPageCount = 2;
@@ -119,6 +122,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private int FocusedUser => SettingsService.Get<int>(SettingsService.FOCUSED_USER);
 
     public UserProfilePage(
+        ICustomCharactersService customCharacters,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameLicenseService,
@@ -129,6 +133,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         ICustomDistributionPaths distributionPaths
     )
     {
+        CustomCharacters = customCharacters;
         Navigation = navigation;
         LiveRooms = liveRooms;
         GameLicenseService = gameLicenseService;
@@ -406,7 +411,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         var renamePopup = new TextInputWindow()
             .SetMainText(t("question.enter_new_name.title"))
             .SetExtraText(extraText)
-            .SetAllowCustomChars(true)
+            .SetCustomCharacters(CustomCharacters.GetCustomCharacters())
             .SetValidation(ValidateMiiName)
             .SetInitialText(oldName ?? "")
             .SetPlaceholderText(oldName ?? "");

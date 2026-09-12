@@ -22,6 +22,8 @@ namespace WheelWizard.Views.Pages;
 
 public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
 {
+    private IPopupFactory Popups { get; }
+
     private INavigationService Navigation { get; }
 
     // Made this static intentionally.
@@ -52,6 +54,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPol
     }
 
     public FriendsPage(
+        IPopupFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameLicenseService,
@@ -60,6 +63,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPol
         ISettingsManager settingsService
     )
     {
+        Popups = popups;
         Navigation = navigation;
         LiveRooms = liveRooms;
         GameLicenseService = gameLicenseService;
@@ -332,7 +336,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPol
             return;
         if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
             return;
-        new PlayerProfileWindow(selectedPlayer.FriendCode).Show();
+        Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode).Show();
     }
 
     private void RemoveFriend_OnClick(object sender, RoutedEventArgs e)

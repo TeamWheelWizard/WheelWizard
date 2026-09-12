@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement.MiiEditor;
@@ -13,6 +14,8 @@ namespace WheelWizard.Views.Popups.MiiManagement;
 
 public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
 {
+    private IPageFactory Pages { get; }
+
     // whether you want to save the Mii
     public bool Result { get; private set; } = false;
     private TaskCompletionSource<bool>? _tcs;
@@ -33,9 +36,10 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
 
     private VisualizationType selectedVisualization = VisualizationType.Face;
 
-    public MiiEditorWindow()
+    public MiiEditorWindow(IPageFactory pages)
         : base(true, false, false, t("popup_title.mii_editor"))
     {
+        Pages = pages;
         InitializeComponent();
         DataContext = this;
     }
@@ -48,7 +52,7 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
 
     public void SetEditorPage(Type pageType)
     {
-        EditorPresenter.Content = Activator.CreateInstance(pageType, this)!;
+        EditorPresenter.Content = Pages.Create(pageType, this);
         Window.WindowTitle = $"{t("popup_title.mii_editor")} - {Mii.Name}";
     }
 

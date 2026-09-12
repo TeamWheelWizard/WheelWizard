@@ -1,8 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
-using WheelWizard.CustomCharacters;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Base;
 using Button = WheelWizard.Views.Components.Button;
 
@@ -10,9 +8,6 @@ namespace WheelWizard.Views.Popups.Generic;
 
 public partial class TextInputWindow : PopupContent
 {
-    [Inject]
-    private ICustomCharactersService CustomCharactersService { get; set; } = null!;
-
     private string? _result;
     private TaskCompletionSource<string?>? _tcs;
     private string? _initialText;
@@ -26,7 +21,6 @@ public partial class TextInputWindow : PopupContent
         InitializeComponent();
         InputField.TextChanged += InputField_TextChanged;
         UpdateSubmitButtonState();
-        SetupCustomChars();
     }
 
     public TextInputWindow SetMainText(string mainText)
@@ -47,15 +41,11 @@ public partial class TextInputWindow : PopupContent
         return this;
     }
 
-    public TextInputWindow SetAllowCustomChars(bool allow, bool initiallyOpen = false)
+    public TextInputWindow SetCustomCharacters(IEnumerable<char> characters, bool initiallyOpen = false)
     {
-        CustomCharsButton.IsVisible = allow;
-
-        if (allow && initiallyOpen)
-        {
-            CustomChars.IsVisible = true;
-            CustomCharsButton.IsVisible = false;
-        }
+        SetupCustomChars(characters);
+        CustomChars.IsVisible = CustomChars.Children.Count > 0 && initiallyOpen;
+        CustomCharsButton.IsVisible = CustomChars.Children.Count > 0 && !initiallyOpen;
         return this;
     }
 
@@ -96,11 +86,11 @@ public partial class TextInputWindow : PopupContent
         return await _tcs.Task;
     }
 
-    private void SetupCustomChars()
+    private void SetupCustomChars(IEnumerable<char> characters)
     {
         CustomChars.Children.Clear();
 
-        foreach (var c in CustomCharactersService.GetCustomCharacters())
+        foreach (var c in characters)
         {
             var button = new Button()
             {

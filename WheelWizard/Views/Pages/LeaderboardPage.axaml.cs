@@ -44,6 +44,8 @@ public sealed record LeaderboardPlayerItem
 
 public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 {
+    private IPopupFactory Popups { get; }
+
     private INavigationService Navigation { get; }
 
     private static readonly LeaderboardPlayerItem EmptyPodiumPlayer = new()
@@ -168,6 +170,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     public bool HasPodiumThird => _podiumThird != null;
 
     public LeaderboardPage(
+        IPopupFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IRrLeaderboardSingletonService leaderboardService,
@@ -176,6 +179,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         ISettingsManager settingsManager
     )
     {
+        Popups = popups;
         Navigation = navigation;
         LiveRooms = liveRooms;
         LeaderboardService = leaderboardService;
@@ -453,7 +457,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         if (player == null || string.IsNullOrWhiteSpace(player.FriendCode))
             return;
 
-        new PlayerProfileWindow(player.FriendCode).Show();
+        Popups.Create<PlayerProfileWindow>(player.FriendCode).Show();
     }
 
     private async void AddFriend_OnClick(object sender, RoutedEventArgs e)
