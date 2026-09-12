@@ -5,7 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings.Types;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views;
