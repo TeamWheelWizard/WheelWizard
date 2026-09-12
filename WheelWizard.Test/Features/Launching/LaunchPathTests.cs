@@ -80,7 +80,8 @@ public class LaunchPathTests
             mods,
             descriptor,
             environment,
-            Substitute.For<ILaunchPrompts>()
+            Substitute.For<ILaunchPrompts>(),
+            new InlineModPresentation()
         );
         Assert.True((await launcher.LaunchAsync(beta)).IsFailure);
 

@@ -16,6 +16,9 @@ public record ModItem(Bitmap FullImageUrl);
 public partial class ModContent : UserControlBase
 {
     [Inject]
+    private IModOperationPresentation ModPresentation { get; set; } = null!;
+
+    [Inject]
     private IModPaths ModPaths { get; set; } = null!;
 
     [Inject]
@@ -278,7 +281,10 @@ public partial class ModContent : UserControlBase
             return Fail(t("message_warning.mod_name_invalid.extra"));
         }
 
-        var installResult = await ModManager.InstallModFromFileAsync(downloadedFilePath, modName, CurrentMod.Author.Name, CurrentMod.Id);
+        var installResult = await ModPresentation.RunAsync(
+            (progress, _) =>
+                ModManager.InstallModFromFileAsync(downloadedFilePath, modName, CurrentMod.Author.Name, CurrentMod.Id, progress)
+        );
         if (installResult.IsFailure)
             return installResult.Error;
 
