@@ -31,7 +31,12 @@ public class Program : IDesignerEntryPoint
         try
         {
             // Initialize the Avalonia application
-            var builder = CreateWheelWizardApp(isDesigner: false, applicationData);
+            var services = new ServiceCollection();
+            services.AddWheelWizardServices(applicationData);
+            using var serviceProvider = services.BuildServiceProvider(
+                new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }
+            );
+            var builder = CreateWheelWizardApp(serviceProvider);
 
             // Start the application
             builder.StartWithClassicDesktopLifetime(args);
@@ -46,7 +51,7 @@ public class Program : IDesignerEntryPoint
         }
     }
 
-    public static AppBuilder BuildAvaloniaApp() => CreateWheelWizardApp(isDesigner: true);
+    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
 
     private static void RegisterGlobalExceptionLogging()
     {
@@ -71,36 +76,19 @@ public class Program : IDesignerEntryPoint
     /// <summary>
     /// Configures the WheelWizard application.
     /// </summary>
-    private static AppBuilder CreateWheelWizardApp(bool isDesigner, IApplicationDataLocation? applicationData = null)
+    private static AppBuilder CreateWheelWizardApp(IServiceProvider services)
     {
-        var builder = AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
-
-        var services = new ServiceCollection();
-        services.AddWheelWizardServices(applicationData);
-
-        var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
-
-        // Override the default TraceLogSink with our AvaloniaLoggerAdapter
-        Logger.Sink = serviceProvider.GetRequiredService<AvaloniaLoggerAdapter>();
-
-        // First, set up the application instance
-        builder.AfterSetup(appBuilder =>
-        {
-            if (appBuilder.Instance is not App app)
-                throw new InvalidOperationException("The application instance is not of type App.");
-
-            // Set the service provider in the application instance
-            app.SetServiceProvider(serviceProvider);
-            serviceProvider.GetRequiredService<WheelWizard.Views.Patterns.MiiControlThemes>().Install(app.Resources);
-
-            // Make sure this comes AFTER setting the service provider
-            // of the `App` instance! Otherwise, things like logging will not work
-            // in `Setup`.
-            Setup(serviceProvider);
-            serviceProvider.GetRequiredService<WindowAppearance>().Install(app.Resources);
-        });
-
-        return builder;
+        Logger.Sink = services.GetRequiredService<AvaloniaLoggerAdapter>();
+        return AppBuilder
+            .Configure(() => new App(services.GetRequiredService<WheelWizard.Views.Startup.IDesktopStartup>()))
+            .UsePlatformDetect()
+            .WithInterFont()
+            .AfterSetup(builder =>
+            {
+                Setup(services);
+                services.GetRequiredService<WheelWizard.Views.Patterns.MiiControlThemes>().Install(builder.Instance!.Resources);
+                services.GetRequiredService<WindowAppearance>().Install(builder.Instance.Resources);
+            });
     }
 
     private static void SetupWorkingDirectory()
