@@ -1,7 +1,8 @@
+using System.IO.Abstractions;
 using Avalonia.Threading;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Services;
+using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Mods;
@@ -13,7 +14,7 @@ public interface IModsLaunchService
     Task<OperationResult> PrepareModsForLaunch(string targetFolderPath, bool clearTargetFolderWhenNoEnabledMods = false);
 }
 
-public sealed class ModsLaunchService(IModManager modManager) : IModsLaunchService
+public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSystem) : IModsLaunchService
 {
     private static readonly string ModsFolderPath = PathManager.ModsFolderPath;
 
@@ -23,7 +24,7 @@ public sealed class ModsLaunchService(IModManager modManager) : IModsLaunchServi
         if (mods.Length == 0)
         {
             if (clearTargetFolderWhenNoEnabledMods && ShouldAskToClearTargetFolder(targetFolderPath))
-                return FileHelper.DeleteDirectoryIfExists(targetFolderPath);
+                return fileSystem.DeleteDirectoryIfExists(targetFolderPath);
 
             return Ok();
         }

@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
+using WheelWizard.Shared.IO;
 using WheelWizard.Shared.Platform;
 
 namespace WheelWizard.Dolphin.Paths;
@@ -205,8 +206,8 @@ public sealed partial class DolphinPathLayout(
             return DefaultDolphinFlatpakAppId;
         }
 
-        var fullFlatpakUserFolderPath = NormalizePath(flatpakUserFolder);
-        var fullHomePath = NormalizePath(HomeFolderPath);
+        var fullFlatpakUserFolderPath = Path.NormalizePath(flatpakUserFolder);
+        var fullHomePath = Path.NormalizePath(HomeFolderPath);
 
         if (!fullFlatpakUserFolderPath.StartsWith(fullHomePath + '/', StringComparison.Ordinal))
         {
@@ -235,21 +236,5 @@ public sealed partial class DolphinPathLayout(
     public string GetDolphinExeDirectory()
     {
         return GetContainingBaseDirectorySafe(DolphinFilePath);
-    }
-
-    private string NormalizePath(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException("Path cannot be empty.", nameof(value));
-        var fullPath = Path.GetFullPath(value);
-        var root = Path.GetPathRoot(fullPath) ?? "";
-        while (fullPath.Length > root.Length)
-        {
-            var trimmed = Path.TrimEndingDirectorySeparator(fullPath);
-            if (trimmed.Equals(fullPath, StringComparison.Ordinal))
-                break;
-            fullPath = trimmed;
-        }
-        return fullPath;
     }
 }

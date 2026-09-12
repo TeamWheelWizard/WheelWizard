@@ -45,7 +45,9 @@ public static class EnvHelper
 
     public static bool IsFlatpakSandboxed()
     {
-        return OperatingSystem.IsLinux() && FileHelper.FileExists("/.flatpak-info") && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FLATPAK_ID"));
+        return OperatingSystem.IsLinux()
+            && File.Exists("/.flatpak-info")
+            && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FLATPAK_ID"));
     }
 
     public static string? MaybeDolphinLocationOverride()
