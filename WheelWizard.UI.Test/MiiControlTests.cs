@@ -19,6 +19,55 @@ namespace WheelWizard.UI.Test;
 public class MiiControlTests
 {
     [AvaloniaFact]
+    public async Task FriendPortrait_RemainsVisibleWithoutAnExplicitWidth()
+    {
+        var images = InstallThemes();
+        using var bitmap = new WriteableBitmap(new PixelSize(512, 512), new Vector(96, 96));
+        var rendered = new TaskCompletionSource<OperationResult<Bitmap>>();
+        images.GetImageAsync(Arg.Any<Mii>(), Arg.Any<MiiImageSpecifications>()).Returns(rendered.Task);
+        // Friend-card badges still use the application provider at this stack layer.
+        var services = Substitute.For<IServiceProvider>();
+        services
+            .GetService(typeof(WheelWizard.WheelWizardData.IWhWzDataSingletonService))
+            .Returns(Substitute.For<WheelWizard.WheelWizardData.IWhWzDataSingletonService>());
+        ((Views.App)Application.Current!).SetServiceProvider(services);
+        var card = new FriendsListItem
+        {
+            Width = 428,
+            Height = 124,
+            Mii = MiiFactory.CreateRandomMii(new Testably.Abstractions.RealRandomSystem().Random.New(1)),
+        };
+        var window = new Window { Content = card };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            rendered.SetResult(bitmap);
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            foreach (var (online, pending) in new[] { (false, false), (true, false), (false, true) })
+            {
+                card.IsOnline = online;
+                card.IsPending = pending;
+                window.UpdateLayout();
+                var control = Assert.Single(card.GetVisualDescendants().OfType<MiiImageLoader>());
+                var view = Assert.Single(control.GetVisualDescendants().OfType<MiiImageView>());
+                Assert.Same(bitmap, Assert.Single(view.GeneratedImages));
+                var image = Assert.Single(view.GetVisualDescendants().OfType<Image>(), image => image.IsVisible && image.Source == bitmap);
+                var position = image.TranslatePoint(default, card)!.Value;
+                var visiblePortrait = new Rect(position, image.Bounds.Size).Intersect(new Rect(card.Bounds.Size));
+                Assert.True(
+                    visiblePortrait.Width >= 50 && visiblePortrait.Height >= 100,
+                    $"Portrait is clipped outside the card: {position}, {image.Bounds}; visible area {visiblePortrait}"
+                );
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void Templates_ConstructAllRenderingViewsWithoutAGlobalServiceProvider()
     {
         var images = InstallThemes();
