@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 using Testably.Abstractions;
@@ -20,6 +20,7 @@ using WheelWizard.Services.Launcher;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Downloads;
+using WheelWizard.Shared.IO;
 using WheelWizard.Shared.Services;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
@@ -57,6 +58,7 @@ public static class SetupExtensions
 
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();
+        services.AddSingleton<IDirectoryTransferService, DirectoryTransferService>();
         services.AddSingleton<ITimeSystem, RealTimeSystem>();
         services.AddSingleton<IRandomSystem, RealRandomSystem>();
         services.AddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions()));

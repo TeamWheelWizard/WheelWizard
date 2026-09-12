@@ -1,9 +1,10 @@
+using System.IO.Abstractions;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using WheelWizard.Features.Archives;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Services;
+using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Features.Patches;
@@ -25,8 +26,11 @@ public interface IModPatchConversionService
     Task<OperationResult<ModPatchConversionResult>> ConvertToPatchesAsync(Mod mod, CancellationToken cancellationToken);
 }
 
-public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConverter, ILogger<ModPatchConversionService> logger)
-    : IModPatchConversionService
+public sealed class ModPatchConversionService(
+    ISzsPatchConverter szsPatchConverter,
+    ILogger<ModPatchConversionService> logger,
+    IFileSystem fileSystem
+) : IModPatchConversionService
 {
     public bool HasIncompatibleSzsFiles(Mod mod) => GetConvertibleArchiveFiles(mod).Any();
 
@@ -198,7 +202,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         finally
         {
             progressWindow.Close();
-            _ = FileHelper.DeleteDirectoryIfExists(tempRoot);
+            _ = fileSystem.DeleteDirectoryIfExists(tempRoot);
         }
     }
 
@@ -381,7 +385,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         }
     }
 
-    private static void ReplaceDirectory(string sourceDirectory, string convertedDirectory, CancellationToken cancellationToken)
+    private void ReplaceDirectory(string sourceDirectory, string convertedDirectory, CancellationToken cancellationToken)
     {
         var backupDirectory = $"{sourceDirectory}.patch-conversion-backup-{Guid.NewGuid():N}";
 
@@ -390,7 +394,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         {
             cancellationToken.ThrowIfCancellationRequested();
             CopyDirectory(convertedDirectory, sourceDirectory, cancellationToken);
-            _ = FileHelper.DeleteDirectoryIfExists(backupDirectory);
+            _ = fileSystem.DeleteDirectoryIfExists(backupDirectory);
         }
         catch
         {

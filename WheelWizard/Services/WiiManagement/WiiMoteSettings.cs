@@ -19,7 +19,7 @@ public static class WiiMoteSettings
     private static string GetSavedWiiMoteLocation()
     {
         var wiimoteFile = Path.Combine(PathManager.ConfigFolderPath, "WiimoteNew.ini");
-        if (FileHelper.FileExists(wiimoteFile))
+        if (File.Exists(wiimoteFile))
             return wiimoteFile;
 
         return string.Empty;

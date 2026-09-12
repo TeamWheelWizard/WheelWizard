@@ -7,6 +7,7 @@ using WheelWizard.Models.Enums;
 using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings.Types;
+using WheelWizard.Shared.IO;
 
 namespace WheelWizard.Settings;
 
@@ -110,9 +111,9 @@ public class SettingsManager : ISettingsManager, IDisposable
                         // XXX: Circular symlink references may stil break the Flatpak, but they
                         // shouldn't be present under normal usage.
                         if (
-                            FileHelper
-                                .NormalizePath(blockedUserFolder)
-                                .Equals(FileHelper.NormalizePath(userFolderPath), StringComparison.Ordinal)
+                            _fileSystem
+                                .Path.NormalizePath(blockedUserFolder)
+                                .Equals(_fileSystem.Path.NormalizePath(userFolderPath), StringComparison.Ordinal)
                         )
                         {
                             return false;
@@ -161,7 +162,7 @@ public class SettingsManager : ISettingsManager, IDisposable
                             // In this case, the user requested native Dolphin's split config/user folders (not `~/.dolphin-emu`).
                             // Since Flatpak may leave an empty `~/.dolphin-emu` folder around, we need to check
                             // if it is empty and remove it, so our bundled Dolphin does not use it.
-                            if (!FileHelper.IsDirectoryEmpty(legacyFolderPath))
+                            if (!_fileSystem.IsDirectoryEmpty(legacyFolderPath))
                             {
                                 return false;
                             }
