@@ -186,6 +186,7 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            desktop.Exit += (_, _) => (_serviceProvider as IDisposable)?.Dispose();
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             _ = InitializeDesktopAsync(desktop);
         }

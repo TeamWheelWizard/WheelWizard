@@ -35,6 +35,8 @@ public static class SetupExtensions
     /// </summary>
     public static void AddWheelWizardServices(this IServiceCollection services)
     {
+        services.AddSingleton<WheelWizard.Shared.Polling.IPollingScheduler, WheelWizard.Views.Polling.AvaloniaPollingScheduler>();
+        services.AddSingleton<WheelWizard.Views.Diagnostics.DevelopmentRefreshService>();
         // Features
         services.AddDolphinInstaller();
         services.AddSingleton<WheelWizard.Launching.IRetroRewindLaunchDescriptor, WheelWizard.Launching.RetroRewindLaunchDescriptor>();
