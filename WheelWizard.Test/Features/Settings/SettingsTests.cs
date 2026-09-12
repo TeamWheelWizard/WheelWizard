@@ -6,6 +6,7 @@ using Testably.Abstractions;
 using Testably.Abstractions.Testing;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Localization;
+using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 
@@ -111,13 +112,14 @@ public class SettingsManagerTests
     public void LoadSettings_CallsUnderlyingManagersOnlyOnce()
     {
         var manager = CreateManager(new MockFileSystem(), out var whWzManager, out var dolphinManager, out var recompManager);
+        SettingsTestUtils.InitializeSettingsRuntime("/wheelwizard-settings-load");
 
         manager.LoadSettings();
         manager.LoadSettings();
 
-        whWzManager.Received(1).LoadSettings();
-        dolphinManager.Received(1).LoadSettings();
-        recompManager.Received(1).LoadSettings();
+        whWzManager.Received(1).LoadSettings(PathManager.WheelWizardConfigFilePath);
+        dolphinManager.Received(1).LoadSettings(PathManager.ConfigFolderPath);
+        recompManager.Received(1).LoadSettings(PathManager.RecompConfigFilePath);
     }
 
     private static SettingsManager CreateManager(
