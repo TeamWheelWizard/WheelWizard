@@ -39,6 +39,35 @@ public class AtomicFileHelperTests
     }
 
     [Fact]
+    public void WriteAllBytesAtomic_CreatesThenReplacesRepeatedly_KeepingPreviousContents()
+    {
+        var fileSystem = new Testably.Abstractions.RealFileSystem();
+        var temporaryDirectory = Path.Combine(Path.GetTempPath(), $"wheelwizard-atomic-{Guid.NewGuid():N}");
+        var filePath = Path.Combine(temporaryDirectory, "save.dat");
+        try
+        {
+            for (byte version = 1; version <= 3; version++)
+            {
+                var result = fileSystem.WriteAllBytesAtomic(filePath, [version]);
+
+                Assert.True(result.IsSuccess, result.IsFailure ? result.Error.Exception?.ToString() ?? result.Error.Message : null);
+                Assert.Equal(new byte[] { version }, fileSystem.File.ReadAllBytes(filePath));
+                Assert.False(fileSystem.File.Exists(filePath + AtomicFileHelper.TempExtension));
+                if (version > 1)
+                    Assert.Equal(
+                        new byte[] { (byte)(version - 1) },
+                        fileSystem.File.ReadAllBytes(filePath + AtomicFileHelper.BackupExtension)
+                    );
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(temporaryDirectory))
+                Directory.Delete(temporaryDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void WriteAllBytesAtomic_LeavesOriginalIntact_WhenWriteFails()
     {
         var fileSystem = new MockFileSystem();
