@@ -1,10 +1,8 @@
-using Avalonia.Threading;
 using Semver;
 using WheelWizard.AutoUpdating.Platforms;
 using WheelWizard.Branding;
 using WheelWizard.GitHub;
 using WheelWizard.GitHub.Domain;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.AutoUpdating;
 
@@ -16,48 +14,39 @@ public interface IAutoUpdaterSingletonService
 public class AutoUpdaterSingletonService(
     IUpdatePlatform updatePlatform,
     IBrandingSingletonService brandingService,
-    IGitHubSingletonService gitHubService
+    IGitHubSingletonService gitHubService,
+    IUpdatePresentation presentation
 ) : IAutoUpdaterSingletonService
 {
+    private bool _manualUpdateShown;
     private string CurrentVersion => brandingService.Branding.Version;
 
     public async Task CheckForUpdatesAsync()
     {
-        // TODO: How to run this in a background thread?
         var latestRelease = await GetLatestReleaseAsync();
         if (latestRelease?.TagName is null)
             return;
 
-        var asset = updatePlatform.GetAssetForCurrentPlatform(latestRelease);
-        if (asset is null)
-            return;
-
-        var latestVersion = SemVersion.Parse(latestRelease.TagName.TrimStart('v'), SemVersionStyles.Any);
-        var popupExtraText = t("question.new_version_wh_wz.extra", latestVersion, CurrentVersion)!;
-
-        var shouldUpdate = false;
-        await Dispatcher.UIThread.InvokeAsync(async () =>
+        var latestVersion = latestRelease.TagName.TrimStart('v');
+        if (!updatePlatform.SupportsAutomaticUpdate)
         {
-            shouldUpdate = await new YesNoWindow()
-                .SetButtonText(t("action.update"), t("action.maybe_later"))
-                .SetMainText(t("question.new_version_wh_wz.title"))
-                .SetExtraText(popupExtraText)
-                .AwaitAnswer();
-        });
-
-        if (!shouldUpdate)
+            if (!_manualUpdateShown)
+            {
+                _manualUpdateShown = true;
+                await presentation.ShowManualUpdateAsync(latestVersion, CurrentVersion);
+            }
             return;
-
-        var updateResult = await updatePlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl);
-
-        if (updateResult.IsFailure)
-        {
-            await new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Warning)
-                .SetTitleText("Unable to update Wheel Wizard")
-                .SetInfoText(updateResult.Error.Message)
-                .ShowDialog();
         }
+
+        var asset = updatePlatform.GetAssetForCurrentPlatform(latestRelease);
+        if (asset is null || !await presentation.ConfirmUpdateAsync(latestVersion, CurrentVersion))
+            return;
+
+        var updateResult = await presentation.RunUpdateAsync(
+            (progress, cancellation) => updatePlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl, progress, cancellation)
+        );
+        if (updateResult.IsFailure)
+            await presentation.ShowUpdateFailureAsync(updateResult.Error.Message);
     }
 
     private async Task<GithubRelease?> GetLatestReleaseAsync()
@@ -65,18 +54,7 @@ public class AutoUpdaterSingletonService(
         var releasesResult = await gitHubService.GetReleasesAsync();
         if (releasesResult.IsFailure)
         {
-            await Dispatcher.UIThread.InvokeAsync(async () =>
-            {
-                await new MessageBoxWindow()
-                    .SetMessageType(MessageBoxWindow.MessageType.Error)
-                    .SetTitleText("Failed to check for updates")
-                    .SetInfoText(
-                        "An error occurred while checking for updates. Please try again later. "
-                            + "\nError: "
-                            + releasesResult.Error.Message
-                    )
-                    .ShowDialog();
-            });
+            await presentation.ShowCheckFailureAsync(releasesResult.Error.Message);
 
             return null;
         }
@@ -104,7 +82,7 @@ public class AutoUpdaterSingletonService(
                 continue;
 
             var asset = updatePlatform.GetAssetForCurrentPlatform(release);
-            if (asset is null)
+            if (updatePlatform.SupportsAutomaticUpdate && asset is null)
                 continue;
 
             if (bestVersion is null || releaseVersion.ComparePrecedenceTo(bestVersion) > 0)
