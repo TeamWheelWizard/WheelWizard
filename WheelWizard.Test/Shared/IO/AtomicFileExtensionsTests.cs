@@ -1,9 +1,9 @@
 using Testably.Abstractions.Testing;
-using WheelWizard.Helpers;
+using WheelWizard.Shared.IO;
 
-namespace WheelWizard.Test.Helpers;
+namespace WheelWizard.Test.Shared.IO;
 
-public class AtomicFileHelperTests
+public class AtomicFileExtensionsTests
 {
     private const string FilePath = "/save/rksys.dat";
 
@@ -17,8 +17,8 @@ public class AtomicFileHelperTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal(contents, fileSystem.File.ReadAllBytes(FilePath));
-        Assert.False(fileSystem.File.Exists(FilePath + AtomicFileHelper.TempExtension));
-        Assert.False(fileSystem.File.Exists(FilePath + AtomicFileHelper.BackupExtension));
+        Assert.False(fileSystem.File.Exists(FilePath + AtomicFileExtensions.TempExtension));
+        Assert.False(fileSystem.File.Exists(FilePath + AtomicFileExtensions.BackupExtension));
     }
 
     [Fact]
@@ -34,8 +34,8 @@ public class AtomicFileHelperTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal(newContents, fileSystem.File.ReadAllBytes(FilePath));
-        Assert.Equal(oldContents, fileSystem.File.ReadAllBytes(FilePath + AtomicFileHelper.BackupExtension));
-        Assert.False(fileSystem.File.Exists(FilePath + AtomicFileHelper.TempExtension));
+        Assert.Equal(oldContents, fileSystem.File.ReadAllBytes(FilePath + AtomicFileExtensions.BackupExtension));
+        Assert.False(fileSystem.File.Exists(FilePath + AtomicFileExtensions.TempExtension));
     }
 
     [Fact]
@@ -52,11 +52,11 @@ public class AtomicFileHelperTests
 
                 Assert.True(result.IsSuccess, result.IsFailure ? result.Error.Exception?.ToString() ?? result.Error.Message : null);
                 Assert.Equal(new byte[] { version }, fileSystem.File.ReadAllBytes(filePath));
-                Assert.False(fileSystem.File.Exists(filePath + AtomicFileHelper.TempExtension));
+                Assert.False(fileSystem.File.Exists(filePath + AtomicFileExtensions.TempExtension));
                 if (version > 1)
                     Assert.Equal(
                         new byte[] { (byte)(version - 1) },
-                        fileSystem.File.ReadAllBytes(filePath + AtomicFileHelper.BackupExtension)
+                        fileSystem.File.ReadAllBytes(filePath + AtomicFileExtensions.BackupExtension)
                     );
             }
         }
@@ -76,7 +76,7 @@ public class AtomicFileHelperTests
         fileSystem.File.WriteAllBytes(FilePath, oldContents);
 
         // A directory on the temp path makes writing the temp file fail before anything is swapped in.
-        fileSystem.Directory.CreateDirectory(FilePath + AtomicFileHelper.TempExtension);
+        fileSystem.Directory.CreateDirectory(FilePath + AtomicFileExtensions.TempExtension);
 
         var result = fileSystem.WriteAllBytesAtomic(FilePath, [1, 2, 3, 4], "Failed to save rksys.dat.");
 

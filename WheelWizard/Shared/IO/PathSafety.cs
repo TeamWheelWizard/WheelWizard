@@ -1,6 +1,6 @@
-namespace WheelWizard.Helpers;
+namespace WheelWizard.Shared.IO;
 
-public static class PathSafetyHelper
+public static class PathSafety
 {
     public static bool TryGetPathWithinDirectory(string directory, string relativePath, out string fullPath)
     {

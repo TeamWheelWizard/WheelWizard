@@ -1,4 +1,4 @@
-﻿namespace WheelWizard.Utilities.Mockers;
+namespace WheelWizard.Views.DesignTime;
 
 public class FriendCodeFactory : MockingDataFactory<string, FriendCodeFactory>
 {

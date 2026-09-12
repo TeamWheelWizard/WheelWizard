@@ -1,4 +1,4 @@
-﻿namespace WheelWizard.Utilities.Mockers;
+namespace WheelWizard.Views.DesignTime;
 
 public abstract class MockingDataFactory<T, U>
     where U : MockingDataFactory<T, U>, new()

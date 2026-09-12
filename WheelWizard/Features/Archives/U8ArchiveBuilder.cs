@@ -1,5 +1,6 @@
 using System.Text;
 using WheelWizard.Helpers;
+using WheelWizard.Shared.Binary;
 
 namespace WheelWizard.Features.Archives;
 
@@ -89,10 +90,10 @@ public static class U8ArchiveBuilder
         }
 
         var output = new byte[writeOffset];
-        BigEndianBinaryHelper.WriteUInt32BigEndian(output, 0x00, U8Magic);
-        BigEndianBinaryHelper.WriteUInt32BigEndian(output, 0x04, rootOffset);
-        BigEndianBinaryHelper.WriteUInt32BigEndian(output, 0x08, (uint)combinedNodeSize);
-        BigEndianBinaryHelper.WriteUInt32BigEndian(output, 0x0c, (uint)Align32(rootOffset + combinedNodeSize));
+        BigEndianBinary.WriteUInt32BigEndian(output, 0x00, U8Magic);
+        BigEndianBinary.WriteUInt32BigEndian(output, 0x04, rootOffset);
+        BigEndianBinary.WriteUInt32BigEndian(output, 0x08, (uint)combinedNodeSize);
+        BigEndianBinary.WriteUInt32BigEndian(output, 0x0c, (uint)Align32(rootOffset + combinedNodeSize));
 
         var nodeOffset = rootOffset;
         foreach (var node in nodes)
@@ -101,8 +102,8 @@ public static class U8ArchiveBuilder
             output[nodeOffset + 1] = (byte)((node.NameOffset >> 16) & 0xff);
             output[nodeOffset + 2] = (byte)((node.NameOffset >> 8) & 0xff);
             output[nodeOffset + 3] = (byte)(node.NameOffset & 0xff);
-            BigEndianBinaryHelper.WriteUInt32BigEndian(output, nodeOffset + 4, (uint)node.DataOffset);
-            BigEndianBinaryHelper.WriteUInt32BigEndian(output, nodeOffset + 8, (uint)node.Size);
+            BigEndianBinary.WriteUInt32BigEndian(output, nodeOffset + 4, (uint)node.DataOffset);
+            BigEndianBinary.WriteUInt32BigEndian(output, nodeOffset + 8, (uint)node.Size);
             nodeOffset += 12;
         }
 
