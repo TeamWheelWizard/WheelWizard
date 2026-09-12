@@ -41,7 +41,8 @@ public sealed class SettingsSignalBus(ILogger<SettingsSignalBus> logger) : ISett
 
         // You could use a lock for reading the subscribes. But let's minimize the lock usage to where it is important.
         // If the handlers list is slightly outdated it is not a problem (unlike when this happens when modifying this list)
-        handlers = [.. _subscribers.Values];
+        lock (_syncSubscribers)
+            handlers = [.. _subscribers.Values];
 
         var signal = new SettingChangedSignal(setting);
         foreach (var handler in handlers)

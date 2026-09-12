@@ -144,6 +144,5 @@ public class DolphinSettingManagerTests : IDisposable
     public void Dispose()
     {
         SettingsTestUtils.ResetSettingsRuntime();
-        SettingsTestUtils.ResetSignalRuntime();
     }
 }
