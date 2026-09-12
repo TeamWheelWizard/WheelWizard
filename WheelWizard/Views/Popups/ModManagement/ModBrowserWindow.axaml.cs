@@ -1,12 +1,13 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
+using WheelWizard.Views.ModManagement;
 using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Popups.Base;
@@ -15,7 +16,7 @@ using VisualExtensions = Avalonia.VisualTree.VisualExtensions;
 
 namespace WheelWizard.Views.Popups.ModManagement;
 
-public record ModSearchResult(GameBananaModPreview Mod, string PreviewImageUrl);
+public record ModSearchResult(GameBananaModPreview Mod, ModPreviewViewModel? Preview);
 
 public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 {
@@ -40,13 +41,22 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     private CancellationTokenSource? _loadCancellationToken;
 
     private string _currentSearchTerm = "";
+    private readonly IGameBananaMediaService _media;
+    private int _searchGeneration;
+    private bool _closed;
 
-    public ModBrowserWindow(ModContent modDetailViewer, IGameBananaSingletonService gameBananaService, INavigationService navigation)
+    public ModBrowserWindow(
+        ModContent modDetailViewer,
+        IGameBananaSingletonService gameBananaService,
+        INavigationService navigation,
+        IGameBananaMediaService media
+    )
         : base(true, false, false, t("popup_title.mod_browser"))
     {
         ModDetailViewer = modDetailViewer;
         GameBananaService = gameBananaService;
         Navigation = navigation;
+        _media = media;
         InitializeComponent();
         ModDetailHost.Content = ModDetailViewer;
         DataContext = this;
@@ -74,13 +84,17 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     /// </summary>
     private async Task LoadMods(int page, string searchTerm = "", bool ensurePatchResults = true)
     {
-        if (_isLoading || !_hasMoreMods)
+        if (_closed || _isLoading || !_hasMoreMods)
             return;
 
         _isLoading = true;
 
+        var generation = _searchGeneration;
         var effectiveSearchTerm = GetEffectiveSearchTerm(searchTerm);
         var result = await GameBananaService.GetModSearchResults(effectiveSearchTerm, page);
+
+        if (_closed || generation != _searchGeneration)
+            return;
 
         if (result.IsFailure)
         {
@@ -98,9 +112,9 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 
         foreach (var mod in newMods)
         {
-            LoadedMods.Add(
-                new(mod, mod.PreviewMedia != null ? mod.PreviewMedia.Images[0].BaseUrl + "/" + mod.PreviewMedia.Images[0].File : "")
-            );
+            var image = mod.PreviewMedia?.Images?.FirstOrDefault();
+            var url = image is null ? "" : $"{image.BaseUrl}/{image.File}";
+            LoadedMods.Add(new(mod, new ModPreviewViewModel(mod.Id, GameBananaService, _media, url)));
         }
 
         _hasMoreMods = !metadata.IsComplete;
@@ -117,7 +131,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     /// </summary>
     private async void ModListView_ScrollChanged(object? sender, ScrollChangedEventArgs e)
     {
-        if (_isLoading || !_hasMoreMods)
+        if (_closed || _isLoading || !_hasMoreMods)
             return;
 
         // Get the ScrollViewer from the ListBox's template
@@ -152,7 +166,10 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     /// </summary>
     private async void ModListView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
+        if (_closed)
+            return;
         _loadCancellationToken?.Cancel(); //this cancels the previous load task if it's still running
+        _loadCancellationToken?.Dispose();
         _loadCancellationToken = new();
 
         var modId = -1;
@@ -175,9 +192,34 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 
     protected override void BeforeClose()
     {
-        // a bit dirty, but it's the easiest way to refresh the mod list in the ModsPage
+        ReleaseResults();
+        // Refresh installed mods after closing the browser.
         Navigation.NavigateTo<ModsPage>();
         base.BeforeClose();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        ReleaseResults();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void ReleaseResults()
+    {
+        _closed = true;
+        ++_searchGeneration;
+        _loadCancellationToken?.Cancel();
+        _loadCancellationToken?.Dispose();
+        _loadCancellationToken = null;
+        DisposePreviews();
+    }
+
+    private void DisposePreviews()
+    {
+        Mods.Clear();
+        foreach (var result in LoadedMods)
+            result.Preview?.Dispose();
+        LoadedMods.Clear();
     }
 
     private void SearchTextBox_OnKeyDown(object? sender, KeyEventArgs e)
@@ -202,8 +244,9 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     {
         _currentPage = 1;
         _hasMoreMods = true;
-        LoadedMods.Clear();
-        await Dispatcher.UIThread.InvokeAsync(Mods.Clear);
+        ++_searchGeneration;
+        _isLoading = false;
+        DisposePreviews();
         await LoadMods(_currentPage, _currentSearchTerm);
     }
 
@@ -231,14 +274,14 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
             Mods.Add(mod);
 
         if (_hasMoreMods)
-            Mods.Add(new(GameBananaService.GetLoadingPreview(), ""));
+            Mods.Add(new(GameBananaService.GetLoadingPreview(), null));
 
         ModListView.SelectedItem = selectedModId == null ? null : Mods.FirstOrDefault(mod => mod.Mod.Id == selectedModId);
     }
 
     private async Task EnsurePatchesOnlyResultsAsync()
     {
-        while (ShowPatchesOnly && _hasMoreMods && !LoadedMods.Any(mod => mod.Mod.UsesPatches))
+        while (!_closed && !_isLoading && ShowPatchesOnly && _hasMoreMods && !LoadedMods.Any(mod => mod.Mod.UsesPatches))
             await LoadMods(_currentPage + 1, _currentSearchTerm, false);
     }
 
