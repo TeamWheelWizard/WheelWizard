@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Helpers;
 using WheelWizard.Recomp;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Binary;
 using WheelWizard.Shared.IO;
@@ -60,6 +60,7 @@ public class MiiRepositoryServiceService(
     IFileSystem fileSystem,
     ISettingsManager settings,
     IRecompPaths recompPaths,
+    IDolphinPaths dolphinPaths,
     IRecompDolphinDataService? recompDolphinData = null
 ) : IMiiRepositoryService
 {
@@ -72,12 +73,12 @@ public class MiiRepositoryServiceService(
     private string ResolveMiiDbFilePath()
     {
         if (!settings.IsRecompModeActive())
-            return PathManager.MiiDbFile;
+            return fileSystem.Path.GetMiiDbFilePath(dolphinPaths.WiiFolderPath);
 
         // Match the launcher's selection, including the runtime's private NAND when no linked
         // NAND is available. A missing copy must never send Mii edits to Dolphin's source NAND.
         var nandFolder = recompDolphinData?.NandFolderPath ?? recompPaths.PrivateNandFolderPath;
-        return PathManager.GetMiiDbFilePath(nandFolder);
+        return fileSystem.Path.GetMiiDbFilePath(nandFolder);
     }
 
     public List<byte[]> LoadAllBlocks()

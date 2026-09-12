@@ -10,6 +10,7 @@ public static class DolphinExtensions
     public static IServiceCollection AddDolphin(this IServiceCollection services)
     {
         services.TryAddSingleton<IRuntimeEnvironment, RuntimeEnvironment>();
+        services.TryAddSingleton<IDolphinPaths, DolphinPaths>();
         services.TryAddSingleton<IDolphinPathResolver, DolphinPathResolver>();
         services.TryAddSingleton<IDolphinRegistrySettings, DolphinRegistrySettings>();
         services.TryAddSingleton<IDolphinDiscoveryService, DolphinDiscoveryService>();
