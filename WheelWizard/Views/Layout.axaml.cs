@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -8,7 +8,7 @@ using Avalonia.Media;
 using WheelWizard.Branding;
 using WheelWizard.Localization;
 using WheelWizard.Mods;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
@@ -18,6 +18,7 @@ using WheelWizard.Views.Pages;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement.GameLicense;
 
@@ -51,6 +52,12 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     private int _testerClickCount;
     private bool _testerPromptOpen;
     private IDisposable? _settingsSignalSubscription;
+
+    [Inject]
+    private LiveRoomsService LiveRooms { get; set; } = null!;
+
+    [Inject]
+    private LiveStatusService LiveStatus { get; set; } = null!;
 
     [Inject]
     private IBrandingSingletonService BrandingService { get; set; } = null!;
@@ -90,8 +97,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
             WindowDecorations = WindowDecorations.Full;
         }
 
-        WhWzStatusManager.Instance.Subscribe(this);
-        RRLiveRooms.Instance.Subscribe(this);
+        LiveStatus.Subscribe(this);
+        LiveRooms.Subscribe(this);
         GameLicenseService.Subscribe(this);
         ModManagerService.PropertyChanged += ModManager_PropertyChanged;
         _ = ReloadModsAndShowErrorsAsync();
@@ -112,6 +119,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     protected override void OnClosed(EventArgs e)
     {
+        DetachLiveSubscriptions();
         _settingsSignalSubscription?.Dispose();
         _settingsSignalSubscription = null;
         LocalizationProvider.LanguageChanged -= OnLanguageChanged;
@@ -225,10 +233,10 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         switch (sender)
         {
-            case RRLiveRooms liveRooms:
+            case LiveRoomsService liveRooms:
                 UpdatePlayerAndRoomCount(liveRooms);
                 break;
-            case WhWzStatusManager liveAlerts:
+            case LiveStatusService liveAlerts:
                 UpdateLiveAlert(liveAlerts);
                 break;
         }
@@ -243,7 +251,16 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     public void UpdateSidebarProfile() => SidebarCurrentUserProfile.Refresh();
 
-    public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
+    public void DetachLiveSubscriptions()
+    {
+        LiveRooms.Unsubscribe(this);
+        LiveStatus.Unsubscribe(this);
+        GameLicenseService.Unsubscribe(this);
+    }
+
+    public void UpdatePlayerAndRoomCount() => UpdatePlayerAndRoomCount(LiveRooms);
+
+    public void UpdatePlayerAndRoomCount(LiveRoomsService sender)
     {
         var playerCount = sender.PlayerCount;
         RoomsButton.BoxText = playerCount.ToString();
@@ -251,9 +268,9 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         UpdateFriendCount();
     }
 
-    public void UpdateLiveAlert() => UpdateLiveAlert(WhWzStatusManager.Instance);
+    public void UpdateLiveAlert() => UpdateLiveAlert(LiveStatus);
 
-    private void UpdateLiveAlert(WhWzStatusManager sender)
+    private void UpdateLiveAlert(LiveStatusService sender)
     {
         var hasVariant = sender.Status?.Variant != null && sender.Status.Variant != WhWzStatusVariant.None;
         var hasCustomIcon = !string.IsNullOrEmpty(sender.Status?.Icon);

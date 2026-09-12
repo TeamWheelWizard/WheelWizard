@@ -1,21 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using WheelWizard.Utilities.RepeatedTasks;
-using WheelWizard.Views;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 
-namespace WheelWizard.Services.LiveData;
+namespace WheelWizard.WheelWizardData;
 
-public class WhWzStatusManager : RepeatedTaskManager
+public class LiveStatusService : RepeatedTaskManager
 {
     private readonly IWhWzDataSingletonService _whWzDataService;
-    private readonly ILogger<WhWzStatusManager> _logger;
+    private readonly ILogger<LiveStatusService> _logger;
 
     public WhWzStatus? Status { get; private set; }
 
-    public static WhWzStatusManager Instance => App.Services.GetRequiredService<WhWzStatusManager>();
-
-    public WhWzStatusManager(IWhWzDataSingletonService whWzDataService, ILogger<WhWzStatusManager> logger)
+    public LiveStatusService(IWhWzDataSingletonService whWzDataService, ILogger<LiveStatusService> logger)
         : base(90)
     {
         _whWzDataService = whWzDataService;
