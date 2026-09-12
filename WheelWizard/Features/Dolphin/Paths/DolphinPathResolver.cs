@@ -14,8 +14,5 @@ public sealed class DolphinPathResolver(IFileSystem fileSystem, IRuntimeEnvironm
     public DolphinPathLayout Resolve(string dolphinLocation, string userFolderPath) =>
         new(fileSystem.Path, environment, IsFlatpakSandboxed(), dolphinLocation, userFolderPath);
 
-    private bool IsFlatpakSandboxed() =>
-        environment.IsLinux
-        && fileSystem.File.Exists("/.flatpak-info")
-        && !string.IsNullOrWhiteSpace(environment.GetEnvironmentVariable("FLATPAK_ID"));
+    private bool IsFlatpakSandboxed() => environment.IsFlatpakSandboxed(fileSystem);
 }

@@ -150,7 +150,7 @@ public class DolphinLaunchServiceTests
     private sealed class Fixture
     {
         public IProcessLauncher Processes { get; } = Substitute.For<IProcessLauncher>();
-        public ILinuxProcessService LinuxProcesses { get; } = Substitute.For<ILinuxProcessService>();
+        public IUnixProcessService LinuxProcesses { get; } = Substitute.For<IUnixProcessService>();
         public IDolphinVersionService Versions { get; } = Substitute.For<IDolphinVersionService>();
         public ILinuxDolphinInstaller Installer { get; } = Substitute.For<ILinuxDolphinInstaller>();
         public IDolphinLaunchPresentation Presentation { get; } = Substitute.For<IDolphinLaunchPresentation>();

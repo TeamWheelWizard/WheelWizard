@@ -1,5 +1,6 @@
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.DolphinInstaller;
 
@@ -12,7 +13,7 @@ public interface IDolphinVersionService
     (DolphinVersionStatus Status, string? Version) CheckConfiguredDolphin();
 }
 
-public sealed class DolphinVersionService(ILinuxProcessService processService, IDolphinPaths paths, IRuntimeEnvironment environment)
+public sealed class DolphinVersionService(IUnixProcessService processService, IDolphinPaths paths, IRuntimeEnvironment environment)
     : IDolphinVersionService
 {
     public (DolphinVersionStatus Status, string? Version) CheckConfiguredDolphin()

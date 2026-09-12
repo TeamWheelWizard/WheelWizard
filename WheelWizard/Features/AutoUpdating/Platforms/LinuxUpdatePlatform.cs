@@ -2,8 +2,8 @@ using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using WheelWizard.GitHub.Domain;
-using WheelWizard.Helpers;
 using WheelWizard.Shared.Downloads;
+using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Downloads;
 
 namespace WheelWizard.AutoUpdating.Platforms;
@@ -84,17 +84,17 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem, IDownloadService downlo
             sleep 1
 
             echo 'Replacing old executable...'
-            rm -f {EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))}
-            mv {EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, newFileName))} {EnvHelper.SingleQuotePath(
+            rm -f {ShellQuoting.QuoteUnixArgument(fileSystem.Path.Combine(currentFolder, originalFileName))}
+            mv {ShellQuoting.QuoteUnixArgument(fileSystem.Path.Combine(currentFolder, newFileName))} {ShellQuoting.QuoteUnixArgument(
                 fileSystem.Path.Combine(currentFolder, originalFileName)
             )}
-            chmod +x {EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))}
+            chmod +x {ShellQuoting.QuoteUnixArgument(fileSystem.Path.Combine(currentFolder, originalFileName))}
 
             echo 'Starting the updated application...'
-            nohup {EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))} > /dev/null 2>&1 &
+            nohup {ShellQuoting.QuoteUnixArgument(fileSystem.Path.Combine(currentFolder, originalFileName))} > /dev/null 2>&1 &
 
             echo 'Cleaning up...'
-            rm -- {EnvHelper.SingleQuotePath(scriptFilePath)}
+            rm -- {ShellQuoting.QuoteUnixArgument(scriptFilePath)}
 
             echo 'Update completed successfully.'
             

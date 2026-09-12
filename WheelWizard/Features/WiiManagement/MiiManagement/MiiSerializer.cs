@@ -1,5 +1,4 @@
 using System.Text;
-using WheelWizard.Helpers;
 using WheelWizard.Shared.Binary;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;

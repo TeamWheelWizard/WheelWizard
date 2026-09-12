@@ -1,6 +1,5 @@
 using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
-using WheelWizard.Helpers;
 using WheelWizard.Settings;
 using WheelWizard.Shared.IO;
 
@@ -31,7 +30,8 @@ public static class PathManager
 
     // Paths set by the user
     public static string GameFilePath => Settings.Get<string>(Settings.GAME_LOCATION);
-    public static string DolphinFilePath => EnvHelper.MaybeDolphinLocationOverride() ?? Settings.Get<string>(Settings.DOLPHIN_LOCATION);
+    public static string DolphinFilePath =>
+        ResolveDolphinLayout(Settings.Get<string>(Settings.DOLPHIN_LOCATION), UserFolderPath).DolphinFilePath;
     public static string UserFolderPath => Settings.Get<string>(Settings.USER_FOLDER_PATH);
 
     public static string WheelWizardAppdataPath => ApplicationData.DirectoryPath;
@@ -122,8 +122,6 @@ public static class PathManager
         DefaultDolphinLayout.LinuxFlatpakSandboxedDolphinUserFolderBlockList;
     public static string SplitLinuxDolphinNativeConfigDir => CurrentDolphinLayout.SplitLinuxDolphinNativeConfigDir;
     public static string SplitLinuxDolphinConfigDir => CurrentDolphinLayout.SplitLinuxDolphinConfigDir;
-
-    private static bool IsFlatpakSandboxed() => EnvHelper.IsFlatpakSandboxed();
 
     public static bool IsLinuxDolphinConfigSplit() => CurrentDolphinLayout.IsLinuxDolphinConfigSplit();
 

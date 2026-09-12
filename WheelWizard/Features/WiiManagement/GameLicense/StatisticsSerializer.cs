@@ -1,4 +1,3 @@
-using WheelWizard.Helpers;
 using WheelWizard.Shared.Binary;
 using WheelWizard.WiiManagement.GameLicense.Domain.Statistics;
 

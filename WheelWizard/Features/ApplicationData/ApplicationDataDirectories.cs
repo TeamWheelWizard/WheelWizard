@@ -11,10 +11,7 @@ public sealed class ApplicationDataDirectories
 
     public ApplicationDataDirectories(IFileSystem fileSystem, IRuntimeEnvironment environment)
     {
-        var sandboxed =
-            environment.IsLinux
-            && fileSystem.File.Exists("/.flatpak-info")
-            && !string.IsNullOrWhiteSpace(environment.GetEnvironmentVariable("FLATPAK_ID"));
+        var sandboxed = environment.IsFlatpakSandboxed(fileSystem);
         var portable = !sandboxed && fileSystem.File.Exists("portable-ww.txt");
         var baseDirectory = portable ? string.Empty : environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         DefaultDirectoryPath = fileSystem.Path.NormalizePath(fileSystem.Path.Combine(baseDirectory, "CT-MKWII"));

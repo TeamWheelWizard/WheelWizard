@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-namespace WheelWizard.DolphinInstaller;
+namespace WheelWizard.Shared.Processes;
 
-public interface ILinuxProcessService
+public interface IUnixProcessService
 {
     OperationResult<int> Run(string fileName, string arguments, out string stdOut, out string stdErr);
     OperationResult<int> Run(string fileName, IEnumerable<string> argumentList, out string stdOut, out string stdErr);
@@ -12,7 +12,7 @@ public interface ILinuxProcessService
     Task<OperationResult> LaunchAndStopAsync(string fileName, string arguments, TimeSpan duration);
 }
 
-public sealed class LinuxProcessService : ILinuxProcessService
+public sealed class UnixProcessService : IUnixProcessService
 {
     public OperationResult<int> Run(string fileName, string arguments, out string stdOut, out string stdErr)
     {

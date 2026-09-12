@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
