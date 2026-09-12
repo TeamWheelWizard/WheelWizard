@@ -9,6 +9,15 @@ public static class GameBananaExtensions
     {
         services.AddWhWzRefitApi<IGameBananaApi>(Endpoints.GameBananaBaseAddress);
         services.AddSingleton<IGameBananaSingletonService, GameBananaSingletonService>();
+        services.AddHttpClient(
+            GameBananaMediaService.ClientName,
+            (provider, client) =>
+            {
+                client.ConfigureWheelWizardClient(provider);
+                client.Timeout = TimeSpan.FromSeconds(6);
+            }
+        );
+        services.AddSingleton<IGameBananaMediaService, GameBananaMediaService>();
         return services;
     }
 }
