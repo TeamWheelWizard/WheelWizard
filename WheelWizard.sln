@@ -1,8 +1,10 @@
-﻿
+ï»¿
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WheelWizard", "WheelWizard\WheelWizard.csproj", "{DF73A1D9-B01E-4826-A0F3-A8105E66A931}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WheelWizard.Test", "WheelWizard.Test\WheelWizard.Test.csproj", "{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WheelWizard.UI.Test", "WheelWizard.UI.Test\WheelWizard.UI.Test.csproj", "{3F647251-42DF-4234-9FEA-92681D2C952D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +20,9 @@ Global
 		{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2A6FF37-2E6B-4683-A8DA-AD965E1CC55A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F647251-42DF-4234-9FEA-92681D2C952D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F647251-42DF-4234-9FEA-92681D2C952D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F647251-42DF-4234-9FEA-92681D2C952D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F647251-42DF-4234-9FEA-92681D2C952D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

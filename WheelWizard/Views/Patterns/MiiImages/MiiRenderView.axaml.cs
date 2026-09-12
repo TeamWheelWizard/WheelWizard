@@ -10,15 +10,13 @@ using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiRendering.Services;
 using WheelWizard.Shared.Calendar;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
 
-public partial class Mii3DRender : BaseMiiImage
+public partial class MiiRenderView : BaseMiiImage
 {
-    [Inject]
-    private ISeasonalCalendar Calendar { get; set; } = null!;
+    private readonly ISeasonalCalendar Calendar;
 
     private const float YawDragSensitivity = 0.8f;
     private const float PitchDragSensitivity = 0.8f;
@@ -30,8 +28,7 @@ public partial class Mii3DRender : BaseMiiImage
     private const float MaxCameraVerticalOffset = 90f;
     private static readonly TimeSpan RapidModelUpdateThreshold = TimeSpan.FromMilliseconds(120);
 
-    [Inject]
-    private IMiiNativeRenderer NativeRenderer { get; set; } = null!;
+    private readonly IMiiNativeRenderer NativeRenderer;
 
     private readonly object _renderLock = new();
     private PendingRender? _pendingRender;
@@ -57,7 +54,7 @@ public partial class Mii3DRender : BaseMiiImage
     private float _currentZoom = 1f;
 
     public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty = AvaloniaProperty.Register<
-        Mii3DRender,
+        MiiRenderView,
         MiiImageSpecifications
     >(nameof(ImageVariant), MiiImageVariants.OnlinePlayerSmall, coerce: CoerceVariant);
 
@@ -67,7 +64,7 @@ public partial class Mii3DRender : BaseMiiImage
         set => SetValue(ImageVariantProperty, value);
     }
 
-    public static readonly StyledProperty<bool> InteractiveProperty = AvaloniaProperty.Register<Mii3DRender, bool>(
+    public static readonly StyledProperty<bool> InteractiveProperty = AvaloniaProperty.Register<MiiRenderView, bool>(
         nameof(Interactive),
         true,
         coerce: CoerceInteractive
@@ -79,7 +76,7 @@ public partial class Mii3DRender : BaseMiiImage
         set => SetValue(InteractiveProperty, value);
     }
 
-    public static readonly StyledProperty<float> PreviewRenderScaleProperty = AvaloniaProperty.Register<Mii3DRender, float>(
+    public static readonly StyledProperty<float> PreviewRenderScaleProperty = AvaloniaProperty.Register<MiiRenderView, float>(
         nameof(PreviewRenderScale),
         0.2f
     );
@@ -90,7 +87,7 @@ public partial class Mii3DRender : BaseMiiImage
         set => SetValue(PreviewRenderScaleProperty, value);
     }
 
-    public static readonly StyledProperty<int> HighQualitySettleDelayMsProperty = AvaloniaProperty.Register<Mii3DRender, int>(
+    public static readonly StyledProperty<int> HighQualitySettleDelayMsProperty = AvaloniaProperty.Register<MiiRenderView, int>(
         nameof(HighQualitySettleDelayMs),
         90
     );
@@ -101,8 +98,11 @@ public partial class Mii3DRender : BaseMiiImage
         set => SetValue(HighQualitySettleDelayMsProperty, value);
     }
 
-    public Mii3DRender()
+    public MiiRenderView(IMiiImagesSingletonService images, ISeasonalCalendar calendar, IMiiNativeRenderer nativeRenderer)
+        : base(images)
     {
+        Calendar = calendar;
+        NativeRenderer = nativeRenderer;
         InitializeComponent();
         ImageBorder.IsHitTestVisible = Interactive;
     }
@@ -121,13 +121,13 @@ public partial class Mii3DRender : BaseMiiImage
 
     private static MiiImageSpecifications CoerceVariant(AvaloniaObject o, MiiImageSpecifications value)
     {
-        ((Mii3DRender)o).OnVariantChanged(value);
+        ((MiiRenderView)o).OnVariantChanged(value);
         return value;
     }
 
     private static bool CoerceInteractive(AvaloniaObject o, bool value)
     {
-        ((Mii3DRender)o).OnInteractiveChanged(value);
+        ((MiiRenderView)o).OnInteractiveChanged(value);
         return value;
     }
 
@@ -160,7 +160,7 @@ public partial class Mii3DRender : BaseMiiImage
         UpdateStudioDataAndQueue(forcePreview: false);
     }
 
-    public void RefreshCurrentMii()
+    public override void RefreshCurrentMii()
     {
         _currentMii = Mii ?? _currentMii;
         UpdateStudioDataAndQueue(forcePreview: true);
@@ -198,6 +198,8 @@ public partial class Mii3DRender : BaseMiiImage
 
     private void QueueRenderCurrentView(float renderScale)
     {
+        if (!IsImageAttached)
+            return;
         var mii = _currentMii;
         if (mii == null || string.IsNullOrWhiteSpace(_studioData))
         {

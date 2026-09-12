@@ -91,6 +91,7 @@ public class Program : IDesignerEntryPoint
 
             // Set the service provider in the application instance
             app.SetServiceProvider(serviceProvider);
+            serviceProvider.GetRequiredService<WheelWizard.Views.Patterns.MiiControlThemes>().Install(app.Resources);
 
             // Make sure this comes AFTER setting the service provider
             // of the `App` instance! Otherwise, things like logging will not work
