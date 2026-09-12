@@ -1,12 +1,9 @@
-﻿using WheelWizard.Settings;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
 
 public static class MiiExtensions
 {
-    private static ISettingsManager Settings => SettingsRuntime.Current;
-
     private static readonly DateTime MiiIdEpochUtc = new(2006, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private const uint MiiIdCounterMask = 0x1FFFFFFF;
     private const int MiiIdTickResolutionSeconds = 4;
@@ -65,24 +62,30 @@ public static class MiiExtensions
         return cloneResult.Value;
     }
 
-    public static bool IsGlobal(this Mii self)
+    public static bool IsGlobal(this Mii self, string? localMacAddress)
     {
         // If it has blue pants, then its definitely global
         if ((self.MiiId1 >> 5) == 0b110)
             return true;
 
         // But it can also be global if the mac address is not the same as your own address
-        var macAddressString = Settings.Get<string>(Settings.MACADDRESS);
-        var macParts = macAddressString.Split(':');
+        var macParts = localMacAddress?.Split(':');
+        if (macParts is not { Length: 6 })
+            return false;
         var macBytes = new byte[6];
         for (var i = 0; i < 6; i++)
-            macBytes[i] = byte.Parse(macParts[i], System.Globalization.NumberStyles.HexNumber);
+            if (
+                !byte.TryParse(
+                    macParts[i],
+                    System.Globalization.NumberStyles.HexNumber,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out macBytes[i]
+                )
+            )
+                return false;
         var systemId0 = (byte)((macBytes[0] + macBytes[1] + macBytes[2]) & 0xFF);
         return (
-            self?.SystemId0 != systemId0
-            || self?.SystemId1 != macBytes[3]
-            || self?.SystemId2 != macBytes[4]
-            || self?.SystemId3 != macBytes[5]
+            self.SystemId0 != systemId0 || self.SystemId1 != macBytes[3] || self.SystemId2 != macBytes[4] || self.SystemId3 != macBytes[5]
         );
     }
 }
