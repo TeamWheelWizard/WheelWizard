@@ -4,12 +4,12 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
 using WheelWizard.AutoUpdating;
+using WheelWizard.GameBanana.InstallRequests;
 using WheelWizard.MiiRendering.Services;
 using WheelWizard.Mods;
 using WheelWizard.RrRooms;
 using WheelWizard.Services;
 using WheelWizard.Services.Launcher;
-using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Settings;
 using WheelWizard.Views.Behaviors;
 using WheelWizard.Views.Popups.Generic;
@@ -134,7 +134,7 @@ public class App : Application
             );
         }
 
-        await UrlProtocolManager.ShowPopupForLaunchUrlAsync(protocolArgument);
+        await Services.GetRequiredService<IModInstallRequestHandler>().HandleAsync(protocolArgument);
         return true;
     }
 
