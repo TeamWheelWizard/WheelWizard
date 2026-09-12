@@ -6,7 +6,7 @@ using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class VideoSettings : UserControlBase
+public partial class VideoSettings : UserControl
 {
     private static readonly string[] ResolutionOptions =
     [

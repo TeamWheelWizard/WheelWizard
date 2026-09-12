@@ -28,7 +28,9 @@ public static class ViewUtils
 
     public static void ShowSnackbar(string message, SnackbarType type = SnackbarType.Success) => GetLayout().ShowSnackbar(message, type);
 
-    public static Layout GetLayout() => Layout.Instance;
+    public static Layout GetLayout() =>
+        (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as Layout
+        ?? throw new InvalidOperationException("The main window is not available.");
 
     public static double GetUsableWindowScale(double requestedScale, Size unscaledSize, Window window)
     {
@@ -44,38 +46,6 @@ public static class ViewUtils
 
         maxScale = Math.Max(SettingValues.MinWindowScale, maxScale);
         return Math.Clamp(requestedScale, SettingValues.MinWindowScale, maxScale);
-    }
-
-    public static void RefreshWindow()
-    {
-        // Refresh window  opens in the start page again, that is nessesairy
-        // we would prefer opening up where we left off, however, that does not work since the translations
-        // are still in the context of the layout before, and so the dropdowns will break
-
-        var oldWindow = GetLayout();
-        // Creating a new one will also set re-assign `Layout.Instance` right away, and this `GetLayout()`
-        Layout newWindow = new();
-        newWindow.Position = oldWindow.Position;
-        oldWindow.DetachLiveSubscriptions();
-
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            var previousShutdownMode = desktop.ShutdownMode;
-            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            desktop.MainWindow = newWindow;
-            newWindow.Show();
-            oldWindow.Close();
-            desktop.ShutdownMode =
-                previousShutdownMode == ShutdownMode.OnMainWindowClose ? ShutdownMode.OnMainWindowClose : previousShutdownMode;
-        }
-        else
-        {
-            newWindow.Show();
-            oldWindow.Close();
-        }
-
-        newWindow.UpdatePlayerAndRoomCount();
-        newWindow.UpdateLiveAlert();
     }
 
     public static T? FindParent<T>(object? child, int maxSearchDepth = 10)

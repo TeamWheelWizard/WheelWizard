@@ -7,7 +7,7 @@ using WheelWizard.Views.Pages.KitchenSink;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class KitchenSinkPage : UserControlBase
+public partial class KitchenSinkPage : UserControl
 {
     private readonly SectionDefinition[] _sections =
     [
