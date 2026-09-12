@@ -1,7 +1,7 @@
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Logging;
 using Serilog;
+using Testably.Abstractions;
 using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationIntegration;
 using WheelWizard.ApplicationLifecycle.Logging;
@@ -9,6 +9,8 @@ using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views;
+using WheelWizard.Views.Patterns;
+using WheelWizard.Views.Startup;
 
 namespace WheelWizard;
 
@@ -21,12 +23,9 @@ public class Program : IDesignerEntryPoint
         // Make sure this is the first action on startup!
         SetupWorkingDirectory();
 
-        // Create a static logger instance for the application
-        var applicationData = ApplicationDataComposition.CreateLocation(
-            new Testably.Abstractions.RealFileSystem(),
-            new WheelWizard.Shared.Platform.RuntimeEnvironment()
-        );
-        var logFiles = new ApplicationLogFiles(applicationData, new LogFileFactory(new Testably.Abstractions.RealFileSystem()));
+        // Logging and feature paths share the same application-data location.
+        var applicationData = ApplicationDataComposition.CreateLocation(new RealFileSystem(), new RuntimeEnvironment());
+        var logFiles = new ApplicationLogFiles(applicationData, new LogFileFactory(new RealFileSystem()));
         Log.Logger = CreateLoggerWithRecovery(applicationData, logFiles);
         ApplicationLogging.LogStartup(Log.Logger);
         RegisterGlobalExceptionLogging();
@@ -108,7 +107,7 @@ public class Program : IDesignerEntryPoint
     {
         Logger.Sink = services.GetRequiredService<AvaloniaLoggerAdapter>();
         var builder = AppBuilder
-            .Configure(() => new App(services.GetRequiredService<WheelWizard.Views.Startup.IDesktopStartup>()))
+            .Configure(() => new App(services.GetRequiredService<IDesktopStartup>()))
             .UsePlatformDetect()
             .WithInterFont();
 
@@ -122,14 +121,14 @@ public class Program : IDesignerEntryPoint
         return builder.AfterSetup(appBuilder =>
         {
             Setup(services);
-            services.GetRequiredService<WheelWizard.Views.Patterns.MiiControlThemes>().Install(appBuilder.Instance!.Resources);
+            services.GetRequiredService<MiiControlThemes>().Install(appBuilder.Instance!.Resources);
             services.GetRequiredService<WindowAppearance>().Install(appBuilder.Instance.Resources);
         });
     }
 
     private static void SetupWorkingDirectory()
     {
-        if (new WheelWizard.Shared.Platform.RuntimeEnvironment().IsFlatpakSandboxed(new Testably.Abstractions.RealFileSystem()))
+        if (new RuntimeEnvironment().IsFlatpakSandboxed(new RealFileSystem()))
         {
             // In this case, we would not want executable directory-relative paths, since this is in `/app/bin`.
             // We are going to use the home directory instead (this should be the original working directory anyway).

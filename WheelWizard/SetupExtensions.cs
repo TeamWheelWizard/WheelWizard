@@ -1,8 +1,6 @@
-using System.IO.Abstractions;
-using Microsoft.Extensions.Caching.Memory;
-using Serilog;
-using Testably.Abstractions;
 using WheelWizard.ApplicationData;
+using WheelWizard.ApplicationIntegration;
+using WheelWizard.ApplicationLifecycle;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
 using WheelWizard.CustomCharacters;
@@ -19,57 +17,27 @@ using WheelWizard.Mods;
 using WheelWizard.Recomp;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
-using WheelWizard.Shared.Downloads;
-using WheelWizard.Shared.IO;
-using WheelWizard.Shared.Services;
+using WheelWizard.Views;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
-using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard;
 
 public static class SetupExtensions
 {
-    /// <summary>
-    /// Adds the services required for WheelWizard.
-    /// </summary>
+    /// <summary>Composes feature services and their desktop presentation adapters.</summary>
     public static void AddWheelWizardServices(this IServiceCollection services, IApplicationDataLocation? applicationData = null)
     {
-        services.AddSingleton<WheelWizard.Shared.Polling.IPollingScheduler, WheelWizard.Views.Polling.AvaloniaPollingScheduler>();
-        services.AddSingleton<WheelWizard.Views.Diagnostics.DevelopmentRefreshService>();
-        services.AddSingleton<
-            WheelWizard.ApplicationIntegration.IUrlProtocolRegistrationStore,
-            WheelWizard.ApplicationIntegration.WindowsUrlProtocolRegistrationStore
-        >();
-        services.AddSingleton<
-            WheelWizard.ApplicationIntegration.IUrlProtocolRegistration,
-            WheelWizard.ApplicationIntegration.UrlProtocolRegistration
-        >();
-        services.AddSingleton<
-            WheelWizard.GameBanana.InstallRequests.IModInstallRequestPresentation,
-            WheelWizard.Views.ModManagement.ModInstallRequestPresentation
-        >();
-        services.AddSingleton<
-            WheelWizard.Views.Storage.IStorageProviderAccessor,
-            WheelWizard.Views.Storage.DesktopStorageProviderAccessor
-        >();
-        services.AddSingleton<WheelWizard.Views.Storage.IFilePickerService, WheelWizard.Views.Storage.FilePickerService>();
-        services.AddSingleton<WheelWizard.CustomDistributions.IDistributionPrompts, WheelWizard.Views.Distributions.DistributionPrompts>();
-        // Features
-        services.AddSingleton<WheelWizard.Shared.Processes.IUnixCommandService, WheelWizard.Shared.Processes.UnixCommandService>();
-        services.AddSingleton<WheelWizard.Shared.Processes.IUnixProcessService, WheelWizard.Shared.Processes.UnixProcessService>();
+        services.AddSharedServices();
+        services.AddApplicationData(applicationData);
+        services.AddApplicationIntegration();
+        services.AddApplicationLifecycle();
+        services.AddLaunching();
         services.AddDolphinInstaller();
-        services.AddSingleton<WheelWizard.Launching.IRetroRewindLaunchDescriptor, WheelWizard.Launching.RetroRewindLaunchDescriptor>();
-        services.AddSingleton<WheelWizard.Shared.Processes.IProcessLauncher, WheelWizard.Shared.Processes.ProcessLauncher>();
-        services.AddSingleton<WheelWizard.Launching.IDolphinLaunchService, WheelWizard.Launching.DolphinLaunchService>();
-        services.AddSingleton<WheelWizard.Launching.IDolphinLaunchPresentation, WheelWizard.Views.Launching.DolphinLaunchPresentation>();
-        services.AddDownloads();
         services.AddLocalization();
         services.AddSettings();
         services.AddCustomCharacters();
         services.AddAutoUpdating();
-        services.AddSingleton<WheelWizard.AutoUpdating.IUpdatePresentation, WheelWizard.Views.Updating.UpdatePresentation>();
-        services.AddSingleton<WheelWizard.Shared.Processes.IApplicationProcess, WheelWizard.Shared.Processes.ApplicationProcess>();
         services.AddBranding();
         services.AddGitHub();
         services.AddRrRooms();
@@ -80,76 +48,8 @@ public static class SetupExtensions
         services.AddCustomDistributionService();
         services.AddArchives();
         services.AddPatches();
-        services.AddSingleton<WheelWizard.Recomp.IRecompPresentation, WheelWizard.Views.Recomp.RecompPresentation>();
-        services.AddSingleton<WheelWizard.Shared.Calendar.ISeasonalCalendar, WheelWizard.Shared.Calendar.SeasonalCalendar>();
-        services.AddTransient<WheelWizard.Views.Pages.HomeViewModel>();
-        services.AddSingleton<WheelWizard.Views.Pages.IHomePresentation, WheelWizard.Views.Pages.HomePresentation>();
-        services.AddTransient<Func<int, WheelWizard.Views.ModManagement.ModPreviewViewModel>>(provider =>
-        {
-            var mods = provider.GetRequiredService<WheelWizard.GameBanana.IGameBananaSingletonService>();
-            var media = provider.GetRequiredService<WheelWizard.GameBanana.IGameBananaMediaService>();
-            return id => new WheelWizard.Views.ModManagement.ModPreviewViewModel(id, mods, media);
-        });
-        services.AddSingleton<WheelWizard.Views.Navigation.IPageFactory, WheelWizard.Views.Navigation.PageFactory>();
-        services.AddSingleton<WheelWizard.Views.Navigation.INavigationService, WheelWizard.Views.Navigation.NavigationService>();
-        services.AddSingleton<WheelWizard.Views.Popups.IPopupFactory, WheelWizard.Views.Popups.PopupFactory>();
-        services.AddTransient<WheelWizard.Views.Popups.ModManagement.ModContent>();
-        services.AddTransient<WheelWizard.Views.Patterns.VrHistoryViewModel>();
-        services.AddTransient<WheelWizard.Views.Patterns.VrHistoryGraph>();
-        services.AddSingleton<WheelWizard.Views.Patterns.MiiControlThemes>();
-        services.AddTransient<WheelWizard.Views.Layout>();
-        services.AddSingleton<Func<WheelWizard.Views.Layout>>(provider => () => provider.GetRequiredService<WheelWizard.Views.Layout>());
-        services.AddSingleton<WheelWizard.Views.IMainWindowService, WheelWizard.Views.MainWindowService>();
-        services.AddSingleton<WheelWizard.Views.WindowAppearance>();
-        services.AddSingleton<WheelWizard.ApplicationLifecycle.IApplicationStartup, WheelWizard.ApplicationLifecycle.ApplicationStartup>();
-        services.AddSingleton<
-            WheelWizard.ApplicationLifecycle.IApplicationLiveUpdates,
-            WheelWizard.ApplicationLifecycle.ApplicationLiveUpdates
-        >();
-        services.AddSingleton<WheelWizard.Views.Startup.IDesktopStartup, WheelWizard.Views.Startup.DesktopStartup>();
-        services.AddSingleton<WheelWizard.Views.Startup.IMiiSetupPresentation, WheelWizard.Views.Startup.MiiSetupPresentation>();
-        services.AddSingleton<
-            WheelWizard.ApplicationLifecycle.Logging.ILogFileFactory,
-            WheelWizard.ApplicationLifecycle.Logging.LogFileFactory
-        >();
-        services.AddSingleton<WheelWizard.ApplicationLifecycle.Logging.ApplicationLogFiles>();
-        services.AddSingleton<WheelWizard.ApplicationLifecycle.Logging.IApplicationLogFiles>(provider =>
-            provider.GetRequiredService<WheelWizard.ApplicationLifecycle.Logging.ApplicationLogFiles>()
-        );
         services.AddMods();
-        services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();
-
-        if (applicationData != null)
-            services.AddSingleton(applicationData);
-        else
-            services.AddSingleton(provider =>
-                ApplicationDataComposition.CreateLocation(
-                    provider.GetRequiredService<IFileSystem>(),
-                    provider.GetRequiredService<WheelWizard.Shared.Platform.IRuntimeEnvironment>()
-                )
-            );
-
-        // IO Abstractions
-        services.AddSingleton<IFileSystem, RealFileSystem>();
-        services.AddSingleton<IDirectoryTransferService, DirectoryTransferService>();
-        services.AddSingleton<ITimeSystem, RealTimeSystem>();
-        services.AddSingleton<IRandomSystem, RealRandomSystem>();
-        services.AddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions()));
-
-        // Logging
-        services.AddTransient<AvaloniaLoggerAdapter>();
-        services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: false));
-
-        // Dynamic API calls
-        services.AddTransient(typeof(IApiCaller<>), typeof(ApiCaller<>));
-        services.AddSingleton<IRetroRewindLaunchService, RetroRewindLaunchService>();
-        services.AddSingleton<ILaunchPrompts, WheelWizard.Views.Launching.LaunchPrompts>();
-        services.AddSingleton<IDistributionOperationPresentation, WheelWizard.Views.Distributions.DistributionOperationPresentation>();
-        services.AddSingleton<Func<RrLauncher>>(provider => () => provider.GetRequiredService<RrLauncher>());
-        services.AddSingleton<Func<RecompLauncher?>>(provider => () => provider.GetService<RecompLauncher>());
-        services.AddTransient<RrLauncher>();
-        services.AddTransient<RrBetaLauncher>();
-        services.AddSingleton<ILauncherProvider, LauncherProvider>();
+        services.AddPresentation();
     }
 }
