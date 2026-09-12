@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Serilog;
+using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Helpers;
 using WheelWizard.Services;
@@ -40,6 +41,9 @@ public partial class WhWzSettings : UserControlBase
 
     [Inject]
     private IDolphinDiscoveryService DolphinDiscovery { get; set; } = null!;
+
+    [Inject]
+    private IApplicationDataLocation ApplicationData { get; set; } = null!;
 
     public WhWzSettings()
     {
@@ -372,10 +376,10 @@ public partial class WhWzSettings : UserControlBase
 
     private void AppDataLocationOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if (!Directory.Exists(PathManager.WheelWizardAppdataPath))
-            Directory.CreateDirectory(PathManager.WheelWizardAppdataPath);
+        if (!Directory.Exists(ApplicationData.DirectoryPath))
+            Directory.CreateDirectory(ApplicationData.DirectoryPath);
 
-        FilePickerHelper.OpenFolderInFileManager(PathManager.WheelWizardAppdataPath);
+        FilePickerHelper.OpenFolderInFileManager(ApplicationData.DirectoryPath);
     }
 
     private void UpdateLocationRows()
@@ -437,22 +441,22 @@ public partial class WhWzSettings : UserControlBase
     {
         var statusText =
             _isMovingAppData ? t("status.data_folder.moving")
-            : PathManager.IsUsingCustomWheelWizardAppdataPath ? t("status.data_folder.custom")
+            : ApplicationData.IsCustom ? t("status.data_folder.custom")
             : string.Empty;
 
         AppDataLocationStatus.Text = statusText;
         AppDataLocationStatus.IsVisible = !string.IsNullOrEmpty(statusText);
         AppDataLocationChangeButton.IsEnabled = !_isMovingAppData;
-        AppDataLocationResetButton.IsEnabled = !_isMovingAppData && PathManager.IsUsingCustomWheelWizardAppdataPath;
+        AppDataLocationResetButton.IsEnabled = !_isMovingAppData && ApplicationData.IsCustom;
         AppDataLocationOpenButton.IsEnabled = !_isMovingAppData;
-        ToolTip.SetTip(AppDataLocationResetButton, PathManager.DefaultWheelWizardAppdataFolderPath);
+        ToolTip.SetTip(AppDataLocationResetButton, ApplicationData.DefaultDirectoryPath);
     }
 
     private void SetAppDataLocationBusyState(bool isBusy)
     {
         _isMovingAppData = isBusy;
         AppDataLocationChangeButton.IsEnabled = !isBusy;
-        AppDataLocationResetButton.IsEnabled = !isBusy && PathManager.IsUsingCustomWheelWizardAppdataPath;
+        AppDataLocationResetButton.IsEnabled = !isBusy && ApplicationData.IsCustom;
         AppDataLocationOpenButton.IsEnabled = !isBusy;
         if (isBusy)
         {
@@ -468,7 +472,7 @@ public partial class WhWzSettings : UserControlBase
 
         var trimmedTarget = targetPath.Trim();
 
-        var validationSuccessful = PathManager.TryValidateWheelWizardAppdataTarget(
+        var validationSuccessful = ApplicationData.TryValidateTarget(
             trimmedTarget,
             out var normalizedTarget,
             out _,
@@ -527,7 +531,7 @@ public partial class WhWzSettings : UserControlBase
         {
             moveResult = await Task.Run(() =>
             {
-                var moveSuccessful = PathManager.TrySetWheelWizardAppdataPath(targetPath, out var error, out var moveDetails, progress);
+                var moveSuccessful = ApplicationData.TryMove(targetPath, out var error, out var moveDetails, progress);
                 return (moveSuccessful, error, moveDetails);
             });
         }
@@ -582,7 +586,7 @@ public partial class WhWzSettings : UserControlBase
             var revert = await prompt.AwaitAnswer();
             if (revert)
             {
-                var revertSucceeded = PathManager.TryRevertWheelWizardAppdataMove(
+                var revertSucceeded = ApplicationData.TryRevertMove(
                     moveDetails.SourcePath,
                     moveDetails.DestinationPath,
                     out var revertError
@@ -612,8 +616,8 @@ public partial class WhWzSettings : UserControlBase
         }
 
         var infoText =
-            t("message_success.data_folder_moved.extra", PathManager.WheelWizardAppdataPath)
-            ?? $"Wheel Wizard data is now stored in:\n{PathManager.WheelWizardAppdataPath}";
+            t("message_success.data_folder_moved.extra", ApplicationData.DirectoryPath)
+            ?? $"Wheel Wizard data is now stored in:\n{ApplicationData.DirectoryPath}";
 
         if (!string.IsNullOrWhiteSpace(warningMessage))
             infoText += $"\n\n{warningMessage}";
@@ -648,7 +652,7 @@ public partial class WhWzSettings : UserControlBase
             var revert = await prompt.AwaitAnswer();
             if (revert)
             {
-                var cleaned = PathManager.TryCleanupPartialWheelWizardAppdataMove(moveDetails.DestinationPath, out var cleanupError);
+                var cleaned = ApplicationData.TryCleanupPartialMove(moveDetails.DestinationPath, out var cleanupError);
                 if (!cleaned)
                 {
                     await new MessageBoxWindow()
@@ -677,7 +681,7 @@ public partial class WhWzSettings : UserControlBase
         var topLevel = TopLevel.GetTopLevel(this);
         IStorageFolder? suggestedStart = null;
 
-        var currentPath = PathManager.WheelWizardAppdataPath;
+        var currentPath = ApplicationData.DirectoryPath;
         if (!string.IsNullOrWhiteSpace(currentPath) && Directory.Exists(currentPath))
             suggestedStart = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentPath);
 
@@ -692,10 +696,10 @@ public partial class WhWzSettings : UserControlBase
 
     private async void AppDataLocationReset_OnClick(object sender, RoutedEventArgs e)
     {
-        if (_isMovingAppData || !PathManager.IsUsingCustomWheelWizardAppdataPath)
+        if (_isMovingAppData || !ApplicationData.IsCustom)
             return;
 
-        await ConfirmAndMoveAppDataAsync(PathManager.DefaultWheelWizardAppdataFolderPath);
+        await ConfirmAndMoveAppDataAsync(ApplicationData.DefaultDirectoryPath);
     }
 
     private async void WindowScaleDropdown_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

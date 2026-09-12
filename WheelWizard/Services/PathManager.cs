@@ -1,42 +1,31 @@
-using System.IO.Abstractions;
-using Serilog;
+using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Helpers;
 using WheelWizard.Recomp;
 using WheelWizard.Settings;
 using WheelWizard.Shared.IO;
-#if WINDOWS
-using Microsoft.Win32;
-#endif
 
 namespace WheelWizard.Services;
 
 public static class PathManager
 {
-    private static IFileSystem FileSystem => new Testably.Abstractions.RealFileSystem();
-
     private static ISettingsManager Settings => SettingsRuntime.Current;
 
     // IMPORTANT: To keep things consistent all paths should be Attrib expressions,
     //            and either end with `FilePath` or `FolderPath`
 
-    private const string WheelWizardFolderName = "CT-MKWII";
-#if WINDOWS
-    private const string WindowsAppDataOverrideRegistryKeyPath = @"Software\\WheelWizard";
-    private const string WindowsAppDataOverrideRegistryValueName = "AppDataLocation";
-#endif
-    private static readonly object WheelWizardAppdataLock = new();
+    // Shared only with legacy callers during migration; composition registers this exact instance.
+    internal static IApplicationDataLocation ApplicationData { get; } = CreateApplicationDataLocation();
 
-    // Portable WheelWizard config only makes sense on non-Flatpak WheelWizard
-    private static readonly bool IsPortableWhWz = !IsFlatpakSandboxed() && File.Exists("portable-ww.txt");
-    private static readonly string DefaultWheelWizardAppdataPath = FileSystem.Path.NormalizePath(
-        Path.Combine(IsPortableWhWz ? string.Empty : AppDataFolder, WheelWizardFolderName)
-    );
-    private static string? _wheelWizardAppdataOverride;
-
-    static PathManager()
+    private static IApplicationDataLocation CreateApplicationDataLocation()
     {
-        _wheelWizardAppdataOverride = LoadSavedWheelWizardAppdataOverride();
+        var fileSystem = new Testably.Abstractions.RealFileSystem();
+        var environment = new WheelWizard.Shared.Platform.RuntimeEnvironment();
+        var directories = new ApplicationDataDirectories(fileSystem, environment);
+        IApplicationDataLocationStore store = environment.IsWindows
+            ? new WindowsApplicationDataLocationStore()
+            : new FileApplicationDataLocationStore(fileSystem, directories);
+        return new ApplicationDataLocation(fileSystem, directories, store, new DirectoryTransferService(fileSystem));
     }
 
     public static string HomeFolderPath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -46,34 +35,10 @@ public static class PathManager
     public static string DolphinFilePath => EnvHelper.MaybeDolphinLocationOverride() ?? Settings.Get<string>(Settings.DOLPHIN_LOCATION);
     public static string UserFolderPath => Settings.Get<string>(Settings.USER_FOLDER_PATH);
 
-    private static string AppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     private static string LocalAppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    private static string UnixAppDataOverrideFilePath =>
-        Path.Combine(IsPortableWhWz ? string.Empty : AppDataFolder, "wheelwizard-appdata-location");
-
-    // Wheel wizard's appdata paths (don't have to be expressions since they don't depend on user input like the others)
-    public static string WheelWizardAppdataPath
-    {
-        get
-        {
-            lock (WheelWizardAppdataLock)
-            {
-                return _wheelWizardAppdataOverride ?? DefaultWheelWizardAppdataPath;
-            }
-        }
-    }
-
-    public static string DefaultWheelWizardAppdataFolderPath => DefaultWheelWizardAppdataPath;
-    public static bool IsUsingCustomWheelWizardAppdataPath
-    {
-        get
-        {
-            lock (WheelWizardAppdataLock)
-            {
-                return _wheelWizardAppdataOverride != null;
-            }
-        }
-    }
+    public static string WheelWizardAppdataPath => ApplicationData.DirectoryPath;
+    public static string DefaultWheelWizardAppdataFolderPath => ApplicationData.DefaultDirectoryPath;
+    public static bool IsUsingCustomWheelWizardAppdataPath => ApplicationData.IsCustom;
 
     public static string WheelWizardConfigFilePath => Path.Combine(WheelWizardAppdataPath, "config.json");
     public static string RrLaunchJsonFilePath => Path.Combine(WheelWizardAppdataPath, "RR.json");
@@ -147,444 +112,12 @@ public static class PathManager
     /// <summary>The file the recomp setup writes to mark a directory as one of its installations.</summary>
     public const string RecompInstallStateFileName = "install-state.json";
 
-    #region Wheel Wizard Appdata Override
-
-    private static string? LoadSavedWheelWizardAppdataOverride()
-    {
-        try
-        {
-            var storedPath = LoadPersistedWheelWizardAppdataOverride();
-            if (string.IsNullOrWhiteSpace(storedPath))
-                return null;
-
-            var normalized = FileSystem.Path.NormalizePath(storedPath);
-            if (FileSystem.Path.PathsEqual(normalized, DefaultWheelWizardAppdataPath))
-                return null;
-
-            // If a previously selected custom location is no longer available (for example,
-            // when an external drive letter changes), fall back to the default path.
-            if (!TryEnsureWheelWizardAppdataPathAccessible(normalized))
-                return null;
-
-            return normalized;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static bool TryEnsureWheelWizardAppdataPathAccessible(string normalizedPath)
-    {
-        try
-        {
-            FileSystem.EnsureDirectory(normalizedPath);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private static string? LoadPersistedWheelWizardAppdataOverride()
-    {
-#if WINDOWS
-        if (OperatingSystem.IsWindows())
-        {
-            try
-            {
-                using var key = Registry.CurrentUser.OpenSubKey(WindowsAppDataOverrideRegistryKeyPath, writable: false);
-                if (key != null)
-                {
-                    var value = key.GetValue(WindowsAppDataOverrideRegistryValueName) as string;
-                    if (!string.IsNullOrWhiteSpace(value))
-                        return value;
-                }
-            }
-            catch
-            {
-                // ignored; fall back to other persistence mechanisms
-            }
-        }
-#endif
-
-        if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
-        {
-            var storedPath = (File.Exists(UnixAppDataOverrideFilePath) ? File.ReadAllText(UnixAppDataOverrideFilePath) : null);
-            if (!string.IsNullOrWhiteSpace(storedPath))
-                return storedPath;
-        }
-
-        return null;
-    }
-
     public static bool TrySetWheelWizardAppdataPath(
-        string requestedPath,
+        string path,
         out string errorMessage,
-        out DirectoryMoveContentsResult moveResult,
+        out DirectoryMoveContentsResult result,
         IProgress<double>? progress = null
-    )
-    {
-        errorMessage = string.Empty;
-        moveResult = new DirectoryMoveContentsResult(
-            DirectoryMoveOutcome.NoOp,
-            string.Empty,
-            string.Empty,
-            copyAttempted: false,
-            verificationAttempted: false,
-            deleteSourceRequested: false,
-            sourceDeletionSucceeded: true
-        );
-
-        if (
-            !TryValidateWheelWizardAppdataTarget(
-                requestedPath,
-                out var normalizedTarget,
-                out var currentPath,
-                out errorMessage,
-                out var requiresMove
-            )
-        )
-            return false;
-
-        if (!requiresMove)
-        {
-            moveResult = new DirectoryMoveContentsResult(
-                DirectoryMoveOutcome.NoOp,
-                currentPath,
-                normalizedTarget,
-                copyAttempted: false,
-                verificationAttempted: false,
-                deleteSourceRequested: false,
-                sourceDeletionSucceeded: true
-            );
-            return true;
-        }
-
-        if (!Directory.Exists(normalizedTarget))
-        {
-            try
-            {
-                FileSystem.EnsureDirectory(normalizedTarget);
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Unable to create the selected folder: {ex.Message}";
-                return false;
-            }
-        }
-        else if (!FileSystem.IsDirectoryEmpty(normalizedTarget))
-        {
-            errorMessage = "The selected folder must be empty. Please choose an empty folder.";
-            return false;
-        }
-
-        var newOverrideValue = FileSystem.Path.PathsEqual(normalizedTarget, DefaultWheelWizardAppdataPath) ? null : normalizedTarget;
-
-        try
-        {
-            moveResult = new DirectoryTransferService(FileSystem).MoveContents(currentPath, normalizedTarget, progress: progress);
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Failed to move Wheel Wizard files: {ex.Message}";
-            return false;
-        }
-
-        switch (moveResult.Outcome)
-        {
-            case DirectoryMoveOutcome.CopyFailed:
-                errorMessage = moveResult.ErrorMessage ?? "Failed to copy Wheel Wizard files.";
-                return false;
-            case DirectoryMoveOutcome.VerificationFailed:
-                var failureMessage = moveResult.ErrorMessage ?? "Failed to verify Wheel Wizard files.";
-                if (moveResult.VerificationFailures.Count > 0)
-                    failureMessage += $"\n{string.Join("\n", moveResult.VerificationFailures)}";
-                errorMessage = failureMessage;
-                return false;
-            case DirectoryMoveOutcome.NoOp:
-            case DirectoryMoveOutcome.Success:
-            case DirectoryMoveOutcome.SourceDeletionFailed:
-                break;
-            default:
-                errorMessage = "Unknown outcome while moving Wheel Wizard files.";
-                return false;
-        }
-
-        // Update the setting even if persistence fails, since files were successfully moved or intentionally skipped
-        lock (WheelWizardAppdataLock)
-        {
-            _wheelWizardAppdataOverride = newOverrideValue;
-        }
-
-        try
-        {
-            PersistWheelWizardAppdataOverride(newOverrideValue);
-        }
-        catch (Exception ex)
-        {
-            // Log the persistence failure but don't fail the operation since files are already moved
-            // and the in-memory setting is updated
-            errorMessage = $"Warning: Files were moved successfully, but failed to persist the setting: {ex.Message}";
-            // Still return true since the operation succeeded where it matters
-        }
-
-        if (moveResult.Outcome == DirectoryMoveOutcome.SourceDeletionFailed)
-        {
-            var deletionWarning =
-                moveResult.ErrorMessage
-                ?? $"Files were moved successfully, but the old folder '{currentPath}' could not be deleted. You may need to remove it manually.";
-
-            errorMessage = string.IsNullOrEmpty(errorMessage) ? deletionWarning : $"{errorMessage} {deletionWarning}";
-        }
-
-        return true;
-    }
-
-    public static bool TryResetWheelWizardAppdataPath(out string errorMessage) =>
-        TrySetWheelWizardAppdataPath(DefaultWheelWizardAppdataPath, out errorMessage, out _);
-
-    public static bool TryRevertWheelWizardAppdataMove(string previousPath, string newPath, out string errorMessage)
-    {
-        errorMessage = string.Empty;
-
-        string normalizedPrevious;
-        string normalizedNew;
-
-        try
-        {
-            normalizedPrevious = FileSystem.Path.NormalizePath(previousPath);
-            normalizedNew = FileSystem.Path.NormalizePath(newPath);
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Invalid folder path: {ex.Message}";
-            return false;
-        }
-
-        var previousOverrideValue = FileSystem.Path.PathsEqual(normalizedPrevious, DefaultWheelWizardAppdataPath)
-            ? null
-            : normalizedPrevious;
-
-        lock (WheelWizardAppdataLock)
-        {
-            _wheelWizardAppdataOverride = previousOverrideValue;
-        }
-
-        try
-        {
-            PersistWheelWizardAppdataOverride(previousOverrideValue);
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Failed to persist Wheel Wizard data folder setting: {ex.Message}";
-            return false;
-        }
-
-        if (Directory.Exists(normalizedNew))
-        {
-            try
-            {
-                Directory.Delete(normalizedNew, true);
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"Reverted to the previous folder, but failed to remove the new folder '{normalizedNew}': {ex.Message}";
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static bool TryCleanupPartialWheelWizardAppdataMove(string destinationPath, out string errorMessage)
-    {
-        errorMessage = string.Empty;
-
-        string normalizedDestination;
-        try
-        {
-            normalizedDestination = FileSystem.Path.NormalizePath(destinationPath);
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Invalid folder path: {ex.Message}";
-            return false;
-        }
-
-        if (!Directory.Exists(normalizedDestination))
-            return true;
-
-        try
-        {
-            Directory.Delete(normalizedDestination, true);
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Failed to remove the partially copied folder '{normalizedDestination}': {ex.Message}";
-            return false;
-        }
-
-        return true;
-    }
-
-    public static bool TryValidateWheelWizardAppdataTarget(
-        string requestedPath,
-        out string normalizedTarget,
-        out string currentPath,
-        out string errorMessage,
-        out bool requiresMove
-    )
-    {
-        normalizedTarget = string.Empty;
-        currentPath = string.Empty;
-        errorMessage = string.Empty;
-        requiresMove = false;
-
-        if (string.IsNullOrWhiteSpace(requestedPath))
-        {
-            errorMessage = "Please select a valid folder.";
-            return false;
-        }
-
-        try
-        {
-            normalizedTarget = FileSystem.Path.NormalizePath(requestedPath);
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Invalid folder path: {ex.Message}";
-            return false;
-        }
-
-        lock (WheelWizardAppdataLock)
-        {
-            currentPath = _wheelWizardAppdataOverride ?? DefaultWheelWizardAppdataPath;
-        }
-
-        if (FileSystem.Path.PathsEqual(currentPath, normalizedTarget))
-            return true;
-
-        if (FileSystem.Path.IsDescendantPath(normalizedTarget, currentPath))
-        {
-            errorMessage = "The selected folder is inside the current Wheel Wizard data folder. Please choose a different folder.";
-            return false;
-        }
-
-        if (FileSystem.Path.IsDescendantPath(currentPath, normalizedTarget))
-        {
-            errorMessage = "The selected folder contains the current Wheel Wizard data folder. Please choose a different folder.";
-            return false;
-        }
-
-        if (File.Exists(normalizedTarget))
-        {
-            errorMessage = "The selected path points to a file. Please choose an empty folder instead.";
-            return false;
-        }
-
-        if (FileSystem.Path.IsRootDirectory(normalizedTarget))
-        {
-            errorMessage = "Selecting a drive or root directory is not allowed. Please choose an empty folder.";
-            return false;
-        }
-
-        if (Directory.Exists(normalizedTarget) && !FileSystem.IsDirectoryEmpty(normalizedTarget))
-        {
-            errorMessage = "The selected folder must be empty. Please choose an empty folder.";
-            return false;
-        }
-
-        requiresMove = true;
-        return true;
-    }
-
-    private static void PersistWheelWizardAppdataOverride(string? overridePath)
-    {
-        if (string.IsNullOrWhiteSpace(overridePath) || FileSystem.Path.PathsEqual(overridePath, DefaultWheelWizardAppdataPath))
-        {
-            ClearWheelWizardAppdataOverride();
-            return;
-        }
-
-        try
-        {
-            var normalizedOverride = FileSystem.Path.NormalizePath(overridePath);
-            SaveWheelWizardAppdataOverride(normalizedOverride);
-        }
-        catch
-        {
-            // ignored
-        }
-    }
-
-    private static void ClearWheelWizardAppdataOverride()
-    {
-#if WINDOWS
-        if (OperatingSystem.IsWindows())
-        {
-            try
-            {
-                using var key = Registry.CurrentUser.OpenSubKey(WindowsAppDataOverrideRegistryKeyPath, writable: true);
-                key?.DeleteValue(WindowsAppDataOverrideRegistryValueName, throwOnMissingValue: false);
-            }
-            catch
-            {
-                // ignored
-            }
-
-            return;
-        }
-#endif
-
-        if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
-        {
-            TryDeleteFileSilently(UnixAppDataOverrideFilePath);
-        }
-    }
-
-    private static void SaveWheelWizardAppdataOverride(string overridePath)
-    {
-#if WINDOWS
-        if (OperatingSystem.IsWindows())
-        {
-            try
-            {
-                using var key = Registry.CurrentUser.CreateSubKey(WindowsAppDataOverrideRegistryKeyPath, writable: true);
-                key?.SetValue(WindowsAppDataOverrideRegistryValueName, overridePath, RegistryValueKind.String);
-                return;
-            }
-            catch
-            {
-                // Fall back to other persistence mechanisms
-            }
-        }
-#endif
-
-        if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
-        {
-            FileSystem.WriteAllTextCreatingDirectory(UnixAppDataOverrideFilePath, overridePath);
-        }
-    }
-
-    private static void TryDeleteFileSilently(string path)
-    {
-        try
-        {
-            if (File.Exists(path))
-                File.Delete(path);
-        }
-        catch
-        {
-            // ignored
-        }
-    }
-
-    private static DirectoryMoveContentsResult MoveWheelWizardAppdataContents(string sourcePath, string destinationPath) =>
-        new DirectoryTransferService(FileSystem).MoveContents(sourcePath, destinationPath);
-
-    #endregion
+    ) => ApplicationData.TryMove(path, out errorMessage, out result, progress);
 
     // In case it is unclear, the mods folder is a folder with mods that are desired to be installed (if enabled).
     // When launching, enabled mods are synced into the active Patches runtime folder.

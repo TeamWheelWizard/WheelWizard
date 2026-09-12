@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 using Testably.Abstractions;
+using WheelWizard.ApplicationData;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
 using WheelWizard.CustomCharacters;
@@ -55,6 +56,8 @@ public static class SetupExtensions
         services.AddPatches();
         services.AddMods();
         services.AddRecomp();
+
+        services.AddSingleton<IApplicationDataLocation>(Services.PathManager.ApplicationData);
 
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();
