@@ -1,14 +1,14 @@
 using WheelWizard.Helpers;
 using WheelWizard.Services;
 using WheelWizard.Services.Launcher.Helpers;
-using WheelWizard.Services.WiiManagement;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Views.Downloads;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WiiManagement.Controllers;
 
 namespace WheelWizard.Launching;
 
-public sealed class MiiChannelLauncher(IDownloadService downloads)
+public sealed class MiiChannelLauncher(IDownloadService downloads, IWiiRemoteConfigurationService wiiRemoteConfiguration)
 {
     private static string MiiChannelPath => Path.Combine(PathManager.WheelWizardAppdataPath, "MiiChannel.wad");
 
@@ -19,7 +19,7 @@ public sealed class MiiChannelLauncher(IDownloadService downloads)
         if (preflightResult.IsFailure)
             return;
 
-        WiiMoteSettings.EnableVirtualWiiMote();
+        wiiRemoteConfiguration.SetVirtualRemoteEnabled(PathManager.ConfigFolderPath, true);
         var miiChannelExists = File.Exists(MiiChannelPath);
         ;
 

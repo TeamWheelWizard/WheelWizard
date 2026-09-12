@@ -5,7 +5,6 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
-using WheelWizard.Services.Other;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Binary;
@@ -92,6 +91,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private readonly IWhWzDataSingletonService _whWzDataSingletonService;
     private readonly IRrRatingReader _rrratingReader;
     private readonly ISettingsManager _settingsManager;
+    private readonly ISaveRegionService _saveRegions;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
 
@@ -100,7 +100,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         IFileSystem fileSystem,
         IWhWzDataSingletonService whWzDataSingletonService,
         IRrRatingReader rrratingReader,
-        ISettingsManager settingsManager
+        ISettingsManager settingsManager,
+        ISaveRegionService saveRegions
     )
         : base(40)
     {
@@ -109,6 +110,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         _whWzDataSingletonService = whWzDataSingletonService;
         _rrratingReader = rrratingReader;
         _settingsManager = settingsManager;
+        _saveRegions = saveRegions;
         Licenses = new();
     }
 
@@ -644,7 +646,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             if (currentRegion == MarioKartWiiEnums.Regions.None)
             {
                 // Double check if there's at least one valid region
-                var validRegions = RRRegionManager.GetValidRegions();
+                var validRegions = _saveRegions.GetAvailableRegions(PathManager.SaveFolderPath);
                 if (validRegions.First() != MarioKartWiiEnums.Regions.None)
                 {
                     currentRegion = validRegions.First();
@@ -656,7 +658,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
                 }
             }
 
-            var saveFileFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, RRRegionManager.ConvertRegionToGameId(currentRegion));
+            var saveFileFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, GameRegion.GetGameId(currentRegion));
             var saveFile = _fileSystem.Directory.GetFiles(saveFileFolder, "rksys.dat", SearchOption.TopDirectoryOnly);
             if (saveFile.Length == 0)
                 return Fail("rksys.dat not found");
@@ -767,7 +769,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
         FixRksysCrc(_rksysData);
         var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
-        var saveFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, RRRegionManager.ConvertRegionToGameId(currentRegion));
+        var saveFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, GameRegion.GetGameId(currentRegion));
         var path = _fileSystem.Path.Combine(saveFolder, "rksys.dat");
         return _fileSystem.WriteAllBytesAtomic(path, _rksysData, "Failed to save rksys.dat.");
     }
