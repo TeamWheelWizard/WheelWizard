@@ -131,11 +131,11 @@ public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompS
             // The backend owns creating Config.toml, so reread first: right after an install the
             // file is brand new and this manager may never have seen it. Without a file there is
             // nothing to configure yet, and the next successful install applies this again.
-            recompSettings.ReloadSettings();
+            recompSettings.ReloadSettings(PathManager.RecompConfigFilePath);
 
             if (nandFolderPath is null)
             {
-                recompSettings.RemoveTomlSetting("paths", "nand_root");
+                recompSettings.RemoveTomlSetting(PathManager.RecompConfigFilePath, "paths", "nand_root");
                 settings.Set(settings.RECOMP_NAND_ROOT, "", skipSave: true);
                 return Ok();
             }

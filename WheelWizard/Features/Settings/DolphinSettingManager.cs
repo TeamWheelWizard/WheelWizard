@@ -1,13 +1,10 @@
 using System.IO.Abstractions;
-using WheelWizard.Services;
 using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Settings;
 
 public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingManager
 {
-    private string ConfigFolderPath(string fileName) => fileSystem.Path.Combine(PathManager.ConfigFolderPath, fileName);
-
     // LOCKS:
     // We use locks to keep the settings state and file IO consistent.
     // Even though we do not manually create threads in this class, work can still happen concurrently
@@ -32,7 +29,7 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
         }
     }
 
-    public void SaveSettings(DolphinSetting invokingSetting)
+    public void SaveSettings(string configDirectory, DolphinSetting invokingSetting)
     {
         List<DolphinSetting> settingsSnapshot;
         lock (_syncRoot)
@@ -48,12 +45,12 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
         {
             foreach (var setting in settingsSnapshot)
             {
-                ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
+                ChangeIniSettings(configDirectory, setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
             }
         }
     }
 
-    public void ReloadSettings()
+    public void ReloadSettings(string configDirectory)
     {
         lock (_syncRoot)
         {
@@ -62,13 +59,13 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
             _loaded = false;
         }
 
-        LoadSettings();
+        LoadSettings(configDirectory);
     }
 
-    public void LoadSettings()
+    public void LoadSettings(string configDirectory)
     {
         List<DolphinSetting> settingsSnapshot;
-        if (_loaded || !fileSystem.Directory.Exists(PathManager.ConfigFolderPath))
+        if (_loaded || !fileSystem.Directory.Exists(configDirectory))
             return;
 
         lock (_syncRoot)
@@ -88,18 +85,18 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
         {
             foreach (var setting in settingsSnapshot)
             {
-                var value = ReadIniSetting(setting.FileName, setting.Section, setting.Name);
+                var value = ReadIniSetting(configDirectory, setting.FileName, setting.Section, setting.Name);
                 if (value == null)
-                    ChangeIniSettings(setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
+                    ChangeIniSettings(configDirectory, setting.FileName, setting.Section, setting.Name, setting.GetStringValue());
                 else
                     setting.SetFromString(value, true); // we read it, which means there is no purpose in saving it again
             }
         }
     }
 
-    private string[]? ReadIniFile(string fileName)
+    private string[]? ReadIniFile(string configDirectory, string fileName)
     {
-        var filePath = ConfigFolderPath(fileName);
+        var filePath = fileSystem.Path.Combine(configDirectory, fileName);
         if (!fileSystem.File.Exists(filePath))
             return null;
 
@@ -113,9 +110,9 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
         }
     }
 
-    private string? ReadIniSetting(string fileName, string section, string settingToRead)
+    private string? ReadIniSetting(string configDirectory, string fileName, string section, string settingToRead)
     {
-        var lines = ReadIniFile(fileName);
+        var lines = ReadIniFile(configDirectory, fileName);
         if (lines == null)
             return null;
 
@@ -144,9 +141,9 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
     }
 
     // TODO: find out when to use `setting=value` and when to use `setting = value`
-    private void ChangeIniSettings(string fileName, string section, string settingToChange, string value)
+    private void ChangeIniSettings(string configDirectory, string fileName, string section, string settingToChange, string value)
     {
-        var lines = ReadIniFile(fileName)?.ToList();
+        var lines = ReadIniFile(configDirectory, fileName)?.ToList();
         if (lines == null)
             return;
 
@@ -155,7 +152,7 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
         {
             lines.Add($"[{section}]");
             lines.Add($"{settingToChange} = {value}");
-            fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
+            fileSystem.File.WriteAllLines(fileSystem.Path.Combine(configDirectory, fileName), lines);
             return;
         }
 
@@ -169,12 +166,12 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
                 continue;
 
             lines[i] = $"{settingToChange} = {value}";
-            fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
+            fileSystem.File.WriteAllLines(fileSystem.Path.Combine(configDirectory, fileName), lines);
             return;
         }
         // you only get here if the setting was not found in the section
 
         lines.Insert(sectionIndex + 1, $"{settingToChange} = {value}");
-        fileSystem.File.WriteAllLines(ConfigFolderPath(fileName), lines);
+        fileSystem.File.WriteAllLines(fileSystem.Path.Combine(configDirectory, fileName), lines);
     }
 }

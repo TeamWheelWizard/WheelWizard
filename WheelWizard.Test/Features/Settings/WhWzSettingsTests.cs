@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Testably.Abstractions.Testing;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 
@@ -86,14 +85,14 @@ public class WhWzSettingManagerTests
         var manager = new WhWzSettingManager(logger, fileSystem);
         var volume = new WhWzSetting(typeof(int), "Volume", 5).SetValidation(value => (int)value! >= 0);
         var language = new WhWzSetting(typeof(string), "Language", "en");
-        var configPath = PathManager.WheelWizardConfigFilePath;
+        var configPath = fileSystem.Path.GetFullPath("/settings/config.json");
         var configFolderPath = fileSystem.Path.GetDirectoryName(configPath)!;
         fileSystem.Directory.CreateDirectory(configFolderPath);
         fileSystem.File.WriteAllText(configPath, "{\"Volume\":12,\"Language\":\"de\",\"Unknown\":true}");
 
         manager.RegisterSetting(volume);
         manager.RegisterSetting(language);
-        manager.LoadSettings();
+        manager.LoadSettings(configPath);
 
         Assert.Equal(12, Assert.IsType<int>(volume.Get()));
         Assert.Equal("de", Assert.IsType<string>(language.Get()));
@@ -106,13 +105,13 @@ public class WhWzSettingManagerTests
         var logger = Substitute.For<ILogger<WhWzSettingManager>>();
         var manager = new WhWzSettingManager(logger, fileSystem);
         var volume = new WhWzSetting(typeof(int), "Volume", 5).SetValidation(value => (int)value! >= 0);
-        var configPath = PathManager.WheelWizardConfigFilePath;
+        var configPath = fileSystem.Path.GetFullPath("/settings/config.json");
         var configFolderPath = fileSystem.Path.GetDirectoryName(configPath)!;
         fileSystem.Directory.CreateDirectory(configFolderPath);
         fileSystem.File.WriteAllText(configPath, "{\"Volume\":-1}");
 
         manager.RegisterSetting(volume);
-        manager.LoadSettings();
+        manager.LoadSettings(configPath);
 
         Assert.Equal(5, Assert.IsType<int>(volume.Get()));
     }
@@ -124,12 +123,12 @@ public class WhWzSettingManagerTests
         var logger = Substitute.For<ILogger<WhWzSettingManager>>();
         var manager = new WhWzSettingManager(logger, fileSystem);
         var volume = new WhWzSetting(typeof(int), "Volume", 5);
-        var configPath = PathManager.WheelWizardConfigFilePath;
+        var configPath = fileSystem.Path.GetFullPath("/settings/config.json");
 
         manager.RegisterSetting(volume);
-        manager.LoadSettings();
+        manager.LoadSettings(configPath);
         volume.Set(9, skipSave: true);
-        manager.SaveSettings(volume);
+        manager.SaveSettings(configPath, volume);
 
         var savedJson = fileSystem.File.ReadAllText(configPath);
         Assert.Contains("\"Volume\": 9", savedJson);
@@ -143,14 +142,14 @@ public class WhWzSettingManagerTests
         var manager = new WhWzSettingManager(logger, fileSystem);
         var registeredBeforeLoad = new WhWzSetting(typeof(int), "Volume", 1);
         var ignoredAfterLoad = new WhWzSetting(typeof(string), "Future", "initial");
-        var configPath = PathManager.WheelWizardConfigFilePath;
+        var configPath = fileSystem.Path.GetFullPath("/settings/config.json");
 
         manager.RegisterSetting(registeredBeforeLoad);
-        manager.LoadSettings();
+        manager.LoadSettings(configPath);
         manager.RegisterSetting(ignoredAfterLoad);
         registeredBeforeLoad.Set(2, skipSave: true);
         ignoredAfterLoad.Set("changed", skipSave: true);
-        manager.SaveSettings(registeredBeforeLoad);
+        manager.SaveSettings(configPath, registeredBeforeLoad);
 
         var savedJson = fileSystem.File.ReadAllText(configPath);
         Assert.Contains("\"Volume\": 2", savedJson);
