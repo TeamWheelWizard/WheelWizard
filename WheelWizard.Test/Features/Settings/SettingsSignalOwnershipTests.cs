@@ -1,6 +1,8 @@
 using Testably.Abstractions.Testing;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
+using WheelWizard.Shared.Platform;
 
 namespace WheelWizard.Test.Features.Settings;
 
@@ -62,6 +64,7 @@ public sealed class SettingsSignalOwnershipTests
             Substitute.For<IDolphinSettingManager>(),
             Substitute.For<IRecompSettingManager>(),
             new MockFileSystem(),
-            bus
+            bus,
+            new DolphinPathResolver(new MockFileSystem(), new RuntimeEnvironment())
         );
 }

@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
@@ -17,6 +18,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     private readonly IDolphinSettingManager _dolphinSettingManager;
     private readonly IRecompSettingManager _recompSettingManager;
     private readonly IFileSystem _fileSystem;
+    private readonly IDolphinPathResolver _dolphinPaths;
 
     private readonly Setting _dolphinCompilationMode;
     private readonly Setting _dolphinCompileShadersAtStart;
@@ -32,7 +34,8 @@ public class SettingsManager : ISettingsManager, IDisposable
         IDolphinSettingManager dolphinSettingManager,
         IRecompSettingManager recompSettingManager,
         IFileSystem fileSystem,
-        ISettingsSignalBus signalBus
+        ISettingsSignalBus signalBus,
+        IDolphinPathResolver dolphinPaths
     )
     {
         _whWzSettingManager = whWzSettingManager;
@@ -40,6 +43,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         _recompSettingManager = recompSettingManager;
         _fileSystem = fileSystem;
         _signalBus = signalBus;
+        _dolphinPaths = dolphinPaths;
 
         #region WhWz settings
         // Register this first because the path validators use the active frontend mode when deciding
@@ -86,6 +90,7 @@ public class SettingsManager : ISettingsManager, IDisposable
                     return false;
 
                 var dolphinLocation = Get<string>(DOLPHIN_LOCATION);
+                var dolphinPaths = _dolphinPaths.Resolve(dolphinLocation, userFolderPath);
 
                 // We cannot determine the validity of the user folder path in that case
                 if (!EnvHelper.IsFlatpakSandboxed() && string.IsNullOrWhiteSpace(dolphinLocation))
@@ -94,13 +99,13 @@ public class SettingsManager : ISettingsManager, IDisposable
                 // If we want to use a split XDG dolphin config,
                 // this only really works as expected if certain conditions are met.
                 // Note that the Wheel Wizard Flatpak always uses the split config internally, so it cannot return early here.
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || !PathManager.IsLinuxDolphinConfigSplit())
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || !dolphinPaths.IsLinuxDolphinConfigSplit())
                     return true;
 
                 if (EnvHelper.IsFlatpakSandboxed())
                 {
                     // Reject the internal Dolphin directory symlink paths
-                    foreach (var blockedUserFolder in PathManager.LinuxFlatpakSandboxedDolphinUserFolderBlockList)
+                    foreach (var blockedUserFolder in dolphinPaths.LinuxFlatpakSandboxedDolphinUserFolderBlockList)
                     {
                         // XXX: Circular symlink references may stil break the Flatpak, but they
                         // shouldn't be present under normal usage.
@@ -122,7 +127,7 @@ public class SettingsManager : ISettingsManager, IDisposable
                 // The Dolphin executable directory with `portable.txt` case
                 if (
                     !EnvHelper.IsFlatpakSandboxed()
-                    && _fileSystem.File.Exists(_fileSystem.Path.Combine(PathManager.GetDolphinExeDirectory(), "portable.txt"))
+                    && _fileSystem.File.Exists(_fileSystem.Path.Combine(dolphinPaths.GetDolphinExeDirectory(), "portable.txt"))
                 )
                     return false;
 
@@ -140,15 +145,15 @@ public class SettingsManager : ISettingsManager, IDisposable
                 }
 
                 // `~/.dolphin-emu` would be used if it exists
-                var legacyFolderPath = PathManager.LinuxDolphinLegacyFolderPath;
+                var legacyFolderPath = dolphinPaths.LinuxDolphinLegacyFolderPath;
                 if (_fileSystem.Directory.Exists(legacyFolderPath))
                 {
                     if (EnvHelper.IsFlatpakSandboxed())
                     {
                         if (
-                            !string.IsNullOrWhiteSpace(PathManager.SplitLinuxDolphinConfigDir)
-                            && PathManager.SplitLinuxDolphinConfigDir.Equals(
-                                PathManager.SplitLinuxDolphinNativeConfigDir,
+                            !string.IsNullOrWhiteSpace(dolphinPaths.SplitLinuxDolphinConfigDir)
+                            && dolphinPaths.SplitLinuxDolphinConfigDir.Equals(
+                                dolphinPaths.SplitLinuxDolphinNativeConfigDir,
                                 StringComparison.Ordinal
                             )
                         )
@@ -176,7 +181,7 @@ public class SettingsManager : ISettingsManager, IDisposable
                             }
                         }
                     }
-                    else if (!PathManager.IsFlatpakDolphinFilePath(dolphinLocation))
+                    else if (!dolphinPaths.IsFlatpakDolphinFilePath(dolphinLocation))
                     {
                         // The official Dolphin Flatpak ignores the `~/.dolphin-emu` folder, so only return
                         // false if it is not a Flatpak Dolphin executable
@@ -402,7 +407,9 @@ public class SettingsManager : ISettingsManager, IDisposable
             return;
 
         _whWzSettingManager.LoadSettings(PathManager.WheelWizardConfigFilePath);
-        _dolphinSettingManager.LoadSettings(PathManager.ConfigFolderPath);
+        _dolphinSettingManager.LoadSettings(
+            _dolphinPaths.Resolve(Get<string>(DOLPHIN_LOCATION), Get<string>(USER_FOLDER_PATH)).ConfigFolderPath
+        );
         _recompSettingManager.LoadSettings(PathManager.RecompConfigFilePath);
         _hasLoadedSettings = true;
     }
@@ -431,7 +438,11 @@ public class SettingsManager : ISettingsManager, IDisposable
             typeof(T),
             location,
             defaultValue!,
-            setting => _dolphinSettingManager.SaveSettings(PathManager.ConfigFolderPath, setting)
+            setting =>
+                _dolphinSettingManager.SaveSettings(
+                    _dolphinPaths.Resolve(Get<string>(DOLPHIN_LOCATION), Get<string>(USER_FOLDER_PATH)).ConfigFolderPath,
+                    setting
+                )
         );
         if (validation != null)
             setting.SetValidation(validation);

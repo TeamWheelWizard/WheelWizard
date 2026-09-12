@@ -1,3 +1,7 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using WheelWizard.Dolphin.Paths;
+using WheelWizard.Shared.Platform;
+
 namespace WheelWizard.Settings;
 
 public static class SettingsExtensions
@@ -11,6 +15,8 @@ public static class SettingsExtensions
 
         // TODO:  Investigate / migrate to IOptions: https://learn.microsoft.com/en-us/dotnet/core/extensions/options
 
+        services.TryAddSingleton<IRuntimeEnvironment, RuntimeEnvironment>();
+        services.TryAddSingleton<IDolphinPathResolver, DolphinPathResolver>();
         services.AddSingleton<ISettingsSignalBus, SettingsSignalBus>();
         services.AddSingleton<IWhWzSettingManager, WhWzSettingManager>();
         services.AddSingleton<IDolphinSettingManager, DolphinSettingManager>();
