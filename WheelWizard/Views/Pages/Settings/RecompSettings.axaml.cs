@@ -28,13 +28,16 @@ public partial class RecompSettings : UserControlBase
     [Inject]
     private IRecompInstallService? RecompInstallService { get; set; }
 
+    [Inject]
+    private IRecompPaths RecompPaths { get; set; } = null!;
+
     public RecompSettings()
     {
         InitializeComponent();
 
         // Config.toml is also written by the in-game settings bar, so opening the page rereads the
         // file rather than trusting whatever was loaded at startup.
-        RecompSettingsFile.ReloadSettings(PathManager.RecompConfigFilePath);
+        RecompSettingsFile.ReloadSettings(RecompPaths.ConfigFilePath);
         LoadSettings();
 
         // Attached after loading, so populating a control never writes it straight back.
@@ -57,7 +60,7 @@ public partial class RecompSettings : UserControlBase
             VideoBorder.IsEnabled = installed;
             InstallationBorder.IsEnabled = installed;
 
-            var installFolder = RecompEnvironment?.InstallFolderPath ?? PathManager.RecompInstallFolderPath;
+            var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
             InstallLocationText.Text = installFolder;
             OpenInstallFolder.IsEnabled = installed && Directory.Exists(installFolder);
             UninstallButton.IsEnabled = installed;
@@ -71,7 +74,7 @@ public partial class RecompSettings : UserControlBase
             ShareDolphinData.IsChecked = sharingDolphinData;
             SharedNandWarningIcon.IsVisible = sharingDolphinData;
 
-            var cloneFolder = PathManager.RecompNandCopyFolderPath;
+            var cloneFolder = RecompPaths.NandCopyFolderPath;
             DolphinCloneStatus.Text = Directory.Exists(cloneFolder)
                 ? t("status.recomp_dolphin_clone_available", cloneFolder)
                 : t("status.recomp_dolphin_clone_missing");
@@ -253,7 +256,7 @@ public partial class RecompSettings : UserControlBase
             return;
         }
 
-        var cloneFolder = PathManager.RecompNandCopyFolderPath;
+        var cloneFolder = RecompPaths.NandCopyFolderPath;
         if (Directory.Exists(cloneFolder))
         {
             var overwrite = await new YesNoWindow()
@@ -313,7 +316,7 @@ public partial class RecompSettings : UserControlBase
 
     private void OpenInstallFolder_OnClick(object? sender, RoutedEventArgs e)
     {
-        var installFolder = RecompEnvironment?.InstallFolderPath ?? PathManager.RecompInstallFolderPath;
+        var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
         if (Directory.Exists(installFolder))
             FilePickerHelper.OpenFolderInFileManager(installFolder);
     }

@@ -66,6 +66,7 @@ public sealed class SettingsSignalOwnershipTests
             new MockFileSystem(),
             bus,
             new DolphinPathResolver(new MockFileSystem(), new RuntimeEnvironment()),
-            SettingsTestUtils.CreateApplicationDataLocation()
+            SettingsTestUtils.CreateApplicationDataLocation(),
+            SettingsTestUtils.CreateRecompPaths()
         );
 }
