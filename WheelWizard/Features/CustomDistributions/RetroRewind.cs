@@ -54,6 +54,8 @@ public class RetroRewind : IDistribution
 
     public async Task<OperationResult> InstallAsync(DistributionOperation operation)
     {
+        if (operation.CancellationToken.IsCancellationRequested)
+            return Fail("Distribution installation was cancelled.");
         if (GetCurrentVersion() is not null)
         {
             var removeResult = await RemoveAsync(operation);
@@ -75,7 +77,7 @@ public class RetroRewind : IDistribution
             return downloadResult;
 
         if (operation.CancellationToken.IsCancellationRequested)
-            return Ok();
+            return Fail("Retro Rewind installation was cancelled.");
 
         var updateResult = await UpdateAsync(operation);
         if (updateResult.IsFailure)
@@ -109,7 +111,7 @@ public class RetroRewind : IDistribution
             //todo, service
             var download = await downloads.DownloadDistributionAsync(installUrlResult.Value.Trim(), downloadedZipPath, operation);
             if (download.IsFailure)
-                return operation.CancellationToken.IsCancellationRequested ? Ok() : download.Error;
+                return download.Error;
             if (!_fileSystem.File.Exists(download.Value))
                 return Fail("Failed to download Retro Rewind files.");
             downloadedZipPath = download.Value;
@@ -248,6 +250,8 @@ public class RetroRewind : IDistribution
 
     public async Task<OperationResult> UpdateAsync(DistributionOperation operation)
     {
+        if (operation.CancellationToken.IsCancellationRequested)
+            return Fail("Distribution update was cancelled.");
         try
         {
             var currentVersion = GetCurrentVersion();
@@ -290,12 +294,11 @@ public class RetroRewind : IDistribution
         // Step 3: Download and apply the updates (if any)
         for (var i = 0; i < updatesToApply.Count; i++)
         {
+            if (operation.CancellationToken.IsCancellationRequested)
+                return Fail("Retro Rewind update was cancelled.");
             var update = updatesToApply[i];
 
             var success = await DownloadAndApplyUpdate(update, updatesToApply.Count, i + 1, operation);
-            if (operation.CancellationToken.IsCancellationRequested)
-                return Ok();
-
             if (success.IsFailure)
                 return Fail(t("message_error.abort_rr.extra.failed_update_apply"));
 
