@@ -3,13 +3,14 @@ using System.Text.RegularExpressions;
 using Serilog;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
+using WheelWizard.Recomp;
 #if WINDOWS
 using Microsoft.Win32;
 #endif
 
 namespace WheelWizard.Services;
 
-public static class PathManager
+public static partial class PathManager
 {
     private static ISettingsManager Settings => SettingsRuntime.Current;
 
@@ -39,7 +40,7 @@ public static class PathManager
 
     // Paths set by the user
     public static string GameFilePath => Settings.Get<string>(Settings.GAME_LOCATION);
-    public static string DolphinFilePath => Settings.Get<string>(Settings.DOLPHIN_LOCATION);
+    public static string DolphinFilePath => EnvHelper.MaybeDolphinLocationOverride() ?? Settings.Get<string>(Settings.DOLPHIN_LOCATION);
     public static string UserFolderPath => Settings.Get<string>(Settings.USER_FOLDER_PATH);
 
     private static string AppDataFolder => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -92,26 +93,51 @@ public static class PathManager
     /// <summary>The backend install directory inside Wheel Wizard's portable recomp root.</summary>
     public static string RecompInstallFolderPath => PortableRecompInstallFolderPath;
 
-    /// <summary>Whether the recomp uses the portable layout, which is what earns the setup's <c>--portable</c> flag.</summary>
-    public static bool IsRecompInstallPortable => true;
+    /// <summary>
+    /// Whether the recomp uses the portable layout, which is what earns the setup's <c>--portable</c> flag.
+    /// The Linux AppImage has no portable mode: it always installs into the user's XDG data directory.
+    /// </summary>
+    public static bool IsRecompInstallPortable => !RecompPlatform.IsLinux;
 
     public static string RecompCacheFolderPath => Path.Combine(RecompFolderPath, "Cache");
     public static string RecompInstallStateFilePath => Path.Combine(RecompInstallFolderPath, RecompInstallStateFileName);
-    public static string RecompSetupFilePath => Path.Combine(RecompInstallFolderPath, "WiiCompiled-Setup.exe");
+    public static string RecompSetupFilePath => Path.Combine(RecompInstallFolderPath, RecompPlatform.SetupFileName);
 
     /// <summary>The backend-owned runtime user state (Config.toml, private NAND, caches) inside the portable root.</summary>
     public static string RecompUserDataFolderPath => Path.Combine(RecompFolderPath, "UserData");
 
+    /// <summary>
+    /// On Linux the AppImage owns this directory under <c>$XDG_DATA_HOME</c> (the same value .NET reports as
+    /// local application data): its <c>install-state.json</c>, the built products under <c>Install/</c>,
+    /// <c>Config.toml</c>, logs and the multi-gigabyte build workspace. Wheel Wizard reads it and removes it
+    /// on uninstall, but never chooses it: a manual AppImage run installs to the very same place.
+    /// </summary>
+    public static string RecompLinuxBackendFolderPath => Path.Combine(LocalAppDataFolder, "WiiCompiled");
+
+    /// <summary>The AppImage's own record of what it installed and where. Not the same schema as the Windows state file.</summary>
+    public static string RecompLinuxBackendStateFilePath => Path.Combine(RecompLinuxBackendFolderPath, RecompInstallStateFileName);
+
     /// <summary>The recomp's own settings file, shared between Wheel Wizard and the in-game settings bar.</summary>
-    public static string RecompConfigFilePath => Path.Combine(RecompUserDataFolderPath, "Config.toml");
+    public static string RecompConfigFilePath =>
+        RecompPlatform.IsLinux
+            ? Path.Combine(RecompLinuxBackendFolderPath, "Config.toml")
+            : Path.Combine(RecompUserDataFolderPath, "Config.toml");
 
     /// <summary>The Wheel Wizard-owned copy of the Dolphin NAND, used when the user chose copying over sharing it in place.</summary>
     public static string RecompNandCopyFolderPath => Path.Combine(RecompFolderPath, "Nand");
 
     /// <summary>The marker file whose presence makes <see cref="RecompFolderPath"/> a portable root.</summary>
     public static string RecompPortableMarkerFilePath => Path.Combine(RecompFolderPath, "portable.txt");
-    public static string WiiDbFolder => Path.Combine(WiiFolderPath, "shared2", "menu", "FaceLib");
-    public static string MiiDbFile => Path.Combine(WiiDbFolder, "RFL_DB.dat");
+
+    /// <summary>The recomp runtime's private NAND, used when no Dolphin NAND is linked.</summary>
+    public static string RecompPrivateNandFolderPath => Path.Combine(RecompUserDataFolderPath, "NAND");
+
+    public static string GetWiiDbFolderPath(string nandFolderPath) => Path.Combine(nandFolderPath, "shared2", "menu", "FaceLib");
+
+    public static string GetMiiDbFilePath(string nandFolderPath) => Path.Combine(GetWiiDbFolderPath(nandFolderPath), "RFL_DB.dat");
+
+    public static string WiiDbFolder => GetWiiDbFolderPath(WiiFolderPath);
+    public static string MiiDbFile => GetMiiDbFilePath(WiiFolderPath);
     public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRRating.pul");
 
     /// <summary>The file the recomp setup writes to mark a directory as one of its installations.</summary>
@@ -594,7 +620,8 @@ public static class PathManager
     public static string LinuxDolphinLegacyFolderPath => Path.Combine(HomeFolderPath, LinuxDolphinLegacyRelSubFolderPath);
     private static string LinuxDolphinRelSubFolderPath => "dolphin-emu";
 
-    private static string LinuxDolphinFlatpakAppDataFolderPath => Path.Combine(HomeFolderPath, ".var", "app", "org.DolphinEmu.dolphin-emu");
+    // We at least try to be compatible with potential forks of Dolphin (different app IDs) but default to the original Dolphin Flatpak
+    private static string LinuxDolphinFlatpakAppDataFolderPath => Path.Combine(HomeFolderPath, ".var", "app", IsFlatpakSandboxed() ? ExtractDolphinFlatpakAppIdOverrideFromUserFolder(UserFolderPath) : ExtractDolphinFlatpakAppId(DolphinFilePath));
     public static string LinuxDolphinFlatpakDataDir =>
         Path.Combine(LinuxDolphinFlatpakAppDataFolderPath, "data", LinuxDolphinRelSubFolderPath);
     public static string LinuxDolphinFlatpakConfigDir =>
@@ -607,14 +634,11 @@ public static class PathManager
 
     private static bool IsFlatpakSandboxed()
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            return false;
-
         return EnvHelper.IsFlatpakSandboxed();
     }
 
-    private static string LinuxXdgDataHome => LocalAppDataFolder;
-    private static string LinuxXdgConfigHome => AppDataFolder;
+    public static string LinuxXdgDataHome => LocalAppDataFolder;
+    public static string LinuxXdgConfigHome => AppDataFolder;
     private static string LinuxHostXdgDataHome =>
         NullIfRelativeLinuxPath(Environment.GetEnvironmentVariable("HOST_XDG_DATA_HOME") ?? string.Empty)
         ?? Path.Combine(HomeFolderPath, ".local", "share");
@@ -624,8 +648,19 @@ public static class PathManager
 
     private static string LinuxDolphinHostNativeInstallConfigDir => Path.Combine(LinuxHostXdgConfigHome, LinuxDolphinRelSubFolderPath);
     private static string LinuxDolphinHostNativeInstallDataDir => Path.Combine(LinuxHostXdgDataHome, LinuxDolphinRelSubFolderPath);
-    private static string LinuxDolphinNativeInstallConfigDir => Path.Combine(LinuxXdgConfigHome, LinuxDolphinRelSubFolderPath);
-    private static string LinuxDolphinNativeInstallDataDir => Path.Combine(LinuxXdgDataHome, LinuxDolphinRelSubFolderPath);
+    public static string LinuxDolphinNativeInstallConfigDir => Path.Combine(LinuxXdgConfigHome, LinuxDolphinRelSubFolderPath);
+    public static string LinuxDolphinNativeInstallDataDir => Path.Combine(LinuxXdgDataHome, LinuxDolphinRelSubFolderPath);
+
+    private static string LinuxFlatpakBundledDolphinXdgInternalSuffix => "-dolphin-emu";
+
+    public static string LinuxFlatpakBundledDolphinXdgConfigDir => Path.Combine(HomeFolderPath, ".var", "app", WheelWizardFlatpakAppId, "config" + LinuxFlatpakBundledDolphinXdgInternalSuffix, LinuxDolphinRelSubFolderPath);
+
+    public static string LinuxFlatpakBundledDolphinXdgDataDir => Path.Combine(HomeFolderPath, ".var", "app", WheelWizardFlatpakAppId, "data" + LinuxFlatpakBundledDolphinXdgInternalSuffix, LinuxDolphinRelSubFolderPath);
+
+    public static string[] LinuxFlatpakSandboxedDolphinUserFolderBlockList => [
+        LinuxFlatpakBundledDolphinXdgConfigDir,
+        LinuxFlatpakBundledDolphinXdgDataDir
+    ];
 
     public static string SplitLinuxDolphinNativeConfigDir
     {
@@ -649,15 +684,21 @@ public static class PathManager
     {
         get
         {
-            if (IsFlatpakDolphinFilePath(DolphinFilePath))
+            if (IsFlatpakSandboxed() || IsFlatpakDolphinFilePath(DolphinFilePath))
             {
                 if (LinuxDolphinFlatpakDataDir.Equals(Path.GetFullPath(UserFolderPath), StringComparison.Ordinal))
                     return LinuxDolphinFlatpakConfigDir;
+            }
 
+            if (!IsFlatpakSandboxed() && IsFlatpakDolphinFilePath(DolphinFilePath))
+            {
+                // Early return in the case of non-sandboxed Wheel Wizard: the Dolphin executable/command governs the decision
                 return string.Empty;
             }
             else
             {
+                // Flatpak-sandboxed Wheel Wizard will also consider the split native config directory based on the user folder
+                // since the executable/command for Dolphin is not selectable anymore
                 return SplitLinuxDolphinNativeConfigDir;
             }
         }
@@ -665,7 +706,8 @@ public static class PathManager
 
     public static bool IsLinuxDolphinConfigSplit()
     {
-        return !string.IsNullOrWhiteSpace(SplitLinuxDolphinConfigDir);
+        // Our Flatpak will always use split config/data directories internally.
+        return IsFlatpakSandboxed() || !string.IsNullOrWhiteSpace(SplitLinuxDolphinConfigDir);
     }
 
     public static string LoadFolderPath
@@ -726,7 +768,12 @@ public static class PathManager
         return filePath.StartsWith(flatpakRunCommand, StringComparison.Ordinal);
     }
 
+    public static string WheelWizardFlatpakAppId => Environment.GetEnvironmentVariable("FLATPAK_ID") ?? "io.github.TeamWheelWizard.WheelWizard";
+
     public const string DefaultDolphinFlatpakAppId = "org.DolphinEmu.dolphin-emu";
+
+    [GeneratedRegex(@"(?i)\b[a-z][a-z0-9]*(?:\.[a-z_][a-z0-9_]*){1,}\.[a-z_][a-z0-9_-]*\b", RegexOptions.IgnoreCase)]
+    private static partial Regex FlatpakRunAppIdRegex { get; }
 
     /// <summary>
     /// Pulls the app ID out of a "flatpak run ..." command, so custom or forked Dolphin Flatpaks keep working.
@@ -736,8 +783,38 @@ public static class PathManager
         if (string.IsNullOrWhiteSpace(flatpakDolphinLocation))
             return DefaultDolphinFlatpakAppId;
 
-        var matches = Regex.Matches(flatpakDolphinLocation, @"(?i)\b[a-z][a-z0-9]*(?:\.[a-z_][a-z0-9_]*){1,}\.[a-z_][a-z0-9_-]*\b");
+        var matches = FlatpakRunAppIdRegex.Matches(flatpakDolphinLocation);
         return matches.Count == 0 ? DefaultDolphinFlatpakAppId : matches[^1].Value;
+    }
+
+    [GeneratedRegex(@"(?i)^\.var/app/(?<AppId>[a-z][a-z0-9]*(?:\.[a-z_][a-z0-9_]*){1,}\.[a-z_][a-z0-9_-]*)/data/dolphin-emu/?$", RegexOptions.IgnoreCase)]
+    private static partial Regex DolphinFlatpakAppIdInUserFolderRegex { get; }
+
+    /// <summary>
+    /// Extracts a potential Dolphin Flatpak app ID from a configured
+    /// Dolphin user folder if it matches a <c>dolphin-emu</c> data folder
+    /// in <c>~/.var/app/[appId]</c>.
+    /// </summary>
+    private static string ExtractDolphinFlatpakAppIdOverrideFromUserFolder(string flatpakUserFolder)
+    {
+        if (!IsFlatpakSandboxed() || string.IsNullOrWhiteSpace(flatpakUserFolder))
+        {
+            return DefaultDolphinFlatpakAppId;
+        }
+
+        var fullFlatpakUserFolderPath = FileHelper.NormalizePath(flatpakUserFolder);
+        var fullHomePath = FileHelper.NormalizePath(HomeFolderPath);
+
+        if (!fullFlatpakUserFolderPath.StartsWith(fullHomePath + '/', StringComparison.Ordinal))
+        {
+            return DefaultDolphinFlatpakAppId;
+        }
+
+        var homeDirRelativeFlatpakUserFolderPath = Path.GetRelativePath(fullHomePath, fullFlatpakUserFolderPath);
+
+        var match = DolphinFlatpakAppIdInUserFolderRegex.Match(homeDirRelativeFlatpakUserFolderPath);
+
+        return match.Success ? match.Groups["AppId"].Value : DefaultDolphinFlatpakAppId;
     }
 
     private static string GetContainingBaseDirectorySafe(string path)
@@ -831,17 +908,23 @@ public static class PathManager
 
     private static string TryFindPortableUserFolderPath()
     {
+        if (IsFlatpakSandboxed())
+        {
+            // It does not make sense to check portable folders, so return early for the WheelWizard Flatpak
+            return string.Empty;
+        }
+
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             // In this case, Dolphin would use `EMBEDDED_USER_DIR` which is the portable `user` directory
             // in the current directory (the directory of the WheelWizard executable).
             // This is actually undocumented...
-            string embeddedUserPath = Path.GetFullPath("user");
+            var embeddedUserPath = Path.GetFullPath("user");
             if (FileHelper.DirectoryExists(embeddedUserPath))
                 return embeddedUserPath;
         }
 
-        string portableUserPath = PortableUserFolderPath;
+        var portableUserPath = PortableUserFolderPath;
         if (FileHelper.FileExists(Path.Combine(GetDolphinExeDirectory(), "portable.txt")))
         {
             if (FileHelper.DirectoryExists(portableUserPath))
@@ -900,7 +983,7 @@ public static class PathManager
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            string registryUserConfigPath = TryFindRegistryUserConfigPath();
+            var registryUserConfigPath = TryFindRegistryUserConfigPath();
             if (!string.IsNullOrWhiteSpace(registryUserConfigPath))
                 return registryUserConfigPath;
 
@@ -923,14 +1006,13 @@ public static class PathManager
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            if (IsFlatpakDolphinFilePath(dolphinFilePath))
-            {
-                return TryFindLinuxFlatpakUserFolderPath();
-            }
-            else
-            {
-                return TryFindLinuxNativeUserFolderPath();
-            }
+            var flatpakUserFolder = TryFindLinuxFlatpakUserFolderPath();
+            // The sandboxed version of Wheel Wizard will prioritize found Dolphin Flatpak user folders
+            // because the builds should be more similar.
+            return IsFlatpakSandboxed() && flatpakUserFolder != null
+                || !IsFlatpakSandboxed() && IsFlatpakDolphinFilePath(dolphinFilePath)
+                ? flatpakUserFolder
+                : TryFindLinuxNativeUserFolderPath();
         }
 
         return null;

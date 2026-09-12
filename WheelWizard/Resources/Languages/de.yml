@@ -174,7 +174,7 @@ de:
     mii_editor: "Mii Maker"
     mii_carousel: "Mii-Vorschau"
   text:
-    made_by_string: |
+    made_by_string: |-
       Erstellt von: {$1}
       und {$2}
     thanks_translators: "Vielen Dank an alle Übersetzer:"
@@ -285,27 +285,24 @@ de:
       extra: "Diese Änderung wird in {$1} zurückgesetzt, außer du wendest die Änderung an."
     move_data:
       title: "Wheel Wizard Daten verschieben?"
-      extra: |
-        Wheel Wizard wird seine Dateien nach
-
+      extra: |-
+        Wheel Wizard wird seine Datein nach
         {$1}
-
         verschieben. Das könnte eine Weile dauern.
     dolphin_found:
       title: "Dolphin Emulator-Ordner gefunden"
-      extra: |
+      extra: |-
         Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
-
         Dolphin Emulator-Ordner gefunden. Möchtest du diesen Ordner verwenden?
     dolphin_outdated:
       title: "Die Dolphin Emulator-Version ist veraltet"
-      extra: |
+      extra: |-
         Diese Dolphin-Version ({$1}) hat eine bekannte Sicherheitslücke, mit welcher schädliche Spieldateien, Mods, oder cheatende Online-Spieler deinen PC mit Malware infizieren können.
 
         Update Dolphin auf die Version {$2} oder neuer, um sicher zu sein.
     dolphin_program_found:
       title: "Dolphin Emulator gefunden"
-      extra: |
+      extra: |-
         Wenn du nicht weißt, was das alles bedeutet, klick einfach auf „Ja“ :)
 
         Dolphin Emulator gefunden. Möchtest du Folgendes verwenden?
@@ -362,7 +359,7 @@ de:
       extra: "Der Ordner „Dolphin Emulator“ wurde nicht automatisch gefunden. Versuche bitte, den Ordner manuell zu finden. Für weitere Informationen auf „Hilfe“ klicken."
     dolphin_version_unverified:
       title: "Die verwendete Dolphin Emulator-Version konnte nicht verifiziert werden"
-      extra: |
+      extra: |-
         Wheel Wizard konnte die Version des eingerichteten Dolphin Emulator nicht lesen und kann daher nicht feststellen, ob die Sicherheitsupdates installiert sind.
 
         Bitte verifiziere manuell, dass du Version {$1} oder neuer verwendest. Ältere Versionen haben eine bekannte Sicherheitslücke, mit welcher schädliche Spieldateien, Mods, oder cheatende Online-Spieler deinen PC mit Malware infizieren können.
@@ -374,13 +371,11 @@ de:
       extra: "Es ist gerade nicht möglich, nach Updates zu suchen. Du bist vielleicht nicht mit dem Internet verbunden oder der Server hat gerade Schwierigkeiten."
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Es kann nicht überprüft werden, ob Wheel Wizard auf dem neuesten Stand ist.
-
           Möglicherweise treten derzeit Netzwerkprobleme auf.
-        reason_location: |
+        reason_location: |-
           Wheel Wizard kann nicht aktualisiert werden. Bitte stelle sicher, dass sich die Anwendung in einem Ordner befindet, in den geschrieben werden kann.
-
           Der aktuelle Ordner konnte nicht gefunden werden.
       title: "Wheel Wizard konnte nicht aktualisiert werden."
     no_connect_server:
@@ -421,9 +416,8 @@ de:
       extra:
         failed_update_delete: "Dateien für das Update konnten nicht gelöscht werden. Abbruch."
         failed_update_apply: "Das Update konnte nicht installiert werden. Abbruch."
-        invalid_file_path: |
+        invalid_file_path: |-
           Ungültiger Dateipfad wurde erkannt. Bitte kontaktiere die Entwickler.
-
           Server-Fehler: {$1}
       title: "Über das RR Update"
     restart_admin_fail:
@@ -449,9 +443,8 @@ de:
       title: "Einstellungen erfolgreich gespeichert!"
     data_folder_moved:
       title: "Datenordner aktualisiert."
-      extra: |
-        Wheel Wizard's Daten sind jetzt gespeichert in:
-
+      extra: |-
+        Wheel WIzard's Daten sind jetzt gespeichert in:
         {$1}
     rr_up_to_date:
       title: "Retro Rewind ist auf dem neuesten Stand."
@@ -529,7 +522,6 @@ de:
     mario_kart_game: "Mario Kart Wii Spiel-Datei"
     dolphin_emulator_exe: "Dolphin Emulator Programmdatei"
     make_primary: "Als Hauptprofil verwenden"
-    remove_blur: "Unschärfe entfernen"
     enable_animations: "Animationen aktivieren"
     reinstall: "RR neu installieren"
     open_game_folder: "Spielordner öffnen"
@@ -540,6 +532,8 @@ de:
     recomp_graphics_api: "Grafik-API"
     recomp_prevent_stutters: "Verhindere Ruckler"
   section:
+    graphics: "Grafik"
+    general: "Allgemein"
     language: "Sprache"
     wii: "Wii-Einstellungen"
     resolution: "Auflösung"
@@ -577,6 +571,7 @@ de:
     about: "Über"
     other: "Sonstiges"
     general: "Allgemein"
+    video: "Video"
   status:
     recomp_dolphin_data_not_linked: "Nicht verknüpft. WiiCompiled wird seine privaten Wii-Daten nutzen."
     recomp_dolphin_data_linked: "Verwendet verknüpfte Dolphin-Daten von {$1}"
@@ -585,7 +580,6 @@ de:
     recomp_not_installed: "WiiCompiled noch nicht installiert. Installiere es zuerst von der Startseite."
     recomp_uninstalled: "WiiCompiled wurde deinstalliert."
     data_folder:
-      default: "Standard-Speicherort wird verwendet."
       custom: "Verwendet benutzerdefinierten Speicherort"
       moving: "Dateien werden verschoben, bitte warten..."
   value:

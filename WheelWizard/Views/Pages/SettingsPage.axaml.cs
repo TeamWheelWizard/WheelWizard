@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Settings;
+using WheelWizard.Shared;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Popups;
@@ -26,9 +27,7 @@ public partial class SettingsPage : UserControlBase
         UpdateTabVisibility();
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingChanged);
 
-#if DEBUG
-        DevButton.IsVisible = true;
-#endif
+        DevButton.IsVisible = DevelopmentMode.IsEnabled;
 
         SettingsContent.Content = initialSettingsPage;
         SetCheckedTopBarButton(initialSettingsPage);
@@ -98,4 +97,11 @@ public partial class SettingsPage : UserControlBase
     }
 
     private void DevButton_OnClick(object? sender, RoutedEventArgs e) => new DevToolWindow().Show();
+
+    public void HideDevelopmentFeatures()
+    {
+        DevButton.IsVisible = false;
+        if (SettingsContent.Content is AppInfo)
+            SettingsContent.Content = new AppInfo();
+    }
 }

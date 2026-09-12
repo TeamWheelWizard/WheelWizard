@@ -88,12 +88,6 @@ public partial class MiiRenderingSetupPopup : PopupContent
         ProgressTextBlock.Text = progress.BytesDownloaded > 0 ? $"{FormatMegabytes(progress.BytesDownloaded)} downloaded" : "Working...";
     }
 
-    private void CloseButton_OnClick(object? sender, RoutedEventArgs e)
-    {
-        _downloadCancellationTokenSource?.Cancel();
-        Close();
-    }
-
     private void SkipButton_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_downloadCancellationTokenSource != null)
@@ -115,8 +109,6 @@ public partial class MiiRenderingSetupPopup : PopupContent
         StatusTextBlock.Text = statusText;
         DownloadButton.IsEnabled = !busy;
         SkipButton.IsEnabled = !busy;
-        CloseButton.IsEnabled = true;
-        CloseButton.Text = busy ? "Close and Exit" : "Close";
     }
 
     private void ShowError(string message)
