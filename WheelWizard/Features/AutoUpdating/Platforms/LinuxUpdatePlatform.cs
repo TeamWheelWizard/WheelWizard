@@ -3,10 +3,12 @@ using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using WheelWizard.GitHub.Domain;
 using WheelWizard.Helpers;
+using WheelWizard.Shared.Downloads;
+using WheelWizard.Views.Downloads;
 
 namespace WheelWizard.AutoUpdating.Platforms;
 
-public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
+public class LinuxUpdatePlatform(IFileSystem fileSystem, IDownloadService downloads) : IUpdatePlatform
 {
     public GithubAsset? GetAssetForCurrentPlatform(GithubRelease release)
     {
@@ -40,12 +42,12 @@ public class LinuxUpdatePlatform(IFileSystem fileSystem) : IUpdatePlatform
         if (fileSystem.File.Exists(newFilePath))
             fileSystem.File.Delete(newFilePath);
 
-        var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(
+        var downloadedFilePath = await downloads.DownloadToLocationAsync(
             downloadUrl,
             newFilePath,
             t("progress.update_wh_wz"),
             t("progress.latest_wh_wz_github"),
-            ForceGivenFilePath: true
+            useExactPath: true
         );
 
         if (string.IsNullOrWhiteSpace(downloadedFilePath) || !fileSystem.File.Exists(downloadedFilePath))

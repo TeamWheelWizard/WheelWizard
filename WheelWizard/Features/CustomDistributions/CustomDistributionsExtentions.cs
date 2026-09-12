@@ -11,6 +11,8 @@ public static class CustomDistributionsExtentions
         services.AddWhWzRefitApi<IRetroRewindApi>(Endpoints.RRUrl);
 
         services.AddSingleton<ICustomDistributionSingletonService, CustomDistributionSingletonService>();
+        services.AddSingleton<RetroRewind>();
+        services.AddSingleton<RetroRewindBeta>();
         return services;
     }
 }
