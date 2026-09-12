@@ -6,7 +6,6 @@ using Semver;
 using SharpCompress.Archives;
 using SharpCompress.Readers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.IO;
@@ -62,7 +61,12 @@ public class RetroRewindBeta : IDistribution
                 _fileSystem.Directory.Delete(tempRootPath, recursive: true);
             _fileSystem.Directory.CreateDirectory(tempRootPath);
 
-            var download = await downloads.DownloadDistributionAsync(Endpoints.RRTestersZipUrl, tempZipPath, operation, useExactPath: true);
+            var download = await downloads.DownloadDistributionAsync(
+                RetroRewindEndpoints.BetaArchiveUrl,
+                tempZipPath,
+                operation,
+                useExactPath: true
+            );
 
             if (download.IsFailure)
                 return operation.CancellationToken.IsCancellationRequested ? Ok() : download.Error;

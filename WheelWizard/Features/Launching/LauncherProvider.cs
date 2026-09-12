@@ -1,7 +1,7 @@
 using WheelWizard.Recomp;
 using WheelWizard.Settings;
 
-namespace WheelWizard.Services.Launcher;
+namespace WheelWizard.Launching;
 
 /// <summary>
 /// Resolves the launcher the Home page should drive. The recomp is a beta (Windows and Linux) that, when
@@ -13,10 +13,11 @@ public interface ILauncherProvider
     ILauncher GetActiveLauncher();
 }
 
-public class LauncherProvider(ISettingsManager settings, IServiceProvider serviceProvider) : ILauncherProvider
+public class LauncherProvider(ISettingsManager settings, Func<RrLauncher> createRetroRewind, Func<RecompLauncher?> createRecomp)
+    : ILauncherProvider
 {
     public ILauncher GetActiveLauncher() =>
         settings.IsRecompModeActive()
-            ? serviceProvider.GetRequiredService<RecompLauncher>()
-            : serviceProvider.GetRequiredService<RrLauncher>();
+            ? createRecomp() ?? throw new InvalidOperationException("The recomp launcher is unavailable on this platform.")
+            : createRetroRewind();
 }

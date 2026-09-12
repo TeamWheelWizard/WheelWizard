@@ -1,7 +1,7 @@
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
+using WheelWizard.Launching;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services.Launcher;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
