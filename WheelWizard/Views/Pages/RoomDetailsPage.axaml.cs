@@ -8,11 +8,11 @@ using WheelWizard.Models.RRInfo;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Utilities.Generators;
-using WheelWizard.Utilities.Mockers;
 using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
+using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 
@@ -141,7 +141,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return;
         }
 
-        var activeUserPid = FriendCodeGenerator.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
+        var activeUserPid = FriendCode.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
         if (activeUserPid == 0)
         {
             ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
@@ -162,7 +162,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         }
 
         var normalizedFriendCode = normalizedFriendCodeResult.Value;
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode);
         if (activeUserPid == friendProfileId)
         {
             ViewUtils.ShowSnackbar("You cannot add your own friend code.", ViewUtils.SnackbarType.Warning);
@@ -171,7 +171,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
 
         var duplicateFriend = GameDataService.ActiveCurrentFriends.Any(friend =>
         {
-            var existingPid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
             return existingPid != 0 && existingPid == friendProfileId;
         });
 
@@ -219,7 +219,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return Fail("Friend code must be exactly 12 digits.");
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
             return Fail("Invalid friend code.");
 

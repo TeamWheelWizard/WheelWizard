@@ -1,8 +1,8 @@
-﻿using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
-namespace WheelWizard.Utilities.Mockers;
+namespace WheelWizard.Views.DesignTime;
 
 public class MiiFactory : MockingDataFactory<Mii, MiiFactory>
 {

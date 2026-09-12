@@ -1,6 +1,6 @@
-namespace WheelWizard.Helpers;
+namespace WheelWizard.Shared.Binary;
 
-public static class CrcHelper
+public static class Crc
 {
     public static ushort ComputeCrc16Ccitt(byte[] buffer, int offset, int length)
     {

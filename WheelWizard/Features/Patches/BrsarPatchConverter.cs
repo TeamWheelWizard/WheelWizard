@@ -1,5 +1,6 @@
 using System.Text;
 using WheelWizard.Helpers;
+using WheelWizard.Shared.Binary;
 using static WheelWizard.Features.Patches.PatchConversionHelpers;
 
 namespace WheelWizard.Features.Patches;
@@ -160,10 +161,10 @@ public static class BrsarPatchConverter
 
     private static BrsarParseResult ParseBrsar(byte[] bytes)
     {
-        if (BinaryStringHelper.ReadAscii(bytes, 0, 4) != "RSAR")
+        if (BinaryStrings.ReadAscii(bytes, 0, 4) != "RSAR")
             throw new InvalidDataException("The selected BRSAR file does not start with the RSAR header.");
 
-        var infoOffset = BigEndianBinaryHelper.BufferToInt32(bytes, 0x18);
+        var infoOffset = BigEndianBinary.BufferToInt32(bytes, 0x18);
         var infoBase = infoOffset + 0x08;
         var fileTableOffset = ResolveDataRef(bytes, infoBase + 0x18, infoBase);
         var groupTableOffset = ResolveDataRef(bytes, infoBase + 0x20, infoBase);
@@ -183,13 +184,13 @@ public static class BrsarPatchConverter
         for (var fileId = 0; fileId < fileEntryOffsets.Count; fileId++)
         {
             var entryOffset = fileEntryOffsets[fileId];
-            var declaredFileSize = BigEndianBinaryHelper.BufferToInt32(bytes, entryOffset);
-            var declaredWaveSize = BigEndianBinaryHelper.BufferToInt32(bytes, entryOffset + 0x04);
+            var declaredFileSize = BigEndianBinary.BufferToInt32(bytes, entryOffset);
+            var declaredWaveSize = BigEndianBinary.BufferToInt32(bytes, entryOffset + 0x04);
             var externalNameRef = ResolveDataRef(bytes, entryOffset + 0x0c, infoBase);
             if (externalNameRef != null)
             {
                 externalCount++;
-                var externalPath = BinaryStringHelper.ReadNullTerminatedAscii(bytes, externalNameRef.Value);
+                var externalPath = BinaryStrings.ReadNullTerminatedAscii(bytes, externalNameRef.Value);
                 entries[fileId] = new(
                     BrsarEntryKind.External,
                     Utf8.GetBytes(externalPath),
@@ -217,8 +218,8 @@ public static class BrsarPatchConverter
             }
 
             var firstPosition = positions[0];
-            var groupIndex = BigEndianBinaryHelper.BufferToInt32(bytes, firstPosition);
-            var itemIndex = BigEndianBinaryHelper.BufferToInt32(bytes, firstPosition + 4);
+            var groupIndex = BigEndianBinary.BufferToInt32(bytes, firstPosition);
+            var itemIndex = BigEndianBinary.BufferToInt32(bytes, firstPosition + 4);
             var group = groupIndex >= 0 && groupIndex < groups.Length ? groups[groupIndex] : null;
 
             if (group == null || itemIndex < 0 || itemIndex >= group.ItemOffsets.Count)
@@ -229,8 +230,8 @@ public static class BrsarPatchConverter
             }
 
             var itemOffset = group.ItemOffsets[itemIndex];
-            var fileRelativeOffset = BigEndianBinaryHelper.BufferToInt32(bytes, itemOffset + 0x04);
-            var audioRelativeOffset = BigEndianBinaryHelper.BufferToInt32(bytes, itemOffset + 0x0c);
+            var fileRelativeOffset = BigEndianBinary.BufferToInt32(bytes, itemOffset + 0x04);
+            var audioRelativeOffset = BigEndianBinary.BufferToInt32(bytes, itemOffset + 0x0c);
             var mainGuess = group.FileDataOffset + fileRelativeOffset;
             var waveGuess = group.AudioDataOffset + audioRelativeOffset;
             var mainHeader = FindNearestBrsarHeader(knownHeaders, mainGuess, declaredFileSize);
@@ -279,15 +280,15 @@ public static class BrsarPatchConverter
             throw new InvalidDataException($"Group {groupIndex} does not contain an item table.");
 
         return new(
-            BigEndianBinaryHelper.BufferToInt32(bytes, entryOffset + 0x10),
-            BigEndianBinaryHelper.BufferToInt32(bytes, entryOffset + 0x18),
+            BigEndianBinary.BufferToInt32(bytes, entryOffset + 0x10),
+            BigEndianBinary.BufferToInt32(bytes, entryOffset + 0x18),
             ParseReferenceTable(bytes, itemTableOffset.Value, infoOffset)
         );
     }
 
     private static List<int> ParseReferenceTable(byte[] bytes, int tableOffset, int baseAddress)
     {
-        var count = BigEndianBinaryHelper.BufferToInt32(bytes, tableOffset);
+        var count = BigEndianBinary.BufferToInt32(bytes, tableOffset);
         var offsets = new List<int>();
 
         for (var index = 0; index < count; index++)
@@ -306,7 +307,7 @@ public static class BrsarPatchConverter
             return null;
 
         var refType = bytes[refOffset];
-        var value = BigEndianBinaryHelper.BufferToInt32(bytes, refOffset + 4);
+        var value = BigEndianBinary.BufferToInt32(bytes, refOffset + 4);
         if (value == 0)
             return null;
         if (refType == 0)
@@ -327,11 +328,11 @@ public static class BrsarPatchConverter
             if (bytes[offset] != 0x52)
                 continue;
 
-            var magic = BinaryStringHelper.ReadAscii(bytes, offset, 4);
+            var magic = BinaryStrings.ReadAscii(bytes, offset, 4);
             if (magic is not ("RWSD" or "RBNK" or "RWAV" or "RSEQ" or "RSTM" or "RWAR"))
                 continue;
 
-            var size = BigEndianBinaryHelper.BufferToInt32(bytes, offset + 0x08);
+            var size = BigEndianBinary.BufferToInt32(bytes, offset + 0x08);
             if (size < 0x20 || offset + size > bytes.Length)
                 continue;
 

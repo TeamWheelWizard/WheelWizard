@@ -9,6 +9,7 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
 using WheelWizard.Settings;
+using WheelWizard.Shared.IO;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views.Popups.Generic;
 
@@ -362,7 +363,7 @@ public class RetroRewind : IDistribution
         for (var i = 0; i < total; i++)
         {
             var entry = entries[i];
-            if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, entry.FullName, out var destinationPath))
+            if (!PathSafety.TryGetPathWithinDirectory(destinationDirectory, entry.FullName, out var destinationPath))
                 return Fail("The file path is outside the destination directory. Please contact the developers.");
 
             // If itâ€™s a directory, create it
@@ -409,7 +410,7 @@ public class RetroRewind : IDistribution
             {
                 // The deletion list is server-controlled, so keep every resolved path inside the riivolution folder.
                 if (
-                    !PathSafetyHelper.TryGetPathWithinDirectory(
+                    !PathSafety.TryGetPathWithinDirectory(
                         PathManager.RiivolutionWhWzFolderPath,
                         file.Path.TrimStart('/', '\\'),
                         out var filePath

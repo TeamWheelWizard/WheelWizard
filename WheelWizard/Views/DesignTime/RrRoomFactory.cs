@@ -1,7 +1,7 @@
-﻿using WheelWizard.Models.RRInfo;
-using WheelWizard.Utilities.Mockers.RrInfo;
+using WheelWizard.Models.RRInfo;
+using WheelWizard.Views.DesignTime.RrInfo;
 
-namespace WheelWizard.Utilities.Mockers;
+namespace WheelWizard.Views.DesignTime;
 
 public class RrRoomFactory : MockingDataFactory<RrRoom, RrRoomFactory>
 {
