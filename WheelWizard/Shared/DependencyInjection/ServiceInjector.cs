@@ -13,6 +13,8 @@ public static class ServiceInjector
     /// <summary>
     /// Injects services into properties marked with the <see cref="InjectAttribute"/> in the given instance.
     /// </summary>
+    public static bool RequiresInjection(Type type) => GetInjectProperties(type).Length > 0;
+
     public static void InjectServices(IServiceProvider serviceProvider, object instance)
     {
         var type = instance.GetType();

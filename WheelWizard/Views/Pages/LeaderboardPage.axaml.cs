@@ -6,7 +6,7 @@ using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
@@ -44,6 +44,8 @@ public sealed record LeaderboardPlayerItem
 
 public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 {
+    private INavigationService Navigation { get; }
+
     private static readonly LeaderboardPlayerItem EmptyPodiumPlayer = new()
     {
         Rank = 0,
@@ -59,20 +61,15 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
     private CancellationTokenSource? _loadCts;
 
-    [Inject]
-    private LiveRoomsService LiveRooms { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private IRrLeaderboardSingletonService LeaderboardService { get; set; } = null!;
+    private IRrLeaderboardSingletonService LeaderboardService { get; }
 
-    [Inject]
-    private IWhWzDataSingletonService BadgeService { get; set; } = null!;
+    private IWhWzDataSingletonService BadgeService { get; }
 
-    [Inject]
-    private IGameLicenseSingletonService GameDataService { get; set; } = null!;
+    private IGameLicenseSingletonService GameDataService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsManager { get; set; } = null!;
+    private ISettingsManager SettingsManager { get; }
 
     private bool _hasLoadedOnce;
     private bool _isLoading;
@@ -170,8 +167,21 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     public bool HasPodiumSecond => _podiumSecond != null;
     public bool HasPodiumThird => _podiumThird != null;
 
-    public LeaderboardPage()
+    public LeaderboardPage(
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        IRrLeaderboardSingletonService leaderboardService,
+        IWhWzDataSingletonService badgeService,
+        IGameLicenseSingletonService gameDataService,
+        ISettingsManager settingsManager
+    )
     {
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        LeaderboardService = leaderboardService;
+        BadgeService = badgeService;
+        GameDataService = gameDataService;
+        SettingsManager = settingsManager;
         InitializeComponent();
         DataContext = this;
         RemainingPlayers.CollectionChanged += RemainingPlayers_OnCollectionChanged;
@@ -538,7 +548,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;
 
-            NavigationManager.NavigateTo<RoomDetailsPage>(room);
+            Navigation.NavigateTo<RoomDetailsPage>(room);
             return;
         }
 

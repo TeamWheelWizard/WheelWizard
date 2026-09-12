@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Settings;
 using WheelWizard.Shared;
-using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Popups;
 
@@ -10,25 +10,30 @@ namespace WheelWizard.Views.Pages;
 
 public partial class SettingsPage : UserControlBase
 {
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private ISettingsSignalBus SettingsSignalBus { get; set; } = null!;
+    private ISettingsSignalBus SettingsSignalBus { get; }
 
+    private IPageFactory Pages { get; }
     private IDisposable? _settingsSignalSubscription;
 
-    public SettingsPage()
-        : this(new WhWzSettings()) { }
-
-    public SettingsPage(UserControl initialSettingsPage)
+    public SettingsPage(
+        ISettingsManager settingsService,
+        ISettingsSignalBus settingsSignalBus,
+        IPageFactory pages,
+        Type? initialPage = null
+    )
     {
+        SettingsService = settingsService;
+        SettingsSignalBus = settingsSignalBus;
+        Pages = pages;
         InitializeComponent();
         UpdateTabVisibility();
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingChanged);
 
         DevButton.IsVisible = DevelopmentMode.IsEnabled;
 
+        var initialSettingsPage = Pages.Create(initialPage ?? typeof(WhWzSettings));
         SettingsContent.Content = initialSettingsPage;
         SetCheckedTopBarButton(initialSettingsPage);
     }
@@ -62,7 +67,7 @@ public partial class SettingsPage : UserControlBase
         if (!hiddenSelected)
             return;
 
-        var fallback = new WhWzSettings();
+        var fallback = Pages.Create<WhWzSettings>();
         SettingsContent.Content = fallback;
         SetCheckedTopBarButton(fallback);
     }
@@ -79,10 +84,7 @@ public partial class SettingsPage : UserControlBase
         if (type == null || !typeof(UserControl).IsAssignableFrom(type))
             return;
 
-        if (Activator.CreateInstance(type) is not UserControl instance)
-            return;
-
-        SettingsContent.Content = instance;
+        SettingsContent.Content = Pages.Create(type);
     }
 
     private void SetCheckedTopBarButton(UserControl settingsPage)
@@ -102,6 +104,6 @@ public partial class SettingsPage : UserControlBase
     {
         DevButton.IsVisible = false;
         if (SettingsContent.Content is AppInfo)
-            SettingsContent.Content = new AppInfo();
+            SettingsContent.Content = Pages.Create<AppInfo>();
     }
 }

@@ -6,25 +6,24 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Testably.Abstractions;
 using WheelWizard.Models.Enums;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Components;
 
 namespace WheelWizard.Views.Pages;
 
 public partial class HomePage : UserControlBase
 {
-    [Inject]
-    private HomeViewModel Model { get; set; } = null!;
+    private HomeViewModel Model { get; }
 
-    [Inject]
-    private IRandomSystem RandomSystem { get; set; } = null!;
+    private IRandomSystem RandomSystem { get; }
 
     private readonly WheelTrail[] _trails;
     private WheelTrailState _currentTrailState = WheelTrailState.Static_None;
     private bool _isAttached;
 
-    public HomePage()
+    public HomePage(HomeViewModel model, IRandomSystem randomSystem)
     {
+        Model = model;
+        RandomSystem = randomSystem;
         InitializeComponent();
         _trails = [HomeTrail1, HomeTrail2, HomeTrail3, HomeTrail4, HomeTrail5];
         RandomSystem.Random.Shared.Shuffle(_trails);
