@@ -4,8 +4,8 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
+using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
-using WheelWizard.Services.Other;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
@@ -46,6 +46,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
+
+    [Inject]
+    private ISaveRegionService SaveRegions { get; set; } = null!;
 
     public Mii? CurrentMii
     {
@@ -130,7 +133,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void PopulateRegions()
     {
-        var validRegions = RRRegionManager.GetValidRegions();
+        var validRegions = SaveRegions.GetAvailableRegions(PathManager.SaveFolderPath);
         var currentRegion = SettingsService.Get<MarioKartWiiEnums.Regions>(SettingsService.RR_REGION);
         foreach (var region in Enum.GetValues<MarioKartWiiEnums.Regions>())
         {
