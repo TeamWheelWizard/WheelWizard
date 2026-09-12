@@ -4,6 +4,7 @@ using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Storage;
 

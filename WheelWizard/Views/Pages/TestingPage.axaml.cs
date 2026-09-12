@@ -5,6 +5,7 @@ using WheelWizard.Services.Launcher;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages;
