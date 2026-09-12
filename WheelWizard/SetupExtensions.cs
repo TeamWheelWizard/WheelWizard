@@ -81,6 +81,9 @@ public static class SetupExtensions
         services.AddArchives();
         services.AddPatches();
         services.AddSingleton<WheelWizard.Recomp.IRecompPresentation, WheelWizard.Views.Recomp.RecompPresentation>();
+        services.AddSingleton<WheelWizard.Shared.Calendar.ISeasonalCalendar, WheelWizard.Shared.Calendar.SeasonalCalendar>();
+        services.AddTransient<WheelWizard.Views.Pages.HomeViewModel>();
+        services.AddSingleton<WheelWizard.Views.Pages.IHomePresentation, WheelWizard.Views.Pages.HomePresentation>();
         services.AddMods();
         services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();

@@ -9,6 +9,7 @@ using Avalonia.VisualTree;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Shared.Calendar;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
@@ -16,6 +17,9 @@ namespace WheelWizard.Views.Patterns;
 
 public partial class Mii3DRender : BaseMiiImage
 {
+    [Inject]
+    private ISeasonalCalendar Calendar { get; set; } = null!;
+
     private const float YawDragSensitivity = 0.8f;
     private const float PitchDragSensitivity = 0.8f;
     private const float MiddlePanSensitivity = 0.35f;
@@ -171,7 +175,7 @@ public partial class Mii3DRender : BaseMiiImage
             return;
         }
 
-        var serialized = MiiStudioDataSerializer.Serialize(_currentMii);
+        var serialized = MiiStudioDataSerializer.Serialize(_currentMii, Calendar.IsAprilFirst);
         if (serialized.IsFailure)
         {
             _studioData = null;
