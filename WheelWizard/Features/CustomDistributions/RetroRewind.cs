@@ -9,14 +9,17 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.IO;
 using WheelWizard.Shared.Services;
+using WheelWizard.Views.Downloads;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
 
 public class RetroRewind : IDistribution
 {
+    private readonly IDownloadService downloads;
     private readonly IFileSystem _fileSystem;
     private readonly IApiCaller<IRetroRewindApi> _api;
     private readonly ILogger<IDistribution> _logger;
@@ -26,10 +29,12 @@ public class RetroRewind : IDistribution
         IFileSystem fileSystem,
         IApiCaller<IRetroRewindApi> api,
         ILogger<IDistribution> logger,
-        ISettingsManager settingsManager
+        ISettingsManager settingsManager,
+        IDownloadService downloads
     )
     {
         _api = api;
+        this.downloads = downloads;
         _fileSystem = fileSystem;
         _logger = logger;
         _settingsManager = settingsManager;
@@ -100,7 +105,7 @@ public class RetroRewind : IDistribution
                 return Fail("Failed to get Retro Rewind download URL.");
 
             //todo, service
-            var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(
+            var downloadedFilePath = await downloads.DownloadToLocationAsync(
                 installUrlResult.Value.Trim(),
                 downloadedZipPath,
                 progressWindow
@@ -318,7 +323,7 @@ public class RetroRewind : IDistribution
         try
         {
             popupWindow.SetExtraText($"{t("action.update")} {currentUpdateIndex}/{totalUpdates}: {update.Description}");
-            var finalFile = await DownloadHelper.DownloadToLocationAsync(update.Url, tempZipPath, popupWindow);
+            var finalFile = await downloads.DownloadToLocationAsync(update.Url, tempZipPath, popupWindow);
 
             if (finalFile == null)
                 return Fail("Failed to download update file");

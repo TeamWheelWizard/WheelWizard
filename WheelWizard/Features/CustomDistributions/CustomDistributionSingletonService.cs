@@ -1,9 +1,3 @@
-using System.IO.Abstractions;
-using Microsoft.Extensions.Logging;
-using WheelWizard.CustomDistributions.Domain;
-using WheelWizard.Settings;
-using WheelWizard.Shared.Services;
-
 namespace WheelWizard.CustomDistributions;
 
 public interface ICustomDistributionSingletonService
@@ -22,15 +16,10 @@ public class CustomDistributionSingletonService : ICustomDistributionSingletonSe
     public RetroRewind RetroRewind { get; }
     public RetroRewindBeta RetroRewindBeta { get; }
 
-    public CustomDistributionSingletonService(
-        IFileSystem fileSystem,
-        IApiCaller<IRetroRewindApi> api,
-        ILogger<IDistribution> logger,
-        ISettingsManager settingsManager
-    )
+    public CustomDistributionSingletonService(RetroRewind retroRewind, RetroRewindBeta retroRewindBeta)
     {
-        RetroRewind = new RetroRewind(fileSystem, api, logger, settingsManager);
-        RetroRewindBeta = new RetroRewindBeta(fileSystem, logger, settingsManager);
+        RetroRewind = retroRewind;
+        RetroRewindBeta = retroRewindBeta;
     }
 
     public List<IDistribution> GetAllDistributions()

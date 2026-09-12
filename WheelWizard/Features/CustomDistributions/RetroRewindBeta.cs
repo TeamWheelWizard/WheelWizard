@@ -10,20 +10,29 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.IO;
+using WheelWizard.Views.Downloads;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
 
 public class RetroRewindBeta : IDistribution
 {
+    private readonly IDownloadService downloads;
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<IDistribution> _logger;
     private readonly ISettingsManager _settingsManager;
 
-    public RetroRewindBeta(IFileSystem fileSystem, ILogger<IDistribution> logger, ISettingsManager settingsManager)
+    public RetroRewindBeta(
+        IFileSystem fileSystem,
+        ILogger<IDistribution> logger,
+        ISettingsManager settingsManager,
+        IDownloadService downloads
+    )
     {
         _fileSystem = fileSystem;
+        this.downloads = downloads;
         _logger = logger;
         _settingsManager = settingsManager;
     }
@@ -51,11 +60,11 @@ public class RetroRewindBeta : IDistribution
                 _fileSystem.Directory.Delete(tempRootPath, recursive: true);
             _fileSystem.Directory.CreateDirectory(tempRootPath);
 
-            var downloadedFile = await DownloadHelper.DownloadToLocationAsync(
+            var downloadedFile = await downloads.DownloadToLocationAsync(
                 Endpoints.RRTestersZipUrl,
                 tempZipPath,
                 progressWindow,
-                ForceGivenFilePath: true
+                useExactPath: true
             );
 
             if (string.IsNullOrWhiteSpace(downloadedFile) || !_fileSystem.File.Exists(downloadedFile))
