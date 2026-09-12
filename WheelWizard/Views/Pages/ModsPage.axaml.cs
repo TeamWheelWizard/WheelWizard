@@ -13,16 +13,28 @@ using WheelWizard.Mods;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.ModManagement;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.ModManagement;
 using WheelWizard.Views.Storage;
 
 namespace WheelWizard.Views.Pages;
 
-public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest);
+public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest, ModPreviewViewModel Preview);
 
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
+    [Inject]
+    private Func<int, ModPreviewViewModel> CreatePreview { get; set; } = null!;
+    private readonly Dictionary<int, ModPreviewViewModel> _previews = [];
+
+    private ModPreviewViewModel GetPreview(int id)
+    {
+        if (!_previews.TryGetValue(id, out var preview))
+            _previews[id] = preview = CreatePreview(id);
+        return preview;
+    }
+
     [Inject]
     private IModOperationPresentation ModPresentation { get; set; } = null!;
 
@@ -45,7 +57,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             ModManager.Mods.Select(mod => new ModListItem(
                 mod,
                 mod.Priority == ModManager.GetLowestActivePriority(),
-                mod.Priority == ModManager.GetHighestActivePriority()
+                mod.Priority == ModManager.GetHighestActivePriority(),
+                GetPreview(mod.ModID)
             ))
         );
 
@@ -101,6 +114,9 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         ModManager.PropertyChanged -= OnModsChanged;
+        foreach (var preview in _previews.Values)
+            preview.Dispose();
+        _previews.Clear();
         base.OnDetachedFromVisualTree(e);
     }
 
