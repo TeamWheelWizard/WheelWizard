@@ -1,9 +1,11 @@
+using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using Serilog;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Helpers;
 using WheelWizard.Recomp;
 using WheelWizard.Settings;
+using WheelWizard.Shared.IO;
 #if WINDOWS
 using Microsoft.Win32;
 #endif
@@ -12,6 +14,8 @@ namespace WheelWizard.Services;
 
 public static class PathManager
 {
+    private static IFileSystem FileSystem => new Testably.Abstractions.RealFileSystem();
+
     private static ISettingsManager Settings => SettingsRuntime.Current;
 
     // IMPORTANT: To keep things consistent all paths should be Attrib expressions,
@@ -26,8 +30,8 @@ public static class PathManager
 
     // Portable WheelWizard config only makes sense on non-Flatpak WheelWizard
     private static readonly bool IsPortableWhWz = !IsFlatpakSandboxed() && File.Exists("portable-ww.txt");
-    private static readonly string DefaultWheelWizardAppdataPath = FileHelper.NormalizePath(
-        FileHelper.Combine(IsPortableWhWz ? string.Empty : AppDataFolder, WheelWizardFolderName)
+    private static readonly string DefaultWheelWizardAppdataPath = FileSystem.Path.NormalizePath(
+        Path.Combine(IsPortableWhWz ? string.Empty : AppDataFolder, WheelWizardFolderName)
     );
     private static string? _wheelWizardAppdataOverride;
 
@@ -154,8 +158,8 @@ public static class PathManager
             if (string.IsNullOrWhiteSpace(storedPath))
                 return null;
 
-            var normalized = FileHelper.NormalizePath(storedPath);
-            if (FileHelper.PathsEqual(normalized, DefaultWheelWizardAppdataPath))
+            var normalized = FileSystem.Path.NormalizePath(storedPath);
+            if (FileSystem.Path.PathsEqual(normalized, DefaultWheelWizardAppdataPath))
                 return null;
 
             // If a previously selected custom location is no longer available (for example,
@@ -175,7 +179,7 @@ public static class PathManager
     {
         try
         {
-            FileHelper.EnsureDirectory(normalizedPath);
+            FileSystem.EnsureDirectory(normalizedPath);
             return true;
         }
         catch
@@ -208,7 +212,7 @@ public static class PathManager
 
         if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
         {
-            var storedPath = FileHelper.ReadAllTextSafe(UnixAppDataOverrideFilePath);
+            var storedPath = (File.Exists(UnixAppDataOverrideFilePath) ? File.ReadAllText(UnixAppDataOverrideFilePath) : null);
             if (!string.IsNullOrWhiteSpace(storedPath))
                 return storedPath;
         }
@@ -259,11 +263,11 @@ public static class PathManager
             return true;
         }
 
-        if (!FileHelper.DirectoryExists(normalizedTarget))
+        if (!Directory.Exists(normalizedTarget))
         {
             try
             {
-                FileHelper.EnsureDirectory(normalizedTarget);
+                FileSystem.EnsureDirectory(normalizedTarget);
             }
             catch (Exception ex)
             {
@@ -271,17 +275,17 @@ public static class PathManager
                 return false;
             }
         }
-        else if (!FileHelper.IsDirectoryEmpty(normalizedTarget))
+        else if (!FileSystem.IsDirectoryEmpty(normalizedTarget))
         {
             errorMessage = "The selected folder must be empty. Please choose an empty folder.";
             return false;
         }
 
-        var newOverrideValue = FileHelper.PathsEqual(normalizedTarget, DefaultWheelWizardAppdataPath) ? null : normalizedTarget;
+        var newOverrideValue = FileSystem.Path.PathsEqual(normalizedTarget, DefaultWheelWizardAppdataPath) ? null : normalizedTarget;
 
         try
         {
-            moveResult = FileHelper.MoveDirectoryContents(currentPath, normalizedTarget, progress: progress);
+            moveResult = new DirectoryTransferService(FileSystem).MoveContents(currentPath, normalizedTarget, progress: progress);
         }
         catch (Exception ex)
         {
@@ -351,8 +355,8 @@ public static class PathManager
 
         try
         {
-            normalizedPrevious = FileHelper.NormalizePath(previousPath);
-            normalizedNew = FileHelper.NormalizePath(newPath);
+            normalizedPrevious = FileSystem.Path.NormalizePath(previousPath);
+            normalizedNew = FileSystem.Path.NormalizePath(newPath);
         }
         catch (Exception ex)
         {
@@ -360,7 +364,9 @@ public static class PathManager
             return false;
         }
 
-        var previousOverrideValue = FileHelper.PathsEqual(normalizedPrevious, DefaultWheelWizardAppdataPath) ? null : normalizedPrevious;
+        var previousOverrideValue = FileSystem.Path.PathsEqual(normalizedPrevious, DefaultWheelWizardAppdataPath)
+            ? null
+            : normalizedPrevious;
 
         lock (WheelWizardAppdataLock)
         {
@@ -377,7 +383,7 @@ public static class PathManager
             return false;
         }
 
-        if (FileHelper.DirectoryExists(normalizedNew))
+        if (Directory.Exists(normalizedNew))
         {
             try
             {
@@ -400,7 +406,7 @@ public static class PathManager
         string normalizedDestination;
         try
         {
-            normalizedDestination = FileHelper.NormalizePath(destinationPath);
+            normalizedDestination = FileSystem.Path.NormalizePath(destinationPath);
         }
         catch (Exception ex)
         {
@@ -408,7 +414,7 @@ public static class PathManager
             return false;
         }
 
-        if (!FileHelper.DirectoryExists(normalizedDestination))
+        if (!Directory.Exists(normalizedDestination))
             return true;
 
         try
@@ -445,7 +451,7 @@ public static class PathManager
 
         try
         {
-            normalizedTarget = FileHelper.NormalizePath(requestedPath);
+            normalizedTarget = FileSystem.Path.NormalizePath(requestedPath);
         }
         catch (Exception ex)
         {
@@ -458,34 +464,34 @@ public static class PathManager
             currentPath = _wheelWizardAppdataOverride ?? DefaultWheelWizardAppdataPath;
         }
 
-        if (FileHelper.PathsEqual(currentPath, normalizedTarget))
+        if (FileSystem.Path.PathsEqual(currentPath, normalizedTarget))
             return true;
 
-        if (FileHelper.IsDescendantPath(normalizedTarget, currentPath))
+        if (FileSystem.Path.IsDescendantPath(normalizedTarget, currentPath))
         {
             errorMessage = "The selected folder is inside the current Wheel Wizard data folder. Please choose a different folder.";
             return false;
         }
 
-        if (FileHelper.IsDescendantPath(currentPath, normalizedTarget))
+        if (FileSystem.Path.IsDescendantPath(currentPath, normalizedTarget))
         {
             errorMessage = "The selected folder contains the current Wheel Wizard data folder. Please choose a different folder.";
             return false;
         }
 
-        if (FileHelper.FileExists(normalizedTarget))
+        if (File.Exists(normalizedTarget))
         {
             errorMessage = "The selected path points to a file. Please choose an empty folder instead.";
             return false;
         }
 
-        if (FileHelper.IsRootDirectory(normalizedTarget))
+        if (FileSystem.Path.IsRootDirectory(normalizedTarget))
         {
             errorMessage = "Selecting a drive or root directory is not allowed. Please choose an empty folder.";
             return false;
         }
 
-        if (FileHelper.DirectoryExists(normalizedTarget) && !FileHelper.IsDirectoryEmpty(normalizedTarget))
+        if (Directory.Exists(normalizedTarget) && !FileSystem.IsDirectoryEmpty(normalizedTarget))
         {
             errorMessage = "The selected folder must be empty. Please choose an empty folder.";
             return false;
@@ -497,7 +503,7 @@ public static class PathManager
 
     private static void PersistWheelWizardAppdataOverride(string? overridePath)
     {
-        if (string.IsNullOrWhiteSpace(overridePath) || FileHelper.PathsEqual(overridePath, DefaultWheelWizardAppdataPath))
+        if (string.IsNullOrWhiteSpace(overridePath) || FileSystem.Path.PathsEqual(overridePath, DefaultWheelWizardAppdataPath))
         {
             ClearWheelWizardAppdataOverride();
             return;
@@ -505,7 +511,7 @@ public static class PathManager
 
         try
         {
-            var normalizedOverride = FileHelper.NormalizePath(overridePath);
+            var normalizedOverride = FileSystem.Path.NormalizePath(overridePath);
             SaveWheelWizardAppdataOverride(normalizedOverride);
         }
         catch
@@ -559,7 +565,7 @@ public static class PathManager
 
         if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
         {
-            FileHelper.WriteAllTextSafe(UnixAppDataOverrideFilePath, overridePath);
+            FileSystem.WriteAllTextCreatingDirectory(UnixAppDataOverrideFilePath, overridePath);
         }
     }
 
@@ -567,7 +573,7 @@ public static class PathManager
     {
         try
         {
-            if (FileHelper.FileExists(path))
+            if (File.Exists(path))
                 File.Delete(path);
         }
         catch
@@ -577,7 +583,7 @@ public static class PathManager
     }
 
     private static DirectoryMoveContentsResult MoveWheelWizardAppdataContents(string sourcePath, string destinationPath) =>
-        FileHelper.MoveDirectoryContents(sourcePath, destinationPath);
+        new DirectoryTransferService(FileSystem).MoveContents(sourcePath, destinationPath);
 
     #endregion
 
@@ -741,7 +747,7 @@ public static class PathManager
 
             var foundUserConfigPath = key.GetValue(userConfigPathValueName) as string;
             // We need to replace `/` with `\` here since Dolphin writes mismatching separators to the registry
-            if (!string.IsNullOrWhiteSpace(foundUserConfigPath) && FileHelper.DirectoryExists(foundUserConfigPath))
+            if (!string.IsNullOrWhiteSpace(foundUserConfigPath) && Directory.Exists(foundUserConfigPath))
                 userConfigPath = foundUserConfigPath.Replace(
                     Path.AltDirectorySeparatorChar.ToString(),
                     Path.DirectorySeparatorChar.ToString()
@@ -771,20 +777,20 @@ public static class PathManager
             // in the current directory (the directory of the WheelWizard executable).
             // This is actually undocumented...
             var embeddedUserPath = Path.GetFullPath("user");
-            if (FileHelper.DirectoryExists(embeddedUserPath))
+            if (Directory.Exists(embeddedUserPath))
                 return embeddedUserPath;
         }
 
         var portableUserPath = PortableUserFolderPath;
-        if (FileHelper.FileExists(Path.Combine(GetDolphinExeDirectory(), "portable.txt")))
+        if (File.Exists(Path.Combine(GetDolphinExeDirectory(), "portable.txt")))
         {
-            if (FileHelper.DirectoryExists(portableUserPath))
+            if (Directory.Exists(portableUserPath))
                 return portableUserPath;
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && HasWindowsLocalUserConfigSet())
         {
-            if (FileHelper.DirectoryExists(portableUserPath))
+            if (Directory.Exists(portableUserPath))
                 return portableUserPath;
         }
 
@@ -839,20 +845,20 @@ public static class PathManager
                 return registryUserConfigPath;
 
             var documentsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Dolphin Emulator");
-            if (FileHelper.DirectoryExists(documentsPath))
+            if (Directory.Exists(documentsPath))
                 return documentsPath;
 
             var appDataPath = Path.Combine(AppDataFolder, "Dolphin Emulator");
-            if (FileHelper.DirectoryExists(appDataPath))
+            if (Directory.Exists(appDataPath))
                 return appDataPath;
 
-            if (FileHelper.DirectoryExists(PortableUserFolderPath))
+            if (Directory.Exists(PortableUserFolderPath))
                 return PortableUserFolderPath;
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             var libraryPath = Path.Combine(AppDataFolder, "Dolphin");
-            if (FileHelper.DirectoryExists(libraryPath))
+            if (Directory.Exists(libraryPath))
                 return libraryPath;
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -875,11 +881,11 @@ public static class PathManager
             var dolphinApplicationPath = Path.Combine("Dolphin.app", "Contents", "MacOS", "Dolphin");
             // Try system wide install on MacOS
             var path = Path.Combine("/Applications", dolphinApplicationPath);
-            if (FileHelper.FileExists(path))
+            if (File.Exists(path))
                 return path;
             // Try user install on MacOS
             path = Path.Combine(HomeFolderPath, "Applications", dolphinApplicationPath);
-            if (FileHelper.FileExists(path))
+            if (File.Exists(path))
                 return path;
         }
         return null;

@@ -1,9 +1,10 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Settings;
+using WheelWizard.Shared.IO;
 using WheelWizard.Views;
 using WheelWizard.Views.Popups.Generic;
 using Button = WheelWizard.Views.Components.Button;
@@ -273,13 +274,15 @@ public static class DolphinLaunchHelper
                     {
                         // The bundled `dolphin-emu-wrapper` changes XDG_CONFIG_HOME and XDG_DATA_HOME to these folders.
                         // We need to ensure they point to the correct folders before launching Dolphin.
-                        FileHelper.EnsureRelativeSymlink(
+                        new Testably.Abstractions.RealFileSystem().EnsureRelativeSymlink(
                             PathManager.LinuxFlatpakBundledDolphinXdgConfigDir,
                             PathManager.ConfigFolderPath,
-                            createTarget: true);
-                        FileHelper.EnsureRelativeSymlink(
+                            createTarget: true
+                        );
+                        new Testably.Abstractions.RealFileSystem().EnsureRelativeSymlink(
                             PathManager.LinuxFlatpakBundledDolphinXdgDataDir,
-                            PathManager.UserFolderPath);
+                            PathManager.UserFolderPath
+                        );
                     }
                 }
                 startInfo.ArgumentList.Add($"{dolphinLocation} {dolphinLaunchArguments}");
