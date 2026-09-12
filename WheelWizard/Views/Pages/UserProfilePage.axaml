@@ -269,9 +269,7 @@
                     </Carousel.PageTransition>
                     <Carousel.Items>
                         <Border Background="Transparent" BorderThickness="0" Padding="0">
-                            <behavior:VrHistoryGraph HorizontalAlignment="Stretch"
-                                                     VerticalAlignment="Stretch"
-                                                     FriendCode="{Binding CurrentFriendCode}" />
+                            <ContentControl x:Name="HistoryHost" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
                         </Border>
 
                         <Border Background="Transparent" BorderThickness="0">
