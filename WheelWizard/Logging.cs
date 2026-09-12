@@ -1,6 +1,5 @@
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
-using WheelWizard.Services;
 
 namespace WheelWizard;
 
@@ -13,33 +12,12 @@ public static class Logging
     /// Do not call this method multiple times. It is intended to be called once at application startup.
     /// Do not use the static logger instance other than for the application startup.
     /// </remarks>
-    public static void CreateStaticLogger(bool logStartup = true, bool tryReset = true)
+    public static void CreateStaticLogger(string applicationDataDirectory, bool logStartup = true)
     {
         try
         {
-            var logsDirectory = Path.Combine(PathManager.WheelWizardAppdataPath, "logs");
-            try
-            {
-                Directory.CreateDirectory(logsDirectory);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                if (tryReset)
-                {
-                    Console.WriteLine("Resetting the Wheel Wizard directory due to an error");
-                    var resetWasSuccessful = PathManager.TryResetWheelWizardAppdataPath(out var errorMessage);
-                    if (!string.IsNullOrWhiteSpace(errorMessage))
-                        Console.WriteLine($"Error message recorded when the Wheel Wizard directory was reset: {errorMessage}");
-                    if (!resetWasSuccessful)
-                        throw;
-
-                    // Recurse only once
-                    CreateStaticLogger(logStartup: logStartup, tryReset: false);
-                    return;
-                }
-                throw;
-            }
+            var logsDirectory = Path.Combine(applicationDataDirectory, "logs");
+            Directory.CreateDirectory(logsDirectory);
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
@@ -64,10 +42,10 @@ public static class Logging
     /// <summary>
     /// Recreates the static logger instance, flushing any existing loggers first.
     /// </summary>
-    public static void RecreateStaticLogger()
+    public static void RecreateStaticLogger(string applicationDataDirectory)
     {
         Log.CloseAndFlush();
-        CreateStaticLogger(logStartup: false);
+        CreateStaticLogger(applicationDataDirectory, logStartup: false);
     }
 
     /// <summary>

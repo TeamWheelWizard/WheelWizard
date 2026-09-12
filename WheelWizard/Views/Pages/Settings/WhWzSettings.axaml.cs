@@ -544,7 +544,7 @@ public partial class WhWzSettings : UserControlBase
         catch (Exception ex)
         {
             progressWindow.Close();
-            WheelWizard.Logging.RecreateStaticLogger();
+            WheelWizard.Logging.RecreateStaticLogger(ApplicationData.DirectoryPath);
             SetAppDataLocationBusyState(false);
             UpdateAppDataLocationUi();
 
@@ -558,7 +558,7 @@ public partial class WhWzSettings : UserControlBase
 
         progressWindow.Close();
 
-        WheelWizard.Logging.RecreateStaticLogger();
+        WheelWizard.Logging.RecreateStaticLogger(ApplicationData.DirectoryPath);
 
         SetAppDataLocationBusyState(false);
         UpdateAppDataLocationUi();
@@ -597,7 +597,7 @@ public partial class WhWzSettings : UserControlBase
                     moveDetails.DestinationPath,
                     out var revertError
                 );
-                WheelWizard.Logging.RecreateStaticLogger();
+                WheelWizard.Logging.RecreateStaticLogger(ApplicationData.DirectoryPath);
                 UpdateAppDataLocationUi();
 
                 if (!revertSucceeded)

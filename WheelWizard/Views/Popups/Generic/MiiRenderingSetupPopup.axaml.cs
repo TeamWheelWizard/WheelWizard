@@ -1,7 +1,6 @@
 using Avalonia.Interactivity;
 using Microsoft.Extensions.Logging;
 using WheelWizard.MiiRendering.Services;
-using WheelWizard.Services;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Base;
 
@@ -24,7 +23,7 @@ public partial class MiiRenderingSetupPopup : PopupContent
         : base(true, false, true, "Wheel Wizard")
     {
         InitializeComponent();
-        PathTextBlock.Text = PathManager.MiiRenderingResourceFilePath;
+        PathTextBlock.Text = ResourceInstaller.ManagedResourcePath;
         StatusTextBlock.Text = "Download the Mii rendering resource to enable offline 3D Mii rendering.";
         ProgressTextBlock.Text = "Ready to install.";
     }
