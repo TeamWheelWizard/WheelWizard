@@ -21,7 +21,7 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class MiiListPage : UserControlBase
+public partial class MiiListPage : UserControl
 {
     private IPopupFactory Popups { get; }
 

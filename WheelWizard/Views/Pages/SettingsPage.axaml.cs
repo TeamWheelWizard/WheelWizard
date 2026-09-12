@@ -8,7 +8,7 @@ using WheelWizard.Views.Popups;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class SettingsPage : UserControlBase
+public partial class SettingsPage : UserControl
 {
     private IPopupFactory Popups { get; }
 

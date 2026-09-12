@@ -25,7 +25,7 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
+public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 {
     private ICustomCharactersService CustomCharacters { get; }
 

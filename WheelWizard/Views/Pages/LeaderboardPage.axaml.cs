@@ -42,7 +42,7 @@ public sealed record LeaderboardPlayerItem
     public bool IsOpenHost => false;
 }
 
-public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
+public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 {
     private IPopupFactory Popups { get; }
 

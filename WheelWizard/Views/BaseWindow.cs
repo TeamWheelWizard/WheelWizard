@@ -1,11 +1,10 @@
-﻿using Avalonia.Controls;
-using WheelWizard.Shared.DependencyInjection;
+using Avalonia.Controls;
 
 namespace WheelWizard.Views;
 
 public abstract class BaseWindow : Window
 {
-    private static readonly List<WindowLayer> WindowLayers = [];
+    private List<WindowLayer> _windowLayers = [];
 
     private int _disableCount = 0;
     private WindowLayer? _currentLayer;
@@ -15,44 +14,57 @@ public abstract class BaseWindow : Window
 
     protected bool AllowParentInteraction = false;
 
-    public BaseWindow()
+    protected override void OnOpened(EventArgs e)
     {
-        ServiceInjector.InjectServices(App.Services, this);
+        if (Owner is BaseWindow owner)
+            _windowLayers = owner._windowLayers;
+        AddLayer();
+        base.OnOpened(e);
     }
 
-    protected void AddLayer()
+    protected override void OnClosed(EventArgs e)
     {
-        if (!AllowParentInteraction || WindowLayers.Count == 0)
+        RemoveLayer();
+        base.OnClosed(e);
+    }
+
+    private void AddLayer()
+    {
+        if (_currentLayer is not null)
+            return;
+        if (!AllowParentInteraction || _windowLayers.Count == 0)
         {
             _currentLayer = new(this);
-            if (WindowLayers.Count != 0)
-                WindowLayers.Last().SetInteractable(false);
-            WindowLayers.Add(_currentLayer);
+            if (_windowLayers.Count != 0)
+                _windowLayers.Last().SetInteractable(false);
+            _windowLayers.Add(_currentLayer);
 
             return;
         }
 
-        WindowLayers.First().SubsequentWindows.Add(this);
-        _currentLayer = WindowLayers.Last();
+        _windowLayers.Last().SubsequentWindows.Add(this);
+        _currentLayer = _windowLayers.Last();
     }
 
-    protected void RemoveLayer()
+    private void RemoveLayer()
     {
-        if (_currentLayer?.Owner == this)
+        var layer = _currentLayer;
+        _currentLayer = null;
+        if (layer?.Owner == this)
         {
-            WindowLayers.Remove(_currentLayer);
+            _windowLayers.Remove(layer);
 
-            foreach (var bw in _currentLayer.SubsequentWindows)
+            foreach (var bw in layer.SubsequentWindows.ToArray())
             {
                 bw.Close();
             }
 
-            if (WindowLayers.Count != 0)
-                WindowLayers.Last().SetInteractable(true);
+            if (_windowLayers.Count != 0)
+                _windowLayers.Last().SetInteractable(true);
             return;
         }
 
-        _currentLayer?.SubsequentWindows.Remove(this);
+        layer?.SubsequentWindows.Remove(this);
     }
 
     public void SetInteractable(bool value)

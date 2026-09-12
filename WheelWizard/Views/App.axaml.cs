@@ -213,10 +213,7 @@ public class App : Application
                 }
             }
 
-            var layout = new Layout();
-            desktop.MainWindow = layout;
-            desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
-            layout.Show();
+            Services.GetRequiredService<IMainWindowService>().Show(desktop);
 
             var gameDataService = Services.GetRequiredService<IGameLicenseSingletonService>();
             gameDataService.LoadLicense();

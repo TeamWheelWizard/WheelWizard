@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using WheelWizard.Branding;
 using WheelWizard.CustomDistributions;
@@ -5,7 +6,7 @@ using WheelWizard.Shared;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class AppInfo : UserControlBase
+public partial class AppInfo : UserControl
 {
     private ICustomDistributionSingletonService CustomDistributionSingletonService { get; }
 
