@@ -40,14 +40,13 @@ Wheel Wizard was made by [patchzy](https://github.com/patchzyy) and [wanttobeeme
 Feel free to join our community on [Discord](https://discord.gg/vZ7T2wJnsq) for support and discussions! If you see any bugs, this is also the place to be :P
 
 
-<p align="center">
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/home_page.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/rooms_page.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/profile_page.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/mods_browser.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/miieditor_page.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/mii_page.png" alt="Wheel Wizard Logo" width="450"/>
-</p>
+| <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/home_page.png" alt="Wheel Wizard Logo" width="450"/> | <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/rooms_page.png" alt="Wheel Wizard Logo" width="450"/> |
+|--|--|
+| <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/profile_page.png" alt="Wheel Wizard Logo" width="450"/> | <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/mii_page.png" alt="Wheel Wizard Logo" width="450"/> |
+
+| <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/mods_browser.png" alt="Wheel Wizard Logo" width="450"/> |  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/miieditor_page.png" alt="Wheel Wizard Logo" width="450"/> |
+|--|--|
+
 ---
 
 ## Antivirus Warning
