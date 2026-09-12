@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.Collections.Concurrent;
+using System.IO.Abstractions;
 using System.IO.Compression;
 
 namespace WheelWizard.MiiRendering.Services;
@@ -106,12 +107,12 @@ internal sealed class ManagedFflResourceArchive
     public bool IgnoreMipMaps { get; }
     public bool IsHalfFloatLayout { get; }
 
-    public static OperationResult<ManagedFflResourceArchive> Load(string resourcePath)
+    public static OperationResult<ManagedFflResourceArchive> Load(IFileSystem fileSystem, string resourcePath)
     {
         byte[] bytes;
         try
         {
-            bytes = File.ReadAllBytes(resourcePath);
+            bytes = fileSystem.File.ReadAllBytes(resourcePath);
         }
         catch (Exception exception)
         {

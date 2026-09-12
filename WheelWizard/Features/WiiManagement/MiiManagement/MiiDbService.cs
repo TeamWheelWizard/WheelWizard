@@ -1,4 +1,4 @@
-﻿using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
@@ -54,7 +54,7 @@ public interface IMiiDbService
     bool Exists();
 }
 
-public class MiiDbService(IMiiRepositoryService repository) : IMiiDbService
+public class MiiDbService(IMiiRepositoryService repository, TimeProvider timeProvider) : IMiiDbService
 {
     public List<Mii> GetAllMiis()
     {
@@ -147,21 +147,21 @@ public class MiiDbService(IMiiRepositoryService repository) : IMiiDbService
         return result;
     }
 
-    private static readonly object _miiIdLock = new();
-    private static uint _lastCounter;
-    private static uint _sequenceOffset;
+    private readonly object _miiIdLock = new();
+    private uint _lastCounter;
+    private uint _sequenceOffset;
 
     // This took me days to figure out :))))
     // The Mii ID is a 32-bit unsigned integer,
     // where the first 3 bits are used to indicate the type of Mii i think
     // The remaining 29 bits are a counter that increments every 4 seconds from a fixed epoch (January 1, 2006).
     // For our implementation the counter is incremented by a sequence offset to ensure uniqueness even if the function is called multiple times in the same tick.
-    private static byte[] GenerateMiiId(bool isBlue = false)
+    private byte[] GenerateMiiId(bool isBlue = false)
     {
         // Epoch for Wii: January 1, 2006 UTC
         var epoch = new DateTime(2006, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         // Current time in UTC
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         // Compute base tick (4‑second resolution)
         var baseCounter = (uint)((now - epoch).TotalSeconds / 4u);
@@ -199,22 +199,4 @@ public class MiiDbService(IMiiRepositoryService repository) : IMiiDbService
         var emptyBlock = new byte[74];
         return repository.UpdateBlockByClientId(clientId, emptyBlock);
     }
-
-    /* TODO: Find out if we wanna keep this
-    public uint GenerateCustomMiiId()
-    {
-        var rng = randomSystem.Random.Shared;
-
-        // Byte 0: ensure high bit = 1 (so ID ≥ 0x80000000)
-        var b0 = (byte)(rng.Next(0, 0x40) | 0x80);
-
-        // Bytes 1–3: fully random
-        var b1 = (byte)rng.Next(0, 0x100);
-        var b2 = (byte)rng.Next(0, 0x100);
-        var b3 = (byte)rng.Next(0, 0x100);
-
-        // Combine into big‑endian uint:
-        return ((uint)b0 << 24) | ((uint)b1 << 16) | ((uint)b2 << 8) | (uint)b3;
-    }
-    */
 }
