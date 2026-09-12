@@ -79,6 +79,7 @@ public static class SetupExtensions
         services.AddArchives();
         services.AddPatches();
         services.AddMods();
+        services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();
 
         if (applicationData != null)
