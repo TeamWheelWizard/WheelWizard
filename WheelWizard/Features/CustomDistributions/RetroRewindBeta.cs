@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using System.Security.Cryptography;
 using System.Text.Json;
-using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Semver;
 using SharpCompress.Archives;
@@ -11,14 +10,13 @@ using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.IO;
-using WheelWizard.Views.Downloads;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
 
 public class RetroRewindBeta : IDistribution
 {
     private readonly IDownloadService downloads;
+    private readonly IDistributionPrompts _prompts;
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<IDistribution> _logger;
     private readonly ISettingsManager _settingsManager;
@@ -29,11 +27,13 @@ public class RetroRewindBeta : IDistribution
         ILogger<IDistribution> logger,
         ISettingsManager settingsManager,
         IDownloadService downloads,
-        ICustomDistributionPaths paths
+        ICustomDistributionPaths paths,
+        IDistributionPrompts prompts
     )
     {
         _fileSystem = fileSystem;
         this.downloads = downloads;
+        _prompts = prompts;
         _logger = logger;
         _settingsManager = settingsManager;
         _paths = paths;
@@ -44,7 +44,7 @@ public class RetroRewindBeta : IDistribution
     public string XMLFolderName => "riivolution";
     public string XMLFileName => "RRBeta";
 
-    public async Task<OperationResult> InstallAsync(ProgressWindow progressWindow)
+    public async Task<OperationResult> InstallAsync(DistributionOperation operation)
     {
         var tempRootPath = _paths.BetaDownloadFolderPath;
         var tempZipPath = _paths.BetaArchivePath;
@@ -53,28 +53,26 @@ public class RetroRewindBeta : IDistribution
 
         try
         {
-            var removeResult = await RemoveAsync(progressWindow);
+            var removeResult = await RemoveAsync(operation);
             if (removeResult.IsFailure)
                 return removeResult;
 
-            progressWindow.SetExtraText("Downloading test build");
+            operation.Report(new(Message: "Downloading test build"));
             if (_fileSystem.Directory.Exists(tempRootPath))
                 _fileSystem.Directory.Delete(tempRootPath, recursive: true);
             _fileSystem.Directory.CreateDirectory(tempRootPath);
 
-            var downloadedFile = await downloads.DownloadToLocationAsync(
-                Endpoints.RRTestersZipUrl,
-                tempZipPath,
-                progressWindow,
-                useExactPath: true
-            );
+            var download = await downloads.DownloadDistributionAsync(Endpoints.RRTestersZipUrl, tempZipPath, operation, useExactPath: true);
 
-            if (string.IsNullOrWhiteSpace(downloadedFile) || !_fileSystem.File.Exists(downloadedFile))
-                return progressWindow.WasCancellationRequested ? Ok() : Fail("Failed to download the testing build");
+            if (download.IsFailure)
+                return operation.CancellationToken.IsCancellationRequested ? Ok() : download.Error;
+            var downloadedFile = download.Value;
+            if (!_fileSystem.File.Exists(downloadedFile))
+                return Fail("Failed to download the testing build");
 
             while (true)
             {
-                var password = await RequestPasswordAsync();
+                var password = await _prompts.RequestBetaPasswordAsync();
                 if (string.IsNullOrWhiteSpace(password))
                     return Fail("Password was not provided.");
 
@@ -82,21 +80,17 @@ public class RetroRewindBeta : IDistribution
                     _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
                 _fileSystem.Directory.CreateDirectory(tempExtractionPath);
 
-                progressWindow.SetExtraText(t("state.extracting"));
+                operation.Report(new(Message: t("state.extracting")));
                 var badPassword = false;
                 var extractResult = await Task.Run(
-                    () => ExtractZipFile(downloadedFile, tempExtractionPath, progressWindow, password, out badPassword)
+                    () => ExtractZipFile(downloadedFile, tempExtractionPath, operation, password, out badPassword)
                 );
                 if (extractResult.IsSuccess)
                     break;
 
                 if (badPassword)
                 {
-                    var retry = await new YesNoWindow()
-                        .SetMainText("Incorrect password")
-                        .SetExtraText("Do you want to try again?")
-                        .SetButtonText("Retry", "Cancel")
-                        .AwaitAnswer();
+                    var retry = await _prompts.ConfirmPasswordRetryAsync();
                     if (retry)
                         continue;
                     return Fail("Incorrect password.");
@@ -135,9 +129,9 @@ public class RetroRewindBeta : IDistribution
         return result;
     }
 
-    public Task<OperationResult> UpdateAsync(ProgressWindow progressWindow) => InstallAsync(progressWindow);
+    public Task<OperationResult> UpdateAsync(DistributionOperation operation) => InstallAsync(operation);
 
-    public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
+    public Task<OperationResult> RemoveAsync(DistributionOperation operation)
     {
         var rootPath = _paths.RootFolderPath;
 
@@ -162,13 +156,13 @@ public class RetroRewindBeta : IDistribution
         return Task.FromResult(Ok());
     }
 
-    public async Task<OperationResult> ReinstallAsync(ProgressWindow progressWindow)
+    public async Task<OperationResult> ReinstallAsync(DistributionOperation operation)
     {
-        var removeResult = await RemoveAsync(progressWindow);
+        var removeResult = await RemoveAsync(operation);
         if (removeResult.IsFailure)
             return removeResult;
 
-        return await InstallAsync(progressWindow);
+        return await InstallAsync(operation);
     }
 
     public Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync()
@@ -183,19 +177,10 @@ public class RetroRewindBeta : IDistribution
 
     public SemVersion? GetCurrentVersion() => null;
 
-    private async Task<string?> RequestPasswordAsync()
-    {
-        return await new TextInputWindow()
-            .SetMainText("Please enter Password")
-            .SetPlaceholderText("Password")
-            .SetButtonText("Cancel", "Submit")
-            .ShowDialog();
-    }
-
     private OperationResult ExtractZipFile(
         string zipPath,
         string destinationDirectory,
-        ProgressWindow progressWindow,
+        DistributionOperation operation,
         string password,
         out bool badPassword
     )
@@ -209,10 +194,7 @@ public class RetroRewindBeta : IDistribution
             if (entries.Count == 0)
                 return Ok();
 
-            Dispatcher.UIThread.Post(() =>
-            {
-                progressWindow.SetExtraText(t("state.extracting")).SetGoal($"Extracting {entries.Count} files");
-            });
+            operation.Report(new(Message: t("state.extracting"), Goal: $"Extracting {entries.Count} files"));
 
             for (var i = 0; i < entries.Count; i++)
             {
@@ -233,14 +215,11 @@ public class RetroRewindBeta : IDistribution
                     _fileSystem.Directory.CreateDirectory(destinationDir);
 
                 using var entryStream = entry.OpenEntryStream();
-                using var outputStream = File.Create(destinationPath);
+                using var outputStream = _fileSystem.File.Create(destinationPath);
                 entryStream.CopyTo(outputStream);
 
                 var percent = (int)(((i + 1) / (double)entries.Count) * 100);
-                Dispatcher.UIThread.Post(() =>
-                {
-                    progressWindow.UpdateProgress(percent);
-                });
+                operation.Report(new(Percent: percent));
             }
 
             return Ok();

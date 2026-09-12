@@ -7,6 +7,7 @@ using WheelWizard.Mods;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Processes;
+using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WiiManagement.Controllers;
 

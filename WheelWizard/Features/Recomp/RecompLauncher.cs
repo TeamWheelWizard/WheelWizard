@@ -4,6 +4,7 @@ using WheelWizard.Mods;
 using WheelWizard.Recomp.Domain;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Recomp;
