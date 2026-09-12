@@ -7,7 +7,6 @@ using Serilog;
 using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;

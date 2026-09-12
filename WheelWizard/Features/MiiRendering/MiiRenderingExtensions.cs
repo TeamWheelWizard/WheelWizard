@@ -3,7 +3,6 @@ using Refit;
 using WheelWizard.MiiRendering.Configuration;
 using WheelWizard.MiiRendering.Domain;
 using WheelWizard.MiiRendering.Services;
-using WheelWizard.Services;
 
 namespace WheelWizard.MiiRendering;
 
@@ -15,7 +14,7 @@ public static class MiiRenderingExtensions
             .AddRefitClient<IMiiRenderingAssetApi>()
             .ConfigureHttpClient(client =>
             {
-                client.BaseAddress = new Uri(Endpoints.InternetArchiveBaseAddress);
+                client.BaseAddress = new Uri(MiiRenderingEndpoints.ArchiveBaseUrl);
                 client.DefaultRequestHeaders.UserAgent.Clear();
                 client.DefaultRequestHeaders.UserAgent.ParseAdd(
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"

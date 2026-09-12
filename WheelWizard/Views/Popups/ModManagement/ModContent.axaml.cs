@@ -3,7 +3,6 @@ using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
 using WheelWizard.Mods;
-using WheelWizard.Services;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.MessageTranslations;
