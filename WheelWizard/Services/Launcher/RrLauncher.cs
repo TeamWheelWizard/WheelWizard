@@ -1,10 +1,12 @@
+using System.IO.Abstractions;
 using WheelWizard.CustomDistributions;
-using WheelWizard.Helpers;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Launching;
 using WheelWizard.Models.Enums;
 using WheelWizard.Mods;
-using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WiiManagement.Controllers;
 
@@ -14,7 +16,15 @@ public class RrLauncher : ILauncher
 {
     private readonly IDolphinLaunchService _dolphinLaunchService;
     public string GameTitle { get; } = "Retro Rewind";
-    private static string RrLaunchJsonFilePath => PathManager.RrLaunchJsonFilePath;
+    private string RrLaunchJsonFilePath => _distributionPaths.LaunchJsonFilePath;
+    private readonly IFileSystem _fileSystem;
+    private readonly IDolphinPaths _dolphinPaths;
+    private readonly ICustomDistributionPaths _distributionPaths;
+    private readonly IRetroRewindLaunchDescriptor _descriptor;
+    private readonly IRuntimeEnvironment _environment;
+
+    private string QuotePath(string path) => ShellQuoting.QuoteArgument(path, _environment.IsWindows);
+
     private readonly ICustomDistributionSingletonService _customDistributionSingletonService;
     private readonly IModsLaunchService _modsLaunchService;
     private readonly ISettingsManager _settingsManager;
@@ -25,7 +35,12 @@ public class RrLauncher : ILauncher
         IModsLaunchService modsLaunchService,
         ISettingsManager settingsManager,
         IWiiRemoteConfigurationService wiiRemoteConfiguration,
-        IDolphinLaunchService dolphinLaunchService
+        IDolphinLaunchService dolphinLaunchService,
+        IFileSystem fileSystem,
+        IDolphinPaths dolphinPaths,
+        ICustomDistributionPaths distributionPaths,
+        IRetroRewindLaunchDescriptor descriptor,
+        IRuntimeEnvironment environment
     )
     {
         _customDistributionSingletonService = customDistributionSingletonService;
@@ -33,6 +48,11 @@ public class RrLauncher : ILauncher
         _settingsManager = settingsManager;
         _wiiRemoteConfiguration = wiiRemoteConfiguration;
         _dolphinLaunchService = dolphinLaunchService;
+        _fileSystem = fileSystem;
+        _dolphinPaths = dolphinPaths;
+        _distributionPaths = distributionPaths;
+        _descriptor = descriptor;
+        _environment = environment;
     }
 
     public async Task<OperationResult> Launch()
@@ -40,7 +60,7 @@ public class RrLauncher : ILauncher
         try
         {
             //case SHOULD be impossible since launch button should be disabled
-            if (!File.Exists(PathManager.GameFilePath))
+            if (!_fileSystem.File.Exists(_settingsManager.Get<string>(_settingsManager.GAME_LOCATION)))
                 return Fail(t("message_warning.not_find_game.extra"));
 
             // Check first so a blocked launch does not kill Dolphin or prepare patches.
@@ -50,8 +70,8 @@ public class RrLauncher : ILauncher
 
             _dolphinLaunchService.KillDolphin();
             if (_settingsManager.Get<bool>(_settingsManager.FORCE_WIIMOTE))
-                _wiiRemoteConfiguration.SetVirtualRemoteEnabled(PathManager.ConfigFolderPath, false);
-            var targetFolderPath = PathManager.PatchesFolderPath;
+                _wiiRemoteConfiguration.SetVirtualRemoteEnabled(_dolphinPaths.ConfigFolderPath, false);
+            var targetFolderPath = _distributionPaths.PatchesFolderPath;
             var clearTargetFolder = false;
             if (_modsLaunchService.ShouldAskToClearTargetFolder(targetFolderPath))
             {
@@ -66,10 +86,10 @@ public class RrLauncher : ILauncher
             if (modsLaunchResult.IsFailure)
                 return modsLaunchResult.Error;
 
-            RetroRewindLaunchHelper.GenerateLaunchJson();
+            _descriptor.GenerateLaunchJson();
             var dolphinLaunchType = _settingsManager.Get<bool>(_settingsManager.LAUNCH_WITH_DOLPHIN) ? "" : "-b";
             var dolphinLaunchResult = await _dolphinLaunchService.LaunchDolphin(
-                $"{dolphinLaunchType} -e {EnvHelper.QuotePath(Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False",
+                $"{dolphinLaunchType} -e {QuotePath(_fileSystem.Path.GetFullPath(RrLaunchJsonFilePath))} --config=Dolphin.Core.EnableCheats=False --config=Achievements.Achievements.Enabled=False",
                 versionPreflightResult: preflightResult
             );
             if (dolphinLaunchResult.IsFailure)

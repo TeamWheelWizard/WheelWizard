@@ -1,6 +1,10 @@
-using WheelWizard.Helpers;
+using System.IO.Abstractions;
+using WheelWizard.ApplicationData;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Services;
 using WheelWizard.Shared.Downloads;
+using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Downloads;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WiiManagement.Controllers;
@@ -10,10 +14,14 @@ namespace WheelWizard.Launching;
 public sealed class MiiChannelLauncher(
     IDownloadService downloads,
     IWiiRemoteConfigurationService wiiRemoteConfiguration,
-    IDolphinLaunchService dolphinLaunchService
+    IDolphinLaunchService dolphinLaunchService,
+    IApplicationDataLocation applicationData,
+    IDolphinPaths dolphinPaths,
+    IFileSystem fileSystem,
+    IRuntimeEnvironment environment
 )
 {
-    private static string MiiChannelPath => Path.Combine(PathManager.WheelWizardAppdataPath, "MiiChannel.wad");
+    private string MiiChannelPath => fileSystem.Path.Combine(applicationData.DirectoryPath, "MiiChannel.wad");
 
     public async Task LaunchMiiChannel()
     {
@@ -22,9 +30,8 @@ public sealed class MiiChannelLauncher(
         if (preflightResult.IsFailure)
             return;
 
-        wiiRemoteConfiguration.SetVirtualRemoteEnabled(PathManager.ConfigFolderPath, true);
-        var miiChannelExists = File.Exists(MiiChannelPath);
-        ;
+        wiiRemoteConfiguration.SetVirtualRemoteEnabled(dolphinPaths.ConfigFolderPath, true);
+        var miiChannelExists = fileSystem.File.Exists(MiiChannelPath);
 
         if (!miiChannelExists)
         {
@@ -40,15 +47,13 @@ public sealed class MiiChannelLauncher(
                     MiiChannelPath,
                     "Downloading MiiChannel"
                 );
-                //we wait to make sure the file is written to disk
-                await Task.Delay(200);
-                miiChannelExists = !string.IsNullOrWhiteSpace(downloadedFilePath) && File.Exists(MiiChannelPath);
+                miiChannelExists = !string.IsNullOrWhiteSpace(downloadedFilePath) && fileSystem.File.Exists(MiiChannelPath);
             }
         }
 
         if (miiChannelExists)
             await dolphinLaunchService.LaunchDolphin(
-                $"-b {EnvHelper.QuotePath(Path.GetFullPath(MiiChannelPath))}",
+                $"-b {ShellQuoting.QuoteArgument(fileSystem.Path.GetFullPath(MiiChannelPath), environment.IsWindows)}",
                 versionPreflightResult: preflightResult
             );
     }
