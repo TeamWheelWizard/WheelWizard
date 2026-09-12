@@ -130,7 +130,9 @@ public static partial class PathManager
     public static string RecompPortableMarkerFilePath => Path.Combine(RecompFolderPath, "portable.txt");
 
     /// <summary>The recomp runtime's private NAND, used when no Dolphin NAND is linked.</summary>
-    public static string RecompPrivateNandFolderPath => Path.Combine(RecompUserDataFolderPath, "NAND");
+    public static string RecompPrivateNandFolderPath => RecompPlatform.IsLinux
+        ? Path.Combine(RecompLinuxBackendFolderPath, "NAND")
+        : Path.Combine(RecompUserDataFolderPath, "NAND");
 
     public static string GetWiiDbFolderPath(string nandFolderPath) => Path.Combine(nandFolderPath, "shared2", "menu", "FaceLib");
 
