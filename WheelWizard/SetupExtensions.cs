@@ -38,6 +38,9 @@ public static class SetupExtensions
     {
         // Features
         services.AddDolphinInstaller();
+        services.AddSingleton<WheelWizard.Shared.Processes.IProcessLauncher, WheelWizard.Shared.Processes.ProcessLauncher>();
+        services.AddSingleton<WheelWizard.Launching.IDolphinLaunchService, WheelWizard.Launching.DolphinLaunchService>();
+        services.AddSingleton<WheelWizard.Launching.IDolphinLaunchPresentation, WheelWizard.Views.Launching.DolphinLaunchPresentation>();
         services.AddDownloads();
         services.AddTransient<WheelWizard.Launching.MiiChannelLauncher>();
         services.AddLocalization();
