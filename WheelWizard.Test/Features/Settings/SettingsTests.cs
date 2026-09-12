@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Testably.Abstractions;
 using Testably.Abstractions.Testing;
+using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Localization;
@@ -118,7 +119,7 @@ public class SettingsManagerTests
         manager.LoadSettings();
         manager.LoadSettings();
 
-        whWzManager.Received(1).LoadSettings(PathManager.WheelWizardConfigFilePath);
+        whWzManager.Received(1).LoadSettings(Path.Combine(SettingsTestUtils.CreateApplicationDataLocation().DirectoryPath, "config.json"));
         dolphinManager.Received(1).LoadSettings(Path.Combine("", "Config"));
         recompManager.Received(1).LoadSettings(PathManager.RecompConfigFilePath);
     }
@@ -129,7 +130,7 @@ public class SettingsManagerTests
         var fs = new MockFileSystem();
         var userFolder = fs.Path.GetFullPath("/owned-dolphin-user");
         fs.Directory.CreateDirectory(userFolder);
-        var configPath = PathManager.WheelWizardConfigFilePath;
+        var configPath = fs.Path.Combine(SettingsTestUtils.CreateApplicationDataLocation().DirectoryPath, "config.json");
         fs.Directory.CreateDirectory(fs.Path.GetDirectoryName(configPath)!);
         fs.File.WriteAllText(configPath, System.Text.Json.JsonSerializer.Serialize(new { UserFolderPath = userFolder }));
         var dolphinManager = Substitute.For<IDolphinSettingManager>();
@@ -139,7 +140,8 @@ public class SettingsManagerTests
             Substitute.For<IRecompSettingManager>(),
             fs,
             SettingsTestUtils.CreateSettingsSignalBus(),
-            new DolphinPathResolver(fs, new RuntimeEnvironment())
+            new DolphinPathResolver(fs, new RuntimeEnvironment()),
+            SettingsTestUtils.CreateApplicationDataLocation()
         );
 
         manager.LoadSettings();
@@ -164,7 +166,8 @@ public class SettingsManagerTests
             recompSettingManager,
             fileSystem,
             SettingsTestUtils.CreateSettingsSignalBus(),
-            new DolphinPathResolver(fileSystem, new RuntimeEnvironment())
+            new DolphinPathResolver(fileSystem, new RuntimeEnvironment()),
+            SettingsTestUtils.CreateApplicationDataLocation()
         );
     }
 }
@@ -391,6 +394,13 @@ public class SettingsStartupInitializerTests
 
 internal static class SettingsTestUtils
 {
+    public static IApplicationDataLocation CreateApplicationDataLocation()
+    {
+        var location = Substitute.For<IApplicationDataLocation>();
+        location.DirectoryPath.Returns(Path.GetFullPath("/settings-test-data"));
+        return location;
+    }
+
     public static ISettingsManager InitializeSettingsRuntime(string userFolderPath, string dolphinLocation = "dolphin-emu")
     {
         var settings = CreateRuntimeSettingsStub(userFolderPath, dolphinLocation);

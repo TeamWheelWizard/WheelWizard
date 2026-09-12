@@ -65,6 +65,7 @@ public sealed class SettingsSignalOwnershipTests
             Substitute.For<IRecompSettingManager>(),
             new MockFileSystem(),
             bus,
-            new DolphinPathResolver(new MockFileSystem(), new RuntimeEnvironment())
+            new DolphinPathResolver(new MockFileSystem(), new RuntimeEnvironment()),
+            SettingsTestUtils.CreateApplicationDataLocation()
         );
 }
