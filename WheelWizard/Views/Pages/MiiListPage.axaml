@@ -106,7 +106,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <behaviorComponent:MiiBlock Width="90" Height="90" Margin="8,10"
-                                                                Mii="{Binding Mii}"
+                                                                Mii="{Binding Mii}" IsGlobal="{Binding IsGlobal}"
                                                                 GroupName="{Binding SelectionGroup}"
                                                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                                                 Click="MiiBlock_OnClick">

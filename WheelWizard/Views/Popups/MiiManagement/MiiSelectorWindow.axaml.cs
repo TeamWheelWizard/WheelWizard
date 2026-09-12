@@ -33,9 +33,10 @@ public partial class MiiSelectorWindow : PopupContent
         return this;
     }
 
-    public MiiSelectorWindow SetMiiOptions(List<Mii> miis, int selectedIndex) => SetMiiOptions(miis, miis[selectedIndex]);
+    public MiiSelectorWindow SetMiiOptions(List<Mii> miis, int selectedIndex, string localMacAddress) =>
+        SetMiiOptions(miis, miis[selectedIndex], localMacAddress);
 
-    public MiiSelectorWindow SetMiiOptions(List<Mii> miis, Mii? selected)
+    public MiiSelectorWindow SetMiiOptions(List<Mii> miis, Mii? selected, string localMacAddress)
     {
         MiiList.Children.Clear();
         foreach (var mii in miis.OrderByDescending(m => m.IsFavorite))
@@ -43,6 +44,7 @@ public partial class MiiSelectorWindow : PopupContent
             var miiBlock = new MiiBlock
             {
                 Mii = mii,
+                IsGlobal = mii.IsGlobal(localMacAddress),
                 Width = 90,
                 Height = 90,
                 Margin = new(8, 10),

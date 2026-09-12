@@ -327,7 +327,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        var selectedMii = await new MiiSelectorWindow().SetMiiOptions(availableMiis, CurrentMii).AwaitAnswer();
+        var selectedMii = await new MiiSelectorWindow()
+            .SetMiiOptions(availableMiis, CurrentMii, SettingsService.Get<string>(SettingsService.MACADDRESS))
+            .AwaitAnswer();
 
         if (selectedMii == null)
             return;

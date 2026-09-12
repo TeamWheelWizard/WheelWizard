@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.IO.Abstractions;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Testably.Abstractions;
 using Testably.Abstractions.Testing;
@@ -79,9 +78,6 @@ public class SettingsManagerTests
     public void ValidateCorePathSettings_ReturnsAllExpectedIssues_WhenDefaultsAreInvalid()
     {
         var manager = CreateManager(new RealFileSystem(), out _, out _, out _);
-#pragma warning disable CS0618
-        SettingsRuntime.Initialize(manager);
-#pragma warning restore CS0618
 
         var result = manager.ValidateCorePathSettings();
 
@@ -102,9 +98,6 @@ public class SettingsManagerTests
         var dolphinLocation = SettingsTestUtils.GetValidDolphinLocation(fileSystem);
         fileSystem.Directory.CreateDirectory(userFolderPath);
         fileSystem.File.WriteAllText(gameFilePath, "iso");
-#pragma warning disable CS0618
-        SettingsRuntime.Initialize(manager);
-#pragma warning restore CS0618
 
         Assert.True(manager.Set(manager.USER_FOLDER_PATH, userFolderPath, skipSave: true));
         Assert.True(manager.Set(manager.GAME_LOCATION, gameFilePath, skipSave: true));
@@ -365,7 +358,7 @@ public class SettingsLocalizationServiceTests
 public class SettingsStartupInitializerTests
 {
     [Fact]
-    public void Initialize_LoadsSettings_InitializesLocalization_AndSetsRuntimes()
+    public void Initialize_LoadsSettings_AndInitializesLocalization()
     {
         var settingsManager = Substitute.For<ISettingsManager>();
         var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
@@ -378,9 +371,6 @@ public class SettingsStartupInitializerTests
 
         settingsManager.Received(1).LoadSettings();
         localizationService.Received(1).Initialize();
-#pragma warning disable CS0618
-        Assert.Same(settingsManager, SettingsRuntime.Current);
-#pragma warning restore CS0618
     }
 
     [Fact]
@@ -417,26 +407,10 @@ internal static class SettingsTestUtils
         return location;
     }
 
-    public static ISettingsManager InitializeSettingsRuntime(string userFolderPath, string dolphinLocation = "dolphin-emu")
-    {
-        var settings = CreateSettingsStub(userFolderPath, dolphinLocation);
-#pragma warning disable CS0618
-        SettingsRuntime.Initialize(settings);
-#pragma warning restore CS0618
-        return settings;
-    }
-
     public static ISettingsSignalBus CreateSettingsSignalBus()
     {
         var logger = Substitute.For<ILogger<SettingsSignalBus>>();
         return new SettingsSignalBus(logger);
-    }
-
-    public static void ResetSettingsRuntime()
-    {
-#pragma warning disable CS0618
-        SetPrivateStaticFieldValue(typeof(SettingsRuntime), "_current", null);
-#pragma warning restore CS0618
     }
 
     public static string GetValidDolphinLocation(IFileSystem fileSystem)
@@ -470,13 +444,5 @@ internal static class SettingsTestUtils
             .Returns(_ => (string)dolphinLocationSetting.Get());
 
         return settings;
-    }
-
-    private static void SetPrivateStaticFieldValue(Type targetType, string fieldName, object? value)
-    {
-        var field =
-            targetType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static)
-            ?? throw new InvalidOperationException($"{targetType.Name}.{fieldName} field was not found.");
-        field.SetValue(null, value);
     }
 }

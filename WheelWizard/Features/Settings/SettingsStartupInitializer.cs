@@ -10,7 +10,6 @@ public sealed class SettingsStartupInitializer(
 {
     public void Initialize()
     {
-        SettingsRuntime.Initialize(settingsManager);
         settingsManager.LoadSettings();
         localizationService.Initialize();
 
