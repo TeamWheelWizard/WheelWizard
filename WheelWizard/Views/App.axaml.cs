@@ -30,7 +30,7 @@ public class App : Application
     /// Gets the service provider configured for this application.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown if the application is not initialized yet.</exception>
-    public static IServiceProvider Services =>
+    private static IServiceProvider Services =>
         (Current as App)?._serviceProvider ?? throw new InvalidOperationException("The application is not initialized yet.");
 
     private IServiceProvider? _serviceProvider;

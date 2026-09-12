@@ -77,7 +77,7 @@
                                                     Vr="{Binding Vr}"
                                                     Br="{Binding Br}"
                                                     Mii="{Binding Mii}"
-                                                    HasBadges="{Binding HasBadges}"
+                                                    HasBadges="{Binding HasBadges}" BadgeVariants="{Binding BadgeVariants}"
                                                     IsOnline="{Binding IsOnline}"
                                                     IsPending="{Binding IsPending}"
                                                     TotalLosses="{Binding Losses}"
