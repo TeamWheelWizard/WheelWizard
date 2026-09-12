@@ -3,7 +3,7 @@ using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using WheelWizard.Features.Archives;
 using WheelWizard.Models.Mods;
-using WheelWizard.Services;
+using WheelWizard.Mods;
 using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
@@ -29,14 +29,16 @@ public interface IModPatchConversionService
 public sealed class ModPatchConversionService(
     ISzsPatchConverter szsPatchConverter,
     ILogger<ModPatchConversionService> logger,
-    IFileSystem fileSystem
+    IFileSystem fileSystem,
+    IModPaths paths,
+    IGameBaselineStore baselineStore
 ) : IModPatchConversionService
 {
     public bool HasIncompatibleSzsFiles(Mod mod) => GetConvertibleArchiveFiles(mod).Any();
 
     public IReadOnlyList<string> GetConvertibleArchiveFiles(Mod mod)
     {
-        var modDirectory = PathManager.GetModDirectoryPath(mod.Title);
+        var modDirectory = paths.GetModDirectoryPath(mod.Title);
         if (!Directory.Exists(modDirectory))
             return [];
 
@@ -50,7 +52,7 @@ public sealed class ModPatchConversionService(
 
     public async Task<OperationResult<ModPatchConversionResult>> ConvertToPatchesAsync(Mod mod, CancellationToken cancellationToken)
     {
-        var sourceDirectory = PathManager.GetModDirectoryPath(mod.Title);
+        var sourceDirectory = paths.GetModDirectoryPath(mod.Title);
         if (!Directory.Exists(sourceDirectory))
             return Fail(t("message_error.no_mod_folder.extra"));
 
@@ -231,12 +233,12 @@ public sealed class ModPatchConversionService(
     private BaselineEntry? SelectBaseline(string fileName, byte[] moddedBytes)
     {
         var kind = IsBrsarFileName(fileName) ? "brsar" : "szs";
-        var candidates = GameBaselineStore.Instance.FindCandidates(fileName, kind);
+        var candidates = baselineStore.FindCandidates(fileName, kind);
         if (candidates.Count == 0)
             return null;
 
         return candidates
-            .Select(candidate => new { Candidate = candidate, Entry = GameBaselineStore.Instance.GetEntry(candidate.Id) })
+            .Select(candidate => new { Candidate = candidate, Entry = baselineStore.GetEntry(candidate.Id) })
             .Where(item => item.Entry != null)
             .Select(item => new
             {

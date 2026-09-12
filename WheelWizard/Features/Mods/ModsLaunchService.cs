@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using Avalonia.Threading;
 using WheelWizard.Models.Mods;
-using WheelWizard.Services;
 using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
@@ -14,9 +13,9 @@ public interface IModsLaunchService
     Task<OperationResult> PrepareModsForLaunch(string targetFolderPath, bool clearTargetFolderWhenNoEnabledMods = false);
 }
 
-public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSystem) : IModsLaunchService
+public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSystem, IModPaths paths) : IModsLaunchService
 {
-    private static readonly string ModsFolderPath = PathManager.ModsFolderPath;
+    private string ModsFolderPath => paths.RootFolderPath;
 
     public async Task<OperationResult> PrepareModsForLaunch(string targetFolderPath, bool clearTargetFolderWhenNoEnabledMods = false)
     {
@@ -126,7 +125,7 @@ public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSy
         }
     }
 
-    private static bool ShouldCopyFile(Mod mod, string filePath)
+    private bool ShouldCopyFile(Mod mod, string filePath)
     {
         var modMetadataFile = Path.Combine(ModsFolderPath, mod.Title, $"{mod.Title}.ini");
         if (Path.GetFullPath(filePath).Equals(Path.GetFullPath(modMetadataFile), StringComparison.OrdinalIgnoreCase))
