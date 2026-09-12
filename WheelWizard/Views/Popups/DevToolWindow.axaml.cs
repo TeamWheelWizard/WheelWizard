@@ -4,7 +4,6 @@ using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.Launching;
 using WheelWizard.RrRooms;
 using WheelWizard.Shared;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Components;
@@ -17,21 +16,26 @@ namespace WheelWizard.Views.Popups;
 
 public partial class DevToolWindow : PopupContent, IPollingListener
 {
-    [Inject]
-    private DevelopmentRefreshService DevelopmentRefresh { get; set; } = null!;
+    private IMemoryCache Cache { get; }
 
-    [Inject]
-    private LiveRoomsService LiveRooms { get; set; } = null!;
+    private IDolphinLaunchService DolphinLaunchService { get; }
 
-    [Inject]
-    private IDolphinLaunchService DolphinLaunchService { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private IMemoryCache Cache { get; set; } = null!;
+    private DevelopmentRefreshService DevelopmentRefresh { get; }
 
-    public DevToolWindow()
+    public DevToolWindow(
+        IMemoryCache cache,
+        IDolphinLaunchService dolphinLaunchService,
+        LiveRoomsService liveRooms,
+        DevelopmentRefreshService developmentRefresh
+    )
         : base(true, true, true, "Dev Tool")
     {
+        Cache = cache;
+        DolphinLaunchService = dolphinLaunchService;
+        LiveRooms = liveRooms;
+        DevelopmentRefresh = developmentRefresh;
         InitializeComponent();
         DevelopmentRefresh.Subscribe(this);
         LoadSettings();

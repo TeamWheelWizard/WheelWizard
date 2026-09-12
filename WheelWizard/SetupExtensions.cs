@@ -92,6 +92,8 @@ public static class SetupExtensions
         });
         services.AddSingleton<WheelWizard.Views.Navigation.IPageFactory, WheelWizard.Views.Navigation.PageFactory>();
         services.AddSingleton<WheelWizard.Views.Navigation.INavigationService, WheelWizard.Views.Navigation.NavigationService>();
+        services.AddSingleton<WheelWizard.Views.Popups.IPopupFactory, WheelWizard.Views.Popups.PopupFactory>();
+        services.AddTransient<WheelWizard.Views.Popups.ModManagement.ModContent>();
         services.AddMods();
         services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();
