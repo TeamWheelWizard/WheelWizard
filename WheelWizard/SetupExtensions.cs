@@ -80,6 +80,7 @@ public static class SetupExtensions
         services.AddCustomDistributionService();
         services.AddArchives();
         services.AddPatches();
+        services.AddSingleton<WheelWizard.Recomp.IRecompPresentation, WheelWizard.Views.Recomp.RecompPresentation>();
         services.AddMods();
         services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();
