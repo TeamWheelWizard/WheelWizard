@@ -30,6 +30,10 @@ de:
     time_online: "Zeit online"
     message: "Nachricht"
     is_online: "Ist Online"
+    vr_history: "R-Punkte Verlauf"
+    start_vr: "R-Punkte zu Beginn"
+    end_vr: "R-Punkte am Ende"
+    net_change: "Nettoveränderung"
     mii:
       gender_male: "Weiblich"
       gender: "Geschlecht"
@@ -64,8 +68,10 @@ de:
     status: "Status"
     priority: "Priorität"
     sort_by: "Sortieren nach"
+    match: "Match"
+    enable_matches: "Matches"
     total_games_won: "Gesamte gewonnene Spiele"
-    total_games_played: "Gesamte verlorene Spiele"
+    total_games_played: "Gesamte gespielte Spiele"
     vr_abbreviation: "R-Punkte"
     br_abbreviation: "W-Punkte"
     br_full: "Wettkampf-Punkte"
@@ -219,6 +225,9 @@ de:
     no_miis: "Die Mii-Daten können nicht von deinem System geladen werden. Stelle sicher, dass du dein Spiel mindestens einmal gestartet hast."
     no_mod_selected_title: "Keine Mod ausgewählt."
     no_mod_selected: "Wähle eine Mod aus der Liste, um mehr Details zu sehen."
+    no_vr_history_title: "Kein R-Punkte Verlauf"
+    no_vr_history: "Ein Freundescode wird benötigt, um den R-Punkte Verlauf zu laden."
+    no_vr_history_range: "Noch kein R-Punkte Verlauf für diese Zeitspanne."
   time:
     days:
       1: "1 Tag"
@@ -232,6 +241,13 @@ de:
     seconds:
       1: "1 Sekunde"
       n: "{$1} Sekunden"
+    last_24_hours: "Letzte 24 Stunden"
+    last_7_days: "Letzte 7 Tage"
+    last_30_days: "Letzte 30 Tage"
+    last_60_days: "Letzte 60 Tage"
+    lifetime: "Insgesamt"
+    lifetime_history: "Gesamter Verlauf"
+    past_n_days_with_range: "Vergangene {$1} Tage ({$2} bis {$3})"
   progress:
     estimated_time_remaining: "Geschätzte verbleibende Zeit:"
     downloading_mb: "Herunterladen mit {$1} MB"
@@ -438,6 +454,7 @@ de:
     mod_download_fail:
       title: "Mod Download ist fehlgeschlagen."
       extra: "Während dem Download ist ein Fehler aufgetreten: {$1}"
+    failed_vr_history: "Konnte R-Punkte Verlauf nicht laden."
   message_success:
     settings_saved:
       title: "Einstellungen erfolgreich gespeichert!"
