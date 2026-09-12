@@ -35,9 +35,9 @@ de:
     end_vr: "R-Punkte am Ende"
     net_change: "Nettoveränderung"
     mii:
-      gender_male: "Weiblich"
+      gender_male: "Männlich"
       gender: "Geschlecht"
-      gender_female: "Männlich"
+      gender_female: "Weiblich"
       vertical_position: "Vertikale Position (hoch/runter)"
       size: "Größe"
       nose_type: "Nasenform"
@@ -597,6 +597,7 @@ de:
     recomp_not_installed: "WiiCompiled noch nicht installiert. Installiere es zuerst von der Startseite."
     recomp_uninstalled: "WiiCompiled wurde deinstalliert."
     data_folder:
+      default: "Standard-Speicherort wird verwendet."
       custom: "Verwendet benutzerdefinierten Speicherort"
       moving: "Dateien werden verschoben, bitte warten..."
   value:
