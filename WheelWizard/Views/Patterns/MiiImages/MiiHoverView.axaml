@@ -3,11 +3,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
-             x:Class="WheelWizard.Views.Patterns.MiiImageLoaderWithHover"
+             x:Class="WheelWizard.Views.Patterns.MiiHoverView"
              xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:conv="clr-namespace:WheelWizard.Views.Converters"
-             x:DataType="behaviorComp:MiiImageLoaderWithHover" x:Name="Self"
+             x:DataType="behaviorComp:MiiHoverView" x:Name="Self"
              VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
     <components:AspectGrid x:Name="MiiImageContainer" ClipToBounds="True" ColumnDefinitions="*,3*,*"
                              RowDefinitions="*,3*,*"

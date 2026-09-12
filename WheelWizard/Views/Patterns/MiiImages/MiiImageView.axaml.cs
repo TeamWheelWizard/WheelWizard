@@ -4,19 +4,17 @@ using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.Shared.Calendar;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
 
-public partial class MiiImageLoader : BaseMiiImage
+public partial class MiiImageView : BaseMiiImage
 {
-    [Inject]
-    private ISeasonalCalendar Calendar { get; set; } = null!;
+    private readonly ISeasonalCalendar Calendar;
 
     #region properties
 
-    public static readonly StyledProperty<bool> LowQualitySpeedupProperty = AvaloniaProperty.Register<MiiImageLoader, bool>(
+    public static readonly StyledProperty<bool> LowQualitySpeedupProperty = AvaloniaProperty.Register<MiiImageView, bool>(
         nameof(LowQualitySpeedup)
     );
 
@@ -26,7 +24,7 @@ public partial class MiiImageLoader : BaseMiiImage
         set => SetValue(LowQualitySpeedupProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush> LoadingColorProperty = AvaloniaProperty.Register<MiiImageLoader, IBrush>(
+    public static readonly StyledProperty<IBrush> LoadingColorProperty = AvaloniaProperty.Register<MiiImageView, IBrush>(
         nameof(LoadingColor),
         new SolidColorBrush(ViewUtils.Colors.Neutral900)
     );
@@ -37,7 +35,7 @@ public partial class MiiImageLoader : BaseMiiImage
         set => SetValue(LoadingColorProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush> FallBackColorProperty = AvaloniaProperty.Register<MiiImageLoader, IBrush>(
+    public static readonly StyledProperty<IBrush> FallBackColorProperty = AvaloniaProperty.Register<MiiImageView, IBrush>(
         nameof(FallBackColor),
         new SolidColorBrush(ViewUtils.Colors.Neutral700)
     );
@@ -48,7 +46,7 @@ public partial class MiiImageLoader : BaseMiiImage
         set => SetValue(FallBackColorProperty, value);
     }
 
-    public static readonly StyledProperty<Thickness> ImageOnlyMarginProperty = AvaloniaProperty.Register<MiiImageLoader, Thickness>(
+    public static readonly StyledProperty<Thickness> ImageOnlyMarginProperty = AvaloniaProperty.Register<MiiImageView, Thickness>(
         nameof(ImageOnlyMargin),
         enableDataValidation: true
     );
@@ -60,7 +58,7 @@ public partial class MiiImageLoader : BaseMiiImage
     }
 
     public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty = AvaloniaProperty.Register<
-        MiiImageLoader,
+        MiiImageView,
         MiiImageSpecifications
     >(nameof(ImageVariant), MiiImageVariants.OnlinePlayerSmall, coerce: CoerceVariant);
 
@@ -72,21 +70,23 @@ public partial class MiiImageLoader : BaseMiiImage
 
     private static MiiImageSpecifications CoerceVariant(AvaloniaObject o, MiiImageSpecifications value)
     {
-        ((MiiImageLoader)o).OnVariantChanged(value);
+        ((MiiImageView)o).OnVariantChanged(value);
         return value;
     }
 
     #endregion
 
-    public MiiImageLoader()
+    public MiiImageView(IMiiImagesSingletonService images, ISeasonalCalendar calendar)
+        : base(images)
     {
+        Calendar = calendar;
         InitializeComponent();
 
         if (Calendar.IsAprilFirst)
             MiiImageContainer.RenderTransform = new RotateTransform(Random.Shared.NextDouble() * 360);
     }
 
-    public void RefreshCurrentMii() => OnMiiChanged(Mii);
+    public override void RefreshCurrentMii() => OnMiiChanged(Mii);
 
     protected void OnVariantChanged(MiiImageSpecifications newSpecifications)
     {

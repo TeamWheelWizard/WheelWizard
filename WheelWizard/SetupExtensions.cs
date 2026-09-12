@@ -96,6 +96,7 @@ public static class SetupExtensions
         services.AddTransient<WheelWizard.Views.Popups.ModManagement.ModContent>();
         services.AddTransient<WheelWizard.Views.Patterns.VrHistoryViewModel>();
         services.AddTransient<WheelWizard.Views.Patterns.VrHistoryGraph>();
+        services.AddSingleton<WheelWizard.Views.Patterns.MiiControlThemes>();
         services.AddMods();
         services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();

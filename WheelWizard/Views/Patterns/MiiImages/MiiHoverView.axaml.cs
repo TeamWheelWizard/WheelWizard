@@ -4,21 +4,16 @@ using Avalonia.Media;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.Shared.Calendar;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
 
-public partial class MiiImageLoaderWithHover : BaseMiiImage
+public partial class MiiHoverView : BaseMiiImage
 {
-    [Inject]
-    private ISeasonalCalendar Calendar { get; set; } = null!;
+    private readonly ISeasonalCalendar Calendar;
     private bool _hasLoadedHoverVariant;
 
-    public static readonly StyledProperty<bool> IsHoveredProperty = AvaloniaProperty.Register<MiiImageLoaderWithHover, bool>(
-        nameof(IsHovered),
-        false
-    );
+    public static readonly StyledProperty<bool> IsHoveredProperty = AvaloniaProperty.Register<MiiHoverView, bool>(nameof(IsHovered), false);
 
     public bool IsHovered
     {
@@ -26,7 +21,7 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
         set => SetValue(IsHoveredProperty, value);
     }
 
-    public static readonly StyledProperty<bool> ShowNormalImageProperty = AvaloniaProperty.Register<MiiImageLoaderWithHover, bool>(
+    public static readonly StyledProperty<bool> ShowNormalImageProperty = AvaloniaProperty.Register<MiiHoverView, bool>(
         nameof(ShowNormalImage),
         true
     );
@@ -37,7 +32,7 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
         private set => SetValue(ShowNormalImageProperty, value);
     }
 
-    public static readonly StyledProperty<bool> ShowHoverImageProperty = AvaloniaProperty.Register<MiiImageLoaderWithHover, bool>(
+    public static readonly StyledProperty<bool> ShowHoverImageProperty = AvaloniaProperty.Register<MiiHoverView, bool>(
         nameof(ShowHoverImage),
         false
     );
@@ -64,7 +59,7 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
         }
     }
 
-    public static readonly StyledProperty<IBrush> LoadingColorProperty = AvaloniaProperty.Register<MiiImageLoaderWithHover, IBrush>(
+    public static readonly StyledProperty<IBrush> LoadingColorProperty = AvaloniaProperty.Register<MiiHoverView, IBrush>(
         nameof(LoadingColor),
         new SolidColorBrush(ViewUtils.Colors.Neutral900)
     );
@@ -75,7 +70,7 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
         set => SetValue(LoadingColorProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush> FallBackColorProperty = AvaloniaProperty.Register<MiiImageLoaderWithHover, IBrush>(
+    public static readonly StyledProperty<IBrush> FallBackColorProperty = AvaloniaProperty.Register<MiiHoverView, IBrush>(
         nameof(FallBackColor),
         new SolidColorBrush(ViewUtils.Colors.Neutral700)
     );
@@ -86,10 +81,10 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
         set => SetValue(FallBackColorProperty, value);
     }
 
-    public static readonly StyledProperty<Thickness> ImageOnlyMarginProperty = AvaloniaProperty.Register<
-        MiiImageLoaderWithHover,
-        Thickness
-    >(nameof(ImageOnlyMargin), enableDataValidation: true);
+    public static readonly StyledProperty<Thickness> ImageOnlyMarginProperty = AvaloniaProperty.Register<MiiHoverView, Thickness>(
+        nameof(ImageOnlyMargin),
+        enableDataValidation: true
+    );
 
     public Thickness ImageOnlyMargin
     {
@@ -98,9 +93,9 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
     }
 
     public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty = AvaloniaProperty.Register<
-        MiiImageLoaderWithHover,
+        MiiHoverView,
         MiiImageSpecifications
-    >(nameof(ImageVariant), MiiImageVariants.OnlinePlayerSmall, coerce: CoerceVariant);
+    >(nameof(ImageVariant), MiiImageVariants.OnlinePlayerSmall);
 
     public MiiImageSpecifications ImageVariant
     {
@@ -109,9 +104,9 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
     }
 
     public static readonly StyledProperty<MiiImageSpecifications?> HoverVariantProperty = AvaloniaProperty.Register<
-        MiiImageLoaderWithHover,
+        MiiHoverView,
         MiiImageSpecifications?
-    >(nameof(HoverVariant), coerce: CoerceHoverVariant);
+    >(nameof(HoverVariant));
 
     public MiiImageSpecifications? HoverVariant
     {
@@ -119,29 +114,22 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
         set => SetValue(HoverVariantProperty, value);
     }
 
-    private static MiiImageSpecifications? CoerceHoverVariant(AvaloniaObject o, MiiImageSpecifications? value)
+    static MiiHoverView()
     {
-        var loader = (MiiImageLoaderWithHover)o;
-        loader._hasLoadedHoverVariant = false;
-        if (loader.Mii != null)
-            loader.ReloadPrimaryVariant();
-        return value;
+        ImageVariantProperty.Changed.AddClassHandler<MiiHoverView>((view, _) => view.RefreshCurrentMii());
+        HoverVariantProperty.Changed.AddClassHandler<MiiHoverView>((view, _) => view.RefreshCurrentMii());
     }
 
-    private static MiiImageSpecifications CoerceVariant(AvaloniaObject o, MiiImageSpecifications value)
+    public MiiHoverView(IMiiImagesSingletonService images, ISeasonalCalendar calendar)
+        : base(images)
     {
-        ((MiiImageLoaderWithHover)o).OnVariantChanged(value);
-        return value;
-    }
-
-    public MiiImageLoaderWithHover()
-    {
+        Calendar = calendar;
         InitializeComponent();
 
         if (Calendar.IsAprilFirst)
             MiiImageContainer.RenderTransform = new RotateTransform(Random.Shared.NextDouble() * 360);
 
-        PropertyChanged += MiiImageLoaderWithHover_PropertyChanged;
+        PropertyChanged += MiiHoverView_PropertyChanged;
         GeneratedImages.CollectionChanged += (s, e) => UpdateImageVisibility();
         MiiImageLoaded += (s, e) => UpdateImageVisibility();
     }
@@ -158,7 +146,7 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
         }
     }
 
-    private void MiiImageLoaderWithHover_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void MiiHoverView_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(GeneratedImages))
         {
@@ -181,6 +169,8 @@ public partial class MiiImageLoaderWithHover : BaseMiiImage
         if (IsHovered)
             TryLoadHoverVariant();
     }
+
+    public override void RefreshCurrentMii() => OnMiiChanged(Mii);
 
     public void ReloadBothVariants()
     {
