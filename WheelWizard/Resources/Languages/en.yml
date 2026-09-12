@@ -526,7 +526,7 @@ en:
       title: "INCOMPATIBLE MOD"
   warning:
     brsar_external_count: "{$1} BRSAR file entries are external references and cannot be exported."
-    brsar_file_id_external: "BRSAR fielId {$1} is an external file reference and cannot be exported."
+    brsar_file_id_external: "BRSAR fileId {$1} is an external file reference and cannot be exported."
     brsar_file_id_unsupported_magic: "BRSAR fileId {$1} changed, but it resolves to {$2} and Pulsar only supports RBNK/RSEQ/RWSD loose overrides."
     brsar_file_id_unresolved: "BRSAR fileId {$1} could not be resolved to a supported embedded sound file."
     brsar_no_supported_differences: "No supported RBNK/RSEQ/RWSD differences were found against the built-in game baseline."
