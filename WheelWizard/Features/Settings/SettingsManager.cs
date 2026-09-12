@@ -6,7 +6,6 @@ using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Recomp;
-using WheelWizard.Services;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.IO;
 
@@ -22,6 +21,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     private readonly IFileSystem _fileSystem;
     private readonly IDolphinPathResolver _dolphinPaths;
     private readonly IApplicationDataLocation _applicationData;
+    private readonly IRecompPaths _recompPaths;
 
     private readonly Setting _dolphinCompilationMode;
     private readonly Setting _dolphinCompileShadersAtStart;
@@ -39,7 +39,8 @@ public class SettingsManager : ISettingsManager, IDisposable
         IFileSystem fileSystem,
         ISettingsSignalBus signalBus,
         IDolphinPathResolver dolphinPaths,
-        IApplicationDataLocation applicationData
+        IApplicationDataLocation applicationData,
+        IRecompPaths recompPaths
     )
     {
         _whWzSettingManager = whWzSettingManager;
@@ -49,6 +50,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         _signalBus = signalBus;
         _dolphinPaths = dolphinPaths;
         _applicationData = applicationData;
+        _recompPaths = recompPaths;
 
         #region WhWz settings
         // Register this first because the path validators use the active frontend mode when deciding
@@ -415,7 +417,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         _dolphinSettingManager.LoadSettings(
             _dolphinPaths.Resolve(Get<string>(DOLPHIN_LOCATION), Get<string>(USER_FOLDER_PATH)).ConfigFolderPath
         );
-        _recompSettingManager.LoadSettings(PathManager.RecompConfigFilePath);
+        _recompSettingManager.LoadSettings(_recompPaths.ConfigFilePath);
         _hasLoadedSettings = true;
     }
     #endregion
@@ -463,7 +465,7 @@ public class SettingsManager : ISettingsManager, IDisposable
             typeof(T),
             location,
             defaultValue!,
-            setting => _recompSettingManager.SaveSettings(PathManager.RecompConfigFilePath, setting)
+            setting => _recompSettingManager.SaveSettings(_recompPaths.ConfigFilePath, setting)
         );
         if (validation != null)
             setting.SetValidation(validation);
