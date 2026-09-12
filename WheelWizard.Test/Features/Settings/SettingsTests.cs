@@ -131,7 +131,13 @@ public class SettingsManagerTests
         dolphinSettingManager = Substitute.For<IDolphinSettingManager>();
         recompSettingManager = Substitute.For<IRecompSettingManager>();
 
-        return new SettingsManager(whWzSettingManager, dolphinSettingManager, recompSettingManager, fileSystem);
+        return new SettingsManager(
+            whWzSettingManager,
+            dolphinSettingManager,
+            recompSettingManager,
+            fileSystem,
+            SettingsTestUtils.CreateSettingsSignalBus()
+        );
     }
 }
 
@@ -326,7 +332,7 @@ public class SettingsStartupInitializerTests
         var localizationService = Substitute.For<ISettingsLocalizationService>();
         var logger = Substitute.For<ILogger<SettingsStartupInitializer>>();
         settingsManager.ValidateCorePathSettings().Returns(Ok(new SettingsValidationReport([])));
-        var initializer = new SettingsStartupInitializer(settingsManager, signalBus, localizationService, logger);
+        var initializer = new SettingsStartupInitializer(settingsManager, localizationService, logger);
 
         initializer.Initialize();
 
@@ -345,7 +351,7 @@ public class SettingsStartupInitializerTests
         var localizationService = Substitute.For<ISettingsLocalizationService>();
         var logger = Substitute.For<ILogger<SettingsStartupInitializer>>();
         settingsManager.ValidateCorePathSettings().Returns(Fail("validation failed"));
-        var initializer = new SettingsStartupInitializer(settingsManager, signalBus, localizationService, logger);
+        var initializer = new SettingsStartupInitializer(settingsManager, localizationService, logger);
 
         var exception = Record.Exception(initializer.Initialize);
 
@@ -366,13 +372,6 @@ internal static class SettingsTestUtils
         return settings;
     }
 
-    public static void InitializeSignalRuntime(ISettingsSignalBus? signalBus = null)
-    {
-#pragma warning disable CS0618
-        SettingsSignalRuntime.Initialize(signalBus ?? CreateSettingsSignalBus());
-#pragma warning restore CS0618
-    }
-
     public static ISettingsSignalBus CreateSettingsSignalBus()
     {
         var logger = Substitute.For<ILogger<SettingsSignalBus>>();
@@ -384,19 +383,6 @@ internal static class SettingsTestUtils
 #pragma warning disable CS0618
         SetPrivateStaticFieldValue(typeof(SettingsRuntime), "_current", null);
 #pragma warning restore CS0618
-    }
-
-    public static void ResetSignalRuntime()
-    {
-#pragma warning disable CS0618
-        SetPrivateStaticFieldValue(typeof(SettingsSignalRuntime), "_current", null);
-        var pendingInitializersField =
-            typeof(SettingsSignalRuntime).GetField("PendingInitializers", BindingFlags.NonPublic | BindingFlags.Static)
-            ?? throw new InvalidOperationException("SettingsSignalRuntime pending initializers field was not found.");
-#pragma warning restore CS0618
-        if (pendingInitializersField.GetValue(null) is not System.Collections.IList pendingInitializers)
-            throw new InvalidOperationException("SettingsSignalRuntime pending initializers storage has an unexpected type.");
-        pendingInitializers.Clear();
     }
 
     public static string GetValidDolphinLocation(IFileSystem fileSystem)
