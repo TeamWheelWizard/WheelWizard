@@ -3,8 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using Serilog;
 using WheelWizard.ApplicationData;
+using WheelWizard.ApplicationLifecycle.Logging;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Settings;
@@ -21,6 +21,7 @@ namespace WheelWizard.Views.Pages.Settings;
 public partial class WhWzSettings : UserControl
 {
     private readonly IMainWindowService _mainWindow;
+    private readonly IApplicationLogFiles _logFiles;
 
     private sealed record LanguageDropdownItem(string Key, string DisplayName)
     {
@@ -47,6 +48,7 @@ public partial class WhWzSettings : UserControl
     private IApplicationDataLocation ApplicationData { get; }
 
     public WhWzSettings(
+        IApplicationLogFiles logFiles,
         IMainWindowService mainWindow,
         IFilePickerService filePicker,
         IDolphinPaths dolphinPaths,
@@ -65,6 +67,7 @@ public partial class WhWzSettings : UserControl
         DolphinDiscovery = dolphinDiscovery;
         ApplicationData = applicationData;
         _mainWindow = mainWindow;
+        _logFiles = logFiles;
         InitializeComponent();
         ConfigureLocationFieldsForActiveFrontend();
         UpdateLocationRows();
@@ -533,7 +536,7 @@ public partial class WhWzSettings : UserControl
     private async Task MoveWheelWizardDataAsync(string targetPath)
     {
         SetAppDataLocationBusyState(true);
-        Log.CloseAndFlush();
+        using var loggingPause = _logFiles.Pause();
 
         var progressWindow = new ProgressWindow(t("status.data_folder.moving"))
             .SetExtraText(t("helper_text.wheel_wizard_data_folder"))
@@ -558,7 +561,7 @@ public partial class WhWzSettings : UserControl
         catch (Exception ex)
         {
             progressWindow.Close();
-            WheelWizard.Logging.RecreateStaticLogger(ApplicationData.DirectoryPath);
+            loggingPause.Dispose();
             SetAppDataLocationBusyState(false);
             UpdateAppDataLocationUi();
 
@@ -572,7 +575,7 @@ public partial class WhWzSettings : UserControl
 
         progressWindow.Close();
 
-        WheelWizard.Logging.RecreateStaticLogger(ApplicationData.DirectoryPath);
+        loggingPause.Dispose();
 
         SetAppDataLocationBusyState(false);
         UpdateAppDataLocationUi();
@@ -606,12 +609,12 @@ public partial class WhWzSettings : UserControl
             var revert = await prompt.AwaitAnswer();
             if (revert)
             {
-                var revertSucceeded = ApplicationData.TryRevertMove(
-                    moveDetails.SourcePath,
-                    moveDetails.DestinationPath,
-                    out var revertError
-                );
-                WheelWizard.Logging.RecreateStaticLogger(ApplicationData.DirectoryPath);
+                bool revertSucceeded;
+                string revertError;
+                using (_logFiles.Pause())
+                {
+                    revertSucceeded = ApplicationData.TryRevertMove(moveDetails.SourcePath, moveDetails.DestinationPath, out revertError);
+                }
                 UpdateAppDataLocationUi();
 
                 if (!revertSucceeded)

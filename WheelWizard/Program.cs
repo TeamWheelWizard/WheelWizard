@@ -4,6 +4,7 @@ using Avalonia.Logging;
 using Serilog;
 using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationIntegration;
+using WheelWizard.ApplicationLifecycle.Logging;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Services;
@@ -25,7 +26,9 @@ public class Program : IDesignerEntryPoint
             new Testably.Abstractions.RealFileSystem(),
             new WheelWizard.Shared.Platform.RuntimeEnvironment()
         );
-        Logging.CreateStaticLogger(applicationData.DirectoryPath);
+        var logFiles = new ApplicationLogFiles(applicationData, new LogFileFactory(new Testably.Abstractions.RealFileSystem()));
+        Log.Logger = ApplicationLogging.CreateLogger(logFiles);
+        ApplicationLogging.LogStartup(Log.Logger);
         RegisterGlobalExceptionLogging();
 
         try
@@ -33,6 +36,7 @@ public class Program : IDesignerEntryPoint
             // Initialize the Avalonia application
             var services = new ServiceCollection();
             services.AddWheelWizardServices(applicationData);
+            services.AddSingleton(logFiles);
             using var serviceProvider = services.BuildServiceProvider(
                 new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }
             );
