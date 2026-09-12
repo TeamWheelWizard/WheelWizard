@@ -8,7 +8,6 @@ using Avalonia.Interactivity;
 using Testably.Abstractions;
 using WheelWizard.CustomCharacters;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Patterns;
@@ -26,29 +25,37 @@ public partial class MiiListPage : UserControlBase
     public ObservableCollection<MiiListRow> MiiRows { get; } = [];
     private readonly List<MiiListEntry> _miiEntries = [];
 
-    [Inject]
-    private IFilePickerService FilePicker { get; set; } = null!;
+    private IFilePickerService FilePicker { get; }
 
-    [Inject]
-    private ICustomCharactersService CustomCharactersService { get; set; } = null!;
+    private ICustomCharactersService CustomCharactersService { get; }
 
-    [Inject]
-    private IMiiDbService MiiDbService { get; set; } = null!;
+    private IMiiDbService MiiDbService { get; }
 
-    [Inject]
-    private IMiiRepositoryService MiiRepositoryService { get; set; } = null!;
+    private IMiiRepositoryService MiiRepositoryService { get; }
 
-    [Inject]
-    private IFileSystem FileSystem { get; set; } = null!;
+    private IFileSystem FileSystem { get; }
 
-    [Inject]
-    private IRandomSystem Random { get; set; } = null!;
+    private IRandomSystem Random { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    public MiiListPage()
+    public MiiListPage(
+        IFilePickerService filePicker,
+        ICustomCharactersService customCharactersService,
+        IMiiDbService miiDbService,
+        IMiiRepositoryService miiRepositoryService,
+        IFileSystem fileSystem,
+        IRandomSystem random,
+        ISettingsManager settingsService
+    )
     {
+        FilePicker = filePicker;
+        CustomCharactersService = customCharactersService;
+        MiiDbService = miiDbService;
+        MiiRepositoryService = miiRepositoryService;
+        FileSystem = fileSystem;
+        Random = random;
+        SettingsService = settingsService;
         InitializeComponent();
         DataContext = this;
 

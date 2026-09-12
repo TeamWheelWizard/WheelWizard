@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.Views.Popups.Generic;
@@ -19,6 +20,9 @@ public record ModSearchResult(GameBananaModPreview Mod, string PreviewImageUrl);
 
 public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 {
+    [Inject]
+    private INavigationService Navigation { get; set; } = null!;
+
     // Collection to hold the mods
     private ObservableCollection<ModSearchResult> Mods { get; } = [];
     private List<ModSearchResult> LoadedMods { get; } = [];
@@ -169,7 +173,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
     protected override void BeforeClose()
     {
         // a bit dirty, but it's the easiest way to refresh the mod list in the ModsPage
-        NavigationManager.NavigateTo<ModsPage>();
+        Navigation.NavigateTo<ModsPage>();
         base.BeforeClose();
     }
 

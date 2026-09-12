@@ -14,6 +14,7 @@ using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
@@ -26,6 +27,9 @@ namespace WheelWizard.Views;
 
 public partial class Layout : BaseWindow, IPollingListener
 {
+    [Inject]
+    private INavigationService Navigation { get; set; } = null!;
+
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
 
@@ -78,6 +82,11 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         Instance = this;
         InitializeComponent();
+        Navigation.PageChanged += Navigation_OnPageChanged;
+        foreach (var button in SidePanelButtons.Children.OfType<SidebarRadioButton>())
+            button.NavigationRequested += (_, pageType) => Navigation.NavigateTo(pageType);
+        SidebarCurrentUserProfile.ProfileRequested += (_, _) => Navigation.NavigateTo<UserProfilePage>();
+        UpdateSidebarProfile();
         AddLayer();
 
         ClampSavedWindowScaleToCurrentScreen();
@@ -114,11 +123,12 @@ public partial class Layout : BaseWindow, IPollingListener
         UpdateModsButtonText();
         // UpdateModsActionIndicator();
 
-        NavigationManager.NavigateTo<HomePage>();
+        Navigation.NavigateTo<HomePage>();
     }
 
     protected override void OnClosed(EventArgs e)
     {
+        Navigation.PageChanged -= Navigation_OnPageChanged;
         DetachLiveSubscriptions();
         _settingsSignalSubscription?.Dispose();
         _settingsSignalSubscription = null;
@@ -200,6 +210,8 @@ public partial class Layout : BaseWindow, IPollingListener
     //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
     // }
 
+    private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
+
     public void NavigateToPage(UserControl page)
     {
         var oldPage = ContentArea.Content as Control;
@@ -249,7 +261,13 @@ public partial class Layout : BaseWindow, IPollingListener
         FriendsButton.BoxTip = t("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
     }
 
-    public void UpdateSidebarProfile() => SidebarCurrentUserProfile.Refresh();
+    public void UpdateSidebarProfile()
+    {
+        GameLicenseService.RefreshOnlineStatus();
+        GameLicenseService.LoadLicense();
+        var user = GameLicenseService.ActiveUser;
+        SidebarCurrentUserProfile.DisplayProfile(user.NameOfMii, user.FriendCode, user.Mii);
+    }
 
     public void DetachLiveSubscriptions()
     {
@@ -395,7 +413,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void SidebarSettingsButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        NavigationManager.NavigateTo<SettingsPage>();
+        Navigation.NavigateTo<SettingsPage>();
         e.Handled = true;
     }
 
@@ -439,7 +457,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void SupportUs_OnClick(object? sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
-    private void About_Click(object? sender, RoutedEventArgs e) => NavigationManager.NavigateTo<SettingsPage>(new AppInfo());
+    private void About_Click(object? sender, RoutedEventArgs e) => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
 
     private void CloseSnackbar_OnClick(object? sender, EventArgs e)
     {

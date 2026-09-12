@@ -3,7 +3,6 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Launching;
 using WheelWizard.Models.Enums;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;
@@ -15,17 +14,21 @@ public partial class TestingPage : UserControlBase
     private WheelWizardStatus _status = WheelWizardStatus.Loading;
     private bool _isBusy;
 
-    [Inject]
-    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private RrBetaLauncher LauncherService { get; set; } = null!;
+    private RrBetaLauncher LauncherService { get; }
 
-    public TestingPage()
+    public TestingPage(
+        ICustomDistributionSingletonService customDistributionSingletonService,
+        ISettingsManager settingsService,
+        RrBetaLauncher launcherService
+    )
     {
+        CustomDistributionSingletonService = customDistributionSingletonService;
+        SettingsService = settingsService;
+        LauncherService = launcherService;
         InitializeComponent();
         UpdateStatusAsync();
     }

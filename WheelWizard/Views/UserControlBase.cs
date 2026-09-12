@@ -5,11 +5,9 @@ namespace WheelWizard.Views;
 
 public abstract class UserControlBase : UserControl
 {
-    protected IServiceProvider ServiceProvider { get; }
-
     protected UserControlBase()
     {
-        ServiceProvider = App.Services;
-        ServiceInjector.InjectServices(ServiceProvider, this);
+        if (ServiceInjector.RequiresInjection(GetType()))
+            ServiceInjector.InjectServices(App.Services, this);
     }
 }
