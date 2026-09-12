@@ -43,7 +43,7 @@ public sealed partial class DolphinPathLayout(
         return path.StartsWith('/') ? path : null;
     }
 
-    private bool IsFlatpakSandboxed()
+    internal bool IsFlatpakSandboxed()
     {
         return isFlatpakSandboxed;
     }

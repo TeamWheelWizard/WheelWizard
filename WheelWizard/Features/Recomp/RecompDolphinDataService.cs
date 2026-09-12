@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 
@@ -28,8 +29,12 @@ public interface IRecompDolphinDataService
     OperationResult ApplyNandToRecompConfig();
 }
 
-public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompSettingManager recompSettings, IFileSystem fileSystem)
-    : IRecompDolphinDataService
+public sealed class RecompDolphinDataService(
+    ISettingsManager settings,
+    IRecompSettingManager recompSettings,
+    IFileSystem fileSystem,
+    IDolphinDiscoveryService dolphinDiscovery
+) : IRecompDolphinDataService
 {
     public bool IsSharingEnabled => settings.Get<bool>(settings.RECOMP_USE_DOLPHIN_DATA);
 
@@ -71,7 +76,13 @@ public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompS
         }
     }
 
-    public string? FindCandidateUserFolder() => ValidateUserFolder(PathManager.TryFindUserFolderPath());
+    public string? FindCandidateUserFolder() =>
+        ValidateUserFolder(
+            dolphinDiscovery.FindUserDirectory(
+                settings.Get<string>(settings.DOLPHIN_LOCATION),
+                settings.Get<string>(settings.USER_FOLDER_PATH)
+            )
+        );
 
     public OperationResult Link(string userFolderPath)
     {

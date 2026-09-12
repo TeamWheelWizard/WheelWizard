@@ -1,5 +1,4 @@
 using System.IO.Abstractions;
-using System.Runtime.InteropServices;
 using Serilog;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Helpers;
@@ -620,9 +619,6 @@ public static class PathManager
     public static string XmlFilePath => Path.Combine(RiivolutionXmlFolderPath, "RetroRewind6.xml");
     public static string RrBetaXmlFilePath => Path.Combine(RiivolutionXmlFolderPath, "RRBeta.xml");
 
-    private static string PortableUserFolderPath =>
-        Path.Combine(GetDolphinExeDirectory(), RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "user" : "User");
-
     // Transitional facade for remaining static callers. New consumers inject IDolphinPathResolver.
     private static DolphinPathLayout ResolveDolphinLayout(string dolphinLocation, string userFolderPath) =>
         new DolphinPathResolver(new Testably.Abstractions.RealFileSystem(), new WheelWizard.Shared.Platform.RuntimeEnvironment()).Resolve(
@@ -634,15 +630,10 @@ public static class PathManager
     private static DolphinPathLayout DefaultDolphinLayout => ResolveDolphinLayout("", "");
 
     public static string LinuxDolphinLegacyFolderPath => DefaultDolphinLayout.LinuxDolphinLegacyFolderPath;
-    private static string LinuxDolphinFlatpakAppDataFolderPath => CurrentDolphinLayout.LinuxDolphinFlatpakAppDataFolderPath;
     public static string LinuxDolphinFlatpakDataDir => CurrentDolphinLayout.LinuxDolphinFlatpakDataDir;
     public static string LinuxDolphinFlatpakConfigDir => CurrentDolphinLayout.LinuxDolphinFlatpakConfigDir;
     public static string LinuxXdgDataHome => DefaultDolphinLayout.LinuxXdgDataHome;
     public static string LinuxXdgConfigHome => DefaultDolphinLayout.LinuxXdgConfigHome;
-    private static string LinuxHostXdgDataHome => DefaultDolphinLayout.LinuxHostXdgDataHome;
-    private static string LinuxHostXdgConfigHome => DefaultDolphinLayout.LinuxHostXdgConfigHome;
-    private static string LinuxDolphinHostNativeInstallConfigDir => DefaultDolphinLayout.LinuxDolphinHostNativeInstallConfigDir;
-    private static string LinuxDolphinHostNativeInstallDataDir => DefaultDolphinLayout.LinuxDolphinHostNativeInstallDataDir;
     public static string LinuxDolphinNativeInstallConfigDir => DefaultDolphinLayout.LinuxDolphinNativeInstallConfigDir;
     public static string LinuxDolphinNativeInstallDataDir => DefaultDolphinLayout.LinuxDolphinNativeInstallDataDir;
     public static string LinuxFlatpakBundledDolphinXdgConfigDir => DefaultDolphinLayout.LinuxFlatpakBundledDolphinXdgConfigDir;
@@ -688,206 +679,4 @@ public static class PathManager
     public const string DefaultDolphinFlatpakAppId = DolphinPathLayout.DefaultDolphinFlatpakAppId;
 
     public static string ExtractDolphinFlatpakAppId(string command) => DefaultDolphinLayout.ExtractDolphinFlatpakAppId(command);
-
-    public static string GetDolphinExeDirectory() => CurrentDolphinLayout.GetDolphinExeDirectory();
-
-    private static bool HasWindowsLocalUserConfigSet()
-    {
-#if WINDOWS
-        try
-        {
-            var dolphinRegistryPath = @"Software\Dolphin Emulator";
-            var localUserConfigValueName = "LocalUserConfig";
-            var local = false;
-            using var key = Registry.CurrentUser.OpenSubKey(dolphinRegistryPath);
-            if (key == null)
-                return local;
-
-            var localUserConfigValue = key.GetValue(localUserConfigValueName);
-            if (localUserConfigValue == null)
-                return local;
-
-            if (localUserConfigValue is string localUserConfigValueString)
-            {
-                if (localUserConfigValueString.Equals("1", StringComparison.Ordinal))
-                    local = true;
-            }
-            else if (localUserConfigValue is int localUserConfigValueInt)
-            {
-                if (localUserConfigValueInt == 1)
-                    local = true;
-            }
-            else if (localUserConfigValue is long localUserConfigValueLong)
-            {
-                if (localUserConfigValueLong == 1)
-                    local = true;
-            }
-            return local;
-        }
-        catch
-        {
-            return false;
-        }
-#else
-        return false;
-#endif
-    }
-
-    private static string TryFindRegistryUserConfigPath()
-    {
-#if WINDOWS
-        try
-        {
-            var dolphinRegistryPath = @"Software\Dolphin Emulator";
-            var userConfigPathValueName = "UserConfigPath";
-            var userConfigPath = string.Empty;
-            using var key = Registry.CurrentUser.OpenSubKey(dolphinRegistryPath);
-            if (key == null)
-                return userConfigPath;
-
-            var foundUserConfigPath = key.GetValue(userConfigPathValueName) as string;
-            // We need to replace `/` with `\` here since Dolphin writes mismatching separators to the registry
-            if (!string.IsNullOrWhiteSpace(foundUserConfigPath) && Directory.Exists(foundUserConfigPath))
-                userConfigPath = foundUserConfigPath.Replace(
-                    Path.AltDirectorySeparatorChar.ToString(),
-                    Path.DirectorySeparatorChar.ToString()
-                );
-            return userConfigPath;
-        }
-        catch
-        {
-            return string.Empty;
-        }
-#else
-        return string.Empty;
-#endif
-    }
-
-    private static string TryFindPortableUserFolderPath()
-    {
-        if (IsFlatpakSandboxed())
-        {
-            // It does not make sense to check portable folders, so return early for the WheelWizard Flatpak
-            return string.Empty;
-        }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            // In this case, Dolphin would use `EMBEDDED_USER_DIR` which is the portable `user` directory
-            // in the current directory (the directory of the WheelWizard executable).
-            // This is actually undocumented...
-            var embeddedUserPath = Path.GetFullPath("user");
-            if (Directory.Exists(embeddedUserPath))
-                return embeddedUserPath;
-        }
-
-        var portableUserPath = PortableUserFolderPath;
-        if (File.Exists(Path.Combine(GetDolphinExeDirectory(), "portable.txt")))
-        {
-            if (Directory.Exists(portableUserPath))
-                return portableUserPath;
-        }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && HasWindowsLocalUserConfigSet())
-        {
-            if (Directory.Exists(portableUserPath))
-                return portableUserPath;
-        }
-
-        return string.Empty;
-    }
-
-    // This should return null if not found since functions above require it
-    private static string? TryFindLinuxFlatpakUserFolderPath()
-    {
-        if (Directory.Exists(LinuxDolphinFlatpakAppDataFolderPath))
-            return Path.Combine(LinuxDolphinFlatpakDataDir);
-
-        // If not found, return null.
-        return null;
-    }
-
-    private static string? TryFindLinuxNativeUserFolderPath()
-    {
-        if (Directory.Exists(LinuxDolphinLegacyFolderPath))
-            return LinuxDolphinLegacyFolderPath;
-
-        if (IsFlatpakSandboxed())
-        {
-            if (Directory.Exists(LinuxHostXdgConfigHome) && Directory.Exists(LinuxHostXdgDataHome))
-            {
-                if (Directory.Exists(LinuxDolphinHostNativeInstallConfigDir) && Directory.Exists(LinuxDolphinHostNativeInstallDataDir))
-                    return LinuxDolphinHostNativeInstallDataDir;
-            }
-        }
-        else
-        {
-            if (Directory.Exists(LinuxDolphinNativeInstallConfigDir) && Directory.Exists(LinuxDolphinNativeInstallDataDir))
-                return LinuxDolphinNativeInstallDataDir;
-        }
-
-        // If not found, return null.
-        return null;
-    }
-
-    public static string? TryFindUserFolderPath() => TryFindUserFolderPath(DolphinFilePath);
-
-    public static string? TryFindUserFolderPath(string dolphinFilePath)
-    {
-        var portableUserFolderPath = TryFindPortableUserFolderPath();
-        if (!string.IsNullOrWhiteSpace(portableUserFolderPath))
-            return portableUserFolderPath;
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            var registryUserConfigPath = TryFindRegistryUserConfigPath();
-            if (!string.IsNullOrWhiteSpace(registryUserConfigPath))
-                return registryUserConfigPath;
-
-            var documentsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Dolphin Emulator");
-            if (Directory.Exists(documentsPath))
-                return documentsPath;
-
-            var appDataPath = Path.Combine(AppDataFolder, "Dolphin Emulator");
-            if (Directory.Exists(appDataPath))
-                return appDataPath;
-
-            if (Directory.Exists(PortableUserFolderPath))
-                return PortableUserFolderPath;
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            var libraryPath = Path.Combine(AppDataFolder, "Dolphin");
-            if (Directory.Exists(libraryPath))
-                return libraryPath;
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            var flatpakUserFolder = TryFindLinuxFlatpakUserFolderPath();
-            // The sandboxed version of Wheel Wizard will prioritize found Dolphin Flatpak user folders
-            // because the builds should be more similar.
-            return IsFlatpakSandboxed() && flatpakUserFolder != null || !IsFlatpakSandboxed() && IsFlatpakDolphinFilePath(dolphinFilePath)
-                ? flatpakUserFolder
-                : TryFindLinuxNativeUserFolderPath();
-        }
-
-        return null;
-    }
-
-    public static string? TryToFindApplicationPath()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            var dolphinApplicationPath = Path.Combine("Dolphin.app", "Contents", "MacOS", "Dolphin");
-            // Try system wide install on MacOS
-            var path = Path.Combine("/Applications", dolphinApplicationPath);
-            if (File.Exists(path))
-                return path;
-            // Try user install on MacOS
-            path = Path.Combine(HomeFolderPath, "Applications", dolphinApplicationPath);
-            if (File.Exists(path))
-                return path;
-        }
-        return null;
-    }
 }

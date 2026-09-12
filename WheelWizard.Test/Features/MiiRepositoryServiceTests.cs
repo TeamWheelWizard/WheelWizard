@@ -1,4 +1,5 @@
 using Testably.Abstractions.Testing;
+using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings;
@@ -34,7 +35,12 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         _settings.Get<bool>(useSetting).Returns(_ => _useDolphinData);
         _settings.IsRecompModeActive().Returns(_ => _recompEnabled);
         _fileSystem.Directory.CreateDirectory(_sourceNand);
-        _dolphinData = new RecompDolphinDataService(_settings, Substitute.For<IRecompSettingManager>(), _fileSystem);
+        _dolphinData = new RecompDolphinDataService(
+            _settings,
+            Substitute.For<IRecompSettingManager>(),
+            _fileSystem,
+            Substitute.For<IDolphinDiscoveryService>()
+        );
         _repository = new MiiRepositoryServiceService(_fileSystem, _settings, _dolphinData);
     }
 
