@@ -122,7 +122,7 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         Assert.True(_repository.AddMiiToBlocks(Block(5)).IsSuccess);
         Assert.NotNull(_repository.GetRawBlockByAvatarId(5));
         Assert.Null(_repository.GetRawBlockByAvatarId(4));
-        Assert.True(_fileSystem.File.Exists(DbPath(Path.Combine(PathManager.RecompUserDataFolderPath, "NAND"))));
+        Assert.True(_fileSystem.File.Exists(DbPath(PathManager.RecompPrivateNandFolderPath)));
         Assert.Equal(sourceBytes, _fileSystem.File.ReadAllBytes(DbPath(_sourceNand)));
     }
 
