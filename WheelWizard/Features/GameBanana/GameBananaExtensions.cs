@@ -18,6 +18,7 @@ public static class GameBananaExtensions
             }
         );
         services.AddSingleton<IGameBananaMediaService, GameBananaMediaService>();
+        services.AddSingleton<InstallRequests.IModInstallRequestHandler, InstallRequests.ModInstallRequestHandler>();
         return services;
     }
 }
