@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://flathub.org/apps/io.github.TeamWheelWizard.WheelWizard">
-    <img src="https://flathub.org/api/badge?locale=en" alt="Get it on Flathub" width="240" />
+    <img src="https://flathub.org/api/badge?svg&locale=en" alt="Get it on Flathub" width="240" />
   </a>
 </p>
 
