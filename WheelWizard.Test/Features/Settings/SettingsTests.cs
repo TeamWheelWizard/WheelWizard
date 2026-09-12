@@ -4,11 +4,13 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Testably.Abstractions;
 using Testably.Abstractions.Testing;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Localization;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
+using WheelWizard.Shared.Platform;
 
 namespace WheelWizard.Test.Features.Settings;
 
@@ -112,14 +114,37 @@ public class SettingsManagerTests
     public void LoadSettings_CallsUnderlyingManagersOnlyOnce()
     {
         var manager = CreateManager(new MockFileSystem(), out var whWzManager, out var dolphinManager, out var recompManager);
-        SettingsTestUtils.InitializeSettingsRuntime("/wheelwizard-settings-load");
 
         manager.LoadSettings();
         manager.LoadSettings();
 
         whWzManager.Received(1).LoadSettings(PathManager.WheelWizardConfigFilePath);
-        dolphinManager.Received(1).LoadSettings(PathManager.ConfigFolderPath);
+        dolphinManager.Received(1).LoadSettings(Path.Combine("", "Config"));
         recompManager.Received(1).LoadSettings(PathManager.RecompConfigFilePath);
+    }
+
+    [Fact]
+    public void LoadSettings_UsesUserDirectoryLoadedFromOwnJson_ForDolphinSettings()
+    {
+        var fs = new MockFileSystem();
+        var userFolder = fs.Path.GetFullPath("/owned-dolphin-user");
+        fs.Directory.CreateDirectory(userFolder);
+        var configPath = PathManager.WheelWizardConfigFilePath;
+        fs.Directory.CreateDirectory(fs.Path.GetDirectoryName(configPath)!);
+        fs.File.WriteAllText(configPath, System.Text.Json.JsonSerializer.Serialize(new { UserFolderPath = userFolder }));
+        var dolphinManager = Substitute.For<IDolphinSettingManager>();
+        using var manager = new SettingsManager(
+            new WhWzSettingManager(Substitute.For<ILogger<WhWzSettingManager>>(), fs),
+            dolphinManager,
+            Substitute.For<IRecompSettingManager>(),
+            fs,
+            SettingsTestUtils.CreateSettingsSignalBus(),
+            new DolphinPathResolver(fs, new RuntimeEnvironment())
+        );
+
+        manager.LoadSettings();
+
+        dolphinManager.Received(1).LoadSettings(fs.Path.Combine(userFolder, "Config"));
     }
 
     private static SettingsManager CreateManager(
@@ -138,7 +163,8 @@ public class SettingsManagerTests
             dolphinSettingManager,
             recompSettingManager,
             fileSystem,
-            SettingsTestUtils.CreateSettingsSignalBus()
+            SettingsTestUtils.CreateSettingsSignalBus(),
+            new DolphinPathResolver(fileSystem, new RuntimeEnvironment())
         );
     }
 }
