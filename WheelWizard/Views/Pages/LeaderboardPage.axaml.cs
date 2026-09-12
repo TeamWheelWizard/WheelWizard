@@ -26,6 +26,7 @@ public sealed record LeaderboardPlayerItem
     public required string FriendCode { get; init; }
     public required string VrText { get; init; }
     public Mii? Mii { get; init; }
+    public BadgeVariant[] BadgeVariants { get; init; } = [];
     public BadgeVariant PrimaryBadge { get; init; }
     public bool HasBadge { get; init; }
     public bool IsSuspicious { get; init; }
@@ -318,6 +319,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
             VrText = entry.Vr?.ToString("N0") ?? "--",
             Mii = DeserializeMii(entry.MiiData),
             PrimaryBadge = primaryBadge,
+            BadgeVariants = badges,
             HasBadge = primaryBadge != BadgeVariant.None,
             IsSuspicious = entry.IsSuspicious,
             IsEvenRow = index % 2 == 0,

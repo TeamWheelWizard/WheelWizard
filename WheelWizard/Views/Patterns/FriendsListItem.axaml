@@ -1,4 +1,5 @@
 <Styles xmlns="https://github.com/avaloniaui"
+        xmlns:domain="using:WheelWizard.WheelWizardData.Domain"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:WheelWizard.Localization"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
@@ -176,11 +177,16 @@
                                 IsVisible="{TemplateBinding HasBadges}"
                                 BorderBrush="{StaticResource Neutral600}">
                             <ScrollViewer HorizontalScrollBarVisibility="Auto" Padding="3">
-                                <StackPanel Orientation="Horizontal" x:Name="PART_BadgeContainer" Spacing="3">
-                                    <components:Badge Variant="Translator" Width="30" Height="30" />
-                                    <components:Badge Variant="WhWzDev" Width="30" Height="30" />
-                                    <components:Badge Variant="RrDev" Width="30" Height="30" />
-                                </StackPanel>
+                                <ItemsControl ItemsSource="{TemplateBinding BadgeVariants}" x:Name="PART_BadgeContainer">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="3" /></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="domain:BadgeVariant">
+                                                <components:Badge Variant="{Binding}" Width="30" Height="30" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                             </ScrollViewer>
                         </Border>
 
