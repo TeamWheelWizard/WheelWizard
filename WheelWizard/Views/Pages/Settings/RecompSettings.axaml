@@ -8,68 +8,231 @@
              x:Class="WheelWizard.Views.Pages.Settings.RecompSettings">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,15,0,0">
-            <Border Padding="4" Margin="0,-10,0,10" x:Name="NotInstalledText" IsVisible="False"
-                    CornerRadius="{StaticResource GlobalCornerRadius}"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Top"
-                    Background="{StaticResource Warning600}">
-                <TextBlock HorizontalAlignment="Center" Classes="BodyText" TextWrapping="Wrap"
-                           FontWeight="SemiBold" Text="{loc:T status.recomp_not_installed}"
-                           Foreground="{StaticResource BackgroundColor}" />
-            </Border>
+            <Grid Margin="0,-10,0,10" MinHeight="40" x:Name="NotInstalledText" IsVisible="False">
+                <Border Background="{StaticResource Warning600}"
+                        CornerRadius="9999"
+                        Effect="blur(150)"
+                        Opacity="0.1" />
+                <Border Background="{StaticResource Neutral700}"
+                        BorderBrush="{StaticResource Warning500}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource GlobalCornerRadius}">
+                    <Grid ColumnDefinitions="40,*">
+                        <PathIcon Data="{StaticResource WarningTip}"
+                                  Foreground="{StaticResource Warning500}"
+                                  Width="20" />
+                        <SelectableTextBlock Grid.Column="1"
+                                             Margin="0,6,10,6"
+                                             Classes="BodyText"
+                                             TextWrapping="Wrap"
+                                             VerticalAlignment="Center"
+                                             Text="{loc:T status.recomp_not_installed}"
+                                             Foreground="{StaticResource Neutral200}" />
+                    </Grid>
+                </Border>
+            </Grid>
 
-            <components:FormFieldLabel x:Name="VideoSectionLabel" Text="{loc:T section.recomp_video}" />
-            <Border Classes="SettingsBlockStyle" x:Name="VideoBorder">
-                <StackPanel>
-                    <components:FormFieldLabel Text="{loc:T option.recomp_resolution}" />
-                    <ComboBox x:Name="ResolutionDropdown" HorizontalAlignment="Stretch"
-                              Margin="0,0,0,10" VerticalAlignment="Top" />
+            <components:FormFieldLabel x:Name="VideoSectionLabel"
+                                       Text="{loc:T section.recomp_video}"
+                                       Margin="0,0,0,4" />
+            <StackPanel x:Name="VideoBorder"
+                        Spacing="4"
+                        Margin="0,0,0,7">
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components:FormFieldLabel Text="{loc:T option.recomp_resolution}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.resolution_scale}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1"
+                                  x:Name="ResolutionDropdown"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
 
-                    <components:FormFieldLabel Text="{loc:T option.recomp_graphics_api}"
-                                               TipText="{loc:T helper_text.recomp_graphics_api}" />
-                    <ComboBox x:Name="GraphicsApiDropdown" HorizontalAlignment="Stretch"
-                              Margin="0,0,0,10" VerticalAlignment="Top" />
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components:FormFieldLabel Text="{loc:T option.recomp_graphics_api}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.recomp_graphics_api}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1"
+                                  x:Name="GraphicsApiDropdown"
+                                  PlaceholderText="Auto"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
 
-                    <CheckBox x:Name="ShowFps" Classes="SwitchDark" Margin="0,2">
-                        <components:FormFieldLabel Text="{loc:T option.show_fps}" />
-                    </CheckBox>
-                    <CheckBox x:Name="PreventStutters" Classes="SwitchDark" Margin="0,2">
-                        <components:FormFieldLabel Text="{loc:T option.recomp_prevent_stutters}"
-                                                   TipText="{loc:T helper_text.recomp_prevent_stutters}" />
-                    </CheckBox>
-                </StackPanel>
-            </Border>
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <components:FormFieldLabel Grid.Column="0"
+                                                   Margin="0,0,16,0"
+                                                   HorizontalAlignment="Left"
+                                                   VerticalAlignment="Center"
+                                                   Text="{loc:T option.show_fps}" />
+                        <CheckBox Grid.Column="1"
+                                  x:Name="ShowFps"
+                                  Classes="SwitchDark"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
 
-            <components:FormFieldLabel Text="{loc:T section.recomp_dolphin_data}" Margin="0,10,0,0" />
-            <Border Classes="SettingsBlockStyle">
-                <StackPanel>
-                    <CheckBox x:Name="UseDolphinData" Classes="SwitchDark" Margin="0,2">
-                        <components:FormFieldLabel Text="{loc:T option.recomp_use_dolphin_data}"
-                                                   TipText="{loc:T helper_text.recomp_use_dolphin_data}" />
-                    </CheckBox>
-                    <TextBlock x:Name="DolphinDataStatus" Classes="TinyText" Margin="0,4,0,0"
-                               TextWrapping="Wrap" />
-                </StackPanel>
-            </Border>
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components:FormFieldLabel Text="{loc:T option.recomp_prevent_stutters}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.recomp_prevent_stutters}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="PreventStutters"
+                                  Classes="SwitchDark"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+            </StackPanel>
 
             <components:FormFieldLabel x:Name="InstallationSectionLabel"
-                                       Text="{loc:T section.installation}" Margin="0,10,0,0" />
-            <Border Classes="SettingsBlockStyle" x:Name="InstallationBorder">
-                <StackPanel>
-                    <TextBox x:Name="InstallLocation" Classes="dark" Height="40" IsReadOnly="True" />
-                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                        <components:Button x:Name="OpenInstallFolder"
-                                           HorizontalAlignment="Left"
+                                       Text="{loc:T section.setup}" Margin="0,10,0,4" />
+            <StackPanel x:Name="InstallationBorder"
+                        Spacing="4"
+                        Margin="0,0,0,7">
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <components:FormFieldLabel Text="{loc:T option.recomp_share_dolphin_data}" />
+                                <PathIcon x:Name="SharedNandWarningIcon"
+                                          IsVisible="False"
+                                          Data="{StaticResource WarningTriangle}"
+                                          Foreground="{StaticResource Warning600}"
+                                          ToolTip.Tip="{loc:T helper_text.recomp_shared_nand_warning}"
+                                          ToolTip.Placement="Top"
+                                          ToolTip.ShowDelay="50"
+                                          Width="14"
+                                          Height="14" />
+                            </StackPanel>
+                            <SelectableTextBlock Classes="TinyText"
+                                                 Text="{loc:T helper_text.recomp_share_dolphin_data}"
+                                                 TextAlignment="Left"
+                                                 TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="ShareDolphinData"
+                                  Classes="SwitchDark"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components:FormFieldLabel Text="{loc:T option.recomp_clone_dolphin_data}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                                 Text="{loc:T helper_text.recomp_clone_dolphin_data}"
+                                                 TextAlignment="Left"
+                                                 TextWrapping="Wrap" />
+                            <SelectableTextBlock x:Name="DolphinCloneStatus"
+                                                 Classes="TinyText"
+                                                 TextAlignment="Left"
+                                                 TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components:Button Grid.Column="1"
+                                           x:Name="CloneDolphinDataButton"
+                                           Variant="Default"
+                                           ButtonSize="Compact"
+                                           Text="{loc:T action.clone}"
+                                           IconData="{StaticResource Duplicate}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Click="CloneDolphinData_OnClick" />
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components:FormFieldLabel Text="{loc:T option.installation_folder}" />
+                            <SelectableTextBlock x:Name="InstallLocationText"
+                                       Classes="TinyText"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components:Button Grid.Column="1"
+                                           x:Name="OpenInstallFolder"
+                                           Variant="Default"
+                                           ButtonSize="Compact"
                                            IconData="{StaticResource Folder}"
-                                           Text="{loc:T action.open_folder}"
+                                           Text="{loc:T action.open}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
                                            Click="OpenInstallFolder_OnClick" />
-                        <components:Button x:Name="UninstallButton" Margin="6,0,0,0"
-                                           Variant="Danger" HorizontalAlignment="Left"
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components:FormFieldLabel Text="{loc:T option.recomp_installation}" />
+                            <SelectableTextBlock x:Name="WiiCompiledVersionText"
+                                       Classes="TinyText"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components:Button Grid.Column="1"
+                                           x:Name="UninstallButton"
+                                           Variant="Danger"
+                                           ButtonSize="Compact"
                                            IconData="{StaticResource Trash}"
                                            Text="{loc:T action.un_install}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
                                            Click="Uninstall_OnClick" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+                    </Grid>
+                </Border>
+            </StackPanel>
+            <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

@@ -155,9 +155,7 @@ es:
     rooms: "Salas"
     miis: "Miis"
   text:
-    made_by_string: |
-      Hecho por: {$1}
-      y {$2}
+    made_by_string: "Hecho por: {$1} y {$2}"
     thanks_translators: "Muchas gracias a todos los traductores:"
     wh_wz_translation_percentage: "La traducción de este idioma está a un {$1}%."
   hover:
@@ -224,10 +222,9 @@ es:
       extra: "Este cambio se revertira en {$1} a menos de que decidas de quedarte con este cambio."
     dolphin_found:
       title: "Carpeta del Emulador Dolphin encontrado"
-      extra: |
-        Ante la duda, solo marque si.
-
-        Carpeta del emulador Dolphin encontrado. ¿Desea usar esta carpeta?
+      extra: |-
+        Ante la duda, solo marque si
+        . Carpeta del emulador Dolphin encontrado. ¿Desea usar esta carpeta?
     new_version_wh_wz:
       title: "Actualización de Wheel Wizard disponible"
       extra: "La version {$1} de WheelWizzard está disponible (Actualmente en {$2}). ¿Desea actualizar ahora?"
@@ -268,13 +265,11 @@ es:
       extra: "No se pueden buscar actualizaciones en este momento. Es posible que no tengas conexión a internet o que el servidor esté inactivo."
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Incapaz de confirmar la actualidad de su versión de Wheel Wizard.
-
           Podrías estar experimentando problemas de conexión.
-        reason_location: |
+        reason_location: |-
           Incapaz de actualizar Wheel Wizard. Asegurate que la aplicación esta ubicada en una carpeta que se puede editar.
-
           No se encontró la carpeta actual.
       title: "No se pudo actualizar Wheel Wizard."
     no_connect_server:
@@ -300,9 +295,8 @@ es:
       extra:
         failed_update_delete: "Error al borrar archivos para la actualización. Cancelando"
         failed_update_apply: "Error al aplicar una actualización. Cancelando."
-        invalid_file_path: |
+        invalid_file_path: |-
           Se detectó una ruta de archivo no válida. Contacte a los desarrolladores.
-
           Error del servidor: {$1}
       title: "Abortando actualización de RR"
     restart_admin_fail:
@@ -361,12 +355,13 @@ es:
     mario_kart_game: "Archivo del juego Mario Kart Wii"
     dolphin_emulator_exe: "Emulador Dolphin Ejecutable"
     make_primary: "Hacer primaria"
-    remove_blur: "Quitar Blur"
     enable_animations: "Activar Animaciones"
     reinstall: "Reinstalar RR"
     open_game_folder: "Abrir carpeta de juegos"
     open_save_folder: "Abrir carpeta de archivos de juego guardados"
   section:
+    graphics: "Gráficos"
+    general: "General"
     language: "Idioma"
     wii: "Ajustes de Wii"
     resolution: "Resolución"
@@ -386,10 +381,10 @@ es:
     end_with_exe: "La ruta debe terminar en un .exe"
     enable_animations: "Esto activa las animaciones en la aplicación Wheel Wizard"
   category:
-    video: "Video"
     about: "Acerca de"
     other: "Otro"
     general: "General"
+    video: "Video"
   value:
     language:
       france: "Francés"

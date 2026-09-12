@@ -23,11 +23,16 @@ public static class RecompReleaseResolver
     /// <summary>
     /// Returns the newest usable release, or <see langword="null"/> when the listing contains none.
     /// </summary>
-    public static RecompRelease? FindLatest(IEnumerable<GithubRelease>? releases)
+    /// <param name="assetName">
+    /// The setup asset a release must carry to count, <see cref="RecompPlatform.ReleaseAssetName"/> by
+    /// default. A release that only ships another platform's setup is skipped, not treated as newest.
+    /// </param>
+    public static RecompRelease? FindLatest(IEnumerable<GithubRelease>? releases, string? assetName = null)
     {
         if (releases is null)
             return null;
 
+        assetName ??= RecompPlatform.ReleaseAssetName;
         RecompRelease? best = null;
         foreach (var release in releases)
         {
@@ -37,9 +42,7 @@ public static class RecompReleaseResolver
             if (!RecompVersion.TryParse(release.TagName, out var version))
                 continue;
 
-            var asset = release.Assets.FirstOrDefault(candidate =>
-                string.Equals(candidate.Name, RecompSetupCommandBuilder.SetupFileName, StringComparison.OrdinalIgnoreCase)
-            );
+            var asset = release.Assets.FirstOrDefault(candidate => string.Equals(candidate.Name, assetName, StringComparison.OrdinalIgnoreCase));
             if (asset is null || string.IsNullOrWhiteSpace(asset.BrowserDownloadUrl))
                 continue;
 

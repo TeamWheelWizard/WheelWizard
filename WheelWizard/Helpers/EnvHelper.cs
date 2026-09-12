@@ -45,7 +45,16 @@ public static class EnvHelper
 
     public static bool IsFlatpakSandboxed()
     {
-        return FileHelper.FileExists("/.flatpak-info") && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FLATPAK_ID"));
+        return OperatingSystem.IsLinux() && FileHelper.FileExists("/.flatpak-info") && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FLATPAK_ID"));
+    }
+
+    public static string? MaybeDolphinLocationOverride()
+    {
+        if (IsFlatpakSandboxed())
+        {
+            return "/app/bin/dolphin-emu-wrapper";
+        }
+        return null;
     }
 
     public static bool IsRelativeLinuxPath(string path)

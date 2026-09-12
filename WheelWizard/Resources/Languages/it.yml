@@ -167,7 +167,7 @@ it:
     mii_editor: "Creatore Mii"
     mii_carousel: "Visualizzatore Mii"
   text:
-    made_by_string: |
+    made_by_string: |-
       Fatto da: {$1}
       e {$2}
     thanks_translators: "Grazie a tutti i traduttori:"
@@ -246,9 +246,8 @@ it:
       extra: "Questa modifica si ripristinerà in {$1} a meno che tu decida di mantenerla."
     dolphin_found:
       title: "Cartella dell'Emulatore Dolphin trovata"
-      extra: |
+      extra: |-
         Se non sai cosa ciò vuol dire, clicca su sì :)
-
         Cartella dell'Emulatore Dolphin trovata. Vuoi usare questa cartella?
     new_version_wh_wz:
       title: "Aggiornamento di Wheel Wizard disponibile"
@@ -299,13 +298,11 @@ it:
       extra: "Impossibile verificare gli aggiornamenti in questo momento. Potresti non avere una connessione ad internet oppure il server potrebbe essere offline."
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Impossibile verificare se Wheel Wizard è aggiornato.
-
           Potresti avere problemi di connessione.
-        reason_location: |
+        reason_location: |-
           Impossibile aggiornare Wheel Wizard. Assicurati che l'applicazione si trovi in una cartella con diritti di scrittura.
-
           Non è possibile trovare la cartella attuale.
       title: "Impossibile aggiornare Wheel Wizard."
     no_connect_server:
@@ -342,9 +339,8 @@ it:
       extra:
         failed_update_delete: "Fallito il cancellamento dei file dell'aggiornamento. Annullamento."
         failed_update_apply: "Fallita l'applicazione di un aggiornamento. Annullamento."
-        invalid_file_path: |
+        invalid_file_path: |-
           Incontrato un percorso file invalido. Contatta gli sviluppatori.
-
           Errore server: {$1}
       title: "Annullando l'aggiornamento di RR"
     restart_admin_fail:
@@ -411,12 +407,13 @@ it:
     mario_kart_game: "File di gioco di Mario Kart Wii"
     dolphin_emulator_exe: "Eseguibile Emulatore Dolphin"
     make_primary: "Rendi di default"
-    remove_blur: "Rimuovere la sfocatura (Blur)"
     enable_animations: "Attiva le animazioni"
     reinstall: "Reinstalla Retro Rewind"
     open_game_folder: "Apri la cartella del gioco"
     open_save_folder: "Apri la cartella del salvataggio"
   section:
+    graphics: "Grafica"
+    general: "Generali"
     language: "Lingua"
     wii: "Impostazioni Wii"
     resolution: "Risoluzione"
@@ -436,14 +433,13 @@ it:
     end_with_exe: "L'indirizzo deve terminare con .exe"
     enable_animations: "Questa impostazione abiliterà le animazioni nell'applicazione Wheel Wizard"
     end_with_x: "L'indirizzo può terminare con:"
-    wh_wz_language: "Questo cambia soltanto la lingua di Wheel Wizard. Per cambiare la lingua all'interno del gioco, dovrai farlo dalle impostazioni del gioco stesso."
     optional: "Opzionale"
     must_set_paths: "Devi impostare questi 3 indirizzi prima di poter iniziare a giocare a Retro Rewind"
   category:
-    video: "Video"
     about: "A riguardo"
     other: "Altro"
     general: "Generale"
+    video: "Video"
   value:
     language:
       france: "Francese"

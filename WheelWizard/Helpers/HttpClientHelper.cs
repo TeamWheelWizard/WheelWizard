@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using WheelWizard.Models;
+using WheelWizard.Shared;
 
 namespace WheelWizard.Helpers;
 
@@ -34,7 +35,7 @@ public static class HttpClientHelper
     public static async Task<HttpClientResult<T>> PostAsync<T>(string url, HttpContent? body, JsonSerializerOptions? options = null)
     {
 #if DEBUG
-        if (!FakeConnectionToInternet)
+        if (DevelopmentMode.IsEnabled && !FakeConnectionToInternet)
             return GetErrorResult<T>(new("No internet connection"));
 #endif
 
@@ -70,7 +71,7 @@ public static class HttpClientHelper
     public static async Task<HttpClientResult<T>> GetAsync<T>(string url, JsonSerializerOptions? options = null)
     {
 #if DEBUG
-        if (!FakeConnectionToInternet)
+        if (DevelopmentMode.IsEnabled && !FakeConnectionToInternet)
             return GetErrorResult<T>(new("No internet connection"));
 #endif
 

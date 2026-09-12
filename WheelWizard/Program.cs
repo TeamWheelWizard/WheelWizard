@@ -98,7 +98,7 @@ public class Program : IDesignerEntryPoint
 
     private static void SetupWorkingDirectory()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && EnvHelper.IsFlatpakSandboxed())
+        if (EnvHelper.IsFlatpakSandboxed())
         {
             // In this case, we would not want executable directory-relative paths, since this is in `/app/bin`.
             // We are going to use the home directory instead (this should be the original working directory anyway).

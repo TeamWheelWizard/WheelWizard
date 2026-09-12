@@ -3,15 +3,18 @@ fi:
     home: "Etusivu"
     settings: "Asetukset"
     mods: "My Stuff"
+    patches: "Paikkaukset"
     my_profiles: "Omat profiilit"
     rooms: "Huoneet"
     friends: "Kaverit"
+    leaderboard: "Tulostaulu"
     room_details: "Huoneen tiedot"
     my_miis: "Omat Miit"
   attribute:
     status_online: "Online"
     enabled: "Käytössä"
     title: "Otsikko"
+    all: "Kaikki"
     status_offline: "Offline"
     name: "Nimi"
     id: "ID"
@@ -108,6 +111,7 @@ fi:
     install: "Asenna"
     update: "Päivitä"
     import: "Tuo"
+    convert_to_patches: "Muunna paikkauksiksi"
     enable_all: "Ota kaikki käyttöön"
     disable_all: "Poista kaikki"
     rename: "Nimeä uudelleen"
@@ -167,13 +171,15 @@ fi:
     mii_editor: "Mii-editori"
     mii_carousel: "Miin katselu"
   text:
-    made_by_string: |
+    made_by_string: |-
       Tehnyt: {$1}
       ja {$2}
     thanks_translators: "Suuret kiitokset kaikille kääntäjille:"
     wh_wz_translation_percentage: "Tämän kielen käännökset ovat {$1} % valmiita."
     powered_gamebanana: "Palvelun tarjoaa GameBanana"
     language_translated_by: "Tämän kielen käännökset tarjoaa: {$1}"
+    external_reference: "Ulkoinen viite"
+    external_reference_with_path: "Ulkoinen viite: {$1}"
   hover:
     players_online:
       0: "Ei pelaajia online-tilassa"
@@ -192,7 +198,7 @@ fi:
       Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
     friends_page_disclaimer: "Kavereiden lisääminen täytyy tehdä pelin sisällä."
     region_user_selection: "Näyttää vain alueet, joilla itse olet pelannut"
-    primary_profile: "Pääprofiilia käytetään referenssinä Wheel Wizardissa"
+    primary_profile: "Pääprofiilia käytetään viitteenä Wheel Wizardissa"
   empty_content:
     no_profiles: "Sinun on pelattava peliä vähintään kerran nähdäksesi profiilisi listalla"
     no_friends_title: "Ei kavereita vielä."
@@ -223,7 +229,7 @@ fi:
     downloading_mb: "Ladataan {$1} Mt"
     installing_mods: "Asennetaan modeja"
     installing_mods_count: "Asennetaan {$1} modia"
-    processing_xof_y: "Käsitellään {$1}/{$1} tiedostoa..."
+    processing_xof_y: "Käsitellään {$1}/{$2} tiedostoa..."
     update_rr: "Päivitetään Retro Rewindia"
     latest_wh_wz_github: "Hankitaan uusinta Wheel Wizard -versiota GitHubista"
     update_wh_wz: "Päivitetään Wheel Wizardia"
@@ -231,6 +237,14 @@ fi:
     installing_rr_first_time: "Asennetaan Retro Rewindia ensimmäistä kertaa"
     installing_dolphin: "Asennetaan Dolphin-emulaattoria"
     this_may_take_a_while: "Tässä voi kestää jonkin aikaa riippuen internet-yhteydestäsi."
+    applying_converted_mod: "Sovelletaan muunnettu modi"
+    combining_files: "Yhdistetään tiedostoja"
+    converting_file: "Muunnetaan {$1}"
+    converting_files_count: "Muunnetaan {$1} tiedostoa"
+    converting_mod_to_patches: "Muunnetaan modi paikkauksiksi"
+    downloading_mod: "Ladataan {$1}"
+    installing_mod: "Asennetaan modia"
+    preparing_files_count: "Valmistellaan {$1} tiedostoa"
   question:
     launch_clear_mods_found:
       title: "Modeja löytyi"
@@ -244,11 +258,16 @@ fi:
     apply_scale:
       title: "Haluatko ottaa uuden skaalan käyttöön?"
       extra: "Muutos perutaan {$1} kuluttua, ellet aio pitää muutosta."
+    move_data:
+      title: "Siirretäänkö Wheel Wizardin tiedot?"
+      extra: |-
+        Wheel Wizardin tiedostot siirretään sijaintiin:
+        {$1}
+        Tässä saattaa mennä hetki riippuen tietojen määrästä.
     dolphin_found:
       title: "Dolphin-emulaattorin kansio löytyi"
-      extra: |
+      extra: |-
         Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä' :)
-
         Dolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?
     new_version_wh_wz:
       title: "Wheel Wizard -päivitys saatavilla"
@@ -279,6 +298,13 @@ fi:
     enter_new_name:
       title: "Anna uusi nimi"
       extra: "Muutetaan nimeä: {$1}"
+    enter_mod_name:
+      title: "Modin nimi:"
+    launch_clear_patches_found:
+      extra: "Olet käynnistämässä pelin ilman modeja. Haluatko tyhjentää paikkauskansiosi? Pelin käynnistyy muuten nykyisen paikkauskansion ollessa aktiivinen."
+    apply_language_settings:
+      title: "Tämä sulkee ikkunan ja avaa uuden valitulla kieliasetuksella."
+      extra: "Haluatko ottaa uuden kieliasetuksen käyttöön?"
   message_warning:
     not_find_dolphin:
       extra: "Dolphin-emulaattoria ei löytynyt. Määritä sijaintipolku asetuksissa."
@@ -296,18 +322,19 @@ fi:
     dolphin_not_found:
       title: "Dolphin-emulaattorin kansiota ei löytynyt"
       extra: "Dolphin-emulaattorin kansiota ei löytynyt automaattisesti. Yritä etsiä kansio mauaalisesti. Lisätietoa saat napsauttamalla 'Ohje'."
+    dolphin_tool_selected:
+      title: "Kelvoton Dolphinin käynnistystiedosto valittuna"
+      extra: "Sinulla on DolphinTool.exe valittuna. Ole hyvä ja valitse Dolphin.exe (Dolphin-emulaattorin käynnistystiedosto) sen sijaan."
     fail_check_updates:
       title: "Päivitysten tarkistus epäonnistui"
       extra: "Päivityksiä ei voi tarkistaa juuri nyt. Internet-yhteyttä ei ole tai palvelimessa on ongelma."
     unable_update_wh_wz:
       extra:
-        reason_network: |
+        reason_network: |-
           Ei voitu tarkistaa, onko Wheel Wizard ajan tasalla.
-
           Syynä saattaa olla verkkoyhteysongelmat.
-        reason_location: |
+        reason_location: |-
           Wheel Wizardia ei voi päivittää. Varmista, että sovellus sijaitsee kansiossa, johon voi kirjoittaa tietoja.
-
           Nykyistä kansiota ei löytynyt.
       title: "Wheel Wizardia ei voi päivittää."
     no_connect_server:
@@ -330,6 +357,8 @@ fi:
     unable_download_mod:
       title: "Modia ei voi ladata"
       extra: "Tiedostoja ei löytynyt."
+    could_not_convert_mod:
+      title: "Modia ei voitu muuntaa"
   placeholder:
     enter_mod_name: "Anna modin nimi..."
     search_mod: "Hae modeja..."
@@ -340,13 +369,14 @@ fi:
   message_error:
     no_mod_folder:
       extra: "Modikansiota ei ole olemassa"
+    data_folder_move:
+      title: "Tietojen siirto epäonnistui"
     abort_rr:
       extra:
         failed_update_delete: "Tiedostojen poistaminen päivitystä varten epäonnistui. Perutaan."
         failed_update_apply: "Päivityksen käyttöönotto epäonnistui. Perutaan."
-        invalid_file_path: |
+        invalid_file_path: |-
           Virheellinen polku. Ota yhteyttä kehittäjiin.
-
           Palvelinvirhe: {$1}
       title: "Perutaan RR-päivitys"
     restart_admin_fail:
@@ -370,9 +400,22 @@ fi:
   message_success:
     settings_saved:
       title: "Asetukset tallennettu!"
+    data_folder_moved:
+      title: "Tietokansio päivitetty"
+      extra: |-
+        Wheel Wizardin tiedot sijaitsevat nyt kohteessa:
+        {$1}
     rr_up_to_date:
       title: "Retro Rewind on ajan tasalla."
     mii_changed: "Mii vaihdettu!"
+    mod_converted_to_patches:
+      title: "Muunnettu paikkauksiksi"
+    mod_installed:
+      extra: "Modi '{$1}' asennettu."
+      title: "Modi asennettu!"
+    patch_conversion_result: "{$1} tiedostoa muunnettu {$2} paikkaustiedostoksi."
+    patch_conversion_skipped: "{$1} tiedostoa ei muutettu, koska niitä ei voitu muuntaa."
+    patch_conversion_notes: "Huomautus: {$1}"
   snackbar_warning:
     cant_save_mii: "Miitä ei voi tallentaa"
     no_mii_export: "Vietäviä Miitä ei ole"
@@ -397,27 +440,38 @@ fi:
     mii_failure_duplicate: "Miin '{$1}' kopioiminen epäonnistui"
   helper_note:
     name_must_between: "Nimien täytyy olla 3–10 merkkiä pitkä."
+    creator_name_less11: "Tekijän nimen täytyy olla alle 11 merkkiä pitkä."
     creator_name_less10: "Tekijän nimen täytyy olla alle 10 merkkiä pitkä."
+  file_picker:
+    select_mod_file: "Valittu moditiedosto"
+  patch:
+    incompatible_mod:
+      message: "Tämä modi on yhteensopimaton muiden modien kanssa. Pelin käynnistäminen tämän modin kanssa voi aiheuttaa virheellistä toimintaa tai kaatumisia. Harkitse modin muuntamista paikkauksiksi napsauttamalla sitä hiiren oikealla painikkeella."
+      title: "YHTEENSOPIMATON MODI"
   option:
     wh_wz_language: "Wheel Wizardin kieli"
     force_disable_wiimote: "Pakota Wiimote pois käytöstä"
     launch_with_dolphin: "Käynnistä peli Dolphin-ikkunassa"
+    launch_rr_on_startup: "Käynnistä Retro Rewind heti"
     v_sync: "Pystytahdistus (V-Sync)"
     recommended: "Suositellut asetukset"
     show_fps: "Näytä kuvalaskuri"
     renderer: "Renderöijä"
     window_scale: "Ikkunan koko"
     open_config: "Avaa asetuskansio"
+    wheel_wizard_data_folder: "Wheel Wizardinin tietokansio"
+    reset_data_folder: "Käytä oletussijaintia"
     dolphin_user_path: "Dolphin-käyttäjäkansio"
     mario_kart_game: "Mario Kart Wii -pelitiedosto"
     dolphin_emulator_exe: "Dolphin-emulaattorin käynnistystiedosto"
     make_primary: "Aseta ensisijaiseksi"
-    remove_blur: "Poista sumennus"
     enable_animations: "Animaatiot"
     reinstall: "Asenna RR uudelleen"
     open_game_folder: "Avaa pelikansio"
     open_save_folder: "Avaa tallennuskansio"
   section:
+    graphics: "Grafiikka"
+    general: "Yleiset"
     language: "Kieli"
     wii: "Wii-asetukset"
     resolution: "Resoluutio"
@@ -430,21 +484,26 @@ fi:
     topbar:
       location_warning: "Asetukset on lukittu, suorita sijaintipolkujen asetukset ensin"
     launch_with_dolphin: "Käynnistää Dolphinin pääikkunan pelin mukana"
+    launch_rr_on_startup: "Retro Rewind käynnistetään heti kun Wheel Wizard käynnistyy"
     force_disable_wiimote: "Poistaa Wiimoten käytöstä pelissä, mutta ottaa sen käyttöön Wii-valikossa"
     resolution_scale: "1x on alkuperäinen resoluutio"
     recommended: "Muuttaa joitakin Dolphinin asetuksia pätkimisen ja lagipiikkien vähentämiseksi"
     30_fps: "Pakottaa pelin toimimaan 30 FPS -tilassa (oletus on 60)"
+    wheel_wizard_data_folder: "Valitse Wheel Wizardin tiedostosijainti. Siirtäminen voi kestää hetken."
     end_with_exe: "Polun täytyy loppua päätteeseen .exe"
     enable_animations: "Ottaa käyttöön animaatiot Wheel Wizard -sovelluksessa"
     end_with_x: "Polku voi loppua:"
-    wh_wz_language: "Vaihtaa kielen vain Wheel Wizard -sovelluksessa. Pelin kielen saa vaihdettua itse pelin sisällä."
     optional: "Valinnainen"
     must_set_paths: "Nämä 3 polkua on määritettävä ennen kuin voit pelata Retro Rewindia"
   category:
-    video: "Grafiikka"
     about: "Tietoa"
     other: "Muut"
     general: "Yleiset"
+    video: "Grafiikka"
+  status:
+    data_folder:
+      custom: "Käytetään mukautettua sijaintia."
+      moving: "Siirretään tietoja, odota hetki..."
   value:
     language:
       france: "Ranska"
@@ -463,4 +522,4 @@ fi:
       norwegian: "Norja"
       chinese: "Kiina"
       portuguese: "Portugali"
-      z_translators: "Clavey"
+      z_translators: "Clavey, Alokas"

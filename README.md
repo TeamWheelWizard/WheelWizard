@@ -8,6 +8,12 @@
 
 <p align="center"><a href="https://github.com/TeamWheelWizard/WheelWizard">Wheel wizard</a> by <span>Patchzy and WantToBeeMe</span> is licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">GNU General Public License v3.0</a></p>
 
+<p align="center">
+  <a href="https://flathub.org/apps/io.github.TeamWheelWizard.WheelWizard">
+    <img src="https://flathub.org/api/badge?svg&locale=en" alt="Get it on Flathub" width="240" />
+  </a>
+</p>
+
 # Wheel Wizard
 
 <p align="center">
@@ -18,6 +24,15 @@
 
 Wheel Wizard, our mod manager, is created for the sole purpose of convenience. Technically, these mods and Retro Rewind are all doable without this app, but this app makes it possible with just a few clicks. It still has a lot of features in the planning stage and is fully in development, so keep an eye out for updates.
 
+## Requirements
+
+In order to play, a Mario Kart Wii game backup, dumped by you, is required. Accepted formats are .iso, .gcm, .gcz, .ciso, .wbfs, .wia and .rvz. Depending on what you like to play, a specific game version may be required.
+
+| Retro Rewind in Dolphin | Wiicompiled (with or without Retro Rewind) |
+|-------------------------|--------------------------------------------|
+| Any region              | PAL only                                   |
+
+
 ## Free and Open Source
 
 Wheel Wizard was made by [patchzy](https://github.com/patchzyy) and [wanttobeeme](https://github.com/wanttobeeme). This application is completely free to use. You can go to the [latest releases](https://github.com/TeamWheelWizard/WheelWizard/releases) and download the executable there. Once installed, the app will automatically notify you when updates are available.
@@ -25,14 +40,13 @@ Wheel Wizard was made by [patchzy](https://github.com/patchzyy) and [wanttobeeme
 Feel free to join our community on [Discord](https://discord.gg/vZ7T2wJnsq) for support and discussions! If you see any bugs, this is also the place to be :P
 
 
-<p align="center">
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/home_page.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/rooms_page.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/profile_page.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/mods_browser.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/miieditor_page.png" alt="Wheel Wizard Logo" width="450"/>
-  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/mii_page.png" alt="Wheel Wizard Logo" width="450"/>
-</p>
+| <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/home_page.png" alt="Wheel Wizard Logo" width="450"/> | <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/rooms_page.png" alt="Wheel Wizard Logo" width="450"/> |
+|--|--|
+| <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/profile_page.png" alt="Wheel Wizard Logo" width="450"/> | <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/mii_page.png" alt="Wheel Wizard Logo" width="450"/> |
+
+| <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/mods_browser.png" alt="Wheel Wizard Logo" width="450"/> |  <img src="https://github.com/TeamWheelWizard/.github/blob/main/images/screenshots/miieditor_page.png" alt="Wheel Wizard Logo" width="450"/> |
+|--|--|
+
 ---
 
 ## Antivirus Warning
