@@ -3,14 +3,16 @@ using Avalonia.Media;
 using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
-using WheelWizard.Utilities;
+using WheelWizard.Shared.Calendar;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
 
 public partial class MiiImageLoader : BaseMiiImage
 {
-    private static readonly bool IsAprilFirst = AprilFirstHelper.IsAprilFirstLocalOrBst();
+    [Inject]
+    private ISeasonalCalendar Calendar { get; set; } = null!;
 
     #region properties
 
@@ -80,7 +82,7 @@ public partial class MiiImageLoader : BaseMiiImage
     {
         InitializeComponent();
 
-        if (IsAprilFirst)
+        if (Calendar.IsAprilFirst)
             MiiImageContainer.RenderTransform = new RotateTransform(Random.Shared.NextDouble() * 360);
     }
 
