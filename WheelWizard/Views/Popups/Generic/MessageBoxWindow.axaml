@@ -4,10 +4,11 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:loc="clr-namespace:WheelWizard.Localization"
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    ClipToBounds="False"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450">
-    <Grid Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="40,2*,1*">
+    <Grid Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="40,2*,Auto,1*">
 
         <!-- Message Title -->
         <Border Grid.Row="0" Margin="-10" x:Name="TitleBorder">
@@ -33,8 +34,16 @@
                                  HorizontalAlignment="Left" Margin="0,10,0,0" />
         </ScrollViewer>
 
+        <!-- Do not show again -->
+        <CheckBox Grid.Row="2" x:Name="DoNotShowAgainCheckBox"
+                  Classes="CheckBox"
+                  Content="{loc:T action.do_not_show_again}"
+                  HorizontalAlignment="Left"
+                  Margin="0,0,0,10"
+                  IsVisible="False" />
+
         <!-- OK Button -->
-        <components:Button Grid.Row="2" x:Name="CancelButton"
+        <components:Button Grid.Row="3" x:Name="CancelButton"
                            Text="OK" Width="140"
                            Variant="Default"
                            HorizontalAlignment="Center"

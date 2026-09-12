@@ -18,6 +18,14 @@ public sealed class SettingsFeatureCollection;
 public class SettingsManagerTests
 {
     [Fact]
+    public void DoNotShowAgain_DefaultsToAnEmptyArray()
+    {
+        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+
+        Assert.Empty(manager.Get<string[]>(manager.DO_NOT_SHOW_AGAIN));
+    }
+
+    [Fact]
     public void Get_Throws_WhenRequestedTypeDoesNotMatchSettingType()
     {
         var manager = CreateManager(new MockFileSystem(), out _, out _, out _);

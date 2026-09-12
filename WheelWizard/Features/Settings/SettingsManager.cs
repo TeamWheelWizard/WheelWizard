@@ -41,6 +41,7 @@ public class SettingsManager : ISettingsManager
         // Register this first because the path validators use the active frontend mode when deciding
         // whether Dolphin-only locations may be left blank.
         ENABLE_RECOMP = RegisterWhWz("EnableRecomp", false);
+        DO_NOT_SHOW_AGAIN = RegisterWhWz("do_not_show_again", Array.Empty<string>());
         // Whether WiiCompiled directly shares Dolphin's live NAND. Disabled means private mode;
         // private mode uses the imported clone below when one exists, otherwise the runtime default.
         RECOMP_USE_DOLPHIN_DATA = RegisterWhWz("RecompUseDolphinData", false);
@@ -275,6 +276,7 @@ public class SettingsManager : ISettingsManager
     #endregion
 
     #region Settings Properties
+    public Setting DO_NOT_SHOW_AGAIN { get; }
     public Setting USER_FOLDER_PATH { get; }
     public Setting DOLPHIN_LOCATION { get; }
     public Setting GAME_LOCATION { get; }

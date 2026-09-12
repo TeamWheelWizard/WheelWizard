@@ -33,6 +33,7 @@ public interface IRecompSettingManager
 
 public interface ISettingsProperties
 {
+    Setting DO_NOT_SHOW_AGAIN { get; }
     Setting USER_FOLDER_PATH { get; }
     Setting DOLPHIN_LOCATION { get; }
     Setting GAME_LOCATION { get; }

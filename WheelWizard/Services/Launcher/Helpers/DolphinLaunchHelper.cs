@@ -12,6 +12,7 @@ namespace WheelWizard.Services.Launcher.Helpers;
 
 public static class DolphinLaunchHelper
 {
+    private const string DolphinVersionUnverifiedWarningKey = "dolphin-version-unverified";
     private const string DolphinDownloadUrl = "https://dolphin-emu.org/download/";
 
     private const string WheelWizardFlathubUrl = "https://flathub.org/apps/io.github.TeamWheelWizard.WheelWizard";
@@ -152,6 +153,7 @@ public static class DolphinLaunchHelper
                 .SetMessageType(MessageBoxWindow.MessageType.Warning)
                 .SetTitleText(t("message_warning.dolphin_version_unverified.title"))
                 .SetInfoText(t("message_warning.dolphin_version_unverified.extra", DolphinVersion.MinimumDisplayText))
+                .SetDoNotShowAgain(DolphinVersionUnverifiedWarningKey)
                 .ShowDialog();
             return Ok();
         }
