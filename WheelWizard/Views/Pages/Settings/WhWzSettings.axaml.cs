@@ -15,6 +15,7 @@ using WheelWizard.Shared.IO;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Views.Storage;
 using SettingsButton = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Pages.Settings;
@@ -30,6 +31,9 @@ public partial class WhWzSettings : UserControlBase
     private bool _editingScale;
     private bool _isMovingAppData;
     private bool _updatingLanguageDropdown;
+
+    [Inject]
+    private IFilePickerService FilePicker { get; set; } = null!;
 
     [Inject]
     private IDolphinPaths DolphinPaths { get; set; } = null!;
@@ -211,7 +215,7 @@ public partial class WhWzSettings : UserControlBase
             }
 
             // Fallback to manual selection
-            var folders = await FilePickerHelper.SelectFolderAsync("Select Dolphin.app");
+            var folders = await FilePicker.SelectFolderAsync("Select Dolphin.app");
             if (folders != null && folders.Count >= 1)
             {
                 var resolvedFolder = await ResolveSelectedFolderPathAsync(folders[0]);
@@ -225,7 +229,7 @@ public partial class WhWzSettings : UserControlBase
             return; // do not do normal selection for MacOS
         }
 
-        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Dolphin Emulator", [executableFileType]);
+        var filePath = await FilePicker.OpenSingleFileAsync("Select Dolphin Emulator", [executableFileType]);
         if (!string.IsNullOrEmpty(filePath))
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -269,7 +273,7 @@ public partial class WhWzSettings : UserControlBase
             Patterns = ["*.iso", "*.gcm", "*.gcz", "*.ciso", "*.wbfs", "*.wia", "*.rvz"],
         };
 
-        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Mario Kart Wii Game File", [fileType]);
+        var filePath = await FilePicker.OpenSingleFileAsync("Select Mario Kart Wii Game File", [fileType]);
         if (!string.IsNullOrEmpty(filePath))
         {
             await ApplyLocationSettingAsync(SettingsService.GAME_LOCATION, filePath);
@@ -308,7 +312,7 @@ public partial class WhWzSettings : UserControlBase
         if (!string.IsNullOrEmpty(currentFolder) && Directory.Exists(currentFolder))
         {
             var folder = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentFolder);
-            var folders = await FilePickerHelper.SelectFolderAsync("Select Dolphin User Path", folder);
+            var folders = await FilePicker.SelectFolderAsync("Select Dolphin User Path", folder);
 
             if (folders != null && folders.Count >= 1)
             {
@@ -321,7 +325,7 @@ public partial class WhWzSettings : UserControlBase
         else
         {
             // Let the user manually select a folder
-            var manualFolders = await FilePickerHelper.SelectFolderAsync("Select Dolphin User Path");
+            var manualFolders = await FilePicker.SelectFolderAsync("Select Dolphin User Path");
 
             if (manualFolders != null && manualFolders.Count >= 1)
             {
@@ -361,17 +365,17 @@ public partial class WhWzSettings : UserControlBase
     private void DolphinUserFolderOpen_OnClick(object sender, RoutedEventArgs e)
     {
         if (Directory.Exists(DolphinPaths.UserFolderPath))
-            FilePickerHelper.OpenFolderInFileManager(DolphinPaths.UserFolderPath);
+            FilePicker.OpenFolderInFileManager(DolphinPaths.UserFolderPath);
     }
 
-    private static void OpenContainingFolder(string filePath)
+    private void OpenContainingFolder(string filePath)
     {
         try
         {
             var unquotedPath = filePath.Trim().Trim('\'', '"');
             var folderPath = Path.GetDirectoryName(Path.GetFullPath(unquotedPath));
             if (!string.IsNullOrWhiteSpace(folderPath) && Directory.Exists(folderPath))
-                FilePickerHelper.OpenFolderInFileManager(folderPath);
+                FilePicker.OpenFolderInFileManager(folderPath);
         }
         catch
         {
@@ -384,7 +388,7 @@ public partial class WhWzSettings : UserControlBase
         if (!Directory.Exists(ApplicationData.DirectoryPath))
             Directory.CreateDirectory(ApplicationData.DirectoryPath);
 
-        FilePickerHelper.OpenFolderInFileManager(ApplicationData.DirectoryPath);
+        FilePicker.OpenFolderInFileManager(ApplicationData.DirectoryPath);
     }
 
     private void UpdateLocationRows()
@@ -691,7 +695,7 @@ public partial class WhWzSettings : UserControlBase
         if (!string.IsNullOrWhiteSpace(currentPath) && Directory.Exists(currentPath))
             suggestedStart = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentPath);
 
-        var folders = await FilePickerHelper.SelectFolderAsync("Select Wheel Wizard data folder", suggestedStart);
+        var folders = await FilePicker.SelectFolderAsync("Select Wheel Wizard data folder", suggestedStart);
         if (folders == null || folders.Count == 0)
             return;
 
@@ -767,7 +771,7 @@ public partial class WhWzSettings : UserControlBase
         if (folder == null)
             return null;
 
-        var resolved = FilePickerHelper.TryResolveLocalPath(folder);
+        var resolved = StoragePaths.TryResolveLocalPath(folder);
         if (!string.IsNullOrWhiteSpace(resolved))
             return resolved;
 
