@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using WheelWizard.Localization;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
@@ -324,10 +325,10 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     private static string GetPlacementLabel(int rank) =>
         rank switch
         {
-            1 => "Champion",
-            2 => "2nd Place",
-            3 => "3rd Place",
-            _ => $"#{rank}",
+            1 => t("placement.first"),
+            2 => t("placement.second"),
+            3 => t("placement.third"),
+            _ => t("placement.n", rank),
         };
 
     private static Mii? DeserializeMii(string? miiData)

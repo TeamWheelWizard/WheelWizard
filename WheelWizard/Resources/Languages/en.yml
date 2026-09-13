@@ -259,6 +259,11 @@ en:
     lifetime: "Lifetime"
     lifetime_history: "Lifetime history"
     past_n_days_with_range: "Past {$1} days ({$2} to {$3})"
+  placement:
+    first: "Champion"
+    second: "2nd Place"
+    third: "3rd Place"
+    n: "#{$1}"
   progress:
     estimated_time_remaining: "Estimated time remaining:"
     downloading_mb: "downloading {$1} MB"
