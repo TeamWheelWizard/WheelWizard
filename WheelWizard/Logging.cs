@@ -13,12 +13,33 @@ public static class Logging
     /// Do not call this method multiple times. It is intended to be called once at application startup.
     /// Do not use the static logger instance other than for the application startup.
     /// </remarks>
-    public static void CreateStaticLogger(bool logStartup = true)
+    public static void CreateStaticLogger(bool logStartup = true, bool tryReset = true)
     {
         try
         {
             var logsDirectory = Path.Combine(PathManager.WheelWizardAppdataPath, "logs");
-            Directory.CreateDirectory(logsDirectory);
+            try
+            {
+                Directory.CreateDirectory(logsDirectory);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                if (tryReset)
+                {
+                    Console.WriteLine("Resetting the Wheel Wizard directory due to an error");
+                    var resetWasSuccessful = PathManager.TryResetWheelWizardAppdataPath(out var errorMessage);
+                    if (!string.IsNullOrWhiteSpace(errorMessage))
+                        Console.WriteLine($"Error message recorded when the Wheel Wizard directory was reset: {errorMessage}");
+                    if (!resetWasSuccessful)
+                        throw;
+
+                    // Recurse only once
+                    CreateStaticLogger(logStartup: logStartup, tryReset: false);
+                    return;
+                }
+                throw;
+            }
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
