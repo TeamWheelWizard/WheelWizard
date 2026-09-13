@@ -1,8 +1,10 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using WheelWizard.Helpers;
 using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Binary;
+using WheelWizard.Shared.IO;
 using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.WiiManagement.MiiManagement;
@@ -123,7 +125,7 @@ public class MiiRepositoryServiceService(
         {
             // compute CRC over everything before CrcOffset
             var existingCrc = (ushort)((db[CrcOffset] << 8) | db[CrcOffset + 1]);
-            var calcCrc = CrcHelper.ComputeCrc16Ccitt(db, 0, CrcOffset);
+            var calcCrc = Crc.ComputeCrc16Ccitt(db, 0, CrcOffset);
 
             if (existingCrc != calcCrc)
             {
@@ -149,7 +151,7 @@ public class MiiRepositoryServiceService(
 
         if (db.Length >= CrcOffset + 2)
         {
-            var crc = CrcHelper.ComputeCrc16Ccitt(db, 0, CrcOffset);
+            var crc = Crc.ComputeCrc16Ccitt(db, 0, CrcOffset);
             db[CrcOffset] = (byte)(crc >> 8);
             db[CrcOffset + 1] = (byte)(crc & 0xFF);
         }
@@ -169,7 +171,7 @@ public class MiiRepositoryServiceService(
             if (block.Length != MiiLength)
                 continue;
 
-            var thisId = BigEndianBinaryHelper.BufferToUint32(block, 0x18);
+            var thisId = BigEndianBinary.BufferToUint32(block, 0x18);
             if (thisId == clientId)
                 return block;
         }
@@ -208,7 +210,7 @@ public class MiiRepositoryServiceService(
         db[0x1D06] = 0xFF;
         db[0x1D07] = 0xFF;
 
-        var crc = CrcHelper.ComputeCrc16Ccitt(db, 0, CrcOffset);
+        var crc = Crc.ComputeCrc16Ccitt(db, 0, CrcOffset);
         db[CrcOffset] = (byte)(crc >> 8);
         db[CrcOffset + 1] = (byte)(crc & 0xFF);
 
@@ -234,7 +236,7 @@ public class MiiRepositoryServiceService(
             if (block.Length != MiiLength)
                 continue;
 
-            var thisId = BigEndianBinaryHelper.BufferToUint32(block, 0x18);
+            var thisId = BigEndianBinary.BufferToUint32(block, 0x18);
             if (thisId != clientId)
                 continue;
 

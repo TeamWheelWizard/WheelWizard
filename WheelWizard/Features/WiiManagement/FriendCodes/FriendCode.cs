@@ -1,16 +1,16 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
-using WheelWizard.Helpers;
+using WheelWizard.Shared.Binary;
 
-namespace WheelWizard.Utilities.Generators;
+namespace WheelWizard.WiiManagement.FriendCodes;
 
-public class FriendCodeGenerator
+public static class FriendCode
 {
     private const uint GameCodeInt = 0x524D434A; // "RMCJ" in big-endian
 
     public static string GetFriendCode(byte[] data, int offset)
     {
-        var pid = BigEndianBinaryHelper.BufferToUint32(data, offset);
+        var pid = BigEndianBinary.BufferToUint32(data, offset);
         if (pid == 0)
             return string.Empty;
 

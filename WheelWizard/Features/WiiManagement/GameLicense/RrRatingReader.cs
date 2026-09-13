@@ -1,8 +1,9 @@
-using WheelWizard.Helpers;
+using WheelWizard.Shared.Binary;
+using WheelWizard.WiiManagement.FriendCodes;
 
-namespace WheelWizard.Utilities.Generators;
+namespace WheelWizard.WiiManagement.GameLicense;
 
-public interface IRRratingReader
+public interface IRrRatingReader
 {
     /// <summary>
     /// Reads VR and BR values from RRRating.pul file for a given profile ID.
@@ -15,7 +16,7 @@ public interface IRRratingReader
     (float vr, float br)? ReadRatingFromFileByFriendCode(byte[] fileData, string friendCode);
 }
 
-public class RRratingReader : IRRratingReader
+public class RrRatingReader : IRrRatingReader
 {
     private const uint Magic = 0x52525254; // 'RRRT'
     private const ushort Version = 1;
@@ -33,9 +34,9 @@ public class RRratingReader : IRRratingReader
             return null;
 
         // Read header
-        var magic = BigEndianBinaryHelper.BufferToUint32(fileData, 0);
-        var version = BigEndianBinaryHelper.BufferToUint16(fileData, 4);
-        var count = BigEndianBinaryHelper.BufferToUint16(fileData, 6);
+        var magic = BigEndianBinary.BufferToUint32(fileData, 0);
+        var version = BigEndianBinary.BufferToUint16(fileData, 4);
+        var count = BigEndianBinary.BufferToUint16(fileData, 6);
 
         if (magic != Magic || version != Version || count != MaxProfiles)
             return null;
@@ -44,10 +45,10 @@ public class RRratingReader : IRRratingReader
         var offset = HeaderSize;
         for (var i = 0; i < MaxProfiles; i++)
         {
-            var entryProfileId = BigEndianBinaryHelper.BufferToUint32(fileData, offset);
-            var vr = BigEndianBinaryHelper.BufferToFloat(fileData, offset + 4);
-            var br = BigEndianBinaryHelper.BufferToFloat(fileData, offset + 8);
-            var flags = BigEndianBinaryHelper.BufferToUint32(fileData, offset + 12);
+            var entryProfileId = BigEndianBinary.BufferToUint32(fileData, offset);
+            var vr = BigEndianBinary.BufferToFloat(fileData, offset + 4);
+            var br = BigEndianBinary.BufferToFloat(fileData, offset + 8);
+            var flags = BigEndianBinary.BufferToUint32(fileData, offset + 12);
 
             var hasData = (flags & FlagHasData) != 0 && entryProfileId > 0;
 
@@ -67,7 +68,7 @@ public class RRratingReader : IRRratingReader
     /// </summary>
     public (float vr, float br)? ReadRatingFromFileByFriendCode(byte[] fileData, string friendCode)
     {
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(friendCode);
+        var profileId = FriendCode.FriendCodeToProfileId(friendCode);
         if (profileId == 0)
             return null;
 

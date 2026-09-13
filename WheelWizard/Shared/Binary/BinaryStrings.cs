@@ -1,8 +1,8 @@
 using System.Text;
 
-namespace WheelWizard.Helpers;
+namespace WheelWizard.Shared.Binary;
 
-public static class BinaryStringHelper
+public static class BinaryStrings
 {
     private static readonly Encoding Ascii = Encoding.ASCII;
 

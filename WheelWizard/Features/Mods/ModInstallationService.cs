@@ -4,6 +4,7 @@ using SharpCompress.Archives;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Services;
+using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Mods;
@@ -127,7 +128,7 @@ public sealed class ModInstallationService : IModInstallationService
                 });
 
                 var entryKey = entry.Key ?? string.Empty;
-                if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, entryKey, out var fullEntry))
+                if (!PathSafety.TryGetPathWithinDirectory(destinationDirectory, entryKey, out var fullEntry))
                     return Fail("Archive entry is outside of the destination directory.");
 
                 var directoryPath = Path.GetDirectoryName(fullEntry);
