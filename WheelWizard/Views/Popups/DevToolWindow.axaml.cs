@@ -1,7 +1,6 @@
 ﻿using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Microsoft.Extensions.Caching.Memory;
-using WheelWizard.Helpers;
 using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Shared;
@@ -48,13 +47,9 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
     private void LoadSettings()
     {
         WhWzTopMost.IsChecked = ViewUtils.GetLayout().Topmost;
-        HttpHelperOff.IsChecked = !HttpClientHelper.FakeConnectionToInternet;
     }
 
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
-
-    private void HttpHelperOff_OnClick(object sender, RoutedEventArgs e) =>
-        HttpClientHelper.FakeConnectionToInternet = HttpHelperOff.IsChecked != true;
 
     private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
 
@@ -63,7 +58,6 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
     private void HideDevelopmentFeatures_OnClick(object sender, RoutedEventArgs e)
     {
         DevelopmentMode.Hide();
-        HttpClientHelper.FakeConnectionToInternet = true;
         ViewUtils.GetLayout().HideDevelopmentFeatures();
         Close();
     }
