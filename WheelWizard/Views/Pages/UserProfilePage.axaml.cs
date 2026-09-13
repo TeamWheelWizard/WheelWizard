@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
@@ -304,7 +304,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         UpdatePage();
     }
 
-    private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) => SetUserAsPrimary();
+    private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) => ViewUtils.IfChecked(sender, () => SetUserAsPrimary());
 
     private void PrevCarouselPage_OnClick(object? sender, RoutedEventArgs e) => MoveCarouselPage(-1);
 

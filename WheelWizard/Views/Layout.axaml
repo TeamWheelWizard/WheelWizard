@@ -10,9 +10,8 @@
         xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
         Height="876" Width="656" WindowStartupLocation="CenterScreen"
-        SystemDecorations="None"
+        WindowDecorations="None"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
         CanResize='False' Background="Transparent">
     <Grid ColumnDefinitions="192,*" RowDefinitions="27,17,18,96,*,80" x:Name="CompleteGrid"
           Background="{StaticResource FrameColor}">

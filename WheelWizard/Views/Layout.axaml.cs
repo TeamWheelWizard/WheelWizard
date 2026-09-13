@@ -5,26 +5,20 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Platform;
 using WheelWizard.Branding;
-using WheelWizard.Helpers;
 using WheelWizard.Localization;
 using WheelWizard.Mods;
-using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Utilities.RepeatedTasks;
-using WheelWizard.Views.Components;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData.Domain;
-using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.Views;
@@ -93,8 +87,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
             TitleLabel.Margin -= new Thickness(0, 0, 0, 18);
 
             ExtendClientAreaTitleBarHeightHint = 0;
-            SystemDecorations = SystemDecorations.Full;
-            ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.PreferSystemChrome;
+            WindowDecorations = WindowDecorations.Full;
         }
 
         WhWzStatusManager.Instance.Subscribe(this);

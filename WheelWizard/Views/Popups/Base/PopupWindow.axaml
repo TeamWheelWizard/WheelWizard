@@ -6,10 +6,9 @@
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="WheelWizard.Views.Popups.Base.PopupWindow"
-        SystemDecorations="None" SizeToContent="WidthAndHeight"
+        WindowDecorations="None" SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
         CanResize='False' Background="Transparent"
         x:DataType="base:PopupWindow"
         Title="{Binding WindowTitle}">

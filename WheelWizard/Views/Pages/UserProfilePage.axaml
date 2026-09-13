@@ -223,7 +223,7 @@
 
                             <RadioButton Margin="8,0,0,8" x:Name="PrimaryCheckBox"
                                          HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                                         Checked="CheckBox_SetPrimaryUser" Classes="CheckBox">
+                                         IsCheckedChanged="CheckBox_SetPrimaryUser" Classes="CheckBox">
                                 <components:FormFieldLabel Margin="0,2,0,0" Text="{loc:T option.make_primary}"
                                                            TipText="{loc:T hover.primary_profile}" />
                             </RadioButton>
