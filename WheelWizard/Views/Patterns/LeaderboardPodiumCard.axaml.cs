@@ -8,6 +8,7 @@ namespace WheelWizard.Views.Patterns;
 public class LeaderboardPodiumCard : TemplatedControl
 {
     public static readonly StyledProperty<int> RankProperty = AvaloniaProperty.Register<LeaderboardPodiumCard, int>(nameof(Rank));
+    public string TopLabel => t("placement.n", Rank);
 
     public int Rank
     {
