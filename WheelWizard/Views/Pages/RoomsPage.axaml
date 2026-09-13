@@ -34,7 +34,7 @@
         </StackPanel>
 
         <TextBox Grid.Row="0" Width="200"
-                 Watermark="{loc:T placeholder.search_for_players}"
+                 PlaceholderText="{loc:T placeholder.search_for_players}"
                  VerticalAlignment="Bottom"
                  TextChanged="PlayerSearchField_OnTextChanged"
                  HorizontalAlignment="Right"
@@ -77,7 +77,7 @@
                                           IsVisible="{Binding IsPublic, Converter={x:Static BoolConverters.Not}}" />
 
                                 <!-- Temporary, will replace this later with path icon, but it's cool that this exists -->
-                                <!-- <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True" 
+                                <!-- <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True"
                                         Background="{StaticResource Neutral950}" Width="50" Height="50" Margin="0,3">
                                     <miiComp:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                                             LoadingColor="{StaticResource Neutral600}"
