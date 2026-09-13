@@ -54,7 +54,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
     {
         lock (_fileIoSync)
         {
-            var lines = ReadTomlFile()?.ToList();
+            var lines = ReadTomlFile(ignoreReadErrors: false)?.ToList();
             if (lines == null)
                 return;
 
@@ -108,7 +108,8 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
         }
     }
 
-    private string[]? ReadTomlFile()
+    // Loading may fall back to defaults, but a mutation must report an unreadable existing file.
+    private string[]? ReadTomlFile(bool ignoreReadErrors = true)
     {
         if (!fileSystem.File.Exists(PathManager.RecompConfigFilePath))
             return null;
@@ -117,7 +118,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
         {
             return fileSystem.File.ReadAllLines(PathManager.RecompConfigFilePath);
         }
-        catch
+        catch when (ignoreReadErrors)
         {
             return null;
         }
@@ -156,7 +157,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
 
     private void WriteTomlSetting(string section, string settingToChange, string value)
     {
-        var lines = ReadTomlFile()?.ToList();
+        var lines = ReadTomlFile(ignoreReadErrors: false)?.ToList();
 
         // The backend owns creating Config.toml; a write before it exists would hand the runtime a
         // file Wheel Wizard invented, so the value simply stays in memory until the next load.
