@@ -97,6 +97,7 @@ en:
     gender_male: "Male"
   state:
     loading: "Loading..."
+    loading_leaderboard: "Loading leaderboard..."
     installing: "Installing..."
     updating: "Updating..."
     config_not_finished: "Config Not Finished"
@@ -130,6 +131,7 @@ en:
     cancel: "Cancel"
     save: "Save"
     copy_friend_code: "Copy Friend Code"
+    add_friend: "Add Friend"
     export: "Export"
     apply: "Apply"
     yes: "Yes"
@@ -143,6 +145,7 @@ en:
     view_mod: "View Mod"
     save_external_mii: "Add Mii to \"My Miis\""
     view_mii: "View Mii"
+    view_profile: "View Profile"
     duplicate: "Duplicate"
     back: "Back"
     unfavorite: "Unfavorite"
@@ -198,6 +201,8 @@ en:
     modified_archive_member: "Modified archive member"
     new_archive_member: "New archive member"
     whole_file_override: "Whole-file override"
+    top_3_podium: "Top 3 Podium"
+    live_rwfc: "Live from RWFC"
   hover:
     players_online:
       0: "There are currently no players online"
@@ -232,6 +237,8 @@ en:
     no_vr_history_title: "No VR history"
     no_vr_history: "Friend code is required to load VR history."
     no_vr_history_range: "No VR history found for this range yet."
+    no_leaderboard_title: "No leaderboard data"
+    no_leaderboard: "There are no ranked players available right now."
   time:
     days:
       1: "1 day"
@@ -472,6 +479,7 @@ en:
       title: "Mod download failed."
       extra: "An error occurred during download: {$1}"
     failed_vr_history: "Failed to load VR history"
+    failed_load_leaderboard: "Could not load leaderboard."
   message_success:
     settings_saved:
       title: "Settings saved successfully!"
