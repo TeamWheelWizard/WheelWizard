@@ -117,7 +117,7 @@
                            Width="310"
                            TextAlignment="Center"
                            HorizontalAlignment="Center" />
-                <components:Button Text="Retry"
+                <components:Button Text="{loc:T action.retry}"
                                    Variant="Primary"
                                    IconData="{StaticResource Refresh}"
                                    Width="160"
@@ -132,7 +132,7 @@
                 <components:EmptyPageInfo Title="{loc:T empty_content.no_leaderboard_title}"
                                           BodyText="{loc:T empty_content.no_leaderboard}"
                                           IconData="{StaticResource Award}" />
-                <components:Button Text="Refresh"
+                <components:Button Text="{loc:T action.refresh}"
                                    Variant="Primary"
                                    IconData="{StaticResource Refresh}"
                                    Width="170"

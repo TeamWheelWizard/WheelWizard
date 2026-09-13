@@ -138,6 +138,8 @@ en:
     no: "No"
     keep: "Keep"
     ok: "Ok"
+    retry: "Retry"
+    refresh: "Refresh"
     revert: "Revert"
     maybe_later: "Maybe Later"
     browse: "Browse"

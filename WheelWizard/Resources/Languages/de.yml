@@ -137,6 +137,8 @@ de:
     keep: "Behalten"
     ok: "Ok"
     revert: "Rückgängig"
+    retry: "Neu laden"
+    refresh: "Refresh"
     maybe_later: "Vielleicht später"
     browse: "Durchsuchen"
     view_mod: "Mod ansehen"
