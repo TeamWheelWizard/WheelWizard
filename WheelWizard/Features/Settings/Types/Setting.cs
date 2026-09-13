@@ -1,9 +1,9 @@
-using WheelWizard.Settings;
-
 namespace WheelWizard.Settings.Types;
 
 public abstract class Setting
 {
+    public event Action<Setting>? Changed;
+
     protected Setting(Type type, string name, object defaultValue)
     {
         Name = name;
@@ -60,5 +60,5 @@ public abstract class Setting
         return this;
     }
 
-    protected void SignalChange() => SettingsSignalRuntime.Publish(this);
+    protected void SignalChange() => Changed?.Invoke(this);
 }

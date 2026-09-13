@@ -2,13 +2,13 @@ using WheelWizard.Settings;
 
 namespace WheelWizard.Settings.Types;
 
-public class VirtualSetting : Setting
+public class VirtualSetting : Setting, IDisposable
 {
     private Setting[] _dependencies;
     private readonly Action<object> _setter;
     private readonly Func<object> _getter;
     private bool _acceptsSignals = true;
-    private IDisposable? _signalSubscription;
+    private bool _dependenciesAssigned;
 
     public VirtualSetting(Type type, Action<object> setter, Func<object> getter)
         : base(type, "virtual", getter())
@@ -47,15 +47,13 @@ public class VirtualSetting : Setting
     public VirtualSetting SetDependencies(params Setting[] dependencies)
     {
         // I rather not translate this message, makes it easier to check where a given error came from
-        if (_dependencies.Length != 0)
+        if (_dependenciesAssigned)
             throw new ArgumentException("Dependencies have already been set once");
 
         _dependencies = dependencies;
-        SettingsSignalRuntime.OnInitialized(signalBus =>
-        {
-            _signalSubscription?.Dispose();
-            _signalSubscription = signalBus.Subscribe(OnSignal);
-        });
+        _dependenciesAssigned = true;
+        foreach (var dependency in _dependencies)
+            dependency.Changed += OnDependencyChanged;
 
         return this;
     }
@@ -65,15 +63,19 @@ public class VirtualSetting : Setting
         Value = _getter();
     }
 
-    private void OnSignal(SettingChangedSignal signal)
+    private void OnDependencyChanged(Setting dependency)
     {
         if (!_acceptsSignals)
             return;
 
-        if (!_dependencies.Contains(signal.Setting))
-            return;
-
         Recalculate();
         SignalChange();
+    }
+
+    public void Dispose()
+    {
+        foreach (var dependency in _dependencies)
+            dependency.Changed -= OnDependencyChanged;
+        _dependencies = [];
     }
 }

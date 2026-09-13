@@ -9,8 +9,10 @@ using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Settings;
 
-public class SettingsManager : ISettingsManager
+public class SettingsManager : ISettingsManager, IDisposable
 {
+    private readonly ISettingsSignalBus _signalBus;
+    private readonly List<Setting> _ownedSettings = [];
     private readonly IWhWzSettingManager _whWzSettingManager;
     private readonly IDolphinSettingManager _dolphinSettingManager;
     private readonly IRecompSettingManager _recompSettingManager;
@@ -29,13 +31,15 @@ public class SettingsManager : ISettingsManager
         IWhWzSettingManager whWzSettingManager,
         IDolphinSettingManager dolphinSettingManager,
         IRecompSettingManager recompSettingManager,
-        IFileSystem fileSystem
+        IFileSystem fileSystem,
+        ISettingsSignalBus signalBus
     )
     {
         _whWzSettingManager = whWzSettingManager;
         _dolphinSettingManager = dolphinSettingManager;
         _recompSettingManager = recompSettingManager;
         _fileSystem = fileSystem;
+        _signalBus = signalBus;
 
         #region WhWz settings
         // Register this first because the path validators use the active frontend mode when deciding
@@ -100,9 +104,11 @@ public class SettingsManager : ISettingsManager
                     {
                         // XXX: Circular symlink references may stil break the Flatpak, but they
                         // shouldn't be present under normal usage.
-                        if (FileHelper.NormalizePath(blockedUserFolder)
-                                .Equals(FileHelper.NormalizePath(userFolderPath),
-                                        StringComparison.Ordinal))
+                        if (
+                            FileHelper
+                                .NormalizePath(blockedUserFolder)
+                                .Equals(FileHelper.NormalizePath(userFolderPath), StringComparison.Ordinal)
+                        )
                         {
                             return false;
                         }
@@ -114,7 +120,10 @@ public class SettingsManager : ISettingsManager
                     return false;
 
                 // The Dolphin executable directory with `portable.txt` case
-                if (!EnvHelper.IsFlatpakSandboxed() && _fileSystem.File.Exists(_fileSystem.Path.Combine(PathManager.GetDolphinExeDirectory(), "portable.txt")))
+                if (
+                    !EnvHelper.IsFlatpakSandboxed()
+                    && _fileSystem.File.Exists(_fileSystem.Path.Combine(PathManager.GetDolphinExeDirectory(), "portable.txt"))
+                )
                     return false;
 
                 if (!EnvHelper.IsFlatpakSandboxed())
@@ -136,10 +145,13 @@ public class SettingsManager : ISettingsManager
                 {
                     if (EnvHelper.IsFlatpakSandboxed())
                     {
-                        if (!string.IsNullOrWhiteSpace(PathManager.SplitLinuxDolphinConfigDir) &&
-                            PathManager.SplitLinuxDolphinConfigDir.Equals(
+                        if (
+                            !string.IsNullOrWhiteSpace(PathManager.SplitLinuxDolphinConfigDir)
+                            && PathManager.SplitLinuxDolphinConfigDir.Equals(
                                 PathManager.SplitLinuxDolphinNativeConfigDir,
-                                StringComparison.Ordinal))
+                                StringComparison.Ordinal
+                            )
+                        )
                         {
                             // In this case, the user requested native Dolphin's split config/user folders (not `~/.dolphin-emu`).
                             // Since Flatpak may leave an empty `~/.dolphin-emu` folder around, we need to check
@@ -270,6 +282,10 @@ public class SettingsManager : ISettingsManager
                 return !value4 && value2 && value3 == "0x00000002" && value1 == DolphinShaderCompilationMode.HybridUberShaders;
             }
         ).SetDependencies(_dolphinCompilationMode, _dolphinCompileShadersAtStart, _dolphinMsaa, _dolphinSsaa);
+        _ownedSettings.Add(WINDOW_SCALE);
+        _ownedSettings.Add(RECOMMENDED_SETTINGS);
+        foreach (var setting in _ownedSettings)
+            setting.Changed += _signalBus.Publish;
         #endregion
     }
     #endregion
@@ -358,7 +374,13 @@ public class SettingsManager : ISettingsManager
                 issues.Add(new(SettingsValidationCode.InvalidUserFolderPath, USER_FOLDER_PATH.Name, "User folder path is invalid."));
 
             // Sandboxed Wheel Wizard is allowed to omit the Dolphin location setting as it uses the bundled version
-            if (requireDolphin && (!EnvHelper.IsFlatpakSandboxed() && string.IsNullOrWhiteSpace(Get<string>(DOLPHIN_LOCATION)) || !DOLPHIN_LOCATION.IsValid()))
+            if (
+                requireDolphin
+                && (
+                    !EnvHelper.IsFlatpakSandboxed() && string.IsNullOrWhiteSpace(Get<string>(DOLPHIN_LOCATION))
+                    || !DOLPHIN_LOCATION.IsValid()
+                )
+            )
                 issues.Add(
                     new(SettingsValidationCode.InvalidDolphinLocation, DOLPHIN_LOCATION.Name, "Dolphin path or command is invalid.")
                 );
@@ -394,6 +416,7 @@ public class SettingsManager : ISettingsManager
             setting.SetValidation(validation);
 
         _whWzSettingManager.RegisterSetting(setting);
+        _ownedSettings.Add(setting);
         return setting;
     }
 
@@ -404,6 +427,7 @@ public class SettingsManager : ISettingsManager
             setting.SetValidation(validation);
 
         _dolphinSettingManager.RegisterSetting(setting);
+        _ownedSettings.Add(setting);
         return setting;
     }
 
@@ -414,7 +438,19 @@ public class SettingsManager : ISettingsManager
             setting.SetValidation(validation);
 
         _recompSettingManager.RegisterSetting(setting);
+        _ownedSettings.Add(setting);
         return setting;
     }
     #endregion
+
+    public void Dispose()
+    {
+        foreach (var setting in _ownedSettings)
+        {
+            setting.Changed -= _signalBus.Publish;
+            if (setting is IDisposable disposable)
+                disposable.Dispose();
+        }
+        _ownedSettings.Clear();
+    }
 }
