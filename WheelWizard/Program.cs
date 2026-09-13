@@ -70,6 +70,14 @@ public class Program : IDesignerEntryPoint
     {
         var builder = AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
 
+        // https://docs.avaloniaui.net/docs/platform-specific-guides/linux#enabling-the-wayland-backend
+        // NOTE: UseWayland() will prevent fallback to X11.
+        if (OperatingSystem.IsLinux()
+            && Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") is not null)
+        {
+            builder = builder.UseWayland();
+        }
+
         var services = new ServiceCollection();
         services.AddWheelWizardServices();
 

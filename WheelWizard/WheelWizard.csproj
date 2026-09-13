@@ -33,12 +33,13 @@
 
     <ItemGroup>
         <!-- Everything specifically for Avalonia -->
-        <PackageReference Include="Avalonia" Version="11.3.19"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.19"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.19"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.19"/>
-        <PackageReference Include="Avalonia.HtmlRenderer" Version="11.3.0"/>
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.19"/>
+        <PackageReference Include="Avalonia" Version="12.1.2" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.2" />
+        <PackageReference Include="Avalonia.HtmlRenderer" Version="12.0.0" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.22" />
+        <PackageReference Include="Avalonia.Wayland" Version="12.1.2" />
 
         <!-- Code analyzers -->
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
@@ -47,23 +48,23 @@
         </PackageReference>
 
         <!-- Everything from the OG Wheel wizard project -->
-        <PackageReference Include="ini-parser" Version="2.5.2" NoWarn="NU1701"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0"/>
-        <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0"/>
-        <PackageReference Include="Semver" Version="3.0.0"/>
-        <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
-        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
-        <PackageReference Include="SharpCompress" Version="0.48.1"/>
-        <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3"/>
+        <PackageReference Include="ini-parser" Version="2.5.2" NoWarn="NU1701" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
+        <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
+        <PackageReference Include="Semver" Version="3.0.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+        <PackageReference Include="SharpCompress" Version="0.48.1" />
+        <PackageReference Include="Tmds.DBus.Protocol" Version="0.94.1" />
         <PackageReference Include="TestableIO.System.IO.Abstractions.Analyzers" Version="2022.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Testably.Abstractions" Version="9.0.0"/>
-        <PackageReference Include="YamlDotNet" Version="17.1.0"/>
+        <PackageReference Include="Testably.Abstractions" Version="9.0.0" />
+        <PackageReference Include="YamlDotNet" Version="17.1.0" />
     </ItemGroup>
 
     <ItemGroup Label="Embedded Resources">
@@ -84,16 +85,16 @@
     </ItemGroup>
 
     <ItemGroup Label="Additional Files">
-        <AdditionalFiles Include="Views\Styles\Resources\Constants.axaml"/>
-        <AdditionalFiles Include="Views\Styles\Resources\Icons.axaml"/>
-        <AdditionalFiles Include="Views\Styles\Styles\ButtonStyles.axaml"/>
-        <AdditionalFiles Include="Views\Styles\Styles\TextStyles.axaml"/>
-        <AdditionalFiles Include="Views\Styles\Util\IconExampleComponent.axaml"/>
+        <AdditionalFiles Include="Views\Styles\Resources\Constants.axaml" />
+        <AdditionalFiles Include="Views\Styles\Resources\Icons.axaml" />
+        <AdditionalFiles Include="Views\Styles\Styles\ButtonStyles.axaml" />
+        <AdditionalFiles Include="Views\Styles\Styles\TextStyles.axaml" />
+        <AdditionalFiles Include="Views\Styles\Util\IconExampleComponent.axaml" />
     </ItemGroup>
 
     <ItemGroup Label="Fonts">
-        <AvaloniaResource Include="Resources\Fonts\Roboto-Regular.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\ctmkf.ttf"/>
+        <AvaloniaResource Include="Resources\Fonts\Roboto-Regular.ttf" />
+        <AvaloniaResource Include="Resources\Fonts\ctmkf.ttf" />
     </ItemGroup>
 
     <ItemGroup Label="Mii Rendering Resources">
@@ -105,7 +106,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorGeneralPage.axaml"/>
-        <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorWindow.axaml"/>
+        <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorGeneralPage.axaml" />
+        <UpToDateCheckInput Remove="Views\Popups\MiiCreatorTabs\MiiCreatorWindow.axaml" />
     </ItemGroup>
 </Project>

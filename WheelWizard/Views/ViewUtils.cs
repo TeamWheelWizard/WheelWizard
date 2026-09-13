@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings.Types;
@@ -102,6 +103,14 @@ public static class ViewUtils
         }
 
         return default;
+    }
+
+    public static void IfChecked(object? sender, Action action)
+    {
+        if (sender is ToggleButton { IsChecked: true })
+        {
+            action();
+        }
     }
 
     #region Colors

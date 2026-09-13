@@ -121,9 +121,9 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
         RefreshImage();
     }
 
-    private void MiiFaceToggle_OnChecked(object? sender, RoutedEventArgs e) => SetVisualization(VisualizationType.Face);
+    private void MiiFaceToggle_OnCheckedChanged(object? sender, RoutedEventArgs e) => ViewUtils.IfChecked(sender, () => SetVisualization(VisualizationType.Face));
 
-    private void MiiCarouselToggle_OnChecked(object? sender, RoutedEventArgs e) => SetVisualization(VisualizationType.Carousel);
+    private void MiiCarouselToggle_OnCheckedChanged(object? sender, RoutedEventArgs e) => ViewUtils.IfChecked(sender, () => SetVisualization(VisualizationType.Carousel));
 
     private enum VisualizationType
     {
