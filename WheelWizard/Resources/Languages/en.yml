@@ -233,6 +233,7 @@ en:
     no_rooms: "You might not have internet connection, or no-one might be playing."
     no_rooms_title: "No rooms found"
     no_miis_title: "No Miis yet!"
+    no_mii_name: "Unknown Player"
     no_miis: "We can't read the Mii data from your system. Make sure you started the game at least once"
     no_mod_selected_title: "No mod selected"
     no_mod_selected: "Select a mod in the list to view its details"

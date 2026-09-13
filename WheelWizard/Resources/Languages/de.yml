@@ -230,6 +230,7 @@ de:
     no_rooms_title: "Keine Räume gefunden."
     no_miis_title: "Noch keine Miis erstellt!"
     no_miis: "Die Mii-Daten können nicht von deinem System geladen werden. Stelle sicher, dass du dein Spiel mindestens einmal gestartet hast."
+    no_mii_name: "Unbekannter Spieler"
     no_mod_selected_title: "Keine Mod ausgewählt."
     no_mod_selected: "Wähle eine Mod aus der Liste, um mehr Details zu sehen."
     no_vr_history_title: "Kein R-Punkte Verlauf"

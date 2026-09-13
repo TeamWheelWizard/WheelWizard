@@ -298,7 +298,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         {
             Rank = rank,
             PlacementLabel = GetPlacementLabel(rank),
-            Name = string.IsNullOrWhiteSpace(entry.Name) ? "Unknown Player" : entry.Name,
+            Name = string.IsNullOrWhiteSpace(entry.Name) ? t("empty_content.no_mii_name") : entry.Name,
             FriendCode = friendCode,
             VrText = entry.Vr?.ToString("N0") ?? "--",
             Mii = DeserializeMii(entry.MiiData),
