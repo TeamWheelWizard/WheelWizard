@@ -40,7 +40,7 @@ public sealed record LeaderboardPlayerItem
     public Mii? FirstMii => Mii;
     public bool HasBadges => HasBadge;
     public bool IsTopLeaderboardPlayer => true;
-    public string TopLabel => $"#{Rank}";
+    public string TopLabel => t("placement.n", Rank);
     public bool IsOpenHost => false;
 }
 
