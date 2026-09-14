@@ -167,6 +167,10 @@ public class App : Application
                         launchResult.Error.Message
                     );
                 }
+                else if (settingsManager.Get<bool>(settingsManager.CLOSE_ON_GAME_LAUNCH))
+                {
+                    ViewUtils.CloseApplication();
+                }
             }
         }
         catch (Exception e)

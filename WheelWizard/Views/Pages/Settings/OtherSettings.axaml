@@ -64,6 +64,28 @@
                                     Spacing="3"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.close_on_game_launch}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.close_on_game_launch}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="CloseOnGameLaunch"
+                                  Classes="SwitchDark"
+                                  IsChecked="False"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
                             <components1:FormFieldLabel Text="{loc:T option.retro_rewind_installation}" />
                             <SelectableTextBlock x:Name="RetroRewindVersionText"
                                        Classes="TinyText"
