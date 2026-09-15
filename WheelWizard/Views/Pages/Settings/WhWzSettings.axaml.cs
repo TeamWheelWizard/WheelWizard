@@ -5,6 +5,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Serilog;
 using WheelWizard.Helpers;
+using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
@@ -35,6 +36,9 @@ public partial class WhWzSettings : UserControlBase
 
     [Inject]
     private IDolphinSettingManager DolphinSettingsService { get; set; } = null!;
+
+    [Inject]
+    private IRecompDolphinDataService? RecompDolphinData { get; set; }
 
     public WhWzSettings()
     {
@@ -604,6 +608,19 @@ public partial class WhWzSettings : UserControlBase
 
                 return;
             }
+        }
+
+        // The move is now accepted, including Continue after a source-deletion failure.
+        // Config.toml and the copied NAND moved with CT-MKWII on Windows; on Linux the
+        // config stays in WiiCompiled's data folder but must point at the relocated copy.
+        // Update even in Dolphin mode so a later WiiCompiled launch sees the new paths.
+        if (RecompDolphinData is not null)
+        {
+            var pathsResult = await Task.Run(RecompDolphinData.ApplyPathsToRecompConfig);
+            if (pathsResult.IsFailure)
+                warningMessage = string.IsNullOrWhiteSpace(warningMessage)
+                    ? pathsResult.Error.Message
+                    : $"{warningMessage}\n\n{pathsResult.Error.Message}";
         }
 
         var infoText =

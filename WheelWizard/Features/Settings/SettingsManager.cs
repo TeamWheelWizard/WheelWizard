@@ -233,6 +233,8 @@ public class SettingsManager : ISettingsManager
         // The Wii data folder the runtime should use, written by RecompDolphinDataService after an
         // install and whenever the sharing choice changes. Empty/absent means the runtime's private NAND.
         RECOMP_NAND_ROOT = RegisterRecomp(("paths", "nand_root"), "");
+        // The pack also selects the Riivolution save redirect used by the runtime.
+        RECOMP_RETRO_REWIND_ROOT = RegisterRecomp(("paths", "retro_rewind_root"), "");
         #endregion
 
         #region Virtual settings
@@ -307,6 +309,7 @@ public class SettingsManager : ISettingsManager
     public Setting RECOMP_SHOW_FPS { get; }
     public Setting RECOMP_PREVENT_STUTTERS { get; }
     public Setting RECOMP_NAND_ROOT { get; }
+    public Setting RECOMP_RETRO_REWIND_ROOT { get; }
     #endregion
 
     #region Public API
