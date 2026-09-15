@@ -141,6 +141,8 @@ public partial class HomePage : UserControlBase
         var launchResult = await CurrentLauncher.Launch();
         if (launchResult.IsFailure)
             MessageTranslationHelper.ShowMessage(launchResult.Error);
+        else if (SettingsService.Get<bool>(SettingsService.CLOSE_ON_GAME_LAUNCH))
+            ViewUtils.CloseApplication();
     }
 
     private bool ShouldShowAprilFirstLaunchPrompts() =>

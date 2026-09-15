@@ -37,6 +37,7 @@ public partial class OtherSettings : UserControlBase
 
         // Attach event handlers after loading settings to avoid unwanted triggers
         LaunchRrOnStartup.IsCheckedChanged += ClickLaunchRrOnStartup;
+        CloseOnGameLaunch.IsCheckedChanged += ClickCloseOnGameLaunch;
         EnableRecomp.IsCheckedChanged += ClickEnableRecomp;
     }
 
@@ -51,6 +52,7 @@ public partial class OtherSettings : UserControlBase
     private void ForceLoadSettings()
     {
         // Always loads
+        CloseOnGameLaunch.IsChecked = SettingsService.Get<bool>(SettingsService.CLOSE_ON_GAME_LAUNCH);
 
         // The recomp only runs where a setup backend exists for it, so elsewhere the whole section stays hidden.
         var recompSupported = RecompPlatform.IsSupported;
@@ -69,6 +71,11 @@ public partial class OtherSettings : UserControlBase
     private void ClickLaunchRrOnStartup(object? sender, RoutedEventArgs e)
     {
         SettingsService.Set(SettingsService.LAUNCH_RR_ON_STARTUP, LaunchRrOnStartup.IsChecked == true);
+    }
+
+    private void ClickCloseOnGameLaunch(object? sender, RoutedEventArgs e)
+    {
+        SettingsService.Set(SettingsService.CLOSE_ON_GAME_LAUNCH, CloseOnGameLaunch.IsChecked == true);
     }
 
     private void ClickEnableRecomp(object? sender, RoutedEventArgs e)
