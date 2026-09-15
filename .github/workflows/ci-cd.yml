@@ -6,14 +6,15 @@ on:
       - main
       - dev
   pull_request:
-    branches:
-      - main
-      - dev
 
 jobs:
   build-and-test:
-    name: Build and Test
-    runs-on: ubuntu-latest
+    name: Build and Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
