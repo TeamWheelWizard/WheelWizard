@@ -71,6 +71,11 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     {
         Instance = this;
         InitializeComponent();
+
+        // Respects tiling window managers better if resizable.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            CanResize = true;
+
         AddLayer();
 
         ClampSavedWindowScaleToCurrentScreen();
