@@ -311,7 +311,7 @@ de:
       extra: "Löschen ist permanent und kann nicht rückgängig gemacht werden"
       title_miis: "Bist du sicher, dass du {$1} Miis löschen möchtest?"
     apply_scale:
-      title: "Möchtest du die neue Skala anwenden?"
+      title: "Möchtest du die neue Skalierung anwenden?"
       extra: "Diese Änderung wird in {$1} zurückgesetzt, außer du wendest die Änderung an."
     move_data:
       title: "Wheel Wizard Daten verschieben?"
