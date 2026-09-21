@@ -299,7 +299,7 @@ de:
       extra: "Dolphin rät davon ab, andere Programme direkten Zugriff auf die Wii-Daten (NAND) zu geben, da es zu Datenverlusten kommen kann, wenn zwei Programme gleichzeitig darauf schreiben. Durch eine Kopie bleibt WiiCompiled vollständig getrennt, allerdings werden die in einem Programm erzielten Fortschritte nicht im anderen angezeigt."
     recomp_share_dolphin_data:
       title: "Teile NAND-Daten mit Dolphin?"
-      extra: "Durch das Klonen erhält WiiCompiled dieselben Speicherdaten, Miis, und Wii-Einstellungen, behält jedoch eine seperate Kopie. Dies ist sicherer. Beim direkten Teilen schreiben Dolphin und WiiCompiled in dieselben NAND-Daten, was zu Datenverlusten führen kann, wenn beide Programme gleichzeitig ausgeführt werden. Fahre nur fort, wenn du dir des Risikos bewusst bist."
+      extra: "Durch das Klonen erhält WiiCompiled dieselben Speicherdaten, Miis und Wii-Einstellungen, behält jedoch eine separate Kopie. Dies ist sicherer. Beim direkten Teilen schreiben Dolphin und WiiCompiled in dieselben NAND-Daten, was zu Datenverlusten führen kann, wenn beide Programme gleichzeitig ausgeführt werden. Fahre nur fort, wenn du dir des Risikos bewusst bist."
     recomp_overwrite_dolphin_clone:
       title: "Den privaten Dolphin-Klon ersetzen?"
       extra: "Diese Aktion ersetzt den momentanen Klon mit Daten von Dolphin. Speicherdaten, Miis, und Wii-Einstellungen in WiiCompiled werden überschrieben."
@@ -593,9 +593,9 @@ de:
       location_warning: "Einstellungen sind deaktiviert, vervollständige erst die Dateispeicherorte."
     enable_recomp: "Verwende WiiCompiled, um das Spiel zu starten. Ist diese Option deaktiviert, wird Dolphin und Retro Rewind verwendet. Nur auf Windows."
     recomp_use_dolphin_data: "Verwende Dolphin's \"Wii\"-Ordner, damit WiiCompiled Speicherdaten, Miis und Wii-Einstellungen von Dolphin verwenden kann. Die Änderung wird beim nächsten Start von WiiCompiled übernommen."
-    recomp_share_dolphin_data: "WiiCompiled und Dolphin verwenden diesselben Speicherdaten, Miis, und Wii-Einstellungen."
+    recomp_share_dolphin_data: "WiiCompiled und Dolphin verwenden dieselben Speicherdaten, Miis und Wii-Einstellungen."
     recomp_shared_nand_warning: "Führe Dolphin und WiiCompiled nicht gleichzeitig aus, wenn diese Option aktiviert ist."
-    recomp_clone_dolphin_data: "Kopiert Dolphin's momentane Speicherdaten, Miis, und Wii-Einstellungen in private WiiCompiled-Daten"
+    recomp_clone_dolphin_data: "Kopiert Dolphins momentane Speicherdaten, Miis und Wii-Einstellungen in private WiiCompiled-Daten"
     recomp_graphics_api: "WiiCompiled funktioniert nur mit DirectX 12 und Vulkan zuverlässig, deswegen werden keine anderen Optionen angeboten."
     recomp_dolphin_data_not_found: "Setze zuerst einen existierenden Dolphin-Benutzerordner in den Wheel Wizard-Einstellungen. Der Ordner muss einen \"Wii\"-Ordner enthalten."
     recomp_prevent_stutters: "Während ein Shader noch kompiliert wird, werden die Objekte, die ihn benötigen, für einige Frames übersprungen, anstatt dass das gesamte Spiel ins Stocken gerät, bis er fertig ist. So kommt es zu einem winzigen Pop-in statt zu Rucklern."
