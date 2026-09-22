@@ -362,6 +362,7 @@ jobs:
           gh release create "$TAG_NAME" "${ASSETS[@]}" \
             --repo "$REPO" \
             --title "$TAG_NAME" \
+            --notes "Also available on [Flathub](https://flathub.org/apps/io.github.TeamWheelWizard.WheelWizard)." \
             --generate-notes
 
 
