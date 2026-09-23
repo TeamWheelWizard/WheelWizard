@@ -41,10 +41,14 @@ public sealed class VirtualProfileCloudService(
         try
         {
             await CaptureLocalSlotAsync(profileId, localSlot);
-            var result = await PullAsync(profileId);
-            if (result.Success && result.Action == CloudSyncAction.Pulled)
-                await ApplyVaultProfileToLocalSlotAsync(profileId, localSlot);
-            return result;
+            // Do not record the downloaded revision until it was successfully written into the
+            // physical save slot. Otherwise a failed apply would make the next sync believe an
+            // older local license is a new change and allow it to overwrite the cloud copy.
+            return await SynchronizeAsync(
+                profileId,
+                pull: true,
+                beforePullStateCommit: () => ApplyVaultProfileToLocalSlotAsync(profileId, localSlot)
+            );
         }
         catch (Exception ex)
         {
@@ -87,7 +91,7 @@ public sealed class VirtualProfileCloudService(
         }
     }
 
-    private async Task<CloudSyncResult> SynchronizeAsync(Guid profileId, bool pull)
+    private async Task<CloudSyncResult> SynchronizeAsync(Guid profileId, bool pull, Func<Task>? beforePullStateCommit = null)
     {
         await _gate.WaitAsync();
         try
@@ -133,7 +137,13 @@ public sealed class VirtualProfileCloudService(
             {
                 if (comparison.Kind == ConflictKind.SafePush)
                     return CloudSyncResult.Ok(CloudSyncAction.NoOp, "Local changes will be uploaded after WiiCompiled exits.");
-                return await DownloadAndStoreAsync(provider, remote, profileId, updateState: true);
+                return await DownloadAndStoreAsync(
+                    provider,
+                    remote,
+                    profileId,
+                    updateState: true,
+                    beforeStateCommit: beforePullStateCommit
+                );
             }
 
             if (comparison.Kind == ConflictKind.SafePull)
@@ -169,7 +179,8 @@ public sealed class VirtualProfileCloudService(
         ICloudProvider provider,
         CloudProfileManifest remote,
         Guid profileId,
-        bool updateState
+        bool updateState,
+        Func<Task>? beforeStateCommit = null
     )
     {
         if (remote.ProfileId != profileId)
@@ -196,6 +207,8 @@ public sealed class VirtualProfileCloudService(
             EnsureVaultProfileIsSelectedForSync(profileId);
             if (updateState)
             {
+                if (beforeStateCommit is not null)
+                    await beforeStateCommit();
                 var deviceId = DeviceId;
                 var state = await ReadStateAsync(profileId, deviceId);
                 await WriteStateAsync(

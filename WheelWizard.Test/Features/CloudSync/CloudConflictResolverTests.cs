@@ -41,6 +41,17 @@ public sealed class CloudConflictResolverTests
     }
 
     [Fact]
+    public async Task CompareAsync_RemoteProgressWithAnUnchangedOlderLocalCopy_PullsSafely()
+    {
+        var local = new CloudSyncSnapshot(Manifest(4, "base"), 4, "base");
+        var remote = new CloudSyncSnapshot(Manifest(5, "newer-cloud-progress"), 4, "base");
+
+        var result = await _resolver.CompareAsync(local, remote);
+
+        Assert.Equal(ConflictKind.SafePull, result.Kind);
+    }
+
+    [Fact]
     public async Task CompareAsync_EqualHashes_ReturnsNoOpEvenWhenRevisionsDiffer()
     {
         var local = new CloudSyncSnapshot(Manifest(2, "same"), 1, "base");
