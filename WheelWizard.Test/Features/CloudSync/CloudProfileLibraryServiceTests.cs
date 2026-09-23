@@ -16,13 +16,23 @@ public sealed class CloudProfileLibraryServiceTests : IDisposable
     [Fact]
     public void GetVisible_WithoutStoredSelection_ShowsAtMostFourLocalOrVaultProfiles()
     {
-        var (service, _) = CreateService("[]", "");
+        var (service, _) = CreateService("", "");
         var profiles = Profiles();
 
         var visible = service.GetVisible(profiles);
 
         Assert.Equal(["local:0", "vault:one", "local:1", "vault:two"], visible.Select(profile => profile.Key));
         Assert.DoesNotContain(visible, profile => profile.Source == ProfileLibrarySource.Cloud);
+    }
+
+    [Fact]
+    public void GetVisible_ExplicitEmptySelection_RemainsEmpty()
+    {
+        var (service, _) = CreateService("[]", "");
+
+        var visible = service.GetVisible(Profiles());
+
+        Assert.Empty(visible);
     }
 
     [Fact]
@@ -126,7 +136,36 @@ public sealed class CloudProfileLibraryServiceTests : IDisposable
 
         Assert.Single(profiles);
         Assert.Equal(ProfileStorageState.CloudAndLocal, profiles[0].StorageState);
-        await bindings.Received(1).BindAsync(0, remoteId);
+        await bindings.Received(1).BindAsync(0, Arg.Any<string>(), remoteId);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_NameOnlyCloudMatch_IsRenderedWithoutBindingThePhysicalSlot()
+    {
+        var runtimeSettings = SettingsTestUtils.InitializeSettingsRuntime(Path.GetTempPath());
+        runtimeSettings.LOAD_PATH.Returns(new TestSetting("load"));
+        var settings = Substitute.For<ISettingsManager>();
+        var enabledSetting = new TestSetting("enabled", typeof(bool));
+        settings.CLOUD_SYNC_ENABLED.Returns(enabledSetting);
+        settings.Get<bool>(enabledSetting).Returns(true);
+        var licenses = Substitute.For<IGameLicenseSingletonService>();
+        licenses.LicenseCollection.Returns(new LicenseCollection { Users = [ActiveLicense()] });
+        var cloudSync = Substitute.For<ICloudSyncService>();
+        cloudSync.GetAvailableProfilesAsync().Returns([new CloudProfileManifest { ProfileId = Guid.NewGuid(), ProfileName = "Alex" }]);
+        var bindings = Substitute.For<IProfileCloudBindingService>();
+        var service = new CloudProfileLibraryService(
+            licenses,
+            cloudSync,
+            settings,
+            Substitute.For<IVirtualProfileVaultService>(),
+            bindings
+        );
+
+        var profiles = await service.GetAllAsync();
+
+        Assert.Single(profiles);
+        Assert.Equal(ProfileStorageState.CloudAndLocal, profiles[0].StorageState);
+        await bindings.DidNotReceive().BindAsync(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<Guid>());
     }
 
     public void Dispose() => SettingsTestUtils.ResetSettingsRuntime();

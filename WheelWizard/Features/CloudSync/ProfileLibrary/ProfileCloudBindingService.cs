@@ -8,19 +8,24 @@ public sealed class ProfileCloudBindingService : IProfileCloudBindingService
     private readonly SemaphoreSlim _gate = new(1, 1);
     private string Path => System.IO.Path.Combine(PathManager.CloudSyncStateFolderPath, "local-profile-cloud-bindings.json");
 
-    public async Task<Guid> GetProfileIdAsync(int localSlot)
+    public async Task<Guid> GetProfileIdAsync(int localSlot, string licenseIdentity)
     {
         if (localSlot is < 0 or >= 4)
             throw new ArgumentOutOfRangeException(nameof(localSlot));
+        ArgumentException.ThrowIfNullOrWhiteSpace(licenseIdentity);
         await _gate.WaitAsync();
         try
         {
             var bindings = await ReadAsync();
-            if (bindings.TryGetValue(localSlot, out var profileId) && profileId != Guid.Empty)
-                return profileId;
+            if (
+                bindings.TryGetValue(localSlot, out var binding)
+                && binding.LicenseIdentity == licenseIdentity
+                && binding.ProfileId != Guid.Empty
+            )
+                return binding.ProfileId;
 
-            profileId = Guid.NewGuid();
-            bindings[localSlot] = profileId;
+            var profileId = Guid.NewGuid();
+            bindings[localSlot] = new LocalProfileBinding(licenseIdentity, profileId);
             await WriteAsync(bindings);
             return profileId;
         }
@@ -30,10 +35,11 @@ public sealed class ProfileCloudBindingService : IProfileCloudBindingService
         }
     }
 
-    public async Task BindAsync(int localSlot, Guid profileId)
+    public async Task BindAsync(int localSlot, string licenseIdentity, Guid profileId)
     {
         if (localSlot is < 0 or >= 4)
             throw new ArgumentOutOfRangeException(nameof(localSlot));
+        ArgumentException.ThrowIfNullOrWhiteSpace(licenseIdentity);
         if (profileId == Guid.Empty)
             throw new ArgumentException("A cloud profile binding requires a profile ID.", nameof(profileId));
 
@@ -41,9 +47,13 @@ public sealed class ProfileCloudBindingService : IProfileCloudBindingService
         try
         {
             var bindings = await ReadAsync();
-            if (bindings.TryGetValue(localSlot, out var current) && current == profileId)
+            if (
+                bindings.TryGetValue(localSlot, out var current)
+                && current.ProfileId == profileId
+                && current.LicenseIdentity == licenseIdentity
+            )
                 return;
-            bindings[localSlot] = profileId;
+            bindings[localSlot] = new LocalProfileBinding(licenseIdentity, profileId);
             await WriteAsync(bindings);
         }
         finally
@@ -52,13 +62,13 @@ public sealed class ProfileCloudBindingService : IProfileCloudBindingService
         }
     }
 
-    private async Task<Dictionary<int, Guid>> ReadAsync()
+    private async Task<Dictionary<int, LocalProfileBinding>> ReadAsync()
     {
         if (!File.Exists(Path))
             return [];
         try
         {
-            return JsonSerializer.Deserialize<Dictionary<int, Guid>>(await File.ReadAllTextAsync(Path)) ?? [];
+            return JsonSerializer.Deserialize<Dictionary<int, LocalProfileBinding>>(await File.ReadAllTextAsync(Path)) ?? [];
         }
         catch (JsonException)
         {
@@ -67,9 +77,13 @@ public sealed class ProfileCloudBindingService : IProfileCloudBindingService
         }
     }
 
-    private async Task WriteAsync(Dictionary<int, Guid> bindings)
+    private async Task WriteAsync(Dictionary<int, LocalProfileBinding> bindings)
     {
         Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path)!);
-        await File.WriteAllTextAsync(Path, JsonSerializer.Serialize(bindings));
+        var temporary = Path + ".tmp";
+        await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(bindings));
+        File.Move(temporary, Path, overwrite: true);
     }
+
+    private sealed record LocalProfileBinding(string LicenseIdentity, Guid ProfileId);
 }

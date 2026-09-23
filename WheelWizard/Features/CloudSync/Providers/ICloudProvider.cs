@@ -13,6 +13,16 @@ public interface ICloudProvider
     Task<RemoteFileInfo?> GetFileInfoAsync(string path);
     Task DownloadAsync(string remotePath, string localPath);
     Task UploadAsync(string localPath, string remotePath);
+
+    /// <summary>Publishes a replacement only when the currently observed ETag still matches.</summary>
+    async Task<bool> UploadIfMatchAsync(string localPath, string remotePath, string? expectedETag)
+    {
+        var current = await GetFileInfoAsync(remotePath);
+        if (expectedETag is null ? current is not null : current?.ETag != expectedETag)
+            return false;
+        await UploadAsync(localPath, remotePath);
+        return true;
+    }
     Task<bool> ExistsAsync(string path);
     Task<IReadOnlyList<string>> ListAsync(string path);
 }

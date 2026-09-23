@@ -81,26 +81,31 @@ public sealed class CloudProfileLibraryService(
                 if (cloudIdentity is not null && !displayedCloudIdentities.Add(cloudIdentity))
                     continue;
 
-                var matchingLocalIndex = FindMatchingLocalProfile(
+                var localMatch = FindMatchingLocalProfile(
                     result,
                     profile.ProfileName,
                     [license?.FriendCode ?? string.Empty],
                     cloudMii?.MiiId
                 );
-                if (matchingLocalIndex >= 0)
+                if (localMatch is not null)
                 {
                     // Keep the local key and slot: choosing this card must continue to select the
                     // existing physical license when WiiCompiled is launched.
+                    var matchingLocalIndex = localMatch.Index;
                     result[matchingLocalIndex] = result[matchingLocalIndex] with
                     {
                         StorageState = ProfileStorageState.CloudAndLocal,
                         LastUpdatedUtc = Max(result[matchingLocalIndex].LastUpdatedUtc, profile.LastModifiedUtc),
                     };
-                    // A visual local/cloud match must also establish the canonical sync identity.
-                    // Otherwise a later pull would create a random ID for this physical slot and
-                    // leave the actual remote profile untouched.
-                    if (result[matchingLocalIndex].LocalSlot is int localSlot)
-                        await bindings.BindAsync(localSlot, profile.ProfileId);
+                    // A name alone is only a presentation hint: two independent licenses can
+                    // share it. Persist a cloud identity only after a strong friend-code or Mii
+                    // match, so a name collision can never redirect future sync operations.
+                    if (localMatch.IsStrong && result[matchingLocalIndex].LocalSlot is int localSlot)
+                        await bindings.BindAsync(
+                            localSlot,
+                            ProfileCloudBindingIdentity.Create(result[matchingLocalIndex]),
+                            profile.ProfileId
+                        );
                     continue;
                 }
 
@@ -130,15 +135,17 @@ public sealed class CloudProfileLibraryService(
 
     private static CloudLicensePreview? SelectProfileLicensePreview(CloudProfileManifest profile)
     {
-        var matchingNamePreviews = profile.LicensePreviews
-            .Where(preview => preview.IsPresent && string.Equals(preview.Name, profile.ProfileName, StringComparison.Ordinal))
+        var matchingNamePreviews = profile
+            .LicensePreviews.Where(preview =>
+                preview.IsPresent && string.Equals(preview.Name, profile.ProfileName, StringComparison.Ordinal)
+            )
             .ToList();
         return matchingNamePreviews.Count == 1
             ? matchingNamePreviews[0]
             : profile.LicensePreviews.FirstOrDefault(preview => preview.IsPresent);
     }
 
-    private static int FindMatchingLocalProfile(
+    private static LocalProfileMatch? FindMatchingLocalProfile(
         IReadOnlyList<ProfileLibraryEntry> localProfiles,
         string cloudProfileName,
         IEnumerable<string> cloudFriendCodes,
@@ -154,12 +161,9 @@ public sealed class CloudProfileLibraryService(
             .ToList();
 
         // The cloud Mii preview belongs to the focused profile, so it is the strongest identity when present.
-        var miiMatches =
-            cloudMiiId is > 0
-                ? localIndexes.Where(index => localProfiles[index].Mii?.MiiId == cloudMiiId).ToList()
-                : [];
+        var miiMatches = cloudMiiId is > 0 ? localIndexes.Where(index => localProfiles[index].Mii?.MiiId == cloudMiiId).ToList() : [];
         if (miiMatches.Count == 1)
-            return miiMatches[0];
+            return new LocalProfileMatch(miiMatches[0], IsStrong: true);
 
         // A standard cloud package contains the entire rksys.dat, not only the focused profile. Check every
         // license preview instead of assuming the first present slot is the profile represented by the card.
@@ -168,7 +172,7 @@ public sealed class CloudProfileLibraryService(
             .Where(index => normalizedCloudFriendCodes.Contains(NormalizeFriendCode(localProfiles[index].FriendCode)))
             .ToList();
         if (friendCodeMatches.Count == 1)
-            return friendCodeMatches[0];
+            return new LocalProfileMatch(friendCodeMatches[0], IsStrong: true);
 
         // Offline profiles have neither a usable friend code nor a reliably persisted Mii. A unique name is a
         // safe fallback; when several local profiles share a name, leave the cloud entry separate rather than
@@ -176,8 +180,10 @@ public sealed class CloudProfileLibraryService(
         var nameMatches = localIndexes
             .Where(index => string.Equals(localProfiles[index].Name, cloudProfileName, StringComparison.Ordinal))
             .ToList();
-        return nameMatches.Count == 1 ? nameMatches[0] : -1;
+        return nameMatches.Count == 1 ? new LocalProfileMatch(nameMatches[0], IsStrong: false) : null;
     }
+
+    private sealed record LocalProfileMatch(int Index, bool IsStrong);
 
     private static string? NormalizeFriendCode(string? friendCode)
     {
@@ -209,10 +215,10 @@ public sealed class CloudProfileLibraryService(
 
     public IReadOnlyList<ProfileLibraryEntry> GetVisible(IReadOnlyList<ProfileLibraryEntry> profiles)
     {
-        var keys = ReadVisibleKeys();
-        if (keys.Count == 0)
+        if (string.IsNullOrWhiteSpace(settings.Get<string>(settings.CLOUD_VISIBLE_PROFILE_IDS)))
             return profiles.Where(profile => profile.Source is ProfileLibrarySource.Local or ProfileLibrarySource.Vault).Take(4).ToList();
 
+        var keys = ReadVisibleKeys();
         return keys.Select(key => profiles.FirstOrDefault(profile => profile.Key == key))
             .Where(profile => profile is not null)
             .Take(4)

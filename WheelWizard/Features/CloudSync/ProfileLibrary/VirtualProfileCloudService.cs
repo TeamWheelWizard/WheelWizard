@@ -189,7 +189,8 @@ public sealed class VirtualProfileCloudService(
         var temporary = Path.Combine(Path.GetTempPath(), $"wheelwizard-vault-{profileId:N}.zip");
         try
         {
-            await provider.DownloadAsync(RemotePath(profileId, "profile.zip"), temporary);
+            var packagePath = await ResolvePackagePathAsync(provider, profileId, remote.Revision);
+            await provider.DownloadAsync(packagePath, temporary);
             var downloaded = await packages.ReadPackageAsync(temporary);
             await packages.ValidateProfileAsync(downloaded);
             if (
@@ -199,7 +200,7 @@ public sealed class VirtualProfileCloudService(
             )
                 return CloudSyncResult.Fail("Cloud package does not match its manifest; no local license was replaced.");
 
-            var license = ExtractOnlyLicense(downloaded.RksysData);
+            var license = ExtractOnlyLicense(downloaded.RksysData, downloaded.Manifest);
             // The backup is taken before the Mii database is changed as well as before the vault item is written.
             await backups.CreateBackupAsync();
             var existing = await vault.GetAsync(profileId);
@@ -262,11 +263,25 @@ public sealed class VirtualProfileCloudService(
         var temporary = Path.Combine(Path.GetTempPath(), $"wheelwizard-vault-{profileId:N}-upload.zip");
         try
         {
+            var expectedManifest = await provider.GetFileInfoAsync(RemotePath(profileId, "manifest.json"));
+            if (remote is not null && (expectedManifest is null || string.IsNullOrWhiteSpace(expectedManifest.ETag)))
+                return new CloudSyncResult(
+                    false,
+                    CloudSyncAction.Conflict,
+                    "Cloud manifest changed before this upload started.",
+                    ConflictKind.Conflict
+                );
             await packages.WritePackageAsync(local, temporary);
-            await provider.UploadAsync(temporary, RemotePath(profileId, "profile.zip"));
+            await provider.UploadAsync(temporary, PackageRemotePath(profileId, revision));
             var manifestPath = temporary + ".json";
             await File.WriteAllTextAsync(manifestPath, JsonSerializer.Serialize(local.Manifest));
-            await provider.UploadAsync(manifestPath, RemotePath(profileId, "manifest.json"));
+            if (!await provider.UploadIfMatchAsync(manifestPath, RemotePath(profileId, "manifest.json"), expectedManifest?.ETag))
+                return new CloudSyncResult(
+                    false,
+                    CloudSyncAction.Conflict,
+                    "Cloud changed while this profile was being uploaded.",
+                    ConflictKind.Conflict
+                );
             await WriteStateAsync(
                 profileId,
                 deviceId,
@@ -354,15 +369,20 @@ public sealed class VirtualProfileCloudService(
         File.Move(temporary, targetPath, overwrite: true);
     }
 
-    private static byte[] ExtractOnlyLicense(byte[] rksys)
+    private static byte[] ExtractOnlyLicense(byte[] rksys, CloudProfileManifest manifest)
     {
-        for (var slot = 0; slot < SlotCount; slot++)
-        {
-            var offset = RksysHeaderSize + slot * RkpdSize;
-            if (rksys.Length >= offset + RkpdSize && rksys.AsSpan(offset, 4).SequenceEqual("RKPD"u8))
-                return rksys.AsSpan(offset, RkpdSize).ToArray();
-        }
-        throw new InvalidDataException("The cloud package has no Mario Kart license.");
+        var present = manifest.LicensePreviews.Where(preview => preview.IsPresent && preview.Slot is >= 0 and < SlotCount).ToList();
+        var named = present.Where(preview => string.Equals(preview.Name, manifest.ProfileName, StringComparison.Ordinal)).ToList();
+        var selected =
+            named.Count == 1 ? named[0]
+            : named.Count == 0 && present.Count == 1 ? present[0]
+            : null;
+        if (selected is null)
+            throw new InvalidDataException("The cloud package does not identify one unambiguous Mario Kart license.");
+        var offset = RksysHeaderSize + selected.Slot * RkpdSize;
+        if (rksys.Length < offset + RkpdSize || !rksys.AsSpan(offset, 4).SequenceEqual("RKPD"u8))
+            throw new InvalidDataException("The cloud package license preview does not match its rksys.dat slot.");
+        return rksys.AsSpan(offset, RkpdSize).ToArray();
     }
 
     private async Task<CloudProfileManifest?> ReadManifestAsync(ICloudProvider provider, Guid profileId)
@@ -392,6 +412,14 @@ public sealed class VirtualProfileCloudService(
     private Guid DeviceId => Guid.TryParse(settings.Get<string>(settings.CLOUD_DEVICE_ID), out var id) ? id : Guid.Empty;
 
     private static string RemotePath(Guid profileId, string name) => $"/WheelWizard/CloudSaves/{profileId:D}/{name}";
+
+    private static string PackageRemotePath(Guid profileId, long revision) => RemotePath(profileId, $"revisions/{revision}/profile.zip");
+
+    private static async Task<string> ResolvePackagePathAsync(ICloudProvider provider, Guid profileId, long revision)
+    {
+        var revisionPath = PackageRemotePath(profileId, revision);
+        return await provider.ExistsAsync(revisionPath) ? revisionPath : RemotePath(profileId, "profile.zip");
+    }
 
     private static string StatePath(Guid profileId, Guid deviceId) =>
         Path.Combine(PathManager.CloudSyncStateFolderPath, $"{profileId:D}-{deviceId:D}.json");

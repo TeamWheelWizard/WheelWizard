@@ -76,6 +76,29 @@ public class WebDavProvider(IHttpClientFactory clients, ISettingsManager setting
 
     public async Task UploadAsync(string localPath, string remotePath)
     {
+        await UploadCoreAsync(localPath, remotePath, null, null);
+    }
+
+    public async Task<bool> UploadIfMatchAsync(string localPath, string remotePath, string? expectedETag)
+    {
+        await EnsureParentCollectionsAsync(remotePath);
+        await using var input = File.OpenRead(localPath);
+        using var content = new StreamContent(input);
+        using var request = await CreateRequestAsync(HttpMethod.Put, remotePath);
+        request.Content = content;
+        if (expectedETag is null)
+            request.Headers.TryAddWithoutValidation("If-None-Match", "*");
+        else
+            request.Headers.TryAddWithoutValidation("If-Match", expectedETag);
+        using var response = await Client.SendAsync(request);
+        if (response.StatusCode is HttpStatusCode.PreconditionFailed or HttpStatusCode.Conflict)
+            return false;
+        response.EnsureSuccessStatusCode();
+        return true;
+    }
+
+    private async Task UploadCoreAsync(string localPath, string remotePath, string? ifMatch, string? ifNoneMatch)
+    {
         await EnsureParentCollectionsAsync(remotePath);
         await using var input = File.OpenRead(localPath);
         using var content = new StreamContent(input);

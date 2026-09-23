@@ -6,6 +6,7 @@ using WheelWizard.CloudSync.ProfileLibrary;
 using WheelWizard.CloudSync.Providers;
 using WheelWizard.Services;
 using WheelWizard.Settings;
+using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.CloudSync;
 
@@ -16,7 +17,8 @@ public sealed class CloudSyncService(
     IRetroWfcEnrollmentService enrollment,
     ISettingsManager settings,
     IVirtualProfileCloudService vaultProfiles,
-    IProfileCloudBindingService profileBindings
+    IProfileCloudBindingService profileBindings,
+    IGameLicenseSingletonService gameLicenses
 ) : ICloudSyncService
 {
     private readonly SemaphoreSlim _syncGate = new(1, 1);
@@ -84,7 +86,12 @@ public sealed class CloudSyncService(
                 CloudSyncResult? selectedResult = null;
                 foreach (var localSlot in selection.LocalSlots)
                 {
-                    var selectedProfileId = await profileBindings.GetProfileIdAsync(localSlot);
+                    if (localSlot < 0 || localSlot >= gameLicenses.LicenseCollection.Users.Count)
+                        return CloudSyncResult.Fail("The selected local Mario Kart license no longer exists.");
+                    var selectedProfileId = await profileBindings.GetProfileIdAsync(
+                        localSlot,
+                        ProfileCloudBindingIdentity.Create(gameLicenses.LicenseCollection.Users[localSlot])
+                    );
                     var result = preLaunch
                         ? await vaultProfiles.PullLocalSlotAsync(selectedProfileId, localSlot)
                         : await vaultProfiles.PushLocalSlotAsync(selectedProfileId, localSlot);
