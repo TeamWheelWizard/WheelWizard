@@ -43,6 +43,8 @@
                                               Fill="{StaticResource Neutral800}" Stroke="{StaticResource Neutral300}" StrokeThickness="1.4" />
                                     </Grid>
                                     <CheckBox Grid.Column="3" IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding CanSelect}"
+                                              AutomationProperties.Name="{Binding Name}"
+                                              AutomationProperties.HelpText="{Binding FriendCode}"
                                               VerticalAlignment="Center" Margin="8" />
                                 </Grid>
                                 <patterns:MiiImageLoader Width="80" Height="80" Margin="-7,0,0,1"

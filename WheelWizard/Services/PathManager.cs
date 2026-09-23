@@ -167,7 +167,13 @@ public static partial class PathManager
             return WiiFolderPath;
 
         if (Settings.Get<bool>(Settings.RECOMP_USE_DOLPHIN_DATA))
-            return WiiFolderPath;
+        {
+            var configured = Settings.Get<string>(Settings.NAND_ROOT_PATH);
+            if (!string.IsNullOrWhiteSpace(configured) && Directory.Exists(configured))
+                return configured;
+            var userFolder = Directory.Exists(UserFolderPath) ? UserFolderPath : TryFindUserFolderPath();
+            return string.IsNullOrWhiteSpace(userFolder) ? WiiFolderPath : Path.Combine(userFolder, "Wii");
+        }
 
         if (Settings.Get<bool>(Settings.RECOMP_COPY_DOLPHIN_NAND) && Directory.Exists(RecompNandCopyFolderPath))
             return RecompNandCopyFolderPath;

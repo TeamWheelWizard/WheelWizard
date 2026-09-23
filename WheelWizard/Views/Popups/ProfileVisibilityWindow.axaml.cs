@@ -65,6 +65,7 @@ public sealed class ProfileVisibilityChoice : INotifyPropertyChanged
 public partial class ProfileVisibilityWindow : PopupContent
 {
     private readonly TaskCompletionSource<IReadOnlyList<string>?> _result = new();
+    private List<string> _selectedKeys = [];
 
     public ObservableCollection<ProfileVisibilityChoice> Choices { get; } = [];
 
@@ -78,7 +79,8 @@ public partial class ProfileVisibilityWindow : PopupContent
 
     public ProfileVisibilityWindow SetProfiles(IEnumerable<ProfileLibraryEntry> profiles, IEnumerable<string> selectedKeys)
     {
-        var selected = selectedKeys.ToHashSet(StringComparer.Ordinal);
+        _selectedKeys = selectedKeys.Distinct(StringComparer.Ordinal).ToList();
+        var selected = _selectedKeys.ToHashSet(StringComparer.Ordinal);
         Choices.Clear();
         foreach (var profile in profiles)
         {
@@ -98,7 +100,15 @@ public partial class ProfileVisibilityWindow : PopupContent
 
     private void Apply_OnClick(object? sender, RoutedEventArgs e)
     {
-        var selected = Choices.Where(choice => choice.IsSelected).Select(choice => choice.Entry.Key).ToList();
+        var selectedSet = Choices.Where(choice => choice.IsSelected).Select(choice => choice.Entry.Key).ToHashSet(StringComparer.Ordinal);
+        var selected = _selectedKeys
+            .Where(selectedSet.Contains)
+            .Concat(
+                Choices
+                    .Where(choice => choice.IsSelected && !_selectedKeys.Contains(choice.Entry.Key, StringComparer.Ordinal))
+                    .Select(choice => choice.Entry.Key)
+            )
+            .ToList();
         if (selected.Count > 4)
         {
             Validation.Text = "Select at most four profiles.";

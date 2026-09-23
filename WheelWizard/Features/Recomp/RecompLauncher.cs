@@ -73,6 +73,8 @@ public class RecompLauncher(
             // awaited through game exit.
             progressWindow.SetCancellationTokenSource(null);
             progressWindow.Close();
+            // Always recover an interrupted temporary profile view before cloud sync reads the save.
+            await visibleProfiles.RestoreAsync();
             var preSync = await cloudSync.PreLaunchSyncAsync();
             if (!preSync.Success)
                 return Fail(preSync.Message);

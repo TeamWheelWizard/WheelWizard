@@ -13,7 +13,8 @@ public sealed class VisibleProfileLaunchService(
     ISettingsManager settings,
     IGameLicenseSingletonService gameLicenses,
     IVirtualProfileVaultService vault,
-    ICloudSyncService cloudSync
+    ICloudSyncService cloudSync,
+    ICloudProfileLibraryService profileLibrary
 ) : IVisibleProfileLaunchService
 {
     private const int RksysHeaderSize = 0x08;
@@ -26,11 +27,16 @@ public sealed class VisibleProfileLaunchService(
 
     public async Task PrepareAsync()
     {
+        await RestoreAsync(); // Recover before sync/capture can observe an unfinished temporary view.
         if (!settings.Get<bool>(settings.CLOUD_SYNC_ENABLED))
             return;
 
-        await RestoreAsync(); // Recover safely after a prior forced game exit before creating a new view.
         var selected = ReadSelection();
+        if (selected.Count == 0 && string.IsNullOrWhiteSpace(settings.Get<string>(settings.CLOUD_VISIBLE_PROFILE_IDS)))
+        {
+            var profiles = await profileLibrary.GetAllAsync();
+            selected = profileLibrary.GetVisible(profiles).Select(profile => profile.Key).ToList();
+        }
         if (selected.Count == 0)
             return;
         // A cloud-only entry is materialized in the vault first. This preserves every
@@ -46,30 +52,7 @@ public sealed class VisibleProfileLaunchService(
                 throw new InvalidOperationException(downloaded.Message);
         }
 
-        var sourceSlots = selected
-            .Select(ParseLocalSlot)
-            .Where(slot => slot is >= 0 and < SlotCount)
-            .Distinct()
-            .Select(slot => slot!.Value)
-            .ToList();
-        var vaultProfiles = new List<VirtualProfileRecord>();
-        foreach (
-            var profileId in selected
-                .Select(key => ParseVaultProfileId(key) ?? ParseCloudProfileId(key))
-                .Where(profileId => profileId is not null)
-                .Select(profileId => profileId!.Value)
-                .Distinct()
-        )
-        {
-            var profile =
-                await vault.GetAsync(profileId)
-                ?? throw new InvalidDataException("A selected virtual profile is no longer available in the local profile vault.");
-            await vault.EnsureMiiPresentAsync(profile);
-            vaultProfiles.Add(profile);
-        }
-        if (sourceSlots.Count + vaultProfiles.Count == 0)
-            return;
-        if (sourceSlots.Count + vaultProfiles.Count > SlotCount)
+        if (selected.Count > SlotCount)
             throw new InvalidOperationException("WiiCompiled can display at most four selected profiles at once.");
 
         var rksysPath = distributions.RetroRewind.FindExistingRksysPath() ?? PathManager.GetRetroWfcSavePath();
@@ -79,30 +62,48 @@ public sealed class VisibleProfileLaunchService(
         if (original.Length < RksysHeaderSize + SlotCount * RkpdSize)
             throw new InvalidDataException("rksys.dat is too small to filter its license slots.");
 
-        await backups.CreateBackupAsync();
+        await backups.CreateBackupAsync(rksysPath);
         Directory.CreateDirectory(SessionFolder);
         await File.WriteAllBytesAsync(OriginalPath, original);
         var view = original.ToArray();
         for (var slot = 0; slot < SlotCount; slot++)
             Array.Clear(view, RksysHeaderSize + slot * RkpdSize, RkpdSize);
         var maps = new List<SlotMap>();
-        var targetSlot = 0;
-        foreach (var sourceSlot in sourceSlots)
+        foreach (var key in selected.Distinct(StringComparer.Ordinal))
         {
-            Buffer.BlockCopy(original, RksysHeaderSize + sourceSlot * RkpdSize, view, RksysHeaderSize + targetSlot * RkpdSize, RkpdSize);
-            maps.Add(new SlotMap(targetSlot++, sourceSlot, null));
-        }
-        foreach (var virtualProfile in vaultProfiles)
-        {
+            var targetSlot = maps.Count;
+            if (ParseLocalSlot(key) is int sourceSlot && sourceSlot is >= 0 and < SlotCount)
+            {
+                Buffer.BlockCopy(
+                    original,
+                    RksysHeaderSize + sourceSlot * RkpdSize,
+                    view,
+                    RksysHeaderSize + targetSlot * RkpdSize,
+                    RkpdSize
+                );
+                maps.Add(new SlotMap(targetSlot, sourceSlot, null));
+                continue;
+            }
+            var profileId = ParseVaultProfileId(key) ?? ParseCloudProfileId(key);
+            if (profileId is null)
+                continue;
+            var virtualProfile =
+                await vault.GetAsync(profileId.Value)
+                ?? throw new InvalidDataException("A selected virtual profile is no longer available in the local profile vault.");
+            await vault.EnsureMiiPresentAsync(virtualProfile);
             Buffer.BlockCopy(virtualProfile.LicenseData, 0, view, RksysHeaderSize + targetSlot * RkpdSize, RkpdSize);
-            maps.Add(new SlotMap(targetSlot++, null, virtualProfile.ProfileId));
+            maps.Add(new SlotMap(targetSlot, null, virtualProfile.ProfileId));
         }
+        if (maps.Count == 0)
+            return;
         // Mario Kart validates a CRC32 at 0x27FFC. The temporary slot view is still a complete
         // rksys.dat and needs the same checksum repair as every normal save write.
         GameLicenseSingletonService.FixRksysCrc(view);
 
-        await File.WriteAllTextAsync(StatePath, JsonSerializer.Serialize(new VisibleProfileSession(rksysPath, maps)));
+        var state = new VisibleProfileSession(rksysPath, maps, Installed: false);
+        await File.WriteAllTextAsync(StatePath, JsonSerializer.Serialize(state));
         await WriteAtomicAsync(rksysPath, view);
+        await File.WriteAllTextAsync(StatePath, JsonSerializer.Serialize(state with { Installed = true }));
     }
 
     public async Task RestoreAsync()
@@ -113,12 +114,19 @@ public sealed class VisibleProfileLaunchService(
         if (state is null || !File.Exists(state.RksysPath))
             return;
 
+        if (!state.Installed)
+        {
+            Directory.Delete(SessionFolder, recursive: true);
+            return;
+        }
+
         var original = await File.ReadAllBytesAsync(OriginalPath);
         var session = await File.ReadAllBytesAsync(state.RksysPath);
         if (original.Length < RksysHeaderSize + SlotCount * RkpdSize || session.Length < RksysHeaderSize + SlotCount * RkpdSize)
             throw new InvalidDataException("The visible-profile launch session is corrupt; the original save was left in its backup.");
 
         var validMaps = state.Maps.Where(map => map.TargetSlot is >= 0 and < SlotCount).ToList();
+        var recoveredVaultProfiles = state.RecoveredVaultProfiles ?? [];
         foreach (var map in validMaps.Where(map => map.SourceSlot is >= 0 and < SlotCount))
             Buffer.BlockCopy(
                 session,
@@ -154,9 +162,16 @@ public sealed class VisibleProfileLaunchService(
             {
                 // All four physical slots are occupied. Preserve a newly created license in the
                 // vault rather than overwriting an unselected local profile.
-                var created = await vault.CreateAsync(licenseData);
-                EnsureVaultProfileIsSelectedForSync(created.ProfileId);
-                EnsureProfileIsVisible($"vault:{created.ProfileId:D}");
+                if (!recoveredVaultProfiles.TryGetValue(targetSlot, out var profileId))
+                {
+                    var existing = (await vault.GetAllAsync()).FirstOrDefault(profile => profile.LicenseData.SequenceEqual(licenseData));
+                    profileId = existing?.ProfileId ?? (await vault.CreateAsync(licenseData)).ProfileId;
+                    recoveredVaultProfiles[targetSlot] = profileId;
+                    state = state with { RecoveredVaultProfiles = recoveredVaultProfiles };
+                    await File.WriteAllTextAsync(StatePath, JsonSerializer.Serialize(state));
+                }
+                EnsureVaultProfileIsSelectedForSync(profileId);
+                EnsureProfileIsVisible($"vault:{profileId:D}");
             }
         }
         GameLicenseSingletonService.FixRksysCrc(original);
@@ -202,7 +217,10 @@ public sealed class VisibleProfileLaunchService(
     {
         try
         {
-            var keys = JsonSerializer.Deserialize<List<string>>(settings.Get<string>(settings.CLOUD_SYNC_PROFILE_IDS)) ?? [];
+            var stored = settings.Get<string>(settings.CLOUD_SYNC_PROFILE_IDS);
+            if (string.IsNullOrWhiteSpace(stored))
+                return;
+            var keys = JsonSerializer.Deserialize<List<string>>(stored) ?? [];
             var key = $"vault:{profileId:D}";
             if (keys.Contains(key, StringComparer.Ordinal))
                 return;
@@ -238,7 +256,12 @@ public sealed class VisibleProfileLaunchService(
         File.Move(temporary, path, overwrite: true);
     }
 
-    private sealed record VisibleProfileSession(string RksysPath, List<SlotMap> Maps);
+    private sealed record VisibleProfileSession(
+        string RksysPath,
+        List<SlotMap> Maps,
+        bool Installed,
+        Dictionary<int, Guid>? RecoveredVaultProfiles = null
+    );
 
     private sealed record SlotMap(int TargetSlot, int? SourceSlot, Guid? VaultProfileId);
 }

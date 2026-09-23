@@ -203,7 +203,7 @@ public class SettingsManager : ISettingsManager
         // application ids from the user's Google Cloud / Microsoft Entra registration.
         CLOUD_GOOGLE_CLIENT_ID = RegisterWhWz("CloudGoogleClientId", "");
         CLOUD_ONEDRIVE_CLIENT_ID = RegisterWhWz("CloudOneDriveClientId", "");
-        CLOUD_VISIBLE_PROFILE_IDS = RegisterWhWz("CloudVisibleProfileIds", "[]");
+        CLOUD_VISIBLE_PROFILE_IDS = RegisterWhWz("CloudVisibleProfileIds", "");
         CLOUD_SYNC_PROFILE_IDS = RegisterWhWz("CloudSyncProfileIds", "");
         #endregion
 

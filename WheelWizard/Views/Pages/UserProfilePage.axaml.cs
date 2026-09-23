@@ -135,9 +135,12 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         UpdateCarouselIndicators();
         _ = RefreshVisibleProfileLibraryAsync();
         ProfileLibraryChangeNotifier.Changed += ProfileLibraryChanged_OnChanged;
+        DetachedFromVisualTree += (_, _) => DeactivateProfileLibrarySubscription();
         // Make sure this action gets subscribed AFTER the PopulateRegions method
         RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
     }
+
+    internal void DeactivateProfileLibrarySubscription() => ProfileLibraryChangeNotifier.Changed -= ProfileLibraryChanged_OnChanged;
 
     private void ProfileLibraryChanged_OnChanged(object? sender, EventArgs e)
     {

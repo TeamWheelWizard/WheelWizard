@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Interactivity;
+using Serilog;
 using WheelWizard.CloudSync;
 using WheelWizard.CloudSync.ProfileLibrary;
 using WheelWizard.Shared.DependencyInjection;
@@ -49,6 +50,7 @@ public sealed class CloudSyncProfileChoice(ProfileLibraryEntry entry, bool selec
 public partial class CloudPage : UserControlBase
 {
     private bool _syncInProgress;
+    private bool _profilesLoaded;
 
     [Inject]
     private ICloudProfileLibraryService ProfileLibraryService { get; set; } = null!;
@@ -68,35 +70,50 @@ public partial class CloudPage : UserControlBase
     private async Task LoadProfilesAsync()
     {
         Status.Text = "Loading local and cloud profiles...";
-        var profiles = await ProfileLibraryService.GetAllAsync();
-        var selected = ProfileLibraryService.GetSyncSelected(profiles).Select(profile => profile.Key).ToHashSet(StringComparer.Ordinal);
-        Profiles.Clear();
-        foreach (var profile in profiles)
-            Profiles.Add(new CloudSyncProfileChoice(profile, selected.Contains(profile.Key)));
-
-        Status.Text =
-            Profiles.Count == 0
-                ? "No Mario Kart licenses were found on this device."
-                : "Select the local profiles you want to sync, then save your selection.";
+        _profilesLoaded = false;
+        try
+        {
+            var profiles = await ProfileLibraryService.GetAllAsync();
+            var selected = ProfileLibraryService.GetSyncSelected(profiles).Select(profile => profile.Key).ToHashSet(StringComparer.Ordinal);
+            Profiles.Clear();
+            foreach (var profile in profiles)
+                Profiles.Add(new CloudSyncProfileChoice(profile, selected.Contains(profile.Key)));
+            _profilesLoaded = true;
+            Status.Text =
+                Profiles.Count == 0
+                    ? "No Mario Kart licenses were found on this device."
+                    : "Select the local profiles you want to sync, then save your selection.";
+        }
+        catch (Exception exception)
+        {
+            Log.Error(exception, "Could not load cloud profiles");
+            Status.Text = $"Could not load cloud profiles: {exception.Message}";
+        }
     }
 
     private void SaveSelection_OnClick(object? sender, RoutedEventArgs e)
     {
-        SaveSelection();
-        Status.Text = "Cloud profile selection saved.";
+        Status.Text = SaveSelection() ? "Cloud profile selection saved." : "Profiles are still loading; the selection was not changed.";
     }
 
     private async void ChooseVisibleProfiles_OnClick(object? sender, RoutedEventArgs e)
     {
-        var profiles = (await ProfileLibraryService.GetAllAsync()).ToList();
-        var visible = ProfileLibraryService.GetVisible(profiles).Select(profile => profile.Key);
-        var selected = await new ProfileVisibilityWindow().SetProfiles(profiles, visible).AwaitAnswer();
-        if (selected is null)
-            return;
-
-        ProfileLibraryService.SaveVisible(selected);
-        await LoadProfilesAsync();
-        Status.Text = "Visible profiles updated.";
+        try
+        {
+            var profiles = (await ProfileLibraryService.GetAllAsync()).ToList();
+            var visible = ProfileLibraryService.GetVisible(profiles).Select(profile => profile.Key);
+            var selected = await new ProfileVisibilityWindow().SetProfiles(profiles, visible).AwaitAnswer();
+            if (selected is null)
+                return;
+            ProfileLibraryService.SaveVisible(selected);
+            await LoadProfilesAsync();
+            Status.Text = "Visible profiles updated.";
+        }
+        catch (Exception exception)
+        {
+            Log.Error(exception, "Could not choose visible cloud profiles");
+            Status.Text = $"Could not update visible profiles: {exception.Message}";
+        }
     }
 
     private async void SyncSelected_OnClick(object? sender, RoutedEventArgs e)
@@ -104,7 +121,12 @@ public partial class CloudPage : UserControlBase
         if (_syncInProgress)
             return;
         _syncInProgress = true;
-        SaveSelection();
+        if (!SaveSelection())
+        {
+            Status.Text = "Profiles are still loading; synchronization was not started.";
+            _syncInProgress = false;
+            return;
+        }
         Status.Text = "Synchronizing selected profiles...";
         SyncButton.Text = "Syncing profiles...";
         SyncButton.IsLoading = true;
@@ -115,6 +137,11 @@ public partial class CloudPage : UserControlBase
             await LoadProfilesAsync();
             Status.Text = result.Message;
         }
+        catch (Exception exception)
+        {
+            Log.Error(exception, "Could not synchronize cloud profiles");
+            Status.Text = $"Cloud synchronization failed: {exception.Message}";
+        }
         finally
         {
             _syncInProgress = false;
@@ -124,10 +151,13 @@ public partial class CloudPage : UserControlBase
         }
     }
 
-    private void SaveSelection()
+    private bool SaveSelection()
     {
+        if (!_profilesLoaded)
+            return false;
         var selected = Profiles.Where(profile => profile.CanSync && profile.IsSelected).Select(profile => profile.Entry.Key);
         ProfileLibraryService.SaveSyncSelected(selected);
+        return true;
     }
 
     private void CloudSettings_OnClick(object? sender, RoutedEventArgs e) =>

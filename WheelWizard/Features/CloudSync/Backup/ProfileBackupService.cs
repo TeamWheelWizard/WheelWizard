@@ -5,13 +5,13 @@ namespace WheelWizard.CloudSync.Backup;
 
 public sealed class ProfileBackupService(ICustomDistributionSingletonService distributions) : IProfileBackupService
 {
-    public Task<BackupInfo> CreateBackupAsync()
+    public Task<BackupInfo> CreateBackupAsync(string? rksysPath = null)
     {
         var now = DateTime.UtcNow;
         var target = Path.Combine(PathManager.CloudBackupFolderPath, now.ToString("yyyyMMdd-HHmmssfff"));
         Directory.CreateDirectory(target);
         var nand = PathManager.GetActiveNandPath();
-        var rksys = distributions.RetroRewind.FindExistingRksysPath();
+        var rksys = rksysPath ?? distributions.RetroRewind.FindExistingRksysPath() ?? PathManager.GetRetroWfcSavePath();
         CopyIfPresent(rksys, Path.Combine(target, "MarioKart", "rksys.dat"));
         CopyIfPresent(PathManager.GetMiiDatabasePath(nand), Path.Combine(target, "Mii", "RFL_DB.dat"));
         CopyIfPresent(PathManager.GetRetroRewindRatingPath(nand), Path.Combine(target, "RetroRewind", "RRRating.pul"));
