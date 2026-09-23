@@ -29,6 +29,8 @@
                              Click="TopBarRadio_OnClick" Content="{loc:T category.dolphin}"/>
                 <RadioButton Classes="TopBar" Tag="OtherSettings" 
                              Click="TopBarRadio_OnClick" Content="{loc:T category.other}" />
+                <RadioButton Classes="TopBar" Tag="CloudSaveSettings"
+                             Click="TopBarRadio_OnClick" Content="Cloud" />
                 <RadioButton Classes="TopBar" Tag="AppInfo"
                              Click="TopBarRadio_OnClick" Content="{loc:T category.about}" />
             </StackPanel>

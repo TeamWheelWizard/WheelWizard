@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             x:Class="WheelWizard.Views.Pages.Settings.CloudSaveSettings">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,15,0,0" Spacing="8">
+            <TextBlock Classes="HeaderText" Text="Cloud saves" />
+            <TextBlock Classes="TinyText" TextWrapping="Wrap"
+                       Text="Only your Mario Kart profile is synchronized. NAND, Console Serial, Device ID and WiiCompiled configuration always remain local to this device." />
+            <Border Classes="SettingsBlockStyle" Padding="12">
+                <StackPanel Spacing="8">
+                    <CheckBox x:Name="Enabled" Classes="SwitchDark" Content="Enable cloud saves" />
+                    <CheckBox x:Name="BeforeLaunch" Classes="SwitchDark" Content="Pull before launching WiiCompiled" />
+                    <CheckBox x:Name="AfterLaunch" Classes="SwitchDark" Content="Push after WiiCompiled closes" />
+                    <TextBlock Text="Provider" />
+                    <ComboBox x:Name="Provider" SelectionChanged="Provider_OnSelectionChanged"><ComboBoxItem Content="WebDav" /><ComboBoxItem Content="Nextcloud" /><ComboBoxItem Content="Google Drive" /><ComboBoxItem Content="OneDrive" /></ComboBox>
+                    <StackPanel x:Name="ServerSettings" Spacing="4">
+                        <TextBlock x:Name="ServerUrlLabel" />
+                        <TextBlock x:Name="ServerUrlHint" Classes="TinyText" TextWrapping="Wrap" />
+                        <TextBox x:Name="RemoteRoot" />
+                    </StackPanel>
+                    <StackPanel x:Name="WebDavCredentials" Spacing="4">
+                        <TextBlock Text="WebDAV user name" />
+                        <TextBox x:Name="UserName" PlaceholderText="Account user name" />
+                        <TextBlock Text="WebDAV app password" />
+                        <TextBox x:Name="AppPassword" PasswordChar="*" PlaceholderText="Stored only in the OS credential store" />
+                    </StackPanel>
+                    <StackPanel x:Name="OAuthClientSettings" Spacing="4" IsVisible="False">
+                        <TextBlock x:Name="OAuthClientIdLabel" />
+                        <TextBlock x:Name="OAuthClientIdHint" Classes="TinyText" TextWrapping="Wrap" />
+                        <TextBox x:Name="OAuthClientId" PlaceholderText="OAuth client ID" />
+                    </StackPanel>
+                    <TextBlock x:Name="BrowserAuthorizationHint" Classes="TinyText" TextWrapping="Wrap" IsVisible="False" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <components:Button x:Name="ConnectButton" Width="128" Text="Sign in" Click="Connect_OnClick"
+                                           PointerEntered="ConnectButton_OnPointerEntered"
+                                           PointerExited="ConnectButton_OnPointerExited" />
+                        <components:Button Text="Sync now" Click="SyncNow_OnClick" />
+                    </StackPanel>
+                    <TextBlock x:Name="Status" Classes="TinyText" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

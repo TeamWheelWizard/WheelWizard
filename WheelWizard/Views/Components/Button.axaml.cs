@@ -21,6 +21,8 @@ public class Button : Avalonia.Controls.Button // Change to TemplatedControl
 
     public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<Button, string>(nameof(Text));
 
+    public static readonly StyledProperty<bool> IsLoadingProperty = AvaloniaProperty.Register<Button, bool>(nameof(IsLoading));
+
     public enum ButtonsVariantType
     {
         Primary,
@@ -73,6 +75,12 @@ public class Button : Avalonia.Controls.Button // Change to TemplatedControl
     {
         get => GetValue(TextProperty);
         set => SetValue(TextProperty, value);
+    }
+
+    public bool IsLoading
+    {
+        get => GetValue(IsLoadingProperty);
+        set => SetValue(IsLoadingProperty, value);
     }
 
     // UpdateStyleClasses remains the same
