@@ -28,6 +28,12 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     // Though I do see the use in saving it when using the app so you can swap pages in the meantime
     private static ListOrderCondition CurrentOrder = ListOrderCondition.IS_ONLINE;
 
+    // rksys.dat VR/BR is unreliable, so prefer live rooms, then the API (VR only)
+    private static readonly TimeSpan ApiVrCacheDuration = TimeSpan.FromMinutes(5);
+    private static readonly Dictionary<string, (uint? Vr, DateTime FetchedAt)> ApiVrCache = [];
+    private static readonly HashSet<string> PendingApiVrRequests = [];
+    private static readonly Dictionary<string, uint> LiveBrCache = [];
+
     private ObservableCollection<FriendProfile> _friendlist = [];
 
     [Inject]
@@ -111,7 +117,73 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             ListOrderCondition.TOTAL_RACES => f => f.Losses + f.Wins,
             ListOrderCondition.IS_ONLINE or _ => f => f.IsOnline,
         };
-        return GameLicenseService.ActiveCurrentFriends.OrderByDescending(orderMethod).ToList();
+        var friends = GameLicenseService.ActiveCurrentFriends;
+        ApplyAccurateRatings(friends);
+        return friends.OrderByDescending(orderMethod).ToList();
+    }
+
+    private void ApplyAccurateRatings(List<FriendProfile> friends)
+    {
+        var onlinePlayers = RRLiveRooms
+            .Instance.CurrentRooms.SelectMany(room => room.Players)
+            .Where(player => !string.IsNullOrWhiteSpace(player.FriendCode))
+            .GroupBy(player => player.FriendCode)
+            .ToDictionary(group => group.Key, group => group.First());
+
+        var friendCodesToFetch = new List<string>();
+        foreach (var friend in friends)
+        {
+            if (string.IsNullOrWhiteSpace(friend.FriendCode))
+                continue;
+
+            if (onlinePlayers.TryGetValue(friend.FriendCode, out var livePlayer) && livePlayer.Vr.HasValue)
+            {
+                friend.Vr = (uint)Math.Max(livePlayer.Vr.Value, 0);
+                if (livePlayer.Br.HasValue)
+                {
+                    friend.Br = (uint)Math.Max(livePlayer.Br.Value, 0);
+                    LiveBrCache[friend.FriendCode] = friend.Br;
+                }
+                ApiVrCache[friend.FriendCode] = (friend.Vr, DateTime.Now);
+                continue;
+            }
+
+            if (LiveBrCache.TryGetValue(friend.FriendCode, out var cachedBr))
+                friend.Br = cachedBr;
+
+            if (ApiVrCache.TryGetValue(friend.FriendCode, out var cached))
+            {
+                if (cached.Vr.HasValue)
+                    friend.Vr = cached.Vr.Value;
+                if (DateTime.Now - cached.FetchedAt < ApiVrCacheDuration)
+                    continue;
+            }
+
+            if (PendingApiVrRequests.Add(friend.FriendCode))
+                friendCodesToFetch.Add(friend.FriendCode);
+        }
+
+        if (friendCodesToFetch.Count > 0)
+            _ = FetchApiVrAsync(friendCodesToFetch);
+    }
+
+    private async Task FetchApiVrAsync(List<string> friendCodes)
+    {
+        var anyUpdated = false;
+        // Sequential to avoid flooding the API
+        foreach (var friendCode in friendCodes)
+        {
+            var profileResult = await ApiCaller.CallApiAsync(rwfcApi => rwfcApi.GetPlayerProfileAsync(friendCode));
+            uint? vr = profileResult.IsSuccess && profileResult.Value is { Vr: > 0 } profile ? (uint)profile.Vr : null;
+
+            // Failures are cached too, to avoid retrying on every update
+            ApiVrCache[friendCode] = (vr, DateTime.Now);
+            PendingApiVrRequests.Remove(friendCode);
+            anyUpdated |= vr.HasValue;
+        }
+
+        if (anyUpdated)
+            UpdateFriendList();
     }
 
     private void PopulateSortingList()
