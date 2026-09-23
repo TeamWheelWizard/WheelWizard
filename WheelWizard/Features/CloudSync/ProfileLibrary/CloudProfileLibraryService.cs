@@ -1,7 +1,9 @@
 using System.Text.Json;
 using WheelWizard.Services;
 using WheelWizard.Settings;
+using WheelWizard.Settings.Types;
 using WheelWizard.WiiManagement.GameLicense;
+using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.CloudSync.ProfileLibrary;
@@ -10,7 +12,8 @@ public sealed class CloudProfileLibraryService(
     IGameLicenseSingletonService gameLicenses,
     ICloudSyncService cloudSync,
     ISettingsManager settings,
-    IVirtualProfileVaultService vault
+    IVirtualProfileVaultService vault,
+    IProfileCloudBindingService bindings
 ) : ICloudProfileLibraryService
 {
     public async Task<IReadOnlyList<ProfileLibraryEntry>> GetAllAsync()
@@ -21,7 +24,7 @@ public sealed class CloudProfileLibraryService(
             : (DateTime?)null;
         foreach (var (license, slot) in gameLicenses.LicenseCollection.Users.Select((license, slot) => (license, slot)))
         {
-            if (string.IsNullOrWhiteSpace(license.NameOfMii) || license.NameOfMii == "No license")
+            if (!IsUsableLocalLicense(license))
                 continue;
             result.Add(
                 new ProfileLibraryEntry(
@@ -79,6 +82,11 @@ public sealed class CloudProfileLibraryService(
                         StorageState = ProfileStorageState.CloudAndLocal,
                         LastUpdatedUtc = Max(result[matchingLocalIndex].LastUpdatedUtc, profile.LastModifiedUtc),
                     };
+                    // A visual local/cloud match must also establish the canonical sync identity.
+                    // Otherwise a later pull would create a random ID for this physical slot and
+                    // leave the actual remote profile untouched.
+                    if (result[matchingLocalIndex].LocalSlot is int localSlot)
+                        await bindings.BindAsync(localSlot, profile.ProfileId);
                     continue;
                 }
 
@@ -111,7 +119,10 @@ public sealed class CloudProfileLibraryService(
         for (var index = 0; index < localProfiles.Count; index++)
         {
             var local = localProfiles[index];
-            if (local.Source is not (ProfileLibrarySource.Local or ProfileLibrarySource.Vault))
+            if (
+                local.Source is not (ProfileLibrarySource.Local or ProfileLibrarySource.Vault)
+                || local.StorageState != ProfileStorageState.LocalOnly
+            )
                 continue;
 
             if (!string.IsNullOrWhiteSpace(cloudFriendCode) && string.Equals(local.FriendCode, cloudFriendCode, StringComparison.Ordinal))
@@ -123,6 +134,12 @@ public sealed class CloudProfileLibraryService(
 
         return -1;
     }
+
+    /// <summary>GameLicenseService represents an empty RKPD slot as a dummy Mii named "no license".</summary>
+    private static bool IsUsableLocalLicense(LicenseProfile license) =>
+        license.Mii is not null
+        && !string.IsNullOrWhiteSpace(license.NameOfMii)
+        && !string.Equals(license.NameOfMii, SettingValues.NoLicense, StringComparison.OrdinalIgnoreCase);
 
     private static DateTime? Max(DateTime? first, DateTime second) => first is null || second > first.Value ? second : first;
 

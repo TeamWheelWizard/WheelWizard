@@ -4,4 +4,7 @@ namespace WheelWizard.CloudSync.ProfileLibrary;
 public interface IProfileCloudBindingService
 {
     Task<Guid> GetProfileIdAsync(int localSlot);
+
+    /// <summary>Binds an already matched physical slot to its canonical remote profile ID.</summary>
+    Task BindAsync(int localSlot, Guid profileId);
 }

@@ -21,9 +21,30 @@ public sealed class ProfileCloudBindingService : IProfileCloudBindingService
 
             profileId = Guid.NewGuid();
             bindings[localSlot] = profileId;
-            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path)!);
-            await File.WriteAllTextAsync(Path, JsonSerializer.Serialize(bindings));
+            await WriteAsync(bindings);
             return profileId;
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    public async Task BindAsync(int localSlot, Guid profileId)
+    {
+        if (localSlot is < 0 or >= 4)
+            throw new ArgumentOutOfRangeException(nameof(localSlot));
+        if (profileId == Guid.Empty)
+            throw new ArgumentException("A cloud profile binding requires a profile ID.", nameof(profileId));
+
+        await _gate.WaitAsync();
+        try
+        {
+            var bindings = await ReadAsync();
+            if (bindings.TryGetValue(localSlot, out var current) && current == profileId)
+                return;
+            bindings[localSlot] = profileId;
+            await WriteAsync(bindings);
         }
         finally
         {
@@ -44,5 +65,11 @@ public sealed class ProfileCloudBindingService : IProfileCloudBindingService
             // A malformed binding file must never make us repurpose an existing cloud profile.
             return [];
         }
+    }
+
+    private async Task WriteAsync(Dictionary<int, Guid> bindings)
+    {
+        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path)!);
+        await File.WriteAllTextAsync(Path, JsonSerializer.Serialize(bindings));
     }
 }
