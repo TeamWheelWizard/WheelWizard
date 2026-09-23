@@ -64,6 +64,22 @@ public interface ISettingsProperties
     Setting RECOMP_SHOW_FPS { get; }
     Setting RECOMP_PREVENT_STUTTERS { get; }
     Setting RECOMP_NAND_ROOT { get; }
+    Setting CLOUD_SYNC_ENABLED { get; }
+    Setting CLOUD_PROVIDER_TYPE { get; }
+    Setting CLOUD_PROFILE_ID { get; }
+    Setting CLOUD_DEVICE_ID { get; }
+    Setting SYNC_BEFORE_LAUNCH { get; }
+    Setting SYNC_AFTER_LAUNCH { get; }
+    Setting CLOUD_REMOTE_ROOT { get; }
+    Setting CLOUD_NEXTCLOUD_SERVER { get; }
+
+    /// <summary>Public OAuth application identifier; never a client secret.</summary>
+    Setting CLOUD_GOOGLE_CLIENT_ID { get; }
+
+    /// <summary>Public OAuth application identifier; never a client secret.</summary>
+    Setting CLOUD_ONEDRIVE_CLIENT_ID { get; }
+    Setting CLOUD_VISIBLE_PROFILE_IDS { get; }
+    Setting CLOUD_SYNC_PROFILE_IDS { get; }
 }
 
 public interface ISettingsManager : ISettingsProperties

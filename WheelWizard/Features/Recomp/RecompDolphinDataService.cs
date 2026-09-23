@@ -16,6 +16,9 @@ public interface IRecompDolphinDataService
     /// <summary>The NAND directory handed to the recomp, honoring both the sharing and the copy choice.</summary>
     string? NandFolderPath { get; }
 
+    /// <summary>Returns the NAND currently used by WiiCompiled as a local source only.</summary>
+    string ActiveNandPath { get; }
+
     string? SourceNandFolderPath { get; }
 
     string? FindCandidateUserFolder();
@@ -54,6 +57,8 @@ public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompS
             return null;
         }
     }
+
+    public string ActiveNandPath => PathManager.GetActiveNandPath();
 
     public string? SourceNandFolderPath
     {

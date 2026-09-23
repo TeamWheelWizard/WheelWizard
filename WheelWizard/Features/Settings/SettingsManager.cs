@@ -189,6 +189,22 @@ public class SettingsManager : ISettingsManager
         SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, SettingValues.IsValidWindowScale);
         RR_REGION = RegisterWhWz("RR_Region", MarioKartWiiEnums.Regions.None);
         WW_LANGUAGE = RegisterWhWz("WW_Language", "en", value => SettingValues.WhWzLanguages.ContainsKey((string)value!));
+        // Cloud credentials are intentionally not settings.  Only non-sensitive identifiers and
+        // switches are persisted in config.json; secrets belong to ISecureCredentialStore.
+        CLOUD_SYNC_ENABLED = RegisterWhWz("CloudSyncEnabled", false);
+        CLOUD_PROVIDER_TYPE = RegisterWhWz("CloudProviderType", "WebDav");
+        CLOUD_PROFILE_ID = RegisterWhWz("CloudProfileId", "");
+        CLOUD_DEVICE_ID = RegisterWhWz("CloudDeviceId", Guid.NewGuid().ToString("D"));
+        SYNC_BEFORE_LAUNCH = RegisterWhWz("SyncBeforeLaunch", true);
+        SYNC_AFTER_LAUNCH = RegisterWhWz("SyncAfterLaunch", true);
+        CLOUD_REMOTE_ROOT = RegisterWhWz("CloudRemoteRoot", "");
+        CLOUD_NEXTCLOUD_SERVER = RegisterWhWz("CloudNextcloudServer", "");
+        // OAuth refresh/access tokens go in ISecureCredentialStore. These are only the public
+        // application ids from the user's Google Cloud / Microsoft Entra registration.
+        CLOUD_GOOGLE_CLIENT_ID = RegisterWhWz("CloudGoogleClientId", "");
+        CLOUD_ONEDRIVE_CLIENT_ID = RegisterWhWz("CloudOneDriveClientId", "");
+        CLOUD_VISIBLE_PROFILE_IDS = RegisterWhWz("CloudVisibleProfileIds", "[]");
+        CLOUD_SYNC_PROFILE_IDS = RegisterWhWz("CloudSyncProfileIds", "");
         #endregion
 
         #region Dolphin settings
@@ -307,6 +323,18 @@ public class SettingsManager : ISettingsManager
     public Setting RECOMP_SHOW_FPS { get; }
     public Setting RECOMP_PREVENT_STUTTERS { get; }
     public Setting RECOMP_NAND_ROOT { get; }
+    public Setting CLOUD_SYNC_ENABLED { get; }
+    public Setting CLOUD_PROVIDER_TYPE { get; }
+    public Setting CLOUD_PROFILE_ID { get; }
+    public Setting CLOUD_DEVICE_ID { get; }
+    public Setting SYNC_BEFORE_LAUNCH { get; }
+    public Setting SYNC_AFTER_LAUNCH { get; }
+    public Setting CLOUD_REMOTE_ROOT { get; }
+    public Setting CLOUD_NEXTCLOUD_SERVER { get; }
+    public Setting CLOUD_GOOGLE_CLIENT_ID { get; }
+    public Setting CLOUD_ONEDRIVE_CLIENT_ID { get; }
+    public Setting CLOUD_VISIBLE_PROFILE_IDS { get; }
+    public Setting CLOUD_SYNC_PROFILE_IDS { get; }
     #endregion
 
     #region Public API

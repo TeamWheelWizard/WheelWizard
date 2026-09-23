@@ -142,6 +142,43 @@ public static partial class PathManager
     public static string MiiDbFile => GetMiiDbFilePath(WiiFolderPath);
     public static string RRratingFilePath => Path.Combine(WiiFolderPath, "shared2", "Pulsar", "RetroRewind6", "RRRating.pul");
 
+    // Cloud saves deliberately resolve individual profile files.  They must never use a NAND
+    // directory as a package source: a NAND contains the console identity and other device state.
+    public static string GetRetroWfcSavePath() => Path.Combine(SaveFolderPath, "rksys.dat");
+
+    public static string GetMiiDatabasePath(string activeNandPath) => GetMiiDbFilePath(activeNandPath);
+
+    public static string GetRetroRewindRatingPath(string activeNandPath) =>
+        Path.Combine(activeNandPath, "shared2", "Pulsar", "RetroRewind6", "RRRating.pul");
+
+    public static string GetRetroRewindSettingsPath(string activeNandPath) =>
+        Path.Combine(activeNandPath, "shared2", "Pulsar", "RetroRewind6", "RRSettings.pul");
+
+    public static string GetRetroRewindGameSettingsPath(string activeNandPath) =>
+        Path.Combine(activeNandPath, "shared2", "Pulsar", "RetroRewind6", "RRGameSettings.pul");
+
+    /// <summary>
+    /// Resolves the NAND selected for the current frontend.  This is a local file source for
+    /// profile files only; callers must never enumerate or upload this directory.
+    /// </summary>
+    public static string GetActiveNandPath()
+    {
+        if (!Settings.IsRecompModeActive())
+            return WiiFolderPath;
+
+        if (Settings.Get<bool>(Settings.RECOMP_USE_DOLPHIN_DATA))
+            return WiiFolderPath;
+
+        if (Settings.Get<bool>(Settings.RECOMP_COPY_DOLPHIN_NAND) && Directory.Exists(RecompNandCopyFolderPath))
+            return RecompNandCopyFolderPath;
+
+        return RecompPrivateNandFolderPath;
+    }
+
+    public static string CloudSavesFolderPath => Path.Combine(WheelWizardAppdataPath, "CloudSaves");
+    public static string CloudSyncStateFolderPath => Path.Combine(CloudSavesFolderPath, "State");
+    public static string CloudBackupFolderPath => Path.Combine(CloudSavesFolderPath, "Backups");
+
     /// <summary>The file the recomp setup writes to mark a directory as one of its installations.</summary>
     public const string RecompInstallStateFileName = "install-state.json";
 

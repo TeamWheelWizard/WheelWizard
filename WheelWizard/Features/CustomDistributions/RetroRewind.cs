@@ -194,6 +194,19 @@ public class RetroRewind : IDistribution
         return !string.IsNullOrWhiteSpace(GetOldRksys());
     }
 
+    /// <summary>
+    /// Resolves the same RetroWFC save that the existing install/migration flow uses.  Consumers
+    /// must use this rather than guessing a second rksys.dat location.
+    /// </summary>
+    public string? FindExistingRksysPath()
+    {
+        var saveRoot = GetOldRksys();
+        if (string.IsNullOrWhiteSpace(saveRoot) || !_fileSystem.Directory.Exists(saveRoot))
+            return null;
+
+        return _fileSystem.Directory.GetFiles(saveRoot, "rksys.dat", SearchOption.AllDirectories).FirstOrDefault();
+    }
+
     private string GetOldRksys()
     {
         // todo, maybe we should check for the existence of the file instead of the folder? and also find the oldest one?
