@@ -354,7 +354,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             var friend = new FriendProfile
             {
                 Vr = BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x16),
-                Br = FriendBrFromRksys(BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x18)),
+                Br = FriendRatingResolver.BrFromRksys(BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x18)),
                 FriendCode = friendCode,
                 Wins = BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x14),
                 Losses = BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x12),
@@ -464,12 +464,6 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
         return ParseUsers();
     }
-
-    private const uint DefaultFriendRating = 5000;
-    private const uint MaxRksysFriendRating = 1_000_000 / 100;
-
-    // The game stores BR / 100; WheelWizard only ever writes the default 5000
-    private static uint FriendBrFromRksys(uint rawBr) => rawBr == DefaultFriendRating || rawBr > MaxRksysFriendRating ? rawBr : rawBr * 100;
 
     private bool CheckForMiiData(int offset)
     {
