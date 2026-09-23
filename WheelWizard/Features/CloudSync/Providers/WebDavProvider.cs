@@ -41,7 +41,7 @@ public class WebDavProvider(IHttpClientFactory clients, ISettingsManager setting
 
     private async Task ValidateConnectionAsync()
     {
-        using var request = CreateRequest(HttpMethod.Options, string.Empty);
+        using var request = await CreateRequestAsync(HttpMethod.Options, string.Empty);
         using var response = await Client.SendAsync(request);
         if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NotFound)
             throw new HttpRequestException($"WebDAV authentication failed ({(int)response.StatusCode}).");
@@ -51,7 +51,7 @@ public class WebDavProvider(IHttpClientFactory clients, ISettingsManager setting
 
     public async Task<RemoteFileInfo?> GetFileInfoAsync(string path)
     {
-        using var request = CreateRequest(HttpMethod.Head, path);
+        using var request = await CreateRequestAsync(HttpMethod.Head, path);
         using var response = await Client.SendAsync(request);
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
@@ -66,7 +66,7 @@ public class WebDavProvider(IHttpClientFactory clients, ISettingsManager setting
 
     public async Task DownloadAsync(string remotePath, string localPath)
     {
-        using var request = CreateRequest(HttpMethod.Get, remotePath);
+        using var request = await CreateRequestAsync(HttpMethod.Get, remotePath);
         using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
         response.EnsureSuccessStatusCode();
         Directory.CreateDirectory(Path.GetDirectoryName(localPath)!);
@@ -79,7 +79,7 @@ public class WebDavProvider(IHttpClientFactory clients, ISettingsManager setting
         await EnsureParentCollectionsAsync(remotePath);
         await using var input = File.OpenRead(localPath);
         using var content = new StreamContent(input);
-        using var request = CreateRequest(HttpMethod.Put, remotePath);
+        using var request = await CreateRequestAsync(HttpMethod.Put, remotePath);
         request.Content = content;
         using var response = await Client.SendAsync(request);
         response.EnsureSuccessStatusCode();
@@ -89,7 +89,7 @@ public class WebDavProvider(IHttpClientFactory clients, ISettingsManager setting
 
     public async Task<IReadOnlyList<string>> ListAsync(string path)
     {
-        using var request = CreateRequest(new HttpMethod("PROPFIND"), path);
+        using var request = await CreateRequestAsync(new HttpMethod("PROPFIND"), path);
         request.Headers.TryAddWithoutValidation("Depth", "1");
         request.Content = new StringContent(
             "<?xml version=\"1.0\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:resourcetype/></d:prop></d:propfind>",
@@ -120,7 +120,7 @@ public class WebDavProvider(IHttpClientFactory clients, ISettingsManager setting
         foreach (var segment in segments[..^1])
         {
             current += "/" + segment;
-            using var request = CreateRequest(new HttpMethod("MKCOL"), current);
+            using var request = await CreateRequestAsync(new HttpMethod("MKCOL"), current);
             using var response = await Client.SendAsync(request);
             // 201 = created, 405 = already exists. Servers may return 301/204 for their
             // configured root; any other response is a real upload precondition failure.
@@ -134,12 +134,12 @@ public class WebDavProvider(IHttpClientFactory clients, ISettingsManager setting
     protected ISecureCredentialStore Credentials => credentials;
     protected string RemoteRoot => settings.Get<string>(settings.CLOUD_REMOTE_ROOT).Trim();
 
-    protected HttpRequestMessage CreateRequest(HttpMethod method, string path)
+    protected async Task<HttpRequestMessage> CreateRequestAsync(HttpMethod method, string path)
     {
         if (!Uri.TryCreate(RemoteRoot.TrimEnd('/') + "/" + path.TrimStart('/'), UriKind.Absolute, out var uri))
             throw new InvalidOperationException("The WebDAV remote root is not a valid absolute URI.");
         var request = new HttpRequestMessage(method, uri);
-        var secret = credentials.GetAsync(CredentialKey).GetAwaiter().GetResult();
+        var secret = await credentials.GetAsync(CredentialKey);
         if (secret is not null)
             request.Headers.Authorization = new AuthenticationHeaderValue(
                 "Basic",
