@@ -1,3 +1,5 @@
+using WheelWizard.CloudSync;
+using WheelWizard.CloudSync.ProfileLibrary;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Mods;
@@ -19,7 +21,9 @@ public class RecompLauncher(
     IRecompInstallService installService,
     ICustomDistributionSingletonService customDistributions,
     IModsLaunchService modsLaunchService,
-    IRecompDolphinDataService dolphinData
+    IRecompDolphinDataService dolphinData,
+    ICloudSyncService cloudSync,
+    IVisibleProfileLaunchService visibleProfiles
 ) : ILauncher
 {
     public string GameTitle { get; } = "WiiCompiled";
@@ -69,11 +73,35 @@ public class RecompLauncher(
             // awaited through game exit.
             progressWindow.SetCancellationTokenSource(null);
             progressWindow.Close();
-            return await installService.LaunchAsync(CancellationToken.None);
+            var preSync = await cloudSync.PreLaunchSyncAsync();
+            if (!preSync.Success)
+                return Fail(preSync.Message);
+
+            await visibleProfiles.PrepareAsync();
+            OperationResult launchResult;
+            try
+            {
+                // LaunchAsync completes only after WiiCompiled's process exits.  This makes the
+                // post-launch capture safe even on platforms where the setup host spawns the game.
+                launchResult = await installService.LaunchAsync(CancellationToken.None);
+            }
+            finally
+            {
+                // Merge only the visible slots back into the complete local rksys.dat before cloud capture.
+                await visibleProfiles.RestoreAsync();
+            }
+            var postSync = await cloudSync.PostLaunchSyncAsync();
+            return launchResult.IsFailure ? launchResult
+                : postSync.Success ? launchResult
+                : Fail(postSync.Message);
         }
         catch (OperationCanceledException)
         {
             return CancellationWarning("WiiCompiled launch preparation was cancelled.");
+        }
+        catch (Exception exception)
+        {
+            return Fail($"WiiCompiled could not start with the selected profiles: {exception.Message}");
         }
         finally
         {
