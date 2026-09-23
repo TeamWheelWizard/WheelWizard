@@ -28,6 +28,9 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
     // Though I do see the use in saving it when using the app so you can swap pages in the meantime
     private static ListOrderCondition CurrentOrder = ListOrderCondition.IS_ONLINE;
 
+    // Static so the caches survive page swaps
+    private static readonly FriendRatingResolver RatingResolver = new();
+
     private ObservableCollection<FriendProfile> _friendlist = [];
 
     [Inject]
@@ -111,7 +114,29 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             ListOrderCondition.TOTAL_RACES => f => f.Losses + f.Wins,
             ListOrderCondition.IS_ONLINE or _ => f => f.IsOnline,
         };
-        return GameLicenseService.ActiveCurrentFriends.OrderByDescending(orderMethod).ToList();
+        var friends = GameLicenseService.ActiveCurrentFriends;
+        var onlinePlayers = RRLiveRooms.Instance.CurrentRooms.SelectMany(room => room.Players);
+        var friendCodesToFetch = RatingResolver.Apply(friends, onlinePlayers, DateTime.Now);
+        if (friendCodesToFetch.Count > 0)
+            _ = FetchApiVrAsync(friendCodesToFetch);
+
+        return friends.OrderByDescending(orderMethod).ToList();
+    }
+
+    private async Task FetchApiVrAsync(List<string> friendCodes)
+    {
+        var anyUpdated = false;
+        // Sequential to avoid flooding the API
+        foreach (var friendCode in friendCodes)
+        {
+            var profileResult = await ApiCaller.CallApiAsync(rwfcApi => rwfcApi.GetPlayerProfileAsync(friendCode));
+            var vr = profileResult.IsSuccess ? FriendRatingResolver.VrFromApiProfile(profileResult.Value) : null;
+            RatingResolver.StoreApiVr(friendCode, vr, DateTime.Now);
+            anyUpdated |= vr.HasValue;
+        }
+
+        if (anyUpdated)
+            UpdateFriendList();
     }
 
     private void PopulateSortingList()
