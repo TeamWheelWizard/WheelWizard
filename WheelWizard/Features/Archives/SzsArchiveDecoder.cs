@@ -1,4 +1,5 @@
 using WheelWizard.Helpers;
+using WheelWizard.Shared.Binary;
 
 namespace WheelWizard.Features.Archives;
 
@@ -18,7 +19,7 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
 
             if (raw.Length < 8)
                 return new OperationError { Message = "The provided file is too small to contain a valid U8 archive header." };
-            if (BigEndianBinaryHelper.BufferToUint32(raw, 0) != U8Magic)
+            if (BigEndianBinary.BufferToUint32(raw, 0) != U8Magic)
                 return new OperationError { Message = "The provided file is not a valid Yaz0/U8 archive." };
 
             return ParseU8Archive(raw);
@@ -36,13 +37,13 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
             if (bytes.Length < 4)
                 return bytes;
 
-            if (BinaryStringHelper.ReadAscii(bytes, 0, 4) != "Yaz0")
+            if (BinaryStrings.ReadAscii(bytes, 0, 4) != "Yaz0")
                 return bytes;
 
             if (bytes.Length < 8)
                 return new OperationError { Message = "Yaz0 header is truncated." };
 
-            var outputSize = checked((int)BigEndianBinaryHelper.BufferToUint32(bytes, 4));
+            var outputSize = checked((int)BigEndianBinary.BufferToUint32(bytes, 4));
             var output = new byte[outputSize];
             var src = 0x10;
             var dst = 0;
@@ -107,7 +108,7 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
 
     private static DecodedArchive ParseU8Archive(byte[] bytes)
     {
-        var rootOffset = (int)BigEndianBinaryHelper.BufferToUint32(bytes, 4);
+        var rootOffset = (int)BigEndianBinary.BufferToUint32(bytes, 4);
         var rootNode = ReadU8Node(bytes, rootOffset);
         var nodeCount = rootNode.Size;
         var stringTableOffset = rootOffset + nodeCount * 12;
@@ -139,7 +140,7 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
                     continue;
                 }
 
-                var name = BinaryStringHelper.ReadNullTerminatedAscii(bytes, nameOffset);
+                var name = BinaryStrings.ReadNullTerminatedAscii(bytes, nameOffset);
                 var logicalPath = string.IsNullOrEmpty(prefix) ? name : $"{prefix}/{name}";
 
                 if (node.Type == 1)
@@ -169,8 +170,8 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
         return new(
             bytes[offset] == 0 ? 0 : 1,
             (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3],
-            (int)BigEndianBinaryHelper.BufferToUint32(bytes, offset + 4),
-            (int)BigEndianBinaryHelper.BufferToUint32(bytes, offset + 8)
+            (int)BigEndianBinary.BufferToUint32(bytes, offset + 4),
+            (int)BigEndianBinary.BufferToUint32(bytes, offset + 8)
         );
     }
 }

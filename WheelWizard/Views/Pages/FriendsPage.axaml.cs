@@ -10,11 +10,11 @@ using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Services;
-using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
+using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
@@ -151,7 +151,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             return;
         }
 
-        var activeUserPid = FriendCodeGenerator.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
+        var activeUserPid = FriendCode.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
         if (activeUserPid == 0)
         {
             ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
@@ -227,8 +227,8 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (normalizedFriendCodeResult.IsFailure)
             return normalizedFriendCodeResult.Error;
 
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
-        var currentProfileId = FriendCodeGenerator.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
+        var currentProfileId = FriendCode.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
         if (currentProfileId != 0 && currentProfileId == friendProfileId)
             return Fail("You cannot add your own friend code.");
 
@@ -241,10 +241,10 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (normalizedFriendCodeResult.IsFailure)
             return null;
 
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
         var duplicateFriend = GameLicenseService.ActiveCurrentFriends.Any(friend =>
         {
-            var existingPid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
             return existingPid != 0 && existingPid == friendProfileId;
         });
 
@@ -261,7 +261,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             return Fail("Friend code must be exactly 12 digits.");
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
             return Fail("Invalid friend code.");
 

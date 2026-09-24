@@ -1,10 +1,10 @@
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
-using WheelWizard.Utilities.Generators;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -73,7 +73,7 @@ public class RRLiveRooms : RepeatedTaskManager
         var splitRaw = SplitMergedRooms(raw);
 
         var friendProfileIds = _gameLicenseService
-            .ActiveCurrentFriends.Select(friend => FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode))
+            .ActiveCurrentFriends.Select(friend => FriendCode.FriendCodeToProfileId(friend.FriendCode))
             .Where(profileId => profileId != 0)
             .ToHashSet();
 
@@ -130,7 +130,7 @@ public class RRLiveRooms : RepeatedTaskManager
         }
 
         var friendCode = p.FriendCode ?? string.Empty;
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(friendCode);
+        var profileId = FriendCode.FriendCodeToProfileId(friendCode);
 
         var leaderboardEntry = GetLeaderboardEntry(p, friendCode, leaderboardByPid, leaderboardByFriendCode);
 

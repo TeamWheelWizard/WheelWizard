@@ -10,6 +10,7 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
 using WheelWizard.Settings;
+using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
@@ -131,7 +132,7 @@ public class RetroRewindBeta : IDistribution
 
         foreach (var entry in LoadManifest())
         {
-            if (!PathSafetyHelper.TryGetPathWithinDirectory(rootPath, entry, out var fullPath))
+            if (!PathSafety.TryGetPathWithinDirectory(rootPath, entry, out var fullPath))
                 continue;
 
             if (_fileSystem.File.Exists(fullPath))
@@ -206,7 +207,7 @@ public class RetroRewindBeta : IDistribution
             for (var i = 0; i < entries.Count; i++)
             {
                 var entry = entries[i];
-                if (!PathSafetyHelper.TryNormalizeRelativePath(entry.Key ?? string.Empty, out var normalized))
+                if (!PathSafety.TryNormalizeRelativePath(entry.Key ?? string.Empty, out var normalized))
                     continue;
 
                 if (!TryGetRelativeExtractionPath(normalized, out var relativePath))
@@ -214,7 +215,7 @@ public class RetroRewindBeta : IDistribution
                         $"Unexpected file in the test archive: '{entry.Key}' (normalized: '{normalized}'). Please contact the developers."
                     );
 
-                if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, relativePath, out var destinationPath))
+                if (!PathSafety.TryGetPathWithinDirectory(destinationDirectory, relativePath, out var destinationPath))
                     return Fail("The file path is outside the destination directory. Please contact the developers.");
 
                 var destinationDir = _fileSystem.Path.GetDirectoryName(destinationPath);
@@ -309,7 +310,7 @@ public class RetroRewindBeta : IDistribution
                 continue;
             }
 
-            if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationRoot, relativePath, out var destinationPath))
+            if (!PathSafety.TryGetPathWithinDirectory(destinationRoot, relativePath, out var destinationPath))
                 return Fail("The file path is outside the destination directory. Please contact the developers.");
 
             var destinationDirectory = _fileSystem.Path.GetDirectoryName(destinationPath);

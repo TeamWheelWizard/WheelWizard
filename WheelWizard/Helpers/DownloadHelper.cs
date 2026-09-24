@@ -1,3 +1,4 @@
+using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Helpers;
@@ -79,7 +80,7 @@ public static class DownloadHelper
                         var fileName =
                             contentDisposition?.FileNameStar ?? contentDisposition?.FileName ?? Path.GetFileName(new Uri(url).AbsolutePath);
 
-                        if (!PathSafetyHelper.TryGetSafeFileName(fileName, out fileName))
+                        if (!PathSafety.TryGetSafeFileName(fileName, out fileName))
                             throw new InvalidOperationException("The server returned an invalid download filename.");
 
                         var finalExtension = Path.GetExtension(response.RequestMessage.RequestUri.AbsolutePath);
@@ -97,7 +98,7 @@ public static class DownloadHelper
                         }
 
                         // Update resolvedFilePath with resolved fileName
-                        if (!PathSafetyHelper.TryGetPathWithinDirectory(directory, fileName, out resolvedFilePath))
+                        if (!PathSafety.TryGetPathWithinDirectory(directory, fileName, out resolvedFilePath))
                             throw new InvalidOperationException("The download path escaped the target directory.");
                     }
 

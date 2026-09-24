@@ -1,13 +1,13 @@
 using System.IO.Abstractions;
 
-namespace WheelWizard.Helpers;
+namespace WheelWizard.Shared.IO;
 
 /// <summary>
 /// Helpers for writing files that must never end up half written (Wii save files for example).
 /// The new contents are written to a temporary file first, flushed to disk, and only then swapped
 /// in place, keeping a backup of the previous file.
 /// </summary>
-public static class AtomicFileHelper
+public static class AtomicFileExtensions
 {
     /// <summary>
     /// The extension appended to the file that is being written before it is swapped in.

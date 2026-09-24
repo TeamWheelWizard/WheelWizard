@@ -1,8 +1,8 @@
-﻿using System.Text;
+using System.Text;
 
-namespace WheelWizard.Helpers;
+namespace WheelWizard.Shared.Binary;
 
-public static class BigEndianBinaryHelper
+public static class BigEndianBinary
 {
     //Helper functions to convert a buffer to an uint using big endian
     public static uint BufferToUint32(byte[] data, int offset)

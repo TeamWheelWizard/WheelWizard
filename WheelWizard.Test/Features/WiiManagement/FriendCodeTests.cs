@@ -1,15 +1,15 @@
-using WheelWizard.Utilities.Generators;
+using WheelWizard.WiiManagement.FriendCodes;
 
-namespace WheelWizard.Test.Features;
+namespace WheelWizard.Test.Features.WiiManagement;
 
-public class FriendCodeGeneratorTests
+public class FriendCodeTests
 {
     [Fact]
     public void FriendCodeToProfileId_ReturnsProfileId_ForValidFriendCode()
     {
         const string friendCode = "3484-8484-8484";
 
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(friendCode);
+        var profileId = FriendCode.FriendCodeToProfileId(friendCode);
 
         Assert.Equal(592497508u, profileId);
     }
@@ -19,7 +19,7 @@ public class FriendCodeGeneratorTests
     {
         const string invalidFriendCode = "0005-9249-7508";
 
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(invalidFriendCode);
+        var profileId = FriendCode.FriendCodeToProfileId(invalidFriendCode);
 
         Assert.Equal(0u, profileId);
     }
@@ -29,7 +29,7 @@ public class FriendCodeGeneratorTests
     {
         const uint profileId = 592497508;
 
-        var friendCodeValue = FriendCodeGenerator.ProfileIdToFriendCode(profileId);
+        var friendCodeValue = FriendCode.ProfileIdToFriendCode(profileId);
 
         Assert.Equal(348484848484ul, friendCodeValue);
     }

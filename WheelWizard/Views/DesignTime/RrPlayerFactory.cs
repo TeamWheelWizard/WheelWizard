@@ -1,6 +1,6 @@
-﻿using WheelWizard.Models.RRInfo;
+using WheelWizard.Models.RRInfo;
 
-namespace WheelWizard.Utilities.Mockers.RrInfo;
+namespace WheelWizard.Views.DesignTime.RrInfo;
 
 public class RrPlayerFactory : MockingDataFactory<RrPlayer, RrPlayerFactory>
 {

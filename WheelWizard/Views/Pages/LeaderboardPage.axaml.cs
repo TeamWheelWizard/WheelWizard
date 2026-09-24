@@ -9,11 +9,11 @@ using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Utilities.Generators;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
+using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -230,12 +230,12 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             .ToList();
 
         var friendProfileIds = GameDataService
-            .ActiveCurrentFriends.Select(friend => FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode))
+            .ActiveCurrentFriends.Select(friend => FriendCode.FriendCodeToProfileId(friend.FriendCode))
             .Where(profileId => profileId != 0)
             .ToHashSet();
         var onlineProfileIds = RRLiveRooms
             .Instance.CurrentRooms.SelectMany(room => room.Players)
-            .Select(player => FriendCodeGenerator.FriendCodeToProfileId(player.FriendCode))
+            .Select(player => FriendCode.FriendCodeToProfileId(player.FriendCode))
             .Where(profileId => profileId != 0)
             .ToHashSet();
 
@@ -290,7 +290,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     )
     {
         var friendCode = entry.FriendCode ?? string.Empty;
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(friendCode);
+        var profileId = FriendCode.FriendCodeToProfileId(friendCode);
         var badges = string.IsNullOrWhiteSpace(friendCode) ? [] : BadgeService.GetBadges(friendCode);
         var primaryBadge = badges.FirstOrDefault(BadgeVariant.None);
 
@@ -464,7 +464,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        var activeUserPid = FriendCodeGenerator.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
+        var activeUserPid = FriendCode.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
         if (activeUserPid == 0)
         {
             ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
@@ -485,7 +485,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         }
 
         var normalizedFriendCode = normalizedFriendCodeResult.Value;
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode);
         if (activeUserPid == friendProfileId)
         {
             ViewUtils.ShowSnackbar("You cannot add your own friend code.", ViewUtils.SnackbarType.Warning);
@@ -494,7 +494,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
         var duplicateFriend = GameDataService.ActiveCurrentFriends.Any(friend =>
         {
-            var existingPid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
             return existingPid != 0 && existingPid == friendProfileId;
         });
 
@@ -561,7 +561,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             return Fail("Friend code must be exactly 12 digits.");
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
             return Fail("Invalid friend code.");
 

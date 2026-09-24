@@ -8,9 +8,11 @@ using WheelWizard.Services.LiveData;
 using WheelWizard.Services.Other;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Utilities.Generators;
+using WheelWizard.Shared.Binary;
+using WheelWizard.Shared.IO;
 using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.WheelWizardData;
+using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -88,7 +90,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private readonly IMiiDbService _miiService;
     private readonly IFileSystem _fileSystem;
     private readonly IWhWzDataSingletonService _whWzDataSingletonService;
-    private readonly IRRratingReader _rrratingReader;
+    private readonly IRrRatingReader _rrratingReader;
     private readonly ISettingsManager _settingsManager;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
@@ -97,7 +99,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         IMiiDbService miiService,
         IFileSystem fileSystem,
         IWhWzDataSingletonService whWzDataSingletonService,
-        IRRratingReader rrratingReader,
+        IRrRatingReader rrratingReader,
         ISettingsManager settingsManager
     )
         : base(40)
@@ -226,16 +228,16 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         if (_rksysData == null)
             return new ArgumentNullException(nameof(_rksysData));
 
-        var profileId = BigEndianBinaryHelper.BufferToUint32(_rksysData, rkpdOffset + 0x5C);
-        var friendCode = FriendCodeGenerator.GetFriendCode(_rksysData, rkpdOffset + 0x5C);
+        var profileId = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0x5C);
+        var friendCode = FriendCode.GetFriendCode(_rksysData, rkpdOffset + 0x5C);
         var miiDataResult = ParseMiiData(rkpdOffset);
         var miiToUse = miiDataResult.IsFailure ? new() : miiDataResult.Value;
 
         var statistics = StatisticsSerializer.ParseStatistics(_rksysData, rkpdOffset);
 
         // Try to read VR/BR from RRRating.pul file
-        var vrFromRksys = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB0);
-        var brFromRksys = BigEndianBinaryHelper.BufferToUint16(_rksysData, rkpdOffset + 0xB2);
+        var vrFromRksys = BigEndianBinary.BufferToUint16(_rksysData, rkpdOffset + 0xB0);
+        var brFromRksys = BigEndianBinary.BufferToUint16(_rksysData, rkpdOffset + 0xB2);
         var vr = vrFromRksys;
         var br = brFromRksys;
 
@@ -251,7 +253,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
                 if (rating.HasValue)
                 {
                     // Calculate friend code from profile_id and compare with rksys friend code
-                    var calculatedFriendCode = FriendCodeGenerator.ProfileIdToFriendCode(profileId);
+                    var calculatedFriendCode = FriendCode.ProfileIdToFriendCode(profileId);
                     // Convert friend code string to ulong for comparison
                     var fcString = friendCode.Replace("-", "");
                     if (ulong.TryParse(fcString, out var fcDec))
@@ -274,12 +276,12 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             FriendCode = friendCode,
             Vr = vr,
             Br = br,
-            TotalRaceCount = BigEndianBinaryHelper.BufferToUint32(_rksysData, rkpdOffset + 0xB4),
-            TotalWinCount = BigEndianBinaryHelper.BufferToUint32(_rksysData, rkpdOffset + 0xDC),
+            TotalRaceCount = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0xB4),
+            TotalWinCount = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0xDC),
             BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
             // Region is often found near offset 0x23308 + 0x3802 in RKGD. This code is a partial guess.
             // In practice, region might be read differently depending on your rksys layout.
-            RegionId = BigEndianBinaryHelper.BufferToUint16(_rksysData, 0x23308 + 0x3802) / 4096,
+            RegionId = BigEndianBinary.BufferToUint16(_rksysData, 0x23308 + 0x3802) / 4096,
             Statistics = statistics,
         };
 
@@ -311,11 +313,11 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             return new ArgumentNullException(nameof(_rksysData));
 
         // licenseName is NOT always the same as mii name, could be useful
-        var licenseName = BigEndianBinaryHelper.GetUtf16String(_rksysData, rkpdOffset + 0x14, 10);
+        var licenseName = BigEndianBinary.GetUtf16String(_rksysData, rkpdOffset + 0x14, 10);
         // id of mii
-        var avatarId = BigEndianBinaryHelper.BufferToUint32(_rksysData, rkpdOffset + 0x28);
+        var avatarId = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0x28);
         // id of the actual system
-        var clientId = BigEndianBinaryHelper.BufferToUint32(_rksysData, rkpdOffset + 0x2C);
+        var clientId = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0x2C);
 
         var rawMiiResult = _miiService.GetByAvatarId(avatarId);
         if (rawMiiResult.IsFailure)
@@ -336,7 +338,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             if (!CheckForMiiData(currentOffset + 0x1A))
                 continue;
 
-            var statusFlags = (ushort)BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x10);
+            var statusFlags = (ushort)BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x10);
             var baseSlotState = (ushort)(statusFlags & 0x0003);
             var secondaryOffset = userOffset + FriendSecondaryDataOffset + i * FriendSecondaryDataSize;
             var secondaryControlByte = _rksysData[secondaryOffset + 0x2];
@@ -346,18 +348,18 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
                 && (secondaryControlByte == DwcFriendControlTypeFriendKey || secondaryControlByte == DwcFriendControlTypeInvalid);
 
             var rawMiiBytes = _rksysData.AsSpan(currentOffset + 0x1A, MiiSize).ToArray();
-            var friendCode = FriendCodeGenerator.GetFriendCode(_rksysData, currentOffset + 4);
+            var friendCode = FriendCode.GetFriendCode(_rksysData, currentOffset + 4);
             var miiResult = MiiSerializer.Deserialize(rawMiiBytes);
             if (miiResult.IsFailure)
                 continue;
 
             var friend = new FriendProfile
             {
-                Vr = BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x16),
-                Br = BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x18),
+                Vr = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x16),
+                Br = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x18),
                 FriendCode = friendCode,
-                Wins = BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x14),
-                Losses = BigEndianBinaryHelper.BufferToUint16(_rksysData, currentOffset + 0x12),
+                Wins = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x14),
+                Losses = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x12),
                 CountryCode = _rksysData[currentOffset + 0x68],
                 RegionId = _rksysData[currentOffset + 0x69],
                 BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
@@ -390,11 +392,11 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             return Fail("Invalid or unloaded rksys.dat data.");
 
         var rkpdOffset = 0x08 + userIndex * RkpdSize;
-        BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, rkpdOffset + 0x28, newMii.MiiId); // Avatar ID
+        BigEndianBinary.WriteUInt32BigEndian(_rksysData, rkpdOffset + 0x28, newMii.MiiId); // Avatar ID
 
         var systemid = newMii.SystemId0 << 24 | newMii.SystemId1 << 16 | newMii.SystemId2 << 8 | newMii.SystemId3;
 
-        BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, rkpdOffset + 0x2C, (uint)systemid);
+        BigEndianBinary.WriteUInt32BigEndian(_rksysData, rkpdOffset + 0x2C, (uint)systemid);
 
         var nameWrite = WriteLicenseNameToSaveData(userIndex, newMii.Name.ToString());
         if (nameWrite.IsFailure)
@@ -420,20 +422,20 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         if (normalizedFriendCode.IsFailure)
             return normalizedFriendCode.Error;
 
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode.Value);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode.Value);
         if (friendProfileId == 0)
             return Fail("Invalid friend code.");
-        if (!FriendCodeGenerator.TryParseFriendCode(normalizedFriendCode.Value, out var friendCodeValue))
+        if (!FriendCode.TryParseFriendCode(normalizedFriendCode.Value, out var friendCodeValue))
             return Fail("Invalid friend code.");
 
         var selectedLicense = Licenses.Users[userIndex];
-        var currentUserPid = FriendCodeGenerator.FriendCodeToProfileId(selectedLicense.FriendCode);
+        var currentUserPid = FriendCode.FriendCodeToProfileId(selectedLicense.FriendCode);
         if (currentUserPid != 0 && currentUserPid == friendProfileId)
             return Fail("You cannot add your own friend code.");
 
         var duplicateFriend = selectedLicense.Friends.Any(friend =>
         {
-            var pid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            var pid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
             return pid != 0 && pid == friendProfileId;
         });
         if (duplicateFriend)
@@ -501,8 +503,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         if (_rksysData == null)
             return true;
 
-        var statusFlags = (ushort)BigEndianBinaryHelper.BufferToUint16(_rksysData, friendSlotOffset + 0x10);
-        var profileId = BigEndianBinaryHelper.BufferToUint32(_rksysData, friendSlotOffset + 0x04);
+        var statusFlags = (ushort)BigEndianBinary.BufferToUint16(_rksysData, friendSlotOffset + 0x10);
+        var profileId = BigEndianBinary.BufferToUint32(_rksysData, friendSlotOffset + 0x04);
         var hasMii = CheckForMiiData(friendSlotOffset + 0x1A);
 
         return profileId == 0 && (statusFlags & 0x0003) == 0 && !hasMii;
@@ -528,34 +530,34 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         Array.Clear(_rksysData, secondaryOffset, FriendSecondaryDataSize);
 
         // Friend identity key (high 32 bits + profile ID low 32 bits).
-        BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset, (uint)(friendCodeValue >> 32));
-        BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset + 0x04, friendProfileId);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x10, FriendSlotStateAdded);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x12, 0);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x14, 0);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x16, vr);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x18, br);
+        BigEndianBinary.WriteUInt32BigEndian(_rksysData, mainOffset, (uint)(friendCodeValue >> 32));
+        BigEndianBinary.WriteUInt32BigEndian(_rksysData, mainOffset + 0x04, friendProfileId);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x10, FriendSlotStateAdded);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x12, 0);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x14, 0);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x16, vr);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x18, br);
 
         Array.Copy(serializedMii, 0, _rksysData, mainOffset + 0x1A, MiiSize);
-        var miiCrc = CrcHelper.ComputeCrc16Ccitt(serializedMii, 0, serializedMii.Length);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x64, miiCrc);
+        var miiCrc = Crc.ComputeCrc16Ccitt(serializedMii, 0, serializedMii.Length);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x64, miiCrc);
 
         _rksysData[mainOffset + 0x66] = (byte)slotIndex;
         _rksysData[mainOffset + 0x67] = DefaultFriendGameRegion;
         _rksysData[mainOffset + 0x68] = DefaultFriendCountryCode;
         _rksysData[mainOffset + 0x69] = DefaultFriendRegionId;
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6A, DefaultFriendCityId);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6C, 0);
-        BigEndianBinaryHelper.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6E, 0);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6A, DefaultFriendCityId);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6C, 0);
+        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6E, 0);
 
         for (var i = 0; i < 10; i++)
         {
-            BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, mainOffset + 0x70 + i * 8, 0xFFFFFFFF);
+            BigEndianBinary.WriteUInt32BigEndian(_rksysData, mainOffset + 0x70 + i * 8, 0xFFFFFFFF);
         }
 
         // One-sided pending friend request token.
         _rksysData[secondaryOffset + 0x2] = DwcFriendControlTypeFriendKey;
-        BigEndianBinaryHelper.WriteUInt32BigEndian(_rksysData, secondaryOffset + 0x4, friendProfileId);
+        BigEndianBinary.WriteUInt32BigEndian(_rksysData, secondaryOffset + 0x4, friendProfileId);
     }
 
     public OperationResult RemoveFriend(int userIndex, string friendCode)
@@ -569,7 +571,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         if (normalizedFriendCode.IsFailure)
             return normalizedFriendCode.Error;
 
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode.Value);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode.Value);
         if (friendProfileId == 0)
             return Fail("Invalid friend code.");
 
@@ -599,7 +601,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         for (var i = 0; i < MaxFriendNum; i++)
         {
             var currentOffset = friendOffset + i * FriendDataSize;
-            var currentPid = BigEndianBinaryHelper.BufferToUint32(_rksysData, currentOffset + 0x04);
+            var currentPid = BigEndianBinary.BufferToUint32(_rksysData, currentOffset + 0x04);
             if (currentPid == friendProfileId)
                 return i;
         }
@@ -617,7 +619,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             return Fail("Friend code must be exactly 12 digits.");
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
             return Fail("Invalid friend code.");
 
@@ -675,10 +677,10 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
             throw new ArgumentException("Invalid rksys.dat data");
 
         var lengthToCrc = 0x27FFC;
-        var newCrc = CrcHelper.ComputeCrc32(rksysData, 0, lengthToCrc);
+        var newCrc = Crc.ComputeCrc32(rksysData, 0, lengthToCrc);
 
         // 2) Write CRC at offset 0x27FFC in big-endian.
-        BigEndianBinaryHelper.WriteUInt32BigEndian(rksysData, 0x27FFC, newCrc);
+        BigEndianBinary.WriteUInt32BigEndian(rksysData, 0x27FFC, newCrc);
     }
 
     public OperationResult ChangeMiiName(int userIndex, string? newName)
