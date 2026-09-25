@@ -25,7 +25,8 @@ public interface IRecompDolphinDataService
 
     OperationResult CopyNandForRecomp();
 
-    OperationResult ApplyNandToRecompConfig();
+    /// <summary>Synchronizes the NAND and the pack that selects Retro Rewind assets and saves.</summary>
+    OperationResult ApplyPathsToRecompConfig();
 }
 
 public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompSettingManager recompSettings, IFileSystem fileSystem)
@@ -77,7 +78,7 @@ public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompS
     {
         var validated = ValidateUserFolder(userFolderPath);
         if (validated is null)
-            return Fail("The selected Dolphin folder does not contain a Wii data folder.");
+            return Fail("The selected Dolphin user folder is unavailable.");
 
         if (!settings.Set(settings.USER_FOLDER_PATH, validated))
             return Fail("Wheel Wizard could not save the Dolphin user folder.");
@@ -123,15 +124,22 @@ public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompS
         return Ok();
     }
 
-    public OperationResult ApplyNandToRecompConfig()
+    public OperationResult ApplyPathsToRecompConfig()
     {
-        var nandFolderPath = NandFolderPath?.TrimEnd('\\', '/');
+        var nandFolderPath = NandFolderPath;
         try
         {
             // The backend owns creating Config.toml, so reread first: right after an install the
             // file is brand new and this manager may never have seen it. Without a file there is
             // nothing to configure yet, and the next successful install applies this again.
             recompSettings.ReloadSettings();
+
+            // Both frontends and the license manager use this pack. WiiCompiled resolves its
+            // Riivolution XML (including the save redirect) from retro_rewind_root, independently
+            // of nand_root. Reapply even without a rebuild, since the user or Load folder may move.
+            settings.Set(settings.RECOMP_RETRO_REWIND_ROOT, "", skipSave: true);
+            if (!settings.Set(settings.RECOMP_RETRO_REWIND_ROOT, fileSystem.Path.GetFullPath(PathManager.RetroRewind6FolderPath)))
+                return Fail("Wheel Wizard could not save the Retro Rewind folder to the WiiCompiled configuration.");
 
             if (nandFolderPath is null)
             {
@@ -176,8 +184,9 @@ public sealed class RecompDolphinDataService(ISettingsManager settings, IRecompS
         try
         {
             var fullPath = fileSystem.Path.GetFullPath(userFolderPath);
-            var nandPath = fileSystem.Path.Combine(fullPath, "Wii");
-            return fileSystem.Directory.Exists(fullPath) && fileSystem.Directory.Exists(nandPath) ? fullPath : null;
+            // Dolphin may redirect NANDRootPath outside this folder, and a new default NAND is
+            // created on first use. Requiring <User>/Wii rejects both valid configurations.
+            return fileSystem.Directory.Exists(fullPath) ? fullPath : null;
         }
         catch
         {

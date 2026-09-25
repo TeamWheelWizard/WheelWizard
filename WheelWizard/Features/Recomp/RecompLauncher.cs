@@ -65,6 +65,13 @@ public class RecompLauncher(
             if (IsCancellationRequested(progressWindow, cancellationTokenSource))
                 return CancellationWarning("WiiCompiled launch preparation was cancelled.");
 
+            // A repair may rewrite Config.toml, and a ready product may still reference the old
+            // pack after the Dolphin user/Load folder changes. Synchronize after reconciliation
+            // on every launch so the game uses the same assets and saves as Wheel Wizard.
+            var pathsResult = dolphinData.ApplyPathsToRecompConfig();
+            if (pathsResult.IsFailure)
+                return pathsResult;
+
             // Reconciliation is the only cancellable progress phase. The launch call is
             // awaited through game exit.
             progressWindow.SetCancellationTokenSource(null);
@@ -93,13 +100,13 @@ public class RecompLauncher(
 
         // The recomp compiled without any NAND knowledge; pointing its Config.toml at the chosen
         // Wii data is what makes the choice real, and it applies on the very next launch.
-        return dolphinData.ApplyNandToRecompConfig();
+        return dolphinData.ApplyPathsToRecompConfig();
     }
 
     /// <summary>
     /// The setup service selects its full-release or targeted-repair operation after Retro Rewind
     /// has been brought current below, and only after --check-products says work is needed.
-    /// Re-applying the NAND setting afterwards keeps an installation in sync when the user moved or
+    /// Re-applying the runtime paths afterwards keeps an installation in sync when the user moved or
     /// re-linked their Dolphin data since the last one.
     /// </summary>
     public async Task<OperationResult> Update()
@@ -108,7 +115,7 @@ public class RecompLauncher(
         if (updateResult.IsFailure)
             return updateResult;
 
-        return dolphinData.ApplyNandToRecompConfig();
+        return dolphinData.ApplyPathsToRecompConfig();
     }
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
