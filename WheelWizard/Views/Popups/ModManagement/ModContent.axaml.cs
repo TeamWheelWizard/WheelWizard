@@ -20,7 +20,7 @@ public partial class ModContent : UserControlBase
     [Inject]
     private IGameBananaMediaService Media { get; set; } = null!;
 
-    [Inject]
+	[Inject]
     private IDownloadService downloads { get; set; } = null!;
 
     private bool loadingVisual;
