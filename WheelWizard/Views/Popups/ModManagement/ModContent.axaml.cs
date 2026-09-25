@@ -18,6 +18,9 @@ public record ModItem(Bitmap FullImageUrl);
 public partial class ModContent : UserControlBase
 {
     [Inject]
+    private IGameBananaMediaService Media { get; set; } = null!;
+
+	[Inject]
     private IDownloadService downloads { get; set; } = null!;
 
     private bool loadingVisual;
@@ -132,15 +135,11 @@ public partial class ModContent : UserControlBase
 
             var fullImageUrl = $"{image.BaseUrl}/{image.File}";
 
-            var streamResult = await HttpClientHelper.GetStreamAsync(fullImageUrl, cancellationToken);
-            if (!streamResult.Succeeded || streamResult.Content == null)
+            var imageResult = await Media.GetImageAsync(fullImageUrl, cancellationToken);
+            if (imageResult.IsFailure)
                 continue;
 
-            // Get the image stream with cancellation support
-            await using var stream = streamResult.Content;
-            var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream, cancellationToken);
-            memoryStream.Position = 0;
+            using var memoryStream = new MemoryStream(imageResult.Value, writable: false);
 
             // Create a bitmap from the memory stream
             var bitmap = new Bitmap(memoryStream);
