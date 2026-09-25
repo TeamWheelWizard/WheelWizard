@@ -4,14 +4,12 @@ namespace WheelWizard.Settings;
 
 public sealed class SettingsStartupInitializer(
     ISettingsManager settingsManager,
-    ISettingsSignalBus settingsSignalBus,
     ISettingsLocalizationService localizationService,
     ILogger<SettingsStartupInitializer> logger
 ) : ISettingsStartupInitializer
 {
     public void Initialize()
     {
-        SettingsSignalRuntime.Initialize(settingsSignalBus);
         SettingsRuntime.Initialize(settingsManager);
         settingsManager.LoadSettings();
         localizationService.Initialize();

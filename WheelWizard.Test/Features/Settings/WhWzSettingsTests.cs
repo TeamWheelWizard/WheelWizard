@@ -49,6 +49,50 @@ public class WhWzSettingTests
     }
 
     [Fact]
+    public void Set_NotifiesLaterHandlers_WhenAChangedHandlerThrows()
+    {
+        var setting = new WhWzSetting(typeof(int), "Volume", 10);
+        Setting? received = null;
+        setting.Changed += _ => throw new InvalidOperationException("Subscriber failed");
+        setting.Changed += changed => received = changed;
+
+        Assert.True(setting.Set(20));
+
+        Assert.Same(setting, received);
+        Assert.Equal(20, setting.Get());
+    }
+
+    [Fact]
+    public void Reset_RestoresValidation_WhenAChangedHandlerThrows()
+    {
+        var setting = new WhWzSetting(typeof(int), "Threshold", 5).SetValidation(value => (int)value! >= 10);
+        setting.Set(12);
+        setting.Changed += _ => throw new InvalidOperationException("Subscriber failed");
+
+        setting.Reset();
+
+        Assert.Equal(5, setting.Get());
+        Assert.False(setting.Set(6));
+        Assert.Equal(5, setting.Get());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Reset_RestoresForceSave_WhenSavingThrows(bool forceSave)
+    {
+        var setting = new WhWzSetting(typeof(int), "Threshold", 5, _ => throw new IOException("Save failed"))
+            .SetValidation(value => (int)value! >= 10)
+            .SetForceSave(forceSave);
+        setting.Set(12, skipSave: true);
+
+        Assert.Throws<IOException>(setting.Reset);
+
+        Assert.Equal(forceSave, setting.Set(6, skipSave: true));
+        Assert.Equal(forceSave ? 6 : 5, setting.Get());
+    }
+
+    [Fact]
     public void SetFromJson_ParsesEnumAndArrayValues()
     {
         var enumSetting = new WhWzSetting(typeof(DayOfWeek), "Day", DayOfWeek.Monday);
