@@ -401,9 +401,9 @@ public class SettingsManager : ISettingsManager, IDisposable
         if (_hasLoadedSettings)
             return;
 
-        _whWzSettingManager.LoadSettings();
-        _dolphinSettingManager.LoadSettings();
-        _recompSettingManager.LoadSettings();
+        _whWzSettingManager.LoadSettings(PathManager.WheelWizardConfigFilePath);
+        _dolphinSettingManager.LoadSettings(PathManager.ConfigFolderPath);
+        _recompSettingManager.LoadSettings(PathManager.RecompConfigFilePath);
         _hasLoadedSettings = true;
     }
     #endregion
@@ -411,7 +411,12 @@ public class SettingsManager : ISettingsManager, IDisposable
     #region Registration Helpers
     private WhWzSetting RegisterWhWz<T>(string name, T defaultValue, Func<object?, bool>? validation = null)
     {
-        var setting = new WhWzSetting(typeof(T), name, defaultValue!, _whWzSettingManager.SaveSettings);
+        var setting = new WhWzSetting(
+            typeof(T),
+            name,
+            defaultValue!,
+            setting => _whWzSettingManager.SaveSettings(PathManager.WheelWizardConfigFilePath, setting)
+        );
         if (validation != null)
             setting.SetValidation(validation);
 
@@ -422,7 +427,12 @@ public class SettingsManager : ISettingsManager, IDisposable
 
     private DolphinSetting RegisterDolphin<T>((string, string, string) location, T defaultValue, Func<object?, bool>? validation = null)
     {
-        var setting = new DolphinSetting(typeof(T), location, defaultValue!, _dolphinSettingManager.SaveSettings);
+        var setting = new DolphinSetting(
+            typeof(T),
+            location,
+            defaultValue!,
+            setting => _dolphinSettingManager.SaveSettings(PathManager.ConfigFolderPath, setting)
+        );
         if (validation != null)
             setting.SetValidation(validation);
 
@@ -433,7 +443,12 @@ public class SettingsManager : ISettingsManager, IDisposable
 
     private RecompSetting RegisterRecomp<T>((string, string) location, T defaultValue, Func<object?, bool>? validation = null)
     {
-        var setting = new RecompSetting(typeof(T), location, defaultValue!, _recompSettingManager.SaveSettings);
+        var setting = new RecompSetting(
+            typeof(T),
+            location,
+            defaultValue!,
+            setting => _recompSettingManager.SaveSettings(PathManager.RecompConfigFilePath, setting)
+        );
         if (validation != null)
             setting.SetValidation(validation);
 

@@ -1,5 +1,4 @@
 using System.IO.Abstractions;
-using WheelWizard.Services;
 using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Settings;
@@ -26,7 +25,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
         }
     }
 
-    public void SaveSettings(RecompSetting invokingSetting)
+    public void SaveSettings(string configPath, RecompSetting invokingSetting)
     {
         lock (_syncRoot)
         {
@@ -36,25 +35,25 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
 
         lock (_fileIoSync)
         {
-            WriteTomlSetting(invokingSetting.Section, invokingSetting.Name, invokingSetting.GetStringValue());
+            WriteTomlSetting(configPath, invokingSetting.Section, invokingSetting.Name, invokingSetting.GetStringValue());
         }
     }
 
-    public void ReloadSettings()
+    public void ReloadSettings(string configPath)
     {
         lock (_syncRoot)
         {
             _loaded = false;
         }
 
-        LoadSettings();
+        LoadSettings(configPath);
     }
 
-    public void RemoveTomlSetting(string section, string settingToRemove)
+    public void RemoveTomlSetting(string configPath, string section, string settingToRemove)
     {
         lock (_fileIoSync)
         {
-            var lines = ReadTomlFile()?.ToList();
+            var lines = ReadTomlFile(configPath)?.ToList();
             if (lines == null)
                 return;
 
@@ -73,16 +72,16 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
                     continue;
 
                 lines.RemoveAt(i);
-                fileSystem.File.WriteAllLines(PathManager.RecompConfigFilePath, lines);
+                fileSystem.File.WriteAllLines(configPath, lines);
                 return;
             }
         }
     }
 
-    public void LoadSettings()
+    public void LoadSettings(string configPath)
     {
         List<RecompSetting> settingsSnapshot;
-        if (_loaded || !fileSystem.File.Exists(PathManager.RecompConfigFilePath))
+        if (_loaded || !fileSystem.File.Exists(configPath))
             return;
 
         lock (_syncRoot)
@@ -101,21 +100,21 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
                 // A missing or unparsable key keeps the registered default without writing it back:
                 // the runtime falls back to the very same default, so the file stays untouched until
                 // the user actually changes something.
-                var value = ReadTomlSetting(setting.Section, setting.Name);
+                var value = ReadTomlSetting(configPath, setting.Section, setting.Name);
                 if (value != null)
                     setting.SetFromString(value, true);
             }
         }
     }
 
-    private string[]? ReadTomlFile()
+    private string[]? ReadTomlFile(string configPath)
     {
-        if (!fileSystem.File.Exists(PathManager.RecompConfigFilePath))
+        if (!fileSystem.File.Exists(configPath))
             return null;
 
         try
         {
-            return fileSystem.File.ReadAllLines(PathManager.RecompConfigFilePath);
+            return fileSystem.File.ReadAllLines(configPath);
         }
         catch
         {
@@ -123,9 +122,9 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
         }
     }
 
-    private string? ReadTomlSetting(string section, string settingToRead)
+    private string? ReadTomlSetting(string configPath, string section, string settingToRead)
     {
-        var lines = ReadTomlFile();
+        var lines = ReadTomlFile(configPath);
         if (lines == null)
             return null;
 
@@ -154,9 +153,9 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
         return null;
     }
 
-    private void WriteTomlSetting(string section, string settingToChange, string value)
+    private void WriteTomlSetting(string configPath, string section, string settingToChange, string value)
     {
-        var lines = ReadTomlFile()?.ToList();
+        var lines = ReadTomlFile(configPath)?.ToList();
 
         // The backend owns creating Config.toml; a write before it exists would hand the runtime a
         // file Wheel Wizard invented, so the value simply stays in memory until the next load.
@@ -170,7 +169,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
                 lines.Add(string.Empty);
             lines.Add($"[{section}]");
             lines.Add($"{settingToChange} = {value}");
-            fileSystem.File.WriteAllLines(PathManager.RecompConfigFilePath, lines);
+            fileSystem.File.WriteAllLines(configPath, lines);
             return;
         }
 
@@ -184,12 +183,12 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
                 continue;
 
             lines[i] = $"{settingToChange} = {value}";
-            fileSystem.File.WriteAllLines(PathManager.RecompConfigFilePath, lines);
+            fileSystem.File.WriteAllLines(configPath, lines);
             return;
         }
 
         lines.Insert(sectionIndex + 1, $"{settingToChange} = {value}");
-        fileSystem.File.WriteAllLines(PathManager.RecompConfigFilePath, lines);
+        fileSystem.File.WriteAllLines(configPath, lines);
     }
 
     private static bool IsSettingLine(string trimmedLine, string settingName) =>
