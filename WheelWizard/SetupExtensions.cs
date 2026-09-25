@@ -19,6 +19,7 @@ using WheelWizard.RrRooms;
 using WheelWizard.Services.Launcher;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.Services;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
@@ -35,6 +36,8 @@ public static class SetupExtensions
     {
         // Features
         services.AddDolphinInstaller();
+        services.AddDownloads();
+        services.AddTransient<WheelWizard.Launching.MiiChannelLauncher>();
         services.AddLocalization();
         services.AddSettings();
         services.AddCustomCharacters();

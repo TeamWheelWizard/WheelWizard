@@ -1,4 +1,4 @@
-﻿using Avalonia.Interactivity;
+using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
@@ -6,7 +6,9 @@ using WheelWizard.Helpers;
 using WheelWizard.Mods;
 using WheelWizard.Services;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Downloads;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Popups.ModManagement;
@@ -15,6 +17,9 @@ public record ModItem(Bitmap FullImageUrl);
 
 public partial class ModContent : UserControlBase
 {
+    [Inject]
+    private IDownloadService downloads { get; set; } = null!;
+
     private bool loadingVisual;
     private GameBananaModDetails? CurrentMod { get; set; }
     private string? OverrideDownloadUrl { get; set; }
@@ -316,11 +321,11 @@ public partial class ModContent : UserControlBase
         }
     }
 
-    private static async Task<OperationResult<string?>> DownloadModFileAsync(string url, string filePath, ProgressWindow progressWindow)
+    private async Task<OperationResult<string?>> DownloadModFileAsync(string url, string filePath, ProgressWindow progressWindow)
     {
         try
         {
-            return await DownloadHelper.DownloadToLocationAsync(url, filePath, progressWindow);
+            return await downloads.DownloadToLocationAsync(url, filePath, progressWindow);
         }
         catch (Exception ex)
         {
