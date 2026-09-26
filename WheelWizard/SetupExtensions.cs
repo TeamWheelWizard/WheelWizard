@@ -108,6 +108,14 @@ public static class SetupExtensions
         >();
         services.AddSingleton<WheelWizard.Views.Startup.IDesktopStartup, WheelWizard.Views.Startup.DesktopStartup>();
         services.AddSingleton<WheelWizard.Views.Startup.IMiiSetupPresentation, WheelWizard.Views.Startup.MiiSetupPresentation>();
+        services.AddSingleton<
+            WheelWizard.ApplicationLifecycle.Logging.ILogFileFactory,
+            WheelWizard.ApplicationLifecycle.Logging.LogFileFactory
+        >();
+        services.AddSingleton<WheelWizard.ApplicationLifecycle.Logging.ApplicationLogFiles>();
+        services.AddSingleton<WheelWizard.ApplicationLifecycle.Logging.IApplicationLogFiles>(provider =>
+            provider.GetRequiredService<WheelWizard.ApplicationLifecycle.Logging.ApplicationLogFiles>()
+        );
         services.AddMods();
         services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();
