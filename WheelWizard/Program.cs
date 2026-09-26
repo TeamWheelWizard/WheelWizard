@@ -2,9 +2,9 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Logging;
 using Serilog;
-using WheelWizard.Helpers;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views;
 
@@ -106,7 +106,7 @@ public class Program : IDesignerEntryPoint
 
     private static void SetupWorkingDirectory()
     {
-        if (EnvHelper.IsFlatpakSandboxed())
+        if (new WheelWizard.Shared.Platform.RuntimeEnvironment().IsFlatpakSandboxed(new Testably.Abstractions.RealFileSystem()))
         {
             // In this case, we would not want executable directory-relative paths, since this is in `/app/bin`.
             // We are going to use the home directory instead (this should be the original working directory anyway).

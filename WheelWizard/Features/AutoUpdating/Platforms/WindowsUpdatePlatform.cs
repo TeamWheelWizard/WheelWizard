@@ -2,8 +2,8 @@ using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Security.Principal;
 using WheelWizard.GitHub.Domain;
-using WheelWizard.Helpers;
 using WheelWizard.Shared.Downloads;
+using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Downloads;
 using WheelWizard.Views.Popups.Generic;
 
@@ -121,7 +121,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem, IDownloadService down
             Write-Output 'Starting update process...'
 
             # Wait for the original application to exit
-            while (Get-Process -Name {{EnvHelper.SingleQuotePath(fileSystem.Path.GetFileNameWithoutExtension(originalFileName))}} -ErrorAction SilentlyContinue) {
+            while (Get-Process -Name {{ShellQuoting.QuotePowerShellArgument(fileSystem.Path.GetFileNameWithoutExtension(originalFileName))}} -ErrorAction SilentlyContinue) {
                 Write-Output 'Waiting for {{originalFileName}} to exit...'
                 Start-Sleep -Seconds 1
             }
@@ -133,7 +133,7 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem, IDownloadService down
 
             while (-not $deleted -and $retryCount -lt $maxRetries) {
                 try {
-                    Remove-Item -Path {{EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))}} -Force -ErrorAction Stop
+                    Remove-Item -Path {{ShellQuoting.QuotePowerShellArgument(fileSystem.Path.Combine(currentFolder, originalFileName))}} -Force -ErrorAction Stop
                     $deleted = $true
                 }
                 catch {
@@ -151,10 +151,10 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem, IDownloadService down
 
             Write-Output 'Renaming new executable...'
             try {
-                Rename-Item -Path {{EnvHelper.SingleQuotePath(fileSystem.Path.Combine(
+                Rename-Item -Path {{ShellQuoting.QuotePowerShellArgument(fileSystem.Path.Combine(
                 currentFolder,
                 newFileName
-            ))}} -NewName {{EnvHelper.SingleQuotePath(originalFileName)}} -ErrorAction Stop
+            ))}} -NewName {{ShellQuoting.QuotePowerShellArgument(originalFileName)}} -ErrorAction Stop
             }
             catch {
                 Write-Output 'Failed to rename {{newFileName}} to {{originalFileName}}. Update aborted.'
@@ -163,10 +163,10 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem, IDownloadService down
             }
 
             Write-Output 'Starting the updated application...'
-            Start-Process -FilePath {{EnvHelper.SingleQuotePath(fileSystem.Path.Combine(currentFolder, originalFileName))}}
+            Start-Process -FilePath {{ShellQuoting.QuotePowerShellArgument(fileSystem.Path.Combine(currentFolder, originalFileName))}}
 
             Write-Output 'Cleaning up...'
-            Remove-Item -Path {{EnvHelper.SingleQuotePath(scriptFilePath)}} -Force
+            Remove-Item -Path {{ShellQuoting.QuotePowerShellArgument(scriptFilePath)}} -Force
 
             Write-Output 'Update completed successfully.'
 

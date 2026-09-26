@@ -2,7 +2,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
-using WheelWizard.Helpers;
 using WheelWizard.Mods;
 using WheelWizard.Services;
 using WheelWizard.Shared.DependencyInjection;

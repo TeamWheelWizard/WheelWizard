@@ -1,6 +1,5 @@
 using System.IO.Abstractions;
 using WheelWizard.Dolphin.Paths;
-using WheelWizard.Helpers;
 using WheelWizard.Recomp;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Binary;

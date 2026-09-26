@@ -8,7 +8,6 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using WheelWizard.Features.Patches;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Mods;
 using WheelWizard.Services;

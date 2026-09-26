@@ -4,7 +4,6 @@ using WheelWizard.AutoUpdating.Platforms;
 using WheelWizard.Branding;
 using WheelWizard.GitHub;
 using WheelWizard.GitHub.Domain;
-using WheelWizard.Helpers;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.AutoUpdating;
