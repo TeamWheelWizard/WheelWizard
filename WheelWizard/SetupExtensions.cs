@@ -68,6 +68,8 @@ public static class SetupExtensions
         services.AddSettings();
         services.AddCustomCharacters();
         services.AddAutoUpdating();
+        services.AddSingleton<WheelWizard.AutoUpdating.IUpdatePresentation, WheelWizard.Views.Updating.UpdatePresentation>();
+        services.AddSingleton<WheelWizard.Shared.Processes.IApplicationProcess, WheelWizard.Shared.Processes.ApplicationProcess>();
         services.AddBranding();
         services.AddGitHub();
         services.AddRrRooms();
