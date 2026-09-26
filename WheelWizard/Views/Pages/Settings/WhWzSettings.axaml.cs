@@ -513,59 +513,67 @@ public partial class WhWzSettings : UserControlBase
     private async Task MoveWheelWizardDataAsync(string targetPath)
     {
         SetAppDataLocationBusyState(true);
-        Log.CloseAndFlush();
-
-        var progressWindow = new ProgressWindow(t("status.data_folder.moving"))
-            .SetExtraText(t("helper_text.wheel_wizard_data_folder"))
-            .SetGoal(t("status.data_folder.moving"));
-        progressWindow.Show();
-
-        var progress = new Progress<double>(value =>
-        {
-            var percentage = (int)Math.Clamp(Math.Round(value * 100), 0, 100);
-            progressWindow.UpdateProgress(percentage);
-        });
-
-        (bool success, string errorMessage, DirectoryMoveContentsResult details) moveResult;
         try
         {
-            moveResult = await Task.Run(() =>
+            // Keep logs unchanged until the user has finished deciding whether to revert.
+            Log.CloseAndFlush();
+
+            var progressWindow = new ProgressWindow(t("status.data_folder.moving"))
+                .SetExtraText(t("helper_text.wheel_wizard_data_folder"))
+                .SetGoal(t("status.data_folder.moving"));
+            progressWindow.Show();
+
+            var progress = new Progress<double>(value =>
             {
-                var moveSuccessful = ApplicationData.TryMove(targetPath, out var error, out var moveDetails, progress);
-                return (moveSuccessful, error, moveDetails);
+                var percentage = (int)Math.Clamp(Math.Round(value * 100), 0, 100);
+                progressWindow.UpdateProgress(percentage);
             });
-        }
-        catch (Exception ex)
-        {
+
+            (bool success, string errorMessage, DirectoryMoveContentsResult details) moveResult;
+            try
+            {
+                moveResult = await Task.Run(() =>
+                {
+                    var moveSuccessful = ApplicationData.TryMove(targetPath, out var error, out var moveDetails, progress);
+                    return (moveSuccessful, error, moveDetails);
+                });
+            }
+            catch (Exception ex)
+            {
+                progressWindow.Close();
+
+                await new MessageBoxWindow()
+                    .SetMessageType(MessageBoxWindow.MessageType.Error)
+                    .SetTitleText(t("message_error.data_folder_move.title"))
+                    .SetInfoText(ex.Message)
+                    .ShowDialog();
+                return;
+            }
+
             progressWindow.Close();
-            WheelWizard.Logging.RecreateStaticLogger();
-            SetAppDataLocationBusyState(false);
-            UpdateAppDataLocationUi();
 
-            await new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText(t("message_error.data_folder_move.title"))
-                .SetInfoText(ex.Message)
-                .ShowDialog();
-            return;
+            var (success, errorMessage, details) = moveResult;
+
+            if (success)
+            {
+                await HandleSuccessfulAppdataMoveAsync(details, errorMessage);
+            }
+            else
+            {
+                await HandleFailedAppdataMoveAsync(details, errorMessage);
+            }
         }
-
-        progressWindow.Close();
-
-        WheelWizard.Logging.RecreateStaticLogger();
-
-        SetAppDataLocationBusyState(false);
-        UpdateAppDataLocationUi();
-
-        var (success, errorMessage, details) = moveResult;
-
-        if (success)
+        finally
         {
-            await HandleSuccessfulAppdataMoveAsync(details, errorMessage);
-        }
-        else
-        {
-            await HandleFailedAppdataMoveAsync(details, errorMessage);
+            try
+            {
+                WheelWizard.Logging.RecreateStaticLogger();
+            }
+            finally
+            {
+                SetAppDataLocationBusyState(false);
+                UpdateAppDataLocationUi();
+            }
         }
     }
 
@@ -591,8 +599,6 @@ public partial class WhWzSettings : UserControlBase
                     moveDetails.DestinationPath,
                     out var revertError
                 );
-                WheelWizard.Logging.RecreateStaticLogger();
-                UpdateAppDataLocationUi();
 
                 if (!revertSucceeded)
                 {

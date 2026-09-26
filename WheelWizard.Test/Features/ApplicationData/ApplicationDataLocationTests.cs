@@ -171,6 +171,33 @@ public class ApplicationDataLocationTests
         store.DidNotReceiveWithAnyArgs().Save(default);
     }
 
+    [Theory]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    public void Revert_RequiresCopiedLogsToRemainUnchanged(bool appendLog, bool createLog, bool expectedSuccess)
+    {
+        var (fs, _, location) = Create(savedLocation: "/relocated");
+        fs.Directory.CreateDirectory("/appdata/CT-MKWII/logs");
+        fs.Directory.CreateDirectory("/relocated/logs");
+        fs.File.WriteAllText("/appdata/CT-MKWII/logs/log.txt", "before move");
+        fs.File.WriteAllText("/relocated/logs/log.txt", "before move");
+
+        if (appendLog)
+            fs.File.AppendAllText("/relocated/logs/log.txt", "\nafter move");
+        if (createLog)
+            fs.File.WriteAllText("/relocated/logs/new-day.txt", "after move");
+
+        Assert.Equal(expectedSuccess, location.TryRevertMove("/appdata/CT-MKWII", "/relocated", out _));
+        Assert.Equal(expectedSuccess ? "/appdata/CT-MKWII" : "/relocated", location.DirectoryPath);
+        Assert.Equal(!expectedSuccess, fs.Directory.Exists("/relocated"));
+        Assert.Equal("before move", fs.File.ReadAllText("/appdata/CT-MKWII/logs/log.txt"));
+        if (appendLog)
+            Assert.EndsWith("after move", fs.File.ReadAllText("/relocated/logs/log.txt"));
+        if (createLog)
+            Assert.Equal("after move", fs.File.ReadAllText("/relocated/logs/new-day.txt"));
+    }
+
     private static MockFileSystem NewFileSystem() => new(options => options.SimulatingOperatingSystem(SimulationMode.Linux));
 
     private static (MockFileSystem, IApplicationDataLocationStore, ApplicationDataLocation) Create(
