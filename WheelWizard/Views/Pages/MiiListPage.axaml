@@ -6,9 +6,8 @@
              xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:loc="clr-namespace:WheelWizard.Localization"
              mc:Ignorable="d" d:DesignWidth="456" d:DesignHeight="776"
-             x:CompileBindings="False"
              x:Class="WheelWizard.Views.Pages.MiiListPage">
-    <Grid x:Name="CompleteGrid">
+    <Grid x:Name="CompleteGrid" x:CompileBindings="False">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <!-- This is the total height as the (Title + infoSection) - (padding) -->

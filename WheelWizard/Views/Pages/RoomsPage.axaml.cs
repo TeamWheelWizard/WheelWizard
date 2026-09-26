@@ -4,16 +4,17 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.Polling;
+using WheelWizard.Views.Navigation;
 using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Pages;
 
 public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
 {
-    [Inject]
-    private LiveRoomsService LiveRooms { get; set; } = null!;
+    private INavigationService Navigation { get; }
+
+    private LiveRoomsService LiveRooms { get; }
 
     private string? _searchQuery;
 
@@ -41,8 +42,10 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IPolli
         }
     }
 
-    public RoomsPage()
+    public RoomsPage(INavigationService navigation, LiveRoomsService liveRooms)
     {
+        Navigation = navigation;
+        LiveRooms = liveRooms;
         InitializeComponent();
         DataContext = this;
         LiveRooms.Subscribe(this);
@@ -116,7 +119,7 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IPolli
         if (listBox.SelectedItem is not RrRoom selectedRoom)
             return;
 
-        NavigationManager.NavigateTo<RoomDetailsPage>(selectedRoom);
+        Navigation.NavigateTo<RoomDetailsPage>(selectedRoom);
         listBox.SelectedItem = null;
         // Deselect the item immediately after navigating. This is important
         // for a good user experience. Otherwise, the item stays selected,
@@ -132,7 +135,8 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IPolli
 
         var room = Rooms.FirstOrDefault(r => r.Players.Any(p => p.Equals(selectedRoom)));
 
-        NavigationManager.NavigateTo<RoomDetailsPage>(room);
+        if (room is not null)
+            Navigation.NavigateTo<RoomDetailsPage>(room);
         listBox.SelectedItem = null;
         // Deselect the item immediately after navigating. This is important
         // for a good user experience. Otherwise, the item stays selected,

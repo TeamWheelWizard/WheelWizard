@@ -6,10 +6,10 @@ using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Shared.Services;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
@@ -23,6 +23,8 @@ namespace WheelWizard.Views.Pages;
 
 public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
 {
+    private INavigationService Navigation { get; }
+
     // Made this static intentionally.
     // I personally don't think its worth saving it as a setting.
     // Though I do see the use in saving it when using the app so you can swap pages in the meantime
@@ -30,20 +32,15 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPol
 
     private ObservableCollection<FriendProfile> _friendlist = [];
 
-    [Inject]
-    private LiveRoomsService LiveRooms { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; }
 
-    [Inject]
-    private IMiiDbService MiiDbService { get; set; } = null!;
+    private IMiiDbService MiiDbService { get; }
 
-    [Inject]
-    private IApiCaller<IRwfcApi> ApiCaller { get; set; } = null!;
+    private IApiCaller<IRwfcApi> ApiCaller { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
     public ObservableCollection<FriendProfile> FriendList
     {
@@ -55,8 +52,21 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPol
         }
     }
 
-    public FriendsPage()
+    public FriendsPage(
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        IGameLicenseSingletonService gameLicenseService,
+        IMiiDbService miiDbService,
+        IApiCaller<IRwfcApi> apiCaller,
+        ISettingsManager settingsService
+    )
     {
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        GameLicenseService = gameLicenseService;
+        MiiDbService = miiDbService;
+        ApiCaller = apiCaller;
+        SettingsService = settingsService;
         InitializeComponent();
         GameLicenseService.Subscribe(this);
         UpdateFriendList();
@@ -359,7 +369,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPol
             if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;
 
-            NavigationManager.NavigateTo<RoomDetailsPage>(room);
+            Navigation.NavigateTo<RoomDetailsPage>(room);
             return;
         }
 

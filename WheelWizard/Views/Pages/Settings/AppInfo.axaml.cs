@@ -2,20 +2,22 @@ using Avalonia.Controls.Primitives;
 using WheelWizard.Branding;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Shared;
-using WheelWizard.Shared.DependencyInjection;
 
 namespace WheelWizard.Views.Pages.Settings;
 
 public partial class AppInfo : UserControlBase
 {
-    [Inject]
-    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; }
 
-    [Inject]
-    private IBrandingSingletonService BrandingSingletonService { get; set; } = null!;
+    private IBrandingSingletonService BrandingSingletonService { get; }
 
-    public AppInfo()
+    public AppInfo(
+        ICustomDistributionSingletonService customDistributionSingletonService,
+        IBrandingSingletonService brandingSingletonService
+    )
     {
+        CustomDistributionSingletonService = customDistributionSingletonService;
+        BrandingSingletonService = brandingSingletonService;
         InitializeComponent();
 
         RrVersionText.Text = "RR: " + CustomDistributionSingletonService.RetroRewind.GetCurrentVersion();

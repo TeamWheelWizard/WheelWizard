@@ -1,10 +1,6 @@
 using Avalonia;
 using Avalonia.Input;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Views.Pages;
-using WheelWizard.WiiManagement;
-using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
@@ -12,9 +8,6 @@ namespace WheelWizard.Views.Patterns;
 public partial class CurrentUserProfile : UserControlBase
 {
     #region Properties
-
-    [Inject]
-    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
 
     public static readonly StyledProperty<string> FriendCodeProperty = AvaloniaProperty.Register<CurrentUserProfile, string>(
         nameof(FriendCode)
@@ -50,27 +43,21 @@ public partial class CurrentUserProfile : UserControlBase
     {
         InitializeComponent();
         DataContext = this;
-
-        Refresh();
     }
 
-    public void Refresh()
+    public void DisplayProfile(string name, string friendCode, Mii? mii)
     {
-        GameLicenseService.RefreshOnlineStatus();
-        GameLicenseService.LoadLicense();
-
-        var currentUser = GameLicenseService.ActiveUser;
-
-        var name = currentUser.NameOfMii;
         if (name == SettingValues.NoName)
             name = t("state.no_name");
         if (name == SettingValues.NoLicense)
             name = t("state.no_license");
 
         UserName = name;
-        FriendCode = currentUser.FriendCode;
-        Mii = currentUser.Mii;
+        FriendCode = friendCode;
+        Mii = mii;
     }
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e) => NavigationManager.NavigateTo<UserProfilePage>();
+    public event EventHandler? ProfileRequested;
+
+    protected override void OnPointerPressed(PointerPressedEventArgs e) => ProfileRequested?.Invoke(this, EventArgs.Empty);
 }

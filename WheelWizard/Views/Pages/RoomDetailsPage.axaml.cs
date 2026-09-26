@@ -7,9 +7,9 @@ using WheelWizard.Models;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Views.DesignTime;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
@@ -21,17 +21,15 @@ namespace WheelWizard.Views.Pages;
 
 public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
 {
-    [Inject]
-    private LiveRoomsService LiveRooms { get; set; } = null!;
+    private INavigationService Navigation { get; } = null!;
 
-    [Inject]
-    private IGameLicenseSingletonService GameDataService { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; } = null!;
 
-    [Inject]
-    private IMiiDbService MiiDbService { get; set; } = null!;
+    private IGameLicenseSingletonService GameDataService { get; } = null!;
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private IMiiDbService MiiDbService { get; } = null!;
+
+    private ISettingsManager SettingsService { get; } = null!;
 
     private RrRoom _room = null!;
 
@@ -65,8 +63,20 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         PlayersList = new(Room.Players);
     }
 
-    public RoomDetailsPage(RrRoom room)
+    public RoomDetailsPage(
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        IGameLicenseSingletonService gameDataService,
+        IMiiDbService miiDbService,
+        ISettingsManager settingsService,
+        RrRoom room
+    )
     {
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        GameDataService = gameDataService;
+        MiiDbService = miiDbService;
+        SettingsService = settingsService;
         InitializeComponent();
         DataContext = this;
         Room = room;
@@ -87,7 +97,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         if (room == null)
         {
             // Reason we do this incase room gets disbanded or something idk
-            NavigationManager.NavigateTo<RoomsPage>();
+            Navigation.NavigateTo<RoomsPage>();
             return;
         }
 
@@ -99,7 +109,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         }
     }
 
-    private void GoBackClick(object? sender, EventArgs eventArgs) => NavigationManager.NavigateTo<RoomsPage>();
+    private void GoBackClick(object? sender, EventArgs eventArgs) => Navigation.NavigateTo<RoomsPage>();
 
     private void CopyFriendCode_OnClick(object sender, RoutedEventArgs e)
     {

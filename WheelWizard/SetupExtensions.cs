@@ -90,6 +90,8 @@ public static class SetupExtensions
             var media = provider.GetRequiredService<WheelWizard.GameBanana.IGameBananaMediaService>();
             return id => new WheelWizard.Views.ModManagement.ModPreviewViewModel(id, mods, media);
         });
+        services.AddSingleton<WheelWizard.Views.Navigation.IPageFactory, WheelWizard.Views.Navigation.PageFactory>();
+        services.AddSingleton<WheelWizard.Views.Navigation.INavigationService, WheelWizard.Views.Navigation.NavigationService>();
         services.AddMods();
         services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();
