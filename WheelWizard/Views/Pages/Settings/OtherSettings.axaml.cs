@@ -4,6 +4,8 @@ using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Storage;
 
@@ -86,10 +88,24 @@ public partial class OtherSettings : UserControlBase
     private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e)
     {
         var progressWindow = new ProgressWindow();
-        progressWindow.Show();
-        await CustomDistributionSingletonService.RetroRewind.ReinstallAsync(progressWindow);
-        progressWindow.Close();
-        RefreshRetroRewindVersion();
+        OperationResult result;
+        try
+        {
+            progressWindow.Show();
+            result = await CustomDistributionSingletonService.RetroRewind.ReinstallAsync(progressWindow);
+        }
+        catch (Exception exception)
+        {
+            result = Fail(exception);
+        }
+        finally
+        {
+            progressWindow.Close();
+            RefreshRetroRewindVersion();
+        }
+
+        if (result.IsFailure)
+            MessageTranslationHelper.ShowMessage(result.Error);
     }
 
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)

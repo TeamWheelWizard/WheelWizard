@@ -54,6 +54,7 @@ public static class SetupExtensions
             WheelWizard.Views.Storage.DesktopStorageProviderAccessor
         >();
         services.AddSingleton<WheelWizard.Views.Storage.IFilePickerService, WheelWizard.Views.Storage.FilePickerService>();
+        services.AddSingleton<WheelWizard.CustomDistributions.IDistributionPrompts, WheelWizard.Views.Distributions.DistributionPrompts>();
         // Features
         services.AddSingleton<WheelWizard.Shared.Processes.IUnixCommandService, WheelWizard.Shared.Processes.UnixCommandService>();
         services.AddSingleton<WheelWizard.Shared.Processes.IUnixProcessService, WheelWizard.Shared.Processes.UnixProcessService>();
