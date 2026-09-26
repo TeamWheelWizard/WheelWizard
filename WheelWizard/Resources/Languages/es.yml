@@ -4,7 +4,7 @@ es:
     settings: "Ajustes"
     mods: "My Stuff"
     patches: "Parches"
-    my_profiles: "Mis perfiles"
+    my_profiles: "Mis Perfiles"
     rooms: "Salas"
     friends: "Amigos"
     leaderboard: "Ranking"
@@ -30,6 +30,10 @@ es:
     time_online: "Tiempo en línea"
     message: "Mensaje"
     is_online: "Está Online"
+    vr_history: "Historial de PC"
+    start_vr: "PC Inicial"
+    end_vr: "PC Final"
+    net_change: "Variación Neta"
     mii:
       gender_male: "Hombre"
       gender: "Género"
@@ -39,7 +43,7 @@ es:
       nose_type: "Tipo de Nariz"
       horizontal_position: "Posición Horizontal (Izq/Der)"
       mouth_type: "Tipo de Boca"
-      hair_color: "Color del Pelo"
+      hair_color: "Color de Pelo"
       hair_type: "Tipo de Pelo"
       mirror_hair: "Voltear Pelo"
       glasses_type: "Tipo de Gafas"
@@ -53,7 +57,7 @@ es:
       head_shape: "Forma de la Cabeza"
       facial_feature: "Rasgo Facial"
       irish_color: "Color de los Ojos"
-      space_between: "Espacio intermedio"
+      space_between: "Espacio Intermedio"
       rotation: "Rotación (Rotar Izquierda/Derecha)"
       eyebrow_type: "Tipo de Cejas"
       mustache_type: "Tipo de Bigote"
@@ -63,7 +67,9 @@ es:
       default_name: "Nuevo Mii"
     status: "Estado"
     priority: "Prioridad"
-    sort_by: "Ordernar por"
+    sort_by: "Ordenar por"
+    match: "Partida"
+    enable_matches: "Partidas"
     total_games_won: "Partidas ganadas"
     total_games_played: "Partidas jugadas"
     vr_abbreviation: "PC"
@@ -107,11 +113,13 @@ es:
     installed: "Instalado"
   action:
     play: "Jugar"
+    open: "Abrir"
     play_offline: "Jugar sin internet"
     play_anyway: "Jugar de todos modos"
     install: "Instalar"
     update: "Actualizar"
     import: "Importar"
+    clone: "Clonar"
     convert_to_patches: "Convertir a parches"
     enable_all: "Activar todo"
     disable_all: "Desactivar todo"
@@ -131,6 +139,7 @@ es:
     revert: "Deshacer"
     maybe_later: "Quizás más tarde"
     browse: "Buscar"
+    change: "Cambiar"
     view_mod: "Ver Mod"
     save_external_mii: "Añadir Mii a \"Mis Miis\""
     view_mii: "Ver Mii"
@@ -141,6 +150,7 @@ es:
     view_room: "Ver sala"
     recomp_nand_copy: "Crear una copia"
     recomp_nand_share: "Usar directamente"
+    recomp_install_offline: "Instalar modo sin internet"
     link:
       discord: "¡Habla con nosotros!"
       github: "Código fuente"
@@ -173,7 +183,7 @@ es:
       y {$2}
     thanks_translators: "Muchas gracias a todos los traductores:"
     wh_wz_translation_percentage: "La traducción de este idioma está a un {$1}%."
-    powered_gamebanana: "Impulsado por GameBanana"
+    powered_gamebanana: "Habilitado por GameBanana"
     language_translated_by: "Este idioma está traducido por: {$1}"
     brsar_entry: "{$1} entrada {$2}"
     brsar_entry_with_rwar: "{$1} entrada {$2} + RWAR"
@@ -213,6 +223,9 @@ es:
     no_miis: "No podemos leer la información de Miis de tu sistema. Asegúrate que hayas lanzado el juego al menos una vez."
     no_mod_selected_title: "Ningún mod seleccionado"
     no_mod_selected: "Selecciona un mod de la lista para ver sus detalles"
+    no_vr_history_title: "Sin historial de PC"
+    no_vr_history: "Se requiere clave de amigo para cargar el historial de PC."
+    no_vr_history_range: "No se encontró historial de PC para este rango todavía."
   time:
     days:
       1: "1 día"
@@ -226,6 +239,13 @@ es:
     seconds:
       1: "1 segundo"
       n: "{$1} segundos"
+    last_24_hours: "Últimas 24 horas"
+    last_7_days: "Últimos 7 días"
+    last_30_days: "Últimos 30 días"
+    last_60_days: "Últimos 60 días"
+    lifetime: "Desde siempre"
+    lifetime_history: "Historial completo"
+    past_n_days_with_range: "Pasados {$1} días ({$2} a {$3})"
   progress:
     estimated_time_remaining: "Tiempo restante estimado:"
     downloading_mb: "descargando {$1} MB"
@@ -250,6 +270,7 @@ es:
     preparing_files_count: "Preparando {$1} archivo(s)"
     installing_recomp: "Instalando WiiCompiled"
     updating_recomp: "Actualizando WiiCompiled"
+    uninstalling_recomp: "Desinstalando WiiCompiled"
     recomp_checking_release: "Buscando la versión más reciente de WiiCompiled"
     recomp_downloading_setup: "Descargando el instalador de WiiCompiled"
     recomp_running_setup: "Ejecutando el instalador de WiiCompiled"
@@ -297,9 +318,18 @@ es:
     recomp_use_dolphin_nand:
       title: "¿Usar tus datos de guardado de Dolphin?"
       extra: "WiiCompiled puede jugar con tus datos guardados, Miis y claves de amigo que ya hayas usado en Dolphin. En caso contrario, empezará de cero con sus propios datos de Wii."
+    recomp_retro_wfc_unavailable:
+      title: "No se ha podido contactar con Retro WFC."
+      extra: "WiiCompiled necesita los servidores de Retro WFC para preparar juegos en línea, y en estos momentos no responden. Puedes instalarlo ahora en modo sin internet; WiiCompiled los habilitará automáticamente la próxima vez que actualices una vez se restauren los servidores."
     recomp_nand_mode:
       title: "¿Copiar tus datos de Dolphin, o usarlos directamente?"
       extra: "Dolphin recomienda en contra de que otros programas usen sus datos de Wii (NAND) directamente, ya que dos programas escribiendo a la vez pueden dañar los datos. Por ello, una copia mantiene separado completamente a WiiCompiled, pero el progreso realizado en uno no aparecerá en el otro."
+    recomp_share_dolphin_data:
+      title: "¿Compartir datos NAND con Dolphin?"
+      extra: "Clonar otorga a WiiCompiled los datos de guardado, Miis y ajustes de Wii actuales, pero mantiene su copia separada y es más seguro. El compartir directamente permite que Dolphin y WiiCompiled escriban a la misma NAND, lo cual puede causar que se dañen los datos si ambos se ejecutan a la vez. Continúa solamente si comprendes el riesgo."
+    recomp_overwrite_dolphin_clone:
+      title: "¿Reemplazar el clonado privado de Dolphin?"
+      extra: "Esto reemplaza el clonado actual con los datos de Dolphin. Se perderán los guardados, Miis y ajustes de Wii que se hayan cambiado solamente en WiiCompiled."
     move_data:
       title: "¿Mover datos de Wheel Wizard?"
       extra: |-
@@ -335,6 +365,9 @@ es:
       title: "Esto cerrará la ventana actual y abrirá una nueva con la nueva configuración de idioma."
       extra: "¿Deseas aplicar la nueva configuración de idioma?"
   message_warning:
+    recomp_operation_cancelled:
+      title: "Operación de WiiCompiled cancelada"
+      extra: "La operación fue interrumpida antes de terminar. Puedes reiniciarla cuando estés listo."
     not_find_dolphin:
       extra: "No se encontró el Emulador Dolphin. Por favor selecciona la ruta en ajustes."
     not_find_game:
@@ -399,7 +432,7 @@ es:
     search_mod: "Buscar mods..."
     enter_mii_name: "Introducir nombre de Mii..."
     enter_text_here: "Introducir texto aquí..."
-    search_for_players: "Buscando jugadores..."
+    search_for_players: "Buscar jugadores..."
     enter_path: "Introducir la ruta deseada..."
   message_error:
     no_mod_folder:
@@ -432,6 +465,7 @@ es:
     mod_download_fail:
       title: "Se produjo un error al descargar el mod."
       extra: "Se produjo un error durante la descarga: {$1}"
+    failed_vr_history: "Se produjo un error al cargar el historial de PC"
   message_success:
     settings_saved:
       title: "Se guardaron correctamente los ajustes."
@@ -484,6 +518,9 @@ es:
     launch_with_dolphin: "Lanzar juego con la ventana de Dolphin"
     launch_rr_on_startup: "Lanzar Retro Rewind al iniciar"
     retro_rewind_installation: "Instalación de Retro Rewind"
+    save_folder: "Carpeta de Guardados"
+    installation_folder: "Carpeta de Instalación"
+    recomp_installation: "Instalación de WiiCompiled"
     v_sync: "VSync"
     recommended: "Ajustes recomendados"
     show_fps: "Mostrar FPS"
@@ -491,6 +528,7 @@ es:
     window_scale: "Escala de la ventana"
     open_config: "Abrir carpeta de configuraciones"
     wheel_wizard_data_folder: "Carpeta de datos de Wheel Wizard"
+    retro_rewind_folder: "Carpeta de Retro Rewind"
     reset_data_folder: "Usar ubicación por defecto"
     dolphin_user_path: "Carpeta de Usuario de Dolphin"
     mario_kart_game: "Archivo del juego Mario Kart Wii"
@@ -502,6 +540,8 @@ es:
     open_save_folder: "Abrir carpeta de archivos de juego guardados"
     enable_recomp: "Habilitar WiiCompiled (beta)"
     recomp_use_dolphin_data: "Compartir datos de guardado de Dolphin"
+    recomp_share_dolphin_data: "Compartir datos NAND con Dolphin"
+    recomp_clone_dolphin_data: "Clonar NAND de Dolphin"
     recomp_resolution: "Resolución"
     recomp_graphics_api: "API de Gráficos"
     recomp_prevent_stutters: "Prevenir caídas de FPS (stuttering)"
@@ -517,6 +557,7 @@ es:
     location_paths: "Ajustes de Ubicación"
     wh_wz_appearance: "Apariencia de Wheel Wizard"
     installation: "Instalación"
+    setup: "Configuración"
     recomp: "WiiCompiled (beta)"
     recomp_dolphin_data: "Datos de Dolphin"
     recomp_video: "Vídeo"
@@ -525,12 +566,16 @@ es:
       location_warning: "Los ajustes están desactivados. Completa antes los ajustes de ubicación."
     enable_recomp: "Utiliza WiiCompiled como lanzador de inicio. Desactiva esto para utilizar Dolphin y Retro Rewind en su lugar. Solo para Windows."
     recomp_use_dolphin_data: "Utiliza la carpeta Wii de Dolphin ya existente en su lugar para que WiiCompiled comparta guardados, Miis y ajustes de Wii. El cambio surtirá en efecto la próxima vez que se lance WiiCompiled."
+    recomp_share_dolphin_data: "WiiCompiled y Dolphin utilizan los mismos datos guardados, Miis y ajustes de Wii."
+    recomp_shared_nand_warning: "No ejecutes Dolphin y WiiCompiled a la vez mientras se compartan datos NAND."
+    recomp_clone_dolphin_data: "Copia los datos guardados, Miis y ajustes de Wii actuales de Dolphin a los datos privados de WiiCompiled."
     recomp_graphics_api: "Solo DirectX 12 y Vulkan ejecutan WiiCompiled de manera fiable. Por ende, no se ofrecen más opciones."
     recomp_dolphin_data_not_found: "Indica antes en los Ajustes de Ubicación una Carpeta de Usuario Dolphin que ya exista. Es necesario que contenga una carpeta Wii."
     recomp_prevent_stutters: "Mientras un sombreador se compila, los objetos que lo requieren son omitidos por unos pocos fotogramas, en vez de que se quede el juego estancado hasta que esté listo. Recibirás pequeñas apariciones repentinas en vez de caídas de FPS (stuttering)."
     launch_with_dolphin: "Se lanzará la ventana principal de Dolphin junto con el juego"
     launch_rr_on_startup: "Lanza automáticamente Retro Rewind cuando se inicia Wheel Wizard"
     retro_rewind_version: "Versión instalada: {$1}"
+    installed_version: "Versión instalada: {$1}"
     force_disable_wiimote: "Este ajuste desactiva el Wiimote en juego, pero lo activa para el Canal Wii"
     resolution_scale: "1x es la resolución nativa"
     renderer: "Selecciona el backend de gráficos que utiliza Dolphin para renderizar el juego."
@@ -538,7 +583,10 @@ es:
     recommended: "Este ajuste cambiará ciertos ajustes de Dolphin para reducir caídas de FPS (stuttering) y picos de lag."
     30_fps: "Este ajuste forzará al juego a ejecutarse a 30 FPS (por defecto es 60)"
     wheel_wizard_data_folder: "Indica dónde almacena Wheel Wizard sus archivos. Puede tardar un rato en moverlos."
+    retro_rewind_folder: "Abre la carpeta que contiene los archivos de Retro Rewind instalados."
     end_with_exe: "La ruta debe terminar en .exe"
+    select_dolphin_linux: "Selecciona el ejecutable Dolphin o introduce un comando de lanzamiento"
+    select_dolphin_macos: "Selecciona Dolphin.app"
     enable_animations: "Esto activa las animaciones en la aplicación Wheel Wizard"
     end_with_x: "Las rutas pueden acabar en:"
     wh_wz_language: "Cambia el idioma usado por Wheel Wizard, no el idioma del juego."
@@ -599,6 +647,9 @@ es:
     unsupported_loose_override_extension: "{$1} utiliza una extensión de sobreescritura suelta sin soportar (.kcl, .kmp, .slt)."
     whole_file_baseline: "Este SZS se almacena como base. Exportando una sobreescritura completa."
   status:
+    recomp_dolphin_clone_available: "Clonado privado: {$1}"
+    recomp_dolphin_clone_missing: "No se ha creado ningún clonado privado."
+    recomp_dolphin_data_cloned: "Datos de Dolphin clonados para WiiCompiled"
     recomp_dolphin_data_not_linked: "Sin vincular. WiiCompiled utilizará sus datos de Wii privados."
     recomp_dolphin_data_linked: "Compartiendo datos de Dolphin desde {$1}"
     recomp_dolphin_data_copied: "Usando una copia de tus datos de Dolphin en {$1}"
