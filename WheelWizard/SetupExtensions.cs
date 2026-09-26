@@ -49,6 +49,11 @@ public static class SetupExtensions
             WheelWizard.GameBanana.InstallRequests.IModInstallRequestPresentation,
             WheelWizard.Views.ModManagement.ModInstallRequestPresentation
         >();
+        services.AddSingleton<
+            WheelWizard.Views.Storage.IStorageProviderAccessor,
+            WheelWizard.Views.Storage.DesktopStorageProviderAccessor
+        >();
+        services.AddSingleton<WheelWizard.Views.Storage.IFilePickerService, WheelWizard.Views.Storage.FilePickerService>();
         // Features
         services.AddSingleton<WheelWizard.Shared.Processes.IUnixCommandService, WheelWizard.Shared.Processes.UnixCommandService>();
         services.AddSingleton<WheelWizard.Shared.Processes.IUnixProcessService, WheelWizard.Shared.Processes.UnixProcessService>();
