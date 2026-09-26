@@ -89,6 +89,35 @@ public class DirectoryTransferServiceTests
         Assert.Equal("saved-data", fs.File.ReadAllText("/source/nested/save.dat"));
     }
 
+    [Theory]
+    [InlineData("/source/child")]
+    [InlineData("/source/..cache")]
+    public void NestedDestination_IsRejectedWithoutChangingSource(string destination)
+    {
+        var fs = CreateSource();
+
+        var result = new DirectoryTransferService(fs).MoveContents("/source", destination);
+
+        Assert.Equal(DirectoryMoveOutcome.CopyFailed, result.Outcome);
+        Assert.False(result.CopyAttempted);
+        Assert.Equal("saved-data", fs.File.ReadAllText("/source/nested/save.dat"));
+        Assert.False(fs.Directory.Exists(destination));
+    }
+
+    [Fact]
+    public void AncestorDestination_IsRejectedWithoutOverwritingExistingFiles()
+    {
+        var fs = CreateSource();
+        fs.File.WriteAllText("/source/save.dat", "existing-data");
+
+        var result = new DirectoryTransferService(fs).MoveContents("/source/nested", "/source");
+
+        Assert.Equal(DirectoryMoveOutcome.CopyFailed, result.Outcome);
+        Assert.False(result.CopyAttempted);
+        Assert.Equal("saved-data", fs.File.ReadAllText("/source/nested/save.dat"));
+        Assert.Equal("existing-data", fs.File.ReadAllText("/source/save.dat"));
+    }
+
     private static MockFileSystem CreateSource()
     {
         var fs = new MockFileSystem();

@@ -179,8 +179,7 @@ public static class PathManager
     {
         try
         {
-            FileSystem.EnsureDirectory(normalizedPath);
-            return true;
+            return FileSystem.EnsureDirectory(normalizedPath).IsSuccess;
         }
         catch
         {
@@ -267,7 +266,12 @@ public static class PathManager
         {
             try
             {
-                FileSystem.EnsureDirectory(normalizedTarget);
+                var ensureResult = FileSystem.EnsureDirectory(normalizedTarget);
+                if (ensureResult.IsFailure)
+                {
+                    errorMessage = $"Unable to create the selected folder: {ensureResult.Error.Message}";
+                    return false;
+                }
             }
             catch (Exception ex)
             {

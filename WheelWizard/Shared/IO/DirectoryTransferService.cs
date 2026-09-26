@@ -72,6 +72,18 @@ public sealed class DirectoryTransferService(IFileSystem fileSystem) : IDirector
             return CreateResult(DirectoryMoveOutcome.NoOp, sourceDeletionSucceeded: true);
         }
 
+        if (
+            fileSystem.Path.IsDescendantPath(normalizedDestination, normalizedSource)
+            || fileSystem.Path.IsDescendantPath(normalizedSource, normalizedDestination)
+        )
+        {
+            progress?.Report(1.0);
+            return CreateResult(
+                DirectoryMoveOutcome.CopyFailed,
+                errorMessage: "Source and destination folders must not contain each other."
+            );
+        }
+
         var destinationEnsureResult = CreateEnsureDirectoryFailureResult(fileSystem.EnsureDirectory(normalizedDestination));
         if (destinationEnsureResult is not null)
         {

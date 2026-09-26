@@ -29,6 +29,10 @@ public class PathExtensionsTests
 
     [Theory]
     [InlineData("/data/child", "/data", true)]
+    [InlineData("/data/..cache", "/data", true)]
+    [InlineData("/data/..cache/nested", "/data", true)]
+    [InlineData("/data/../data/..cache", "/data", true)]
+    [InlineData("/data/..", "/data", false)]
     [InlineData("/data-other", "/data", false)]
     [InlineData("/data", "/data", false)]
     [InlineData("/data/../other", "/data", false)]
@@ -37,5 +41,18 @@ public class PathExtensionsTests
         var fs = new MockFileSystem();
 
         Assert.Equal(expected, fs.Path.IsDescendantPath(descendant, ancestor));
+    }
+
+    [Theory]
+    [InlineData(SimulationMode.Windows)]
+    [InlineData(SimulationMode.Linux)]
+    public void DescendantCheck_DistinguishesDotPrefixedNamesFromParentSegments(SimulationMode platform)
+    {
+        var fs = new MockFileSystem(options => options.SimulatingOperatingSystem(platform));
+        var ancestor = fs.Path.GetFullPath("/data");
+
+        Assert.True(fs.Path.IsDescendantPath(fs.Path.Combine(ancestor, "..cache"), ancestor));
+        Assert.False(fs.Path.IsDescendantPath(fs.Path.Combine(ancestor, ".."), ancestor));
+        Assert.False(fs.Path.IsDescendantPath(fs.Path.Combine(ancestor, "..", "other"), ancestor));
     }
 }

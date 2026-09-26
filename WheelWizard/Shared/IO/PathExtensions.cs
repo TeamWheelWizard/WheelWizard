@@ -73,6 +73,9 @@ public static class PathExtensions
         var normalizedAncestor = paths.NormalizePath(potentialAncestor);
         var normalizedDescendant = paths.NormalizePath(potentialDescendant);
         var relative = paths.GetRelativePath(normalizedAncestor, normalizedDescendant);
-        return !relative.StartsWith("..", StringComparison.Ordinal) && !paths.IsPathRooted(relative);
+        return relative != ".."
+            && !relative.StartsWith($"..{paths.DirectorySeparatorChar}", StringComparison.Ordinal)
+            && !relative.StartsWith($"..{paths.AltDirectorySeparatorChar}", StringComparison.Ordinal)
+            && !paths.IsPathRooted(relative);
     }
 }
