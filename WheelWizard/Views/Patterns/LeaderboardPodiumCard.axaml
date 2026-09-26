@@ -82,7 +82,7 @@
                                         BorderBrush="#4FFFFFFF"
                                         Background="#22FFFFFF"
                                         VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding Rank, RelativeSource={RelativeSource TemplatedParent}, StringFormat='#{0}'}"
+                                    <TextBlock Text="{Binding RankLabel, RelativeSource={RelativeSource TemplatedParent}}"
                                                FontSize="12"
                                                FontWeight="Bold"
                                                Foreground="White" />

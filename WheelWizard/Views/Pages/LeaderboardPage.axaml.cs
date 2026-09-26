@@ -4,6 +4,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using WheelWizard.Localization;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Services.LiveData;
@@ -40,7 +41,7 @@ public sealed record LeaderboardPlayerItem
     public Mii? FirstMii => Mii;
     public bool HasBadges => HasBadge;
     public bool IsTopLeaderboardPlayer => true;
-    public string TopLabel => $"#{Rank}";
+    public string TopLabel => t("placement.n", Rank);
     public bool IsOpenHost => false;
 }
 
@@ -298,7 +299,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         {
             Rank = rank,
             PlacementLabel = GetPlacementLabel(rank),
-            Name = string.IsNullOrWhiteSpace(entry.Name) ? "Unknown Player" : entry.Name,
+            Name = string.IsNullOrWhiteSpace(entry.Name) ? t("empty_content.no_mii_name") : entry.Name,
             FriendCode = friendCode,
             VrText = entry.Vr?.ToString("N0") ?? "--",
             Mii = DeserializeMii(entry.MiiData),
@@ -325,10 +326,10 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     private static string GetPlacementLabel(int rank) =>
         rank switch
         {
-            1 => "Champion",
-            2 => "2nd Place",
-            3 => "3rd Place",
-            _ => $"#{rank}",
+            1 => t("placement.first"),
+            2 => t("placement.second"),
+            3 => t("placement.third"),
+            _ => t("placement.n", rank),
         };
 
     private static Mii? DeserializeMii(string? miiData)
@@ -453,27 +454,27 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
         if (player.FirstMii == null)
         {
-            ViewUtils.ShowSnackbar("This player has no valid Mii data.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.mii_invalid"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
         var focusedUserIndex = SettingsManager.Get<int>(SettingsManager.FOCUSED_USER);
         if (focusedUserIndex is < 0 or > 3)
         {
-            ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.license_invalid"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
         var activeUserPid = FriendCode.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
         if (activeUserPid == 0)
         {
-            ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.license_invalid_self"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
         if (GameDataService.ActiveCurrentFriends.Count >= 30)
         {
-            ViewUtils.ShowSnackbar("Your friend list is full.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.friend_list_full"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
@@ -488,7 +489,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode);
         if (activeUserPid == friendProfileId)
         {
-            ViewUtils.ShowSnackbar("You cannot add your own friend code.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.add_own_fc"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
@@ -500,7 +501,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
         if (duplicateFriend)
         {
-            ViewUtils.ShowSnackbar("This friend is already in your list.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.add_existing_friend"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
@@ -524,7 +525,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         }
 
         ViewUtils.GetLayout().UpdateFriendCount();
-        ViewUtils.ShowSnackbar($"Added {player.Name} to your friend list.");
+        ViewUtils.ShowSnackbar(t("snackbar_success.friend_added", player.Name));
     }
 
     private void JoinRoom_OnClick(string friendCode)
@@ -541,7 +542,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        ViewUtils.ShowSnackbar("Could not find an active room for this player.", ViewUtils.SnackbarType.Warning);
+        ViewUtils.ShowSnackbar(t("snackbar_warning.no_active_room"), ViewUtils.SnackbarType.Warning);
     }
 
     private static LeaderboardPlayerItem? GetContextPlayer(object sender)
@@ -554,16 +555,16 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     private static OperationResult<string> NormalizeFriendCode(string friendCode)
     {
         if (string.IsNullOrWhiteSpace(friendCode))
-            return Fail("Friend code cannot be empty.");
+            return Fail(t("snackbar_warning.empty_fc"));
 
         var digits = new string(friendCode.Where(char.IsDigit).ToArray());
         if (digits.Length != 12 || !ulong.TryParse(digits, out _))
-            return Fail("Friend code must be exactly 12 digits.");
+            return Fail(t("snackbar_warning.invalid_fc"));
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
         var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
-            return Fail("Invalid friend code.");
+            return Fail(t("snackbar_warning.nonexisting_fc"));
 
         return formatted;
     }

@@ -78,7 +78,7 @@
                 VerticalAlignment="Bottom" />
 
         <TextBlock Grid.Row="0"
-                   Text="Leaderboard"
+                   Text="{loc:T page_title.leaderboard}"
                    VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
 
@@ -92,7 +92,7 @@
                                         Height="68"
                                         Foreground="{StaticResource Neutral700}"
                                         HorizontalAlignment="Center" />
-                <TextBlock Text="Loading leaderboard..."
+                <TextBlock Text="{loc:T state.loading_leaderboard}"
                            Classes="BodyText"
                            FontSize="14"
                            HorizontalAlignment="Center" />
@@ -108,7 +108,7 @@
                           Height="56"
                           Foreground="{StaticResource Danger500}"
                           HorizontalAlignment="Center" />
-                <TextBlock Text="Could not load leaderboard."
+                <TextBlock Text="{loc:T message_error.failed_load_leaderboard}"
                            Classes="TitleText"
                            FontSize="18"
                            HorizontalAlignment="Center" />
@@ -117,7 +117,7 @@
                            Width="310"
                            TextAlignment="Center"
                            HorizontalAlignment="Center" />
-                <components:Button Text="Retry"
+                <components:Button Text="{loc:T action.retry}"
                                    Variant="Primary"
                                    IconData="{StaticResource Refresh}"
                                    Width="160"
@@ -129,10 +129,10 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Spacing="10">
-                <components:EmptyPageInfo Title="No leaderboard data"
-                                          BodyText="There are no ranked players available right now."
+                <components:EmptyPageInfo Title="{loc:T empty_content.no_leaderboard_title}"
+                                          BodyText="{loc:T empty_content.no_leaderboard}"
                                           IconData="{StaticResource Award}" />
-                <components:Button Text="Refresh"
+                <components:Button Text="{loc:T action.refresh}"
                                    Variant="Primary"
                                    IconData="{StaticResource Refresh}"
                                    Width="170"
@@ -157,7 +157,7 @@
                                           Width="14"
                                           Height="14"
                                           Foreground="{StaticResource Warning500}" />
-                                <TextBlock Text="Top 3 Podium"
+                                <TextBlock Text="{loc:T text.top_3_podium}"
                                            FontSize="16"
                                            FontWeight="Bold"
                                            Foreground="White" />
@@ -165,7 +165,7 @@
 
                             <TextBlock Grid.Row="1"
                                        Margin="0,4,0,0"
-                                       Text="Live from RWFC"
+                                       Text="{loc:T text.live_rwfc}"
                                        Classes="TinyText"
                                        Foreground="{StaticResource Neutral300}" />
 
@@ -193,10 +193,10 @@
                                                       Click="CopyFriendCode_OnClick" />
                                             <MenuItem Header="{loc:T action.view_mii}"
                                                       Click="OpenCarousel_OnClick" />
-                                            <MenuItem Header="Add Friend"
+                                            <MenuItem Header="{loc:T action.add_friend}"
                                                       Click="AddFriend_OnClick" />
                                             <Separator />
-                                            <MenuItem Header="View Profile"
+                                            <MenuItem Header="{loc:T action.view_profile}"
                                                       Click="ViewProfile_OnClick" />
                                         </ContextMenu>
                                     </patterns:LeaderboardPodiumCard.ContextMenu>
@@ -222,10 +222,10 @@
                                                       Click="CopyFriendCode_OnClick" />
                                             <MenuItem Header="{loc:T action.view_mii}"
                                                       Click="OpenCarousel_OnClick" />
-                                            <MenuItem Header="Add Friend"
+                                            <MenuItem Header="{loc:T action.add_friend}"
                                                       Click="AddFriend_OnClick" />
                                             <Separator />
-                                            <MenuItem Header="View Profile"
+                                            <MenuItem Header="{loc:T action.view_profile}"
                                                       Click="ViewProfile_OnClick" />
                                         </ContextMenu>
                                     </patterns:LeaderboardPodiumCard.ContextMenu>
@@ -250,10 +250,10 @@
                                                       Click="CopyFriendCode_OnClick" />
                                             <MenuItem Header="{loc:T action.view_mii}"
                                                       Click="OpenCarousel_OnClick" />
-                                            <MenuItem Header="Add Friend"
+                                            <MenuItem Header="{loc:T action.add_friend}"
                                                       Click="AddFriend_OnClick" />
                                             <Separator />
-                                            <MenuItem Header="View Profile"
+                                            <MenuItem Header="{loc:T action.view_profile}"
                                                       Click="ViewProfile_OnClick" />
                                         </ContextMenu>
                                     </patterns:LeaderboardPodiumCard.ContextMenu>
@@ -282,10 +282,10 @@
                                                       Click="CopyFriendCode_OnClick" />
                                             <MenuItem Header="{loc:T action.view_mii}"
                                                       Click="OpenCarousel_OnClick" />
-                                            <MenuItem Header="Add Friend"
+                                            <MenuItem Header="{loc:T action.add_friend}"
                                                       Click="AddFriend_OnClick" />
                                             <Separator />
-                                            <MenuItem Header="View Profile"
+                                            <MenuItem Header="{loc:T action.view_profile}"
                                                       Click="ViewProfile_OnClick" />
                                         </ContextMenu>
                                     </patterns:PlayerListItem.ContextMenu>
