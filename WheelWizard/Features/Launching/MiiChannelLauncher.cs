@@ -1,6 +1,5 @@
 using WheelWizard.Helpers;
 using WheelWizard.Services;
-using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Views.Downloads;
 using WheelWizard.Views.Popups.Generic;
@@ -8,14 +7,18 @@ using WheelWizard.WiiManagement.Controllers;
 
 namespace WheelWizard.Launching;
 
-public sealed class MiiChannelLauncher(IDownloadService downloads, IWiiRemoteConfigurationService wiiRemoteConfiguration)
+public sealed class MiiChannelLauncher(
+    IDownloadService downloads,
+    IWiiRemoteConfigurationService wiiRemoteConfiguration,
+    IDolphinLaunchService dolphinLaunchService
+)
 {
     private static string MiiChannelPath => Path.Combine(PathManager.WheelWizardAppdataPath, "MiiChannel.wad");
 
     public async Task LaunchMiiChannel()
     {
         // Check first so a blocked launch does not enable the virtual Wii Remote.
-        var preflightResult = await DolphinLaunchHelper.PreflightDolphinVersionAsync();
+        var preflightResult = await dolphinLaunchService.PreflightDolphinVersionAsync();
         if (preflightResult.IsFailure)
             return;
 
@@ -44,7 +47,7 @@ public sealed class MiiChannelLauncher(IDownloadService downloads, IWiiRemoteCon
         }
 
         if (miiChannelExists)
-            await DolphinLaunchHelper.LaunchDolphin(
+            await dolphinLaunchService.LaunchDolphin(
                 $"-b {EnvHelper.QuotePath(Path.GetFullPath(MiiChannelPath))}",
                 versionPreflightResult: preflightResult
             );
