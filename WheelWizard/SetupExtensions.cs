@@ -101,6 +101,13 @@ public static class SetupExtensions
         services.AddSingleton<Func<WheelWizard.Views.Layout>>(provider => () => provider.GetRequiredService<WheelWizard.Views.Layout>());
         services.AddSingleton<WheelWizard.Views.IMainWindowService, WheelWizard.Views.MainWindowService>();
         services.AddSingleton<WheelWizard.Views.WindowAppearance>();
+        services.AddSingleton<WheelWizard.ApplicationLifecycle.IApplicationStartup, WheelWizard.ApplicationLifecycle.ApplicationStartup>();
+        services.AddSingleton<
+            WheelWizard.ApplicationLifecycle.IApplicationLiveUpdates,
+            WheelWizard.ApplicationLifecycle.ApplicationLiveUpdates
+        >();
+        services.AddSingleton<WheelWizard.Views.Startup.IDesktopStartup, WheelWizard.Views.Startup.DesktopStartup>();
+        services.AddSingleton<WheelWizard.Views.Startup.IMiiSetupPresentation, WheelWizard.Views.Startup.MiiSetupPresentation>();
         services.AddMods();
         services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();
