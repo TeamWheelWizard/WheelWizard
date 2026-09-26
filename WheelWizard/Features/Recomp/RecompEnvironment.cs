@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using WheelWizard.Services;
+using WheelWizard.Settings;
 
 namespace WheelWizard.Recomp;
 
@@ -54,29 +55,29 @@ public interface IRecompEnvironment
 }
 
 /// <inheritdoc />
-public sealed class RecompEnvironment(IFileSystem fileSystem) : IRecompEnvironment
+public sealed class RecompEnvironment(IFileSystem fileSystem, IRecompPaths paths, ISettingsManager settings) : IRecompEnvironment
 {
-    public string GameFilePath => PathManager.GameFilePath;
+    public string GameFilePath => settings.Get<string>(settings.GAME_LOCATION);
 
-    public string InstallFolderPath => PathManager.RecompInstallFolderPath;
+    public string InstallFolderPath => paths.InstallFolderPath;
 
-    public bool IsPortableInstall => PathManager.IsRecompInstallPortable;
+    public bool IsPortableInstall => paths.IsPortableInstall;
 
-    public string CacheFolderPath => PathManager.RecompCacheFolderPath;
+    public string CacheFolderPath => paths.CacheFolderPath;
 
-    public string UserDataFolderPath => PathManager.RecompUserDataFolderPath;
+    public string UserDataFolderPath => paths.UserDataFolderPath;
 
-    public string PortableMarkerFilePath => PathManager.RecompPortableMarkerFilePath;
+    public string PortableMarkerFilePath => paths.PortableMarkerFilePath;
 
-    public string InstallStateFilePath => PathManager.RecompInstallStateFilePath;
+    public string InstallStateFilePath => paths.InstallStateFilePath;
 
-    public string BackendStateFilePath => PathManager.RecompInstallStateFilePath;
+    public string BackendStateFilePath => paths.InstallStateFilePath;
 
-    public string InstalledSetupFilePath => PathManager.RecompSetupFilePath;
+    public string InstalledSetupFilePath => paths.SetupFilePath;
 
     public string? RetroRewindFolderPath => ExistingFolderOrNull(PathManager.RetroRewind6FolderPath);
 
-    public string NandCopyFolderPath => PathManager.RecompNandCopyFolderPath;
+    public string NandCopyFolderPath => paths.NandCopyFolderPath;
 
     private string? ExistingFolderOrNull(string path)
     {
@@ -88,33 +89,33 @@ public sealed class RecompEnvironment(IFileSystem fileSystem) : IRecompEnvironme
 }
 
 /// <summary>
-/// The Linux layout. The AppImage owns <see cref="PathManager.RecompLinuxBackendFolderPath"/> (products,
+/// The Linux layout. The AppImage owns <see cref="IRecompPaths.LinuxBackendFolderPath"/> (products,
 /// state, Config.toml, workspace); Wheel Wizard's own <c>Recomp</c> folder only holds the download cache,
 /// the installed copy of the AppImage and the state file Wheel Wizard writes about it.
 /// </summary>
-public sealed class RecompLinuxEnvironment(IFileSystem fileSystem) : IRecompEnvironment
+public sealed class RecompLinuxEnvironment(IFileSystem fileSystem, IRecompPaths paths, ISettingsManager settings) : IRecompEnvironment
 {
-    public string GameFilePath => PathManager.GameFilePath;
+    public string GameFilePath => settings.Get<string>(settings.GAME_LOCATION);
 
-    public string InstallFolderPath => PathManager.RecompLinuxBackendFolderPath;
+    public string InstallFolderPath => paths.LinuxBackendFolderPath;
 
     public bool IsPortableInstall => false;
 
-    public string CacheFolderPath => PathManager.RecompCacheFolderPath;
+    public string CacheFolderPath => paths.CacheFolderPath;
 
     // Config.toml, logs and the private NAND all live in the backend folder on Linux.
-    public string UserDataFolderPath => PathManager.RecompLinuxBackendFolderPath;
+    public string UserDataFolderPath => paths.LinuxBackendFolderPath;
 
-    public string PortableMarkerFilePath => PathManager.RecompPortableMarkerFilePath;
+    public string PortableMarkerFilePath => paths.PortableMarkerFilePath;
 
-    public string InstallStateFilePath => PathManager.RecompInstallStateFilePath;
+    public string InstallStateFilePath => paths.InstallStateFilePath;
 
-    public string BackendStateFilePath => PathManager.RecompLinuxBackendStateFilePath;
+    public string BackendStateFilePath => paths.LinuxBackendStateFilePath;
 
-    public string InstalledSetupFilePath => PathManager.RecompSetupFilePath;
+    public string InstalledSetupFilePath => paths.SetupFilePath;
 
     public string? RetroRewindFolderPath =>
         fileSystem.Directory.Exists(PathManager.RetroRewind6FolderPath) ? PathManager.RetroRewind6FolderPath : null;
 
-    public string NandCopyFolderPath => PathManager.RecompNandCopyFolderPath;
+    public string NandCopyFolderPath => paths.NandCopyFolderPath;
 }

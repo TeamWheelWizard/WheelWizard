@@ -59,6 +59,7 @@ public interface IMiiRepositoryService
 public class MiiRepositoryServiceService(
     IFileSystem fileSystem,
     ISettingsManager settings,
+    IRecompPaths recompPaths,
     IRecompDolphinDataService? recompDolphinData = null
 ) : IMiiRepositoryService
 {
@@ -75,7 +76,7 @@ public class MiiRepositoryServiceService(
 
         // Match the launcher's selection, including the runtime's private NAND when no linked
         // NAND is available. A missing copy must never send Mii edits to Dolphin's source NAND.
-        var nandFolder = recompDolphinData?.NandFolderPath ?? PathManager.RecompPrivateNandFolderPath;
+        var nandFolder = recompDolphinData?.NandFolderPath ?? recompPaths.PrivateNandFolderPath;
         return PathManager.GetMiiDbFilePath(nandFolder);
     }
 
