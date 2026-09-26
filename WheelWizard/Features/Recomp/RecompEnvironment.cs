@@ -1,5 +1,5 @@
 using System.IO.Abstractions;
-using WheelWizard.Services;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Settings;
 
 namespace WheelWizard.Recomp;
@@ -55,7 +55,12 @@ public interface IRecompEnvironment
 }
 
 /// <inheritdoc />
-public sealed class RecompEnvironment(IFileSystem fileSystem, IRecompPaths paths, ISettingsManager settings) : IRecompEnvironment
+public sealed class RecompEnvironment(
+    IFileSystem fileSystem,
+    IRecompPaths paths,
+    ISettingsManager settings,
+    ICustomDistributionPaths distributionPaths
+) : IRecompEnvironment
 {
     public string GameFilePath => settings.Get<string>(settings.GAME_LOCATION);
 
@@ -75,7 +80,7 @@ public sealed class RecompEnvironment(IFileSystem fileSystem, IRecompPaths paths
 
     public string InstalledSetupFilePath => paths.SetupFilePath;
 
-    public string? RetroRewindFolderPath => ExistingFolderOrNull(PathManager.RetroRewind6FolderPath);
+    public string? RetroRewindFolderPath => ExistingFolderOrNull(distributionPaths.RetroRewindFolderPath);
 
     public string NandCopyFolderPath => paths.NandCopyFolderPath;
 
@@ -93,7 +98,12 @@ public sealed class RecompEnvironment(IFileSystem fileSystem, IRecompPaths paths
 /// state, Config.toml, workspace); Wheel Wizard's own <c>Recomp</c> folder only holds the download cache,
 /// the installed copy of the AppImage and the state file Wheel Wizard writes about it.
 /// </summary>
-public sealed class RecompLinuxEnvironment(IFileSystem fileSystem, IRecompPaths paths, ISettingsManager settings) : IRecompEnvironment
+public sealed class RecompLinuxEnvironment(
+    IFileSystem fileSystem,
+    IRecompPaths paths,
+    ISettingsManager settings,
+    ICustomDistributionPaths distributionPaths
+) : IRecompEnvironment
 {
     public string GameFilePath => settings.Get<string>(settings.GAME_LOCATION);
 
@@ -115,7 +125,7 @@ public sealed class RecompLinuxEnvironment(IFileSystem fileSystem, IRecompPaths 
     public string InstalledSetupFilePath => paths.SetupFilePath;
 
     public string? RetroRewindFolderPath =>
-        fileSystem.Directory.Exists(PathManager.RetroRewind6FolderPath) ? PathManager.RetroRewind6FolderPath : null;
+        fileSystem.Directory.Exists(distributionPaths.RetroRewindFolderPath) ? distributionPaths.RetroRewindFolderPath : null;
 
     public string NandCopyFolderPath => paths.NandCopyFolderPath;
 }

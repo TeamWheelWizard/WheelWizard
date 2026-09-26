@@ -413,7 +413,7 @@ internal static class SettingsTestUtils
 
     public static ISettingsManager InitializeSettingsRuntime(string userFolderPath, string dolphinLocation = "dolphin-emu")
     {
-        var settings = CreateRuntimeSettingsStub(userFolderPath, dolphinLocation);
+        var settings = CreateSettingsStub(userFolderPath, dolphinLocation);
 #pragma warning disable CS0618
         SettingsRuntime.Initialize(settings);
 #pragma warning restore CS0618
@@ -447,7 +447,7 @@ internal static class SettingsTestUtils
         return exePath;
     }
 
-    private static ISettingsManager CreateRuntimeSettingsStub(string userFolderPath, string dolphinLocation)
+    public static ISettingsManager CreateSettingsStub(string userFolderPath, string dolphinLocation = "dolphin-emu")
     {
         var settings = Substitute.For<ISettingsManager>();
         var userFolderSetting = new WhWzSetting(typeof(string), "UserFolderPath", userFolderPath);
