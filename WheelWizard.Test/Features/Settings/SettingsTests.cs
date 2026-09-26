@@ -289,7 +289,7 @@ public class SettingsLocalizationServiceTests
         settingsManager.WW_LANGUAGE.Returns(languageSetting);
         settingsManager.Get<string>(Arg.Any<Setting>()).Returns(_ => (string)languageSetting.Get());
         var yamlLocalizationService = new EmbeddedYamlLocalizationService();
-        var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
+        using var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
 
         try
         {
@@ -327,7 +327,7 @@ public class SettingsLocalizationServiceTests
         settingsManager.WW_LANGUAGE.Returns(languageSetting);
         settingsManager.Get<string>(Arg.Any<Setting>()).Returns(_ => (string)languageSetting.Get());
         var yamlLocalizationService = new EmbeddedYamlLocalizationService();
-        var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
+        using var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
 
         try
         {
@@ -341,6 +341,14 @@ public class SettingsLocalizationServiceTests
             Assert.Equal("de", CultureInfo.DefaultThreadCurrentUICulture?.TwoLetterISOLanguageName);
             Assert.Equal("de", yamlLocalizationService.CurrentLanguage);
             Assert.Equal("de", LocalizationProvider.Current.CurrentLanguage);
+
+            localizationService.Dispose();
+            languageSetting.Set("fr", skipSave: true);
+            signalBus.Publish(languageSetting);
+
+            Assert.Equal("de", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+            Assert.Equal("de", yamlLocalizationService.CurrentLanguage);
+            Assert.Throws<ObjectDisposedException>(() => localizationService.Initialize());
         }
         finally
         {
