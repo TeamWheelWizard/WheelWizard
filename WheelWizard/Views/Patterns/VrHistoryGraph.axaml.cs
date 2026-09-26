@@ -8,7 +8,7 @@ using WheelWizard.RrRooms;
 
 namespace WheelWizard.Views.Patterns;
 
-public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
+public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
 {
     private const int DefaultHistoryDays = 30;
     private const int lifetimeDays = 999;

@@ -128,6 +128,7 @@ public class Program : IDesignerEntryPoint
             // of the `App` instance! Otherwise, things like logging will not work
             // in `Setup`.
             Setup(serviceProvider);
+            serviceProvider.GetRequiredService<WindowAppearance>().Install(app.Resources);
         });
 
         return builder;

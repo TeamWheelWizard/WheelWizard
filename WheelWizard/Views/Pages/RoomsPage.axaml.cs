@@ -10,7 +10,7 @@ using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
+public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
     private INavigationService Navigation { get; }
 

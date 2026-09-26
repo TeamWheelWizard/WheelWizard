@@ -19,7 +19,7 @@ using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
+public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
     private IPopupFactory Popups { get; } = null!;
 

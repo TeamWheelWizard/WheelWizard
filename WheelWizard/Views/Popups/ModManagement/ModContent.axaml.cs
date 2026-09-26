@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
@@ -12,7 +13,7 @@ namespace WheelWizard.Views.Popups.ModManagement;
 
 public record ModItem(Bitmap FullImageUrl);
 
-public partial class ModContent : UserControlBase
+public partial class ModContent : UserControl
 {
     private IModManager ModManager { get; }
 

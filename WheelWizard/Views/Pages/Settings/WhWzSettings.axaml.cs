@@ -18,8 +18,10 @@ using SettingsButton = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class WhWzSettings : UserControlBase
+public partial class WhWzSettings : UserControl
 {
+    private readonly IMainWindowService _mainWindow;
+
     private sealed record LanguageDropdownItem(string Key, string DisplayName)
     {
         public override string ToString() => DisplayName;
@@ -45,6 +47,7 @@ public partial class WhWzSettings : UserControlBase
     private IApplicationDataLocation ApplicationData { get; }
 
     public WhWzSettings(
+        IMainWindowService mainWindow,
         IFilePickerService filePicker,
         IDolphinPaths dolphinPaths,
         ISettingsManager settingsService,
@@ -61,6 +64,7 @@ public partial class WhWzSettings : UserControlBase
         DolphinSettingsService = dolphinSettingsService;
         DolphinDiscovery = dolphinDiscovery;
         ApplicationData = applicationData;
+        _mainWindow = mainWindow;
         InitializeComponent();
         ConfigureLocationFieldsForActiveFrontend();
         UpdateLocationRows();
@@ -842,7 +846,7 @@ public partial class WhWzSettings : UserControlBase
             LocalizationService.ApplyCurrentLanguage();
             RefreshLanguageDropdown();
             RefreshLocalizedCodeText();
-            ViewUtils.RefreshWindow();
+            _mainWindow.Refresh();
         }
     }
 

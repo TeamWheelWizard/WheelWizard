@@ -8,7 +8,7 @@ using WheelWizard.Views.Storage;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class RecompSettings : UserControlBase
+public partial class RecompSettings : UserControl
 {
     private bool _loading;
 

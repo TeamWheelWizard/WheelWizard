@@ -11,7 +11,6 @@ using WheelWizard.Mods;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Navigation;
@@ -27,15 +26,13 @@ namespace WheelWizard.Views;
 
 public partial class Layout : BaseWindow, IPollingListener
 {
-    [Inject]
-    private INavigationService Navigation { get; set; } = null!;
+    private INavigationService Navigation { get; }
 
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
 
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
-    public static Layout Instance { get; private set; } = null!;
     private const int TesterClicksRequired = 10;
 
     // so this is not really "Secret" its just ment to hold out people who are not meant to be testers
@@ -57,37 +54,45 @@ public partial class Layout : BaseWindow, IPollingListener
     private bool _testerPromptOpen;
     private IDisposable? _settingsSignalSubscription;
 
-    [Inject]
-    private LiveRoomsService LiveRooms { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private LiveStatusService LiveStatus { get; set; } = null!;
+    private LiveStatusService LiveStatus { get; }
 
-    [Inject]
-    private IBrandingSingletonService BrandingService { get; set; } = null!;
+    private IBrandingSingletonService BrandingService { get; }
 
-    [Inject]
-    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private ISettingsSignalBus SettingsSignalBus { get; set; } = null!;
+    private ISettingsSignalBus SettingsSignalBus { get; }
 
-    [Inject]
-    private IModManager ModManagerService { get; set; } = null!;
+    private IModManager ModManagerService { get; }
 
-    public Layout()
+    public Layout(
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        LiveStatusService liveStatus,
+        IBrandingSingletonService brandingService,
+        IGameLicenseSingletonService gameLicenseService,
+        ISettingsManager settingsService,
+        ISettingsSignalBus settingsSignalBus,
+        IModManager modManagerService
+    )
     {
-        Instance = this;
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        LiveStatus = liveStatus;
+        BrandingService = brandingService;
+        GameLicenseService = gameLicenseService;
+        SettingsService = settingsService;
+        SettingsSignalBus = settingsSignalBus;
+        ModManagerService = modManagerService;
         InitializeComponent();
         Navigation.PageChanged += Navigation_OnPageChanged;
         foreach (var button in SidePanelButtons.Children.OfType<SidebarRadioButton>())
             button.NavigationRequested += (_, pageType) => Navigation.NavigateTo(pageType);
         SidebarCurrentUserProfile.ProfileRequested += (_, _) => Navigation.NavigateTo<UserProfilePage>();
         UpdateSidebarProfile();
-        AddLayer();
 
         ClampSavedWindowScaleToCurrentScreen();
         OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);

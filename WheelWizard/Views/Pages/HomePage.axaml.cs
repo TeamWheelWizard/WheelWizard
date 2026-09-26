@@ -10,7 +10,7 @@ using WheelWizard.Views.Components;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class HomePage : UserControlBase
+public partial class HomePage : UserControl
 {
     private HomeViewModel Model { get; }
 

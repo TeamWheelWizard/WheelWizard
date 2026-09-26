@@ -4,27 +4,35 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
-using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Views;
 
 namespace WheelWizard.Views.Popups.Base;
 
 public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 {
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    public static readonly StyledProperty<double> RequestedWindowScaleProperty = AvaloniaProperty.Register<PopupWindow, double>(
+        nameof(RequestedWindowScale),
+        1
+    );
+
+    public double RequestedWindowScale
+    {
+        get => GetValue(RequestedWindowScaleProperty);
+        set => SetValue(RequestedWindowScaleProperty, value);
+    }
 
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
 
     private bool _disableOpening = false;
+    private bool _closed;
 
     public PopupWindow()
     {
         // Constructor is never used, however, UI elements must have a constructor with no params
         InitializeComponent();
+        this.Bind(RequestedWindowScaleProperty, new DynamicResourceExtension(WindowAppearance.ScaleResourceKey));
         DataContext = this;
         Loaded += PopupWindow_Loaded;
     }
@@ -97,7 +105,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
         AllowParentInteraction = allowParentInteraction;
 
         InitializeComponent();
-        AddLayer();
+        this.Bind(RequestedWindowScaleProperty, new DynamicResourceExtension(WindowAppearance.ScaleResourceKey));
         DataContext = this;
 
         var mainWindow = TryGetVisibleMainWindow();
@@ -112,6 +120,16 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
         }
 
         Loaded += PopupWindow_Loaded;
+    }
+
+    public new void Show()
+    {
+        // Parameterless Window.Show clears ownership, so pass the current owner explicitly.
+        var owner = TryGetVisibleMainWindow() ?? Owner as Window;
+        if (owner is { IsVisible: true })
+            base.Show(owner);
+        else
+            base.Show();
     }
 
     private static Window? TryGetVisibleMainWindow()
@@ -138,7 +156,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
     {
         base.OnResized(e);
 
-        if (CompleteBorder == null)
+        if (_closed || CompleteBorder == null)
             return;
 
         CompleteBorder.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
@@ -148,7 +166,9 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
     public void SetWindowSize(Size size)
     {
-        var scaleFactor = ViewUtils.GetUsableWindowScale(SettingsService.Get<double>(SettingsService.WINDOW_SCALE), size, this);
+        if (_closed)
+            return;
+        var scaleFactor = ViewUtils.GetUsableWindowScale(RequestedWindowScale, size, this);
         Width = size.Width * scaleFactor;
         Height = size.Height * scaleFactor;
         CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
@@ -167,8 +187,8 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
     protected override void OnClosed(EventArgs e)
     {
+        _closed = true;
         BeforeClose();
-        RemoveLayer();
 
         base.OnClosed(e);
     }
