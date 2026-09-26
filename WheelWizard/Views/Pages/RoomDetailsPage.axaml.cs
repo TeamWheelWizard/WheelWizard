@@ -8,7 +8,7 @@ using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
@@ -19,7 +19,7 @@ using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
+public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
 {
     [Inject]
     private LiveRoomsService LiveRooms { get; set; } = null!;
@@ -77,7 +77,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         Unloaded += RoomsDetailPage_Unloaded;
     }
 
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
         if (sender is not LiveRoomsService liveRooms)
             return;

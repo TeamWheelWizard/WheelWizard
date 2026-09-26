@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Logging;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.FriendCodes;
@@ -10,7 +11,7 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.RrRooms;
 
-public class LiveRoomsService : RepeatedTaskManager
+public class LiveRoomsService : ObservablePollingService
 {
     private readonly IWhWzDataSingletonService _whWzService;
     private readonly IRrRoomsSingletonService _roomsService;
@@ -28,9 +29,12 @@ public class LiveRoomsService : RepeatedTaskManager
         IRrRoomsSingletonService roomsService,
         IRrLeaderboardSingletonService leaderboardService,
         IGameLicenseSingletonService gameLicenseService,
-        IRoomPresence presence
+        IRoomPresence presence,
+        IPollingScheduler scheduler,
+        TimeProvider timeProvider,
+        ILogger<LiveRoomsService> logger
     )
-        : base(40)
+        : base(40, scheduler, timeProvider, logger)
     {
         _whWzService = whWzService;
         _roomsService = roomsService;
@@ -39,12 +43,14 @@ public class LiveRoomsService : RepeatedTaskManager
         _presence = presence;
     }
 
-    protected override async Task ExecuteTaskAsync()
+    protected override async Task ExecuteTaskAsync(CancellationToken cancellationToken)
     {
         var roomsTask = _roomsService.GetRoomsAsync();
         var leaderboardTask = _leaderboardService.GetTopPlayersAsync(50);
 
-        await Task.WhenAll(roomsTask, leaderboardTask);
+        await Task.WhenAll(roomsTask, leaderboardTask).WaitAsync(cancellationToken);
+        // Stop may run after the request completes but before this continuation.
+        cancellationToken.ThrowIfCancellationRequested();
 
         var roomsResult = roomsTask.Result;
         var leaderboardResult = leaderboardTask.Result;

@@ -13,7 +13,7 @@ using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
@@ -24,7 +24,7 @@ using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.Views;
 
-public partial class Layout : BaseWindow, IRepeatedTaskListener
+public partial class Layout : BaseWindow, IPollingListener
 {
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
@@ -229,7 +229,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         }
     }
 
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
         switch (sender)
         {

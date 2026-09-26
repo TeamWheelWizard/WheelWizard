@@ -6,17 +6,20 @@ using WheelWizard.RrRooms;
 using WheelWizard.Shared;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.Utilities;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Diagnostics;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Popups;
 
-public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
+public partial class DevToolWindow : PopupContent, IPollingListener
 {
+    [Inject]
+    private DevelopmentRefreshService DevelopmentRefresh { get; set; } = null!;
+
     [Inject]
     private LiveRoomsService LiveRooms { get; set; } = null!;
 
@@ -30,22 +33,17 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
         : base(true, true, true, "Dev Tool")
     {
         InitializeComponent();
-        AppStateMonitor.Instance.Subscribe(this);
+        DevelopmentRefresh.Subscribe(this);
         LoadSettings();
     }
 
     protected override void BeforeClose()
     {
-        AppStateMonitor.Instance.Unsubscribe(this);
+        DevelopmentRefresh.Unsubscribe(this);
         base.BeforeClose();
     }
 
-    // Yes, it would absolutely be more optimized to insteadof every x seconds refreshing, to just refresh when something changes
-    // However, We explicitly do it this way, so all code in the codebase can stay unchanged. The idea is that you can remove the AppStateMonitor and everything will still work
-    // This is indeed also possible if you make it if you make everything an observer pattern, where-ever you want to monitor something.
-    // However, the problem with that is that we will everything an observer pattern, but something like the MiiImageManager has no reason
-    // to be an observer pattern besides this, and it would make the codebase more complex for no reason.
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
         RrRefreshTimeLeft.Text = LiveRooms.TimeUntilNextTick.Seconds.ToString();
         MiiImagesCashed.Text = ((MemoryCache)Cache).Count.ToString();

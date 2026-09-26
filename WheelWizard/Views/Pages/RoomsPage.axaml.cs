@@ -5,12 +5,12 @@ using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
+public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
 {
     [Inject]
     private LiveRoomsService LiveRooms { get; set; } = null!;
@@ -51,7 +51,7 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
         Unloaded += RoomsPage_Unloaded;
     }
 
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
         if (sender is not LiveRoomsService liveRooms)
             return;
