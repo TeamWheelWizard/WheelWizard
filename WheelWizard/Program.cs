@@ -4,6 +4,7 @@ using Avalonia.Logging;
 using Serilog;
 using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationIntegration;
+using WheelWizard.ApplicationLifecycle.Logging;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Services;
@@ -25,7 +26,9 @@ public class Program : IDesignerEntryPoint
             new Testably.Abstractions.RealFileSystem(),
             new WheelWizard.Shared.Platform.RuntimeEnvironment()
         );
-        CreateStaticLoggerWithRecovery(applicationData);
+        var logFiles = new ApplicationLogFiles(applicationData, new LogFileFactory(new Testably.Abstractions.RealFileSystem()));
+        Log.Logger = CreateLoggerWithRecovery(applicationData, logFiles);
+        ApplicationLogging.LogStartup(Log.Logger);
         RegisterGlobalExceptionLogging();
 
         try
@@ -33,6 +36,7 @@ public class Program : IDesignerEntryPoint
             // Initialize the Avalonia application
             var services = new ServiceCollection();
             services.AddWheelWizardServices(applicationData);
+            services.AddSingleton(logFiles);
             using var serviceProvider = services.BuildServiceProvider(
                 new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }
             );
@@ -54,16 +58,17 @@ public class Program : IDesignerEntryPoint
     public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
 
     /// <summary>
-    /// Creates the static logger, resetting the application data location once when its logs directory is unusable.
+    /// Creates the logger, resetting the application data location once when its logs directory is unusable.
     /// </summary>
-    private static void CreateStaticLoggerWithRecovery(IApplicationDataLocation applicationData)
+    private static Serilog.Core.Logger CreateLoggerWithRecovery(IApplicationDataLocation applicationData, ApplicationLogFiles logFiles)
     {
         try
         {
-            Logging.CreateStaticLogger(applicationData.DirectoryPath);
+            return ApplicationLogging.CreateLogger(logFiles);
         }
-        catch
+        catch (Exception e)
         {
+            Console.WriteLine(e);
             Console.WriteLine("Resetting the Wheel Wizard directory due to an error");
             var resetWasSuccessful = applicationData.TryReset(out var errorMessage);
             if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -72,7 +77,7 @@ public class Program : IDesignerEntryPoint
                 throw;
 
             // Retry only once, against the location the reset restored.
-            Logging.CreateStaticLogger(applicationData.DirectoryPath);
+            return ApplicationLogging.CreateLogger(logFiles);
         }
     }
 

@@ -3,8 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using Serilog;
 using WheelWizard.ApplicationData;
+using WheelWizard.ApplicationLifecycle.Logging;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Settings;
@@ -21,6 +21,7 @@ namespace WheelWizard.Views.Pages.Settings;
 public partial class WhWzSettings : UserControl
 {
     private readonly IMainWindowService _mainWindow;
+    private readonly IApplicationLogFiles _logFiles;
 
     private sealed record LanguageDropdownItem(string Key, string DisplayName)
     {
@@ -47,6 +48,7 @@ public partial class WhWzSettings : UserControl
     private IApplicationDataLocation ApplicationData { get; }
 
     public WhWzSettings(
+        IApplicationLogFiles logFiles,
         IMainWindowService mainWindow,
         IFilePickerService filePicker,
         IDolphinPaths dolphinPaths,
@@ -65,6 +67,7 @@ public partial class WhWzSettings : UserControl
         DolphinDiscovery = dolphinDiscovery;
         ApplicationData = applicationData;
         _mainWindow = mainWindow;
+        _logFiles = logFiles;
         InitializeComponent();
         ConfigureLocationFieldsForActiveFrontend();
         UpdateLocationRows();
@@ -536,7 +539,7 @@ public partial class WhWzSettings : UserControl
         try
         {
             // Keep logs unchanged until the user has finished deciding whether to revert.
-            Log.CloseAndFlush();
+            using var loggingPause = _logFiles.Pause();
 
             var progressWindow = new ProgressWindow(t("status.data_folder.moving"))
                 .SetExtraText(t("helper_text.wheel_wizard_data_folder"))
@@ -585,15 +588,8 @@ public partial class WhWzSettings : UserControl
         }
         finally
         {
-            try
-            {
-                WheelWizard.Logging.RecreateStaticLogger(ApplicationData.DirectoryPath);
-            }
-            finally
-            {
-                SetAppDataLocationBusyState(false);
-                UpdateAppDataLocationUi();
-            }
+            SetAppDataLocationBusyState(false);
+            UpdateAppDataLocationUi();
         }
     }
 
