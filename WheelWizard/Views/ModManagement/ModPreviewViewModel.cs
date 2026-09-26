@@ -19,7 +19,10 @@ public sealed class ModPreviewViewModel(int modId, IGameBananaSingletonService m
     {
         if (_disposed || modId <= 0 || Image is not null)
             return Task.CompletedTask;
-        return _loading ??= LoadCoreAsync();
+        // Share active requests, but let rebuilt cards retry a completed load that left no image.
+        if (_loading is null || _loading.IsCompleted)
+            _loading = LoadCoreAsync();
+        return _loading;
     }
 
     private async Task LoadCoreAsync()
