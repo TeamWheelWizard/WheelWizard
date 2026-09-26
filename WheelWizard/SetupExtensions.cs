@@ -84,6 +84,12 @@ public static class SetupExtensions
         services.AddSingleton<WheelWizard.Shared.Calendar.ISeasonalCalendar, WheelWizard.Shared.Calendar.SeasonalCalendar>();
         services.AddTransient<WheelWizard.Views.Pages.HomeViewModel>();
         services.AddSingleton<WheelWizard.Views.Pages.IHomePresentation, WheelWizard.Views.Pages.HomePresentation>();
+        services.AddTransient<Func<int, WheelWizard.Views.ModManagement.ModPreviewViewModel>>(provider =>
+        {
+            var mods = provider.GetRequiredService<WheelWizard.GameBanana.IGameBananaSingletonService>();
+            var media = provider.GetRequiredService<WheelWizard.GameBanana.IGameBananaMediaService>();
+            return id => new WheelWizard.Views.ModManagement.ModPreviewViewModel(id, mods, media);
+        });
         services.AddMods();
         services.AddSingleton<IModOperationPresentation, WheelWizard.Views.ModManagement.ModOperationPresentation>();
         services.AddRecomp();
