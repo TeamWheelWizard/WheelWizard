@@ -1,8 +1,10 @@
 using System.IO.Abstractions;
+using Microsoft.Extensions.Logging.Abstractions;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Polling;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
@@ -38,7 +40,10 @@ public class RoomPresenceTests
             Substitute.For<ISaveRegionService>(),
             Substitute.For<IDolphinPaths>(),
             Substitute.For<ICustomDistributionPaths>(),
-            presence
+            presence,
+            Substitute.For<IPollingScheduler>(),
+            TimeProvider.System,
+            NullLogger<GameLicenseSingletonService>.Instance
         );
         var user = new LicenseProfile
         {
@@ -136,8 +141,18 @@ public class RoomPresenceTests
         IRrLeaderboardSingletonService leaderboard,
         IGameLicenseSingletonService licenses,
         IRoomPresence presence
-    ) : LiveRoomsService(data, rooms, leaderboard, licenses, presence)
+    )
+        : LiveRoomsService(
+            data,
+            rooms,
+            leaderboard,
+            licenses,
+            presence,
+            Substitute.For<IPollingScheduler>(),
+            TimeProvider.System,
+            NullLogger<LiveRoomsService>.Instance
+        )
     {
-        public Task Refresh() => ExecuteTaskAsync();
+        public Task Refresh() => ExecuteTaskAsync(CancellationToken.None);
     }
 }

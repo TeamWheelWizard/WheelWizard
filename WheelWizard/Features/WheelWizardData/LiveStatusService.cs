@@ -1,27 +1,32 @@
 using Microsoft.Extensions.Logging;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 
 namespace WheelWizard.WheelWizardData;
 
-public class LiveStatusService : RepeatedTaskManager
+public class LiveStatusService : ObservablePollingService
 {
     private readonly IWhWzDataSingletonService _whWzDataService;
     private readonly ILogger<LiveStatusService> _logger;
 
     public WhWzStatus? Status { get; private set; }
 
-    public LiveStatusService(IWhWzDataSingletonService whWzDataService, ILogger<LiveStatusService> logger)
-        : base(90)
+    public LiveStatusService(
+        IWhWzDataSingletonService whWzDataService,
+        ILogger<LiveStatusService> logger,
+        IPollingScheduler scheduler,
+        TimeProvider timeProvider
+    )
+        : base(90, scheduler, timeProvider, logger)
     {
         _whWzDataService = whWzDataService;
         _logger = logger;
     }
 
-    protected override async Task ExecuteTaskAsync()
+    protected override async Task ExecuteTaskAsync(CancellationToken cancellationToken)
     {
-        var statusResult = await _whWzDataService.GetStatusAsync();
+        var statusResult = await _whWzDataService.GetStatusAsync().WaitAsync(cancellationToken);
 
         if (statusResult.IsSuccess)
         {

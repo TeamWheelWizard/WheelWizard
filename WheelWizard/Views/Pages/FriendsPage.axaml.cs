@@ -8,8 +8,8 @@ using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Shared.Polling;
 using WheelWizard.Shared.Services;
-using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
@@ -21,7 +21,7 @@ using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
+public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
 {
     // Made this static intentionally.
     // I personally don't think its worth saving it as a setting.
@@ -67,7 +67,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         HandleVisibility();
     }
 
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
         if (sender is not GameLicenseSingletonService)
             return;

@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Helpers;
@@ -10,7 +11,7 @@ using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Binary;
 using WheelWizard.Shared.IO;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense.Domain;
@@ -67,8 +68,8 @@ public interface IGameLicenseSingletonService
     /// <summary>
     /// Subscribes a listener to the repeated task manager.
     /// </summary>
-    void Subscribe(IRepeatedTaskListener subscriber);
-    bool Unsubscribe(IRepeatedTaskListener subscriber);
+    void Subscribe(IPollingListener subscriber);
+    bool Unsubscribe(IPollingListener subscriber);
 
     /// <summary>
     /// Changes the Mii for a specific user index.
@@ -86,7 +87,7 @@ public interface IGameLicenseSingletonService
     OperationResult RemoveFriend(int userIndex, string friendCode);
 }
 
-public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSingletonService
+public class GameLicenseSingletonService : ObservablePollingService, IGameLicenseSingletonService
 {
     private readonly IMiiDbService _miiService;
     private readonly IFileSystem _fileSystem;
@@ -109,9 +110,12 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         ISaveRegionService saveRegions,
         IDolphinPaths dolphinPaths,
         ICustomDistributionPaths distributionPaths,
-        IRoomPresence presence
+        IRoomPresence presence,
+        IPollingScheduler scheduler,
+        TimeProvider timeProvider,
+        ILogger<GameLicenseSingletonService> logger
     )
-        : base(40)
+        : base(40, scheduler, timeProvider, logger)
     {
         _miiService = miiService;
         _fileSystem = fileSystem;
@@ -786,7 +790,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         return _fileSystem.WriteAllBytesAtomic(path, _rksysData, "Failed to save rksys.dat.");
     }
 
-    protected override Task ExecuteTaskAsync()
+    protected override Task ExecuteTaskAsync(CancellationToken cancellationToken)
     {
         var result = LoadLicense();
         if (result.IsFailure)
