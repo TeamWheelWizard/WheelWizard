@@ -1,32 +1,42 @@
-﻿using System.Text.Json;
+using System.IO.Abstractions;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Models.RRLaunchModels;
+using WheelWizard.Settings;
 
-namespace WheelWizard.Services.Launcher.Helpers;
+namespace WheelWizard.Launching;
 
-public static class RetroRewindLaunchHelper
+public interface IRetroRewindLaunchDescriptor
 {
-    private static string XmlFilePath => PathManager.XmlFilePath;
-    private static string JsonFilePath => PathManager.RrLaunchJsonFilePath;
+    void GenerateLaunchJson();
+    void GenerateLaunchJson(string xmlFilePath);
+}
 
-    public static void GenerateLaunchJson()
+public sealed class RetroRewindLaunchDescriptor(IFileSystem fileSystem, ISettingsManager settings, ICustomDistributionPaths paths)
+    : IRetroRewindLaunchDescriptor
+{
+    private string XmlFilePath => paths.XmlFilePath;
+    private string JsonFilePath => paths.LaunchJsonFilePath;
+
+    public void GenerateLaunchJson()
     {
         GenerateLaunchJson(XmlFilePath);
     }
 
-    public static void GenerateLaunchJson(string xmlFilePath)
+    public void GenerateLaunchJson(string xmlFilePath)
     {
         var launchInfo = GetLaunchInfo(xmlFilePath);
         GenerateLaunchJson(
             xmlFilePath,
-            PathManager.RiivolutionWhWzFolderPath,
+            paths.RootFolderPath,
             launchInfo.SectionName,
             launchInfo.MyStuffChoice,
             launchInfo.EnableSeparateSave
         );
     }
 
-    private static void GenerateLaunchJson(
+    private void GenerateLaunchJson(
         string xmlFilePath,
         string rootFolderPath,
         string sectionName,
@@ -36,7 +46,7 @@ public static class RetroRewindLaunchHelper
     {
         var launchConfig = new LaunchConfig
         {
-            BaseFile = Path.GetFullPath(PathManager.GameFilePath),
+            BaseFile = fileSystem.Path.GetFullPath(settings.Get<string>(settings.GAME_LOCATION)),
             DisplayName = "RR",
             Riivolution = new()
             {
@@ -45,8 +55,8 @@ public static class RetroRewindLaunchHelper
                     new()
                     {
                         Options = BuildOptions(sectionName, myStuffChoice, enableSeparateSave).ToArray(),
-                        Root = Path.GetFullPath(rootFolderPath),
-                        Xml = Path.GetFullPath(xmlFilePath),
+                        Root = fileSystem.Path.GetFullPath(rootFolderPath),
+                        Xml = fileSystem.Path.GetFullPath(xmlFilePath),
                     },
                 ],
             },
@@ -64,7 +74,7 @@ public static class RetroRewindLaunchHelper
             }
         );
 
-        File.WriteAllText(JsonFilePath, jsonString);
+        fileSystem.File.WriteAllText(JsonFilePath, jsonString);
     }
 
     private static List<OptionConfig> BuildOptions(string sectionName, int myStuffChoice, bool enableSeparateSave)
