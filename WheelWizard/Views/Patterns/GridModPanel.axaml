@@ -14,9 +14,9 @@
             <!-- Image area -->
             <Border Background="{StaticResource Neutral700}" ClipToBounds="True">
                 <Panel>
-                    <Image x:Name="ModImage" Stretch="UniformToFill" />
+                    <Image Source="{Binding Preview.Image}" Stretch="UniformToFill" />
                     <!-- Placeholder icon when no image is loaded -->
-                    <PathIcon x:Name="PlaceholderIcon"
+                    <PathIcon IsVisible="{Binding Preview.ShowPlaceholder}"
                               Data="{StaticResource CubesStacked}"
                               Width="36" Height="36"
                               Foreground="{StaticResource Neutral500}"
