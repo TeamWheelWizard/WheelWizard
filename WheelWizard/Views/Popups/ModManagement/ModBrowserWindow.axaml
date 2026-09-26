@@ -50,7 +50,7 @@
                                                        ViewCount="{Binding Mod.ViewCount}"
                                                        LikeCount="{Binding Mod.LikeCount}"
                                                        UsesPatches="{Binding Mod.UsesPatches}"
-                                                       ImageUrl="{Binding PreviewImageUrl}"
+                                                       Preview="{Binding Preview}"
                                                         />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
