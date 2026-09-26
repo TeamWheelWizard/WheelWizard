@@ -49,6 +49,8 @@ public class LiveRoomsService : ObservablePollingService
         var leaderboardTask = _leaderboardService.GetTopPlayersAsync(50);
 
         await Task.WhenAll(roomsTask, leaderboardTask).WaitAsync(cancellationToken);
+        // Stop may run after the request completes but before this continuation.
+        cancellationToken.ThrowIfCancellationRequested();
 
         var roomsResult = roomsTask.Result;
         var leaderboardResult = leaderboardTask.Result;

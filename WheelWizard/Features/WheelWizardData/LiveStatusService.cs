@@ -27,6 +27,8 @@ public class LiveStatusService : ObservablePollingService
     protected override async Task ExecuteTaskAsync(CancellationToken cancellationToken)
     {
         var statusResult = await _whWzDataService.GetStatusAsync().WaitAsync(cancellationToken);
+        // Stop may run after the request completes but before this continuation.
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (statusResult.IsSuccess)
         {
