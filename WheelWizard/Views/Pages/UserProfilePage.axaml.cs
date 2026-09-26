@@ -1,5 +1,7 @@
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -12,6 +14,7 @@ using WheelWizard.Settings.Types;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Navigation;
+using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
@@ -123,6 +126,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private int FocusedUser => SettingsService.Get<int>(SettingsService.FOCUSED_USER);
 
     public UserProfilePage(
+        VrHistoryGraph historyGraph,
         ICustomCharactersService customCharacters,
         INavigationService navigation,
         LiveRoomsService liveRooms,
@@ -144,6 +148,8 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         SaveRegions = saveRegions;
         DistributionPaths = distributionPaths;
         InitializeComponent();
+        HistoryHost.Content = historyGraph;
+        historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("CurrentFriendCode") { Source = this });
         ResetMiiTopBar();
         ViewMii(FocusedUser);
         PopulateRegions();
