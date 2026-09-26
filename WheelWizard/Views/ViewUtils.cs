@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+using Avalonia.Threading;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings.Types;
 using WheelWizard.Utilities.RepeatedTasks;
@@ -23,6 +24,17 @@ public static class ViewUtils
     {
         Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
         ShowSnackbar("Opened link");
+    }
+
+    public static void CloseApplication()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.Shutdown();
+            }
+        });
     }
 
     public static void ShowSnackbar(string message, SnackbarType type = SnackbarType.Success) => GetLayout().ShowSnackbar(message, type);

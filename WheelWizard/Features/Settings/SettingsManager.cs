@@ -196,6 +196,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         GAME_LOCATION = RegisterWhWz("GameLocation", "", value => _fileSystem.File.Exists(value as string ?? string.Empty));
         FORCE_WIIMOTE = RegisterWhWz("ForceWiimote", false);
         LAUNCH_WITH_DOLPHIN = RegisterWhWz("LaunchWithDolphin", false);
+        CLOSE_ON_GAME_LAUNCH = RegisterWhWz("CloseOnGameLaunch", false);
         LAUNCH_RR_ON_STARTUP = RegisterWhWz("LaunchRrOnStartup", false);
         PREFERS_MODS_ROW_VIEW = RegisterWhWz("PrefersModsRowView", true);
         USE_PATCHES_SYSTEM = RegisterWhWz("UsePatchesSystem", false);
@@ -301,6 +302,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     public Setting GAME_LOCATION { get; }
     public Setting FORCE_WIIMOTE { get; }
     public Setting LAUNCH_WITH_DOLPHIN { get; }
+    public Setting CLOSE_ON_GAME_LAUNCH { get; }
     public Setting LAUNCH_RR_ON_STARTUP { get; }
     public Setting ENABLE_RECOMP { get; }
     public Setting RECOMP_USE_DOLPHIN_DATA { get; }

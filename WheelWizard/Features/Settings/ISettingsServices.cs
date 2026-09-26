@@ -38,6 +38,7 @@ public interface ISettingsProperties
     Setting GAME_LOCATION { get; }
     Setting FORCE_WIIMOTE { get; }
     Setting LAUNCH_WITH_DOLPHIN { get; }
+    Setting CLOSE_ON_GAME_LAUNCH { get; }
     Setting LAUNCH_RR_ON_STARTUP { get; }
     Setting ENABLE_RECOMP { get; }
     Setting RECOMP_USE_DOLPHIN_DATA { get; }

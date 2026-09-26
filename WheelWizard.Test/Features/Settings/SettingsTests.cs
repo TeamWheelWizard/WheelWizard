@@ -74,6 +74,22 @@ public class SettingsManagerTests
     }
 
     [Fact]
+    public void CloseOnGameLaunch_DefaultsToFalse_AndCanBeToggled()
+    {
+        var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
+
+        Assert.False(manager.Get<bool>(manager.CLOSE_ON_GAME_LAUNCH));
+
+        var setToTrue = manager.Set(manager.CLOSE_ON_GAME_LAUNCH, true, skipSave: true);
+        Assert.True(setToTrue);
+        Assert.True(manager.Get<bool>(manager.CLOSE_ON_GAME_LAUNCH));
+
+        var setToFalse = manager.Set(manager.CLOSE_ON_GAME_LAUNCH, false, skipSave: true);
+        Assert.True(setToFalse);
+        Assert.False(manager.Get<bool>(manager.CLOSE_ON_GAME_LAUNCH));
+    }
+
+    [Fact]
     public void ValidateCorePathSettings_ReturnsAllExpectedIssues_WhenDefaultsAreInvalid()
     {
         var manager = CreateManager(new RealFileSystem(), out _, out _, out _);
