@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Shared.Calendar;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.MiiImages;
@@ -16,6 +17,7 @@ public interface IMiiImagesSingletonService
 public class MiiImagesSingletonService : IMiiImagesSingletonService, IDisposable
 {
     private const long ImageCacheSizeLimitBytes = 64L * 1024L * 1024L;
+    private readonly ISeasonalCalendar _calendar;
     private readonly IMiiNativeRenderer _nativeRenderer;
     private readonly ILogger<MiiImagesSingletonService> _logger;
     private readonly MemoryCache _imageCache = new(
@@ -25,10 +27,15 @@ public class MiiImagesSingletonService : IMiiImagesSingletonService, IDisposable
     // Track in-flight requests to prevent duplicate renders.
     private readonly ConcurrentDictionary<string, Task<OperationResult<Bitmap>>> _inFlightRequests = new();
 
-    public MiiImagesSingletonService(IMiiNativeRenderer nativeRenderer, ILogger<MiiImagesSingletonService> logger)
+    public MiiImagesSingletonService(
+        IMiiNativeRenderer nativeRenderer,
+        ILogger<MiiImagesSingletonService> logger,
+        ISeasonalCalendar calendar
+    )
     {
         _nativeRenderer = nativeRenderer;
         _logger = logger;
+        _calendar = calendar;
     }
 
     public async Task<OperationResult<Bitmap>> GetImageAsync(Mii? mii, MiiImageSpecifications specifications)
@@ -36,7 +43,7 @@ public class MiiImagesSingletonService : IMiiImagesSingletonService, IDisposable
         if (mii == null)
             return Fail("Mii cannot be null.");
 
-        var data = MiiStudioDataSerializer.Serialize(mii);
+        var data = MiiStudioDataSerializer.Serialize(mii, _calendar.IsAprilFirst);
         if (data.IsFailure)
         {
             _logger.LogWarning(

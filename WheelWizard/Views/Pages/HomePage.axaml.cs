@@ -1,114 +1,70 @@
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Threading;
 using Testably.Abstractions;
-using WheelWizard.Launching;
 using WheelWizard.Models.Enums;
-using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.Utilities;
 using WheelWizard.Views.Components;
-using WheelWizard.Views.Popups.Generic;
-using Button = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Pages;
 
 public partial class HomePage : UserControlBase
 {
-    private static readonly bool IsAprilFirst = AprilFirstHelper.IsAprilFirstLocalOrBst();
-    private static readonly (string MainText, string ExtraText, string YesText, string NoText)[] AprilFirstLaunchPrompts =
-    [
-        ("You wanna start the game?", "This feels suspiciously productive.", "Yeah", "Nah"),
-        ("Eeeeh not feeling like it", "Try asking a little nicer next time.", "Please", "Whatever"),
-        ("Launch Retro Beefbai?", "I am consulting the ancient wheel.", "Do it", "Nope"),
-        ("You again?", "The game is pretending not to notice you.", "Open it", "Leave it"),
-        ("Starting the game already?", "That was fast. Almost too fast.", "Fine", "Hold on"),
-    ];
-
     [Inject]
-    private IDolphinLaunchService DolphinLaunchService { get; set; } = null!;
-
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
-
-    [Inject]
-    private ILauncherProvider LauncherProvider { get; set; } = null!;
+    private HomeViewModel Model { get; set; } = null!;
 
     [Inject]
     private IRandomSystem RandomSystem { get; set; } = null!;
 
-    private ILauncher CurrentLauncher => _launcherTypes[_launcherIndex];
-    private int _launcherIndex; // Make sure this index never goes over the list index
-
-    private readonly WheelTrail[] _trails; // also used as a lock
+    private readonly WheelTrail[] _trails;
     private WheelTrailState _currentTrailState = WheelTrailState.Static_None;
-
-    private readonly List<ILauncher> _launcherTypes = [];
-
-    private WheelWizardStatus _status;
-    private MainButtonState CurrentButtonState => GetButtonState(_status);
-
-    private MainButtonState GetButtonState(WheelWizardStatus status) =>
-        status switch
-        {
-            WheelWizardStatus.Loading => new(t("state.loading"), Button.ButtonsVariantType.Default, "Spinner", null, false),
-            WheelWizardStatus.NoServer => new(t("state.no_server"), Button.ButtonsVariantType.Danger, "RoadError", null, true),
-            WheelWizardStatus.NoServerButInstalled => new(
-                t("action.play_offline"),
-                Button.ButtonsVariantType.Warning,
-                "Play",
-                LaunchGame,
-                true
-            ),
-            WheelWizardStatus.NoDolphin => new(
-                "Dolphin not setup",
-                Button.ButtonsVariantType.Warning,
-                "Settings",
-                NavigateToSettings,
-                false
-            ),
-            WheelWizardStatus.ConfigNotFinished => new(
-                t("state.config_not_finished"),
-                Button.ButtonsVariantType.Warning,
-                "Settings",
-                NavigateToSettings,
-                true
-            ),
-            WheelWizardStatus.NotInstalled => new(t("action.install"), Button.ButtonsVariantType.Warning, "Download", Download, true),
-            WheelWizardStatus.OutOfDate => new(t("action.update"), Button.ButtonsVariantType.Warning, "Download", Update, true),
-            WheelWizardStatus.Ready => new(t("action.play"), Button.ButtonsVariantType.Primary, "Play", LaunchGame, true),
-            _ => new(t("state.loading"), Button.ButtonsVariantType.Default, "Spinner", null, false),
-        };
+    private bool _isAttached;
 
     public HomePage()
     {
         InitializeComponent();
-
-        // The trails double as the animation lock, so they have to exist before anything that can
-        // reach an animation runs. UpdatePage() ends in a status read that is allowed to complete
-        // synchronously (a launcher that already knows it is Ready never yields), and a synchronous
-        // Ready draws the button and starts the entrance animation inside this constructor.
         _trails = [HomeTrail1, HomeTrail2, HomeTrail3, HomeTrail4, HomeTrail5];
         RandomSystem.Random.Shared.Shuffle(_trails);
-
-        _launcherTypes.Add(LauncherProvider.GetActiveLauncher());
-        if (SettingsService.IsRecompModeActive())
-            DolphinButton.IsVisible = false;
-        else
+        DataContext = Model;
+        if (Model.IsDolphinVisible)
             ApplyDolphinTrailColors();
-        PopulateGameModeDropdown();
-        UpdatePage();
     }
 
-    /// <summary>
-    /// The wheel trails tell you what Play will start: blue for a Dolphin session, and the default
-    /// primary color for WiiCompiled. The XAML defaults are the WiiCompiled palette, so only the
-    /// Dolphin frontend recolors anything.
-    /// </summary>
+    protected override async void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _isAttached = true;
+        Model.PropertyChanged += Model_OnPropertyChanged;
+        Model.MainActionStarted += Model_OnMainActionStarted;
+        await Model.RefreshAsync();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _isAttached = false;
+        Model.PropertyChanged -= Model_OnPropertyChanged;
+        Model.MainActionStarted -= Model_OnMainActionStarted;
+        Model.Dispose();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void Model_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (this.FindResource(Model.IconName) is Geometry geometry)
+            PlayButton.IconData = geometry;
+        if (Model.Status == WheelWizardStatus.Ready && !Model.IsBusy)
+            PlayEntranceAnimation();
+    }
+
+    private void Model_OnMainActionStarted(object? sender, EventArgs e) => PlayActivateAnimation();
+
+    private async void PlayButton_Click(object? sender, RoutedEventArgs e) => await Model.ExecuteMainAsync();
+
+    private async void DolphinButton_OnClick(object? sender, RoutedEventArgs e) => await Model.LaunchDolphinAsync();
+
     private void ApplyDolphinTrailColors()
     {
         RecolorTrail(HomeTrail1, "Blue400", "Blue700");
@@ -126,140 +82,6 @@ public partial class HomePage : UserControlBase
             trail.Foreground = new SolidColorBrush(foreground);
     }
 
-    private void UpdatePage()
-    {
-        GameTitle.Text = CurrentLauncher.GameTitle == "Retro Rewind" && IsAprilFirst ? "Retro Beefbai" : CurrentLauncher.GameTitle;
-        UpdateActionButton();
-    }
-
-    private async void DolphinButton_OnClick(object? sender, RoutedEventArgs e)
-    {
-        await DolphinLaunchService.LaunchDolphin();
-        DisableAllButtonsTemporarily();
-    }
-
-    private async void LaunchGame()
-    {
-        var launchResult = await CurrentLauncher.Launch();
-        if (launchResult.IsFailure)
-            MessageTranslationHelper.ShowMessage(launchResult.Error);
-    }
-
-    private bool ShouldShowAprilFirstLaunchPrompts() =>
-        IsAprilFirst && _status is WheelWizardStatus.Ready or WheelWizardStatus.NoServerButInstalled;
-
-    private async Task ShowAprilFirstLaunchPromptsAsync()
-    {
-        var promptPool = ((string MainText, string ExtraText, string YesText, string NoText)[])AprilFirstLaunchPrompts.Clone();
-        RandomSystem.Random.Shared.Shuffle(promptPool);
-
-        for (var i = 0; i < 4; i++)
-        {
-            var prompt = promptPool[i];
-            await new YesNoWindow()
-                .SetMainText(prompt.MainText)
-                .SetExtraText(prompt.ExtraText)
-                .SetButtonText(prompt.YesText, prompt.NoText)
-                .AwaitAnswer();
-        }
-    }
-
-    private void NavigateToSettings() => NavigationManager.NavigateTo<SettingsPage>();
-
-    private async void Download()
-    {
-        ViewUtils.GetLayout().SetInteractable(false);
-        var installResult = await CurrentLauncher.Install();
-        ViewUtils.GetLayout().SetInteractable(true);
-        if (installResult.IsFailure)
-            MessageTranslationHelper.ShowMessage(installResult.Error);
-        NavigationManager.NavigateTo<HomePage>();
-    }
-
-    private async void Update()
-    {
-        ViewUtils.GetLayout().SetInteractable(false);
-        var updateResult = await CurrentLauncher.Update();
-        ViewUtils.GetLayout().SetInteractable(true);
-        if (updateResult.IsFailure)
-            MessageTranslationHelper.ShowMessage(updateResult.Error);
-        NavigationManager.NavigateTo<HomePage>();
-    }
-
-    private async void PlayButton_Click(object? sender, RoutedEventArgs e)
-    {
-        if (CurrentButtonState?.OnClick == null)
-            return;
-
-        if (ShouldShowAprilFirstLaunchPrompts())
-            await ShowAprilFirstLaunchPromptsAsync();
-
-        CurrentButtonState.OnClick.Invoke();
-        PlayActivateAnimation();
-        UpdateActionButton();
-        DisableAllButtonsTemporarily();
-    }
-
-    private void GameModeDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        _launcherIndex = GameModeDropdown.SelectedIndex;
-        UpdatePage();
-    }
-
-    private void PopulateGameModeDropdown()
-    {
-        // If there is only 1 option, we don't want to confuse the player with that option
-        GameModeOption.IsVisible = _launcherTypes.Count > 1;
-        if (!GameModeOption.IsVisible)
-            return;
-
-        foreach (var launcherType in _launcherTypes)
-        {
-            if (launcherType.GameTitle == "Retro Rewind" && IsAprilFirst)
-                GameModeDropdown.Items.Add("Retro Beefbai");
-            else
-                GameModeDropdown.Items.Add(launcherType.GameTitle);
-        }
-
-        GameModeDropdown.SelectedIndex = _launcherIndex;
-    }
-
-    private async void UpdateActionButton()
-    {
-        _status = WheelWizardStatus.Loading;
-        SetButtonState(CurrentButtonState);
-        _status = await CurrentLauncher.GetCurrentStatus();
-        SetButtonState(CurrentButtonState);
-    }
-
-    private void DisableAllButtonsTemporarily()
-    {
-        CompleteGrid.IsEnabled = false;
-        //wait 5 seconds before re-enabling the buttons
-        Task.Delay(2000)
-            .ContinueWith(_ =>
-            {
-                Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    SetButtonState(CurrentButtonState);
-                    return CompleteGrid.IsEnabled = true;
-                });
-            });
-    }
-
-    private void SetButtonState(MainButtonState state)
-    {
-        PlayButton.Text = state.Text;
-        PlayButton.Variant = state.Type;
-        PlayButton.IsEnabled = state.OnClick != null;
-        if (Application.Current != null && Application.Current.FindResource(state.IconName) is Geometry geometry)
-            PlayButton.IconData = geometry;
-        DolphinButton.IsEnabled = state.SubButtonsEnabled && SettingsService.PathsSetupCorrectly();
-
-        if (_status == WheelWizardStatus.Ready)
-            PlayEntranceAnimation();
-    }
-
     #region WheelTrail Animations
     // --------------------------
     // IMPORTANT
@@ -274,7 +96,7 @@ public partial class HomePage : UserControlBase
         // If the animations are disabled, it will never play the entrance animation
         // The entrance animation is also the only one that makes the wheels visible, meaning hat if this one does not play
         // all the other animations are all also impossible to play
-        if (!SettingsService.Get<bool>(SettingsService.ENABLE_ANIMATIONS))
+        if (!Model.AnimationsEnabled)
             return;
 
         var allowedToRun = WaitForWheelTrailState(
@@ -287,6 +109,8 @@ public partial class HomePage : UserControlBase
 
         foreach (var t in _trails)
         {
+            if (!_isAttached)
+                return;
             t.Classes.Add("EntranceTrail");
             await Task.Delay(80);
         }
@@ -294,6 +118,8 @@ public partial class HomePage : UserControlBase
         await Task.Delay(600);
         foreach (var t in _trails)
         {
+            if (!_isAttached)
+                return;
             t.Classes.Remove("EntranceTrail");
         }
 
@@ -305,7 +131,7 @@ public partial class HomePage : UserControlBase
 
     private async void PlayActivateAnimation()
     {
-        if (!SettingsService.Get<bool>(SettingsService.ENABLE_ANIMATIONS))
+        if (!Model.AnimationsEnabled)
             return;
 
         var allowedToRun = WaitForWheelTrailState(
@@ -324,6 +150,8 @@ public partial class HomePage : UserControlBase
 
         foreach (var t in _trails)
         {
+            if (!_isAttached)
+                return;
             t.Classes.Clear();
             if (oldState == WheelTrailState.Static_Hover)
                 t.Classes.Add("ActivateTrailFromHover");
@@ -335,6 +163,8 @@ public partial class HomePage : UserControlBase
         await Task.Delay(1000);
         foreach (var t in _trails)
         {
+            if (!_isAttached)
+                return;
             t.Classes.Remove("ActivateTrailFromIdle");
             t.Classes.Remove("ActivateTrailFromHover");
             await Task.Delay(40);
@@ -358,6 +188,8 @@ public partial class HomePage : UserControlBase
 
         foreach (var t in _trails)
         {
+            if (!_isAttached)
+                return;
             // Making sure that if after these seconds the state changed ,that it will not apply the class anymore
             lock (_trails)
             {
@@ -391,6 +223,8 @@ public partial class HomePage : UserControlBase
 
         foreach (var t in _trails)
         {
+            if (!_isAttached)
+                return;
             lock (_trails)
             {
                 if (_currentTrailState is not WheelTrailState.Playing_HoverExit)
@@ -435,6 +269,8 @@ public partial class HomePage : UserControlBase
 
         while (!accepted)
         {
+            if (!_isAttached)
+                return null;
             await Task.Delay(20);
             bool abort;
             lock (_trails)
@@ -471,16 +307,4 @@ public partial class HomePage : UserControlBase
     }
 
     #endregion
-
-    public class MainButtonState
-    {
-        public MainButtonState(string text, Button.ButtonsVariantType type, string iconName, Action? onClick, bool subButtonsEnables) =>
-            (Text, Type, IconName, OnClick, SubButtonsEnabled) = (text, type, iconName, onClick, subButtonsEnables);
-
-        public string Text { get; set; }
-        public Button.ButtonsVariantType Type { get; set; }
-        public string IconName { get; set; }
-        public Action? OnClick { get; set; }
-        public bool SubButtonsEnabled { get; set; }
-    }
 }
