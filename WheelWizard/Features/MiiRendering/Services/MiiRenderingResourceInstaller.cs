@@ -12,6 +12,7 @@ public sealed class MiiRenderingResourceInstaller(
     IMiiRenderingResourceLocator resourceLocator,
     IFileSystem fileSystem,
     MiiRenderingConfiguration configuration,
+    IMiiRenderingPaths paths,
     ILogger<MiiRenderingResourceInstaller> logger
 ) : IMiiRenderingResourceInstaller
 {
@@ -19,7 +20,7 @@ public sealed class MiiRenderingResourceInstaller(
     private const string TemporaryExtractedFileName = "FFLResHigh.dat.partial";
     private const int MaxDownloadAttempts = 3;
 
-    public string ManagedResourcePath => configuration.ManagedResourcePath;
+    public string ManagedResourcePath => paths.ManagedResourcePath;
 
     public OperationResult<string> GetResolvedResourcePath() => resourceLocator.GetFflResourcePath();
 
@@ -49,7 +50,8 @@ public sealed class MiiRenderingResourceInstaller(
         CancellationToken cancellationToken
     )
     {
-        var targetDirectory = fileSystem.Path.GetDirectoryName(configuration.ManagedResourcePath);
+        var targetPath = paths.ManagedResourcePath;
+        var targetDirectory = fileSystem.Path.GetDirectoryName(targetPath);
         if (string.IsNullOrWhiteSpace(targetDirectory))
             return Fail("Unable to determine the Mii rendering resource folder.");
 
@@ -71,10 +73,10 @@ public sealed class MiiRenderingResourceInstaller(
                 return validationResult.Error!;
 
             progress?.Report(new("Finalizing install", archiveBuffer.Length, archiveBuffer.Length));
-            fileSystem.File.Move(temporaryExtractedPath, configuration.ManagedResourcePath, overwrite: true);
+            fileSystem.File.Move(temporaryExtractedPath, targetPath, overwrite: true);
 
-            logger.LogInformation("Installed Mii rendering resource to {ResourcePath}", configuration.ManagedResourcePath);
-            return configuration.ManagedResourcePath;
+            logger.LogInformation("Installed Mii rendering resource to {ResourcePath}", targetPath);
+            return targetPath;
         }
         finally
         {
