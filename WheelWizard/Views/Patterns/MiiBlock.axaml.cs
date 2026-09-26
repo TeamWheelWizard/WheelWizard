@@ -44,7 +44,7 @@ public class MiiBlock : RadioButton
     public bool IsGlobal
     {
         get => GetValue(IsGlobalProperty);
-        private set => SetValue(IsGlobalProperty, value);
+        set => SetValue(IsGlobalProperty, value);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -87,7 +87,6 @@ public class MiiBlock : RadioButton
             var mii = change.GetNewValue<Mii?>();
             MiiName = mii?.Name.ToString();
             IsFavorite = mii?.IsFavorite ?? false;
-            IsGlobal = mii?.IsGlobal() ?? false;
 
             // Ensure hover variant is set when Mii changes
             if (_miiImageLoader != null)
