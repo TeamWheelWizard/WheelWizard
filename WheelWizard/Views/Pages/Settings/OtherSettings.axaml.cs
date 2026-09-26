@@ -1,7 +1,6 @@
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Recomp;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;

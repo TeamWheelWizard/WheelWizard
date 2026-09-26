@@ -12,12 +12,12 @@ using WheelWizard.Features.Archives;
 using WheelWizard.Features.Patches;
 using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
+using WheelWizard.Launching;
 using WheelWizard.Localization;
 using WheelWizard.MiiImages;
 using WheelWizard.Mods;
 using WheelWizard.Recomp;
 using WheelWizard.RrRooms;
-using WheelWizard.Services.Launcher;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.IO;
@@ -64,7 +64,6 @@ public static class SetupExtensions
         services.AddSingleton<WheelWizard.Launching.IDolphinLaunchService, WheelWizard.Launching.DolphinLaunchService>();
         services.AddSingleton<WheelWizard.Launching.IDolphinLaunchPresentation, WheelWizard.Views.Launching.DolphinLaunchPresentation>();
         services.AddDownloads();
-        services.AddTransient<WheelWizard.Launching.MiiChannelLauncher>();
         services.AddLocalization();
         services.AddSettings();
         services.AddCustomCharacters();
@@ -105,6 +104,11 @@ public static class SetupExtensions
 
         // Dynamic API calls
         services.AddTransient(typeof(IApiCaller<>), typeof(ApiCaller<>));
+        services.AddSingleton<IRetroRewindLaunchService, RetroRewindLaunchService>();
+        services.AddSingleton<ILaunchPrompts, WheelWizard.Views.Launching.LaunchPrompts>();
+        services.AddSingleton<IDistributionOperationPresentation, WheelWizard.Views.Distributions.DistributionOperationPresentation>();
+        services.AddSingleton<Func<RrLauncher>>(provider => () => provider.GetRequiredService<RrLauncher>());
+        services.AddSingleton<Func<RecompLauncher?>>(provider => () => provider.GetService<RecompLauncher>());
         services.AddTransient<RrLauncher>();
         services.AddTransient<RrBetaLauncher>();
         services.AddSingleton<ILauncherProvider, LauncherProvider>();
