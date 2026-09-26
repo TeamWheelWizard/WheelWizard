@@ -11,6 +11,7 @@ using WheelWizard.Settings;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Patterns;
+using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.Views.Storage;
@@ -22,6 +23,8 @@ namespace WheelWizard.Views.Pages;
 
 public partial class MiiListPage : UserControlBase
 {
+    private IPopupFactory Popups { get; }
+
     public ObservableCollection<MiiListRow> MiiRows { get; } = [];
     private readonly List<MiiListEntry> _miiEntries = [];
 
@@ -40,6 +43,7 @@ public partial class MiiListPage : UserControlBase
     private ISettingsManager SettingsService { get; }
 
     public MiiListPage(
+        IPopupFactory popups,
         IFilePickerService filePicker,
         ICustomCharactersService customCharactersService,
         IMiiDbService miiDbService,
@@ -49,6 +53,7 @@ public partial class MiiListPage : UserControlBase
         ISettingsManager settingsService
     )
     {
+        Popups = popups;
         FilePicker = filePicker;
         CustomCharactersService = customCharactersService;
         MiiDbService = miiDbService;
@@ -403,7 +408,7 @@ public partial class MiiListPage : UserControlBase
 
     private async void EditMii(Mii mii)
     {
-        var window = new MiiEditorWindow().SetMii(mii);
+        var window = Popups.Create<MiiEditorWindow>().SetMii(mii);
         var save = await window.AwaitAnswer();
         if (!save)
             return;
@@ -429,7 +434,7 @@ public partial class MiiListPage : UserControlBase
         if (mii == null)
             return;
 
-        var window = new MiiEditorWindow().SetMii(mii);
+        var window = Popups.Create<MiiEditorWindow>().SetMii(mii);
         var save = await window.AwaitAnswer();
         if (!save)
             return;

@@ -3,7 +3,6 @@ using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
 using WheelWizard.Mods;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Downloads;
@@ -15,30 +14,37 @@ public record ModItem(Bitmap FullImageUrl);
 
 public partial class ModContent : UserControlBase
 {
-    [Inject]
-    private IModOperationPresentation ModPresentation { get; set; } = null!;
+    private IModManager ModManager { get; }
 
-    [Inject]
-    private IModPaths ModPaths { get; set; } = null!;
+    private IGameBananaSingletonService GameBananaService { get; }
 
-    [Inject]
-    private IGameBananaMediaService Media { get; set; } = null!;
+    private IDownloadService Downloads { get; }
 
-	[Inject]
-    private IDownloadService downloads { get; set; } = null!;
+    private IGameBananaMediaService Media { get; }
+
+    private IModPaths ModPaths { get; }
+
+    private IModOperationPresentation ModPresentation { get; }
 
     private bool loadingVisual;
     private GameBananaModDetails? CurrentMod { get; set; }
     private string? OverrideDownloadUrl { get; set; }
 
-    [Inject]
-    private IGameBananaSingletonService GameBananaService { get; set; } = null!;
-
-    [Inject]
-    private IModManager ModManager { get; set; } = null!;
-
-    public ModContent()
+    public ModContent(
+        IModManager modManager,
+        IGameBananaSingletonService gameBananaService,
+        IDownloadService downloads,
+        IGameBananaMediaService media,
+        IModPaths modPaths,
+        IModOperationPresentation modPresentation
+    )
     {
+        ModManager = modManager;
+        GameBananaService = gameBananaService;
+        Downloads = downloads;
+        Media = media;
+        ModPaths = modPaths;
+        ModPresentation = modPresentation;
         InitializeComponent();
         ResetVisibility();
         UnInstallButton.IsVisible = false;
@@ -331,7 +337,7 @@ public partial class ModContent : UserControlBase
     {
         try
         {
-            return await downloads.DownloadToLocationAsync(url, filePath, progressWindow);
+            return await Downloads.DownloadToLocationAsync(url, filePath, progressWindow);
         }
         catch (Exception ex)
         {

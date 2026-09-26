@@ -204,7 +204,7 @@ public class App : Application
             var resourceInstaller = Services.GetRequiredService<IMiiRenderingResourceInstaller>();
             if (resourceInstaller.GetResolvedResourcePath().IsFailure)
             {
-                var setupPopup = new MiiRenderingSetupPopup();
+                var setupPopup = Services.GetRequiredService<WheelWizard.Views.Popups.IPopupFactory>().Create<MiiRenderingSetupPopup>();
                 var shouldContinue = await setupPopup.ShowAndAwaitCompletionAsync();
                 if (!shouldContinue)
                 {
