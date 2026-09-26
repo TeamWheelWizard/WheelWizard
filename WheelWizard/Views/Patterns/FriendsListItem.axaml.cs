@@ -2,14 +2,24 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using WheelWizard.WheelWizardData;
+using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
-using Badge = WheelWizard.Views.Components.Badge;
 
 namespace WheelWizard.Views.Patterns;
 
 public class FriendsListItem : TemplatedControl
 {
+    public static readonly StyledProperty<BadgeVariant[]> BadgeVariantsProperty = AvaloniaProperty.Register<
+        FriendsListItem,
+        BadgeVariant[]
+    >(nameof(BadgeVariants), []);
+
+    public BadgeVariant[] BadgeVariants
+    {
+        get => GetValue(BadgeVariantsProperty);
+        set => SetValue(BadgeVariantsProperty, value);
+    }
+
     public static readonly StyledProperty<bool> IsOnlineProperty = AvaloniaProperty.Register<FriendsListItem, bool>(nameof(IsOnline));
 
     public bool IsOnline
@@ -121,21 +131,6 @@ public class FriendsListItem : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        var container = e.NameScope.Find<StackPanel>("PART_BadgeContainer");
-        if (container != null)
-        {
-            container.Children.Clear();
-            var badges = App
-                .Services.GetRequiredService<IWhWzDataSingletonService>()
-                .GetBadges(FriendCode)
-                .Select(variant => new Badge { Variant = variant });
-            foreach (var badge in badges)
-            {
-                badge.Height = 30;
-                badge.Width = 30;
-                container.Children.Add(badge);
-            }
-        }
 
         var viewRoomButton = e.NameScope.Find<Button>("ViewRoomButton");
         if (viewRoomButton != null)

@@ -25,12 +25,6 @@ public class MiiControlTests
         using var bitmap = new WriteableBitmap(new PixelSize(512, 512), new Vector(96, 96));
         var rendered = new TaskCompletionSource<OperationResult<Bitmap>>();
         images.GetImageAsync(Arg.Any<Mii>(), Arg.Any<MiiImageSpecifications>()).Returns(rendered.Task);
-        // Friend-card badges still use the application provider at this stack layer.
-        var services = Substitute.For<IServiceProvider>();
-        services
-            .GetService(typeof(WheelWizard.WheelWizardData.IWhWzDataSingletonService))
-            .Returns(Substitute.For<WheelWizard.WheelWizardData.IWhWzDataSingletonService>());
-        ((Views.App)Application.Current!).SetServiceProvider(services);
         var card = new FriendsListItem
         {
             Width = 428,
