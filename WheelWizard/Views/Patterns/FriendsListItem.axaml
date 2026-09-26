@@ -54,7 +54,7 @@
                         <Border Grid.Column="0" Background="{StaticResource Neutral700}"
                                 Margin="-10,-5,0,-5" CornerRadius="7,0,0,7" />
                         <behaviorComponent:MiiImageLoader Grid.Column="0" Grid.ColumnSpan="2" Margin="-180,-25,0,-5"
-                                                          HorizontalAlignment="Left"
+                                                          HorizontalAlignment="Stretch"
                                                           VerticalAlignment="Stretch"
                                                           Mii="{TemplateBinding Mii}"
                                                           FallBackColor="{StaticResource Neutral500}"
