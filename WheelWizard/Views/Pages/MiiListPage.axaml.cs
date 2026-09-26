@@ -125,7 +125,7 @@ public partial class MiiListPage : UserControlBase
         _miiEntries.Clear();
         foreach (var mii in MiiDbService.GetAllMiis().OrderByDescending(m => m.IsFavorite))
         {
-            _miiEntries.Add(new MiiListEntry(mii));
+            _miiEntries.Add(new MiiListEntry(mii, isGlobal: mii.IsGlobal(SettingsService.Get<string>(SettingsService.MACADDRESS))));
         }
 
         var count = _miiEntries.Count;
@@ -504,12 +504,13 @@ public partial class MiiListPage : UserControlBase
         public IReadOnlyList<MiiListEntry> Items { get; } = items;
     }
 
-    public sealed class MiiListEntry(Mii? mii, bool isAddEntry = false) : INotifyPropertyChanged
+    public sealed class MiiListEntry(Mii? mii, bool isAddEntry = false, bool isGlobal = false) : INotifyPropertyChanged
     {
         private bool _isSelected;
 
         public Mii? Mii { get; } = mii;
         public bool IsAddEntry { get; } = isAddEntry;
+        public bool IsGlobal { get; } = isGlobal;
         public bool HasMii => Mii != null;
         public string SelectionGroup { get; } = Guid.NewGuid().ToString("N");
         public string FavoriteActionHeader => Mii?.IsFavorite == true ? t("action.unfavorite") : t("action.favorite");
