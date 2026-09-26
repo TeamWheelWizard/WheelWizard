@@ -1,3 +1,5 @@
+using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Popups.Base;
 
@@ -5,6 +7,9 @@ namespace WheelWizard.Views.Popups.ModManagement;
 
 public partial class ModIndependentWindow : PopupContent
 {
+    [Inject]
+    private INavigationService Navigation { get; set; } = null!;
+
     public ModIndependentWindow(string windowTitle = "Mod Details")
         : base(true, false, true, windowTitle)
     {
@@ -20,7 +25,7 @@ public partial class ModIndependentWindow : PopupContent
 
     protected override void BeforeClose()
     {
-        NavigationManager.NavigateTo<ModsPage>();
+        Navigation.NavigateTo<ModsPage>();
         base.BeforeClose();
     }
 }

@@ -2,7 +2,6 @@ using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Recomp;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;
@@ -14,20 +13,25 @@ public partial class OtherSettings : UserControlBase
 {
     private readonly bool _settingsAreDisabled;
 
-    [Inject]
-    private IFilePickerService FilePicker { get; set; } = null!;
+    private IFilePickerService FilePicker { get; }
 
-    [Inject]
-    private ICustomDistributionPaths DistributionPaths { get; set; } = null!;
+    private ICustomDistributionPaths DistributionPaths { get; }
 
-    [Inject]
-    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    public OtherSettings()
+    public OtherSettings(
+        IFilePickerService filePicker,
+        ICustomDistributionPaths distributionPaths,
+        ICustomDistributionSingletonService customDistributionSingletonService,
+        ISettingsManager settingsService
+    )
     {
+        FilePicker = filePicker;
+        DistributionPaths = distributionPaths;
+        CustomDistributionSingletonService = customDistributionSingletonService;
+        SettingsService = settingsService;
         InitializeComponent();
         _settingsAreDisabled = !SettingsService.DolphinPathsSetupCorrectly();
         DisabledWarningText.IsVisible = _settingsAreDisabled;

@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Recomp;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Storage;
@@ -13,29 +12,37 @@ public partial class RecompSettings : UserControlBase
 {
     private bool _loading;
 
-    [Inject]
-    private IFilePickerService FilePicker { get; set; } = null!;
+    private IFilePickerService FilePicker { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private IRecompSettingManager RecompSettingsFile { get; set; } = null!;
+    private IRecompSettingManager RecompSettingsFile { get; }
 
-    [Inject]
-    private IRecompDolphinDataService? DolphinData { get; set; }
+    private IRecompDolphinDataService? DolphinData { get; }
 
-    [Inject]
-    private IRecompEnvironment? RecompEnvironment { get; set; }
+    private IRecompEnvironment? RecompEnvironment { get; }
 
-    [Inject]
-    private IRecompInstallService? RecompInstallService { get; set; }
+    private IRecompInstallService? RecompInstallService { get; }
 
-    [Inject]
-    private IRecompPaths RecompPaths { get; set; } = null!;
+    private IRecompPaths RecompPaths { get; }
 
-    public RecompSettings()
+    public RecompSettings(
+        IFilePickerService filePicker,
+        ISettingsManager settingsService,
+        IRecompSettingManager recompSettingsFile,
+        IRecompPaths recompPaths,
+        IRecompDolphinDataService? dolphinData = null,
+        IRecompEnvironment? recompEnvironment = null,
+        IRecompInstallService? recompInstallService = null
+    )
     {
+        FilePicker = filePicker;
+        SettingsService = settingsService;
+        RecompSettingsFile = recompSettingsFile;
+        RecompPaths = recompPaths;
+        DolphinData = dolphinData;
+        RecompEnvironment = recompEnvironment;
+        RecompInstallService = recompInstallService;
         InitializeComponent();
 
         // Config.toml is also written by the in-game settings bar, so opening the page rereads the

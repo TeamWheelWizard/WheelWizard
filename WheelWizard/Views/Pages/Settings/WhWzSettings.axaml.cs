@@ -9,7 +9,6 @@ using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.IO;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Processes;
@@ -31,29 +30,37 @@ public partial class WhWzSettings : UserControlBase
     private bool _isMovingAppData;
     private bool _updatingLanguageDropdown;
 
-    [Inject]
-    private IFilePickerService FilePicker { get; set; } = null!;
+    private IFilePickerService FilePicker { get; }
 
-    [Inject]
-    private IDolphinPaths DolphinPaths { get; set; } = null!;
+    private IDolphinPaths DolphinPaths { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private ISettingsLocalizationService LocalizationService { get; set; } = null!;
+    private ISettingsLocalizationService LocalizationService { get; }
 
-    [Inject]
-    private IDolphinSettingManager DolphinSettingsService { get; set; } = null!;
+    private IDolphinSettingManager DolphinSettingsService { get; }
 
-    [Inject]
-    private IDolphinDiscoveryService DolphinDiscovery { get; set; } = null!;
+    private IDolphinDiscoveryService DolphinDiscovery { get; }
 
-    [Inject]
-    private IApplicationDataLocation ApplicationData { get; set; } = null!;
+    private IApplicationDataLocation ApplicationData { get; }
 
-    public WhWzSettings()
+    public WhWzSettings(
+        IFilePickerService filePicker,
+        IDolphinPaths dolphinPaths,
+        ISettingsManager settingsService,
+        ISettingsLocalizationService localizationService,
+        IDolphinSettingManager dolphinSettingsService,
+        IDolphinDiscoveryService dolphinDiscovery,
+        IApplicationDataLocation applicationData
+    )
     {
+        FilePicker = filePicker;
+        DolphinPaths = dolphinPaths;
+        SettingsService = settingsService;
+        LocalizationService = localizationService;
+        DolphinSettingsService = dolphinSettingsService;
+        DolphinDiscovery = dolphinDiscovery;
+        ApplicationData = applicationData;
         InitializeComponent();
         ConfigureLocationFieldsForActiveFrontend();
         UpdateLocationRows();

@@ -11,7 +11,6 @@ using WheelWizard.Features.Patches;
 using WheelWizard.Models.Mods;
 using WheelWizard.Mods;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.ModManagement;
 using WheelWizard.Views.Popups.Generic;
@@ -24,8 +23,7 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest, ModPreviewView
 
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
-    [Inject]
-    private Func<int, ModPreviewViewModel> CreatePreview { get; set; } = null!;
+    private Func<int, ModPreviewViewModel> CreatePreview { get; }
     private readonly Dictionary<int, ModPreviewViewModel> _previews = [];
 
     private ModPreviewViewModel GetPreview(int id)
@@ -35,20 +33,15 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         return preview;
     }
 
-    [Inject]
-    private IModOperationPresentation ModPresentation { get; set; } = null!;
+    private IModOperationPresentation ModPresentation { get; }
 
-    [Inject]
-    private IFilePickerService FilePicker { get; set; } = null!;
+    private IFilePickerService FilePicker { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private IModPatchConversionService ModPatchConversionService { get; set; } = null!;
+    private IModPatchConversionService ModPatchConversionService { get; }
 
-    [Inject]
-    private IModManager ModManagerService { get; set; } = null!;
+    private IModManager ModManagerService { get; }
 
     public IModManager ModManager => ModManagerService;
 
@@ -93,8 +86,21 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     private IPointer? _capturedPointer;
     private const double DragThreshold = 5.0;
 
-    public ModsPage()
+    public ModsPage(
+        Func<int, ModPreviewViewModel> createPreview,
+        IModOperationPresentation modPresentation,
+        IFilePickerService filePicker,
+        ISettingsManager settingsService,
+        IModPatchConversionService modPatchConversionService,
+        IModManager modManagerService
+    )
     {
+        CreatePreview = createPreview;
+        ModPresentation = modPresentation;
+        FilePicker = filePicker;
+        SettingsService = settingsService;
+        ModPatchConversionService = modPatchConversionService;
+        ModManagerService = modManagerService;
         InitializeComponent();
         DataContext = this;
         Focusable = true;

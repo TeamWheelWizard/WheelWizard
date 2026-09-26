@@ -8,9 +8,9 @@ using WheelWizard.Models.Enums;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
@@ -24,6 +24,8 @@ namespace WheelWizard.Views.Pages;
 
 public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 {
+    private INavigationService Navigation { get; }
+
     private const int ProfileCarouselPageCount = 2;
     private const int ProfileSelectorMaxCharacters = 12;
 
@@ -35,26 +37,19 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private string _currentFriendCode = string.Empty;
     private int _activeInfoSlideIndex;
 
-    [Inject]
-    private LiveRoomsService LiveRooms { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; }
 
-    [Inject]
-    private IWhWzDataSingletonService BadgeService { get; set; } = null!;
+    private IWhWzDataSingletonService BadgeService { get; }
 
-    [Inject]
-    private IMiiDbService MiiDbService { get; set; } = null!;
+    private IMiiDbService MiiDbService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private ISaveRegionService SaveRegions { get; set; } = null!;
+    private ISaveRegionService SaveRegions { get; }
 
-    [Inject]
-    private ICustomDistributionPaths DistributionPaths { get; set; } = null!;
+    private ICustomDistributionPaths DistributionPaths { get; }
 
     public Mii? CurrentMii
     {
@@ -124,8 +119,25 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private int _currentUserIndex;
     private int FocusedUser => SettingsService.Get<int>(SettingsService.FOCUSED_USER);
 
-    public UserProfilePage()
+    public UserProfilePage(
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        IGameLicenseSingletonService gameLicenseService,
+        IWhWzDataSingletonService badgeService,
+        IMiiDbService miiDbService,
+        ISettingsManager settingsService,
+        ISaveRegionService saveRegions,
+        ICustomDistributionPaths distributionPaths
+    )
     {
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        GameLicenseService = gameLicenseService;
+        BadgeService = badgeService;
+        MiiDbService = miiDbService;
+        SettingsService = settingsService;
+        SaveRegions = saveRegions;
+        DistributionPaths = distributionPaths;
         InitializeComponent();
         ResetMiiTopBar();
         ViewMii(FocusedUser);
@@ -361,7 +373,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             if (room.Players.All(player => player.FriendCode != currentPlayer?.FriendCode))
                 continue;
 
-            NavigationManager.NavigateTo<RoomDetailsPage>(room);
+            Navigation.NavigateTo<RoomDetailsPage>(room);
             return;
         }
 
