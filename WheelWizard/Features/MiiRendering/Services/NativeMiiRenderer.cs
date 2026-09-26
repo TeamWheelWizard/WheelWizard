@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.Collections.Concurrent;
+using System.IO.Abstractions;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Avalonia;
@@ -15,7 +16,7 @@ namespace WheelWizard.MiiRendering.Services;
 /// Native, fully-offline renderer entry point for Mii images.
 /// Uses FFL-generated geometry and texture data from FFLResHigh.dat.
 /// </summary>
-public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocator) : IMiiNativeRenderer
+public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocator, IFileSystem fileSystem) : IMiiNativeRenderer
 {
     public sealed record NativeMiiRenderRequest(
         string StudioData,
@@ -35,9 +36,9 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
     );
 
     private static readonly TextureStore TextureRegistry = new();
-    private static readonly object ManagedArchiveLock = new();
-    private static ManagedFflResourceArchive? _managedArchive;
-    private static string? _managedArchivePath;
+    private readonly object _managedArchiveLock = new();
+    private ManagedFflResourceArchive? _managedArchive;
+    private string? _managedArchivePath;
     private static readonly object HeadDrawCacheLock = new();
     private static readonly Dictionary<string, CachedHeadDrawParams> HeadDrawCache = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, LinkedListNode<string>> HeadDrawCacheNodes = new(StringComparer.Ordinal);
@@ -869,20 +870,24 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         return info;
     }
 
-    private static OperationResult<ManagedFflResourceArchive> GetManagedArchive(string resourcePath)
+    private OperationResult<ManagedFflResourceArchive> GetManagedArchive(string resourcePath)
     {
-        lock (ManagedArchiveLock)
+        lock (_managedArchiveLock)
         {
             if (
                 _managedArchive != null
                 && !string.IsNullOrWhiteSpace(_managedArchivePath)
-                && string.Equals(Path.GetFullPath(resourcePath), Path.GetFullPath(_managedArchivePath), StringComparison.OrdinalIgnoreCase)
+                && string.Equals(
+                    fileSystem.Path.GetFullPath(resourcePath),
+                    fileSystem.Path.GetFullPath(_managedArchivePath),
+                    StringComparison.OrdinalIgnoreCase
+                )
             )
             {
                 return _managedArchive;
             }
 
-            var loadResult = ManagedFflResourceArchive.Load(resourcePath);
+            var loadResult = ManagedFflResourceArchive.Load(fileSystem, resourcePath);
             if (loadResult.IsFailure)
                 return loadResult.Error!;
 
