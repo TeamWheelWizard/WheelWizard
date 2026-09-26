@@ -1,14 +1,15 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Abstractions;
 using System.IO.Compression;
 using Avalonia.Threading;
 using IniParser;
 using Serilog;
 using WheelWizard.Features.Patches;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Services;
+using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Mods;
@@ -63,6 +64,7 @@ public interface IModManager : INotifyPropertyChanged
 public sealed class ModManager : IModManager
 {
     private static readonly char[] _illegalChars = new[] { '.', '/', '~', '\\' };
+    private readonly IFileSystem _fileSystem;
     private readonly IModInstallationService _modInstallationService;
     private readonly IModPatchConversionService _modPatchConversionService;
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
@@ -81,8 +83,13 @@ public sealed class ModManager : IModManager
 
     private bool _isBatchUpdating;
 
-    public ModManager(IModInstallationService modInstallationService, IModPatchConversionService modPatchConversionService)
+    public ModManager(
+        IModInstallationService modInstallationService,
+        IModPatchConversionService modPatchConversionService,
+        IFileSystem fileSystem
+    )
     {
+        _fileSystem = fileSystem;
         _modInstallationService = modInstallationService;
         _modPatchConversionService = modPatchConversionService;
         _mods = [];
@@ -207,7 +214,7 @@ public sealed class ModManager : IModManager
         finally
         {
             progressWindow?.Close();
-            var result = FileHelper.TryDeleteFile(tempZipPath);
+            var result = _fileSystem.TryDeleteFile(tempZipPath);
             //todo: result should be returned and bubbled up
             if (result.IsFailure)
                 Log.Warning(result.Error.Exception, "Failed to delete temporary mod archive: {Message}", result.Error.Message);
@@ -405,7 +412,6 @@ public sealed class ModManager : IModManager
         }
     }
 
-    //todo: move to FileHelper (or the DI version if that gets made)
     private static OperationResult OpenFolder(string modDirectory)
     {
         try
@@ -461,7 +467,7 @@ public sealed class ModManager : IModManager
 
         OnPropertyChanged(nameof(Mods));
 
-        return FileHelper.DeleteDirectoryIfExists(oldDirectoryName);
+        return _fileSystem.DeleteDirectoryIfExists(oldDirectoryName);
     }
 
     private static OperationResult RenameDirectoryAndMetadataFile(
@@ -506,13 +512,13 @@ public sealed class ModManager : IModManager
         }
     }
 
-    private static OperationResult DeleteModDirectory(string modDirectory)
+    private OperationResult DeleteModDirectory(string modDirectory)
     {
         try
         {
-            var modsRoot = FileHelper.NormalizePath(PathManager.ModsFolderPath);
+            var modsRoot = _fileSystem.Path.NormalizePath(PathManager.ModsFolderPath);
 
-            var target = FileHelper.NormalizePath(modDirectory);
+            var target = _fileSystem.Path.NormalizePath(modDirectory);
 
             var relativePath = Path.GetRelativePath(modsRoot, target);
 

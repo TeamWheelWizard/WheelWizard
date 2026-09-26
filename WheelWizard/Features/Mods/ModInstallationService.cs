@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
+using System.IO.Abstractions;
 using Avalonia.Threading;
 using SharpCompress.Archives;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Services;
 using WheelWizard.Shared.IO;
@@ -26,17 +26,17 @@ public interface IModInstallationService
     );
 }
 
-public sealed class ModInstallationService : IModInstallationService
+public sealed class ModInstallationService(IFileSystem fileSystem) : IModInstallationService
 {
     private readonly string _modsFolderPath = PathManager.ModsFolderPath;
 
     public async Task<OperationResult<ObservableCollection<Mod>>> LoadModsAsync()
     {
-        var modsFolderResult = FileHelper.EnsureDirectory(_modsFolderPath);
+        var modsFolderResult = fileSystem.EnsureDirectory(_modsFolderPath);
         if (modsFolderResult.IsFailure)
             return modsFolderResult.Error;
 
-        var iniFilesResult = FileHelper.FindFilesByExtension(_modsFolderPath, "*.ini");
+        var iniFilesResult = fileSystem.FindFilesByExtension(_modsFolderPath, "*.ini");
         if (iniFilesResult.IsFailure)
             return iniFilesResult.Error;
 
@@ -59,7 +59,7 @@ public sealed class ModInstallationService : IModInstallationService
         foreach (var mod in mods)
         {
             var modDirectory = PathManager.GetModDirectoryPath(mod.Title);
-            var directoryResult = FileHelper.EnsureDirectory(modDirectory);
+            var directoryResult = fileSystem.EnsureDirectory(modDirectory);
             if (directoryResult.IsFailure)
                 return directoryResult.Error;
 
