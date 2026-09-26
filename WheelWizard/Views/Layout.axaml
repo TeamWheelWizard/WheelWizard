@@ -113,6 +113,9 @@
                                            Text="{loc:T page_title.my_miis}" />
             <TextBlock Text="{loc:T attribute.status_online}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from values -->
+            <patterns:SidebarRadioButton IconData="{StaticResource CloudFilled}"
+                                           PageType="{x:Type pages:CloudPage}"
+                                           Text="Cloud" />
             <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}"
                                            PageType="{x:Type pages:RoomsPage}"
                                            Text="{loc:T page_title.rooms}" x:Name="RoomsButton"

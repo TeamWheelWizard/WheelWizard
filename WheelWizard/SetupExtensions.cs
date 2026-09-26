@@ -4,6 +4,7 @@ using Serilog;
 using Testably.Abstractions;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
+using WheelWizard.CloudSync;
 using WheelWizard.CustomCharacters;
 using WheelWizard.CustomDistributions;
 using WheelWizard.DolphinInstaller;
@@ -54,6 +55,7 @@ public static class SetupExtensions
         services.AddPatches();
         services.AddMods();
         services.AddRecomp();
+        services.AddCloudSync();
 
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();

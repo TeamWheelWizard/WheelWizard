@@ -46,14 +46,25 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
-                    <components1:IconLabel
-                        IconData="{TemplateBinding IconData}"
-                        IconSize="{TemplateBinding IconSize}"
-                        Text="{TemplateBinding Text}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Foreground="{TemplateBinding Foreground}"
-                    />
+                    <Grid>
+                        <components1:IconLabel
+                            IconData="{TemplateBinding IconData}"
+                            IconSize="{TemplateBinding IconSize}"
+                            Text="{TemplateBinding Text}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="{TemplateBinding Foreground}"
+                            IsVisible="{TemplateBinding IsLoading, Converter={x:Static BoolConverters.Not}}"
+                        />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    IsVisible="{TemplateBinding IsLoading}">
+                            <components1:LoadingIcon Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}"
+                                                     Foreground="{TemplateBinding Foreground}" />
+                            <Rectangle Width="10" Height="0" Fill="Transparent" />
+                            <TextBlock Text="{TemplateBinding Text}" FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </ControlTemplate>
         </Setter>

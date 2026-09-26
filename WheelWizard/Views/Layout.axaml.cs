@@ -195,6 +195,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     public void NavigateToPage(UserControl page)
     {
         var oldPage = ContentArea.Content as Control;
+        if (oldPage is UserProfilePage userProfilePage)
+            userProfilePage.DeactivateProfileLibrarySubscription();
         var isRoomsToDetails = oldPage is RoomsPage && page is RoomDetailsPage;
         var isDetailsToRooms = oldPage is RoomDetailsPage && page is RoomsPage;
 

@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
+             xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+             x:Class="WheelWizard.Views.Pages.CloudPage"
+             x:DataType="pages:CloudPage">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto">
+            <TextBlock Text="Cloud" Classes="PageTitleText" VerticalAlignment="Bottom" />
+            <components:Button Grid.Column="1" Text="Visible profiles" IconData="{StaticResource UserCouple}"
+                               Click="ChooseVisibleProfiles_OnClick" VerticalAlignment="Bottom" Margin="0,0,8,10" />
+            <components:Button Grid.Column="2" Text="Cloud settings" Click="CloudSettings_OnClick"
+                               VerticalAlignment="Bottom" Margin="0,0,0,10" />
+        </Grid>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,15,0,0" Spacing="8">
+                <TextBlock Classes="HeaderText" Text="Profiles to sync" />
+                <TextBlock Classes="TinyText" TextWrapping="Wrap"
+                           Text="Choose the local profiles that should be included in your cloud-save setup. Cloud-only profiles are shown for reference and can be downloaded to a local license before they can be synced from this device." />
+                <Border Classes="SettingsBlockStyle" Padding="12">
+                    <StackPanel Spacing="8">
+                        <TextBlock x:Name="Status" Classes="TinyText" TextWrapping="Wrap" />
+                        <ItemsControl ItemsSource="{Binding Profiles}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="pages:CloudSyncProfileChoice">
+                                    <Border Height="60" Margin="0,0,0,8" Background="Transparent"
+                                            BorderBrush="{StaticResource Neutral600}" BorderThickness="1"
+                                            CornerRadius="{StaticResource GlobalCornerRadius}" ClipToBounds="True">
+                                        <Grid>
+                                            <Grid Margin="5,0" ColumnDefinitions="58,*,Auto,Auto">
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="SidebarSectionText" Text="{Binding Name}"
+                                                               Foreground="{StaticResource Neutral200}" Margin="10,0,0,0" />
+                                                    <TextBlock Classes="TinyText" Text="{Binding FriendCode}"
+                                                               Foreground="{StaticResource Neutral400}" Margin="10,0,0,0" />
+                                                    <TextBlock Classes="TinyText" Text="{Binding LastUpdated}"
+                                                               Foreground="{StaticResource Neutral500}" Margin="10,0,0,0" />
+                                                </StackPanel>
+                                                <Grid Grid.Column="2" Width="32" Height="32" Margin="4" ToolTip.Tip="{Binding StorageStatus}">
+                                                    <Path Data="M5,22 C2.8,22 1,20.2 1,18 C1,15.7 2.8,13.9 5.1,13.9 C5.8,10.5 8.6,8 12.1,8 C16.1,8 19.3,10.8 19.8,14.6 C22.2,14.8 24,16.7 24,19 C24,20.9 22.5,22 20.5,22 L5,22"
+                                                          Fill="Transparent" Stroke="{StaticResource Neutral300}" StrokeThickness="1.8" />
+                                                    <Line IsVisible="{Binding IsLocalOnly}" StartPoint="2,30" EndPoint="30,2"
+                                                          Stroke="{StaticResource Neutral300}" StrokeThickness="2.2" />
+                                                    <Path IsVisible="{Binding IsCloudAndLocal}"
+                                                          Data="M16,18 L27,18 L27,25 L16,25 Z M14,26 L29,26 L31,29 L12,29 Z"
+                                                          Fill="{StaticResource Neutral800}" Stroke="{StaticResource Neutral300}" StrokeThickness="1.4" />
+                                                </Grid>
+                                                <CheckBox Grid.Column="3" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                          IsEnabled="{Binding CanSync}" VerticalAlignment="Center" Margin="8" />
+                                            </Grid>
+                                            <patterns:MiiImageLoader Width="80" Height="80" Margin="-7,0,0,1"
+                                                                     HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                                                     IsHitTestVisible="False" LoadingColor="Transparent"
+                                                                     FallBackColor="{StaticResource Neutral600}" Mii="{Binding Mii}"
+                                                                     ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <components:Button Text="Save cloud profile selection" Click="SaveSelection_OnClick" />
+                            <components:Button x:Name="SyncButton" Text="Sync selected profiles" IconData="{StaticResource CloudFilled}"
+                                               Click="SyncSelected_OnClick" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
