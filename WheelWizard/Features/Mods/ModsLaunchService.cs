@@ -1,8 +1,6 @@
 using System.IO.Abstractions;
-using Avalonia.Threading;
 using WheelWizard.Models.Mods;
 using WheelWizard.Shared.IO;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Mods;
 
@@ -10,14 +8,22 @@ public interface IModsLaunchService
 {
     bool ShouldAskToClearTargetFolder(string targetFolderPath);
 
-    Task<OperationResult> PrepareModsForLaunch(string targetFolderPath, bool clearTargetFolderWhenNoEnabledMods = false);
+    Task<OperationResult> PrepareModsForLaunch(
+        string targetFolderPath,
+        bool clearTargetFolderWhenNoEnabledMods = false,
+        IProgress<ModOperationProgress>? progress = null
+    );
 }
 
 public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSystem, IModPaths paths) : IModsLaunchService
 {
     private string ModsFolderPath => paths.RootFolderPath;
 
-    public async Task<OperationResult> PrepareModsForLaunch(string targetFolderPath, bool clearTargetFolderWhenNoEnabledMods = false)
+    public async Task<OperationResult> PrepareModsForLaunch(
+        string targetFolderPath,
+        bool clearTargetFolderWhenNoEnabledMods = false,
+        IProgress<ModOperationProgress>? progress = null
+    )
     {
         var mods = modManager.Mods.Where(mod => mod.IsEnabled).ToArray();
         if (mods.Length == 0)
@@ -37,11 +43,11 @@ public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSy
             if (!mod.IsEnabled)
                 continue;
 
-            var modFolder = Path.Combine(ModsFolderPath, mod.Title);
-            if (!Directory.Exists(modFolder))
+            var modFolder = fileSystem.Path.Combine(ModsFolderPath, mod.Title);
+            if (!fileSystem.Directory.Exists(modFolder))
                 continue;
 
-            foreach (var file in Directory.GetFiles(modFolder, "*", SearchOption.AllDirectories))
+            foreach (var file in fileSystem.Directory.GetFiles(modFolder, "*", SearchOption.AllDirectories))
             {
                 if (!ShouldCopyFile(mod, file))
                     continue;
@@ -53,41 +59,35 @@ public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSy
             }
         }
 
-        Directory.CreateDirectory(targetFolderPath);
+        fileSystem.Directory.CreateDirectory(targetFolderPath);
 
-        var totalFiles = finalFiles.Count;
-        var progressWindow = new ProgressWindow(t("progress.installing_mods")).SetGoal(t("progress.installing_mods_count", totalFiles)!);
-        progressWindow.Show();
-
-        var copyResult = await Task.Run(() => CopyFinalFiles(targetFolderPath, finalFiles, progressWindow));
-
-        progressWindow.Close();
-        return copyResult;
+        progress?.Report(new(ModOperationStage.Installing, 0, TotalFiles: finalFiles.Count));
+        return await Task.Run(() => CopyFinalFiles(targetFolderPath, finalFiles, progress));
     }
 
     public bool ShouldAskToClearTargetFolder(string targetFolderPath) =>
         !modManager.Mods.Any(mod => mod.IsEnabled)
-        && Directory.Exists(targetFolderPath)
-        && Directory.EnumerateFiles(targetFolderPath).Any();
+        && fileSystem.Directory.Exists(targetFolderPath)
+        && fileSystem.Directory.EnumerateFiles(targetFolderPath).Any();
 
-    private static OperationResult CopyFinalFiles(
+    private OperationResult CopyFinalFiles(
         string targetFolderPath,
         Dictionary<string, string> finalFiles,
-        ProgressWindow progressWindow
+        IProgress<ModOperationProgress>? progress
     )
     {
         try
         {
             var totalFiles = finalFiles.Count;
             var processedFiles = 0;
-            if (Directory.Exists(targetFolderPath))
+            if (fileSystem.Directory.Exists(targetFolderPath))
             {
-                var files = Directory.GetFiles(targetFolderPath, "*.*", SearchOption.TopDirectoryOnly);
+                var files = fileSystem.Directory.GetFiles(targetFolderPath, "*.*", SearchOption.TopDirectoryOnly);
                 foreach (var file in files)
                 {
-                    var relativePath = Path.GetFileName(file);
+                    var relativePath = fileSystem.Path.GetFileName(file);
                     if (!finalFiles.ContainsKey(relativePath))
-                        File.Delete(file);
+                        fileSystem.File.Delete(file);
                 }
             }
 
@@ -95,26 +95,23 @@ public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSy
             {
                 var relativePath = kvp.Key;
                 var sourceFile = kvp.Value;
-                var destinationFile = Path.Combine(targetFolderPath, relativePath);
+                var destinationFile = fileSystem.Path.Combine(targetFolderPath, relativePath);
 
                 processedFiles++;
-                var progress = (int)(processedFiles / (double)totalFiles * 100);
-                Dispatcher.UIThread.Post(() =>
-                {
-                    progressWindow.UpdateProgress(progress);
-                    progressWindow.SetExtraText($"{t("state.installing")} {relativePath}");
-                });
+                progress?.Report(
+                    new(ModOperationStage.Installing, (int)(processedFiles / (double)totalFiles * 100), relativePath, totalFiles)
+                );
 
-                if (File.Exists(destinationFile))
+                if (fileSystem.File.Exists(destinationFile))
                 {
-                    var sourceInfo = new FileInfo(sourceFile);
-                    var destInfo = new FileInfo(destinationFile);
+                    var sourceInfo = fileSystem.FileInfo.New(sourceFile);
+                    var destInfo = fileSystem.FileInfo.New(destinationFile);
 
                     if (sourceInfo.Length == destInfo.Length && sourceInfo.LastWriteTimeUtc == destInfo.LastWriteTimeUtc)
                         continue;
                 }
 
-                File.Copy(sourceFile, destinationFile, true);
+                fileSystem.File.Copy(sourceFile, destinationFile, true);
             }
 
             return Ok();
@@ -127,28 +124,28 @@ public sealed class ModsLaunchService(IModManager modManager, IFileSystem fileSy
 
     private bool ShouldCopyFile(Mod mod, string filePath)
     {
-        var modMetadataFile = Path.Combine(ModsFolderPath, mod.Title, $"{mod.Title}.ini");
-        if (Path.GetFullPath(filePath).Equals(Path.GetFullPath(modMetadataFile), StringComparison.OrdinalIgnoreCase))
+        var modMetadataFile = fileSystem.Path.Combine(ModsFolderPath, mod.Title, $"{mod.Title}.ini");
+        if (fileSystem.Path.GetFullPath(filePath).Equals(fileSystem.Path.GetFullPath(modMetadataFile), StringComparison.OrdinalIgnoreCase))
             return false;
 
         return true;
     }
 
-    private static string GetLaunchPatchFileName(Mod mod, string filePath)
+    private string GetLaunchPatchFileName(Mod mod, string filePath)
     {
-        var fileName = Path.GetFileName(filePath);
+        var fileName = fileSystem.Path.GetFileName(filePath);
         if (!IsModdingArchiveFile(fileName))
             return fileName;
 
         return $"{mod.Priority}.{StripExistingPriorityPrefix(fileName)}";
     }
 
-    private static bool IsModdingArchiveFile(string fileName)
+    private bool IsModdingArchiveFile(string fileName)
     {
         if (!fileName.EndsWith(".szs", StringComparison.OrdinalIgnoreCase))
             return false;
 
-        var nameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+        var nameWithoutExtension = fileSystem.Path.GetFileNameWithoutExtension(fileName);
         var tagSeparator = nameWithoutExtension.LastIndexOf('.');
         return tagSeparator > 0 && tagSeparator + 1 < nameWithoutExtension.Length;
     }

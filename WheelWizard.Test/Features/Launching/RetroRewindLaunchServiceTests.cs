@@ -25,7 +25,7 @@ public class RetroRewindLaunchServiceTests
 
         Assert.True((await fixture.Service.LaunchAsync(beta)).IsSuccess);
 
-        await fixture.Mods.Received(1).PrepareModsForLaunch(patches, true);
+        await fixture.Mods.Received(1).PrepareModsForLaunch(patches, true, Arg.Any<IProgress<ModOperationProgress>>());
         fixture.Descriptor.Received(1).GenerateLaunchJson(xml);
         fixture.Remotes.Received(1).SetVirtualRemoteEnabled("/dolphin/Config", false);
         await fixture.Dolphin.Received(1).PreflightDolphinVersionAsync();
@@ -42,7 +42,9 @@ public class RetroRewindLaunchServiceTests
     public async Task FailedModPreparation_DoesNotWriteDescriptorOrStartGame()
     {
         var fixture = new Fixture();
-        fixture.Mods.PrepareModsForLaunch(Arg.Any<string>(), Arg.Any<bool>()).Returns(Fail("preparation failed"));
+        fixture
+            .Mods.PrepareModsForLaunch(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<IProgress<ModOperationProgress>>())
+            .Returns(Fail("preparation failed"));
 
         Assert.True((await fixture.Service.LaunchAsync()).IsFailure);
 
@@ -77,7 +79,8 @@ public class RetroRewindLaunchServiceTests
             distribution,
             Substitute.For<IModsLaunchService>(),
             Substitute.For<IRecompDolphinDataService>(),
-            Substitute.For<ICustomDistributionPaths>()
+            Substitute.For<ICustomDistributionPaths>(),
+            new InlineModPresentation()
         );
         var rrCount = 0;
         var recompCount = 0;
@@ -132,7 +135,7 @@ public class RetroRewindLaunchServiceTests
             dolphinPaths.ConfigFolderPath.Returns("/dolphin/Config");
             Dolphin.PreflightDolphinVersionAsync().Returns(Ok());
             Dolphin.LaunchDolphin(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<OperationResult>()).Returns(Ok());
-            Mods.PrepareModsForLaunch(Arg.Any<string>(), Arg.Any<bool>()).Returns(Ok());
+            Mods.PrepareModsForLaunch(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<IProgress<ModOperationProgress>>()).Returns(Ok());
             Service = new(
                 settings,
                 Fs,
@@ -143,8 +146,17 @@ public class RetroRewindLaunchServiceTests
                 Mods,
                 Descriptor,
                 Substitute.For<IRuntimeEnvironment>(),
-                Prompts
+                Prompts,
+                new InlineModPresentation()
             );
         }
     }
+}
+
+internal sealed class InlineModPresentation : IModOperationPresentation
+{
+    public Task<TResult> RunAsync<TResult>(
+        Func<IProgress<ModOperationProgress>, CancellationToken, Task<TResult>> operation,
+        bool canCancel = false
+    ) => operation(new Progress<ModOperationProgress>(), CancellationToken.None);
 }

@@ -29,7 +29,8 @@ public sealed class RetroRewindLaunchService(
     IModsLaunchService mods,
     IRetroRewindLaunchDescriptor descriptor,
     IRuntimeEnvironment environment,
-    ILaunchPrompts prompts
+    ILaunchPrompts prompts,
+    IModOperationPresentation modPresentation
 ) : IRetroRewindLaunchService
 {
     private string QuotePath(string path) => ShellQuoting.QuoteArgument(path, environment.IsWindows);
@@ -57,7 +58,9 @@ public sealed class RetroRewindLaunchService(
                 clearTargetFolder = await prompts.ConfirmPatchCleanupAsync();
             }
 
-            var modsLaunchResult = await mods.PrepareModsForLaunch(targetFolderPath, clearTargetFolder);
+            var modsLaunchResult = await modPresentation.RunAsync(
+                (progress, _) => mods.PrepareModsForLaunch(targetFolderPath, clearTargetFolder, progress)
+            );
             if (modsLaunchResult.IsFailure)
                 return modsLaunchResult.Error;
 

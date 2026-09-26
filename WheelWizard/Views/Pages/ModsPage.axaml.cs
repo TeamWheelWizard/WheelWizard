@@ -24,6 +24,9 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest);
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
     [Inject]
+    private IModOperationPresentation ModPresentation { get; set; } = null!;
+
+    [Inject]
     private IFilePickerService FilePicker { get; set; } = null!;
 
     [Inject]
@@ -156,7 +159,9 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(modName))
             return;
 
-        var importResult = await ModManager.ImportModFilesAsync(selectedFiles.ToArray(), modName);
+        var importResult = await ModPresentation.RunAsync(
+            (progress, _) => ModManager.ImportModFilesAsync(selectedFiles.ToArray(), modName, progress)
+        );
         if (importResult.IsFailure)
         {
             MessageTranslationHelper.ShowMessage(importResult.Error);
@@ -227,7 +232,10 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (!selectedMod.Mod.HasIncompatibleFiles)
             return;
 
-        var result = await ModPatchConversionService.ConvertToPatchesAsync(selectedMod.Mod, CancellationToken.None);
+        var result = await ModPresentation.RunAsync(
+            (progress, cancellation) => ModPatchConversionService.ConvertToPatchesAsync(selectedMod.Mod, cancellation, progress),
+            canCancel: true
+        );
         OnModsChanged();
 
         if (result.IsSuccess)
