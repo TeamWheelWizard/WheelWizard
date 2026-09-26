@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 using WheelWizard.AutoUpdating;
 using WheelWizard.MiiRendering.Services;
 using WheelWizard.Mods;
+using WheelWizard.RrRooms;
 using WheelWizard.Services;
 using WheelWizard.Services.Launcher;
-using WheelWizard.Services.LiveData;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Settings;
 using WheelWizard.Views.Behaviors;
@@ -178,8 +178,8 @@ public class App : Application
 
     private static void InitializeManagers()
     {
-        WhWzStatusManager.Instance.Start();
-        RRLiveRooms.Instance.Start();
+        Services.GetRequiredService<LiveStatusService>().Start();
+        Services.GetRequiredService<LiveRoomsService>().Start();
     }
 
     public override void OnFrameworkInitializationCompleted()
