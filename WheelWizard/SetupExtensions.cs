@@ -37,6 +37,18 @@ public static class SetupExtensions
     {
         services.AddSingleton<WheelWizard.Shared.Polling.IPollingScheduler, WheelWizard.Views.Polling.AvaloniaPollingScheduler>();
         services.AddSingleton<WheelWizard.Views.Diagnostics.DevelopmentRefreshService>();
+        services.AddSingleton<
+            WheelWizard.ApplicationIntegration.IUrlProtocolRegistrationStore,
+            WheelWizard.ApplicationIntegration.WindowsUrlProtocolRegistrationStore
+        >();
+        services.AddSingleton<
+            WheelWizard.ApplicationIntegration.IUrlProtocolRegistration,
+            WheelWizard.ApplicationIntegration.UrlProtocolRegistration
+        >();
+        services.AddSingleton<
+            WheelWizard.GameBanana.InstallRequests.IModInstallRequestPresentation,
+            WheelWizard.Views.ModManagement.ModInstallRequestPresentation
+        >();
         // Features
         services.AddSingleton<WheelWizard.Shared.Processes.IUnixCommandService, WheelWizard.Shared.Processes.UnixCommandService>();
         services.AddSingleton<WheelWizard.Shared.Processes.IUnixProcessService, WheelWizard.Shared.Processes.UnixProcessService>();

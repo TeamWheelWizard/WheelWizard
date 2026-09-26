@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Logging;
 using Serilog;
 using WheelWizard.ApplicationData;
-using WheelWizard.Services.UrlProtocol;
+using WheelWizard.ApplicationIntegration;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Services;
@@ -166,6 +166,8 @@ public class Program : IDesignerEntryPoint
     private static void Setup(IServiceProvider serviceProvider)
     {
         serviceProvider.GetRequiredService<ISettingsStartupInitializer>().Initialize();
-        UrlProtocolManager.SetWhWzScheme();
+        var registration = serviceProvider.GetRequiredService<IUrlProtocolRegistration>().EnsureRegistered(Environment.ProcessPath);
+        if (registration.IsFailure)
+            Log.Warning(registration.Error.Exception, "URL protocol registration failed: {Message}", registration.Error.Message);
     }
 }
