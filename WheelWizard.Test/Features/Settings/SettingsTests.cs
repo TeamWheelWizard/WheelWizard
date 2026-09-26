@@ -8,6 +8,7 @@ using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Localization;
+using WheelWizard.Recomp;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
@@ -121,7 +122,7 @@ public class SettingsManagerTests
 
         whWzManager.Received(1).LoadSettings(Path.Combine(SettingsTestUtils.CreateApplicationDataLocation().DirectoryPath, "config.json"));
         dolphinManager.Received(1).LoadSettings(Path.Combine("", "Config"));
-        recompManager.Received(1).LoadSettings(PathManager.RecompConfigFilePath);
+        recompManager.Received(1).LoadSettings(SettingsTestUtils.CreateRecompPaths().ConfigFilePath);
     }
 
     [Fact]
@@ -141,7 +142,8 @@ public class SettingsManagerTests
             fs,
             SettingsTestUtils.CreateSettingsSignalBus(),
             new DolphinPathResolver(fs, new RuntimeEnvironment()),
-            SettingsTestUtils.CreateApplicationDataLocation()
+            SettingsTestUtils.CreateApplicationDataLocation(),
+            SettingsTestUtils.CreateRecompPaths()
         );
 
         manager.LoadSettings();
@@ -167,7 +169,8 @@ public class SettingsManagerTests
             fileSystem,
             SettingsTestUtils.CreateSettingsSignalBus(),
             new DolphinPathResolver(fileSystem, new RuntimeEnvironment()),
-            SettingsTestUtils.CreateApplicationDataLocation()
+            SettingsTestUtils.CreateApplicationDataLocation(),
+            SettingsTestUtils.CreateRecompPaths()
         );
     }
 }
@@ -394,6 +397,13 @@ public class SettingsStartupInitializerTests
 
 internal static class SettingsTestUtils
 {
+    public static IRecompPaths CreateRecompPaths()
+    {
+        var paths = Substitute.For<IRecompPaths>();
+        paths.ConfigFilePath.Returns(Path.GetFullPath("/settings-test-data/Recomp/Config.toml"));
+        return paths;
+    }
+
     public static IApplicationDataLocation CreateApplicationDataLocation()
     {
         var location = Substitute.For<IApplicationDataLocation>();

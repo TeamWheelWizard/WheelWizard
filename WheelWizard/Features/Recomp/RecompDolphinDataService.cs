@@ -1,6 +1,5 @@
 using System.IO.Abstractions;
 using WheelWizard.Dolphin.Discovery;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 
 namespace WheelWizard.Recomp;
@@ -33,7 +32,8 @@ public sealed class RecompDolphinDataService(
     ISettingsManager settings,
     IRecompSettingManager recompSettings,
     IFileSystem fileSystem,
-    IDolphinDiscoveryService dolphinDiscovery
+    IDolphinDiscoveryService dolphinDiscovery,
+    IRecompPaths paths
 ) : IRecompDolphinDataService
 {
     public bool IsSharingEnabled => settings.Get<bool>(settings.RECOMP_USE_DOLPHIN_DATA);
@@ -54,7 +54,7 @@ public sealed class RecompDolphinDataService(
             // A missing copy never falls back to the Dolphin NAND: the user chose the copy exactly
             // so that Dolphin's own data is left alone, and a private NAND is the safe default.
             if (CopyEnabled)
-                return ValidateNandFolder(PathManager.RecompNandCopyFolderPath);
+                return ValidateNandFolder(paths.NandCopyFolderPath);
 
             return null;
         }
@@ -107,7 +107,7 @@ public sealed class RecompDolphinDataService(
         if (source is null)
             return Fail("No Dolphin Wii data folder was found to copy.");
 
-        var destination = PathManager.RecompNandCopyFolderPath;
+        var destination = paths.NandCopyFolderPath;
         try
         {
             if (fileSystem.Directory.Exists(destination))
@@ -142,11 +142,11 @@ public sealed class RecompDolphinDataService(
             // The backend owns creating Config.toml, so reread first: right after an install the
             // file is brand new and this manager may never have seen it. Without a file there is
             // nothing to configure yet, and the next successful install applies this again.
-            recompSettings.ReloadSettings(PathManager.RecompConfigFilePath);
+            recompSettings.ReloadSettings(paths.ConfigFilePath);
 
             if (nandFolderPath is null)
             {
-                recompSettings.RemoveTomlSetting(PathManager.RecompConfigFilePath, "paths", "nand_root");
+                recompSettings.RemoveTomlSetting(paths.ConfigFilePath, "paths", "nand_root");
                 settings.Set(settings.RECOMP_NAND_ROOT, "", skipSave: true);
                 return Ok();
             }
