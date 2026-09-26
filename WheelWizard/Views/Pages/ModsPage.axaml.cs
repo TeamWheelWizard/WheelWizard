@@ -10,7 +10,6 @@ using Avalonia.VisualTree;
 using WheelWizard.Features.Patches;
 using WheelWizard.Models.Mods;
 using WheelWizard.Mods;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;

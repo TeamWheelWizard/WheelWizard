@@ -6,7 +6,6 @@ using Semver;
 using WheelWizard.CustomDistributions.Domain;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.IO;
@@ -491,7 +490,7 @@ public class RetroRewind : IDistribution
             if (string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(path))
                 continue;
             // Fix old URLs using HTTP to the new endpoint
-            var fixedUrl = url.Replace(Endpoints.OldRRUrl, Endpoints.RRUrl);
+            var fixedUrl = url.Replace(RetroRewindEndpoints.LegacyBaseUrl, RetroRewindEndpoints.BaseUrl);
             if (!SemVersion.TryParse(version, out var _))
                 continue;
             var parsedVersion = SemVersion.Parse(version);

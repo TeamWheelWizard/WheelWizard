@@ -1,8 +1,8 @@
 using WheelWizard.CustomDistributions;
+using WheelWizard.Launching;
 using WheelWizard.Models.Enums;
 using WheelWizard.Mods;
 using WheelWizard.Recomp.Domain;
-using WheelWizard.Services.Launcher;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;

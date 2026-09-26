@@ -1,6 +1,6 @@
 using WheelWizard.Models.Enums;
 
-namespace WheelWizard.Services.Launcher;
+namespace WheelWizard.Launching;
 
 public interface ILauncher
 {

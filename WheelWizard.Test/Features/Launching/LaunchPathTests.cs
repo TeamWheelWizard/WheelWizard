@@ -5,7 +5,6 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Launching;
 using WheelWizard.Mods;
-using WheelWizard.Services.Launcher;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Downloads;
@@ -71,48 +70,24 @@ public class LaunchPathTests
         var dolphinPaths = Substitute.For<IDolphinPaths>();
         var paths = Substitute.For<ICustomDistributionPaths>();
         var environment = Substitute.For<IRuntimeEnvironment>();
-        ILauncher launcher = beta
-            ? new RrBetaLauncher(distributions, mods, settings, remotes, dolphin, fs, dolphinPaths, paths, descriptor, environment)
-            : new RrLauncher(distributions, mods, settings, remotes, dolphin, fs, dolphinPaths, paths, descriptor, environment);
-
-        Assert.True((await launcher.Launch()).IsFailure);
+        var launcher = new RetroRewindLaunchService(
+            settings,
+            fs,
+            dolphin,
+            remotes,
+            dolphinPaths,
+            paths,
+            mods,
+            descriptor,
+            environment,
+            Substitute.For<ILaunchPrompts>()
+        );
+        Assert.True((await launcher.LaunchAsync(beta)).IsFailure);
 
         dolphin.DidNotReceive().KillDolphin();
         Assert.Empty(mods.ReceivedCalls());
         Assert.Empty(remotes.ReceivedCalls());
         Assert.Empty(descriptor.ReceivedCalls());
-    }
-
-    [Fact]
-    public async Task MiiChannel_UsesRelocatedApplicationData()
-    {
-        var fs = new MockFileSystem(options => options.SimulatingOperatingSystem(SimulationMode.Linux));
-        fs.Directory.CreateDirectory("/moved");
-        fs.File.WriteAllText("/moved/MiiChannel.wad", "channel");
-        var location = Substitute.For<IApplicationDataLocation>();
-        location.DirectoryPath.Returns("/old");
-        var dolphin = Substitute.For<IDolphinLaunchService>();
-        dolphin.PreflightDolphinVersionAsync().Returns(Ok());
-        var paths = Substitute.For<IDolphinPaths>();
-        paths.ConfigFolderPath.Returns("/config");
-        var remotes = Substitute.For<IWiiRemoteConfigurationService>();
-        var launcher = new MiiChannelLauncher(
-            Substitute.For<IDownloadService>(),
-            remotes,
-            dolphin,
-            location,
-            paths,
-            fs,
-            Substitute.For<IRuntimeEnvironment>()
-        );
-        location.DirectoryPath.Returns("/moved");
-
-        await launcher.LaunchMiiChannel();
-
-        remotes.Received(1).SetVirtualRemoteEnabled("/config", true);
-        await dolphin
-            .Received(1)
-            .LaunchDolphin("-b '/moved/MiiChannel.wad'", false, Arg.Is<WheelWizard.Shared.OperationResult>(result => result.IsSuccess));
     }
 
     private static ISettingsManager CreateSettings()

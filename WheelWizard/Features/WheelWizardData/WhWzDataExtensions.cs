@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using WheelWizard.Services;
 using WheelWizard.Shared.JsonConverters;
 using WheelWizard.WheelWizardData.Domain;
 
@@ -11,7 +10,7 @@ public static class WhWzDataExtensions
     public static IServiceCollection AddWhWzData(this IServiceCollection services)
     {
         services.AddWhWzRefitApi<IWhWzDataApi>(
-            Endpoints.WhWzDataBaseAddress,
+            "https://raw.githubusercontent.com/TeamWheelWizard/WheelWizard-Data/main",
             new()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
