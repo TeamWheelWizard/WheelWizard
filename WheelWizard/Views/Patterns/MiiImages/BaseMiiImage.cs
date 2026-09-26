@@ -4,7 +4,6 @@ using Avalonia;
 using Avalonia.Media.Imaging;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
@@ -19,8 +18,28 @@ public abstract class BaseMiiImage : UserControlBase, INotifyPropertyChanged
         KeepInstanceUntilNew, // reload each image, and swap them if loaded. If there are more images, they will
     }
 
-    [Inject]
-    protected IMiiImagesSingletonService MiiImageService { get; set; } = null!;
+    private readonly IMiiImagesSingletonService MiiImageService;
+    protected bool IsImageAttached { get; private set; }
+
+    protected BaseMiiImage(IMiiImagesSingletonService images) => MiiImageService = images;
+
+    public abstract void RefreshCurrentMii();
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        IsImageAttached = true;
+        RefreshCurrentMii();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        IsImageAttached = false;
+        _reloadCts?.Cancel();
+        _reloadCts?.Dispose();
+        _reloadCts = null;
+        base.OnDetachedFromVisualTree(e);
+    }
 
     private bool _miiLoaded;
     public bool MiiLoaded
@@ -63,7 +82,7 @@ public abstract class BaseMiiImage : UserControlBase, INotifyPropertyChanged
         set => SetValue(ReloadMethodProperty, value);
     }
 
-    public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<BaseMiiImage, Mii?>(nameof(Mii), coerce: CoerceMii);
+    public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<BaseMiiImage, Mii?>(nameof(Mii));
 
     public Mii? Mii
     {
@@ -71,11 +90,9 @@ public abstract class BaseMiiImage : UserControlBase, INotifyPropertyChanged
         set => SetValue(MiiProperty, value);
     }
 
-    private static Mii? CoerceMii(AvaloniaObject o, Mii? value)
+    static BaseMiiImage()
     {
-        // Consider casting to BaseMiiImage if MiiImageLoader isn't guaranteed
-        ((BaseMiiImage)o).OnMiiChanged(value);
-        return value;
+        MiiProperty.Changed.AddClassHandler<BaseMiiImage>((view, change) => view.OnMiiChanged(change.GetNewValue<Mii?>()));
     }
 
     protected abstract void OnMiiChanged(Mii? newMii);
@@ -84,6 +101,9 @@ public abstract class BaseMiiImage : UserControlBase, INotifyPropertyChanged
 
     protected async void ReloadImages(Mii? newMii, ICollection<MiiImageSpecifications> variants)
     {
+        if (!IsImageAttached)
+            return;
+
         // Cancel and dispose previous operation if any
         _reloadCts?.Cancel();
         _reloadCts?.Dispose();
