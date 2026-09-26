@@ -1,229 +1,39 @@
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.Logging;
-using WheelWizard.AutoUpdating;
-using WheelWizard.GameBanana.InstallRequests;
-using WheelWizard.Launching;
-using WheelWizard.MiiRendering.Services;
-using WheelWizard.Mods;
-using WheelWizard.RrRooms;
-using WheelWizard.Settings;
+using WheelWizard.ApplicationLifecycle;
 using WheelWizard.Views.Behaviors;
-using WheelWizard.Views.Popups.Generic;
-using WheelWizard.WheelWizardData;
-using WheelWizard.WiiManagement;
-using WheelWizard.WiiManagement.GameLicense;
+using WheelWizard.Views.Startup;
 
 namespace WheelWizard.Views;
 
 public class App : Application
 {
-    private enum StartupLaunchTarget
-    {
-        None,
-        RetroRewind,
-    }
+    private readonly IDesktopStartup? _startup;
 
-    /// <summary>
-    /// Gets the service provider configured for this application.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the application is not initialized yet.</exception>
-    private static IServiceProvider Services =>
-        (Current as App)?._serviceProvider ?? throw new InvalidOperationException("The application is not initialized yet.");
+    /// <summary>Loads visual resources for the Avalonia previewer and headless UI tests.</summary>
+    public App() { }
 
-    private IServiceProvider? _serviceProvider;
-
-    /// <summary>
-    /// Sets the service provider for this application.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the service provider has already been set.</exception>
-    public void SetServiceProvider(IServiceProvider serviceProvider)
-    {
-        if (_serviceProvider != null)
-            throw new InvalidOperationException("The service provider has already been set.");
-
-        _serviceProvider = serviceProvider;
-    }
+    public App(IDesktopStartup startup) => _startup = startup;
 
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-        InitializeBehaviorOverrides();
-    }
-
-    private void InitializeBehaviorOverrides()
-    {
-        //Behavior overrides are native components where we are overriding the behavior of
         ToolTipBubbleBehavior.Initialize();
-    }
-
-    private static string? GetLaunchProtocolArgument()
-    {
-        var args = Environment.GetCommandLineArgs();
-        for (var i = 1; i < args.Length; i++)
-        {
-            var argument = args[i];
-            if (argument.StartsWith("wheelwizard://", StringComparison.OrdinalIgnoreCase))
-                return argument;
-        }
-
-        return null;
-    }
-
-    private static StartupLaunchTarget GetStartupLaunchTarget()
-    {
-        var args = Environment.GetCommandLineArgs();
-
-        for (var i = 1; i < args.Length; i++)
-        {
-            var argument = args[i];
-            if (
-                argument.Equals("--launch", StringComparison.OrdinalIgnoreCase) || argument.Equals("-l", StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                if (i + 1 >= args.Length)
-                    continue;
-
-                var launchTarget = args[++i];
-                if (
-                    launchTarget.Equals("rr", StringComparison.OrdinalIgnoreCase)
-                    || launchTarget.Equals("retrorewind", StringComparison.OrdinalIgnoreCase)
-                    || launchTarget.Equals("retro-rewind", StringComparison.OrdinalIgnoreCase)
-                )
-                {
-                    return StartupLaunchTarget.RetroRewind;
-                }
-
-                continue;
-            }
-
-            if (!argument.StartsWith("--launch=", StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            var launchTargetFromEquals = argument["--launch=".Length..].Trim();
-            if (
-                launchTargetFromEquals.Equals("rr", StringComparison.OrdinalIgnoreCase)
-                || launchTargetFromEquals.Equals("retrorewind", StringComparison.OrdinalIgnoreCase)
-                || launchTargetFromEquals.Equals("retro-rewind", StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                return StartupLaunchTarget.RetroRewind;
-            }
-        }
-
-        return StartupLaunchTarget.None;
-    }
-
-    private static async Task<bool> OpenGameBananaModWindowAsync()
-    {
-        var protocolArgument = GetLaunchProtocolArgument();
-        if (string.IsNullOrWhiteSpace(protocolArgument))
-            return false;
-
-        var reloadResult = await Services.GetRequiredService<IModManager>().ReloadAsync();
-        if (reloadResult.IsFailure)
-        {
-            var logger = Services.GetRequiredService<ILogger<App>>();
-            logger.LogError(
-                reloadResult.Error.Exception,
-                "Failed to reload mods before opening protocol window: {Message}",
-                reloadResult.Error.Message
-            );
-        }
-
-        await Services.GetRequiredService<IModInstallRequestHandler>().HandleAsync(protocolArgument);
-        return true;
-    }
-
-    private async void OnInitializedAsync()
-    {
-        try
-        {
-            var launchedFromProtocol = await OpenGameBananaModWindowAsync();
-
-            var updateService = Services.GetRequiredService<IAutoUpdaterSingletonService>();
-            var whWzDataService = Services.GetRequiredService<IWhWzDataSingletonService>();
-
-            await updateService.CheckForUpdatesAsync();
-            await whWzDataService.LoadBadgesAsync();
-            InitializeManagers();
-
-            var settingsManager = Services.GetRequiredService<ISettingsManager>();
-            var requestedByCli = GetStartupLaunchTarget() == StartupLaunchTarget.RetroRewind;
-            var shouldLaunchRrOnStartup = !launchedFromProtocol && settingsManager.Get<bool>(settingsManager.LAUNCH_RR_ON_STARTUP);
-            if (requestedByCli || shouldLaunchRrOnStartup)
-            {
-                var rrLauncher = Services.GetRequiredService<RrLauncher>();
-                var launchResult = await rrLauncher.Launch();
-                if (launchResult.IsFailure)
-                {
-                    var logger = Services.GetRequiredService<ILogger<App>>();
-                    logger.LogError(
-                        launchResult.Error.Exception,
-                        "Failed to launch Retro Rewind on startup: {Message}",
-                        launchResult.Error.Message
-                    );
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            var logger = Services.GetRequiredService<ILogger<App>>();
-            logger.LogError(e, "Failed to initialize application: {Message}", e.Message);
-        }
-    }
-
-    private static void InitializeManagers()
-    {
-        Services.GetRequiredService<LiveStatusService>().Start();
-        Services.GetRequiredService<LiveRoomsService>().Start();
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (_startup is not null && ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.Exit += (_, _) => (_serviceProvider as IDisposable)?.Dispose();
-            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            _ = InitializeDesktopAsync(desktop);
-        }
-
-        base.OnFrameworkInitializationCompleted();
-    }
-
-    private async Task InitializeDesktopAsync(IClassicDesktopStyleApplicationLifetime desktop)
-    {
-        try
-        {
-            // Fire and forget: removing the extraction folders of previous versions can take a while
-            // and must never block (or fail) the startup of the application.
-            _ = Services.GetRequiredService<IBundleExtractionCleanupService>().CleanupStaleExtractionsAsync();
-
-            var resourceInstaller = Services.GetRequiredService<IMiiRenderingResourceInstaller>();
-            if (resourceInstaller.GetResolvedResourcePath().IsFailure)
+            var shutdown = new CancellationTokenSource();
+            desktop.Exit += (_, _) =>
             {
-                var setupPopup = Services.GetRequiredService<WheelWizard.Views.Popups.IPopupFactory>().Create<MiiRenderingSetupPopup>();
-                var shouldContinue = await setupPopup.ShowAndAwaitCompletionAsync();
-                if (!shouldContinue)
-                {
-                    desktop.Shutdown();
-                    return;
-                }
-            }
-
-            Services.GetRequiredService<IMainWindowService>().Show(desktop);
-
-            var gameDataService = Services.GetRequiredService<IGameLicenseSingletonService>();
-            gameDataService.LoadLicense();
-            OnInitializedAsync();
+                shutdown.Cancel();
+                shutdown.Dispose();
+            };
+            _ = _startup.StartAsync(desktop, StartupOptions.Parse(desktop.Args ?? []), shutdown.Token);
         }
-        catch (Exception e)
-        {
-            var logger = Services.GetRequiredService<ILogger<App>>();
-            logger.LogError(e, "Failed to initialize desktop application: {Message}", e.Message);
-            desktop.Shutdown();
-        }
+        base.OnFrameworkInitializationCompleted();
     }
 }
