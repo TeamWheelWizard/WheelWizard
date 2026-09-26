@@ -5,9 +5,9 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Testably.Abstractions;
+using WheelWizard.Launching;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services.Launcher;
-using WheelWizard.Services.Launcher.Helpers;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
@@ -29,6 +29,9 @@ public partial class HomePage : UserControlBase
         ("You again?", "The game is pretending not to notice you.", "Open it", "Leave it"),
         ("Starting the game already?", "That was fast. Almost too fast.", "Fine", "Hold on"),
     ];
+
+    [Inject]
+    private IDolphinLaunchService DolphinLaunchService { get; set; } = null!;
 
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
@@ -132,7 +135,7 @@ public partial class HomePage : UserControlBase
 
     private async void DolphinButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        await DolphinLaunchHelper.LaunchDolphin();
+        await DolphinLaunchService.LaunchDolphin();
         DisableAllButtonsTemporarily();
     }
 

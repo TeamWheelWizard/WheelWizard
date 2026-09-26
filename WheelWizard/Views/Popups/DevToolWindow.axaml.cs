@@ -1,7 +1,7 @@
-﻿using Avalonia.Interactivity;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Microsoft.Extensions.Caching.Memory;
-using WheelWizard.Services.Launcher.Helpers;
+using WheelWizard.Launching;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Shared;
 using WheelWizard.Shared.DependencyInjection;
@@ -16,6 +16,9 @@ namespace WheelWizard.Views.Popups;
 
 public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
 {
+    [Inject]
+    private IDolphinLaunchService DolphinLaunchService { get; set; } = null!;
+
     [Inject]
     private IMemoryCache Cache { get; set; } = null!;
 
@@ -63,7 +66,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
     }
 
     private async void MiiChannel_OnClick(object? sender, RoutedEventArgs e) =>
-        await DolphinLaunchHelper.LaunchDolphin(" -b -n 0001000248414341");
+        await DolphinLaunchService.LaunchDolphin(" -b -n 0001000248414341");
 
     #region Popup Tests
 
