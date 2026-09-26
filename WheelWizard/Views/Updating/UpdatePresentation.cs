@@ -52,7 +52,7 @@ public sealed class UpdatePresentation : IUpdatePresentation
                         $"There is a new Wheel Wizard version available!\nVersion {latestVersion} (You are currently on {currentVersion})\n"
                             + "You can manually update it by going to the GitHub releases at: https://github.com/TeamWheelWizard/WheelWizard/releases"
                     )
-                    .ShowDialog()
+                    .Show()
         );
 
     public async Task<OperationResult> RunUpdateAsync(
