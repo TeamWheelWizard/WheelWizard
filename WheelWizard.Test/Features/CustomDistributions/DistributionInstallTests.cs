@@ -138,11 +138,40 @@ public class DistributionInstallTests
         }
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task CancelledInstallation_IsNotReportedAsCompleted(bool beta)
+    {
+        var fixture = new Fixture();
+        using var cancellation = new CancellationTokenSource();
+        fixture
+            .Downloads.DownloadAsync(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<bool>(),
+                Arg.Any<IProgress<DownloadProgress>>(),
+                cancellation.Token
+            )
+            .Returns(_ =>
+            {
+                cancellation.Cancel();
+                return Task.FromCanceled<OperationResult<string>>(cancellation.Token);
+            });
+        IDistribution distribution = beta ? fixture.Beta : fixture.Stable;
+
+        var result = await distribution.InstallAsync(new(CancellationToken: cancellation.Token));
+
+        Assert.True(result.IsFailure);
+        Assert.False(fixture.Fs.Directory.Exists(beta ? fixture.Paths.BetaFolderPath : fixture.Paths.RetroRewindFolderPath));
+    }
+
     private sealed class Fixture
     {
         public MockFileSystem Fs { get; } = new();
         public CustomDistributionPaths Paths { get; }
         public IDistributionPrompts Prompts { get; } = Substitute.For<IDistributionPrompts>();
+        public IDownloadService Downloads { get; } = Substitute.For<IDownloadService>();
         public byte[] Archive { get; set; } = [];
         public RetroRewind Stable { get; }
         public RetroRewindBeta Beta { get; }
@@ -158,7 +187,7 @@ public class DistributionInstallTests
             dolphin.WiiFolderPath.Returns(Fs.Path.Combine(root, "nand"));
             dolphin.LoadFolderPath.Returns(Fs.Path.Combine(root, "load"));
             Paths = new(location, dolphin, Fs);
-            var downloads = Substitute.For<IDownloadService>();
+            var downloads = Downloads;
             downloads
                 .DownloadAsync(
                     Arg.Any<string>(),

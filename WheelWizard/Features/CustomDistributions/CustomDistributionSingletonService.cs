@@ -7,14 +7,14 @@ public interface ICustomDistributionSingletonService
     // FIXME: Abstract this reference away. A generic Distributions service kinda loses its purpose when you still have to reference a distribution by name (like done here)
     //  Instead you would want something like DistService.GetCurrentDistro()
     //  The rest of the application should not have to know what distribution is currently active.
-    RetroRewind RetroRewind { get; }
-    RetroRewindBeta RetroRewindBeta { get; }
+    IDistribution RetroRewind { get; }
+    IDistribution RetroRewindBeta { get; }
 }
 
 public class CustomDistributionSingletonService : ICustomDistributionSingletonService
 {
-    public RetroRewind RetroRewind { get; }
-    public RetroRewindBeta RetroRewindBeta { get; }
+    public IDistribution RetroRewind { get; }
+    public IDistribution RetroRewindBeta { get; }
 
     public CustomDistributionSingletonService(RetroRewind retroRewind, RetroRewindBeta retroRewindBeta)
     {
