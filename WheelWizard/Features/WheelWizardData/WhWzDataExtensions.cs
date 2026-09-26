@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using WheelWizard.Services;
 using WheelWizard.Shared.JsonConverters;
@@ -20,6 +20,8 @@ public static class WhWzDataExtensions
         );
 
         services.AddSingleton<IWhWzDataSingletonService, WhWzDataSingletonService>();
+
+        services.AddSingleton<LiveStatusService>();
 
         return services;
     }

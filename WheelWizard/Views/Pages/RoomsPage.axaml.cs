@@ -1,15 +1,20 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
+using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Pages;
 
 public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
 {
+    [Inject]
+    private LiveRoomsService LiveRooms { get; set; } = null!;
+
     private string? _searchQuery;
 
     private readonly ObservableCollection<RrRoom> _rooms = [];
@@ -40,15 +45,15 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
     {
         InitializeComponent();
         DataContext = this;
-        RRLiveRooms.Instance.Subscribe(this);
+        LiveRooms.Subscribe(this);
 
-        OnUpdate(RRLiveRooms.Instance);
+        OnUpdate(LiveRooms);
         Unloaded += RoomsPage_Unloaded;
     }
 
     public void OnUpdate(RepeatedTaskManager sender)
     {
-        if (sender is not RRLiveRooms liveRooms)
+        if (sender is not LiveRoomsService liveRooms)
             return;
 
         Rooms.Clear();
@@ -93,7 +98,7 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
 
     private void RoomsPage_Unloaded(object? sender, RoutedEventArgs e)
     {
-        RRLiveRooms.Instance.Unsubscribe(this);
+        LiveRooms.Unsubscribe(this);
     }
 
     private void PlayerSearchField_OnTextChanged(object? sender, TextChangedEventArgs e)

@@ -5,7 +5,7 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Binary;
@@ -68,6 +68,7 @@ public interface IGameLicenseSingletonService
     /// Subscribes a listener to the repeated task manager.
     /// </summary>
     void Subscribe(IRepeatedTaskListener subscriber);
+    bool Unsubscribe(IRepeatedTaskListener subscriber);
 
     /// <summary>
     /// Changes the Mii for a specific user index.
@@ -95,6 +96,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private readonly ISaveRegionService _saveRegions;
     private readonly IDolphinPaths _dolphinPaths;
     private readonly ICustomDistributionPaths _distributionPaths;
+    private readonly IRoomPresence _presence;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
 
@@ -106,7 +108,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         ISettingsManager settingsManager,
         ISaveRegionService saveRegions,
         IDolphinPaths dolphinPaths,
-        ICustomDistributionPaths distributionPaths
+        ICustomDistributionPaths distributionPaths,
+        IRoomPresence presence
     )
         : base(40)
     {
@@ -118,6 +121,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         _saveRegions = saveRegions;
         _dolphinPaths = dolphinPaths;
         _distributionPaths = distributionPaths;
+        _presence = presence;
         Licenses = new();
     }
 
@@ -157,11 +161,11 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
     public void RefreshOnlineStatus()
     {
-        var currentRooms = RRLiveRooms.Instance.CurrentRooms;
-        var onlinePlayers = currentRooms.SelectMany(room => room.Players).ToList();
         foreach (var user in Licenses.Users)
         {
-            user.IsOnline = onlinePlayers.Any(player => player.FriendCode == user.FriendCode);
+            user.IsOnline = _presence.IsOnline(user.FriendCode);
+            foreach (var friend in user.Friends)
+                friend.IsOnline = _presence.IsOnline(friend.FriendCode);
         }
     }
 
@@ -229,6 +233,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         {
             Licenses.Users.Add(CreateDummyLicense());
         }
+        RefreshOnlineStatus();
         return Ok();
     }
 

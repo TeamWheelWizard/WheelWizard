@@ -1,7 +1,6 @@
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Utilities.RepeatedTasks;
-using WheelWizard.Views;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.FriendCodes;
@@ -9,9 +8,9 @@ using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
-namespace WheelWizard.Services.LiveData;
+namespace WheelWizard.RrRooms;
 
-public class RRLiveRooms : RepeatedTaskManager
+public class LiveRoomsService : RepeatedTaskManager
 {
     private readonly IWhWzDataSingletonService _whWzService;
     private readonly IRrRoomsSingletonService _roomsService;
@@ -22,13 +21,14 @@ public class RRLiveRooms : RepeatedTaskManager
     public int PlayerCount => CurrentRooms.Sum(room => room.PlayerCount);
     public int RoomCount => CurrentRooms.Count;
 
-    public static RRLiveRooms Instance => App.Services.GetRequiredService<RRLiveRooms>();
+    private readonly IRoomPresence _presence;
 
-    public RRLiveRooms(
+    public LiveRoomsService(
         IWhWzDataSingletonService whWzService,
         IRrRoomsSingletonService roomsService,
         IRrLeaderboardSingletonService leaderboardService,
-        IGameLicenseSingletonService gameLicenseService
+        IGameLicenseSingletonService gameLicenseService,
+        IRoomPresence presence
     )
         : base(40)
     {
@@ -36,6 +36,7 @@ public class RRLiveRooms : RepeatedTaskManager
         _roomsService = roomsService;
         _leaderboardService = leaderboardService;
         _gameLicenseService = gameLicenseService;
+        _presence = presence;
     }
 
     protected override async Task ExecuteTaskAsync()
@@ -49,7 +50,7 @@ public class RRLiveRooms : RepeatedTaskManager
         var leaderboardResult = leaderboardTask.Result;
         if (roomsResult.IsFailure)
         {
-            CurrentRooms = [];
+            PublishRooms([]);
             return;
         }
 
@@ -81,7 +82,14 @@ public class RRLiveRooms : RepeatedTaskManager
             .Select(room => MapRoom(room, _whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
             .ToList();
 
-        CurrentRooms = rrRooms;
+        PublishRooms(rrRooms);
+    }
+
+    private void PublishRooms(List<RrRoom> rooms)
+    {
+        CurrentRooms = rooms;
+        _presence.Replace(rooms.SelectMany(room => room.Players).Select(player => player.FriendCode));
+        _gameLicenseService.RefreshOnlineStatus();
     }
 
     private static RrRoom MapRoom(

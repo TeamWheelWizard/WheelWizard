@@ -2,7 +2,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.Launching;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Shared;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
@@ -11,11 +11,15 @@ using WheelWizard.Utilities.RepeatedTasks;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Popups;
 
 public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
 {
+    [Inject]
+    private LiveRoomsService LiveRooms { get; set; } = null!;
+
     [Inject]
     private IDolphinLaunchService DolphinLaunchService { get; set; } = null!;
 
@@ -43,7 +47,7 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
     // to be an observer pattern besides this, and it would make the codebase more complex for no reason.
     public void OnUpdate(RepeatedTaskManager sender)
     {
-        RrRefreshTimeLeft.Text = RRLiveRooms.Instance.TimeUntilNextTick.Seconds.ToString();
+        RrRefreshTimeLeft.Text = LiveRooms.TimeUntilNextTick.Seconds.ToString();
         MiiImagesCashed.Text = ((MemoryCache)Cache).Count.ToString();
     }
 
