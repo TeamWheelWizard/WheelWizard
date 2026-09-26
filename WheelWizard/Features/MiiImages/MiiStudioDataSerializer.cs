@@ -1,6 +1,5 @@
 using System.Text;
 using WheelWizard.Shared.Binary;
-using WheelWizard.Utilities;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -9,7 +8,6 @@ namespace WheelWizard.MiiImages;
 
 public class MiiStudioDataSerializer
 {
-    private static readonly bool IsAprilFirst = AprilFirstHelper.IsAprilFirstLocalOrBst();
     private const string AprilFirstMiiBase64 =
         "BCAAWgBQAEzwbQAAAAAAAAAAAAAAAH9MyRhyVCQREREEBYGAAUDIsjyMiEAUSJiNcGoAiiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
     private static readonly byte[] AprilFirstMiiData = Convert.FromBase64String(AprilFirstMiiBase64);
@@ -19,12 +17,12 @@ public class MiiStudioDataSerializer
     /// <summary>
     /// Serialize the Mii in t the encoded data string required by the Nintendo Mii Image URL.
     /// </summary>
-    public static OperationResult<string> Serialize(Mii? mii)
+    public static OperationResult<string> Serialize(Mii? mii, bool useAprilFirstAppearance = false)
     {
         if (mii == null)
             return Fail("Mii cannot be null.");
 
-        if (IsAprilFirst)
+        if (useAprilFirstAppearance)
         {
             var aprilFirstMiiResult = MiiSerializer.Deserialize(AprilFirstMiiData);
             if (aprilFirstMiiResult.IsFailure)

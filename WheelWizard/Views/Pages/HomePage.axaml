@@ -7,6 +7,8 @@
              xmlns:behaviorComponent="clr-namespace:WheelWizard.Views.Patterns"
              mc:Ignorable="d" d:DesignWidth="490" d:DesignHeight="830"
              ClipToBounds="False"
+             xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
+             x:DataType="pages:HomeViewModel"
              x:Class="WheelWizard.Views.Pages.HomePage">
     <UserControl.Styles>
         <Style Selector="components|WheelTrail.HoverEnterTrail">
@@ -103,7 +105,7 @@
 
         
     </UserControl.Styles>
-    <Grid x:Name="CompleteGrid">
+    <Grid x:Name="CompleteGrid" IsEnabled="{Binding IsInteractable}">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <!-- This is the total height as the (Title + infoSection) - (padding) -->
@@ -117,14 +119,7 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,6"
-                    HorizontalAlignment="Right"
-                    x:Name="GameModeOption">
-            <components:FormFieldLabel Text="Game mode:" VerticalAlignment="Center" />
-            <ComboBox x:Name="GameModeDropdown"
-                      SelectionChanged="GameModeDropdown_OnSelectionChanged" MinWidth="160"
-                      VerticalAlignment="Top" />
-        </StackPanel>
+
 
         <!-- These are invisible by default, they will be set to visible once the button is turned to green 
             This way we don't have to take in account whether or not an animation can play, since if it plays but it is not allowed, it will be invisible anyways -->
@@ -154,11 +149,11 @@
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="180" Margin="0,220">
 
-            <TextBlock HorizontalAlignment="Center" Classes="TitleText" x:Name="GameTitle" />
+            <TextBlock HorizontalAlignment="Center" Classes="TitleText" x:Name="GameTitle" Text="{Binding GameTitle}" />
             <components:Button x:Name="PlayButton"
-                               IsEnabled="True"
-                               Variant="Primary"
-                               Text="Play" PointerEntered="PlayButton_OnPointerEntered"
+                               IsEnabled="{Binding CanExecuteMain}"
+                               Variant="{Binding ButtonVariant}"
+                               Text="{Binding ButtonText}" PointerEntered="PlayButton_OnPointerEntered"
                                PointerExited="PlayButton_OnPointerExit"
                                IconData="{StaticResource Play}"
                                Click="PlayButton_Click"
@@ -167,7 +162,8 @@
             <!-- Normally we should not change the iconSize and/or Height since default is already correct
              But because the dolphin icon looks goofy that small, we can increase the size, and then change the size to be the default size again  -->
             <components:Button x:Name="DolphinButton"
-                               IsEnabled="True"
+                               IsEnabled="{Binding CanLaunchDolphin}"
+                               IsVisible="{Binding IsDolphinVisible}"
                                IconData="{StaticResource DolphinIcon}"
                                IconSize="30"
                                Height="40"
