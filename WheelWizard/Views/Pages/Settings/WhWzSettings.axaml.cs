@@ -594,11 +594,11 @@ public partial class WhWzSettings : UserControlBase
             var revert = await prompt.AwaitAnswer();
             if (revert)
             {
-                var revertSucceeded = ApplicationData.TryRevertMove(
-                    moveDetails.SourcePath,
-                    moveDetails.DestinationPath,
-                    out var revertError
-                );
+                var (revertSucceeded, revertError) = await Task.Run(() =>
+                {
+                    var success = ApplicationData.TryRevertMove(moveDetails.SourcePath, moveDetails.DestinationPath, out var error);
+                    return (success, error);
+                });
 
                 if (!revertSucceeded)
                 {
