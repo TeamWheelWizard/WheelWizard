@@ -21,7 +21,7 @@ using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
+public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
     private IPopupFactory Popups { get; }
 

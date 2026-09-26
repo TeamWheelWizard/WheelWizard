@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Launching;
@@ -9,7 +10,7 @@ using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class TestingPage : UserControlBase
+public partial class TestingPage : UserControl
 {
     private WheelWizardStatus _status = WheelWizardStatus.Loading;
     private bool _isBusy;

@@ -1,11 +1,12 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using WheelWizard.Settings.Types;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
 
-public partial class CurrentUserProfile : UserControlBase
+public partial class CurrentUserProfile : UserControl
 {
     #region Properties
 

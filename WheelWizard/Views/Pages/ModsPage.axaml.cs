@@ -22,7 +22,7 @@ namespace WheelWizard.Views.Pages;
 
 public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest, ModPreviewViewModel Preview);
 
-public partial class ModsPage : UserControlBase, INotifyPropertyChanged
+public partial class ModsPage : UserControl, INotifyPropertyChanged
 {
     private IPopupFactory Popups { get; }
 

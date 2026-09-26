@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
@@ -8,7 +9,7 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Patterns;
 
-public abstract class BaseMiiImage : UserControlBase, INotifyPropertyChanged
+public abstract class BaseMiiImage : UserControl, INotifyPropertyChanged
 {
     public enum ReloadMethodType
     {

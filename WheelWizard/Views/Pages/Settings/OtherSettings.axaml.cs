@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Recomp;
@@ -9,7 +10,7 @@ using WheelWizard.Views.Storage;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class OtherSettings : UserControlBase
+public partial class OtherSettings : UserControl
 {
     private readonly bool _settingsAreDisabled;
 
