@@ -3,9 +3,9 @@ using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Mods;
 using WheelWizard.Services.Launcher.Helpers;
-using WheelWizard.Services.WiiManagement;
 using WheelWizard.Settings;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WiiManagement.Controllers;
 
 namespace WheelWizard.Services.Launcher;
 
@@ -16,16 +16,19 @@ public class RrLauncher : ILauncher
     private readonly ICustomDistributionSingletonService _customDistributionSingletonService;
     private readonly IModsLaunchService _modsLaunchService;
     private readonly ISettingsManager _settingsManager;
+    private readonly IWiiRemoteConfigurationService _wiiRemoteConfiguration;
 
     public RrLauncher(
         ICustomDistributionSingletonService customDistributionSingletonService,
         IModsLaunchService modsLaunchService,
-        ISettingsManager settingsManager
+        ISettingsManager settingsManager,
+        IWiiRemoteConfigurationService wiiRemoteConfiguration
     )
     {
         _customDistributionSingletonService = customDistributionSingletonService;
         _modsLaunchService = modsLaunchService;
         _settingsManager = settingsManager;
+        _wiiRemoteConfiguration = wiiRemoteConfiguration;
     }
 
     public async Task<OperationResult> Launch()
@@ -42,8 +45,8 @@ public class RrLauncher : ILauncher
                 return preflightResult.Error;
 
             DolphinLaunchHelper.KillDolphin();
-            if (WiiMoteSettings.IsForceSettingsEnabled())
-                WiiMoteSettings.DisableVirtualWiiMote();
+            if (_settingsManager.Get<bool>(_settingsManager.FORCE_WIIMOTE))
+                _wiiRemoteConfiguration.SetVirtualRemoteEnabled(PathManager.ConfigFolderPath, false);
             var targetFolderPath = PathManager.PatchesFolderPath;
             var clearTargetFolder = false;
             if (_modsLaunchService.ShouldAskToClearTargetFolder(targetFolderPath))
