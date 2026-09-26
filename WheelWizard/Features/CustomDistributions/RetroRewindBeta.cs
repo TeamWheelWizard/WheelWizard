@@ -23,18 +23,21 @@ public class RetroRewindBeta : IDistribution
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<IDistribution> _logger;
     private readonly ISettingsManager _settingsManager;
+    private readonly ICustomDistributionPaths _paths;
 
     public RetroRewindBeta(
         IFileSystem fileSystem,
         ILogger<IDistribution> logger,
         ISettingsManager settingsManager,
-        IDownloadService downloads
+        IDownloadService downloads,
+        ICustomDistributionPaths paths
     )
     {
         _fileSystem = fileSystem;
         this.downloads = downloads;
         _logger = logger;
         _settingsManager = settingsManager;
+        _paths = paths;
     }
 
     public string Title => "Retro Rewind Beta";
@@ -44,8 +47,8 @@ public class RetroRewindBeta : IDistribution
 
     public async Task<OperationResult> InstallAsync(ProgressWindow progressWindow)
     {
-        var tempRootPath = PathManager.RrBetaTempFolderPath;
-        var tempZipPath = PathManager.RrBetaTempFilePath;
+        var tempRootPath = _paths.BetaDownloadFolderPath;
+        var tempZipPath = _paths.BetaArchivePath;
         var tempExtractionPath = _fileSystem.Path.Combine(tempRootPath, "Extracted");
         OperationResult? result = null;
 
@@ -137,7 +140,7 @@ public class RetroRewindBeta : IDistribution
 
     public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
     {
-        var rootPath = PathManager.RiivolutionWhWzFolderPath;
+        var rootPath = _paths.RootFolderPath;
 
         foreach (var entry in LoadManifest())
         {
@@ -150,12 +153,12 @@ public class RetroRewindBeta : IDistribution
                 _fileSystem.Directory.Delete(fullPath, recursive: true);
         }
 
-        if (_fileSystem.Directory.Exists(PathManager.RrBetaFolderPath))
-            _fileSystem.Directory.Delete(PathManager.RrBetaFolderPath, recursive: true);
-        if (_fileSystem.File.Exists(PathManager.RrBetaXmlFilePath))
-            _fileSystem.File.Delete(PathManager.RrBetaXmlFilePath);
-        if (_fileSystem.File.Exists(PathManager.RrBetaManifestFilePath))
-            _fileSystem.File.Delete(PathManager.RrBetaManifestFilePath);
+        if (_fileSystem.Directory.Exists(_paths.BetaFolderPath))
+            _fileSystem.Directory.Delete(_paths.BetaFolderPath, recursive: true);
+        if (_fileSystem.File.Exists(_paths.BetaXmlFilePath))
+            _fileSystem.File.Delete(_paths.BetaXmlFilePath);
+        if (_fileSystem.File.Exists(_paths.BetaManifestFilePath))
+            _fileSystem.File.Delete(_paths.BetaManifestFilePath);
 
         return Task.FromResult(Ok());
     }
@@ -174,8 +177,7 @@ public class RetroRewindBeta : IDistribution
         if (!_settingsManager.PathsSetupCorrectly())
             return Task.FromResult(Ok(WheelWizardStatus.ConfigNotFinished));
 
-        var isInstalled =
-            _fileSystem.Directory.Exists(PathManager.RrBetaFolderPath) && _fileSystem.File.Exists(PathManager.RrBetaXmlFilePath);
+        var isInstalled = _fileSystem.Directory.Exists(_paths.BetaFolderPath) && _fileSystem.File.Exists(_paths.BetaXmlFilePath);
 
         return Task.FromResult(Ok(isInstalled ? WheelWizardStatus.Ready : WheelWizardStatus.NotInstalled));
     }
@@ -299,7 +301,7 @@ public class RetroRewindBeta : IDistribution
 
     private OperationResult<List<string>> MoveExtractedFiles(string tempExtractionPath)
     {
-        var destinationRoot = PathManager.RiivolutionWhWzFolderPath;
+        var destinationRoot = _paths.RootFolderPath;
         _fileSystem.Directory.CreateDirectory(destinationRoot);
 
         var betaFolderSource = _fileSystem.Path.Combine(tempExtractionPath, FolderName);
@@ -352,12 +354,12 @@ public class RetroRewindBeta : IDistribution
     {
         try
         {
-            var manifestDirectory = _fileSystem.Path.GetDirectoryName(PathManager.RrBetaManifestFilePath);
+            var manifestDirectory = _fileSystem.Path.GetDirectoryName(_paths.BetaManifestFilePath);
             if (!string.IsNullOrEmpty(manifestDirectory))
                 _fileSystem.Directory.CreateDirectory(manifestDirectory);
 
             var json = JsonSerializer.Serialize(entries, new JsonSerializerOptions { WriteIndented = true });
-            _fileSystem.File.WriteAllText(PathManager.RrBetaManifestFilePath, json);
+            _fileSystem.File.WriteAllText(_paths.BetaManifestFilePath, json);
         }
         catch (Exception ex)
         {
@@ -369,10 +371,10 @@ public class RetroRewindBeta : IDistribution
     {
         try
         {
-            if (!_fileSystem.File.Exists(PathManager.RrBetaManifestFilePath))
+            if (!_fileSystem.File.Exists(_paths.BetaManifestFilePath))
                 return [];
 
-            var json = _fileSystem.File.ReadAllText(PathManager.RrBetaManifestFilePath);
+            var json = _fileSystem.File.ReadAllText(_paths.BetaManifestFilePath);
             return JsonSerializer.Deserialize<List<string>>(json) ?? [];
         }
         catch (Exception ex)

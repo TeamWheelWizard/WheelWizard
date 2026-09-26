@@ -1,9 +1,10 @@
 using System.IO.Abstractions;
 using System.Text;
 using System.Text.RegularExpressions;
+using WheelWizard.CustomDistributions;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services;
 using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
@@ -92,6 +93,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     private readonly IRrRatingReader _rrratingReader;
     private readonly ISettingsManager _settingsManager;
     private readonly ISaveRegionService _saveRegions;
+    private readonly IDolphinPaths _dolphinPaths;
+    private readonly ICustomDistributionPaths _distributionPaths;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
 
@@ -101,7 +104,9 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         IWhWzDataSingletonService whWzDataSingletonService,
         IRrRatingReader rrratingReader,
         ISettingsManager settingsManager,
-        ISaveRegionService saveRegions
+        ISaveRegionService saveRegions,
+        IDolphinPaths dolphinPaths,
+        ICustomDistributionPaths distributionPaths
     )
         : base(40)
     {
@@ -111,6 +116,8 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
         _rrratingReader = rrratingReader;
         _settingsManager = settingsManager;
         _saveRegions = saveRegions;
+        _dolphinPaths = dolphinPaths;
+        _distributionPaths = distributionPaths;
         Licenses = new();
     }
 
@@ -295,7 +302,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     {
         try
         {
-            var rrRatingPath = PathManager.RRratingFilePath;
+            var rrRatingPath = _fileSystem.Path.GetRrRatingFilePath(_dolphinPaths.WiiFolderPath);
             if (_fileSystem.File.Exists(rrRatingPath))
             {
                 return _fileSystem.File.ReadAllBytes(rrRatingPath);
@@ -639,14 +646,14 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
     {
         try
         {
-            if (!_fileSystem.Directory.Exists(PathManager.SaveFolderPath))
+            if (!_fileSystem.Directory.Exists(_distributionPaths.SaveFolderPath))
                 return Fail("Save folder not found");
 
             var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
             if (currentRegion == MarioKartWiiEnums.Regions.None)
             {
                 // Double check if there's at least one valid region
-                var validRegions = _saveRegions.GetAvailableRegions(PathManager.SaveFolderPath);
+                var validRegions = _saveRegions.GetAvailableRegions(_distributionPaths.SaveFolderPath);
                 if (validRegions.First() != MarioKartWiiEnums.Regions.None)
                 {
                     currentRegion = validRegions.First();
@@ -658,7 +665,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
                 }
             }
 
-            var saveFileFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, GameRegion.GetGameId(currentRegion));
+            var saveFileFolder = _fileSystem.Path.Combine(_distributionPaths.SaveFolderPath, GameRegion.GetGameId(currentRegion));
             var saveFile = _fileSystem.Directory.GetFiles(saveFileFolder, "rksys.dat", SearchOption.TopDirectoryOnly);
             if (saveFile.Length == 0)
                 return Fail("rksys.dat not found");
@@ -769,7 +776,7 @@ public class GameLicenseSingletonService : RepeatedTaskManager, IGameLicenseSing
 
         FixRksysCrc(_rksysData);
         var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
-        var saveFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, GameRegion.GetGameId(currentRegion));
+        var saveFolder = _fileSystem.Path.Combine(_distributionPaths.SaveFolderPath, GameRegion.GetGameId(currentRegion));
         var path = _fileSystem.Path.Combine(saveFolder, "rksys.dat");
         return _fileSystem.WriteAllBytesAtomic(path, _rksysData, "Failed to save rksys.dat.");
     }

@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Semver;
 using WheelWizard.CustomDistributions.Domain;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
@@ -24,13 +25,17 @@ public class RetroRewind : IDistribution
     private readonly IApiCaller<IRetroRewindApi> _api;
     private readonly ILogger<IDistribution> _logger;
     private readonly ISettingsManager _settingsManager;
+    private readonly ICustomDistributionPaths _paths;
+    private readonly IDolphinPaths _dolphinPaths;
 
     public RetroRewind(
         IFileSystem fileSystem,
         IApiCaller<IRetroRewindApi> api,
         ILogger<IDistribution> logger,
         ISettingsManager settingsManager,
-        IDownloadService downloads
+        IDownloadService downloads,
+        ICustomDistributionPaths paths,
+        IDolphinPaths dolphinPaths
     )
     {
         _api = api;
@@ -38,6 +43,8 @@ public class RetroRewind : IDistribution
         _fileSystem = fileSystem;
         _logger = logger;
         _settingsManager = settingsManager;
+        _paths = paths;
+        _dolphinPaths = dolphinPaths;
     }
 
     public string Title => "Retro Rewind";
@@ -85,12 +92,12 @@ public class RetroRewind : IDistribution
     private async Task<OperationResult> DownloadAndExtractRetroRewind(ProgressWindow progressWindow)
     {
         progressWindow.SetExtraText(t("progress.installing_rr_first_time"));
-        var downloadedZipPath = PathManager.RetroRewindTempFile;
+        var downloadedZipPath = _paths.RetroRewindArchivePath;
         // where we'll do the extraction
-        var tempExtractionPath = PathManager.TempModsFolderPath;
+        var tempExtractionPath = _paths.DownloadFolderPath;
 
         //where all distributions are stored
-        var destinationParentDir = _fileSystem.DirectoryInfo.New(PathManager.RiivolutionWhWzFolderPath);
+        var destinationParentDir = _fileSystem.DirectoryInfo.New(_paths.RootFolderPath);
 
         OperationResult? result = null;
         try
@@ -189,7 +196,7 @@ public class RetroRewind : IDistribution
         var datFileData = await _fileSystem.File.ReadAllBytesAsync(sourceFile);
         if (regionFolderName == null)
             return;
-        var destinationFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, regionFolderName);
+        var destinationFolder = _fileSystem.Path.Combine(_paths.SaveFolderPath, regionFolderName);
         _fileSystem.Directory.CreateDirectory(destinationFolder);
         var destinationFile = _fileSystem.Path.Combine(destinationFolder, "rksys.dat");
         await _fileSystem.File.WriteAllBytesAsync(destinationFile, datFileData);
@@ -205,13 +212,13 @@ public class RetroRewind : IDistribution
         // todo, maybe we should check for the existence of the file instead of the folder? and also find the oldest one?
         var rrWfcPaths = new[]
         {
-            PathManager.SaveFolderPath,
+            _paths.SaveFolderPath,
             // Also consider the folder with upper-case `Save`
-            _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, "riivolution", "Save", "RetroWFC"),
-            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "Riivolution", "save", "RetroWFC"),
-            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "Riivolution", "Save", "RetroWFC"),
-            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "riivolution", "save", "RetroWFC"),
-            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(_paths.RootFolderPath, "riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(_dolphinPaths.LoadFolderPath, "Riivolution", "save", "RetroWFC"),
+            _fileSystem.Path.Combine(_dolphinPaths.LoadFolderPath, "Riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(_dolphinPaths.LoadFolderPath, "riivolution", "save", "RetroWFC"),
+            _fileSystem.Path.Combine(_dolphinPaths.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
         };
 
         foreach (var rrWfc in rrWfcPaths)
@@ -308,7 +315,7 @@ public class RetroRewind : IDistribution
 
     private void UpdateVersionFile(SemVersion newVersion)
     {
-        var versionFilePath = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName, "version.txt");
+        var versionFilePath = _fileSystem.Path.Combine(_paths.RootFolderPath, FolderName, "version.txt");
         _fileSystem.File.WriteAllText(versionFilePath, newVersion.ToString());
     }
 
@@ -330,7 +337,7 @@ public class RetroRewind : IDistribution
 
             popupWindow.UpdateProgress(100);
             popupWindow.SetExtraText(t("state.extracting"));
-            var destinationDirectoryPath = PathManager.RiivolutionWhWzFolderPath;
+            var destinationDirectoryPath = _paths.RootFolderPath;
             _fileSystem.Directory.CreateDirectory(destinationDirectoryPath);
             var extractResult = ExtractZipFile(finalFile, destinationDirectoryPath, popupWindow);
             if (extractResult.IsFailure)
@@ -414,13 +421,7 @@ public class RetroRewind : IDistribution
             foreach (var file in deletionsToApply)
             {
                 // The deletion list is server-controlled, so keep every resolved path inside the riivolution folder.
-                if (
-                    !PathSafety.TryGetPathWithinDirectory(
-                        PathManager.RiivolutionWhWzFolderPath,
-                        file.Path.TrimStart('/', '\\'),
-                        out var filePath
-                    )
-                )
+                if (!PathSafety.TryGetPathWithinDirectory(_paths.RootFolderPath, file.Path.TrimStart('/', '\\'), out var filePath))
                     return Fail("Invalid file path detected. Please contact the developers.\n Server error: " + file.Path);
 
                 if (_fileSystem.File.Exists(filePath))
@@ -550,9 +551,9 @@ public class RetroRewind : IDistribution
     public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
     {
         //where the RR distribution lives
-        var distributionDataDestination = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName);
+        var distributionDataDestination = _fileSystem.Path.Combine(_paths.RootFolderPath, FolderName);
         //where the RR wiiDisc xml file lives
-        var riivolutionDiscXMLFile = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, XMLFolderName, $"{XMLFileName}.xml");
+        var riivolutionDiscXMLFile = _fileSystem.Path.Combine(_paths.RootFolderPath, XMLFolderName, $"{XMLFileName}.xml");
 
         if (_fileSystem.Directory.Exists(distributionDataDestination))
             _fileSystem.Directory.Delete(distributionDataDestination, recursive: true);
@@ -600,7 +601,7 @@ public class RetroRewind : IDistribution
 
     public SemVersion? GetCurrentVersion()
     {
-        var versionFilePath = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName, "version.txt");
+        var versionFilePath = _fileSystem.Path.Combine(_paths.RootFolderPath, FolderName, "version.txt");
         if (!_fileSystem.File.Exists(versionFilePath))
             return null;
 
