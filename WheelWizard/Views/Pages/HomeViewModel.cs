@@ -159,9 +159,11 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
         );
     }
 
-    public Task LaunchDolphinAsync() => CanLaunchDolphin ? RunActionAsync(() => _dolphin.LaunchDolphin(), false) : Task.CompletedTask;
+    // Dolphin owns its preflight choices and launch-error dialogs; only unexpected exceptions need Home's error handling.
+    public Task LaunchDolphinAsync() =>
+        CanLaunchDolphin ? RunActionAsync(() => _dolphin.LaunchDolphin(), setup: false, showResultErrors: false) : Task.CompletedTask;
 
-    private async Task RunActionAsync(Func<Task<OperationResult>> action, bool setup)
+    private async Task RunActionAsync(Func<Task<OperationResult>> action, bool setup, bool showResultErrors = true)
     {
         _busy = true;
         ++_refreshGeneration;
@@ -172,7 +174,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
             if (setup)
                 _presentation.SetApplicationInteractable(false);
             var result = await action();
-            if (result.IsFailure && !_disposed)
+            if (showResultErrors && result.IsFailure && !_disposed)
                 _presentation.ShowError(result.Error);
         }
         catch (Exception ex)
