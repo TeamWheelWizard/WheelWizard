@@ -5,9 +5,6 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WheelWizard.RrRooms;
-using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Shared.Services;
-using WheelWizard.Views;
 
 namespace WheelWizard.Views.Patterns;
 
@@ -18,8 +15,7 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
     private const double GraphWidth = 1000;
     private const double GraphHeight = 260;
 
-    [Inject]
-    private IApiCaller<IRwfcApi> ApiCaller { get; set; } = null!;
+    private readonly VrHistoryViewModel _model;
 
     private bool _isLoading;
     private string _errorMessage = string.Empty;
@@ -32,7 +28,6 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
     private int _entriesCount;
     private string _dateRangeText = string.Empty;
     private bool _hasData;
-    private int _requestVersion;
     private int _reloadVersion;
     private bool _isInitializingDaysDropdown;
     private int _selectedHistoryDays = DefaultHistoryDays;
@@ -284,8 +279,9 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
 
     public bool IsTotalChangeNeutral => TotalChange == 0;
 
-    public VrHistoryGraph()
+    public VrHistoryGraph(VrHistoryViewModel model)
     {
+        _model = model;
         InitializeComponent();
         PopulateHistoryDaysDropdown();
     }
@@ -293,7 +289,16 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        _model.PropertyChanged += Model_OnPropertyChanged;
         TriggerHistoryReload();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        ++_reloadVersion;
+        _model.PropertyChanged -= Model_OnPropertyChanged;
+        _model.CancelPending();
+        base.OnDetachedFromVisualTree(e);
     }
 
     private void PopulateHistoryDaysDropdown()
@@ -336,40 +341,27 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
         );
     }
 
-    private async Task ReloadHistoryAsync()
+    private Task ReloadHistoryAsync() => _model.LoadAsync(FriendCode, _selectedHistoryDays);
+
+    private void Model_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var friendCode = NormalizeFriendCode(FriendCode);
-        if (IsMissingFriendCode(friendCode))
+        IsLoading = _model.IsLoading;
+        ErrorMessage = _model.Error?.Message ?? string.Empty;
+        if (IsLoading)
+            return;
+        if (!_model.HasFriendCode)
         {
             SetNoFriendCodeState();
             return;
         }
-
-        var requestVersion = Interlocked.Increment(ref _requestVersion);
-
-        IsLoading = true;
-        ErrorMessage = string.Empty;
-
-        var result = await ApiCaller.CallApiAsync(api => api.GetPlayerVrHistoryAsync(friendCode, _selectedHistoryDays));
-
-        await Dispatcher.UIThread.InvokeAsync(() =>
+        if (_model.History is { } history)
+            ApplyHistoryData(history, _model.HistoryDays);
+        else
         {
-            if (requestVersion != _requestVersion)
-                return;
-
-            if (result.IsSuccess && result.Value != null)
-            {
-                ApplyHistoryData(result.Value, _selectedHistoryDays);
-            }
-            else
-            {
-                HasData = false;
-                ResetGraph();
-                ErrorMessage = result.Error?.Message ?? t("message_error.failed_vr_history");
-            }
-
-            IsLoading = false;
-        });
+            HasData = false;
+            ResetGraph();
+            ErrorMessage = _model.Error?.Message ?? t("message_error.failed_vr_history");
+        }
     }
 
     private void SetNoFriendCodeState()
@@ -546,31 +538,6 @@ public partial class VrHistoryGraph : UserControlBase, INotifyPropertyChanged
             return $"+{value:N0}";
 
         return value.ToString("N0");
-    }
-
-    private static string NormalizeFriendCode(string? friendCode)
-    {
-        var trimmed = friendCode?.Trim() ?? string.Empty;
-        if (trimmed.Length == 0)
-            return string.Empty;
-
-        var digits = new string(trimmed.Where(char.IsDigit).ToArray());
-        if (digits.Length == 12)
-            return $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-
-        return trimmed;
-    }
-
-    private static bool IsMissingFriendCode(string friendCode)
-    {
-        if (string.IsNullOrWhiteSpace(friendCode))
-            return true;
-
-        var digits = new string(friendCode.Where(char.IsDigit).ToArray());
-        if (digits.Length == 0)
-            return true;
-
-        return digits.All(digit => digit == '0');
     }
 
     public new event PropertyChangedEventHandler? PropertyChanged;
