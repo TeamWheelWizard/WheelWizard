@@ -6,13 +6,14 @@ using Avalonia.Threading;
 using Serilog;
 using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Discovery;
-using WheelWizard.Helpers;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.IO;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Popups.Generic;
 using SettingsButton = WheelWizard.Views.Components.Button;
 
@@ -29,6 +30,9 @@ public partial class WhWzSettings : UserControlBase
     private bool _editingScale;
     private bool _isMovingAppData;
     private bool _updatingLanguageDropdown;
+
+    [Inject]
+    private IDolphinPaths DolphinPaths { get; set; } = null!;
 
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
@@ -60,7 +64,7 @@ public partial class WhWzSettings : UserControlBase
     private void ConfigureLocationFieldsForActiveFrontend()
     {
         var recompEnabled = SettingsService.IsRecompModeActive();
-        DolphinExecutableField.IsVisible = !recompEnabled && !EnvHelper.IsFlatpakSandboxed();
+        DolphinExecutableField.IsVisible = !recompEnabled && !DolphinPaths.Layout.IsFlatpakSandboxed();
         GameLocationBorder.CornerRadius = recompEnabled ? new Avalonia.CornerRadius(12, 12, 5, 5) : new Avalonia.CornerRadius(5);
         DolphinUserFolderLabel.Text = recompEnabled
             ? $"{t("option.dolphin_user_path")} ({t("helper_text.optional")})"
@@ -120,7 +124,7 @@ public partial class WhWzSettings : UserControlBase
     private void RefreshLocalizedCodeText()
     {
         MarioKartHelperText.Text = t("helper_text.end_with_x") + " .iso/.gcm/.gcz/.ciso/.wbfs/.wia/.rvz";
-        if (string.IsNullOrWhiteSpace(PathManager.DolphinFilePath))
+        if (string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath))
             DolphinExecutableValueText.Text = GetDolphinExecutableHelperText();
         TranslationsPercentageText.Text = t("text.language_translated_by", t("value.language.z_translators"));
         TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
@@ -179,7 +183,7 @@ public partial class WhWzSettings : UserControlBase
                 return;
         }
 
-        if (EnvHelper.IsFlatpakSandboxed())
+        if (DolphinPaths.Layout.IsFlatpakSandboxed())
         {
             // Having a picker does not make sense if Wheel Wizard is sandboxed.
             return;
@@ -197,7 +201,7 @@ public partial class WhWzSettings : UserControlBase
 
                 if (result)
                 {
-                    await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, EnvHelper.SingleQuotePath(dolphinAppPath));
+                    await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, ShellQuoting.QuoteUnixArgument(dolphinAppPath));
                     return;
                 }
             }
@@ -215,7 +219,7 @@ public partial class WhWzSettings : UserControlBase
                     return;
 
                 var executablePath = Path.Combine(resolvedFolder, "Contents", "MacOS", "Dolphin");
-                await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, EnvHelper.SingleQuotePath(executablePath));
+                await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, ShellQuoting.QuoteUnixArgument(executablePath));
             }
 
             return; // do not do normal selection for MacOS
@@ -237,14 +241,14 @@ public partial class WhWzSettings : UserControlBase
             }
             else
             {
-                await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, EnvHelper.SingleQuotePath(filePath));
+                await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, ShellQuoting.QuoteUnixArgument(filePath));
             }
         }
     }
 
     private async Task EnterLinuxDolphinCommandAsync()
     {
-        var currentValue = PathManager.DolphinFilePath;
+        var currentValue = DolphinPaths.ExecutablePath;
         var command = await new TextInputWindow()
             .SetMainText("Enter Dolphin launch command")
             .SetExtraText("Enter the terminal command Wheel Wizard should use to launch Dolphin.")
@@ -343,20 +347,21 @@ public partial class WhWzSettings : UserControlBase
 
         UpdateLocationRows();
         if (!string.Equals(previousPath, normalizedPath, StringComparison.Ordinal) && SettingsService.PathsSetupCorrectly())
-            DolphinSettingsService.ReloadSettings(PathManager.ConfigFolderPath);
+            DolphinSettingsService.ReloadSettings(DolphinPaths.ConfigFolderPath);
 
         await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Success_PathSettingsSaved);
         return true;
     }
 
-    private void DolphinExecutableOpen_OnClick(object sender, RoutedEventArgs e) => OpenContainingFolder(PathManager.DolphinFilePath);
+    private void DolphinExecutableOpen_OnClick(object sender, RoutedEventArgs e) => OpenContainingFolder(DolphinPaths.ExecutablePath);
 
-    private void GameLocationOpen_OnClick(object sender, RoutedEventArgs e) => OpenContainingFolder(PathManager.GameFilePath);
+    private void GameLocationOpen_OnClick(object sender, RoutedEventArgs e) =>
+        OpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
 
     private void DolphinUserFolderOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if (Directory.Exists(PathManager.UserFolderPath))
-            FilePickerHelper.OpenFolderInFileManager(PathManager.UserFolderPath);
+        if (Directory.Exists(DolphinPaths.UserFolderPath))
+            FilePickerHelper.OpenFolderInFileManager(DolphinPaths.UserFolderPath);
     }
 
     private static void OpenContainingFolder(string filePath)
@@ -388,13 +393,14 @@ public partial class WhWzSettings : UserControlBase
             DolphinExecutableCompleteIcon,
             DolphinExecutableWarningIcon,
             DolphinExecutableChangeButton,
-            SettingsService.DOLPHIN_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(PathManager.DolphinFilePath)
+            SettingsService.DOLPHIN_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath)
         );
         SetLocationRowState(
             GameLocationCompleteIcon,
             GameLocationWarningIcon,
             GameLocationChangeButton,
-            SettingsService.GAME_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(PathManager.GameFilePath)
+            SettingsService.GAME_LOCATION.IsValid()
+                && !string.IsNullOrWhiteSpace(SettingsService.Get<string>(SettingsService.GAME_LOCATION))
         );
         SetLocationRowState(
             DolphinUserFolderCompleteIcon,
@@ -404,14 +410,14 @@ public partial class WhWzSettings : UserControlBase
         );
 
         LocationWarningIcon.IsVisible = !SettingsService.PathsSetupCorrectly();
-        DolphinExecutableValueText.Text = string.IsNullOrWhiteSpace(PathManager.DolphinFilePath)
+        DolphinExecutableValueText.Text = string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath)
             ? GetDolphinExecutableHelperText()
-            : PathManager.DolphinFilePath;
-        DolphinExecutableOpenButton.IsVisible = !OperatingSystem.IsLinux() || IsConfiguredExecutableFile(PathManager.DolphinFilePath);
+            : DolphinPaths.ExecutablePath;
+        DolphinExecutableOpenButton.IsVisible = !OperatingSystem.IsLinux() || IsConfiguredExecutableFile(DolphinPaths.ExecutablePath);
         DolphinExecutableOpenButton.IsEnabled =
-            DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(PathManager.DolphinFilePath);
-        GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(PathManager.GameFilePath);
-        DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(PathManager.UserFolderPath);
+            DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(DolphinPaths.ExecutablePath);
+        GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
+        DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(DolphinPaths.UserFolderPath);
     }
 
     private static void SetLocationRowState(PathIcon completeIcon, PathIcon warningIcon, SettingsButton changeButton, bool isValid)

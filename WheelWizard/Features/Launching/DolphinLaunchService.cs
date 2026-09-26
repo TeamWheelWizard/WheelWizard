@@ -25,7 +25,7 @@ public sealed class DolphinLaunchService(
     IFileSystem fileSystem,
     IRuntimeEnvironment environment,
     IProcessLauncher processes,
-    ILinuxProcessService linuxProcesses,
+    IUnixProcessService linuxProcesses,
     IDolphinVersionService versions,
     ILinuxDolphinInstaller installer,
     IDolphinLaunchPresentation presentation

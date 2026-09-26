@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Semver;
 using SharpCompress.Archives;
 using SharpCompress.Readers;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
 using WheelWizard.Settings;

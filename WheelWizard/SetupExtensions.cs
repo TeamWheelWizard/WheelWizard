@@ -38,6 +38,8 @@ public static class SetupExtensions
         services.AddSingleton<WheelWizard.Shared.Polling.IPollingScheduler, WheelWizard.Views.Polling.AvaloniaPollingScheduler>();
         services.AddSingleton<WheelWizard.Views.Diagnostics.DevelopmentRefreshService>();
         // Features
+        services.AddSingleton<WheelWizard.Shared.Processes.IUnixCommandService, WheelWizard.Shared.Processes.UnixCommandService>();
+        services.AddSingleton<WheelWizard.Shared.Processes.IUnixProcessService, WheelWizard.Shared.Processes.UnixProcessService>();
         services.AddDolphinInstaller();
         services.AddSingleton<WheelWizard.Launching.IRetroRewindLaunchDescriptor, WheelWizard.Launching.RetroRewindLaunchDescriptor>();
         services.AddSingleton<WheelWizard.Shared.Processes.IProcessLauncher, WheelWizard.Shared.Processes.ProcessLauncher>();

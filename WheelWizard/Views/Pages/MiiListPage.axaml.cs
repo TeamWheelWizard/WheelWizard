@@ -7,7 +7,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Testably.Abstractions;
 using WheelWizard.CustomCharacters;
-using WheelWizard.Helpers;
 using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;

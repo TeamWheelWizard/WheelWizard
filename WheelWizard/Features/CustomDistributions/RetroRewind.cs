@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Semver;
 using WheelWizard.CustomDistributions.Domain;
 using WheelWizard.Dolphin.Paths;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Services;
 using WheelWizard.Settings;

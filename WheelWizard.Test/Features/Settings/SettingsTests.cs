@@ -13,6 +13,7 @@ using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.Test.Features.Settings;
 
@@ -143,7 +144,9 @@ public class SettingsManagerTests
             SettingsTestUtils.CreateSettingsSignalBus(),
             new DolphinPathResolver(fs, new RuntimeEnvironment()),
             SettingsTestUtils.CreateApplicationDataLocation(),
-            SettingsTestUtils.CreateRecompPaths()
+            SettingsTestUtils.CreateRecompPaths(),
+            new RuntimeEnvironment(),
+            Substitute.For<IUnixCommandService>()
         );
 
         manager.LoadSettings();
@@ -161,6 +164,8 @@ public class SettingsManagerTests
         whWzSettingManager = Substitute.For<IWhWzSettingManager>();
         dolphinSettingManager = Substitute.For<IDolphinSettingManager>();
         recompSettingManager = Substitute.For<IRecompSettingManager>();
+        var commands = Substitute.For<IUnixCommandService>();
+        commands.IsCommandAvailable("/usr/bin/env").Returns(true);
 
         return new SettingsManager(
             whWzSettingManager,
@@ -170,7 +175,9 @@ public class SettingsManagerTests
             SettingsTestUtils.CreateSettingsSignalBus(),
             new DolphinPathResolver(fileSystem, new RuntimeEnvironment()),
             SettingsTestUtils.CreateApplicationDataLocation(),
-            SettingsTestUtils.CreateRecompPaths()
+            SettingsTestUtils.CreateRecompPaths(),
+            new RuntimeEnvironment(),
+            commands
         );
     }
 }

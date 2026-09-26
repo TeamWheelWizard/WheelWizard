@@ -1,13 +1,13 @@
 using System.IO.Abstractions;
-using System.Runtime.InteropServices;
 using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
 using WheelWizard.Recomp;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.IO;
+using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.Settings;
 
@@ -22,6 +22,8 @@ public class SettingsManager : ISettingsManager, IDisposable
     private readonly IDolphinPathResolver _dolphinPaths;
     private readonly IApplicationDataLocation _applicationData;
     private readonly IRecompPaths _recompPaths;
+    private readonly IRuntimeEnvironment _environment;
+    private bool IsFlatpakSandboxed => _environment.IsFlatpakSandboxed(_fileSystem);
 
     private readonly Setting _dolphinCompilationMode;
     private readonly Setting _dolphinCompileShadersAtStart;
@@ -40,7 +42,9 @@ public class SettingsManager : ISettingsManager, IDisposable
         ISettingsSignalBus signalBus,
         IDolphinPathResolver dolphinPaths,
         IApplicationDataLocation applicationData,
-        IRecompPaths recompPaths
+        IRecompPaths recompPaths,
+        IRuntimeEnvironment environment,
+        IUnixCommandService commands
     )
     {
         _whWzSettingManager = whWzSettingManager;
@@ -51,6 +55,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         _dolphinPaths = dolphinPaths;
         _applicationData = applicationData;
         _recompPaths = recompPaths;
+        _environment = environment;
 
         #region WhWz settings
         // Register this first because the path validators use the active frontend mode when deciding
@@ -64,10 +69,10 @@ public class SettingsManager : ISettingsManager, IDisposable
         DOLPHIN_LOCATION = RegisterWhWz(
             "DolphinLocation",
             // Use the wrapper for the Flatpak as the default value as a hint for curious users
-            EnvHelper.MaybeDolphinLocationOverride() ?? "",
+            IsFlatpakSandboxed ? "/app/bin/dolphin-emu-wrapper" : "",
             value =>
             {
-                if (EnvHelper.IsFlatpakSandboxed())
+                if (IsFlatpakSandboxed)
                 {
                     // The Dolphin location setting is ignored with the Flatpak since it bundles a separate Dolphin
                     return true;
@@ -76,9 +81,9 @@ public class SettingsManager : ISettingsManager, IDisposable
                 if (string.IsNullOrWhiteSpace(pathOrCommand))
                     return IsRecompModeActive();
 
-                if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                if (environment.IsLinux || environment.IsMacOS)
                 {
-                    return EnvHelper.IsValidUnixCommand(pathOrCommand);
+                    return commands.IsCommandAvailable(pathOrCommand);
                 }
 
                 return _fileSystem.File.Exists(pathOrCommand);
@@ -100,16 +105,16 @@ public class SettingsManager : ISettingsManager, IDisposable
                 var dolphinPaths = _dolphinPaths.Resolve(dolphinLocation, userFolderPath);
 
                 // We cannot determine the validity of the user folder path in that case
-                if (!EnvHelper.IsFlatpakSandboxed() && string.IsNullOrWhiteSpace(dolphinLocation))
+                if (!IsFlatpakSandboxed && string.IsNullOrWhiteSpace(dolphinLocation))
                     return true;
 
                 // If we want to use a split XDG dolphin config,
                 // this only really works as expected if certain conditions are met.
                 // Note that the Wheel Wizard Flatpak always uses the split config internally, so it cannot return early here.
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || !dolphinPaths.IsLinuxDolphinConfigSplit())
+                if (!environment.IsLinux || !dolphinPaths.IsLinuxDolphinConfigSplit())
                     return true;
 
-                if (EnvHelper.IsFlatpakSandboxed())
+                if (IsFlatpakSandboxed)
                 {
                     // Reject the internal Dolphin directory symlink paths
                     foreach (var blockedUserFolder in dolphinPaths.LinuxFlatpakSandboxedDolphinUserFolderBlockList)
@@ -133,18 +138,18 @@ public class SettingsManager : ISettingsManager, IDisposable
 
                 // The Dolphin executable directory with `portable.txt` case
                 if (
-                    !EnvHelper.IsFlatpakSandboxed()
+                    !IsFlatpakSandboxed
                     && _fileSystem.File.Exists(_fileSystem.Path.Combine(dolphinPaths.GetDolphinExeDirectory(), "portable.txt"))
                 )
                     return false;
 
-                if (!EnvHelper.IsFlatpakSandboxed())
+                if (!IsFlatpakSandboxed)
                 {
                     // The Wheel Wizard Flatpak's wrapper unsets this.
                     // The value of this environment variable would be used instead if it was somehow set.
                     const string environmentVariableToAvoid = "DOLPHIN_EMU_USERPATH";
 
-                    if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(environmentVariableToAvoid)))
+                    if (!string.IsNullOrWhiteSpace(environment.GetEnvironmentVariable(environmentVariableToAvoid)))
                         return false;
 
                     if (dolphinLocation.Contains(environmentVariableToAvoid, StringComparison.Ordinal))
@@ -155,7 +160,7 @@ public class SettingsManager : ISettingsManager, IDisposable
                 var legacyFolderPath = dolphinPaths.LinuxDolphinLegacyFolderPath;
                 if (_fileSystem.Directory.Exists(legacyFolderPath))
                 {
-                    if (EnvHelper.IsFlatpakSandboxed())
+                    if (IsFlatpakSandboxed)
                     {
                         if (
                             !string.IsNullOrWhiteSpace(dolphinPaths.SplitLinuxDolphinConfigDir)
@@ -388,10 +393,7 @@ public class SettingsManager : ISettingsManager, IDisposable
             // Sandboxed Wheel Wizard is allowed to omit the Dolphin location setting as it uses the bundled version
             if (
                 requireDolphin
-                && (
-                    !EnvHelper.IsFlatpakSandboxed() && string.IsNullOrWhiteSpace(Get<string>(DOLPHIN_LOCATION))
-                    || !DOLPHIN_LOCATION.IsValid()
-                )
+                && (!IsFlatpakSandboxed && string.IsNullOrWhiteSpace(Get<string>(DOLPHIN_LOCATION)) || !DOLPHIN_LOCATION.IsValid())
             )
                 issues.Add(
                     new(SettingsValidationCode.InvalidDolphinLocation, DOLPHIN_LOCATION.Name, "Dolphin path or command is invalid.")
