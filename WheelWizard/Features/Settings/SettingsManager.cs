@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
+using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Helpers;
@@ -20,6 +21,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     private readonly IRecompSettingManager _recompSettingManager;
     private readonly IFileSystem _fileSystem;
     private readonly IDolphinPathResolver _dolphinPaths;
+    private readonly IApplicationDataLocation _applicationData;
 
     private readonly Setting _dolphinCompilationMode;
     private readonly Setting _dolphinCompileShadersAtStart;
@@ -36,7 +38,8 @@ public class SettingsManager : ISettingsManager, IDisposable
         IRecompSettingManager recompSettingManager,
         IFileSystem fileSystem,
         ISettingsSignalBus signalBus,
-        IDolphinPathResolver dolphinPaths
+        IDolphinPathResolver dolphinPaths,
+        IApplicationDataLocation applicationData
     )
     {
         _whWzSettingManager = whWzSettingManager;
@@ -45,6 +48,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         _fileSystem = fileSystem;
         _signalBus = signalBus;
         _dolphinPaths = dolphinPaths;
+        _applicationData = applicationData;
 
         #region WhWz settings
         // Register this first because the path validators use the active frontend mode when deciding
@@ -407,7 +411,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         if (_hasLoadedSettings)
             return;
 
-        _whWzSettingManager.LoadSettings(PathManager.WheelWizardConfigFilePath);
+        _whWzSettingManager.LoadSettings(_fileSystem.Path.Combine(_applicationData.DirectoryPath, "config.json"));
         _dolphinSettingManager.LoadSettings(
             _dolphinPaths.Resolve(Get<string>(DOLPHIN_LOCATION), Get<string>(USER_FOLDER_PATH)).ConfigFolderPath
         );
@@ -423,7 +427,7 @@ public class SettingsManager : ISettingsManager, IDisposable
             typeof(T),
             name,
             defaultValue!,
-            setting => _whWzSettingManager.SaveSettings(PathManager.WheelWizardConfigFilePath, setting)
+            setting => _whWzSettingManager.SaveSettings(_fileSystem.Path.Combine(_applicationData.DirectoryPath, "config.json"), setting)
         );
         if (validation != null)
             setting.SetValidation(validation);
