@@ -1,39 +1,27 @@
-﻿using WheelWizard.Helpers;
-using WheelWizard.Settings;
+﻿using System.IO.Abstractions;
 
-namespace WheelWizard.Services.WiiManagement;
+namespace WheelWizard.WiiManagement.Controllers;
 
-public static class WiiMoteSettings
+public interface IWiiRemoteConfigurationService
 {
-    private static ISettingsManager Settings => SettingsRuntime.Current;
+    void SetVirtualRemoteEnabled(string configDirectory, bool enabled);
+}
 
+public sealed class WiiRemoteConfigurationService(IFileSystem fileSystem) : IWiiRemoteConfigurationService
+{
     private const string WiimoteSection = "[Wiimote1]";
     private const string SourceParameter = "Source";
 
-    public static void EnableVirtualWiiMote() => ModifyWiiMoteSource(1);
-
-    public static void DisableVirtualWiiMote() => ModifyWiiMoteSource(0);
-
-    public static bool IsForceSettingsEnabled() => Settings.Get<bool>(Settings.FORCE_WIIMOTE);
-
-    private static string GetSavedWiiMoteLocation()
+    public void SetVirtualRemoteEnabled(string configDirectory, bool enabled)
     {
-        var wiimoteFile = Path.Combine(PathManager.ConfigFolderPath, "WiimoteNew.ini");
-        if (File.Exists(wiimoteFile))
-            return wiimoteFile;
-
-        return string.Empty;
-    }
-
-    private static void ModifyWiiMoteSource(int sourceValue)
-    {
-        var configPath = GetSavedWiiMoteLocation();
+        var configPath = fileSystem.Path.Combine(configDirectory, "WiimoteNew.ini");
+        var sourceValue = enabled ? 1 : 0;
 
         // I rather not translate this message, makes it easier to check where a given error came from
-        if (string.IsNullOrEmpty(configPath) || !File.Exists(configPath))
+        if (string.IsNullOrEmpty(configPath) || !fileSystem.File.Exists(configPath))
             throw new FileNotFoundException("WiiMote configuration file not found.");
 
-        var lines = File.ReadAllLines(configPath);
+        var lines = fileSystem.File.ReadAllLines(configPath);
         var inWiimote1Section = false;
         var sourceModified = false;
 
@@ -60,12 +48,18 @@ public static class WiiMoteSettings
         if (!sourceModified)
         {
             // Source parameter not found, add it to the Wiimote1 section
-            var insertIndex = Array.FindIndex(lines, l => l.Trim() == WiimoteSection) + 1;
+            var sectionIndex = Array.FindIndex(lines, l => l.Trim() == WiimoteSection);
+            if (sectionIndex == -1)
+            {
+                fileSystem.File.WriteAllLines(configPath, [.. lines, WiimoteSection, $"{SourceParameter} = {sourceValue}"]);
+                return;
+            }
+            var insertIndex = sectionIndex + 1;
             Array.Resize(ref lines, lines.Length + 1);
             Array.Copy(lines, insertIndex, lines, insertIndex + 1, lines.Length - insertIndex - 1);
             lines[insertIndex] = $"{SourceParameter} = {sourceValue}";
         }
 
-        File.WriteAllLines(configPath, lines);
+        fileSystem.File.WriteAllLines(configPath, lines);
     }
 }
