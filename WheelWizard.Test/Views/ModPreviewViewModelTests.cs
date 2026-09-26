@@ -57,4 +57,59 @@ public class ModPreviewViewModelTests
         Assert.Empty(media.ReceivedCalls());
         Assert.Null(model.Image);
     }
+
+    [Fact]
+    public async Task SearchPreview_RetriesKnownUrlWithoutFetchingModDetails()
+    {
+        var mods = Substitute.For<IGameBananaSingletonService>();
+        var media = Substitute.For<IGameBananaMediaService>();
+        media.GetImageAsync("https://images.test/preview.png", Arg.Any<CancellationToken>()).Returns(Fail("offline"));
+        using var model = new ModPreviewViewModel(42, mods, media, "https://images.test/preview.png");
+
+        await model.LoadAsync();
+        await model.LoadAsync();
+
+        Assert.Empty(mods.ReceivedCalls());
+        await media.Received(2).GetImageAsync("https://images.test/preview.png", Arg.Any<CancellationToken>());
+        Assert.True(model.ShowPlaceholder);
+    }
+
+    [Fact]
+    public async Task SearchWithoutImage_DoesNotRequestDetailsOrMedia()
+    {
+        var mods = Substitute.For<IGameBananaSingletonService>();
+        var media = Substitute.For<IGameBananaMediaService>();
+        using var model = new ModPreviewViewModel(42, mods, media, "");
+
+        await model.LoadAsync();
+
+        Assert.Empty(mods.ReceivedCalls());
+        Assert.Empty(media.ReceivedCalls());
+    }
+
+    [Fact]
+    public async Task DisposingSearchResult_CancelsWaitingForMedia_AndIgnoresLateResponse()
+    {
+        var mods = Substitute.For<IGameBananaSingletonService>();
+        var media = Substitute.For<IGameBananaMediaService>();
+        var response = new TaskCompletionSource<OperationResult<byte[]>>();
+        CancellationToken requestToken = default;
+        media
+            .GetImageAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                requestToken = call.Arg<CancellationToken>();
+                return response.Task;
+            });
+        var model = new ModPreviewViewModel(42, mods, media, "https://images.test/preview.png");
+        var pending = model.LoadAsync();
+        model.Dispose();
+        await pending.WaitAsync(TimeSpan.FromSeconds(1));
+        response.SetResult(new byte[] { 1, 2, 3 });
+
+        Assert.True(requestToken.IsCancellationRequested);
+        Assert.Null(model.Image);
+        await model.LoadAsync();
+        await media.Received(1).GetImageAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
 }

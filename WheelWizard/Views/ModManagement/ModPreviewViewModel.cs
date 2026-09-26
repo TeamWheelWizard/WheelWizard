@@ -4,9 +4,12 @@ using WheelWizard.GameBanana;
 
 namespace WheelWizard.Views.ModManagement;
 
-public sealed class ModPreviewViewModel(int modId, IGameBananaSingletonService mods, IGameBananaMediaService media)
-    : INotifyPropertyChanged,
-        IDisposable
+public sealed class ModPreviewViewModel(
+    int modId,
+    IGameBananaSingletonService mods,
+    IGameBananaMediaService media,
+    string? previewUrl = null
+) : INotifyPropertyChanged, IDisposable
 {
     private readonly CancellationTokenSource _lifetime = new();
     private Task? _loading;
@@ -17,7 +20,7 @@ public sealed class ModPreviewViewModel(int modId, IGameBananaSingletonService m
 
     public Task LoadAsync()
     {
-        if (_disposed || modId <= 0 || Image is not null)
+        if (_disposed || (previewUrl is null && modId <= 0) || Image is not null)
             return Task.CompletedTask;
         // Share active requests, but let rebuilt cards retry a completed load that left no image.
         if (_loading is null || _loading.IsCompleted)
@@ -29,14 +32,20 @@ public sealed class ModPreviewViewModel(int modId, IGameBananaSingletonService m
     {
         try
         {
-            var details = await mods.GetModDetails(modId).WaitAsync(_lifetime.Token);
-            if (_disposed || details.IsFailure)
+            var url = previewUrl;
+            if (url is null)
+            {
+                var details = await mods.GetModDetails(modId).WaitAsync(_lifetime.Token);
+                if (_disposed || details.IsFailure)
+                    return;
+                var preview = details.Value.PreviewMedia?.Images?.FirstOrDefault();
+                if (preview is null)
+                    return;
+                url = $"{preview.BaseUrl}/{preview.File220 ?? preview.File}";
+            }
+            if (string.IsNullOrWhiteSpace(url))
                 return;
-            var preview = details.Value.PreviewMedia?.Images?.FirstOrDefault();
-            if (preview is null)
-                return;
-            var url = $"{preview.BaseUrl}/{preview.File220 ?? preview.File}";
-            var result = await media.GetImageAsync(url, _lifetime.Token);
+            var result = await media.GetImageAsync(url, _lifetime.Token).WaitAsync(_lifetime.Token);
             if (_disposed || result.IsFailure)
                 return;
             using var stream = new MemoryStream(result.Value);
