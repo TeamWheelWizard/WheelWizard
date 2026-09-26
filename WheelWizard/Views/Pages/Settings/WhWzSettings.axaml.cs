@@ -573,7 +573,7 @@ public partial class WhWzSettings : UserControlBase
         {
             try
             {
-                WheelWizard.Logging.RecreateStaticLogger();
+                WheelWizard.Logging.RecreateStaticLogger(ApplicationData.DirectoryPath);
             }
             finally
             {

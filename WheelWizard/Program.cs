@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Logging;
 using Serilog;
+using WheelWizard.ApplicationData;
 using WheelWizard.Services.UrlProtocol;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
@@ -20,13 +21,17 @@ public class Program : IDesignerEntryPoint
         SetupWorkingDirectory();
 
         // Create a static logger instance for the application
-        Logging.CreateStaticLogger();
+        var applicationData = ApplicationDataComposition.CreateLocation(
+            new Testably.Abstractions.RealFileSystem(),
+            new WheelWizard.Shared.Platform.RuntimeEnvironment()
+        );
+        CreateStaticLoggerWithRecovery(applicationData);
         RegisterGlobalExceptionLogging();
 
         try
         {
             // Initialize the Avalonia application
-            var builder = CreateWheelWizardApp(isDesigner: false);
+            var builder = CreateWheelWizardApp(isDesigner: false, applicationData);
 
             // Start the application
             builder.StartWithClassicDesktopLifetime(args);
@@ -42,6 +47,29 @@ public class Program : IDesignerEntryPoint
     }
 
     public static AppBuilder BuildAvaloniaApp() => CreateWheelWizardApp(isDesigner: true);
+
+    /// <summary>
+    /// Creates the static logger, resetting the application data location once when its logs directory is unusable.
+    /// </summary>
+    private static void CreateStaticLoggerWithRecovery(IApplicationDataLocation applicationData)
+    {
+        try
+        {
+            Logging.CreateStaticLogger(applicationData.DirectoryPath);
+        }
+        catch
+        {
+            Console.WriteLine("Resetting the Wheel Wizard directory due to an error");
+            var resetWasSuccessful = applicationData.TryReset(out var errorMessage);
+            if (!string.IsNullOrWhiteSpace(errorMessage))
+                Console.WriteLine($"Error message recorded when the Wheel Wizard directory was reset: {errorMessage}");
+            if (!resetWasSuccessful)
+                throw;
+
+            // Retry only once, against the location the reset restored.
+            Logging.CreateStaticLogger(applicationData.DirectoryPath);
+        }
+    }
 
     private static void RegisterGlobalExceptionLogging()
     {
@@ -66,7 +94,7 @@ public class Program : IDesignerEntryPoint
     /// <summary>
     /// Configures the WheelWizard application.
     /// </summary>
-    private static AppBuilder CreateWheelWizardApp(bool isDesigner)
+    private static AppBuilder CreateWheelWizardApp(bool isDesigner, IApplicationDataLocation? applicationData = null)
     {
         var builder = AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
 
@@ -79,7 +107,7 @@ public class Program : IDesignerEntryPoint
         }
 
         var services = new ServiceCollection();
-        services.AddWheelWizardServices();
+        services.AddWheelWizardServices(applicationData);
 
         var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
 

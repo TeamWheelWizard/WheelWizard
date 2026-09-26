@@ -33,7 +33,7 @@ public static class SetupExtensions
     /// <summary>
     /// Adds the services required for WheelWizard.
     /// </summary>
-    public static void AddWheelWizardServices(this IServiceCollection services)
+    public static void AddWheelWizardServices(this IServiceCollection services, IApplicationDataLocation? applicationData = null)
     {
         services.AddSingleton<WheelWizard.Shared.Polling.IPollingScheduler, WheelWizard.Views.Polling.AvaloniaPollingScheduler>();
         services.AddSingleton<WheelWizard.Views.Diagnostics.DevelopmentRefreshService>();
@@ -64,7 +64,15 @@ public static class SetupExtensions
         services.AddMods();
         services.AddRecomp();
 
-        services.AddSingleton<IApplicationDataLocation>(Services.PathManager.ApplicationData);
+        if (applicationData != null)
+            services.AddSingleton(applicationData);
+        else
+            services.AddSingleton(provider =>
+                ApplicationDataComposition.CreateLocation(
+                    provider.GetRequiredService<IFileSystem>(),
+                    provider.GetRequiredService<WheelWizard.Shared.Platform.IRuntimeEnvironment>()
+                )
+            );
 
         // IO Abstractions
         services.AddSingleton<IFileSystem, RealFileSystem>();
