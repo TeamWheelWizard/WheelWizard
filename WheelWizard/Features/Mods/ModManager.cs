@@ -8,7 +8,6 @@ using IniParser;
 using Serilog;
 using WheelWizard.Features.Patches;
 using WheelWizard.Models.Mods;
-using WheelWizard.Services;
 using WheelWizard.Shared.IO;
 using WheelWizard.Views.Popups.Generic;
 
@@ -65,6 +64,7 @@ public sealed class ModManager : IModManager
 {
     private static readonly char[] _illegalChars = new[] { '.', '/', '~', '\\' };
     private readonly IFileSystem _fileSystem;
+    private readonly IModPaths _paths;
     private readonly IModInstallationService _modInstallationService;
     private readonly IModPatchConversionService _modPatchConversionService;
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
@@ -86,10 +86,12 @@ public sealed class ModManager : IModManager
     public ModManager(
         IModInstallationService modInstallationService,
         IModPatchConversionService modPatchConversionService,
-        IFileSystem fileSystem
+        IFileSystem fileSystem,
+        IModPaths paths
     )
     {
         _fileSystem = fileSystem;
+        _paths = paths;
         _modInstallationService = modInstallationService;
         _modPatchConversionService = modPatchConversionService;
         _mods = [];
@@ -271,8 +273,8 @@ public sealed class ModManager : IModManager
         if (validationResult.IsFailure)
             return validationResult.Error;
 
-        var oldDirectoryName = PathManager.GetModDirectoryPath(oldTitle);
-        var newDirectoryName = PathManager.GetModDirectoryPath(newTitle);
+        var oldDirectoryName = _paths.GetModDirectoryPath(oldTitle);
+        var newDirectoryName = _paths.GetModDirectoryPath(newTitle);
 
         if (!Directory.Exists(oldDirectoryName))
             return Fail("The mod folder could not be found.");
@@ -289,7 +291,7 @@ public sealed class ModManager : IModManager
 
     public async Task<OperationResult> DeleteModAsync(Mod selectedMod)
     {
-        var modDirectory = Path.GetFullPath(PathManager.GetModDirectoryPath(selectedMod.Title));
+        var modDirectory = Path.GetFullPath(_paths.GetModDirectoryPath(selectedMod.Title));
 
         if (!Directory.Exists(modDirectory))
             return await RemoveModAsync(selectedMod);
@@ -303,7 +305,7 @@ public sealed class ModManager : IModManager
 
     public OperationResult OpenModFolder(Mod selectedMod)
     {
-        var modDirectory = PathManager.GetModDirectoryPath(selectedMod.Title);
+        var modDirectory = _paths.GetModDirectoryPath(selectedMod.Title);
         if (Directory.Exists(modDirectory))
             return OpenFolder(modDirectory);
 
@@ -516,7 +518,7 @@ public sealed class ModManager : IModManager
     {
         try
         {
-            var modsRoot = _fileSystem.Path.NormalizePath(PathManager.ModsFolderPath);
+            var modsRoot = _fileSystem.Path.NormalizePath(_paths.RootFolderPath);
 
             var target = _fileSystem.Path.NormalizePath(modDirectory);
 

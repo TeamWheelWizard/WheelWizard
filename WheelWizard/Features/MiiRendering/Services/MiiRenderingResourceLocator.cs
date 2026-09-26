@@ -3,17 +3,12 @@ using WheelWizard.MiiRendering.Configuration;
 
 namespace WheelWizard.MiiRendering.Services;
 
-public sealed class MiiRenderingResourceLocator(IFileSystem fileSystem, MiiRenderingConfiguration configuration)
+public sealed class MiiRenderingResourceLocator(IFileSystem fileSystem, MiiRenderingConfiguration configuration, IMiiRenderingPaths paths)
     : IMiiRenderingResourceLocator
 {
-    private string? _resolvedPath;
-
     public OperationResult<string> GetFflResourcePath()
     {
-        if (!string.IsNullOrWhiteSpace(_resolvedPath) && fileSystem.File.Exists(_resolvedPath))
-            return _resolvedPath;
-
-        var normalized = NormalizeCandidate(configuration.ManagedResourcePath);
+        var normalized = NormalizeCandidate(paths.ManagedResourcePath);
         if (!string.IsNullOrWhiteSpace(normalized) && fileSystem.File.Exists(normalized))
         {
             var length = fileSystem.FileInfo.New(normalized).Length;
@@ -25,7 +20,6 @@ public sealed class MiiRenderingResourceLocator(IFileSystem fileSystem, MiiRende
                 );
             }
 
-            _resolvedPath = normalized;
             return normalized;
         }
 
