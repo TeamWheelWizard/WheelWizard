@@ -273,7 +273,7 @@
                                                            ShowJoinRoomButton="True"
                                                            JoinRoomAction="JoinRoom_OnClick"
                                                            IsOpenHost="{Binding IsOpenHost}"
-                                                           HasBadges="{Binding HasBadges}"
+                                                           HasBadges="{Binding HasBadges}" BadgeVariants="{Binding BadgeVariants}"
                                                            IsTopPlayer="True"
                                                            TopLabel="{Binding TopLabel}">
                                     <patterns:PlayerListItem.ContextMenu>
