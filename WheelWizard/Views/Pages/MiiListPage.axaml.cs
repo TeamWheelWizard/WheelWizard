@@ -15,6 +15,7 @@ using WheelWizard.Views.Components;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
+using WheelWizard.Views.Storage;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -25,6 +26,9 @@ public partial class MiiListPage : UserControlBase
 {
     public ObservableCollection<MiiListRow> MiiRows { get; } = [];
     private readonly List<MiiListEntry> _miiEntries = [];
+
+    [Inject]
+    private IFilePickerService FilePicker { get; set; } = null!;
 
     [Inject]
     private ICustomCharactersService CustomCharactersService { get; set; } = null!;
@@ -163,8 +167,8 @@ public partial class MiiListPage : UserControlBase
 
     private async void ImportMii_OnClick(object? sender, RoutedEventArgs e)
     {
-        var miiFiles = await FilePickerHelper.OpenFilePickerAsync(
-            fileType: CustomFilePickerFileType.Miis,
+        var miiFiles = await FilePicker.OpenFilePickerAsync(
+            fileType: FilePickerFilters.Miis,
             allowMultiple: true,
             title: "Select Mii file(s)"
         );
@@ -308,9 +312,9 @@ public partial class MiiListPage : UserControlBase
     private async void ExportMiiAsFile(Mii mii)
     {
         var exportName = ReplaceInvalidFileNameChars(CustomCharactersService.NormalizeToAscii(mii.Name.ToString()));
-        var diaglog = await FilePickerHelper.SaveFileAsync(
+        var diaglog = await FilePicker.SaveFileAsync(
             title: "Save Mii as file",
-            fileTypes: [CustomFilePickerFileType.Miis],
+            fileTypes: [FilePickerFilters.Miis],
             defaultFileName: $"{exportName}"
         );
         if (diaglog == null)

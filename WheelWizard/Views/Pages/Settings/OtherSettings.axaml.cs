@@ -5,12 +5,16 @@ using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Views.Storage;
 
 namespace WheelWizard.Views.Pages.Settings;
 
 public partial class OtherSettings : UserControlBase
 {
     private readonly bool _settingsAreDisabled;
+
+    [Inject]
+    private IFilePickerService FilePicker { get; set; } = null!;
 
     [Inject]
     private ICustomDistributionPaths DistributionPaths { get; set; } = null!;
@@ -90,7 +94,7 @@ public partial class OtherSettings : UserControlBase
 
     private void OpenSaveFolder_OnClick(object? sender, RoutedEventArgs e)
     {
-        FilePickerHelper.OpenFolderInFileManager(DistributionPaths.SaveFolderPath);
+        FilePicker.OpenFolderInFileManager(DistributionPaths.SaveFolderPath);
     }
 
     private void GameFileFolder_Click(object? sender, RoutedEventArgs e)
@@ -98,6 +102,6 @@ public partial class OtherSettings : UserControlBase
         if (!Directory.Exists(DistributionPaths.RootFolderPath))
             return;
 
-        FilePickerHelper.OpenFolderInFileManager(DistributionPaths.RootFolderPath);
+        FilePicker.OpenFolderInFileManager(DistributionPaths.RootFolderPath);
     }
 }

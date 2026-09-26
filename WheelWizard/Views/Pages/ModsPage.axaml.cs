@@ -16,6 +16,7 @@ using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.ModManagement;
+using WheelWizard.Views.Storage;
 
 namespace WheelWizard.Views.Pages;
 
@@ -23,6 +24,9 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest);
 
 public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 {
+    [Inject]
+    private IFilePickerService FilePicker { get; set; } = null!;
+
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
 
@@ -137,8 +141,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private async void ImportMod_Click(object sender, RoutedEventArgs e)
     {
-        var selectedFiles = await FilePickerHelper.OpenFilePickerAsync(
-            CustomFilePickerFileType.All,
+        var selectedFiles = await FilePicker.OpenFilePickerAsync(
+            FilePickerFilters.All,
             allowMultiple: true,
             title: t("file_picker.select_mod_file")
         );

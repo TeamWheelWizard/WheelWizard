@@ -6,12 +6,16 @@ using WheelWizard.Settings;
 using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Views.Storage;
 
 namespace WheelWizard.Views.Pages.Settings;
 
 public partial class RecompSettings : UserControlBase
 {
     private bool _loading;
+
+    [Inject]
+    private IFilePickerService FilePicker { get; set; } = null!;
 
     [Inject]
     private ISettingsManager SettingsService { get; set; } = null!;
@@ -318,7 +322,7 @@ public partial class RecompSettings : UserControlBase
     {
         var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
         if (Directory.Exists(installFolder))
-            FilePickerHelper.OpenFolderInFileManager(installFolder);
+            FilePicker.OpenFolderInFileManager(installFolder);
     }
 
     private async void Uninstall_OnClick(object? sender, RoutedEventArgs e)

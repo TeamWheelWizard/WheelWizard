@@ -1,17 +1,17 @@
 using Avalonia.Platform.Storage;
 
-namespace WheelWizard.Services;
+namespace WheelWizard.Views.Storage;
 
-public static class CustomFilePickerFileType
+public static class FilePickerFilters
 {
-    public static FilePickerFileType All { get; } =
+    public static FilePickerFileType All =>
         new(t("attribute.all"))
         {
             Patterns = ["*"],
             AppleUniformTypeIdentifiers = ["public.data"],
             MimeTypes = ["application/octet-stream"],
         };
-    public static FilePickerFileType Miis { get; } =
+    public static FilePickerFileType Miis =>
         new("Miis")
         {
             Patterns = ["*.mii", "*.miigx", "*.mae"],
