@@ -1,73 +1,85 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
-using System.Security.Principal;
 using WheelWizard.GitHub.Domain;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.Processes;
-using WheelWizard.Views.Downloads;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.AutoUpdating.Platforms;
 
-public class WindowsUpdatePlatform(IFileSystem fileSystem, IDownloadService downloads) : IUpdatePlatform
+public class WindowsUpdatePlatform(
+    IFileSystem fileSystem,
+    IDownloadService downloads,
+    IApplicationProcess application,
+    IProcessLauncher processes,
+    IUpdatePresentation presentation
+) : IUpdatePlatform
 {
+    public bool SupportsAutomaticUpdate => true;
+
     public GithubAsset? GetAssetForCurrentPlatform(GithubRelease release)
     {
         // Select the first asset ending with ".exe"
         return release.Assets.FirstOrDefault(asset => asset.BrowserDownloadUrl.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task<OperationResult> ExecuteUpdateAsync(string downloadUrl)
+    public async Task<OperationResult> ExecuteUpdateAsync(
+        string downloadUrl,
+        IProgress<DownloadProgress>? progress = null,
+        CancellationToken cancellationToken = default
+    )
     {
-        // If running as administrator, update immediately.
-        if (IsAdministrator())
-            return await UpdateAsync(downloadUrl);
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            // If running as administrator, update immediately.
+            if (application.IsAdministrator)
+                return await UpdateAsync(downloadUrl, progress, cancellationToken);
 
-        // Otherwise, ask if the user wants to restart as admin.
-        var restartAsAdmin = await new YesNoWindow()
-            .SetMainText(t("question.update_admin.title"))
-            .SetExtraText(t("question.update_admin.extra"))
-            .AwaitAnswer();
+            // Otherwise, ask if the user wants to restart as admin.
+            var restartAsAdmin = await presentation.ConfirmElevationAsync();
 
-        if (!restartAsAdmin)
-            return await UpdateAsync(downloadUrl);
+            if (!restartAsAdmin)
+                return await UpdateAsync(downloadUrl, progress, cancellationToken);
 
-        return RestartAsAdmin();
+            return RestartAsAdmin();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            return new OperationError { Message = $"Failed to prepare application update: {ex.Message}", Exception = ex };
+        }
     }
 
-    private static OperationResult RestartAsAdmin()
+    private OperationResult RestartAsAdmin()
     {
         var startInfo = new ProcessStartInfo
         {
             UseShellExecute = true,
-            WorkingDirectory = Environment.CurrentDirectory,
-            FileName = Environment.ProcessPath,
+            WorkingDirectory = application.WorkingDirectory,
+            FileName = application.ExecutablePath,
             Verb = "runas", // This verb asks for elevation.
         };
 
         return TryCatch(
             () =>
             {
-                Process.Start(startInfo);
-                Environment.Exit(0);
+                processes.Start(startInfo);
+                application.Exit(0);
             },
             errorMessage: t("message_error.restart_admin_fail.extra")
         );
     }
 
-    private static bool IsAdministrator()
+    private async Task<OperationResult> UpdateAsync(
+        string downloadUrl,
+        IProgress<DownloadProgress>? progress,
+        CancellationToken cancellationToken
+    )
     {
-        if (!OperatingSystem.IsWindows())
-            return false;
-
-        using var identity = WindowsIdentity.GetCurrent();
-        var principal = new WindowsPrincipal(identity);
-        return principal.IsInRole(WindowsBuiltInRole.Administrator);
-    }
-
-    private async Task<OperationResult> UpdateAsync(string downloadUrl)
-    {
-        var currentExecutablePath = Environment.ProcessPath;
+        var currentExecutablePath = application.ExecutablePath;
         if (currentExecutablePath is null)
             return Fail(t("message_warning.unable_update_wh_wz.extra.reason_location"));
 
@@ -82,26 +94,20 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem, IDownloadService down
         if (fileSystem.File.Exists(newFilePath))
             fileSystem.File.Delete(newFilePath);
 
-        var downloadedFilePath = await downloads.DownloadToLocationAsync(
-            downloadUrl,
-            newFilePath,
-            t("progress.update_wh_wz"),
-            t("progress.latest_wh_wz_github"),
-            useExactPath: true
-        );
-
-        if (string.IsNullOrWhiteSpace(downloadedFilePath) || !fileSystem.File.Exists(downloadedFilePath))
-            return Ok();
-
-        // Wait briefly to ensure the file is saved on disk.
-        await Task.Delay(200);
+        progress?.Report(new DownloadProgress(0, null));
+        var downloadResult = await downloads.DownloadAsync(downloadUrl, newFilePath, true, progress, cancellationToken);
+        if (downloadResult.IsFailure)
+            return downloadResult.Error;
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!fileSystem.File.Exists(newFilePath))
+            return Fail("The downloaded update executable could not be found.");
 
         // Create and run the PowerShell script to perform the update.
         var scriptResult = CreateAndRunPowerShellScript(currentExecutablePath, newFilePath);
         if (scriptResult.IsFailure)
             return scriptResult;
 
-        Environment.Exit(0);
+        application.Exit(0);
 
         return Ok();
     }
@@ -183,6 +189,6 @@ public class WindowsUpdatePlatform(IFileSystem fileSystem, IDownloadService down
             WorkingDirectory = currentFolder,
         };
 
-        return TryCatch(() => Process.Start(processStartInfo), errorMessage: "Failed to execute the update script.");
+        return TryCatch(() => processes.Start(processStartInfo), errorMessage: "Failed to execute the update script.");
     }
 }
