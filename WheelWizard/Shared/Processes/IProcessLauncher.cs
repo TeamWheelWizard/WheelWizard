@@ -14,7 +14,9 @@ public sealed class ProcessLauncher : IProcessLauncher
     public void Start(ProcessStartInfo startInfo)
     {
         using var process = Process.Start(startInfo);
-        if (process == null)
+        // The shell may hand documents and folders to an already running process (e.g. Explorer),
+        // in which case no process is returned even though the request succeeded.
+        if (process == null && !startInfo.UseShellExecute)
             throw new InvalidOperationException($"Failed to start {startInfo.FileName}.");
     }
 

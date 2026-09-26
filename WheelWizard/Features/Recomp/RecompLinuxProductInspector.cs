@@ -32,12 +32,21 @@ public sealed class RecompLinuxProductInspector(IFileSystem fileSystem, ILogger<
     /// have been built from. <see langword="null"/> when Retro Rewind is not installed, in which case the
     /// Retro Rewind product is only checked for presence.
     /// </param>
-    public RecompProductsEvent Inspect(string backendStateFilePath, string? setupVersion, string installFolderPath, string? retroRewindFolderPath)
+    public RecompProductsEvent Inspect(
+        string backendStateFilePath,
+        string? setupVersion,
+        string installFolderPath,
+        string? retroRewindFolderPath
+    )
     {
         var state = ReadBackendState(backendStateFilePath, out var stateMalformed);
         if (stateMalformed)
         {
-            var malformed = new RecompProductStatus(RecompProductState.Unknown, "The WiiCompiled install state could not be read.", ProtocolValid: false);
+            var malformed = new RecompProductStatus(
+                RecompProductState.Unknown,
+                "The WiiCompiled install state could not be read.",
+                ProtocolValid: false
+            );
             return new(setupVersion, installFolderPath, RebuildRequired: false, malformed, malformed, ProtocolValid: false);
         }
 
