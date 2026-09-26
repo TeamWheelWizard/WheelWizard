@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Serilog;
+using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Helpers;
 using WheelWizard.Services;
 using WheelWizard.Settings;
@@ -36,6 +37,9 @@ public partial class WhWzSettings : UserControlBase
 
     [Inject]
     private IDolphinSettingManager DolphinSettingsService { get; set; } = null!;
+
+    [Inject]
+    private IDolphinDiscoveryService DolphinDiscovery { get; set; } = null!;
 
     public WhWzSettings()
     {
@@ -179,7 +183,7 @@ public partial class WhWzSettings : UserControlBase
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            var dolphinAppPath = PathManager.TryToFindApplicationPath();
+            var dolphinAppPath = DolphinDiscovery.FindApplication();
             if (!string.IsNullOrEmpty(dolphinAppPath))
             {
                 var result = await new YesNoWindow()
@@ -266,10 +270,10 @@ public partial class WhWzSettings : UserControlBase
 
     private async void DolphinUserPathBrowse_OnClick(object sender, RoutedEventArgs e)
     {
-        var currentDolphinPath = PathManager.DolphinFilePath;
-        var folderPath = string.IsNullOrWhiteSpace(currentDolphinPath)
-            ? PathManager.TryFindUserFolderPath()
-            : PathManager.TryFindUserFolderPath(currentDolphinPath);
+        var folderPath = DolphinDiscovery.FindUserDirectory(
+            SettingsService.Get<string>(SettingsService.DOLPHIN_LOCATION),
+            SettingsService.Get<string>(SettingsService.USER_FOLDER_PATH)
+        );
 
         if (!string.IsNullOrEmpty(folderPath))
         {
