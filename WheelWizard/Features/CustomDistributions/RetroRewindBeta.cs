@@ -45,6 +45,8 @@ public class RetroRewindBeta : IDistribution
 
     public async Task<OperationResult> InstallAsync(DistributionOperation operation)
     {
+        if (operation.CancellationToken.IsCancellationRequested)
+            return Fail("Distribution installation was cancelled.");
         var tempRootPath = _paths.BetaDownloadFolderPath;
         var tempZipPath = _paths.BetaArchivePath;
         var tempExtractionPath = _fileSystem.Path.Combine(tempRootPath, "Extracted");
@@ -69,7 +71,7 @@ public class RetroRewindBeta : IDistribution
             );
 
             if (download.IsFailure)
-                return operation.CancellationToken.IsCancellationRequested ? Ok() : download.Error;
+                return download.Error;
             var downloadedFile = download.Value;
             if (!_fileSystem.File.Exists(downloadedFile))
                 return Fail("Failed to download the testing build");

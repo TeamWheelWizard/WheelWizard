@@ -80,7 +80,9 @@ public class RetroRewindLaunchServiceTests
             Substitute.For<IModsLaunchService>(),
             Substitute.For<IRecompDolphinDataService>(),
             Substitute.For<ICustomDistributionPaths>(),
-            new InlineModPresentation()
+            new InlineModPresentation(),
+            Substitute.For<IRecompPresentation>(),
+            Substitute.For<ILaunchPrompts>()
         );
         var rrCount = 0;
         var recompCount = 0;

@@ -39,7 +39,9 @@ public static class DistributionPresentation
         });
         try
         {
-            return await action(new(progress, cancellation.Token));
+            var result = await action(new(progress, cancellation.Token));
+            // Existing screens treat user cancellation as dismissal, while feature callers receive the actual failure.
+            return result.IsFailure && cancellation.IsCancellationRequested ? Ok() : result;
         }
         finally
         {
