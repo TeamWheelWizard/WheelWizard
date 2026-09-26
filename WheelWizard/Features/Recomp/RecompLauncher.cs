@@ -20,7 +20,8 @@ public class RecompLauncher(
     ICustomDistributionSingletonService customDistributions,
     IModsLaunchService modsLaunchService,
     IRecompDolphinDataService dolphinData,
-    ICustomDistributionPaths distributionPaths
+    ICustomDistributionPaths distributionPaths,
+    IModOperationPresentation modPresentation
 ) : ILauncher
 {
     public string GameTitle { get; } = "WiiCompiled";
@@ -52,7 +53,9 @@ public class RecompLauncher(
                     .AwaitAnswer();
             }
 
-            var modsLaunchResult = await modsLaunchService.PrepareModsForLaunch(targetFolderPath, clearTargetFolder);
+            var modsLaunchResult = await modPresentation.RunAsync(
+                (progress, _) => modsLaunchService.PrepareModsForLaunch(targetFolderPath, clearTargetFolder, progress)
+            );
             if (modsLaunchResult.IsFailure)
                 return modsLaunchResult.Error;
 
