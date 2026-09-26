@@ -10,6 +10,8 @@ namespace WheelWizard.Views.Pages;
 
 public partial class SettingsPage : UserControlBase
 {
+    private IPopupFactory Popups { get; }
+
     private ISettingsManager SettingsService { get; }
 
     private ISettingsSignalBus SettingsSignalBus { get; }
@@ -18,12 +20,14 @@ public partial class SettingsPage : UserControlBase
     private IDisposable? _settingsSignalSubscription;
 
     public SettingsPage(
+        IPopupFactory popups,
         ISettingsManager settingsService,
         ISettingsSignalBus settingsSignalBus,
         IPageFactory pages,
         Type? initialPage = null
     )
     {
+        Popups = popups;
         SettingsService = settingsService;
         SettingsSignalBus = settingsSignalBus;
         Pages = pages;
@@ -98,7 +102,7 @@ public partial class SettingsPage : UserControlBase
         }
     }
 
-    private void DevButton_OnClick(object? sender, RoutedEventArgs e) => new DevToolWindow().Show();
+    private void DevButton_OnClick(object? sender, RoutedEventArgs e) => Popups.Create<DevToolWindow>().Show();
 
     public void HideDevelopmentFeatures()
     {

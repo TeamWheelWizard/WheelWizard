@@ -21,6 +21,8 @@ namespace WheelWizard.Views.Pages;
 
 public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, IPollingListener
 {
+    private IPopupFactory Popups { get; } = null!;
+
     private INavigationService Navigation { get; } = null!;
 
     private LiveRoomsService LiveRooms { get; } = null!;
@@ -64,6 +66,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
     }
 
     public RoomDetailsPage(
+        IPopupFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameDataService,
@@ -72,6 +75,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         RrRoom room
     )
     {
+        Popups = popups;
         Navigation = navigation;
         LiveRooms = liveRooms;
         GameDataService = gameDataService;
@@ -134,7 +138,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return;
         if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
             return;
-        new PlayerProfileWindow(selectedPlayer.FriendCode).Show();
+        Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode).Show();
     }
 
     private async void AddFriend_OnClick(object sender, RoutedEventArgs e)
