@@ -106,6 +106,7 @@
                         <MenuItem Header="Add Friend" Click="AddFriend_OnClick" />
                         <Separator />
                         <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />
+                        <MenuItem Header="View player on RWFC" Click="ViewOnRwfc_OnClick" />
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>

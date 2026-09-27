@@ -141,6 +141,12 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode).Show();
     }
 
+    private void ViewOnRwfc_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (PlayersListView.SelectedItem is RrPlayer selectedPlayer)
+            ViewUtils.OpenRwfcPlayer(selectedPlayer.FriendCode);
+    }
+
     private async void AddFriend_OnClick(object sender, RoutedEventArgs e)
     {
         if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
