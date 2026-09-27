@@ -46,7 +46,7 @@ public partial class Layout : BaseWindow, IPollingListener
         PageTransitions =
         [
             new PageSlide { Duration = PageSwapDuration, Orientation = PageSlide.SlideAxis.Horizontal },
-            new CrossFade { Duration = PageSwapDuration },
+            new CrossFade { Duration = PageSwapDuration, FillMode = FillMode.None },
         ],
     };
 
