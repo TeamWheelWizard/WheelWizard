@@ -463,6 +463,12 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         Popups.Create<PlayerProfileWindow>(player.FriendCode).Show();
     }
 
+    private void ViewOnRwfc_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (GetContextPlayer(sender) is { } player)
+            ViewUtils.OpenRwfcPlayer(player.FriendCode);
+    }
+
     private async void AddFriend_OnClick(object sender, RoutedEventArgs e)
     {
         var player = GetContextPlayer(sender);

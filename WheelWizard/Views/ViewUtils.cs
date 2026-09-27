@@ -26,6 +26,15 @@ public static class ViewUtils
         ShowSnackbar("Opened link");
     }
 
+    public static void OpenRwfcPlayer(string? friendCode)
+    {
+        var digits = new string((friendCode ?? string.Empty).Where(char.IsAsciiDigit).ToArray());
+        if (digits.Length != 12)
+            return;
+
+        OpenLink($"https://rwfc.net/player/{digits[..4]}-{digits[4..8]}-{digits[8..]}");
+    }
+
     public static void ShowSnackbar(string message, SnackbarType type = SnackbarType.Success) => GetLayout().ShowSnackbar(message, type);
 
     public static Layout GetLayout() =>

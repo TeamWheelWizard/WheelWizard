@@ -340,6 +340,12 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode).Show();
     }
 
+    private void ViewOnRwfc_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (FriendsListView.SelectedItem is FriendProfile selectedPlayer)
+            ViewUtils.OpenRwfcPlayer(selectedPlayer.FriendCode);
+    }
+
     private void RemoveFriend_OnClick(object sender, RoutedEventArgs e)
     {
         if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
