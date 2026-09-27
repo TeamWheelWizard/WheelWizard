@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
@@ -32,10 +33,8 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     // Though I do see the use in saving it when using the app so you can swap pages in the meantime
     private static ListOrderCondition CurrentOrder = ListOrderCondition.IS_ONLINE;
 
-    // Static so the caches survive page swaps
-    private static readonly FriendRatingResolver RatingResolver = new();
-
     private ObservableCollection<FriendProfile> _friendlist = [];
+    private bool _isUnloaded;
 
     private LiveRoomsService LiveRooms { get; }
 
@@ -44,6 +43,8 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     private IMiiDbService MiiDbService { get; }
 
     private IApiCaller<IRwfcApi> ApiCaller { get; }
+
+    private FriendRatingService Ratings { get; }
 
     private ISettingsManager SettingsService { get; }
 
@@ -64,6 +65,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         IGameLicenseSingletonService gameLicenseService,
         IMiiDbService miiDbService,
         IApiCaller<IRwfcApi> apiCaller,
+        FriendRatingService ratings,
         ISettingsManager settingsService
     )
     {
@@ -73,9 +75,13 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         GameLicenseService = gameLicenseService;
         MiiDbService = miiDbService;
         ApiCaller = apiCaller;
+        Ratings = ratings;
         SettingsService = settingsService;
         InitializeComponent();
         GameLicenseService.Subscribe(this);
+        LiveRooms.Subscribe(this);
+        Ratings.RatingsChanged += RatingsChanged;
+        Unloaded += FriendsPage_Unloaded;
         UpdateFriendList();
 
         DataContext = this;
@@ -86,9 +92,24 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
 
     public void OnUpdate(ObservablePollingService sender)
     {
-        if (sender is not GameLicenseSingletonService)
+        if (sender is not GameLicenseSingletonService and not LiveRoomsService)
             return;
         UpdateFriendList();
+    }
+
+    private void RatingsChanged() =>
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!_isUnloaded)
+                UpdateFriendList();
+        });
+
+    private void FriendsPage_Unloaded(object? sender, RoutedEventArgs e)
+    {
+        _isUnloaded = true;
+        GameLicenseService.Unsubscribe(this);
+        LiveRooms.Unsubscribe(this);
+        Ratings.RatingsChanged -= RatingsChanged;
     }
 
     private void UpdateFriendList()
@@ -132,28 +153,10 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
             ListOrderCondition.IS_ONLINE or _ => f => f.IsOnline,
         };
         var friends = GameLicenseService.ActiveCurrentFriends;
-        var onlinePlayers = RRLiveRooms.Instance.CurrentRooms.SelectMany(room => room.Players);
-        var friendCodesToFetch = RatingResolver.Apply(friends, onlinePlayers, DateTime.Now);
-        if (friendCodesToFetch.Count > 0)
-            _ = FetchApiVrAsync(friendCodesToFetch);
+        var onlinePlayers = LiveRooms.CurrentRooms.SelectMany(room => room.Players);
+        Ratings.Refresh(friends, onlinePlayers);
 
         return friends.OrderByDescending(orderMethod).ToList();
-    }
-
-    private async Task FetchApiVrAsync(List<string> friendCodes)
-    {
-        var anyUpdated = false;
-        // Sequential to avoid flooding the API
-        foreach (var friendCode in friendCodes)
-        {
-            var profileResult = await ApiCaller.CallApiAsync(rwfcApi => rwfcApi.GetPlayerProfileAsync(friendCode));
-            var vr = profileResult.IsSuccess ? FriendRatingResolver.VrFromApiProfile(profileResult.Value) : null;
-            RatingResolver.StoreApiVr(friendCode, vr, DateTime.Now);
-            anyUpdated |= vr.HasValue;
-        }
-
-        if (anyUpdated)
-            UpdateFriendList();
     }
 
     private void PopulateSortingList()

@@ -172,6 +172,7 @@ public class FriendRatingResolverTests
         var toFetch = resolver.Apply([friend], [CreatePlayer(null, (int)br)], Now);
 
         Assert.Equal(GameRksysValue(vr), friend.Vr);
+        Assert.Equal(br, friend.Br);
         Assert.Equal([FriendCode], toFetch);
     }
 

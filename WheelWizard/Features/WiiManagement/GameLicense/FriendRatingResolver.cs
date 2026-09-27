@@ -37,16 +37,19 @@ public class FriendRatingResolver
             if (string.IsNullOrWhiteSpace(friend.FriendCode))
                 continue;
 
-            if (onlineByFriendCode.TryGetValue(friend.FriendCode, out var livePlayer) && livePlayer.Vr.HasValue)
+            if (onlineByFriendCode.TryGetValue(friend.FriendCode, out var livePlayer))
             {
-                friend.Vr = (uint)Math.Max(livePlayer.Vr.Value, 0);
                 if (livePlayer.Br.HasValue)
                 {
                     friend.Br = (uint)Math.Max(livePlayer.Br.Value, 0);
                     _liveBrCache[friend.FriendCode] = friend.Br;
                 }
-                _apiVrCache[friend.FriendCode] = (friend.Vr, now);
-                continue;
+                if (livePlayer.Vr.HasValue)
+                {
+                    friend.Vr = (uint)Math.Max(livePlayer.Vr.Value, 0);
+                    _apiVrCache[friend.FriendCode] = (friend.Vr, now);
+                    continue;
+                }
             }
 
             if (_liveBrCache.TryGetValue(friend.FriendCode, out var cachedBr))
