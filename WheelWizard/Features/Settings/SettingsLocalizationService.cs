@@ -20,6 +20,7 @@ public sealed class SettingsLocalizationService(
             return;
 
         _subscription = settingsSignalBus.Subscribe(OnSignal);
+        LocalizationProvider.Use(localizationService);
         ApplyCurrentLanguage();
         _initialized = true;
     }
@@ -47,6 +48,5 @@ public sealed class SettingsLocalizationService(
         CultureInfo.CurrentUICulture = newCulture;
 
         localizationService.SetLanguage(languageCode);
-        LocalizationProvider.Use(localizationService);
     }
 }
