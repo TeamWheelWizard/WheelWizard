@@ -7,9 +7,9 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
 {
     private readonly object _sync = new();
     private bool _loaded;
-    private readonly List<DolphinSetting> _settings = [];
+    private readonly List<IDolphinSetting> _settings = [];
 
-    public void RegisterSetting(DolphinSetting setting)
+    public void RegisterSetting(IDolphinSetting setting)
     {
         lock (_sync)
         {
@@ -18,7 +18,7 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
         }
     }
 
-    public void SaveSettings(string configDirectory, DolphinSetting invokingSetting)
+    public void SaveSettings(string configDirectory, IDolphinSetting invokingSetting)
     {
         lock (_sync)
         {

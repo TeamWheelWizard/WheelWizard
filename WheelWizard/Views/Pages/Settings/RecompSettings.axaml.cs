@@ -160,7 +160,7 @@ public partial class RecompSettings : UserControl
         if (_loading || index < 0 || index >= RecompVideoConfig.ResolutionMultipliers.Count)
             return;
 
-        SettingsService.Set(SettingsService.RECOMP_RESOLUTION_MULTIPLIER, RecompVideoConfig.ResolutionMultipliers[index]);
+        SettingsEditing.Set(SettingsService, SettingsService.RECOMP_RESOLUTION_MULTIPLIER, RecompVideoConfig.ResolutionMultipliers[index]);
     }
 
     private void GraphicsApi_OnChanged(object? sender, SelectionChangedEventArgs e)
@@ -169,7 +169,7 @@ public partial class RecompSettings : UserControl
         if (_loading || index < 0 || index >= RecompVideoConfig.OfferedGraphicsApis.Count)
             return;
 
-        SettingsService.Set(SettingsService.RECOMP_GRAPHICS_API, RecompVideoConfig.OfferedGraphicsApis[index]);
+        SettingsEditing.Set(SettingsService, SettingsService.RECOMP_GRAPHICS_API, RecompVideoConfig.OfferedGraphicsApis[index]);
     }
 
     private void ShowFps_OnChanged(object? sender, RoutedEventArgs e)
@@ -177,7 +177,7 @@ public partial class RecompSettings : UserControl
         if (_loading)
             return;
 
-        SettingsService.Set(SettingsService.RECOMP_SHOW_FPS, ShowFps.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.RECOMP_SHOW_FPS, ShowFps.IsChecked == true);
     }
 
     private void PreventStutters_OnChanged(object? sender, RoutedEventArgs e)
@@ -185,7 +185,7 @@ public partial class RecompSettings : UserControl
         if (_loading)
             return;
 
-        SettingsService.Set(SettingsService.RECOMP_PREVENT_STUTTERS, PreventStutters.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.RECOMP_PREVENT_STUTTERS, PreventStutters.IsChecked == true);
     }
 
     #endregion

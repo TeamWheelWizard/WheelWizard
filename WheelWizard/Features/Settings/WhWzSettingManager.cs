@@ -10,10 +10,10 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
     private readonly object _sync = new();
     private bool _loaded;
     private Exception? _loadError;
-    private readonly Dictionary<string, WhWzSetting> _settings = new();
+    private readonly Dictionary<string, IWhWzSetting> _settings = new();
     private readonly Dictionary<string, JsonElement> _unknownSettings = new();
 
-    public void RegisterSetting(WhWzSetting setting)
+    public void RegisterSetting(IWhWzSetting setting)
     {
         lock (_sync)
         {
@@ -22,7 +22,7 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
         }
     }
 
-    public void SaveSettings(string configPath, WhWzSetting invokingSetting)
+    public void SaveSettings(string configPath, IWhWzSetting invokingSetting)
     {
         lock (_sync)
         {
@@ -33,7 +33,7 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
 
             var values = _unknownSettings.ToDictionary(pair => pair.Key, pair => (object?)pair.Value);
             foreach (var (name, setting) in _settings)
-                values[name] = setting.Get();
+                values[name] = setting.GetValue();
 
             try
             {

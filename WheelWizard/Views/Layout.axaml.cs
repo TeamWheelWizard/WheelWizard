@@ -176,7 +176,7 @@ public partial class Layout : BaseWindow, IPollingListener
         // Note that this method will also be called whenever the setting changes
         if (setting == SettingsService.WINDOW_SCALE || setting == SettingsService.SAVED_WINDOW_SCALE)
         {
-            var scaleFactor = GetUsableWindowScale((double)setting.Get());
+            var scaleFactor = GetUsableWindowScale(SettingsService.WINDOW_SCALE.Value);
             CompleteGrid.Resources["SettingsRowGap"] = 2d / scaleFactor;
             Height = WindowHeight * scaleFactor;
             Width = WindowWidth * scaleFactor;

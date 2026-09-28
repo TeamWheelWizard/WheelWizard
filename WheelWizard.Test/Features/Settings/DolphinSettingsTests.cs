@@ -10,7 +10,7 @@ public class DolphinSettingTests
     [Fact]
     public void Constructor_Throws_WhenFileNameIsNotIni()
     {
-        var action = () => new DolphinSetting(typeof(string), ("Dolphin.cfg", "General", "NANDRootPath"), "value");
+        var action = () => new DolphinSetting<string>(("Dolphin.cfg", "General", "NANDRootPath"), "value");
 
         Assert.Throws<ArgumentException>(action);
     }
@@ -18,8 +18,7 @@ public class DolphinSettingTests
     [Fact]
     public void SetFromString_ParsesEnumAndFormatsAsIntegerString()
     {
-        var setting = new DolphinSetting(
-            typeof(DolphinShaderCompilationMode),
+        var setting = new DolphinSetting<DolphinShaderCompilationMode>(
             ("GFX.ini", "Settings", "ShaderCompilationMode"),
             DolphinShaderCompilationMode.Default
         );
@@ -34,9 +33,7 @@ public class DolphinSettingTests
     [Fact]
     public void Set_ReturnsFalseAndKeepsOldValue_WhenValidationFails()
     {
-        var setting = new DolphinSetting(typeof(int), ("GFX.ini", "Settings", "InternalResolution"), 1).SetValidation(value =>
-            (int)value! >= 0
-        );
+        var setting = new DolphinSetting<int>(("GFX.ini", "Settings", "InternalResolution"), 1).SetValidation(value => value >= 0);
         setting.Set(2);
 
         var result = setting.Set(-1);
@@ -46,11 +43,12 @@ public class DolphinSettingTests
     }
 
     [Fact]
-    public void SetFromString_Throws_WhenTypeIsUnsupported()
+    public void SetFromString_ParsesTypedNumbers()
     {
-        var setting = new DolphinSetting(typeof(decimal), ("GFX.ini", "Settings", "Price"), 1m);
+        var setting = new DolphinSetting<decimal>(("GFX.ini", "Settings", "Price"), 1m);
 
-        Assert.Throws<InvalidOperationException>(() => setting.SetFromString("3.14"));
+        Assert.True(setting.SetFromString("3.14"));
+        Assert.Equal(3.14m, setting.Value);
     }
 }
 
@@ -67,7 +65,7 @@ public class DolphinSettingManagerTests
         fileSystem.Directory.CreateDirectory(configFolderPath);
         fileSystem.File.WriteAllLines(iniPath, ["[General]", "NANDRootPath = /persisted"]);
         var manager = new DolphinSettingManager(fileSystem);
-        var setting = new DolphinSetting(typeof(string), ("Dolphin.ini", "General", "NANDRootPath"), "/default");
+        var setting = new DolphinSetting<string>(("Dolphin.ini", "General", "NANDRootPath"), "/default");
 
         manager.RegisterSetting(setting);
         manager.LoadSettings(configFolderPath);
@@ -85,7 +83,7 @@ public class DolphinSettingManagerTests
         fileSystem.Directory.CreateDirectory(configFolderPath);
         fileSystem.File.WriteAllLines(iniPath, ["[General]", "OtherSetting = 1"]);
         var manager = new DolphinSettingManager(fileSystem);
-        var setting = new DolphinSetting(typeof(string), ("Dolphin.ini", "General", "NANDRootPath"), "/default");
+        var setting = new DolphinSetting<string>(("Dolphin.ini", "General", "NANDRootPath"), "/default");
 
         manager.RegisterSetting(setting);
         manager.LoadSettings(configFolderPath);
@@ -105,7 +103,7 @@ public class DolphinSettingManagerTests
         fileSystem.Directory.CreateDirectory(configFolderPath);
         fileSystem.File.WriteAllLines(iniPath, ["[General]", "NANDRootPath = /old"]);
         var manager = new DolphinSettingManager(fileSystem);
-        var setting = new DolphinSetting(typeof(string), ("Dolphin.ini", "General", "NANDRootPath"), "/default");
+        var setting = new DolphinSetting<string>(("Dolphin.ini", "General", "NANDRootPath"), "/default");
 
         manager.RegisterSetting(setting);
         manager.LoadSettings(configFolderPath);
@@ -127,7 +125,7 @@ public class DolphinSettingManagerTests
         fileSystem.Directory.CreateDirectory(configFolderPath);
         fileSystem.File.WriteAllLines(iniPath, ["[General]", "NANDRootPath = /first"]);
         var manager = new DolphinSettingManager(fileSystem);
-        var setting = new DolphinSetting(typeof(string), ("Dolphin.ini", "General", "NANDRootPath"), "/default");
+        var setting = new DolphinSetting<string>(("Dolphin.ini", "General", "NANDRootPath"), "/default");
 
         manager.RegisterSetting(setting);
         manager.LoadSettings(configFolderPath);

@@ -51,12 +51,12 @@ public partial class VideoSettings : UserControl
 
     private void ClickForceWiimote(object? sender, RoutedEventArgs e)
     {
-        SettingsService.Set(SettingsService.FORCE_WIIMOTE, DisableForce.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.FORCE_WIIMOTE, DisableForce.IsChecked == true);
     }
 
     private void ClickLaunchWithDolphinWindow(object? sender, RoutedEventArgs e)
     {
-        SettingsService.Set(SettingsService.LAUNCH_WITH_DOLPHIN, LaunchWithDolphin.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.LAUNCH_WITH_DOLPHIN, LaunchWithDolphin.IsChecked == true);
     }
 
     private void LoadSettings()
@@ -91,22 +91,22 @@ public partial class VideoSettings : UserControl
     private void ResolutionDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (ResolutionDropdown.SelectedIndex >= 0)
-            SettingsService.Set(SettingsService.INTERNAL_RESOLUTION, ResolutionDropdown.SelectedIndex + 1);
+            SettingsEditing.Set(SettingsService, SettingsService.INTERNAL_RESOLUTION, ResolutionDropdown.SelectedIndex + 1);
     }
 
     private void VSync_OnClick(object? sender, RoutedEventArgs e)
     {
-        SettingsService.Set(SettingsService.VSYNC, VSyncButton.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.VSYNC, VSyncButton.IsChecked == true);
     }
 
     private void Recommended_OnClick(object? sender, RoutedEventArgs e)
     {
-        SettingsService.Set(SettingsService.RECOMMENDED_SETTINGS, RecommendedButton.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.RECOMMENDED_SETTINGS, RecommendedButton.IsChecked == true);
     }
 
     private void ShowFPS_OnClick(object? sender, RoutedEventArgs e)
     {
-        SettingsService.Set(SettingsService.SHOW_FPS, ShowFPSButton.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.SHOW_FPS, ShowFPSButton.IsChecked == true);
     }
 
     private void RendererDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -117,7 +117,7 @@ public partial class VideoSettings : UserControl
 
         if (SettingValues.GFXRenderers.TryGetValue(selectedDisplayName, out var actualValue))
         {
-            SettingsService.Set(SettingsService.GFX_BACKEND, actualValue);
+            SettingsEditing.Set(SettingsService, SettingsService.GFX_BACKEND, actualValue);
         }
         else
         {

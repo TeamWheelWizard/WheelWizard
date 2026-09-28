@@ -117,7 +117,7 @@ public class HomeDolphinLaunchTests
         public IDolphinVersionService Versions { get; } = Substitute.For<IDolphinVersionService>();
         public ILinuxDolphinInstaller Installer { get; } = Substitute.For<ILinuxDolphinInstaller>();
         public IDolphinLaunchPresentation Presentation { get; } = Substitute.For<IDolphinLaunchPresentation>();
-        public WhWzSetting GamePath { get; } = new(typeof(string), "GamePath", "/game.iso");
+        public WhWzSetting<string> GamePath { get; } = new("GamePath", "/game.iso");
         public DolphinLaunchService Service { get; }
 
         public Fixture(bool windows = false, string command = "dolphin-emu")

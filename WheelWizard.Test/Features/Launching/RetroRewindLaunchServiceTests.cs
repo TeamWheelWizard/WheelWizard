@@ -122,11 +122,11 @@ public class RetroRewindLaunchServiceTests
         {
             Fs.File.WriteAllText("/game.iso", "game");
             var settings = Substitute.For<ISettingsManager>();
-            settings.GAME_LOCATION.Returns(new WhWzSetting(typeof(string), "Game", "/game.iso"));
-            settings.FORCE_WIIMOTE.Returns(new WhWzSetting(typeof(bool), "Force", true));
-            settings.LAUNCH_WITH_DOLPHIN.Returns(new WhWzSetting(typeof(bool), "Dolphin", false));
-            settings.Get<string>(Arg.Any<Setting>()).Returns(call => (string)call.Arg<Setting>().Get());
-            settings.Get<bool>(Arg.Any<Setting>()).Returns(call => (bool)call.Arg<Setting>().Get());
+            settings.GAME_LOCATION.Returns(new WhWzSetting<string>("Game", "/game.iso"));
+            settings.FORCE_WIIMOTE.Returns(new WhWzSetting<bool>("Force", true));
+            settings.LAUNCH_WITH_DOLPHIN.Returns(new WhWzSetting<bool>("Dolphin", false));
+            settings.Get<string>(Arg.Any<Setting<string>>()).Returns(call => (string)call.Arg<Setting<string>>().Get());
+            settings.Get<bool>(Arg.Any<Setting<bool>>()).Returns(call => (bool)call.Arg<Setting<bool>>().Get());
             var paths = Substitute.For<ICustomDistributionPaths>();
             paths.PatchesFolderPath.Returns("/stable-patches");
             paths.BetaPatchesFolderPath.Returns("/beta-patches");
