@@ -305,6 +305,28 @@ public class FriendRatingResolverTests
         Assert.Equal([FriendCode], toFetch);
     }
 
+    [Fact]
+    public void Apply_KeepsLastGoodVr_AfterFailedRefreshAndFriendReload()
+    {
+        var resolver = new FriendRatingResolver();
+        resolver.Apply([CreateStaleFriend(29367, 5000)], [], Now);
+        resolver.StoreApiVr(FriendCode, 29367, Now);
+
+        var refreshAt = Now + FriendRatingResolver.ApiVrCacheDuration;
+        Assert.Equal([FriendCode], resolver.Apply([CreateStaleFriend(29367, 5000)], [], refreshAt));
+        resolver.StoreApiVr(FriendCode, null, refreshAt);
+
+        var reloadedFriend = CreateStaleFriend(29367, 5000);
+        var toFetch = resolver.Apply([reloadedFriend], [], refreshAt.AddMinutes(1));
+
+        Assert.Equal(29367u, reloadedFriend.Vr);
+        Assert.Empty(toFetch);
+        Assert.Equal(
+            [FriendCode],
+            resolver.Apply([CreateStaleFriend(29367, 5000)], [], refreshAt + FriendRatingResolver.ApiVrCacheDuration)
+        );
+    }
+
     #endregion
 
     [Fact]

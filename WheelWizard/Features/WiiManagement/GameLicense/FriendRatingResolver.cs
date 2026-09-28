@@ -11,7 +11,7 @@ public class FriendRatingResolver
     public const uint MaxRksysFriendRating = 1_000_000 / 100;
     public static readonly TimeSpan ApiVrCacheDuration = TimeSpan.FromMinutes(5);
 
-    private readonly Dictionary<string, (uint? Vr, DateTime FetchedAt)> _apiVrCache = [];
+    private readonly Dictionary<string, (uint? Vr, DateTime LastAttemptAt)> _apiVrCache = [];
     private readonly HashSet<string> _pendingApiVrRequests = [];
     private readonly Dictionary<string, uint> _liveBrCache = [];
 
@@ -59,7 +59,7 @@ public class FriendRatingResolver
             {
                 if (cached.Vr.HasValue)
                     friend.Vr = cached.Vr.Value;
-                if (now - cached.FetchedAt < ApiVrCacheDuration)
+                if (now - cached.LastAttemptAt < ApiVrCacheDuration)
                     continue;
             }
 
@@ -71,12 +71,13 @@ public class FriendRatingResolver
     }
 
     /// <summary>
-    /// Stores the result of an API request. A null VR marks a failed request, which is cached too
-    /// to avoid retrying on every update.
+    /// Stores the result of an API request. A failed request keeps the last good VR while
+    /// its attempt time prevents another request until the cooldown expires.
     /// </summary>
     public void StoreApiVr(string friendCode, uint? vr, DateTime now)
     {
-        _apiVrCache[friendCode] = (vr, now);
+        _apiVrCache.TryGetValue(friendCode, out var cached);
+        _apiVrCache[friendCode] = (vr ?? cached.Vr, now);
         _pendingApiVrRequests.Remove(friendCode);
     }
 }
