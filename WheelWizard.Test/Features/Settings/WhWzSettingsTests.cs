@@ -85,10 +85,11 @@ public class WhWzSettingTests
             .SetForceSave(forceSave);
         setting.Set(12, skipSave: true);
 
-        Assert.Throws<IOException>(setting.Reset);
+        setting.Reset();
+        Assert.IsType<IOException>(setting.SaveError);
 
         Assert.Equal(forceSave, setting.Set(6, skipSave: true));
-        Assert.Equal(forceSave ? 6 : 5, setting.Get());
+        Assert.Equal(forceSave ? 6 : 12, setting.Get());
     }
 
     [Fact]

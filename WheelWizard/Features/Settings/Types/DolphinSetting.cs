@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace WheelWizard.Settings.Types;
 
 public class DolphinSetting : Setting
@@ -62,7 +64,7 @@ public class DolphinSetting : Setting
         if (ValueType.IsEnum)
             return ((int)Value).ToString();
 
-        return Value?.ToString() ?? "null";
+        return Convert.ToString(Value, CultureInfo.InvariantCulture) ?? "null";
     }
 
     public bool SetFromString(string newValue, bool skipSave = false)
@@ -72,12 +74,16 @@ public class DolphinSetting : Setting
         return ValueType switch
         {
             { } t when t == typeof(string) => Set(newValue, skipSave),
-            { } t when t == typeof(int) => Set(int.Parse(newValue), skipSave),
-            { } t when t == typeof(long) => Set(long.Parse(newValue), skipSave),
-            { } t when t == typeof(float) => Set(float.Parse(newValue), skipSave),
-            { } t when t == typeof(double) => Set(double.Parse(newValue), skipSave),
-            { } t when t == typeof(bool) => Set(bool.Parse(newValue), skipSave),
-            { IsEnum: true } t => Set(Enum.ToObject(t, int.Parse(newValue)), skipSave),
+            { } t when t == typeof(int) => int.TryParse(newValue, CultureInfo.InvariantCulture, out var number) && Set(number, skipSave),
+            { } t when t == typeof(long) => long.TryParse(newValue, CultureInfo.InvariantCulture, out var number) && Set(number, skipSave),
+            { } t when t == typeof(float) => float.TryParse(newValue, CultureInfo.InvariantCulture, out var number)
+                && Set(number, skipSave),
+            { } t when t == typeof(double) => double.TryParse(newValue, CultureInfo.InvariantCulture, out var number)
+                && Set(number, skipSave),
+            { } t when t == typeof(bool) => bool.TryParse(newValue, out var flag) && Set(flag, skipSave),
+            { IsEnum: true } t => int.TryParse(newValue, out var number)
+                && Enum.IsDefined(t, number)
+                && Set(Enum.ToObject(t, number), skipSave),
             _ => throw new InvalidOperationException($"Unsupported type: {ValueType.Name}"),
         };
     }

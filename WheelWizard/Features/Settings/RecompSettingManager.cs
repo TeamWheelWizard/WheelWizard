@@ -30,7 +30,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
         lock (_syncRoot)
         {
             if (!_loaded)
-                return;
+                throw new IOException("The WiiCompiled settings have not been loaded.");
         }
 
         lock (_fileIoSync)
@@ -51,7 +51,6 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
 
     public void RemoveTomlSetting(string configPath, string section, string settingToRemove)
     {
-        // #todo: use the same atomic save helper as setting updates so removing a key can't leave a partial config.
         lock (_fileIoSync)
         {
             var lines = ReadTomlFile(configPath)?.ToList();
@@ -73,7 +72,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
                     continue;
 
                 lines.RemoveAt(i);
-                fileSystem.File.WriteAllLines(configPath, lines);
+                SettingsFile.WriteLines(fileSystem, configPath, lines);
                 return;
             }
         }
@@ -82,7 +81,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
     public void LoadSettings(string configPath)
     {
         List<RecompSetting> settingsSnapshot;
-        if (_loaded || !fileSystem.File.Exists(configPath))
+        if (_loaded)
             return;
 
         lock (_syncRoot)
@@ -101,9 +100,17 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
                 // A missing or unparsable key keeps the registered default without writing it back:
                 // the runtime falls back to the very same default, so the file stays untouched until
                 // the user actually changes something.
-                var value = ReadTomlSetting(configPath, setting.Section, setting.Name);
-                if (value != null)
-                    setting.SetFromString(value, true);
+                string? value;
+                try
+                {
+                    value = ReadTomlSetting(configPath, setting.Section, setting.Name);
+                }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+                {
+                    value = null;
+                }
+                if (value == null || !setting.SetFromString(value, true))
+                    setting.Reset(skipSave: true);
             }
         }
     }
@@ -113,14 +120,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
         if (!fileSystem.File.Exists(configPath))
             return null;
 
-        try
-        {
-            return fileSystem.File.ReadAllLines(configPath);
-        }
-        catch
-        {
-            return null;
-        }
+        return fileSystem.File.ReadAllLines(configPath);
     }
 
     private string? ReadTomlSetting(string configPath, string section, string settingToRead)
@@ -156,13 +156,12 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
 
     private void WriteTomlSetting(string configPath, string section, string settingToChange, string value)
     {
-        // #todo: add a shared temp-file-and-backup save helper for toml updates while preserving keys owned by the game.
         var lines = ReadTomlFile(configPath)?.ToList();
 
         // The backend owns creating Config.toml; a write before it exists would hand the runtime a
         // file Wheel Wizard invented, so the value simply stays in memory until the next load.
         if (lines == null)
-            return;
+            throw new IOException("The WiiCompiled configuration file is not available.");
 
         var sectionIndex = lines.FindIndex(line => line.Trim() == $"[{section}]");
         if (sectionIndex == -1)
@@ -171,7 +170,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
                 lines.Add(string.Empty);
             lines.Add($"[{section}]");
             lines.Add($"{settingToChange} = {value}");
-            fileSystem.File.WriteAllLines(configPath, lines);
+            SettingsFile.WriteLines(fileSystem, configPath, lines);
             return;
         }
 
@@ -185,12 +184,12 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
                 continue;
 
             lines[i] = $"{settingToChange} = {value}";
-            fileSystem.File.WriteAllLines(configPath, lines);
+            SettingsFile.WriteLines(fileSystem, configPath, lines);
             return;
         }
 
         lines.Insert(sectionIndex + 1, $"{settingToChange} = {value}");
-        fileSystem.File.WriteAllLines(configPath, lines);
+        SettingsFile.WriteLines(fileSystem, configPath, lines);
     }
 
     private static bool IsSettingLine(string trimmedLine, string settingName) =>

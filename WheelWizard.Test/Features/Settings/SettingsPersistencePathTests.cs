@@ -97,7 +97,7 @@ public class SettingsPersistencePathTests
         manager.RegisterSetting(setting);
 
         manager.LoadSettings(configPath);
-        manager.SaveSettings(configPath, setting);
+        Assert.Throws<IOException>(() => manager.SaveSettings(configPath, setting));
         manager.RemoveTomlSetting(configPath, "video", "show_fps");
 
         Assert.False(fs.File.Exists(configPath));
