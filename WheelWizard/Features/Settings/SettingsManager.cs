@@ -249,6 +249,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         );
 
         // Readonly settings
+        // #todo: (#377) validate blank mac settings and guide recovery before mii creation; add a regression test.
         MACADDRESS = RegisterDolphin(("Dolphin.ini", "General", "WirelessMac"), "02:01:02:03:04:05");
         #endregion
 
@@ -345,6 +346,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     #region Public API
     public T Get<T>(Setting setting)
     {
+        // #todo: make setting keys generic so reading and writing the wrong value type fails at compile time.
         var value = setting.Get();
         if (value is not T typedValue)
             throw new InvalidOperationException($"Setting '{setting.Name}' does not match expected type '{typeof(T).Name}'.");

@@ -8,6 +8,7 @@ public sealed class SzsArchiveDecoder : ISzsArchiveDecoder
 
     public OperationResult<DecodedArchive> TryDecodeU8Archive(byte[] bytes)
     {
+        // #todo: add decoder tests for real archives, truncated headers, invalid offsets and broken compressed data.
         try
         {
             var decompressResult = DecompressYaz0IfNeeded(bytes);

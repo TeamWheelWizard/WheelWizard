@@ -38,6 +38,7 @@ public static class DistributionDownloads
         }
         catch (OperationCanceledException) when (operation.CancellationToken.IsCancellationRequested)
         {
+            // #todo: follow the shared cancellation contract here so callers can tell a cancelled download from a failed one.
             return Fail("Distribution download was cancelled.");
         }
         finally

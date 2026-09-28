@@ -11,6 +11,7 @@ public static class BrsarPatchConverter
 
     public static PatchConversionAnalysis AnalyzeAgainstBaseline(BaselineEntry baseline, string moddedName, byte[] moddedBytes)
     {
+        // #todo: add direct conversion tests for changed sound data, missing entries and malformed archives.
         if (!string.Equals(baseline.Kind, "brsar", StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("The selected baseline is not a BRSAR file.");
 

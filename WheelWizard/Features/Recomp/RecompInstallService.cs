@@ -82,6 +82,7 @@ public interface IRecompInstallService : IDisposable
 /// <inheritdoc />
 public sealed class RecompInstallService : IRecompInstallService
 {
+    // #todo: test the real install, repair, launch and uninstall flows with fake dependencies, including cancellation and failures.
     // Where the setup phase starts on the 0-100 progress bar; the download phase before it lives in the acquirer.
     private const int SetupPercentFloor = RecompSetupHostAcquirer.SetupPercentFloor;
 

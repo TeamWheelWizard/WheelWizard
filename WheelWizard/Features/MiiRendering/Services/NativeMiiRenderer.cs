@@ -18,6 +18,7 @@ namespace WheelWizard.MiiRendering.Services;
 /// </summary>
 public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocator, IFileSystem fileSystem) : IMiiNativeRenderer
 {
+    // #todo: split resource loading, caching, geometry and rasterization into focused helpers so this renderer is easier to change.
     public sealed record NativeMiiRenderRequest(
         string StudioData,
         int Width,

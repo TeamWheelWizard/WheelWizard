@@ -24,6 +24,7 @@ public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest, ModPreviewView
 
 public partial class ModsPage : UserControl, INotifyPropertyChanged
 {
+    // #todo: move list state and mod workflows into a view model, and split drag-and-drop visuals into their own behavior.
     private IPopupFactory Popups { get; }
 
     private Func<int, ModPreviewViewModel> CreatePreview { get; }

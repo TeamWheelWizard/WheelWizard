@@ -143,6 +143,7 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
     // TODO: find out when to use `setting=value` and when to use `setting = value`
     private void ChangeIniSettings(string configDirectory, string fileName, string section, string settingToChange, string value)
     {
+        // #todo: replace ini files atomically with a backup instead of overwriting them in place.
         var lines = ReadIniFile(configDirectory, fileName)?.ToList();
         if (lines == null)
             return;

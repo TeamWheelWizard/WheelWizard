@@ -26,6 +26,7 @@ public sealed class ApplicationStartup(
 {
     public async Task RunAsync(StartupOptions options, CancellationToken cancellationToken = default)
     {
+        // #todo: pass shutdown cancellation into the startup operations too; cancelling these waits leaves their work running.
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -53,6 +54,7 @@ public sealed class ApplicationStartup(
 
             if (options.LaunchRetroRewind || (!openedProtocol && settings.Get<bool>(settings.LAUNCH_RR_ON_STARTUP)))
             {
+                // #todo: (#484) use the active launcher for startup too, and test both dolphin and recomp.
                 var result = await launch.LaunchAsync().WaitAsync(cancellationToken);
                 if (result.IsFailure)
                     logger.LogError(result.Error.Exception, "Failed to launch Retro Rewind on startup: {Message}", result.Error.Message);

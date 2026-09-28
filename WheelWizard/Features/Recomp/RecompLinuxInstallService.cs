@@ -25,6 +25,7 @@ namespace WheelWizard.Recomp;
 /// </summary>
 public sealed class RecompLinuxInstallService : IRecompInstallService
 {
+    // #todo: test the actual linux install and launch orchestration, including busy sessions, cancellation and backend failures.
     // Where the setup phase starts on the 0-100 progress bar; the download phase before it lives in the acquirer.
     private const int SetupPercentFloor = RecompSetupHostAcquirer.SetupPercentFloor;
 

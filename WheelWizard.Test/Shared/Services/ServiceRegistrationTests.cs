@@ -12,6 +12,7 @@ namespace WheelWizard.Test.Shared.Services;
 
 public sealed class ServiceRegistrationTests
 {
+    // #todo: add architecture checks for feature-to-view dependencies and service lookups outside composition code.
     [Fact]
     public void BootstrapLocation_IsTheSameInstanceUsedByFeaturePaths_AfterRelocation()
     {

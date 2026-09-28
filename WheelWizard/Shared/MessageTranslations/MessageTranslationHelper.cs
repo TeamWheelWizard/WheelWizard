@@ -197,6 +197,7 @@ public static class MessageTranslationHelper
     /// <summary>
     ///  Shows a message box with the given message enum.
     /// </summary>
+    // #todo: move the popup methods into an injected presentation service so shared code only handles translation data.
     public static void ShowMessage(MessageTranslation msg, object[]? titleReplacements = null, object[]? extraReplacements = null) =>
         CreateMessageBox(msg, titleReplacements, extraReplacements).Show();
 

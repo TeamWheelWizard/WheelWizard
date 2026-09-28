@@ -32,6 +32,7 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
 
     public void SaveSettings(string configPath, WhWzSetting invokingSetting)
     {
+        // #todo: write to a temp file and swap it in with a backup so an interrupted save can't leave a broken config.
         Dictionary<string, WhWzSetting> settingsSnapshot;
         lock (_syncRoot)
         {

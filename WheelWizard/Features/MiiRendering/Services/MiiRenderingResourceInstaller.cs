@@ -143,6 +143,7 @@ public sealed class MiiRenderingResourceInstaller(
             }
         }
 
+        // #todo: (#482) include the archive url in download errors so blocked hosts are easier to spot.
         return Fail("Failed to download a valid Mii rendering archive after multiple attempts.");
     }
 

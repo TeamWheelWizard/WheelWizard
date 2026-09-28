@@ -20,6 +20,7 @@ namespace WheelWizard.Views.Pages.Settings;
 
 public partial class WhWzSettings : UserControl
 {
+    // #todo: move settings state and location-change workflows into a view model so this page mostly handles the controls.
     private readonly IMainWindowService _mainWindow;
     private readonly IApplicationLogFiles _logFiles;
 

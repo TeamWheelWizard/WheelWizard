@@ -51,6 +51,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
 
     public void RemoveTomlSetting(string configPath, string section, string settingToRemove)
     {
+        // #todo: use the same atomic save helper as setting updates so removing a key can't leave a partial config.
         lock (_fileIoSync)
         {
             var lines = ReadTomlFile(configPath)?.ToList();
@@ -155,6 +156,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
 
     private void WriteTomlSetting(string configPath, string section, string settingToChange, string value)
     {
+        // #todo: add a shared temp-file-and-backup save helper for toml updates while preserving keys owned by the game.
         var lines = ReadTomlFile(configPath)?.ToList();
 
         // The backend owns creating Config.toml; a write before it exists would hand the runtime a
