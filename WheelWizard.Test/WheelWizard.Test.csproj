@@ -34,4 +34,7 @@
         <ProjectReference Include="..\WheelWizard\WheelWizard.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\Languages\*.yml" />
+    </ItemGroup>
 </Project>

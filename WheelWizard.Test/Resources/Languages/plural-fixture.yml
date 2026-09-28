@@ -1,0 +1,16 @@
+en:
+  items:
+    one: "One item for {$2}"
+    other: "{$1} items for {$2}"
+  fallback:
+    one: "English one"
+    other: "English other"
+  plain: "Value {$1}"
+ru:
+  items:
+    one: "ru one"
+    few: "ru few"
+    many: "ru many"
+    other: "ru other"
+  fallback:
+    one: "ru one"
