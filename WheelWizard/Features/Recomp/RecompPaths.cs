@@ -27,7 +27,7 @@ public sealed class RecompPaths(IApplicationDataLocation applicationData, IFileS
 {
     public const string InstallStateFileName = "install-state.json";
     private bool IsLinux => environment.IsLinux && RecompPlatform.LinuxReleaseAssetName(environment.OSArchitecture) is not null;
-
+    private bool IsFlatpak => environment.IsFlatpakSandboxed(fileSystem);
     public string RootFolderPath => fileSystem.Path.Combine(applicationData.DirectoryPath, "Recomp");
     public string InstallFolderPath => fileSystem.Path.Combine(RootFolderPath, "Install");
     public bool IsPortableInstall => !IsLinux;
@@ -35,7 +35,9 @@ public sealed class RecompPaths(IApplicationDataLocation applicationData, IFileS
     public string UserDataFolderPath => fileSystem.Path.Combine(RootFolderPath, "UserData");
     public string InstallStateFilePath => fileSystem.Path.Combine(InstallFolderPath, InstallStateFileName);
     public string SetupFilePath =>
-        fileSystem.Path.Combine(InstallFolderPath, IsLinux ? "WiiCompiled-Setup.AppImage" : RecompSetupCommandBuilder.SetupFileName);
+        IsFlatpak
+            ? "/app/extensions/backends/wiicompiled/bin/wiicompiled-setup"
+            : fileSystem.Path.Combine(InstallFolderPath, IsLinux ? "WiiCompiled-Setup.AppImage" : RecompSetupCommandBuilder.SetupFileName);
     public string LinuxBackendFolderPath =>
         fileSystem.Path.Combine(environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WiiCompiled");
     public string LinuxBackendStateFilePath => fileSystem.Path.Combine(LinuxBackendFolderPath, InstallStateFileName);

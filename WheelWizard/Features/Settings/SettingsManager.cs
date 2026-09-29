@@ -24,6 +24,8 @@ public class SettingsManager : ISettingsManager, IDisposable
     private readonly IRecompPaths _recompPaths;
     private readonly IRuntimeEnvironment _environment;
     private bool IsFlatpakSandboxed => _environment.IsFlatpakSandboxed(_fileSystem);
+    private bool IsMissingExtensionForDolphin => _environment.IsMissingDolphinFlatpakExtension(_fileSystem);
+    private bool IsMissingExtensionForRecomp => _environment.IsMissingRecompFlatpakExtension(_fileSystem);
 
     private readonly Setting _dolphinCompilationMode;
     private readonly Setting _dolphinCompileShadersAtStart;
@@ -69,7 +71,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         DOLPHIN_LOCATION = RegisterWhWz(
             "DolphinLocation",
             // Use the wrapper for the Flatpak as the default value as a hint for curious users
-            IsFlatpakSandboxed ? "/app/bin/dolphin-emu-wrapper" : "",
+            IsFlatpakSandboxed ? "/app/extensions/backends/dolphin-emu/bin/dolphin-emu-wrapper" : "",
             value =>
             {
                 if (IsFlatpakSandboxed)
@@ -489,5 +491,24 @@ public class SettingsManager : ISettingsManager, IDisposable
                 disposable.Dispose();
         }
         _ownedSettings.Clear();
+    }
+
+    public ExtensionConfigurationInfo CheckExtensionConfiguration()
+    {
+        if (IsRecompModeActive())
+        {
+            if (IsMissingExtensionForRecomp)
+            {
+                return ExtensionConfigurationInfo.MissingRecomp;
+            }
+        }
+        else
+        {
+            if (IsMissingExtensionForDolphin)
+            {
+                return ExtensionConfigurationInfo.MissingDolphin;
+            }
+        }
+        return ExtensionConfigurationInfo.ExtensionFoundOrNotNeeded;
     }
 }

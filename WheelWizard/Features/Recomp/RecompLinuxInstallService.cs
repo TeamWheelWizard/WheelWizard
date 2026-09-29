@@ -85,9 +85,9 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
 
     private bool HasInstalledHost => fileSystem.File.Exists(environment.InstalledSetupFilePath);
 
-    public async Task<string?> GetInstalledVersionAsync(CancellationToken cancellationToken = default)
+    private async Task<string?> GetInstalledVersionWithoutInstallStateAsync(CancellationToken cancellationToken = default)
     {
-        if (!IsInstalled)
+        if (!HasInstalledHost)
             return null;
 
         string? versionText = null;
@@ -106,19 +106,42 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
         return runResult.IsSuccess && runResult.Value == 0 ? versionText : null;
     }
 
+    public async Task<string?> GetInstalledVersionAsync(CancellationToken cancellationToken = default)
+    {
+        return !IsInstalled ? null : await GetInstalledVersionWithoutInstallStateAsync(cancellationToken);
+    }
+
     public async Task<WheelWizardStatus> GetCurrentStatusAsync(CancellationToken cancellationToken = default)
     {
+        switch (environment.GetExtensionConfigurationInfo)
+        {
+            // This would mean that Wheel Wizard is configured to use Dolphin
+            case Settings.ExtensionConfigurationInfo.MissingDolphin:
+                return WheelWizardStatus.ConfigNotFinished;
+
+            case Settings.ExtensionConfigurationInfo.MissingRecomp:
+                return WheelWizardStatus.NoRecompExtension;
+
+            case Settings.ExtensionConfigurationInfo.ExtensionFoundOrNotNeeded:
+                break;
+        }
+
         var state = ReadInstalledState();
         var hasInstalledHost = HasInstalledHost;
-        if (hasInstalledHost && !IsCurrentInstallState(state))
+        if (hasInstalledHost && state != null && !IsCurrentInstallState(state))
             return IsGameFileConfigured() ? WheelWizardStatus.OutOfDate : WheelWizardStatus.ConfigNotFinished;
 
         var installedVersion = IsCurrentInstallState(state) ? state!.SetupVersion : null;
-        var latestRelease = await hosts.TryGetLatestReleaseAsync(cancellationToken);
+        var ignoreRecompRelease = IsBundledRecomp(environment.InstalledSetupFilePath);
+        var latestReleaseVersion = (ignoreRecompRelease ? null : await hosts.TryGetLatestReleaseAsync(cancellationToken))?.Version;
+        if (latestReleaseVersion is null)
+        {
+            RecompVersion.TryParse(await GetInstalledVersionWithoutInstallStateAsync(cancellationToken), out latestReleaseVersion);
+        }
         var setupUpgradeRequired =
             RecompVersion.TryParse(installedVersion, out var installed)
-            && latestRelease is not null
-            && latestRelease.Version.ComparePrecedenceTo(installed) > 0;
+            && latestReleaseVersion is not null
+            && latestReleaseVersion.ComparePrecedenceTo(installed) > 0;
         var products =
             installedVersion is not null && hasInstalledHost && !setupUpgradeRequired ? await CheckProductsAsync(cancellationToken) : null;
 
@@ -129,7 +152,7 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
         var status = RecompStatusResolver.Resolve(
             IsGameFileConfigured(),
             hasInstalledHost ? installedVersion : null,
-            latestRelease?.TagName,
+            latestReleaseVersion?.ToString(),
             products?.IsSuccess == true ? products.Value : null,
             installationBusy
         );
@@ -198,6 +221,14 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
         }
     }
 
+    /// <summary>
+    /// Decides based on the setup file path whether or not this is a bundled recomp setup binary
+    /// </summary>
+    private bool IsBundledRecomp(string setupFilePath)
+    {
+        return !setupFilePath.EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase);
+    }
+
     private async Task<OperationResult> InstallCoreAsync(
         IProgress<RecompInstallProgress>? progress,
         Func<Task<bool>>? confirmOfflineInstall,
@@ -209,7 +240,6 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
 
         Report(progress, t("progress.recomp_checking_release"), 0);
         var state = ReadInstalledState();
-        var release = await hosts.TryGetLatestReleaseAsync(cancellationToken);
 
         // Decided up front, before any download or build, so the user is asked while nothing has started
         // yet rather than after a multi-minute build has already failed on the payload.
@@ -222,6 +252,12 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
         // cannot see the payload choice, so the rebuild has to be forced.
         var forceRetroRebuild = state is { IsRetroWfcPayloadSkipped: true } && payloadMode == RecompRetroWfcPayloadMode.Download;
 
+        // If Wheel Wizard is running as a Flatpak, the setup file path should never be an AppImage
+        var ignoreRecompRelease = IsBundledRecomp(environment.InstalledSetupFilePath);
+
+        // Avoid fetching the GitHub release if we don't want it
+        var release = ignoreRecompRelease ? null : await hosts.TryGetLatestReleaseAsync(cancellationToken);
+
         // The installed host repairs on its own, offline included, as long as no newer release exists.
         if (await InstalledHostIsCurrentAsync(state, release, cancellationToken))
             return await RepairWhatTheCheckDemandsAsync(
@@ -231,6 +267,10 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
                 reportCompletion: true,
                 cancellationToken
             );
+
+        // Return early in case we have to use the bundled recomp
+        if (ignoreRecompRelease)
+            return await RunFullInstallAsync(environment.InstalledSetupFilePath, null, payloadMode, progress, cancellationToken);
 
         if (release is null)
             return Fail("Could not verify a current WiiCompiled setup release or installed repair host.");
@@ -262,7 +302,7 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
 
     private async Task<OperationResult> RunFullInstallAsync(
         string setupFilePath,
-        RecompRelease release,
+        RecompRelease? release,
         RecompRetroWfcPayloadMode payloadMode,
         IProgress<RecompInstallProgress>? progress,
         CancellationToken cancellationToken
@@ -298,10 +338,11 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
             return setupOutcome;
 
         // The AppImage reports the version it actually is; the release tag is only the fallback.
-        var installedVersion = RecompVersion.TryParse(resultHolder.Value?.Version, out var reported)
-            ? reported.ToString()
-            : release.Version.ToString();
-        var recordResult = RecordInstalledHost(setupFilePath, installedVersion, payloadMode);
+        var installedVersion =
+            RecompVersion.TryParse(resultHolder.Value?.Version, out var reported) ? reported.ToString()
+            : !(IsBundledRecomp(setupFilePath) || IsBundledRecomp(environment.InstalledSetupFilePath)) ? release?.Version.ToString()
+            : null;
+        var recordResult = await RecordInstalledHostAsync(setupFilePath, installedVersion, payloadMode, cancellationToken);
         if (recordResult.IsFailure)
             return recordResult;
 
@@ -313,17 +354,31 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
     /// Makes the AppImage that just installed the game the installed host: a copy beside a state file
     /// that says which release it is. Only after this does the installation count as present.
     /// </summary>
-    private OperationResult RecordInstalledHost(string setupFilePath, string installedVersion, RecompRetroWfcPayloadMode payloadMode)
+    private Task<OperationResult> RecordInstalledHostAsync(
+        string setupFilePath,
+        string? installedVersion,
+        RecompRetroWfcPayloadMode payloadMode,
+        CancellationToken cancellationToken = default
+    )
     {
         return TryCatch(
-            () =>
+            async () =>
             {
-                var hostFolderPath = fileSystem.Path.GetDirectoryName(environment.InstalledSetupFilePath);
-                if (!string.IsNullOrWhiteSpace(hostFolderPath))
-                    fileSystem.Directory.CreateDirectory(hostFolderPath);
-                if (!PathsMatch(setupFilePath, environment.InstalledSetupFilePath))
-                    fileSystem.File.Copy(setupFilePath, environment.InstalledSetupFilePath, overwrite: true);
-                hosts.MakeExecutable(environment.InstalledSetupFilePath);
+                if (!(IsBundledRecomp(setupFilePath) || IsBundledRecomp(environment.InstalledSetupFilePath)))
+                {
+                    var hostFolderPath = fileSystem.Path.GetDirectoryName(environment.InstalledSetupFilePath);
+                    if (!string.IsNullOrWhiteSpace(hostFolderPath))
+                        fileSystem.Directory.CreateDirectory(hostFolderPath);
+                    if (!PathsMatch(setupFilePath, environment.InstalledSetupFilePath))
+                        fileSystem.File.Copy(setupFilePath, environment.InstalledSetupFilePath, overwrite: true);
+                    hosts.MakeExecutable(environment.InstalledSetupFilePath);
+                }
+
+                installedVersion ??= await GetInstalledVersionWithoutInstallStateAsync(cancellationToken);
+                if (string.IsNullOrWhiteSpace(installedVersion))
+                {
+                    throw new InvalidOperationException("The installed WiiCompiled version could not be determined");
+                }
 
                 var retroRewindInstalled = environment.RetroRewindFolderPath is not null;
                 WriteInstallState(
@@ -480,7 +535,11 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
             () =>
             {
                 DeleteFolderIfPresent(environment.InstallFolderPath);
-                DeleteFolderIfPresent(fileSystem.Path.GetDirectoryName(environment.InstalledSetupFilePath));
+                if (!IsBundledRecomp(environment.InstalledSetupFilePath))
+                {
+                    // Deleting the Flatpak Extension binary must not be attempted
+                    DeleteFolderIfPresent(fileSystem.Path.GetDirectoryName(environment.InstalledSetupFilePath));
+                }
                 DeleteFolderIfPresent(environment.CacheFolderPath);
                 DeleteFolderIfPresent(environment.NandCopyFolderPath);
                 logger.LogInformation("Uninstalled WiiCompiled from {InstallFolder}", environment.InstallFolderPath);

@@ -72,6 +72,7 @@ public interface ISettingsManager : ISettingsProperties
 
     T Get<T>(Setting setting);
     bool Set<T>(Setting setting, T value, bool skipSave = false);
+    ExtensionConfigurationInfo CheckExtensionConfiguration();
     bool PathsSetupCorrectly();
     bool DolphinPathsSetupCorrectly();
 
