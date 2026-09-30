@@ -18,7 +18,7 @@ public sealed partial class DolphinPathLayout(
     private string HomeFolderPath => environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
     private string AppDataFolder => environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
     private string LocalAppDataFolder => environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
-    public string DolphinFilePath => isFlatpakSandboxed ? "/app/bin/dolphin-emu-wrapper" : dolphinLocation;
+    public string DolphinFilePath => isFlatpakSandboxed ? "/app/extensions/backends/dolphin-emu/bin/dolphin-emu-wrapper" : dolphinLocation;
     public string UserFolderPath => userFolderPath;
     private string LinuxDolphinLegacyRelSubFolderPath => ".dolphin-emu";
     public string LinuxDolphinLegacyFolderPath => Path.Combine(HomeFolderPath, LinuxDolphinLegacyRelSubFolderPath);

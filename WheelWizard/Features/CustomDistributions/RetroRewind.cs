@@ -569,6 +569,16 @@ public class RetroRewind : IDistribution
 
     public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync()
     {
+        switch (_settingsManager.CheckExtensionConfiguration())
+        {
+            case ExtensionConfigurationInfo.MissingDolphin:
+                return WheelWizardStatus.NoDolphinExtension;
+            case ExtensionConfigurationInfo.MissingRecomp:
+                return WheelWizardStatus.NoRecompExtension;
+            case ExtensionConfigurationInfo.ExtensionFoundOrNotNeeded:
+                break;
+        }
+
         if (!_settingsManager.PathsSetupCorrectly())
             return WheelWizardStatus.ConfigNotFinished;
 

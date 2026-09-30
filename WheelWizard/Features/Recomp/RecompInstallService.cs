@@ -165,9 +165,23 @@ public sealed class RecompInstallService : IRecompInstallService
 
     public async Task<WheelWizardStatus> GetCurrentStatusAsync(CancellationToken cancellationToken = default)
     {
+        // This switch statement should be a no-op on non-Linux/Flatpak systems anyway.
+        switch (environment.GetExtensionConfigurationInfo)
+        {
+            // This would mean that Wheel Wizard is configured to use Dolphin
+            case Settings.ExtensionConfigurationInfo.MissingDolphin:
+                return WheelWizardStatus.ConfigNotFinished;
+
+            case Settings.ExtensionConfigurationInfo.MissingRecomp:
+                return WheelWizardStatus.NoRecompExtension;
+
+            case Settings.ExtensionConfigurationInfo.ExtensionFoundOrNotNeeded:
+                break;
+        }
+
         var state = ReadInstalledState();
         var hasInstalledHost = fileSystem.File.Exists(environment.InstalledSetupFilePath);
-        if (hasInstalledHost && !IsCurrentInstallState(state))
+        if (hasInstalledHost && state != null && !IsCurrentInstallState(state))
             return IsGameFileConfigured() ? WheelWizardStatus.OutOfDate : WheelWizardStatus.ConfigNotFinished;
 
         var installedVersion = IsCurrentInstallState(state) ? state!.SetupVersion : null;

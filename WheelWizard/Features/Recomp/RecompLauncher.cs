@@ -99,9 +99,14 @@ public class RecompLauncher(
 
             switch (retroRewindStatus.Value)
             {
+                // This would mean that Wheel Wizard is configured to use Dolphin instead
+                case WheelWizardStatus.NoDolphinExtension:
+                    return WheelWizardStatus.ConfigNotFinished;
+
                 case WheelWizardStatus.ConfigNotFinished:
                 case WheelWizardStatus.NotInstalled:
                 case WheelWizardStatus.OutOfDate:
+                case WheelWizardStatus.NoRecompExtension:
                 case WheelWizardStatus.NoServer:
                     return retroRewindStatus.Value;
             }
@@ -215,12 +220,16 @@ public class RecompLauncher(
             return status.Error;
 
         var requiresCommit = status.Value is WheelWizardStatus.NotInstalled or WheelWizardStatus.OutOfDate;
-        OperationResult result = status.Value switch
+        var result = status.Value switch
         {
             WheelWizardStatus.Ready or WheelWizardStatus.NoServerButInstalled => Ok(),
             WheelWizardStatus.NotInstalled => await customDistributions.RetroRewind.InstallAsync(operation),
             WheelWizardStatus.OutOfDate => await customDistributions.RetroRewind.UpdateAsync(operation),
             WheelWizardStatus.ConfigNotFinished => Fail(t("message_warning.not_find_game.extra")),
+            WheelWizardStatus.NoRecompExtension => Fail(
+                "Retro Rewind was not checked because the Wiicompiled Flatpak extension is missing"
+            ),
+            WheelWizardStatus.NoDolphinExtension => Fail("Retro Rewind was not checked because the Dolphin Flatpak extension is missing"),
             WheelWizardStatus.NoServer => Fail("Retro Rewind could not be checked or installed because its update service is unavailable."),
             _ => Fail("Retro Rewind is not ready for WiiCompiled."),
         };

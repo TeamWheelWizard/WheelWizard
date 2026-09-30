@@ -27,6 +27,57 @@ public class EnvironmentDependencyTests
         Assert.Equal(expected, environment.IsFlatpakSandboxed(fs));
     }
 
+    [Theory]
+    [InlineData(true, true, "io.example.App", false, true, false, true)]
+    [InlineData(true, false, "io.example.App", false, false, false, false)]
+    [InlineData(false, true, "io.example.App", false, false, false, false)]
+    [InlineData(false, false, "io.example.App", false, false, false, false)]
+    [InlineData(true, true, "io.example.App", true, false, false, true)]
+    [InlineData(true, false, "io.example.App", true, false, false, false)]
+    [InlineData(false, true, "io.example.App", true, false, false, false)]
+    [InlineData(false, false, "io.example.App", true, false, false, false)]
+    [InlineData(true, true, "io.example.App", false, true, true, false)]
+    [InlineData(true, false, "io.example.App", false, false, true, false)]
+    [InlineData(false, true, "io.example.App", false, false, true, false)]
+    [InlineData(false, false, "io.example.App", false, false, true, false)]
+    [InlineData(true, true, "io.example.App", true, false, true, false)]
+    [InlineData(true, false, "io.example.App", true, false, true, false)]
+    [InlineData(false, true, "io.example.App", true, false, true, false)]
+    [InlineData(false, false, "io.example.App", true, false, true, false)]
+    public void SandboxExtensions_RequiresDetectedSandboxAndSpecificRequiredExtensionProgram(
+        bool linux,
+        bool marker,
+        string appId,
+        bool hasDolphinExtensionFile,
+        bool expectsMissingDolphinExtension,
+        bool hasRecompExtensionFile,
+        bool expectsMissingRecompExtension
+    )
+    {
+        // Flatpak environment setup
+        var fs = new MockFileSystem(options => options.SimulatingOperatingSystem(SimulationMode.Linux));
+        if (marker)
+            fs.File.WriteAllText("/.flatpak-info", "sandbox");
+        var environment = Substitute.For<IRuntimeEnvironment>();
+        environment.IsLinux.Returns(linux);
+        environment.GetEnvironmentVariable("FLATPAK_ID").Returns(appId);
+
+        if (hasDolphinExtensionFile)
+        {
+            fs.Directory.CreateDirectory("/app/extensions/backends/dolphin-emu/bin/");
+            fs.File.WriteAllText("/app/extensions/backends/dolphin-emu/bin/dolphin-emu-wrapper", "#!/bin/sh\n");
+        }
+
+        if (hasRecompExtensionFile)
+        {
+            fs.Directory.CreateDirectory("/app/extensions/backends/wiicompiled/bin/");
+            fs.File.WriteAllText("/app/extensions/backends/wiicompiled/bin/wiicompiled-setup", "#!/bin/sh\n");
+        }
+
+        Assert.Equal(expectsMissingDolphinExtension, environment.IsMissingDolphinFlatpakExtension(fs));
+        Assert.Equal(expectsMissingRecompExtension, environment.IsMissingRecompFlatpakExtension(fs));
+    }
+
     [Fact]
     public void ShellQuoting_UsesTargetShellRules_ForApostrophesAndMetacharacters()
     {
