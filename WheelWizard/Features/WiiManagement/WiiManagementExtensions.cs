@@ -14,6 +14,7 @@ public static class WiiManagementExtensions
         services.AddSingleton<IMiiDbService, MiiDbService>();
         services.AddSingleton<IMiiRepositoryService, MiiRepositoryServiceService>();
         services.AddSingleton<IGameLicenseSingletonService, GameLicenseSingletonService>();
+        services.AddSingleton<FriendRatingService>();
         return services;
     }
 }

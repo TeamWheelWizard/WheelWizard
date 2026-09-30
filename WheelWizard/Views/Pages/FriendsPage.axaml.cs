@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
@@ -33,6 +34,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     private static ListOrderCondition CurrentOrder = ListOrderCondition.IS_ONLINE;
 
     private ObservableCollection<FriendProfile> _friendlist = [];
+    private bool _isUnloaded;
 
     private LiveRoomsService LiveRooms { get; }
 
@@ -41,6 +43,8 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     private IMiiDbService MiiDbService { get; }
 
     private IApiCaller<IRwfcApi> ApiCaller { get; }
+
+    private FriendRatingService Ratings { get; }
 
     private ISettingsManager SettingsService { get; }
 
@@ -61,6 +65,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         IGameLicenseSingletonService gameLicenseService,
         IMiiDbService miiDbService,
         IApiCaller<IRwfcApi> apiCaller,
+        FriendRatingService ratings,
         ISettingsManager settingsService
     )
     {
@@ -70,9 +75,13 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         GameLicenseService = gameLicenseService;
         MiiDbService = miiDbService;
         ApiCaller = apiCaller;
+        Ratings = ratings;
         SettingsService = settingsService;
         InitializeComponent();
         GameLicenseService.Subscribe(this);
+        LiveRooms.Subscribe(this);
+        Ratings.RatingsChanged += RatingsChanged;
+        Unloaded += FriendsPage_Unloaded;
         UpdateFriendList();
 
         DataContext = this;
@@ -83,9 +92,24 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
 
     public void OnUpdate(ObservablePollingService sender)
     {
-        if (sender is not GameLicenseSingletonService)
+        if (sender is not GameLicenseSingletonService and not LiveRoomsService)
             return;
         UpdateFriendList();
+    }
+
+    private void RatingsChanged() =>
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!_isUnloaded)
+                UpdateFriendList();
+        });
+
+    private void FriendsPage_Unloaded(object? sender, RoutedEventArgs e)
+    {
+        _isUnloaded = true;
+        GameLicenseService.Unsubscribe(this);
+        LiveRooms.Unsubscribe(this);
+        Ratings.RatingsChanged -= RatingsChanged;
     }
 
     private void UpdateFriendList()
@@ -128,7 +152,11 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
             ListOrderCondition.TOTAL_RACES => f => f.Losses + f.Wins,
             ListOrderCondition.IS_ONLINE or _ => f => f.IsOnline,
         };
-        return GameLicenseService.ActiveCurrentFriends.OrderByDescending(orderMethod).ToList();
+        var friends = GameLicenseService.ActiveCurrentFriends;
+        var onlinePlayers = LiveRooms.CurrentRooms.SelectMany(room => room.Players);
+        Ratings.Refresh(friends, onlinePlayers);
+
+        return friends.OrderByDescending(orderMethod).ToList();
     }
 
     private void PopulateSortingList()

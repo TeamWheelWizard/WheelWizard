@@ -373,7 +373,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             var friend = new FriendProfile
             {
                 Vr = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x16),
-                Br = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x18),
+                Br = FriendRatingResolver.BrFromRksys(BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x18)),
                 FriendCode = friendCode,
                 Wins = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x14),
                 Losses = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x12),
