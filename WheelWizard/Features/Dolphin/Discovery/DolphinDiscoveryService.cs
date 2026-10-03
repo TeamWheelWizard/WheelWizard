@@ -17,6 +17,11 @@ public sealed class DolphinDiscoveryService(
     IDolphinRegistrySettings registry
 ) : IDolphinDiscoveryService
 {
+    public bool IsMissingDolphinFlatpakExtension()
+    {
+        return environment.IsMissingDolphinFlatpakExtension(fileSystem);
+    }
+
     public string? FindUserDirectory(string dolphinLocation, string currentUserDirectory)
     {
         var layout = paths.Resolve(dolphinLocation, currentUserDirectory);

@@ -17,6 +17,12 @@ public interface IRecompEnvironment
     string InstallFolderPath { get; }
 
     /// <summary>
+    /// Indicates whether Wheel Wizard is missing an extension to be able to run
+    /// the game with the configured settings.
+    /// </summary>
+    ExtensionConfigurationInfo GetExtensionConfigurationInfo { get; }
+
+    /// <summary>
     /// Whether <see cref="InstallFolderPath"/> is the portable location, which is what decides whether
     /// a fresh install is asked to lay itself out portably.
     /// </summary>
@@ -66,6 +72,8 @@ public sealed class RecompEnvironment(
 
     public string InstallFolderPath => paths.InstallFolderPath;
 
+    public ExtensionConfigurationInfo GetExtensionConfigurationInfo => ExtensionConfigurationInfo.ExtensionFoundOrNotNeeded;
+
     public bool IsPortableInstall => paths.IsPortableInstall;
 
     public string CacheFolderPath => paths.CacheFolderPath;
@@ -108,6 +116,8 @@ public sealed class RecompLinuxEnvironment(
     public string GameFilePath => settings.Get<string>(settings.GAME_LOCATION);
 
     public string InstallFolderPath => paths.LinuxBackendFolderPath;
+
+    public ExtensionConfigurationInfo GetExtensionConfigurationInfo => settings.CheckExtensionConfiguration();
 
     public bool IsPortableInstall => false;
 

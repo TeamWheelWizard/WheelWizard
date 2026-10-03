@@ -50,7 +50,7 @@ public sealed class DolphinVersionService(IUnixProcessService processService, ID
         // a broken Qt platform configuration should not be what stops us from reading the version.
         List<string> arguments = [];
         if (paths.Layout.IsFlatpakSandboxed() || environment.IsLinux && !paths.Layout.IsFlatpakDolphinFilePath(dolphinLocation))
-            arguments.Add("QT_QPA_PLATFORM=xcb");
+            arguments.Add("QT_QPA_PLATFORM=wayland;xcb");
 
         arguments.AddRange(["sh", "-c", "--", $"{dolphinLocation} --version"]);
 

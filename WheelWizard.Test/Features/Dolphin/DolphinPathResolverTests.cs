@@ -59,7 +59,7 @@ public class DolphinPathResolverTests
             "/home/player/.var/app/org.example.DolphinFork/data/dolphin-emu"
         );
 
-        Assert.Equal("/app/bin/dolphin-emu-wrapper", paths.DolphinFilePath);
+        Assert.Equal("/app/extensions/backends/dolphin-emu/bin/dolphin-emu-wrapper", paths.DolphinFilePath);
         Assert.Equal("/home/player/.var/app/org.example.DolphinFork/config/dolphin-emu", paths.ConfigFolderPath);
         Assert.Contains(
             "/home/player/.var/app/org.example.WheelWizard/data-dolphin-emu/dolphin-emu",

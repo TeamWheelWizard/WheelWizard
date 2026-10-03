@@ -63,6 +63,8 @@ public partial class TestingPage : UserControl
             WheelWizardStatus.NotInstalled => "Not installed",
             WheelWizardStatus.Ready => "Installed - Ready to play",
             WheelWizardStatus.NoServer or WheelWizardStatus.NoServerButInstalled => "Server offline",
+            WheelWizardStatus.NoDolphinExtension => "No Dolphin extension",
+            WheelWizardStatus.NoRecompExtension => "No Wiicompiled extension",
             WheelWizardStatus.OutOfDate => "Update available",
             _ => "Checking status...",
         };
@@ -82,6 +84,8 @@ public partial class TestingPage : UserControl
                 StatusPill.Classes.Add("warning");
                 break;
             case WheelWizardStatus.NoServer:
+            case WheelWizardStatus.NoDolphinExtension:
+            case WheelWizardStatus.NoRecompExtension:
             case WheelWizardStatus.NoServerButInstalled:
                 StatusPill.Classes.Add("danger");
                 break;

@@ -188,7 +188,7 @@ public sealed class DolphinLaunchService(
                     if (!IsFlatpakSandboxed && paths.Layout.IsFlatpakDolphinFilePath(dolphinLocation))
                         dolphinLocation = FixFlatpakDolphinPermissions(dolphinLocation);
                     else
-                        startInfo.EnvironmentVariables["QT_QPA_PLATFORM"] = "xcb";
+                        startInfo.EnvironmentVariables["QT_QPA_PLATFORM"] = "wayland;xcb";
 
                     if (IsFlatpakSandboxed)
                     {

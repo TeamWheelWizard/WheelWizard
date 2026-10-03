@@ -73,12 +73,14 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
         IsInteractable
         && IsDolphinVisible
         && _settings.PathsSetupCorrectly()
-        && _status is not (WheelWizardStatus.Loading or WheelWizardStatus.NoDolphin);
+        && _status is not (WheelWizardStatus.Loading or WheelWizardStatus.NoDolphin or WheelWizardStatus.NoDolphinExtension);
 
     public string ButtonText =>
         _status switch
         {
             WheelWizardStatus.NoServer => t("state.no_server"),
+            WheelWizardStatus.NoDolphinExtension => t("state.no_dolphin_extension"),
+            WheelWizardStatus.NoRecompExtension => t("state.no_recomp_extension"),
             WheelWizardStatus.NoServerButInstalled => t("action.play_offline"),
             WheelWizardStatus.NoDolphin => "Dolphin not setup",
             WheelWizardStatus.ConfigNotFinished => t("state.config_not_finished"),
@@ -91,7 +93,9 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
     public Button.ButtonsVariantType ButtonVariant =>
         _status switch
         {
-            WheelWizardStatus.NoServer => Button.ButtonsVariantType.Danger,
+            WheelWizardStatus.NoServer or WheelWizardStatus.NoRecompExtension or WheelWizardStatus.NoDolphinExtension => Button
+                .ButtonsVariantType
+                .Danger,
             WheelWizardStatus.Ready => Button.ButtonsVariantType.Primary,
             WheelWizardStatus.Loading => Button.ButtonsVariantType.Default,
             _ => Button.ButtonsVariantType.Warning,
@@ -100,7 +104,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
     public string IconName =>
         _status switch
         {
-            WheelWizardStatus.NoServer => "RoadError",
+            WheelWizardStatus.NoServer or WheelWizardStatus.NoRecompExtension or WheelWizardStatus.NoDolphinExtension => "RoadError",
             WheelWizardStatus.NoServerButInstalled or WheelWizardStatus.Ready => "Play",
             WheelWizardStatus.NoDolphin or WheelWizardStatus.ConfigNotFinished => "Settings",
             WheelWizardStatus.NotInstalled or WheelWizardStatus.OutOfDate => "Download",
