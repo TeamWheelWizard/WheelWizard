@@ -13,7 +13,7 @@ public sealed class EmbeddedYamlLocalizationService : ILocalizationService
     public EmbeddedYamlLocalizationService()
         : this(typeof(EmbeddedYamlLocalizationService).Assembly) { }
 
-    internal EmbeddedYamlLocalizationService(Assembly resourceAssembly)
+    public EmbeddedYamlLocalizationService(Assembly resourceAssembly)
     {
         _translations = LoadTranslations(resourceAssembly);
         if (_translations.Count == 0)
@@ -47,6 +47,23 @@ public sealed class EmbeddedYamlLocalizationService : ILocalizationService
     public string Translate(string key)
     {
         return TranslateForLanguage(key, CurrentLanguage);
+    }
+
+    public string TranslatePlural(string key, decimal count, string? languageCode = null)
+    {
+        var language = NormalizeLanguage(languageCode ?? CurrentLanguage);
+        // Select again in English on fallback; a Russian 'few' must not request English 'few'.
+        foreach (var candidate in new[] { language, DefaultLanguage }.Distinct())
+        {
+            var category = PluralRules.Select(candidate, count).ToString().ToLowerInvariant();
+            if (
+                TryGetValue(candidate, $"{key}.{category}", out var value)
+                || TryGetValue(candidate, $"{key}.other", out value)
+                || TryGetValue(candidate, key, out value)
+            )
+                return value;
+        }
+        return key;
     }
 
     public string TranslateForLanguage(string key, string languageCode)
