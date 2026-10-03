@@ -101,7 +101,18 @@ public partial class VideoSettings : UserControl
 
     private void Recommended_OnClick(object? sender, RoutedEventArgs e)
     {
-        SettingsService.Set(SettingsService.RECOMMENDED_SETTINGS, RecommendedButton.IsChecked == true);
+        if (!SettingsService.Set(SettingsService.RECOMMENDED_SETTINGS, RecommendedButton.IsChecked == true))
+        {
+            RecommendedButton.IsCheckedChanged -= Recommended_OnClick;
+            try
+            {
+                RecommendedButton.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMMENDED_SETTINGS);
+            }
+            finally
+            {
+                RecommendedButton.IsCheckedChanged += Recommended_OnClick;
+            }
+        }
     }
 
     private void ShowFPS_OnClick(object? sender, RoutedEventArgs e)
