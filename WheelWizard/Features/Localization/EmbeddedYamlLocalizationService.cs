@@ -5,6 +5,8 @@ namespace WheelWizard.Localization;
 
 public sealed class EmbeddedYamlLocalizationService : ILocalizationService
 {
+    public event EventHandler? LanguageChanged;
+
     private const string DefaultLanguage = "en";
     private readonly Dictionary<string, IReadOnlyDictionary<string, string>> _translations;
     private readonly object _languageLock = new();
@@ -41,7 +43,12 @@ public sealed class EmbeddedYamlLocalizationService : ILocalizationService
             normalizedLanguage = DefaultLanguage;
 
         lock (_languageLock)
+        {
+            if (_currentLanguage == normalizedLanguage)
+                return;
             _currentLanguage = normalizedLanguage;
+        }
+        LanguageChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public string Translate(string key)

@@ -7,6 +7,7 @@ using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationLifecycle.Logging;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
+using WheelWizard.Localization;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.IO;
@@ -21,7 +22,6 @@ namespace WheelWizard.Views.Pages.Settings;
 public partial class WhWzSettings : UserControl
 {
     // #todo: move settings state and location-change workflows into a view model so this page mostly handles the controls.
-    private readonly IMainWindowService _mainWindow;
     private readonly IApplicationLogFiles _logFiles;
 
     private sealed record LanguageDropdownItem(string Key, string DisplayName)
@@ -40,22 +40,15 @@ public partial class WhWzSettings : UserControl
 
     private ISettingsManager SettingsService { get; }
 
-    private ISettingsLocalizationService LocalizationService { get; }
-
-    private IDolphinSettingManager DolphinSettingsService { get; }
-
     private IDolphinDiscoveryService DolphinDiscovery { get; }
 
     private IApplicationDataLocation ApplicationData { get; }
 
     public WhWzSettings(
         IApplicationLogFiles logFiles,
-        IMainWindowService mainWindow,
         IFilePickerService filePicker,
         IDolphinPaths dolphinPaths,
         ISettingsManager settingsService,
-        ISettingsLocalizationService localizationService,
-        IDolphinSettingManager dolphinSettingsService,
         IDolphinDiscoveryService dolphinDiscovery,
         IApplicationDataLocation applicationData
     )
@@ -63,11 +56,8 @@ public partial class WhWzSettings : UserControl
         FilePicker = filePicker;
         DolphinPaths = dolphinPaths;
         SettingsService = settingsService;
-        LocalizationService = localizationService;
-        DolphinSettingsService = dolphinSettingsService;
         DolphinDiscovery = dolphinDiscovery;
         ApplicationData = applicationData;
-        _mainWindow = mainWindow;
         _logFiles = logFiles;
         InitializeComponent();
         ConfigureLocationFieldsForActiveFrontend();
@@ -77,6 +67,33 @@ public partial class WhWzSettings : UserControl
         _pageLoaded = true;
 
         WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        LocalizationProvider.LanguageChanged += OnLanguageChanged;
+    }
+
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        LocalizationProvider.LanguageChanged -= OnLanguageChanged;
+        base.OnUnloaded(e);
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs args)
+    {
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(() => OnLanguageChanged(sender, args));
+            return;
+        }
+        RefreshLanguageDropdown();
+        RefreshLocalizedCodeText();
+        RefreshScaleDropdown();
+        ConfigureLocationFieldsForActiveFrontend();
+        UpdateLocationRows();
+        UpdateAppDataLocationUi();
     }
 
     private void ConfigureLocationFieldsForActiveFrontend()
@@ -98,23 +115,29 @@ public partial class WhWzSettings : UserControl
         RefreshLanguageDropdown();
         RefreshLocalizedCodeText();
 
-        // -----------------
-        // Window Scale settings
-        // -----------------
-        // IMPORTANT: Make sure that the number and percentage is always the last word in the string,
-        // If you don't want this, you should change the code below that parses the string back to an actual value
-
-        foreach (var scale in SettingValues.WindowScales)
-        {
-            WindowScaleDropdown.Items.Add(ScaleToString(scale));
-        }
-
-        var selectedItemText = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
-        if (!WindowScaleDropdown.Items.Contains(selectedItemText))
-            WindowScaleDropdown.Items.Add(selectedItemText);
-        WindowScaleDropdown.SelectedItem = selectedItemText;
+        RefreshScaleDropdown();
 
         EnableAnimations.IsChecked = (bool)SettingsService.ENABLE_ANIMATIONS.Get();
+    }
+
+    private void RefreshScaleDropdown()
+    {
+        var wasEditing = _editingScale;
+        _editingScale = true;
+        try
+        {
+            WindowScaleDropdown.Items.Clear();
+            foreach (var scale in SettingValues.WindowScales)
+                WindowScaleDropdown.Items.Add(ScaleToString(scale));
+            var selected = ScaleToString(SettingsService.WINDOW_SCALE.Get());
+            if (!WindowScaleDropdown.Items.Contains(selected))
+                WindowScaleDropdown.Items.Add(selected);
+            WindowScaleDropdown.SelectedItem = selected;
+        }
+        finally
+        {
+            _editingScale = wasEditing;
+        }
     }
 
     private void RefreshLanguageDropdown()
@@ -833,13 +856,8 @@ public partial class WhWzSettings : UserControl
             return; // We only want to change the setting if we really apply this change
         }
 
-        if (SettingsEditing.Set(SettingsService, SettingsService.WW_LANGUAGE, selectedLanguage.Key))
-        {
-            LocalizationService.ApplyCurrentLanguage();
-            RefreshLanguageDropdown();
-            RefreshLocalizedCodeText();
-            _mainWindow.Refresh();
-        }
+        SettingsEditing.Set(SettingsService, SettingsService.WW_LANGUAGE, selectedLanguage.Key);
+        RefreshLanguageDropdown();
     }
 
     private void EnableAnimations_OnClick(object sender, RoutedEventArgs e) =>

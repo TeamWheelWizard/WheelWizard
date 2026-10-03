@@ -144,6 +144,12 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
+        if (!Avalonia.Threading.Dispatcher.UIThread.CheckAccess())
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => OnLanguageChanged(sender, e));
+            return;
+        }
+        UpdatePlayerAndRoomCount();
         UpdateModsButtonText();
         UpdateMadeByText();
         UpdateLiveAlert();

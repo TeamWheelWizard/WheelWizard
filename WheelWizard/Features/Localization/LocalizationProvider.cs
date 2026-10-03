@@ -2,7 +2,7 @@ namespace WheelWizard.Localization;
 
 public static class LocalizationProvider
 {
-    // #todo: let the app own the localization service and language events instead of sharing mutable state globally.
+    // Compatibility facade for global t() and XAML; the injected service owns the language.
     private static readonly object ServiceLock = new();
     private static ILocalizationService? _service;
 
@@ -13,7 +13,14 @@ public static class LocalizationProvider
         get
         {
             lock (ServiceLock)
-                return _service ??= new EmbeddedYamlLocalizationService();
+            {
+                if (_service == null)
+                {
+                    _service = new EmbeddedYamlLocalizationService();
+                    _service.LanguageChanged += ForwardLanguageChanged;
+                }
+                return _service;
+            }
         }
     }
 
@@ -22,7 +29,14 @@ public static class LocalizationProvider
         ArgumentNullException.ThrowIfNull(service);
 
         lock (ServiceLock)
+        {
+            if (ReferenceEquals(_service, service))
+                return;
+            if (_service != null)
+                _service.LanguageChanged -= ForwardLanguageChanged;
             _service = service;
+            _service.LanguageChanged += ForwardLanguageChanged;
+        }
 
         NotifyLanguageChanged();
     }
@@ -30,10 +44,11 @@ public static class LocalizationProvider
     public static void SetLanguage(string languageCode)
     {
         Current.SetLanguage(languageCode);
-        NotifyLanguageChanged();
     }
 
-    public static void NotifyLanguageChanged()
+    private static void ForwardLanguageChanged(object? sender, EventArgs args) => NotifyLanguageChanged();
+
+    private static void NotifyLanguageChanged()
     {
         LanguageChanged?.Invoke(null, EventArgs.Empty);
     }

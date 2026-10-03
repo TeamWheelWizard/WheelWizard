@@ -4,6 +4,36 @@ namespace WheelWizard.Test.Features.Localization;
 
 public class TranslationFunctionsTests
 {
+    [Fact]
+    public void ProviderForwardsOnlyActiveServiceChangesOnce()
+    {
+        var previous = LocalizationProvider.Current;
+        var first = new EmbeddedYamlLocalizationService();
+        var second = new EmbeddedYamlLocalizationService();
+        var notifications = 0;
+        EventHandler handler = (_, _) => notifications++;
+        LocalizationProvider.Use(first);
+        LocalizationProvider.LanguageChanged += handler;
+        try
+        {
+            first.SetLanguage("nl");
+            first.SetLanguage("NL");
+            Assert.Equal(1, notifications);
+            LocalizationProvider.Use(second);
+            Assert.Equal(2, notifications);
+            first.SetLanguage("fr");
+            Assert.Equal(2, notifications);
+            second.SetLanguage("fr");
+            Assert.Equal(3, notifications);
+            Assert.Equal(second.Translate("action.cancel"), TranslationFunctions.t("action.cancel"));
+        }
+        finally
+        {
+            LocalizationProvider.LanguageChanged -= handler;
+            LocalizationProvider.Use(previous);
+        }
+    }
+
     [Fact(DisplayName = "Format with no params returns default string")]
     public void FormatWithNoParams_ShouldReturnDefaultString()
     {

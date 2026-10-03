@@ -2,6 +2,7 @@ namespace WheelWizard.Localization;
 
 public interface ILocalizationService
 {
+    event EventHandler? LanguageChanged;
     string CurrentLanguage { get; }
     IReadOnlyCollection<string> AvailableLanguages { get; }
 
