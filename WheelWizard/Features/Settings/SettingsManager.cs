@@ -27,10 +27,10 @@ public class SettingsManager : ISettingsManager, IDisposable
     private bool IsMissingExtensionForDolphin => _environment.IsMissingDolphinFlatpakExtension(_fileSystem);
     private bool IsMissingExtensionForRecomp => _environment.IsMissingRecompFlatpakExtension(_fileSystem);
 
-    private readonly Setting _dolphinCompilationMode;
-    private readonly Setting _dolphinCompileShadersAtStart;
-    private readonly Setting _dolphinSsaa;
-    private readonly Setting _dolphinMsaa;
+    private readonly Setting<DolphinShaderCompilationMode> _dolphinCompilationMode;
+    private readonly Setting<bool> _dolphinCompileShadersAtStart;
+    private readonly Setting<bool> _dolphinSsaa;
+    private readonly Setting<string> _dolphinMsaa;
 
     private bool _hasLoadedSettings;
     private double _internalScale = -1.0;
@@ -79,7 +79,7 @@ public class SettingsManager : ISettingsManager, IDisposable
                     // The Dolphin location setting is ignored with the Flatpak since it bundles a separate Dolphin
                     return true;
                 }
-                var pathOrCommand = value as string ?? string.Empty;
+                var pathOrCommand = value;
                 if (string.IsNullOrWhiteSpace(pathOrCommand))
                     return IsRecompModeActive();
 
@@ -97,7 +97,7 @@ public class SettingsManager : ISettingsManager, IDisposable
             "",
             value =>
             {
-                var userFolderPath = value as string ?? string.Empty;
+                var userFolderPath = value;
                 if (string.IsNullOrWhiteSpace(userFolderPath))
                     return IsRecompModeActive();
                 if (!_fileSystem.Directory.Exists(userFolderPath))
@@ -207,36 +207,28 @@ public class SettingsManager : ISettingsManager, IDisposable
             }
         );
 
-        GAME_LOCATION = RegisterWhWz("GameLocation", "", value => _fileSystem.File.Exists(value as string ?? string.Empty));
+        GAME_LOCATION = RegisterWhWz("GameLocation", "", value => _fileSystem.File.Exists(value));
         FORCE_WIIMOTE = RegisterWhWz("ForceWiimote", false);
         LAUNCH_WITH_DOLPHIN = RegisterWhWz("LaunchWithDolphin", false);
         LAUNCH_RR_ON_STARTUP = RegisterWhWz("LaunchRrOnStartup", false);
         PREFERS_MODS_ROW_VIEW = RegisterWhWz("PrefersModsRowView", true);
         USE_PATCHES_SYSTEM = RegisterWhWz("UsePatchesSystem", false);
-        FOCUSED_USER = RegisterWhWz("FavoriteUser", 0, value => (int)(value ?? -1) >= 0 && (int)(value ?? -1) < 4);
+        FOCUSED_USER = RegisterWhWz("FavoriteUser", 0, value => value >= 0 && value < 4);
 
         ENABLE_ANIMATIONS = RegisterWhWz("EnableAnimations", true);
         TESTING_MODE_ENABLED = RegisterWhWz("TestingModeEnabled", false);
         SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, SettingValues.IsValidWindowScale);
         RR_REGION = RegisterWhWz("RR_Region", MarioKartWiiEnums.Regions.None);
-        WW_LANGUAGE = RegisterWhWz("WW_Language", "en", value => SettingValues.WhWzLanguages.ContainsKey((string)value!));
+        WW_LANGUAGE = RegisterWhWz("WW_Language", "en", value => SettingValues.WhWzLanguages.ContainsKey(value));
         #endregion
 
         #region Dolphin settings
-        NAND_ROOT_PATH = RegisterDolphin(
-            ("Dolphin.ini", "General", "NANDRootPath"),
-            "",
-            value => _fileSystem.Directory.Exists(value as string ?? string.Empty)
-        );
+        NAND_ROOT_PATH = RegisterDolphin(("Dolphin.ini", "General", "NANDRootPath"), "", value => _fileSystem.Directory.Exists(value));
 
-        LOAD_PATH = RegisterDolphin(
-            ("Dolphin.ini", "General", "LoadPath"),
-            "",
-            value => _fileSystem.Directory.Exists(value as string ?? string.Empty)
-        );
+        LOAD_PATH = RegisterDolphin(("Dolphin.ini", "General", "LoadPath"), "", value => _fileSystem.Directory.Exists(value));
 
         VSYNC = RegisterDolphin(("GFX.ini", "Hardware", "VSync"), false);
-        INTERNAL_RESOLUTION = RegisterDolphin(("GFX.ini", "Settings", "InternalResolution"), 1, value => (int)(value ?? -1) >= 0);
+        INTERNAL_RESOLUTION = RegisterDolphin(("GFX.ini", "Settings", "InternalResolution"), 1, value => value >= 0);
         SHOW_FPS = RegisterDolphin(("GFX.ini", "Settings", "ShowFPS"), false);
         GFX_BACKEND = RegisterDolphin(("Dolphin.ini", "Core", "GFXBackend"), SettingValues.GFXRenderers.Values.First());
 
@@ -247,7 +239,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         _dolphinMsaa = RegisterDolphin(
             ("GFX.ini", "Settings", "MSAA"),
             "0x00000001",
-            value => (value?.ToString() ?? "") is "0x00000001" or "0x00000002" or "0x00000004" or "0x00000008"
+            value => (value) is "0x00000001" or "0x00000002" or "0x00000004" or "0x00000008"
         );
 
         // Readonly settings
@@ -268,34 +260,26 @@ public class SettingsManager : ISettingsManager, IDisposable
         #endregion
 
         #region Virtual settings
-        var windowScale = new VirtualSetting(
-            typeof(double),
-            value => _internalScale = (double)value!,
+        var windowScale = new VirtualSetting<double>(
+            value => _internalScale = value,
             () => _internalScale == -1.0 ? SAVED_WINDOW_SCALE.Get() : _internalScale
         );
         windowScale.SetValidation(SettingValues.IsValidWindowScale);
         WINDOW_SCALE = windowScale.SetDependencies(SAVED_WINDOW_SCALE);
 
-        RECOMMENDED_SETTINGS = new VirtualSetting(
-            typeof(bool),
+        RECOMMENDED_SETTINGS = new VirtualSetting<bool>(
             value =>
             {
-                void SetDolphinSetting(Setting setting, object newValue)
-                {
-                    if (!setting.Set(newValue))
-                        throw setting.SaveError ?? new IOException($"Failed to save Dolphin setting '{setting.Name}'.");
-                }
-
-                var newValue = (bool)value!;
-                SetDolphinSetting(
+                var newValue = value;
+                SaveRecommended(
                     _dolphinCompilationMode,
                     newValue ? DolphinShaderCompilationMode.HybridUberShaders : DolphinShaderCompilationMode.Default
                 );
 #if WINDOWS
-                SetDolphinSetting(_dolphinCompileShadersAtStart, newValue);
+                SaveRecommended(_dolphinCompileShadersAtStart, newValue);
 #endif
-                SetDolphinSetting(_dolphinMsaa, newValue ? "0x00000002" : "0x00000001");
-                SetDolphinSetting(_dolphinSsaa, false);
+                SaveRecommended(_dolphinMsaa, newValue ? "0x00000002" : "0x00000001");
+                SaveRecommended(_dolphinSsaa, false);
             },
             () =>
             {
@@ -317,58 +301,64 @@ public class SettingsManager : ISettingsManager, IDisposable
     }
     #endregion
 
-    #region Settings Properties
-    public Setting USER_FOLDER_PATH { get; }
-    public Setting DOLPHIN_LOCATION { get; }
-    public Setting GAME_LOCATION { get; }
-    public Setting FORCE_WIIMOTE { get; }
-    public Setting LAUNCH_WITH_DOLPHIN { get; }
-    public Setting LAUNCH_RR_ON_STARTUP { get; }
-    public Setting ENABLE_RECOMP { get; }
-    public Setting RECOMP_USE_DOLPHIN_DATA { get; }
-    public Setting RECOMP_COPY_DOLPHIN_NAND { get; }
-    public Setting PREFERS_MODS_ROW_VIEW { get; }
-    public Setting USE_PATCHES_SYSTEM { get; }
-    public Setting FOCUSED_USER { get; }
-    public Setting ENABLE_ANIMATIONS { get; }
-    public Setting TESTING_MODE_ENABLED { get; }
-    public Setting SAVED_WINDOW_SCALE { get; }
-    public Setting RR_REGION { get; }
-    public Setting WW_LANGUAGE { get; }
+    private static void SaveRecommended<T>(Setting<T> setting, T value)
+    {
+        if (!setting.Set(value))
+            throw setting.SaveError ?? new IOException($"Could not save {setting.Name}.");
+    }
 
-    public Setting NAND_ROOT_PATH { get; }
-    public Setting LOAD_PATH { get; }
-    public Setting VSYNC { get; }
-    public Setting INTERNAL_RESOLUTION { get; }
-    public Setting SHOW_FPS { get; }
-    public Setting GFX_BACKEND { get; }
-    public Setting MACADDRESS { get; }
-    public Setting WINDOW_SCALE { get; }
-    public Setting RECOMMENDED_SETTINGS { get; }
-    public Setting RECOMP_RESOLUTION_MULTIPLIER { get; }
-    public Setting RECOMP_GRAPHICS_API { get; }
-    public Setting RECOMP_SHOW_FPS { get; }
-    public Setting RECOMP_PREVENT_STUTTERS { get; }
-    public Setting RECOMP_NAND_ROOT { get; }
+    #region Settings Properties
+    public Setting<string> USER_FOLDER_PATH { get; }
+    public Setting<string> DOLPHIN_LOCATION { get; }
+    public Setting<string> GAME_LOCATION { get; }
+    public Setting<bool> FORCE_WIIMOTE { get; }
+    public Setting<bool> LAUNCH_WITH_DOLPHIN { get; }
+    public Setting<bool> LAUNCH_RR_ON_STARTUP { get; }
+    public Setting<bool> ENABLE_RECOMP { get; }
+    public Setting<bool> RECOMP_USE_DOLPHIN_DATA { get; }
+    public Setting<bool> RECOMP_COPY_DOLPHIN_NAND { get; }
+    public Setting<bool> PREFERS_MODS_ROW_VIEW { get; }
+    public Setting<bool> USE_PATCHES_SYSTEM { get; }
+    public Setting<int> FOCUSED_USER { get; }
+    public Setting<bool> ENABLE_ANIMATIONS { get; }
+    public Setting<bool> TESTING_MODE_ENABLED { get; }
+    public Setting<double> SAVED_WINDOW_SCALE { get; }
+    public Setting<MarioKartWiiEnums.Regions> RR_REGION { get; }
+    public Setting<string> WW_LANGUAGE { get; }
+
+    public Setting<string> NAND_ROOT_PATH { get; }
+    public Setting<string> LOAD_PATH { get; }
+    public Setting<bool> VSYNC { get; }
+    public Setting<int> INTERNAL_RESOLUTION { get; }
+    public Setting<bool> SHOW_FPS { get; }
+    public Setting<string> GFX_BACKEND { get; }
+    public Setting<string> MACADDRESS { get; }
+    public Setting<double> WINDOW_SCALE { get; }
+    public Setting<bool> RECOMMENDED_SETTINGS { get; }
+    public Setting<double> RECOMP_RESOLUTION_MULTIPLIER { get; }
+    public Setting<string> RECOMP_GRAPHICS_API { get; }
+    public Setting<bool> RECOMP_SHOW_FPS { get; }
+    public Setting<bool> RECOMP_PREVENT_STUTTERS { get; }
+    public Setting<string> RECOMP_NAND_ROOT { get; }
     #endregion
 
     #region Public API
-    public T Get<T>(Setting setting)
-    {
-        // #todo: make setting keys generic so reading and writing the wrong value type fails at compile time.
-        var value = setting.Get();
-        if (value is not T typedValue)
-            throw new InvalidOperationException($"Setting '{setting.Name}' does not match expected type '{typeof(T).Name}'.");
+    public T Get<T>(Setting<T> setting) => setting.Value;
 
-        return typedValue;
-    }
-
-    public bool Set<T>(Setting setting, T value, bool skipSave = false)
+    public bool Set<T>(Setting<T> setting, T value, bool skipSave = false)
     {
         if (value == null)
             throw new ArgumentNullException(nameof(value));
 
-        return setting.Set(value, skipSave);
+        var previous = setting.Value;
+        if (!setting.Set(value, skipSave))
+            return false;
+        if (
+            !EqualityComparer<T>.Default.Equals(previous, value)
+            && (ReferenceEquals(setting, USER_FOLDER_PATH) || ReferenceEquals(setting, DOLPHIN_LOCATION))
+        )
+            _dolphinSettingManager.ReloadSettings(_dolphinPaths.Resolve(DOLPHIN_LOCATION.Value, USER_FOLDER_PATH.Value).ConfigFolderPath);
+        return true;
     }
 
     public bool PathsSetupCorrectly()
@@ -436,10 +426,9 @@ public class SettingsManager : ISettingsManager, IDisposable
     #endregion
 
     #region Registration Helpers
-    private WhWzSetting RegisterWhWz<T>(string name, T defaultValue, Func<object?, bool>? validation = null)
+    private WhWzSetting<T> RegisterWhWz<T>(string name, T defaultValue, Func<T, bool>? validation = null)
     {
-        var setting = new WhWzSetting(
-            typeof(T),
+        var setting = new WhWzSetting<T>(
             name,
             defaultValue!,
             setting => _whWzSettingManager.SaveSettings(_fileSystem.Path.Combine(_applicationData.DirectoryPath, "config.json"), setting)
@@ -452,10 +441,9 @@ public class SettingsManager : ISettingsManager, IDisposable
         return setting;
     }
 
-    private DolphinSetting RegisterDolphin<T>((string, string, string) location, T defaultValue, Func<object?, bool>? validation = null)
+    private DolphinSetting<T> RegisterDolphin<T>((string, string, string) location, T defaultValue, Func<T, bool>? validation = null)
     {
-        var setting = new DolphinSetting(
-            typeof(T),
+        var setting = new DolphinSetting<T>(
             location,
             defaultValue!,
             setting =>
@@ -472,10 +460,9 @@ public class SettingsManager : ISettingsManager, IDisposable
         return setting;
     }
 
-    private RecompSetting RegisterRecomp<T>((string, string) location, T defaultValue, Func<object?, bool>? validation = null)
+    private RecompSetting<T> RegisterRecomp<T>((string, string) location, T defaultValue, Func<T, bool>? validation = null)
     {
-        var setting = new RecompSetting(
-            typeof(T),
+        var setting = new RecompSetting<T>(
             location,
             defaultValue!,
             setting => _recompSettingManager.SaveSettings(_recompPaths.ConfigFilePath, setting)

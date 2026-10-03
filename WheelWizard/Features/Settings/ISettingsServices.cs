@@ -1,26 +1,27 @@
+using WheelWizard.Models.Enums;
 using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Settings;
 
 public interface IWhWzSettingManager
 {
-    void RegisterSetting(WhWzSetting setting);
-    void SaveSettings(string configPath, WhWzSetting invokingSetting);
+    void RegisterSetting(IWhWzSetting setting);
+    void SaveSettings(string configPath, IWhWzSetting invokingSetting);
     void LoadSettings(string configPath);
 }
 
 public interface IDolphinSettingManager
 {
-    void RegisterSetting(DolphinSetting setting);
-    void SaveSettings(string configDirectory, DolphinSetting invokingSetting);
+    void RegisterSetting(IDolphinSetting setting);
+    void SaveSettings(string configDirectory, IDolphinSetting invokingSetting);
     void ReloadSettings(string configDirectory);
     void LoadSettings(string configDirectory);
 }
 
 public interface IRecompSettingManager
 {
-    void RegisterSetting(RecompSetting setting);
-    void SaveSettings(string configPath, RecompSetting invokingSetting);
+    void RegisterSetting(IRecompSetting setting);
+    void SaveSettings(string configPath, IRecompSetting invokingSetting);
     void ReloadSettings(string configPath);
     void LoadSettings(string configPath);
 
@@ -33,45 +34,45 @@ public interface IRecompSettingManager
 
 public interface ISettingsProperties
 {
-    Setting USER_FOLDER_PATH { get; }
-    Setting DOLPHIN_LOCATION { get; }
-    Setting GAME_LOCATION { get; }
-    Setting FORCE_WIIMOTE { get; }
-    Setting LAUNCH_WITH_DOLPHIN { get; }
-    Setting LAUNCH_RR_ON_STARTUP { get; }
-    Setting ENABLE_RECOMP { get; }
-    Setting RECOMP_USE_DOLPHIN_DATA { get; }
-    Setting RECOMP_COPY_DOLPHIN_NAND { get; }
-    Setting PREFERS_MODS_ROW_VIEW { get; }
-    Setting USE_PATCHES_SYSTEM { get; }
-    Setting FOCUSED_USER { get; }
-    Setting ENABLE_ANIMATIONS { get; }
-    Setting TESTING_MODE_ENABLED { get; }
-    Setting SAVED_WINDOW_SCALE { get; }
-    Setting RR_REGION { get; }
-    Setting WW_LANGUAGE { get; }
-    Setting NAND_ROOT_PATH { get; }
-    Setting LOAD_PATH { get; }
-    Setting VSYNC { get; }
-    Setting INTERNAL_RESOLUTION { get; }
-    Setting SHOW_FPS { get; }
-    Setting GFX_BACKEND { get; }
-    Setting MACADDRESS { get; }
-    Setting WINDOW_SCALE { get; }
-    Setting RECOMMENDED_SETTINGS { get; }
-    Setting RECOMP_RESOLUTION_MULTIPLIER { get; }
-    Setting RECOMP_GRAPHICS_API { get; }
-    Setting RECOMP_SHOW_FPS { get; }
-    Setting RECOMP_PREVENT_STUTTERS { get; }
-    Setting RECOMP_NAND_ROOT { get; }
+    Setting<string> USER_FOLDER_PATH { get; }
+    Setting<string> DOLPHIN_LOCATION { get; }
+    Setting<string> GAME_LOCATION { get; }
+    Setting<bool> FORCE_WIIMOTE { get; }
+    Setting<bool> LAUNCH_WITH_DOLPHIN { get; }
+    Setting<bool> LAUNCH_RR_ON_STARTUP { get; }
+    Setting<bool> ENABLE_RECOMP { get; }
+    Setting<bool> RECOMP_USE_DOLPHIN_DATA { get; }
+    Setting<bool> RECOMP_COPY_DOLPHIN_NAND { get; }
+    Setting<bool> PREFERS_MODS_ROW_VIEW { get; }
+    Setting<bool> USE_PATCHES_SYSTEM { get; }
+    Setting<int> FOCUSED_USER { get; }
+    Setting<bool> ENABLE_ANIMATIONS { get; }
+    Setting<bool> TESTING_MODE_ENABLED { get; }
+    Setting<double> SAVED_WINDOW_SCALE { get; }
+    Setting<MarioKartWiiEnums.Regions> RR_REGION { get; }
+    Setting<string> WW_LANGUAGE { get; }
+    Setting<string> NAND_ROOT_PATH { get; }
+    Setting<string> LOAD_PATH { get; }
+    Setting<bool> VSYNC { get; }
+    Setting<int> INTERNAL_RESOLUTION { get; }
+    Setting<bool> SHOW_FPS { get; }
+    Setting<string> GFX_BACKEND { get; }
+    Setting<string> MACADDRESS { get; }
+    Setting<double> WINDOW_SCALE { get; }
+    Setting<bool> RECOMMENDED_SETTINGS { get; }
+    Setting<double> RECOMP_RESOLUTION_MULTIPLIER { get; }
+    Setting<string> RECOMP_GRAPHICS_API { get; }
+    Setting<bool> RECOMP_SHOW_FPS { get; }
+    Setting<bool> RECOMP_PREVENT_STUTTERS { get; }
+    Setting<string> RECOMP_NAND_ROOT { get; }
 }
 
 public interface ISettingsManager : ISettingsProperties
 {
     OperationResult<SettingsValidationReport> ValidateCorePathSettings();
 
-    T Get<T>(Setting setting);
-    bool Set<T>(Setting setting, T value, bool skipSave = false);
+    T Get<T>(Setting<T> setting);
+    bool Set<T>(Setting<T> setting, T value, bool skipSave = false);
     ExtensionConfigurationInfo CheckExtensionConfiguration();
     bool PathsSetupCorrectly();
     bool DolphinPathsSetupCorrectly();

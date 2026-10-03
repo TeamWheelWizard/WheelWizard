@@ -94,19 +94,19 @@ public class FeaturePathOwnershipTests
     private static (ISettingsManager, DolphinPaths) CreateDolphinPaths(MockFileSystem fs, string userFolder)
     {
         var settings = Substitute.For<ISettingsManager>();
-        settings.USER_FOLDER_PATH.Returns(new WhWzSetting(typeof(string), "UserFolderPath", userFolder));
-        settings.DOLPHIN_LOCATION.Returns(new WhWzSetting(typeof(string), "DolphinLocation", "dolphin-emu"));
+        settings.USER_FOLDER_PATH.Returns(new WhWzSetting<string>("UserFolderPath", userFolder));
+        settings.DOLPHIN_LOCATION.Returns(new WhWzSetting<string>("DolphinLocation", "dolphin-emu"));
         settings.LOAD_PATH.Returns(
-            new WhWzSetting(typeof(string), "LoadPath", "").SetValidation(value =>
+            new WhWzSetting<string>("LoadPath", "").SetValidation(value =>
                 value is string directory && !string.IsNullOrWhiteSpace(directory) && fs.Directory.Exists(directory)
             )
         );
         settings.NAND_ROOT_PATH.Returns(
-            new WhWzSetting(typeof(string), "NandRootPath", "").SetValidation(value =>
+            new WhWzSetting<string>("NandRootPath", "").SetValidation(value =>
                 value is string directory && !string.IsNullOrWhiteSpace(directory) && fs.Directory.Exists(directory)
             )
         );
-        settings.Get<string>(Arg.Any<Setting>()).Returns(call => (string)call.Arg<Setting>().Get());
+        settings.Get<string>(Arg.Any<Setting<string>>()).Returns(call => (string)call.Arg<Setting<string>>().Get());
         return (settings, new DolphinPaths(settings, new DolphinPathResolver(fs, Substitute.For<IRuntimeEnvironment>()), fs));
     }
 }

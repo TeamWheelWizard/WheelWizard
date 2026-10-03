@@ -14,8 +14,8 @@ public class SettingsRecoveryTests
         fs.Directory.CreateDirectory("/config");
         fs.File.WriteAllText("/config/GFX.ini", "[Settings]\nShowFPS = False\nInternalResolution = 1\n");
         var manager = new DolphinSettingManager(fs);
-        var fps = new DolphinSetting(typeof(bool), ("GFX.ini", "Settings", "ShowFPS"), false, s => manager.SaveSettings("/config", s));
-        var resolution = new DolphinSetting(typeof(int), ("GFX.ini", "Settings", "InternalResolution"), 1);
+        var fps = new DolphinSetting<bool>(("GFX.ini", "Settings", "ShowFPS"), false, s => manager.SaveSettings("/config", s));
+        var resolution = new DolphinSetting<int>(("GFX.ini", "Settings", "InternalResolution"), 1);
         manager.RegisterSetting(fps);
         manager.RegisterSetting(resolution);
         manager.LoadSettings("/config");
@@ -39,7 +39,7 @@ public class SettingsRecoveryTests
         fs.Directory.CreateDirectory("/config");
         fs.File.WriteAllText("/config/Config.toml", "[video]\nshow_fps = false\n");
         var manager = new RecompSettingManager(fs);
-        var setting = new RecompSetting(typeof(bool), ("video", "show_fps"), true, s => manager.SaveSettings("/config/Config.toml", s));
+        var setting = new RecompSetting<bool>(("video", "show_fps"), true, s => manager.SaveSettings("/config/Config.toml", s));
         manager.RegisterSetting(setting);
         manager.LoadSettings("/config/Config.toml");
         fs.File.WriteAllText("/config/Config.toml", "[video]\n");
@@ -54,8 +54,7 @@ public class SettingsRecoveryTests
     public void FailedSaveRollsBackAndCanBeRetried()
     {
         var fail = true;
-        var setting = new WhWzSetting(
-            typeof(bool),
+        var setting = new WhWzSetting<bool>(
             "Enabled",
             false,
             _ =>
@@ -84,7 +83,7 @@ public class SettingsRecoveryTests
         const string original = "{\"EnableAnimations\":false,\"FutureSetting\":{\"value\":2}}";
         fs.File.WriteAllText(path, original);
         var manager = new WhWzSettingManager(NullLogger<WhWzSettingManager>.Instance, fs);
-        var setting = new WhWzSetting(typeof(bool), "EnableAnimations", true, s => manager.SaveSettings(path, s));
+        var setting = new WhWzSetting<bool>("EnableAnimations", true, s => manager.SaveSettings(path, s));
         manager.RegisterSetting(setting);
         manager.LoadSettings(path);
         Assert.Equal(false, setting.Get());
@@ -102,8 +101,8 @@ public class SettingsRecoveryTests
     [Fact]
     public void VirtualSettingTracksDependenciesAfterSetterFailure()
     {
-        var source = new WhWzSetting(typeof(int), "source", 1);
-        using var derived = new VirtualSetting(typeof(int), _ => throw new IOException("save failed"), source.Get).SetDependencies(source);
+        var source = new WhWzSetting<int>("source", 1);
+        using var derived = new VirtualSetting<int>(_ => throw new IOException("save failed"), source.Get).SetDependencies(source);
         Assert.False(derived.Set(2));
         source.Set(3);
         Assert.Equal(3, derived.Get());

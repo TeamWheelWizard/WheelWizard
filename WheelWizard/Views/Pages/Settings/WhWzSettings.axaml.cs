@@ -350,22 +350,17 @@ public partial class WhWzSettings : UserControl
         }
     }
 
-    private async Task<bool> ApplyLocationSettingAsync(Setting setting, string path)
+    private async Task<bool> ApplyLocationSettingAsync(Setting<string> setting, string path)
     {
-        var normalizedPath =
-            setting == SettingsService.USER_FOLDER_PATH ? path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) : path;
-        var previousPath = (string)setting.Get();
+        var normalizedPath = setting == SettingsService.USER_FOLDER_PATH ? Path.TrimEndingDirectorySeparator(path) : path;
 
-        if (!setting.Set(normalizedPath))
+        if (!SettingsEditing.Set(SettingsService, setting, normalizedPath))
         {
-            await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Warning_InvalidPathSettings);
             UpdateLocationRows();
             return false;
         }
 
         UpdateLocationRows();
-        if (!string.Equals(previousPath, normalizedPath, StringComparison.Ordinal) && SettingsService.PathsSetupCorrectly())
-            DolphinSettingsService.ReloadSettings(DolphinPaths.ConfigFolderPath);
 
         await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Success_PathSettingsSaved);
         return true;
@@ -739,7 +734,7 @@ public partial class WhWzSettings : UserControl
             WindowScaleDropdown.Items.Add(selectedItemText);
         WindowScaleDropdown.SelectedItem = selectedItemText;
 
-        if (!SettingsService.WINDOW_SCALE.Set(scale))
+        if (!SettingsEditing.Set(SettingsService, SettingsService.WINDOW_SCALE, scale))
         {
             WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
             _editingScale = false;
@@ -769,7 +764,7 @@ public partial class WhWzSettings : UserControl
 
         var yesNoAnswer = await yesNoWindow.AwaitAnswer();
         if (yesNoAnswer)
-            SettingsService.SAVED_WINDOW_SCALE.Set(SettingsService.WINDOW_SCALE.Get());
+            SettingsEditing.Set(SettingsService, SettingsService.SAVED_WINDOW_SCALE, SettingsService.WINDOW_SCALE.Value);
         else
         {
             SettingsService.WINDOW_SCALE.Set(SettingsService.SAVED_WINDOW_SCALE.Get());
@@ -838,7 +833,7 @@ public partial class WhWzSettings : UserControl
             return; // We only want to change the setting if we really apply this change
         }
 
-        if (SettingsService.WW_LANGUAGE.Set(selectedLanguage.Key))
+        if (SettingsEditing.Set(SettingsService, SettingsService.WW_LANGUAGE, selectedLanguage.Key))
         {
             LocalizationService.ApplyCurrentLanguage();
             RefreshLanguageDropdown();
@@ -848,5 +843,5 @@ public partial class WhWzSettings : UserControl
     }
 
     private void EnableAnimations_OnClick(object sender, RoutedEventArgs e) =>
-        SettingsService.ENABLE_ANIMATIONS.Set(EnableAnimations.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.ENABLE_ANIMATIONS, EnableAnimations.IsChecked == true);
 }

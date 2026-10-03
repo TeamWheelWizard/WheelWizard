@@ -94,8 +94,8 @@ public class LaunchPathTests
     private static ISettingsManager CreateSettings()
     {
         var settings = Substitute.For<ISettingsManager>();
-        settings.GAME_LOCATION.Returns(new WhWzSetting(typeof(string), "GamePath", "/game.iso"));
-        settings.Get<string>(Arg.Any<Setting>()).Returns(call => (string)call.Arg<Setting>().Get());
+        settings.GAME_LOCATION.Returns(new WhWzSetting<string>("GamePath", "/game.iso"));
+        settings.Get<string>(Arg.Any<Setting<string>>()).Returns(call => (string)call.Arg<Setting<string>>().Get());
         return settings;
     }
 }
