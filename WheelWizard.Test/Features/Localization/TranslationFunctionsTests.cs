@@ -2,6 +2,7 @@ using WheelWizard.Localization;
 
 namespace WheelWizard.Test.Features.Localization;
 
+[Collection("SettingsFeature")]
 public class TranslationFunctionsTests
 {
     [Fact]
