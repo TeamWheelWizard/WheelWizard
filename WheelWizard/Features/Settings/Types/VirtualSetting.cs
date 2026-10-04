@@ -30,6 +30,9 @@ public class VirtualSetting<T> : Setting<T>, IDisposable
         }
     }
 
+    // Earlier child saves may have succeeded, so the previous composite value can be stale.
+    protected override void RestoreValueAfterSaveFailure(T previousValue) => Recalculate();
+
     public VirtualSetting<T> SetDependencies(params Setting[] dependencies)
     {
         // I rather not translate this message, makes it easier to check where a given error came from

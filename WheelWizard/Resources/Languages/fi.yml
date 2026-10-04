@@ -27,9 +27,13 @@ fi:
     races_played: "Kisoja pelattu"
     friend_code: "Kaverikoodi"
     player_count: "Pelaajia"
-    time_online: "Aika online-tilassa"
+    time_online: "Aika verkossa"
     message: "Viesti"
-    is_online: "Online-tilassa"
+    is_online: "Paikalla"
+    vr_history: "KP-historia"
+    start_vr: "KP alussa"
+    end_vr: "KP lopussa"
+    net_change: "Nettomuutos"
     mii:
       gender_male: "Mies"
       gender: "Sukupuoli"
@@ -64,6 +68,8 @@ fi:
     status: "Status"
     priority: "Prioriteetti"
     sort_by: "Järjestä"
+    match: "Ottelu"
+    enable_matches: "Ottelua"
     total_games_won: "Kisoja voitettu yhteensä"
     total_games_played: "Kisoja pelattu yhteensä"
     vr_abbreviation: "KP"
@@ -107,10 +113,13 @@ fi:
     installed: "Asennettu"
   action:
     play: "Pelaa"
+    open: "Avoin"
     play_offline: "Pelaa offline-tilassa"
+    play_anyway: "Pelaa silti"
     install: "Asenna"
     update: "Päivitä"
     import: "Tuo"
+    clone: "Kloonaa"
     convert_to_patches: "Muunna paikkauksiksi"
     enable_all: "Ota kaikki käyttöön"
     disable_all: "Poista kaikki"
@@ -130,6 +139,7 @@ fi:
     revert: "Palauta"
     maybe_later: "Myöhemmin"
     browse: "Selaa"
+    change: "Muuta"
     view_mod: "Näytä modi"
     save_external_mii: "Lisää Mii omiin Mii-hahmoihin"
     view_mii: "Näytä Mii"
@@ -138,6 +148,9 @@ fi:
     unfavorite: "Poista suosikeista"
     favorite: "Suosikki"
     view_room: "Näytä huone"
+    recomp_nand_copy: "Luo kopio"
+    recomp_nand_share: "Käytä suoraan"
+    recomp_install_offline: "Asenna vain offline-tilassa"
     link:
       discord: "Puhu meille!"
       github: "Lähdekoodi"
@@ -180,19 +193,22 @@ fi:
     language_translated_by: "Tämän kielen käännökset tarjoaa: {$1}"
     external_reference: "Ulkoinen viite"
     external_reference_with_path: "Ulkoinen viite: {$1}"
+    modified_archive_member: "Muokattu arkiston jäsen"
+    new_archive_member: "Uusi arkiston jäsen"
+    whole_file_override: "Koko tiedoston ohitus"
   hover:
     players_online:
-      0: "Ei pelaajia online-tilassa"
-      1: "1 pelaaja on online-tilassa"
-      n: "{$1} pelaajaa on online-tilassa"
+      0: "Ei pelaajia paikalla"
+      1: "1 pelaaja on paikalla"
+      n: "{$1} pelaajaa on paikalla"
     rooms_online:
       0: "Ei aktiivisia huoneita"
       1: "1 aktiivinen huone"
       n: "{$1} aktiivista huonetta"
     friends_online:
-      0: "Ei kavereita online-tilassa"
-      1: "1 kaveri on online-tilassa"
-      n: "{$1} kaveria on online-tilassa"
+      0: "Ei kavereita paikalla"
+      1: "1 kaveri on paikalla"
+      n: "{$1} kaveria on paikalla"
     rooms_page_disclaimer: |-
       Huomioi, että tältä sivulta ei voi liittyä huoneeseen suoraan.
       Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
@@ -211,6 +227,9 @@ fi:
     no_miis: "Mii-tietojen lukeminen järjestelmältäsi epäonnistui. Varmista, että olet käynnistänyt pelin ainakin kerran."
     no_mod_selected_title: "Ei modia valittuna"
     no_mod_selected: "Valitse modi listalta nähdäksesi sen tiedot"
+    no_vr_history_title: "Ei KP-historiaa"
+    no_vr_history: "Kaverikoodi vaaditaan KP-historian lataamiseen."
+    no_vr_history_range: "Tällä aikavälillä ei löydy KP-historiaa."
   time:
     days:
       1: "1 pv"
@@ -224,6 +243,13 @@ fi:
     seconds:
       1: "1 s"
       n: "{$1} s"
+    last_24_hours: "Viimeiset 24 tuntia"
+    last_7_days: "Viimeiset 7 päivää"
+    last_30_days: "Viimeiset 30 päivää"
+    last_60_days: "Viimeiset 60 päivää"
+    lifetime: "Koko ajalta"
+    lifetime_history: "Koko ajan historia"
+    past_n_days_with_range: "Viimeiset {$1} päivää ({$2}–{$3})"
   progress:
     estimated_time_remaining: "Arvioitu kestoaika:"
     downloading_mb: "Ladataan {$1} Mt"
@@ -236,6 +262,7 @@ fi:
     installing_rr: "Asennetaan Retro Rewindia"
     installing_rr_first_time: "Asennetaan Retro Rewindia ensimmäistä kertaa"
     installing_dolphin: "Asennetaan Dolphin-emulaattoria"
+    updating_dolphin: "Päivitetään Dolphin-emulaattoria"
     this_may_take_a_while: "Tässä voi kestää jonkin aikaa riippuen internet-yhteydestäsi."
     applying_converted_mod: "Sovelletaan muunnettu modi"
     combining_files: "Yhdistetään tiedostoja"
@@ -245,7 +272,35 @@ fi:
     downloading_mod: "Ladataan {$1}"
     installing_mod: "Asennetaan modia"
     preparing_files_count: "Valmistellaan {$1} tiedostoa"
+    installing_recomp: "Asennetaan WiiCompiled"
+    updating_recomp: "Päivitetään WiiCompiled"
+    uninstalling_recomp: "Poistetaan WiiCompiled-asennusta"
+    recomp_checking_release: "Etsitään uusinta WiiCompiled-versiota"
+    recomp_downloading_setup: "Ladataan WiiCompiledin asennusohjelmaa"
+    recomp_running_setup: "Käynnistetään WiiCompiledin asennusohjelmaa"
+    recomp_finished: "WiiCompiled on valmis pelattavaksi"
+    recomp_copying_nand: "Kopioidaan Dolphin-dataa"
   question:
+    recomp_uninstall:
+      title: "Poistetaanko WiiCompiledin asennus?"
+      extra_shared: "Poistaa WiiCompiledin asennuksen. Tallennuksesi säilyy Dolphinin Wii-kansiossa, ja Retro Rewind pysyy asennettuna."
+      extra_private: "Poistaa WiiCompiledin asennuksen sekä sen yksityiset Wii-tallennustiedot. Retro Rewind pysyy asennettuna."
+      extra_copy: "Poistaa WiiCompiledin asennuksen sekä sen kopiot Dolphin-datastasi. Alkuperäinen Dolphin-data pysyy muuttumattomana, ja Retro Rewind pysyy asennettuna."
+    recomp_use_dolphin_nand:
+      title: "Käytetäänkö Dolphin-tallennustietoja?"
+      extra: "WiiCompiled voi käyttää tallennuksia, Miitä ja kaverikoodeja, jotka ovat jo käytössä Dolphinissa. Jos niitä ei ole, se aloittaa alusta omalla Wii-datallaan."
+    recomp_retro_wfc_unavailable:
+      title: "Retro WFC:hen ei saada yhteyttä"
+      extra: "WiiCompiled vaatii Retro WFC -palvelimia verkkopelaamista varten, ja ne eivät vastaa juuri nyt. Voit asentaa ilman verkkopeliä nyt; WiiCompiled lisää sen automaattisesti seuraavalla päivityskerralla, kun palvelimet ovat taas toiminnassa."
+    recomp_nand_mode:
+      title: "Kopioidaanko Dolphin-data vai käytetäänkö niitä suoraan?"
+      extra: "Dolphin suosittelee, etteivät muut ohjelmat käytä Wii-dataa (NAND) suoraan, koska kaksi samaan aikaan siihen kirjoittavaa ohjelmaa voi vioittaa sen. Kopio pitää WiiCompiledin täysin erillään, mutta toisessa tehdyt edistymiset eivät näy toisessa."
+    recomp_share_dolphin_data:
+      title: "Jaetaanko NAND-data Dolphinin kanssa?"
+      extra: "Kloonaus antaa WiiCompiledille samat nykyiset tallennukset, Miit ja Wii-asetukset, mutta pitää kopion erillään ja on turvallisempi. Suora jakaminen antaa Dolphinille ja WiiCompiledille mahdollisuuden kirjoittaa samaan NAND-muistiin, mikä voi vioittaa sitä, jos molemmat suorittavat samanaikaisesti. Jatka vain, jos ymmärrät riskin."
+    recomp_overwrite_dolphin_clone:
+      title: "Korvataanko yksityinen Dolphin-klooni?"
+      extra: "Korvaa nykyisen kloonin Dolphinin tiedoilla. Vain WiiCompiledissa muutetut tallennukset, Miit ja Wii-asetukset menetetään."
     launch_clear_mods_found:
       title: "Modeja löytyi"
       extra: |-
@@ -267,8 +322,19 @@ fi:
     dolphin_found:
       title: "Dolphin-emulaattorin kansio löytyi"
       extra: |-
-        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä' :)
+        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä'.
         Dolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?
+    dolphin_outdated:
+      title: "Dolphin-emulaattorisi on vanhentunut"
+      extra: |-
+        Tässä Dolphin-versiossa ({$1}) on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
+
+        Päivitä versioon {$2} tai uudempaan varmuuden vuoksi.
+    dolphin_program_found:
+      title: "Dolphin-emulaattori löytyi"
+      extra: |-
+        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä'.
+        Dolphin-emulaattori löytyi. Haluatko käyttää sitä?
     new_version_wh_wz:
       title: "Wheel Wizard -päivitys saatavilla"
       extra: "Wheel Wizardin versio {$1} on saatavilla (nykyinen versio: {$2}). Haluatko päivittää heti?"
@@ -306,6 +372,9 @@ fi:
       title: "Tämä sulkee ikkunan ja avaa uuden valitulla kieliasetuksella."
       extra: "Haluatko ottaa uuden kieliasetuksen käyttöön?"
   message_warning:
+    recomp_operation_cancelled:
+      title: "WiiCompiledin toiminto peruttiin"
+      extra: "Toiminto pysäytettiin ennen sen valmistumista. Voit aloittaa sen uudelleen milloin tahansa."
     not_find_dolphin:
       extra: "Dolphin-emulaattoria ei löytynyt. Määritä sijaintipolku asetuksissa."
     not_find_game:
@@ -322,6 +391,12 @@ fi:
     dolphin_not_found:
       title: "Dolphin-emulaattorin kansiota ei löytynyt"
       extra: "Dolphin-emulaattorin kansiota ei löytynyt automaattisesti. Yritä etsiä kansio mauaalisesti. Lisätietoa saat napsauttamalla 'Ohje'."
+    dolphin_version_unverified:
+      title: "Dolphin-emulaattorin versiota ei voitu vahvistaa"
+      extra: |-
+        Wheel Wizard ei voinut lukea määrittämääsi Dolphin-emulaattorin versiota, joten se ei voi tietää, onko siinä tietoturvakorjauksia.
+
+        Tarkista, että käytät {$1}-versiota tai uudempaa. Vanhemmissa versioissa on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
     dolphin_tool_selected:
       title: "Kelvoton Dolphinin käynnistystiedosto valittuna"
       extra: "Sinulla on DolphinTool.exe valittuna. Ole hyvä ja valitse Dolphin.exe (Dolphin-emulaattorin käynnistystiedosto) sen sijaan."
@@ -397,6 +472,7 @@ fi:
     mod_download_fail:
       title: "Modin lataus epäonnistui."
       extra: "Ladattaessa tapahtui virhe: {$1}"
+    failed_vr_history: "KP-historian lataaminen epäonnistui"
   message_success:
     settings_saved:
       title: "Asetukset tallennettu!"
@@ -430,6 +506,7 @@ fi:
     created_duplicate: "{$1}' kopioitu"
     created_duplicates_miis: "{$1}' kopioitua Miitä luotu"
     profile_set_primary: "Aseta profiili ensisijaiseksi"
+    dolphin_updated: "Dolphin-emulaattori on päivitetty"
   snackbar_error:
     mii_failure_deserialize: "Miin '{$1}' deserialisointi epäonnistui"
     mii_failure_update: "Miin '{$1}' päivittäminen epäonnistui"
@@ -448,11 +525,18 @@ fi:
     incompatible_mod:
       message: "Tämä modi on yhteensopimaton muiden modien kanssa. Pelin käynnistäminen tämän modin kanssa voi aiheuttaa virheellistä toimintaa tai kaatumisia. Harkitse modin muuntamista paikkauksiksi napsauttamalla sitä hiiren oikealla painikkeella."
       title: "YHTEENSOPIMATON MODI"
+  warning:
+    brsar_external_count: "{$1} BRSAR-tiedostomerkintää ovat ulkoisia viittauksia, eikä niitä voida viedä."
+    brsar_file_id_external: "BRSAR-tiedostotunnus {$1} on ulkoinen tiedostoviittaus, eikä sitä voida viedä."
   option:
     wh_wz_language: "Wheel Wizardin kieli"
     force_disable_wiimote: "Pakota Wiimote pois käytöstä"
     launch_with_dolphin: "Käynnistä peli Dolphin-ikkunassa"
     launch_rr_on_startup: "Käynnistä Retro Rewind heti"
+    retro_rewind_installation: "Retro Rewind -asennus"
+    save_folder: "Tallennuskansio"
+    installation_folder: "Asennuskansio"
+    recomp_installation: "WiiCompiled -asennus"
     v_sync: "Pystytahdistus (V-Sync)"
     recommended: "Suositellut asetukset"
     show_fps: "Näytä kuvalaskuri"
@@ -460,6 +544,7 @@ fi:
     window_scale: "Ikkunan koko"
     open_config: "Avaa asetuskansio"
     wheel_wizard_data_folder: "Wheel Wizardinin tietokansio"
+    retro_rewind_folder: "Retro Rewind -kansio"
     reset_data_folder: "Käytä oletussijaintia"
     dolphin_user_path: "Dolphin-käyttäjäkansio"
     mario_kart_game: "Mario Kart Wii -pelitiedosto"
@@ -469,9 +554,17 @@ fi:
     reinstall: "Asenna RR uudelleen"
     open_game_folder: "Avaa pelikansio"
     open_save_folder: "Avaa tallennuskansio"
+    enable_recomp: "Käytä WiiCompiledia (beta)"
+    recomp_use_dolphin_data: "Jaa Dolphin-tallennustiedot"
+    recomp_share_dolphin_data: "Jaa NAND-data Dolphinin kanssa"
+    recomp_clone_dolphin_data: "Kloonaa Dolphinin NAND"
+    recomp_resolution: "Resoluutio"
+    recomp_graphics_api: "Grafiikan API"
+    recomp_prevent_stutters: "Estä pätkiminen"
   section:
     graphics: "Grafiikka"
     general: "Yleiset"
+    retro_rewind: "Retro Rewind"
     language: "Kieli"
     wii: "Wii-asetukset"
     resolution: "Resoluutio"
@@ -480,27 +573,58 @@ fi:
     location_paths: "Sijaintiasetukset"
     wh_wz_appearance: "Wheel Wizardin ulkoasu"
     installation: "Asennus"
+    setup: "Kokoonpano"
+    recomp: "WiiCompiled (beta)"
+    recomp_dolphin_data: "Dolphin-data"
+    recomp_video: "Video"
   helper_text:
     topbar:
       location_warning: "Asetukset on lukittu, suorita sijaintipolkujen asetukset ensin"
+    enable_recomp: "Käyttää WiiCompiledia käynnistysohjelmana kotisivulla. Poista tämä käytöstä käyttääksesi Dolphinia ja Retro Rewindia. Vain Windowsille."
+    recomp_use_dolphin_data: "Käytä Dolphinin olemassa olevaa Wii-kansiota, jotta WiiCompiled jakaa tallennukset, Miit ja Wii-asetukset. Muutos tulee voimaan, kun WiiCompiled käynnistyy seuraavan kerran."
+    recomp_share_dolphin_data: "WiiCompiled ja Dolphin käyttävät samoja tallennuksia, Miitä ja Wii-asetuksia."
+    recomp_shared_nand_warning: "Älä käytä Dolphinia ja WiiCompiledia samaan aikaan, kun NAND-data jaetaan."
+    recomp_clone_dolphin_data: "Kopioi Dolphinin nykyiset tallennukset, Miit ja Wii-asetukset yksityiseksi WiiCompiled-dataksi."
+    recomp_graphics_api: "Vain DirectX 12 ja Vulkan suorittavat WiiCompiledia luotettavasti, joten muita vaihtoehtoja ei ole tarjolla."
+    recomp_dolphin_data_not_found: "Määritä ensin olemassa oleva Dolphin-käyttäjäkansio sijaintiasetuksissa. Sen on sisällettävä Wii-kansio."
+    recomp_prevent_stutters: "Varjostinta käännettäessä sitä tarvitsevat objektit ohitetaan muutaman kuvan ajan sen sijaan, että koko peli jumiutuisi, kunnes se on valmis. Vähentää pätkimistä grafiikan äkillisen ilmestymisen kustannuksella."
     launch_with_dolphin: "Käynnistää Dolphinin pääikkunan pelin mukana"
     launch_rr_on_startup: "Retro Rewind käynnistetään heti kun Wheel Wizard käynnistyy"
+    retro_rewind_version: "Asennettu versio: {$1}"
+    installed_version: "Asennettu versio: {$1}"
     force_disable_wiimote: "Poistaa Wiimoten käytöstä pelissä, mutta ottaa sen käyttöön Wii-valikossa"
     resolution_scale: "1x on alkuperäinen resoluutio"
+    renderer: "Valitsee grafiikkaohjelman, jota Dolphin käyttää pelin renderöintiin."
+    v_sync: "Synkronoi pelin kuvataajuuden näyttösi kanssa estääkseen kuvan pilkottumista."
     recommended: "Muuttaa joitakin Dolphinin asetuksia pätkimisen ja lagipiikkien vähentämiseksi"
     30_fps: "Pakottaa pelin toimimaan 30 FPS -tilassa (oletus on 60)"
     wheel_wizard_data_folder: "Valitse Wheel Wizardin tiedostosijainti. Siirtäminen voi kestää hetken."
+    retro_rewind_folder: "Avaa kansion, joka sisältää asennetut Retro Rewind -tiedostot."
     end_with_exe: "Polun täytyy loppua päätteeseen .exe"
+    select_dolphin_linux: "Valitse Dolphin-ohjelmatiedosto tai anna käynnistyskomento"
+    select_dolphin_macos: "Valitse Dolphin.app"
     enable_animations: "Ottaa käyttöön animaatiot Wheel Wizard -sovelluksessa"
     end_with_x: "Polku voi loppua:"
+    wh_wz_language: "Muuttaa Wheel Wizardin käyttämää kieltä, mutta ei pelin sisäistä kieltä."
     optional: "Valinnainen"
     must_set_paths: "Nämä 3 polkua on määritettävä ennen kuin voit pelata Retro Rewindia"
+    must_set_game_path: "Sinun on valittava Mario Kart Wii -pelitiedostosi ennen kuin voit pelata WiiCompiledia"
   category:
+    dolphin: "Dolphin"
     about: "Tietoa"
     other: "Muut"
     general: "Yleiset"
-    video: "Grafiikka"
+    video: "Video"
   status:
+    recomp_dolphin_clone_available: "Yksityinen klooni: {$1}"
+    recomp_dolphin_clone_missing: "Yksityistä kloonia ei ole luotu."
+    recomp_dolphin_data_cloned: "Dolphin-data kloonattu WiiCompiledille"
+    recomp_dolphin_data_not_linked: "Ei linkitetty. WiiCompiled käyttää omaa yksityistä Wii-dataa."
+    recomp_dolphin_data_linked: "Jaetaan Dolphin-dataa kohteesta {$1}"
+    recomp_dolphin_data_copied: "Käytetään Dolphin-datasi kopiota kohteessa {$1}"
+    recomp_dolphin_data_not_found: "Dolphin-dataa ei löytynyt"
+    recomp_not_installed: "WiiCompiledia ei ole vielä asennettu. Asenna se ensin kotisivulta."
+    recomp_uninstalled: "WiiCompiledin asennus on poistettu"
     data_folder:
       default: "Käytetään oletussijaintia."
       custom: "Käytetään mukautettua sijaintia."
@@ -522,5 +646,6 @@ fi:
       czech: "Tšekki"
       norwegian: "Norja"
       chinese: "Kiina"
+      polish: "Puola"
       portuguese: "Portugali"
       z_translators: "Clavey, Alokas"

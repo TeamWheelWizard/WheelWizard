@@ -55,7 +55,7 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            Value = previous;
+            RestoreValueAfterSaveFailure(previous);
             SaveError = exception;
             return false;
         }
@@ -64,6 +64,8 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
     }
 
     protected abstract void ApplyValue(bool skipSave);
+
+    protected virtual void RestoreValueAfterSaveFailure(T previousValue) => Value = previousValue;
 
     public override bool IsValid() => _validation?.Invoke(Value) ?? true;
 
