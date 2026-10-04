@@ -88,6 +88,11 @@ public partial class Layout : BaseWindow, IPollingListener
         SettingsSignalBus = settingsSignalBus;
         ModManagerService = modManagerService;
         InitializeComponent();
+
+        // Respects tiling window managers better if resizable.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            CanResize = true;
+
         Navigation.PageChanged += Navigation_OnPageChanged;
         foreach (var button in SidePanelButtons.Children.OfType<SidebarRadioButton>())
             button.NavigationRequested += (_, pageType) => Navigation.NavigateTo(pageType);
