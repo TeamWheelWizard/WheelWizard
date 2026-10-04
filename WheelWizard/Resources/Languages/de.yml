@@ -311,7 +311,7 @@ de:
       extra: "Löschen ist permanent und kann nicht rückgängig gemacht werden"
       title_miis: "Bist du sicher, dass du {$1} Miis löschen möchtest?"
     apply_scale:
-      title: "Möchtest du die neue Skala anwenden?"
+      title: "Möchtest du die neue Skalierung anwenden?"
       extra: "Diese Änderung wird in {$1} zurückgesetzt, außer du wendest die Änderung an."
     move_data:
       title: "Wheel Wizard Daten verschieben?"
@@ -545,7 +545,7 @@ de:
     launch_with_dolphin: "Starte das Spiel zusammen mit dem Dolphin-Fenster"
     launch_rr_on_startup: "Starte Retro Rewind beim Starten von Wheel Wizard"
     retro_rewind_installation: "Retro Rewind-Installation"
-    save_folder: "Speicherordner"
+    save_folder: "Speicherdaten-Ordner"
     installation_folder: "Installationsordner"
     recomp_installation: "WiiCompiled-Installation"
     v_sync: "VSync"
@@ -601,7 +601,7 @@ de:
     recomp_prevent_stutters: "Während ein Shader noch kompiliert wird, werden die Objekte, die ihn benötigen, für einige Frames übersprungen, anstatt dass das gesamte Spiel ins Stocken gerät, bis er fertig ist. So kommt es zu einem winzigen Pop-in statt zu Rucklern."
     launch_with_dolphin: "Öffne Dolphins Hauptfenster zusammen mit dem Spiel."
     launch_rr_on_startup: "Startet Retro Rewind automatisch, wenn Wheel Wizard gestartet wird"
-    retro_rewind_version: "Installierte Version: {$1}"
+    retro_rewind_version: "Installierte Retro Rewind Version: {$1}"
     installed_version: "Installierte Version: {$1}"
     force_disable_wiimote: "Diese Einstellung deaktiviert die Wiimote im Spiel, sie kann aber weiterhin für den Wii-Kanal verwendet werden."
     resolution_scale: "1x ist die native Auflösung"
