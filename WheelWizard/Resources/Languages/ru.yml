@@ -178,15 +178,15 @@ ru:
     players_online:
       none: "Игроков в сети: 0"
       one: "Игроков в сети: 1"
-      other: "Игроков в сети: %{amount}"
+      other: "Игроков в сети: %{count}"
     rooms_online:
       none: "Активных групп: 0"
       one: "Активных групп: 1"
-      other: "Активных групп: %{amount}"
+      other: "Активных групп: %{count}"
     friends_online:
       none: "Друзей в сети: 0"
       one: "Друзей в сети: 1"
-      other: "Друзей в сети: %{amount}"
+      other: "Друзей в сети: %{count}"
     rooms_page_disclaimer: "Вы не можете заходить в комнаты прямо через это меню. Чтобы зайти в определённую комнату, вам нужно либо зайти через друга, либо надеяться попасть в неё через онлайн сервера."
     friends_page_disclaimer: "Чтобы добавить друга нужно сначала подружить"
   empty_content:
@@ -203,16 +203,16 @@ ru:
   time:
     days:
       one: "1 день"
-      other: "%{amount} дн."
+      other: "%{count} дн."
     hours:
       one: "1 ч"
-      other: "%{amount} ч"
+      other: "%{count} ч"
     minutes:
       one: "1 мин"
-      other: "%{amount} мин"
+      other: "%{count} мин"
     seconds:
       one: "1 сек"
-      other: "%{amount} сек"
+      other: "%{count} сек"
   progress:
     estimated_time_remaining: "Осталось примерно:"
     downloading_mb: "Загружено %{megabytes} МБ"

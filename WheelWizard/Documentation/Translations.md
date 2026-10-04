@@ -23,18 +23,18 @@ Anonymous-object properties replace named placeholders such as `%{name}` and `%{
 ```yaml
 items:
   one: "%{name} has one item"
-  other: "%{name} has %{amount} items"
+  other: "%{name} has %{count} items"
 ```
 
 ```csharp
-var message = t("items", count: 12, new { name = "Alex", amount = 12 });
+var message = t("items", count: 12, new { name = "Alex" });
 ```
 
-`count` is reserved for plural selection: exactly 1 selects `one`, and every other value selects `other`. Do not use `%{count}` as a placeholder; pass a separate named argument such as `amount` when displaying the number.
+`count` selects the plural form and automatically fills `%{count}`: exactly 1 selects `one`, and every other value selects `other`. The explicit count argument takes precedence over an anonymous-object property named `count`.
 
-Use `.one` and `.other` for quantities, for example `t("time.days", count: days, new { amount = days })`.
+Use `.one` and `.other` for quantities, for example `t("time.days", count: days)`.
 
-An optional `.none` key describes an empty state. Callers must explicitly select it when appropriate: `amount == 0 ? t("items.none") : t("items", count: amount, new { amount })`. Localization never selects `.none` automatically; a count of zero selects `.other`.
+An optional `.none` key describes an empty state. Callers must explicitly select it when appropriate: `amount == 0 ? t("items.none") : t("items", count: amount)`. Localization never selects `.none` automatically; a count of zero selects `.other`.
 
 `tFormat(text, new { name = "Alex" })` formats an already translated string.
 

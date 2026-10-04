@@ -178,15 +178,15 @@ ko:
     players_online:
       none: "모두 오프라인이네요..."
       one: "1 명의 친구가 온라인입니다"
-      other: "%{amount} 명의 친구가 온라인입니다"
+      other: "%{count} 명의 친구가 온라인입니다"
     rooms_online:
       none: "활동 중인 방이 없습니다"
       one: "1 개의 방이 활동 중입니다"
-      other: "%{amount} 개의 방이 활동 중입니다"
+      other: "%{count} 개의 방이 활동 중입니다"
     friends_online:
       none: "모두 오프라인이네요..."
       one: "1 명의 친구가 온라인입니다"
-      other: "%{amount} 명의 친구가 온라인입니다"
+      other: "%{count} 명의 친구가 온라인입니다"
     rooms_page_disclaimer: |-
       주의) 해당 페이지에선 방에 직접 합류하는 기능은 없습니다.
       특정 방에 들어가려면, 친구를 통해 들어가거나 온라인 서버에 가입하여 들어가야 합니다.
@@ -208,16 +208,16 @@ ko:
   time:
     days:
       one: "1일"
-      other: "%{amount}일"
+      other: "%{count}일"
     hours:
       one: "1시간"
-      other: "%{amount}시간"
+      other: "%{count}시간"
     minutes:
       one: "1분"
-      other: "%{amount}분"
+      other: "%{count}분"
     seconds:
       one: "1초"
-      other: "%{amount}초"
+      other: "%{count}초"
   progress:
     estimated_time_remaining: "추정된 남은 시간:"
     downloading_mb: "%{megabytes} MB 다운로드 중"

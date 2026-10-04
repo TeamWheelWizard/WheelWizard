@@ -15,7 +15,7 @@ public static class TranslationFunctions
     public static string t(string key, decimal count, object? args = null)
     {
         var prefixed = TrySplitLanguageKey(key, out var language, out var translationKey);
-        return Format(LocalizationProvider.Current.TranslatePlural(translationKey, count, prefixed ? language : null), args);
+        return Format(LocalizationProvider.Current.TranslatePlural(translationKey, count, prefixed ? language : null), args, count);
     }
 
 #pragma warning disable IDE1006 // Naming Styles
@@ -32,11 +32,11 @@ public static class TranslationFunctions
         {
             var days = timeSpan.Days;
             var hours = timeSpan.Hours;
-            var dayText = t("time.days", count: days, new { amount = days });
+            var dayText = t("time.days", count: days);
             if (hours == 0)
                 return dayText;
 
-            var hourText = t("time.hours", count: hours, new { amount = hours });
+            var hourText = t("time.hours", count: hours);
             return $"{dayText} {hourText}";
         }
 
@@ -44,11 +44,11 @@ public static class TranslationFunctions
         {
             var hours = timeSpan.Hours;
             var minutes = timeSpan.Minutes;
-            var hourText = t("time.hours", count: hours, new { amount = hours });
+            var hourText = t("time.hours", count: hours);
             if (minutes == 0)
                 return hourText;
 
-            var minuteText = t("time.minutes", count: minutes, new { amount = minutes });
+            var minuteText = t("time.minutes", count: minutes);
             return $"{hourText} {minuteText}";
         }
 
@@ -56,15 +56,15 @@ public static class TranslationFunctions
         {
             var minutes = timeSpan.Minutes;
             var seconds = timeSpan.Seconds;
-            var minuteText = t("time.minutes", count: minutes, new { amount = minutes });
+            var minuteText = t("time.minutes", count: minutes);
             if (seconds == 0)
                 return minuteText;
 
-            var secondText = t("time.seconds", count: seconds, new { amount = seconds });
+            var secondText = t("time.seconds", count: seconds);
             return $"{minuteText} {secondText}";
         }
 
-        return t("time.seconds", count: timeSpan.Seconds, new { amount = timeSpan.Seconds });
+        return t("time.seconds", count: timeSpan.Seconds);
     }
 
     private static bool TrySplitLanguageKey(string key, out string languageCode, out string translationKey)
@@ -85,15 +85,19 @@ public static class TranslationFunctions
         return true;
     }
 
-    private static string Format(string value, object? args)
+    private static string Format(string value, object? args, decimal? count = null)
     {
-        if (args == null)
+        if (args == null && count == null)
             return value;
 
-        var replacements = args.GetType()
-            .GetProperties()
-            .Where(property => property.CanRead && property.GetIndexParameters().Length == 0)
-            .ToDictionary(property => property.Name, property => property.GetValue(args)?.ToString() ?? string.Empty);
+        var replacements =
+            args?.GetType()
+                .GetProperties()
+                .Where(property => property.CanRead && property.GetIndexParameters().Length == 0)
+                .ToDictionary(property => property.Name, property => property.GetValue(args)?.ToString() ?? string.Empty)
+            ?? new Dictionary<string, string>();
+        if (count.HasValue)
+            replacements["count"] = count.Value.ToString();
 
         // Replace once so placeholder-like text inside an argument remains literal.
         return System.Text.RegularExpressions.Regex.Replace(

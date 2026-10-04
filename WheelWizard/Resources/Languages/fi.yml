@@ -200,15 +200,15 @@ fi:
     players_online:
       none: "Ei pelaajia paikalla"
       one: "1 pelaaja on paikalla"
-      other: "%{amount} pelaajaa on paikalla"
+      other: "%{count} pelaajaa on paikalla"
     rooms_online:
       none: "Ei aktiivisia huoneita"
       one: "1 aktiivinen huone"
-      other: "%{amount} aktiivista huonetta"
+      other: "%{count} aktiivista huonetta"
     friends_online:
       none: "Ei kavereita paikalla"
       one: "1 kaveri on paikalla"
-      other: "%{amount} kaveria on paikalla"
+      other: "%{count} kaveria on paikalla"
     rooms_page_disclaimer: |-
       Huomioi, että tältä sivulta ei voi liittyä huoneeseen suoraan.
       Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
@@ -233,16 +233,16 @@ fi:
   time:
     days:
       one: "1 pv"
-      other: "%{amount} pv"
+      other: "%{count} pv"
     hours:
       one: "1 t"
-      other: "%{amount} t"
+      other: "%{count} t"
     minutes:
       one: "1 min"
-      other: "%{amount} min"
+      other: "%{count} min"
     seconds:
       one: "1 s"
-      other: "%{amount} s"
+      other: "%{count} s"
     last_24_hours: "Viimeiset 24 tuntia"
     last_7_days: "Viimeiset 7 päivää"
     last_30_days: "Viimeiset 30 päivää"

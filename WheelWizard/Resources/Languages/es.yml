@@ -196,15 +196,15 @@ es:
     players_online:
       none: "No hay jugadores en línea"
       one: "Hay 1 jugador en línea"
-      other: "Hay %{amount} jugadores en línea"
+      other: "Hay %{count} jugadores en línea"
     rooms_online:
       none: "No hay salas activas"
       one: "Hay una sala activa"
-      other: "Hay %{amount} salas activas"
+      other: "Hay %{count} salas activas"
     friends_online:
       none: "No hay amigos en línea"
       one: "Hay 1 amigo en línea"
-      other: "Hay %{amount} amigos en línea"
+      other: "Hay %{count} amigos en línea"
     rooms_page_disclaimer: |-
       Atención. Esta página no tiene la funcionalidad de unirte a una sala directamente.
       Para unirte a una sala en específico, necesitarás unirte mediante un amigo, o con suerte, encontrando la sala en VS Mundial.
@@ -229,16 +229,16 @@ es:
   time:
     days:
       one: "1 día"
-      other: "%{amount} días"
+      other: "%{count} días"
     hours:
       one: "1 hora"
-      other: "%{amount} horas"
+      other: "%{count} horas"
     minutes:
       one: "1 minuto"
-      other: "%{amount} minutos"
+      other: "%{count} minutos"
     seconds:
       one: "1 segundo"
-      other: "%{amount} segundos"
+      other: "%{count} segundos"
     last_24_hours: "Últimas 24 horas"
     last_7_days: "Últimos 7 días"
     last_30_days: "Últimos 30 días"

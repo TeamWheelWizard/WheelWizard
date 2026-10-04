@@ -178,15 +178,15 @@ cs:
     players_online:
       none: "Právě nejsou žádní hráči online"
       one: "Právě je 1 hráč online"
-      other: "Právě jsou %{amount} hráči online"
+      other: "Právě jsou %{count} hráči online"
     rooms_online:
       none: "Momentálně nejsou žádné aktivní místnosti"
       one: "Momentálně je aktivní 1 místnost"
-      other: "Momentálně jsou aktivní %{amount} místnosti"
+      other: "Momentálně jsou aktivní %{count} místnosti"
     friends_online:
       none: "Právě nejsou žádní kamarádi online"
       one: "Právě je 1 kamarád online"
-      other: "Právě jsou %{amount} kamarádi online"
+      other: "Právě jsou %{count} kamarádi online"
     rooms_page_disclaimer: |-
       Upozorňujeme, že tato stránka nenabízí žádnou funkci pro přímé připojení k místnosti.
       Chceš-li se připojit ke konkrétní místnosti, budeš se muset buď připojit prostřednictvím kamaráda, nebo doufat, že se k ní připojíš připojením k online serverům.
@@ -208,16 +208,16 @@ cs:
   time:
     days:
       one: "1 den"
-      other: "%{amount} dny"
+      other: "%{count} dny"
     hours:
       one: "1 hodina"
-      other: "%{amount} hodiny"
+      other: "%{count} hodiny"
     minutes:
       one: "1 minuta"
-      other: "%{amount} minuty"
+      other: "%{count} minuty"
     seconds:
       one: "1 sekunda"
-      other: "%{amount} sekundy"
+      other: "%{count} sekundy"
   progress:
     estimated_time_remaining: "Předpokládaný zbývající čas:"
     downloading_mb: "Stahování %{megabytes} MB"

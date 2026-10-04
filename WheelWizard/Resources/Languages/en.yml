@@ -211,15 +211,15 @@ en:
     players_online:
       none: "There are currently no players online"
       one: "There is currently 1 player online"
-      other: "There are currently %{amount} players online"
+      other: "There are currently %{count} players online"
     rooms_online:
       none: "There are currently no active rooms"
       one: "There is currently 1 room active"
-      other: "There are currently %{amount} rooms active"
+      other: "There are currently %{count} rooms active"
     friends_online:
       none: "There are currently no friends online"
       one: "There is currently 1 friend online"
-      other: "There are currently %{amount} friends online"
+      other: "There are currently %{count} friends online"
     rooms_page_disclaimer: |-
       Please note that this page does not offer any functionality to join a room directly.
       To join a specific room, you'll need to either join through a friend, or hope to join it by joining the online servers.
@@ -247,16 +247,16 @@ en:
   time:
     days:
       one: "1 day"
-      other: "%{amount} days"
+      other: "%{count} days"
     hours:
       one: "1 hour"
-      other: "%{amount}  hours"
+      other: "%{count}  hours"
     minutes:
       one: "1 minute"
-      other: "%{amount} minutes"
+      other: "%{count} minutes"
     seconds:
       one: "1 second"
-      other: "%{amount} seconds"
+      other: "%{count} seconds"
     last_24_hours: "Last 24 hours"
     last_7_days: "Last 7 days"
     last_30_days: "Last 30 days"

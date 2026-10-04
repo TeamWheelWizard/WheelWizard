@@ -350,7 +350,7 @@ public class SettingsLocalizationServiceTests
             localizationService.SetLanguage("en");
 
             Assert.Equal("1 day", TranslationFunctions.t("time.days", 1));
-            Assert.Equal("2 days", TranslationFunctions.t("time.days", count: 2, new { amount = 2 }));
+            Assert.Equal("2 days", TranslationFunctions.t("time.days", count: 2));
         }
         finally
         {

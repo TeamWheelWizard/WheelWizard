@@ -26,7 +26,9 @@ public class PluralRulesTests
         try
         {
             Assert.Equal("One item for Alex", TranslationFunctions.t("items", count: 1, new { name = "Alex" }));
-            Assert.Equal("2 items for Alex", TranslationFunctions.t("items", count: 2, new { amount = 2, name = "Alex" }));
+            Assert.Equal("2 items for Alex", TranslationFunctions.t("items", count: 2, new { name = "Alex" }));
+            Assert.Equal("2 items for Alex", TranslationFunctions.t("items", count: 2, new { name = "Alex", count = 99 }));
+            Assert.Equal("2 items for %{count}", TranslationFunctions.t("items", count: 2, new { name = "%{count}" }));
             Assert.Equal("Value 3", TranslationFunctions.t("plain", new { amount = 3 }));
             service.SetLanguage("ru");
             Assert.Equal("ru other", TranslationFunctions.t("items", count: 22));
@@ -71,7 +73,7 @@ public class PluralRulesTests
         try
         {
             Assert.Equal("1 day", TranslationFunctions.t("en.time.days", 1));
-            Assert.Equal("2 days", TranslationFunctions.t("en.time.days", count: 2, new { amount = 2 }));
+            Assert.Equal("2 days", TranslationFunctions.t("en.time.days", count: 2));
             Assert.Equal("0 seconds", TranslationFunctions.tTime(0));
             Assert.Equal("1 minute", TranslationFunctions.tTime(60));
             Assert.Equal("1 minute 2 seconds", TranslationFunctions.tTime(62));
@@ -79,7 +81,7 @@ public class PluralRulesTests
             {
                 var translationKey = $"en.hover.{key}";
                 var emptyText = TranslationFunctions.t($"{translationKey}.none");
-                var zeroCountText = TranslationFunctions.t(translationKey, count: 0, new { amount = 0 });
+                var zeroCountText = TranslationFunctions.t(translationKey, count: 0);
                 Assert.DoesNotContain(".none", emptyText);
                 Assert.NotEqual(emptyText, zeroCountText);
                 Assert.Contains("0", zeroCountText);

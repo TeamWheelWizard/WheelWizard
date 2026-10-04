@@ -178,15 +178,15 @@ nl:
     players_online:
       none: "Er zijn momenteel geen spelers online."
       one: "Er is momenteel 1 speler online."
-      other: "Er zijn momenteel %{amount} spelers online."
+      other: "Er zijn momenteel %{count} spelers online."
     rooms_online:
       none: "Er zijn momenteel geen kamers actief."
       one: "Er is momenteel 1 kamer actief."
-      other: "Er zijn momenteel %{amount} kamers actief."
+      other: "Er zijn momenteel %{count} kamers actief."
     friends_online:
       none: "Er zijn momenteel geen vrienden online."
       one: "Er is momenteel 1 vriend online."
-      other: "Er zijn momenteel %{amount} vrienden online."
+      other: "Er zijn momenteel %{count} vrienden online."
     rooms_page_disclaimer: |-
       Let op dat deze pagina er niet voor kan zorgen om direct deel te nemen aan een kamer.
       Om aan een specifieke kamer deel te nemen, moet je dit óf via een vriend óf via de online servers doen.
@@ -208,16 +208,16 @@ nl:
   time:
     days:
       one: "1 dag"
-      other: "%{amount} dagen"
+      other: "%{count} dagen"
     hours:
       one: "1 uur"
-      other: "%{amount} uren"
+      other: "%{count} uren"
     minutes:
       one: "1 minuut"
-      other: "%{amount} minuten"
+      other: "%{count} minuten"
     seconds:
       one: "1 seconde"
-      other: "%{amount} secondes"
+      other: "%{count} secondes"
   progress:
     estimated_time_remaining: "Geschatte resterende tijd:"
     downloading_mb: "Downloaden van %{megabytes} MB."

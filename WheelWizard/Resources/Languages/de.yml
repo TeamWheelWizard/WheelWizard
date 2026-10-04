@@ -209,15 +209,15 @@ de:
     players_online:
       none: "Zurzeit sind keine Spieler online"
       one: "Zurzeit ist nur 1 Spieler online"
-      other: "Zurzeit sind %{amount} Spieler online"
+      other: "Zurzeit sind %{count} Spieler online"
     rooms_online:
       none: "Zurzeit gibt es keine aktiven Räume"
       one: "Zurzeit ist nur 1 Raum aktiv"
-      other: "Zurzeit gibt es %{amount} aktive Räume"
+      other: "Zurzeit gibt es %{count} aktive Räume"
     friends_online:
       none: "Zurzeit sind keine Freunde online"
       one: "Zurzeit ist nur 1 Freund online"
-      other: "Zurzeit sind %{amount} Freunde online"
+      other: "Zurzeit sind %{count} Freunde online"
     rooms_page_disclaimer: |-
       Bitte beachte, dass diese Seite keine Funktion bietet, um dich direkt mit einem Raum zu verbinden.
       Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund beitreten oder hoffen, dass du ihm über das normale Beitreten zum Server beitreten kannst.
@@ -245,16 +245,16 @@ de:
   time:
     days:
       one: "1 Tag"
-      other: "%{amount} Tage"
+      other: "%{count} Tage"
     hours:
       one: "1 Stunde"
-      other: "%{amount} Stunden"
+      other: "%{count} Stunden"
     minutes:
       one: "1 Minute"
-      other: "%{amount} Minuten"
+      other: "%{count} Minuten"
     seconds:
       one: "1 Sekunde"
-      other: "%{amount} Sekunden"
+      other: "%{count} Sekunden"
     last_24_hours: "Letzte 24 Stunden"
     last_7_days: "Letzte 7 Tage"
     last_30_days: "Letzte 30 Tage"

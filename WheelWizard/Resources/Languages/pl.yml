@@ -180,15 +180,15 @@ pl:
     players_online:
       none: "Nie ma żadnych graczy online"
       one: "Jest 1 gracz online"
-      other: "jest teraz %{amount} graczy online"
+      other: "jest teraz %{count} graczy online"
     rooms_online:
       none: "Nie ma żadnych aktywnych pokoi"
       one: "Jest 1 aktywny pokój"
-      other: "jest teraz %{amount} aktywnych pokoi"
+      other: "jest teraz %{count} aktywnych pokoi"
     friends_online:
       none: "żaden z twoich przyjaciół nie jest onllne"
       one: "Jest teraz 1 przyjaciel online"
-      other: "Jest teraz %{amount} przyjaciół online"
+      other: "Jest teraz %{count} przyjaciół online"
     rooms_page_disclaimer: "Prosze pamiętaj, że ta strona nie daje możliwości dołączenia prosto do pokoju. By dołączyć do specyficznego pokoju musisz dołączyć poprzez przyjaciela lub mieć nadzieje, że uda ci się połączyć poprzez losowy serwer."
     friends_page_disclaimer: "By dodać przyjaciół musisz ich dodać w grze"
     region_user_selection: "To tylko pokazuje regiony, w których TY grałeś."
@@ -207,16 +207,16 @@ pl:
   time:
     days:
       one: "1 dzień"
-      other: "%{amount} dni"
+      other: "%{count} dni"
     hours:
       one: "1 godz"
-      other: "%{amount} godz"
+      other: "%{count} godz"
     minutes:
       one: "1 min"
-      other: "%{amount} min"
+      other: "%{count} min"
     seconds:
       one: "1 sek"
-      other: "%{amount} sek"
+      other: "%{count} sek"
   progress:
     estimated_time_remaining: "Oszacowany pozostały czas."
     downloading_mb: "Pobieranie %{megabytes} MB"
