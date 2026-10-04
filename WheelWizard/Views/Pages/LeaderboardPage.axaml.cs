@@ -2,18 +2,18 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using WheelWizard.Localization;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
-using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Utilities.Generators;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
+using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -28,6 +28,7 @@ public sealed record LeaderboardPlayerItem
     public required string FriendCode { get; init; }
     public required string VrText { get; init; }
     public Mii? Mii { get; init; }
+    public BadgeVariant[] BadgeVariants { get; init; } = [];
     public BadgeVariant PrimaryBadge { get; init; }
     public bool HasBadge { get; init; }
     public bool IsSuspicious { get; init; }
@@ -44,8 +45,12 @@ public sealed record LeaderboardPlayerItem
     public bool IsOpenHost => false;
 }
 
-public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
+public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 {
+    private IPopupFactory Popups { get; }
+
+    private INavigationService Navigation { get; }
+
     private static readonly LeaderboardPlayerItem EmptyPodiumPlayer = new()
     {
         Rank = 0,
@@ -61,17 +66,15 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
     private CancellationTokenSource? _loadCts;
 
-    [Inject]
-    private IRrLeaderboardSingletonService LeaderboardService { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private IWhWzDataSingletonService BadgeService { get; set; } = null!;
+    private IRrLeaderboardSingletonService LeaderboardService { get; }
 
-    [Inject]
-    private IGameLicenseSingletonService GameDataService { get; set; } = null!;
+    private IWhWzDataSingletonService BadgeService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsManager { get; set; } = null!;
+    private IGameLicenseSingletonService GameDataService { get; }
+
+    private ISettingsManager SettingsManager { get; }
 
     private bool _hasLoadedOnce;
     private bool _isLoading;
@@ -169,8 +172,23 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     public bool HasPodiumSecond => _podiumSecond != null;
     public bool HasPodiumThird => _podiumThird != null;
 
-    public LeaderboardPage()
+    public LeaderboardPage(
+        IPopupFactory popups,
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        IRrLeaderboardSingletonService leaderboardService,
+        IWhWzDataSingletonService badgeService,
+        IGameLicenseSingletonService gameDataService,
+        ISettingsManager settingsManager
+    )
     {
+        Popups = popups;
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        LeaderboardService = leaderboardService;
+        BadgeService = badgeService;
+        GameDataService = gameDataService;
+        SettingsManager = settingsManager;
         InitializeComponent();
         DataContext = this;
         RemainingPlayers.CollectionChanged += RemainingPlayers_OnCollectionChanged;
@@ -230,12 +248,12 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             .ToList();
 
         var friendProfileIds = GameDataService
-            .ActiveCurrentFriends.Select(friend => FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode))
+            .ActiveCurrentFriends.Select(friend => FriendCode.FriendCodeToProfileId(friend.FriendCode))
             .Where(profileId => profileId != 0)
             .ToHashSet();
-        var onlineProfileIds = RRLiveRooms
-            .Instance.CurrentRooms.SelectMany(room => room.Players)
-            .Select(player => FriendCodeGenerator.FriendCodeToProfileId(player.FriendCode))
+        var onlineProfileIds = LiveRooms
+            .CurrentRooms.SelectMany(room => room.Players)
+            .Select(player => FriendCode.FriendCodeToProfileId(player.FriendCode))
             .Where(profileId => profileId != 0)
             .ToHashSet();
 
@@ -290,7 +308,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
     )
     {
         var friendCode = entry.FriendCode ?? string.Empty;
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(friendCode);
+        var profileId = FriendCode.FriendCodeToProfileId(friendCode);
         var badges = string.IsNullOrWhiteSpace(friendCode) ? [] : BadgeService.GetBadges(friendCode);
         var primaryBadge = badges.FirstOrDefault(BadgeVariant.None);
 
@@ -303,6 +321,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             VrText = entry.Vr?.ToString("N0") ?? "--",
             Mii = DeserializeMii(entry.MiiData),
             PrimaryBadge = primaryBadge,
+            BadgeVariants = badges,
             HasBadge = primaryBadge != BadgeVariant.None,
             IsSuspicious = entry.IsSuspicious,
             IsEvenRow = index % 2 == 0,
@@ -442,7 +461,13 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         if (player == null || string.IsNullOrWhiteSpace(player.FriendCode))
             return;
 
-        new PlayerProfileWindow(player.FriendCode).Show();
+        Popups.Create<PlayerProfileWindow>(player.FriendCode).Show();
+    }
+
+    private void ViewOnRwfc_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (GetContextPlayer(sender) is { } player)
+            ViewUtils.OpenRwfcPlayer(player.FriendCode);
     }
 
     private async void AddFriend_OnClick(object sender, RoutedEventArgs e)
@@ -464,7 +489,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        var activeUserPid = FriendCodeGenerator.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
+        var activeUserPid = FriendCode.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
         if (activeUserPid == 0)
         {
             ViewUtils.ShowSnackbar(t("snackbar_warning.license_invalid_self"), ViewUtils.SnackbarType.Warning);
@@ -485,7 +510,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         }
 
         var normalizedFriendCode = normalizedFriendCodeResult.Value;
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode);
         if (activeUserPid == friendProfileId)
         {
             ViewUtils.ShowSnackbar(t("snackbar_warning.add_own_fc"), ViewUtils.SnackbarType.Warning);
@@ -494,7 +519,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
 
         var duplicateFriend = GameDataService.ActiveCurrentFriends.Any(friend =>
         {
-            var existingPid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
             return existingPid != 0 && existingPid == friendProfileId;
         });
 
@@ -532,12 +557,12 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(friendCode))
             return;
 
-        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        foreach (var room in LiveRooms.CurrentRooms)
         {
             if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;
 
-            NavigationManager.NavigateTo<RoomDetailsPage>(room);
+            Navigation.NavigateTo<RoomDetailsPage>(room);
             return;
         }
 
@@ -561,7 +586,7 @@ public partial class LeaderboardPage : UserControlBase, INotifyPropertyChanged
             return Fail(t("snackbar_warning.invalid_fc"));
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
             return Fail(t("snackbar_warning.nonexisting_fc"));
 

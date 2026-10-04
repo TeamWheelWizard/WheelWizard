@@ -144,7 +144,10 @@ public sealed class RecompSetupHostAcquirer(
         try
         {
             var mode = fileSystem.File.GetUnixFileMode(filePath);
-            fileSystem.File.SetUnixFileMode(filePath, mode | UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
+            fileSystem.File.SetUnixFileMode(
+                filePath,
+                mode | UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute
+            );
         }
         catch (Exception exception)
         {

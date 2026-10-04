@@ -1,15 +1,21 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
-using WheelWizard.Services.LiveData;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.RrRooms;
+using WheelWizard.Shared.Polling;
+using WheelWizard.Views.Navigation;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
+public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
+    private INavigationService Navigation { get; }
+
+    private LiveRoomsService LiveRooms { get; }
+
     private string? _searchQuery;
 
     private readonly ObservableCollection<RrRoom> _rooms = [];
@@ -36,19 +42,21 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
         }
     }
 
-    public RoomsPage()
+    public RoomsPage(INavigationService navigation, LiveRoomsService liveRooms)
     {
+        Navigation = navigation;
+        LiveRooms = liveRooms;
         InitializeComponent();
         DataContext = this;
-        RRLiveRooms.Instance.Subscribe(this);
+        LiveRooms.Subscribe(this);
 
-        OnUpdate(RRLiveRooms.Instance);
+        OnUpdate(LiveRooms);
         Unloaded += RoomsPage_Unloaded;
     }
 
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
-        if (sender is not RRLiveRooms liveRooms)
+        if (sender is not LiveRoomsService liveRooms)
             return;
 
         Rooms.Clear();
@@ -93,7 +101,7 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
 
     private void RoomsPage_Unloaded(object? sender, RoutedEventArgs e)
     {
-        RRLiveRooms.Instance.Unsubscribe(this);
+        LiveRooms.Unsubscribe(this);
     }
 
     private void PlayerSearchField_OnTextChanged(object? sender, TextChangedEventArgs e)
@@ -111,7 +119,7 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
         if (listBox.SelectedItem is not RrRoom selectedRoom)
             return;
 
-        NavigationManager.NavigateTo<RoomDetailsPage>(selectedRoom);
+        Navigation.NavigateTo<RoomDetailsPage>(selectedRoom);
         listBox.SelectedItem = null;
         // Deselect the item immediately after navigating. This is important
         // for a good user experience. Otherwise, the item stays selected,
@@ -127,7 +135,8 @@ public partial class RoomsPage : UserControlBase, INotifyPropertyChanged, IRepea
 
         var room = Rooms.FirstOrDefault(r => r.Players.Any(p => p.Equals(selectedRoom)));
 
-        NavigationManager.NavigateTo<RoomDetailsPage>(room);
+        if (room is not null)
+            Navigation.NavigateTo<RoomDetailsPage>(room);
         listBox.SelectedItem = null;
         // Deselect the item immediately after navigating. This is important
         // for a good user experience. Otherwise, the item stays selected,

@@ -1,10 +1,8 @@
 using System.Collections.ObjectModel;
-using Avalonia.Threading;
+using System.IO.Abstractions;
 using SharpCompress.Archives;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
-using WheelWizard.Services;
-using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Shared.IO;
 
 namespace WheelWizard.Mods;
 
@@ -21,21 +19,22 @@ public interface IModInstallationService
         string givenModName,
         int priority,
         string author = "-1",
-        int modID = -1
+        int modID = -1,
+        IProgress<ModOperationProgress>? progress = null
     );
 }
 
-public sealed class ModInstallationService : IModInstallationService
+public sealed class ModInstallationService(IFileSystem fileSystem, IModPaths paths) : IModInstallationService
 {
-    private readonly string _modsFolderPath = PathManager.ModsFolderPath;
+    private string ModsFolderPath => paths.RootFolderPath;
 
     public async Task<OperationResult<ObservableCollection<Mod>>> LoadModsAsync()
     {
-        var modsFolderResult = FileHelper.EnsureDirectory(_modsFolderPath);
+        var modsFolderResult = fileSystem.EnsureDirectory(ModsFolderPath);
         if (modsFolderResult.IsFailure)
             return modsFolderResult.Error;
 
-        var iniFilesResult = FileHelper.FindFilesByExtension(_modsFolderPath, "*.ini");
+        var iniFilesResult = fileSystem.FindFilesByExtension(ModsFolderPath, "*.ini");
         if (iniFilesResult.IsFailure)
             return iniFilesResult.Error;
 
@@ -57,12 +56,12 @@ public sealed class ModInstallationService : IModInstallationService
     {
         foreach (var mod in mods)
         {
-            var modDirectory = PathManager.GetModDirectoryPath(mod.Title);
-            var directoryResult = FileHelper.EnsureDirectory(modDirectory);
+            var modDirectory = paths.GetModDirectoryPath(mod.Title);
+            var directoryResult = fileSystem.EnsureDirectory(modDirectory);
             if (directoryResult.IsFailure)
                 return directoryResult.Error;
 
-            var iniFilePath = Path.Combine(modDirectory, $"{mod.Title}.ini");
+            var iniFilePath = fileSystem.Path.Combine(modDirectory, $"{mod.Title}.ini");
             var saveResult = await SaveModToIniAsync(mod, iniFilePath);
             if (saveResult.IsFailure)
                 return saveResult.Error;
@@ -74,11 +73,11 @@ public sealed class ModInstallationService : IModInstallationService
     public bool ContainsModByTitle(IEnumerable<Mod> mods, string modName) =>
         mods.Any(mod => mod.Title.Equals(modName, StringComparison.OrdinalIgnoreCase));
 
-    private static async Task<OperationResult<Mod>> LoadModFromIniAsync(string iniFile)
+    private async Task<OperationResult<Mod>> LoadModFromIniAsync(string iniFile)
     {
         try
         {
-            return await Mod.LoadFromIniAsync(iniFile);
+            return ModMetadata.Parse(await fileSystem.File.ReadAllTextAsync(iniFile));
         }
         catch (Exception ex)
         {
@@ -86,11 +85,11 @@ public sealed class ModInstallationService : IModInstallationService
         }
     }
 
-    private static async Task<OperationResult> SaveModToIniAsync(Mod mod, string iniFilePath)
+    private async Task<OperationResult> SaveModToIniAsync(Mod mod, string iniFilePath)
     {
         try
         {
-            await mod.SaveToIniAsync(iniFilePath);
+            await fileSystem.File.WriteAllTextAsync(iniFilePath, ModMetadata.Serialize(mod));
             return Ok();
         }
         catch (Exception ex)
@@ -99,14 +98,15 @@ public sealed class ModInstallationService : IModInstallationService
         }
     }
 
-    private static OperationResult ExtractModArchive(string file, string destinationDirectory, ProgressWindow progressWindow)
+    private OperationResult ExtractModArchive(string file, string destinationDirectory, IProgress<ModOperationProgress>? progress)
     {
-        var extension = Path.GetExtension(file).ToLowerInvariant();
+        var extension = fileSystem.Path.GetExtension(file).ToLowerInvariant();
 
-        if (!Directory.Exists(destinationDirectory))
-            Directory.CreateDirectory(destinationDirectory);
+        if (!fileSystem.Directory.Exists(destinationDirectory))
+            fileSystem.Directory.CreateDirectory(destinationDirectory);
 
-        var archiveResult = OpenArchive(file, extension);
+        using var archiveStream = fileSystem.File.OpenRead(file);
+        var archiveResult = OpenArchive(archiveStream, extension);
         if (archiveResult.IsFailure)
             return archiveResult.Error;
 
@@ -120,22 +120,20 @@ public sealed class ModInstallationService : IModInstallationService
             {
                 processedEntries++;
 
-                var progress = (int)(processedEntries / (double)totalEntries * 100);
-                Dispatcher.UIThread.Post(() =>
-                {
-                    progressWindow.UpdateProgress(progress);
-                });
+                progress?.Report(
+                    new(ModOperationStage.Extracting, (int)(processedEntries / (double)totalEntries * 100), entry.Key, totalEntries)
+                );
 
                 var entryKey = entry.Key ?? string.Empty;
-                if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, entryKey, out var fullEntry))
+                if (!PathSafety.TryGetPathWithinDirectory(destinationDirectory, entryKey, out var fullEntry))
                     return Fail("Archive entry is outside of the destination directory.");
 
-                var directoryPath = Path.GetDirectoryName(fullEntry);
-                if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
-                    Directory.CreateDirectory(directoryPath);
+                var directoryPath = fileSystem.Path.GetDirectoryName(fullEntry);
+                if (!string.IsNullOrEmpty(directoryPath) && !fileSystem.Directory.Exists(directoryPath))
+                    fileSystem.Directory.CreateDirectory(directoryPath);
 
                 using var stream = entry.OpenEntryStream();
-                using var fileStream = File.Create(fullEntry);
+                using var fileStream = fileSystem.File.Create(fullEntry);
                 stream.CopyTo(fileStream);
             }
 
@@ -151,14 +149,14 @@ public sealed class ModInstallationService : IModInstallationService
         }
     }
 
-    private static OperationResult<IArchive> OpenArchive(string filePath, string extension)
+    private OperationResult<IArchive> OpenArchive(Stream stream, string extension)
     {
         if (extension is not (".zip" or ".7z" or ".rar"))
             return Fail($"Unsupported archive format: {extension}");
 
         try
         {
-            return Ok(ArchiveFactory.OpenArchive(filePath));
+            return Ok(ArchiveFactory.OpenArchive(stream));
         }
         catch (Exception ex)
         {
@@ -171,31 +169,29 @@ public sealed class ModInstallationService : IModInstallationService
         string givenModName,
         int priority,
         string author = "-1",
-        int modID = -1
+        int modID = -1,
+        IProgress<ModOperationProgress>? progress = null
     )
     {
-        if (!File.Exists(filePath))
+        if (!fileSystem.File.Exists(filePath))
             return new FileNotFoundException("File not found.", filePath);
 
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        var extension = fileSystem.Path.GetExtension(filePath).ToLowerInvariant();
         if (extension is not (".zip" or ".7z" or ".rar"))
             return Fail($"Unsupported file type: {extension}. Only .zip, .7z, and .rar files are supported.");
 
         if (string.IsNullOrWhiteSpace(givenModName))
             return Fail("Mod name cannot be empty.");
 
-        ProgressWindow? progressWindow = null;
         try
         {
-            progressWindow = new(t("progress.installing_mod"));
-            progressWindow.SetGoal(t("state.extracting"));
-            progressWindow.Show();
+            progress?.Report(new(ModOperationStage.Extracting, 0));
 
-            var modDirectory = PathManager.GetModDirectoryPath(givenModName);
-            if (!Directory.Exists(modDirectory))
-                Directory.CreateDirectory(modDirectory);
+            var modDirectory = paths.GetModDirectoryPath(givenModName);
+            if (!fileSystem.Directory.Exists(modDirectory))
+                fileSystem.Directory.CreateDirectory(modDirectory);
 
-            var extractResult = await Task.Run(() => ExtractModArchive(filePath, modDirectory, progressWindow));
+            var extractResult = await Task.Run(() => ExtractModArchive(filePath, modDirectory, progress));
             if (extractResult.IsFailure)
                 return extractResult.Error;
 
@@ -208,16 +204,16 @@ public sealed class ModInstallationService : IModInstallationService
                 Priority = priority,
             };
 
-            var iniFilePath = Path.Combine(modDirectory, $"{givenModName}.ini");
+            var iniFilePath = fileSystem.Path.Combine(modDirectory, $"{givenModName}.ini");
             var saveResult = await SaveModToIniAsync(newMod, iniFilePath);
             if (saveResult.IsFailure)
                 return saveResult.Error;
 
             return newMod;
         }
-        finally
+        catch (Exception ex)
         {
-            progressWindow?.Close();
+            return new OperationError { Message = $"Failed to install mod: {ex.Message}", Exception = ex };
         }
     }
 }

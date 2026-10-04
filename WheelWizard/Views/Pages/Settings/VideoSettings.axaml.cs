@@ -2,12 +2,11 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class VideoSettings : UserControlBase
+public partial class VideoSettings : UserControl
 {
     private static readonly string[] ResolutionOptions =
     [
@@ -23,11 +22,11 @@ public partial class VideoSettings : UserControlBase
 
     private readonly bool _settingsAreDisabled;
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    public VideoSettings()
+    public VideoSettings(ISettingsManager settingsService)
     {
+        SettingsService = settingsService;
         InitializeComponent();
         _settingsAreDisabled = !SettingsService.DolphinPathsSetupCorrectly();
         DisabledWarningText.IsVisible = _settingsAreDisabled;

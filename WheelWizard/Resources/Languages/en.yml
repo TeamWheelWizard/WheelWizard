@@ -102,6 +102,8 @@ en:
     updating: "Updating..."
     config_not_finished: "Config Not Finished"
     no_server: "No Server"
+    no_dolphin_extension: "No Dolphin Extension"
+    no_recomp_extension: "No Wiicompiled Extension"
     unknown: "Unknown"
     error: "Error"
     warning: "Warning"

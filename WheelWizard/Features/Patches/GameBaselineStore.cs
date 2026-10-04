@@ -3,13 +3,16 @@ using System.Text.Json;
 
 namespace WheelWizard.Features.Patches;
 
-public sealed class GameBaselineStore
+public interface IGameBaselineStore
+{
+    IReadOnlyList<BaselineCandidate> FindCandidates(string fileName, string? kind = null);
+    BaselineEntry? GetEntry(string id);
+}
+
+public sealed class GameBaselineStore : IGameBaselineStore
 {
     private const string ResourcePrefix = "WheelWizard.Features.Patches.Resources.";
-    private static readonly Lazy<GameBaselineStore> s_instance = new(() => new GameBaselineStore());
     private static readonly JsonSerializerOptions s_jsonOptions = new() { PropertyNameCaseInsensitive = true };
-
-    public static GameBaselineStore Instance => s_instance.Value;
 
     private readonly Lazy<GameBaselineIndex> _index = new(() => LoadResource<GameBaselineIndex>("game-baseline-index.json"));
     private readonly Lazy<GameBaselineData> _data = new(() => LoadResource<GameBaselineData>("game-baseline-data.json"));

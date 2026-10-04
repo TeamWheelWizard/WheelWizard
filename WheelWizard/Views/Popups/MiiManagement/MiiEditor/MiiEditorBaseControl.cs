@@ -6,7 +6,7 @@ using WheelWizard.Views.Components;
 
 namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
 
-public class MiiEditorBaseControl : UserControlBase
+public class MiiEditorBaseControl : UserControl
 {
     protected MiiEditorWindow Editor { get; init; }
 

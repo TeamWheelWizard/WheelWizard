@@ -198,6 +198,8 @@
                                             <Separator />
                                             <MenuItem Header="{loc:T action.view_profile}"
                                                       Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="View player on RWFC"
+                                                      Click="ViewOnRwfc_OnClick" />
                                         </ContextMenu>
                                     </patterns:LeaderboardPodiumCard.ContextMenu>
                                 </patterns:LeaderboardPodiumCard>
@@ -227,6 +229,8 @@
                                             <Separator />
                                             <MenuItem Header="{loc:T action.view_profile}"
                                                       Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="View player on RWFC"
+                                                      Click="ViewOnRwfc_OnClick" />
                                         </ContextMenu>
                                     </patterns:LeaderboardPodiumCard.ContextMenu>
                                 </patterns:LeaderboardPodiumCard>
@@ -255,6 +259,8 @@
                                             <Separator />
                                             <MenuItem Header="{loc:T action.view_profile}"
                                                       Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="View player on RWFC"
+                                                      Click="ViewOnRwfc_OnClick" />
                                         </ContextMenu>
                                     </patterns:LeaderboardPodiumCard.ContextMenu>
                                 </patterns:LeaderboardPodiumCard>
@@ -273,7 +279,7 @@
                                                            ShowJoinRoomButton="True"
                                                            JoinRoomAction="JoinRoom_OnClick"
                                                            IsOpenHost="{Binding IsOpenHost}"
-                                                           HasBadges="{Binding HasBadges}"
+                                                           HasBadges="{Binding HasBadges}" BadgeVariants="{Binding BadgeVariants}"
                                                            IsTopPlayer="True"
                                                            TopLabel="{Binding TopLabel}">
                                     <patterns:PlayerListItem.ContextMenu>
@@ -287,6 +293,8 @@
                                             <Separator />
                                             <MenuItem Header="{loc:T action.view_profile}"
                                                       Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="View player on RWFC"
+                                                      Click="ViewOnRwfc_OnClick" />
                                         </ContextMenu>
                                     </patterns:PlayerListItem.ContextMenu>
                                 </patterns:PlayerListItem>

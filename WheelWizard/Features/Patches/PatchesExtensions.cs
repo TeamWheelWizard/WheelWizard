@@ -4,6 +4,7 @@ public static class PatchesExtensions
 {
     public static IServiceCollection AddPatches(this IServiceCollection services)
     {
+        services.AddSingleton<IGameBaselineStore, GameBaselineStore>();
         services.AddSingleton<ISzsPatchConverter, SzsPatchConverter>();
         services.AddSingleton<IModPatchConversionService, ModPatchConversionService>();
         return services;

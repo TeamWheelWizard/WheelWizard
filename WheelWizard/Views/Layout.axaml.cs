@@ -1,42 +1,38 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Platform;
 using WheelWizard.Branding;
-using WheelWizard.Helpers;
 using WheelWizard.Localization;
 using WheelWizard.Mods;
-using WheelWizard.Services;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.Utilities.RepeatedTasks;
-using WheelWizard.Views.Components;
+using WheelWizard.Shared.Polling;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
-using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.Views;
 
-public partial class Layout : BaseWindow, IRepeatedTaskListener
+public partial class Layout : BaseWindow, IPollingListener
 {
+    private INavigationService Navigation { get; }
+
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => CompleteGrid;
 
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
-    public static Layout Instance { get; private set; } = null!;
     private const int TesterClicksRequired = 10;
 
     // so this is not really "Secret" its just ment to hold out people who are not meant to be testers
@@ -50,7 +46,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         PageTransitions =
         [
             new PageSlide { Duration = PageSwapDuration, Orientation = PageSlide.SlideAxis.Horizontal },
-            new CrossFade { Duration = PageSwapDuration },
+            new CrossFade { Duration = PageSwapDuration, FillMode = FillMode.None },
         ],
     };
 
@@ -58,26 +54,45 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     private bool _testerPromptOpen;
     private IDisposable? _settingsSignalSubscription;
 
-    [Inject]
-    private IBrandingSingletonService BrandingService { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
+    private LiveStatusService LiveStatus { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private IBrandingSingletonService BrandingService { get; }
 
-    [Inject]
-    private ISettingsSignalBus SettingsSignalBus { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; }
 
-    [Inject]
-    private IModManager ModManagerService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    public Layout()
+    private ISettingsSignalBus SettingsSignalBus { get; }
+
+    private IModManager ModManagerService { get; }
+
+    public Layout(
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        LiveStatusService liveStatus,
+        IBrandingSingletonService brandingService,
+        IGameLicenseSingletonService gameLicenseService,
+        ISettingsManager settingsService,
+        ISettingsSignalBus settingsSignalBus,
+        IModManager modManagerService
+    )
     {
-        Instance = this;
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        LiveStatus = liveStatus;
+        BrandingService = brandingService;
+        GameLicenseService = gameLicenseService;
+        SettingsService = settingsService;
+        SettingsSignalBus = settingsSignalBus;
+        ModManagerService = modManagerService;
         InitializeComponent();
-        AddLayer();
+        Navigation.PageChanged += Navigation_OnPageChanged;
+        foreach (var button in SidePanelButtons.Children.OfType<SidebarRadioButton>())
+            button.NavigationRequested += (_, pageType) => Navigation.NavigateTo(pageType);
+        SidebarCurrentUserProfile.ProfileRequested += (_, _) => Navigation.NavigateTo<UserProfilePage>();
+        UpdateSidebarProfile();
 
         ClampSavedWindowScaleToCurrentScreen();
         OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);
@@ -93,12 +108,11 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
             TitleLabel.Margin -= new Thickness(0, 0, 0, 18);
 
             ExtendClientAreaTitleBarHeightHint = 0;
-            SystemDecorations = SystemDecorations.Full;
-            ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.PreferSystemChrome;
+            WindowDecorations = WindowDecorations.Full;
         }
 
-        WhWzStatusManager.Instance.Subscribe(this);
-        RRLiveRooms.Instance.Subscribe(this);
+        LiveStatus.Subscribe(this);
+        LiveRooms.Subscribe(this);
         GameLicenseService.Subscribe(this);
         ModManagerService.PropertyChanged += ModManager_PropertyChanged;
         _ = ReloadModsAndShowErrorsAsync();
@@ -114,11 +128,13 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         UpdateModsButtonText();
         // UpdateModsActionIndicator();
 
-        NavigationManager.NavigateTo<HomePage>();
+        Navigation.NavigateTo<HomePage>();
     }
 
     protected override void OnClosed(EventArgs e)
     {
+        Navigation.PageChanged -= Navigation_OnPageChanged;
+        DetachLiveSubscriptions();
         _settingsSignalSubscription?.Dispose();
         _settingsSignalSubscription = null;
         LocalizationProvider.LanguageChanged -= OnLanguageChanged;
@@ -199,6 +215,8 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
     //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
     // }
 
+    private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
+
     public void NavigateToPage(UserControl page)
     {
         var oldPage = ContentArea.Content as Control;
@@ -228,14 +246,14 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         }
     }
 
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
         switch (sender)
         {
-            case RRLiveRooms liveRooms:
+            case LiveRoomsService liveRooms:
                 UpdatePlayerAndRoomCount(liveRooms);
                 break;
-            case WhWzStatusManager liveAlerts:
+            case LiveStatusService liveAlerts:
                 UpdateLiveAlert(liveAlerts);
                 break;
         }
@@ -248,9 +266,24 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         FriendsButton.BoxTip = t("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
     }
 
-    public void UpdateSidebarProfile() => SidebarCurrentUserProfile.Refresh();
+    public void UpdateSidebarProfile()
+    {
+        GameLicenseService.RefreshOnlineStatus();
+        GameLicenseService.LoadLicense();
+        var user = GameLicenseService.ActiveUser;
+        SidebarCurrentUserProfile.DisplayProfile(user.NameOfMii, user.FriendCode, user.Mii);
+    }
 
-    public void UpdatePlayerAndRoomCount(RRLiveRooms sender)
+    public void DetachLiveSubscriptions()
+    {
+        LiveRooms.Unsubscribe(this);
+        LiveStatus.Unsubscribe(this);
+        GameLicenseService.Unsubscribe(this);
+    }
+
+    public void UpdatePlayerAndRoomCount() => UpdatePlayerAndRoomCount(LiveRooms);
+
+    public void UpdatePlayerAndRoomCount(LiveRoomsService sender)
     {
         var playerCount = sender.PlayerCount;
         RoomsButton.BoxText = playerCount.ToString();
@@ -258,9 +291,9 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
         UpdateFriendCount();
     }
 
-    public void UpdateLiveAlert() => UpdateLiveAlert(WhWzStatusManager.Instance);
+    public void UpdateLiveAlert() => UpdateLiveAlert(LiveStatus);
 
-    private void UpdateLiveAlert(WhWzStatusManager sender)
+    private void UpdateLiveAlert(LiveStatusService sender)
     {
         var hasVariant = sender.Status?.Variant != null && sender.Status.Variant != WhWzStatusVariant.None;
         var hasCustomIcon = !string.IsNullOrEmpty(sender.Status?.Icon);
@@ -385,7 +418,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     private void SidebarSettingsButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        NavigationManager.NavigateTo<SettingsPage>();
+        Navigation.NavigateTo<SettingsPage>();
         e.Handled = true;
     }
 
@@ -429,7 +462,7 @@ public partial class Layout : BaseWindow, IRepeatedTaskListener
 
     private void SupportUs_OnClick(object? sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
-    private void About_Click(object? sender, RoutedEventArgs e) => NavigationManager.NavigateTo<SettingsPage>(new AppInfo());
+    private void About_Click(object? sender, RoutedEventArgs e) => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
 
     private void CloseSnackbar_OnClick(object? sender, EventArgs e)
     {

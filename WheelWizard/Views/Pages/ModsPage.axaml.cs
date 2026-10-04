@@ -8,30 +8,44 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using WheelWizard.Features.Patches;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
 using WheelWizard.Mods;
-using WheelWizard.Services;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.ModManagement;
+using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.ModManagement;
+using WheelWizard.Views.Storage;
 
 namespace WheelWizard.Views.Pages;
 
-public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest);
+public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest, ModPreviewViewModel Preview);
 
-public partial class ModsPage : UserControlBase, INotifyPropertyChanged
+public partial class ModsPage : UserControl, INotifyPropertyChanged
 {
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    // #todo: move list state and mod workflows into a view model, and split drag-and-drop visuals into their own behavior.
+    private IPopupFactory Popups { get; }
 
-    [Inject]
-    private IModPatchConversionService ModPatchConversionService { get; set; } = null!;
+    private Func<int, ModPreviewViewModel> CreatePreview { get; }
+    private readonly Dictionary<int, ModPreviewViewModel> _previews = [];
 
-    [Inject]
-    private IModManager ModManagerService { get; set; } = null!;
+    private ModPreviewViewModel GetPreview(int id)
+    {
+        if (!_previews.TryGetValue(id, out var preview))
+            _previews[id] = preview = CreatePreview(id);
+        return preview;
+    }
+
+    private IModOperationPresentation ModPresentation { get; }
+
+    private IFilePickerService FilePicker { get; }
+
+    private ISettingsManager SettingsService { get; }
+
+    private IModPatchConversionService ModPatchConversionService { get; }
+
+    private IModManager ModManagerService { get; }
 
     public IModManager ModManager => ModManagerService;
 
@@ -40,7 +54,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             ModManager.Mods.Select(mod => new ModListItem(
                 mod,
                 mod.Priority == ModManager.GetLowestActivePriority(),
-                mod.Priority == ModManager.GetHighestActivePriority()
+                mod.Priority == ModManager.GetHighestActivePriority(),
+                GetPreview(mod.ModID)
             ))
         );
 
@@ -75,8 +90,23 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     private IPointer? _capturedPointer;
     private const double DragThreshold = 5.0;
 
-    public ModsPage()
+    public ModsPage(
+        IPopupFactory popups,
+        Func<int, ModPreviewViewModel> createPreview,
+        IModOperationPresentation modPresentation,
+        IFilePickerService filePicker,
+        ISettingsManager settingsService,
+        IModPatchConversionService modPatchConversionService,
+        IModManager modManagerService
+    )
     {
+        Popups = popups;
+        CreatePreview = createPreview;
+        ModPresentation = modPresentation;
+        FilePicker = filePicker;
+        SettingsService = settingsService;
+        ModPatchConversionService = modPatchConversionService;
+        ModManagerService = modManagerService;
         InitializeComponent();
         DataContext = this;
         Focusable = true;
@@ -96,6 +126,9 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         ModManager.PropertyChanged -= OnModsChanged;
+        foreach (var preview in _previews.Values)
+            preview.Dispose();
+        _previews.Clear();
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -125,7 +158,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private void BrowseMod_Click(object sender, RoutedEventArgs e)
     {
-        var modPopup = new ModBrowserWindow();
+        var modPopup = Popups.Create<ModBrowserWindow>();
         modPopup.Show();
     }
 
@@ -138,8 +171,8 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
 
     private async void ImportMod_Click(object sender, RoutedEventArgs e)
     {
-        var selectedFiles = await FilePickerHelper.OpenFilePickerAsync(
-            CustomFilePickerFileType.All,
+        var selectedFiles = await FilePicker.OpenFilePickerAsync(
+            FilePickerFilters.All,
             allowMultiple: true,
             title: t("file_picker.select_mod_file")
         );
@@ -154,7 +187,9 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(modName))
             return;
 
-        var importResult = await ModManager.ImportModFilesAsync(selectedFiles.ToArray(), modName);
+        var importResult = await ModPresentation.RunAsync(
+            (progress, _) => ModManager.ImportModFilesAsync(selectedFiles.ToArray(), modName, progress)
+        );
         if (importResult.IsFailure)
         {
             MessageTranslationHelper.ShowMessage(importResult.Error);
@@ -225,7 +260,10 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
         if (!selectedMod.Mod.HasIncompatibleFiles)
             return;
 
-        var result = await ModPatchConversionService.ConvertToPatchesAsync(selectedMod.Mod, CancellationToken.None);
+        var result = await ModPresentation.RunAsync(
+            (progress, cancellation) => ModPatchConversionService.ConvertToPatchesAsync(selectedMod.Mod, cancellation, progress),
+            canCancel: true
+        );
         OnModsChanged();
 
         if (result.IsSuccess)
@@ -287,7 +325,7 @@ public partial class ModsPage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        var modPopup = new ModIndependentWindow();
+        var modPopup = Popups.Create<ModIndependentWindow>();
         _ = modPopup.LoadModAsync(selectedMod.Mod.ModID);
         modPopup.ShowDialog();
     }

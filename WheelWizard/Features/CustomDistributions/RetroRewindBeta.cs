@@ -1,30 +1,41 @@
 using System.IO.Abstractions;
 using System.Security.Cryptography;
 using System.Text.Json;
-using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Semver;
 using SharpCompress.Archives;
 using SharpCompress.Readers;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services;
 using WheelWizard.Settings;
-using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Shared.Downloads;
+using WheelWizard.Shared.IO;
 
 namespace WheelWizard.CustomDistributions;
 
 public class RetroRewindBeta : IDistribution
 {
+    private readonly IDownloadService downloads;
+    private readonly IDistributionPrompts _prompts;
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<IDistribution> _logger;
     private readonly ISettingsManager _settingsManager;
+    private readonly ICustomDistributionPaths _paths;
 
-    public RetroRewindBeta(IFileSystem fileSystem, ILogger<IDistribution> logger, ISettingsManager settingsManager)
+    public RetroRewindBeta(
+        IFileSystem fileSystem,
+        ILogger<IDistribution> logger,
+        ISettingsManager settingsManager,
+        IDownloadService downloads,
+        ICustomDistributionPaths paths,
+        IDistributionPrompts prompts
+    )
     {
         _fileSystem = fileSystem;
+        this.downloads = downloads;
+        _prompts = prompts;
         _logger = logger;
         _settingsManager = settingsManager;
+        _paths = paths;
     }
 
     public string Title => "Retro Rewind Beta";
@@ -32,37 +43,42 @@ public class RetroRewindBeta : IDistribution
     public string XMLFolderName => "riivolution";
     public string XMLFileName => "RRBeta";
 
-    public async Task<OperationResult> InstallAsync(ProgressWindow progressWindow)
+    public async Task<OperationResult> InstallAsync(DistributionOperation operation)
     {
-        var tempRootPath = PathManager.RrBetaTempFolderPath;
-        var tempZipPath = PathManager.RrBetaTempFilePath;
+        if (operation.CancellationToken.IsCancellationRequested)
+            return Fail("Distribution installation was cancelled.");
+        var tempRootPath = _paths.BetaDownloadFolderPath;
+        var tempZipPath = _paths.BetaArchivePath;
         var tempExtractionPath = _fileSystem.Path.Combine(tempRootPath, "Extracted");
         OperationResult? result = null;
 
         try
         {
-            var removeResult = await RemoveAsync(progressWindow);
+            var removeResult = await RemoveAsync(operation);
             if (removeResult.IsFailure)
                 return removeResult;
 
-            progressWindow.SetExtraText("Downloading test build");
+            operation.Report(new(Message: "Downloading test build"));
             if (_fileSystem.Directory.Exists(tempRootPath))
                 _fileSystem.Directory.Delete(tempRootPath, recursive: true);
             _fileSystem.Directory.CreateDirectory(tempRootPath);
 
-            var downloadedFile = await DownloadHelper.DownloadToLocationAsync(
-                Endpoints.RRTestersZipUrl,
+            var download = await downloads.DownloadDistributionAsync(
+                RetroRewindEndpoints.BetaArchiveUrl,
                 tempZipPath,
-                progressWindow,
-                ForceGivenFilePath: true
+                operation,
+                useExactPath: true
             );
 
-            if (string.IsNullOrWhiteSpace(downloadedFile) || !_fileSystem.File.Exists(downloadedFile))
-                return progressWindow.WasCancellationRequested ? Ok() : Fail("Failed to download the testing build");
+            if (download.IsFailure)
+                return download.Error;
+            var downloadedFile = download.Value;
+            if (!_fileSystem.File.Exists(downloadedFile))
+                return Fail("Failed to download the testing build");
 
             while (true)
             {
-                var password = await RequestPasswordAsync();
+                var password = await _prompts.RequestBetaPasswordAsync();
                 if (string.IsNullOrWhiteSpace(password))
                     return Fail("Password was not provided.");
 
@@ -70,21 +86,17 @@ public class RetroRewindBeta : IDistribution
                     _fileSystem.Directory.Delete(tempExtractionPath, recursive: true);
                 _fileSystem.Directory.CreateDirectory(tempExtractionPath);
 
-                progressWindow.SetExtraText(t("state.extracting"));
+                operation.Report(new(Message: t("state.extracting")));
                 var badPassword = false;
                 var extractResult = await Task.Run(
-                    () => ExtractZipFile(downloadedFile, tempExtractionPath, progressWindow, password, out badPassword)
+                    () => ExtractZipFile(downloadedFile, tempExtractionPath, operation, password, out badPassword)
                 );
                 if (extractResult.IsSuccess)
                     break;
 
                 if (badPassword)
                 {
-                    var retry = await new YesNoWindow()
-                        .SetMainText("Incorrect password")
-                        .SetExtraText("Do you want to try again?")
-                        .SetButtonText("Retry", "Cancel")
-                        .AwaitAnswer();
+                    var retry = await _prompts.ConfirmPasswordRetryAsync();
                     if (retry)
                         continue;
                     return Fail("Incorrect password.");
@@ -123,15 +135,15 @@ public class RetroRewindBeta : IDistribution
         return result;
     }
 
-    public Task<OperationResult> UpdateAsync(ProgressWindow progressWindow) => InstallAsync(progressWindow);
+    public Task<OperationResult> UpdateAsync(DistributionOperation operation) => InstallAsync(operation);
 
-    public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
+    public Task<OperationResult> RemoveAsync(DistributionOperation operation)
     {
-        var rootPath = PathManager.RiivolutionWhWzFolderPath;
+        var rootPath = _paths.RootFolderPath;
 
         foreach (var entry in LoadManifest())
         {
-            if (!PathSafetyHelper.TryGetPathWithinDirectory(rootPath, entry, out var fullPath))
+            if (!PathSafety.TryGetPathWithinDirectory(rootPath, entry, out var fullPath))
                 continue;
 
             if (_fileSystem.File.Exists(fullPath))
@@ -140,51 +152,51 @@ public class RetroRewindBeta : IDistribution
                 _fileSystem.Directory.Delete(fullPath, recursive: true);
         }
 
-        if (_fileSystem.Directory.Exists(PathManager.RrBetaFolderPath))
-            _fileSystem.Directory.Delete(PathManager.RrBetaFolderPath, recursive: true);
-        if (_fileSystem.File.Exists(PathManager.RrBetaXmlFilePath))
-            _fileSystem.File.Delete(PathManager.RrBetaXmlFilePath);
-        if (_fileSystem.File.Exists(PathManager.RrBetaManifestFilePath))
-            _fileSystem.File.Delete(PathManager.RrBetaManifestFilePath);
+        if (_fileSystem.Directory.Exists(_paths.BetaFolderPath))
+            _fileSystem.Directory.Delete(_paths.BetaFolderPath, recursive: true);
+        if (_fileSystem.File.Exists(_paths.BetaXmlFilePath))
+            _fileSystem.File.Delete(_paths.BetaXmlFilePath);
+        if (_fileSystem.File.Exists(_paths.BetaManifestFilePath))
+            _fileSystem.File.Delete(_paths.BetaManifestFilePath);
 
         return Task.FromResult(Ok());
     }
 
-    public async Task<OperationResult> ReinstallAsync(ProgressWindow progressWindow)
+    public async Task<OperationResult> ReinstallAsync(DistributionOperation operation)
     {
-        var removeResult = await RemoveAsync(progressWindow);
+        var removeResult = await RemoveAsync(operation);
         if (removeResult.IsFailure)
             return removeResult;
 
-        return await InstallAsync(progressWindow);
+        return await InstallAsync(operation);
     }
 
     public Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync()
     {
+        switch (_settingsManager.CheckExtensionConfiguration())
+        {
+            case ExtensionConfigurationInfo.MissingDolphin:
+                return Task.FromResult(Ok(WheelWizardStatus.NoDolphinExtension));
+            case ExtensionConfigurationInfo.MissingRecomp:
+                return Task.FromResult(Ok(WheelWizardStatus.NoRecompExtension));
+            case ExtensionConfigurationInfo.ExtensionFoundOrNotNeeded:
+                break;
+        }
+
         if (!_settingsManager.PathsSetupCorrectly())
             return Task.FromResult(Ok(WheelWizardStatus.ConfigNotFinished));
 
-        var isInstalled =
-            _fileSystem.Directory.Exists(PathManager.RrBetaFolderPath) && _fileSystem.File.Exists(PathManager.RrBetaXmlFilePath);
+        var isInstalled = _fileSystem.Directory.Exists(_paths.BetaFolderPath) && _fileSystem.File.Exists(_paths.BetaXmlFilePath);
 
         return Task.FromResult(Ok(isInstalled ? WheelWizardStatus.Ready : WheelWizardStatus.NotInstalled));
     }
 
     public SemVersion? GetCurrentVersion() => null;
 
-    private async Task<string?> RequestPasswordAsync()
-    {
-        return await new TextInputWindow()
-            .SetMainText("Please enter Password")
-            .SetPlaceholderText("Password")
-            .SetButtonText("Cancel", "Submit")
-            .ShowDialog();
-    }
-
     private OperationResult ExtractZipFile(
         string zipPath,
         string destinationDirectory,
-        ProgressWindow progressWindow,
+        DistributionOperation operation,
         string password,
         out bool badPassword
     )
@@ -198,15 +210,12 @@ public class RetroRewindBeta : IDistribution
             if (entries.Count == 0)
                 return Ok();
 
-            Dispatcher.UIThread.Post(() =>
-            {
-                progressWindow.SetExtraText(t("state.extracting")).SetGoal($"Extracting {entries.Count} files");
-            });
+            operation.Report(new(Message: t("state.extracting"), Goal: $"Extracting {entries.Count} files"));
 
             for (var i = 0; i < entries.Count; i++)
             {
                 var entry = entries[i];
-                if (!PathSafetyHelper.TryNormalizeRelativePath(entry.Key ?? string.Empty, out var normalized))
+                if (!PathSafety.TryNormalizeRelativePath(entry.Key ?? string.Empty, out var normalized))
                     continue;
 
                 if (!TryGetRelativeExtractionPath(normalized, out var relativePath))
@@ -214,7 +223,7 @@ public class RetroRewindBeta : IDistribution
                         $"Unexpected file in the test archive: '{entry.Key}' (normalized: '{normalized}'). Please contact the developers."
                     );
 
-                if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, relativePath, out var destinationPath))
+                if (!PathSafety.TryGetPathWithinDirectory(destinationDirectory, relativePath, out var destinationPath))
                     return Fail("The file path is outside the destination directory. Please contact the developers.");
 
                 var destinationDir = _fileSystem.Path.GetDirectoryName(destinationPath);
@@ -222,14 +231,11 @@ public class RetroRewindBeta : IDistribution
                     _fileSystem.Directory.CreateDirectory(destinationDir);
 
                 using var entryStream = entry.OpenEntryStream();
-                using var outputStream = File.Create(destinationPath);
+                using var outputStream = _fileSystem.File.Create(destinationPath);
                 entryStream.CopyTo(outputStream);
 
                 var percent = (int)(((i + 1) / (double)entries.Count) * 100);
-                Dispatcher.UIThread.Post(() =>
-                {
-                    progressWindow.UpdateProgress(percent);
-                });
+                operation.Report(new(Percent: percent));
             }
 
             return Ok();
@@ -289,7 +295,7 @@ public class RetroRewindBeta : IDistribution
 
     private OperationResult<List<string>> MoveExtractedFiles(string tempExtractionPath)
     {
-        var destinationRoot = PathManager.RiivolutionWhWzFolderPath;
+        var destinationRoot = _paths.RootFolderPath;
         _fileSystem.Directory.CreateDirectory(destinationRoot);
 
         var betaFolderSource = _fileSystem.Path.Combine(tempExtractionPath, FolderName);
@@ -309,7 +315,7 @@ public class RetroRewindBeta : IDistribution
                 continue;
             }
 
-            if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationRoot, relativePath, out var destinationPath))
+            if (!PathSafety.TryGetPathWithinDirectory(destinationRoot, relativePath, out var destinationPath))
                 return Fail("The file path is outside the destination directory. Please contact the developers.");
 
             var destinationDirectory = _fileSystem.Path.GetDirectoryName(destinationPath);
@@ -342,12 +348,12 @@ public class RetroRewindBeta : IDistribution
     {
         try
         {
-            var manifestDirectory = _fileSystem.Path.GetDirectoryName(PathManager.RrBetaManifestFilePath);
+            var manifestDirectory = _fileSystem.Path.GetDirectoryName(_paths.BetaManifestFilePath);
             if (!string.IsNullOrEmpty(manifestDirectory))
                 _fileSystem.Directory.CreateDirectory(manifestDirectory);
 
             var json = JsonSerializer.Serialize(entries, new JsonSerializerOptions { WriteIndented = true });
-            _fileSystem.File.WriteAllText(PathManager.RrBetaManifestFilePath, json);
+            _fileSystem.File.WriteAllText(_paths.BetaManifestFilePath, json);
         }
         catch (Exception ex)
         {
@@ -359,10 +365,10 @@ public class RetroRewindBeta : IDistribution
     {
         try
         {
-            if (!_fileSystem.File.Exists(PathManager.RrBetaManifestFilePath))
+            if (!_fileSystem.File.Exists(_paths.BetaManifestFilePath))
                 return [];
 
-            var json = _fileSystem.File.ReadAllText(PathManager.RrBetaManifestFilePath);
+            var json = _fileSystem.File.ReadAllText(_paths.BetaManifestFilePath);
             return JsonSerializer.Deserialize<List<string>>(json) ?? [];
         }
         catch (Exception ex)

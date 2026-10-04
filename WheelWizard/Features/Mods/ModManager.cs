@@ -1,15 +1,14 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Abstractions;
 using System.IO.Compression;
-using Avalonia.Threading;
-using IniParser;
-using Serilog;
+using IniParser.Parser;
+using Microsoft.Extensions.Logging;
 using WheelWizard.Features.Patches;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
-using WheelWizard.Services;
-using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Shared.IO;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.Mods;
 
@@ -27,7 +26,7 @@ public interface IModManager : INotifyPropertyChanged
 
     Task<OperationResult> RemoveModAsync(Mod mod);
 
-    Task<OperationResult> ImportModFilesAsync(string[] filePaths, string modName);
+    Task<OperationResult> ImportModFilesAsync(string[] filePaths, string modName, IProgress<ModOperationProgress>? progress = null);
 
     Task<OperationResult> ToggleAllModsAsync(bool enable);
 
@@ -41,7 +40,13 @@ public interface IModManager : INotifyPropertyChanged
 
     OperationResult OpenModFolder(Mod selectedMod);
 
-    Task<OperationResult> InstallModFromFileAsync(string filePath, string givenModName, string author = "-1", int modID = -1);
+    Task<OperationResult> InstallModFromFileAsync(
+        string filePath,
+        string givenModName,
+        string author = "-1",
+        int modID = -1,
+        IProgress<ModOperationProgress>? progress = null
+    );
 
     Task<OperationResult> DeleteModByIdAsync(int modId);
 
@@ -63,6 +68,10 @@ public interface IModManager : INotifyPropertyChanged
 public sealed class ModManager : IModManager
 {
     private static readonly char[] _illegalChars = new[] { '.', '/', '~', '\\' };
+    private readonly IFileSystem _fileSystem;
+    private readonly IModPaths _paths;
+    private readonly IProcessLauncher _processes;
+    private readonly ILogger<ModManager> _logger;
     private readonly IModInstallationService _modInstallationService;
     private readonly IModPatchConversionService _modPatchConversionService;
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
@@ -81,8 +90,19 @@ public sealed class ModManager : IModManager
 
     private bool _isBatchUpdating;
 
-    public ModManager(IModInstallationService modInstallationService, IModPatchConversionService modPatchConversionService)
+    public ModManager(
+        IModInstallationService modInstallationService,
+        IModPatchConversionService modPatchConversionService,
+        IFileSystem fileSystem,
+        IModPaths paths,
+        IProcessLauncher processes,
+        ILogger<ModManager> logger
+    )
     {
+        _fileSystem = fileSystem;
+        _paths = paths;
+        _processes = processes;
+        _logger = logger;
         _modInstallationService = modInstallationService;
         _modPatchConversionService = modPatchConversionService;
         _mods = [];
@@ -178,39 +198,34 @@ public sealed class ModManager : IModManager
         Mods = sortedMods;
     }
 
-    public async Task<OperationResult> ImportModFilesAsync(string[] filePaths, string modName)
+    public async Task<OperationResult> ImportModFilesAsync(
+        string[] filePaths,
+        string modName,
+        IProgress<ModOperationProgress>? progress = null
+    )
     {
         var validationResult = ValidateModName(null, modName);
         if (validationResult.IsFailure)
             return validationResult.Error;
 
-        var tempZipPath = Path.Combine(Path.GetTempPath(), $"{modName}.zip");
-        ProgressWindow? progressWindow = null;
+        var tempZipPath = _fileSystem.Path.Combine(_fileSystem.Path.GetTempPath(), $"WheelWizard-{Guid.NewGuid():N}.zip");
 
         try
         {
             var totalFiles = filePaths.Length;
-            //todo: this is supposed to be backend only, ProgressWindow should not be created here.
-            progressWindow = new ProgressWindow(t("progress.combining_files"))
-                .SetGoal(t("progress.preparing_files_count", totalFiles)!)
-                .SetExtraText(t("state.loading"));
-            progressWindow.Show();
-
-            var zipResult = await CreateModArchiveAsync(tempZipPath, filePaths, totalFiles, progressWindow);
+            progress?.Report(new(ModOperationStage.Preparing, 0, TotalFiles: totalFiles));
+            var zipResult = await CreateModArchiveAsync(tempZipPath, filePaths, totalFiles, progress);
             if (zipResult.IsFailure)
                 return zipResult.Error;
 
-            progressWindow.Close();
-
-            return await InstallModFromFileAsync(tempZipPath, modName, author: "-1", modID: -1);
+            return await InstallModFromFileAsync(tempZipPath, modName, author: "-1", modID: -1, progress: progress);
         }
         finally
         {
-            progressWindow?.Close();
-            var result = FileHelper.TryDeleteFile(tempZipPath);
+            var result = _fileSystem.TryDeleteFile(tempZipPath);
             //todo: result should be returned and bubbled up
             if (result.IsFailure)
-                Log.Warning(result.Error.Exception, "Failed to delete temporary mod archive: {Message}", result.Error.Message);
+                _logger.LogWarning(result.Error.Exception, "Failed to delete temporary mod archive: {Message}", result.Error.Message);
         }
     }
 
@@ -240,7 +255,7 @@ public sealed class ModManager : IModManager
         if (_modInstallationService.ContainsModByTitle(Mods, newName))
             return Fail("Mod name already exists.");
 
-        if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+        if (newName.IndexOfAny(_fileSystem.Path.GetInvalidFileNameChars()) != -1)
             return Fail("Mod name contains illegal characters.");
 
         if (newName.Any(x => _illegalChars.Contains(x)))
@@ -264,10 +279,10 @@ public sealed class ModManager : IModManager
         if (validationResult.IsFailure)
             return validationResult.Error;
 
-        var oldDirectoryName = PathManager.GetModDirectoryPath(oldTitle);
-        var newDirectoryName = PathManager.GetModDirectoryPath(newTitle);
+        var oldDirectoryName = _paths.GetModDirectoryPath(oldTitle);
+        var newDirectoryName = _paths.GetModDirectoryPath(newTitle);
 
-        if (!Directory.Exists(oldDirectoryName))
+        if (!_fileSystem.Directory.Exists(oldDirectoryName))
             return Fail("The mod folder could not be found.");
 
         GC.Collect();
@@ -282,9 +297,9 @@ public sealed class ModManager : IModManager
 
     public async Task<OperationResult> DeleteModAsync(Mod selectedMod)
     {
-        var modDirectory = Path.GetFullPath(PathManager.GetModDirectoryPath(selectedMod.Title));
+        var modDirectory = _fileSystem.Path.GetFullPath(_paths.GetModDirectoryPath(selectedMod.Title));
 
-        if (!Directory.Exists(modDirectory))
+        if (!_fileSystem.Directory.Exists(modDirectory))
             return await RemoveModAsync(selectedMod);
 
         var deleteResult = DeleteModDirectory(modDirectory);
@@ -296,20 +311,26 @@ public sealed class ModManager : IModManager
 
     public OperationResult OpenModFolder(Mod selectedMod)
     {
-        var modDirectory = PathManager.GetModDirectoryPath(selectedMod.Title);
-        if (Directory.Exists(modDirectory))
+        var modDirectory = _paths.GetModDirectoryPath(selectedMod.Title);
+        if (_fileSystem.Directory.Exists(modDirectory))
             return OpenFolder(modDirectory);
 
         return Fail(t("message_error.no_mod_folder.extra"));
     }
 
-    public async Task<OperationResult> InstallModFromFileAsync(string filePath, string givenModName, string author = "-1", int modID = -1)
+    public async Task<OperationResult> InstallModFromFileAsync(
+        string filePath,
+        string givenModName,
+        string author = "-1",
+        int modID = -1,
+        IProgress<ModOperationProgress>? progress = null
+    )
     {
         if (_modInstallationService.ContainsModByTitle(Mods, givenModName))
             return Fail($"Mod with name '{givenModName}' already exists.");
 
         var priority = Mods.Count > 0 ? Mods.Max(m => m.Priority) + 1 : 1;
-        var modResult = await _modInstallationService.InstallModFromFileAsync(filePath, givenModName, priority, author, modID);
+        var modResult = await _modInstallationService.InstallModFromFileAsync(filePath, givenModName, priority, author, modID, progress);
         if (modResult.IsFailure)
             return modResult.Error;
 
@@ -369,31 +390,29 @@ public sealed class ModManager : IModManager
         return await SaveModsAsync();
     }
 
-    private static async Task<OperationResult> CreateModArchiveAsync(
+    private async Task<OperationResult> CreateModArchiveAsync(
         string tempZipPath,
         string[] filePaths,
         int totalFiles,
-        ProgressWindow progressWindow
+        IProgress<ModOperationProgress>? progress
     )
     {
         try
         {
             await Task.Run(() =>
             {
-                using var zipArchive = ZipFile.Open(tempZipPath, ZipArchiveMode.Create);
+                using var archiveStream = _fileSystem.File.Create(tempZipPath);
+                using var zipArchive = new ZipArchive(archiveStream, ZipArchiveMode.Create);
                 var processed = 0;
                 foreach (var filePath in filePaths)
                 {
-                    var entryName = Path.GetFileName(filePath);
-                    zipArchive.CreateEntryFromFile(filePath, entryName, CompressionLevel.Optimal);
+                    var entryName = _fileSystem.Path.GetFileName(filePath);
+                    using var input = _fileSystem.File.OpenRead(filePath);
+                    using var output = zipArchive.CreateEntry(entryName, CompressionLevel.Optimal).Open();
+                    input.CopyTo(output);
                     processed++;
 
-                    var progress = (int)(processed / (double)totalFiles * 100);
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        progressWindow.UpdateProgress(progress);
-                        progressWindow.SetExtraText($"{t("state.installing")} {entryName}");
-                    });
+                    progress?.Report(new(ModOperationStage.Preparing, (int)(processed / (double)totalFiles * 100), entryName, totalFiles));
                 }
             });
 
@@ -405,12 +424,11 @@ public sealed class ModManager : IModManager
         }
     }
 
-    //todo: move to FileHelper (or the DI version if that gets made)
-    private static OperationResult OpenFolder(string modDirectory)
+    private OperationResult OpenFolder(string modDirectory)
     {
         try
         {
-            Process.Start(
+            _processes.Start(
                 new ProcessStartInfo
                 {
                     FileName = modDirectory,
@@ -450,7 +468,7 @@ public sealed class ModManager : IModManager
             _isBatchUpdating = false;
         }
 
-        var newIniPath = Path.Combine(newDirectoryName, $"{newTitle}.ini");
+        var newIniPath = _fileSystem.Path.Combine(newDirectoryName, $"{newTitle}.ini");
         var saveResult = await SaveRenamedModMetadataAsync(selectedMod, newIniPath);
         if (saveResult.IsFailure)
             return saveResult;
@@ -461,10 +479,10 @@ public sealed class ModManager : IModManager
 
         OnPropertyChanged(nameof(Mods));
 
-        return FileHelper.DeleteDirectoryIfExists(oldDirectoryName);
+        return _fileSystem.DeleteDirectoryIfExists(oldDirectoryName);
     }
 
-    private static OperationResult RenameDirectoryAndMetadataFile(
+    private OperationResult RenameDirectoryAndMetadataFile(
         string oldDirectoryName,
         string newDirectoryName,
         string oldTitle,
@@ -473,16 +491,16 @@ public sealed class ModManager : IModManager
     {
         try
         {
-            Directory.Move(oldDirectoryName, newDirectoryName);
-            var newIniPath = Path.Combine(newDirectoryName, $"{newTitle}.ini");
-            var updatedOldIniPath = Path.Combine(newDirectoryName, $"{oldTitle}.ini");
-            if (File.Exists(updatedOldIniPath))
+            _fileSystem.Directory.Move(oldDirectoryName, newDirectoryName);
+            var newIniPath = _fileSystem.Path.Combine(newDirectoryName, $"{newTitle}.ini");
+            var updatedOldIniPath = _fileSystem.Path.Combine(newDirectoryName, $"{oldTitle}.ini");
+            if (_fileSystem.File.Exists(updatedOldIniPath))
             {
-                File.Move(updatedOldIniPath, newIniPath);
-                var parser = new FileIniDataParser();
-                var data = parser.ReadFile(newIniPath);
+                _fileSystem.File.Move(updatedOldIniPath, newIniPath);
+                var parser = new IniDataParser();
+                var data = parser.Parse(_fileSystem.File.ReadAllText(newIniPath));
                 data["Mod"]["Name"] = newTitle;
-                parser.WriteFile(newIniPath, data);
+                _fileSystem.File.WriteAllText(newIniPath, data.ToString());
             }
 
             return Ok();
@@ -493,11 +511,11 @@ public sealed class ModManager : IModManager
         }
     }
 
-    private static async Task<OperationResult> SaveRenamedModMetadataAsync(Mod selectedMod, string newIniPath)
+    private async Task<OperationResult> SaveRenamedModMetadataAsync(Mod selectedMod, string newIniPath)
     {
         try
         {
-            await selectedMod.SaveToIniAsync(newIniPath);
+            await _fileSystem.File.WriteAllTextAsync(newIniPath, ModMetadata.Serialize(selectedMod));
             return Ok();
         }
         catch (Exception ex)
@@ -506,34 +524,34 @@ public sealed class ModManager : IModManager
         }
     }
 
-    private static OperationResult DeleteModDirectory(string modDirectory)
+    private OperationResult DeleteModDirectory(string modDirectory)
     {
         try
         {
-            var modsRoot = FileHelper.NormalizePath(PathManager.ModsFolderPath);
+            var modsRoot = _fileSystem.Path.NormalizePath(_paths.RootFolderPath);
 
-            var target = FileHelper.NormalizePath(modDirectory);
+            var target = _fileSystem.Path.NormalizePath(modDirectory);
 
-            var relativePath = Path.GetRelativePath(modsRoot, target);
+            var relativePath = _fileSystem.Path.GetRelativePath(modsRoot, target);
 
             if (
                 relativePath == "."
                 || relativePath == ".."
-                || relativePath.StartsWith(".." + Path.DirectorySeparatorChar)
-                || relativePath.StartsWith(".." + Path.AltDirectorySeparatorChar)
-                || Path.IsPathRooted(relativePath)
+                || relativePath.StartsWith(".." + _fileSystem.Path.DirectorySeparatorChar)
+                || relativePath.StartsWith(".." + _fileSystem.Path.AltDirectorySeparatorChar)
+                || _fileSystem.Path.IsPathRooted(relativePath)
             )
             {
                 return Fail("Invalid mod directory.");
             }
 
-            if (!Directory.Exists(target))
+            if (!_fileSystem.Directory.Exists(target))
                 return Fail("Mod directory does not exist.");
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            var di = new DirectoryInfo(target);
+            var di = _fileSystem.DirectoryInfo.New(target);
 
             foreach (var dir in di.EnumerateDirectories("*", SearchOption.AllDirectories))
                 dir.Attributes &= ~FileAttributes.ReadOnly;
@@ -543,7 +561,7 @@ public sealed class ModManager : IModManager
 
             di.Attributes &= ~FileAttributes.ReadOnly;
 
-            Directory.Delete(target, true);
+            _fileSystem.Directory.Delete(target, true);
             return Ok();
         }
         catch (Exception ex)
@@ -570,7 +588,7 @@ public sealed class ModManager : IModManager
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to save mods.");
+            _logger.LogError(ex, "Failed to save mods.");
         }
         finally
         {
@@ -583,7 +601,7 @@ public sealed class ModManager : IModManager
     {
         var saveResult = await SaveModsAsync();
         if (saveResult.IsFailure)
-            Log.Error(saveResult.Error.Exception, "Failed to save mods: {Message}", saveResult.Error.Message);
+            _logger.LogError(saveResult.Error.Exception, "Failed to save mods: {Message}", saveResult.Error.Message);
     }
 
     #region PropertyChanged

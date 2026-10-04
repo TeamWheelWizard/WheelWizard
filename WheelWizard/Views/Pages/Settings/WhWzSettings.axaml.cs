@@ -3,20 +3,27 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using Serilog;
-using WheelWizard.Helpers;
-using WheelWizard.Services;
+using WheelWizard.ApplicationData;
+using WheelWizard.ApplicationLifecycle.Logging;
+using WheelWizard.Dolphin.Discovery;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.IO;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Views.Storage;
 using SettingsButton = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class WhWzSettings : UserControlBase
+public partial class WhWzSettings : UserControl
 {
+    // #todo: move settings state and location-change workflows into a view model so this page mostly handles the controls.
+    private readonly IMainWindowService _mainWindow;
+    private readonly IApplicationLogFiles _logFiles;
+
     private sealed record LanguageDropdownItem(string Key, string DisplayName)
     {
         public override string ToString() => DisplayName;
@@ -27,17 +34,41 @@ public partial class WhWzSettings : UserControlBase
     private bool _isMovingAppData;
     private bool _updatingLanguageDropdown;
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private IFilePickerService FilePicker { get; }
 
-    [Inject]
-    private ISettingsLocalizationService LocalizationService { get; set; } = null!;
+    private IDolphinPaths DolphinPaths { get; }
 
-    [Inject]
-    private IDolphinSettingManager DolphinSettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    public WhWzSettings()
+    private ISettingsLocalizationService LocalizationService { get; }
+
+    private IDolphinSettingManager DolphinSettingsService { get; }
+
+    private IDolphinDiscoveryService DolphinDiscovery { get; }
+
+    private IApplicationDataLocation ApplicationData { get; }
+
+    public WhWzSettings(
+        IApplicationLogFiles logFiles,
+        IMainWindowService mainWindow,
+        IFilePickerService filePicker,
+        IDolphinPaths dolphinPaths,
+        ISettingsManager settingsService,
+        ISettingsLocalizationService localizationService,
+        IDolphinSettingManager dolphinSettingsService,
+        IDolphinDiscoveryService dolphinDiscovery,
+        IApplicationDataLocation applicationData
+    )
     {
+        FilePicker = filePicker;
+        DolphinPaths = dolphinPaths;
+        SettingsService = settingsService;
+        LocalizationService = localizationService;
+        DolphinSettingsService = dolphinSettingsService;
+        DolphinDiscovery = dolphinDiscovery;
+        ApplicationData = applicationData;
+        _mainWindow = mainWindow;
+        _logFiles = logFiles;
         InitializeComponent();
         ConfigureLocationFieldsForActiveFrontend();
         UpdateLocationRows();
@@ -51,7 +82,7 @@ public partial class WhWzSettings : UserControlBase
     private void ConfigureLocationFieldsForActiveFrontend()
     {
         var recompEnabled = SettingsService.IsRecompModeActive();
-        DolphinExecutableField.IsVisible = !recompEnabled && !EnvHelper.IsFlatpakSandboxed();
+        DolphinExecutableField.IsVisible = !recompEnabled && !DolphinPaths.Layout.IsFlatpakSandboxed();
         GameLocationBorder.CornerRadius = recompEnabled ? new Avalonia.CornerRadius(12, 12, 5, 5) : new Avalonia.CornerRadius(5);
         DolphinUserFolderLabel.Text = recompEnabled
             ? $"{t("option.dolphin_user_path")} ({t("helper_text.optional")})"
@@ -111,7 +142,7 @@ public partial class WhWzSettings : UserControlBase
     private void RefreshLocalizedCodeText()
     {
         MarioKartHelperText.Text = t("helper_text.end_with_x") + " .iso/.gcm/.gcz/.ciso/.wbfs/.wia/.rvz";
-        if (string.IsNullOrWhiteSpace(PathManager.DolphinFilePath))
+        if (string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath))
             DolphinExecutableValueText.Text = GetDolphinExecutableHelperText();
         TranslationsPercentageText.Text = t("text.language_translated_by", t("value.language.z_translators"));
         TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
@@ -170,7 +201,7 @@ public partial class WhWzSettings : UserControlBase
                 return;
         }
 
-        if (EnvHelper.IsFlatpakSandboxed())
+        if (DolphinPaths.Layout.IsFlatpakSandboxed())
         {
             // Having a picker does not make sense if Wheel Wizard is sandboxed.
             return;
@@ -178,7 +209,7 @@ public partial class WhWzSettings : UserControlBase
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            var dolphinAppPath = PathManager.TryToFindApplicationPath();
+            var dolphinAppPath = DolphinDiscovery.FindApplication();
             if (!string.IsNullOrEmpty(dolphinAppPath))
             {
                 var result = await new YesNoWindow()
@@ -188,7 +219,7 @@ public partial class WhWzSettings : UserControlBase
 
                 if (result)
                 {
-                    await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, EnvHelper.SingleQuotePath(dolphinAppPath));
+                    await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, ShellQuoting.QuoteUnixArgument(dolphinAppPath));
                     return;
                 }
             }
@@ -198,7 +229,7 @@ public partial class WhWzSettings : UserControlBase
             }
 
             // Fallback to manual selection
-            var folders = await FilePickerHelper.SelectFolderAsync("Select Dolphin.app");
+            var folders = await FilePicker.SelectFolderAsync("Select Dolphin.app");
             if (folders != null && folders.Count >= 1)
             {
                 var resolvedFolder = await ResolveSelectedFolderPathAsync(folders[0]);
@@ -206,13 +237,13 @@ public partial class WhWzSettings : UserControlBase
                     return;
 
                 var executablePath = Path.Combine(resolvedFolder, "Contents", "MacOS", "Dolphin");
-                await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, EnvHelper.SingleQuotePath(executablePath));
+                await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, ShellQuoting.QuoteUnixArgument(executablePath));
             }
 
             return; // do not do normal selection for MacOS
         }
 
-        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Dolphin Emulator", [executableFileType]);
+        var filePath = await FilePicker.OpenSingleFileAsync("Select Dolphin Emulator", [executableFileType]);
         if (!string.IsNullOrEmpty(filePath))
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -228,14 +259,14 @@ public partial class WhWzSettings : UserControlBase
             }
             else
             {
-                await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, EnvHelper.SingleQuotePath(filePath));
+                await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, ShellQuoting.QuoteUnixArgument(filePath));
             }
         }
     }
 
     private async Task EnterLinuxDolphinCommandAsync()
     {
-        var currentValue = PathManager.DolphinFilePath;
+        var currentValue = DolphinPaths.ExecutablePath;
         var command = await new TextInputWindow()
             .SetMainText("Enter Dolphin launch command")
             .SetExtraText("Enter the terminal command Wheel Wizard should use to launch Dolphin.")
@@ -256,7 +287,7 @@ public partial class WhWzSettings : UserControlBase
             Patterns = ["*.iso", "*.gcm", "*.gcz", "*.ciso", "*.wbfs", "*.wia", "*.rvz"],
         };
 
-        var filePath = await FilePickerHelper.OpenSingleFileAsync("Select Mario Kart Wii Game File", [fileType]);
+        var filePath = await FilePicker.OpenSingleFileAsync("Select Mario Kart Wii Game File", [fileType]);
         if (!string.IsNullOrEmpty(filePath))
         {
             await ApplyLocationSettingAsync(SettingsService.GAME_LOCATION, filePath);
@@ -265,10 +296,10 @@ public partial class WhWzSettings : UserControlBase
 
     private async void DolphinUserPathBrowse_OnClick(object sender, RoutedEventArgs e)
     {
-        var currentDolphinPath = PathManager.DolphinFilePath;
-        var folderPath = string.IsNullOrWhiteSpace(currentDolphinPath)
-            ? PathManager.TryFindUserFolderPath()
-            : PathManager.TryFindUserFolderPath(currentDolphinPath);
+        var folderPath = DolphinDiscovery.FindUserDirectory(
+            SettingsService.Get<string>(SettingsService.DOLPHIN_LOCATION),
+            SettingsService.Get<string>(SettingsService.USER_FOLDER_PATH)
+        );
 
         if (!string.IsNullOrEmpty(folderPath))
         {
@@ -295,7 +326,7 @@ public partial class WhWzSettings : UserControlBase
         if (!string.IsNullOrEmpty(currentFolder) && Directory.Exists(currentFolder))
         {
             var folder = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentFolder);
-            var folders = await FilePickerHelper.SelectFolderAsync("Select Dolphin User Path", folder);
+            var folders = await FilePicker.SelectFolderAsync("Select Dolphin User Path", folder);
 
             if (folders != null && folders.Count >= 1)
             {
@@ -308,7 +339,7 @@ public partial class WhWzSettings : UserControlBase
         else
         {
             // Let the user manually select a folder
-            var manualFolders = await FilePickerHelper.SelectFolderAsync("Select Dolphin User Path");
+            var manualFolders = await FilePicker.SelectFolderAsync("Select Dolphin User Path");
 
             if (manualFolders != null && manualFolders.Count >= 1)
             {
@@ -334,30 +365,31 @@ public partial class WhWzSettings : UserControlBase
 
         UpdateLocationRows();
         if (!string.Equals(previousPath, normalizedPath, StringComparison.Ordinal) && SettingsService.PathsSetupCorrectly())
-            DolphinSettingsService.ReloadSettings();
+            DolphinSettingsService.ReloadSettings(DolphinPaths.ConfigFolderPath);
 
         await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Success_PathSettingsSaved);
         return true;
     }
 
-    private void DolphinExecutableOpen_OnClick(object sender, RoutedEventArgs e) => OpenContainingFolder(PathManager.DolphinFilePath);
+    private void DolphinExecutableOpen_OnClick(object sender, RoutedEventArgs e) => OpenContainingFolder(DolphinPaths.ExecutablePath);
 
-    private void GameLocationOpen_OnClick(object sender, RoutedEventArgs e) => OpenContainingFolder(PathManager.GameFilePath);
+    private void GameLocationOpen_OnClick(object sender, RoutedEventArgs e) =>
+        OpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
 
     private void DolphinUserFolderOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if (Directory.Exists(PathManager.UserFolderPath))
-            FilePickerHelper.OpenFolderInFileManager(PathManager.UserFolderPath);
+        if (Directory.Exists(DolphinPaths.UserFolderPath))
+            FilePicker.OpenFolderInFileManager(DolphinPaths.UserFolderPath);
     }
 
-    private static void OpenContainingFolder(string filePath)
+    private void OpenContainingFolder(string filePath)
     {
         try
         {
             var unquotedPath = filePath.Trim().Trim('\'', '"');
             var folderPath = Path.GetDirectoryName(Path.GetFullPath(unquotedPath));
             if (!string.IsNullOrWhiteSpace(folderPath) && Directory.Exists(folderPath))
-                FilePickerHelper.OpenFolderInFileManager(folderPath);
+                FilePicker.OpenFolderInFileManager(folderPath);
         }
         catch
         {
@@ -367,10 +399,10 @@ public partial class WhWzSettings : UserControlBase
 
     private void AppDataLocationOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if (!Directory.Exists(PathManager.WheelWizardAppdataPath))
-            Directory.CreateDirectory(PathManager.WheelWizardAppdataPath);
+        if (!Directory.Exists(ApplicationData.DirectoryPath))
+            Directory.CreateDirectory(ApplicationData.DirectoryPath);
 
-        FilePickerHelper.OpenFolderInFileManager(PathManager.WheelWizardAppdataPath);
+        FilePicker.OpenFolderInFileManager(ApplicationData.DirectoryPath);
     }
 
     private void UpdateLocationRows()
@@ -379,13 +411,14 @@ public partial class WhWzSettings : UserControlBase
             DolphinExecutableCompleteIcon,
             DolphinExecutableWarningIcon,
             DolphinExecutableChangeButton,
-            SettingsService.DOLPHIN_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(PathManager.DolphinFilePath)
+            SettingsService.DOLPHIN_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath)
         );
         SetLocationRowState(
             GameLocationCompleteIcon,
             GameLocationWarningIcon,
             GameLocationChangeButton,
-            SettingsService.GAME_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(PathManager.GameFilePath)
+            SettingsService.GAME_LOCATION.IsValid()
+                && !string.IsNullOrWhiteSpace(SettingsService.Get<string>(SettingsService.GAME_LOCATION))
         );
         SetLocationRowState(
             DolphinUserFolderCompleteIcon,
@@ -395,14 +428,14 @@ public partial class WhWzSettings : UserControlBase
         );
 
         LocationWarningIcon.IsVisible = !SettingsService.PathsSetupCorrectly();
-        DolphinExecutableValueText.Text = string.IsNullOrWhiteSpace(PathManager.DolphinFilePath)
+        DolphinExecutableValueText.Text = string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath)
             ? GetDolphinExecutableHelperText()
-            : PathManager.DolphinFilePath;
-        DolphinExecutableOpenButton.IsVisible = !OperatingSystem.IsLinux() || IsConfiguredExecutableFile(PathManager.DolphinFilePath);
+            : DolphinPaths.ExecutablePath;
+        DolphinExecutableOpenButton.IsVisible = !OperatingSystem.IsLinux() || IsConfiguredExecutableFile(DolphinPaths.ExecutablePath);
         DolphinExecutableOpenButton.IsEnabled =
-            DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(PathManager.DolphinFilePath);
-        GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(PathManager.GameFilePath);
-        DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(PathManager.UserFolderPath);
+            DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(DolphinPaths.ExecutablePath);
+        GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
+        DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(DolphinPaths.UserFolderPath);
     }
 
     private static void SetLocationRowState(PathIcon completeIcon, PathIcon warningIcon, SettingsButton changeButton, bool isValid)
@@ -432,22 +465,22 @@ public partial class WhWzSettings : UserControlBase
     {
         var statusText =
             _isMovingAppData ? t("status.data_folder.moving")
-            : PathManager.IsUsingCustomWheelWizardAppdataPath ? t("status.data_folder.custom")
+            : ApplicationData.IsCustom ? t("status.data_folder.custom")
             : string.Empty;
 
         AppDataLocationStatus.Text = statusText;
         AppDataLocationStatus.IsVisible = !string.IsNullOrEmpty(statusText);
         AppDataLocationChangeButton.IsEnabled = !_isMovingAppData;
-        AppDataLocationResetButton.IsEnabled = !_isMovingAppData && PathManager.IsUsingCustomWheelWizardAppdataPath;
+        AppDataLocationResetButton.IsEnabled = !_isMovingAppData && ApplicationData.IsCustom;
         AppDataLocationOpenButton.IsEnabled = !_isMovingAppData;
-        ToolTip.SetTip(AppDataLocationResetButton, PathManager.DefaultWheelWizardAppdataFolderPath);
+        ToolTip.SetTip(AppDataLocationResetButton, ApplicationData.DefaultDirectoryPath);
     }
 
     private void SetAppDataLocationBusyState(bool isBusy)
     {
         _isMovingAppData = isBusy;
         AppDataLocationChangeButton.IsEnabled = !isBusy;
-        AppDataLocationResetButton.IsEnabled = !isBusy && PathManager.IsUsingCustomWheelWizardAppdataPath;
+        AppDataLocationResetButton.IsEnabled = !isBusy && ApplicationData.IsCustom;
         AppDataLocationOpenButton.IsEnabled = !isBusy;
         if (isBusy)
         {
@@ -463,7 +496,7 @@ public partial class WhWzSettings : UserControlBase
 
         var trimmedTarget = targetPath.Trim();
 
-        var validationSuccessful = PathManager.TryValidateWheelWizardAppdataTarget(
+        var validationSuccessful = ApplicationData.TryValidateTarget(
             trimmedTarget,
             out var normalizedTarget,
             out _,
@@ -504,59 +537,60 @@ public partial class WhWzSettings : UserControlBase
     private async Task MoveWheelWizardDataAsync(string targetPath)
     {
         SetAppDataLocationBusyState(true);
-        Log.CloseAndFlush();
-
-        var progressWindow = new ProgressWindow(t("status.data_folder.moving"))
-            .SetExtraText(t("helper_text.wheel_wizard_data_folder"))
-            .SetGoal(t("status.data_folder.moving"));
-        progressWindow.Show();
-
-        var progress = new Progress<double>(value =>
-        {
-            var percentage = (int)Math.Clamp(Math.Round(value * 100), 0, 100);
-            progressWindow.UpdateProgress(percentage);
-        });
-
-        (bool success, string errorMessage, DirectoryMoveContentsResult details) moveResult;
         try
         {
-            moveResult = await Task.Run(() =>
+            // Keep logs unchanged until the user has finished deciding whether to revert.
+            using var loggingPause = _logFiles.Pause();
+
+            var progressWindow = new ProgressWindow(t("status.data_folder.moving"))
+                .SetExtraText(t("helper_text.wheel_wizard_data_folder"))
+                .SetGoal(t("status.data_folder.moving"));
+            progressWindow.Show();
+
+            var progress = new Progress<double>(value =>
             {
-                var moveSuccessful = PathManager.TrySetWheelWizardAppdataPath(targetPath, out var error, out var moveDetails, progress);
-                return (moveSuccessful, error, moveDetails);
+                var percentage = (int)Math.Clamp(Math.Round(value * 100), 0, 100);
+                progressWindow.UpdateProgress(percentage);
             });
-        }
-        catch (Exception ex)
-        {
+
+            (bool success, string errorMessage, DirectoryMoveContentsResult details) moveResult;
+            try
+            {
+                moveResult = await Task.Run(() =>
+                {
+                    var moveSuccessful = ApplicationData.TryMove(targetPath, out var error, out var moveDetails, progress);
+                    return (moveSuccessful, error, moveDetails);
+                });
+            }
+            catch (Exception ex)
+            {
+                progressWindow.Close();
+
+                await new MessageBoxWindow()
+                    .SetMessageType(MessageBoxWindow.MessageType.Error)
+                    .SetTitleText(t("message_error.data_folder_move.title"))
+                    .SetInfoText(ex.Message)
+                    .ShowDialog();
+                return;
+            }
+
             progressWindow.Close();
-            WheelWizard.Logging.RecreateStaticLogger();
+
+            var (success, errorMessage, details) = moveResult;
+
+            if (success)
+            {
+                await HandleSuccessfulAppdataMoveAsync(details, errorMessage);
+            }
+            else
+            {
+                await HandleFailedAppdataMoveAsync(details, errorMessage);
+            }
+        }
+        finally
+        {
             SetAppDataLocationBusyState(false);
             UpdateAppDataLocationUi();
-
-            await new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText(t("message_error.data_folder_move.title"))
-                .SetInfoText(ex.Message)
-                .ShowDialog();
-            return;
-        }
-
-        progressWindow.Close();
-
-        WheelWizard.Logging.RecreateStaticLogger();
-
-        SetAppDataLocationBusyState(false);
-        UpdateAppDataLocationUi();
-
-        var (success, errorMessage, details) = moveResult;
-
-        if (success)
-        {
-            await HandleSuccessfulAppdataMoveAsync(details, errorMessage);
-        }
-        else
-        {
-            await HandleFailedAppdataMoveAsync(details, errorMessage);
         }
     }
 
@@ -577,13 +611,11 @@ public partial class WhWzSettings : UserControlBase
             var revert = await prompt.AwaitAnswer();
             if (revert)
             {
-                var revertSucceeded = PathManager.TryRevertWheelWizardAppdataMove(
-                    moveDetails.SourcePath,
-                    moveDetails.DestinationPath,
-                    out var revertError
-                );
-                WheelWizard.Logging.RecreateStaticLogger();
-                UpdateAppDataLocationUi();
+                var (revertSucceeded, revertError) = await Task.Run(() =>
+                {
+                    var success = ApplicationData.TryRevertMove(moveDetails.SourcePath, moveDetails.DestinationPath, out var error);
+                    return (success, error);
+                });
 
                 if (!revertSucceeded)
                 {
@@ -607,8 +639,8 @@ public partial class WhWzSettings : UserControlBase
         }
 
         var infoText =
-            t("message_success.data_folder_moved.extra", PathManager.WheelWizardAppdataPath)
-            ?? $"Wheel Wizard data is now stored in:\n{PathManager.WheelWizardAppdataPath}";
+            t("message_success.data_folder_moved.extra", ApplicationData.DirectoryPath)
+            ?? $"Wheel Wizard data is now stored in:\n{ApplicationData.DirectoryPath}";
 
         if (!string.IsNullOrWhiteSpace(warningMessage))
             infoText += $"\n\n{warningMessage}";
@@ -643,7 +675,7 @@ public partial class WhWzSettings : UserControlBase
             var revert = await prompt.AwaitAnswer();
             if (revert)
             {
-                var cleaned = PathManager.TryCleanupPartialWheelWizardAppdataMove(moveDetails.DestinationPath, out var cleanupError);
+                var cleaned = ApplicationData.TryCleanupPartialMove(moveDetails.DestinationPath, out var cleanupError);
                 if (!cleaned)
                 {
                     await new MessageBoxWindow()
@@ -672,11 +704,11 @@ public partial class WhWzSettings : UserControlBase
         var topLevel = TopLevel.GetTopLevel(this);
         IStorageFolder? suggestedStart = null;
 
-        var currentPath = PathManager.WheelWizardAppdataPath;
+        var currentPath = ApplicationData.DirectoryPath;
         if (!string.IsNullOrWhiteSpace(currentPath) && Directory.Exists(currentPath))
             suggestedStart = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentPath);
 
-        var folders = await FilePickerHelper.SelectFolderAsync("Select Wheel Wizard data folder", suggestedStart);
+        var folders = await FilePicker.SelectFolderAsync("Select Wheel Wizard data folder", suggestedStart);
         if (folders == null || folders.Count == 0)
             return;
 
@@ -687,10 +719,10 @@ public partial class WhWzSettings : UserControlBase
 
     private async void AppDataLocationReset_OnClick(object sender, RoutedEventArgs e)
     {
-        if (_isMovingAppData || !PathManager.IsUsingCustomWheelWizardAppdataPath)
+        if (_isMovingAppData || !ApplicationData.IsCustom)
             return;
 
-        await ConfirmAndMoveAppDataAsync(PathManager.DefaultWheelWizardAppdataFolderPath);
+        await ConfirmAndMoveAppDataAsync(ApplicationData.DefaultDirectoryPath);
     }
 
     private async void WindowScaleDropdown_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -752,7 +784,7 @@ public partial class WhWzSettings : UserControlBase
         if (folder == null)
             return null;
 
-        var resolved = FilePickerHelper.TryResolveLocalPath(folder);
+        var resolved = StoragePaths.TryResolveLocalPath(folder);
         if (!string.IsNullOrWhiteSpace(resolved))
             return resolved;
 
@@ -811,7 +843,7 @@ public partial class WhWzSettings : UserControlBase
             LocalizationService.ApplyCurrentLanguage();
             RefreshLanguageDropdown();
             RefreshLocalizedCodeText();
-            ViewUtils.RefreshWindow();
+            _mainWindow.Refresh();
         }
     }
 

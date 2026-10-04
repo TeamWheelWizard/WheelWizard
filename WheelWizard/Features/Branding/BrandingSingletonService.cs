@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using WheelWizard.Services;
+using System.Reflection;
 
 namespace WheelWizard.Branding;
 
@@ -23,8 +22,8 @@ public class BrandingSingletonService : IBrandingSingletonService
             Identifier = "WheelWizard",
             Version = string.Join('.', Assembly.GetExecutingAssembly().GetName().Version?.ToString().Split('.')[..3] ?? ["0.0.0"]),
 
-            RepositoryUrl = new(Endpoints.WhWzGithubUrl),
-            DiscordUrl = new(Endpoints.WhWzDiscordUrl),
-            SupportUrl = new(Endpoints.SupportLink),
+            RepositoryUrl = new("https://github.com/TeamWheelWizard/WheelWizard"),
+            DiscordUrl = new("https://discord.gg/vZ7T2wJnsq"),
+            SupportUrl = new("https://ko-fi.com/wheelwizard"),
         };
 }

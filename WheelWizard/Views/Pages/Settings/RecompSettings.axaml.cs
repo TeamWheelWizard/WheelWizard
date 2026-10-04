@@ -1,40 +1,53 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Recomp;
-using WheelWizard.Services;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Views.Storage;
 
 namespace WheelWizard.Views.Pages.Settings;
 
-public partial class RecompSettings : UserControlBase
+public partial class RecompSettings : UserControl
 {
     private bool _loading;
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private IFilePickerService FilePicker { get; }
 
-    [Inject]
-    private IRecompSettingManager RecompSettingsFile { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private IRecompDolphinDataService? DolphinData { get; set; }
+    private IRecompSettingManager RecompSettingsFile { get; }
 
-    [Inject]
-    private IRecompEnvironment? RecompEnvironment { get; set; }
+    private IRecompDolphinDataService? DolphinData { get; }
 
-    [Inject]
-    private IRecompInstallService? RecompInstallService { get; set; }
+    private IRecompEnvironment? RecompEnvironment { get; }
 
-    public RecompSettings()
+    private IRecompInstallService? RecompInstallService { get; }
+
+    private IRecompPaths RecompPaths { get; }
+
+    public RecompSettings(
+        IFilePickerService filePicker,
+        ISettingsManager settingsService,
+        IRecompSettingManager recompSettingsFile,
+        IRecompPaths recompPaths,
+        IRecompDolphinDataService? dolphinData = null,
+        IRecompEnvironment? recompEnvironment = null,
+        IRecompInstallService? recompInstallService = null
+    )
     {
+        FilePicker = filePicker;
+        SettingsService = settingsService;
+        RecompSettingsFile = recompSettingsFile;
+        RecompPaths = recompPaths;
+        DolphinData = dolphinData;
+        RecompEnvironment = recompEnvironment;
+        RecompInstallService = recompInstallService;
         InitializeComponent();
 
         // Config.toml is also written by the in-game settings bar, so opening the page rereads the
         // file rather than trusting whatever was loaded at startup.
-        RecompSettingsFile.ReloadSettings();
+        RecompSettingsFile.ReloadSettings(RecompPaths.ConfigFilePath);
         LoadSettings();
 
         // Attached after loading, so populating a control never writes it straight back.
@@ -57,7 +70,7 @@ public partial class RecompSettings : UserControlBase
             VideoBorder.IsEnabled = installed;
             InstallationBorder.IsEnabled = installed;
 
-            var installFolder = RecompEnvironment?.InstallFolderPath ?? PathManager.RecompInstallFolderPath;
+            var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
             InstallLocationText.Text = installFolder;
             OpenInstallFolder.IsEnabled = installed && Directory.Exists(installFolder);
             UninstallButton.IsEnabled = installed;
@@ -71,7 +84,7 @@ public partial class RecompSettings : UserControlBase
             ShareDolphinData.IsChecked = sharingDolphinData;
             SharedNandWarningIcon.IsVisible = sharingDolphinData;
 
-            var cloneFolder = PathManager.RecompNandCopyFolderPath;
+            var cloneFolder = RecompPaths.NandCopyFolderPath;
             DolphinCloneStatus.Text = Directory.Exists(cloneFolder)
                 ? t("status.recomp_dolphin_clone_available", cloneFolder)
                 : t("status.recomp_dolphin_clone_missing");
@@ -253,7 +266,7 @@ public partial class RecompSettings : UserControlBase
             return;
         }
 
-        var cloneFolder = PathManager.RecompNandCopyFolderPath;
+        var cloneFolder = RecompPaths.NandCopyFolderPath;
         if (Directory.Exists(cloneFolder))
         {
             var overwrite = await new YesNoWindow()
@@ -313,9 +326,9 @@ public partial class RecompSettings : UserControlBase
 
     private void OpenInstallFolder_OnClick(object? sender, RoutedEventArgs e)
     {
-        var installFolder = RecompEnvironment?.InstallFolderPath ?? PathManager.RecompInstallFolderPath;
+        var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
         if (Directory.Exists(installFolder))
-            FilePickerHelper.OpenFolderInFileManager(installFolder);
+            FilePicker.OpenFolderInFileManager(installFolder);
     }
 
     private async void Uninstall_OnClick(object? sender, RoutedEventArgs e)

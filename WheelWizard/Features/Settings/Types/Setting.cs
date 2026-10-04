@@ -1,9 +1,11 @@
-using WheelWizard.Settings;
+using System.Diagnostics;
 
 namespace WheelWizard.Settings.Types;
 
 public abstract class Setting
 {
+    public event Action<Setting>? Changed;
+
     protected Setting(Type type, string name, object defaultValue)
     {
         Name = name;
@@ -42,8 +44,14 @@ public abstract class Setting
     {
         var s = SaveEvenIfNotValid;
         SaveEvenIfNotValid = true;
-        Set(DefaultValue);
-        SaveEvenIfNotValid = s;
+        try
+        {
+            Set(DefaultValue);
+        }
+        finally
+        {
+            SaveEvenIfNotValid = s;
+        }
     }
 
     public abstract bool IsValid();
@@ -60,5 +68,23 @@ public abstract class Setting
         return this;
     }
 
-    protected void SignalChange() => SettingsSignalRuntime.Publish(this);
+    protected void SignalChange()
+    {
+        var handlers = Changed;
+        if (handlers is null)
+            return;
+
+        foreach (Action<Setting> handler in handlers.GetInvocationList())
+        {
+            try
+            {
+                handler(this);
+            }
+            catch (Exception exception)
+            {
+                // A subscriber failure must not interrupt the mutation or delivery to other subscribers.
+                Trace.TraceError($"A subscriber threw while handling a change to setting '{Name}': {exception}");
+            }
+        }
+    }
 }
