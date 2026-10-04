@@ -46,6 +46,9 @@ public class VirtualSetting : Setting, IDisposable
 
     public override object Get() => Value;
 
+    // Earlier child saves may have succeeded, so the previous composite value can be stale.
+    protected override void RestoreValueAfterSaveFailure(object previousValue) => Recalculate();
+
     // We dont have to constantly recalculate the value, since if they didn't change, the value is still the same
     // and they only change when the dependencies change, or when the users sets a new value
     public override bool IsValid() => ValidationFunc == null || ValidationFunc(Value);
