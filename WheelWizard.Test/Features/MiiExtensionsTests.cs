@@ -5,6 +5,32 @@ namespace WheelWizard.Test.Features;
 
 public class MiiExtensionsTests
 {
+    [Theory]
+    [InlineData("00:11:22:33:44:55", false)]
+    [InlineData("00:11:22:33:44:56", true)]
+    [InlineData("invalid", false)]
+    [InlineData(null, false)]
+    public void IsGlobal_UsesExplicitConsoleIdentity(string? macAddress, bool expected)
+    {
+        var mii = new Mii
+        {
+            MiiId = 0x80000001,
+            SystemId0 = 0x33,
+            SystemId1 = 0x33,
+            SystemId2 = 0x44,
+            SystemId3 = 0x55,
+        };
+
+        Assert.Equal(expected, mii.IsGlobal(macAddress));
+    }
+
+    [Fact]
+    public void BluePants_AreGlobalWithoutConsoleIdentity()
+    {
+        var mii = new Mii { MiiId = 0xC0000001 };
+        Assert.True(mii.IsGlobal(null));
+    }
+
     [Fact]
     public void GetCreationDateUtc_ShouldDecodeLower29Bits()
     {

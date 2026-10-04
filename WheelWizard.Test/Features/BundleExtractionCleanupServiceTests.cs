@@ -2,6 +2,8 @@ using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using Testably.Abstractions.Testing;
 using WheelWizard.AutoUpdating;
+using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.Test.Features;
 
@@ -16,11 +18,56 @@ public class BundleExtractionCleanupServiceTests
 
     public BundleExtractionCleanupServiceTests()
     {
-        _service = new(_fileSystem, Substitute.For<ILogger<BundleExtractionCleanupService>>());
+        _service = new(
+            _fileSystem,
+            Substitute.For<ILogger<BundleExtractionCleanupService>>(),
+            Substitute.For<IApplicationProcess>(),
+            Substitute.For<IProcessLauncher>(),
+            new RuntimeEnvironment()
+        );
 
         _extractionRoot = _fileSystem.Path.GetFullPath(_fileSystem.Path.Combine("/", "temp", ".net"));
         _appDirectory = _fileSystem.Path.Combine(_extractionRoot, "WheelWizard");
         _currentExtraction = _fileSystem.Path.Combine(_appDirectory, "current-bundle-id");
+    }
+
+    [Theory]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    public async Task BackgroundCleanup_UsesInjectedProcessState_AndPreservesOtherInstances(
+        bool otherInstance,
+        bool enumerationFails,
+        bool expectRemoval
+    )
+    {
+        var current = CreateExtraction("WheelWizard", "current-bundle-id");
+        var old = CreateExtraction("WheelWizard", "old-bundle-id");
+        var application = Substitute.For<IApplicationProcess>();
+        application.ExecutablePath.Returns(_fileSystem.Path.Combine(_fileSystem.Path.GetFullPath("/apps"), "WheelWizard.exe"));
+        application.NativeLibrarySearchDirectories.Returns(current);
+        application.Id.Returns(42);
+        var processes = Substitute.For<IProcessLauncher>();
+        processes
+            .GetProcessIds(Arg.Any<string>())
+            .Returns(call =>
+            {
+                if (enumerationFails)
+                    throw new InvalidOperationException("Cannot inspect processes");
+                return otherInstance ? new[] { 42, 99 } : new[] { 42 };
+            });
+        var service = new BundleExtractionCleanupService(
+            _fileSystem,
+            Substitute.For<ILogger<BundleExtractionCleanupService>>(),
+            application,
+            processes,
+            new RuntimeEnvironment()
+        );
+
+        await service.CleanupStaleExtractionsAsync();
+
+        Assert.True(_fileSystem.Directory.Exists(current));
+        Assert.Equal(!expectRemoval, _fileSystem.Directory.Exists(old));
     }
 
     private string CreateExtraction(string appName, string bundleId)

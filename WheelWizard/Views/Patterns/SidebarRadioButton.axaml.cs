@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -115,6 +115,8 @@ public partial class SidebarRadioButton : RadioButton
         _hoverEffect = e.NameScope.Find<Border>("PART_HoverEffect");
     }
 
+    public event EventHandler<Type>? NavigationRequested;
+
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
@@ -123,6 +125,6 @@ public partial class SidebarRadioButton : RadioButton
 
         PageType ??= typeof(NotFoundPage);
 
-        NavigationManager.NavigateTo(PageType);
+        NavigationRequested?.Invoke(this, PageType);
     }
 }

@@ -4,6 +4,8 @@ public enum WheelWizardStatus
 {
     Loading,
     NoServer,
+    NoRecompExtension,
+    NoDolphinExtension,
     NoDolphin,
     ConfigNotFinished,
     NotInstalled,

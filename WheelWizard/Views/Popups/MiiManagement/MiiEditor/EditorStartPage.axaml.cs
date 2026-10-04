@@ -1,6 +1,5 @@
 using Avalonia.Interactivity;
 using Testably.Abstractions;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Views.Components;
 using MiiFactory = WheelWizard.WiiManagement.MiiManagement.MiiFactory;
 
@@ -8,12 +7,12 @@ namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
 
 public partial class EditorStartPage : MiiEditorBaseControl
 {
-    [Inject]
-    private IRandomSystem Random { get; set; } = null!;
+    private IRandomSystem Random { get; }
 
-    public EditorStartPage(MiiEditorWindow ew)
+    public EditorStartPage(IRandomSystem random, MiiEditorWindow ew)
         : base(ew)
     {
+        Random = random;
         InitializeComponent();
         MiiName.Text = Editor.Mii.Name.ToString();
         if (Editor.Mii.IsFavorite)

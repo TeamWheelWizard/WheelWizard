@@ -7,46 +7,60 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Testably.Abstractions;
 using WheelWizard.CustomCharacters;
-using WheelWizard.Helpers;
-using WheelWizard.Services;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Patterns;
+using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
+using WheelWizard.Views.Storage;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class MiiListPage : UserControlBase
+public partial class MiiListPage : UserControl
 {
+    private IPopupFactory Popups { get; }
+
     public ObservableCollection<MiiListRow> MiiRows { get; } = [];
     private readonly List<MiiListEntry> _miiEntries = [];
 
-    [Inject]
-    private ICustomCharactersService CustomCharactersService { get; set; } = null!;
+    private IFilePickerService FilePicker { get; }
 
-    [Inject]
-    private IMiiDbService MiiDbService { get; set; } = null!;
+    private ICustomCharactersService CustomCharactersService { get; }
 
-    [Inject]
-    private IMiiRepositoryService MiiRepositoryService { get; set; } = null!;
+    private IMiiDbService MiiDbService { get; }
 
-    [Inject]
-    private IFileSystem FileSystem { get; set; } = null!;
+    private IMiiRepositoryService MiiRepositoryService { get; }
 
-    [Inject]
-    private IRandomSystem Random { get; set; } = null!;
+    private IFileSystem FileSystem { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private IRandomSystem Random { get; }
 
-    public MiiListPage()
+    private ISettingsManager SettingsService { get; }
+
+    public MiiListPage(
+        IPopupFactory popups,
+        IFilePickerService filePicker,
+        ICustomCharactersService customCharactersService,
+        IMiiDbService miiDbService,
+        IMiiRepositoryService miiRepositoryService,
+        IFileSystem fileSystem,
+        IRandomSystem random,
+        ISettingsManager settingsService
+    )
     {
+        Popups = popups;
+        FilePicker = filePicker;
+        CustomCharactersService = customCharactersService;
+        MiiDbService = miiDbService;
+        MiiRepositoryService = miiRepositoryService;
+        FileSystem = fileSystem;
+        Random = random;
+        SettingsService = settingsService;
         InitializeComponent();
         DataContext = this;
 
@@ -123,7 +137,7 @@ public partial class MiiListPage : UserControlBase
         _miiEntries.Clear();
         foreach (var mii in MiiDbService.GetAllMiis().OrderByDescending(m => m.IsFavorite))
         {
-            _miiEntries.Add(new MiiListEntry(mii));
+            _miiEntries.Add(new MiiListEntry(mii, isGlobal: mii.IsGlobal(SettingsService.Get<string>(SettingsService.MACADDRESS))));
         }
 
         var count = _miiEntries.Count;
@@ -164,8 +178,8 @@ public partial class MiiListPage : UserControlBase
 
     private async void ImportMii_OnClick(object? sender, RoutedEventArgs e)
     {
-        var miiFiles = await FilePickerHelper.OpenFilePickerAsync(
-            fileType: CustomFilePickerFileType.Miis,
+        var miiFiles = await FilePicker.OpenFilePickerAsync(
+            fileType: FilePickerFilters.Miis,
             allowMultiple: true,
             title: "Select Mii file(s)"
         );
@@ -309,9 +323,9 @@ public partial class MiiListPage : UserControlBase
     private async void ExportMiiAsFile(Mii mii)
     {
         var exportName = ReplaceInvalidFileNameChars(CustomCharactersService.NormalizeToAscii(mii.Name.ToString()));
-        var diaglog = await FilePickerHelper.SaveFileAsync(
+        var diaglog = await FilePicker.SaveFileAsync(
             title: "Save Mii as file",
-            fileTypes: [CustomFilePickerFileType.Miis],
+            fileTypes: [FilePickerFilters.Miis],
             defaultFileName: $"{exportName}"
         );
         if (diaglog == null)
@@ -394,7 +408,7 @@ public partial class MiiListPage : UserControlBase
 
     private async void EditMii(Mii mii)
     {
-        var window = new MiiEditorWindow().SetMii(mii);
+        var window = Popups.Create<MiiEditorWindow>().SetMii(mii);
         var save = await window.AwaitAnswer();
         if (!save)
             return;
@@ -420,7 +434,7 @@ public partial class MiiListPage : UserControlBase
         if (mii == null)
             return;
 
-        var window = new MiiEditorWindow().SetMii(mii);
+        var window = Popups.Create<MiiEditorWindow>().SetMii(mii);
         var save = await window.AwaitAnswer();
         if (!save)
             return;
@@ -502,12 +516,13 @@ public partial class MiiListPage : UserControlBase
         public IReadOnlyList<MiiListEntry> Items { get; } = items;
     }
 
-    public sealed class MiiListEntry(Mii? mii, bool isAddEntry = false) : INotifyPropertyChanged
+    public sealed class MiiListEntry(Mii? mii, bool isAddEntry = false, bool isGlobal = false) : INotifyPropertyChanged
     {
         private bool _isSelected;
 
         public Mii? Mii { get; } = mii;
         public bool IsAddEntry { get; } = isAddEntry;
+        public bool IsGlobal { get; } = isGlobal;
         public bool HasMii => Mii != null;
         public string SelectionGroup { get; } = Guid.NewGuid().ToString("N");
         public string FavoriteActionHeader => Mii?.IsFavorite == true ? t("action.unfavorite") : t("action.favorite");

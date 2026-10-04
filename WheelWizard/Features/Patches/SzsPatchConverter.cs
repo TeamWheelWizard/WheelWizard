@@ -1,5 +1,4 @@
 using WheelWizard.Features.Archives;
-using WheelWizard.Helpers;
 using static WheelWizard.Features.Patches.PatchConversionHelpers;
 
 namespace WheelWizard.Features.Patches;
@@ -8,6 +7,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
 {
     public OperationResult<PatchConversionAnalysis> AnalyzeAgainstBaseline(BaselineEntry baseline, string moddedName, byte[] moddedBytes)
     {
+        // #todo: test conversion against real baselines, including changed, added, removed and unsupported archive members.
         if (!string.Equals(baseline.Kind, "szs", StringComparison.OrdinalIgnoreCase))
             return Fail("The selected baseline is not an SZS file.");
 

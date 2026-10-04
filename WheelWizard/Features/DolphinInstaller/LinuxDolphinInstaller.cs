@@ -1,3 +1,5 @@
+using WheelWizard.Shared.Processes;
+
 namespace WheelWizard.DolphinInstaller;
 
 public interface ILinuxDolphinInstaller
@@ -10,7 +12,7 @@ public interface ILinuxDolphinInstaller
     Task<OperationResult> UpdateFlatpakDolphin(string appId, IProgress<int>? progress = null);
 }
 
-public sealed class LinuxDolphinInstaller(ILinuxCommandEnvironment commandEnvironment, ILinuxProcessService processService)
+public sealed class LinuxDolphinInstaller(IUnixCommandService commandEnvironment, IUnixProcessService processService)
     : ILinuxDolphinInstaller
 {
     public bool IsDolphinInstalledInFlatpak()

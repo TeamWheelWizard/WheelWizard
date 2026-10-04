@@ -1,30 +1,35 @@
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
+using WheelWizard.Launching;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services.Launcher;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Distributions;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class TestingPage : UserControlBase
+public partial class TestingPage : UserControl
 {
     private WheelWizardStatus _status = WheelWizardStatus.Loading;
     private bool _isBusy;
 
-    [Inject]
-    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; set; } = null!;
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private ISettingsManager SettingsService { get; }
 
-    [Inject]
-    private RrBetaLauncher LauncherService { get; set; } = null!;
+    private RrBetaLauncher LauncherService { get; }
 
-    public TestingPage()
+    public TestingPage(
+        ICustomDistributionSingletonService customDistributionSingletonService,
+        ISettingsManager settingsService,
+        RrBetaLauncher launcherService
+    )
     {
+        CustomDistributionSingletonService = customDistributionSingletonService;
+        SettingsService = settingsService;
+        LauncherService = launcherService;
         InitializeComponent();
         UpdateStatusAsync();
     }
@@ -58,6 +63,8 @@ public partial class TestingPage : UserControlBase
             WheelWizardStatus.NotInstalled => "Not installed",
             WheelWizardStatus.Ready => "Installed - Ready to play",
             WheelWizardStatus.NoServer or WheelWizardStatus.NoServerButInstalled => "Server offline",
+            WheelWizardStatus.NoDolphinExtension => "No Dolphin extension",
+            WheelWizardStatus.NoRecompExtension => "No Wiicompiled extension",
             WheelWizardStatus.OutOfDate => "Update available",
             _ => "Checking status...",
         };
@@ -77,6 +84,8 @@ public partial class TestingPage : UserControlBase
                 StatusPill.Classes.Add("warning");
                 break;
             case WheelWizardStatus.NoServer:
+            case WheelWizardStatus.NoDolphinExtension:
+            case WheelWizardStatus.NoRecompExtension:
             case WheelWizardStatus.NoServerButInstalled:
                 StatusPill.Classes.Add("danger");
                 break;

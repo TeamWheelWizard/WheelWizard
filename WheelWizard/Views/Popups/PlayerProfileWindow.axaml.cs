@@ -1,9 +1,11 @@
 using System.ComponentModel;
+using Avalonia;
+using Avalonia.Data;
 using Avalonia.Threading;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.Services;
+using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -12,17 +14,19 @@ namespace WheelWizard.Views.Popups;
 
 public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
 {
-    [Inject]
-    private IApiCaller<IRwfcApi> ApiCaller { get; set; } = null!;
+    private IApiCaller<IRwfcApi> ApiCaller { get; }
 
     private PlayerProfileResponse? _profile;
     private bool _isLoading = true;
     private string _errorMessage = string.Empty;
 
-    public PlayerProfileWindow(string friendCode)
+    public PlayerProfileWindow(VrHistoryGraph historyGraph, IApiCaller<IRwfcApi> apiCaller, string friendCode)
         : base(true, true, false, "Player Profile")
     {
+        ApiCaller = apiCaller;
         InitializeComponent();
+        HistoryHost.Content = historyGraph;
+        historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("Profile.FriendCode") { Source = this });
         DataContext = this;
         Window.WindowTitle = friendCode;
         LoadProfile(friendCode);

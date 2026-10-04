@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using WheelWizard.Shared;
 
 namespace WheelWizard.Recomp;
@@ -14,6 +15,8 @@ public static class RecompExtensions
     /// </summary>
     public static IServiceCollection AddRecomp(this IServiceCollection services)
     {
+        // Settings still need a config location on platforms without the recomp frontend.
+        services.TryAddSingleton<IRecompPaths, RecompPaths>();
         if (!RecompPlatform.IsSupported)
             return services;
 

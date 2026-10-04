@@ -1,16 +1,20 @@
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using WheelWizard.Helpers;
+using WheelWizard.CustomCharacters;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services.LiveData;
-using WheelWizard.Services.Other;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Navigation;
+using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
 using WheelWizard.WheelWizardData;
@@ -22,8 +26,12 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
+public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 {
+    private ICustomCharactersService CustomCharacters { get; }
+
+    private INavigationService Navigation { get; }
+
     private const int ProfileCarouselPageCount = 2;
     private const int ProfileSelectorMaxCharacters = 12;
 
@@ -35,17 +43,19 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private string _currentFriendCode = string.Empty;
     private int _activeInfoSlideIndex;
 
-    [Inject]
-    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private IWhWzDataSingletonService BadgeService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; }
 
-    [Inject]
-    private IMiiDbService MiiDbService { get; set; } = null!;
+    private IWhWzDataSingletonService BadgeService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private IMiiDbService MiiDbService { get; }
+
+    private ISettingsManager SettingsService { get; }
+
+    private ISaveRegionService SaveRegions { get; }
+
+    private ICustomDistributionPaths DistributionPaths { get; }
 
     public Mii? CurrentMii
     {
@@ -115,9 +125,31 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
     private int _currentUserIndex;
     private int FocusedUser => SettingsService.Get<int>(SettingsService.FOCUSED_USER);
 
-    public UserProfilePage()
+    public UserProfilePage(
+        VrHistoryGraph historyGraph,
+        ICustomCharactersService customCharacters,
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        IGameLicenseSingletonService gameLicenseService,
+        IWhWzDataSingletonService badgeService,
+        IMiiDbService miiDbService,
+        ISettingsManager settingsService,
+        ISaveRegionService saveRegions,
+        ICustomDistributionPaths distributionPaths
+    )
     {
+        CustomCharacters = customCharacters;
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        GameLicenseService = gameLicenseService;
+        BadgeService = badgeService;
+        MiiDbService = miiDbService;
+        SettingsService = settingsService;
+        SaveRegions = saveRegions;
+        DistributionPaths = distributionPaths;
         InitializeComponent();
+        HistoryHost.Content = historyGraph;
+        historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("CurrentFriendCode") { Source = this });
         ResetMiiTopBar();
         ViewMii(FocusedUser);
         PopulateRegions();
@@ -130,7 +162,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void PopulateRegions()
     {
-        var validRegions = RRRegionManager.GetValidRegions();
+        var validRegions = SaveRegions.GetAvailableRegions(DistributionPaths.SaveFolderPath);
         var currentRegion = SettingsService.Get<MarioKartWiiEnums.Regions>(SettingsService.RR_REGION);
         foreach (var region in Enum.GetValues<MarioKartWiiEnums.Regions>())
         {
@@ -304,7 +336,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         UpdatePage();
     }
 
-    private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) => SetUserAsPrimary();
+    private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) => ViewUtils.IfChecked(sender, () => SetUserAsPrimary());
 
     private void PrevCarouselPage_OnClick(object? sender, RoutedEventArgs e) => MoveCarouselPage(-1);
 
@@ -319,7 +351,9 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             return;
         }
 
-        var selectedMii = await new MiiSelectorWindow().SetMiiOptions(availableMiis, CurrentMii).AwaitAnswer();
+        var selectedMii = await new MiiSelectorWindow()
+            .SetMiiOptions(availableMiis, CurrentMii, SettingsService.Get<string>(SettingsService.MACADDRESS))
+            .AwaitAnswer();
 
         if (selectedMii == null)
             return;
@@ -345,12 +379,12 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
 
     private void ViewRoom_OnClick(object? sender, RoutedEventArgs e)
     {
-        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        foreach (var room in LiveRooms.CurrentRooms)
         {
             if (room.Players.All(player => player.FriendCode != currentPlayer?.FriendCode))
                 continue;
 
-            NavigationManager.NavigateTo<RoomDetailsPage>(room);
+            Navigation.NavigateTo<RoomDetailsPage>(room);
             return;
         }
 
@@ -384,7 +418,7 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
         var renamePopup = new TextInputWindow()
             .SetMainText(t("question.enter_new_name.title"))
             .SetExtraText(extraText)
-            .SetAllowCustomChars(true)
+            .SetCustomCharacters(CustomCharacters.GetCustomCharacters())
             .SetValidation(ValidateMiiName)
             .SetInitialText(oldName ?? "")
             .SetPlaceholderText(oldName ?? "");
@@ -441,12 +475,12 @@ public partial class UserProfilePage : UserControlBase, INotifyPropertyChanged
             dot.Classes.Remove("active");
     }
 
-    private static bool IsUserInLiveRoom(string? friendCode)
+    private bool IsUserInLiveRoom(string? friendCode)
     {
         if (string.IsNullOrWhiteSpace(friendCode))
             return false;
 
-        return RRLiveRooms.Instance.CurrentRooms.Any(room => room.Players.Any(player => player.FriendCode == friendCode));
+        return LiveRooms.CurrentRooms.Any(room => room.Players.Any(player => player.FriendCode == friendCode));
     }
 
     private void UpdateOnlineBorders()

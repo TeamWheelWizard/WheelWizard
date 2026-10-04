@@ -1,18 +1,19 @@
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Shared;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.Test.Features;
 
 public class LinuxDolphinInstallerTests
 {
-    private readonly ILinuxCommandEnvironment _commandEnvironment;
-    private readonly ILinuxProcessService _processService;
+    private readonly IUnixCommandService _commandEnvironment;
+    private readonly IUnixProcessService _processService;
     private readonly LinuxDolphinInstaller _installer;
 
     public LinuxDolphinInstallerTests()
     {
-        _commandEnvironment = Substitute.For<ILinuxCommandEnvironment>();
-        _processService = Substitute.For<ILinuxProcessService>();
+        _commandEnvironment = Substitute.For<IUnixCommandService>();
+        _processService = Substitute.For<IUnixProcessService>();
         _installer = new LinuxDolphinInstaller(_commandEnvironment, _processService);
     }
 

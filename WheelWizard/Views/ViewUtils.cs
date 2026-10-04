@@ -2,10 +2,12 @@ using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
 using Avalonia.Media;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings.Types;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views;
 
@@ -24,9 +26,20 @@ public static class ViewUtils
         ShowSnackbar("Opened link");
     }
 
+    public static void OpenRwfcPlayer(string? friendCode)
+    {
+        var digits = new string((friendCode ?? string.Empty).Where(char.IsAsciiDigit).ToArray());
+        if (digits.Length != 12)
+            return;
+
+        OpenLink($"https://rwfc.net/player/{digits[..4]}-{digits[4..8]}-{digits[8..]}");
+    }
+
     public static void ShowSnackbar(string message, SnackbarType type = SnackbarType.Success) => GetLayout().ShowSnackbar(message, type);
 
-    public static Layout GetLayout() => Layout.Instance;
+    public static Layout GetLayout() =>
+        (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as Layout
+        ?? throw new InvalidOperationException("The main window is not available.");
 
     public static double GetUsableWindowScale(double requestedScale, Size unscaledSize, Window window)
     {
@@ -42,45 +55,6 @@ public static class ViewUtils
 
         maxScale = Math.Max(SettingValues.MinWindowScale, maxScale);
         return Math.Clamp(requestedScale, SettingValues.MinWindowScale, maxScale);
-    }
-
-    public static void RefreshWindow()
-    {
-        // Refresh window  opens in the start page again, that is nessesairy
-        // we would prefer opening up where we left off, however, that does not work since the translations
-        // are still in the context of the layout before, and so the dropdowns will break
-
-        var oldWindow = GetLayout();
-        // Creating a new one will also set re-assign `Layout.Instance` right away, and this `GetLayout()`
-        Layout newWindow = new();
-        newWindow.Position = oldWindow.Position;
-        if (oldWindow is IRepeatedTaskListener oldListener)
-        {
-            // Unsubscribing is not really necessary. But i guess it prevents memory leaks when
-            // someone is refreshing the window a lot (happens when changing the language e.g.
-            // So they would have to change the language like 1000 of times in a row)
-            WhWzStatusManager.Instance.Unsubscribe(oldListener);
-            RRLiveRooms.Instance.Unsubscribe(oldListener);
-        }
-
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            var previousShutdownMode = desktop.ShutdownMode;
-            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            desktop.MainWindow = newWindow;
-            newWindow.Show();
-            oldWindow.Close();
-            desktop.ShutdownMode =
-                previousShutdownMode == ShutdownMode.OnMainWindowClose ? ShutdownMode.OnMainWindowClose : previousShutdownMode;
-        }
-        else
-        {
-            newWindow.Show();
-            oldWindow.Close();
-        }
-
-        newWindow.UpdatePlayerAndRoomCount(RRLiveRooms.Instance);
-        newWindow.UpdateLiveAlert();
     }
 
     public static T? FindParent<T>(object? child, int maxSearchDepth = 10)
@@ -102,6 +76,14 @@ public static class ViewUtils
         }
 
         return default;
+    }
+
+    public static void IfChecked(object? sender, Action action)
+    {
+        if (sender is ToggleButton { IsChecked: true })
+        {
+            action();
+        }
     }
 
     #region Colors

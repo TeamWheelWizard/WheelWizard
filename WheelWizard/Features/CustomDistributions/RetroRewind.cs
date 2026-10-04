@@ -1,37 +1,48 @@
 using System.IO.Abstractions;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
-using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Semver;
 using WheelWizard.CustomDistributions.Domain;
-using WheelWizard.Helpers;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Models.Enums;
-using WheelWizard.Services;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Downloads;
+using WheelWizard.Shared.IO;
 using WheelWizard.Shared.Services;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
 
 public class RetroRewind : IDistribution
 {
+    private readonly IDownloadService downloads;
+    private readonly IDistributionPrompts _prompts;
     private readonly IFileSystem _fileSystem;
     private readonly IApiCaller<IRetroRewindApi> _api;
     private readonly ILogger<IDistribution> _logger;
     private readonly ISettingsManager _settingsManager;
+    private readonly ICustomDistributionPaths _paths;
+    private readonly IDolphinPaths _dolphinPaths;
 
     public RetroRewind(
         IFileSystem fileSystem,
         IApiCaller<IRetroRewindApi> api,
         ILogger<IDistribution> logger,
-        ISettingsManager settingsManager
+        ISettingsManager settingsManager,
+        IDownloadService downloads,
+        ICustomDistributionPaths paths,
+        IDolphinPaths dolphinPaths,
+        IDistributionPrompts prompts
     )
     {
         _api = api;
+        this.downloads = downloads;
+        _prompts = prompts;
         _fileSystem = fileSystem;
         _logger = logger;
         _settingsManager = settingsManager;
+        _paths = paths;
+        _dolphinPaths = dolphinPaths;
     }
 
     public string Title => "Retro Rewind";
@@ -41,50 +52,50 @@ public class RetroRewind : IDistribution
     public string XMLFolderName => "riivolution";
     public string XMLFileName => "RetroRewind6";
 
-    public async Task<OperationResult> InstallAsync(ProgressWindow progressWindow)
+    public async Task<OperationResult> InstallAsync(DistributionOperation operation)
     {
+        // #todo: download and validate the replacement before removing the current install, then roll back if publishing fails.
+        if (operation.CancellationToken.IsCancellationRequested)
+            return Fail("Distribution installation was cancelled.");
         if (GetCurrentVersion() is not null)
         {
-            var removeResult = await RemoveAsync(progressWindow);
+            var removeResult = await RemoveAsync(operation);
             if (removeResult.IsFailure)
                 return removeResult;
         }
 
         if (HasOldRksys())
         {
-            var rksysQuestion = new YesNoWindow()
-                .SetMainText(t("question.old_rksys_found.title"))
-                .SetExtraText(t("question.old_rksys_found.extra"));
-            if (await rksysQuestion.AwaitAnswer())
+            if (await _prompts.ConfirmOldSaveBackupAsync())
                 await BackupOldrksys();
         }
         var serverResponse = await _api.CallApiAsync(api => api.Ping()); // actual response doesnt matter
         if (serverResponse.IsFailure)
             return Fail("Could not connect to the server");
 
-        var downloadResult = await DownloadAndExtractRetroRewind(progressWindow);
+        var downloadResult = await DownloadAndExtractRetroRewind(operation);
         if (downloadResult.IsFailure)
             return downloadResult;
 
-        if (progressWindow.WasCancellationRequested)
-            return Ok();
+        if (operation.CancellationToken.IsCancellationRequested)
+            return Fail("Retro Rewind installation was cancelled.");
 
-        var updateResult = await UpdateAsync(progressWindow);
+        var updateResult = await UpdateAsync(operation);
         if (updateResult.IsFailure)
             return updateResult;
 
         return Ok();
     }
 
-    private async Task<OperationResult> DownloadAndExtractRetroRewind(ProgressWindow progressWindow)
+    private async Task<OperationResult> DownloadAndExtractRetroRewind(DistributionOperation operation)
     {
-        progressWindow.SetExtraText(t("progress.installing_rr_first_time"));
-        var downloadedZipPath = PathManager.RetroRewindTempFile;
+        operation.Report(new(Message: t("progress.installing_rr_first_time")));
+        var downloadedZipPath = _paths.RetroRewindArchivePath;
         // where we'll do the extraction
-        var tempExtractionPath = PathManager.TempModsFolderPath;
+        var tempExtractionPath = _paths.DownloadFolderPath;
 
         //where all distributions are stored
-        var destinationParentDir = _fileSystem.DirectoryInfo.New(PathManager.RiivolutionWhWzFolderPath);
+        var destinationParentDir = _fileSystem.DirectoryInfo.New(_paths.RootFolderPath);
 
         OperationResult? result = null;
         try
@@ -99,20 +110,17 @@ public class RetroRewind : IDistribution
                 return Fail("Failed to get Retro Rewind download URL.");
 
             //todo, service
-            var downloadedFilePath = await DownloadHelper.DownloadToLocationAsync(
-                installUrlResult.Value.Trim(),
-                downloadedZipPath,
-                progressWindow
-            );
-            if (string.IsNullOrWhiteSpace(downloadedFilePath) || !_fileSystem.File.Exists(downloadedFilePath))
-                return progressWindow.WasCancellationRequested ? Ok() : Fail("Failed to download Retro Rewind files.");
-
-            downloadedZipPath = downloadedFilePath;
+            var download = await downloads.DownloadDistributionAsync(installUrlResult.Value.Trim(), downloadedZipPath, operation);
+            if (download.IsFailure)
+                return download.Error;
+            if (!_fileSystem.File.Exists(download.Value))
+                return Fail("Failed to download Retro Rewind files.");
+            downloadedZipPath = download.Value;
 
             // 2) Extract
-            progressWindow.SetExtraText(t("state.extracting"));
+            operation.Report(new(Message: t("state.extracting")));
 
-            var extractResult = await Task.Run(() => ExtractZipFile(downloadedZipPath, tempExtractionPath, progressWindow));
+            var extractResult = await Task.Run(() => ExtractZipFile(downloadedZipPath, tempExtractionPath, operation));
 
             if (extractResult.IsFailure)
             {
@@ -126,7 +134,7 @@ public class RetroRewind : IDistribution
                 throw new DirectoryNotFoundException($"Could not find a '{FolderName}' folder inside {tempExtractionPath}");
 
             // 4) Remove existing install, if any
-            var removeResult = await RemoveAsync(progressWindow);
+            var removeResult = await RemoveAsync(operation);
             if (removeResult.IsFailure)
             {
                 result = removeResult;
@@ -183,7 +191,7 @@ public class RetroRewind : IDistribution
         var datFileData = await _fileSystem.File.ReadAllBytesAsync(sourceFile);
         if (regionFolderName == null)
             return;
-        var destinationFolder = _fileSystem.Path.Combine(PathManager.SaveFolderPath, regionFolderName);
+        var destinationFolder = _fileSystem.Path.Combine(_paths.SaveFolderPath, regionFolderName);
         _fileSystem.Directory.CreateDirectory(destinationFolder);
         var destinationFile = _fileSystem.Path.Combine(destinationFolder, "rksys.dat");
         await _fileSystem.File.WriteAllBytesAsync(destinationFile, datFileData);
@@ -199,13 +207,13 @@ public class RetroRewind : IDistribution
         // todo, maybe we should check for the existence of the file instead of the folder? and also find the oldest one?
         var rrWfcPaths = new[]
         {
-            PathManager.SaveFolderPath,
+            _paths.SaveFolderPath,
             // Also consider the folder with upper-case `Save`
-            _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, "riivolution", "Save", "RetroWFC"),
-            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "Riivolution", "save", "RetroWFC"),
-            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "Riivolution", "Save", "RetroWFC"),
-            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "riivolution", "save", "RetroWFC"),
-            _fileSystem.Path.Combine(PathManager.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(_paths.RootFolderPath, "riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(_dolphinPaths.LoadFolderPath, "Riivolution", "save", "RetroWFC"),
+            _fileSystem.Path.Combine(_dolphinPaths.LoadFolderPath, "Riivolution", "Save", "RetroWFC"),
+            _fileSystem.Path.Combine(_dolphinPaths.LoadFolderPath, "riivolution", "save", "RetroWFC"),
+            _fileSystem.Path.Combine(_dolphinPaths.LoadFolderPath, "riivolution", "Save", "RetroWFC"),
         };
 
         foreach (var rrWfc in rrWfcPaths)
@@ -241,13 +249,15 @@ public class RetroRewind : IDistribution
         return SemVersion.Parse(result);
     }
 
-    public async Task<OperationResult> UpdateAsync(ProgressWindow progressWindow)
+    public async Task<OperationResult> UpdateAsync(DistributionOperation operation)
     {
+        if (operation.CancellationToken.IsCancellationRequested)
+            return Fail("Distribution update was cancelled.");
         try
         {
             var currentVersion = GetCurrentVersion();
             if (currentVersion == null)
-                return await InstallAsync(progressWindow);
+                return await InstallAsync(operation);
 
             var isRRUpToDate = await IsRRUpToDate(currentVersion);
             if (isRRUpToDate.IsFailure)
@@ -259,10 +269,10 @@ public class RetroRewind : IDistribution
             //if current version is below 3.2.6 we need to do a full reinstall
             if (currentVersion.ComparePrecedenceTo(new SemVersion(3, 2, 6)) < 0)
             {
-                var result = await ReinstallAsync(progressWindow);
+                var result = await ReinstallAsync(operation);
                 return result.IsSuccess ? Ok() : result;
             }
-            return await ApplyUpdates(currentVersion, progressWindow);
+            return await ApplyUpdates(currentVersion, operation);
         }
         catch (Exception e)
         {
@@ -270,7 +280,7 @@ public class RetroRewind : IDistribution
         }
     }
 
-    private async Task<OperationResult> ApplyUpdates(SemVersion currentVersion, ProgressWindow progressWindow)
+    private async Task<OperationResult> ApplyUpdates(SemVersion currentVersion, DistributionOperation operation)
     {
         var allVersions = await GetAllVersionData();
         var updatesToApply = GetUpdatesToApply(currentVersion, allVersions);
@@ -285,12 +295,11 @@ public class RetroRewind : IDistribution
         // Step 3: Download and apply the updates (if any)
         for (var i = 0; i < updatesToApply.Count; i++)
         {
+            if (operation.CancellationToken.IsCancellationRequested)
+                return Fail("Retro Rewind update was cancelled.");
             var update = updatesToApply[i];
 
-            var success = await DownloadAndApplyUpdate(update, updatesToApply.Count, i + 1, progressWindow);
-            if (progressWindow.WasCancellationRequested)
-                return Ok();
-
+            var success = await DownloadAndApplyUpdate(update, updatesToApply.Count, i + 1, operation);
             if (success.IsFailure)
                 return Fail(t("message_error.abort_rr.extra.failed_update_apply"));
 
@@ -302,7 +311,7 @@ public class RetroRewind : IDistribution
 
     private void UpdateVersionFile(SemVersion newVersion)
     {
-        var versionFilePath = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName, "version.txt");
+        var versionFilePath = _fileSystem.Path.Combine(_paths.RootFolderPath, FolderName, "version.txt");
         _fileSystem.File.WriteAllText(versionFilePath, newVersion.ToString());
     }
 
@@ -310,23 +319,23 @@ public class RetroRewind : IDistribution
         UpdateData update,
         int totalUpdates,
         int currentUpdateIndex,
-        ProgressWindow popupWindow
+        DistributionOperation operation
     )
     {
         var tempZipPath = _fileSystem.Path.Combine(_fileSystem.Path.GetTempPath(), _fileSystem.Path.GetRandomFileName());
         try
         {
-            popupWindow.SetExtraText($"{t("action.update")} {currentUpdateIndex}/{totalUpdates}: {update.Description}");
-            var finalFile = await DownloadHelper.DownloadToLocationAsync(update.Url, tempZipPath, popupWindow);
+            operation.Report(new(Message: $"{t("action.update")} {currentUpdateIndex}/{totalUpdates}: {update.Description}"));
+            var download = await downloads.DownloadDistributionAsync(update.Url, tempZipPath, operation);
+            if (download.IsFailure)
+                return download.Error;
+            var finalFile = download.Value;
 
-            if (finalFile == null)
-                return Fail("Failed to download update file");
-
-            popupWindow.UpdateProgress(100);
-            popupWindow.SetExtraText(t("state.extracting"));
-            var destinationDirectoryPath = PathManager.RiivolutionWhWzFolderPath;
+            operation.Report(new(Percent: 100));
+            operation.Report(new(Message: t("state.extracting")));
+            var destinationDirectoryPath = _paths.RootFolderPath;
             _fileSystem.Directory.CreateDirectory(destinationDirectoryPath);
-            var extractResult = ExtractZipFile(finalFile, destinationDirectoryPath, popupWindow);
+            var extractResult = ExtractZipFile(finalFile, destinationDirectoryPath, operation);
             if (extractResult.IsFailure)
                 return extractResult;
 
@@ -342,9 +351,10 @@ public class RetroRewind : IDistribution
         return Ok();
     }
 
-    private OperationResult ExtractZipFile(string path, string destinationDirectory, ProgressWindow progressWindow)
+    private OperationResult ExtractZipFile(string path, string destinationDirectory, DistributionOperation operation)
     {
-        using var archive = ZipFile.OpenRead(path);
+        using var archiveStream = _fileSystem.File.OpenRead(path);
+        using var archive = new ZipArchive(archiveStream, ZipArchiveMode.Read);
 
         // 1) Compute total work units (weâ€™ll treat each entry as one â€œunitâ€)
         var entries = archive.Entries.Where(e => !e.FullName.EndsWith("desktop.ini", StringComparison.OrdinalIgnoreCase)).ToList();
@@ -354,15 +364,12 @@ public class RetroRewind : IDistribution
 
         // Tell the UI what weâ€™re doing, and set a â€œgoalâ€ so it can estimate MB or items
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            progressWindow.SetExtraText(t("state.extracting")).SetGoal($"Extracting {total} files");
-        });
+        operation.Report(new(Message: t("state.extracting"), Goal: $"Extracting {total} files"));
 
         for (var i = 0; i < total; i++)
         {
             var entry = entries[i];
-            if (!PathSafetyHelper.TryGetPathWithinDirectory(destinationDirectory, entry.FullName, out var destinationPath))
+            if (!PathSafety.TryGetPathWithinDirectory(destinationDirectory, entry.FullName, out var destinationPath))
                 return Fail("The file path is outside the destination directory. Please contact the developers.");
 
             // If itâ€™s a directory, create it
@@ -380,15 +387,14 @@ public class RetroRewind : IDistribution
                 // Ensure read permission is set
                 entry.ExternalAttributes |= Convert.ToInt32("644", 8) << 16;
                 // Extract the file
-                entry.ExtractToFile(destinationPath, overwrite: true);
+                using var input = entry.Open();
+                using var output = _fileSystem.File.Create(destinationPath);
+                input.CopyTo(output);
             }
 
             // Report incremental progress (0â€“100)
             var percent = (int)(((i + 1) / (double)total) * 100);
-            Dispatcher.UIThread.Post(() =>
-            {
-                progressWindow.UpdateProgress(percent);
-            });
+            operation.Report(new(Percent: percent));
         }
 
         return Ok();
@@ -408,13 +414,7 @@ public class RetroRewind : IDistribution
             foreach (var file in deletionsToApply)
             {
                 // The deletion list is server-controlled, so keep every resolved path inside the riivolution folder.
-                if (
-                    !PathSafetyHelper.TryGetPathWithinDirectory(
-                        PathManager.RiivolutionWhWzFolderPath,
-                        file.Path.TrimStart('/', '\\'),
-                        out var filePath
-                    )
-                )
+                if (!PathSafety.TryGetPathWithinDirectory(_paths.RootFolderPath, file.Path.TrimStart('/', '\\'), out var filePath))
                     return Fail("Invalid file path detected. Please contact the developers.\n Server error: " + file.Path);
 
                 if (_fileSystem.File.Exists(filePath))
@@ -494,7 +494,7 @@ public class RetroRewind : IDistribution
             if (string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(path))
                 continue;
             // Fix old URLs using HTTP to the new endpoint
-            var fixedUrl = url.Replace(Endpoints.OldRRUrl, Endpoints.RRUrl);
+            var fixedUrl = url.Replace(RetroRewindEndpoints.LegacyBaseUrl, RetroRewindEndpoints.BaseUrl);
             if (!SemVersion.TryParse(version, out var _))
                 continue;
             var parsedVersion = SemVersion.Parse(version);
@@ -541,12 +541,12 @@ public class RetroRewind : IDistribution
         return deletionsToApply;
     }
 
-    public Task<OperationResult> RemoveAsync(ProgressWindow progressWindow)
+    public Task<OperationResult> RemoveAsync(DistributionOperation operation)
     {
         //where the RR distribution lives
-        var distributionDataDestination = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName);
+        var distributionDataDestination = _fileSystem.Path.Combine(_paths.RootFolderPath, FolderName);
         //where the RR wiiDisc xml file lives
-        var riivolutionDiscXMLFile = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, XMLFolderName, $"{XMLFileName}.xml");
+        var riivolutionDiscXMLFile = _fileSystem.Path.Combine(_paths.RootFolderPath, XMLFolderName, $"{XMLFileName}.xml");
 
         if (_fileSystem.Directory.Exists(distributionDataDestination))
             _fileSystem.Directory.Delete(distributionDataDestination, recursive: true);
@@ -556,18 +556,29 @@ public class RetroRewind : IDistribution
         return Task.FromResult(Ok());
     }
 
-    public async Task<OperationResult> ReinstallAsync(ProgressWindow progressWindow)
+    public async Task<OperationResult> ReinstallAsync(DistributionOperation operation)
     {
+        // #todo: use the staged install flow here too so a failed download doesn't leave the user without a working install.
         //Remove and install
-        var removeResult = await RemoveAsync(progressWindow);
+        var removeResult = await RemoveAsync(operation);
         if (removeResult.IsFailure)
             return removeResult;
 
-        return await InstallAsync(progressWindow);
+        return await InstallAsync(operation);
     }
 
     public async Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync()
     {
+        switch (_settingsManager.CheckExtensionConfiguration())
+        {
+            case ExtensionConfigurationInfo.MissingDolphin:
+                return WheelWizardStatus.NoDolphinExtension;
+            case ExtensionConfigurationInfo.MissingRecomp:
+                return WheelWizardStatus.NoRecompExtension;
+            case ExtensionConfigurationInfo.ExtensionFoundOrNotNeeded:
+                break;
+        }
+
         if (!_settingsManager.PathsSetupCorrectly())
             return WheelWizardStatus.ConfigNotFinished;
 
@@ -594,7 +605,7 @@ public class RetroRewind : IDistribution
 
     public SemVersion? GetCurrentVersion()
     {
-        var versionFilePath = _fileSystem.Path.Combine(PathManager.RiivolutionWhWzFolderPath, FolderName, "version.txt");
+        var versionFilePath = _fileSystem.Path.Combine(_paths.RootFolderPath, FolderName, "version.txt");
         if (!_fileSystem.File.Exists(versionFilePath))
             return null;
 

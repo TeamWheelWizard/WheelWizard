@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Media.Imaging;
+using WheelWizard.Views.ModManagement;
 
 namespace WheelWizard.Views.Patterns;
 
@@ -57,14 +57,15 @@ public class ModBrowserListItem : TemplatedControl
         set => SetValue(LikeCountProperty, value);
     }
 
-    public static readonly StyledProperty<string?> ImageUrlProperty = AvaloniaProperty.Register<ModBrowserListItem, string?>(
-        nameof(ImageUrl)
-    );
+    public static readonly StyledProperty<ModPreviewViewModel?> PreviewProperty = AvaloniaProperty.Register<
+        ModBrowserListItem,
+        ModPreviewViewModel?
+    >(nameof(Preview));
 
-    public string? ImageUrl
+    public ModPreviewViewModel? Preview
     {
-        get => GetValue(ImageUrlProperty);
-        set => SetValue(ImageUrlProperty, value);
+        get => GetValue(PreviewProperty);
+        set => SetValue(PreviewProperty, value);
     }
 
     public static readonly StyledProperty<bool> UsesPatchesProperty = AvaloniaProperty.Register<ModBrowserListItem, bool>(
@@ -77,28 +78,25 @@ public class ModBrowserListItem : TemplatedControl
         set => SetValue(UsesPatchesProperty, value);
     }
 
-    protected override async void OnApplyTemplate(TemplateAppliedEventArgs e)
+    private bool _attached;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
-        base.OnApplyTemplate(e);
-        var image = e.NameScope.Find<Image>("ThumbnailImage");
-        if (image == null || string.IsNullOrWhiteSpace(ImageUrl))
-            return;
+        base.OnAttachedToVisualTree(e);
+        _attached = true;
+        _ = Preview?.LoadAsync();
+    }
 
-        try
-        {
-            using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(ImageUrl);
-            response.EnsureSuccessStatusCode();
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _attached = false;
+        base.OnDetachedFromVisualTree(e);
+    }
 
-            await using var stream = await response.Content.ReadAsStreamAsync();
-            var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
-            memoryStream.Position = 0;
-            image.Source = new Bitmap(memoryStream);
-        }
-        catch
-        {
-            // Ignore. we then just don't have an image. also fine
-        }
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (_attached && change.Property == PreviewProperty)
+            _ = Preview?.LoadAsync();
     }
 }

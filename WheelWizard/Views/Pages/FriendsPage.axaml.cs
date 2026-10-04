@@ -1,27 +1,32 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
-using WheelWizard.Services.LiveData;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Shared.Polling;
 using WheelWizard.Shared.Services;
-using WheelWizard.Utilities.Generators;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.Views.Popups.MiiManagement;
+using WheelWizard.WheelWizardData;
+using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
+public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
+    private IPopupFactory Popups { get; }
+
+    private INavigationService Navigation { get; }
+
     // Made this static intentionally.
     // I personally don't think its worth saving it as a setting.
     // Though I do see the use in saving it when using the app so you can swap pages in the meantime
@@ -29,17 +34,15 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     private ObservableCollection<FriendProfile> _friendlist = [];
 
-    [Inject]
-    private IGameLicenseSingletonService GameLicenseService { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; }
 
-    [Inject]
-    private IMiiDbService MiiDbService { get; set; } = null!;
+    private IGameLicenseSingletonService GameLicenseService { get; }
 
-    [Inject]
-    private IApiCaller<IRwfcApi> ApiCaller { get; set; } = null!;
+    private IMiiDbService MiiDbService { get; }
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private IApiCaller<IRwfcApi> ApiCaller { get; }
+
+    private ISettingsManager SettingsService { get; }
 
     public ObservableCollection<FriendProfile> FriendList
     {
@@ -51,8 +54,23 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         }
     }
 
-    public FriendsPage()
+    public FriendsPage(
+        IPopupFactory popups,
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        IGameLicenseSingletonService gameLicenseService,
+        IMiiDbService miiDbService,
+        IApiCaller<IRwfcApi> apiCaller,
+        ISettingsManager settingsService
+    )
     {
+        Popups = popups;
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        GameLicenseService = gameLicenseService;
+        MiiDbService = miiDbService;
+        ApiCaller = apiCaller;
+        SettingsService = settingsService;
         InitializeComponent();
         GameLicenseService.Subscribe(this);
         UpdateFriendList();
@@ -63,7 +81,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         HandleVisibility();
     }
 
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
         if (sender is not GameLicenseSingletonService)
             return;
@@ -150,7 +168,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             return;
         }
 
-        var activeUserPid = FriendCodeGenerator.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
+        var activeUserPid = FriendCode.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
         if (activeUserPid == 0)
         {
             ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
@@ -226,8 +244,8 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (normalizedFriendCodeResult.IsFailure)
             return normalizedFriendCodeResult.Error;
 
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
-        var currentProfileId = FriendCodeGenerator.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
+        var currentProfileId = FriendCode.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
         if (currentProfileId != 0 && currentProfileId == friendProfileId)
             return Fail("You cannot add your own friend code.");
 
@@ -240,10 +258,10 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
         if (normalizedFriendCodeResult.IsFailure)
             return null;
 
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
         var duplicateFriend = GameLicenseService.ActiveCurrentFriends.Any(friend =>
         {
-            var existingPid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
             return existingPid != 0 && existingPid == friendProfileId;
         });
 
@@ -260,7 +278,7 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             return Fail("Friend code must be exactly 12 digits.");
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
             return Fail("Invalid friend code.");
 
@@ -319,7 +337,13 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
             return;
         if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
             return;
-        new PlayerProfileWindow(selectedPlayer.FriendCode).Show();
+        Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode).Show();
+    }
+
+    private void ViewOnRwfc_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (FriendsListView.SelectedItem is FriendProfile selectedPlayer)
+            ViewUtils.OpenRwfcPlayer(selectedPlayer.FriendCode);
     }
 
     private void RemoveFriend_OnClick(object sender, RoutedEventArgs e)
@@ -350,12 +374,12 @@ public partial class FriendsPage : UserControlBase, INotifyPropertyChanged, IRep
 
     private void ViewRoom_OnClick(string friendCode)
     {
-        foreach (var room in RRLiveRooms.Instance.CurrentRooms)
+        foreach (var room in LiveRooms.CurrentRooms)
         {
             if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;
 
-            NavigationManager.NavigateTo<RoomDetailsPage>(room);
+            Navigation.NavigateTo<RoomDetailsPage>(room);
             return;
         }
 

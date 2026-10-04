@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using WheelWizard.Helpers;
+using WheelWizard.CustomCharacters;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain;
@@ -12,12 +12,15 @@ namespace WheelWizard.Views.Popups.MiiManagement.MiiEditor;
 
 public partial class EditorGeneral : MiiEditorBaseControl
 {
+    private ICustomCharactersService CustomCharacters { get; }
+
     private bool _hasMiiNameError;
     private bool _hasCreatorNameError;
 
-    public EditorGeneral(MiiEditorWindow ew)
+    public EditorGeneral(ICustomCharactersService customCharacters, MiiEditorWindow ew)
         : base(ew)
     {
+        CustomCharacters = customCharacters;
         InitializeComponent();
         PopulateValues();
     }
@@ -141,7 +144,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
         var textPopup = new TextInputWindow()
             .SetMainText(t("question.enter_new_name.title"))
             .SetExtraText(t("question.enter_new_name.extra", MiiName.Text ?? string.Empty) ?? string.Empty)
-            .SetAllowCustomChars(true, true)
+            .SetCustomCharacters(CustomCharacters.GetCustomCharacters(), initiallyOpen: true)
             .SetValidation(ValidateMiiName)
             .SetInitialText(MiiName.Text ?? string.Empty)
             .SetPlaceholderText(t("placeholder.enter_mii_name"));

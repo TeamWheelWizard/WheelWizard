@@ -1,3 +1,5 @@
+using WheelWizard.Dolphin;
+
 namespace WheelWizard.Settings;
 
 public static class SettingsExtensions
@@ -11,6 +13,7 @@ public static class SettingsExtensions
 
         // TODO:  Investigate / migrate to IOptions: https://learn.microsoft.com/en-us/dotnet/core/extensions/options
 
+        services.AddDolphin();
         services.AddSingleton<ISettingsSignalBus, SettingsSignalBus>();
         services.AddSingleton<IWhWzSettingManager, WhWzSettingManager>();
         services.AddSingleton<IDolphinSettingManager, DolphinSettingManager>();

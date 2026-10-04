@@ -2,6 +2,7 @@ namespace WheelWizard.Localization;
 
 public static class LocalizationProvider
 {
+    // #todo: let the app own the localization service and language events instead of sharing mutable state globally.
     private static readonly object ServiceLock = new();
     private static ILocalizationService? _service;
 
