@@ -44,18 +44,18 @@ public sealed class ModOperationPresentation : IModOperationPresentation
             window.SetGoal(
                 update.Stage switch
                 {
-                    ModOperationStage.Preparing => t("progress.preparing_files_count", update.TotalFiles ?? 0)!,
+                    ModOperationStage.Preparing => t("progress.preparing_files_count", new { amount = update.TotalFiles ?? 0 })!,
                     ModOperationStage.Extracting => t("state.extracting"),
-                    ModOperationStage.Installing => t("progress.installing_mods_count", update.TotalFiles ?? 0)!,
+                    ModOperationStage.Installing => t("progress.installing_mods_count", new { amount = update.TotalFiles ?? 0 })!,
                     ModOperationStage.Applying => t("progress.applying_converted_mod"),
-                    _ => t("progress.converting_files_count", update.TotalFiles ?? 0)!,
+                    _ => t("progress.converting_files_count", new { amount = update.TotalFiles ?? 0 })!,
                 }
             );
             window.UpdateProgress(update.Percent);
             if (update.FileName is not null)
                 window.SetExtraText(
                     update.Stage == ModOperationStage.Converting
-                        ? t("progress.converting_file", update.FileName)!
+                        ? t("progress.converting_file", new { fileName = update.FileName })!
                         : $"{t("state.installing")} {update.FileName}"
                 );
         });

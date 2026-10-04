@@ -132,7 +132,11 @@ public partial class VideoSettings : UserControl
         }
         else
         {
-            MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_UnkownRendererSelected, null, [selectedDisplayName]);
+            MessageTranslationHelper.ShowMessage(
+                MessageTranslation.Warning_UnkownRendererSelected,
+                null,
+                new { renderer = selectedDisplayName }
+            );
         }
     }
 }

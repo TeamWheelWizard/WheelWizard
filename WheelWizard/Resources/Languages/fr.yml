@@ -179,16 +179,16 @@ fr:
     mii_carousel: "Vue d'ensemble des Miis"
   text:
     made_by_string: |-
-      Fait par: {$1}
-      et {$2}
+      Fait par: %{firstAuthor}
+      et %{secondAuthor}
     thanks_translators: "Merci à tous les traducteurs:"
-    wh_wz_translation_percentage: "La traduction pour cette langue est finie à {$1}%"
+    wh_wz_translation_percentage: "La traduction pour cette langue est finie à %{percentage}%"
     powered_gamebanana: "Propulsé par GameBanana"
-    language_translated_by: "Cette langue a été traduite par: {$1}"
-    brsar_entry: "{$1} entrée {$2}"
-    brsar_entry_with_rwar: "{$1} entrée {$2} + RWAR"
+    language_translated_by: "Cette langue a été traduite par: %{translators}"
+    brsar_entry: "%{fileType} entrée %{entryId}"
+    brsar_entry_with_rwar: "%{fileType} entrée %{entryId} + RWAR"
     external_reference: "Référence externe"
-    external_reference_with_path: "Référence externe: {$1}"
+    external_reference_with_path: "Référence externe: %{path}"
     modified_archive_member: "Membre de l'archive modifié"
     new_archive_member: "Nouveau membre de l'archive"
     whole_file_override: "Écrasement du fichier entier"
@@ -196,15 +196,15 @@ fr:
     players_online:
       0: "Il n'y a actuellement aucun joueur en ligne"
       1: "Il y a actuellement 1 joueur en ligne"
-      n: "Il y a actuellement {$1} joueurs en ligne"
+      n: "Il y a actuellement %{amount} joueurs en ligne"
     rooms_online:
       0: "Il n'y a actuellement aucune salle active"
       1: "Il y a actuellement 1 salle active"
-      n: "Il y a actuellement {$1} salles actives"
+      n: "Il y a actuellement %{amount} salles actives"
     friends_online:
       0: "Il n'y a actuellement aucun ami en ligne"
       1: "Il y a actuellement 1 ami en ligne"
-      n: "Il y a actuellement {$1} amis en ligne"
+      n: "Il y a actuellement %{amount} amis en ligne"
     rooms_page_disclaimer: |-
       Attention, cette page ne permet pas de rejoindre une salle directement.
       Pour rejoindre une salle spécifique, vous devez soit la rejoindre via un ami, soit espérer la rejoindre via les serveurs en ligne.
@@ -226,22 +226,22 @@ fr:
   time:
     days:
       1: "1 jour"
-      n: "{$1} jours"
+      n: "%{amount} jours"
     hours:
       1: "1 heure"
-      n: "{$1} heures"
+      n: "%{amount} heures"
     minutes:
       1: "1 minute"
-      n: "{$1} minutes"
+      n: "%{amount} minutes"
     seconds:
       1: "1 seconde"
-      n: "{$1} secondes"
+      n: "%{amount} secondes"
   progress:
     estimated_time_remaining: "Temps restant estimé :"
-    downloading_mb: "téléchargement de {$1} MB"
+    downloading_mb: "téléchargement de %{megabytes} MB"
     installing_mods: "Installation de mods"
-    installing_mods_count: "Installation de {$1} mods"
-    processing_xof_y: "Traitement de {$1} sur {$2} fichiers"
+    installing_mods_count: "Installation de %{amount} mods"
+    processing_xof_y: "Traitement de %{processed} sur %{total} fichiers"
     update_rr: "Mise à jour de Retro Rewind"
     latest_wh_wz_github: "Obtention de la dernière version de Wheel Wizard depuis Github"
     update_wh_wz: "Mise à jour de Wheel Wizard"
@@ -252,12 +252,12 @@ fr:
     this_may_take_a_while: "Cela peut prendre plus de temps en fonction de votre connexion internet."
     applying_converted_mod: "Application du mod converti"
     combining_files: "En train de combiner des fichiers"
-    converting_file: "Conversion de {$1}"
-    converting_files_count: "Conversion de {$1} fichier(s)"
+    converting_file: "Conversion de %{fileName}"
+    converting_files_count: "Conversion de %{amount} fichier(s)"
     converting_mod_to_patches: "Conversion du mod en patchs"
-    downloading_mod: "Téléchargement de {$1}"
+    downloading_mod: "Téléchargement de %{modName}"
     installing_mod: "Installation du mod"
-    preparing_files_count: "Préparation de {$1} fichier(s)"
+    preparing_files_count: "Préparation de %{amount} fichier(s)"
     installing_recomp: "Installation de WiiCompiled"
     updating_recomp: "Mise à jour WiiCompiled"
     uninstalling_recomp: "Désinstallation de WiiCompiled"
@@ -291,17 +291,17 @@ fr:
       title: "Mods trouvés"
       extra: "Vous êtes sur le point de lancer le jeu sans aucun mod. Voulez-vous supprimer le dossier My Stuff ?"
     sure_delete:
-      title: "Êtes-vous sûr de vouloir supprimer {$1} ?"
+      title: "Êtes-vous sûr de vouloir supprimer %{name} ?"
       extra: "La suppression est permanente et ne peut pas être annulée."
-      title_miis: "Êtes-vous sûr de vouloir supprimer {$1} Miis ?"
+      title_miis: "Êtes-vous sûr de vouloir supprimer %{amount} Miis ?"
     apply_scale:
       title: "Voulez-vous appliquer la nouvelle échelle ?"
-      extra: "Cette modification va être rétablie dans {$1} sauf si vous choisissez de la garder."
+      extra: "Cette modification va être rétablie dans %{remainingTime} sauf si vous choisissez de la garder."
     move_data:
       title: "Déplacer les données de Wheel Wizard ?"
       extra: |-
         Wheel Wizard déplacera ses fichiers vers:
-        {$1}
+        %{path}
         Cela peut prendre un moment selon la quantité de données.
     dolphin_found:
       title: "Dossier de l'émulateur Dolphin trouvé"
@@ -311,9 +311,9 @@ fr:
     dolphin_outdated:
       title: "Votre émulateur Dolphin est obsolète"
       extra: |-
-        Cette version de Dolphin ({$1}) a une faille de sécurité connue qui permet à des fichiers de jeu, mods ou joueurs en ligne malveillants d'infecter votre PC.
+        Cette version de Dolphin (%{currentVersion}) a une faille de sécurité connue qui permet à des fichiers de jeu, mods ou joueurs en ligne malveillants d'infecter votre PC.
 
-        Mettez à jour vers la version {$2} ou ultérieure pour être en sécurité.
+        Mettez à jour vers la version %{minimumVersion} ou ultérieure pour être en sécurité.
     dolphin_program_found:
       title: "Émulateur Dolphin trouvé"
       extra: |-
@@ -322,7 +322,7 @@ fr:
         Émulateur Dolphin trouvé. Voulez-vous l'utiliser ?
     new_version_wh_wz:
       title: "Mise à jour de Wheel Wizard disponible !"
-      extra: "La version {$1} de Wheel Wizard est disponible (Version actuelle: {$2}). Voulez-vous mettre à jour maintenant ?"
+      extra: "La version %{latestVersion} de Wheel Wizard est disponible (Version actuelle: %{currentVersion}). Voulez-vous mettre à jour maintenant ?"
     update_admin:
       title: "Mettre à jour en Administrateur"
       extra: "Parfois, une mise à jour demande les droits d'admin. Voulez-vous les activer pour cette mise à jour ?"
@@ -342,11 +342,11 @@ fr:
       title: "Installation de Dolphin Flatpak..."
       extra: "La version Flatpak de l'émulateur Dolphin ne semble pas être installée. Voulez-vous qu'on vous l'installe ? (pour cet utilisateur)"
     install_mod:
-      title: "Voulez-vous télécharger et installer le mod suivant: {$1} ?"
+      title: "Voulez-vous télécharger et installer le mod suivant: %{modName} ?"
     search_mod: "Recherche de mods..."
     enter_new_name:
       title: "Entrez un nouveau nom"
-      extra: "Changer le nom de: {$1}"
+      extra: "Changer le nom de: %{name}"
     enter_mod_name:
       title: "Nom du mod:"
     launch_clear_patches_found:
@@ -366,7 +366,7 @@ fr:
       title: "Plusieurs fichiers sélectionnés"
     invalid_name:
       extra:
-        mod_name_exists: "Un mod avec le nom \"{$1}\" existe déjà"
+        mod_name_exists: "Un mod avec le nom \"%{modName}\" existe déjà"
       title: "Nom impossible."
     invalid_paths:
       extra: "Vérifiez bien si tous les chemins sont corrects et essayez à nouveau."
@@ -379,7 +379,7 @@ fr:
       extra: |-
         Wheel Wizard n'a pas pu lire la version de l'émulateur Dolphin que vous avez installé, donc il ne peut pas déterminer si l'émulateur a les correctifs de sécurité.
 
-        Vérifiez que vous êtes sur la version {$1} ou ultérieure. Les anciennes versions ont une faille de sécurité connue qui permet aux fichiers de jeu, mods, ou tricheurs en ligne d'infecter votre PC avec des logiciels malveillants.
+        Vérifiez que vous êtes sur la version %{minimumVersion} ou ultérieure. Les anciennes versions ont une faille de sécurité connue qui permet aux fichiers de jeu, mods, ou tricheurs en ligne d'infecter votre PC avec des logiciels malveillants.
     dolphin_tool_selected:
       title: "Mauvais exécutable Dolphin sélectionné"
       extra: "Vous avez sélectionné DolphinTool.exe. Choisissez Dolphin.exe (l'exécutable de l'émulateur Dolphin) à la place."
@@ -435,7 +435,7 @@ fr:
         failed_update_apply: "Échec d'application de la mise à jour. Annulation."
         invalid_file_path: |-
           Le chemin du fichier est incorrect. Veuillez contacter les développeurs de Wheel Wizard.
-          Erreur Serveur: {$1}
+          Erreur Serveur: %{error}
       title: "Annulation de la mise à jour de RR"
     restart_admin_fail:
       extra: "Échec du redémarrage avec les droits d'administrateur."
@@ -454,7 +454,7 @@ fr:
       title: "Échec d'obtention des informations du mod"
     mod_download_fail:
       title: "Échec du téléchargement du mod."
-      extra: "Une erreur s'est produite pendant le téléchargement du mod suivant: {$1}"
+      extra: "Une erreur s'est produite pendant le téléchargement du mod suivant: %{error}"
   message_success:
     settings_saved:
       title: "Paramètres sauvegardés avec succès !"
@@ -462,18 +462,18 @@ fr:
       title: "Mise à jour du dossier de données"
       extra: |-
         Les données de Wheel Wizard sont désormais ici:
-        {$1}
+        %{path}
     rr_up_to_date:
       title: "Retro Rewind est bien à jour."
     mii_changed: "Changement du Mii avec succès"
     mod_converted_to_patches:
       title: "Converti en patchs"
     mod_installed:
-      extra: "Le mod '{$1}' s'est installé avec succès."
+      extra: "Le mod '%{modName}' s'est installé avec succès."
       title: "Installation du mod réussie !"
-    patch_conversion_result: "Conversion de {$1} fichier(s) en {$2} fichier(s) de patchs."
-    patch_conversion_skipped: "{$1} fichier(s) laissé(s) tels quels car ils n'ont pas pu être convertis."
-    patch_conversion_notes: "Note(s): {$1}"
+    patch_conversion_result: "Conversion de %{fileCount} fichier(s) en %{patchCount} fichier(s) de patchs."
+    patch_conversion_skipped: "%{amount} fichier(s) laissé(s) tels quels car ils n'ont pas pu être convertis."
+    patch_conversion_notes: "Note(s): %{amount}"
   snackbar_warning:
     cant_save_mii: "Impossible de sauvegarder le Mii"
     no_mii_export: "Il semblerait qu'il n'y ait aucun Mii à exporter"
@@ -481,22 +481,22 @@ fr:
   snackbar_success:
     mii_added: "Le Mii a été ajouté à vos Miis"
     copied_fc: "Code ami copié dans le presse-papier"
-    name_change: "Changement du nom en '{$1}' avec succès"
-    saved_mii: "Mii '{$1}' sauvegardé dans '{$2}'"
-    deleted: "Suppression de '{$1}'"
-    deleted_miis: "Suppression de {$1} Miis"
-    created_duplicate: "Copie de '{$1}'"
-    created_duplicates_miis: "Copie de {$1} Miis"
+    name_change: "Changement du nom en '%{name}' avec succès"
+    saved_mii: "Mii '%{name}' sauvegardé dans '%{fileName}'"
+    deleted: "Suppression de '%{name}'"
+    deleted_miis: "Suppression de %{amount} Miis"
+    created_duplicate: "Copie de '%{name}'"
+    created_duplicates_miis: "Copie de %{amount} Miis"
     profile_set_primary: "Profil défini en tant que profil principal"
     dolphin_updated: "L'émulateur Dolphin a été mis à jour"
   snackbar_error:
-    mii_failure_deserialize: "Échec de la désérialisation du Mii '{$1}'"
-    mii_failure_update: "Échec de mise à jour du Mii '{$1}'"
-    mii_failure_save: "Échec de sauvegarde du Mii '{$1}'"
-    mii_failure_get: "Échec de l'obtention du Mii '{$1}'"
-    mii_failure_serialize: "Échec de la sérialisation du Mii '{$1}'"
-    mii_failure_create: "Échec de la création du Mii '{$1}'"
-    mii_failure_duplicate: "Échec de la copie des Miis '{$1}'"
+    mii_failure_deserialize: "Échec de la désérialisation du Mii '%{error}'"
+    mii_failure_update: "Échec de mise à jour du Mii '%{error}'"
+    mii_failure_save: "Échec de sauvegarde du Mii '%{error}'"
+    mii_failure_get: "Échec de l'obtention du Mii '%{error}'"
+    mii_failure_serialize: "Échec de la sérialisation du Mii '%{error}'"
+    mii_failure_create: "Échec de la création du Mii '%{error}'"
+    mii_failure_duplicate: "Échec de la copie des Miis '%{error}'"
   helper_note:
     name_must_between: "Les noms doivent être composés de 3 à 10 caractères."
     creator_name_less11: "Le nom de l'auteur doit faire moins de 11 caractères."
@@ -508,19 +508,19 @@ fr:
       message: "Ce mod est incompatible avec d'autres. Lancer en le gardant activé peut provoquer des crashs ou des comportements inattendus. Pensez à le convertir en patchs en faisant un clic droit sur le mod."
       title: "MOD INCOMPATIBLE"
   warning:
-    brsar_external_count: "{$1} entrées de fichier BRSAR sont des références externes et ne peuvent pas être exportées."
-    brsar_file_id_external: "Le fileID BRSAR {$1} est une référence externe de fichier et ne peut pas être exporté."
-    brsar_file_id_unsupported_magic: "Le fileID BRSAR {$1} a changé, mais il correspond à {$2} et Pulsar ne prend en charge que les remplacements \"en loose\" de fichiers RBNK/RSEQ/RWSD."
-    brsar_file_id_unresolved: "Le fileID BRSAR {$1} ne correspond à aucun fichier audio intégré pris en charge."
+    brsar_external_count: "%{amount} entrées de fichier BRSAR sont des références externes et ne peuvent pas être exportées."
+    brsar_file_id_external: "Le fileID BRSAR %{fileId} est une référence externe de fichier et ne peut pas être exporté."
+    brsar_file_id_unsupported_magic: "Le fileID BRSAR %{fileId} a changé, mais il correspond à %{fileType} et Pulsar ne prend en charge que les remplacements \"en loose\" de fichiers RBNK/RSEQ/RWSD."
+    brsar_file_id_unresolved: "Le fileID BRSAR %{fileId} ne correspond à aucun fichier audio intégré pris en charge."
     brsar_no_supported_differences: "Aucune différence RBNK/RSEQ/RWSD prise en charge n’a été trouvée par rapport à la base de références intégrée du jeu."
-    brsar_unresolved_count: "{$1} entrées de fichiers BRSAR intégrées n’ont pas pu être résolues avec certitude."
-    brsar_unsupported_summary: "Seules les entrées RBNK/RSEQ/RWSD peuvent être exportées. L’archive analysée contient également {$1}."
-    file_deletion_not_exportable: "{$1} existe uniquement dans l’archive d’origine. Les suppressions de fichiers ne peuvent pas être exportées sous forme de patchs \"en loose\"."
-    file_name_differs_from_archive_tag: "Le nom du fichier sélectionné diffère du tag de l'archive d’origine \"{$1}.szs\"."
-    file_not_in_built_in_baseline: "{$1} n’est pas présent dans la base de références intégrée du jeu."
+    brsar_unresolved_count: "%{amount} entrées de fichiers BRSAR intégrées n’ont pas pu être résolues avec certitude."
+    brsar_unsupported_summary: "Seules les entrées RBNK/RSEQ/RWSD peuvent être exportées. L’archive analysée contient également %{fileTypes}."
+    file_deletion_not_exportable: "%{fileName} existe uniquement dans l’archive d’origine. Les suppressions de fichiers ne peuvent pas être exportées sous forme de patchs \"en loose\"."
+    file_name_differs_from_archive_tag: "Le nom du fichier sélectionné diffère du tag de l'archive d’origine \"%{archiveTag}.szs\"."
+    file_not_in_built_in_baseline: "%{fileName} n’est pas présent dans la base de références intégrée du jeu."
     no_szs_differences: "Aucune différence SZS n’a été trouvée par rapport à la base de références intégrée du jeu."
     szs_matches_baseline: "Le SZS sélectionné correspond exactement à la base de références intégrée du jeu."
-    unsupported_loose_override_extension: "{$1} utilise une extension de remplacement loose non prise en charge (.kcl, .kmp, .slt)."
+    unsupported_loose_override_extension: "%{fileName} utilise une extension de remplacement loose non prise en charge (.kcl, .kmp, .slt)."
     whole_file_baseline: "Ce SZS est stocké comme base de références du fichier complet. Exportation d’un remplacement du fichier complet."
   option:
     wh_wz_language: "Langue de Wheel Wizard"
@@ -581,7 +581,7 @@ fr:
     recomp_prevent_stutters: "Lors de la compilation d'un shader, les objets qui en ont besoin sont ignorés pendant quelques frames au lieu de bloquer le jeu jusqu'à ce que la compilation soit terminée, provoquant un léger effet de \"pop-in\" au lieu d'un ralentissement"
     launch_with_dolphin: "Affichera la fenêtre d'accueil de Dolphin en plus de celle du jeu"
     launch_rr_on_startup: "Démarre automatiquement Retro Rewind quand Wheel Wizard se lance"
-    installed_version: "Version installée : {$1}"
+    installed_version: "Version installée : %{version}"
     force_disable_wiimote: "Ce paramètre désactivera les Wiimotes en jeu, mais les activera dans le menu Wii"
     resolution_scale: "1x est la résolution native"
     renderer: "Sélectionne le moteur de rendu que Dolphin utilise pour le rendu du jeu."
@@ -604,7 +604,7 @@ fr:
     general: "Général"
     video: "Vidéo"
   status:
-    recomp_dolphin_clone_available: "Copie privée : {$1}"
+    recomp_dolphin_clone_available: "Copie privée : %{path}"
     recomp_dolphin_clone_missing: "Aucune copie privée n'a été créée."
     recomp_dolphin_data_cloned: "Données de Dolphin copiées pour WiiCompiled"
     recomp_dolphin_data_not_found: "Données de Dolphin introuvables"

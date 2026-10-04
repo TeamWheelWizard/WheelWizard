@@ -199,7 +199,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Message)
             .SetTitleText(t("message_success.mod_installed.title"))
-            .SetInfoText(t("message_success.mod_installed.extra", modName)!)
+            .SetInfoText(t("message_success.mod_installed.extra", new { modName = modName })!)
             .Show();
     }
 
@@ -213,7 +213,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         var newTitle = await new TextInputWindow()
             .SetMainText(t("question.enter_mod_name.title"))
             .SetInitialText(oldTitle)
-            .SetExtraText(t("question.enter_new_name.extra", oldTitle)!)
+            .SetExtraText(t("question.enter_new_name.extra", new { name = oldTitle })!)
             .SetPlaceholderText(t("placeholder.enter_mod_name"))
             .SetValidation(ModManager.ValidateRenameModName)
             .ShowDialog();
@@ -232,7 +232,9 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         if (selectedMod == null)
             return;
 
-        var areTheySure = await new YesNoWindow().SetMainText(t("question.sure_delete.title", selectedMod.Mod.Title)!).AwaitAnswer();
+        var areTheySure = await new YesNoWindow()
+            .SetMainText(t("question.sure_delete.title", new { name = selectedMod.Mod.Title })!)
+            .AwaitAnswer();
         if (!areTheySure)
             return;
 
@@ -286,13 +288,16 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
 
     private static string BuildPatchConversionResultMessage(ModPatchConversionResult conversion)
     {
-        var message = t("message_success.patch_conversion_result", conversion.ConvertedFileCount, conversion.WrittenPatchCount);
+        var message = t(
+            "message_success.patch_conversion_result",
+            new { fileCount = conversion.ConvertedFileCount, patchCount = conversion.WrittenPatchCount }
+        );
 
         if (conversion.Skipped.Count > 0)
         {
             message +=
                 $"{Environment.NewLine}{Environment.NewLine}"
-                + t("message_success.patch_conversion_skipped", conversion.Skipped.Count)!
+                + t("message_success.patch_conversion_skipped", new { amount = conversion.Skipped.Count })!
                 + $"{Environment.NewLine}{Environment.NewLine}"
                 + string.Join(Environment.NewLine, conversion.Skipped.Take(8));
         }
@@ -301,7 +306,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         {
             message +=
                 $"{Environment.NewLine}{Environment.NewLine}"
-                + t("message_success.patch_conversion_notes", conversion.Warnings.Count)!
+                + t("message_success.patch_conversion_notes", new { amount = conversion.Warnings.Count })!
                 + $"{Environment.NewLine}{Environment.NewLine}"
                 + string.Join(Environment.NewLine, conversion.Warnings.Take(8));
         }

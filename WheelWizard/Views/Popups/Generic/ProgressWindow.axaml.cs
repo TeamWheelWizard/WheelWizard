@@ -99,7 +99,7 @@ public partial class ProgressWindow : PopupContent
     public ProgressWindow SetGoal(double megaBytes)
     {
         _totalMb = megaBytes;
-        GoalTextBlock.Text = t("progress.downloading_mb", $"{megaBytes:F2}");
+        GoalTextBlock.Text = t("progress.downloading_mb", new { megabytes = $"{megaBytes:F2}" });
         return this;
     }
 

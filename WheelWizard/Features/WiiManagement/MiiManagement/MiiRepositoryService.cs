@@ -136,7 +136,7 @@ public class MiiRepositoryServiceService(
                     $"Corrupt Mii database (bad CRC 0x{item1}, expected 0x{item2}).",
                     MessageTranslation.Error_UpdateMiiDb_CorruptDb,
                     null,
-                    [item1, item2]
+                    new { actualCrc = item1, expectedCrc = item2 }
                 );
             }
         }

@@ -25,9 +25,9 @@ public class PluralRulesTests
         LocalizationProvider.Use(service);
         try
         {
-            Assert.Equal("One item for Alex", TranslationFunctions.t("items", count: 1, "Alex"));
-            Assert.Equal("2 items for Alex", TranslationFunctions.t("items", 2, "Alex"));
-            Assert.Equal("Value 3", TranslationFunctions.t("plain", 3));
+            Assert.Equal("One item for Alex", TranslationFunctions.t("items", count: 1, new { name = "Alex" }));
+            Assert.Equal("2 items for Alex", TranslationFunctions.t("items", count: 2, new { amount = 2, name = "Alex" }));
+            Assert.Equal("Value 3", TranslationFunctions.t("plain", new { amount = 3 }));
             service.SetLanguage("ru");
             Assert.Equal("ru other", TranslationFunctions.t("items", count: 22));
             Assert.Equal("English other", TranslationFunctions.t("fallback", count: 22));
@@ -71,7 +71,7 @@ public class PluralRulesTests
         try
         {
             Assert.Equal("1 day", TranslationFunctions.t_legacy("en.time.days.n", 1));
-            Assert.Equal("2 days", TranslationFunctions.t_legacy("en.time.days.n", 2));
+            Assert.Equal("2 days", TranslationFunctions.t_legacy("en.time.days.n", count: 2, new { amount = 2 }));
         }
         finally
         {

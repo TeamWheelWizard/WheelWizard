@@ -170,25 +170,25 @@ pl:
     mii_editor: "Edytor Mii"
   text:
     made_by_string: |-
-      Stworzone przez: {$1}
-      i {$2}
+      Stworzone przez: %{firstAuthor}
+      i %{secondAuthor}
     thanks_translators: "Dziękujemy bardzo wszystkim tłumaczą:"
-    wh_wz_translation_percentage: "Tłumaczenie dla tego języka jest skończone w {$1}%"
+    wh_wz_translation_percentage: "Tłumaczenie dla tego języka jest skończone w %{percentage}%"
     powered_gamebanana: "Wsparci Przez Gamebanana"
-    language_translated_by: "Ten język jest przetłumaczony przez: {$1}"
+    language_translated_by: "Ten język jest przetłumaczony przez: %{translators}"
   hover:
     players_online:
       0: "Nie ma żadnych graczy online"
       1: "Jest 1 gracz online"
-      n: "jest teraz {$1} graczy online"
+      n: "jest teraz %{amount} graczy online"
     rooms_online:
       0: "Nie ma żadnych aktywnych pokoi"
       1: "Jest 1 aktywny pokój"
-      n: "jest teraz {$1} aktywnych pokoi"
+      n: "jest teraz %{amount} aktywnych pokoi"
     friends_online:
       0: "żaden z twoich przyjaciół nie jest onllne"
       1: "Jest teraz 1 przyjaciel online"
-      n: "Jest teraz {$1} przyjaciół online"
+      n: "Jest teraz %{amount} przyjaciół online"
     rooms_page_disclaimer: "Prosze pamiętaj, że ta strona nie daje możliwości dołączenia prosto do pokoju. By dołączyć do specyficznego pokoju musisz dołączyć poprzez przyjaciela lub mieć nadzieje, że uda ci się połączyć poprzez losowy serwer."
     friends_page_disclaimer: "By dodać przyjaciół musisz ich dodać w grze"
     region_user_selection: "To tylko pokazuje regiony, w których TY grałeś."
@@ -207,22 +207,22 @@ pl:
   time:
     days:
       1: "1 dzień"
-      n: "{$1} dni"
+      n: "%{amount} dni"
     hours:
       1: "1 godz"
-      n: "{$1} godz"
+      n: "%{amount} godz"
     minutes:
       1: "1 min"
-      n: "{$1} min"
+      n: "%{amount} min"
     seconds:
       1: "1 sek"
-      n: "{$1} sek"
+      n: "%{amount} sek"
   progress:
     estimated_time_remaining: "Oszacowany pozostały czas."
-    downloading_mb: "Pobieranie {$1} MB"
+    downloading_mb: "Pobieranie %{megabytes} MB"
     installing_mods: "Instalowanie modów"
-    installing_mods_count: "Instalowanie {$1} modów"
-    processing_xof_y: "Procesowanie {$1} z {$2} Plików"
+    installing_mods_count: "Instalowanie %{amount} modów"
+    processing_xof_y: "Procesowanie %{processed} z %{total} Plików"
     update_rr: "Aktualizowanie Retro Rewind"
     update_wh_wz: "Aktualizowanie Wheel Wizard"
     installing_rr: "Instalowanie Retro Rewind"
@@ -231,28 +231,28 @@ pl:
     this_may_take_a_while: "Może to zająć chwile zależnie od twojego połączenia z internetem."
     applying_converted_mod: "Zastosowywanie skonwertowanych modów"
     combining_files: "Łączenie plików"
-    converting_file: "Konwertowanie {$1}"
-    converting_files_count: "Konwertowanie {$1} Pliku(ów)"
+    converting_file: "Konwertowanie %{fileName}"
+    converting_files_count: "Konwertowanie %{amount} Pliku(ów)"
     converting_mod_to_patches: "Konwertowanie modów na poprawki"
-    downloading_mod: "Pobieranie {$1}"
+    downloading_mod: "Pobieranie %{modName}"
     installing_mod: "Instalowanie Moda"
-    preparing_files_count: "Przygotowywanie {$1} Pliku(ów)"
+    preparing_files_count: "Przygotowywanie %{amount} Pliku(ów)"
   question:
     launch_clear_mods_found:
       title: "Znaleziono Mody"
       extra: "Zaraz uruchomisz grę bez żadnych modów. Czy chcesz wyczyścić twój my-stuff folder?"
     sure_delete:
-      title: "Jesteś pewien, że chcesz usunąć {$1}?"
+      title: "Jesteś pewien, że chcesz usunąć %{name}?"
       extra: "Usuwanie jest nie odwracalne."
-      title_miis: "Jesteś pewien, że chcesz usunąć {$1} Mii?"
+      title_miis: "Jesteś pewien, że chcesz usunąć %{amount} Mii?"
     apply_scale:
       title: "Czy chcesz zastosować nową skalę?"
-      extra: "Ta zmiana zostanie cofnięta za {$1} może, że postanowisz ją zastosować."
+      extra: "Ta zmiana zostanie cofnięta za %{remainingTime} może, że postanowisz ją zastosować."
     move_data:
       title: "Przenieść dane z Wheel Wizard?"
       extra: |-
         Wheel Wizard przeniesie swoje pliki do:
-        {$1}
+        %{path}
         to może zająć chwile zależnie od ilości danych.
     dolphin_found:
       title: "Znaleziono folder Emulatora Dolphin"
@@ -261,7 +261,7 @@ pl:
         Znaleziono folder Emulatora Dolphin. Chciałbyś użyć ten folder?
     new_version_wh_wz:
       title: "Aktualizacja do Wheel Wizard dostępna"
-      extra: "Wersja {$1} Wheel Wizard jest dostępna (obecnie na {$2}). Chcesz aktualizować teraz?"
+      extra: "Wersja %{latestVersion} Wheel Wizard jest dostępna (obecnie na %{currentVersion}). Chcesz aktualizować teraz?"
     update_admin:
       title: "Aktualizuj używając uprawnień administratora"
       extra: "Czasami aktualizacja wymaga uprawnień administratora czy chcesz je aktywować dla tej aktualizacji?"
@@ -275,11 +275,11 @@ pl:
       extra: "Twoja wersja Retro Rewind jest zbyt stara by ją aktualizować. Chcesz zainstalować Retro Rewind ponownie?"
       title: "Wersja Retro Rewind jest zbyt stara."
     install_mod:
-      title: "Czy chcesz pobrać i zainstalować mod: {$1}?"
+      title: "Czy chcesz pobrać i zainstalować mod: %{modName}?"
     search_mod: "Szukaj modów..."
     enter_new_name:
       title: "Wpisz nowe imię"
-      extra: "Zmienianie imienia z: {$1}"
+      extra: "Zmienianie imienia z: %{name}"
     enter_mod_name:
       title: "Nazwa Moda:"
     launch_clear_patches_found:
@@ -296,7 +296,7 @@ pl:
       title: "Wybrano Wiele Plików"
     invalid_name:
       extra:
-        mod_name_exists: "Mod z nazwą \"{$1}\" już istnieje"
+        mod_name_exists: "Mod z nazwą \"%{modName}\" już istnieje"
       title: "Nazwa niedozwolona"
     invalid_paths:
       extra: "Proszę się upewnij, że wszystkie ścieżki są poprawnę i spróbuj ponownie."
@@ -359,7 +359,7 @@ pl:
         failed_update_apply: "Nie udało się zastosować aktualizacji. Abortowanie"
         invalid_file_path: |-
           Wykryto nieprawidłową ścieżkę do pliku. Proszę skontaktuj się z deweloperami.
-          Błąd Serwera: {$1}
+          Błąd Serwera: %{error}
       title: "Abortowanie aktualizacji Retro Rewind"
     restart_admin_fail:
       extra: "Nie udało się zrestartować z uprawnieniami administracyjnymi."
@@ -378,7 +378,7 @@ pl:
       title: "Nie udało się odzyskać informacji moda"
     mod_download_fail:
       title: "Nie udało się pobrać moda."
-      extra: "Wystąpił błąd podczas pobierania: {$1}"
+      extra: "Wystąpił błąd podczas pobierania: %{error}"
   message_success:
     settings_saved:
       title: "Ustawienia zapisane pomyślnie!"
@@ -386,16 +386,16 @@ pl:
       title: "Zaktualizowano folder danych"
       extra: |-
         Dane Wheel Wizard są teraz przechowywane w:
-        {$1}
+        %{path}
     rr_up_to_date:
       title: "Retro Rewind jest na najnowszej wersji."
     mii_changed: "Zmieniono Mii pomyślnie"
     mod_converted_to_patches:
       title: "Konwertuj na poprawki"
     mod_installed:
-      extra: "Mod \"{$1}\" zainstalowany pomyślnie."
+      extra: "Mod \"%{modName}\" zainstalowany pomyślnie."
       title: "Zainstalowano moda pomyślnie!"
-    patch_conversion_skipped: "Zostawiono {$1} plik(i/ów) niezmienionych bo nie mogły być skonwertowane."
+    patch_conversion_skipped: "Zostawiono %{amount} plik(i/ów) niezmienionych bo nie mogły być skonwertowane."
   snackbar_warning:
     cant_save_mii: "Nie można zapisać Mii"
     no_mii_export: "Wygląda na to, że nie było żadnych Mii do eksportowania"
@@ -403,19 +403,19 @@ pl:
   snackbar_success:
     mii_added: "Mii został dodany do twoich Mii"
     copied_fc: "Skopiowano kod przyjaciela do schowka"
-    name_change: "Pomyślnie zmieniono imię na \"{$1}\""
-    saved_mii: "Zapisano Mii \"{$1}\" do pliku \"{$2}\""
-    deleted: "Usunięto \"{$1}\""
-    deleted_miis: "Usunięto {$1} Mii"
-    created_duplicate: "Stworzono kopie \"{$1}\""
-    created_duplicates_miis: "Stworzono {$1} kopi Mii"
+    name_change: "Pomyślnie zmieniono imię na \"%{name}\""
+    saved_mii: "Zapisano Mii \"%{name}\" do pliku \"%{fileName}\""
+    deleted: "Usunięto \"%{name}\""
+    deleted_miis: "Usunięto %{amount} Mii"
+    created_duplicate: "Stworzono kopie \"%{name}\""
+    created_duplicates_miis: "Stworzono %{amount} kopi Mii"
     profile_set_primary: "Ustaw jako główny profil"
   snackbar_error:
-    mii_failure_update: "Nie udało się zaktualizować Mii \"{$1}\""
-    mii_failure_save: "Nie udało się zapisać Mii \"{$1}\""
-    mii_failure_get: "Nie udało się zdobyć Mii \"{$1}\""
-    mii_failure_create: "Nie udało się stworzyć Mii \"{$1}\""
-    mii_failure_duplicate: "Nie udało się skopiować Mii \"{$1}\""
+    mii_failure_update: "Nie udało się zaktualizować Mii \"%{error}\""
+    mii_failure_save: "Nie udało się zapisać Mii \"%{error}\""
+    mii_failure_get: "Nie udało się zdobyć Mii \"%{error}\""
+    mii_failure_create: "Nie udało się stworzyć Mii \"%{error}\""
+    mii_failure_duplicate: "Nie udało się skopiować Mii \"%{error}\""
   helper_note:
     name_must_between: "Nazwy muszą mieć od 3 do 10 znaków."
     creator_name_less11: "Nazwa twórcy musi mieć mniej niż 11 znaków."

@@ -168,25 +168,25 @@ nl:
     mii_carousel: "Mii-carrousel"
   text:
     made_by_string: |-
-      Gemaakt door {$1}
-      en {$2}
+      Gemaakt door %{firstAuthor}
+      en %{secondAuthor}
     thanks_translators: "Hartelijk dank aan alle vertalers:"
-    wh_wz_translation_percentage: "Vertalingen voor deze taal zijn {$1}% voltooid."
+    wh_wz_translation_percentage: "Vertalingen voor deze taal zijn %{percentage}% voltooid."
     powered_gamebanana: "Mogelijk gemaakt door GameBanana."
-    language_translated_by: "Taal vertaald door: {$1}"
+    language_translated_by: "Taal vertaald door: %{translators}"
   hover:
     players_online:
       0: "Er zijn momenteel geen spelers online."
       1: "Er is momenteel 1 speler online."
-      n: "Er zijn momenteel {$1} spelers online."
+      n: "Er zijn momenteel %{amount} spelers online."
     rooms_online:
       0: "Er zijn momenteel geen kamers actief."
       1: "Er is momenteel 1 kamer actief."
-      n: "Er zijn momenteel {$1} kamers actief."
+      n: "Er zijn momenteel %{amount} kamers actief."
     friends_online:
       0: "Er zijn momenteel geen vrienden online."
       1: "Er is momenteel 1 vriend online."
-      n: "Er zijn momenteel {$1} vrienden online."
+      n: "Er zijn momenteel %{amount} vrienden online."
     rooms_page_disclaimer: |-
       Let op dat deze pagina er niet voor kan zorgen om direct deel te nemen aan een kamer.
       Om aan een specifieke kamer deel te nemen, moet je dit óf via een vriend óf via de online servers doen.
@@ -208,22 +208,22 @@ nl:
   time:
     days:
       1: "1 dag"
-      n: "{$1} dagen"
+      n: "%{amount} dagen"
     hours:
       1: "1 uur"
-      n: "{$1} uren"
+      n: "%{amount} uren"
     minutes:
       1: "1 minuut"
-      n: "{$1} minuten"
+      n: "%{amount} minuten"
     seconds:
       1: "1 seconde"
-      n: "{$1} secondes"
+      n: "%{amount} secondes"
   progress:
     estimated_time_remaining: "Geschatte resterende tijd:"
-    downloading_mb: "Downloaden van {$1} MB."
+    downloading_mb: "Downloaden van %{megabytes} MB."
     installing_mods: "Mods installeren"
-    installing_mods_count: "{$1} mods installeren"
-    processing_xof_y: "Verwerken van {$1} uit {$2} bestanden..."
+    installing_mods_count: "%{amount} mods installeren"
+    processing_xof_y: "Verwerken van %{processed} uit %{total} bestanden..."
     update_rr: "Retro Rewind updaten"
     latest_wh_wz_github: "Ophalen van de nieuwste Wheel Wizard van GitHub-releases."
     update_wh_wz: "Wheel Wizard updaten"
@@ -236,12 +236,12 @@ nl:
       title: "Mods gevonden"
       extra: "Je staat op het punt om het spel te starten zonder mods. Wil je de My Stuff-map leegmaken?"
     sure_delete:
-      title: "Weet je zeker dat je {$1} wil verwijderen?"
+      title: "Weet je zeker dat je %{name} wil verwijderen?"
       extra: "Verwijderen is permanent en kan niet ongedaan worden gemaakt."
-      title_miis: "Weet je zeker dat je {$1} Mii's wil verwijderen?"
+      title_miis: "Weet je zeker dat je %{amount} Mii's wil verwijderen?"
     apply_scale:
       title: "Wil je de nieuwe schaal toepassen?"
-      extra: "Deze wijziging wordt over {$1} teruggedraaid, tenzij je ervoor kiest om de wijziging te behouden."
+      extra: "Deze wijziging wordt over %{remainingTime} teruggedraaid, tenzij je ervoor kiest om de wijziging te behouden."
     dolphin_found:
       title: "Dolphin-emulator-map gevonden"
       extra: |-
@@ -249,7 +249,7 @@ nl:
         Dolphin-emulator-map gevonden. Wil je deze gebruiken?
     new_version_wh_wz:
       title: "Wheel Wizard-update beschikbaar"
-      extra: "Versie {$1} van Wheel Wizard is beschikbaar (momenteel op {$2}). Wil je nu updaten?"
+      extra: "Versie %{latestVersion} van Wheel Wizard is beschikbaar (momenteel op %{currentVersion}). Wil je nu updaten?"
     update_admin:
       title: "Update met administrator"
       extra: "Soms zijn er voor een update administratorrechten nodig. Wil je deze activeren voor deze update?"
@@ -269,11 +269,11 @@ nl:
       title: "Dolphin-Flatpak installeren"
       extra: "De Flatpak-versie van de Dolphin-emulator is niet geïnstalleerd. Installeer dit voor je eigen account?"
     install_mod:
-      title: "Wil je de mod \"{$1}\" downloaden en installeren?"
+      title: "Wil je de mod \"%{modName}\" downloaden en installeren?"
     search_mod: "Zoeken naar mods..."
     enter_new_name:
       title: "Vul een nieuwe naam in"
-      extra: "Naam aan het veranderen van \"{$1}\"."
+      extra: "Naam aan het veranderen van \"%{name}\"."
   message_warning:
     not_find_dolphin:
       extra: "Kan Dolphin-emulator niet vinden. Geef eerst de locatie op bij de instellingen."
@@ -283,7 +283,7 @@ nl:
       title: "Meerdere bestanden geselecteerd."
     invalid_name:
       extra:
-        mod_name_exists: "Er bestaat al een mod met de naam \"{$1}\"."
+        mod_name_exists: "Er bestaat al een mod met de naam \"%{modName}\"."
       title: "Naam niet toegestaan."
     invalid_paths:
       extra: "Controleer of alle locaties correct zijn en probeer het opnieuw."
@@ -339,7 +339,7 @@ nl:
         failed_update_apply: "Het is niet gelukt om te updaten. Proces word afgebroken."
         invalid_file_path: |-
           Ongeldige bestandslocatie gedetecteerd. Neem contact op met de ontwikkelaars.
-          Serverfout: {$1}
+          Serverfout: %{error}
       title: "RR-update afgebroken."
     restart_admin_fail:
       extra: "Het is niet gelukt om opnieuw op te starten met administratorrechten."
@@ -358,7 +358,7 @@ nl:
       title: "Ophalen van mod-informatie mislukt."
     mod_download_fail:
       title: "Downloaded van mod mislukt."
-      extra: "Er is een fout opgetreden tijdens het downloaden van {$1}."
+      extra: "Er is een fout opgetreden tijdens het downloaden van %{error}."
   message_success:
     settings_saved:
       title: "Instellingen succesvol opgeslagen!"
@@ -372,21 +372,21 @@ nl:
   snackbar_success:
     mii_added: "Mii is toegevoegd aan \"Mijn Mii's\"."
     copied_fc: "Vriendcode gekopieerd naar klembord."
-    name_change: "Naam succesvol gewijzigd naar \"{$1}\"."
-    saved_mii: "Mii \"{$1}\" is opgeslagen in het bestand \"{$2}\"."
-    deleted: "\"{$1}\" verwijderd."
-    deleted_miis: "{$1} Mii's verwijderd."
-    created_duplicate: "Kopie gemaakt van \"{$1}\"."
-    created_duplicates_miis: "{$1} kopieën gemaakt van Mii."
+    name_change: "Naam succesvol gewijzigd naar \"%{name}\"."
+    saved_mii: "Mii \"%{name}\" is opgeslagen in het bestand \"%{fileName}\"."
+    deleted: "\"%{name}\" verwijderd."
+    deleted_miis: "%{amount} Mii's verwijderd."
+    created_duplicate: "Kopie gemaakt van \"%{name}\"."
+    created_duplicates_miis: "%{amount} kopieën gemaakt van Mii."
     profile_set_primary: "Profiel als hoofdprofiel geselecteerd."
   snackbar_error:
-    mii_failure_deserialize: "Verwerken van Mii \"{$1}\" mislukt."
-    mii_failure_update: "Updaten van Mii \"{$1}\" mislukt."
-    mii_failure_save: "Opslaan van Mii \"{$1}\" mislukt."
-    mii_failure_get: "Verkrijgen van Mii \"{$1}\" mislukt."
-    mii_failure_serialize: "Omzetten van Mii \"{$1}\" mislukt."
-    mii_failure_create: "Creëren van Mii \"{$1}\" mislukt."
-    mii_failure_duplicate: "Kopiëren van Mii \"{$1}\" mislukt."
+    mii_failure_deserialize: "Verwerken van Mii \"%{error}\" mislukt."
+    mii_failure_update: "Updaten van Mii \"%{error}\" mislukt."
+    mii_failure_save: "Opslaan van Mii \"%{error}\" mislukt."
+    mii_failure_get: "Verkrijgen van Mii \"%{error}\" mislukt."
+    mii_failure_serialize: "Omzetten van Mii \"%{error}\" mislukt."
+    mii_failure_create: "Creëren van Mii \"%{error}\" mislukt."
+    mii_failure_duplicate: "Kopiëren van Mii \"%{error}\" mislukt."
   helper_note:
     name_must_between: "Naam moet tussen de 3 en 10 tekens lang zijn."
     creator_name_less11: "Naam moet korter dan 11 tekens zijn."

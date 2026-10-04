@@ -156,7 +156,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void UpdateMadeByText()
     {
-        var completeString = t("text.made_by_string", "Patchzy", "WantToBeeMe");
+        var completeString = t("text.made_by_string", new { firstAuthor = "Patchzy", secondAuthor = "WantToBeeMe" });
         MadeBy.Text = completeString;
     }
 
@@ -268,7 +268,11 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         var friends = GameLicenseService.ActiveCurrentFriends;
         FriendsButton.BoxText = $"{friends.Count(friend => friend.IsOnline)}/{friends.Count}";
-        FriendsButton.BoxTip = t_legacy("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
+        FriendsButton.BoxTip = t_legacy(
+            "hover.friends_online.n",
+            count: friends.Count(friend => friend.IsOnline),
+            new { amount = friends.Count(friend => friend.IsOnline) }
+        );
     }
 
     public void UpdateSidebarProfile()
@@ -292,7 +296,7 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         var playerCount = sender.PlayerCount;
         RoomsButton.BoxText = playerCount.ToString();
-        RoomsButton.BoxTip = t_legacy("hover.players_online.n", playerCount);
+        RoomsButton.BoxTip = t_legacy("hover.players_online.n", count: playerCount, new { amount = playerCount });
         UpdateFriendCount();
     }
 

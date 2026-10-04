@@ -144,7 +144,7 @@ public partial class WhWzSettings : UserControl
         MarioKartHelperText.Text = t("helper_text.end_with_x") + " .iso/.gcm/.gcz/.ciso/.wbfs/.wia/.rvz";
         if (string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath))
             DolphinExecutableValueText.Text = GetDolphinExecutableHelperText();
-        TranslationsPercentageText.Text = t("text.language_translated_by", t("value.language.z_translators"));
+        TranslationsPercentageText.Text = t("text.language_translated_by", new { translators = t("value.language.z_translators") });
         TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
     }
 
@@ -513,7 +513,7 @@ public partial class WhWzSettings : UserControl
             return false;
 
         var extraText =
-            t("question.move_data.extra", normalizedTarget)
+            t("question.move_data.extra", new { path = normalizedTarget })
             ?? $"Wheel Wizard will move its files to:\n{normalizedTarget}\nThis may take a while depending on the amount of data.";
 
         var confirmed = await new YesNoWindow()
@@ -634,7 +634,7 @@ public partial class WhWzSettings : UserControl
         }
 
         var infoText =
-            t("message_success.data_folder_moved.extra", ApplicationData.DirectoryPath)
+            t("message_success.data_folder_moved.extra", new { path = ApplicationData.DirectoryPath })
             ?? $"Wheel Wizard data is now stored in:\n{ApplicationData.DirectoryPath}";
 
         if (!string.IsNullOrWhiteSpace(warningMessage))
@@ -742,7 +742,7 @@ public partial class WhWzSettings : UserControl
         }
         var seconds = 10;
 
-        string ExtraScaleText() => t("question.apply_scale.extra", tTime(seconds));
+        string ExtraScaleText() => t("question.apply_scale.extra", new { remainingTime = tTime(seconds) });
 
         var yesNoWindow = new YesNoWindow()
             .SetButtonText(t("action.apply"), t("action.revert"))

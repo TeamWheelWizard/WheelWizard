@@ -41,7 +41,7 @@ public sealed record LeaderboardPlayerItem
     public Mii? FirstMii => Mii;
     public bool HasBadges => HasBadge;
     public bool IsTopLeaderboardPlayer => true;
-    public string TopLabel => t("placement.n", Rank);
+    public string TopLabel => t("placement.n", new { rank = Rank });
     public bool IsOpenHost => false;
 }
 
@@ -347,7 +347,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
             1 => t("placement.first"),
             2 => t("placement.second"),
             3 => t("placement.third"),
-            _ => t("placement.n", rank),
+            _ => t("placement.n", new { rank = rank }),
         };
 
     private static Mii? DeserializeMii(string? miiData)
@@ -549,7 +549,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         }
 
         ViewUtils.GetLayout().UpdateFriendCount();
-        ViewUtils.ShowSnackbar(t("snackbar_success.friend_added", player.Name));
+        ViewUtils.ShowSnackbar(t("snackbar_success.friend_added", new { name = player.Name }));
     }
 
     private void JoinRoom_OnClick(string friendCode)

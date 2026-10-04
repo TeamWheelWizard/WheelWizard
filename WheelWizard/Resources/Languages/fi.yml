@@ -185,14 +185,14 @@ fi:
     mii_carousel: "Miin katselu"
   text:
     made_by_string: |-
-      Tehnyt: {$1}
-      ja {$2}
+      Tehnyt: %{firstAuthor}
+      ja %{secondAuthor}
     thanks_translators: "Suuret kiitokset kaikille kääntäjille:"
-    wh_wz_translation_percentage: "Tämän kielen käännökset ovat {$1} % valmiita."
+    wh_wz_translation_percentage: "Tämän kielen käännökset ovat %{percentage} % valmiita."
     powered_gamebanana: "Palvelun tarjoaa GameBanana"
-    language_translated_by: "Tämän kielen käännökset tarjoaa: {$1}"
+    language_translated_by: "Tämän kielen käännökset tarjoaa: %{translators}"
     external_reference: "Ulkoinen viite"
-    external_reference_with_path: "Ulkoinen viite: {$1}"
+    external_reference_with_path: "Ulkoinen viite: %{path}"
     modified_archive_member: "Muokattu arkiston jäsen"
     new_archive_member: "Uusi arkiston jäsen"
     whole_file_override: "Koko tiedoston ohitus"
@@ -200,15 +200,15 @@ fi:
     players_online:
       0: "Ei pelaajia paikalla"
       1: "1 pelaaja on paikalla"
-      n: "{$1} pelaajaa on paikalla"
+      n: "%{amount} pelaajaa on paikalla"
     rooms_online:
       0: "Ei aktiivisia huoneita"
       1: "1 aktiivinen huone"
-      n: "{$1} aktiivista huonetta"
+      n: "%{amount} aktiivista huonetta"
     friends_online:
       0: "Ei kavereita paikalla"
       1: "1 kaveri on paikalla"
-      n: "{$1} kaveria on paikalla"
+      n: "%{amount} kaveria on paikalla"
     rooms_page_disclaimer: |-
       Huomioi, että tältä sivulta ei voi liittyä huoneeseen suoraan.
       Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
@@ -233,29 +233,29 @@ fi:
   time:
     days:
       1: "1 pv"
-      n: "{$1} pv"
+      n: "%{amount} pv"
     hours:
       1: "1 t"
-      n: "{$1} t"
+      n: "%{amount} t"
     minutes:
       1: "1 min"
-      n: "{$1} min"
+      n: "%{amount} min"
     seconds:
       1: "1 s"
-      n: "{$1} s"
+      n: "%{amount} s"
     last_24_hours: "Viimeiset 24 tuntia"
     last_7_days: "Viimeiset 7 päivää"
     last_30_days: "Viimeiset 30 päivää"
     last_60_days: "Viimeiset 60 päivää"
     lifetime: "Koko ajalta"
     lifetime_history: "Koko ajan historia"
-    past_n_days_with_range: "Viimeiset {$1} päivää ({$2}–{$3})"
+    past_n_days_with_range: "Viimeiset %{days} päivää (%{fromDate}–%{toDate})"
   progress:
     estimated_time_remaining: "Arvioitu kestoaika:"
-    downloading_mb: "Ladataan {$1} Mt"
+    downloading_mb: "Ladataan %{megabytes} Mt"
     installing_mods: "Asennetaan modeja"
-    installing_mods_count: "Asennetaan {$1} modia"
-    processing_xof_y: "Käsitellään {$1}/{$2} tiedostoa..."
+    installing_mods_count: "Asennetaan %{amount} modia"
+    processing_xof_y: "Käsitellään %{processed}/%{total} tiedostoa..."
     update_rr: "Päivitetään Retro Rewindia"
     latest_wh_wz_github: "Hankitaan uusinta Wheel Wizard -versiota GitHubista"
     update_wh_wz: "Päivitetään Wheel Wizardia"
@@ -266,12 +266,12 @@ fi:
     this_may_take_a_while: "Tässä voi kestää jonkin aikaa riippuen internet-yhteydestäsi."
     applying_converted_mod: "Sovelletaan muunnettu modi"
     combining_files: "Yhdistetään tiedostoja"
-    converting_file: "Muunnetaan {$1}"
-    converting_files_count: "Muunnetaan {$1} tiedostoa"
+    converting_file: "Muunnetaan %{fileName}"
+    converting_files_count: "Muunnetaan %{amount} tiedostoa"
     converting_mod_to_patches: "Muunnetaan modi paikkauksiksi"
-    downloading_mod: "Ladataan {$1}"
+    downloading_mod: "Ladataan %{modName}"
     installing_mod: "Asennetaan modia"
-    preparing_files_count: "Valmistellaan {$1} tiedostoa"
+    preparing_files_count: "Valmistellaan %{amount} tiedostoa"
     installing_recomp: "Asennetaan WiiCompiled"
     updating_recomp: "Päivitetään WiiCompiled"
     uninstalling_recomp: "Poistetaan WiiCompiled-asennusta"
@@ -307,17 +307,17 @@ fi:
         Aiot käynnistää pelin ilman modeja.
         Haluatko tyhjentää 'my-stuff'-kansiosi?
     sure_delete:
-      title: "Haluatko varmasti poistaa '{$1}'?"
+      title: "Haluatko varmasti poistaa '%{name}'?"
       extra: "Poistaminen on pysyvää eikä sitä voi perua."
-      title_miis: "Haluatko varmasti poistaa {$1} Miitä?"
+      title_miis: "Haluatko varmasti poistaa %{amount} Miitä?"
     apply_scale:
       title: "Haluatko ottaa uuden skaalan käyttöön?"
-      extra: "Muutos perutaan {$1} kuluttua, ellet aio pitää muutosta."
+      extra: "Muutos perutaan %{remainingTime} kuluttua, ellet aio pitää muutosta."
     move_data:
       title: "Siirretäänkö Wheel Wizardin tiedot?"
       extra: |-
         Wheel Wizardin tiedostot siirretään sijaintiin:
-        {$1}
+        %{path}
         Tässä saattaa mennä hetki riippuen tietojen määrästä.
     dolphin_found:
       title: "Dolphin-emulaattorin kansio löytyi"
@@ -327,9 +327,9 @@ fi:
     dolphin_outdated:
       title: "Dolphin-emulaattorisi on vanhentunut"
       extra: |-
-        Tässä Dolphin-versiossa ({$1}) on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
+        Tässä Dolphin-versiossa (%{currentVersion}) on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
 
-        Päivitä versioon {$2} tai uudempaan varmuuden vuoksi.
+        Päivitä versioon %{minimumVersion} tai uudempaan varmuuden vuoksi.
     dolphin_program_found:
       title: "Dolphin-emulaattori löytyi"
       extra: |-
@@ -337,7 +337,7 @@ fi:
         Dolphin-emulaattori löytyi. Haluatko käyttää sitä?
     new_version_wh_wz:
       title: "Wheel Wizard -päivitys saatavilla"
-      extra: "Wheel Wizardin versio {$1} on saatavilla (nykyinen versio: {$2}). Haluatko päivittää heti?"
+      extra: "Wheel Wizardin versio %{latestVersion} on saatavilla (nykyinen versio: %{currentVersion}). Haluatko päivittää heti?"
     update_admin:
       title: "Päivitä järjestelmänvalvojana"
       extra: "Joskus päivitys vaatii järjestelmänvalvojan oikeuet. Haluatko aktivoida ne tätä päivitystä varten?"
@@ -359,11 +359,11 @@ fi:
       title: "Dolphin Flatpakin asennus"
       extra: "Dolphin-emulaattorin Flatpak-versio ei näytä olevan asennettuna. Haluatko, että asennamme sen vain omalle käyttäjätilillesi?"
     install_mod:
-      title: "Haluatko ladata ja asentaa modin: {$1}?"
+      title: "Haluatko ladata ja asentaa modin: %{modName}?"
     search_mod: "Haetaan modeja..."
     enter_new_name:
       title: "Anna uusi nimi"
-      extra: "Muutetaan nimeä: {$1}"
+      extra: "Muutetaan nimeä: %{name}"
     enter_mod_name:
       title: "Modin nimi:"
     launch_clear_patches_found:
@@ -383,7 +383,7 @@ fi:
       title: "Usea tiedosto valittuna"
     invalid_name:
       extra:
-        mod_name_exists: "Modi nimellä '{$1}' on jo olemassa."
+        mod_name_exists: "Modi nimellä '%{modName}' on jo olemassa."
       title: "Nimi ei kelpaa."
     invalid_paths:
       extra: "Varmista, että kaikki polut ovat oikein ja yritä uudelleen."
@@ -396,7 +396,7 @@ fi:
       extra: |-
         Wheel Wizard ei voinut lukea määrittämääsi Dolphin-emulaattorin versiota, joten se ei voi tietää, onko siinä tietoturvakorjauksia.
 
-        Tarkista, että käytät {$1}-versiota tai uudempaa. Vanhemmissa versioissa on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
+        Tarkista, että käytät %{minimumVersion}-versiota tai uudempaa. Vanhemmissa versioissa on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
     dolphin_tool_selected:
       title: "Kelvoton Dolphinin käynnistystiedosto valittuna"
       extra: "Sinulla on DolphinTool.exe valittuna. Ole hyvä ja valitse Dolphin.exe (Dolphin-emulaattorin käynnistystiedosto) sen sijaan."
@@ -452,7 +452,7 @@ fi:
         failed_update_apply: "Päivityksen käyttöönotto epäonnistui. Perutaan."
         invalid_file_path: |-
           Virheellinen polku. Ota yhteyttä kehittäjiin.
-          Palvelinvirhe: {$1}
+          Palvelinvirhe: %{error}
       title: "Perutaan RR-päivitys"
     restart_admin_fail:
       extra: "Käynnistäminen järjestelmänvalvojan oikeuksilla epäonnistui."
@@ -471,7 +471,7 @@ fi:
       title: "Modin tietojen noutaminen epäonnistui"
     mod_download_fail:
       title: "Modin lataus epäonnistui."
-      extra: "Ladattaessa tapahtui virhe: {$1}"
+      extra: "Ladattaessa tapahtui virhe: %{error}"
     failed_vr_history: "KP-historian lataaminen epäonnistui"
   message_success:
     settings_saved:
@@ -480,18 +480,18 @@ fi:
       title: "Tietokansio päivitetty"
       extra: |-
         Wheel Wizardin tiedot sijaitsevat nyt kohteessa:
-        {$1}
+        %{path}
     rr_up_to_date:
       title: "Retro Rewind on ajan tasalla."
     mii_changed: "Mii vaihdettu!"
     mod_converted_to_patches:
       title: "Muunnettu paikkauksiksi"
     mod_installed:
-      extra: "Modi '{$1}' asennettu."
+      extra: "Modi '%{modName}' asennettu."
       title: "Modi asennettu!"
-    patch_conversion_result: "{$1} tiedostoa muunnettu {$2} paikkaustiedostoksi."
-    patch_conversion_skipped: "{$1} tiedostoa ei muutettu, koska niitä ei voitu muuntaa."
-    patch_conversion_notes: "Huomautus: {$1}"
+    patch_conversion_result: "%{fileCount} tiedostoa muunnettu %{patchCount} paikkaustiedostoksi."
+    patch_conversion_skipped: "%{amount} tiedostoa ei muutettu, koska niitä ei voitu muuntaa."
+    patch_conversion_notes: "Huomautus: %{amount}"
   snackbar_warning:
     cant_save_mii: "Miitä ei voi tallentaa"
     no_mii_export: "Vietäviä Miitä ei ole"
@@ -499,22 +499,22 @@ fi:
   snackbar_success:
     mii_added: "Mii on lisätty omiin Miihin"
     copied_fc: "Kaverikoodi kopioitu leikepöydälle"
-    name_change: "Nimeksi vaihdettiin '{$1}'"
-    saved_mii: "Mii '{$1}' tallennettiin tiedostoon '{$2}'"
-    deleted: "{$1}' poistettu"
-    deleted_miis: "{$1} Miitä poistettu"
-    created_duplicate: "{$1}' kopioitu"
-    created_duplicates_miis: "{$1}' kopioitua Miitä luotu"
+    name_change: "Nimeksi vaihdettiin '%{name}'"
+    saved_mii: "Mii '%{name}' tallennettiin tiedostoon '%{fileName}'"
+    deleted: "%{name}' poistettu"
+    deleted_miis: "%{amount} Miitä poistettu"
+    created_duplicate: "%{name}' kopioitu"
+    created_duplicates_miis: "%{amount}' kopioitua Miitä luotu"
     profile_set_primary: "Aseta profiili ensisijaiseksi"
     dolphin_updated: "Dolphin-emulaattori on päivitetty"
   snackbar_error:
-    mii_failure_deserialize: "Miin '{$1}' deserialisointi epäonnistui"
-    mii_failure_update: "Miin '{$1}' päivittäminen epäonnistui"
-    mii_failure_save: "Miin '{$1}' tallentaminen epäonnistui"
-    mii_failure_get: "Miin '{$1}' noutaminen epäonnistui"
-    mii_failure_serialize: "Miin '{$1}' serialistointi epäonnistui"
-    mii_failure_create: "Miin '{$1}' luominen epäonnistui"
-    mii_failure_duplicate: "Miin '{$1}' kopioiminen epäonnistui"
+    mii_failure_deserialize: "Miin '%{error}' deserialisointi epäonnistui"
+    mii_failure_update: "Miin '%{error}' päivittäminen epäonnistui"
+    mii_failure_save: "Miin '%{error}' tallentaminen epäonnistui"
+    mii_failure_get: "Miin '%{error}' noutaminen epäonnistui"
+    mii_failure_serialize: "Miin '%{error}' serialistointi epäonnistui"
+    mii_failure_create: "Miin '%{error}' luominen epäonnistui"
+    mii_failure_duplicate: "Miin '%{error}' kopioiminen epäonnistui"
   helper_note:
     name_must_between: "Nimien täytyy olla 3–10 merkkiä pitkä."
     creator_name_less11: "Tekijän nimen täytyy olla alle 11 merkkiä pitkä."
@@ -526,8 +526,8 @@ fi:
       message: "Tämä modi on yhteensopimaton muiden modien kanssa. Pelin käynnistäminen tämän modin kanssa voi aiheuttaa virheellistä toimintaa tai kaatumisia. Harkitse modin muuntamista paikkauksiksi napsauttamalla sitä hiiren oikealla painikkeella."
       title: "YHTEENSOPIMATON MODI"
   warning:
-    brsar_external_count: "{$1} BRSAR-tiedostomerkintää ovat ulkoisia viittauksia, eikä niitä voida viedä."
-    brsar_file_id_external: "BRSAR-tiedostotunnus {$1} on ulkoinen tiedostoviittaus, eikä sitä voida viedä."
+    brsar_external_count: "%{amount} BRSAR-tiedostomerkintää ovat ulkoisia viittauksia, eikä niitä voida viedä."
+    brsar_file_id_external: "BRSAR-tiedostotunnus %{fileId} on ulkoinen tiedostoviittaus, eikä sitä voida viedä."
   option:
     wh_wz_language: "Wheel Wizardin kieli"
     force_disable_wiimote: "Pakota Wiimote pois käytöstä"
@@ -590,8 +590,8 @@ fi:
     recomp_prevent_stutters: "Varjostinta käännettäessä sitä tarvitsevat objektit ohitetaan muutaman kuvan ajan sen sijaan, että koko peli jumiutuisi, kunnes se on valmis. Vähentää pätkimistä grafiikan äkillisen ilmestymisen kustannuksella."
     launch_with_dolphin: "Käynnistää Dolphinin pääikkunan pelin mukana"
     launch_rr_on_startup: "Retro Rewind käynnistetään heti kun Wheel Wizard käynnistyy"
-    retro_rewind_version: "Asennettu versio: {$1}"
-    installed_version: "Asennettu versio: {$1}"
+    retro_rewind_version: "Asennettu versio: %{version}"
+    installed_version: "Asennettu versio: %{version}"
     force_disable_wiimote: "Poistaa Wiimoten käytöstä pelissä, mutta ottaa sen käyttöön Wii-valikossa"
     resolution_scale: "1x on alkuperäinen resoluutio"
     renderer: "Valitsee grafiikkaohjelman, jota Dolphin käyttää pelin renderöintiin."
@@ -616,12 +616,12 @@ fi:
     general: "Yleiset"
     video: "Video"
   status:
-    recomp_dolphin_clone_available: "Yksityinen klooni: {$1}"
+    recomp_dolphin_clone_available: "Yksityinen klooni: %{path}"
     recomp_dolphin_clone_missing: "Yksityistä kloonia ei ole luotu."
     recomp_dolphin_data_cloned: "Dolphin-data kloonattu WiiCompiledille"
     recomp_dolphin_data_not_linked: "Ei linkitetty. WiiCompiled käyttää omaa yksityistä Wii-dataa."
-    recomp_dolphin_data_linked: "Jaetaan Dolphin-dataa kohteesta {$1}"
-    recomp_dolphin_data_copied: "Käytetään Dolphin-datasi kopiota kohteessa {$1}"
+    recomp_dolphin_data_linked: "Jaetaan Dolphin-dataa kohteesta %{path}"
+    recomp_dolphin_data_copied: "Käytetään Dolphin-datasi kopiota kohteessa %{path}"
     recomp_dolphin_data_not_found: "Dolphin-dataa ei löytynyt"
     recomp_not_installed: "WiiCompiledia ei ole vielä asennettu. Asenna se ensin kotisivulta."
     recomp_uninstalled: "WiiCompiledin asennus on poistettu"

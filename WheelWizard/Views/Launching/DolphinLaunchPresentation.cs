@@ -11,7 +11,7 @@ public sealed class DolphinLaunchPresentation : IDolphinLaunchPresentation
         await new MessageBoxWindow()
             .SetMessageType(MessageBoxWindow.MessageType.Warning)
             .SetTitleText(t("message_warning.dolphin_version_unverified.title"))
-            .SetInfoText(t("message_warning.dolphin_version_unverified.extra", DolphinVersion.MinimumDisplayText))
+            .SetInfoText(t("message_warning.dolphin_version_unverified.extra", new { minimumVersion = DolphinVersion.MinimumDisplayText }))
             .ShowDialog();
 
     public async Task<DolphinVersionAction> ChooseOutdatedVersionActionAsync(string? version)
@@ -20,7 +20,12 @@ public sealed class DolphinLaunchPresentation : IDolphinLaunchPresentation
             .SetButtonVariants(Button.ButtonsVariantType.Primary, Button.ButtonsVariantType.Danger)
             .SetButtonText(t("action.update"), t("action.play_anyway"))
             .SetMainText(t("question.dolphin_outdated.title"))
-            .SetExtraText(t("question.dolphin_outdated.extra", version ?? t("state.unknown"), DolphinVersion.MinimumDisplayText));
+            .SetExtraText(
+                t(
+                    "question.dolphin_outdated.extra",
+                    new { currentVersion = version ?? t("state.unknown"), minimumVersion = DolphinVersion.MinimumDisplayText }
+                )
+            );
         if (await popup.AwaitAnswer())
             return DolphinVersionAction.Update;
         return popup.NoButtonClicked ? DolphinVersionAction.PlayAnyway : DolphinVersionAction.Cancel;

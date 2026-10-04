@@ -63,7 +63,11 @@ public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
         if (miiResult.IsFailure)
         {
             DisableOpen(true);
-            MessageTranslationHelper.ShowMessage(MessageTranslation.Error_MiiEditor_CantOpenEditor, null, [miiResult.Error.Message]);
+            MessageTranslationHelper.ShowMessage(
+                MessageTranslation.Error_MiiEditor_CantOpenEditor,
+                null,
+                new { error = miiResult.Error.Message }
+            );
             return this;
         }
 

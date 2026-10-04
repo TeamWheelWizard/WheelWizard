@@ -128,7 +128,7 @@ public sealed class ModPatchConversionService(
                         var conversion = conversionResult.Value;
                         if (conversion.Baseline == null)
                         {
-                            skipped.Add(t("warning.file_not_in_built_in_baseline", fileName)!);
+                            skipped.Add(t("warning.file_not_in_built_in_baseline", new { fileName = fileName })!);
                             continue;
                         }
 

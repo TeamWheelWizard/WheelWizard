@@ -12,7 +12,7 @@ public class LeaderboardPodiumCard : TemplatedControl
         RankProperty.Changed.AddClassHandler<LeaderboardPodiumCard>(
             (card, _) =>
             {
-                card.RankLabel = t("placement.n", card.Rank);
+                card.RankLabel = t("placement.n", new { rank = card.Rank });
             }
         );
     }

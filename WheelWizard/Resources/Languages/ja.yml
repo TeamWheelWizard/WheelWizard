@@ -168,25 +168,25 @@ ja:
     mii_carousel: "Miiスライダー"
   text:
     made_by_string: |-
-      作成者: {$1}
-      と {$2}
+      作成者: %{firstAuthor}
+      と %{secondAuthor}
     thanks_translators: "すべての翻訳者さんに感謝します:"
-    wh_wz_translation_percentage: "この言語の翻訳は{$1}%完了しています"
+    wh_wz_translation_percentage: "この言語の翻訳は%{percentage}%完了しています"
     powered_gamebanana: "GameBananaによって提供されています"
-    language_translated_by: "この言語はこれらの方が翻訳しました: {$1}"
+    language_translated_by: "この言語はこれらの方が翻訳しました: %{translators}"
   hover:
     players_online:
       0: "現在 オンラインのプレイヤーがいません"
       1: "現在 オンラインのプレイヤーが 1人います"
-      n: "現在 オンラインのプレイヤーが {$1}人います"
+      n: "現在 オンラインのプレイヤーが %{amount}人います"
     rooms_online:
       0: "現在 開いているルームがありません"
       1: "現在 開いているルームが 1部屋あります"
-      n: "現在 開いているルームが {$1}部屋あります"
+      n: "現在 開いているルームが %{amount}部屋あります"
     friends_online:
       0: "現在 オンラインのフレンドがいません"
       1: "現在 オンラインのフレンドが 1人います"
-      n: "現在 オンラインのフレンドが {$1}人います"
+      n: "現在 オンラインのフレンドが %{amount}人います"
     rooms_page_disclaimer: |-
       ルームに直接合流する機能はないことに注意してください。
       特定のルームに参加するには、フレンドを通して合流するか、オンラインサーバーに参加して合流する必要があります。
@@ -208,22 +208,22 @@ ja:
   time:
     days:
       1: "1日"
-      n: "{$1}日"
+      n: "%{amount}日"
     hours:
       1: "1時間"
-      n: "{$1}時間"
+      n: "%{amount}時間"
     minutes:
       1: "1分"
-      n: "{$1}分"
+      n: "%{amount}分"
     seconds:
       1: "1秒"
-      n: "{$1}秒"
+      n: "%{amount}秒"
   progress:
     estimated_time_remaining: "おおよその残り時間:"
-    downloading_mb: "{$1}MBをダウンロード中"
+    downloading_mb: "%{megabytes}MBをダウンロード中"
     installing_mods: "Modをインストール"
-    installing_mods_count: "{$1}個のModをインストール"
-    processing_xof_y: "{$2}個中{$1} 個のファイルを処理しています..."
+    installing_mods_count: "%{amount}個のModをインストール"
+    processing_xof_y: "%{total}個中%{processed} 個のファイルを処理しています..."
     update_rr: "Retro Rewindをアップデート"
     latest_wh_wz_github: "githubから最新のWheel Wizardを入手"
     update_wh_wz: "Wheel Wizardをアップデート"
@@ -238,12 +238,12 @@ ja:
         Modなしでゲームを起動しようとしています。
         My Stuffフォルダーをクリアしますか？
     sure_delete:
-      title: "{$1}を削除してもよろしいですか？"
+      title: "%{name}を削除してもよろしいですか？"
       extra: "削除は永久的であり、元に戻すことはできません"
-      title_miis: "{$1}Miiを削除してもよろしいですか？"
+      title_miis: "%{amount}Miiを削除してもよろしいですか？"
     apply_scale:
       title: "新しいウィンドウサイズを適用しますか？"
-      extra: "変更の保存を選択しないと、この変更は{$1}で変更前に戻ります"
+      extra: "変更の保存を選択しないと、この変更は%{remainingTime}で変更前に戻ります"
     dolphin_found:
       title: "Dolphinエミュレーターのフォルダーが見つかりました"
       extra: |-
@@ -251,7 +251,7 @@ ja:
         Dolphinエミュレーターのフォルダーが見つかりました。このフォルダーを使用しますか？
     new_version_wh_wz:
       title: "Wheel Wizardのアップデートがあります"
-      extra: "Wheel Wizardのバージョン{$1} (現在のバージョンは{$2}) が利用できます。すぐにアップデートしますか？"
+      extra: "Wheel Wizardのバージョン%{latestVersion} (現在のバージョンは%{currentVersion}) が利用できます。すぐにアップデートしますか？"
     update_admin:
       title: "管理者権限で更新する"
       extra: "アップデートには管理者権限が必要な場合があります。今回のアップデートで管理者権限を有効にしますか?"
@@ -271,11 +271,11 @@ ja:
       title: "Dolphin flatpakバージョンのインストール"
       extra: "Dolphinエミュレーターのflatpakバージョンがインストールされていないようです。私たちが（あなたのアカウントのみに）インストールしてもよろしいですか？"
     install_mod:
-      title: "Modのダウンロードとインストールを行いますか: {$1}？"
+      title: "Modのダウンロードとインストールを行いますか: %{modName}？"
     search_mod: "Modを検索しています..."
     enter_new_name:
       title: "新しい名前を入力してください"
-      extra: "名前をこれから変更します: {$1}"
+      extra: "名前をこれから変更します: %{name}"
   message_warning:
     not_find_dolphin:
       extra: "Dolphinエミュレーターが見つかりませんでした。設定でパスを設定してください。"
@@ -285,7 +285,7 @@ ja:
       title: "複数のファイルが選択されています"
     invalid_name:
       extra:
-        mod_name_exists: "「{$1}」というModは既に存在しています。"
+        mod_name_exists: "「%{modName}」というModは既に存在しています。"
       title: "その名前にはできません"
     invalid_paths:
       extra: "すべてのパスが正しいことを確認して、もう一度お試しください。"
@@ -343,7 +343,7 @@ ja:
         failed_update_apply: "アップデートの適用に失敗しました。中止しています。"
         invalid_file_path: |-
           無効なファイルパスが検知されました。開発者に連絡してください。
-          サーバーエラー:  {$1}
+          サーバーエラー:  %{error}
       title: "Retro Rewindのアップデートを中止"
     restart_admin_fail:
       extra: "管理者権限で再起動するのに失敗しました。"
@@ -362,7 +362,7 @@ ja:
       title: "Modの情報取得に失敗"
     mod_download_fail:
       title: "Modのダウンロードに失敗しました"
-      extra: "ダウンロード中にエラーが発生しました: {$1}"
+      extra: "ダウンロード中にエラーが発生しました: %{error}"
   message_success:
     settings_saved:
       title: "設定が保存されました！"
@@ -376,21 +376,21 @@ ja:
   snackbar_success:
     mii_added: "MiiはあなたのMiiに追加されました"
     copied_fc: "クリップボードにフレンドコードをコピーしました"
-    name_change: "名前を'{$1}'に変更しました"
-    saved_mii: "Mii '{$1}'をファイル '{$2}'に保存しました"
-    deleted: "{$1}'を削除しました"
-    deleted_miis: "{$1}Miiを削除しました"
-    created_duplicate: "{$1}'のコピーを作成しました"
-    created_duplicates_miis: "{$1}Miiのコピーを作成しました"
+    name_change: "名前を'%{name}'に変更しました"
+    saved_mii: "Mii '%{name}'をファイル '%{fileName}'に保存しました"
+    deleted: "%{name}'を削除しました"
+    deleted_miis: "%{amount}Miiを削除しました"
+    created_duplicate: "%{name}'のコピーを作成しました"
+    created_duplicates_miis: "%{amount}Miiのコピーを作成しました"
     profile_set_primary: "プロファイルをメインに設定する"
   snackbar_error:
-    mii_failure_deserialize: "Mii '{$1}'の復元に失敗しました"
-    mii_failure_update: "Mii '{$1}'のアップデートに失敗しました"
-    mii_failure_save: "Mii '{$1}'の保存に失敗しました"
-    mii_failure_get: "Mii '{$1}'の取得に失敗しました"
-    mii_failure_serialize: "Mii '{$1}'の変換に失敗しました"
-    mii_failure_create: "Mii '{$1}'の作成に失敗しました"
-    mii_failure_duplicate: "Mii '{$1}'のコピーに失敗しました"
+    mii_failure_deserialize: "Mii '%{error}'の復元に失敗しました"
+    mii_failure_update: "Mii '%{error}'のアップデートに失敗しました"
+    mii_failure_save: "Mii '%{error}'の保存に失敗しました"
+    mii_failure_get: "Mii '%{error}'の取得に失敗しました"
+    mii_failure_serialize: "Mii '%{error}'の変換に失敗しました"
+    mii_failure_create: "Mii '%{error}'の作成に失敗しました"
+    mii_failure_duplicate: "Mii '%{error}'のコピーに失敗しました"
   helper_note:
     name_must_between: "名前の長さは3文字から10文字にしてください"
     creator_name_less11: "作成者の名前の長さは10文字以下にしてください"
