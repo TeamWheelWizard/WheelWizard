@@ -10,7 +10,7 @@ public class VirtualSettingTests
     public void Set_StoresValueAndInvokesSetter_WhenValueIsValid()
     {
         var backingValue = 1;
-        var setting = new VirtualSetting(typeof(int), value => backingValue = (int)value, () => backingValue);
+        var setting = new VirtualSetting<int>(value => backingValue = (int)value, () => backingValue);
 
         var result = setting.Set(5);
 
@@ -23,9 +23,7 @@ public class VirtualSettingTests
     public void Set_ReturnsFalseAndKeepsOldValue_WhenValidationFails()
     {
         var backingValue = 2;
-        var setting = new VirtualSetting(typeof(int), value => backingValue = (int)value, () => backingValue).SetValidation(value =>
-            (int)value! >= 0
-        );
+        var setting = new VirtualSetting<int>(value => backingValue = (int)value, () => backingValue).SetValidation(value => value >= 0);
 
         var result = setting.Set(-1);
 
@@ -37,8 +35,8 @@ public class VirtualSettingTests
     [Fact]
     public void SetDependencies_RecalculatesValue_WhenDependencySignalsChange()
     {
-        var dependency = new WhWzSetting(typeof(int), "Dependency", 1);
-        var setting = new VirtualSetting(typeof(int), _ => { }, () => (int)dependency.Get()).SetDependencies(dependency);
+        var dependency = new WhWzSetting<int>("Dependency", 1);
+        var setting = new VirtualSetting<int>(_ => { }, () => (int)dependency.Get()).SetDependencies(dependency);
 
         dependency.Set(7, skipSave: true);
 
@@ -48,8 +46,8 @@ public class VirtualSettingTests
     [Fact]
     public void Dispose_StopsRecalculationWithoutAnyGlobalRuntime()
     {
-        var dependency = new WhWzSetting(typeof(int), "Dependency", 1);
-        var setting = new VirtualSetting(typeof(int), _ => { }, () => dependency.Get()).SetDependencies(dependency);
+        var dependency = new WhWzSetting<int>("Dependency", 1);
+        var setting = new VirtualSetting<int>(_ => { }, () => dependency.Get()).SetDependencies(dependency);
 
         setting.Dispose();
         dependency.Set(7, skipSave: true);
@@ -60,8 +58,8 @@ public class VirtualSettingTests
     [Fact]
     public void SetDependencies_Throws_WhenCalledTwice()
     {
-        var dependency = new WhWzSetting(typeof(int), "Dependency", 1);
-        var setting = new VirtualSetting(typeof(int), _ => { }, () => 1).SetDependencies(dependency);
+        var dependency = new WhWzSetting<int>("Dependency", 1);
+        var setting = new VirtualSetting<int>(_ => { }, () => 1).SetDependencies(dependency);
 
         Assert.Throws<ArgumentException>(() => setting.SetDependencies(dependency));
     }

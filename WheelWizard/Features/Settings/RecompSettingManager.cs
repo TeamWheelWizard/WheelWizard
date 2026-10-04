@@ -12,9 +12,9 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
     private readonly object _syncRoot = new();
     private readonly object _fileIoSync = new();
     private bool _loaded;
-    private readonly List<RecompSetting> _settings = [];
+    private readonly List<IRecompSetting> _settings = [];
 
-    public void RegisterSetting(RecompSetting setting)
+    public void RegisterSetting(IRecompSetting setting)
     {
         lock (_syncRoot)
         {
@@ -25,7 +25,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
         }
     }
 
-    public void SaveSettings(string configPath, RecompSetting invokingSetting)
+    public void SaveSettings(string configPath, IRecompSetting invokingSetting)
     {
         lock (_syncRoot)
         {
@@ -80,7 +80,7 @@ public class RecompSettingManager(IFileSystem fileSystem) : IRecompSettingManage
 
     public void LoadSettings(string configPath)
     {
-        List<RecompSetting> settingsSnapshot;
+        List<IRecompSetting> settingsSnapshot;
         if (_loaded)
             return;
 

@@ -81,12 +81,12 @@ public partial class OtherSettings : UserControl
 
     private void ClickLaunchRrOnStartup(object? sender, RoutedEventArgs e)
     {
-        SettingsService.Set(SettingsService.LAUNCH_RR_ON_STARTUP, LaunchRrOnStartup.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.LAUNCH_RR_ON_STARTUP, LaunchRrOnStartup.IsChecked == true);
     }
 
     private void ClickEnableRecomp(object? sender, RoutedEventArgs e)
     {
-        SettingsService.Set(SettingsService.ENABLE_RECOMP, EnableRecomp.IsChecked == true);
+        SettingsEditing.Set(SettingsService, SettingsService.ENABLE_RECOMP, EnableRecomp.IsChecked == true);
     }
 
     private async void Reinstall_RetroRewind(object sender, RoutedEventArgs e)

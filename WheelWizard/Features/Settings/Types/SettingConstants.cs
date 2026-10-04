@@ -21,9 +21,9 @@ public static class SettingValues
 
     public static readonly double[] WindowScales = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2];
 
-    public static bool IsValidWindowScale(object? value)
+    public static bool IsValidWindowScale(double scale)
     {
-        return value is double scale && scale >= MinWindowScale && scale <= MaxWindowScale;
+        return scale >= MinWindowScale && scale <= MaxWindowScale;
     }
 
     public static readonly Dictionary<string, string> GFXRenderers = new() //Display name, value

@@ -28,14 +28,14 @@ public class SettingsManagerTests
         var children = dolphinManager
             .ReceivedCalls()
             .Where(call => call.GetMethodInfo().Name == nameof(IDolphinSettingManager.RegisterSetting))
-            .Select(call => (DolphinSetting)call.GetArguments()[0]!)
+            .Select(call => (IDolphinSetting)call.GetArguments()[0]!)
             .ToDictionary(setting => setting.Name);
         Assert.True(manager.Set(manager.RECOMMENDED_SETTINGS, true));
-        var recommendedShaderMode = children["ShaderCompilationMode"].Get();
+        var recommendedShaderMode = children["ShaderCompilationMode"].GetStringValue();
         var failure = new IOException("disk full");
         var fail = true;
         dolphinManager
-            .When(m => m.SaveSettings(Arg.Any<string>(), Arg.Is<DolphinSetting>(s => s.Name == "MSAA")))
+            .When(m => m.SaveSettings(Arg.Any<string>(), Arg.Is<IDolphinSetting>(s => s.Name == "MSAA")))
             .Do(_ =>
             {
                 if (fail)
@@ -44,12 +44,12 @@ public class SettingsManagerTests
 
         Assert.False(manager.Set(manager.RECOMMENDED_SETTINGS, false));
         Assert.Same(failure, manager.RECOMMENDED_SETTINGS.SaveError);
-        Assert.NotEqual(recommendedShaderMode, children["ShaderCompilationMode"].Get());
+        Assert.NotEqual(recommendedShaderMode, children["ShaderCompilationMode"].GetStringValue());
         Assert.False(manager.Get<bool>(manager.RECOMMENDED_SETTINGS));
 
         fail = false;
         Assert.True(manager.Set(manager.RECOMMENDED_SETTINGS, true));
-        Assert.Equal(recommendedShaderMode, children["ShaderCompilationMode"].Get());
+        Assert.Equal(recommendedShaderMode, children["ShaderCompilationMode"].GetStringValue());
         Assert.True(manager.Get<bool>(manager.RECOMMENDED_SETTINGS));
         Assert.Null(manager.RECOMMENDED_SETTINGS.SaveError);
     }
@@ -67,13 +67,13 @@ public class SettingsManagerTests
         var children = dolphinManager
             .ReceivedCalls()
             .Where(call => call.GetMethodInfo().Name == nameof(IDolphinSettingManager.RegisterSetting))
-            .Select(call => (DolphinSetting)call.GetArguments()[0]!)
+            .Select(call => (IDolphinSetting)call.GetArguments()[0]!)
             .ToDictionary(setting => setting.Name);
-        children["SSAA"].Set(true, skipSave: true);
+        ((DolphinSetting<bool>)children["SSAA"]).Set(true, skipSave: true);
         var failure = new IOException("disk full");
         var fail = true;
         dolphinManager
-            .When(m => m.SaveSettings(Arg.Any<string>(), Arg.Is<DolphinSetting>(s => s.Name == failedSetting)))
+            .When(m => m.SaveSettings(Arg.Any<string>(), Arg.Is<IDolphinSetting>(s => s.Name == failedSetting)))
             .Do(_ =>
             {
                 if (fail)
@@ -95,11 +95,22 @@ public class SettingsManagerTests
     }
 
     [Fact]
-    public void Get_Throws_WhenRequestedTypeDoesNotMatchSettingType()
+    public void Get_InfersTheTypeFromTheSetting()
     {
         var manager = CreateManager(new MockFileSystem(), out _, out _, out _);
 
-        Assert.Throws<InvalidOperationException>(() => manager.Get<int>(manager.WW_LANGUAGE));
+        string language = manager.Get(manager.WW_LANGUAGE);
+        Assert.Equal("en", language);
+    }
+
+    [Fact]
+    public void SettingApiExposesOnlyItsDeclaredValueType()
+    {
+        var setter = typeof(Setting<bool>).GetMethod("Set")!;
+        Assert.Equal(typeof(bool), setter.GetParameters()[0].ParameterType);
+        Assert.Equal(typeof(bool), typeof(Setting<bool>).GetProperty("Value")!.PropertyType);
+        Assert.Null(typeof(Setting).GetMethod("Set"));
+        Assert.Null(typeof(Setting).GetMethod("Get"));
     }
 
     [Fact]
@@ -254,7 +265,7 @@ public class SettingsSignalBusTests
     public void Publish_NotifiesActiveSubscribers()
     {
         var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
-        var setting = new WhWzSetting(typeof(int), "Volume", 10);
+        var setting = new WhWzSetting<int>("Volume", 10);
         SettingChangedSignal? receivedSignal = null;
         using var _ = signalBus.Subscribe(signal => receivedSignal = signal);
 
@@ -268,7 +279,7 @@ public class SettingsSignalBusTests
     public void DisposeSubscription_StopsReceivingSignals()
     {
         var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
-        var setting = new WhWzSetting(typeof(int), "Volume", 10);
+        var setting = new WhWzSetting<int>("Volume", 10);
         var receiveCount = 0;
         var subscription = signalBus.Subscribe(_ => receiveCount++);
 
@@ -358,9 +369,9 @@ public class SettingsLocalizationServiceTests
         var originalLanguage = LocalizationProvider.Current.CurrentLanguage;
         var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var settingsManager = Substitute.For<ISettingsManager>();
-        var languageSetting = new WhWzSetting(typeof(string), "WW_Language", "fr");
+        var languageSetting = new WhWzSetting<string>("WW_Language", "fr");
         settingsManager.WW_LANGUAGE.Returns(languageSetting);
-        settingsManager.Get<string>(Arg.Any<Setting>()).Returns(_ => (string)languageSetting.Get());
+        settingsManager.Get<string>(Arg.Any<Setting<string>>()).Returns(_ => (string)languageSetting.Get());
         var yamlLocalizationService = new EmbeddedYamlLocalizationService();
         using var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
 
@@ -396,9 +407,9 @@ public class SettingsLocalizationServiceTests
         var originalLanguage = LocalizationProvider.Current.CurrentLanguage;
         var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var settingsManager = Substitute.For<ISettingsManager>();
-        var languageSetting = new WhWzSetting(typeof(string), "WW_Language", "en");
+        var languageSetting = new WhWzSetting<string>("WW_Language", "en");
         settingsManager.WW_LANGUAGE.Returns(languageSetting);
-        settingsManager.Get<string>(Arg.Any<Setting>()).Returns(_ => (string)languageSetting.Get());
+        settingsManager.Get<string>(Arg.Any<Setting<string>>()).Returns(_ => (string)languageSetting.Get());
         var yamlLocalizationService = new EmbeddedYamlLocalizationService();
         using var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
 
@@ -511,17 +522,17 @@ internal static class SettingsTestUtils
     public static ISettingsManager CreateSettingsStub(string userFolderPath, string dolphinLocation = "dolphin-emu")
     {
         var settings = Substitute.For<ISettingsManager>();
-        var userFolderSetting = new WhWzSetting(typeof(string), "UserFolderPath", userFolderPath);
-        var dolphinLocationSetting = new WhWzSetting(typeof(string), "DolphinLocation", dolphinLocation);
+        var userFolderSetting = new WhWzSetting<string>("UserFolderPath", userFolderPath);
+        var dolphinLocationSetting = new WhWzSetting<string>("DolphinLocation", dolphinLocation);
 
         settings.USER_FOLDER_PATH.Returns(userFolderSetting);
         settings.DOLPHIN_LOCATION.Returns(dolphinLocationSetting);
 
         settings
-            .Get<string>(Arg.Is<Setting>(setting => ReferenceEquals(setting, userFolderSetting)))
+            .Get<string>(Arg.Is<Setting<string>>(setting => ReferenceEquals(setting, userFolderSetting)))
             .Returns(_ => (string)userFolderSetting.Get());
         settings
-            .Get<string>(Arg.Is<Setting>(setting => ReferenceEquals(setting, dolphinLocationSetting)))
+            .Get<string>(Arg.Is<Setting<string>>(setting => ReferenceEquals(setting, dolphinLocationSetting)))
             .Returns(_ => (string)dolphinLocationSetting.Get());
 
         return settings;

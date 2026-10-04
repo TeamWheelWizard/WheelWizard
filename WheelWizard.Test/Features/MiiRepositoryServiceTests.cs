@@ -26,9 +26,9 @@ public sealed class MiiRepositoryServiceTests
     public MiiRepositoryServiceTests()
     {
         _settings = SettingsTestUtils.CreateSettingsStub(Path.GetDirectoryName(_sourceNand)!);
-        var nandSetting = new WhWzSetting(typeof(string), "NandRoot", _sourceNand);
-        var copySetting = new WhWzSetting(typeof(bool), "CopyNand", false);
-        var useSetting = new WhWzSetting(typeof(bool), "UseDolphinData", true);
+        var nandSetting = new WhWzSetting<string>("NandRoot", _sourceNand);
+        var copySetting = new WhWzSetting<bool>("CopyNand", false);
+        var useSetting = new WhWzSetting<bool>("UseDolphinData", true);
         _settings.NAND_ROOT_PATH.Returns(nandSetting);
         _settings.RECOMP_COPY_DOLPHIN_NAND.Returns(copySetting);
         _settings.RECOMP_USE_DOLPHIN_DATA.Returns(useSetting);

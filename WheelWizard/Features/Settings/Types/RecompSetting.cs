@@ -8,42 +8,30 @@ namespace WheelWizard.Settings.Types;
 /// in-game settings bar. Values are formatted exactly the way the runtime's own writer formats
 /// them: booleans bare and lowercase, strings double-quoted, numbers invariant.
 /// </summary>
-public class RecompSetting : Setting
+public interface IRecompSetting
 {
-    private readonly Action<RecompSetting> _saveAction;
+    string Name { get; }
+    string Section { get; }
+    string GetStringValue();
+    bool SetFromString(string value, bool skipSave = false);
+    void Reset(bool skipSave = false);
+}
 
-    public string Section { get; }
+public class RecompSetting<T>((string Section, string Key) location, T defaultValue, Action<IRecompSetting> saveAction)
+    : Setting<T>(location.Key, defaultValue),
+        IRecompSetting
+{
+    public string Section { get; } = location.Section;
 
-    public RecompSetting(Type type, (string Section, string Key) location, object defaultValue, Action<RecompSetting> saveAction)
-        : base(type, location.Key, defaultValue)
+    protected override void ApplyValue(bool skipSave)
     {
-        _saveAction = saveAction ?? throw new ArgumentNullException(nameof(saveAction));
-        Section = location.Section;
+        if (!skipSave)
+            saveAction(this);
     }
 
-    protected override bool SetInternal(object newValue, bool skipSave = false)
+    public new RecompSetting<T> SetValidation(Func<T, bool> validation)
     {
-        var oldValue = Value;
-        Value = newValue;
-        var newIsValid = SaveEvenIfNotValid || IsValid();
-        if (newIsValid)
-        {
-            if (!skipSave)
-                _saveAction(this);
-        }
-        else
-            Value = oldValue;
-
-        return newIsValid;
-    }
-
-    public override object Get() => Value;
-
-    public override bool IsValid() => ValidationFunc == null || ValidationFunc(Value);
-
-    public new RecompSetting SetValidation(Func<object?, bool> validationFunc)
-    {
-        base.SetValidation(validationFunc);
+        base.SetValidation(validation);
         return this;
     }
 
@@ -70,13 +58,14 @@ public class RecompSetting : Setting
     public bool SetFromString(string tomlValue, bool skipSave = false)
     {
         var literal = tomlValue.Trim();
-        return ValueType switch
+        return typeof(T) switch
         {
-            { } t when t == typeof(string) => Set(Unquote(literal), skipSave),
-            { } t when t == typeof(bool) => bool.TryParse(literal, out var flag) && Set(flag, skipSave),
+            { } t when t == typeof(string) => Set((T)(object)Unquote(literal), skipSave),
+            { } t when t == typeof(bool) => bool.TryParse(literal, out var flag) && Set((T)(object)flag, skipSave),
             { } t when t == typeof(double) => double.TryParse(literal, NumberStyles.Float, CultureInfo.InvariantCulture, out var number)
-                && Set(number, skipSave),
-            _ => throw new InvalidOperationException($"Unsupported type: {ValueType.Name}"),
+                && double.IsFinite(number)
+                && Set((T)(object)number, skipSave),
+            _ => throw new InvalidOperationException($"Unsupported type: {typeof(T).Name}"),
         };
     }
 

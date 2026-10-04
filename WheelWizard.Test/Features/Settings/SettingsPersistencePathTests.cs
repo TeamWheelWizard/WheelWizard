@@ -17,7 +17,7 @@ public class SettingsPersistencePathTests
         const string originalJson = "{\"Volume\":12}";
         fs.File.WriteAllText(original, originalJson);
         var manager = new WhWzSettingManager(NullLogger<WhWzSettingManager>.Instance, fs);
-        var setting = new WhWzSetting(typeof(int), "Volume", 5);
+        var setting = new WhWzSetting<int>("Volume", 5);
         manager.RegisterSetting(setting);
 
         manager.LoadSettings(original);
@@ -43,7 +43,7 @@ public class SettingsPersistencePathTests
         fs.File.WriteAllText(firstFile, originalIni);
         fs.File.WriteAllText(secondFile, "[General]\nNANDRootPath = /second-nand\nOther = keep\n");
         var manager = new DolphinSettingManager(fs);
-        var setting = new DolphinSetting(typeof(string), ("Dolphin.ini", "General", "NANDRootPath"), "");
+        var setting = new DolphinSetting<string>(("Dolphin.ini", "General", "NANDRootPath"), "");
         manager.RegisterSetting(setting);
 
         manager.LoadSettings(first);
@@ -72,7 +72,7 @@ public class SettingsPersistencePathTests
             ["# keep comment", "[paths]", "nand_root = \"second\"", "other = true", "[video]", "show_fps = false"]
         );
         var manager = new RecompSettingManager(fs);
-        var setting = new RecompSetting(typeof(string), ("paths", "nand_root"), "", _ => { });
+        var setting = new RecompSetting<string>(("paths", "nand_root"), "", _ => { });
         manager.RegisterSetting(setting);
 
         manager.LoadSettings(first);
@@ -93,7 +93,7 @@ public class SettingsPersistencePathTests
         var fs = new MockFileSystem();
         var configPath = fs.Path.GetFullPath("/missing/Config.toml");
         var manager = new RecompSettingManager(fs);
-        var setting = new RecompSetting(typeof(bool), ("video", "show_fps"), false, _ => { });
+        var setting = new RecompSetting<bool>(("video", "show_fps"), false, _ => { });
         manager.RegisterSetting(setting);
 
         manager.LoadSettings(configPath);
