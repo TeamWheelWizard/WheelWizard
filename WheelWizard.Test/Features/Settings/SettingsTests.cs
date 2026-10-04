@@ -21,6 +21,39 @@ public sealed class SettingsFeatureCollection;
 [Collection("SettingsFeature")]
 public class SettingsManagerTests
 {
+    [Fact]
+    public void RecommendedSettings_CanReenableAfterPartialDisableFailure()
+    {
+        using var manager = CreateManager(new MockFileSystem(), out _, out var dolphinManager, out _);
+        var children = dolphinManager
+            .ReceivedCalls()
+            .Where(call => call.GetMethodInfo().Name == nameof(IDolphinSettingManager.RegisterSetting))
+            .Select(call => (IDolphinSetting)call.GetArguments()[0]!)
+            .ToDictionary(setting => setting.Name);
+        Assert.True(manager.Set(manager.RECOMMENDED_SETTINGS, true));
+        var recommendedShaderMode = children["ShaderCompilationMode"].GetStringValue();
+        var failure = new IOException("disk full");
+        var fail = true;
+        dolphinManager
+            .When(m => m.SaveSettings(Arg.Any<string>(), Arg.Is<IDolphinSetting>(s => s.Name == "MSAA")))
+            .Do(_ =>
+            {
+                if (fail)
+                    throw failure;
+            });
+
+        Assert.False(manager.Set(manager.RECOMMENDED_SETTINGS, false));
+        Assert.Same(failure, manager.RECOMMENDED_SETTINGS.SaveError);
+        Assert.NotEqual(recommendedShaderMode, children["ShaderCompilationMode"].GetStringValue());
+        Assert.False(manager.Get<bool>(manager.RECOMMENDED_SETTINGS));
+
+        fail = false;
+        Assert.True(manager.Set(manager.RECOMMENDED_SETTINGS, true));
+        Assert.Equal(recommendedShaderMode, children["ShaderCompilationMode"].GetStringValue());
+        Assert.True(manager.Get<bool>(manager.RECOMMENDED_SETTINGS));
+        Assert.Null(manager.RECOMMENDED_SETTINGS.SaveError);
+    }
+
     [Theory]
     [InlineData("ShaderCompilationMode")]
 #if WINDOWS

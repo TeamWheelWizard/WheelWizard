@@ -7,12 +7,32 @@ namespace WheelWizard.Views.Patterns;
 
 public class LeaderboardPodiumCard : TemplatedControl
 {
+    static LeaderboardPodiumCard()
+    {
+        RankProperty.Changed.AddClassHandler<LeaderboardPodiumCard>(
+            (card, _) =>
+            {
+                card.RankLabel = t("placement.n", card.Rank);
+            }
+        );
+    }
+
     public static readonly StyledProperty<int> RankProperty = AvaloniaProperty.Register<LeaderboardPodiumCard, int>(nameof(Rank));
+
+    public static readonly StyledProperty<string> RankLabelProperty = AvaloniaProperty.Register<LeaderboardPodiumCard, string>(
+        nameof(RankLabel)
+    );
 
     public int Rank
     {
         get => GetValue(RankProperty);
         set => SetValue(RankProperty, value);
+    }
+
+    public string RankLabel
+    {
+        get => GetValue(RankLabelProperty);
+        private set => SetValue(RankLabelProperty, value);
     }
 
     public static readonly StyledProperty<string> PlacementLabelProperty = AvaloniaProperty.Register<LeaderboardPodiumCard, string>(
