@@ -28,7 +28,7 @@ public class SettingsRecoveryTests
         fs.File.WriteAllText("/config/GFX.ini", "[Settings]\nInternalResolution = invalid\n");
         manager.ReloadSettings("/config");
         Assert.Equal(1, resolution.Get());
-        Assert.Equal(false, fps.Get());
+        Assert.False(fps.Get());
         Assert.Contains("invalid", fs.File.ReadAllText("/config/GFX.ini"));
     }
 
@@ -44,10 +44,10 @@ public class SettingsRecoveryTests
         manager.LoadSettings("/config/Config.toml");
         fs.File.WriteAllText("/config/Config.toml", "[video]\n");
         manager.ReloadSettings("/config/Config.toml");
-        Assert.Equal(true, setting.Get());
+        Assert.True(setting.Get());
         fs.File.Delete("/config/Config.toml");
         Assert.False(setting.Set(false));
-        Assert.Equal(true, setting.Get());
+        Assert.True(setting.Get());
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class SettingsRecoveryTests
         var notifications = 0;
         setting.Changed += _ => notifications++;
         Assert.False(setting.Set(true));
-        Assert.Equal(false, setting.Get());
+        Assert.False(setting.Get());
         Assert.Equal(0, notifications);
         fail = false;
         Assert.True(setting.Set(true));
@@ -86,7 +86,7 @@ public class SettingsRecoveryTests
         var setting = new WhWzSetting<bool>("EnableAnimations", true, s => manager.SaveSettings(path, s));
         manager.RegisterSetting(setting);
         manager.LoadSettings(path);
-        Assert.Equal(false, setting.Get());
+        Assert.False(setting.Get());
         Assert.True(setting.Set(true));
         Assert.Contains("FutureSetting", fs.File.ReadAllText(path));
         Assert.Equal(original, fs.File.ReadAllText(path + ".bak"));

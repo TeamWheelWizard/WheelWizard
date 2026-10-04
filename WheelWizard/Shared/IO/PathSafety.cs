@@ -2,6 +2,8 @@ namespace WheelWizard.Shared.IO;
 
 public static class PathSafety
 {
+    private static readonly System.IO.Abstractions.IPath NativePath = new Testably.Abstractions.RealFileSystem().Path;
+
     public static bool TryGetPathWithinDirectory(string directory, string relativePath, out string fullPath)
     {
         fullPath = string.Empty;
@@ -9,9 +11,9 @@ public static class PathSafety
         if (!TryNormalizeRelativePath(relativePath, out var normalizedRelativePath))
             return false;
 
-        var destinationPath = Path.Combine(directory, normalizedRelativePath);
-        var fullDirectory = Path.GetFullPath(directory);
-        var candidatePath = Path.GetFullPath(destinationPath);
+        var destinationPath = NativePath.Combine(directory, normalizedRelativePath);
+        var fullDirectory = NativePath.GetFullPath(directory);
+        var candidatePath = NativePath.GetFullPath(destinationPath);
 
         if (!IsPathWithinDirectory(fullDirectory, candidatePath))
             return false;
@@ -25,16 +27,16 @@ public static class PathSafety
         if (string.IsNullOrWhiteSpace(directory) || string.IsNullOrWhiteSpace(path))
             return false;
 
-        var fullDirectory = Path.GetFullPath(directory);
-        var fullPath = Path.GetFullPath(path);
-        var relativePath = Path.GetRelativePath(fullDirectory, fullPath);
+        var fullDirectory = NativePath.GetFullPath(directory);
+        var fullPath = NativePath.GetFullPath(path);
+        var relativePath = NativePath.GetRelativePath(fullDirectory, fullPath);
 
         return relativePath == "."
             || (
-                !Path.IsPathRooted(relativePath)
+                !NativePath.IsPathRooted(relativePath)
                 && !relativePath.Equals("..", StringComparison.Ordinal)
-                && !relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
-                && !relativePath.StartsWith($"..{Path.AltDirectorySeparatorChar}", StringComparison.Ordinal)
+                && !relativePath.StartsWith($"..{NativePath.DirectorySeparatorChar}", StringComparison.Ordinal)
+                && !relativePath.StartsWith($"..{NativePath.AltDirectorySeparatorChar}", StringComparison.Ordinal)
             );
     }
 
@@ -46,7 +48,7 @@ public static class PathSafety
             return false;
 
         var trimmedPath = path.Trim();
-        if (Path.IsPathFullyQualified(trimmedPath) || trimmedPath.StartsWith('/') || trimmedPath.StartsWith('\\'))
+        if (NativePath.IsPathFullyQualified(trimmedPath) || trimmedPath.StartsWith('/') || trimmedPath.StartsWith('\\'))
             return false;
 
         var segments = trimmedPath.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries).Where(segment => segment != ".");
@@ -54,7 +56,7 @@ public static class PathSafety
         var safeSegments = new List<string>();
         foreach (var segment in segments)
         {
-            if (segment == ".." || segment.Contains(Path.VolumeSeparatorChar))
+            if (segment == ".." || segment.Contains(NativePath.VolumeSeparatorChar))
                 return false;
 
             safeSegments.Add(segment);
@@ -63,7 +65,7 @@ public static class PathSafety
         if (safeSegments.Count == 0)
             return false;
 
-        normalizedPath = Path.Combine(safeSegments.ToArray());
+        normalizedPath = NativePath.Combine(safeSegments.ToArray());
         return true;
     }
 
@@ -78,7 +80,7 @@ public static class PathSafety
         if (string.IsNullOrWhiteSpace(leafName) || leafName is "." or "..")
             return false;
 
-        if (leafName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        if (leafName.IndexOfAny(NativePath.GetInvalidFileNameChars()) >= 0)
             return false;
 
         safeFileName = leafName;

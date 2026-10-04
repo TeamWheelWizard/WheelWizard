@@ -128,7 +128,8 @@ public class Program : IDesignerEntryPoint
 
     private static void SetupWorkingDirectory()
     {
-        if (new RuntimeEnvironment().IsFlatpakSandboxed(new RealFileSystem()))
+        var fileSystem = new RealFileSystem();
+        if (new RuntimeEnvironment().IsFlatpakSandboxed(fileSystem))
         {
             // In this case, we would not want executable directory-relative paths, since this is in `/app/bin`.
             // We are going to use the home directory instead (this should be the original working directory anyway).
@@ -137,7 +138,7 @@ public class Program : IDesignerEntryPoint
         else
         {
             // Resolve all relative paths based on the WheelWizard executable's directory by default
-            var executableDirectory = Path.GetDirectoryName(Environment.ProcessPath);
+            var executableDirectory = fileSystem.Path.GetDirectoryName(Environment.ProcessPath);
             if (!string.IsNullOrWhiteSpace(executableDirectory))
                 Environment.CurrentDirectory = executableDirectory;
         }
@@ -148,7 +149,7 @@ public class Program : IDesignerEntryPoint
         var whWzBaseDir = Environment.GetEnvironmentVariable("WW_BASEDIR") ?? string.Empty;
         try
         {
-            var whWzBaseDirAbsolute = Path.GetFullPath(whWzBaseDir);
+            var whWzBaseDirAbsolute = fileSystem.Path.GetFullPath(whWzBaseDir);
             Environment.CurrentDirectory = whWzBaseDirAbsolute;
         }
         catch

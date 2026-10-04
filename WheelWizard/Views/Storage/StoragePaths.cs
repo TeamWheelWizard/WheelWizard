@@ -4,6 +4,8 @@ namespace WheelWizard.Views.Storage;
 
 public static class StoragePaths
 {
+    private static readonly System.IO.Abstractions.IPath NativePath = new Testably.Abstractions.RealFileSystem().Path;
+
     public static string? TryResolveLocalPath(IStorageItem? item)
     {
         if (item == null)
@@ -38,7 +40,7 @@ public static class StoragePaths
             if (uri.IsAbsoluteUri)
                 return null;
             var raw = uri.ToString();
-            if (!string.IsNullOrWhiteSpace(raw) && Path.IsPathRooted(raw))
+            if (!string.IsNullOrWhiteSpace(raw) && NativePath.IsPathRooted(raw))
                 return raw;
         }
 

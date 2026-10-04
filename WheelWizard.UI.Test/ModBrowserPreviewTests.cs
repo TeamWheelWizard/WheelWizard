@@ -26,6 +26,7 @@ public class ModBrowserPreviewTests
         var response = new TaskCompletionSource<OperationResult<GameBananaSearchResults>>();
         mods.GetModSearchResults(Arg.Any<string>(), Arg.Any<int>()).Returns(response.Task);
         var details = new ModContent(
+            new Testably.Abstractions.Testing.MockFileSystem(),
             Substitute.For<IModManager>(),
             mods,
             Substitute.For<IDownloadService>(),
@@ -154,6 +155,7 @@ public class ModBrowserPreviewTests
     private static ModBrowserWindow CreateBrowser(IGameBananaSingletonService mods, IGameBananaMediaService media) =>
         new(
             new ModContent(
+                new Testably.Abstractions.Testing.MockFileSystem(),
                 Substitute.For<IModManager>(),
                 mods,
                 Substitute.For<IDownloadService>(),

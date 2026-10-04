@@ -2,6 +2,8 @@ namespace WheelWizard.Features.Patches;
 
 public static class LooseBrsarPatchFileName
 {
+    private static readonly System.IO.Abstractions.IPath NativePath = new Testably.Abstractions.RealFileSystem().Path;
+
     public static bool TryGetNormalizedFileName(string fileName, out string normalizedFileName)
     {
         normalizedFileName = string.Empty;
@@ -17,7 +19,7 @@ public static class LooseBrsarPatchFileName
         if (!idText.All(char.IsDigit) || !int.TryParse(idText, out var fileId))
             return false;
 
-        var extension = Path.GetExtension(fileName);
+        var extension = NativePath.GetExtension(fileName);
         if (
             !extension.Equals(".brwsd", StringComparison.OrdinalIgnoreCase)
             && !extension.Equals(".brbnk", StringComparison.OrdinalIgnoreCase)

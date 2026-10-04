@@ -110,9 +110,9 @@ public sealed class RetroRewindLaunchDescriptor(IFileSystem fileSystem, ISetting
         return options;
     }
 
-    private static (string SectionName, int MyStuffChoice, bool EnableSeparateSave) GetLaunchInfo(string xmlFilePath)
+    private (string SectionName, int MyStuffChoice, bool EnableSeparateSave) GetLaunchInfo(string xmlFilePath)
     {
-        var fileName = Path.GetFileName(xmlFilePath);
+        var fileName = fileSystem.Path.GetFileName(xmlFilePath);
         if (fileName.Equals("RRBeta.xml", StringComparison.OrdinalIgnoreCase))
             return ("Retro Rewind Beta", 0, true);
 

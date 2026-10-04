@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
@@ -15,6 +16,8 @@ public record ModItem(Bitmap FullImageUrl);
 
 public partial class ModContent : UserControl
 {
+    private readonly IFileSystem fileSystem;
+
     private IModManager ModManager { get; }
 
     private IGameBananaSingletonService GameBananaService { get; }
@@ -32,6 +35,7 @@ public partial class ModContent : UserControl
     private string? OverrideDownloadUrl { get; set; }
 
     public ModContent(
+        IFileSystem fileSystem,
         IModManager modManager,
         IGameBananaSingletonService gameBananaService,
         IDownloadService downloads,
@@ -40,6 +44,7 @@ public partial class ModContent : UserControl
         IModOperationPresentation modPresentation
     )
     {
+        this.fileSystem = fileSystem;
         ModManager = modManager;
         GameBananaService = gameBananaService;
         Downloads = downloads;
@@ -250,7 +255,7 @@ public partial class ModContent : UserControl
 
         var url = downloadUrls.First();
         var fileName = GetFileNameFromUrl(url);
-        var filePath = Path.Combine(ModPaths.DownloadFolderPath, fileName);
+        var filePath = fileSystem.Path.Combine(ModPaths.DownloadFolderPath, fileName);
         var downloadResult = await DownloadModFileAsync(url, filePath, progressWindow);
         progressWindow.Close();
 
@@ -264,7 +269,7 @@ public partial class ModContent : UserControl
             return Ok();
         }
 
-        if (!File.Exists(downloadedFilePath))
+        if (!fileSystem.File.Exists(downloadedFilePath))
             return Fail(t("message_warning.unable_download_mod.extra"));
 
         var popup = new TextInputWindow()
@@ -285,7 +290,7 @@ public partial class ModContent : UserControl
             return Fail("Mod name cannot be empty.");
         }
 
-        var invalidChars = Path.GetInvalidFileNameChars();
+        var invalidChars = fileSystem.Path.GetInvalidFileNameChars();
         if (modName.Any(c => invalidChars.Contains(c)))
         {
             TryDeleteTempModsFolder();
@@ -310,10 +315,10 @@ public partial class ModContent : UserControl
         try
         {
             var tempFolder = ModPaths.DownloadFolderPath;
-            if (Directory.Exists(tempFolder))
-                Directory.Delete(tempFolder, true);
+            if (fileSystem.Directory.Exists(tempFolder))
+                fileSystem.Directory.Delete(tempFolder, true);
 
-            Directory.CreateDirectory(tempFolder);
+            fileSystem.Directory.CreateDirectory(tempFolder);
             await Task.CompletedTask;
             return Ok();
         }
@@ -327,8 +332,8 @@ public partial class ModContent : UserControl
     {
         try
         {
-            if (Directory.Exists(ModPaths.DownloadFolderPath))
-                Directory.Delete(ModPaths.DownloadFolderPath, true);
+            if (fileSystem.Directory.Exists(ModPaths.DownloadFolderPath))
+                fileSystem.Directory.Delete(ModPaths.DownloadFolderPath, true);
 
             return Ok();
         }
@@ -353,9 +358,9 @@ public partial class ModContent : UserControl
     /// <summary>
     /// Extracts the file name from a URL.
     /// </summary>
-    private static string GetFileNameFromUrl(string url)
+    private string GetFileNameFromUrl(string url)
     {
-        return Path.GetFileName(new Uri(url).AbsolutePath);
+        return fileSystem.Path.GetFileName(new Uri(url).AbsolutePath);
     }
 
     /// <summary>
