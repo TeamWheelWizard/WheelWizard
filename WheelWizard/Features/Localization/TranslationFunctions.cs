@@ -19,23 +19,6 @@ public static class TranslationFunctions
     }
 
 #pragma warning disable IDE1006 // Naming Styles
-    public static string t_legacy(string key, decimal count, object? args = null)
-#pragma warning restore IDE1006 // Naming Styles
-    {
-        var hasLanguagePrefix = TrySplitLanguageKey(key, out var languageCode, out var translationKey);
-        if (!hasLanguagePrefix)
-            languageCode = LocalizationProvider.Current.CurrentLanguage;
-
-        translationKey = ResolveNumberVariant(translationKey, languageCode, count);
-
-        var translated = hasLanguagePrefix
-            ? LocalizationProvider.TranslateForLanguage(translationKey, languageCode)
-            : LocalizationProvider.Translate(translationKey);
-
-        return Format(translated, args);
-    }
-
-#pragma warning disable IDE1006 // Naming Styles
     public static string tFormat(string value, object? args = null) => Format(value, args);
 
     public static string tTime(int seconds) => tTime(TimeSpan.FromSeconds(seconds));
@@ -49,11 +32,11 @@ public static class TranslationFunctions
         {
             var days = timeSpan.Days;
             var hours = timeSpan.Hours;
-            var dayText = t_legacy("time.days.n", count: days, new { amount = days });
+            var dayText = t("time.days", count: days, new { amount = days });
             if (hours == 0)
                 return dayText;
 
-            var hourText = t_legacy("time.hours.n", count: hours, new { amount = hours });
+            var hourText = t("time.hours", count: hours, new { amount = hours });
             return $"{dayText} {hourText}";
         }
 
@@ -61,11 +44,11 @@ public static class TranslationFunctions
         {
             var hours = timeSpan.Hours;
             var minutes = timeSpan.Minutes;
-            var hourText = t_legacy("time.hours.n", count: hours, new { amount = hours });
+            var hourText = t("time.hours", count: hours, new { amount = hours });
             if (minutes == 0)
                 return hourText;
 
-            var minuteText = t_legacy("time.minutes.n", count: minutes, new { amount = minutes });
+            var minuteText = t("time.minutes", count: minutes, new { amount = minutes });
             return $"{hourText} {minuteText}";
         }
 
@@ -73,25 +56,15 @@ public static class TranslationFunctions
         {
             var minutes = timeSpan.Minutes;
             var seconds = timeSpan.Seconds;
-            var minuteText = t_legacy("time.minutes.n", count: minutes, new { amount = minutes });
+            var minuteText = t("time.minutes", count: minutes, new { amount = minutes });
             if (seconds == 0)
                 return minuteText;
 
-            var secondText = t_legacy("time.seconds.n", count: seconds, new { amount = seconds });
+            var secondText = t("time.seconds", count: seconds, new { amount = seconds });
             return $"{minuteText} {secondText}";
         }
 
-        return t_legacy("time.seconds.n", count: timeSpan.Seconds, new { amount = timeSpan.Seconds });
-    }
-
-    private static string ResolveNumberVariant(string translationKey, string languageCode, decimal count)
-    {
-        if (!translationKey.EndsWith(".n", StringComparison.Ordinal))
-            return translationKey;
-
-        var countKey = count.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        var specificKey = translationKey[..^2] + "." + countKey;
-        return LocalizationProvider.TryTranslateForLanguage(specificKey, languageCode, out _) ? specificKey : translationKey;
+        return t("time.seconds", count: timeSpan.Seconds, new { amount = timeSpan.Seconds });
     }
 
     private static bool TrySplitLanguageKey(string key, out string languageCode, out string translationKey)

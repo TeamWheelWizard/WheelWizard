@@ -178,17 +178,17 @@ pl:
     language_translated_by: "Ten język jest przetłumaczony przez: %{translators}"
   hover:
     players_online:
-      0: "Nie ma żadnych graczy online"
-      1: "Jest 1 gracz online"
-      n: "jest teraz %{amount} graczy online"
+      none: "Nie ma żadnych graczy online"
+      one: "Jest 1 gracz online"
+      other: "jest teraz %{amount} graczy online"
     rooms_online:
-      0: "Nie ma żadnych aktywnych pokoi"
-      1: "Jest 1 aktywny pokój"
-      n: "jest teraz %{amount} aktywnych pokoi"
+      none: "Nie ma żadnych aktywnych pokoi"
+      one: "Jest 1 aktywny pokój"
+      other: "jest teraz %{amount} aktywnych pokoi"
     friends_online:
-      0: "żaden z twoich przyjaciół nie jest onllne"
-      1: "Jest teraz 1 przyjaciel online"
-      n: "Jest teraz %{amount} przyjaciół online"
+      none: "żaden z twoich przyjaciół nie jest onllne"
+      one: "Jest teraz 1 przyjaciel online"
+      other: "Jest teraz %{amount} przyjaciół online"
     rooms_page_disclaimer: "Prosze pamiętaj, że ta strona nie daje możliwości dołączenia prosto do pokoju. By dołączyć do specyficznego pokoju musisz dołączyć poprzez przyjaciela lub mieć nadzieje, że uda ci się połączyć poprzez losowy serwer."
     friends_page_disclaimer: "By dodać przyjaciół musisz ich dodać w grze"
     region_user_selection: "To tylko pokazuje regiony, w których TY grałeś."
@@ -206,17 +206,17 @@ pl:
     no_mod_selected: "Wybierz moda na liście by zobaczyć jego szczegóły"
   time:
     days:
-      1: "1 dzień"
-      n: "%{amount} dni"
+      one: "1 dzień"
+      other: "%{amount} dni"
     hours:
-      1: "1 godz"
-      n: "%{amount} godz"
+      one: "1 godz"
+      other: "%{amount} godz"
     minutes:
-      1: "1 min"
-      n: "%{amount} min"
+      one: "1 min"
+      other: "%{amount} min"
     seconds:
-      1: "1 sek"
-      n: "%{amount} sek"
+      one: "1 sek"
+      other: "%{amount} sek"
   progress:
     estimated_time_remaining: "Oszacowany pozostały czas."
     downloading_mb: "Pobieranie %{megabytes} MB"

@@ -41,7 +41,7 @@ public sealed record LeaderboardPlayerItem
     public Mii? FirstMii => Mii;
     public bool HasBadges => HasBadge;
     public bool IsTopLeaderboardPlayer => true;
-    public string TopLabel => t("placement.n", new { rank = Rank });
+    public string TopLabel => t("placement.other", new { rank = Rank });
     public bool IsOpenHost => false;
 }
 
@@ -347,7 +347,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
             1 => t("placement.first"),
             2 => t("placement.second"),
             3 => t("placement.third"),
-            _ => t("placement.n", new { rank = rank }),
+            _ => t("placement.other", new { rank = rank }),
         };
 
     private static Mii? DeserializeMii(string? miiData)

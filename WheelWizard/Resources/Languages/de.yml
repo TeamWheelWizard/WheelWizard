@@ -207,17 +207,17 @@ de:
     live_rwfc: "Live von RWFC"
   hover:
     players_online:
-      0: "Zurzeit sind keine Spieler online"
-      1: "Zurzeit ist nur 1 Spieler online"
-      n: "Zurzeit sind %{amount} Spieler online"
+      none: "Zurzeit sind keine Spieler online"
+      one: "Zurzeit ist nur 1 Spieler online"
+      other: "Zurzeit sind %{amount} Spieler online"
     rooms_online:
-      0: "Zurzeit gibt es keine aktiven Räume"
-      1: "Zurzeit ist nur 1 Raum aktiv"
-      n: "Zurzeit gibt es %{amount} aktive Räume"
+      none: "Zurzeit gibt es keine aktiven Räume"
+      one: "Zurzeit ist nur 1 Raum aktiv"
+      other: "Zurzeit gibt es %{amount} aktive Räume"
     friends_online:
-      0: "Zurzeit sind keine Freunde online"
-      1: "Zurzeit ist nur 1 Freund online"
-      n: "Zurzeit sind %{amount} Freunde online"
+      none: "Zurzeit sind keine Freunde online"
+      one: "Zurzeit ist nur 1 Freund online"
+      other: "Zurzeit sind %{amount} Freunde online"
     rooms_page_disclaimer: |-
       Bitte beachte, dass diese Seite keine Funktion bietet, um dich direkt mit einem Raum zu verbinden.
       Um einem bestimmten Raum beizutreten, musst du entweder über einen Freund beitreten oder hoffen, dass du ihm über das normale Beitreten zum Server beitreten kannst.
@@ -244,17 +244,17 @@ de:
     no_leaderboard: "Derzeit sind keine Spieler in der Rangliste verfügbar."
   time:
     days:
-      1: "1 Tag"
-      n: "%{amount} Tage"
+      one: "1 Tag"
+      other: "%{amount} Tage"
     hours:
-      1: "1 Stunde"
-      n: "%{amount} Stunden"
+      one: "1 Stunde"
+      other: "%{amount} Stunden"
     minutes:
-      1: "1 Minute"
-      n: "%{amount} Minuten"
+      one: "1 Minute"
+      other: "%{amount} Minuten"
     seconds:
-      1: "1 Sekunde"
-      n: "%{amount} Sekunden"
+      one: "1 Sekunde"
+      other: "%{amount} Sekunden"
     last_24_hours: "Letzte 24 Stunden"
     last_7_days: "Letzte 7 Tage"
     last_30_days: "Letzte 30 Tage"
@@ -266,7 +266,7 @@ de:
     first: "Champion"
     second: "Zweiter Platz"
     third: "Dritter Platz"
-    n: "%{rank}."
+    other: "%{rank}."
   progress:
     estimated_time_remaining: "Geschätzte verbleibende Zeit:"
     downloading_mb: "Herunterladen mit %{megabytes} MB"

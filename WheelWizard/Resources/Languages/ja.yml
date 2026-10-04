@@ -176,17 +176,17 @@ ja:
     language_translated_by: "この言語はこれらの方が翻訳しました: %{translators}"
   hover:
     players_online:
-      0: "現在 オンラインのプレイヤーがいません"
-      1: "現在 オンラインのプレイヤーが 1人います"
-      n: "現在 オンラインのプレイヤーが %{amount}人います"
+      none: "現在 オンラインのプレイヤーがいません"
+      one: "現在 オンラインのプレイヤーが 1人います"
+      other: "現在 オンラインのプレイヤーが %{amount}人います"
     rooms_online:
-      0: "現在 開いているルームがありません"
-      1: "現在 開いているルームが 1部屋あります"
-      n: "現在 開いているルームが %{amount}部屋あります"
+      none: "現在 開いているルームがありません"
+      one: "現在 開いているルームが 1部屋あります"
+      other: "現在 開いているルームが %{amount}部屋あります"
     friends_online:
-      0: "現在 オンラインのフレンドがいません"
-      1: "現在 オンラインのフレンドが 1人います"
-      n: "現在 オンラインのフレンドが %{amount}人います"
+      none: "現在 オンラインのフレンドがいません"
+      one: "現在 オンラインのフレンドが 1人います"
+      other: "現在 オンラインのフレンドが %{amount}人います"
     rooms_page_disclaimer: |-
       ルームに直接合流する機能はないことに注意してください。
       特定のルームに参加するには、フレンドを通して合流するか、オンラインサーバーに参加して合流する必要があります。
@@ -207,17 +207,17 @@ ja:
     no_mod_selected: "リスト内のModを選択して詳細を表示します"
   time:
     days:
-      1: "1日"
-      n: "%{amount}日"
+      one: "1日"
+      other: "%{amount}日"
     hours:
-      1: "1時間"
-      n: "%{amount}時間"
+      one: "1時間"
+      other: "%{amount}時間"
     minutes:
-      1: "1分"
-      n: "%{amount}分"
+      one: "1分"
+      other: "%{amount}分"
     seconds:
-      1: "1秒"
-      n: "%{amount}秒"
+      one: "1秒"
+      other: "%{amount}秒"
   progress:
     estimated_time_remaining: "おおよその残り時間:"
     downloading_mb: "%{megabytes}MBをダウンロード中"

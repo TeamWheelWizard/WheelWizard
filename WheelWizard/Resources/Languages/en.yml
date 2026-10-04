@@ -209,17 +209,17 @@ en:
     live_rwfc: "Live from RWFC"
   hover:
     players_online:
-      0: "There are currently no players online"
-      1: "There is currently 1 player online"
-      n: "There are currently %{amount} players online"
+      none: "There are currently no players online"
+      one: "There is currently 1 player online"
+      other: "There are currently %{amount} players online"
     rooms_online:
-      0: "There are currently no active rooms"
-      1: "There is currently 1 room active"
-      n: "There are currently %{amount} rooms active"
+      none: "There are currently no active rooms"
+      one: "There is currently 1 room active"
+      other: "There are currently %{amount} rooms active"
     friends_online:
-      0: "There are currently no friends online"
-      1: "There is currently 1 friend online"
-      n: "There are currently %{amount} friends online"
+      none: "There are currently no friends online"
+      one: "There is currently 1 friend online"
+      other: "There are currently %{amount} friends online"
     rooms_page_disclaimer: |-
       Please note that this page does not offer any functionality to join a room directly.
       To join a specific room, you'll need to either join through a friend, or hope to join it by joining the online servers.
@@ -246,17 +246,17 @@ en:
     no_leaderboard: "There are no ranked players available right now."
   time:
     days:
-      1: "1 day"
-      n: "%{amount} days"
+      one: "1 day"
+      other: "%{amount} days"
     hours:
-      1: "1 hour"
-      n: "%{amount}  hours"
+      one: "1 hour"
+      other: "%{amount}  hours"
     minutes:
-      1: "1 minute"
-      n: "%{amount} minutes"
+      one: "1 minute"
+      other: "%{amount} minutes"
     seconds:
-      1: "1 second"
-      n: "%{amount} seconds"
+      one: "1 second"
+      other: "%{amount} seconds"
     last_24_hours: "Last 24 hours"
     last_7_days: "Last 7 days"
     last_30_days: "Last 30 days"
@@ -268,7 +268,7 @@ en:
     first: "Champion"
     second: "2nd Place"
     third: "3rd Place"
-    n: "#%{rank}"
+    other: "#%{rank}"
   progress:
     estimated_time_remaining: "Estimated time remaining:"
     downloading_mb: "downloading %{megabytes} MB"

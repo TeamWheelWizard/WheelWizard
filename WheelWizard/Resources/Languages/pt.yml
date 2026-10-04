@@ -187,17 +187,17 @@ pt:
     whole_file_override: "Substituição do arquivo inteiro"
   hover:
     players_online:
-      0: "Não há jogadores online"
-      1: "Há 1 jogador online"
-      n: "Há %{amount} jogadores online"
+      none: "Não há jogadores online"
+      one: "Há 1 jogador online"
+      other: "Há %{amount} jogadores online"
     rooms_online:
-      0: "Não há salas ativas"
-      1: "Há 1 sala ativa"
-      n: "Há %{amount} salas ativas"
+      none: "Não há salas ativas"
+      one: "Há 1 sala ativa"
+      other: "Há %{amount} salas ativas"
     friends_online:
-      0: "Não tens amigos online"
-      1: "Tens 1 amigo online"
-      n: "Tens %{amount} amigos online"
+      none: "Não tens amigos online"
+      one: "Tens 1 amigo online"
+      other: "Tens %{amount} amigos online"
     rooms_page_disclaimer: "Tem em conta que esta página não te oferece a funcionalidade de entrares  diretamente numa sala. Para entrares numa sala em específico, terás de entrar através de um amigo, ou então esperas que entres na sala ao entrares nos servers online"
     friends_page_disclaimer: "Para adicionar amigos precisas de adicioná-los dentro do jogo."
     region_user_selection: "Isto só mostra regiões onde TU já jogaste."
@@ -216,17 +216,17 @@ pt:
     no_mod_selected: "Seleciona um modo na lista para ver os seus detalhes"
   time:
     days:
-      1: "1 dia"
-      n: "%{amount} dias"
+      one: "1 dia"
+      other: "%{amount} dias"
     hours:
-      1: "1 hora"
-      n: "%{amount} horas"
+      one: "1 hora"
+      other: "%{amount} horas"
     minutes:
-      1: "1 minuto"
-      n: "%{amount} minutos"
+      one: "1 minuto"
+      other: "%{amount} minutos"
     seconds:
-      1: "1 segundo"
-      n: "%{amount} segundos"
+      one: "1 segundo"
+      other: "%{amount} segundos"
   progress:
     estimated_time_remaining: "Tempo restante estimado:"
     downloading_mb: "A transferir %{megabytes} MB"

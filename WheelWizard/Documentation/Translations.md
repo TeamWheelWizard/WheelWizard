@@ -32,7 +32,11 @@ var message = t("items", count: 12, new { name = "Alex", amount = 12 });
 
 `count` is reserved for plural selection: exactly 1 selects `one`, and every other value selects `other`. Do not use `%{count}` as a placeholder; pass a separate named argument such as `amount` when displaying the number.
 
-Existing numeric translation keys (`.0`, `.1`, `.n`) use `t_legacy("time.days.n", count: days, new { amount = days })`. Both APIs use the same named-placeholder syntax. `tFormat(text, new { name = "Alex" })` formats an already translated string.
+Use `.one` and `.other` for quantities, for example `t("time.days", count: days, new { amount = days })`.
+
+An optional `.none` key describes an empty state. Callers must explicitly select it when appropriate: `amount == 0 ? t("items.none") : t("items", count: amount, new { amount })`. Localization never selects `.none` automatically; a count of zero selects `.other`.
+
+`tFormat(text, new { name = "Alex" })` formats an already translated string.
 
 ## XAML
 

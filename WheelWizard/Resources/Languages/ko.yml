@@ -176,17 +176,17 @@ ko:
     language_translated_by: "해당 언어는 다음 분들이 번역하셨습니다: %{translators}"
   hover:
     players_online:
-      0: "모두 오프라인이네요..."
-      1: "1 명의 친구가 온라인입니다"
-      n: "%{amount} 명의 친구가 온라인입니다"
+      none: "모두 오프라인이네요..."
+      one: "1 명의 친구가 온라인입니다"
+      other: "%{amount} 명의 친구가 온라인입니다"
     rooms_online:
-      0: "활동 중인 방이 없습니다"
-      1: "1 개의 방이 활동 중입니다"
-      n: "%{amount} 개의 방이 활동 중입니다"
+      none: "활동 중인 방이 없습니다"
+      one: "1 개의 방이 활동 중입니다"
+      other: "%{amount} 개의 방이 활동 중입니다"
     friends_online:
-      0: "모두 오프라인이네요..."
-      1: "1 명의 친구가 온라인입니다"
-      n: "%{amount} 명의 친구가 온라인입니다"
+      none: "모두 오프라인이네요..."
+      one: "1 명의 친구가 온라인입니다"
+      other: "%{amount} 명의 친구가 온라인입니다"
     rooms_page_disclaimer: |-
       주의) 해당 페이지에선 방에 직접 합류하는 기능은 없습니다.
       특정 방에 들어가려면, 친구를 통해 들어가거나 온라인 서버에 가입하여 들어가야 합니다.
@@ -207,17 +207,17 @@ ko:
     no_mod_selected: "모드를 선택해서 자세한 설명을 보세요"
   time:
     days:
-      1: "1일"
-      n: "%{amount}일"
+      one: "1일"
+      other: "%{amount}일"
     hours:
-      1: "1시간"
-      n: "%{amount}시간"
+      one: "1시간"
+      other: "%{amount}시간"
     minutes:
-      1: "1분"
-      n: "%{amount}분"
+      one: "1분"
+      other: "%{amount}분"
     seconds:
-      1: "1초"
-      n: "%{amount}초"
+      one: "1초"
+      other: "%{amount}초"
   progress:
     estimated_time_remaining: "추정된 남은 시간:"
     downloading_mb: "%{megabytes} MB 다운로드 중"

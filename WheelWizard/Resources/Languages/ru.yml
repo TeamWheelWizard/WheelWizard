@@ -176,17 +176,17 @@ ru:
     language_translated_by: "Авторы перевода: %{translators}"
   hover:
     players_online:
-      0: "Игроков в сети: 0"
-      1: "Игроков в сети: 1"
-      n: "Игроков в сети: %{amount}"
+      none: "Игроков в сети: 0"
+      one: "Игроков в сети: 1"
+      other: "Игроков в сети: %{amount}"
     rooms_online:
-      0: "Активных групп: 0"
-      1: "Активных групп: 1"
-      n: "Активных групп: %{amount}"
+      none: "Активных групп: 0"
+      one: "Активных групп: 1"
+      other: "Активных групп: %{amount}"
     friends_online:
-      0: "Друзей в сети: 0"
-      1: "Друзей в сети: 1"
-      n: "Друзей в сети: %{amount}"
+      none: "Друзей в сети: 0"
+      one: "Друзей в сети: 1"
+      other: "Друзей в сети: %{amount}"
     rooms_page_disclaimer: "Вы не можете заходить в комнаты прямо через это меню. Чтобы зайти в определённую комнату, вам нужно либо зайти через друга, либо надеяться попасть в неё через онлайн сервера."
     friends_page_disclaimer: "Чтобы добавить друга нужно сначала подружить"
   empty_content:
@@ -202,17 +202,17 @@ ru:
     no_mod_selected: "Выберите мод из списка, чтобы узнать подробности."
   time:
     days:
-      1: "1 день"
-      n: "%{amount} дн."
+      one: "1 день"
+      other: "%{amount} дн."
     hours:
-      1: "1 ч"
-      n: "%{amount} ч"
+      one: "1 ч"
+      other: "%{amount} ч"
     minutes:
-      1: "1 мин"
-      n: "%{amount} мин"
+      one: "1 мин"
+      other: "%{amount} мин"
     seconds:
-      1: "1 сек"
-      n: "%{amount} сек"
+      one: "1 сек"
+      other: "%{amount} сек"
   progress:
     estimated_time_remaining: "Осталось примерно:"
     downloading_mb: "Загружено %{megabytes} МБ"
