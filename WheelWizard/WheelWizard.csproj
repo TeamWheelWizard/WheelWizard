@@ -70,6 +70,10 @@
     <ItemGroup Label="Embedded Resources">
         <EmbeddedResource Include="Resources\Languages\*.yml" />
 
+        <!-- Skinned 3DS Mii body used by the Mii animation player (MiiAnim.Core loads these by logical name). -->
+        <EmbeddedResource Include="Features\MiiAnimation\Resources\MaleBody.glb" LogicalName="MiiAnim.Core.Assets.MaleBody.glb" />
+        <EmbeddedResource Include="Features\MiiAnimation\Resources\FemaleBody.glb" LogicalName="MiiAnim.Core.Assets.FemaleBody.glb" />
+
         <!-- Compile Items -->
         <Compile Update="Views\Components\ListActionButton.axaml.cs">
             <DependentUpon>ListActionButton.axaml</DependentUpon>

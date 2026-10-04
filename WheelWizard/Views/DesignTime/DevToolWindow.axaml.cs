@@ -29,12 +29,15 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     private DevelopmentRefreshService DevelopmentRefresh { get; }
     private INavigationService Navigation { get; }
 
+    private IPopupFactory Popups { get; }
+
     public DevToolWindow(
         IMemoryCache cache,
         IDolphinLaunchService dolphinLaunchService,
         LiveRoomsService liveRooms,
         DevelopmentRefreshService developmentRefresh,
-        INavigationService navigation
+        INavigationService navigation,
+        IPopupFactory popups
     )
         : base(true, true, true, "Dev Tool")
     {
@@ -43,6 +46,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
         LiveRooms = liveRooms;
         DevelopmentRefresh = developmentRefresh;
         Navigation = navigation;
+        Popups = popups;
         InitializeComponent();
         DevelopmentRefresh.Subscribe(this);
         LoadSettings();
@@ -66,6 +70,8 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     }
 
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
+
+    private void ShowMiiAnimator_OnClick(object sender, RoutedEventArgs e) => Popups.Create<MiiAnimatorDevWindow>().Show();
 
     private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
 

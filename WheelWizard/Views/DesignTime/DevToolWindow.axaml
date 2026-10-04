@@ -36,6 +36,9 @@
                                    HorizontalAlignment="Left" Margin="0,2"
                                    Click="MiiChannel_OnClick" />
                 
+                <components:Button Variant="Default" Text="Show Mii Animator"
+                                   IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                                   Click="ShowMiiAnimator_OnClick" />
                 <components:Button Variant="Default" Text="Force enable layout"
                                    IconSize="0" HorizontalAlignment="Left" Margin="0,2"
                                    Click="ForceEnableLayout_OnClick" />

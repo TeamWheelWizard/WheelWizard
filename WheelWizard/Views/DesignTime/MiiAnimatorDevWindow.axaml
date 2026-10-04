@@ -1,0 +1,52 @@
+<base:PopupContent xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:base="clr-namespace:WheelWizard.Views.Dialogs.Base"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="520"
+                   x:Class="WheelWizard.Views.DesignTime.MiiAnimatorDevWindow">
+    <Grid Width="780" Height="500" ColumnDefinitions="*,250">
+        <!-- Preview: drag to orbit -->
+        <Border Grid.Column="0" CornerRadius="8" ClipToBounds="True"
+                Background="{StaticResource BackgroundLineColor}">
+            <Grid x:Name="PreviewArea" Background="Transparent" Cursor="SizeAll"
+                  PointerPressed="Preview_OnPointerPressed"
+                  PointerMoved="Preview_OnPointerMoved"
+                  PointerReleased="Preview_OnPointerReleased">
+                <Image x:Name="PreviewImage" Stretch="Uniform" />
+                <TextBlock x:Name="StatusText" Classes="BodyText" TextWrapping="Wrap" Margin="20"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" />
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Column="1" Margin="12,0,0,0">
+            <StackPanel Spacing="6">
+                <TextBlock Text="Mii" Classes="TitleText" />
+                <TextBlock x:Name="MiiNameText" Classes="BodyText" />
+                <components:Button x:Name="ChooseMiiButton" Variant="Default" Text="Choose Mii"
+                                   IconSize="0" HorizontalAlignment="Stretch"
+                                   Click="ChooseMii_OnClick" />
+
+                <TextBlock Text="Animation" Classes="TitleText" Margin="0,10,0,0" />
+                <components:Button Variant="Primary" Text="Load .miianim"
+                                   IconSize="0" HorizontalAlignment="Stretch"
+                                   Click="LoadAnimation_OnClick" />
+                <TextBlock x:Name="InfoText" Classes="TinyText" TextWrapping="Wrap" />
+
+                <TextBlock Text="Playback" Classes="TitleText" Margin="0,10,0,0" />
+                <Grid ColumnDefinitions="*,6,*">
+                    <components:Button x:Name="PlayButton" Variant="Default" Text="Pause"
+                                       IconSize="0" HorizontalAlignment="Stretch"
+                                       Click="PlayPause_OnClick" />
+                    <ComboBox x:Name="SpeedBox" Grid.Column="2" HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch" SelectionChanged="Speed_OnSelectionChanged" />
+                </Grid>
+                <Slider x:Name="FrameSlider" Minimum="0" Maximum="1" ValueChanged="FrameSlider_OnValueChanged" />
+                <TextBlock x:Name="FrameText" Classes="TinyText" />
+                <TextBlock Classes="TinyText" TextWrapping="Wrap" Opacity="0.7"
+                           Text="Drag the preview to orbit. The animation loops." />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</base:PopupContent>
