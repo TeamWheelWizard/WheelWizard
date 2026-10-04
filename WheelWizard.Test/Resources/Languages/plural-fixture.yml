@@ -1,7 +1,7 @@
 en:
   items:
     one: "One item for %{name}"
-    other: "%{amount} items for %{name}"
+    other: "%{count} items for %{name}"
   fallback:
     one: "English one"
     other: "English other"

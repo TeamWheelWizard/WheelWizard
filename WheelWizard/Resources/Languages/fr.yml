@@ -194,17 +194,17 @@ fr:
     whole_file_override: "Écrasement du fichier entier"
   hover:
     players_online:
-      0: "Il n'y a actuellement aucun joueur en ligne"
-      1: "Il y a actuellement 1 joueur en ligne"
-      n: "Il y a actuellement %{amount} joueurs en ligne"
+      none: "Il n'y a actuellement aucun joueur en ligne"
+      one: "Il y a actuellement 1 joueur en ligne"
+      other: "Il y a actuellement %{count} joueurs en ligne"
     rooms_online:
-      0: "Il n'y a actuellement aucune salle active"
-      1: "Il y a actuellement 1 salle active"
-      n: "Il y a actuellement %{amount} salles actives"
+      none: "Il n'y a actuellement aucune salle active"
+      one: "Il y a actuellement 1 salle active"
+      other: "Il y a actuellement %{count} salles actives"
     friends_online:
-      0: "Il n'y a actuellement aucun ami en ligne"
-      1: "Il y a actuellement 1 ami en ligne"
-      n: "Il y a actuellement %{amount} amis en ligne"
+      none: "Il n'y a actuellement aucun ami en ligne"
+      one: "Il y a actuellement 1 ami en ligne"
+      other: "Il y a actuellement %{count} amis en ligne"
     rooms_page_disclaimer: |-
       Attention, cette page ne permet pas de rejoindre une salle directement.
       Pour rejoindre une salle spécifique, vous devez soit la rejoindre via un ami, soit espérer la rejoindre via les serveurs en ligne.
@@ -225,17 +225,17 @@ fr:
     no_mod_selected: "Sélectionnez un mod dans la liste pour voir ses détails"
   time:
     days:
-      1: "1 jour"
-      n: "%{amount} jours"
+      one: "1 jour"
+      other: "%{count} jours"
     hours:
-      1: "1 heure"
-      n: "%{amount} heures"
+      one: "1 heure"
+      other: "%{count} heures"
     minutes:
-      1: "1 minute"
-      n: "%{amount} minutes"
+      one: "1 minute"
+      other: "%{count} minutes"
     seconds:
-      1: "1 seconde"
-      n: "%{amount} secondes"
+      one: "1 seconde"
+      other: "%{count} secondes"
   progress:
     estimated_time_remaining: "Temps restant estimé :"
     downloading_mb: "téléchargement de %{megabytes} MB"

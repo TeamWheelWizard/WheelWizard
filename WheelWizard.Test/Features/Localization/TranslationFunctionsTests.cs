@@ -4,6 +4,13 @@ namespace WheelWizard.Test.Features.Localization;
 
 public class TranslationFunctionsTests
 {
+    [Fact]
+    public void CountIsReservedEvenWithoutAnExplicitCountArgument()
+    {
+        Assert.Throws<ArgumentException>(() => TranslationFunctions.tFormat("%{count}", new { count = 99 }));
+        Assert.Throws<ArgumentException>(() => TranslationFunctions.t("items", new { count = 99 }));
+    }
+
     [Fact(DisplayName = "Format with no params returns default string")]
     public void FormatWithNoParams_ShouldReturnDefaultString()
     {

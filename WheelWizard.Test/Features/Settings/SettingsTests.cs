@@ -339,7 +339,7 @@ public class SettingsLocalizationServiceTests
     }
 
     [Fact]
-    public void TranslationFunction_UsesSpecificNumberVariant_WhenItExists()
+    public void TranslationFunction_UsesCardinalVariant()
     {
         var originalLanguage = LocalizationProvider.Current.CurrentLanguage;
         var localizationService = new EmbeddedYamlLocalizationService();
@@ -349,8 +349,8 @@ public class SettingsLocalizationServiceTests
         {
             localizationService.SetLanguage("en");
 
-            Assert.Equal("1 day", TranslationFunctions.t_legacy("time.days.n", 1));
-            Assert.Equal("2 days", TranslationFunctions.t_legacy("time.days.n", count: 2, new { amount = 2 }));
+            Assert.Equal("1 day", TranslationFunctions.t("time.days", 1));
+            Assert.Equal("2 days", TranslationFunctions.t("time.days", count: 2));
         }
         finally
         {

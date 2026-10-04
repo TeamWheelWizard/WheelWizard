@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -119,7 +119,7 @@
                                            BoxText="0"
                                            BoxIconData="{StaticResource UserCouple}"
                                            BoxIconSize="14"
-                                           BoxTip="{loc:T hover.players_online.0}" />
+                                           BoxTip="{loc:T hover.players_online.none}" />
             <patterns:SidebarRadioButton IconData="{StaticResource Award}"
                                            PageType="{x:Type pages:LeaderboardPage}"
                                            Text="{loc:T page_title.leaderboard}" />

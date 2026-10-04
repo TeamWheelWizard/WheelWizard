@@ -176,17 +176,17 @@ cs:
     language_translated_by: "Tento jazyk překládá: %{translators}"
   hover:
     players_online:
-      0: "Právě nejsou žádní hráči online"
-      1: "Právě je 1 hráč online"
-      n: "Právě jsou %{amount} hráči online"
+      none: "Právě nejsou žádní hráči online"
+      one: "Právě je 1 hráč online"
+      other: "Právě jsou %{count} hráči online"
     rooms_online:
-      0: "Momentálně nejsou žádné aktivní místnosti"
-      1: "Momentálně je aktivní 1 místnost"
-      n: "Momentálně jsou aktivní %{amount} místnosti"
+      none: "Momentálně nejsou žádné aktivní místnosti"
+      one: "Momentálně je aktivní 1 místnost"
+      other: "Momentálně jsou aktivní %{count} místnosti"
     friends_online:
-      0: "Právě nejsou žádní kamarádi online"
-      1: "Právě je 1 kamarád online"
-      n: "Právě jsou %{amount} kamarádi online"
+      none: "Právě nejsou žádní kamarádi online"
+      one: "Právě je 1 kamarád online"
+      other: "Právě jsou %{count} kamarádi online"
     rooms_page_disclaimer: |-
       Upozorňujeme, že tato stránka nenabízí žádnou funkci pro přímé připojení k místnosti.
       Chceš-li se připojit ke konkrétní místnosti, budeš se muset buď připojit prostřednictvím kamaráda, nebo doufat, že se k ní připojíš připojením k online serverům.
@@ -207,17 +207,17 @@ cs:
     no_mod_selected: "Vyber mod v seznamu pro zobrazení jeho podrobností"
   time:
     days:
-      1: "1 den"
-      n: "%{amount} dny"
+      one: "1 den"
+      other: "%{count} dny"
     hours:
-      1: "1 hodina"
-      n: "%{amount} hodiny"
+      one: "1 hodina"
+      other: "%{count} hodiny"
     minutes:
-      1: "1 minuta"
-      n: "%{amount} minuty"
+      one: "1 minuta"
+      other: "%{count} minuty"
     seconds:
-      1: "1 sekunda"
-      n: "%{amount} sekundy"
+      one: "1 sekunda"
+      other: "%{count} sekundy"
   progress:
     estimated_time_remaining: "Předpokládaný zbývající čas:"
     downloading_mb: "Stahování %{megabytes} MB"

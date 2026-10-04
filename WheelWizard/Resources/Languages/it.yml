@@ -176,17 +176,17 @@ it:
     language_translated_by: "Questa lingua è stata tradotta da: %{translators}"
   hover:
     players_online:
-      0: "Al momento non ci sono giocatori online"
-      1: "Al momento c'è 1 giocatore online"
-      n: "Al momento ci sono %{amount} giocatori online"
+      none: "Al momento non ci sono giocatori online"
+      one: "Al momento c'è 1 giocatore online"
+      other: "Al momento ci sono %{count} giocatori online"
     rooms_online:
-      0: "Al momento non ci sono stanze attive"
-      1: "Al momento c'è 1 stanza attiva"
-      n: "Al momento ci sono %{amount} stanze attive"
+      none: "Al momento non ci sono stanze attive"
+      one: "Al momento c'è 1 stanza attiva"
+      other: "Al momento ci sono %{count} stanze attive"
     friends_online:
-      0: "Al momento non ci sono amici online"
-      1: "Al momento c'è 1 amico online"
-      n: "Al momento ci sono %{amount} amici online"
+      none: "Al momento non ci sono amici online"
+      one: "Al momento c'è 1 amico online"
+      other: "Al momento ci sono %{count} amici online"
     rooms_page_disclaimer: |-
       Attenzione, questa pagina non offre alcuna funzionalità per unirsi ad una stanza direttamente.
       Per unirsi ad una specifica stanza, dovrai farlo tramite un amico oppure sperare di unirti tramite i server online.
@@ -207,17 +207,17 @@ it:
     no_mod_selected: "Seleziona una mod nella lista per vedere i suoi dettagli"
   time:
     days:
-      1: "1 giorno"
-      n: "%{amount} giorni"
+      one: "1 giorno"
+      other: "%{count} giorni"
     hours:
-      1: "1 ora"
-      n: "%{amount} ore"
+      one: "1 ora"
+      other: "%{count} ore"
     minutes:
-      1: "1 minuto"
-      n: "%{amount} minuti"
+      one: "1 minuto"
+      other: "%{count} minuti"
     seconds:
-      1: "1 secondo"
-      n: "%{amount} secondi"
+      one: "1 secondo"
+      other: "%{count} secondi"
   progress:
     estimated_time_remaining: "Tempo stimato rimanente:"
     downloading_mb: "Scaricando %{megabytes} MB"

@@ -198,17 +198,17 @@ fi:
     whole_file_override: "Koko tiedoston ohitus"
   hover:
     players_online:
-      0: "Ei pelaajia paikalla"
-      1: "1 pelaaja on paikalla"
-      n: "%{amount} pelaajaa on paikalla"
+      none: "Ei pelaajia paikalla"
+      one: "1 pelaaja on paikalla"
+      other: "%{count} pelaajaa on paikalla"
     rooms_online:
-      0: "Ei aktiivisia huoneita"
-      1: "1 aktiivinen huone"
-      n: "%{amount} aktiivista huonetta"
+      none: "Ei aktiivisia huoneita"
+      one: "1 aktiivinen huone"
+      other: "%{count} aktiivista huonetta"
     friends_online:
-      0: "Ei kavereita paikalla"
-      1: "1 kaveri on paikalla"
-      n: "%{amount} kaveria on paikalla"
+      none: "Ei kavereita paikalla"
+      one: "1 kaveri on paikalla"
+      other: "%{count} kaveria on paikalla"
     rooms_page_disclaimer: |-
       Huomioi, että tältä sivulta ei voi liittyä huoneeseen suoraan.
       Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
@@ -232,17 +232,17 @@ fi:
     no_vr_history_range: "Tällä aikavälillä ei löydy KP-historiaa."
   time:
     days:
-      1: "1 pv"
-      n: "%{amount} pv"
+      one: "1 pv"
+      other: "%{count} pv"
     hours:
-      1: "1 t"
-      n: "%{amount} t"
+      one: "1 t"
+      other: "%{count} t"
     minutes:
-      1: "1 min"
-      n: "%{amount} min"
+      one: "1 min"
+      other: "%{count} min"
     seconds:
-      1: "1 s"
-      n: "%{amount} s"
+      one: "1 s"
+      other: "%{count} s"
     last_24_hours: "Viimeiset 24 tuntia"
     last_7_days: "Viimeiset 7 päivää"
     last_30_days: "Viimeiset 30 päivää"

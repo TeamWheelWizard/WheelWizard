@@ -176,17 +176,17 @@ tr:
     language_translated_by: "Bu dili çevirenler: %{translators}"
   hover:
     players_online:
-      0: "Şu anda çevrimiçi oyuncu yok."
-      1: "Şu anda çevrimiçi 1 oyuncu var"
-      n: "Şu anda çevrimiçi %{amount} oyuncu var"
+      none: "Şu anda çevrimiçi oyuncu yok."
+      one: "Şu anda çevrimiçi 1 oyuncu var"
+      other: "Şu anda çevrimiçi %{count} oyuncu var"
     rooms_online:
-      0: "Şu anda aktif oda yok"
-      1: "Şu anda 1 aktif oda var"
-      n: "Şu anda %{amount} aktif oda var"
+      none: "Şu anda aktif oda yok"
+      one: "Şu anda 1 aktif oda var"
+      other: "Şu anda %{count} aktif oda var"
     friends_online:
-      0: "Şu anda çevrimiçi arkadaş yok"
-      1: "Şu anda çevrimiçi 1 arkadaş var"
-      n: "Şu anda çevrimiçi %{amount} arkadaş var"
+      none: "Şu anda çevrimiçi arkadaş yok"
+      one: "Şu anda çevrimiçi 1 arkadaş var"
+      other: "Şu anda çevrimiçi %{count} arkadaş var"
     rooms_page_disclaimer: |-
       Lütfen bu sayfanın doğrudan bir odaya katılma işlevi sunmadığını unutmayın.
       Belirli bir odaya katılmak için bir arkadaşınız aracılığıyla katılmanız veya çevrimiçi sunuculara katılarak bu odaya girmeyi ummanız gerekecek.
@@ -207,17 +207,17 @@ tr:
     no_mod_selected: "Detaylarını görmek için listeden bir mod seçin"
   time:
     days:
-      1: "1 gün"
-      n: "%{amount} gün"
+      one: "1 gün"
+      other: "%{count} gün"
     hours:
-      1: "1 saat"
-      n: "%{amount} saat"
+      one: "1 saat"
+      other: "%{count} saat"
     minutes:
-      1: "1 dakika"
-      n: "%{amount} dakika"
+      one: "1 dakika"
+      other: "%{count} dakika"
     seconds:
-      1: "1 saniye"
-      n: "%{amount} saniye"
+      one: "1 saniye"
+      other: "%{count} saniye"
   progress:
     estimated_time_remaining: "Kalan Tahmini Süre:"
     downloading_mb: "%{megabytes} MB indiriliyor"
