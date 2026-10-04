@@ -280,15 +280,22 @@ public class SettingsManager : ISettingsManager, IDisposable
             typeof(bool),
             value =>
             {
+                void SetDolphinSetting(Setting setting, object newValue)
+                {
+                    if (!setting.Set(newValue))
+                        throw setting.SaveError ?? new IOException($"Failed to save Dolphin setting '{setting.Name}'.");
+                }
+
                 var newValue = (bool)value!;
-                _dolphinCompilationMode.Set(
+                SetDolphinSetting(
+                    _dolphinCompilationMode,
                     newValue ? DolphinShaderCompilationMode.HybridUberShaders : DolphinShaderCompilationMode.Default
                 );
 #if WINDOWS
-                _dolphinCompileShadersAtStart.Set(newValue);
+                SetDolphinSetting(_dolphinCompileShadersAtStart, newValue);
 #endif
-                _dolphinMsaa.Set(newValue ? "0x00000002" : "0x00000001");
-                _dolphinSsaa.Set(false);
+                SetDolphinSetting(_dolphinMsaa, newValue ? "0x00000002" : "0x00000001");
+                SetDolphinSetting(_dolphinSsaa, false);
             },
             () =>
             {

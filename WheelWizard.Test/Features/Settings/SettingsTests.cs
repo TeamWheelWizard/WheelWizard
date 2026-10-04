@@ -22,6 +22,79 @@ public sealed class SettingsFeatureCollection;
 public class SettingsManagerTests
 {
     [Fact]
+    public void RecommendedSettings_CanReenableAfterPartialDisableFailure()
+    {
+        using var manager = CreateManager(new MockFileSystem(), out _, out var dolphinManager, out _);
+        var children = dolphinManager
+            .ReceivedCalls()
+            .Where(call => call.GetMethodInfo().Name == nameof(IDolphinSettingManager.RegisterSetting))
+            .Select(call => (DolphinSetting)call.GetArguments()[0]!)
+            .ToDictionary(setting => setting.Name);
+        Assert.True(manager.Set(manager.RECOMMENDED_SETTINGS, true));
+        var recommendedShaderMode = children["ShaderCompilationMode"].Get();
+        var failure = new IOException("disk full");
+        var fail = true;
+        dolphinManager
+            .When(m => m.SaveSettings(Arg.Any<string>(), Arg.Is<DolphinSetting>(s => s.Name == "MSAA")))
+            .Do(_ =>
+            {
+                if (fail)
+                    throw failure;
+            });
+
+        Assert.False(manager.Set(manager.RECOMMENDED_SETTINGS, false));
+        Assert.Same(failure, manager.RECOMMENDED_SETTINGS.SaveError);
+        Assert.NotEqual(recommendedShaderMode, children["ShaderCompilationMode"].Get());
+        Assert.False(manager.Get<bool>(manager.RECOMMENDED_SETTINGS));
+
+        fail = false;
+        Assert.True(manager.Set(manager.RECOMMENDED_SETTINGS, true));
+        Assert.Equal(recommendedShaderMode, children["ShaderCompilationMode"].Get());
+        Assert.True(manager.Get<bool>(manager.RECOMMENDED_SETTINGS));
+        Assert.Null(manager.RECOMMENDED_SETTINGS.SaveError);
+    }
+
+    [Theory]
+    [InlineData("ShaderCompilationMode")]
+#if WINDOWS
+    [InlineData("WaitForShadersBeforeStarting")]
+#endif
+    [InlineData("MSAA")]
+    [InlineData("SSAA")]
+    public void RecommendedSettings_PropagatesChildSaveFailureAndCanRetry(string failedSetting)
+    {
+        using var manager = CreateManager(new MockFileSystem(), out _, out var dolphinManager, out _);
+        var children = dolphinManager
+            .ReceivedCalls()
+            .Where(call => call.GetMethodInfo().Name == nameof(IDolphinSettingManager.RegisterSetting))
+            .Select(call => (DolphinSetting)call.GetArguments()[0]!)
+            .ToDictionary(setting => setting.Name);
+        children["SSAA"].Set(true, skipSave: true);
+        var failure = new IOException("disk full");
+        var fail = true;
+        dolphinManager
+            .When(m => m.SaveSettings(Arg.Any<string>(), Arg.Is<DolphinSetting>(s => s.Name == failedSetting)))
+            .Do(_ =>
+            {
+                if (fail)
+                    throw failure;
+            });
+        var notifications = 0;
+        manager.RECOMMENDED_SETTINGS.Changed += _ => notifications++;
+
+        Assert.False(manager.Set(manager.RECOMMENDED_SETTINGS, true));
+        Assert.Same(failure, manager.RECOMMENDED_SETTINGS.SaveError);
+        Assert.False(manager.Get<bool>(manager.RECOMMENDED_SETTINGS));
+        Assert.Equal(0, notifications);
+
+        fail = false;
+        Assert.True(manager.Set(manager.RECOMMENDED_SETTINGS, true));
+        Assert.True(manager.Get<bool>(manager.RECOMMENDED_SETTINGS));
+        Assert.Null(manager.RECOMMENDED_SETTINGS.SaveError);
+        Assert.Equal(1, notifications);
+    }
+
+    [Fact]
     public void Get_Throws_WhenRequestedTypeDoesNotMatchSettingType()
     {
         var manager = CreateManager(new MockFileSystem(), out _, out _, out _);

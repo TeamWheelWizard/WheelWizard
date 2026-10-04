@@ -20,16 +20,29 @@ public abstract class Setting
     protected Func<object, bool>? ValidationFunc { get; set; }
     protected bool SaveEvenIfNotValid { get; set; }
     public Type ValueType { get; protected set; }
+    public Exception? SaveError { get; private set; }
 
     public bool Set(object newValue, bool skipSave = false)
     {
+        SaveError = null;
         if (newValue.GetType() != ValueType)
             return false;
 
-        if (Value?.Equals(newValue) == true)
+        if (Value.Equals(newValue))
             return true;
 
-        var succeeded = SetInternal(newValue, skipSave);
+        var previousValue = Value;
+        bool succeeded;
+        try
+        {
+            succeeded = SetInternal(newValue, skipSave);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            RestoreValueAfterSaveFailure(previousValue);
+            SaveError = exception;
+            return false;
+        }
         if (succeeded)
             SignalChange();
 
@@ -38,15 +51,17 @@ public abstract class Setting
 
     protected abstract bool SetInternal(object newValue, bool skipSave = false);
 
+    protected virtual void RestoreValueAfterSaveFailure(object previousValue) => Value = previousValue;
+
     public abstract object Get();
 
-    public void Reset()
+    public void Reset(bool skipSave = false)
     {
         var s = SaveEvenIfNotValid;
         SaveEvenIfNotValid = true;
         try
         {
-            Set(DefaultValue);
+            Set(DefaultValue, skipSave);
         }
         finally
         {

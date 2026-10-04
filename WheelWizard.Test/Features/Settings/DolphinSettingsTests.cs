@@ -76,7 +76,7 @@ public class DolphinSettingManagerTests
     }
 
     [Fact]
-    public void LoadSettings_WritesDefaultValue_WhenIniEntryIsMissing()
+    public void LoadSettings_UsesDefaultWithoutWriting_WhenIniEntryIsMissing()
     {
         var fileSystem = new MockFileSystem();
         var userFolderPath = $"/wheelwizard-user-{Guid.NewGuid():N}";
@@ -91,7 +91,8 @@ public class DolphinSettingManagerTests
         manager.LoadSettings(configFolderPath);
 
         var updatedFile = fileSystem.File.ReadAllText(iniPath);
-        Assert.Contains("NANDRootPath = /default", updatedFile);
+        Assert.DoesNotContain("NANDRootPath", updatedFile);
+        Assert.Equal("/default", setting.Get());
     }
 
     [Fact]

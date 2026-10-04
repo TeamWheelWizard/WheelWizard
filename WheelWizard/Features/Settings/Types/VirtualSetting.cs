@@ -22,23 +22,32 @@ public class VirtualSetting : Setting, IDisposable
     {
         // we don't use skipSave here since its a virtual setting, and so there is nothing to save
         _acceptsSignals = false;
-        var oldValue = Value;
-        Value = newValue;
-        var newIsValid = SaveEvenIfNotValid || IsValid();
-        var succeeded = false;
-        if (newIsValid)
+        try
         {
-            _setter(newValue);
-            succeeded = true;
-        }
-        else
-            Value = oldValue;
+            var oldValue = Value;
+            Value = newValue;
+            var newIsValid = SaveEvenIfNotValid || IsValid();
+            var succeeded = false;
+            if (newIsValid)
+            {
+                _setter(newValue);
+                succeeded = true;
+            }
+            else
+                Value = oldValue;
 
-        _acceptsSignals = true;
-        return succeeded;
+            return succeeded;
+        }
+        finally
+        {
+            _acceptsSignals = true;
+        }
     }
 
     public override object Get() => Value;
+
+    // Earlier child saves may have succeeded, so the previous composite value can be stale.
+    protected override void RestoreValueAfterSaveFailure(object previousValue) => Recalculate();
 
     // We dont have to constantly recalculate the value, since if they didn't change, the value is still the same
     // and they only change when the dependencies change, or when the users sets a new value
