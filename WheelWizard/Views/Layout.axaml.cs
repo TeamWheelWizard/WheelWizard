@@ -121,14 +121,15 @@ public partial class Layout : BaseWindow, IPollingListener
         GameLicenseService.Subscribe(this);
         ModManagerService.PropertyChanged += ModManager_PropertyChanged;
         _ = ReloadModsAndShowErrorsAsync();
-        KitchenSinkButton.IsVisible = DevelopmentMode.IsEnabled;
         UpdateOtherSectionVisibility();
+        if (SettingsService.SIDEBAR_COLLAPSED.Get())
+            _ = SetSidebarCollapsedAsync(true, animate: false);
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
         Title = BrandingService.Branding.DisplayName;
-        TitleLabel.Text = BrandingService.Branding.DisplayName;
+        TitleLabel.Text = _sidebarCollapsed ? string.Empty : BrandingService.Branding.DisplayName;
         VersionTagText.Text = $"v{BrandingService.Branding.Version}";
         UpdateModsButtonText();
         // UpdateModsActionIndicator();
@@ -405,12 +406,11 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void UpdateOtherSectionVisibility()
     {
-        OtherSectionText.IsVisible = TestingButton.IsVisible || KitchenSinkButton.IsVisible;
+        OtherSectionText.IsVisible = TestingButton.IsVisible;
     }
 
     public void HideDevelopmentFeatures()
     {
-        KitchenSinkButton.IsVisible = false;
         UpdateOtherSectionVisibility();
         if (ContentArea.Content is SettingsPage settingsPage)
             settingsPage.HideDevelopmentFeatures();

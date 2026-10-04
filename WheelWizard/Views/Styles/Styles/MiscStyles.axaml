@@ -90,8 +90,8 @@
         <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <Grid x:Name="PART_ToolTipChrome" RowDefinitions="Auto,Auto">
-                    <Border Grid.Row="0"
+                <Grid x:Name="PART_ToolTipChrome" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
+                    <Border Grid.Row="0" Grid.Column="1"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
@@ -101,7 +101,7 @@
                                           ContentTemplate="{TemplateBinding ContentTemplate}"
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Border>
-                    <Path Grid.Row="1"
+                    <Path Grid.Row="1" Grid.Column="1"
                           x:Name="PART_ToolTipTail"
                           Width="12"
                           Height="8"
@@ -127,6 +127,23 @@
     <Style Selector="ToolTip.BubblePointerRight /template/ Path#PART_ToolTipTail">
         <Setter Property="HorizontalAlignment" Value="Right"/>
         <Setter Property="Margin" Value="0,-1,16,0"/>
+    </Style>
+
+    <Style Selector="ToolTip.BubbleSideLeft /template/ Path#PART_ToolTipTail, ToolTip.BubbleSideRight /template/ Path#PART_ToolTipTail">
+        <Setter Property="Grid.Row" Value="0"/>
+        <Setter Property="Width" Value="8"/>
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="ToolTip.BubbleSideLeft /template/ Path#PART_ToolTipTail">
+        <Setter Property="Grid.Column" Value="2"/>
+        <Setter Property="Data" Value="M 0 0 L 8 6 L 0 12 Z"/>
+        <Setter Property="Margin" Value="-1,0,0,0"/>
+    </Style>
+    <Style Selector="ToolTip.BubbleSideRight /template/ Path#PART_ToolTipTail">
+        <Setter Property="Grid.Column" Value="0"/>
+        <Setter Property="Data" Value="M 8 0 L 0 6 L 8 12 Z"/>
+        <Setter Property="Margin" Value="0,0,-1,0"/>
     </Style>
 
     <Style Selector="ToolTip.BubbleAnimateIn /template/ Grid#PART_ToolTipChrome">

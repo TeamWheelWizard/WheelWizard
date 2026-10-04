@@ -19,7 +19,7 @@ namespace WheelWizard.UI.Test;
 public class MiiControlTests
 {
     [AvaloniaFact]
-    public async Task FriendPortrait_RemainsVisibleWithoutAnExplicitWidth()
+    public async Task FriendPortrait_RemainsVisibleAndAnchoredWhenRowWidthChanges()
     {
         var images = InstallThemes();
         using var bitmap = new WriteableBitmap(new PixelSize(512, 512), new Vector(96, 96));
@@ -53,6 +53,13 @@ public class MiiControlTests
                     visiblePortrait.Width >= 50 && visiblePortrait.Height >= 100,
                     $"Portrait is clipped outside the card: {position}, {image.Bounds}; visible area {visiblePortrait}"
                 );
+                var portraitSize = image.Bounds.Size;
+                card.Width = 572;
+                window.UpdateLayout();
+                Assert.Equal(position, image.TranslatePoint(default, card)!.Value);
+                Assert.Equal(portraitSize, image.Bounds.Size);
+                card.Width = 428;
+                window.UpdateLayout();
             }
         }
         finally
