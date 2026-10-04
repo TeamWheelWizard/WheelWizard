@@ -52,10 +52,9 @@ public sealed class EmbeddedYamlLocalizationService : ILocalizationService
     public string TranslatePlural(string key, decimal count, string? languageCode = null)
     {
         var language = NormalizeLanguage(languageCode ?? CurrentLanguage);
-        // Select again in English on fallback; a Russian 'few' must not request English 'few'.
+        var category = PluralRules.Select(count).ToString().ToLowerInvariant();
         foreach (var candidate in new[] { language, DefaultLanguage }.Distinct())
         {
-            var category = PluralRules.Select(candidate, count).ToString().ToLowerInvariant();
             if (
                 TryGetValue(candidate, $"{key}.{category}", out var value)
                 || TryGetValue(candidate, $"{key}.other", out value)
