@@ -268,7 +268,7 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         var friends = GameLicenseService.ActiveCurrentFriends;
         FriendsButton.BoxText = $"{friends.Count(friend => friend.IsOnline)}/{friends.Count}";
-        FriendsButton.BoxTip = t("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
+        FriendsButton.BoxTip = t_legacy("hover.friends_online.n", friends.Count(friend => friend.IsOnline));
     }
 
     public void UpdateSidebarProfile()
@@ -292,7 +292,7 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         var playerCount = sender.PlayerCount;
         RoomsButton.BoxText = playerCount.ToString();
-        RoomsButton.BoxTip = t("hover.players_online.n", playerCount);
+        RoomsButton.BoxTip = t_legacy("hover.players_online.n", playerCount);
         UpdateFriendCount();
     }
 
