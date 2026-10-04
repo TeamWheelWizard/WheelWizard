@@ -30,7 +30,7 @@ items:
 var message = t("items", count: 12, new { name = "Alex" });
 ```
 
-`count` selects the plural form and automatically fills `%{count}`: exactly 1 selects `one`, and every other value selects `other`. The explicit count argument takes precedence over an anonymous-object property named `count`.
+`count` selects the plural form and automatically fills `%{count}`: exactly 1 selects `one`, and every other value selects `other`. It is reserved: including a property named `count` in the argument object throws `ArgumentException`. Pass it only through the explicit `count:` argument.
 
 Use `.one` and `.other` for quantities, for example `t("time.days", count: days)`.
 

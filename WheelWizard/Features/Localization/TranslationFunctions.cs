@@ -96,6 +96,9 @@ public static class TranslationFunctions
                 .Where(property => property.CanRead && property.GetIndexParameters().Length == 0)
                 .ToDictionary(property => property.Name, property => property.GetValue(args)?.ToString() ?? string.Empty)
             ?? new Dictionary<string, string>();
+        if (replacements.ContainsKey("count"))
+            throw new ArgumentException("'count' is reserved. Pass it through the count argument instead.", nameof(args));
+
         if (count.HasValue)
             replacements["count"] = count.Value.ToString();
 

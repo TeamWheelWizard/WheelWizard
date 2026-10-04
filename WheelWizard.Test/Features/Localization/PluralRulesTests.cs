@@ -27,7 +27,7 @@ public class PluralRulesTests
         {
             Assert.Equal("One item for Alex", TranslationFunctions.t("items", count: 1, new { name = "Alex" }));
             Assert.Equal("2 items for Alex", TranslationFunctions.t("items", count: 2, new { name = "Alex" }));
-            Assert.Equal("2 items for Alex", TranslationFunctions.t("items", count: 2, new { name = "Alex", count = 99 }));
+            Assert.Throws<ArgumentException>(() => TranslationFunctions.t("items", count: 2, new { name = "Alex", count = 99 }));
             Assert.Equal("2 items for %{count}", TranslationFunctions.t("items", count: 2, new { name = "%{count}" }));
             Assert.Equal("Value 3", TranslationFunctions.t("plain", new { amount = 3 }));
             service.SetLanguage("ru");
