@@ -39,7 +39,7 @@ public abstract class Setting
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            Value = previousValue;
+            RestoreValueAfterSaveFailure(previousValue);
             SaveError = exception;
             return false;
         }
@@ -50,6 +50,8 @@ public abstract class Setting
     }
 
     protected abstract bool SetInternal(object newValue, bool skipSave = false);
+
+    protected virtual void RestoreValueAfterSaveFailure(object previousValue) => Value = previousValue;
 
     public abstract object Get();
 
