@@ -108,7 +108,7 @@ public static class MessageTranslationHelper
                 t("message_warning.invalid_paths.title"),
                 t("message_warning.invalid_paths.extra")
             ),
-            MessageTranslation.Warning_UnkownRendererSelected => ("Unknown renderer selected", "Unknown renderer selected: {$1}"),
+            MessageTranslation.Warning_UnkownRendererSelected => ("Unknown renderer selected", "Unknown renderer selected: %{renderer}"),
             MessageTranslation.Warning_CouldNotFindRoom => (
                 "Couldn't find the room",
                 "Whoops, could not find the room that this player is supposedly playing in"
@@ -161,7 +161,7 @@ public static class MessageTranslationHelper
                 t("message_error.mod_download_fail.title"),
                 t("message_error.mod_download_fail.extra")
             ),
-            MessageTranslation.Error_FailedCopyMii => ("Failed to copy Mii", "{$1}"),
+            MessageTranslation.Error_FailedCopyMii => ("Failed to copy Mii", "%{error}"),
             MessageTranslation.Error_MiiDBAlreadyExists => (t("message_error.failed_create_mii_db.title"), "Database already exists."),
             MessageTranslation.Error_UpdateMiiDb_InvalidClId => ("Invalid Client ID.", "The client ID attached to this Mii is invalid."),
             MessageTranslation.Error_UpdateMiiDb_BlockSizeInvalid => ("Mii block size invalid.", null),
@@ -171,15 +171,15 @@ public static class MessageTranslationHelper
             MessageTranslation.Error_UpdateMiiDb_RFLdbNotFound => ("RFL_DB.dat not found", "The RFL_DB.dat file could not be found."),
             MessageTranslation.Error_UpdateMiiDb_CorruptDb => (
                 "Corrupt Mii Database",
-                "Corrupt Mii database (bad CRC 0x{$1}, expected 0x{$2})."
+                "Corrupt Mii database (bad CRC 0x%{actualCrc}, expected 0x%{expectedCrc})."
             ),
             MessageTranslation.Error_MiiSerializer_MiiNotNull => ("Mii cannot be null", null),
             MessageTranslation.Error_MiiSerializer_MiiId0 => ("Mii ID cannot be 0", null),
             MessageTranslation.Error_MiiSerializer_MiiDataLength => ("Invalid Mii data length.", null),
             MessageTranslation.Error_MiiSerializer_MiiDataEmpty => ("Mii data is empty.", null),
-            MessageTranslation.Error_MiiSerializer_InvalidMiiData => ("Invalid Mii data", "The Mii '{$1}' is invalid."),
+            MessageTranslation.Error_MiiSerializer_InvalidMiiData => ("Invalid Mii data", "The Mii '%{error}' is invalid."),
 
-            MessageTranslation.Error_MiiEditor_CantOpenEditor => ("Cant open Mii Editor", "{$1}"),
+            MessageTranslation.Error_MiiEditor_CantOpenEditor => ("Cant open Mii Editor", "%{error}"),
 
             MessageTranslation.Error_FailedInstallDolphin => (
                 t("message_error.failed_install_dolphin.title"),
@@ -198,7 +198,7 @@ public static class MessageTranslationHelper
     ///  Shows a message box with the given message enum.
     /// </summary>
     // #todo: move the popup methods into an injected presentation service so shared code only handles translation data.
-    public static void ShowMessage(MessageTranslation msg, object[]? titleReplacements = null, object[]? extraReplacements = null) =>
+    public static void ShowMessage(MessageTranslation msg, object? titleReplacements = null, object? extraReplacements = null) =>
         CreateMessageBox(msg, titleReplacements, extraReplacements).Show();
 
     public static void ShowMessage(OperationError error)
@@ -207,7 +207,7 @@ public static class MessageTranslationHelper
         CreateMessageBox(error).Show();
     }
 
-    public static Task AwaitMessageAsync(MessageTranslation msg, object[]? titleReplacements = null, object[]? extraReplacements = null) =>
+    public static Task AwaitMessageAsync(MessageTranslation msg, object? titleReplacements = null, object? extraReplacements = null) =>
         CreateMessageBox(msg, titleReplacements, extraReplacements).ShowDialog();
 
     public static Task AwaitMessageAsync(OperationError error)
@@ -229,8 +229,8 @@ public static class MessageTranslationHelper
 
     private static MessageBoxWindow CreateMessageBox(
         MessageTranslation msg,
-        object[]? titleReplacements = null,
-        object[]? extraReplacements = null
+        object? titleReplacements = null,
+        object? extraReplacements = null
     )
     {
         var (title, extraText) = GetTranslationText(msg);
@@ -238,11 +238,11 @@ public static class MessageTranslationHelper
             (int)msg < 1000 ? MessageBoxWindow.MessageType.Message
             : (int)msg < 3000 ? MessageBoxWindow.MessageType.Warning
             : MessageBoxWindow.MessageType.Error;
-        var box = new MessageBoxWindow().SetMessageType(type).SetTitleText(tFormat(title, titleReplacements ?? []));
+        var box = new MessageBoxWindow().SetMessageType(type).SetTitleText(tFormat(title, titleReplacements));
         if (extraText == null)
-            box.SetInfoText(tFormat(title, titleReplacements ?? []));
+            box.SetInfoText(tFormat(title, titleReplacements));
         else
-            box.SetInfoText(tFormat(extraText, extraReplacements ?? []));
+            box.SetInfoText(tFormat(extraText, extraReplacements));
 
         if ((int)msg >= 2000)
             box.SetTag($"{(int)msg}");

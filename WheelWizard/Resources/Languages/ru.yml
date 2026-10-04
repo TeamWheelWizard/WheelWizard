@@ -168,25 +168,25 @@ ru:
     mii_carousel: "Карусель Mii"
   text:
     made_by_string: |-
-      Создатели: {$1}
-      и {$2}
+      Создатели: %{firstAuthor}
+      и %{secondAuthor}
     thanks_translators: "Низкий поклон и спасибо переводчикам:"
-    wh_wz_translation_percentage: "Перевод на этот язык завершён на {$1}%"
+    wh_wz_translation_percentage: "Перевод на этот язык завершён на %{percentage}%"
     powered_gamebanana: "Моды из GameBanana"
-    language_translated_by: "Авторы перевода: {$1}"
+    language_translated_by: "Авторы перевода: %{translators}"
   hover:
     players_online:
       0: "Игроков в сети: 0"
       1: "Игроков в сети: 1"
-      n: "Игроков в сети: {$1}"
+      n: "Игроков в сети: %{amount}"
     rooms_online:
       0: "Активных групп: 0"
       1: "Активных групп: 1"
-      n: "Активных групп: {$1}"
+      n: "Активных групп: %{amount}"
     friends_online:
       0: "Друзей в сети: 0"
       1: "Друзей в сети: 1"
-      n: "Друзей в сети: {$1}"
+      n: "Друзей в сети: %{amount}"
     rooms_page_disclaimer: "Вы не можете заходить в комнаты прямо через это меню. Чтобы зайти в определённую комнату, вам нужно либо зайти через друга, либо надеяться попасть в неё через онлайн сервера."
     friends_page_disclaimer: "Чтобы добавить друга нужно сначала подружить"
   empty_content:
@@ -203,22 +203,22 @@ ru:
   time:
     days:
       1: "1 день"
-      n: "{$1} дн."
+      n: "%{amount} дн."
     hours:
       1: "1 ч"
-      n: "{$1} ч"
+      n: "%{amount} ч"
     minutes:
       1: "1 мин"
-      n: "{$1} мин"
+      n: "%{amount} мин"
     seconds:
       1: "1 сек"
-      n: "{$1} сек"
+      n: "%{amount} сек"
   progress:
     estimated_time_remaining: "Осталось примерно:"
-    downloading_mb: "Загружено {$1} МБ"
+    downloading_mb: "Загружено %{megabytes} МБ"
     installing_mods: "Устанавливаем моды"
-    installing_mods_count: "Устанавливаем {$1} модов"
-    processing_xof_y: "Обработка {$1} из {$2} файлов..."
+    installing_mods_count: "Устанавливаем %{amount} модов"
+    processing_xof_y: "Обработка %{processed} из %{total} файлов..."
     update_rr: "Обновляем Retro Rewind"
     latest_wh_wz_github: "Получаем последнюю версию Wheel Wizard из GitHub"
     update_wh_wz: "Обновляем Wheel Wizard"
@@ -230,9 +230,9 @@ ru:
       title: "Моды найдены"
       extra: "Прямо сейчас вы запускаете игру без модов. Желаете очистить папку my-stuff?"
     sure_delete:
-      title: "Вы уверены что хотите удалить {$1}?"
+      title: "Вы уверены что хотите удалить %{name}?"
       extra: "Удаление является необратимым и не может быть отменено."
-      title_miis: "Вы уверены, что хотите удалить {$1} Mii?"
+      title_miis: "Вы уверены, что хотите удалить %{amount} Mii?"
     apply_scale:
       title: "Хотите применить новый масштаб?"
     dolphin_found:
@@ -242,7 +242,7 @@ ru:
         Папка эмулятора Dolphin найдена. Хотите её использовать?
     new_version_wh_wz:
       title: "Доступно обновление Wheel Wizard"
-      extra: "Версия {$1} Wheel Wizard'а доступна (прямо сейчас. вы на {$2}). Хотите произвести обновление?"
+      extra: "Версия %{latestVersion} Wheel Wizard'а доступна (прямо сейчас. вы на %{currentVersion}). Хотите произвести обновление?"
     update_admin:
       title: "Обновитесь через права администратора."
       extra: "Иногда, для обновления нужны права администратора. Хотите ли вы их активировать ради этого обновления?"
@@ -259,7 +259,7 @@ ru:
       title: "Скачать Retro Rewind"
       extra: "Не удалось определить вашу версию Retro Rewind. Хотите установить Retro Rewind?"
     install_mod:
-      title: "Хотите установить этот мод: {$1}?"
+      title: "Хотите установить этот мод: %{modName}?"
     search_mod: "Поиск модов..."
     enter_new_name:
       title: "Введите новое название"
@@ -272,7 +272,7 @@ ru:
       title: "Выбрано несколько файлов"
     invalid_name:
       extra:
-        mod_name_exists: "Мод с названием {$1} уже существует."
+        mod_name_exists: "Мод с названием %{modName} уже существует."
     invalid_paths:
       extra: "Убедитесь, что все пути правильны и попробуйте ещё раз."
     dolphin_not_found:
@@ -330,20 +330,20 @@ ru:
   snackbar_success:
     mii_added: "Mii добавлен в ваши Mii"
     copied_fc: "Код друга сохранён в буфер обмена"
-    saved_mii: "Mii '{$1}' сохранён в '{$2}'"
-    deleted: "{$1}' удалено"
-    deleted_miis: "Удалено '{$1}' Mii"
-    created_duplicate: "Создан дубликат '{$1}'"
-    created_duplicates_miis: "Создано '{$1}' дубликатов Mii"
+    saved_mii: "Mii '%{name}' сохранён в '%{fileName}'"
+    deleted: "%{name}' удалено"
+    deleted_miis: "Удалено '%{amount}' Mii"
+    created_duplicate: "Создан дубликат '%{name}'"
+    created_duplicates_miis: "Создано '%{amount}' дубликатов Mii"
     profile_set_primary: "Сделать профиль основным"
   snackbar_error:
-    mii_failure_deserialize: "Не удалось импортировать Mii '{$1}'"
-    mii_failure_update: "Не удалось обновить Mii '{$1}'"
-    mii_failure_save: "Не удалось сохранить Mii '{$1}'"
-    mii_failure_get: "Не удалось получить Mii '{$1}'"
-    mii_failure_serialize: "Не удалось экспортировать Mii '{$1}'"
-    mii_failure_create: "Не удалось создать Mii '{$1}'"
-    mii_failure_duplicate: "Не удалось дублировать Mii '{$1}'"
+    mii_failure_deserialize: "Не удалось импортировать Mii '%{error}'"
+    mii_failure_update: "Не удалось обновить Mii '%{error}'"
+    mii_failure_save: "Не удалось сохранить Mii '%{error}'"
+    mii_failure_get: "Не удалось получить Mii '%{error}'"
+    mii_failure_serialize: "Не удалось экспортировать Mii '%{error}'"
+    mii_failure_create: "Не удалось создать Mii '%{error}'"
+    mii_failure_duplicate: "Не удалось дублировать Mii '%{error}'"
   helper_note:
     name_must_between: "Имена должны быть длиной от 3 до 10 символов."
     creator_name_less11: "Имя создателя должно быть длиной в меньше 11 символов."

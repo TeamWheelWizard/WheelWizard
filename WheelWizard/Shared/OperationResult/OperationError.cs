@@ -1,4 +1,4 @@
-﻿using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Shared.MessageTranslations;
 
 namespace WheelWizard.Shared;
 
@@ -25,12 +25,12 @@ public class OperationError
     /// <summary>
     /// The objects to replace the keys in the translation title
     /// </summary>
-    public object[]? TitleReplacements { get; set; }
+    public object? TitleReplacements { get; set; }
 
     /// <summary>
     /// The objects to replace the keys in the translation extra information
     /// </summary>
-    public object[]? ExtraReplacements { get; set; }
+    public object? ExtraReplacements { get; set; }
 
     // Note that the MessageTranslation can NOT be used to retrieve the message.
     // This is because the translation fo the MessageTranslation is localized, while the actual Message MUST be in English.
@@ -57,8 +57,8 @@ public class OperationError
     public static OperationError Fail(
         OperationError error,
         MessageTranslation? translation,
-        object[]? titleReplacements = null,
-        object[]? extraReplacements = null
+        object? titleReplacements = null,
+        object? extraReplacements = null
     )
     {
         error.MessageTranslation = translation;

@@ -408,7 +408,11 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         var databaseResult = MiiDbService.AddToDatabase(desiredMii, macAddress);
         if (databaseResult.IsFailure)
         {
-            MessageTranslationHelper.ShowMessage(MessageTranslation.Error_FailedCopyMii, null, [databaseResult.Error!.Message]);
+            MessageTranslationHelper.ShowMessage(
+                MessageTranslation.Error_FailedCopyMii,
+                null,
+                new { error = databaseResult.Error!.Message }
+            );
             return;
         }
 

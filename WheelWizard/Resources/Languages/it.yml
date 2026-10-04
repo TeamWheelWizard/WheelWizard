@@ -168,25 +168,25 @@ it:
     mii_carousel: "Visualizzatore Mii"
   text:
     made_by_string: |-
-      Fatto da: {$1}
-      e {$2}
+      Fatto da: %{firstAuthor}
+      e %{secondAuthor}
     thanks_translators: "Grazie a tutti i traduttori:"
-    wh_wz_translation_percentage: "Traduzioni per questa lingua sono complete al {$1}%"
+    wh_wz_translation_percentage: "Traduzioni per questa lingua sono complete al %{percentage}%"
     powered_gamebanana: "Offerto da GameBanana"
-    language_translated_by: "Questa lingua è stata tradotta da: {$1}"
+    language_translated_by: "Questa lingua è stata tradotta da: %{translators}"
   hover:
     players_online:
       0: "Al momento non ci sono giocatori online"
       1: "Al momento c'è 1 giocatore online"
-      n: "Al momento ci sono {$1} giocatori online"
+      n: "Al momento ci sono %{amount} giocatori online"
     rooms_online:
       0: "Al momento non ci sono stanze attive"
       1: "Al momento c'è 1 stanza attiva"
-      n: "Al momento ci sono {$1} stanze attive"
+      n: "Al momento ci sono %{amount} stanze attive"
     friends_online:
       0: "Al momento non ci sono amici online"
       1: "Al momento c'è 1 amico online"
-      n: "Al momento ci sono {$1} amici online"
+      n: "Al momento ci sono %{amount} amici online"
     rooms_page_disclaimer: |-
       Attenzione, questa pagina non offre alcuna funzionalità per unirsi ad una stanza direttamente.
       Per unirsi ad una specifica stanza, dovrai farlo tramite un amico oppure sperare di unirti tramite i server online.
@@ -208,22 +208,22 @@ it:
   time:
     days:
       1: "1 giorno"
-      n: "{$1} giorni"
+      n: "%{amount} giorni"
     hours:
       1: "1 ora"
-      n: "{$1} ore"
+      n: "%{amount} ore"
     minutes:
       1: "1 minuto"
-      n: "{$1} minuti"
+      n: "%{amount} minuti"
     seconds:
       1: "1 secondo"
-      n: "{$1} secondi"
+      n: "%{amount} secondi"
   progress:
     estimated_time_remaining: "Tempo stimato rimanente:"
-    downloading_mb: "Scaricando {$1} MB"
+    downloading_mb: "Scaricando %{megabytes} MB"
     installing_mods: "Installando delle mod"
-    installing_mods_count: "Installando {$1} mod"
-    processing_xof_y: "Processando file {$1} di {$2}..."
+    installing_mods_count: "Installando %{amount} mod"
+    processing_xof_y: "Processando file %{processed} di %{total}..."
     update_rr: "Aggiornando Retro Rewind"
     latest_wh_wz_github: "Ottenendo l'ultima versione di Wheel Wizard da GitHub"
     update_wh_wz: "Aggiornando Wheel Wizard"
@@ -238,12 +238,12 @@ it:
         Stai per avviare il gioco senza alcuna mod.
         Vuoi svuotare la tua cartella My-Stuff?
     sure_delete:
-      title: "Sei sicuro di voler cancellare {$1}?"
+      title: "Sei sicuro di voler cancellare %{name}?"
       extra: "L'eliminazione è permanente e non può essere recuperata."
-      title_miis: "Sei sicuro di voler cancellare {$1} Mii?"
+      title_miis: "Sei sicuro di voler cancellare %{amount} Mii?"
     apply_scale:
       title: "Vuoi applicare le nuove dimensioni?"
-      extra: "Questa modifica si ripristinerà in {$1} a meno che tu decida di mantenerla."
+      extra: "Questa modifica si ripristinerà in %{remainingTime} a meno che tu decida di mantenerla."
     dolphin_found:
       title: "Cartella dell'Emulatore Dolphin trovata"
       extra: |-
@@ -251,7 +251,7 @@ it:
         Cartella dell'Emulatore Dolphin trovata. Vuoi usare questa cartella?
     new_version_wh_wz:
       title: "Aggiornamento di Wheel Wizard disponibile"
-      extra: "La versione {$1} di Wheel Wizard è disponibile (al momento è {$2}). Vuoi aggiornare ora?"
+      extra: "La versione %{latestVersion} di Wheel Wizard è disponibile (al momento è %{currentVersion}). Vuoi aggiornare ora?"
     update_admin:
       title: "Aggiorna usando l'Amministratore"
       extra: "A volte un aggiornamento può richiedere diritti di amministratore, vuoi attivarli per questo aggiornamento?"
@@ -271,11 +271,11 @@ it:
       title: "Installazione di Dolphin tramite Flatpak"
       extra: "La versione Flatpak dell'emulatore Dolphin non sembra essere installata. Vuoi che venga installata per il tuo account?"
     install_mod:
-      title: "Vuoi scaricare ed installare la mod: {$1}?"
+      title: "Vuoi scaricare ed installare la mod: %{modName}?"
     search_mod: "Cercando delle mod..."
     enter_new_name:
       title: "Inserisci il nuovo nome"
-      extra: "Cambiando nome da: {$1}"
+      extra: "Cambiando nome da: %{name}"
   message_warning:
     not_find_dolphin:
       extra: "Non è stato possibile trovare l'Emulatore Dolphin, controlla l'indirizzo nelle impostazioni"
@@ -285,7 +285,7 @@ it:
       title: "Più file selezionati"
     invalid_name:
       extra:
-        mod_name_exists: "Una mod col nome '{$1}' esiste già."
+        mod_name_exists: "Una mod col nome '%{modName}' esiste già."
       title: "Nome impossibile."
     invalid_paths:
       extra: "Assicurati che tutti gli indirizzi siano corretti e riprova."
@@ -341,7 +341,7 @@ it:
         failed_update_apply: "Fallita l'applicazione di un aggiornamento. Annullamento."
         invalid_file_path: |-
           Incontrato un percorso file invalido. Contatta gli sviluppatori.
-          Errore server: {$1}
+          Errore server: %{error}
       title: "Annullando l'aggiornamento di RR"
     restart_admin_fail:
       extra: "Errore riavviando con diritti di amministratore."
@@ -360,7 +360,7 @@ it:
       title: "Recupero delle informazioni della mod fallito"
     mod_download_fail:
       title: "Download della mod fallito."
-      extra: "È successo un errore durante il download: {$1}"
+      extra: "È successo un errore durante il download: %{error}"
   message_success:
     settings_saved:
       title: "Impostazioni salvate con successo!"
@@ -374,21 +374,21 @@ it:
   snackbar_success:
     mii_added: "Un Mii è stato aggiunto ai tuoi favoriti"
     copied_fc: "Copiato il codice amico negli appunti"
-    name_change: "Nome cambiato con successo in '{$1}'"
-    saved_mii: "Salvato il Mii '{$1}' nel file '{$2}'"
-    deleted: "{$1}' cancellato"
-    deleted_miis: "Cancellati {$1} Mii"
-    created_duplicate: "Creato il duplicato di '{$1}'"
-    created_duplicates_miis: "Creati {$1} Mii duplicati"
+    name_change: "Nome cambiato con successo in '%{name}'"
+    saved_mii: "Salvato il Mii '%{name}' nel file '%{fileName}'"
+    deleted: "%{name}' cancellato"
+    deleted_miis: "Cancellati %{amount} Mii"
+    created_duplicate: "Creato il duplicato di '%{name}'"
+    created_duplicates_miis: "Creati %{amount} Mii duplicati"
     profile_set_primary: "Imposta il profilo come primario"
   snackbar_error:
-    mii_failure_deserialize: "Deserializzazione del Mii '{$1}' fallita"
-    mii_failure_update: "Aggiornamento del Mii '{$1}' fallito"
-    mii_failure_save: "Salvataggio del Mii '{$1}' fallito"
-    mii_failure_get: "Ottenimento del Mii '{$1}' fallito"
-    mii_failure_serialize: "Serializzazione del Mii '{$1}' fallita"
-    mii_failure_create: "Creazione del Mii '{$1}' fallita"
-    mii_failure_duplicate: "Duplicazione del Mii '{$1}' fallita"
+    mii_failure_deserialize: "Deserializzazione del Mii '%{error}' fallita"
+    mii_failure_update: "Aggiornamento del Mii '%{error}' fallito"
+    mii_failure_save: "Salvataggio del Mii '%{error}' fallito"
+    mii_failure_get: "Ottenimento del Mii '%{error}' fallito"
+    mii_failure_serialize: "Serializzazione del Mii '%{error}' fallita"
+    mii_failure_create: "Creazione del Mii '%{error}' fallita"
+    mii_failure_duplicate: "Duplicazione del Mii '%{error}' fallita"
   helper_note:
     name_must_between: "I nomi devono essere lunghi tra i 3 e i 10 caratteri."
     creator_name_less11: "Il nome dell'autore deve essere lungo al massimo 10 caratteri."

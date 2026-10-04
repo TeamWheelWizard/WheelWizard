@@ -74,7 +74,10 @@ public partial class RecompSettings : UserControl
             InstallLocationText.Text = installFolder;
             OpenInstallFolder.IsEnabled = installed && Directory.Exists(installFolder);
             UninstallButton.IsEnabled = installed;
-            WiiCompiledVersionText.Text = t("helper_text.installed_version", installed ? t("state.loading") : t("state.unknown"));
+            WiiCompiledVersionText.Text = t(
+                "helper_text.installed_version",
+                new { version = installed ? t("state.loading") : t("state.unknown") }
+            );
             if (installed)
                 _ = RefreshWiiCompiledVersionAsync();
 
@@ -86,7 +89,7 @@ public partial class RecompSettings : UserControl
 
             var cloneFolder = RecompPaths.NandCopyFolderPath;
             DolphinCloneStatus.Text = Directory.Exists(cloneFolder)
-                ? t("status.recomp_dolphin_clone_available", cloneFolder)
+                ? t("status.recomp_dolphin_clone_available", new { path = cloneFolder })
                 : t("status.recomp_dolphin_clone_missing");
         }
         finally
@@ -100,7 +103,7 @@ public partial class RecompSettings : UserControl
         var version = RecompInstallService is null ? null : await RecompInstallService.GetInstalledVersionAsync();
         if (!IsInstalled)
             return;
-        WiiCompiledVersionText.Text = t("helper_text.installed_version", version ?? t("state.unknown"));
+        WiiCompiledVersionText.Text = t("helper_text.installed_version", new { version = version ?? t("state.unknown") });
     }
 
     #region WiiCompiled video settings

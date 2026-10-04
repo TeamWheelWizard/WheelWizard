@@ -200,7 +200,7 @@ public partial class ModContent : UserControl
             return;
 
         var confirmation = await new YesNoWindow()
-            .SetMainText(t("question.install_mod.title", CurrentMod.Name) ?? CurrentMod.Name)
+            .SetMainText(t("question.install_mod.title", new { modName = CurrentMod.Name }) ?? CurrentMod.Name)
             .AwaitAnswer();
         if (!confirmation)
             return;
@@ -208,14 +208,18 @@ public partial class ModContent : UserControl
         var installResult = await DownloadAndInstallCurrentModAsync();
         if (installResult.IsFailure)
         {
-            MessageTranslationHelper.ShowMessage(MessageTranslation.Error_ModDownloadFailed, null, [installResult.Error.Message]);
+            MessageTranslationHelper.ShowMessage(
+                MessageTranslation.Error_ModDownloadFailed,
+                null,
+                new { error = installResult.Error.Message }
+            );
         }
         else
         {
             new MessageBoxWindow()
                 .SetMessageType(MessageBoxWindow.MessageType.Message)
                 .SetTitleText(t("message_success.mod_installed.title"))
-                .SetInfoText(t("message_success.mod_installed.extra", CurrentMod.Name)!)
+                .SetInfoText(t("message_success.mod_installed.extra", new { modName = CurrentMod.Name })!)
                 .Show();
         }
 
@@ -240,7 +244,7 @@ public partial class ModContent : UserControl
         if (downloadUrls.Count == 0)
             return Fail("No downloadable files were found for this mod.");
 
-        var progressWindow = new ProgressWindow(t("progress.downloading_mod", CurrentMod.Name)!);
+        var progressWindow = new ProgressWindow(t("progress.downloading_mod", new { modName = CurrentMod.Name })!);
         progressWindow.Show();
         progressWindow.SetExtraText(t("state.loading"));
 

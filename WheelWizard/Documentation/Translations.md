@@ -15,10 +15,24 @@ Use `t("key")` directly. No localization import is needed.
 ```csharp
 var text = t("action.save");
 var englishText = t("en.action.save");
-var message = t("snackbar_success.name_change", newName);
+var message = t("snackbar_success.name_change", new { name = newName });
 ```
 
-Arguments replace `{$1}`, `{$2}`, and so on.
+Anonymous-object properties replace named placeholders such as `%{name}` and `%{version}`. Names are case-sensitive. Missing arguments leave their placeholders unchanged; null values become empty text.
+
+```yaml
+items:
+  one: "%{name} has one item"
+  other: "%{name} has %{amount} items"
+```
+
+```csharp
+var message = t("items", count: 12, new { name = "Alex", amount = 12 });
+```
+
+`count` is reserved for plural selection: exactly 1 selects `one`, and every other value selects `other`. Do not use `%{count}` as a placeholder; pass a separate named argument such as `amount` when displaying the number.
+
+Existing numeric translation keys (`.0`, `.1`, `.n`) use `t_legacy("time.days.n", count: days, new { amount = days })`. Both APIs use the same named-placeholder syntax. `tFormat(text, new { name = "Alex" })` formats an already translated string.
 
 ## XAML
 

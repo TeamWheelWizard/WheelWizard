@@ -13,7 +13,9 @@ public sealed class UpdatePresentation : IUpdatePresentation
                 new YesNoWindow()
                     .SetButtonText(t("action.update"), t("action.maybe_later"))
                     .SetMainText(t("question.new_version_wh_wz.title"))
-                    .SetExtraText(t("question.new_version_wh_wz.extra", latestVersion, currentVersion)!)
+                    .SetExtraText(
+                        t("question.new_version_wh_wz.extra", new { latestVersion = latestVersion, currentVersion = currentVersion })!
+                    )
                     .AwaitAnswer()
         );
 

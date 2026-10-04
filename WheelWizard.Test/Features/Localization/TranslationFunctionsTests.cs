@@ -17,9 +17,9 @@ public class TranslationFunctionsTests
     [Fact(DisplayName = "Format with null object param returns string with empty value")]
     public void FormatWithNullObjectParam_ShouldReturnStringWithEmptyValue()
     {
-        const string value = "Hello, {$1}!";
+        const string value = "Hello, %{name}!";
 
-        var result = TranslationFunctions.tFormat(value, [null]);
+        var result = TranslationFunctions.tFormat(value, new { name = (string?)null });
 
         Assert.Equal("Hello, !", result);
     }
@@ -27,10 +27,21 @@ public class TranslationFunctionsTests
     [Fact(DisplayName = "Format with object param returns string with object")]
     public void FormatWithObjectParam_ShouldReturnStringWithObject()
     {
-        const string value = "Hello, {$1}!";
+        const string value = "Hello, %{name}!";
 
-        var result = TranslationFunctions.tFormat(value, "World");
+        var result = TranslationFunctions.tFormat(value, new { name = "World" });
 
         Assert.Equal("Hello, World!", result);
+    }
+
+    [Fact]
+    public void NamedArgumentsRespectTranslationOrderAndDoNotExpandInsertedValues()
+    {
+        var result = TranslationFunctions.tFormat(
+            "%{second} / %{first} / %{second} / %{missing}",
+            new { first = "%{second}", second = "Alex" }
+        );
+
+        Assert.Equal("Alex / %{second} / Alex / %{missing}", result);
     }
 }

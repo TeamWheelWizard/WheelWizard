@@ -168,25 +168,25 @@ tr:
     mii_carousel: "Mii Görüntüleyicisi"
   text:
     made_by_string: |-
-      Yapımcı: {$1}
-      Ve {$2}
+      Yapımcı: %{firstAuthor}
+      Ve %{secondAuthor}
     thanks_translators: "Tüm çevirmenlere çok teşekkür ederiz:"
-    wh_wz_translation_percentage: "Bu dilin çevirileri {$1}% tamamlandı"
+    wh_wz_translation_percentage: "Bu dilin çevirileri %{percentage}% tamamlandı"
     powered_gamebanana: "GameBanana tarafından"
-    language_translated_by: "Bu dili çevirenler: {$1}"
+    language_translated_by: "Bu dili çevirenler: %{translators}"
   hover:
     players_online:
       0: "Şu anda çevrimiçi oyuncu yok."
       1: "Şu anda çevrimiçi 1 oyuncu var"
-      n: "Şu anda çevrimiçi {$1} oyuncu var"
+      n: "Şu anda çevrimiçi %{amount} oyuncu var"
     rooms_online:
       0: "Şu anda aktif oda yok"
       1: "Şu anda 1 aktif oda var"
-      n: "Şu anda {$1} aktif oda var"
+      n: "Şu anda %{amount} aktif oda var"
     friends_online:
       0: "Şu anda çevrimiçi arkadaş yok"
       1: "Şu anda çevrimiçi 1 arkadaş var"
-      n: "Şu anda çevrimiçi {$1} arkadaş var"
+      n: "Şu anda çevrimiçi %{amount} arkadaş var"
     rooms_page_disclaimer: |-
       Lütfen bu sayfanın doğrudan bir odaya katılma işlevi sunmadığını unutmayın.
       Belirli bir odaya katılmak için bir arkadaşınız aracılığıyla katılmanız veya çevrimiçi sunuculara katılarak bu odaya girmeyi ummanız gerekecek.
@@ -208,22 +208,22 @@ tr:
   time:
     days:
       1: "1 gün"
-      n: "{$1} gün"
+      n: "%{amount} gün"
     hours:
       1: "1 saat"
-      n: "{$1} saat"
+      n: "%{amount} saat"
     minutes:
       1: "1 dakika"
-      n: "{$1} dakika"
+      n: "%{amount} dakika"
     seconds:
       1: "1 saniye"
-      n: "{$1} saniye"
+      n: "%{amount} saniye"
   progress:
     estimated_time_remaining: "Kalan Tahmini Süre:"
-    downloading_mb: "{$1} MB indiriliyor"
+    downloading_mb: "%{megabytes} MB indiriliyor"
     installing_mods: "Modlar Yükleniyor"
-    installing_mods_count: "{$1} modları yükleniyor"
-    processing_xof_y: "{$1} dosyasından {$2} işleniyor..."
+    installing_mods_count: "%{amount} modları yükleniyor"
+    processing_xof_y: "%{processed} dosyasından %{total} işleniyor..."
     update_rr: "Retro Rewind Güncelleniyor"
     latest_wh_wz_github: "Github sürümlerinden en son Wheel Wizard alınıyor"
     update_wh_wz: "Wheel Wizard güncelleniyor"
@@ -236,12 +236,12 @@ tr:
       title: "Modlar bulundu"
       extra: "Mod olmadan oyunu başlatmak üzeresiniz. My-stuff klasörünüzü temizlemek ister misiniz?"
     sure_delete:
-      title: "{$1}'i silmek istediğinizden emin misiniz?"
+      title: "%{name}'i silmek istediğinizden emin misiniz?"
       extra: "Silmek kalıcıdır ve geri alınamaz."
-      title_miis: "{$1} tane Mii'yi silmek istediğinize emin misiniz?"
+      title_miis: "%{amount} tane Mii'yi silmek istediğinize emin misiniz?"
     apply_scale:
       title: "Yeni ölçeği uygulamak istiyor musunuz?"
-      extra: "Bu değişiklik onaylamadığınız takdirde {$1} içinde eski haline dönecek."
+      extra: "Bu değişiklik onaylamadığınız takdirde %{remainingTime} içinde eski haline dönecek."
     dolphin_found:
       title: "Dolphin Emulator Klasörü Bulundu"
       extra: |-
@@ -249,7 +249,7 @@ tr:
         Dolphin Emulator klasörü bulundu. Bu klasörü kullanmak ister misiniz?
     new_version_wh_wz:
       title: "Wheel Wizard Güncellemesi Mevcut"
-      extra: "Wheel Wizard'ın {$1} sürümü mevcut (şu anda {$2}'de). Şimdi güncellemek ister misiniz?"
+      extra: "Wheel Wizard'ın %{latestVersion} sürümü mevcut (şu anda %{currentVersion}'de). Şimdi güncellemek ister misiniz?"
     update_admin:
       title: "Yönetici kullanarak güncelle"
       extra: "Bazen bir güncelleme yönetici hakları gerektirir, bu güncelleme için onları aktif etmek ister misiniz?"
@@ -269,11 +269,11 @@ tr:
       title: "Dolphin Flatpak Yüklemesi"
       extra: "Bilgisayarınızda Dolphin Emulator'ın Flatpak sürümü bulunamadı. Yüklememizi ister misiniz? (kendi hesabın için)"
     install_mod:
-      title: "Modu indirip kurmak ister misiniz: {$1}?"
+      title: "Modu indirip kurmak ister misiniz: %{modName}?"
     search_mod: "Modları ara..."
     enter_new_name:
       title: "Yeni adı girin:"
-      extra: "Ad değiştiriliyor. (Eski ad: {$1})"
+      extra: "Ad değiştiriliyor. (Eski ad: %{name})"
   message_warning:
     not_find_dolphin:
       extra: "Dolphin Emulator bulunamadı, lütfen yolu ayarlarda belirleyin"
@@ -283,7 +283,7 @@ tr:
       title: "Birden Fazla Dosya Seçildi"
     invalid_name:
       extra:
-        mod_name_exists: "{$1}' adıyla zaten bir mod mevcut."
+        mod_name_exists: "%{modName}' adıyla zaten bir mod mevcut."
       title: "Ada izin verilmiyor."
     invalid_paths:
       extra: "Lütfen tüm yolların doğru olduğundan emin olun ve tekrar deneyin."
@@ -339,7 +339,7 @@ tr:
         failed_update_apply: "Güncellemeyi uygulamak başarısız oldu. İşlem iptal ediliyor."
         invalid_file_path: |-
           Yanlış dosya yolu tespit edildi. Lütfen geliştiricilere bildirin.
-          Sunucu hatası: {$1}
+          Sunucu hatası: %{error}
       title: "Retro Rewind güncellemesi iptal ediliyor"
     restart_admin_fail:
       extra: "Yöneticilik haklarıyla yeniden başlatılamadı."
@@ -358,7 +358,7 @@ tr:
       title: "Mod bilgisi alınamadı."
     mod_download_fail:
       title: "Mod indirmesi başarısız oldu."
-      extra: "İndirme sırasında bir hata oluştu: {$1}"
+      extra: "İndirme sırasında bir hata oluştu: %{error}"
   message_success:
     settings_saved:
       title: "Ayarlar başarıyla kaydedildi!"
@@ -372,21 +372,21 @@ tr:
   snackbar_success:
     mii_added: "Mii, Mii'lerinize eklendi."
     copied_fc: "Arkadaş kodu panoya kopyalandı."
-    name_change: "Ad, başarıyla yeni ada değiştirildi. '{$1}'"
-    saved_mii: "Mii '{$1}' '{$2}' dosyasına kaydedildi."
-    deleted: "{$1}' silindi."
-    deleted_miis: "{$1}' Mii silindi"
-    created_duplicate: "{$1}' nin kopyası oluşturuldu."
-    created_duplicates_miis: "{$1}' Mii kopyası oluşturuldu."
+    name_change: "Ad, başarıyla yeni ada değiştirildi. '%{name}'"
+    saved_mii: "Mii '%{name}' '%{fileName}' dosyasına kaydedildi."
+    deleted: "%{name}' silindi."
+    deleted_miis: "%{amount}' Mii silindi"
+    created_duplicate: "%{name}' nin kopyası oluşturuldu."
+    created_duplicates_miis: "%{amount}' Mii kopyası oluşturuldu."
     profile_set_primary: "Profil birincil olarak ayarlandı."
   snackbar_error:
-    mii_failure_deserialize: "Mii '{$1}' işlenemedi."
-    mii_failure_update: "Mii '{$1}' güncellenemedi."
-    mii_failure_save: "Mii '{$1}' kaydedilemedi."
-    mii_failure_get: "Mii '{$1}' alınamadı."
-    mii_failure_serialize: "Mii '{$1}' işlenemedi."
-    mii_failure_create: "Mii '{$1}' oluşturulamadı."
-    mii_failure_duplicate: "Mii '{$1}' çoğaltılamadı."
+    mii_failure_deserialize: "Mii '%{error}' işlenemedi."
+    mii_failure_update: "Mii '%{error}' güncellenemedi."
+    mii_failure_save: "Mii '%{error}' kaydedilemedi."
+    mii_failure_get: "Mii '%{error}' alınamadı."
+    mii_failure_serialize: "Mii '%{error}' işlenemedi."
+    mii_failure_create: "Mii '%{error}' oluşturulamadı."
+    mii_failure_duplicate: "Mii '%{error}' çoğaltılamadı."
   helper_note:
     name_must_between: "Adın 3 ile 10 karakter arasında olması gerekiyor."
     creator_name_less11: "Yapımcı adı 11 karakterden kısa olması gerekiyor."

@@ -362,11 +362,16 @@ public static class MiiSerializer
 
     private static OperationResult<Mii> InvalidDataExc(string data)
     {
-        return Fail(new InvalidDataException($"Invalid {data}"), MessageTranslation.Error_MiiSerializer_InvalidMiiData, null, [data]);
+        return Fail(
+            new InvalidDataException($"Invalid {data}"),
+            MessageTranslation.Error_MiiSerializer_InvalidMiiData,
+            null,
+            new { error = data }
+        );
     }
 
     private static OperationResult<Mii> InvalidDataExc(Exception exception)
     {
-        return Fail(exception, MessageTranslation.Error_MiiSerializer_InvalidMiiData, null, [exception.Message]);
+        return Fail(exception, MessageTranslation.Error_MiiSerializer_InvalidMiiData, null, new { error = exception.Message });
     }
 }

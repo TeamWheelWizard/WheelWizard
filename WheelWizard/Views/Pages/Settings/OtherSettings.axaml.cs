@@ -76,7 +76,7 @@ public partial class OtherSettings : UserControl
     private void RefreshRetroRewindVersion()
     {
         var version = CustomDistributionSingletonService.RetroRewind.GetCurrentVersion()?.ToString() ?? t("state.unknown");
-        RetroRewindVersionText.Text = t("helper_text.installed_version", version);
+        RetroRewindVersionText.Text = t("helper_text.installed_version", new { version = version });
     }
 
     private void ClickLaunchRrOnStartup(object? sender, RoutedEventArgs e)

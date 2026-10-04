@@ -143,7 +143,7 @@ public partial class EditorGeneral : MiiEditorBaseControl
     {
         var textPopup = new TextInputWindow()
             .SetMainText(t("question.enter_new_name.title"))
-            .SetExtraText(t("question.enter_new_name.extra", MiiName.Text ?? string.Empty) ?? string.Empty)
+            .SetExtraText(t("question.enter_new_name.extra", new { name = MiiName.Text ?? string.Empty }) ?? string.Empty)
             .SetCustomCharacters(CustomCharacters.GetCustomCharacters(), initiallyOpen: true)
             .SetValidation(ValidateMiiName)
             .SetInitialText(MiiName.Text ?? string.Empty)

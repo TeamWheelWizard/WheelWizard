@@ -399,7 +399,18 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
         string dateFormat = (historyResponse.FromDate.Year != historyResponse.ToDate.Year) ? "MMM d, yyyy" : "MMM d"; // to consider if you want to show the year if it goes over
         var fromDate = historyResponse.FromDate.ToLocalTime().ToString(dateFormat);
         var toDate = historyResponse.ToDate.ToLocalTime().ToString("MMM d"); // also if you wanna only show the year from the old date since the current one is always now
-        DateRangeText = days == lifetimeDays ? t("time.lifetime_history") : t("time.past_n_days_with_range", days, fromDate, toDate);
+        DateRangeText =
+            days == lifetimeDays
+                ? t("time.lifetime_history")
+                : t(
+                    "time.past_n_days_with_range",
+                    new
+                    {
+                        days = days,
+                        fromDate = fromDate,
+                        toDate = toDate,
+                    }
+                );
         // also suggestion to add a vr peak
 
         if (orderedByDate.Count == 0)
