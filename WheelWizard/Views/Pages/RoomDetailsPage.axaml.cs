@@ -1,33 +1,37 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using WheelWizard.Models;
 using WheelWizard.Models.RRInfo;
-using WheelWizard.Services.LiveData;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
-using WheelWizard.Shared.DependencyInjection;
-using WheelWizard.Utilities.Generators;
-using WheelWizard.Utilities.Mockers;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
+using WheelWizard.Views.DesignTime;
+using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Popups;
 using WheelWizard.Views.Popups.MiiManagement;
-using WheelWizard.WiiManagement;
+using WheelWizard.WheelWizardData;
+using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.Views.Pages;
 
-public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, IRepeatedTaskListener
+public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
-    [Inject]
-    private IGameLicenseSingletonService GameDataService { get; set; } = null!;
+    private IPopupFactory Popups { get; } = null!;
 
-    [Inject]
-    private IMiiDbService MiiDbService { get; set; } = null!;
+    private INavigationService Navigation { get; } = null!;
 
-    [Inject]
-    private ISettingsManager SettingsService { get; set; } = null!;
+    private LiveRoomsService LiveRooms { get; } = null!;
+
+    private IGameLicenseSingletonService GameDataService { get; } = null!;
+
+    private IMiiDbService MiiDbService { get; } = null!;
+
+    private ISettingsManager SettingsService { get; } = null!;
 
     private RrRoom _room = null!;
 
@@ -61,21 +65,35 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         PlayersList = new(Room.Players);
     }
 
-    public RoomDetailsPage(RrRoom room)
+    public RoomDetailsPage(
+        IPopupFactory popups,
+        INavigationService navigation,
+        LiveRoomsService liveRooms,
+        IGameLicenseSingletonService gameDataService,
+        IMiiDbService miiDbService,
+        ISettingsManager settingsService,
+        RrRoom room
+    )
     {
+        Popups = popups;
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        GameDataService = gameDataService;
+        MiiDbService = miiDbService;
+        SettingsService = settingsService;
         InitializeComponent();
         DataContext = this;
         Room = room;
 
         PlayersList = new(Room.Players);
 
-        RRLiveRooms.Instance.Subscribe(this);
+        LiveRooms.Subscribe(this);
         Unloaded += RoomsDetailPage_Unloaded;
     }
 
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
-        if (sender is not RRLiveRooms liveRooms)
+        if (sender is not LiveRoomsService liveRooms)
             return;
 
         var room = liveRooms.CurrentRooms.Find(r => r.Id == Room.Id);
@@ -83,7 +101,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         if (room == null)
         {
             // Reason we do this incase room gets disbanded or something idk
-            NavigationManager.NavigateTo<RoomsPage>();
+            Navigation.NavigateTo<RoomsPage>();
             return;
         }
 
@@ -95,7 +113,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         }
     }
 
-    private void GoBackClick(object? sender, EventArgs eventArgs) => NavigationManager.NavigateTo<RoomsPage>();
+    private void GoBackClick(object? sender, EventArgs eventArgs) => Navigation.NavigateTo<RoomsPage>();
 
     private void CopyFriendCode_OnClick(object sender, RoutedEventArgs e)
     {
@@ -120,7 +138,13 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return;
         if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
             return;
-        new PlayerProfileWindow(selectedPlayer.FriendCode).Show();
+        Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode).Show();
+    }
+
+    private void ViewOnRwfc_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (PlayersListView.SelectedItem is RrPlayer selectedPlayer)
+            ViewUtils.OpenRwfcPlayer(selectedPlayer.FriendCode);
     }
 
     private async void AddFriend_OnClick(object sender, RoutedEventArgs e)
@@ -141,7 +165,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return;
         }
 
-        var activeUserPid = FriendCodeGenerator.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
+        var activeUserPid = FriendCode.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
         if (activeUserPid == 0)
         {
             ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
@@ -162,7 +186,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
         }
 
         var normalizedFriendCode = normalizedFriendCodeResult.Value;
-        var friendProfileId = FriendCodeGenerator.FriendCodeToProfileId(normalizedFriendCode);
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode);
         if (activeUserPid == friendProfileId)
         {
             ViewUtils.ShowSnackbar("You cannot add your own friend code.", ViewUtils.SnackbarType.Warning);
@@ -171,7 +195,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
 
         var duplicateFriend = GameDataService.ActiveCurrentFriends.Any(friend =>
         {
-            var existingPid = FriendCodeGenerator.FriendCodeToProfileId(friend.FriendCode);
+            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
             return existingPid != 0 && existingPid == friendProfileId;
         });
 
@@ -219,7 +243,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
             return Fail("Friend code must be exactly 12 digits.");
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-        var profileId = FriendCodeGenerator.FriendCodeToProfileId(formatted);
+        var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
             return Fail("Invalid friend code.");
 
@@ -228,7 +252,7 @@ public partial class RoomDetailsPage : UserControlBase, INotifyPropertyChanged, 
 
     private void RoomsDetailPage_Unloaded(object? sender, RoutedEventArgs e)
     {
-        RRLiveRooms.Instance.Unsubscribe(this);
+        LiveRooms.Unsubscribe(this);
     }
 
     private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)

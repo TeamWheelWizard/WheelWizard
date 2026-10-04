@@ -11,7 +11,7 @@
                    x:Class="WheelWizard.Views.Popups.MiiManagement.MiiEditorWindow"
                    x:DataType="miiManagement:MiiEditorWindow" ClipToBounds="False">
     <Grid Height="460" ColumnDefinitions="370,20,450" ClipToBounds="False">
-        <Border Grid.Column="0" CornerRadius="{StaticResource GlobalCornerRadius}" VerticalAlignment="Stretch" 
+        <Border Grid.Column="0" CornerRadius="{StaticResource GlobalCornerRadius}" VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch" Background="{StaticResource Neutral900}">
            <ContentPresenter x:Name="EditorPresenter"/>
        </Border>
@@ -26,33 +26,35 @@
                                             Mii="{Binding Mii}" FallBackColor="{StaticResource Neutral700}"
                                             ImageVariant="{x:Static miiVars:MiiImageVariants.MiiEditorSmall}"/>
                </Border>
-      
+
            </Grid>
-           
+
            <Grid Grid.Row="0" x:Name="VisualizationCarousel" IsVisible="False">
                <behavior:Mii3DRender x:Name="Mii3DRenderControl" Height="350" Width="388" HorizontalAlignment="Center" VerticalAlignment="Center"
                                      ReloadMethod="KeepInstanceUntilNew"
                                      ImageVariant="{x:Static miiVars:MiiImageVariants.MiiEditorPreviewCarousel}"
                                      Mii="{Binding Mii}"/>
            </Grid>
-           
 
-           <Border Grid.Row="1" CornerRadius="6" Background="{StaticResource Neutral900}" Margin="0,10,0,0" 
+
+           <Border Grid.Row="1" CornerRadius="6" Background="{StaticResource Neutral900}" Margin="0,10,0,0"
                    HorizontalAlignment="Center">
                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Stretch" Spacing="6" Margin="6">
-                   <components:MultiIconRadioButton GroupName="VisualizationGroup" Checked="MiiFaceToggle_OnChecked"
+                   <components:MultiIconRadioButton GroupName="VisualizationGroup"
+                                                    IsCheckedChanged="MiiFaceToggle_OnCheckedChanged"
                                                     IconGeo="{StaticResource User}" Width="40" Height="40"
                                                     Color1="{StaticResource Neutral400}" IsChecked="True"
-                                                    HoverColor1="{StaticResource Neutral300}" 
+                                                    HoverColor1="{StaticResource Neutral300}"
                                                     SelectedColor1="{StaticResource Primary400}"/>
-                   <components:MultiIconRadioButton GroupName="VisualizationGroup" Checked="MiiCarouselToggle_OnChecked"
+                   <components:MultiIconRadioButton GroupName="VisualizationGroup"
+                                                    IsCheckedChanged="MiiCarouselToggle_OnCheckedChanged"
                                                     IconGeo="{StaticResource LilGuy}" Width="40" Height="40"
                                                     Color1="{StaticResource Neutral400}"
                                                     HoverColor1="{StaticResource Neutral300}"
                                                     SelectedColor1="{StaticResource Primary400}"/>
                </StackPanel>
            </Border>
-           
+
        </Grid>
     </Grid>
 </base:PopupContent>

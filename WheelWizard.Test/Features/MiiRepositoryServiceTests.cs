@@ -1,18 +1,21 @@
 using Testably.Abstractions.Testing;
+using WheelWizard.Dolphin.Discovery;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.Recomp;
-using WheelWizard.Services;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Test.Features.Settings;
 using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.Test.Features;
 
-[Collection("SettingsFeature")]
-public sealed class MiiRepositoryServiceTests : IDisposable
+public sealed class MiiRepositoryServiceTests
 {
     private readonly MockFileSystem _fileSystem = new();
     private readonly ISettingsManager _settings;
+    private readonly IRecompPaths _recompPaths;
+    private readonly IDolphinPaths _dolphinPaths;
     private readonly RecompDolphinDataService _dolphinData;
     private readonly MiiRepositoryServiceService _repository;
     private readonly string _sourceNand = Path.GetFullPath("MiiTests/Dolphin/Wii");
@@ -22,7 +25,7 @@ public sealed class MiiRepositoryServiceTests : IDisposable
 
     public MiiRepositoryServiceTests()
     {
-        _settings = SettingsTestUtils.InitializeSettingsRuntime(Path.GetDirectoryName(_sourceNand)!);
+        _settings = SettingsTestUtils.CreateSettingsStub(Path.GetDirectoryName(_sourceNand)!);
         var nandSetting = new WhWzSetting(typeof(string), "NandRoot", _sourceNand);
         var copySetting = new WhWzSetting(typeof(bool), "CopyNand", false);
         var useSetting = new WhWzSetting(typeof(bool), "UseDolphinData", true);
@@ -34,8 +37,16 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         _settings.Get<bool>(useSetting).Returns(_ => _useDolphinData);
         _settings.IsRecompModeActive().Returns(_ => _recompEnabled);
         _fileSystem.Directory.CreateDirectory(_sourceNand);
-        _dolphinData = new RecompDolphinDataService(_settings, Substitute.For<IRecompSettingManager>(), _fileSystem);
-        _repository = new MiiRepositoryServiceService(_fileSystem, _settings, _dolphinData);
+        _dolphinPaths = new DolphinPaths(_settings, new DolphinPathResolver(_fileSystem, new RuntimeEnvironment()), _fileSystem);
+        _recompPaths = new RecompPaths(SettingsTestUtils.CreateApplicationDataLocation(), _fileSystem, new RuntimeEnvironment());
+        _dolphinData = new RecompDolphinDataService(
+            _settings,
+            Substitute.For<IRecompSettingManager>(),
+            _fileSystem,
+            Substitute.For<IDolphinDiscoveryService>(),
+            _recompPaths
+        );
+        _repository = new MiiRepositoryServiceService(_fileSystem, _settings, _recompPaths, _dolphinPaths, _dolphinData);
     }
 
     [Fact]
@@ -89,7 +100,7 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         var alternateNand = Path.GetFullPath("MiiTests/Alternate/Wii");
         var alternateData = Substitute.For<IRecompDolphinDataService>();
         alternateData.NandFolderPath.Returns(alternateNand);
-        var alternateRepository = new MiiRepositoryServiceService(_fileSystem, _settings, alternateData);
+        var alternateRepository = new MiiRepositoryServiceService(_fileSystem, _settings, _recompPaths, _dolphinPaths, alternateData);
         Assert.True(alternateRepository.ForceCreateDatabase().IsSuccess);
         Assert.True(alternateRepository.AddMiiToBlocks(Block(2)).IsSuccess);
 
@@ -97,7 +108,7 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         // NAND and miss Mii 1 before it gets a chance to write anything.
         var changingData = Substitute.For<IRecompDolphinDataService>();
         changingData.NandFolderPath.Returns(_sourceNand, alternateNand, _sourceNand);
-        var repository = new MiiRepositoryServiceService(_fileSystem, _settings, changingData);
+        var repository = new MiiRepositoryServiceService(_fileSystem, _settings, _recompPaths, _dolphinPaths, changingData);
 
         Assert.True(repository.UpdateBlockByClientId(1, Block(3)).IsSuccess);
         Assert.Equal(3, _fileSystem.File.ReadAllBytes(DbPath(_sourceNand))[0x04 + 0x1B]);
@@ -122,14 +133,14 @@ public sealed class MiiRepositoryServiceTests : IDisposable
         Assert.True(_repository.AddMiiToBlocks(Block(5)).IsSuccess);
         Assert.NotNull(_repository.GetRawBlockByAvatarId(5));
         Assert.Null(_repository.GetRawBlockByAvatarId(4));
-        Assert.True(_fileSystem.File.Exists(DbPath(PathManager.RecompPrivateNandFolderPath)));
+        Assert.True(_fileSystem.File.Exists(DbPath(_recompPaths.PrivateNandFolderPath)));
         Assert.Equal(sourceBytes, _fileSystem.File.ReadAllBytes(DbPath(_sourceNand)));
     }
 
     [Fact]
     public void DolphinMode_DoesNotRequireRecompServices()
     {
-        var repository = new MiiRepositoryServiceService(_fileSystem, _settings);
+        var repository = new MiiRepositoryServiceService(_fileSystem, _settings, _recompPaths, _dolphinPaths);
         Assert.True(repository.ForceCreateDatabase().IsSuccess);
         Assert.True(_fileSystem.File.Exists(DbPath(_sourceNand)));
     }
@@ -142,6 +153,4 @@ public sealed class MiiRepositoryServiceTests : IDisposable
     }
 
     private static string DbPath(string nand) => Path.Combine(nand, "shared2", "menu", "FaceLib", "RFL_DB.dat");
-
-    public void Dispose() => SettingsTestUtils.ResetSettingsRuntime();
 }

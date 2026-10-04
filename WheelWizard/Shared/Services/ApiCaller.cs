@@ -27,6 +27,7 @@ public class ApiCaller<T>(IServiceScopeFactory scopeFactory, ILogger<ApiCaller<T
 {
     public async Task<OperationResult<TResult>> CallApiAsync<TResult>(Expression<Func<T, Task<TResult>>> apiCall)
     {
+        // #todo: carry cancellation through the api interfaces to the actual requests, not just the caller's wait.
         var apiCallString = apiCall.Body.ToString();
         var apiCallFunction = apiCall.Compile();
         var apiName = typeof(T).Name[1..];

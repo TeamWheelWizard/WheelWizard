@@ -3,10 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" ClipToBounds="False"
-             xmlns:modManagement="clr-namespace:WheelWizard.Views.Popups.ModManagement"
              x:Class="WheelWizard.Views.Popups.ModManagement.ModIndependentWindow">
      <Grid Width="500" Height="700">
          <!-- Use the ModDetailViewer component to display mod details -->
-         <modManagement:ModContent x:Name="ModDetailViewer"/>
+         <ContentControl x:Name="ModDetailHost"/>
      </Grid>
 </UserControl>

@@ -1,60 +1,64 @@
-﻿using Avalonia.Interactivity;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Microsoft.Extensions.Caching.Memory;
-using WheelWizard.Helpers;
-using WheelWizard.Services.Launcher.Helpers;
-using WheelWizard.Services.LiveData;
+using WheelWizard.Launching;
+using WheelWizard.RrRooms;
 using WheelWizard.Shared;
-using WheelWizard.Shared.DependencyInjection;
 using WheelWizard.Shared.MessageTranslations;
-using WheelWizard.Utilities;
-using WheelWizard.Utilities.RepeatedTasks;
+using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Diagnostics;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.Views.Popups.Generic;
+using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.Popups;
 
-public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
+public partial class DevToolWindow : PopupContent, IPollingListener
 {
-    [Inject]
-    private IMemoryCache Cache { get; set; } = null!;
+    private IMemoryCache Cache { get; }
 
-    public DevToolWindow()
+    private IDolphinLaunchService DolphinLaunchService { get; }
+
+    private LiveRoomsService LiveRooms { get; }
+
+    private DevelopmentRefreshService DevelopmentRefresh { get; }
+
+    public DevToolWindow(
+        IMemoryCache cache,
+        IDolphinLaunchService dolphinLaunchService,
+        LiveRoomsService liveRooms,
+        DevelopmentRefreshService developmentRefresh
+    )
         : base(true, true, true, "Dev Tool")
     {
+        Cache = cache;
+        DolphinLaunchService = dolphinLaunchService;
+        LiveRooms = liveRooms;
+        DevelopmentRefresh = developmentRefresh;
         InitializeComponent();
-        AppStateMonitor.Instance.Subscribe(this);
+        DevelopmentRefresh.Subscribe(this);
         LoadSettings();
     }
 
     protected override void BeforeClose()
     {
-        AppStateMonitor.Instance.Unsubscribe(this);
+        DevelopmentRefresh.Unsubscribe(this);
         base.BeforeClose();
     }
 
-    // Yes, it would absolutely be more optimized to insteadof every x seconds refreshing, to just refresh when something changes
-    // However, We explicitly do it this way, so all code in the codebase can stay unchanged. The idea is that you can remove the AppStateMonitor and everything will still work
-    // This is indeed also possible if you make it if you make everything an observer pattern, where-ever you want to monitor something.
-    // However, the problem with that is that we will everything an observer pattern, but something like the MiiImageManager has no reason
-    // to be an observer pattern besides this, and it would make the codebase more complex for no reason.
-    public void OnUpdate(RepeatedTaskManager sender)
+    public void OnUpdate(ObservablePollingService sender)
     {
-        RrRefreshTimeLeft.Text = RRLiveRooms.Instance.TimeUntilNextTick.Seconds.ToString();
+        RrRefreshTimeLeft.Text = LiveRooms.TimeUntilNextTick.Seconds.ToString();
         MiiImagesCashed.Text = ((MemoryCache)Cache).Count.ToString();
     }
 
     private void LoadSettings()
     {
         WhWzTopMost.IsChecked = ViewUtils.GetLayout().Topmost;
-        HttpHelperOff.IsChecked = !HttpClientHelper.FakeConnectionToInternet;
     }
 
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
-
-    private void HttpHelperOff_OnClick(object sender, RoutedEventArgs e) =>
-        HttpClientHelper.FakeConnectionToInternet = HttpHelperOff.IsChecked != true;
 
     private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
 
@@ -63,13 +67,12 @@ public partial class DevToolWindow : PopupContent, IRepeatedTaskListener
     private void HideDevelopmentFeatures_OnClick(object sender, RoutedEventArgs e)
     {
         DevelopmentMode.Hide();
-        HttpClientHelper.FakeConnectionToInternet = true;
         ViewUtils.GetLayout().HideDevelopmentFeatures();
         Close();
     }
 
     private async void MiiChannel_OnClick(object? sender, RoutedEventArgs e) =>
-        await DolphinLaunchHelper.LaunchDolphin(" -b -n 0001000248414341");
+        await DolphinLaunchService.LaunchDolphin(" -b -n 0001000248414341");
 
     #region Popup Tests
 

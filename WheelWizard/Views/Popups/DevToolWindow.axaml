@@ -31,11 +31,6 @@
                           x:Name="WhWzTopMost" Click="WhWzTopMost_OnClick">
                     Wheel Wizard always on top
                 </CheckBox>
-                <CheckBox Margin="0,2" IsChecked="False" Classes="Switch"
-                          x:Name="HttpHelperOff" Click="HttpHelperOff_OnClick">
-                    <components:FormFieldLabel Text="Turn off HttpHelper"
-                                               TipText="Simulating no internet connection for some parts of the application" />
-                </CheckBox>
 
                 <components:Button Variant="Primary" Text="Mii Channel" IconData="{StaticResource DolphinIcon}"
                                    HorizontalAlignment="Left" Margin="0,2"

@@ -15,7 +15,26 @@ namespace WheelWizard.Test.Features
         public MiiDbServiceTests()
         {
             _repositoryService = Substitute.For<IMiiRepositoryService>();
-            _service = new(_repositoryService);
+            _service = new(_repositoryService, TimeProvider.System);
+        }
+
+        [Fact]
+        public void AddToDatabase_UsesInjectedClockAndKeepsSameTickIdsDistinct()
+        {
+            var instant = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            var clock = Substitute.For<TimeProvider>();
+            clock.GetUtcNow().Returns(instant);
+            var service = new MiiDbService(_repositoryService, clock);
+            _repositoryService.AddMiiToBlocks(Arg.Any<byte[]>()).Returns(OperationResult.Ok());
+            var first = CreateValidMii().Value;
+            var second = CreateValidMii().Value;
+
+            Assert.True(service.AddToDatabase(first, "00:11:22:33:44:55").IsSuccess);
+            Assert.True(service.AddToDatabase(second, "00:11:22:33:44:55").IsSuccess);
+
+            Assert.Equal(instant.UtcDateTime, first.GetCreationDateUtc());
+            Assert.Equal(first.MiiId + 1, second.MiiId);
+            Assert.Equal(0b100u, first.MiiId >> 29);
         }
 
         // --- Helper Methods ---

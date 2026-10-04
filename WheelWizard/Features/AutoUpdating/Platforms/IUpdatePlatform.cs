@@ -1,4 +1,5 @@
-﻿using WheelWizard.GitHub.Domain;
+using WheelWizard.GitHub.Domain;
+using WheelWizard.Shared.Downloads;
 
 namespace WheelWizard.AutoUpdating.Platforms;
 
@@ -7,6 +8,8 @@ namespace WheelWizard.AutoUpdating.Platforms;
 /// </summary>
 public interface IUpdatePlatform
 {
+    bool SupportsAutomaticUpdate { get; }
+
     /// <summary>
     /// Gets the asset for the current platform.
     /// </summary>
@@ -15,5 +18,9 @@ public interface IUpdatePlatform
     /// <summary>
     /// Executes the update logic for the current platform.
     /// </summary>
-    Task<OperationResult> ExecuteUpdateAsync(string downloadUrl);
+    Task<OperationResult> ExecuteUpdateAsync(
+        string downloadUrl,
+        IProgress<DownloadProgress>? progress = null,
+        CancellationToken cancellationToken = default
+    );
 }

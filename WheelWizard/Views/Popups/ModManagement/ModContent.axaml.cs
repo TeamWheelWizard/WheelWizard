@@ -1,32 +1,51 @@
-﻿using Avalonia.Interactivity;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
-using WheelWizard.Helpers;
 using WheelWizard.Mods;
-using WheelWizard.Services;
-using WheelWizard.Shared.DependencyInjection;
+using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Downloads;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Popups.ModManagement;
 
 public record ModItem(Bitmap FullImageUrl);
 
-public partial class ModContent : UserControlBase
+public partial class ModContent : UserControl
 {
+    private IModManager ModManager { get; }
+
+    private IGameBananaSingletonService GameBananaService { get; }
+
+    private IDownloadService Downloads { get; }
+
+    private IGameBananaMediaService Media { get; }
+
+    private IModPaths ModPaths { get; }
+
+    private IModOperationPresentation ModPresentation { get; }
+
     private bool loadingVisual;
     private GameBananaModDetails? CurrentMod { get; set; }
     private string? OverrideDownloadUrl { get; set; }
 
-    [Inject]
-    private IGameBananaSingletonService GameBananaService { get; set; } = null!;
-
-    [Inject]
-    private IModManager ModManager { get; set; } = null!;
-
-    public ModContent()
+    public ModContent(
+        IModManager modManager,
+        IGameBananaSingletonService gameBananaService,
+        IDownloadService downloads,
+        IGameBananaMediaService media,
+        IModPaths modPaths,
+        IModOperationPresentation modPresentation
+    )
     {
+        ModManager = modManager;
+        GameBananaService = gameBananaService;
+        Downloads = downloads;
+        Media = media;
+        ModPaths = modPaths;
+        ModPresentation = modPresentation;
         InitializeComponent();
         ResetVisibility();
         UnInstallButton.IsVisible = false;
@@ -127,15 +146,11 @@ public partial class ModContent : UserControlBase
 
             var fullImageUrl = $"{image.BaseUrl}/{image.File}";
 
-            var streamResult = await HttpClientHelper.GetStreamAsync(fullImageUrl, cancellationToken);
-            if (!streamResult.Succeeded || streamResult.Content == null)
+            var imageResult = await Media.GetImageAsync(fullImageUrl, cancellationToken);
+            if (imageResult.IsFailure)
                 continue;
 
-            // Get the image stream with cancellation support
-            await using var stream = streamResult.Content;
-            var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream, cancellationToken);
-            memoryStream.Position = 0;
+            using var memoryStream = new MemoryStream(imageResult.Value, writable: false);
 
             // Create a bitmap from the memory stream
             var bitmap = new Bitmap(memoryStream);
@@ -231,7 +246,7 @@ public partial class ModContent : UserControlBase
 
         var url = downloadUrls.First();
         var fileName = GetFileNameFromUrl(url);
-        var filePath = Path.Combine(PathManager.TempModsFolderPath, fileName);
+        var filePath = Path.Combine(ModPaths.DownloadFolderPath, fileName);
         var downloadResult = await DownloadModFileAsync(url, filePath, progressWindow);
         progressWindow.Close();
 
@@ -273,7 +288,10 @@ public partial class ModContent : UserControlBase
             return Fail(t("message_warning.mod_name_invalid.extra"));
         }
 
-        var installResult = await ModManager.InstallModFromFileAsync(downloadedFilePath, modName, CurrentMod.Author.Name, CurrentMod.Id);
+        var installResult = await ModPresentation.RunAsync(
+            (progress, _) =>
+                ModManager.InstallModFromFileAsync(downloadedFilePath, modName, CurrentMod.Author.Name, CurrentMod.Id, progress)
+        );
         if (installResult.IsFailure)
             return installResult.Error;
 
@@ -283,11 +301,11 @@ public partial class ModContent : UserControlBase
     /// <summary>
     /// Prepares the temporary folder for downloading files.
     /// </summary>
-    private static async Task<OperationResult> PrepareToDownloadFile()
+    private async Task<OperationResult> PrepareToDownloadFile()
     {
         try
         {
-            var tempFolder = PathManager.TempModsFolderPath;
+            var tempFolder = ModPaths.DownloadFolderPath;
             if (Directory.Exists(tempFolder))
                 Directory.Delete(tempFolder, true);
 
@@ -301,12 +319,12 @@ public partial class ModContent : UserControlBase
         }
     }
 
-    private static OperationResult TryDeleteTempModsFolder()
+    private OperationResult TryDeleteTempModsFolder()
     {
         try
         {
-            if (Directory.Exists(PathManager.TempModsFolderPath))
-                Directory.Delete(PathManager.TempModsFolderPath, true);
+            if (Directory.Exists(ModPaths.DownloadFolderPath))
+                Directory.Delete(ModPaths.DownloadFolderPath, true);
 
             return Ok();
         }
@@ -316,11 +334,11 @@ public partial class ModContent : UserControlBase
         }
     }
 
-    private static async Task<OperationResult<string?>> DownloadModFileAsync(string url, string filePath, ProgressWindow progressWindow)
+    private async Task<OperationResult<string?>> DownloadModFileAsync(string url, string filePath, ProgressWindow progressWindow)
     {
         try
         {
-            return await DownloadHelper.DownloadToLocationAsync(url, filePath, progressWindow);
+            return await Downloads.DownloadToLocationAsync(url, filePath, progressWindow);
         }
         catch (Exception ex)
         {

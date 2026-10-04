@@ -1,10 +1,9 @@
-using Avalonia.Threading;
+using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
 using WheelWizard.Features.Archives;
-using WheelWizard.Helpers;
 using WheelWizard.Models.Mods;
-using WheelWizard.Services;
-using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Mods;
+using WheelWizard.Shared.IO;
 
 namespace WheelWizard.Features.Patches;
 
@@ -22,21 +21,33 @@ public interface IModPatchConversionService
 
     void RefreshCompatibility(Mod mod);
 
-    Task<OperationResult<ModPatchConversionResult>> ConvertToPatchesAsync(Mod mod, CancellationToken cancellationToken);
+    Task<OperationResult<ModPatchConversionResult>> ConvertToPatchesAsync(
+        Mod mod,
+        CancellationToken cancellationToken,
+        IProgress<ModOperationProgress>? progress = null
+    );
 }
 
-public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConverter, ILogger<ModPatchConversionService> logger)
-    : IModPatchConversionService
+public sealed class ModPatchConversionService(
+    ISzsPatchConverter szsPatchConverter,
+    ILogger<ModPatchConversionService> logger,
+    IFileSystem fileSystem,
+    IModPaths paths,
+    IGameBaselineStore baselineStore
+) : IModPatchConversionService
 {
     public bool HasIncompatibleSzsFiles(Mod mod) => GetConvertibleArchiveFiles(mod).Any();
 
     public IReadOnlyList<string> GetConvertibleArchiveFiles(Mod mod)
     {
-        var modDirectory = PathManager.GetModDirectoryPath(mod.Title);
-        if (!Directory.Exists(modDirectory))
+        var modDirectory = paths.GetModDirectoryPath(mod.Title);
+        if (!fileSystem.Directory.Exists(modDirectory))
             return [];
 
-        return Directory.EnumerateFiles(modDirectory, "*", SearchOption.AllDirectories).Where(IsConvertibleArchiveFile).ToArray();
+        return fileSystem
+            .Directory.EnumerateFiles(modDirectory, "*", SearchOption.AllDirectories)
+            .Where(IsConvertibleArchiveFile)
+            .ToArray();
     }
 
     public void RefreshCompatibility(Mod mod)
@@ -44,10 +55,14 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         mod.HasIncompatibleFiles = HasIncompatibleSzsFiles(mod);
     }
 
-    public async Task<OperationResult<ModPatchConversionResult>> ConvertToPatchesAsync(Mod mod, CancellationToken cancellationToken)
+    public async Task<OperationResult<ModPatchConversionResult>> ConvertToPatchesAsync(
+        Mod mod,
+        CancellationToken cancellationToken,
+        IProgress<ModOperationProgress>? progress = null
+    )
     {
-        var sourceDirectory = PathManager.GetModDirectoryPath(mod.Title);
-        if (!Directory.Exists(sourceDirectory))
+        var sourceDirectory = paths.GetModDirectoryPath(mod.Title);
+        if (!fileSystem.Directory.Exists(sourceDirectory))
             return Fail(t("message_error.no_mod_folder.extra"));
 
         var sourceFiles = GetConvertibleArchiveFiles(mod);
@@ -59,18 +74,14 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
 
         var tempRoot = Path.Combine(Path.GetTempPath(), "WheelWizardPatchConversion", $"{mod.Title}-{Guid.NewGuid():N}");
         var tempModDirectory = Path.Combine(tempRoot, mod.Title);
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        var progressWindow = new ProgressWindow(t("progress.converting_mod_to_patches"))
-            .SetGoal(t("progress.converting_files_count", sourceFiles.Count)!)
-            .SetCancellationTokenSource(cts);
-        progressWindow.Show();
+        progress?.Report(new(ModOperationStage.Converting, 0, TotalFiles: sourceFiles.Count));
 
         try
         {
             var result = await Task.Run(
                 () =>
                 {
-                    CopyDirectory(sourceDirectory, tempModDirectory, cts.Token);
+                    CopyDirectory(sourceDirectory, tempModDirectory, cancellationToken);
                     var tempFiles = GetConvertibleArchiveFilesInDirectory(tempModDirectory);
                     var warnings = new List<string>();
                     var skipped = new List<string>();
@@ -81,15 +92,18 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
 
                     for (var index = 0; index < tempFiles.Count; index++)
                     {
-                        cts.Token.ThrowIfCancellationRequested();
+                        cancellationToken.ThrowIfCancellationRequested();
                         var file = tempFiles[index];
                         var fileName = Path.GetFileName(file);
 
-                        Dispatcher.UIThread.Post(() =>
-                        {
-                            progressWindow.UpdateProgress((int)(index / (double)Math.Max(tempFiles.Count, 1) * 80));
-                            progressWindow.SetExtraText(t("progress.converting_file", fileName)!);
-                        });
+                        progress?.Report(
+                            new(
+                                ModOperationStage.Converting,
+                                (int)(index / (double)Math.Max(tempFiles.Count, 1) * 80),
+                                fileName,
+                                tempFiles.Count
+                            )
+                        );
 
                         if (LooseBrsarPatchFileName.TryGetNormalizedFileName(fileName, out var normalizedPatchFileName))
                         {
@@ -97,9 +111,9 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                                 archiveBundles,
                                 Path.Combine(Path.GetDirectoryName(file)!, $"{archivePrefix}.revo_kart.szs"),
                                 normalizedPatchFileName,
-                                File.ReadAllBytes(file)
+                                fileSystem.File.ReadAllBytes(file)
                             );
-                            File.Delete(file);
+                            fileSystem.File.Delete(file);
                             convertedCount++;
                             continue;
                         }
@@ -132,8 +146,8 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                                 if (IsDeletionPatchEntry(entry))
                                 {
                                     var deletionDestination = Path.Combine(Path.GetDirectoryName(file)!, entry.ExportPath);
-                                    Directory.CreateDirectory(Path.GetDirectoryName(deletionDestination)!);
-                                    File.WriteAllBytes(deletionDestination, entry.Bytes);
+                                    fileSystem.Directory.CreateDirectory(Path.GetDirectoryName(deletionDestination)!);
+                                    fileSystem.File.WriteAllBytes(deletionDestination, entry.Bytes);
                                     writtenPatchCount++;
                                     continue;
                                 }
@@ -150,26 +164,22 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                             {
                                 var destination = Path.Combine(Path.GetDirectoryName(file)!, entry.ExportPath);
                                 var destinationDirectory = Path.GetDirectoryName(destination)!;
-                                if (!Directory.Exists(destinationDirectory))
-                                    Directory.CreateDirectory(destinationDirectory);
-                                File.WriteAllBytes(destination, entry.Bytes);
+                                if (!fileSystem.Directory.Exists(destinationDirectory))
+                                    fileSystem.Directory.CreateDirectory(destinationDirectory);
+                                fileSystem.File.WriteAllBytes(destination, entry.Bytes);
                                 writtenPatchCount++;
                             }
                         }
 
-                        File.Delete(file);
+                        fileSystem.File.Delete(file);
                         convertedCount++;
                     }
 
                     writtenPatchCount += WriteArchiveBundles(archiveBundles, warnings);
 
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        progressWindow.UpdateProgress(85);
-                        progressWindow.SetExtraText(t("progress.applying_converted_mod"));
-                    });
+                    progress?.Report(new(ModOperationStage.Applying, 85));
 
-                    ReplaceDirectory(sourceDirectory, tempModDirectory, cts.Token);
+                    ReplaceDirectory(sourceDirectory, tempModDirectory, cancellationToken);
                     return new ModPatchConversionResult
                     {
                         ConvertedFileCount = convertedCount,
@@ -178,11 +188,11 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
                         Skipped = skipped,
                     };
                 },
-                cts.Token
+                cancellationToken
             );
 
             RefreshCompatibility(mod);
-            Dispatcher.UIThread.Post(() => progressWindow.UpdateProgress(100));
+            progress?.Report(new(ModOperationStage.Applying, 100));
             return result;
         }
         catch (OperationCanceledException)
@@ -197,8 +207,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         }
         finally
         {
-            progressWindow.Close();
-            _ = FileHelper.DeleteDirectoryIfExists(tempRoot);
+            _ = fileSystem.DeleteDirectoryIfExists(tempRoot);
         }
     }
 
@@ -206,7 +215,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
     {
         try
         {
-            var fileBytes = File.ReadAllBytes(file);
+            var fileBytes = fileSystem.File.ReadAllBytes(file);
             var baseline = SelectBaseline(Path.GetFileName(file), fileBytes);
             if (baseline == null)
                 return new ArchiveConversion(null, new PatchConversionAnalysis());
@@ -227,12 +236,12 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
     private BaselineEntry? SelectBaseline(string fileName, byte[] moddedBytes)
     {
         var kind = IsBrsarFileName(fileName) ? "brsar" : "szs";
-        var candidates = GameBaselineStore.Instance.FindCandidates(fileName, kind);
+        var candidates = baselineStore.FindCandidates(fileName, kind);
         if (candidates.Count == 0)
             return null;
 
         return candidates
-            .Select(candidate => new { Candidate = candidate, Entry = GameBaselineStore.Instance.GetEntry(candidate.Id) })
+            .Select(candidate => new { Candidate = candidate, Entry = baselineStore.GetEntry(candidate.Id) })
             .Where(item => item.Entry != null)
             .Select(item => new
             {
@@ -257,8 +266,8 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
             ? BrsarPatchConverter.EstimateDifference(baseline, fileBytes)
             : szsPatchConverter.EstimateDifference(baseline, fileBytes);
 
-    private static IReadOnlyList<string> GetConvertibleArchiveFilesInDirectory(string directory) =>
-        Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Where(IsConvertibleArchiveFile).ToArray();
+    private IReadOnlyList<string> GetConvertibleArchiveFilesInDirectory(string directory) =>
+        fileSystem.Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Where(IsConvertibleArchiveFile).ToArray();
 
     private static bool IsConvertibleArchiveFile(string filePath)
     {
@@ -320,7 +329,7 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         members[memberPath] = bytes;
     }
 
-    private static int WriteArchiveBundles(Dictionary<string, Dictionary<string, byte[]>> archiveBundles, List<string> warnings)
+    private int WriteArchiveBundles(Dictionary<string, Dictionary<string, byte[]>> archiveBundles, List<string> warnings)
     {
         var writtenCount = 0;
 
@@ -329,14 +338,14 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
             if (members.Count == 0)
                 continue;
 
-            Directory.CreateDirectory(Path.GetDirectoryName(bundlePath)!);
-            if (File.Exists(bundlePath))
+            fileSystem.Directory.CreateDirectory(Path.GetDirectoryName(bundlePath)!);
+            if (fileSystem.File.Exists(bundlePath))
             {
                 warnings.Add($"{Path.GetFileName(bundlePath)} already existed and was replaced with the converted archive bundle.");
-                File.Delete(bundlePath);
+                fileSystem.File.Delete(bundlePath);
             }
 
-            File.WriteAllBytes(bundlePath, U8ArchiveBuilder.BuildYaz0(members));
+            fileSystem.File.WriteAllBytes(bundlePath, U8ArchiveBuilder.BuildYaz0(members));
             writtenCount++;
         }
 
@@ -362,41 +371,41 @@ public sealed class ModPatchConversionService(ISzsPatchConverter szsPatchConvert
         return string.IsNullOrWhiteSpace(cleaned) ? "mod" : cleaned;
     }
 
-    private static void CopyDirectory(string sourceDirectory, string destinationDirectory, CancellationToken cancellationToken)
+    private void CopyDirectory(string sourceDirectory, string destinationDirectory, CancellationToken cancellationToken)
     {
-        Directory.CreateDirectory(destinationDirectory);
+        fileSystem.Directory.CreateDirectory(destinationDirectory);
 
-        foreach (var directory in Directory.EnumerateDirectories(sourceDirectory, "*", SearchOption.AllDirectories))
+        foreach (var directory in fileSystem.Directory.EnumerateDirectories(sourceDirectory, "*", SearchOption.AllDirectories))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            Directory.CreateDirectory(Path.Combine(destinationDirectory, Path.GetRelativePath(sourceDirectory, directory)));
+            fileSystem.Directory.CreateDirectory(Path.Combine(destinationDirectory, Path.GetRelativePath(sourceDirectory, directory)));
         }
 
-        foreach (var file in Directory.EnumerateFiles(sourceDirectory, "*", SearchOption.AllDirectories))
+        foreach (var file in fileSystem.Directory.EnumerateFiles(sourceDirectory, "*", SearchOption.AllDirectories))
         {
             cancellationToken.ThrowIfCancellationRequested();
             var destination = Path.Combine(destinationDirectory, Path.GetRelativePath(sourceDirectory, file));
-            Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-            File.Copy(file, destination, true);
+            fileSystem.Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+            fileSystem.File.Copy(file, destination, true);
         }
     }
 
-    private static void ReplaceDirectory(string sourceDirectory, string convertedDirectory, CancellationToken cancellationToken)
+    private void ReplaceDirectory(string sourceDirectory, string convertedDirectory, CancellationToken cancellationToken)
     {
         var backupDirectory = $"{sourceDirectory}.patch-conversion-backup-{Guid.NewGuid():N}";
 
-        Directory.Move(sourceDirectory, backupDirectory);
+        fileSystem.Directory.Move(sourceDirectory, backupDirectory);
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
             CopyDirectory(convertedDirectory, sourceDirectory, cancellationToken);
-            _ = FileHelper.DeleteDirectoryIfExists(backupDirectory);
+            _ = fileSystem.DeleteDirectoryIfExists(backupDirectory);
         }
         catch
         {
-            if (Directory.Exists(sourceDirectory))
-                Directory.Delete(sourceDirectory, true);
-            Directory.Move(backupDirectory, sourceDirectory);
+            if (fileSystem.Directory.Exists(sourceDirectory))
+                fileSystem.Directory.Delete(sourceDirectory, true);
+            fileSystem.Directory.Move(backupDirectory, sourceDirectory);
             throw;
         }
     }

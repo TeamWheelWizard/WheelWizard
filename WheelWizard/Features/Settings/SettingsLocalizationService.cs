@@ -7,13 +7,15 @@ public sealed class SettingsLocalizationService(
     ISettingsManager settingsManager,
     ISettingsSignalBus settingsSignalBus,
     ILocalizationService localizationService
-) : ISettingsLocalizationService
+) : ISettingsLocalizationService, IDisposable
 {
     private bool _initialized;
+    private bool _disposed;
     private IDisposable? _subscription;
 
     public void Initialize()
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         if (_initialized)
             return;
 
@@ -24,8 +26,15 @@ public sealed class SettingsLocalizationService(
 
     private void OnSignal(SettingChangedSignal signal)
     {
-        if (signal.Setting == settingsManager.WW_LANGUAGE)
+        if (!_disposed && signal.Setting == settingsManager.WW_LANGUAGE)
             ApplyCurrentLanguage();
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _subscription?.Dispose();
+        _subscription = null;
     }
 
     public void ApplyCurrentLanguage()

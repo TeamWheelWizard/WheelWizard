@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using WheelWizard.Services.LiveData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -16,22 +15,15 @@ public abstract class PlayerProfileBase : INotifyPropertyChanged
 
     public string RegionName => GameLicenseDisplay.GetRegionName(RegionId);
 
+    private bool _isOnline;
     public bool IsOnline
     {
-        get
-        {
-            var currentRooms = RRLiveRooms.Instance.CurrentRooms;
-            if (currentRooms.Count <= 0)
-                return false;
-
-            var onlinePlayers = currentRooms.SelectMany(room => room.Players).ToList();
-            return onlinePlayers.Any(player => player.FriendCode == FriendCode);
-        }
+        get => _isOnline;
         set
         {
-            if (value == IsOnline)
+            if (value == _isOnline)
                 return;
-
+            _isOnline = value;
             OnPropertyChanged(nameof(IsOnline));
         }
     }

@@ -104,6 +104,7 @@ public class OperationResult
         MessageTranslation? translation = null
     )
     {
+        // #todo: agree on one cancellation contract for both async wrappers so cancellation isn't treated as a normal failure.
         try
         {
             var value = await func();

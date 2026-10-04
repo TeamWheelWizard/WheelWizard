@@ -61,7 +61,8 @@
                                 CornerRadius="6,0,0,6" Background="{StaticResource Neutral700}"
                                 ClipToBounds="True">
                             <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                   Stretch="UniformToFill" x:Name="ThumbnailImage" />
+                                   Stretch="UniformToFill" x:Name="ThumbnailImage"
+                                   Source="{Binding Preview.Image, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Border>
                     
                      

@@ -77,7 +77,7 @@
                                                     Vr="{Binding Vr}"
                                                     Br="{Binding Br}"
                                                     Mii="{Binding Mii}"
-                                                    HasBadges="{Binding HasBadges}"
+                                                    HasBadges="{Binding HasBadges}" BadgeVariants="{Binding BadgeVariants}"
                                                     IsOnline="{Binding IsOnline}"
                                                     IsPending="{Binding IsPending}"
                                                     TotalLosses="{Binding Losses}"
@@ -91,6 +91,7 @@
                         <MenuItem Header="{loc:T action.view_mii}" Click="OpenCarousel_OnClick" />
                         <Separator />
                         <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />
+                        <MenuItem Header="View player on RWFC" Click="ViewOnRwfc_OnClick" />
                         <MenuItem Header="Remove Friend" Click="RemoveFriend_OnClick" />
                         <!-- <MenuItem Header="{loc:T action.save_external_mii}" Click="SaveMii_OnClick" /> -->
                     </ContextMenu>

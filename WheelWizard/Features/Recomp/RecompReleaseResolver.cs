@@ -42,7 +42,9 @@ public static class RecompReleaseResolver
             if (!RecompVersion.TryParse(release.TagName, out var version))
                 continue;
 
-            var asset = release.Assets.FirstOrDefault(candidate => string.Equals(candidate.Name, assetName, StringComparison.OrdinalIgnoreCase));
+            var asset = release.Assets.FirstOrDefault(candidate =>
+                string.Equals(candidate.Name, assetName, StringComparison.OrdinalIgnoreCase)
+            );
             if (asset is null || string.IsNullOrWhiteSpace(asset.BrowserDownloadUrl))
                 continue;
 

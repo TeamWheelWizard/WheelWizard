@@ -1,6 +1,5 @@
 using Semver;
 using WheelWizard.Models.Enums;
-using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.CustomDistributions;
 
@@ -31,16 +30,16 @@ public interface IDistribution
     /// <summary>
     /// Install the distribution.
     /// </summary>
-    Task<OperationResult> InstallAsync(ProgressWindow progressWindow);
+    Task<OperationResult> InstallAsync(DistributionOperation operation);
 
     /// <summary>
     /// Update the distribution.
     /// </summary>
-    Task<OperationResult> UpdateAsync(ProgressWindow progressWindow);
+    Task<OperationResult> UpdateAsync(DistributionOperation operation);
 
-    Task<OperationResult> RemoveAsync(ProgressWindow progressWindow);
+    Task<OperationResult> RemoveAsync(DistributionOperation operation);
 
-    Task<OperationResult> ReinstallAsync(ProgressWindow progressWindow);
+    Task<OperationResult> ReinstallAsync(DistributionOperation operation);
 
     Task<OperationResult<WheelWizardStatus>> GetCurrentStatusAsync();
 

@@ -1,13 +1,17 @@
 using System.Globalization;
 using System.IO.Abstractions;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Testably.Abstractions;
 using Testably.Abstractions.Testing;
+using WheelWizard.ApplicationData;
+using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Localization;
+using WheelWizard.Recomp;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
+using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Processes;
 
 namespace WheelWizard.Test.Features.Settings;
 
@@ -74,9 +78,6 @@ public class SettingsManagerTests
     public void ValidateCorePathSettings_ReturnsAllExpectedIssues_WhenDefaultsAreInvalid()
     {
         var manager = CreateManager(new RealFileSystem(), out _, out _, out _);
-#pragma warning disable CS0618
-        SettingsRuntime.Initialize(manager);
-#pragma warning restore CS0618
 
         var result = manager.ValidateCorePathSettings();
 
@@ -97,9 +98,6 @@ public class SettingsManagerTests
         var dolphinLocation = SettingsTestUtils.GetValidDolphinLocation(fileSystem);
         fileSystem.Directory.CreateDirectory(userFolderPath);
         fileSystem.File.WriteAllText(gameFilePath, "iso");
-#pragma warning disable CS0618
-        SettingsRuntime.Initialize(manager);
-#pragma warning restore CS0618
 
         Assert.True(manager.Set(manager.USER_FOLDER_PATH, userFolderPath, skipSave: true));
         Assert.True(manager.Set(manager.GAME_LOCATION, gameFilePath, skipSave: true));
@@ -115,9 +113,37 @@ public class SettingsManagerTests
         manager.LoadSettings();
         manager.LoadSettings();
 
-        whWzManager.Received(1).LoadSettings();
-        dolphinManager.Received(1).LoadSettings();
-        recompManager.Received(1).LoadSettings();
+        whWzManager.Received(1).LoadSettings(Path.Combine(SettingsTestUtils.CreateApplicationDataLocation().DirectoryPath, "config.json"));
+        dolphinManager.Received(1).LoadSettings(Path.Combine("", "Config"));
+        recompManager.Received(1).LoadSettings(SettingsTestUtils.CreateRecompPaths().ConfigFilePath);
+    }
+
+    [Fact]
+    public void LoadSettings_UsesUserDirectoryLoadedFromOwnJson_ForDolphinSettings()
+    {
+        var fs = new MockFileSystem();
+        var userFolder = fs.Path.GetFullPath("/owned-dolphin-user");
+        fs.Directory.CreateDirectory(userFolder);
+        var configPath = fs.Path.Combine(SettingsTestUtils.CreateApplicationDataLocation().DirectoryPath, "config.json");
+        fs.Directory.CreateDirectory(fs.Path.GetDirectoryName(configPath)!);
+        fs.File.WriteAllText(configPath, System.Text.Json.JsonSerializer.Serialize(new { UserFolderPath = userFolder }));
+        var dolphinManager = Substitute.For<IDolphinSettingManager>();
+        using var manager = new SettingsManager(
+            new WhWzSettingManager(Substitute.For<ILogger<WhWzSettingManager>>(), fs),
+            dolphinManager,
+            Substitute.For<IRecompSettingManager>(),
+            fs,
+            SettingsTestUtils.CreateSettingsSignalBus(),
+            new DolphinPathResolver(fs, new RuntimeEnvironment()),
+            SettingsTestUtils.CreateApplicationDataLocation(),
+            SettingsTestUtils.CreateRecompPaths(),
+            new RuntimeEnvironment(),
+            Substitute.For<IUnixCommandService>()
+        );
+
+        manager.LoadSettings();
+
+        dolphinManager.Received(1).LoadSettings(fs.Path.Combine(userFolder, "Config"));
     }
 
     private static SettingsManager CreateManager(
@@ -130,8 +156,21 @@ public class SettingsManagerTests
         whWzSettingManager = Substitute.For<IWhWzSettingManager>();
         dolphinSettingManager = Substitute.For<IDolphinSettingManager>();
         recompSettingManager = Substitute.For<IRecompSettingManager>();
+        var commands = Substitute.For<IUnixCommandService>();
+        commands.IsCommandAvailable("/usr/bin/env").Returns(true);
 
-        return new SettingsManager(whWzSettingManager, dolphinSettingManager, recompSettingManager, fileSystem);
+        return new SettingsManager(
+            whWzSettingManager,
+            dolphinSettingManager,
+            recompSettingManager,
+            fileSystem,
+            SettingsTestUtils.CreateSettingsSignalBus(),
+            new DolphinPathResolver(fileSystem, new RuntimeEnvironment()),
+            SettingsTestUtils.CreateApplicationDataLocation(),
+            SettingsTestUtils.CreateRecompPaths(),
+            new RuntimeEnvironment(),
+            commands
+        );
     }
 }
 
@@ -250,7 +289,7 @@ public class SettingsLocalizationServiceTests
         settingsManager.WW_LANGUAGE.Returns(languageSetting);
         settingsManager.Get<string>(Arg.Any<Setting>()).Returns(_ => (string)languageSetting.Get());
         var yamlLocalizationService = new EmbeddedYamlLocalizationService();
-        var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
+        using var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
 
         try
         {
@@ -288,7 +327,7 @@ public class SettingsLocalizationServiceTests
         settingsManager.WW_LANGUAGE.Returns(languageSetting);
         settingsManager.Get<string>(Arg.Any<Setting>()).Returns(_ => (string)languageSetting.Get());
         var yamlLocalizationService = new EmbeddedYamlLocalizationService();
-        var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
+        using var localizationService = new SettingsLocalizationService(settingsManager, signalBus, yamlLocalizationService);
 
         try
         {
@@ -302,6 +341,14 @@ public class SettingsLocalizationServiceTests
             Assert.Equal("de", CultureInfo.DefaultThreadCurrentUICulture?.TwoLetterISOLanguageName);
             Assert.Equal("de", yamlLocalizationService.CurrentLanguage);
             Assert.Equal("de", LocalizationProvider.Current.CurrentLanguage);
+
+            localizationService.Dispose();
+            languageSetting.Set("fr", skipSave: true);
+            signalBus.Publish(languageSetting);
+
+            Assert.Equal("de", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+            Assert.Equal("de", yamlLocalizationService.CurrentLanguage);
+            Assert.Throws<ObjectDisposedException>(() => localizationService.Initialize());
         }
         finally
         {
@@ -319,22 +366,19 @@ public class SettingsLocalizationServiceTests
 public class SettingsStartupInitializerTests
 {
     [Fact]
-    public void Initialize_LoadsSettings_InitializesLocalization_AndSetsRuntimes()
+    public void Initialize_LoadsSettings_AndInitializesLocalization()
     {
         var settingsManager = Substitute.For<ISettingsManager>();
         var signalBus = SettingsTestUtils.CreateSettingsSignalBus();
         var localizationService = Substitute.For<ISettingsLocalizationService>();
         var logger = Substitute.For<ILogger<SettingsStartupInitializer>>();
         settingsManager.ValidateCorePathSettings().Returns(Ok(new SettingsValidationReport([])));
-        var initializer = new SettingsStartupInitializer(settingsManager, signalBus, localizationService, logger);
+        var initializer = new SettingsStartupInitializer(settingsManager, localizationService, logger);
 
         initializer.Initialize();
 
         settingsManager.Received(1).LoadSettings();
         localizationService.Received(1).Initialize();
-#pragma warning disable CS0618
-        Assert.Same(settingsManager, SettingsRuntime.Current);
-#pragma warning restore CS0618
     }
 
     [Fact]
@@ -345,7 +389,7 @@ public class SettingsStartupInitializerTests
         var localizationService = Substitute.For<ISettingsLocalizationService>();
         var logger = Substitute.For<ILogger<SettingsStartupInitializer>>();
         settingsManager.ValidateCorePathSettings().Returns(Fail("validation failed"));
-        var initializer = new SettingsStartupInitializer(settingsManager, signalBus, localizationService, logger);
+        var initializer = new SettingsStartupInitializer(settingsManager, localizationService, logger);
 
         var exception = Record.Exception(initializer.Initialize);
 
@@ -357,46 +401,24 @@ public class SettingsStartupInitializerTests
 
 internal static class SettingsTestUtils
 {
-    public static ISettingsManager InitializeSettingsRuntime(string userFolderPath, string dolphinLocation = "dolphin-emu")
+    public static IRecompPaths CreateRecompPaths()
     {
-        var settings = CreateRuntimeSettingsStub(userFolderPath, dolphinLocation);
-#pragma warning disable CS0618
-        SettingsRuntime.Initialize(settings);
-#pragma warning restore CS0618
-        return settings;
+        var paths = Substitute.For<IRecompPaths>();
+        paths.ConfigFilePath.Returns(Path.GetFullPath("/settings-test-data/Recomp/Config.toml"));
+        return paths;
     }
 
-    public static void InitializeSignalRuntime(ISettingsSignalBus? signalBus = null)
+    public static IApplicationDataLocation CreateApplicationDataLocation()
     {
-#pragma warning disable CS0618
-        SettingsSignalRuntime.Initialize(signalBus ?? CreateSettingsSignalBus());
-#pragma warning restore CS0618
+        var location = Substitute.For<IApplicationDataLocation>();
+        location.DirectoryPath.Returns(Path.GetFullPath("/settings-test-data"));
+        return location;
     }
 
     public static ISettingsSignalBus CreateSettingsSignalBus()
     {
         var logger = Substitute.For<ILogger<SettingsSignalBus>>();
         return new SettingsSignalBus(logger);
-    }
-
-    public static void ResetSettingsRuntime()
-    {
-#pragma warning disable CS0618
-        SetPrivateStaticFieldValue(typeof(SettingsRuntime), "_current", null);
-#pragma warning restore CS0618
-    }
-
-    public static void ResetSignalRuntime()
-    {
-#pragma warning disable CS0618
-        SetPrivateStaticFieldValue(typeof(SettingsSignalRuntime), "_current", null);
-        var pendingInitializersField =
-            typeof(SettingsSignalRuntime).GetField("PendingInitializers", BindingFlags.NonPublic | BindingFlags.Static)
-            ?? throw new InvalidOperationException("SettingsSignalRuntime pending initializers field was not found.");
-#pragma warning restore CS0618
-        if (pendingInitializersField.GetValue(null) is not System.Collections.IList pendingInitializers)
-            throw new InvalidOperationException("SettingsSignalRuntime pending initializers storage has an unexpected type.");
-        pendingInitializers.Clear();
     }
 
     public static string GetValidDolphinLocation(IFileSystem fileSystem)
@@ -413,7 +435,7 @@ internal static class SettingsTestUtils
         return exePath;
     }
 
-    private static ISettingsManager CreateRuntimeSettingsStub(string userFolderPath, string dolphinLocation)
+    public static ISettingsManager CreateSettingsStub(string userFolderPath, string dolphinLocation = "dolphin-emu")
     {
         var settings = Substitute.For<ISettingsManager>();
         var userFolderSetting = new WhWzSetting(typeof(string), "UserFolderPath", userFolderPath);
@@ -430,13 +452,5 @@ internal static class SettingsTestUtils
             .Returns(_ => (string)dolphinLocationSetting.Get());
 
         return settings;
-    }
-
-    private static void SetPrivateStaticFieldValue(Type targetType, string fieldName, object? value)
-    {
-        var field =
-            targetType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static)
-            ?? throw new InvalidOperationException($"{targetType.Name}.{fieldName} field was not found.");
-        field.SetValue(null, value);
     }
 }
