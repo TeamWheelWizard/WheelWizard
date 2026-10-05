@@ -71,7 +71,7 @@ public class ApplicationCompositionTests
                 Assert.Equal(20, logo.IconSize);
                 Assert.Equal(string.Empty, logo.Text);
                 Assert.Equal(!OperatingSystem.IsMacOS(), Assert.IsType<StackPanel>(logo.Parent).IsVisible);
-                Assert.Same(titleBar, logo.Parent!.Parent);
+                Assert.Same(titleBar, Assert.IsType<Grid>(logo.Parent!.Parent).Parent);
                 var logoPosition = logo.TranslatePoint(default, titleBar)!.Value;
                 Assert.Equal(logoPosition.X, logoPosition.Y);
                 Assert.False(original.FindControl<Button>("HeaderBackButton")!.IsEnabled);

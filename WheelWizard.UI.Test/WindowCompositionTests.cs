@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using WheelWizard.Settings.Types;
 using WheelWizard.Views;
 using WheelWizard.Views.Popups.Base;
 
@@ -37,7 +38,10 @@ public class WindowCompositionTests
                 Application.Current!.FindResource("Neutral400"),
                 Assert.IsAssignableFrom<ISolidColorBrush>(minimize.Foreground).Color
             );
-            Assert.Equal(Application.Current!.FindResource("Neutral400"), Assert.IsAssignableFrom<ISolidColorBrush>(close.Foreground).Color);
+            Assert.Equal(
+                Application.Current!.FindResource("Neutral400"),
+                Assert.IsAssignableFrom<ISolidColorBrush>(close.Foreground).Color
+            );
             Assert.False(maximize.IsEnabled);
             Assert.Equal(
                 Application.Current!.FindResource("Neutral950"),
@@ -212,13 +216,83 @@ public class WindowCompositionTests
         popup.Close();
     }
 
-    private static WindowClosingEventArgs CreateClosingArgs(bool programmatic) =>
+    [AvaloniaFact]
+    public void DisabledWindows_RejectNativeCloseButAllowCompletionAndShutdown()
+    {
+        var main = new TestWindow();
+        var popup = new ClosingPopup { CanClose = true };
+        (BaseWindow Window, Action<WindowClosingEventArgs> RequestClose)[] windows =
+        [
+            (main, main.RequestClose),
+            (popup, popup.RequestClose),
+        ];
+        foreach (var (window, requestClose) in windows)
+        {
+            try
+            {
+                window.SetInteractable(false);
+                var native = CreateClosingArgs(false);
+                requestClose(native);
+                Assert.True(native.Cancel);
+                foreach (
+                    var args in new[]
+                    {
+                        CreateClosingArgs(true),
+                        CreateClosingArgs(false, WindowCloseReason.OwnerWindowClosing),
+                        CreateClosingArgs(false, WindowCloseReason.ApplicationShutdown),
+                    }
+                )
+                {
+                    requestClose(args);
+                    Assert.False(args.Cancel);
+                }
+                window.SetInteractable(true);
+                var allowed = CreateClosingArgs(false);
+                requestClose(allowed);
+                Assert.False(allowed.Cancel);
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+    }
+
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PopupSize_ScreenCapCanReduceScaleBelowConfiguredMinimum(bool constrainedWidth)
+    {
+        var popup = new PopupWindow { RequestedWindowScale = SettingValues.MinWindowScale };
+        try
+        {
+            var screen = popup.Screens.Primary;
+            Assert.NotNull(screen);
+            var available = new Size(screen.WorkingArea.Width / screen.Scaling, screen.WorkingArea.Height / screen.Scaling);
+            var size = constrainedWidth
+                ? new Size(available.Width * 1.25 / SettingValues.MinWindowScale, 200)
+                : new Size(300, available.Height / SettingValues.MinWindowScale);
+            popup.SetWindowSize(size);
+            Assert.InRange(popup.Width, double.Epsilon, available.Width + 0.001);
+            Assert.InRange(popup.Height, 30, available.Height + 0.001);
+            Assert.True(popup.Width / size.Width < SettingValues.MinWindowScale);
+        }
+        finally
+        {
+            popup.Close();
+        }
+    }
+
+    private static WindowClosingEventArgs CreateClosingArgs(
+        bool programmatic,
+        WindowCloseReason reason = WindowCloseReason.WindowClosing
+    ) =>
         (WindowClosingEventArgs)
             Activator.CreateInstance(
                 typeof(WindowClosingEventArgs),
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
                 binder: null,
-                args: [WindowCloseReason.WindowClosing, programmatic],
+                args: [reason, programmatic],
                 culture: null
             )!;
 
@@ -238,6 +312,8 @@ public class WindowCompositionTests
 
     private sealed class TestWindow : BaseWindow
     {
+        public void RequestClose(WindowClosingEventArgs args) => OnClosing(args);
+
         private readonly Border _overlay = new();
         private readonly Border _content = new();
         protected override Control InteractionOverlay => _overlay;

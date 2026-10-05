@@ -56,8 +56,8 @@ public static class ViewUtils
             );
         }
 
-        maxScale = Math.Max(SettingValues.MinWindowScale, maxScale);
-        return Math.Clamp(requestedScale, SettingValues.MinWindowScale, maxScale);
+        maxScale = Math.Max(double.Epsilon, maxScale);
+        return Math.Clamp(requestedScale, Math.Min(SettingValues.MinWindowScale, maxScale), maxScale);
     }
 
     public static T? FindParent<T>(object? child, int maxSearchDepth = 10)

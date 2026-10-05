@@ -62,6 +62,14 @@ public abstract class BaseWindow : Window
         base.OnOpened(e);
     }
 
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        // Native close must honor the same interaction gate as the window content.
+        if (!InteractionContent.IsEnabled && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing)
+            e.Cancel = true;
+        base.OnClosing(e);
+    }
+
     protected override void OnClosed(EventArgs e)
     {
         RemoveLayer();
