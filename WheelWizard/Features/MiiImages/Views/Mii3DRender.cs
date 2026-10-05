@@ -28,26 +28,4 @@ public sealed class Mii3DRender : MiiImageControl
         get => GetValue(InteractiveProperty);
         set => SetValue(InteractiveProperty, value);
     }
-
-    public static readonly StyledProperty<float> PreviewRenderScaleProperty = AvaloniaProperty.Register<Mii3DRender, float>(
-        nameof(PreviewRenderScale),
-        0.2f
-    );
-
-    public float PreviewRenderScale
-    {
-        get => GetValue(PreviewRenderScaleProperty);
-        set => SetValue(PreviewRenderScaleProperty, value);
-    }
-
-    public static readonly StyledProperty<int> HighQualitySettleDelayMsProperty = AvaloniaProperty.Register<Mii3DRender, int>(
-        nameof(HighQualitySettleDelayMs),
-        90
-    );
-
-    public int HighQualitySettleDelayMs
-    {
-        get => GetValue(HighQualitySettleDelayMsProperty);
-        set => SetValue(HighQualitySettleDelayMsProperty, value);
-    }
 }

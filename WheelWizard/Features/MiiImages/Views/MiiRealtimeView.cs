@@ -43,6 +43,9 @@ public sealed class MiiRealtimeView : OpenGlControlBase
 
     private Mii? _mii;
     private string? _studioData;
+    private string? _shownStudio;
+    private string? _lastStudio;
+    private MiiGpuFrame? _lastFrame;
     private MiiAnimation? _animation;
     private double _playheadFrames;
     private double _lastEventFrame = -1;
@@ -85,42 +88,65 @@ public sealed class MiiRealtimeView : OpenGlControlBase
     /// <summary>Fired once when a non-looping animation reaches its end.</summary>
     public event Action? AnimationFinished;
 
+    /// <summary>Fired once each time a newly set Mii is first drawn (its head finished building), with its studio data.</summary>
+    public event Action<string>? MiiShown;
+
     /// <summary>OpenGL couldn't be used; the message says why. Fall back to the CPU renderer.</summary>
     public event Action<string>? RealtimeUnavailable;
 
     public Mii? Mii
     {
         get => _mii;
-        set
-        {
-            _mii = value;
-            _studioData = value is null ? null : Remember(value);
-            RequestNextFrameRendering();
-        }
+        set => SetMii(value, null);
+    }
+
+    /// <summary>
+    /// Shows a Mii. Pass <paramref name="studioData"/> when the caller already serialized it (e.g. with the April
+    /// Fools' variant); otherwise it's serialized here. The previous Mii stays on screen until this one's head is built.
+    /// </summary>
+    public void SetMii(Mii? mii, string? studioData)
+    {
+        _mii = mii;
+        studioData ??= mii is null ? null : Serialize(mii);
+        if (studioData != _studioData)
+            _shownStudio = null;
+        _studioData = studioData;
+        if (studioData is not null)
+            Remember(studioData, prewarm: false);
+        RequestNextFrameRendering();
     }
 
     /// <summary>
     /// Builds the heads of a Mii you're about to show (e.g. the other gender for a swap_gender event) so switching
     /// to it is instant. The last <see cref="RecentMiiCount"/> Miis stay cached.
     /// </summary>
-    public void Prewarm(Mii mii) => Remember(mii);
+    public void Prewarm(Mii mii)
+    {
+        if (Serialize(mii) is { } studio)
+            Remember(studio, prewarm: true);
+    }
 
     private const int RecentMiiCount = 3;
     private readonly List<string> _recentStudios = [];
+    private readonly HashSet<string> _prewarmedStudios = [];
 
-    private string? Remember(Mii mii)
+    private static string? Serialize(Mii mii) =>
+        MiiStudioDataSerializer.Serialize(mii) is { IsSuccess: true } serialized ? serialized.Value : null;
+
+    private void Remember(string studio, bool prewarm)
     {
-        if (MiiStudioDataSerializer.Serialize(mii) is not { IsSuccess: true } serialized)
-            return null;
-        var studio = serialized.Value;
         lock (_recentStudios)
         {
             _recentStudios.Remove(studio);
             _recentStudios.Insert(0, studio);
             if (_recentStudios.Count > RecentMiiCount)
                 _recentStudios.RemoveRange(RecentMiiCount, _recentStudios.Count - RecentMiiCount);
-            // Free CPU and GPU copies of heads of Miis that dropped out.
-            foreach (var key in _heads.Keys.Where(k => !_recentStudios.Any(s => k.StartsWith(s + "|"))))
+            if (prewarm)
+                _prewarmedStudios.Add(studio);
+            _prewarmedStudios.IntersectWith(_recentStudios);
+            // Free CPU and GPU copies of heads of Miis that dropped out (but keep the one on screen until it's replaced).
+            var onScreen = _lastStudio;
+            foreach (var key in _heads.Keys.Where(k => !_recentStudios.Append(onScreen).Any(s => s is not null && k.StartsWith(s + "|"))))
                 _heads.TryRemove(key, out _);
             _retainHeads = _heads.Keys.ToHashSet();
         }
@@ -128,13 +154,16 @@ public sealed class MiiRealtimeView : OpenGlControlBase
         RequestHead(studio, MiiExpression.Normal);
         foreach (var expression in UsedExpressions())
             RequestHead(studio, expression);
-        return studio;
     }
 
-    private bool IsRecent(string studio)
+    /// <summary>
+    /// Whether a head of this Mii is still worth building: it's the one on screen or one that was prewarmed. Miis that
+    /// were replaced before their head got built (e.g. while dragging a slider in the editor) are skipped.
+    /// </summary>
+    private bool IsWanted(string studio)
     {
         lock (_recentStudios)
-            return _recentStudios.Contains(studio);
+            return _recentStudios.Contains(studio) && (studio == _studioData || _prewarmedStudios.Contains(studio));
     }
 
     public MiiAnimation? Animation
@@ -176,14 +205,26 @@ public sealed class MiiRealtimeView : OpenGlControlBase
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        // Some systems never give us a GL context (and never call OnOpenGlInit); report that too.
+        // Some systems never give us a GL context (and never call OnOpenGlInit); report that too. Only time spent
+        // visible counts, since a hidden control is never asked to render.
         _initWatchdog?.Stop();
-        _initWatchdog = new DispatcherTimer { Interval = InitTimeout };
+        if (_initialized)
+            return;
+        var visibleFor = TimeSpan.Zero;
+        _initWatchdog = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
         _initWatchdog.Tick += (_, _) =>
         {
+            if (_initialized)
+            {
+                _initWatchdog?.Stop();
+                return;
+            }
+            if (IsEffectivelyVisible && Bounds is { Width: > 0, Height: > 0 })
+                visibleFor += _initWatchdog!.Interval;
+            if (visibleFor < InitTimeout)
+                return;
             _initWatchdog?.Stop();
-            if (!_initialized)
-                ReportUnavailable("OpenGL didn't start.");
+            ReportUnavailable("OpenGL didn't start.");
         };
         _initWatchdog.Start();
     }
@@ -274,25 +315,44 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             pose = rig.Evaluate(animation, frame);
         }
 
+        // Use the pose's face when it's ready, otherwise the default face (built first). While the new Mii's head is
+        // still building, keep drawing the previous Mii so the view never blinks empty.
+        var (head, key) = HeadFor(pose.Expression);
+        if (head is null)
+            return PreviousMiiFrame(pose, aspect);
+
         var setup = _renderer.GetRealtimeFrameSetup(_studioData, Specifications, aspect);
         if (setup.IsFailure)
             return null;
 
-        // Use the pose's face when it's ready, otherwise the default face (built first), so the head never pops out.
-        var (head, key) = HeadFor(pose.Expression);
-        if (head is null)
+        if (_shownStudio != _studioData)
         {
-            RequestHead(_studioData, pose.Expression);
-            return null;
+            var shown = _shownStudio = _studioData;
+            Dispatcher.UIThread.Post(() => MiiShown?.Invoke(shown!));
         }
-
-        return new MiiGpuFrame(setup.Value, pose, head, key);
+        _lastStudio = _studioData;
+        return _lastFrame = new MiiGpuFrame(setup.Value, pose, head, key);
     }
 
-    private MiiRig RigFor(Mii mii)
+    private MiiGpuFrame? PreviousMiiFrame(MiiPose pose, float aspect)
     {
-        if (!_rigs.TryGetValue(mii.IsGirl, out var rig))
-            _rigs[mii.IsGirl] = rig = new MiiRig(MiiBodyModel.Get(mii.IsGirl));
+        if (_lastFrame is not { } last || _lastStudio is null)
+            return null;
+        if (_heads.TryGetValue(last.HeadKey!, out var head) is false)
+            return null;
+        // The previous Mii may have the other body; only reuse the pose when it fits.
+        if (last.Setup.Female != _mii?.IsGirl)
+            pose = RigFor(last.Setup.Female).RestPose;
+        var setup = _renderer.GetRealtimeFrameSetup(_lastStudio, Specifications, aspect);
+        return setup.IsSuccess ? last with { Setup = setup.Value, Pose = pose, Head = head } : null;
+    }
+
+    private MiiRig RigFor(Mii mii) => RigFor(mii.IsGirl);
+
+    private MiiRig RigFor(bool female)
+    {
+        if (!_rigs.TryGetValue(female, out var rig))
+            _rigs[female] = rig = new MiiRig(MiiBodyModel.Get(female));
         return rig;
     }
 
@@ -323,10 +383,10 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             await _buildGate.WaitAsync();
             try
             {
-                if (!IsRecent(studio))
+                if (!IsWanted(studio))
                     return;
                 var result = _renderer.BuildHeadModel(studio, (int)expression);
-                if (result.IsSuccess && IsRecent(studio))
+                if (result.IsSuccess && IsWanted(studio))
                     _heads[key] = result.Value;
             }
             finally

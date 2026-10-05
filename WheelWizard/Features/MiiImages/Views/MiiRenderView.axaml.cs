@@ -5,7 +5,6 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiRendering.Services;
@@ -14,6 +13,10 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.MiiImages.Views;
 
+/// <summary>
+/// Interactive 3D Mii (drag to rotate, middle-drag to pan, scroll to zoom). Draws with the realtime GPU view and
+/// falls back to full-quality CPU renders when OpenGL isn't available.
+/// </summary>
 public partial class MiiRenderView : BaseMiiImage
 {
     private readonly ISeasonalCalendar Calendar;
@@ -26,9 +29,11 @@ public partial class MiiRenderView : BaseMiiImage
     private const float MaxZoom = 1.5f;
     private const float MinCameraVerticalOffset = -90f;
     private const float MaxCameraVerticalOffset = 90f;
-    private static readonly TimeSpan RapidModelUpdateThreshold = TimeSpan.FromMilliseconds(120);
 
     private readonly IMiiNativeRenderer NativeRenderer;
+
+    private MiiRealtimeView? _realtime;
+    private string? _shownStudio;
 
     private readonly object _renderLock = new();
     private PendingRender? _pendingRender;
@@ -39,13 +44,10 @@ public partial class MiiRenderView : BaseMiiImage
 
     private bool _isDragging;
     private Point _lastPointerPosition;
-    private CancellationTokenSource? _interactionSettleCts;
     private WriteableBitmap? _surfaceBitmap;
     private Mii? _currentMii;
     private string? _studioData;
     private bool _forceNextSurfaceRecreate;
-    private DateTime _lastModelChangeUtc = DateTime.MinValue;
-    private bool _hasPresentedFrame;
 
     private MiiImageSpecifications _baseVariant = MiiImageVariants.FullBodyCarousel.Clone();
     private float _currentYaw;
@@ -76,28 +78,6 @@ public partial class MiiRenderView : BaseMiiImage
         set => SetValue(InteractiveProperty, value);
     }
 
-    public static readonly StyledProperty<float> PreviewRenderScaleProperty = AvaloniaProperty.Register<MiiRenderView, float>(
-        nameof(PreviewRenderScale),
-        0.2f
-    );
-
-    public float PreviewRenderScale
-    {
-        get => GetValue(PreviewRenderScaleProperty);
-        set => SetValue(PreviewRenderScaleProperty, value);
-    }
-
-    public static readonly StyledProperty<int> HighQualitySettleDelayMsProperty = AvaloniaProperty.Register<MiiRenderView, int>(
-        nameof(HighQualitySettleDelayMs),
-        90
-    );
-
-    public int HighQualitySettleDelayMs
-    {
-        get => GetValue(HighQualitySettleDelayMsProperty);
-        set => SetValue(HighQualitySettleDelayMsProperty, value);
-    }
-
     public MiiRenderView(IMiiImagesSingletonService images, ISeasonalCalendar calendar, IMiiNativeRenderer nativeRenderer)
         : base(images)
     {
@@ -105,17 +85,19 @@ public partial class MiiRenderView : BaseMiiImage
         NativeRenderer = nativeRenderer;
         InitializeComponent();
         ImageBorder.IsHitTestVisible = Interactive;
+
+        _realtime = new MiiRealtimeView(nativeRenderer) { IsPlaying = false };
+        _realtime.MiiShown += OnRealtimeMiiShown;
+        _realtime.RealtimeUnavailable += _ => SwitchToCpu();
+        RenderHost.Children.Add(_realtime);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
         InvalidatePendingWork();
-        DisposeInteractionSettleCts();
         DisposeSurfaceBitmap();
         _forceNextSurfaceRecreate = false;
-        _hasPresentedFrame = false;
-        _lastModelChangeUtc = DateTime.MinValue;
         RenderImage.Source = null;
     }
 
@@ -139,7 +121,7 @@ public partial class MiiRenderView : BaseMiiImage
         _currentCameraVerticalOffset = Math.Clamp(_baseVariant.CameraVerticalOffset, MinCameraVerticalOffset, MaxCameraVerticalOffset);
         _currentZoom = Math.Clamp(_baseVariant.CameraZoom, MinZoom, MaxZoom);
         _forceNextSurfaceRecreate = true;
-        QueueRenderCurrentView(renderScale: 1f);
+        QueueRenderCurrentView();
     }
 
     private void OnInteractiveChanged(bool interactive)
@@ -147,26 +129,21 @@ public partial class MiiRenderView : BaseMiiImage
         _isDragging = false;
         if (ImageBorder != null)
             ImageBorder.IsHitTestVisible = interactive;
-        if (!interactive)
-        {
-            DisposeInteractionSettleCts();
-            QueueRenderCurrentView(renderScale: 1f);
-        }
     }
 
     protected override void OnMiiChanged(Mii? newMii)
     {
         _currentMii = newMii;
-        UpdateStudioDataAndQueue(forcePreview: false);
+        UpdateStudioDataAndQueue();
     }
 
     public override void RefreshCurrentMii()
     {
         _currentMii = Mii ?? _currentMii;
-        UpdateStudioDataAndQueue(forcePreview: true);
+        UpdateStudioDataAndQueue();
     }
 
-    private void UpdateStudioDataAndQueue(bool forcePreview)
+    private void UpdateStudioDataAndQueue()
     {
         if (_currentMii == null)
         {
@@ -184,19 +161,28 @@ public partial class MiiRenderView : BaseMiiImage
         }
 
         _studioData = serialized.Value;
-
-        var shouldUsePreview = forcePreview || ShouldUsePreviewForModelChange();
-        if (shouldUsePreview)
+        if (_realtime is { } realtime && IsImageAttached)
         {
-            QueueRenderCurrentView(renderScale: GetPreviewRenderScale());
-            ScheduleHighQualityRefresh();
-            return;
+            realtime.SetMii(_currentMii, _studioData);
+            ImageBorder.IsVisible = true;
+            MiiLoaded = _shownStudio == _studioData;
         }
 
-        QueueRenderCurrentView(renderScale: 1f);
+        QueueRenderCurrentView();
     }
 
-    private void QueueRenderCurrentView(float renderScale)
+    private MiiImageSpecifications CurrentVariant()
+    {
+        var variant = _baseVariant.Clone();
+        variant.InstanceCount = 1;
+        variant.CharacterRotate = new(_baseVariant.CharacterRotate.X, NormalizeDegrees(_currentYaw), _baseVariant.CharacterRotate.Z);
+        variant.CameraRotate = new(NormalizeDegrees(_currentPitch), _baseVariant.CameraRotate.Y, _baseVariant.CameraRotate.Z);
+        variant.CameraVerticalOffset = Math.Clamp(_currentCameraVerticalOffset, MinCameraVerticalOffset, MaxCameraVerticalOffset);
+        variant.CameraZoom = Math.Clamp(_currentZoom, MinZoom, MaxZoom);
+        return variant;
+    }
+
+    private void QueueRenderCurrentView()
     {
         if (!IsImageAttached)
             return;
@@ -207,13 +193,12 @@ public partial class MiiRenderView : BaseMiiImage
             return;
         }
 
-        var variant = _baseVariant.Clone();
-        variant.InstanceCount = 1;
-        variant.CharacterRotate = new(_baseVariant.CharacterRotate.X, NormalizeDegrees(_currentYaw), _baseVariant.CharacterRotate.Z);
-        variant.CameraRotate = new(NormalizeDegrees(_currentPitch), _baseVariant.CameraRotate.Y, _baseVariant.CameraRotate.Z);
-        variant.CameraVerticalOffset = Math.Clamp(_currentCameraVerticalOffset, MinCameraVerticalOffset, MaxCameraVerticalOffset);
-        variant.CameraZoom = Math.Clamp(_currentZoom, MinZoom, MaxZoom);
-        variant.RenderScale = Math.Clamp(renderScale, 0.05f, 1f);
+        if (_realtime is { } realtime)
+        {
+            realtime.Specifications = CurrentVariant();
+            realtime.Invalidate();
+            return;
+        }
 
         var generation = Interlocked.Increment(ref _latestQueuedGeneration);
         MiiLoaded = false;
@@ -225,7 +210,7 @@ public partial class MiiRenderView : BaseMiiImage
             _pendingRender?.Cancellation.Cancel();
             _pendingRender?.Cancellation.Dispose();
 
-            _pendingRender = new PendingRender(generation, mii, _studioData!, variant, cancellation);
+            _pendingRender = new PendingRender(generation, mii, _studioData!, CurrentVariant(), cancellation);
             _inFlightRenderCts?.Cancel();
             if (!_renderWorkerRunning)
             {
@@ -236,6 +221,26 @@ public partial class MiiRenderView : BaseMiiImage
 
         if (shouldStartWorker)
             _ = Task.Run(RenderWorkerLoopAsync);
+    }
+
+    private void OnRealtimeMiiShown(string studioData)
+    {
+        _shownStudio = studioData;
+        if (studioData == _studioData)
+            MiiLoaded = true;
+    }
+
+    private void SwitchToCpu()
+    {
+        if (_realtime is not { } realtime)
+            return;
+        _realtime = null;
+        realtime.MiiShown -= OnRealtimeMiiShown;
+        RenderHost.Children.Remove(realtime);
+        RenderImage.IsVisible = true;
+        ImageBorder.IsVisible = false;
+        _forceNextSurfaceRecreate = true;
+        QueueRenderCurrentView();
     }
 
     private async Task RenderWorkerLoopAsync()
@@ -311,7 +316,6 @@ public partial class MiiRenderView : BaseMiiImage
         RenderImage.InvalidateVisual();
         ImageBorder.InvalidateVisual();
         InvalidateVisual();
-        _hasPresentedFrame = true;
         MiiLoaded = true;
     }
 
@@ -350,14 +354,13 @@ public partial class MiiRenderView : BaseMiiImage
         if (expectedGeneration != Volatile.Read(ref _latestQueuedGeneration))
             return;
 
+        _realtime?.SetMii(null, null);
         DisposeSurfaceBitmap();
         RenderImage.Source = null;
         ImageBorder.IsVisible = false;
         RenderImage.InvalidateVisual();
         ImageBorder.InvalidateVisual();
         InvalidateVisual();
-        _hasPresentedFrame = false;
-        _lastModelChangeUtc = DateTime.MinValue;
         MiiLoaded = true;
     }
 
@@ -365,7 +368,6 @@ public partial class MiiRenderView : BaseMiiImage
     {
         var generation = Interlocked.Increment(ref _latestQueuedGeneration);
         _lastPresentedGeneration = generation;
-        DisposeInteractionSettleCts();
         lock (_renderLock)
         {
             _pendingRender?.Cancellation.Cancel();
@@ -378,60 +380,10 @@ public partial class MiiRenderView : BaseMiiImage
         return generation;
     }
 
-    private void ScheduleHighQualityRefresh()
-    {
-        DisposeInteractionSettleCts();
-
-        var cts = new CancellationTokenSource();
-        _interactionSettleCts = cts;
-        var token = cts.Token;
-        var settleDelay = Math.Clamp(HighQualitySettleDelayMs, 20, 1000);
-
-        _ = Task.Run(
-            async () =>
-            {
-                try
-                {
-                    await Task.Delay(settleDelay, token);
-                    await Dispatcher.UIThread.InvokeAsync(
-                        () =>
-                        {
-                            if (!token.IsCancellationRequested)
-                                QueueRenderCurrentView(renderScale: 1f);
-                        },
-                        DispatcherPriority.Background
-                    );
-                }
-                catch (OperationCanceledException)
-                {
-                    // Ignore cancellation: new interaction superseded this request.
-                }
-            },
-            token
-        );
-    }
-
-    private void DisposeInteractionSettleCts()
-    {
-        _interactionSettleCts?.Cancel();
-        _interactionSettleCts?.Dispose();
-        _interactionSettleCts = null;
-    }
-
     private void DisposeSurfaceBitmap()
     {
         _surfaceBitmap?.Dispose();
         _surfaceBitmap = null;
-    }
-
-    private float GetPreviewRenderScale() => Math.Clamp(PreviewRenderScale, 0.05f, 1f);
-
-    private bool ShouldUsePreviewForModelChange()
-    {
-        var now = DateTime.UtcNow;
-        var shouldUsePreview = _hasPresentedFrame && now - _lastModelChangeUtc <= RapidModelUpdateThreshold;
-        _lastModelChangeUtc = now;
-        return shouldUsePreview;
     }
 
     private static float NormalizeDegrees(float degrees)
@@ -484,8 +436,7 @@ public partial class MiiRenderView : BaseMiiImage
             _currentPitch += (float)(deltaY * PitchDragSensitivity);
         }
 
-        QueueRenderCurrentView(renderScale: GetPreviewRenderScale());
-        ScheduleHighQualityRefresh();
+        QueueRenderCurrentView();
     }
 
     private void ImageBorder_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -494,17 +445,10 @@ public partial class MiiRenderView : BaseMiiImage
             return;
 
         _isDragging = false;
-        DisposeInteractionSettleCts();
-        QueueRenderCurrentView(renderScale: 1f);
         e.Pointer.Capture(null);
     }
 
-    private void ImageBorder_OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
-    {
-        _isDragging = false;
-        DisposeInteractionSettleCts();
-        QueueRenderCurrentView(renderScale: 1f);
-    }
+    private void ImageBorder_OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e) => _isDragging = false;
 
     private void ImageBorder_OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
     {
@@ -516,8 +460,7 @@ public partial class MiiRenderView : BaseMiiImage
 
         _currentZoom -= (float)e.Delta.Y * ZoomStep;
         _currentZoom = Math.Clamp(_currentZoom, MinZoom, MaxZoom);
-        QueueRenderCurrentView(renderScale: GetPreviewRenderScale());
-        ScheduleHighQualityRefresh();
+        QueueRenderCurrentView();
     }
 
     private sealed record PendingRender(

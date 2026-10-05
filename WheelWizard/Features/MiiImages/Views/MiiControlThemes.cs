@@ -95,14 +95,6 @@ public sealed class MiiControlThemes(IMiiImagesSingletonService images, ISeasona
                             view.Bind(BaseMiiImage.ReloadMethodProperty, control.GetObservable(MiiImageControl.ReloadMethodProperty));
                             view.Bind(MiiRenderView.ImageVariantProperty, control.GetObservable(Mii3DRender.ImageVariantProperty));
                             view.Bind(MiiRenderView.InteractiveProperty, control.GetObservable(Mii3DRender.InteractiveProperty));
-                            view.Bind(
-                                MiiRenderView.PreviewRenderScaleProperty,
-                                control.GetObservable(Mii3DRender.PreviewRenderScaleProperty)
-                            );
-                            view.Bind(
-                                MiiRenderView.HighQualitySettleDelayMsProperty,
-                                control.GetObservable(Mii3DRender.HighQualitySettleDelayMsProperty)
-                            );
                             view.Bind(BaseMiiImage.MiiProperty, control.GetObservable(MiiImageControl.MiiProperty));
                             return view;
                         }
