@@ -5,12 +5,14 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
+using Avalonia.Rendering.Composition;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Testably.Abstractions.Testing;
 using WheelWizard.ApplicationData;
+using WheelWizard.Mods;
 using WheelWizard.Settings;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Services;
@@ -20,6 +22,7 @@ using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
+using WheelWizard.Views.Startup;
 using Button = Avalonia.Controls.Button;
 
 namespace WheelWizard.UI.Test;
@@ -27,7 +30,45 @@ namespace WheelWizard.UI.Test;
 public class ApplicationCompositionTests
 {
     [AvaloniaFact]
-    public async Task MainWindowAndPages_ConstructWithoutStaticServiceInitialization_AndRefreshSafely()
+    public async Task Splash_RendersWithoutApplicationStyles_AndDoesNotRestartWhenTheyLoad()
+    {
+        var styles = Application.Current!.Styles.ToArray();
+        Application.Current.Styles.Clear();
+        var splash = new SplashWindow();
+        try
+        {
+            splash.Show();
+            splash.UpdateLayout();
+            var wheel = Assert.Single(splash.GetVisualDescendants().OfType<Avalonia.Controls.Image>());
+            Assert.NotNull(wheel.Source);
+            Assert.Equal(220, wheel.Bounds.Width);
+            Assert.Equal(220, wheel.Bounds.Height);
+            var entrance = splash.FindControl<Avalonia.Controls.Grid>("Entrance")!;
+            var visual = ElementComposition.GetElementVisual(wheel);
+            Assert.NotNull(visual);
+            Assert.Equal(new Vector3D(110, 110, 0), visual.CenterPoint);
+            await Task.Delay(250);
+            Assert.Equal(1, entrance.Opacity);
+            foreach (var style in styles)
+                Application.Current.Styles.Add(style);
+            splash.UpdateLayout();
+            Assert.Equal(1, entrance.Opacity);
+            Assert.Same(visual, ElementComposition.GetElementVisual(wheel));
+        }
+        finally
+        {
+            splash.Close();
+            Application.Current.Styles.Clear();
+            foreach (var style in styles)
+                Application.Current.Styles.Add(style);
+        }
+    }
+
+    [AvaloniaTheory]
+    [InlineData("ready")]
+    [InlineData("timeout")]
+    [InlineData("shutdown")]
+    public async Task MainWindowAndPages_ConstructWithoutStaticServiceInitialization_AndRefreshSafely(string completion)
     {
         var fileSystem = new MockFileSystem();
         var directory = Path.Combine(Path.GetTempPath(), "wheelwizard-ui-composition");
@@ -38,6 +79,25 @@ public class ApplicationCompositionTests
         registrations.AddWheelWizardServices(location);
         registrations.AddSingleton<IFileSystem>(fileSystem);
         registrations.AddTransient(typeof(IApiCaller<>), typeof(OfflineApiCaller<>));
+        var modsLoaded = new TaskCompletionSource<OperationResult>();
+        var mods = Substitute.For<IModManager>();
+        mods.ReloadAsync().Returns(modsLoaded.Task);
+        registrations.AddSingleton(mods);
+        TimerCallback? expire = null;
+        object? timerState = null;
+        var time = Substitute.For<System.TimeProvider>();
+        time.CreateTimer(Arg.Any<TimerCallback>(), Arg.Any<object?>(), Arg.Any<TimeSpan>(), Arg.Any<TimeSpan>())
+            .Returns(call =>
+            {
+                expire = call.ArgAt<TimerCallback>(0);
+                timerState = call.ArgAt<object?>(1);
+                Assert.Equal(TimeSpan.FromSeconds(10), call.ArgAt<TimeSpan>(2));
+                return Substitute.For<ITimer>();
+            });
+        registrations.AddSingleton<IMainWindowService>(provider => new MainWindowService(
+            () => provider.GetRequiredService<Layout>(),
+            time
+        ));
         using var services = registrations.BuildServiceProvider(
             new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }
         );
@@ -52,7 +112,41 @@ public class ApplicationCompositionTests
         var windows = services.GetRequiredService<IMainWindowService>();
         try
         {
-            windows.Show(desktop);
+            var splash = new SplashWindow();
+            desktop.MainWindow = splash;
+            splash.Show();
+            Assert.True(splash.IsVisible);
+            using var shutdown = new CancellationTokenSource();
+            var opening = windows.ShowAsync(desktop, shutdown.Token);
+            if (opening.IsFaulted)
+                await opening;
+            Assert.False(opening.IsCompleted);
+            Assert.True(splash.IsVisible);
+            Assert.Equal(0, desktop.MainWindow!.Opacity);
+            Assert.False(desktop.MainWindow.ShowInTaskbar);
+            if (completion == "shutdown")
+            {
+                shutdown.Cancel();
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(() => opening);
+                Assert.Equal(0, desktop.MainWindow.Opacity);
+                Assert.True(splash.IsVisible);
+                modsLoaded.SetResult(OperationResult.Ok());
+                splash.Close();
+                return;
+            }
+            if (completion == "timeout")
+                expire!(timerState);
+            else
+                modsLoaded.SetResult(OperationResult.Ok());
+            await opening;
+            Assert.False(splash.IsVisible);
+            Assert.Equal(1, desktop.MainWindow.Opacity);
+            Assert.True(desktop.MainWindow.ShowInTaskbar);
+            if (completion == "timeout")
+            {
+                Assert.False(modsLoaded.Task.IsCompleted);
+                modsLoaded.SetResult(OperationResult.Ok());
+            }
             var original = Assert.IsType<Layout>(desktop.MainWindow);
             original.UpdateLayout();
             Assert.Equal(Layout.WindowHeight * settings.Get<double>(settings.WINDOW_SCALE), original.Height);
@@ -74,8 +168,8 @@ public class ApplicationCompositionTests
                 Assert.Same(titleBar, Assert.IsType<Grid>(logo.Parent!.Parent).Parent);
                 var logoPosition = logo.TranslatePoint(default, titleBar)!.Value;
                 Assert.Equal(logoPosition.X, logoPosition.Y);
-                Assert.False(original.FindControl<Button>("HeaderBackButton")!.IsEnabled);
-                Assert.False(original.FindControl<Button>("HeaderForwardButton")!.IsEnabled);
+                Assert.Null(original.FindControl<Button>("HeaderBackButton"));
+                Assert.Null(original.FindControl<Button>("HeaderForwardButton"));
                 if (!OperatingSystem.IsMacOS())
                     Assert.Same(Application.Current!.FindResource("DesktopWindowDecorations"), original.WindowDecorationsTheme);
                 original.SetInteractable(false);
@@ -90,29 +184,6 @@ public class ApplicationCompositionTests
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             var navigation = services.GetRequiredService<INavigationService>();
             Assert.IsType<HomePage>(navigation.CurrentPage);
-
-            var back = original.FindControl<Button>("HeaderBackButton")!;
-            var forward = original.FindControl<Button>("HeaderForwardButton")!;
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral950"),
-                Assert.IsAssignableFrom<Avalonia.Media.ISolidColorBrush>(back.Foreground).Color
-            );
-            navigation.NavigateTo<RoomsPage>();
-            Assert.True(back.IsEnabled);
-            Assert.False(forward.IsEnabled);
-            Assert.Equal(
-                Application.Current.FindResource("Neutral400"),
-                Assert.IsAssignableFrom<Avalonia.Media.ISolidColorBrush>(back.Foreground).Color
-            );
-            back.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Assert.IsType<HomePage>(navigation.CurrentPage);
-            Assert.False(back.IsEnabled);
-            Assert.True(forward.IsEnabled);
-            forward.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Assert.IsType<RoomsPage>(navigation.CurrentPage);
-            navigation.NavigateTo<HomePage>();
-            Assert.False(forward.IsEnabled);
-            original.UpdateLayout();
 
             // Collapse reuses the existing controls and must not resize the window or navigate.
             settings.ENABLE_ANIMATIONS.Set(false, skipSave: true);
@@ -235,20 +306,6 @@ public class ApplicationCompositionTests
                 .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var other = Assert.IsType<SettingsPage>(navigation.CurrentPage);
             Assert.IsType<OtherSettings>(other.FindControl<ContentControl>("SettingsContent")!.Content);
-            navigation.GoBack();
-            Assert.IsType<AppInfo>(
-                Assert.IsType<SettingsPage>(navigation.CurrentPage).FindControl<ContentControl>("SettingsContent")!.Content
-            );
-            navigation.GoForward();
-            var restored = Assert.IsType<SettingsPage>(navigation.CurrentPage);
-            Assert.IsType<OtherSettings>(restored.FindControl<ContentControl>("SettingsContent")!.Content);
-            var repeated = navigation.CurrentPage;
-            restored
-                .FindControl<StackPanel>("SettingPages")!
-                .Children.OfType<RadioButton>()
-                .Single(tab => Equals(tab.Tag, nameof(OtherSettings)))
-                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Assert.Same(repeated, navigation.CurrentPage);
             toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             windows.Refresh();
             Assert.Equal(64, Assert.IsType<Layout>(desktop.MainWindow).SidebarWidth);

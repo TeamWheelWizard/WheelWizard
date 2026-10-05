@@ -76,6 +76,9 @@
     </Style>
 
     <Style Selector="TextBlock.BobUp">
+        <Setter Property="RenderTransform">
+            <TranslateTransform />
+        </Setter>
         <Style.Animations>
             <Animation Duration="0:0:0.25" IterationCount="Infinite" PlaybackDirection="Alternate">
                 <KeyFrame Cue="0%">
@@ -89,6 +92,9 @@
     </Style>
 
     <Style Selector="TextBlock.BobDown">
+        <Setter Property="RenderTransform">
+            <TranslateTransform />
+        </Setter>
         <Style.Animations>
             <Animation Duration="0:0:0.25" Delay="0:0:0.25" IterationCount="Infinite" PlaybackDirection="Alternate">
                 <KeyFrame Cue="0%">

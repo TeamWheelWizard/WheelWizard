@@ -57,7 +57,7 @@ public sealed class DesktopStartup(
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            windows.Show(desktop);
+            await windows.ShowAsync(desktop, cancellationToken);
             licenses.LoadLicense();
             await startup.RunAsync(options, cancellationToken);
         }

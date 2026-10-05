@@ -17,7 +17,6 @@ public partial class SettingsPage : UserControl
     private ISettingsSignalBus SettingsSignalBus { get; }
 
     private IPageFactory Pages { get; }
-    private INavigationService Navigation { get; }
     private IDisposable? _settingsSignalSubscription;
 
     public SettingsPage(
@@ -25,7 +24,6 @@ public partial class SettingsPage : UserControl
         ISettingsManager settingsService,
         ISettingsSignalBus settingsSignalBus,
         IPageFactory pages,
-        INavigationService navigation,
         Type? initialPage = null
     )
     {
@@ -33,7 +31,6 @@ public partial class SettingsPage : UserControl
         SettingsService = settingsService;
         SettingsSignalBus = settingsSignalBus;
         Pages = pages;
-        Navigation = navigation;
         InitializeComponent();
         UpdateTabVisibility();
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingChanged);
@@ -91,7 +88,7 @@ public partial class SettingsPage : UserControl
         if (type == null || !typeof(UserControl).IsAssignableFrom(type))
             return;
 
-        Navigation.NavigateTo<SettingsPage>(type);
+        SettingsContent.Content = Pages.Create(type);
     }
 
     private void SetCheckedTopBarButton(UserControl settingsPage)

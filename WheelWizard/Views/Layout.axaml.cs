@@ -5,6 +5,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using WheelWizard.Branding;
 using WheelWizard.Localization;
 using WheelWizard.Mods;
@@ -53,6 +55,8 @@ public partial class Layout : BaseWindow, IPollingListener
     private int _testerClickCount;
     private bool _testerPromptOpen;
     private IDisposable? _settingsSignalSubscription;
+    private readonly Task _modsLoaded;
+    private readonly TaskCompletionSource _loaded = new();
 
     private LiveRoomsService LiveRooms { get; }
 
@@ -115,7 +119,7 @@ public partial class Layout : BaseWindow, IPollingListener
         LiveRooms.Subscribe(this);
         GameLicenseService.Subscribe(this);
         ModManagerService.PropertyChanged += ModManager_PropertyChanged;
-        _ = ReloadModsAndShowErrorsAsync();
+        _modsLoaded = ReloadModsAndShowErrorsAsync();
         UpdateOtherSectionVisibility();
         if (SettingsService.SIDEBAR_COLLAPSED.Get())
             _ = SetSidebarCollapsedAsync(true, animate: false);
@@ -123,6 +127,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
+        base.OnLoaded(e);
         Title = BrandingService.Branding.DisplayName;
         VersionTagText.Text = $"v{BrandingService.Branding.Version}";
         UpdateModsButtonText();
@@ -132,6 +137,24 @@ public partial class Layout : BaseWindow, IPollingListener
             Navigation_OnPageChanged(this, page);
         else
             Navigation.NavigateTo<HomePage>();
+        _loaded.TrySetResult();
+    }
+
+    public async Task WaitForInitialContentAsync(CancellationToken cancellationToken)
+    {
+        await _loaded.Task.WaitAsync(cancellationToken);
+        LiveStatus.Start();
+        LiveRooms.Start();
+        var initialPageReady = Navigation.CurrentPage is HomePage home ? home.InitialContentReady : Task.CompletedTask;
+        await Task.WhenAll(_modsLoaded, initialPageReady, LiveStatus.InitialUpdate, LiveRooms.InitialUpdate).WaitAsync(cancellationToken);
+        UpdateLayout();
+        await Task.WhenAll(
+            this.GetVisualDescendants()
+                .OfType<BaseMiiImage>()
+                .Where(image => image.IsEffectivelyVisible)
+                .Select(image => image.WaitUntilLoadedAsync(cancellationToken))
+        );
+        await Dispatcher.UIThread.InvokeAsync(UpdateLayout, DispatcherPriority.Background, cancellationToken);
     }
 
     protected override void OnClosed(EventArgs e)
@@ -220,16 +243,7 @@ public partial class Layout : BaseWindow, IPollingListener
     //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
     // }
 
-    private void Navigation_OnPageChanged(object? sender, UserControl page)
-    {
-        NavigateToPage(page);
-        HeaderBackButton.IsEnabled = Navigation.CanGoBack;
-        HeaderForwardButton.IsEnabled = Navigation.CanGoForward;
-    }
-
-    private void HeaderBackButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoBack();
-
-    private void HeaderForwardButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoForward();
+    private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
 
     private void HeaderMinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 

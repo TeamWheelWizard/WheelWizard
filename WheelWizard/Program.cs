@@ -20,26 +20,33 @@ public class Program : IDesignerEntryPoint
     [STAThread]
     public static void Main(string[] args)
     {
-        // Make sure this is the first action on startup!
-        SetupWorkingDirectory();
-
-        // Logging and feature paths share the same application-data location.
-        var applicationData = ApplicationDataComposition.CreateLocation(new RealFileSystem(), new RuntimeEnvironment());
-        var logFiles = new ApplicationLogFiles(applicationData, new LogFileFactory(new RealFileSystem()));
-        Log.Logger = CreateLoggerWithRecovery(applicationData, logFiles);
-        ApplicationLogging.LogStartup(Log.Logger);
-        RegisterGlobalExceptionLogging();
-
+        ServiceProvider? serviceProvider = null;
         try
         {
-            // Initialize the Avalonia application
-            var services = new ServiceCollection();
-            services.AddWheelWizardServices(applicationData);
-            services.AddSingleton(logFiles);
-            using var serviceProvider = services.BuildServiceProvider(
-                new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }
-            );
-            var builder = CreateWheelWizardApp(serviceProvider);
+            var builder = CreateWheelWizardApp(async () =>
+            {
+                serviceProvider = await Task.Run(() =>
+                {
+                    // Resolve paths before any application-data or logging work.
+                    SetupWorkingDirectory();
+                    var applicationData = ApplicationDataComposition.CreateLocation(new RealFileSystem(), new RuntimeEnvironment());
+                    var logFiles = new ApplicationLogFiles(applicationData, new LogFileFactory(new RealFileSystem()));
+                    Log.Logger = CreateLoggerWithRecovery(applicationData, logFiles);
+                    ApplicationLogging.LogStartup(Log.Logger);
+                    RegisterGlobalExceptionLogging();
+                    var services = new ServiceCollection();
+                    services.AddWheelWizardServices(applicationData);
+                    services.AddSingleton(logFiles);
+                    return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+                });
+                Logger.Sink = serviceProvider.GetRequiredService<AvaloniaLoggerAdapter>();
+                var app = (App)Application.Current!;
+                app.LoadVisualResources();
+                Setup(serviceProvider);
+                serviceProvider.GetRequiredService<MiiControlThemes>().Install(app.Resources);
+                serviceProvider.GetRequiredService<WindowAppearance>().Install(app.Resources);
+                return serviceProvider.GetRequiredService<IDesktopStartup>();
+            });
 
             // Start the application
             builder.StartWithClassicDesktopLifetime(args);
@@ -50,6 +57,7 @@ public class Program : IDesignerEntryPoint
         }
         finally
         {
+            serviceProvider?.Dispose();
             Log.CloseAndFlush();
         }
     }
@@ -107,12 +115,11 @@ public class Program : IDesignerEntryPoint
     /// <summary>
     /// Configures the WheelWizard application.
     /// </summary>
-    private static AppBuilder CreateWheelWizardApp(IServiceProvider services)
+    private static AppBuilder CreateWheelWizardApp(Func<Task<IDesktopStartup>> createStartup)
     {
-        Logger.Sink = services.GetRequiredService<AvaloniaLoggerAdapter>();
 #pragma warning disable AVALONIA_X11_CSD
         var builder = AppBuilder
-            .Configure(() => new App(services.GetRequiredService<IDesktopStartup>()))
+            .Configure(() => new App(createStartup))
             .UsePlatformDetect()
             .With(new X11PlatformOptions { EnableDrawnDecorations = true })
             .WithInterFont();
@@ -125,12 +132,7 @@ public class Program : IDesignerEntryPoint
             builder = builder.UseWayland();
         }
 
-        return builder.AfterSetup(appBuilder =>
-        {
-            Setup(services);
-            services.GetRequiredService<MiiControlThemes>().Install(appBuilder.Instance!.Resources);
-            services.GetRequiredService<WindowAppearance>().Install(appBuilder.Instance.Resources);
-        });
+        return builder;
     }
 
     private static void SetupWorkingDirectory()

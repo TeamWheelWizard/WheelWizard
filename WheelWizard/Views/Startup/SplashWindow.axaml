@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WheelWizard.Views.Startup.SplashWindow"
+        Title="Wheel Wizard is starting" Width="280" Height="280"
+        WindowStartupLocation="CenterScreen" WindowDecorations="None"
+        CanResize="False" ShowInTaskbar="False"
+        Background="Transparent" TransparencyLevelHint="Transparent">
+    <Window.Template>
+        <ControlTemplate>
+            <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" />
+        </ControlTemplate>
+    </Window.Template>
+    <Grid x:Name="Entrance" Width="220" Height="220" HorizontalAlignment="Center" VerticalAlignment="Center"
+          RenderTransformOrigin="50%,50%">
+        <Image x:Name="Wheel" Source="/Resources/Images/AppIcon.png" Stretch="Uniform" RenderTransformOrigin="50%,50%" />
+    </Grid>
+</Window>
+
