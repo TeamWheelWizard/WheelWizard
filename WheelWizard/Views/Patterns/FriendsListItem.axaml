@@ -53,10 +53,12 @@
                         ClipToBounds="True">
                     <Grid ColumnDefinitions="2*, 5*, 5*">
                         <Border Grid.Column="0" Background="{StaticResource Neutral700}"
+                                Width="78" HorizontalAlignment="Left"
                                 Margin="-10,-5,0,-5" CornerRadius="7,0,0,7" />
-                        <behaviorComponent:MiiImageLoader Grid.Column="0" Grid.ColumnSpan="2" Margin="-180,-25,0,-5"
-                                                          HorizontalAlignment="Stretch"
-                                                          VerticalAlignment="Stretch"
+                        <behaviorComponent:MiiImageLoader Grid.Column="0" Margin="-43,-25,0,-5"
+                                                          Width="144" Height="144"
+                                                          HorizontalAlignment="Left"
+                                                          VerticalAlignment="Top"
                                                           Mii="{TemplateBinding Mii}"
                                                           FallBackColor="{StaticResource Neutral500}"
                                                           ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}"

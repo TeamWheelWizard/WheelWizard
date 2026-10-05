@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using Avalonia.Rendering.Composition;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -16,11 +17,13 @@ using WheelWizard.Settings;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.Navigation;
 using WheelWizard.Views.Pages;
 using WheelWizard.Views.Pages.Settings;
 using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Startup;
+using Button = Avalonia.Controls.Button;
 
 namespace WheelWizard.UI.Test;
 
@@ -113,6 +116,78 @@ public class ApplicationCompositionTests
             var navigation = services.GetRequiredService<INavigationService>();
             Assert.IsType<HomePage>(navigation.CurrentPage);
 
+            // Collapse reuses the existing controls and must not resize the window or navigate.
+            settings.ENABLE_ANIMATIONS.Set(false, skipSave: true);
+            var toggle = original.FindControl<Button>("SidebarToggle")!;
+            var originalWidth = original.Width;
+            Assert.False(settings.SIDEBAR_COLLAPSED.Get());
+            Assert.Equal(221, original.SidebarWidth);
+            var titleDivider = navigation.CurrentPage!.GetVisualDescendants().OfType<Border>().First(border => border.Height == 1);
+            var dividerCenter = titleDivider.TranslatePoint(new Point(0, titleDivider.Bounds.Height / 2), original)!.Value.Y;
+            var toggleCenter = toggle.TranslatePoint(new Point(0, toggle.Bounds.Height / 2), original)!.Value.Y;
+            Assert.Equal(dividerCenter, toggleCenter, 1);
+            // Image positions follow intermediate widths, not just the collapsed/expanded state.
+            original.SidebarWidth = (221d + 64d) / 2;
+            Assert.Equal(-12, original.FindControl<MiiImageLoader>("SidebarMii")!.Margin.Left);
+            Assert.Equal(13.25, original.FindControl<IconLabel>("TitleLabel")!.Margin.Left);
+            Assert.Equal(
+                19.5,
+                original.FindControl<SidebarRadioButton>("RoomsButton")!.GetVisualDescendants().OfType<IconLabel>().Single().Margin.Left
+            );
+            original.SidebarWidth = 221;
+            var roomsTop = original.FindControl<SidebarRadioButton>("RoomsButton")!.Bounds.Top;
+            toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            original.UpdateLayout();
+            Assert.Equal(64, original.SidebarWidth);
+            Assert.True(settings.SIDEBAR_COLLAPSED.Get());
+            Assert.Equal(originalWidth, original.Width);
+            Assert.IsType<HomePage>(navigation.CurrentPage);
+            Assert.False(original.FindControl<Control>("SupportUsButton")!.IsVisible);
+            Assert.True(original.FindControl<MenuItem>("CollapsedSupportMenuItem")!.IsVisible);
+            Assert.Equal(18, original.FindControl<Border>("LiveStatusBorder")!.Margin.Left);
+            Assert.Equal(1, original.FindControl<Border>("LiveStatusBorder")!.Opacity);
+            Assert.Equal(2, Grid.GetRow(original.FindControl<Border>("SidebarInfoButton")!));
+            Assert.Equal(0, Grid.GetRow(original.FindControl<Border>("SidebarSettingsButton")!));
+            var roomsButton = original.FindControl<SidebarRadioButton>("RoomsButton")!;
+            Assert.Equal(roomsTop, roomsButton.Bounds.Top);
+            Assert.Null(ToolTip.GetTip(original.FindControl<Border>("SidebarInfoButton")!));
+            Assert.Equal(PlacementMode.Right, ToolTip.GetPlacement(roomsButton));
+            Assert.Equal(PlacementMode.Right, ToolTip.GetPlacement(original.FindControl<Border>("SidebarSettingsButton")!));
+            foreach (var placement in new[] { PlacementMode.Left, PlacementMode.Right })
+            {
+                var target = new Border();
+                var bubble = new ToolTip { Content = "Side tooltip" };
+                ToolTip.SetPlacement(target, placement);
+                ToolTip.SetTip(target, bubble);
+                Assert.Equal(placement, ToolTip.GetPlacement(target));
+                Assert.Contains(placement == PlacementMode.Left ? "BubbleSideLeft" : "BubbleSideRight", bubble.Classes);
+            }
+            Assert.Equal(roomsButton.Text, ToolTip.GetTip(roomsButton));
+            Assert.Equal(string.Empty, roomsButton.GetVisualDescendants().OfType<IconLabel>().Single().Text);
+            Assert.Equal(19.5, roomsButton.GetVisualDescendants().OfType<IconLabel>().Single().Margin.Left);
+            Assert.Equal(0, original.FindControl<TextBlock>("OtherSectionText")!.Opacity);
+            Assert.False(roomsButton.GetVisualDescendants().OfType<StateBox>().Single().IsVisible);
+            toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            original.UpdateLayout();
+            Assert.Equal(221, original.SidebarWidth);
+            Assert.False(settings.SIDEBAR_COLLAPSED.Get());
+            Assert.Equal(originalWidth, original.Width);
+            Assert.True(original.FindControl<Control>("SupportUsButton")!.IsVisible);
+            Assert.False(original.FindControl<MenuItem>("CollapsedSupportMenuItem")!.IsVisible);
+            Assert.Equal(roomsButton.Text, roomsButton.GetVisualDescendants().OfType<IconLabel>().Single().Text);
+            Assert.Equal(19.5, roomsButton.GetVisualDescendants().OfType<IconLabel>().Single().Margin.Left);
+            Assert.Equal(1, original.FindControl<TextBlock>("OtherSectionText")!.Opacity);
+            Assert.Equal(PlacementMode.Top, ToolTip.GetPlacement(original.FindControl<Border>("SidebarSettingsButton")!));
+            settings.ENABLE_ANIMATIONS.Set(true, skipSave: true);
+            toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            for (var frame = 0; frame < 150 && !toggle.IsEnabled; frame++)
+                await Task.Delay(20);
+            Assert.True(toggle.IsEnabled);
+            Assert.Equal(64, original.SidebarWidth);
+            Assert.Equal(1, original.FindControl<Grid>("SidebarBottomBar")!.Opacity);
+            settings.ENABLE_ANIMATIONS.Set(false, skipSave: true);
+            toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
             Type[] pages =
             [
                 typeof(FriendsPage),
@@ -155,7 +230,10 @@ public class ApplicationCompositionTests
                 original.UpdateLayout();
                 Assert.IsType<SettingsPage>(navigation.CurrentPage);
             }
+            toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             windows.Refresh();
+            Assert.Equal(64, Assert.IsType<Layout>(desktop.MainWindow).SidebarWidth);
+            Assert.Equal(string.Empty, desktop.MainWindow!.FindControl<IconLabel>("TitleLabel")!.Text);
             Assert.NotSame(original, desktop.MainWindow);
             Assert.False(original.IsVisible);
             Assert.True(desktop.MainWindow!.IsVisible);

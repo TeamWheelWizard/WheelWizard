@@ -8,6 +8,8 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Diagnostics;
+using WheelWizard.Views.Navigation;
+using WheelWizard.Views.Pages;
 using WheelWizard.Views.Popups.Base;
 using WheelWizard.Views.Popups.Generic;
 using WheelWizard.WheelWizardData;
@@ -23,12 +25,14 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     private LiveRoomsService LiveRooms { get; }
 
     private DevelopmentRefreshService DevelopmentRefresh { get; }
+    private INavigationService Navigation { get; }
 
     public DevToolWindow(
         IMemoryCache cache,
         IDolphinLaunchService dolphinLaunchService,
         LiveRoomsService liveRooms,
-        DevelopmentRefreshService developmentRefresh
+        DevelopmentRefreshService developmentRefresh,
+        INavigationService navigation
     )
         : base(true, true, true, "Dev Tool")
     {
@@ -36,6 +40,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
         DolphinLaunchService = dolphinLaunchService;
         LiveRooms = liveRooms;
         DevelopmentRefresh = developmentRefresh;
+        Navigation = navigation;
         InitializeComponent();
         DevelopmentRefresh.Subscribe(this);
         LoadSettings();
@@ -63,6 +68,12 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
 
     private void ClearCache_OnClick(object sender, RoutedEventArgs e) => ((MemoryCache)Cache).Clear();
+
+    private void KitchenSink_OnClick(object sender, RoutedEventArgs e)
+    {
+        Close();
+        Navigation.NavigateTo<KitchenSinkPage>();
+    }
 
     private void HideDevelopmentFeatures_OnClick(object sender, RoutedEventArgs e)
     {

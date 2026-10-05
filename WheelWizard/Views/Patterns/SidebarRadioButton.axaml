@@ -35,6 +35,7 @@
     <Setter Property="Background" Value="{DynamicResource Neutral900}" />
     <Setter Property="Foreground" Value="{DynamicResource Neutral400}" />
     <Setter Property="Height" Value="46" />
+    <Setter Property="Padding" Value="19.5,0,10,0" />
     <Setter Property="GroupName" Value="SidebarRadioButton"/> <!-- Because its a radio button, they have to be in the same group to work -->
     <Setter Property="HorizontalAlignment" Value="Stretch"/>
     <Setter Property="Template">
@@ -74,7 +75,7 @@
                              Text="{TemplateBinding Text}"
                              Foreground="{TemplateBinding Foreground}"
                              HorizontalAlignment="Left" VerticalAlignment="Center"
-                             Margin="16,0,10,0" />
+                             Margin="{TemplateBinding Padding}" />
 
             <components:StateBox IsVisible="{TemplateBinding BoxText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                             x:Name="StateBox" Classes="Dark"
@@ -121,5 +122,16 @@
     <Style Selector="^ /template/ Border#PART_SelectionIndicator">
       <Setter Property="Background" Value="{StaticResource Primary400}"/>
     </Style>
+  </Style>
+  <Style Selector="patterns|SidebarRadioButton.compact">
+    <Setter Property="ToolTip.Tip" Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
+    <Setter Property="ToolTip.ShowDelay" Value="100" />
+    <Setter Property="ToolTip.Placement" Value="Right" />
+  </Style>
+  <Style Selector="patterns|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon">
+    <Setter Property="Text" Value="" />
+  </Style>
+  <Style Selector="patterns|SidebarRadioButton.compact /template/ components|StateBox#StateBox">
+    <Setter Property="IsVisible" Value="False" />
   </Style>
 </Styles>

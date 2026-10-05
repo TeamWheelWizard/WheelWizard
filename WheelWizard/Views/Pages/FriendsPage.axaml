@@ -68,9 +68,14 @@
                      Padding="0" Background="Transparent" BorderThickness="0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListBox.Styles>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="domain:FriendProfile">
-                        <patterns:FriendsListItem Width="428" Height="124"
+                        <patterns:FriendsListItem HorizontalAlignment="Stretch" Height="124"
                                                     Margin="0,5"
                                                     UserName="{Binding NameOfMii}"
                                                     FriendCode="{Binding FriendCode}"
