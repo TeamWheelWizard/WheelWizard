@@ -29,7 +29,7 @@ public partial class Layout : BaseWindow, IPollingListener
     private INavigationService Navigation { get; }
 
     protected override Control InteractionOverlay => DisabledDarkenEffect;
-    protected override Control InteractionContent => CompleteGrid;
+    protected override Control InteractionContent => WindowFrame;
 
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
@@ -89,6 +89,10 @@ public partial class Layout : BaseWindow, IPollingListener
         ModManagerService = modManagerService;
         InitializeComponent();
 
+        // Wayland does not expose the drawn caption buttons from our platform decoration template.
+        HeaderWindowControls.IsVisible =
+            OperatingSystem.IsLinux() && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
+
         // Respects tiling window managers better if resizable.
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             CanResize = true;
@@ -107,15 +111,6 @@ public partial class Layout : BaseWindow, IPollingListener
         UpdateMadeByText();
         LocalizationProvider.LanguageChanged += OnLanguageChanged;
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            TopBarButtons.IsVisible = false;
-            TitleLabel.Margin -= new Thickness(0, 0, 0, 18);
-
-            ExtendClientAreaTitleBarHeightHint = 0;
-            WindowDecorations = WindowDecorations.Full;
-        }
-
         LiveStatus.Subscribe(this);
         LiveRooms.Subscribe(this);
         GameLicenseService.Subscribe(this);
@@ -129,12 +124,14 @@ public partial class Layout : BaseWindow, IPollingListener
     protected override void OnLoaded(RoutedEventArgs e)
     {
         Title = BrandingService.Branding.DisplayName;
-        TitleLabel.Text = _sidebarCollapsed ? string.Empty : BrandingService.Branding.DisplayName;
         VersionTagText.Text = $"v{BrandingService.Branding.Version}";
         UpdateModsButtonText();
         // UpdateModsActionIndicator();
 
-        Navigation.NavigateTo<HomePage>();
+        if (Navigation.CurrentPage is { } page)
+            Navigation_OnPageChanged(this, page);
+        else
+            Navigation.NavigateTo<HomePage>();
     }
 
     protected override void OnClosed(EventArgs e)
@@ -185,10 +182,12 @@ public partial class Layout : BaseWindow, IPollingListener
             var scaleFactor = GetUsableWindowScale(SettingsService.WINDOW_SCALE.Value);
             CompleteGrid.Resources["SettingsRowGap"] = 2d / scaleFactor;
             Height = WindowHeight * scaleFactor;
+            // Reserve native chrome inside the existing window height, outside content scaling.
+            var contentHeight = WindowHeight - 30 / scaleFactor;
             Width = WindowWidth * scaleFactor;
             CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
             var marginXCorrection = ((scaleFactor * WindowWidth) - WindowWidth) / 2f;
-            var marginYCorrection = ((scaleFactor * WindowHeight) - WindowHeight) / 2f;
+            var marginYCorrection = ((scaleFactor * contentHeight) - contentHeight) / 2f;
             CompleteGrid.Margin = new(marginXCorrection, marginYCorrection);
             //ExtendClientAreaToDecorationsHint = scaleFactor <= 1.2f;
             return;
@@ -221,7 +220,22 @@ public partial class Layout : BaseWindow, IPollingListener
     //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
     // }
 
-    private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
+    private void Navigation_OnPageChanged(object? sender, UserControl page)
+    {
+        NavigateToPage(page);
+        HeaderBackButton.IsEnabled = Navigation.CanGoBack;
+        HeaderForwardButton.IsEnabled = Navigation.CanGoForward;
+    }
+
+    private void HeaderBackButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoBack();
+
+    private void HeaderForwardButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoForward();
+
+    private void HeaderMinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+    private void HeaderCloseButton_Click(object? sender, RoutedEventArgs e) => Close();
+
+    private static void WindowControl_PointerPressed(object? sender, PointerPressedEventArgs e) => e.Handled = true;
 
     public void NavigateToPage(UserControl page)
     {
@@ -456,10 +470,6 @@ public partial class Layout : BaseWindow, IPollingListener
     private static IBrush GetResourceBrush(string resourceName) =>
         new SolidColorBrush((Color)Application.Current!.FindResource(resourceName)!);
 
-    private void CloseButton_Click(object? sender, RoutedEventArgs e) => Close();
-
-    private void MinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
-
     private void Discord_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.DiscordUrl.ToString());
 
     private void Github_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.RepositoryUrl.ToString());
@@ -467,6 +477,23 @@ public partial class Layout : BaseWindow, IPollingListener
     private void Support_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
     private void SupportUs_OnClick(object? sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+
+    public bool CompleteContentEnabled => InteractionContent.IsEnabled;
+
+    public void ShowAppInfo() => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
+
+    public void ShowSettings() => Navigation.NavigateTo<SettingsPage>();
+
+    public void OpenCommunityLink(string link) =>
+        ViewUtils.OpenLink(
+            link switch
+            {
+                "github" => BrandingService.Branding.RepositoryUrl.ToString(),
+                "discord" => BrandingService.Branding.DiscordUrl.ToString(),
+                "support" => BrandingService.Branding.SupportUrl.ToString(),
+                _ => throw new ArgumentOutOfRangeException(nameof(link)),
+            }
+        );
 
     private void About_Click(object? sender, RoutedEventArgs e) => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
 

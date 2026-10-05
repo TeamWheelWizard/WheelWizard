@@ -23,7 +23,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
     }
 
     protected override Control InteractionOverlay => DisabledDarkenEffect;
-    protected override Control InteractionContent => CompleteGrid;
+    protected override Control InteractionContent => WindowFrame;
 
     private bool _disableOpening = false;
     private bool _closed;
@@ -168,9 +168,9 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
     {
         if (_closed)
             return;
-        var scaleFactor = ViewUtils.GetUsableWindowScale(RequestedWindowScale, size, this);
+        var scaleFactor = ViewUtils.GetUsableWindowScale(RequestedWindowScale, size, this, 30);
         Width = size.Width * scaleFactor;
-        Height = size.Height * scaleFactor;
+        Height = size.Height * scaleFactor + 30;
         CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
         var marginXCorrection = ((scaleFactor * size.Width) - size.Width) / 2f;
         var marginYCorrection = ((scaleFactor * size.Height) - size.Height) / 2f;
@@ -183,7 +183,14 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
             BeginMoveDrag(e);
     }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        // Native window controls must honor the dialog close policy.
+        // Completion, owner close and application shutdown may still close a progress dialog.
+        if (!CanClose && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing)
+            e.Cancel = true;
+        base.OnClosing(e);
+    }
 
     protected override void OnClosed(EventArgs e)
     {
@@ -192,8 +199,6 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
         base.OnClosed(e);
     }
-
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     public void Restore() => WindowState = WindowState.Normal;
 

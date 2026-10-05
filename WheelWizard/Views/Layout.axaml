@@ -10,42 +10,71 @@
         xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
         Height="876" Width="656" WindowStartupLocation="CenterScreen"
-        WindowDecorations="{OnPlatform Default=None, Windows=BorderOnly}"
+        WindowDecorations="Full"
         ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="30"
         CanResize='False' Background="Transparent">
-    <Grid ColumnDefinitions="221,*" RowDefinitions="27,17,18,96,*,80" x:Name="CompleteGrid"
+    <Grid x:Name="WindowFrame" RowDefinitions="30,*"
           Background="{StaticResource FrameColor}">
-
-        <Border Grid.ColumnSpan="2"
-                CornerRadius="0"
-                Background="{StaticResource FrameColor}"
+        <Border Grid.Row="0" Background="Transparent"
+                WindowDecorationProperties.ElementRole="TitleBar"
                 PointerPressed="TopBar_PointerPressed">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center"
+                            IsVisible="{OnPlatform Default=True, macOS=False}">
+                    <components:IconLabel IconData="{StaticResource WheelIcon}" x:Name="TitleLabel" Text=""
+                                          Foreground="{StaticResource Neutral400}"
+                                          FontSize="16" IconSize="20"
+                                          HorizontalAlignment="Left" VerticalAlignment="Center"
+                                          Margin="5,0,5,0" AutomationProperties.Name="Wheel Wizard"
+                                          PointerPressed="TitleLabel_OnPointerPressed" />
+                    <StackPanel.Styles>
+                        <Style Selector="Button.HeaderNavigation:disabled">
+                            <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
+                            <Setter Property="Opacity" Value="1" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <Button x:Name="HeaderBackButton" Width="30" Height="30" Classes="TopButton HeaderNavigation"
+                            IsEnabled="False" AutomationProperties.Name="Back" Click="HeaderBackButton_Click"
+                            WindowDecorationProperties.ElementRole="DecorationsElement">
+                        <PathIcon Data="{StaticResource ArrowLeft}" Width="14" Height="14"
+                                  Foreground="{Binding $parent[Button].Foreground}" />
+                    </Button>
+                    <Button x:Name="HeaderForwardButton" Width="30" Height="30" Classes="TopButton HeaderNavigation"
+                            IsEnabled="False" AutomationProperties.Name="Forward" Click="HeaderForwardButton_Click"
+                            WindowDecorationProperties.ElementRole="DecorationsElement">
+                        <PathIcon Data="{StaticResource ArrowRight}" Width="14" Height="14"
+                                  Foreground="{Binding $parent[Button].Foreground}" />
+                    </Button>
+                </StackPanel>
+
+                <!-- Wayland does not expose the drawn caption buttons from the platform decoration template. -->
+                <StackPanel x:Name="HeaderWindowControls" Grid.Column="1" Orientation="Horizontal"
+                            VerticalAlignment="Center" IsVisible="False">
+                    <StackPanel.Styles>
+                        <Style Selector="Button.CloseWindowControl:pointerover">
+                            <Setter Property="Background" Value="#ffe81123" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <Button Width="30" Height="30" Classes="TopButton WindowControl"
+                            AutomationProperties.Name="Minimize" Click="HeaderMinimizeButton_Click"
+                            PointerPressed="WindowControl_PointerPressed"
+                            WindowDecorationProperties.ElementRole="DecorationsElement">
+                        <PathIcon Data="{StaticResource MinMark}" Width="12" Height="12"
+                                  Foreground="{Binding $parent[Button].Foreground}" />
+                    </Button>
+                    <Button Width="30" Height="30" Classes="TopButton WindowControl CloseWindowControl"
+                            AutomationProperties.Name="Close" Click="HeaderCloseButton_Click"
+                            PointerPressed="WindowControl_PointerPressed"
+                            WindowDecorationProperties.ElementRole="DecorationsElement">
+                        <PathIcon Data="{StaticResource XMark}" Width="11" Height="11"
+                                  Foreground="{Binding $parent[Button].Foreground}" />
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Border>
-
-        <Border Grid.RowSpan="999" Grid.ColumnSpan="999" ZIndex="999" IsVisible="false"
-                x:Name="DisabledDarkenEffect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                Background="Black" Opacity="0.3" />
-
-        <DockPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                   x:Name="TopBarButtons">
-            <Button Width="30" Height="25" Click="MinimizeButton_Click" Classes="TopButton">
-                <PathIcon Data="{StaticResource MinMark}" Width="12" Height="12"
-                          Foreground="{Binding $parent[Button].Foreground}" />
-            </Button>
-            <Button Width="30" Height="25" Click="CloseButton_Click" Classes="TopButton">
-                <PathIcon Data="{StaticResource XMark}" Width="12" Height="12"
-                          Foreground="{Binding $parent[Button].Foreground}" />
-            </Button>
-        </DockPanel>
-
-        <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" VerticalAlignment="Bottom">
-            <components:IconLabel IconData="{StaticResource WheelIcon}" x:Name="TitleLabel"
-                                  Foreground="{StaticResource Neutral400}"
-                                  FontSize="20" IconSize="31"
-                                  HorizontalAlignment="Left"
-                                  Margin="10,10,0,18"
-                                  PointerPressed="TitleLabel_OnPointerPressed" />
-        </Border>
+    <Grid Grid.Row="1" ColumnDefinitions="221,*" RowDefinitions="0,17,18,96,*,80" x:Name="CompleteGrid"
+          Background="{StaticResource FrameColor}">
 
         <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
@@ -60,7 +89,7 @@
         <!-- Sidebar -->
         <Grid Grid.Column="0" Grid.Row="3"
               Height="60"
-              Margin="10,0,10,0"
+              Margin="10,-12,10,0"
               VerticalAlignment="Top"
               ClipToBounds="False">
             <Border x:Name="SidebarProfileBlock"
@@ -453,5 +482,8 @@
                 </Style>
             </Grid.Styles>
         </Grid>
+    </Grid>
+        <Border Grid.RowSpan="2" ZIndex="999" IsVisible="False" IsHitTestVisible="False"
+                x:Name="DisabledDarkenEffect" Background="Black" Opacity="0.3" />
     </Grid>
 </Window>

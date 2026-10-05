@@ -55,9 +55,64 @@ public class ApplicationCompositionTests
             windows.Show(desktop);
             var original = Assert.IsType<Layout>(desktop.MainWindow);
             original.UpdateLayout();
+            Assert.Equal(Layout.WindowHeight * settings.Get<double>(settings.WINDOW_SCALE), original.Height);
+            {
+                var content = original.FindControl<Grid>("CompleteGrid")!;
+                Assert.Equal(0, content.RowDefinitions[0].Height.Value);
+                var frame = Assert.IsType<Grid>(original.Content);
+                var titleBar = Assert.IsType<Border>(frame.Children[0]);
+                Assert.NotNull(titleBar.Background);
+                Assert.Equal(
+                    Avalonia.Input.WindowDecorationsElementRole.TitleBar,
+                    Avalonia.Controls.Chrome.WindowDecorationProperties.GetElementRole(titleBar)
+                );
+                var logo = original.FindControl<IconLabel>("TitleLabel")!;
+                Assert.Equal(16, logo.FontSize);
+                Assert.Equal(20, logo.IconSize);
+                Assert.Equal(string.Empty, logo.Text);
+                Assert.Equal(!OperatingSystem.IsMacOS(), Assert.IsType<StackPanel>(logo.Parent).IsVisible);
+                Assert.Same(titleBar, Assert.IsType<Grid>(logo.Parent!.Parent).Parent);
+                var logoPosition = logo.TranslatePoint(default, titleBar)!.Value;
+                Assert.Equal(logoPosition.X, logoPosition.Y);
+                Assert.False(original.FindControl<Button>("HeaderBackButton")!.IsEnabled);
+                Assert.False(original.FindControl<Button>("HeaderForwardButton")!.IsEnabled);
+                if (!OperatingSystem.IsMacOS())
+                    Assert.Same(Application.Current!.FindResource("DesktopWindowDecorations"), original.WindowDecorationsTheme);
+                original.SetInteractable(false);
+                original.UpdateLayout();
+                var overlay = original.FindControl<Border>("DisabledDarkenEffect")!;
+                Assert.Contains(overlay, frame.Children);
+                Assert.Equal(frame.Bounds.Height, overlay.Bounds.Height);
+                Assert.True(overlay.IsVisible);
+                original.SetInteractable(true);
+                Assert.False(overlay.IsVisible);
+            }
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             var navigation = services.GetRequiredService<INavigationService>();
             Assert.IsType<HomePage>(navigation.CurrentPage);
+
+            var back = original.FindControl<Button>("HeaderBackButton")!;
+            var forward = original.FindControl<Button>("HeaderForwardButton")!;
+            Assert.Equal(
+                Application.Current!.FindResource("Neutral950"),
+                Assert.IsAssignableFrom<Avalonia.Media.ISolidColorBrush>(back.Foreground).Color
+            );
+            navigation.NavigateTo<RoomsPage>();
+            Assert.True(back.IsEnabled);
+            Assert.False(forward.IsEnabled);
+            Assert.Equal(
+                Application.Current.FindResource("Neutral400"),
+                Assert.IsAssignableFrom<Avalonia.Media.ISolidColorBrush>(back.Foreground).Color
+            );
+            back.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.IsType<HomePage>(navigation.CurrentPage);
+            Assert.False(back.IsEnabled);
+            Assert.True(forward.IsEnabled);
+            forward.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.IsType<RoomsPage>(navigation.CurrentPage);
+            navigation.NavigateTo<HomePage>();
+            Assert.False(forward.IsEnabled);
+            original.UpdateLayout();
 
             // Collapse reuses the existing controls and must not resize the window or navigate.
             settings.ENABLE_ANIMATIONS.Set(false, skipSave: true);
@@ -72,7 +127,7 @@ public class ApplicationCompositionTests
             // Image positions follow intermediate widths, not just the collapsed/expanded state.
             original.SidebarWidth = (221d + 64d) / 2;
             Assert.Equal(-12, original.FindControl<MiiImageLoader>("SidebarMii")!.Margin.Left);
-            Assert.Equal(13.25, original.FindControl<IconLabel>("TitleLabel")!.Margin.Left);
+            Assert.Equal(5, original.FindControl<IconLabel>("TitleLabel")!.Margin.Left);
             Assert.Equal(
                 19.5,
                 original.FindControl<SidebarRadioButton>("RoomsButton")!.GetVisualDescendants().OfType<IconLabel>().Single().Margin.Left
@@ -173,6 +228,27 @@ public class ApplicationCompositionTests
                 original.UpdateLayout();
                 Assert.IsType<SettingsPage>(navigation.CurrentPage);
             }
+            var about = Assert.IsType<SettingsPage>(navigation.CurrentPage);
+            var tabs = about.FindControl<StackPanel>("SettingPages")!;
+            tabs.Children.OfType<RadioButton>()
+                .Single(tab => Equals(tab.Tag, nameof(OtherSettings)))
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            var other = Assert.IsType<SettingsPage>(navigation.CurrentPage);
+            Assert.IsType<OtherSettings>(other.FindControl<ContentControl>("SettingsContent")!.Content);
+            navigation.GoBack();
+            Assert.IsType<AppInfo>(
+                Assert.IsType<SettingsPage>(navigation.CurrentPage).FindControl<ContentControl>("SettingsContent")!.Content
+            );
+            navigation.GoForward();
+            var restored = Assert.IsType<SettingsPage>(navigation.CurrentPage);
+            Assert.IsType<OtherSettings>(restored.FindControl<ContentControl>("SettingsContent")!.Content);
+            var repeated = navigation.CurrentPage;
+            restored
+                .FindControl<StackPanel>("SettingPages")!
+                .Children.OfType<RadioButton>()
+                .Single(tab => Equals(tab.Tag, nameof(OtherSettings)))
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Same(repeated, navigation.CurrentPage);
             toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             windows.Refresh();
             Assert.Equal(64, Assert.IsType<Layout>(desktop.MainWindow).SidebarWidth);
