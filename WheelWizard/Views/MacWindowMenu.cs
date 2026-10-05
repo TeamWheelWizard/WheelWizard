@@ -7,13 +7,59 @@ internal static class MacWindowMenu
 {
     private const string ObjectiveC = "/usr/lib/libobjc.A.dylib";
 
+    // NSWindowCollectionBehavior flags from AppKit's public NSWindow API.
+    private const nint FullScreenPrimary = 1 << 7;
+    private const nint FullScreenAuxiliary = 1 << 8;
+    private const nint FullScreenNone = 1 << 9;
+    private const nint FullScreenAllowsTiling = 1 << 11;
+    private const nint FullScreenDisallowsTiling = 1 << 12;
+
     // Owned for the process lifetime. NSApplication and the active menu bar also retain this menu.
     private static nint _menu;
+    private static readonly InsertItemCallback InsertItem = InsertWindowItem;
+    private static nint _insertItemImplementation;
 
-    public static void Attach()
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void InsertItemCallback(nint menu, nint selector, nint item, nint index);
+
+    private static void InsertWindowItem(nint menu, nint selector, nint item, nint index)
+    {
+        // AppKit creates these entries when the menu opens, after initial registration.
+        // The unavailable full-screen tile group follows the positioning submenu
+        // and has no action or submenu. Avoid matching localized system menu titles.
+        if (Send(item, Selector("action")) == Selector("toggleFullScreen:"))
+            Send(item, Selector("setHidden:"), 1);
+        else if (
+            Send(item, Selector("action")) == 0
+            && Send(item, Selector("submenu")) == 0
+            && Send(item, Selector("isSeparatorItem")) == 0
+            && index > 0
+            && Send(Send(menu, Selector("itemAtIndex:"), index - 1), Selector("submenu")) != 0
+        )
+            Send(item, Selector("setHidden:"), 1);
+        Marshal.GetDelegateForFunctionPointer<InsertItemCallback>(_insertItemImplementation)(menu, selector, item, index);
+    }
+
+    private static nint CreateWindowMenuClass()
+    {
+        var menuClass = GetClass("NSMenu");
+        var insertSelector = Selector("insertItem:atIndex:");
+        _insertItemImplementation = GetMethodImplementation(menuClass, insertSelector);
+        var customClass = AllocateClassPair(menuClass, "WheelWizardWindowMenu", 0);
+        AddMethod(customClass, insertSelector, Marshal.GetFunctionPointerForDelegate(InsertItem), "v@:@q");
+        RegisterClassPair(customClass);
+        return customClass;
+    }
+
+    public static void Attach(nint window)
     {
         if (!OperatingSystem.IsMacOS())
             return;
+        // Explicitly opt every window out of full screen, including split-screen tiling.
+        var behavior = Send(window, Selector("collectionBehavior"));
+        behavior &= ~(FullScreenPrimary | FullScreenAuxiliary | FullScreenAllowsTiling);
+        behavior |= FullScreenNone | FullScreenDisallowsTiling;
+        Send(window, Selector("setCollectionBehavior:"), behavior);
         var app = Send(GetClass("NSApplication"), Selector("sharedApplication"));
         var bar = Send(app, Selector("mainMenu"));
         var windowItem = Send(bar, Selector("itemWithTitle:"), String("Window"));
@@ -22,7 +68,7 @@ internal static class MacWindowMenu
 
         if (_menu == 0)
         {
-            _menu = Send(Send(GetClass("NSMenu"), Selector("alloc")), Selector("initWithTitle:"), String("Window"));
+            _menu = Send(Send(CreateWindowMenuClass(), Selector("alloc")), Selector("initWithTitle:"), String("Window"));
             // Standard responder-chain selectors give AppKit control over validation, icons and shortcuts.
             Send(
                 _menu,
@@ -53,7 +99,7 @@ internal static class MacWindowMenu
         if (Send(app, Selector("windowsMenu")) != _menu)
             Send(app, Selector("setWindowsMenu:"), _menu);
         // AppKit adds positioning/tiling items. Its native window constraints govern which are enabled.
-        // Hide the public full-screen command; fixed-size windows cannot enter full screen anyway.
+        // Also cover items already present when this menu is reattached.
         var count = Send(_menu, Selector("numberOfItems"));
         for (nint index = 0; index < count; index++)
         {
@@ -62,6 +108,19 @@ internal static class MacWindowMenu
                 Send(item, Selector("setHidden:"), 1);
         }
     }
+
+    [DllImport(ObjectiveC, EntryPoint = "objc_allocateClassPair")]
+    private static extern nint AllocateClassPair(nint superclass, [MarshalAs(UnmanagedType.LPUTF8Str)] string name, nuint extraBytes);
+
+    [DllImport(ObjectiveC, EntryPoint = "objc_registerClassPair")]
+    private static extern void RegisterClassPair(nint cls);
+
+    [DllImport(ObjectiveC, EntryPoint = "class_addMethod")]
+    [return: MarshalAs(UnmanagedType.I1)]
+    private static extern bool AddMethod(nint cls, nint selector, nint implementation, [MarshalAs(UnmanagedType.LPUTF8Str)] string types);
+
+    [DllImport(ObjectiveC, EntryPoint = "class_getMethodImplementation")]
+    private static extern nint GetMethodImplementation(nint cls, nint selector);
 
     private static nint String(string value) => SendString(GetClass("NSString"), Selector("stringWithUTF8String:"), value);
 

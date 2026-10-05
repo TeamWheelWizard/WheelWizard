@@ -20,6 +20,19 @@ public abstract class BaseWindow : Window
             return;
         // Avalonia owns the menu bar; AppKit owns the contents of the Window submenu.
         var menu = new NativeMenu();
+        var profiles = new NativeMenu();
+        void UpdateProfiles()
+        {
+            if (
+                Avalonia.Application.Current?.ApplicationLifetime
+                is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime { MainWindow: Layout layout }
+            )
+                layout.PopulateMacProfiles(profiles);
+            Avalonia.Threading.Dispatcher.UIThread.Post(AttachMacWindowMenu, Avalonia.Threading.DispatcherPriority.Background);
+        }
+        UpdateProfiles();
+        profiles.NeedsUpdate += (_, _) => UpdateProfiles();
+        menu.Add(new NativeMenuItem("Profiles") { Menu = profiles });
         menu.Add(new NativeMenuItem("Window") { Menu = new NativeMenu() });
         NativeMenu.SetMenu(this, menu);
         Avalonia.Threading.Dispatcher.UIThread.Post(AttachMacWindowMenu, Avalonia.Threading.DispatcherPriority.Background);
@@ -37,7 +50,7 @@ public abstract class BaseWindow : Window
     private void AttachMacWindowMenu()
     {
         if (IsVisible && TryGetPlatformHandle()?.HandleDescriptor == "NSWindow")
-            MacWindowMenu.Attach();
+            MacWindowMenu.Attach(TryGetPlatformHandle()!.Handle);
     }
 
     protected override void OnOpened(EventArgs e)
