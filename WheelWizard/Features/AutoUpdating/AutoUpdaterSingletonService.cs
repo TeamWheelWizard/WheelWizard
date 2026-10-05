@@ -8,7 +8,10 @@ namespace WheelWizard.AutoUpdating;
 
 public interface IAutoUpdaterSingletonService
 {
-    public Task CheckForUpdatesAsync();
+    bool IsUpdateAvailable { get; }
+    event EventHandler? UpdateAvailable;
+    Task CheckForUpdatesAsync();
+    Task ShowAvailableUpdateAsync();
 }
 
 public class AutoUpdaterSingletonService(
@@ -19,6 +22,10 @@ public class AutoUpdaterSingletonService(
 ) : IAutoUpdaterSingletonService
 {
     private bool _manualUpdateShown;
+    private bool _updatePromptOpen;
+    private GithubRelease? _availableRelease;
+    public bool IsUpdateAvailable => _availableRelease is not null;
+    public event EventHandler? UpdateAvailable;
     private string CurrentVersion => brandingService.Branding.Version;
 
     public async Task CheckForUpdatesAsync()
@@ -27,26 +34,44 @@ public class AutoUpdaterSingletonService(
         if (latestRelease?.TagName is null)
             return;
 
-        var latestVersion = latestRelease.TagName.TrimStart('v');
-        if (!updatePlatform.SupportsAutomaticUpdate)
+        _availableRelease = latestRelease;
+        UpdateAvailable?.Invoke(this, EventArgs.Empty);
+        if (!updatePlatform.SupportsAutomaticUpdate && _manualUpdateShown)
+            return;
+
+        await ShowAvailableUpdateAsync();
+    }
+
+    public async Task ShowAvailableUpdateAsync()
+    {
+        if (_availableRelease is not { TagName: not null } latestRelease || _updatePromptOpen)
+            return;
+
+        _updatePromptOpen = true;
+        try
         {
-            if (!_manualUpdateShown)
+            var latestVersion = latestRelease.TagName.TrimStart('v');
+            if (!updatePlatform.SupportsAutomaticUpdate)
             {
                 _manualUpdateShown = true;
                 await presentation.ShowManualUpdateAsync(latestVersion, CurrentVersion);
+                return;
             }
-            return;
+
+            var asset = updatePlatform.GetAssetForCurrentPlatform(latestRelease);
+            if (asset is null || !await presentation.ConfirmUpdateAsync(latestVersion, CurrentVersion))
+                return;
+
+            var updateResult = await presentation.RunUpdateAsync(
+                (progress, cancellation) => updatePlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl, progress, cancellation)
+            );
+            if (updateResult.IsFailure)
+                await presentation.ShowUpdateFailureAsync(updateResult.Error.Message);
         }
-
-        var asset = updatePlatform.GetAssetForCurrentPlatform(latestRelease);
-        if (asset is null || !await presentation.ConfirmUpdateAsync(latestVersion, CurrentVersion))
-            return;
-
-        var updateResult = await presentation.RunUpdateAsync(
-            (progress, cancellation) => updatePlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl, progress, cancellation)
-        );
-        if (updateResult.IsFailure)
-            await presentation.ShowUpdateFailureAsync(updateResult.Error.Message);
+        finally
+        {
+            _updatePromptOpen = false;
+        }
     }
 
     private async Task<GithubRelease?> GetLatestReleaseAsync()

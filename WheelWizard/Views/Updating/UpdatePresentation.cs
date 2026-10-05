@@ -50,10 +50,13 @@ public sealed class UpdatePresentation : IUpdatePresentation
             () =>
                 new MessageBoxWindow()
                     .SetTitleText("New Wheel Wizard version")
+                    .SetWindowTitle("Update available")
+                    .SetTag($"v{latestVersion}")
                     .SetInfoText(
-                        $"There is a new Wheel Wizard version available!\nVersion {latestVersion} (You are currently on {currentVersion})\n"
-                            + "You can manually update it by going to the GitHub releases at: https://github.com/TeamWheelWizard/WheelWizard/releases"
+                        $"There is a new Wheel Wizard version available!\nVersion {latestVersion} (You are currently on {currentVersion})\n\n"
+                            + "You can manually update it by going to the GitHub releases at:"
                     )
+                    .SetLink("https://github.com/TeamWheelWizard/WheelWizard/releases")
                     .Show()
         );
 
