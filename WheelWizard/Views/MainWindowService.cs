@@ -10,10 +10,11 @@ public interface IMainWindowService
     void Refresh();
 }
 
-public sealed class MainWindowService(Func<Layout> createWindow) : IMainWindowService
+public sealed class MainWindowService(Func<Layout> createWindow, TimeProvider time) : IMainWindowService
 {
     private IClassicDesktopStyleApplicationLifetime? _desktop;
 
+    /// <summary>Reveals initial content when ready, or after a 10-second recovery limit; shutdown still cancels startup.</summary>
     public async Task ShowAsync(IClassicDesktopStyleApplicationLifetime desktop, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -31,7 +32,16 @@ public sealed class MainWindowService(Func<Layout> createWindow) : IMainWindowSe
         window.IsHitTestVisible = false;
         desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         window.Show();
-        await window.WaitForInitialContentAsync(cancellationToken);
+        using var limit = new CancellationTokenSource(TimeSpan.FromSeconds(10), time);
+        using var waiting = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, limit.Token);
+        try
+        {
+            await window.WaitForInitialContentAsync(waiting.Token);
+        }
+        catch (OperationCanceledException) when (limit.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            Serilog.Log.Warning("Initial content is still loading after 10 seconds; revealing the main window");
+        }
         cancellationToken.ThrowIfCancellationRequested();
         window.WindowDecorations = decorations;
         window.TransparencyLevelHint = transparency;

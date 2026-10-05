@@ -64,8 +64,11 @@ public class ApplicationCompositionTests
         }
     }
 
-    [AvaloniaFact]
-    public async Task MainWindowAndPages_ConstructWithoutStaticServiceInitialization_AndRefreshSafely()
+    [AvaloniaTheory]
+    [InlineData("ready")]
+    [InlineData("timeout")]
+    [InlineData("shutdown")]
+    public async Task MainWindowAndPages_ConstructWithoutStaticServiceInitialization_AndRefreshSafely(string completion)
     {
         var fileSystem = new MockFileSystem();
         var directory = Path.Combine(Path.GetTempPath(), "wheelwizard-ui-composition");
@@ -80,6 +83,21 @@ public class ApplicationCompositionTests
         var mods = Substitute.For<IModManager>();
         mods.ReloadAsync().Returns(modsLoaded.Task);
         registrations.AddSingleton(mods);
+        TimerCallback? expire = null;
+        object? timerState = null;
+        var time = Substitute.For<System.TimeProvider>();
+        time.CreateTimer(Arg.Any<TimerCallback>(), Arg.Any<object?>(), Arg.Any<TimeSpan>(), Arg.Any<TimeSpan>())
+            .Returns(call =>
+            {
+                expire = call.ArgAt<TimerCallback>(0);
+                timerState = call.ArgAt<object?>(1);
+                Assert.Equal(TimeSpan.FromSeconds(10), call.ArgAt<TimeSpan>(2));
+                return Substitute.For<ITimer>();
+            });
+        registrations.AddSingleton<IMainWindowService>(provider => new MainWindowService(
+            () => provider.GetRequiredService<Layout>(),
+            time
+        ));
         using var services = registrations.BuildServiceProvider(
             new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }
         );
@@ -98,18 +116,37 @@ public class ApplicationCompositionTests
             desktop.MainWindow = splash;
             splash.Show();
             Assert.True(splash.IsVisible);
-            var opening = windows.ShowAsync(desktop);
+            using var shutdown = new CancellationTokenSource();
+            var opening = windows.ShowAsync(desktop, shutdown.Token);
             if (opening.IsFaulted)
                 await opening;
             Assert.False(opening.IsCompleted);
             Assert.True(splash.IsVisible);
             Assert.Equal(0, desktop.MainWindow!.Opacity);
             Assert.False(desktop.MainWindow.ShowInTaskbar);
-            modsLoaded.SetResult(OperationResult.Ok());
+            if (completion == "shutdown")
+            {
+                shutdown.Cancel();
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(() => opening);
+                Assert.Equal(0, desktop.MainWindow.Opacity);
+                Assert.True(splash.IsVisible);
+                modsLoaded.SetResult(OperationResult.Ok());
+                splash.Close();
+                return;
+            }
+            if (completion == "timeout")
+                expire!(timerState);
+            else
+                modsLoaded.SetResult(OperationResult.Ok());
             await opening;
             Assert.False(splash.IsVisible);
             Assert.Equal(1, desktop.MainWindow.Opacity);
             Assert.True(desktop.MainWindow.ShowInTaskbar);
+            if (completion == "timeout")
+            {
+                Assert.False(modsLoaded.Task.IsCompleted);
+                modsLoaded.SetResult(OperationResult.Ok());
+            }
             var original = Assert.IsType<Layout>(desktop.MainWindow);
             original.UpdateLayout();
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
