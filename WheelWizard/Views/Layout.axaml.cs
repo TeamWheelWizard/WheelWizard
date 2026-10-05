@@ -243,16 +243,7 @@ public partial class Layout : BaseWindow, IPollingListener
     //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
     // }
 
-    private void Navigation_OnPageChanged(object? sender, UserControl page)
-    {
-        NavigateToPage(page);
-        HeaderBackButton.IsEnabled = Navigation.CanGoBack;
-        HeaderForwardButton.IsEnabled = Navigation.CanGoForward;
-    }
-
-    private void HeaderBackButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoBack();
-
-    private void HeaderForwardButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoForward();
+    private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
 
     private void HeaderMinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 

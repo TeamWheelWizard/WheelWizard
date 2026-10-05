@@ -168,8 +168,8 @@ public class ApplicationCompositionTests
                 Assert.Same(titleBar, Assert.IsType<Grid>(logo.Parent!.Parent).Parent);
                 var logoPosition = logo.TranslatePoint(default, titleBar)!.Value;
                 Assert.Equal(logoPosition.X, logoPosition.Y);
-                Assert.False(original.FindControl<Button>("HeaderBackButton")!.IsEnabled);
-                Assert.False(original.FindControl<Button>("HeaderForwardButton")!.IsEnabled);
+                Assert.Null(original.FindControl<Button>("HeaderBackButton"));
+                Assert.Null(original.FindControl<Button>("HeaderForwardButton"));
                 if (!OperatingSystem.IsMacOS())
                     Assert.Same(Application.Current!.FindResource("DesktopWindowDecorations"), original.WindowDecorationsTheme);
                 original.SetInteractable(false);
@@ -184,29 +184,6 @@ public class ApplicationCompositionTests
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             var navigation = services.GetRequiredService<INavigationService>();
             Assert.IsType<HomePage>(navigation.CurrentPage);
-
-            var back = original.FindControl<Button>("HeaderBackButton")!;
-            var forward = original.FindControl<Button>("HeaderForwardButton")!;
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral950"),
-                Assert.IsAssignableFrom<Avalonia.Media.ISolidColorBrush>(back.Foreground).Color
-            );
-            navigation.NavigateTo<RoomsPage>();
-            Assert.True(back.IsEnabled);
-            Assert.False(forward.IsEnabled);
-            Assert.Equal(
-                Application.Current.FindResource("Neutral400"),
-                Assert.IsAssignableFrom<Avalonia.Media.ISolidColorBrush>(back.Foreground).Color
-            );
-            back.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Assert.IsType<HomePage>(navigation.CurrentPage);
-            Assert.False(back.IsEnabled);
-            Assert.True(forward.IsEnabled);
-            forward.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Assert.IsType<RoomsPage>(navigation.CurrentPage);
-            navigation.NavigateTo<HomePage>();
-            Assert.False(forward.IsEnabled);
-            original.UpdateLayout();
 
             // Collapse reuses the existing controls and must not resize the window or navigate.
             settings.ENABLE_ANIMATIONS.Set(false, skipSave: true);
@@ -329,20 +306,6 @@ public class ApplicationCompositionTests
                 .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var other = Assert.IsType<SettingsPage>(navigation.CurrentPage);
             Assert.IsType<OtherSettings>(other.FindControl<ContentControl>("SettingsContent")!.Content);
-            navigation.GoBack();
-            Assert.IsType<AppInfo>(
-                Assert.IsType<SettingsPage>(navigation.CurrentPage).FindControl<ContentControl>("SettingsContent")!.Content
-            );
-            navigation.GoForward();
-            var restored = Assert.IsType<SettingsPage>(navigation.CurrentPage);
-            Assert.IsType<OtherSettings>(restored.FindControl<ContentControl>("SettingsContent")!.Content);
-            var repeated = navigation.CurrentPage;
-            restored
-                .FindControl<StackPanel>("SettingPages")!
-                .Children.OfType<RadioButton>()
-                .Single(tab => Equals(tab.Tag, nameof(OtherSettings)))
-                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Assert.Same(repeated, navigation.CurrentPage);
             toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             windows.Refresh();
             Assert.Equal(64, Assert.IsType<Layout>(desktop.MainWindow).SidebarWidth);

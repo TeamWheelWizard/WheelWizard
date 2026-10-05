@@ -66,52 +66,6 @@ public class NavigationTests
         Assert.Equal([destination], received);
     }
 
-    [Fact]
-    public void History_PreservesArgumentsAndDropsForwardEntriesAfterNewNavigation()
-    {
-        var factory = Substitute.For<IPageFactory>();
-        factory.Create(Arg.Any<Type>(), Arg.Any<object[]>()).Returns(_ => new UserControl());
-        var navigation = new NavigationService(factory);
-        navigation.GoBack();
-        navigation.GoForward();
-        Assert.Null(navigation.CurrentPage);
-        navigation.NavigateTo<UserControl>();
-        navigation.NavigateTo<DetailsPage>(42);
-        Assert.True(navigation.CanGoBack);
-        Assert.False(navigation.CanGoForward);
-        navigation.GoBack();
-        Assert.False(navigation.CanGoBack);
-        Assert.True(navigation.CanGoForward);
-        navigation.GoForward();
-        factory.Received(2).Create(typeof(DetailsPage), Arg.Is<object[]>(args => args.Length == 1 && (int)args[0] == 42));
-        navigation.GoBack();
-        navigation.NavigateTo<DetailsPage>(99);
-        var current = navigation.CurrentPage;
-        Assert.False(navigation.CanGoForward);
-        navigation.GoForward();
-        Assert.Same(current, navigation.CurrentPage);
-    }
-
-    [Fact]
-    public void History_SkipsConsecutiveDuplicatePagesButKeepsDifferentArguments()
-    {
-        var factory = Substitute.For<IPageFactory>();
-        factory.Create(Arg.Any<Type>(), Arg.Any<object[]>()).Returns(_ => new UserControl());
-        var navigation = new NavigationService(factory);
-        navigation.NavigateTo<UserControl>();
-        navigation.NavigateTo<UserControl>();
-        Assert.False(navigation.CanGoBack);
-        navigation.NavigateTo<DetailsPage>(42);
-        navigation.NavigateTo<DetailsPage>(42);
-        navigation.NavigateTo<DetailsPage>(99);
-        navigation.GoBack();
-        factory.Received(2).Create(typeof(DetailsPage), Arg.Is<object[]>(args => (int)args[0] == 42));
-        navigation.GoBack();
-        Assert.False(navigation.CanGoBack);
-        navigation.NavigateTo<UserControl>();
-        Assert.True(navigation.CanGoForward);
-    }
-
     public sealed class PageDependency;
 
     public sealed class DetailsPage(PageDependency dependency, int itemId) : UserControl
