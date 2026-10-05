@@ -19,12 +19,33 @@
         <Border Grid.Row="0" Background="Transparent"
                 WindowDecorationProperties.ElementRole="TitleBar"
                 PointerPressed="TopBar_PointerPressed">
-            <components:IconLabel IconData="{StaticResource WheelIcon}" x:Name="TitleLabel"
-                                  Foreground="{StaticResource Neutral400}"
-                                  FontSize="16" IconSize="20"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center"
-                                  Margin="10,0,150,0" IsVisible="{OnPlatform Default=True, macOS=False}"
-                                  PointerPressed="TitleLabel_OnPointerPressed" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center"
+                        IsVisible="{OnPlatform Default=True, macOS=False}">
+                <components:IconLabel IconData="{StaticResource WheelIcon}" x:Name="TitleLabel" Text=""
+                                      Foreground="{StaticResource Neutral400}"
+                                      FontSize="16" IconSize="20"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="5,0,5,0" AutomationProperties.Name="Wheel Wizard"
+                                      PointerPressed="TitleLabel_OnPointerPressed" />
+                <StackPanel.Styles>
+                    <Style Selector="Button.HeaderNavigation:disabled">
+                        <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
+                        <Setter Property="Opacity" Value="1" />
+                    </Style>
+                </StackPanel.Styles>
+                <Button x:Name="HeaderBackButton" Width="30" Height="30" Classes="TopButton HeaderNavigation"
+                        IsEnabled="False" AutomationProperties.Name="Back" Click="HeaderBackButton_Click"
+                        WindowDecorationProperties.ElementRole="DecorationsElement">
+                    <PathIcon Data="{StaticResource ArrowLeft}" Width="14" Height="14"
+                              Foreground="{Binding $parent[Button].Foreground}" />
+                </Button>
+                <Button x:Name="HeaderForwardButton" Width="30" Height="30" Classes="TopButton HeaderNavigation"
+                        IsEnabled="False" AutomationProperties.Name="Forward" Click="HeaderForwardButton_Click"
+                        WindowDecorationProperties.ElementRole="DecorationsElement">
+                    <PathIcon Data="{StaticResource ArrowRight}" Width="14" Height="14"
+                              Foreground="{Binding $parent[Button].Foreground}" />
+                </Button>
+            </StackPanel>
         </Border>
     <Grid Grid.Row="1" ColumnDefinitions="221,*" RowDefinitions="0,17,18,96,*,80" x:Name="CompleteGrid"
           Background="{StaticResource FrameColor}">

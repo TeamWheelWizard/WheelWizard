@@ -120,12 +120,14 @@ public partial class Layout : BaseWindow, IPollingListener
     protected override void OnLoaded(RoutedEventArgs e)
     {
         Title = BrandingService.Branding.DisplayName;
-        TitleLabel.Text = _sidebarCollapsed ? string.Empty : BrandingService.Branding.DisplayName;
         VersionTagText.Text = $"v{BrandingService.Branding.Version}";
         UpdateModsButtonText();
         // UpdateModsActionIndicator();
 
-        Navigation.NavigateTo<HomePage>();
+        if (Navigation.CurrentPage is { } page)
+            Navigation_OnPageChanged(this, page);
+        else
+            Navigation.NavigateTo<HomePage>();
     }
 
     protected override void OnClosed(EventArgs e)
@@ -214,7 +216,16 @@ public partial class Layout : BaseWindow, IPollingListener
     //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
     // }
 
-    private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
+    private void Navigation_OnPageChanged(object? sender, UserControl page)
+    {
+        NavigateToPage(page);
+        HeaderBackButton.IsEnabled = Navigation.CanGoBack;
+        HeaderForwardButton.IsEnabled = Navigation.CanGoForward;
+    }
+
+    private void HeaderBackButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoBack();
+
+    private void HeaderForwardButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoForward();
 
     public void NavigateToPage(UserControl page)
     {

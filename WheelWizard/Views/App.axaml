@@ -30,12 +30,80 @@
             <!-- CONVERTERS -->
             <converters:IsEqualToConverter x:Key="IsEqualTo" />
             <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+            <ControlTheme x:Key="DesktopWindowDecorations" TargetType="WindowDrawnDecorations"
+                          BasedOn="{StaticResource {x:Type WindowDrawnDecorations}}">
+                <Setter Property="Template">
+                    <WindowDrawnDecorationsTemplate>
+                        <WindowDrawnDecorationsContent>
+                            <WindowDrawnDecorationsContent.Underlay>
+                                <Panel x:Name="PART_UnderlayWrapper">
+                                    <Border x:Name="PART_WindowBorder" Background="Transparent"
+                                            BorderThickness="{TemplateBinding FrameThickness}"
+                                            BorderBrush="{StaticResource Neutral600}" IsHitTestVisible="False" />
+                                    <Panel x:Name="PART_TitleBar" VerticalAlignment="Top"
+                                           Height="{TemplateBinding TitleBarHeight}"
+                                           IsVisible="{TemplateBinding HasTitleBar}"
+                                           Background="{StaticResource FrameColor}"
+                                           WindowDecorationProperties.ElementRole="TitleBar" />
+                                </Panel>
+                            </WindowDrawnDecorationsContent.Underlay>
+                            <WindowDrawnDecorationsContent.Overlay>
+                                <Panel x:Name="PART_OverlayWrapper">
+                                    <StackPanel x:Name="PART_OverlayPanel" Orientation="Horizontal"
+                                                HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                Height="{TemplateBinding TitleBarHeight}"
+                                                IsVisible="{TemplateBinding HasTitleBar}">
+                                        <Button x:Name="PART_MinimizeButton" Theme="{StaticResource FluentDrawnCaptionButton}"
+                                                WindowDecorationProperties.ElementRole="MinimizeButton">
+                                            <PathIcon Width="11" Height="11" Data="M0,5 H11 V6 H0 Z"
+                                                      Foreground="{Binding $parent[Button].Foreground}" />
+                                        </Button>
+                                        <Button x:Name="PART_MaximizeButton" Theme="{StaticResource FluentDrawnCaptionButton}"
+                                                WindowDecorationProperties.ElementRole="MaximizeButton">
+                                            <Viewbox Width="11" Height="11">
+                                                <Path x:Name="RestoreButtonPath" Stretch="Uniform"
+                                                      Fill="{Binding $parent[Button].Foreground}"
+                                                      Data="M2048 2048v-2048h-2048v2048h2048zM1843 1843h-1638v-1638h1638v1638z" />
+                                            </Viewbox>
+                                        </Button>
+                                        <Button x:Name="PART_CloseButton" Theme="{StaticResource FluentDrawnCaptionButton}"
+                                                Background="#ffe81123" BorderBrush="#fff1707a"
+                                                WindowDecorationProperties.ElementRole="CloseButton">
+                                            <PathIcon Width="11" Height="11" Data="{StaticResource XMark}"
+                                                      Foreground="{Binding $parent[Button].Foreground}" />
+                                        </Button>
+                                    </StackPanel>
+                                </Panel>
+                            </WindowDrawnDecorationsContent.Overlay>
+                        </WindowDrawnDecorationsContent>
+                    </WindowDrawnDecorationsTemplate>
+                </Setter>
+                <Style Selector="^ /template/ Button">
+                    <Setter Property="Width" Value="30" />
+                    <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+                </Style>
+                <Style Selector="^ /template/ Button:pointerover">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral50}" />
+                </Style>
+                <Style Selector="^ /template/ Button:disabled">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
+                    <Setter Property="Opacity" Value="1" />
+                </Style>
+                <Style Selector="^ /template/ Button#PART_MinimizeButton">
+                    <Setter Property="Background" Value="{StaticResource Neutral600}" />
+                    <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
+                </Style>
+            </ControlTheme>
         </ResourceDictionary>
     </Application.Resources>
 
 
     <Application.Styles>
         <FluentTheme />
+        <Style Selector=":is(Window)">
+            <Setter Property="WindowDecorationsTheme"
+                    Value="{OnPlatform Default={StaticResource DesktopWindowDecorations}, macOS={x:Null}}" />
+        </Style>
         <!-- !!Only used for the designer!! -->
         <StyleInclude Source="Styles/Util/MultiColorExampleComponent.axaml" />
         <!-- !!Only used for the designer!! -->

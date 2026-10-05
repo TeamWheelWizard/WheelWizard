@@ -1,6 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
+using Avalonia.Styling;
+using Avalonia.VisualTree;
 using WheelWizard.Views;
 using WheelWizard.Views.Popups.Base;
 
@@ -8,6 +12,51 @@ namespace WheelWizard.UI.Test;
 
 public class WindowCompositionTests
 {
+    [AvaloniaFact]
+    public void DesktopCaptionButtons_UseNavigationColorsAndMinimizeHoverBackground()
+    {
+        var popup = new PopupWindow(true, false, false, "Caption test");
+        try
+        {
+            popup.Show();
+            var host = popup.GetVisualParent()!;
+            // Headless windows do not request drawn chrome; request it through the same host path.
+            var update = host.GetType()
+                .GetMethod("UpdateDrawnDecorations", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+            var parts = update.GetParameters()[0].ParameterType.GetGenericArguments()[0];
+            update.Invoke(
+                host,
+                [Enum.Parse(parts, "TitleBar, Border"), WindowState.Normal, Application.Current!.FindResource("DesktopWindowDecorations")]
+            );
+            popup.UpdateLayout();
+            var buttons = host.GetVisualDescendants().OfType<Button>().ToArray();
+            var minimize = buttons.Single(button => button.Name == "PART_MinimizeButton");
+            var maximize = buttons.Single(button => button.Name == "PART_MaximizeButton");
+            var close = buttons.Single(button => button.Name == "PART_CloseButton");
+            Assert.Equal(
+                Application.Current!.FindResource("Neutral400"),
+                Assert.IsAssignableFrom<ISolidColorBrush>(minimize.Foreground).Color
+            );
+            Assert.Equal(Application.Current!.FindResource("Neutral400"), Assert.IsAssignableFrom<ISolidColorBrush>(close.Foreground).Color);
+            Assert.False(maximize.IsEnabled);
+            Assert.Equal(
+                Application.Current!.FindResource("Neutral950"),
+                Assert.IsAssignableFrom<ISolidColorBrush>(maximize.Foreground).Color
+            );
+            Assert.Equal(1, maximize.Opacity);
+            ((IPseudoClasses)minimize.Classes).Set(":pointerover", true);
+            var background = minimize.GetVisualDescendants().OfType<ContentPresenter>().Single();
+            Assert.Equal(
+                Application.Current!.FindResource("Neutral600"),
+                Assert.IsAssignableFrom<ISolidColorBrush>(background.Background).Color
+            );
+        }
+        finally
+        {
+            popup.Close();
+        }
+    }
+
     [AvaloniaFact]
     public void PopupScale_UsesApplicationResourcesWithoutAServiceProvider()
     {
