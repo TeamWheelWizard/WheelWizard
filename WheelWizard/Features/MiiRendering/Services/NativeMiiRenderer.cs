@@ -18,7 +18,7 @@ namespace WheelWizard.MiiRendering.Services;
 /// Native, fully-offline renderer entry point for Mii images.
 /// Uses FFL-generated geometry and texture data from FFLResHigh.dat.
 /// </summary>
-public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocator, IFileSystem fileSystem) : IMiiNativeRenderer
+public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocator, IFileSystem fileSystem) : IMiiNativeRenderer
 {
     // #todo: split resource loading, caching, geometry and rasterization into focused helpers so this renderer is easier to change.
     public sealed record NativeMiiRenderRequest(

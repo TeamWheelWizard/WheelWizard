@@ -31,4 +31,10 @@ public interface IMiiNativeRenderer
         MiiImageSpecifications specifications,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>GPU-ready head meshes (with textures) for the realtime renderer. Slow (~0.1 s); call off the UI thread.</summary>
+    OperationResult<List<HeadMeshData>> BuildHeadModel(string studioData, int expressionId);
+
+    /// <summary>Camera, matrices and colours for drawing a Mii on the GPU exactly like the CPU renderer frames it.</summary>
+    OperationResult<MiiRealtimeFrameSetup> GetRealtimeFrameSetup(string studioData, MiiImageSpecifications specifications, float aspect);
 }

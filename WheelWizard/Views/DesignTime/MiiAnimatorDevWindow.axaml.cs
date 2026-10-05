@@ -10,12 +10,14 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using MiiAnim.Core.Animation;
 using MiiAnim.Core.Evaluation;
 using MiiAnim.Core.Format;
 using MiiAnim.Core.Rig;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
+using WheelWizard.MiiImages.Views;
 using WheelWizard.MiiRendering.Services;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Desktop.Storage;
@@ -29,11 +31,14 @@ namespace WheelWizard.Views.DesignTime;
 
 /// <summary>
 /// Dev tool: plays a .miianim (made with the Mii Animator) on any of the user's Miis, looping.
+/// Uses the realtime GPU view; falls back to the CPU renderer when OpenGL isn't available.
 /// </summary>
 public partial class MiiAnimatorDevWindow : PopupContent
 {
     private static readonly double[] Speeds = [0.25, 0.5, 1, 2];
     private static readonly FilePickerFileType MiiAnimFiles = new("Mii animation") { Patterns = ["*" + MiiAnimFormat.FileExtension] };
+    private const string SwapGenderEvent = "swap_gender";
+    private const int EventLogSize = 6;
 
     private IMiiDbService MiiDb { get; }
     private IMiiNativeRenderer Renderer { get; }
@@ -41,29 +46,32 @@ public partial class MiiAnimatorDevWindow : PopupContent
     private IFilePickerService FilePicker { get; }
     private IFileSystem FileSystem { get; }
 
-    private readonly Dictionary<bool, MiiRig> _rigs = new();
-    private readonly Stopwatch _clock = new();
-    private CancellationTokenSource? _loopCts;
-    private WriteableBitmap? _bitmap;
+    private readonly MiiRealtimeView _realtime;
+    private readonly DispatcherTimer _uiTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
+    private readonly Stopwatch _fpsClock = new();
+    private long _fpsFrames;
+    private double _fps;
 
     private Mii? _mii;
-    private string? _studioData;
+    private Mii? _swappedMii;
+    private bool _showingSwapped;
     private MiiAnimation? _animation;
-    private double _playheadSeconds;
-    private double _speed = 1;
-    private bool _playing = true;
     private float _yaw;
     private float _pitch;
     private Point? _dragStart;
     private bool _updatingSlider;
-
-    // Events: playback position in unwrapped frames (keeps counting across loops) and the last few that fired.
-    private const string SwapGenderEvent = "swap_gender";
-    private const int EventLogSize = 6;
-    private double _lastEventFrame = -1;
     private readonly List<string> _eventLog = [];
-    private Mii? _swappedMii;
-    private string? _swappedStudioData;
+
+    // CPU fallback.
+    private bool _useCpu;
+    private readonly Dictionary<bool, MiiRig> _rigs = new();
+    private readonly Stopwatch _cpuClock = new();
+    private CancellationTokenSource? _cpuLoopCts;
+    private WriteableBitmap? _bitmap;
+    private double _cpuPlayheadSeconds;
+    private double _cpuLastEventFrame = -1;
+    private double _speed = 1;
+    private bool _playing = true;
 
     public MiiAnimatorDevWindow(
         IMiiDbService miiDb,
@@ -81,36 +89,43 @@ public partial class MiiAnimatorDevWindow : PopupContent
         FileSystem = fileSystem;
         InitializeComponent();
 
+        // The realtime view is transparent: it sits on the preview's background like any other control.
+        _realtime = new MiiRealtimeView(renderer) { IsHitTestVisible = false };
+        _realtime.AnimationEvent += LogEvent;
+        _realtime.RealtimeUnavailable += SwitchToCpu;
+        PreviewArea.Children.Insert(0, _realtime);
+        PreviewImage.IsVisible = false;
+        UpdateSpecifications();
+
         SpeedBox.ItemsSource = Speeds.Select(s => $"{s:0.##}x speed").ToList();
         SpeedBox.SelectedIndex = Array.IndexOf(Speeds, 1d);
         SetMii(MiiDb.GetAllMiis().OrderByDescending(m => m.IsFavorite).FirstOrDefault());
         UpdateInfo();
+        _uiTimer.Tick += (_, _) => UpdateUi();
     }
 
     protected override void BeforeOpen()
     {
         base.BeforeOpen();
-        _clock.Restart();
-        _loopCts = new CancellationTokenSource();
-        _ = RenderLoopAsync(_loopCts.Token);
+        _fpsClock.Restart();
+        _uiTimer.Start();
     }
 
     protected override void BeforeClose()
     {
-        _loopCts?.Cancel();
+        _uiTimer.Stop();
+        _cpuLoopCts?.Cancel();
         base.BeforeClose();
     }
 
     private void SetMii(Mii? mii)
     {
         _mii = mii;
-        _studioData =
-            mii is null ? null
-            : MiiStudioDataSerializer.Serialize(mii) is { IsSuccess: true } studio ? studio.Value
-            : null;
         _swappedMii = mii is null ? null : WithOtherGender(mii);
-        _swappedStudioData =
-            _swappedMii is not null && MiiStudioDataSerializer.Serialize(_swappedMii) is { IsSuccess: true } swapped ? swapped.Value : null;
+        _showingSwapped = false;
+        _realtime.Mii = mii;
+        if (_swappedMii is not null)
+            _realtime.Prewarm(_swappedMii);
         MiiNameText.Text = mii?.Name.ToString() ?? "No Miis found";
         StatusText.Text = mii is null ? "No Miis found. Create one in the Mii Channel first." : "";
     }
@@ -126,31 +141,128 @@ public partial class MiiAnimatorDevWindow : PopupContent
         return copy.Value;
     }
 
-    /// <summary>Logs events crossed since the last tick (looping) and resets the log when playback jumps.</summary>
-    private void TrackEvents(MiiAnimation animation, double absoluteFrame)
-    {
-        foreach (var animEvent in animation.EventsBetween(_lastEventFrame, absoluteFrame))
+    private MiiImageSpecifications Specifications() =>
+        new()
         {
-            _eventLog.Insert(0, $"{animEvent.Name}  (frame {animEvent.Frame})");
-            if (_eventLog.Count > EventLogSize)
-                _eventLog.RemoveAt(_eventLog.Count - 1);
-        }
+            Name = "MiiAnimatorDev",
+            Type = MiiImageSpecifications.BodyType.all_body,
+            Size = MiiImageSpecifications.ImageSize.medium,
+            RenderScale = 0.8f,
+            CharacterRotate = new Vector3(0, _yaw, 0),
+            CameraRotate = new Vector3(_pitch, 0, 0),
+            BackgroundColor = "00000000",
+        };
 
-        _lastEventFrame = absoluteFrame;
-        EventsText.Text =
-            animation.Events.Count == 0 ? "This animation has no events."
-            : _eventLog.Count == 0 ? "Waiting for the first event…"
-            : "Fired (newest first):\n" + string.Join("\n", _eventLog);
+    private void UpdateSpecifications()
+    {
+        _realtime.Specifications = Specifications();
+        _realtime.Invalidate();
     }
+
+    // ---------- Playback state (GPU view or CPU fallback) ----------
+
+    private float CurrentFrame =>
+        _animation is null ? 0f
+        : _useCpu ? _animation.FrameAtTime(_cpuPlayheadSeconds)
+        : _animation.FrameAtTime(_realtime.PlayheadFrames / Math.Max(1, _animation.Fps));
+
+    private bool IsPlaying => _useCpu ? _playing : _realtime.IsPlaying;
 
     /// <summary>
     /// With "Act on swap_gender" on, the Mii shows with the other gender from the swap_gender event until the
     /// loop restarts, which is how WheelWizard would time a gender change to the animation.
     /// </summary>
-    private bool IsGenderSwapped(float frame) =>
+    private bool ShouldShowSwapped(float frame) =>
         SwapGenderToggle.IsChecked == true
+        && _swappedMii is not null
         && _animation is not null
         && _animation.Events.Any(e => e.Name == SwapGenderEvent && frame >= e.Frame);
+
+    private void UpdateUi()
+    {
+        var frame = CurrentFrame;
+        var swapped = ShouldShowSwapped(frame);
+        if (swapped != _showingSwapped && !_useCpu)
+        {
+            _showingSwapped = swapped;
+            _realtime.Mii = swapped ? _swappedMii : _mii;
+        }
+
+        if (!_useCpu && _fpsClock.Elapsed.TotalSeconds >= 0.5)
+        {
+            _fps = (_realtime.RenderedFrames - _fpsFrames) / _fpsClock.Elapsed.TotalSeconds;
+            _fpsFrames = _realtime.RenderedFrames;
+            _fpsClock.Restart();
+        }
+
+        PlayButton.Text = IsPlaying ? "Pause" : "Play";
+        var renderer = _useCpu ? "CPU renderer (no OpenGL)" : $"GPU · {_fps:0} fps";
+        if (_animation is null)
+        {
+            FrameText.Text = $"No animation loaded — showing the rest pose.\n{renderer}";
+            return;
+        }
+
+        _updatingSlider = true;
+        FrameSlider.Maximum = _animation.Length;
+        FrameSlider.Value = frame;
+        _updatingSlider = false;
+        FrameText.Text = $"Frame {frame:0} / {_animation.Length}\n{renderer}";
+    }
+
+    private void LogEvent(AnimEvent animEvent)
+    {
+        _eventLog.Insert(0, $"{animEvent.Name}  (frame {animEvent.Frame})");
+        if (_eventLog.Count > EventLogSize)
+            _eventLog.RemoveAt(_eventLog.Count - 1);
+        UpdateEventsText();
+    }
+
+    private void UpdateEventsText() =>
+        EventsText.Text =
+            _animation is null || _animation.Events.Count == 0 ? "This animation has no events."
+            : _eventLog.Count == 0 ? "Waiting for the first event…"
+            : "Fired (newest first):\n" + string.Join("\n", _eventLog);
+
+    private void UpdateInfo()
+    {
+        UpdateEventsText();
+        if (_animation is null)
+        {
+            InfoText.Text = "Load an animation made with the Mii Animator.";
+            return;
+        }
+
+        var keys = _animation.Tracks.Sum(t => t.Value.Count);
+        var author =
+            _animation.AuthorMii is { } bytes && MiiSerializer.Deserialize(bytes) is { IsSuccess: true } authorMii
+                ? authorMii.Value.Name.ToString()
+                : "none";
+        InfoText.Text =
+            $"{_animation.Name}\n{_animation.Length} frames @ {_animation.Fps} fps ({_animation.DurationSeconds:0.##}s)\n"
+            + $"{keys} keys on {_animation.Tracks.Count} channels\nMade with Mii: {author}"
+            + (_animation.Events.Count == 0 ? "" : "\nEvents: " + string.Join(", ", _animation.Events.Select(e => $"{e.Name}@{e.Frame}")));
+    }
+
+    // ---------- CPU fallback ----------
+
+    private void SwitchToCpu(string reason)
+    {
+        if (_useCpu)
+            return;
+        _useCpu = true;
+        PreviewArea.Children.Remove(_realtime);
+        PreviewImage.IsVisible = true;
+        _cpuPlayheadSeconds = _realtime.PlayheadFrames / Math.Max(1, _animation?.Fps ?? 60);
+        _cpuLastEventFrame = _realtime.PlayheadFrames;
+        _playing = _realtime.IsPlaying;
+        _speed = _realtime.Speed;
+        StatusText.Text = "";
+        _cpuClock.Restart();
+        _cpuLoopCts = new CancellationTokenSource();
+        _ = CpuRenderLoopAsync(_cpuLoopCts.Token);
+        InfoText.Text += $"\n(Realtime view unavailable: {reason})";
+    }
 
     private MiiRig RigFor(Mii mii)
     {
@@ -159,59 +271,45 @@ public partial class MiiAnimatorDevWindow : PopupContent
         return rig;
     }
 
-    // ---------- Rendering ----------
-
-    private async Task RenderLoopAsync(CancellationToken token)
+    private async Task CpuRenderLoopAsync(CancellationToken token)
     {
-        var lastTick = _clock.Elapsed;
+        var lastTick = _cpuClock.Elapsed;
         while (!token.IsCancellationRequested)
         {
-            var now = _clock.Elapsed;
+            var now = _cpuClock.Elapsed;
             if (_playing)
-                _playheadSeconds += (now - lastTick).TotalSeconds * _speed;
+                _cpuPlayheadSeconds += (now - lastTick).TotalSeconds * _speed;
             lastTick = now;
 
-            if (_mii is null || _studioData is null)
+            var frame = CurrentFrame;
+            if (_animation is not null)
+            {
+                var absolute = _cpuPlayheadSeconds * _animation.Fps;
+                foreach (var animEvent in _animation.EventsBetween(_cpuLastEventFrame, absolute).ToList())
+                    LogEvent(animEvent);
+                _cpuLastEventFrame = absolute;
+            }
+
+            var mii = ShouldShowSwapped(frame) ? _swappedMii! : _mii;
+            if (mii is null || MiiStudioDataSerializer.Serialize(mii) is not { IsSuccess: true } studio)
             {
                 await Task.Delay(100, token).ContinueWith(_ => { });
                 continue;
             }
 
-            var frame = _animation?.FrameAtTime(_playheadSeconds) ?? 0f;
-            if (_animation is not null)
-                TrackEvents(_animation, _playheadSeconds * _animation.Fps);
-            var swapped = IsGenderSwapped(frame) && _swappedMii is not null && _swappedStudioData is not null;
-            var mii = swapped ? _swappedMii! : _mii;
-            var studioData = swapped ? _swappedStudioData! : _studioData;
-
             var rig = RigFor(mii);
             var pose = _animation is null ? rig.RestPose : rig.Evaluate(_animation, frame);
-            var specifications = new MiiImageSpecifications
-            {
-                Name = "MiiAnimatorDev",
-                Type = MiiImageSpecifications.BodyType.all_body,
-                Size = MiiImageSpecifications.ImageSize.medium,
-                RenderScale = 0.8f,
-                CharacterRotate = new Vector3(0, _yaw, 0),
-                CameraRotate = new Vector3(_pitch, 0, 0),
-                BackgroundColor = "00000000",
-            };
-
-            var result = await Renderer.RenderPosedBufferAsync(mii, studioData, specifications, pose, token);
+            var result = await Renderer.RenderPosedBufferAsync(mii, studio.Value, Specifications(), pose, token);
             if (token.IsCancellationRequested)
                 return;
             if (result.IsSuccess)
-            {
                 Present(result.Value);
-                StatusText.Text = "";
-            }
             else
             {
                 StatusText.Text = result.Error!.Message;
                 await Task.Delay(500, token).ContinueWith(_ => { });
             }
 
-            UpdatePlaybackUi(frame);
             await Task.Yield();
         }
     }
@@ -239,41 +337,6 @@ public partial class MiiAnimatorDevWindow : PopupContent
         PreviewImage.InvalidateVisual();
     }
 
-    private void UpdatePlaybackUi(float frame)
-    {
-        PlayButton.Text = _playing ? "Pause" : "Play";
-        if (_animation is null)
-        {
-            FrameText.Text = "No animation loaded — showing the rest pose.";
-            return;
-        }
-
-        _updatingSlider = true;
-        FrameSlider.Maximum = _animation.Length;
-        FrameSlider.Value = frame;
-        _updatingSlider = false;
-        FrameText.Text = $"Frame {frame:0} / {_animation.Length}";
-    }
-
-    private void UpdateInfo()
-    {
-        if (_animation is null)
-        {
-            InfoText.Text = "Load an animation made with the Mii Animator.";
-            return;
-        }
-
-        var keys = _animation.Tracks.Sum(t => t.Value.Count);
-        var author =
-            _animation.AuthorMii is { } bytes && MiiSerializer.Deserialize(bytes) is { IsSuccess: true } authorMii
-                ? authorMii.Value.Name.ToString()
-                : "none";
-        InfoText.Text =
-            $"{_animation.Name}\n{_animation.Length} frames @ {_animation.Fps} fps ({_animation.DurationSeconds:0.##}s)\n"
-            + $"{keys} keys on {_animation.Tracks.Count} channels\nMade with Mii: {author}"
-            + (_animation.Events.Count == 0 ? "" : "\nEvents: " + string.Join(", ", _animation.Events.Select(e => $"{e.Name}@{e.Frame}")));
-    }
-
     // ---------- UI events ----------
 
     private async void ChooseMii_OnClick(object? sender, RoutedEventArgs e)
@@ -294,9 +357,11 @@ public partial class MiiAnimatorDevWindow : PopupContent
         try
         {
             _animation = MiiAnimFormat.Read(FileSystem.File.ReadAllBytes(path));
-            _playheadSeconds = 0;
-            _lastEventFrame = -1;
             _eventLog.Clear();
+            _realtime.Animation = _animation;
+            _realtime.IsPlaying = true;
+            _cpuPlayheadSeconds = 0;
+            _cpuLastEventFrame = -1;
             _playing = true;
             UpdateInfo();
         }
@@ -306,22 +371,31 @@ public partial class MiiAnimatorDevWindow : PopupContent
         }
     }
 
-    private void PlayPause_OnClick(object? sender, RoutedEventArgs e) => _playing = !_playing;
+    private void PlayPause_OnClick(object? sender, RoutedEventArgs e)
+    {
+        _playing = !IsPlaying;
+        _realtime.IsPlaying = _playing;
+        _realtime.Invalidate();
+    }
 
     private void Speed_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (SpeedBox.SelectedIndex >= 0)
-            _speed = Speeds[SpeedBox.SelectedIndex];
+        if (SpeedBox.SelectedIndex < 0)
+            return;
+        _speed = Speeds[SpeedBox.SelectedIndex];
+        _realtime.Speed = _speed;
     }
 
     private void FrameSlider_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
     {
         if (_updatingSlider || _animation is null)
             return;
+        // Scrubbing pauses and jumps without firing the events in between.
         _playing = false;
-        _playheadSeconds = e.NewValue / Math.Max(1, _animation.Fps);
-        // Scrubbing jumps; don't fire everything in between.
-        _lastEventFrame = e.NewValue;
+        _realtime.IsPlaying = false;
+        _realtime.Seek(e.NewValue);
+        _cpuPlayheadSeconds = e.NewValue / Math.Max(1, _animation.Fps);
+        _cpuLastEventFrame = e.NewValue;
     }
 
     private void Preview_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -338,6 +412,7 @@ public partial class MiiAnimatorDevWindow : PopupContent
         _yaw = (_yaw + (float)(point.X - start.X) * 0.6f) % 360f;
         _pitch = Math.Clamp(_pitch + (float)(point.Y - start.Y) * 0.3f, -40f, 40f);
         _dragStart = point;
+        UpdateSpecifications();
     }
 
     private void Preview_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
