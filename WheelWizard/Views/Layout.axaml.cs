@@ -89,6 +89,10 @@ public partial class Layout : BaseWindow, IPollingListener
         ModManagerService = modManagerService;
         InitializeComponent();
 
+        // Wayland does not expose the drawn caption buttons from our platform decoration template.
+        HeaderWindowControls.IsVisible = OperatingSystem.IsLinux()
+            && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
+
         // Respects tiling window managers better if resizable.
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             CanResize = true;
@@ -226,6 +230,12 @@ public partial class Layout : BaseWindow, IPollingListener
     private void HeaderBackButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoBack();
 
     private void HeaderForwardButton_Click(object? sender, RoutedEventArgs e) => Navigation.GoForward();
+
+    private void HeaderMinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+    private void HeaderCloseButton_Click(object? sender, RoutedEventArgs e) => Close();
+
+    private static void WindowControl_PointerPressed(object? sender, PointerPressedEventArgs e) => e.Handled = true;
 
     public void NavigateToPage(UserControl page)
     {
