@@ -17,6 +17,44 @@ public sealed class MiiAnimation
 
     public Dictionary<TrackId, AnimCurve> Tracks { get; } = new();
 
+    /// <summary>Named event markers, kept sorted by frame.</summary>
+    public List<AnimEvent> Events { get; } = [];
+
+    /// <summary>Adds an event (or renames the one already on that frame with the same name) and keeps the list sorted.</summary>
+    public void AddEvent(int frame, string name)
+    {
+        name = name.Trim();
+        if (name.Length > AnimEvent.MaxNameLength)
+            name = name[..AnimEvent.MaxNameLength];
+        var animEvent = new AnimEvent(Math.Max(0, frame), name);
+        if (Events.Contains(animEvent))
+            return;
+        var index = Events.FindIndex(e => e.Frame > animEvent.Frame);
+        Events.Insert(index < 0 ? Events.Count : index, animEvent);
+    }
+
+    /// <summary>
+    /// Events crossed while playback moves from <paramref name="fromFrame"/> (exclusive) to <paramref name="toFrame"/>
+    /// (inclusive). Frames are unwrapped (keep counting past <see cref="Length"/> while looping); start a fresh
+    /// playback from -1 so events on frame 0 fire too. With <paramref name="looping"/> off the animation plays once.
+    /// </summary>
+    public IEnumerable<AnimEvent> EventsBetween(double fromFrame, double toFrame, bool looping = true)
+    {
+        if (Events.Count == 0 || toFrame <= fromFrame || Length <= 0)
+            yield break;
+        var firstLoop = looping ? (long)Math.Floor(Math.Max(fromFrame, 0) / Length) : 0;
+        var lastLoop = looping ? (long)Math.Floor(toFrame / Length) : 0;
+        for (var loop = firstLoop; loop <= lastLoop; loop++)
+        {
+            foreach (var animEvent in Events)
+            {
+                var at = loop * (double)Length + animEvent.Frame;
+                if (at > fromFrame && at <= toFrame)
+                    yield return animEvent;
+            }
+        }
+    }
+
     public float DurationSeconds => Length / (float)Math.Max(1, Fps);
 
     public AnimCurve? TryGetCurve(TrackId id) => Tracks.TryGetValue(id, out var curve) && curve.Count > 0 ? curve : null;
@@ -58,6 +96,7 @@ public sealed class MiiAnimation
         };
         foreach (var (id, curve) in Tracks)
             clone.Tracks[id] = curve.Clone();
+        clone.Events.AddRange(Events);
         return clone;
     }
 

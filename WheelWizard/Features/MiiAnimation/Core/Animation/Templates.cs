@@ -153,7 +153,7 @@ public static class Templates
         Key(a, Bone(MiiBone.ArmL1, Channel.RotY), (0, -25), (30, 25), (60, -25));
         Key(a, Bone(MiiBone.ArmR1, Channel.RotY), (0, -25), (30, 25), (60, -25));
         Key(a, Bone(MiiBone.Head, Channel.RotZ), (0, 0), (15, 2), (30, 0), (45, -2), (60, 0));
-        Expression(a, (0, MiiExpression.Smile));
+        Expression(a, (0, MiiExpression.Normal));
         return a;
     }
 
@@ -199,7 +199,7 @@ public static class Templates
         Key(a, Bone(MiiBone.ArmR1, Channel.RotZ), (0, -20), (30, -40), (60, -20), (90, -120, Interpolation.Overshoot), (120, -20));
         Key(a, Bone(MiiBone.ArmL2, Channel.RotY), (0, -40), (30, -10), (60, -40), (90, -60), (120, -40));
         Key(a, Bone(MiiBone.ArmR2, Channel.RotY), (0, 40), (30, 60), (60, 40), (90, 10), (120, 40));
-        Expression(a, (0, MiiExpression.SmileOpenMouth), (56, MiiExpression.LikeWinkLeft), (66, MiiExpression.SmileOpenMouth));
+        Expression(a, (0, MiiExpression.OpenMouth), (56, MiiExpression.LikeWinkLeft), (66, MiiExpression.OpenMouth));
         return a;
     }
 

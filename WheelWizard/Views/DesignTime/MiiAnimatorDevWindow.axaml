@@ -44,6 +44,12 @@
                 </Grid>
                 <Slider x:Name="FrameSlider" Minimum="0" Maximum="1" ValueChanged="FrameSlider_OnValueChanged" />
                 <TextBlock x:Name="FrameText" Classes="TinyText" />
+
+                <TextBlock Text="Events" Classes="TitleText" Margin="0,10,0,0" />
+                <CheckBox x:Name="SwapGenderToggle" Margin="0,2" IsChecked="True" Classes="Switch">
+                    Act on swap_gender
+                </CheckBox>
+                <TextBlock x:Name="EventsText" Classes="TinyText" TextWrapping="Wrap" />
                 <TextBlock Classes="TinyText" TextWrapping="Wrap" Opacity="0.7"
                            Text="Drag the preview to orbit. The animation loops." />
             </StackPanel>

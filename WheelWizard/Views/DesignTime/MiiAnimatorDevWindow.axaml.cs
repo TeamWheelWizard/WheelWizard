@@ -57,6 +57,14 @@ public partial class MiiAnimatorDevWindow : PopupContent
     private Point? _dragStart;
     private bool _updatingSlider;
 
+    // Events: playback position in unwrapped frames (keeps counting across loops) and the last few that fired.
+    private const string SwapGenderEvent = "swap_gender";
+    private const int EventLogSize = 6;
+    private double _lastEventFrame = -1;
+    private readonly List<string> _eventLog = [];
+    private Mii? _swappedMii;
+    private string? _swappedStudioData;
+
     public MiiAnimatorDevWindow(
         IMiiDbService miiDb,
         IMiiNativeRenderer renderer,
@@ -100,9 +108,49 @@ public partial class MiiAnimatorDevWindow : PopupContent
             mii is null ? null
             : MiiStudioDataSerializer.Serialize(mii) is { IsSuccess: true } studio ? studio.Value
             : null;
+        _swappedMii = mii is null ? null : WithOtherGender(mii);
+        _swappedStudioData =
+            _swappedMii is not null && MiiStudioDataSerializer.Serialize(_swappedMii) is { IsSuccess: true } swapped ? swapped.Value : null;
         MiiNameText.Text = mii?.Name.ToString() ?? "No Miis found";
         StatusText.Text = mii is null ? "No Miis found. Create one in the Mii Channel first." : "";
     }
+
+    private static Mii? WithOtherGender(Mii mii)
+    {
+        if (
+            MiiSerializer.Serialize(mii) is not { IsSuccess: true } bytes
+            || MiiSerializer.Deserialize(bytes.Value) is not { IsSuccess: true } copy
+        )
+            return null;
+        copy.Value.IsGirl = !mii.IsGirl;
+        return copy.Value;
+    }
+
+    /// <summary>Logs events crossed since the last tick (looping) and resets the log when playback jumps.</summary>
+    private void TrackEvents(MiiAnimation animation, double absoluteFrame)
+    {
+        foreach (var animEvent in animation.EventsBetween(_lastEventFrame, absoluteFrame))
+        {
+            _eventLog.Insert(0, $"{animEvent.Name}  (frame {animEvent.Frame})");
+            if (_eventLog.Count > EventLogSize)
+                _eventLog.RemoveAt(_eventLog.Count - 1);
+        }
+
+        _lastEventFrame = absoluteFrame;
+        EventsText.Text =
+            animation.Events.Count == 0 ? "This animation has no events."
+            : _eventLog.Count == 0 ? "Waiting for the first event…"
+            : "Fired (newest first):\n" + string.Join("\n", _eventLog);
+    }
+
+    /// <summary>
+    /// With "Act on swap_gender" on, the Mii shows with the other gender from the swap_gender event until the
+    /// loop restarts, which is how WheelWizard would time a gender change to the animation.
+    /// </summary>
+    private bool IsGenderSwapped(float frame) =>
+        SwapGenderToggle.IsChecked == true
+        && _animation is not null
+        && _animation.Events.Any(e => e.Name == SwapGenderEvent && frame >= e.Frame);
 
     private MiiRig RigFor(Mii mii)
     {
@@ -129,8 +177,14 @@ public partial class MiiAnimatorDevWindow : PopupContent
                 continue;
             }
 
-            var rig = RigFor(_mii);
             var frame = _animation?.FrameAtTime(_playheadSeconds) ?? 0f;
+            if (_animation is not null)
+                TrackEvents(_animation, _playheadSeconds * _animation.Fps);
+            var swapped = IsGenderSwapped(frame) && _swappedMii is not null && _swappedStudioData is not null;
+            var mii = swapped ? _swappedMii! : _mii;
+            var studioData = swapped ? _swappedStudioData! : _studioData;
+
+            var rig = RigFor(mii);
             var pose = _animation is null ? rig.RestPose : rig.Evaluate(_animation, frame);
             var specifications = new MiiImageSpecifications
             {
@@ -143,7 +197,7 @@ public partial class MiiAnimatorDevWindow : PopupContent
                 BackgroundColor = "00000000",
             };
 
-            var result = await Renderer.RenderPosedBufferAsync(_mii, _studioData, specifications, pose, token);
+            var result = await Renderer.RenderPosedBufferAsync(mii, studioData, specifications, pose, token);
             if (token.IsCancellationRequested)
                 return;
             if (result.IsSuccess)
@@ -216,7 +270,8 @@ public partial class MiiAnimatorDevWindow : PopupContent
                 : "none";
         InfoText.Text =
             $"{_animation.Name}\n{_animation.Length} frames @ {_animation.Fps} fps ({_animation.DurationSeconds:0.##}s)\n"
-            + $"{keys} keys on {_animation.Tracks.Count} channels\nMade with Mii: {author}";
+            + $"{keys} keys on {_animation.Tracks.Count} channels\nMade with Mii: {author}"
+            + (_animation.Events.Count == 0 ? "" : "\nEvents: " + string.Join(", ", _animation.Events.Select(e => $"{e.Name}@{e.Frame}")));
     }
 
     // ---------- UI events ----------
@@ -240,6 +295,8 @@ public partial class MiiAnimatorDevWindow : PopupContent
         {
             _animation = MiiAnimFormat.Read(FileSystem.File.ReadAllBytes(path));
             _playheadSeconds = 0;
+            _lastEventFrame = -1;
+            _eventLog.Clear();
             _playing = true;
             UpdateInfo();
         }
@@ -263,6 +320,8 @@ public partial class MiiAnimatorDevWindow : PopupContent
             return;
         _playing = false;
         _playheadSeconds = e.NewValue / Math.Max(1, _animation.Fps);
+        // Scrubbing jumps; don't fire everything in between.
+        _lastEventFrame = e.NewValue;
     }
 
     private void Preview_OnPointerPressed(object? sender, PointerPressedEventArgs e)

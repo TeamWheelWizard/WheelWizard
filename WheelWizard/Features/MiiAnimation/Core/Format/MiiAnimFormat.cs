@@ -10,13 +10,15 @@ namespace MiiAnim.Core.Format;
 /// <code>
 /// "MIAN"            magic
 /// u8                version (1)
-/// u8                flags   bit0 = has author Mii
+/// u8                flags   bit0 = has author Mii, bit1 = has events
 /// u8                fps
 /// varuint           length in frames
 /// varuint + utf8    name
 /// [74 bytes]        author Mii (Wii format), if flag bit0
 /// varuint           track count
 /// track*            see below
+/// [events]          if flag bit1: varuint count, then per event (sorted by frame):
+///                   varuint frameDelta (first is absolute), varuint + utf8 name
 /// u32               CRC-32 of everything above
 ///
 /// track:
@@ -55,7 +57,8 @@ public static class MiiAnimFormat
         ms.Write(Magic);
         ms.WriteByte(Version);
         var hasMii = animation.AuthorMii is { Length: MiiAnimation.MiiDataLength };
-        ms.WriteByte((byte)(hasMii ? 1 : 0));
+        var hasEvents = animation.Events.Count > 0;
+        ms.WriteByte((byte)((hasMii ? 1 : 0) | (hasEvents ? 2 : 0)));
         ms.WriteByte((byte)Math.Clamp(animation.Fps, 1, 255));
         WriteVarUInt(ms, (uint)Math.Max(1, animation.Length));
         var name = Encoding.UTF8.GetBytes(animation.Name ?? "");
@@ -98,6 +101,21 @@ public static class MiiAnimFormat
                     WriteValue(ms, encoding, key.HandleIn.X);
                     WriteValue(ms, encoding, key.HandleIn.Y);
                 }
+            }
+        }
+
+        if (hasEvents)
+        {
+            var events = animation.Events.OrderBy(e => e.Frame).ToList();
+            WriteVarUInt(ms, (uint)events.Count);
+            var previousFrame = 0;
+            foreach (var animEvent in events)
+            {
+                WriteVarUInt(ms, (uint)Math.Max(0, animEvent.Frame - previousFrame));
+                previousFrame = Math.Max(previousFrame, animEvent.Frame);
+                var eventName = Encoding.UTF8.GetBytes(animEvent.Name ?? "");
+                WriteVarUInt(ms, (uint)eventName.Length);
+                ms.Write(eventName);
             }
         }
 
@@ -154,6 +172,18 @@ public static class MiiAnimFormat
             }
 
             animation.Tracks[new TrackId(target, channel)] = curve;
+        }
+
+        if ((flags & 2) != 0)
+        {
+            var eventCount = (int)reader.ReadVarUInt();
+            var frame = 0;
+            for (var e = 0; e < eventCount; e++)
+            {
+                frame += (int)reader.ReadVarUInt();
+                var eventNameLength = (int)reader.ReadVarUInt();
+                animation.Events.Add(new AnimEvent(frame, Encoding.UTF8.GetString(reader.ReadBytes(eventNameLength))));
+            }
         }
 
         return animation;
