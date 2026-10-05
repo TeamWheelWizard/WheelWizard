@@ -1,4 +1,8 @@
+using Avalonia;
+using Avalonia.Headless;
 using Avalonia.Controls;
+using WheelWizard.Models.Mods;
+using WheelWizard.Views.Pages;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -18,6 +22,48 @@ namespace WheelWizard.UI.Test;
 
 public class ModBrowserPreviewTests
 {
+    [AvaloniaFact]
+    public void DisabledGridCard_RestoresColorOnWholeCardHover_AndTracksEnabledState()
+    {
+        using var preview = new ModPreviewViewModel(0, Substitute.For<IGameBananaSingletonService>(), Substitute.For<IGameBananaMediaService>());
+        var mod = new Mod { Title = "Test mod", IsEnabled = false, HasIncompatibleFiles = true };
+        var card = new GridModPanel { DataContext = new ModListItem(mod, false, false, preview) };
+        var window = new Window { Content = card, Width = 300, Height = 220 };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            var grayImage = card.FindControl<Image>("DisabledThumbnailImage")!;
+            var originalSize = card.FindControl<Border>("RootCardBorder")!.Bounds.Size;
+            Assert.True(grayImage.IsVisible);
+            Assert.True(card.FindControl<PathIcon>("CompatibilityWarning")!.IsVisible);
+            window.MouseMove(new Point(25, 130));
+            Assert.False(grayImage.IsVisible);
+            window.MouseMove(card.FindControl<Border>("ThumbnailHeader")!.TranslatePoint(new Point(20, 40), window)!.Value);
+            Assert.False(grayImage.IsVisible);
+            window.MouseMove(new Point(25, 130));
+            Assert.False(grayImage.IsVisible);
+            window.MouseDown(new Point(25, 130), Avalonia.Input.MouseButton.Left);
+            window.MouseUp(new Point(25, 130), Avalonia.Input.MouseButton.Left);
+            Assert.True(mod.IsEnabled);
+            window.UpdateLayout();
+            Assert.Equal(originalSize, card.FindControl<Border>("RootCardBorder")!.Bounds.Size);
+            window.MouseDown(new Point(25, 130), Avalonia.Input.MouseButton.Left);
+            window.MouseUp(new Point(25, 130), Avalonia.Input.MouseButton.Left);
+            Assert.False(mod.IsEnabled);
+            window.MouseMove(new Point(1, 1));
+            Assert.True(grayImage.IsVisible);
+            mod.IsEnabled = true;
+            Assert.False(grayImage.IsVisible);
+            mod.IsEnabled = false;
+            Assert.True(grayImage.IsVisible);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [AvaloniaFact]
     public async Task ClosedBrowser_DiscardsPendingSearchResults()
     {
@@ -219,7 +265,10 @@ public class ModBrowserPreviewTests
     {
         var mods = Substitute.For<IGameBananaSingletonService>();
         var media = Substitute.For<IGameBananaMediaService>();
-        var png = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jvX0AAAAASUVORK5CYII=");
+        using var pixels = new SkiaSharp.SKBitmap(2, 2);
+        pixels.Erase(SkiaSharp.SKColors.Red);
+        using var encoded = pixels.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100);
+        var png = encoded.ToArray();
         media.GetImageAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((OperationResult<byte[]>)png);
         using var first = new ModPreviewViewModel(1, mods, media, "https://images.test/first.png");
         using var second = new ModPreviewViewModel(2, mods, media, "https://images.test/second.png");
@@ -238,6 +287,9 @@ public class ModBrowserPreviewTests
             await first.LoadAsync();
             var image = Assert.Single(card.GetVisualDescendants().OfType<Image>());
             Assert.NotNull(first.Image);
+            Assert.NotNull(first.GrayscaleImage);
+            Assert.NotSame(first.Image, first.GrayscaleImage);
+            Assert.Same(first.GrayscaleImage, first.GrayscaleImage);
             Assert.Same(first.Image, image.Source);
 
             card.Preview = second;

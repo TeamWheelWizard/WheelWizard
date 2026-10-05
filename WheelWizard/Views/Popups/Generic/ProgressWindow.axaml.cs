@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.Views.Popups.Base;
@@ -30,6 +31,7 @@ public partial class ProgressWindow : PopupContent
         : base(false, false, true, windowTitle)
     {
         InitializeComponent();
+        Window.Closing += OnWindowClosing;
         _updateTimer = new();
         _updateTimer.Interval = TimeSpan.FromMilliseconds(100); // Update every 100ms
         _updateTimer.Tick += UpdateTimer_Tick;
@@ -169,7 +171,19 @@ public partial class ProgressWindow : PopupContent
         return SetExtraText($"{t("action.cancel")}...");
     }
 
-    private void CancelButton_OnClick(object? sender, RoutedEventArgs e)
+    private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
+    {
+        if (e.IsProgrammatic || e.CloseReason != WindowCloseReason.WindowClosing || _downloadCancellationTokenSource == null)
+            return;
+
+        // Match Cancel: keep the progress popup open until the operation finishes cleanup.
+        e.Cancel = true;
+        RequestCancellation();
+    }
+
+    private void CancelButton_OnClick(object? sender, RoutedEventArgs e) => RequestCancellation();
+
+    private void RequestCancellation()
     {
         if (_downloadCancellationTokenSource == null || _downloadCancellationTokenSource.IsCancellationRequested)
             return;

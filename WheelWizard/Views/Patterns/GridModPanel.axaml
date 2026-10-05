@@ -7,45 +7,38 @@
              x:Class="WheelWizard.Views.Patterns.GridModPanel"
              x:DataType="pages:ModListItem">
 
-    <Border x:Name="RootCardBorder"
-            CornerRadius="8" Background="{StaticResource Neutral900}"
-            ClipToBounds="True" Margin="4" Height="160">
-        <Grid>
+    <UserControl.Styles>
+        <Style Selector="Border#RootCardBorder">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Border#RootCardBorder:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+        <Style Selector="Border#RootCardBorder.Enabled">
+            <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+        </Style>
+        <Style Selector="Border#RootCardBorder.Enabled:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+        </Style>
+    </UserControl.Styles>
+    <Border x:Name="RootCardBorder" Classes.Enabled="{Binding Mod.IsEnabled}"
+            BorderThickness="1"
+            CornerRadius="8"
+            ClipToBounds="True" Margin="4" Height="134">
+        <Grid x:Name="CardSurface" RowDefinitions="80,52">
             <!-- Image area -->
-            <Border Background="{StaticResource Neutral700}" ClipToBounds="True">
+            <Border x:Name="ThumbnailHeader" Grid.Row="0" Background="{StaticResource Neutral700}" ClipToBounds="True">
                 <Panel>
-                    <Image Source="{Binding Preview.Image}" Stretch="UniformToFill" />
-                    <!-- Placeholder icon when no image is loaded -->
-                    <PathIcon IsVisible="{Binding Preview.ShowPlaceholder}"
-                              Data="{StaticResource CubesStacked}"
-                              Width="36" Height="36"
-                              Foreground="{StaticResource Neutral500}"
-                              HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Panel>
-            </Border>
-
-            <!-- Gradient overlay for the bottom area -->
-            <Border VerticalAlignment="Bottom" Height="100" IsHitTestVisible="False">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                        <GradientStop Color="Transparent" Offset="0.0" />
-                        <GradientStop Color="{StaticResource Neutral900}" Offset="0.7" />
-                        <GradientStop Color="{StaticResource Neutral900}" Offset="1.0" />
-                    </LinearGradientBrush>
-                </Border.Background>
-            </Border>
-
-            <!-- Content -->
-            <Grid RowDefinitions="*, Auto, Auto">
-                <Border Width="34"
-                        Height="14"
-                        CornerRadius="3"
-                        Background="{StaticResource Danger500}"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Margin="0,8,8,0"
-                        IsVisible="{Binding Mod.HasIncompatibleFiles}"
-                        ToolTip.Placement="Top">
+                    <Image x:Name="ThumbnailImage" Source="{Binding Preview.Image}" Stretch="UniformToFill" />
+                    <Image x:Name="DisabledThumbnailImage" Source="{Binding Preview.GrayscaleImage}"
+                           Stretch="UniformToFill" IsVisible="False" />
+                    <PathIcon x:Name="CompatibilityWarning" Data="{StaticResource WarningTip}"
+                              Width="16" Height="16" Foreground="{StaticResource Danger500}" Margin="8" HorizontalAlignment="Right" VerticalAlignment="Top"
+                              IsVisible="{Binding Mod.HasIncompatibleFiles}" ToolTip.Placement="Top">
                     <ToolTip.Tip>
                         <StackPanel MaxWidth="300">
                             <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
@@ -56,23 +49,28 @@
                                        Foreground="{StaticResource Neutral100}" />
                         </StackPanel>
                     </ToolTip.Tip>
-                </Border>
+                    </PathIcon>
+                    <!-- Placeholder icon when no image is loaded -->
+                    <PathIcon IsVisible="{Binding Preview.ShowPlaceholder}"
+                              Data="{StaticResource CubesStacked}"
+                              Width="36" Height="36"
+                              Foreground="{StaticResource Neutral500}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Panel>
+            </Border>
 
-                <!-- Title -->
-                <TextBlock Grid.Row="1" Text="{Binding Mod.Title}" FontSize="13" FontWeight="SemiBold"
-                           Foreground="{StaticResource Neutral100}"
-                           TextTrimming="CharacterEllipsis"
-                           Margin="10,0,10,4" />
+            <Border Grid.Row="1" x:Name="EnabledBackgroundGlow" CornerRadius="99999"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" Height="70" Width="50"
+                    Background="{StaticResource Primary200}" Opacity="0.7" Effect="blur(130)"
+                    IsVisible="{Binding Mod.IsEnabled}" IsHitTestVisible="False" />
 
-                <!-- Bottom controls bar: Enabled switch + Priority -->
-                <Border Grid.Row="2" Padding="8,0,8,8">
-                    <Grid ColumnDefinitions="Auto, *, Auto">
-                        <CheckBox Grid.Column="0"
-                                  IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
-                                  Classes="SwitchDark"
-                                  VerticalAlignment="Center" />
-
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
+            <!-- Fixed-height body keeps both enabled states and title lengths the same size. -->
+            <Grid x:Name="CardBody" Grid.Row="1" ColumnDefinitions="*,Auto" Margin="10,8">
+                <TextBlock x:Name="ModTitle" Text="{Binding Mod.Title}" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{StaticResource Neutral100}" TextTrimming="CharacterEllipsis"
+                           TextWrapping="Wrap" MaxLines="2" LineHeight="18" Height="36"
+                           Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
                                     VerticalAlignment="Center">
                             <TextBlock Text="#" FontSize="13"
                                        Foreground="{StaticResource Neutral500}"
@@ -99,16 +97,8 @@
                                 </TextBox.Styles>
                             </TextBox>
                         </StackPanel>
-                    </Grid>
-                </Border>
             </Grid>
         </Grid>
 
-        <!-- Hover effect -->
-        <Border.Styles>
-            <Style Selector="Border#RootCardBorder:pointerover">
-                <Setter Property="Background" Value="{StaticResource Neutral700}" />
-            </Style>
-        </Border.Styles>
     </Border>
 </UserControl>

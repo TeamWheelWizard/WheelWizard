@@ -13,6 +13,50 @@ namespace WheelWizard.UI.Test;
 
 public class WindowCompositionTests
 {
+    [AvaloniaTheory]
+    [InlineData(400.0)]
+    [InlineData(500.0)]
+    public void ProgressContent_KeepsDefinedMeasuredWidth_ButFillsExtraAvailableWidth(double preferredWidth)
+    {
+        var content = new WheelWizard.Views.Popups.Generic.ProgressWindow("Download");
+        Assert.IsType<Grid>(content.Content).Width = preferredWidth;
+        content.SetGoal(new string('W', 150));
+        content.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        Assert.Equal(preferredWidth, content.DesiredSize.Width);
+        content.Arrange(new Rect(0, 0, 600, 200));
+        Assert.Equal(600, Assert.IsType<Grid>(content.Content).Bounds.Width);
+        Assert.Equal(600, content.FindControl<ProgressBar>("ProgressBar")!.Bounds.Width);
+        content.Close();
+    }
+
+    [AvaloniaTheory]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    [InlineData(true, true)]
+    public void ProgressNativeClose_CancelsOnlyCancelableUserRequests(bool canCancel, bool programmatic)
+    {
+        using var cancellation = new CancellationTokenSource();
+        var content = new WheelWizard.Views.Popups.Generic.ProgressWindow("Download");
+        if (canCancel)
+            content.SetCancellationTokenSource(cancellation);
+        content.Show();
+        var popup = Assert.IsType<PopupWindow>(TopLevel.GetTopLevel(content));
+        try
+        {
+            var args = CreateClosingArgs(programmatic);
+            typeof(PopupWindow).GetMethod("OnClosing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(popup, [args]);
+            Assert.Equal(canCancel && !programmatic, cancellation.IsCancellationRequested);
+            Assert.Equal(canCancel && !programmatic, content.WasCancellationRequested);
+            Assert.Equal(!programmatic, args.Cancel);
+        }
+        finally
+        {
+            content.SetCancellationTokenSource(null);
+            content.Close();
+        }
+    }
+
     [AvaloniaFact]
     public void DesktopCaptionButtons_UseNavigationColorsAndMinimizeHoverBackground()
     {

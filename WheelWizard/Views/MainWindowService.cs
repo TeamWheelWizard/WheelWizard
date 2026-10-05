@@ -48,9 +48,10 @@ public sealed class MainWindowService(Func<Layout> createWindow, TimeProvider ti
         window.Opacity = 1;
         window.ShowInTaskbar = true;
         window.IsHitTestVisible = true;
-        window.Activate();
+        window.ShowActivated = true;
         desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
         splash?.Close();
+        window.Activate();
     }
 
     public void Refresh()

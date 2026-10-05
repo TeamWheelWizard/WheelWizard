@@ -10,9 +10,26 @@
              mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="876"
              x:Class="WheelWizard.Views.Pages.ModsPage"
              x:DataType="pages:ModsPage">
+    <UserControl.Styles>
+        <Style Selector="components|MultiIconRadioButton.ModView /template/ Path#Part_SingleIcon">
+            <Setter Property="Stroke" Value="{Binding Color1, RelativeSource={RelativeSource TemplatedParent}}" />
+            <Setter Property="StrokeThickness" Value="2" />
+            <Setter Property="StrokeLineCap" Value="Round" />
+            <Setter Property="StrokeJoin" Value="Round" />
+            <Setter Property="Fill" Value="Transparent" />
+        </Style>
+        <Style Selector="components|MultiIconRadioButton.ModView:pointerover /template/ Path#Part_SingleIcon">
+            <Setter Property="Stroke" Value="{StaticResource Neutral300}" />
+            <Setter Property="Fill" Value="Transparent" />
+        </Style>
+        <Style Selector="components|MultiIconRadioButton.ModView:checked /template/ Path#Part_SingleIcon">
+            <Setter Property="Stroke" Value="{StaticResource Primary400}" />
+            <Setter Property="Fill" Value="Transparent" />
+        </Style>
+    </UserControl.Styles>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition Height="Auto" MinHeight="95" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -21,20 +38,45 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
 
-        <TextBlock Grid.Row="0" Text="{Binding StoragePageTitle}"
-                   HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                   Classes="PageTitleText" />
+        <StackPanel Grid.Row="0" Orientation="Vertical" VerticalAlignment="Bottom">
+            <CheckBox Classes="Switch" x:Name="EnableAllCheckbox"
+                      HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3,6,0,0" IsVisible="{Binding HasMods}"
+                      Click="ToggleButton_OnIsCheckedChanged" Content="{loc:T action.enable_all}" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8"
+                    HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <TextBlock Text="{Binding StoragePageTitle}" Classes="PageTitleText" />
+            <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount"
+                                 VerticalAlignment="Center" />
+        </StackPanel>
+        </StackPanel>
 
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,12"
                     Orientation="Vertical" x:Name="TopBarButtons" Spacing="3">
-            <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasMods}">
-                <components:Button Variant="Primary" 
+            <Grid ColumnDefinitions="Auto,Auto" IsVisible="{Binding HasMods}">
+                <components:Button Grid.Column="0" Variant="Primary" Height="40" CornerRadius="6,0,0,6"
                                    Text="{loc:T action.browse}" IconData="{StaticResource Search}"
-                                   Click="BrowseMod_Click" HorizontalAlignment="Center" />
-                <components:Button Variant="Default"
-                                   IconData="{StaticResource FileImport}"
-                                   Click="ImportMod_Click" HorizontalAlignment="Center" />
-            </StackPanel>
+                                   Click="BrowseMod_Click" />
+                <components:Button x:Name="ModActionsButton" Grid.Column="1" Variant="Primary" Height="40"
+                                   IconData="{StaticResource ChevronDown}" IconSize="16"
+                                   Padding="10,10" CornerRadius="0,6,6,0"
+                                   AutomationProperties.Name="{loc:T action.browse}"
+                                   Click="ModActionsMenu_Click">
+                    <components:Button.ContextMenu>
+                        <ContextMenu Placement="BottomEdgeAlignedRight">
+                            <MenuItem Header="{loc:T action.browse}" Click="BrowseMod_Click">
+                                <MenuItem.Icon><PathIcon Data="{StaticResource Search}" /></MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="{loc:T action.import}" Click="ImportMod_Click">
+                                <MenuItem.Icon><PathIcon Data="{StaticResource FileImport}" /></MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </components:Button.ContextMenu>
+                </components:Button>
+                <Border Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left"
+                        VerticalAlignment="Center" Background="{StaticResource Primary50}"
+                        Opacity="0.25" IsHitTestVisible="False" />
+            </Grid>
         </StackPanel>
 
         <!-- Empty Mods Message -->
@@ -43,59 +85,36 @@
             <components:EmptyPageInfo Title="{loc:T empty_content.no_mods_title}"
                                       BodyText="{loc:T empty_content.no_mods}"
                                       HorizontalAlignment="Center" />
-            <UniformGrid Margin="0,12" Columns="2" Rows="1">
-                <components:Button Variant="Primary" Margin="3,0"
+            <Grid ColumnDefinitions="Auto,Auto" Margin="0,12" HorizontalAlignment="Center">
+                <components:Button Grid.Column="0" Variant="Primary" Height="40" CornerRadius="6,0,0,6"
                                    Text="{loc:T action.browse}" IconData="{StaticResource Search}"
-                                   Click="BrowseMod_Click" HorizontalAlignment="Stretch" />
-                <components:Button Variant="Default" Margin="3,0"
-                                   Text="{loc:T action.import}"
-                                   IconData="{StaticResource FileImport}"
-                                   Click="ImportMod_Click" HorizontalAlignment="Stretch" />
-            </UniformGrid>
+                                   Click="BrowseMod_Click" />
+                <components:Button x:Name="EmptyModActionsButton" Grid.Column="1" Variant="Primary" Height="40"
+                                   IconData="{StaticResource ChevronDown}" IconSize="16"
+                                   Padding="10,10" CornerRadius="0,6,6,0"
+                                   AutomationProperties.Name="{loc:T action.browse}"
+                                   Click="ModActionsMenu_Click">
+                    <components:Button.ContextMenu>
+                        <ContextMenu Placement="BottomEdgeAlignedRight">
+                            <MenuItem Header="{loc:T action.browse}" Click="BrowseMod_Click">
+                                <MenuItem.Icon><PathIcon Data="{StaticResource Search}" /></MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="{loc:T action.import}" Click="ImportMod_Click">
+                                <MenuItem.Icon><PathIcon Data="{StaticResource FileImport}" /></MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </components:Button.ContextMenu>
+                </components:Button>
+                <Border Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left"
+                        VerticalAlignment="Center" Background="{StaticResource Primary50}"
+                        Opacity="0.25" IsHitTestVisible="False" />
+            </Grid>
         </StackPanel>
 
-        <Grid Grid.Row="1" x:Name="PageWithMods" RowDefinitions="*, 12*" IsVisible="{Binding HasMods}">
-            <Grid Grid.Row="0" Margin="10,0">
-
-                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Column="0"
-                            Orientation="Horizontal">
-                    <CheckBox Classes="Switch" x:Name="EnableAllCheckbox"
-                              VerticalAlignment="Center" Margin="0,5,30,5"
-                              Click="ToggleButton_OnIsCheckedChanged"
-                              Content="{loc:T action.enable_all}" />
-
-                    <components:Button HorizontalAlignment="Right" VerticalAlignment="Center" IconSize="26"
-                                       Click="ToggleModsPageView_OnClick" x:Name="ToggleButton"
-                                       Padding="13,7">
-                        <components:Button.Styles>
-                            <!-- If the current Style is blocks, then the button should show the rows icon -->
-                            <Style Selector="components|Button.Blocks">
-                                <Setter Property="IconData" Value="{StaticResource TableBars}" />
-                            </Style>
-                            <Style Selector="components|Button">
-                                <Setter Property="IconData" Value="{StaticResource TableBlocks}" />
-                            </Style>
-                        </components:Button.Styles>
-                    </components:Button>
-                </StackPanel>
-
-                <!-- THIS IS A COOL IDEA, BUT IT HAS TO BE SUPPORTED FIRST
-             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6" HorizontalAlignment="Right">
-                 <components:FormFieldLabel Text="Sort by:" VerticalAlignment="Center"/>
-                 <ComboBox x:Name="SortByDropdown" MinWidth="160" VerticalAlignment="Top"
-                           SelectionChanged="SortByDropdown_OnSelectionChanged" />
-             </StackPanel> -->
-
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
-                    <components:FormFieldLabel Text="Mods" />
-                    <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount" />
-                </StackPanel>
-                <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
-                        VerticalAlignment="Bottom" />
-            </Grid>
+        <Grid Grid.Row="1" x:Name="PageWithMods" RowDefinitions="Auto,*" IsVisible="{Binding HasMods}">
 
             <!-- Mods List (Blocks / arrow mode) -->
-            <ListBox Grid.Row="1" x:Name="ModsListBox" ItemsSource="{Binding Mods}" Margin="10,5">
+            <ListBox Grid.Row="1" x:Name="ModsListBox" ItemsSource="{Binding Mods}" Margin="10,5" Padding="0,0,0,68">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Classes="BoxItemBackground" Height="50">
@@ -117,6 +136,7 @@
                                     <ColumnDefinition Width="30" />
                                     <ColumnDefinition Width="50" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
                                 <!-- Drag handle -->
@@ -131,38 +151,15 @@
                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Mod.Title}" FontSize="14"
                                            Foreground="{StaticResource Neutral100}"
-                                           Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                           Grid.Column="2" VerticalAlignment="Center" Margin="10,0,8,0"
+                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
 
-                                <Border Width="34"
-                                        Height="14"
-                                        CornerRadius="3"
-                                        Background="{StaticResource Danger500}"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Top"
-                                        IsVisible="{Binding Mod.HasIncompatibleFiles}"
-                                        ToolTip.Placement="Top">
-                                    <ToolTip.Tip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
-                                                       FontWeight="Bold"
-                                                       Foreground="{StaticResource Neutral50}" />
-                                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}"
-                                                       TextWrapping="Wrap"
-                                                       Foreground="{StaticResource Neutral100}" />
-                                        </StackPanel>
-                                    </ToolTip.Tip>
-                                </Border>
 
                                 <!-- Yes i know that it already works without any change event if we remove Mode=OneWay -->
                                 <!-- Removing that will make it so editing that will also edit the model -->
                                 <!-- however, it works really weird if you do that -->
-                                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                                <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right"
                                             VerticalAlignment="Center">
-                                    <TextBlock Text="{loc:T attribute.priority}" FontSize="14"
-                                               Foreground="{StaticResource Neutral100}"
-                                               VerticalAlignment="Center" Margin="10,0,0,0" />
-                                    <TextBlock Text=": " FontSize="14" Foreground="{StaticResource Neutral100}"
-                                               VerticalAlignment="Center" />
                                     <TextBox Text="{Binding Mod.Priority, Mode=OneWay}" Classes="dark"
                                              TextChanged="PriorityText_OnTextChanged"
                                              LostFocus="PriorityText_OnLostFocus" Padding="0"
@@ -181,6 +178,22 @@
                                         </TextBox.Styles>
                                     </TextBox>
 
+                                    <Border Width="16" Margin="8,0" VerticalAlignment="Center">
+                                        <PathIcon Data="{StaticResource WarningTip}" Width="16" Height="16"
+                                                  Foreground="{StaticResource Danger500}"
+                                                  IsVisible="{Binding Mod.HasIncompatibleFiles}" ToolTip.Placement="Top">
+                                    <ToolTip.Tip>
+                                        <StackPanel MaxWidth="300">
+                                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource Neutral50}" />
+                                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}"
+                                                       TextWrapping="Wrap"
+                                                       Foreground="{StaticResource Neutral100}" />
+                                        </StackPanel>
+                                    </ToolTip.Tip>
+                                        </PathIcon>
+                                    </Border>
                                     <StackPanel Margin="10,0,0,0" Spacing="2" x:Name="VisibleWithBlocks">
                                         <components:Button HorizontalAlignment="Right"
                                                            IconData="{StaticResource ChevronUp}"
@@ -224,7 +237,7 @@
             <ScrollViewer Grid.Row="1" x:Name="ModsGridView" IsVisible="False" Margin="10,5"
                           HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                           VerticalContentAlignment="Top">
-                <ItemsControl ItemsSource="{Binding Mods}" VerticalAlignment="Top">
+                <ItemsControl ItemsSource="{Binding Mods}" VerticalAlignment="Top" Margin="0,0,0,68">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="2" VerticalAlignment="Top" />
@@ -252,6 +265,22 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
+            <Border Grid.Row="1" x:Name="ViewModeToggle" ZIndex="10" CornerRadius="6"
+                    Background="{StaticResource Neutral900}" Margin="0,0,12,12"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal" Spacing="6" Margin="6">
+                    <components:MultiIconRadioButton x:Name="GridViewButton" Classes="ModView"
+                        GroupName="ModsView" Width="40" Height="40" IconGeo="{StaticResource Grid2x2}"
+                        Color1="{StaticResource Neutral400}" HoverColor1="{StaticResource Neutral300}"
+                        SelectedColor1="{StaticResource Primary400}" AutomationProperties.Name="Grid view"
+                        IsCheckedChanged="ModsView_OnCheckedChanged" />
+                    <components:MultiIconRadioButton x:Name="ListViewButton" Classes="ModView"
+                        GroupName="ModsView" Width="40" Height="40" IconGeo="{StaticResource Rows3}"
+                        Color1="{StaticResource Neutral400}" HoverColor1="{StaticResource Neutral300}"
+                        SelectedColor1="{StaticResource Primary400}" AutomationProperties.Name="List view"
+                        IsCheckedChanged="ModsView_OnCheckedChanged" />
+                </StackPanel>
+            </Border>
         </Grid>
 
         <!-- Drag-and-drop overlay canvas -->
