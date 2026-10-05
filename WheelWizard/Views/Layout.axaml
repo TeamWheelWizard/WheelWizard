@@ -13,7 +13,7 @@
         WindowDecorations="{OnPlatform Default=None, Windows=BorderOnly}"
         ExtendClientAreaToDecorationsHint="True"
         CanResize='False' Background="Transparent">
-    <Grid ColumnDefinitions="192,*" RowDefinitions="27,17,18,96,*,80" x:Name="CompleteGrid"
+    <Grid ColumnDefinitions="221,*" RowDefinitions="27,17,18,96,*,80" x:Name="CompleteGrid"
           Background="{StaticResource FrameColor}">
 
         <Border Grid.ColumnSpan="2"
@@ -42,6 +42,7 @@
             <components:IconLabel IconData="{StaticResource WheelIcon}" x:Name="TitleLabel"
                                   Foreground="{StaticResource Neutral400}"
                                   FontSize="20" IconSize="31"
+                                  HorizontalAlignment="Left"
                                   Margin="10,10,0,18"
                                   PointerPressed="TitleLabel_OnPointerPressed" />
         </Border>
@@ -83,7 +84,7 @@
                 </Grid>
             </Border>
 
-            <patterns:MiiImageLoader Width="80"
+            <patterns:MiiImageLoader x:Name="SidebarMii" Width="80"
                                      Height="80"
                                      Margin="-7,0,0,1"
                                      HorizontalAlignment="Left"
@@ -97,7 +98,7 @@
 
         <TextBlock Text="{loc:T category.general}" Classes="SidebarSectionText"
                    VerticalAlignment="Bottom" Grid.Row="3" /> <!-- Repurposing this translation from settings -->
-        <StackPanel x:Name="SidePanelButtons" Grid.Column="0" Grid.Row="4" Width="192" VerticalAlignment="Top">
+        <StackPanel x:Name="SidePanelButtons" Grid.Column="0" Grid.Row="4" VerticalAlignment="Top">
             <patterns:SidebarRadioButton IconData="{StaticResource Home}"
                                            Text="{loc:T page_title.home}"
                                            PageType="{x:Type pages:HomePage}"
@@ -134,9 +135,6 @@
             <patterns:SidebarRadioButton IconData="{StaticResource Code}"
                                            PageType="{x:Type pages:TestingPage}"
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
-            <patterns:SidebarRadioButton IconData="{StaticResource Sink}" IsVisible="False"
-                                           PageType="{x:Type pages:KitchenSinkPage}"
-                                           Text="Kitchen Sink" x:Name="KitchenSinkButton" />
         </StackPanel>
 
         <components:IconLabelButton Grid.Column="0" Grid.Row="5"
@@ -152,49 +150,53 @@
                                     VerticalAlignment="Bottom"
                                     Margin="15,0,0,52" />
 
+        <Border Grid.Column="0" Grid.Row="5" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                Margin="10,0,0,12" Cursor="Hand"
+                ToolTip.Tip="This only shows regions YOU have played on"
+                ToolTip.Placement="TopEdgeAlignedLeft" ToolTip.ShowDelay="20"
+                x:Name="LiveStatusBorder" IsVisible="False"
+                Width="28" Height="28"
+                Classes="BottomSidebarIcon">
+            <PathIcon Width="24" Height="24"
+                      Margin="-2"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center" />
+            <Border.Styles>
+                <Style Selector="Border PathIcon">
+                    <Setter Property="Foreground" Value="Transparent" />
+                </Style>
+                <Style Selector="Border.Warning PathIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Warning500}" />
+                    <Setter Property="Data" Value="{StaticResource WarningTip}" />
+                </Style>
+                <Style Selector="Border.Error PathIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Danger500}" />
+                    <Setter Property="Data" Value="{StaticResource ErrorTip}" />
+                </Style>
+                <Style Selector="Border.Success PathIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+                    <Setter Property="Data" Value="{StaticResource SuccessTip}" />
+                </Style>
+                <Style Selector="Border.Info PathIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+                    <Setter Property="Data" Value="{StaticResource InfoTip}" />
+                </Style>
+                <Style Selector="Border.Question PathIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Warning600}" />
+                    <Setter Property="Data" Value="{StaticResource QuestionTip}" />
+                </Style>
+                <Style Selector="Border.Party PathIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Danger300}" />
+                    <Setter Property="Data" Value="{StaticResource StarIcon}" />
+                </Style>
+                <Style Selector="Border#LiveStatusBorder:pointerover PathIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+                </Style>
+            </Border.Styles>
+        </Border>
+
         <Grid Grid.Column="0" Grid.Row="5" ColumnDefinitions="28,8,28,8,28,8,*"
               VerticalAlignment="Bottom" Margin="10,0,13,12" x:Name="SidebarBottomBar">
-            <Border Grid.Column="0"
-                    ToolTip.Tip="This only shows regions YOU have played on"
-                    ToolTip.Placement="TopEdgeAlignedLeft" ToolTip.ShowDelay="20"
-                    x:Name="LiveStatusBorder" IsVisible="False"
-                    Width="28" Height="28"
-                    Classes="BottomSidebarIcon">
-                <PathIcon Width="24" Height="24"
-                          Margin="-2"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center" />
-                <Border.Styles>
-                    <Style Selector="Border PathIcon">
-                        <Setter Property="Foreground" Value="Transparent" />
-                    </Style>
-                    <Style Selector="Border.Warning PathIcon">
-                        <Setter Property="Foreground" Value="{StaticResource Warning500}" />
-                        <Setter Property="Data" Value="{StaticResource WarningTip}" />
-                    </Style>
-                    <Style Selector="Border.Error PathIcon">
-                        <Setter Property="Foreground" Value="{StaticResource Danger500}" />
-                        <Setter Property="Data" Value="{StaticResource ErrorTip}" />
-                    </Style>
-                    <Style Selector="Border.Success PathIcon">
-                        <Setter Property="Foreground" Value="{StaticResource Primary300}" />
-                        <Setter Property="Data" Value="{StaticResource SuccessTip}" />
-                    </Style>
-                    <Style Selector="Border.Info PathIcon">
-                        <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
-                        <Setter Property="Data" Value="{StaticResource InfoTip}" />
-                    </Style>
-                    <Style Selector="Border.Question PathIcon">
-                        <Setter Property="Foreground" Value="{StaticResource Warning600}" />
-                        <Setter Property="Data" Value="{StaticResource QuestionTip}" />
-                    </Style>
-                    <Style Selector="Border.Party PathIcon">
-                        <Setter Property="Foreground" Value="{StaticResource Danger300}" />
-                        <Setter Property="Data" Value="{StaticResource StarIcon}" />
-                    </Style>
-                </Border.Styles>
-            </Border>
-
             <Border Grid.Column="2"
                     x:Name="SidebarInfoButton"
                     Width="28" Height="28"
@@ -251,7 +253,8 @@
                                 <PathIcon Data="{StaticResource GithubIcon}" Width="16" Height="16" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="{loc:T action.link.support}" Click="Support_Click" MinWidth="120">
+                        <MenuItem x:Name="CollapsedSupportMenuItem" IsVisible="False"
+                                  Header="{loc:T action.link.support}" Click="Support_Click">
                             <MenuItem.Icon>
                                 <PathIcon Data="{StaticResource CoffeeIcon}" Width="16" Height="16" />
                             </MenuItem.Icon>
@@ -276,7 +279,7 @@
                           VerticalAlignment="Center" />
             </Border>
 
-            <Border Grid.Column="6"
+            <Border Grid.Column="6" x:Name="VersionTagBorder"
                     Height="26"
                     BorderThickness="1"
                     BorderBrush="{StaticResource Neutral600}"
@@ -311,11 +314,46 @@
                 <Style Selector="Border#SidebarSettingsButton:pointerover PathIcon#SidebarSettingsIcon">
                     <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
                 </Style>
-                <Style Selector="Border#LiveStatusBorder:pointerover PathIcon">
-                    <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
-                </Style>
+
             </Grid.Styles>
         </Grid>
+
+        <Button x:Name="SidebarToggle" Grid.Column="0" Grid.Row="3"
+                Width="26" Height="26" MinWidth="0" MinHeight="0" Padding="0"
+                Margin="0,0,-13,13.5" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                UseLayoutRounding="False"
+                ZIndex="10" CornerRadius="13" BorderThickness="1"
+                BorderBrush="{StaticResource Neutral600}" Background="{StaticResource FrameColor}"
+                Foreground="{StaticResource Neutral300}" Cursor="Hand"
+                AutomationProperties.Name="Toggle sidebar" Click="SidebarToggle_OnClick">
+            <Button.Template>
+                <ControlTemplate>
+                    <Border x:Name="ToggleBackground" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="13">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+            <Button.Styles>
+                <Style Selector="Button#SidebarToggle:pointerover /template/ Border#ToggleBackground">
+                    <Setter Property="Background" Value="{StaticResource Neutral700}" />
+                </Style>
+                <Style Selector="Button#SidebarToggle:pointerover PathIcon">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
+                </Style>
+                <Style Selector="Button#SidebarToggle:disabled">
+                    <Setter Property="Opacity" Value="1" />
+                </Style>
+            </Button.Styles>
+            <PathIcon x:Name="SidebarChevron" Width="8" Height="10"
+                      Data="M 6,0 L 0,5 L 6,10 L 8,8 L 4,5 L 8,2 Z"
+                      RenderTransformOrigin="50%,50%">
+                <PathIcon.RenderTransform>
+                    <RotateTransform Angle="0" />
+                </PathIcon.RenderTransform>
+            </PathIcon>
+        </Button>
 
         <!-- Snackbar -->
         <Grid Grid.Column="1" Grid.Row="4" Grid.RowSpan="2" VerticalAlignment="Bottom"

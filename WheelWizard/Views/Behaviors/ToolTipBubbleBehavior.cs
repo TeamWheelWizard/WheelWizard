@@ -13,6 +13,8 @@ public static class ToolTipBubbleBehavior
     private const string BubblePointerLeftClass = "BubblePointerLeft";
     private const string BubblePointerMiddleClass = "BubblePointerMiddle";
     private const string BubblePointerRightClass = "BubblePointerRight";
+    private const string BubbleSideLeftClass = "BubbleSideLeft";
+    private const string BubbleSideRightClass = "BubbleSideRight";
     private const string BubbleAnimateInClass = "BubbleAnimateIn";
     private const string BubbleAnimateOutClass = "BubbleAnimateOut";
     private const double TailCenterOffsetFromSide = 22d;
@@ -49,8 +51,6 @@ public static class ToolTipBubbleBehavior
         }
 
         var normalizedPlacement = NormalizePlacement(ToolTip.GetPlacement(control));
-        if (ToolTip.GetPlacement(control) != normalizedPlacement)
-            ToolTip.SetPlacement(control, normalizedPlacement);
 
         ToolTip.SetServiceEnabled(control, false);
 
@@ -151,6 +151,8 @@ public static class ToolTipBubbleBehavior
         toolTip.Classes.Remove(BubblePointerLeftClass);
         toolTip.Classes.Remove(BubblePointerMiddleClass);
         toolTip.Classes.Remove(BubblePointerRightClass);
+        toolTip.Classes.Remove(BubbleSideLeftClass);
+        toolTip.Classes.Remove(BubbleSideRightClass);
         toolTip.Classes.Add(GetPointerClass(placement));
     }
 
@@ -161,11 +163,13 @@ public static class ToolTipBubbleBehavior
         {
             PlacementMode.TopEdgeAlignedLeft => controlCenterX - TailCenterOffsetFromSide,
             PlacementMode.TopEdgeAlignedRight => TailCenterOffsetFromSide - controlCenterX,
+            PlacementMode.Left => -4d,
+            PlacementMode.Right => 4d,
             _ => 0d,
         };
 
         ToolTip.SetHorizontalOffset(control, horizontalOffset);
-        ToolTip.SetVerticalOffset(control, TooltipVerticalOffset);
+        ToolTip.SetVerticalOffset(control, placement is PlacementMode.Left or PlacementMode.Right ? 0d : TooltipVerticalOffset);
     }
 
     private static ToolTipState GetState(Control control) => ToolTipStates.GetOrCreateValue(control);
@@ -351,18 +355,20 @@ public static class ToolTipBubbleBehavior
         {
             PlacementMode.TopEdgeAlignedLeft => BubblePointerLeftClass,
             PlacementMode.TopEdgeAlignedRight => BubblePointerRightClass,
+            PlacementMode.Left => BubbleSideLeftClass,
+            PlacementMode.Right => BubbleSideRightClass,
             _ => BubblePointerMiddleClass,
         };
 
     private static PlacementMode NormalizePlacement(PlacementMode placement) =>
         placement switch
         {
-            PlacementMode.Left => PlacementMode.TopEdgeAlignedLeft,
+            PlacementMode.Left => PlacementMode.Left,
             PlacementMode.LeftEdgeAlignedTop => PlacementMode.TopEdgeAlignedLeft,
             PlacementMode.LeftEdgeAlignedBottom => PlacementMode.TopEdgeAlignedLeft,
             PlacementMode.TopEdgeAlignedLeft => PlacementMode.TopEdgeAlignedLeft,
             PlacementMode.BottomEdgeAlignedLeft => PlacementMode.TopEdgeAlignedLeft,
-            PlacementMode.Right => PlacementMode.TopEdgeAlignedRight,
+            PlacementMode.Right => PlacementMode.Right,
             PlacementMode.RightEdgeAlignedTop => PlacementMode.TopEdgeAlignedRight,
             PlacementMode.RightEdgeAlignedBottom => PlacementMode.TopEdgeAlignedRight,
             PlacementMode.TopEdgeAlignedRight => PlacementMode.TopEdgeAlignedRight,

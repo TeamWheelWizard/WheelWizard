@@ -39,6 +39,9 @@
                 <components:Button Variant="Default" Text="Force enable layout"
                                    IconSize="0" HorizontalAlignment="Left" Margin="0,2"
                                    Click="ForceEnableLayout_OnClick" />
+                <components:Button Variant="Default" Text="Kitchen Sink"
+                                   IconData="{StaticResource Sink}" HorizontalAlignment="Left" Margin="0,2"
+                                   Click="KitchenSink_OnClick" />
                 <components:Button Variant="Default" Text="Clear Cache"
                                    IconSize="0" HorizontalAlignment="Left" Margin="0,2"
                                    Click="ClearCache_OnClick" />
