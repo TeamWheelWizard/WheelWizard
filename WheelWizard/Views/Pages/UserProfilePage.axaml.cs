@@ -160,6 +160,23 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
     }
 
+    internal void RefreshSelectedProfile()
+    {
+        RegionDropdown.SelectionChanged -= RegionDropdown_SelectionChanged;
+        try
+        {
+            RegionDropdown.Items.Clear();
+            PopulateRegions();
+            ResetMiiTopBar();
+            ViewMii(FocusedUser);
+            UpdatePage();
+        }
+        finally
+        {
+            RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
+        }
+    }
+
     private void PopulateRegions()
     {
         var validRegions = SaveRegions.GetAvailableRegions(DistributionPaths.SaveFolderPath);

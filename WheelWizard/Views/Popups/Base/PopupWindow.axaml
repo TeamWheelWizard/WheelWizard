@@ -6,52 +6,32 @@
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="WheelWizard.Views.Popups.Base.PopupWindow"
-        WindowDecorations="{OnPlatform Default=None, Windows=BorderOnly}" SizeToContent="WidthAndHeight"
+        WindowDecorations="Full" SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="30"
         CanResize='False' Background="Transparent"
         x:DataType="base:PopupWindow"
         Title="{Binding WindowTitle}">
-    <Grid x:Name="CompleteGrid">
+    <Grid x:Name="WindowFrame" RowDefinitions="30,*">
+        <Border Background="{StaticResource FrameColor}" PointerPressed="TopBar_PointerPressed"
+                WindowDecorationProperties.ElementRole="TitleBar">
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="{OnPlatform Default='10,0,150,0', macOS='80,0,10,0'}" VerticalAlignment="Center">
+                <components:StateBox Text="Beta" Variant="Warning" IconSize="0" IsVisible="{Binding BetaFlag}" />
+                <TextBlock FontSize="16" Text="{Binding WindowTitle}" Foreground="{StaticResource Neutral300}" />
+            </StackPanel>
+        </Border>
+    <Grid Grid.Row="1" x:Name="CompleteGrid">
         <Border Background="{StaticResource  BackgroundColor}" CornerRadius="4"
                 x:Name="CompleteBorder"
                 BorderThickness="1" BorderBrush="{StaticResource BackgroundLineColor}">
-            <Grid RowDefinitions="30,*">
-                <Border Grid.RowSpan="999" Grid.ColumnSpan="999" ZIndex="999" IsVisible="False"
-                        x:Name="DisabledDarkenEffect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                        Background="Black" Opacity="0.3" />
-
-                <Border Grid.Row="0" Background="{StaticResource FrameColor}"
-                        CornerRadius="3,3,0,0" PointerPressed="TopBar_PointerPressed">
-                    <Grid>
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left"
-                                    Orientation="Horizontal" Margin="10,0" Spacing="10">
-                            <components:StateBox Text="Beta" Variant="Warning" IconSize="0" Margin="0,-1,0,0"
-                                                 IsVisible="{Binding BetaFlag}"/>
-                            <TextBlock FontSize="16" Text="{Binding WindowTitle}"
-                                       Foreground="{StaticResource Neutral300}" />
-                        </StackPanel>
-                       
-
-                        <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center">
-
-                            <Button Width="30" Height="25" Click="MinimizeButton_Click" Classes="TopButton">
-                                <PathIcon Data="{StaticResource MinMark}" Width="12" Height="12"
-                                          Foreground="{Binding $parent[Button].Foreground}" />
-                            </Button>
-
-                            <Button Width="30" Height="25" Click="CloseButton_Click" Classes="TopButton"
-                                    IsVisible="{Binding CanClose}">
-                                <PathIcon Data="{StaticResource XMark}" Width="12" Height="12"
-                                          Foreground="{Binding $parent[Button].Foreground}" />
-                            </Button>
-                        </DockPanel>
-                    </Grid>
-                </Border>
-
-                <ContentPresenter x:Name="PopupContent" Grid.Row="1" ClipToBounds="False"
+            <Grid>
+                <ContentPresenter x:Name="PopupContent" ClipToBounds="False"
                                   Margin="{StaticResource EdgeGap}" />
             </Grid>
         </Border>
+    </Grid>
+        <Border Grid.RowSpan="2" ZIndex="999" IsVisible="False" IsHitTestVisible="False"
+                x:Name="DisabledDarkenEffect" Background="Black" Opacity="0.3" />
     </Grid>
 </Window>

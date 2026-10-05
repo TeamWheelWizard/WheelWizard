@@ -32,11 +32,9 @@ public partial class Layout
         if (change.Property == SidebarWidthProperty && CompleteGrid != null)
         {
             CompleteGrid.ColumnDefinitions[0].Width = new GridLength(SidebarWidth);
-            // Follow the same animated width so neither image jumps when labels are hidden.
+            // Follow the animated width so the portrait does not jump when labels are hidden.
             var collapsedProgress = Math.Clamp((221 - SidebarWidth) / (221 - 64), 0, 1);
             SidebarMii.Margin = new Thickness(-7 - 10 * collapsedProgress, 0, 0, 1);
-            var logoMargin = TitleLabel.Margin;
-            TitleLabel.Margin = new Thickness(10 + 6.5 * collapsedProgress, logoMargin.Top, 0, logoMargin.Bottom);
             LiveStatusBorder.Margin = new Thickness(10 + 8 * collapsedProgress, 0, 0, 12);
         }
     }
@@ -165,7 +163,6 @@ public partial class Layout
 
     private void ApplySidebarContents(bool compact)
     {
-        TitleLabel.Text = compact ? string.Empty : BrandingService.Branding.DisplayName;
         SidebarCurrentUserProfile.Opacity = compact ? 0 : 1;
         // Keep the same bottom anchor and overflowing portrait in both sidebar sizes.
         SidebarMii.Width = SidebarMii.Height = 80;

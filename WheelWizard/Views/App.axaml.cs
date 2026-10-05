@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Serilog;
@@ -29,6 +30,49 @@ public class App : Application
     {
         AvaloniaXamlLoader.Load(this);
         ToolTipBubbleBehavior.Initialize();
+        if (OperatingSystem.IsMacOS())
+        {
+            var menu = new NativeMenu();
+            var appItems = new List<NativeMenuItem>();
+            AddItem("About Wheel Wizard…", window => window.ShowAppInfo());
+            AddItem("Settings…", window => window.ShowSettings(), new KeyGesture(Key.OemComma, KeyModifiers.Meta));
+            menu.Add(new NativeMenuItemSeparator());
+            AddItem("GitHub", window => window.OpenCommunityLink("github"));
+            AddItem("Discord", window => window.OpenCommunityLink("discord"));
+            AddItem("Support Wheel Wizard", window => window.OpenCommunityLink("support"));
+            menu.NeedsUpdate += (_, _) =>
+            {
+                var enabled =
+                    ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: Layout window }
+                    && window.IsVisible
+                    && window.CompleteContentEnabled;
+                foreach (var item in appItems)
+                {
+                    // Only our items are gated; the system adds Hide, Services and Quit afterward.
+                    item.IsEnabled = enabled;
+                }
+            };
+            NativeMenu.SetMenu(this, menu);
+
+            void AddItem(string header, Action<Layout> action, KeyGesture? gesture = null)
+            {
+                var item = new NativeMenuItem(header) { Gesture = gesture };
+                item.Click += (_, _) =>
+                {
+                    if (
+                        ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: Layout window }
+                        && window.IsVisible
+                        && window.CompleteContentEnabled
+                    )
+                    {
+                        window.Activate();
+                        action(window);
+                    }
+                };
+                appItems.Add(item);
+                menu.Add(item);
+            }
+        }
     }
 
     public override void OnFrameworkInitializationCompleted()
