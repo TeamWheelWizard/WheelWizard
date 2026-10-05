@@ -130,7 +130,7 @@
                                Width="137" Angle="45" Y="-40" X="170" ExtendedHeight="1000" IsVisible="False"
                                Background="{StaticResource Primary600}" Foreground="{StaticResource Primary800}" />
         <components:WheelTrail Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="HomeTrail3"
-                               Width="137" Angle="45" Y="150" X="190" ExtendedHeight="1000" IsVisible="False"
+                               Width="137" Angle="45" Y="165" X="175" ExtendedHeight="1000" IsVisible="False"
                                Background="{StaticResource Primary200}" Foreground="{StaticResource Primary600}" />
 
         <Border Grid.Row="1" Height="630" Width="250" CornerRadius="125,125,0,0" VerticalAlignment="Bottom"

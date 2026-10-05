@@ -75,11 +75,20 @@ public class RegionLicenseTests
         var settings = Substitute.For<ISettingsManager>();
         var miis = Substitute.For<IMiiDbService>();
         miis.GetByAvatarId(Arg.Any<uint>()).Returns(Fail("Missing Mii"));
-        var service = new GameLicenseSingletonService(miis, fs,
-            Substitute.For<IWhWzDataSingletonService>(), Substitute.For<IRrRatingReader>(), settings,
-            Substitute.For<ISaveRegionService>(), Substitute.For<IDolphinPaths>(), paths,
-            Substitute.For<IRoomPresence>(), Substitute.For<IPollingScheduler>(), System.TimeProvider.System,
-            NullLogger<GameLicenseSingletonService>.Instance);
+        var service = new GameLicenseSingletonService(
+            miis,
+            fs,
+            Substitute.For<IWhWzDataSingletonService>(),
+            Substitute.For<IRrRatingReader>(),
+            settings,
+            Substitute.For<ISaveRegionService>(),
+            Substitute.For<IDolphinPaths>(),
+            paths,
+            Substitute.For<IRoomPresence>(),
+            Substitute.For<IPollingScheduler>(),
+            System.TimeProvider.System,
+            NullLogger<GameLicenseSingletonService>.Instance
+        );
         return (service, fs, settings);
     }
 }

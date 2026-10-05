@@ -290,24 +290,52 @@
                           VerticalAlignment="Center" />
             </Border>
 
-            <Border Grid.Column="6" x:Name="VersionTagBorder"
-                    Height="26"
-                    BorderThickness="1"
-                    BorderBrush="{StaticResource Neutral600}"
-                    Background="Transparent"
-                    CornerRadius="999"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center">
-                <TextBlock x:Name="VersionTagText"
-                           Text="v0.0.0"
-                           Classes="TinyText"
-                           FontSize="13"
-                           Foreground="{StaticResource Neutral300}"
-                           FontWeight="Medium"
-                           Margin="0,0,8,0"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Center" />
-            </Border>
+            <Button Grid.Column="6" x:Name="VersionTagBorder"
+                    Height="26" MaxWidth="90" ClipToBounds="True" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                    Click="VersionTag_OnClick" AutomationProperties.Name="{loc:T action.update}">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Border x:Name="BadgeBackground" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="999">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Center" Margin="8,0" />
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+                <Button.Styles>
+                    <Style Selector="Button#VersionTagBorder">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+                        <Setter Property="Padding" Value="0" />
+                    </Style>
+                    <Style Selector="Button#VersionTagBorder.UpdateAvailable">
+                        <Setter Property="Background" Value="{StaticResource Warning500}" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
+                        <Setter Property="Cursor" Value="Hand" />
+                    </Style>
+                    <Style Selector="Button#VersionTagBorder.UpdateAvailable:pointerover /template/ Border#BadgeBackground">
+                        <Setter Property="Background" Value="{StaticResource Warning300}" />
+                    </Style>
+                </Button.Styles>
+                <Grid ColumnDefinitions="Auto,*">
+                    <Viewbox x:Name="VersionUpdateIcon" Width="16" Height="16" IsVisible="False"
+                             HorizontalAlignment="Left" Margin="0,0,4,0">
+                        <Canvas Width="24" Height="24">
+                            <Path Data="M14 16a1 1 0 0 0 1-1v-2a1 1 0 0 1 1-1h3.293a.707.707 0 0 0 .5-1.207l-6.939-6.939a1.207 1.207 0 0 0-1.708 0l-6.94 6.94a.707.707 0 0 0 .5 1.206H8a1 1 0 0 1 1 1v2a1 1 0 0 0 1 1z M9 20h6"
+                                  Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="2"
+                                  StrokeLineCap="Round" StrokeJoin="Round" />
+                        </Canvas>
+                    </Viewbox>
+                    <TextBlock Grid.Column="1" x:Name="VersionTagText" Text="v0.0.0" Classes="TinyText"
+                               HorizontalAlignment="Right"
+                               FontSize="13" FontWeight="Medium" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Foreground="{Binding $parent[Button].Foreground}" />
+                </Grid>
+            </Button>
 
             <Grid.Styles>
                 <Style Selector="Border.BottomSidebarIcon">

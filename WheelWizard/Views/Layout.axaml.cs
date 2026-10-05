@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
 using WheelWizard.Localization;
 using WheelWizard.Mods;
@@ -29,6 +30,7 @@ namespace WheelWizard.Views;
 public partial class Layout : BaseWindow, IPollingListener
 {
     private INavigationService Navigation { get; }
+    private readonly IAutoUpdaterSingletonService _autoUpdater;
 
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => WindowFrame;
@@ -80,7 +82,8 @@ public partial class Layout : BaseWindow, IPollingListener
         IGameLicenseSingletonService gameLicenseService,
         ISettingsManager settingsService,
         ISettingsSignalBus settingsSignalBus,
-        IModManager modManagerService
+        IModManager modManagerService,
+        IAutoUpdaterSingletonService autoUpdater
     )
     {
         Navigation = navigation;
@@ -92,6 +95,9 @@ public partial class Layout : BaseWindow, IPollingListener
         SettingsSignalBus = settingsSignalBus;
         ModManagerService = modManagerService;
         InitializeComponent();
+        _autoUpdater = autoUpdater;
+        _autoUpdater.UpdateAvailable += OnUpdateAvailable;
+        UpdateVersionBadge();
 
         // Wayland does not expose the drawn caption buttons from our platform decoration template.
         HeaderWindowControls.IsVisible =
@@ -159,6 +165,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     protected override void OnClosed(EventArgs e)
     {
+        _autoUpdater.UpdateAvailable -= OnUpdateAvailable;
         Navigation.PageChanged -= Navigation_OnPageChanged;
         DetachLiveSubscriptions();
         _settingsSignalSubscription?.Dispose();
@@ -167,6 +174,19 @@ public partial class Layout : BaseWindow, IPollingListener
         ModManagerService.PropertyChanged -= ModManager_PropertyChanged;
         base.OnClosed(e);
     }
+
+    private void OnUpdateAvailable(object? sender, EventArgs e) => Dispatcher.UIThread.Post(UpdateVersionBadge);
+
+    private void UpdateVersionBadge()
+    {
+        var available = _autoUpdater.IsUpdateAvailable;
+        VersionTagBorder.Classes.Set("UpdateAvailable", available);
+        VersionTagBorder.IsHitTestVisible = available;
+        VersionTagBorder.Focusable = available;
+        VersionUpdateIcon.IsVisible = available;
+    }
+
+    private async void VersionTag_OnClick(object? sender, RoutedEventArgs e) => await _autoUpdater.ShowAvailableUpdateAsync();
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
