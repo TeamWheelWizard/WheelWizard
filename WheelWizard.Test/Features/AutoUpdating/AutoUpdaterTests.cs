@@ -79,6 +79,33 @@ public class AutoUpdaterTests
         Assert.Empty(fixture.Platform.ReceivedCalls());
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task PostponedUpdate_CanBeReopenedWithoutAnotherLookup(bool automatic)
+    {
+        var fixture = new Fixture();
+        fixture.Platform.SupportsAutomaticUpdate.Returns(automatic);
+        fixture.Releases([Release("v2.0.0")]);
+        var notifications = 0;
+        fixture.Service.UpdateAvailable += (_, _) => notifications++;
+
+        Assert.False(fixture.Service.IsUpdateAvailable);
+        await fixture.Service.ShowAvailableUpdateAsync();
+        Assert.Empty(fixture.Presentation.ReceivedCalls());
+
+        await fixture.Service.CheckForUpdatesAsync();
+        Assert.True(fixture.Service.IsUpdateAvailable);
+        Assert.Equal(1, notifications);
+        await fixture.Service.ShowAvailableUpdateAsync();
+
+        await fixture.GitHub.Received(1).GetReleasesAsync();
+        if (automatic)
+            await fixture.Presentation.Received(2).ConfirmUpdateAsync("2.0.0", "1.0.0");
+        else
+            await fixture.Presentation.Received(2).ShowManualUpdateAsync("2.0.0", "1.0.0");
+    }
+
     private static GithubRelease Release(string version, bool prerelease = false, bool compatible = true) =>
         new()
         {

@@ -44,6 +44,22 @@ public partial class MessageBoxWindow : PopupContent
         return this;
     }
 
+    public MessageBoxWindow SetWindowTitle(string title)
+    {
+        Window.WindowTitle = title;
+        return this;
+    }
+
+    public MessageBoxWindow SetLink(string url)
+    {
+        MessageLink.Text = url;
+        MessageLink.Tag = url;
+        MessageLink.IsVisible = true;
+        return this;
+    }
+
+    private void MessageLink_OnClick(object? sender, EventArgs e) => ViewUtils.OpenLink((string)MessageLink.Tag!);
+
     public MessageBoxWindow SetTag(string extraText)
     {
         MessageTag.Text = extraText;
