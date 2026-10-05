@@ -96,6 +96,88 @@ public class WindowCompositionTests
         }
     }
 
+    [AvaloniaTheory]
+    [InlineData(0.75)]
+    [InlineData(1.5)]
+    public void Popup_TitleBarDoesNotScaleWithContent(double scale)
+    {
+        var popup = new PopupWindow(true, false, false, "Scale test") { RequestedWindowScale = scale };
+        try
+        {
+            popup.SetWindowSize(new Size(300, 200));
+            Assert.Equal(300 * scale, popup.Width);
+            Assert.Equal(200 * scale + 30, popup.Height);
+            Assert.Equal(30, popup.ExtendClientAreaTitleBarHeightHint);
+            Assert.Equal(WindowDecorations.Full, popup.WindowDecorations);
+            var root = Assert.IsType<Grid>(popup.Content);
+            Assert.Null(root.RenderTransform);
+            Assert.Equal(30, root.RowDefinitions[0].Height.Value);
+        }
+        finally
+        {
+            popup.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void PopupDimming_CoversTitleBarAndContent_AndRestoresTogether()
+    {
+        var popup = new PopupWindow(true, false, false, "Dimming test");
+        try
+        {
+            popup.Show();
+            popup.UpdateLayout();
+            var frame = Assert.IsType<Grid>(popup.Content);
+            var overlay = popup.FindControl<Border>("DisabledDarkenEffect")!;
+            popup.SetInteractable(false);
+            popup.UpdateLayout();
+            Assert.Contains(overlay, frame.Children);
+            Assert.Equal(2, Grid.GetRowSpan(overlay));
+            Assert.True(overlay.IsVisible);
+            Assert.Equal(frame.Bounds.Height, overlay.Bounds.Height);
+            Assert.False(frame.IsEnabled);
+            popup.SetInteractable(true);
+            Assert.False(overlay.IsVisible);
+            Assert.True(frame.IsEnabled);
+        }
+        finally
+        {
+            popup.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void NonClosablePopup_RejectsNativeCloseButAllowsProgrammaticCompletion()
+    {
+        var popup = new ClosingPopup();
+        var userClose = CreateClosingArgs(false);
+        popup.RequestClose(userClose);
+        Assert.True(userClose.Cancel);
+        var completion = CreateClosingArgs(true);
+        popup.RequestClose(completion);
+        Assert.False(completion.Cancel);
+        popup.CanClose = true;
+        var allowed = CreateClosingArgs(false);
+        popup.RequestClose(allowed);
+        Assert.False(allowed.Cancel);
+        popup.Close();
+    }
+
+    private static WindowClosingEventArgs CreateClosingArgs(bool programmatic) =>
+        (WindowClosingEventArgs)
+            Activator.CreateInstance(
+                typeof(WindowClosingEventArgs),
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
+                binder: null,
+                args: [WindowCloseReason.WindowClosing, programmatic],
+                culture: null
+            )!;
+
+    private sealed class ClosingPopup : PopupWindow
+    {
+        public void RequestClose(WindowClosingEventArgs args) => OnClosing(args);
+    }
+
     private sealed class OwnedPopup : PopupWindow
     {
         public OwnedPopup(Window owner, bool allowParentInteraction)

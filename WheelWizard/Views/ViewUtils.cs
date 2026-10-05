@@ -41,7 +41,7 @@ public static class ViewUtils
         (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as Layout
         ?? throw new InvalidOperationException("The main window is not available.");
 
-    public static double GetUsableWindowScale(double requestedScale, Size unscaledSize, Window window)
+    public static double GetUsableWindowScale(double requestedScale, Size unscaledSize, Window window, double unscaledChromeHeight = 0)
     {
         var maxScale = SettingValues.MaxWindowScale;
         var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary;
@@ -50,7 +50,10 @@ public static class ViewUtils
             var screenScale = screen.Scaling <= 0 ? 1 : screen.Scaling;
             var availableWidth = screen.WorkingArea.Width / screenScale;
             var availableHeight = screen.WorkingArea.Height / screenScale;
-            maxScale = Math.Min(maxScale, Math.Min(availableWidth / unscaledSize.Width, availableHeight / unscaledSize.Height));
+            maxScale = Math.Min(
+                maxScale,
+                Math.Min(availableWidth / unscaledSize.Width, (availableHeight - unscaledChromeHeight) / unscaledSize.Height)
+            );
         }
 
         maxScale = Math.Max(SettingValues.MinWindowScale, maxScale);

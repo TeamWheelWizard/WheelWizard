@@ -10,42 +10,24 @@
         xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
         Height="876" Width="656" WindowStartupLocation="CenterScreen"
-        WindowDecorations="{OnPlatform Default=None, Windows=BorderOnly}"
+        WindowDecorations="Full"
         ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="30"
         CanResize='False' Background="Transparent">
-    <Grid ColumnDefinitions="221,*" RowDefinitions="27,17,18,96,*,80" x:Name="CompleteGrid"
+    <Grid x:Name="WindowFrame" RowDefinitions="30,*"
           Background="{StaticResource FrameColor}">
-
-        <Border Grid.ColumnSpan="2"
-                CornerRadius="0"
-                Background="{StaticResource FrameColor}"
+        <Border Grid.Row="0" Background="Transparent"
+                WindowDecorationProperties.ElementRole="TitleBar"
                 PointerPressed="TopBar_PointerPressed">
-        </Border>
-
-        <Border Grid.RowSpan="999" Grid.ColumnSpan="999" ZIndex="999" IsVisible="false"
-                x:Name="DisabledDarkenEffect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                Background="Black" Opacity="0.3" />
-
-        <DockPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                   x:Name="TopBarButtons">
-            <Button Width="30" Height="25" Click="MinimizeButton_Click" Classes="TopButton">
-                <PathIcon Data="{StaticResource MinMark}" Width="12" Height="12"
-                          Foreground="{Binding $parent[Button].Foreground}" />
-            </Button>
-            <Button Width="30" Height="25" Click="CloseButton_Click" Classes="TopButton">
-                <PathIcon Data="{StaticResource XMark}" Width="12" Height="12"
-                          Foreground="{Binding $parent[Button].Foreground}" />
-            </Button>
-        </DockPanel>
-
-        <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" VerticalAlignment="Bottom">
             <components:IconLabel IconData="{StaticResource WheelIcon}" x:Name="TitleLabel"
                                   Foreground="{StaticResource Neutral400}"
-                                  FontSize="20" IconSize="31"
-                                  HorizontalAlignment="Left"
-                                  Margin="10,10,0,18"
+                                  FontSize="16" IconSize="20"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Margin="10,0,150,0" IsVisible="{OnPlatform Default=True, macOS=False}"
                                   PointerPressed="TitleLabel_OnPointerPressed" />
         </Border>
+    <Grid Grid.Row="1" ColumnDefinitions="221,*" RowDefinitions="0,17,18,96,*,80" x:Name="CompleteGrid"
+          Background="{StaticResource FrameColor}">
 
         <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
@@ -60,7 +42,7 @@
         <!-- Sidebar -->
         <Grid Grid.Column="0" Grid.Row="3"
               Height="60"
-              Margin="10,0,10,0"
+              Margin="10,-12,10,0"
               VerticalAlignment="Top"
               ClipToBounds="False">
             <Border x:Name="SidebarProfileBlock"
@@ -453,5 +435,8 @@
                 </Style>
             </Grid.Styles>
         </Grid>
+    </Grid>
+        <Border Grid.RowSpan="2" ZIndex="999" IsVisible="False" IsHitTestVisible="False"
+                x:Name="DisabledDarkenEffect" Background="Black" Opacity="0.3" />
     </Grid>
 </Window>

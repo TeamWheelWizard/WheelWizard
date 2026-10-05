@@ -55,6 +55,24 @@ public class ApplicationCompositionTests
             windows.Show(desktop);
             var original = Assert.IsType<Layout>(desktop.MainWindow);
             original.UpdateLayout();
+            Assert.Equal(Layout.WindowHeight * settings.Get<double>(settings.WINDOW_SCALE), original.Height);
+            {
+                var content = original.FindControl<Grid>("CompleteGrid")!;
+                Assert.Equal(0, content.RowDefinitions[0].Height.Value);
+                var frame = Assert.IsType<Grid>(original.Content);
+                var titleBar = Assert.IsType<Border>(frame.Children[0]);
+                Assert.NotNull(titleBar.Background);
+                Assert.Equal(Avalonia.Input.WindowDecorationsElementRole.TitleBar,
+                    Avalonia.Controls.Chrome.WindowDecorationProperties.GetElementRole(titleBar));
+                original.SetInteractable(false);
+                original.UpdateLayout();
+                var overlay = original.FindControl<Border>("DisabledDarkenEffect")!;
+                Assert.Contains(overlay, frame.Children);
+                Assert.Equal(frame.Bounds.Height, overlay.Bounds.Height);
+                Assert.True(overlay.IsVisible);
+                original.SetInteractable(true);
+                Assert.False(overlay.IsVisible);
+            }
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             var navigation = services.GetRequiredService<INavigationService>();
             Assert.IsType<HomePage>(navigation.CurrentPage);
