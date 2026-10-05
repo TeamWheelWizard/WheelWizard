@@ -19,6 +19,8 @@ public partial class HomePage : UserControl
     private readonly WheelTrail[] _trails;
     private WheelTrailState _currentTrailState = WheelTrailState.Static_None;
     private bool _isAttached;
+    private readonly TaskCompletionSource _initialContent = new();
+    public Task InitialContentReady => _initialContent.Task;
 
     public HomePage(HomeViewModel model, IRandomSystem randomSystem)
     {
@@ -38,7 +40,15 @@ public partial class HomePage : UserControl
         _isAttached = true;
         Model.PropertyChanged += Model_OnPropertyChanged;
         Model.MainActionStarted += Model_OnMainActionStarted;
-        await Model.RefreshAsync();
+        try
+        {
+            await Model.RefreshAsync();
+            _initialContent.TrySetResult();
+        }
+        catch (Exception exception)
+        {
+            _initialContent.TrySetException(exception);
+        }
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

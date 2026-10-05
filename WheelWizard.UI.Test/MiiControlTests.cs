@@ -36,7 +36,12 @@ public class MiiControlTests
         {
             window.Show();
             window.UpdateLayout();
+            var portrait = Assert.Single(card.GetVisualDescendants().OfType<MiiImageView>());
+            var ready = portrait.WaitUntilLoadedAsync(CancellationToken.None);
+            Assert.False(ready.IsCompleted);
             rendered.SetResult(bitmap);
+            await ready;
+            await portrait.WaitUntilLoadedAsync(CancellationToken.None);
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             foreach (var (online, pending) in new[] { (false, false), (true, false), (false, true) })
             {

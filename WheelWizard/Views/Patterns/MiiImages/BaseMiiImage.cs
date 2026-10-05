@@ -173,6 +173,23 @@ public abstract class BaseMiiImage : UserControl, INotifyPropertyChanged
 
     public event EventHandler? MiiImageLoaded;
 
+    public async Task WaitUntilLoadedAsync(CancellationToken cancellationToken)
+    {
+        if (MiiLoaded)
+            return;
+        var loaded = new TaskCompletionSource();
+        void OnLoaded(object? sender, EventArgs e) => loaded.TrySetResult();
+        MiiImageLoaded += OnLoaded;
+        try
+        {
+            await loaded.Task.WaitAsync(cancellationToken);
+        }
+        finally
+        {
+            MiiImageLoaded -= OnLoaded;
+        }
+    }
+
     #region INotifyPropertyChanged
 
     public new event PropertyChangedEventHandler? PropertyChanged;

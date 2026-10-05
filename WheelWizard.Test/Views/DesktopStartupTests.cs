@@ -18,7 +18,13 @@ public class DesktopStartupTests
         var fixture = new Fixture();
         fixture.Resources.GetResolvedResourcePath().Returns(Ok("rendering-resource"));
         var sequence = new List<string>();
-        fixture.Windows.When(service => service.Show(fixture.Desktop)).Do(_ => sequence.Add("window"));
+        fixture
+            .Windows.ShowAsync(fixture.Desktop, Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                sequence.Add("window");
+                return Task.CompletedTask;
+            });
         fixture
             .Startup.RunAsync(Arg.Any<StartupOptions>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
@@ -43,7 +49,7 @@ public class DesktopStartupTests
         await fixture.Coordinator.StartAsync(fixture.Desktop, new StartupOptions(null, false), CancellationToken.None);
 
         fixture.Desktop.Received(1).Shutdown();
-        fixture.Windows.DidNotReceiveWithAnyArgs().Show(default!);
+        await fixture.Windows.DidNotReceiveWithAnyArgs().ShowAsync(default!, default);
         await fixture.Startup.DidNotReceiveWithAnyArgs().RunAsync(default!, default);
     }
 
@@ -60,7 +66,7 @@ public class DesktopStartupTests
         await start;
         setup.SetResult(true);
 
-        fixture.Windows.DidNotReceiveWithAnyArgs().Show(default!);
+        await fixture.Windows.DidNotReceiveWithAnyArgs().ShowAsync(default!, default);
         await fixture.Startup.DidNotReceiveWithAnyArgs().RunAsync(default!, default);
     }
 

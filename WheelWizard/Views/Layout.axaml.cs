@@ -5,6 +5,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using WheelWizard.Branding;
 using WheelWizard.Localization;
 using WheelWizard.Mods;
@@ -53,6 +55,8 @@ public partial class Layout : BaseWindow, IPollingListener
     private int _testerClickCount;
     private bool _testerPromptOpen;
     private IDisposable? _settingsSignalSubscription;
+    private readonly Task _modsLoaded;
+    private readonly TaskCompletionSource _loaded = new();
 
     private LiveRoomsService LiveRooms { get; }
 
@@ -120,13 +124,14 @@ public partial class Layout : BaseWindow, IPollingListener
         LiveRooms.Subscribe(this);
         GameLicenseService.Subscribe(this);
         ModManagerService.PropertyChanged += ModManager_PropertyChanged;
-        _ = ReloadModsAndShowErrorsAsync();
+        _modsLoaded = ReloadModsAndShowErrorsAsync();
         KitchenSinkButton.IsVisible = DevelopmentMode.IsEnabled;
         UpdateOtherSectionVisibility();
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
+        base.OnLoaded(e);
         Title = BrandingService.Branding.DisplayName;
         TitleLabel.Text = BrandingService.Branding.DisplayName;
         VersionTagText.Text = $"v{BrandingService.Branding.Version}";
@@ -134,6 +139,25 @@ public partial class Layout : BaseWindow, IPollingListener
         // UpdateModsActionIndicator();
 
         Navigation.NavigateTo<HomePage>();
+        _loaded.TrySetResult();
+    }
+
+    public async Task WaitForInitialContentAsync(CancellationToken cancellationToken)
+    {
+        await _loaded.Task.WaitAsync(cancellationToken);
+        LiveStatus.Start();
+        LiveRooms.Start();
+        var home = (HomePage)Navigation.CurrentPage!;
+        await Task.WhenAll(_modsLoaded, home.InitialContentReady, LiveStatus.InitialUpdate, LiveRooms.InitialUpdate)
+            .WaitAsync(cancellationToken);
+        UpdateLayout();
+        await Task.WhenAll(
+            this.GetVisualDescendants()
+                .OfType<BaseMiiImage>()
+                .Where(image => image.IsEffectivelyVisible)
+                .Select(image => image.WaitUntilLoadedAsync(cancellationToken))
+        );
+        await Dispatcher.UIThread.InvokeAsync(UpdateLayout, DispatcherPriority.Background, cancellationToken);
     }
 
     protected override void OnClosed(EventArgs e)

@@ -97,6 +97,10 @@
         <AvaloniaResource Include="Resources\Fonts\ctmkf.ttf" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AvaloniaResource Include="..\Flatpak\io.github.TeamWheelWizard.WheelWizard.png" Link="Resources\Images\AppIcon.png" />
+    </ItemGroup>
+
     <ItemGroup Label="Mii Rendering Resources">
         <EmbeddedResource Include="Features\MiiRendering\Resources\*.rmdl" />
     </ItemGroup>
