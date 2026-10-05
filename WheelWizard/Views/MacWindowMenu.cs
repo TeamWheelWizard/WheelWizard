@@ -6,6 +6,7 @@ namespace WheelWizard.Views;
 internal static class MacWindowMenu
 {
     private const string ObjectiveC = "/usr/lib/libobjc.A.dylib";
+
     // Owned for the process lifetime. NSApplication and the active menu bar also retain this menu.
     private static nint _menu;
 
@@ -23,13 +24,34 @@ internal static class MacWindowMenu
         {
             _menu = Send(Send(GetClass("NSMenu"), Selector("alloc")), Selector("initWithTitle:"), String("Window"));
             // Standard responder-chain selectors give AppKit control over validation, icons and shortcuts.
-            Send(_menu, Selector("addItemWithTitle:action:keyEquivalent:"),
-                String("Minimize"), Selector("performMiniaturize:"), String("m"));
-            Send(_menu, Selector("addItemWithTitle:action:keyEquivalent:"),
-                String("Close"), Selector("performClose:"), String("w"));
+            Send(
+                _menu,
+                Selector("addItemWithTitle:action:keyEquivalent:"),
+                String("Minimize"),
+                Selector("performMiniaturize:"),
+                String("m")
+            );
+            Send(_menu, Selector("addItemWithTitle:action:keyEquivalent:"), String("Close"), Selector("performClose:"), String("w"));
         }
-        Send(windowItem, Selector("setSubmenu:"), _menu);
-        Send(app, Selector("setWindowsMenu:"), _menu);
+        if (Send(windowItem, Selector("submenu")) != _menu)
+        {
+            // Avalonia creates a separate menu bar for each window. AppKit permits a submenu
+            // to have only one parent, so detach it before moving it into the active menu bar.
+            var previousBar = Send(_menu, Selector("supermenu"));
+            var previousCount = Send(previousBar, Selector("numberOfItems"));
+            for (nint index = 0; index < previousCount; index++)
+            {
+                var previousItem = Send(previousBar, Selector("itemAtIndex:"), index);
+                if (Send(previousItem, Selector("submenu")) == _menu)
+                {
+                    Send(previousItem, Selector("setSubmenu:"), 0);
+                    break;
+                }
+            }
+            Send(windowItem, Selector("setSubmenu:"), _menu);
+        }
+        if (Send(app, Selector("windowsMenu")) != _menu)
+            Send(app, Selector("setWindowsMenu:"), _menu);
         // AppKit adds positioning/tiling items. Its native window constraints govern which are enabled.
         // Hide the public full-screen command; fixed-size windows cannot enter full screen anyway.
         var count = Send(_menu, Selector("numberOfItems"));
@@ -41,8 +63,7 @@ internal static class MacWindowMenu
         }
     }
 
-    private static nint String(string value) =>
-        SendString(GetClass("NSString"), Selector("stringWithUTF8String:"), value);
+    private static nint String(string value) => SendString(GetClass("NSString"), Selector("stringWithUTF8String:"), value);
 
     [DllImport(ObjectiveC, EntryPoint = "objc_getClass")]
     private static extern nint GetClass([MarshalAs(UnmanagedType.LPUTF8Str)] string name);
