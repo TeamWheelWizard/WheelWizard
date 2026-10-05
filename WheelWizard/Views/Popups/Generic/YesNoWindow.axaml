@@ -7,8 +7,8 @@
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="WheelWizard.Views.Popups.Generic.YesNoWindow">
-    <Grid Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="*,Auto">
-        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,10">
+    <Grid x:Name="DialogLayout" Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="*,Auto">
+        <StackPanel x:Name="MessageBody" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,10">
             
             <SelectableTextBlock Classes="TitleText" x:Name="MainTextBlock"
                                  HorizontalAlignment="Left" TextWrapping="Wrap"

@@ -7,7 +7,7 @@
                    xmlns:base="clr-namespace:WheelWizard.Views.Popups.Base"
                    ClipToBounds="False"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450">
-    <Grid Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="40,2*,1*">
+    <Grid x:Name="MessageLayout" Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="40,2*,1*">
 
         <!-- Message Title -->
         <Border Grid.Row="0" Margin="-10" x:Name="TitleBorder">
@@ -27,7 +27,7 @@
         </Border>
 
         <!-- Message Text -->
-        <ScrollViewer Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,10"
+        <ScrollViewer x:Name="MessageBody" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,10"
                       VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <SelectableTextBlock Classes="BodyText" x:Name="MessageInformationBlock" FontSize="14" TextWrapping="Wrap"
                                  HorizontalAlignment="Left" Margin="0,10,0,0" />

@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:animation="clr-namespace:Avalonia.Animation;assembly=Avalonia.Base"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:html="clr-namespace:TheArtOfDev.HtmlRenderer.Avalonia;assembly=Avalonia.HtmlRenderer"
+                   x:Class="WheelWizard.Views.Patterns.UpdateChangelog">
+    <UserControl.Resources>
+        <ControlTemplate x:Key="ChangelogCardTemplate">
+            <Border Background="{StaticResource Neutral800}" CornerRadius="6" Padding="12">
+                <Grid RowDefinitions="Auto,*" RowSpacing="8" Height="226">
+                    <TextBlock x:Name="ReleaseTitle" Classes="TitleText" FontSize="16" />
+                    <Grid Grid.Row="1">
+                        <ScrollViewer x:Name="NotesScroll" HorizontalScrollBarVisibility="Disabled">
+                            <html:HtmlPanel x:Name="ReleaseNotes">
+                                <html:HtmlPanel.BaseStylesheet>
+                                    body { color: #B4B8C5; font-size: 14px; }
+                                    a { color: #34EAC5; }
+                                    h1 { font-size: 22px; } h2 { font-size: 18px; } h3 { font-size: 16px; }
+                                    pre { background-color: #252832; padding: 8px; }
+                                    code { color: #E8EAF0; }
+                                </html:HtmlPanel.BaseStylesheet>
+                            </html:HtmlPanel>
+                        </ScrollViewer>
+                        <StackPanel x:Name="NotesStatus" VerticalAlignment="Center" Spacing="12">
+                            <TextBlock x:Name="NotesStatusText" Text="Loading changelog..." Classes="BodyText"
+                                       TextWrapping="Wrap" HorizontalAlignment="Center" />
+                            <components:Button x:Name="RetryButton" Text="Retry" Variant="Default"
+                                               HorizontalAlignment="Center" IsVisible="False" Click="Retry_OnClick" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Border.carouselDot">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="CornerRadius" Value="9999" />
+            <Setter Property="Background" Value="{StaticResource Neutral500}" />
+            <Setter Property="Opacity" Value="0.75" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Width" Duration="0:0:0.2" Easing="CircularEaseOut" />
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2" Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.carouselDot.active">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="Background" Value="{StaticResource Primary300}" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="Auto,Auto" RowSpacing="10" Margin="0,10,0,0">
+        <TransitioningContentControl x:Name="Cards" Grid.Row="0" ClipToBounds="True"
+                                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <TransitioningContentControl.PageTransition>
+                <animation:CompositePageTransition>
+                    <animation:PageSlide Duration="0:0:0.25" Orientation="Horizontal" />
+                    <animation:CrossFade Duration="0:0:0.25" />
+                </animation:CompositePageTransition>
+            </TransitioningContentControl.PageTransition>
+        </TransitioningContentControl>
+        <Grid Grid.Row="1" x:Name="CarouselNavigation" HorizontalAlignment="Center" ColumnDefinitions="Auto,Auto,Auto">
+            <components:Button IconData="{StaticResource ArrowLeft}" IconSize="12" Width="26" Height="26"
+                               Padding="0" Variant="UglyLight" VerticalAlignment="Center" Margin="0,0,8,0"
+                               AutomationProperties.Name="Previous changelog" Click="Previous_OnClick" />
+            <StackPanel Grid.Column="1" x:Name="CarouselDots" Orientation="Horizontal" Spacing="6"
+                        VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <components:Button Grid.Column="2" IconData="{StaticResource ArrowRight}" IconSize="12" Width="26" Height="26"
+                               Padding="0" Variant="UglyLight" VerticalAlignment="Center" Margin="8,0,0,0"
+                               AutomationProperties.Name="Next changelog" Click="Next_OnClick" />
+        </Grid>
+    </Grid>
+</UserControl>

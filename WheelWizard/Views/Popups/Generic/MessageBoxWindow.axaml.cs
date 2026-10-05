@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Views.Popups.Base;
 using Button = WheelWizard.Views.Components.Button;
@@ -41,6 +42,20 @@ public partial class MessageBoxWindow : PopupContent
     public MessageBoxWindow SetInfoText(string extraText)
     {
         MessageInformationBlock.Text = extraText;
+        return this;
+    }
+
+    public MessageBoxWindow SetContent(Control content)
+    {
+        MessageBody.Content = content;
+        MessageLayout.MaxHeight = double.PositiveInfinity;
+        MessageLayout.RowDefinitions = new RowDefinitions("40,Auto,Auto");
+        return this;
+    }
+
+    public MessageBoxWindow SetWindowTitle(string title)
+    {
+        Window.WindowTitle = title;
         return this;
     }
 

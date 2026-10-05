@@ -13,4 +13,8 @@ public interface IGitHubApi
     /// <returns>A list of releases for the repository.</returns>
     [Get("/repos/{owner}/{repository}/releases")]
     Task<List<GithubRelease>> GetReleasesAsync(string owner, string repository, [AliasAs("per_page")] int count = 3);
+
+    [Get("/repos/TeamWheelWizard/WheelWizard/releases/tags/{tag}")]
+    [Headers("Accept: application/vnd.github.html+json")]
+    Task<GithubRelease> GetReleaseNotesAsync(string tag);
 }

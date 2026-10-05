@@ -18,7 +18,7 @@ public class AutoUpdaterTests
 
         await fixture.Service.CheckForUpdatesAsync();
 
-        await fixture.Presentation.Received(1).ConfirmUpdateAsync("2.0.0", "1.0.0");
+        await fixture.Presentation.Received(1).ConfirmUpdateAsync("2.0.0", "1.0.0", Arg.Any<IReadOnlyList<GithubRelease>>());
         await fixture
             .Platform.DidNotReceive()
             .ExecuteUpdateAsync(Arg.Any<string>(), Arg.Any<IProgress<DownloadProgress>>(), Arg.Any<CancellationToken>());
@@ -32,7 +32,7 @@ public class AutoUpdaterTests
     {
         var fixture = new Fixture();
         fixture.Releases([Release("v2.0.0")]);
-        fixture.Presentation.ConfirmUpdateAsync("2.0.0", "1.0.0").Returns(true);
+        fixture.Presentation.ConfirmUpdateAsync("2.0.0", "1.0.0", Arg.Any<IReadOnlyList<GithubRelease>>()).Returns(true);
         fixture
             .Platform.ExecuteUpdateAsync(Arg.Any<string>(), Arg.Any<IProgress<DownloadProgress>>(), Arg.Any<CancellationToken>())
             .Returns(Fail("disk full"));
@@ -63,8 +63,10 @@ public class AutoUpdaterTests
         await fixture.Service.CheckForUpdatesAsync();
         await fixture.Service.CheckForUpdatesAsync();
 
-        await fixture.Presentation.Received(1).ShowManualUpdateAsync("3.0.0", "1.0.0");
-        await fixture.Presentation.DidNotReceive().ConfirmUpdateAsync(Arg.Any<string>(), Arg.Any<string>());
+        await fixture.Presentation.Received(1).ShowManualUpdateAsync("3.0.0", "1.0.0", Arg.Any<IReadOnlyList<GithubRelease>>());
+        await fixture
+            .Presentation.DidNotReceive()
+            .ConfirmUpdateAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<GithubRelease>>());
     }
 
     [Fact]
@@ -77,6 +79,60 @@ public class AutoUpdaterTests
 
         await fixture.Presentation.Received(1).ShowCheckFailureAsync("offline");
         Assert.Empty(fixture.Platform.ReceivedCalls());
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task PostponedUpdate_CanBeReopenedWithoutAnotherLookup(bool automatic)
+    {
+        var fixture = new Fixture();
+        fixture.Platform.SupportsAutomaticUpdate.Returns(automatic);
+        fixture.Releases([Release("v2.0.0")]);
+        var notifications = 0;
+        fixture.Service.UpdateAvailable += (_, _) => notifications++;
+
+        Assert.False(fixture.Service.IsUpdateAvailable);
+        await fixture.Service.ShowAvailableUpdateAsync();
+        Assert.Empty(fixture.Presentation.ReceivedCalls());
+
+        await fixture.Service.CheckForUpdatesAsync();
+        Assert.True(fixture.Service.IsUpdateAvailable);
+        Assert.Equal(1, notifications);
+        await fixture.Service.ShowAvailableUpdateAsync();
+
+        await fixture.GitHub.Received(1).GetReleasesAsync();
+        if (automatic)
+            await fixture.Presentation.Received(2).ConfirmUpdateAsync("2.0.0", "1.0.0", Arg.Any<IReadOnlyList<GithubRelease>>());
+        else
+            await fixture.Presentation.Received(2).ShowManualUpdateAsync("2.0.0", "1.0.0", Arg.Any<IReadOnlyList<GithubRelease>>());
+    }
+
+    [Fact]
+    public async Task Changelogs_AreNewestFirst_CappedAtTen_AndNotPrefetched()
+    {
+        var fixture = new Fixture();
+        fixture.Releases(
+            Enumerable
+                .Range(2, 15)
+                .Select(version => Release($"v{version}.0.0"))
+                .Append(Release("v20.0.0", prerelease: true))
+                .Append(Release("v1.0.0"))
+                .ToList()
+        );
+
+        await fixture.Service.CheckForUpdatesAsync();
+
+        await fixture
+            .Presentation.Received(1)
+            .ConfirmUpdateAsync(
+                "16.0.0",
+                "1.0.0",
+                Arg.Is<IReadOnlyList<GithubRelease>>(releases =>
+                    releases.Count == 10 && releases[0].TagName == "v16.0.0" && releases[9].TagName == "v7.0.0"
+                )
+            );
+        await fixture.GitHub.DidNotReceive().GetReleaseNotesAsync(Arg.Any<string>());
     }
 
     private static GithubRelease Release(string version, bool prerelease = false, bool compatible = true) =>

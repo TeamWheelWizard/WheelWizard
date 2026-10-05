@@ -1,8 +1,9 @@
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
-using WheelWizard.Views.Components;
 using WheelWizard.Views.Popups.Base;
+using Button = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Popups.Generic;
 
@@ -35,6 +36,20 @@ public partial class YesNoWindow : PopupContent
     public YesNoWindow SetExtraText(string extraText)
     {
         ExtraTextBlock.Text = extraText;
+        return this;
+    }
+
+    public YesNoWindow SetContent(Control content)
+    {
+        ExtraTextBlock.IsVisible = false;
+        MessageBody.Children.Add(content);
+        DialogLayout.MaxHeight = double.PositiveInfinity;
+        return this;
+    }
+
+    public YesNoWindow SetWindowTitle(string title)
+    {
+        Window.WindowTitle = title;
         return this;
     }
 

@@ -1,21 +1,23 @@
 using Avalonia.Threading;
 using WheelWizard.AutoUpdating;
+using WheelWizard.GitHub;
+using WheelWizard.GitHub.Domain;
 using WheelWizard.Shared.Downloads;
+using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Popups.Generic;
 
 namespace WheelWizard.Views.Updating;
 
-public sealed class UpdatePresentation : IUpdatePresentation
+public sealed class UpdatePresentation(IGitHubSingletonService gitHub) : IUpdatePresentation
 {
-    public async Task<bool> ConfirmUpdateAsync(string latestVersion, string currentVersion) =>
+    public async Task<bool> ConfirmUpdateAsync(string latestVersion, string currentVersion, IReadOnlyList<GithubRelease> releases) =>
         await Dispatcher.UIThread.InvokeAsync(
             () =>
                 new YesNoWindow()
                     .SetButtonText(t("action.update"), t("action.maybe_later"))
-                    .SetMainText(t("question.new_version_wh_wz.title"))
-                    .SetExtraText(
-                        t("question.new_version_wh_wz.extra", new { latestVersion = latestVersion, currentVersion = currentVersion })!
-                    )
+                    .SetMainText($"Update available (v{latestVersion})")
+                    .SetWindowTitle("Update available")
+                    .SetContent(new UpdateChangelog(gitHub, releases))
                     .AwaitAnswer()
         );
 
@@ -45,16 +47,15 @@ public sealed class UpdatePresentation : IUpdatePresentation
                     .ShowDialog()
         );
 
-    public async Task ShowManualUpdateAsync(string latestVersion, string currentVersion) =>
+    public async Task ShowManualUpdateAsync(string latestVersion, string currentVersion, IReadOnlyList<GithubRelease> releases) =>
         await Dispatcher.UIThread.InvokeAsync(
             () =>
                 new MessageBoxWindow()
-                    .SetTitleText("New Wheel Wizard version")
-                    .SetInfoText(
-                        $"There is a new Wheel Wizard version available!\nVersion {latestVersion} (You are currently on {currentVersion})\n"
-                            + "You can manually update it by going to the GitHub releases at: https://github.com/TeamWheelWizard/WheelWizard/releases"
-                    )
-                    .Show()
+                    .SetTitleText("Update available")
+                    .SetTag($"v{latestVersion}")
+                    .SetWindowTitle("Update available")
+                    .SetContent(new UpdateChangelog(gitHub, releases))
+                    .ShowDialog()
         );
 
     public async Task<OperationResult> RunUpdateAsync(
