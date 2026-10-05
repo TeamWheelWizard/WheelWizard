@@ -807,8 +807,8 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
 
         try
         {
-            var normalizedFirst = Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(first));
-            var normalizedSecond = Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(second));
+            var normalizedFirst = fileSystem.Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(first));
+            var normalizedSecond = fileSystem.Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(second));
             return normalizedFirst.Equals(normalizedSecond, StringComparison.Ordinal);
         }
         catch (Exception exception)

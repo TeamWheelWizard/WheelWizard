@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.CustomDistributions;
@@ -12,6 +13,8 @@ namespace WheelWizard.Views.Pages.Settings;
 
 public partial class OtherSettings : UserControl
 {
+    private readonly IFileSystem fileSystem;
+
     private readonly bool _settingsAreDisabled;
 
     private IFilePickerService FilePicker { get; }
@@ -23,12 +26,14 @@ public partial class OtherSettings : UserControl
     private ISettingsManager SettingsService { get; }
 
     public OtherSettings(
+        IFileSystem fileSystem,
         IFilePickerService filePicker,
         ICustomDistributionPaths distributionPaths,
         ICustomDistributionSingletonService customDistributionSingletonService,
         ISettingsManager settingsService
     )
     {
+        this.fileSystem = fileSystem;
         FilePicker = filePicker;
         DistributionPaths = distributionPaths;
         CustomDistributionSingletonService = customDistributionSingletonService;
@@ -41,7 +46,7 @@ public partial class OtherSettings : UserControl
         // controls individually so the recomp switch never becomes trapped behind Dolphin setup.
         LaunchRrOnStartup.IsEnabled = !_settingsAreDisabled;
         DolphinReinstallButton.IsEnabled = !_settingsAreDisabled;
-        OpenGameFolderButton.IsEnabled = !_settingsAreDisabled && Directory.Exists(DistributionPaths.RootFolderPath);
+        OpenGameFolderButton.IsEnabled = !_settingsAreDisabled && fileSystem.Directory.Exists(DistributionPaths.RootFolderPath);
         OpenSaveFolderButton.IsEnabled = !_settingsAreDisabled;
         if (!_settingsAreDisabled)
             LoadSettings();
@@ -57,8 +62,8 @@ public partial class OtherSettings : UserControl
     {
         // Only loads when the settings are not disabled (aka when the paths are set up correctly)
         LaunchRrOnStartup.IsChecked = SettingsService.Get<bool>(SettingsService.LAUNCH_RR_ON_STARTUP);
-        OpenGameFolderButton.IsEnabled = Directory.Exists(DistributionPaths.RootFolderPath);
-        OpenSaveFolderButton.IsEnabled = Directory.Exists(DistributionPaths.SaveFolderPath);
+        OpenGameFolderButton.IsEnabled = fileSystem.Directory.Exists(DistributionPaths.RootFolderPath);
+        OpenSaveFolderButton.IsEnabled = fileSystem.Directory.Exists(DistributionPaths.SaveFolderPath);
     }
 
     private void ForceLoadSettings()
@@ -119,7 +124,7 @@ public partial class OtherSettings : UserControl
 
     private void GameFileFolder_Click(object? sender, RoutedEventArgs e)
     {
-        if (!Directory.Exists(DistributionPaths.RootFolderPath))
+        if (!fileSystem.Directory.Exists(DistributionPaths.RootFolderPath))
             return;
 
         FilePicker.OpenFolderInFileManager(DistributionPaths.RootFolderPath);

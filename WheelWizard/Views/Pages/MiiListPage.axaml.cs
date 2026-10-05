@@ -325,7 +325,7 @@ public partial class MiiListPage : UserControl
 
     public static string ReplaceInvalidFileNameChars(string filename)
     {
-        var invalid = Path.GetInvalidFileNameChars();
+        var invalid = new Testably.Abstractions.RealFileSystem().Path.GetInvalidFileNameChars();
         return string.Join("_", filename.Split(invalid, StringSplitOptions.RemoveEmptyEntries));
     }
 

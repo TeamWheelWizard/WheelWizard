@@ -5,6 +5,8 @@ namespace WheelWizard.Features.Patches;
 
 public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsPatchConverter
 {
+    private static readonly System.IO.Abstractions.IPath NativePath = new Testably.Abstractions.RealFileSystem().Path;
+
     public OperationResult<PatchConversionAnalysis> AnalyzeAgainstBaseline(BaselineEntry baseline, string moddedName, byte[] moddedBytes)
     {
         // #todo: test conversion against real baselines, including changed, added, removed and unsupported archive members.
@@ -197,7 +199,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
 
     private static bool IsBlockedLooseRawOverrideExtension(string path)
     {
-        var extension = Path.GetExtension(path);
+        var extension = NativePath.GetExtension(path);
         return extension.Equals(".kcl", StringComparison.OrdinalIgnoreCase)
             || extension.Equals(".kmp", StringComparison.OrdinalIgnoreCase)
             || extension.Equals(".slt", StringComparison.OrdinalIgnoreCase);
@@ -205,7 +207,7 @@ public sealed class SzsPatchConverter(ISzsArchiveDecoder archiveDecoder) : ISzsP
 
     private static string StripExtension(string fileName)
     {
-        var extension = Path.GetExtension(fileName);
+        var extension = NativePath.GetExtension(fileName);
         return string.IsNullOrEmpty(extension) ? fileName : fileName[..^extension.Length];
     }
 }

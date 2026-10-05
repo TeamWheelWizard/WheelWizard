@@ -371,7 +371,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             _ => FflNativeInterop.FflExpressionNormal,
         };
 
-    private static OperationResult<CachedHeadDrawParams> GetOrCreateCachedHeadDrawParams(
+    private OperationResult<CachedHeadDrawParams> GetOrCreateCachedHeadDrawParams(
         ManagedFflResourceArchive archive,
         FflNativeInterop.FFLiCharInfo charInfo,
         NativeMiiRenderRequest request,
@@ -460,10 +460,10 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         }
     }
 
-    private static string BuildHeadDrawCacheKey(string studioData, int expressionId, int width, string resourcePath)
+    private string BuildHeadDrawCacheKey(string studioData, int expressionId, int width, string resourcePath)
     {
         var resolutionBucket = width <= 384 ? 256 : 512;
-        return $"{Path.GetFullPath(resourcePath)}|{resolutionBucket}|{expressionId}|{studioData}";
+        return $"{fileSystem.Path.GetFullPath(resourcePath)}|{resolutionBucket}|{expressionId}|{studioData}";
     }
 
     private static List<DecodedDrawMesh> BuildDecodedDrawMeshes(IReadOnlyList<FflNativeInterop.FFLDrawParam> drawParams)
