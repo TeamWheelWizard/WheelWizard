@@ -54,7 +54,11 @@ public class Program : IDesignerEntryPoint
         }
     }
 
-    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
+    // X11 must opt in to drawn decorations for our extended title bars.
+#pragma warning disable AVALONIA_X11_CSD
+    public static AppBuilder BuildAvaloniaApp() =>
+        AppBuilder.Configure<App>().UsePlatformDetect().With(new X11PlatformOptions { EnableDrawnDecorations = true }).WithInterFont();
+#pragma warning restore AVALONIA_X11_CSD
 
     /// <summary>
     /// Creates the logger, resetting the application data location once when its logs directory is unusable.
@@ -106,10 +110,13 @@ public class Program : IDesignerEntryPoint
     private static AppBuilder CreateWheelWizardApp(IServiceProvider services)
     {
         Logger.Sink = services.GetRequiredService<AvaloniaLoggerAdapter>();
+#pragma warning disable AVALONIA_X11_CSD
         var builder = AppBuilder
             .Configure(() => new App(services.GetRequiredService<IDesktopStartup>()))
             .UsePlatformDetect()
+            .With(new X11PlatformOptions { EnableDrawnDecorations = true })
             .WithInterFont();
+#pragma warning restore AVALONIA_X11_CSD
 
         // https://docs.avaloniaui.net/docs/platform-specific-guides/linux#enabling-the-wayland-backend
         // NOTE: UseWayland() will prevent fallback to X11.
