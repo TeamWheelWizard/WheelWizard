@@ -22,6 +22,8 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
         set => SetValue(RequestedWindowScaleProperty, value);
     }
 
+    protected override bool CanUserClose => CanClose;
+
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => WindowFrame;
 
