@@ -90,8 +90,8 @@ public partial class Layout : BaseWindow, IPollingListener
         InitializeComponent();
 
         // Wayland does not expose the drawn caption buttons from our platform decoration template.
-        HeaderWindowControls.IsVisible = OperatingSystem.IsLinux()
-            && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
+        HeaderWindowControls.IsVisible =
+            OperatingSystem.IsLinux() && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
 
         // Respects tiling window managers better if resizable.
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
