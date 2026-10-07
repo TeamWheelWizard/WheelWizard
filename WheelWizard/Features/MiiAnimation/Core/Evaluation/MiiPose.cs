@@ -40,6 +40,12 @@ public sealed class MiiPose
 
     public MiiExpression Expression { get; set; }
 
+    /// <summary>False while the Visible channel hides this Mii.</summary>
+    public bool Visible { get; set; } = true;
+
+    /// <summary>The Root bone's Move X/Y/Z values: how far the Mii travelled from its start spot (canonical units).</summary>
+    public Vector3 RootTravel { get; set; }
+
     public LimbState[] Limbs { get; } = new LimbState[MiiSkeletonInfo.LimbCount];
 
     public Vector3 WorldPositionOf(MiiBone bone) => Vector3.Transform(WorldPosition[(int)bone], GlobalMatrix);
@@ -65,6 +71,8 @@ public sealed class MiiPose
             GlobalMatrix = GlobalMatrix,
             HeadMatrix = HeadMatrix,
             Expression = Expression,
+            Visible = Visible,
+            RootTravel = RootTravel,
         };
         LocalRotation.CopyTo(clone.LocalRotation, 0);
         LocalTranslation.CopyTo(clone.LocalTranslation, 0);

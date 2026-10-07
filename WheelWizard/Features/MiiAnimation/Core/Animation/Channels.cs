@@ -42,6 +42,9 @@ public enum Channel : byte
     // Global channels.
     /// <summary>FFL expression id, stepped.</summary>
     Expression = 32,
+
+    /// <summary>1 = shown, 0 = hidden (stepped). Lets extra Miis appear or leave mid-animation.</summary>
+    Visible = 33,
 }
 
 public enum TrackTargetKind : byte
@@ -94,6 +97,8 @@ public readonly record struct TrackId(TrackTarget Target, Channel Channel)
     public static TrackId Limb(MiiLimb limb, Channel channel) => new(TrackTarget.Limb(limb), channel);
 
     public static readonly TrackId Expression = new(TrackTarget.Global, Channel.Expression);
+
+    public static readonly TrackId Visible = new(TrackTarget.Global, Channel.Visible);
 }
 
 public static class ChannelInfo
@@ -126,13 +131,14 @@ public static class ChannelInfo
     ];
 
     /// <summary>Discrete channels are always stepped (no easing).</summary>
-    public static bool IsDiscrete(Channel channel) => channel is Channel.Expression or Channel.IkStretch;
+    public static bool IsDiscrete(Channel channel) => channel is Channel.Expression or Channel.IkStretch or Channel.Visible;
 
     public static float DefaultValue(TrackId id) =>
         id.Channel switch
         {
             Channel.ScaleX or Channel.ScaleY or Channel.ScaleZ or Channel.Stretch => 1f,
             Channel.IkBlend => MiiSkeletonInfo.DefaultIkBlend(id.Target.AsLimb),
+            Channel.Visible => 1f,
             _ => 0f,
         };
 
@@ -159,6 +165,7 @@ public static class ChannelInfo
             Channel.Swivel => "Elbow/Knee Direction",
             Channel.IkStretch => "Stretchy Limb",
             Channel.Expression => "Expression",
+            Channel.Visible => "Visible",
             _ => channel.ToString(),
         };
 

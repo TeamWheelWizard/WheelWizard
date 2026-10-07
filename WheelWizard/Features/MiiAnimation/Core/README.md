@@ -6,3 +6,5 @@ curve evaluation and IK, so WheelWizard plays animations exactly like the animat
 
 Do not edit these files here; change them in the animator and copy them over again.
 The skinned body models live in `../Resources` and are embedded with the same logical names.
+Templates, particle presets and the built-in particle images (SVGs) are authoring tools and stay in the animator;
+animations carry their own particle images, so nothing here knows about shapes.

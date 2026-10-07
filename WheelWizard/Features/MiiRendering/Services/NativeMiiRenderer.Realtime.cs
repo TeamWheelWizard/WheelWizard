@@ -210,6 +210,7 @@ public sealed partial class NativeMiiRenderer
 
         // Same 15° camera as the CPU renderer; widen the vertical field of view for tall targets so nothing is cropped.
         aspect = Math.Max(0.05f, aspect);
+        var cameraUp = CalculateUpVector(cameraRotate);
         var halfFov = 7.5f * MathF.PI / 180f;
         var fovY = aspect >= 1f ? halfFov * 2f : 2f * MathF.Atan(MathF.Tan(halfFov) / aspect);
         var projection = Matrix4x4.CreatePerspectiveFieldOfView(fovY, aspect, 10f, 1200f);
@@ -220,16 +221,22 @@ public sealed partial class NativeMiiRenderer
             bodyScale,
             baseRotation,
             Matrix4x4.CreateScale(MiiBodyModel.CanonicalToRenderUnits) * baseRotation * Matrix4x4.CreateScale(bodyScale),
-            Matrix4x4.CreateLookAt(cameraPosition, cameraTarget, CalculateUpVector(cameraRotate)),
+            Matrix4x4.CreateLookAt(cameraPosition, cameraTarget, cameraUp),
             projection,
             ReadFavoriteColorOrDefault(charInfo.favoriteColor),
-            PantsColor
+            PantsColor,
+            cameraPosition,
+            cameraTarget,
+            cameraUp
         );
     }
 }
 
 /// <summary>See <see cref="NativeMiiRenderer.GetRealtimeFrameSetup"/>.</summary>
-/// <param name="BodyMatrix">Applied after skinning: canonical → render units, character rotation, body scale.</param>
+/// <param name="BodyMatrix">
+/// Applied after skinning: canonical → render units, character rotation, body scale. Use <see cref="BodyMatrixFor"/>
+/// for animated poses.
+/// </param>
 public sealed record MiiRealtimeFrameSetup(
     bool Female,
     bool HasBody,
@@ -239,9 +246,34 @@ public sealed record MiiRealtimeFrameSetup(
     Matrix4x4 View,
     Matrix4x4 Projection,
     Vector4 BodyColor,
-    Vector4 PantsColor
+    Vector4 PantsColor,
+    Vector3 CameraPosition,
+    Vector3 CameraTarget,
+    Vector3 CameraUp
 )
 {
+    /// <summary>Body matrix for this pose: <see cref="BodyMatrix"/> plus the walk-distance correction (see <see cref="MiiStage"/>).</summary>
+    public Matrix4x4 BodyMatrixFor(MiiPose pose) => BodyMatrix * Matrix4x4.CreateTranslation(StageOffset(pose));
+
     /// <summary>Model matrix for the FFL head in this pose.</summary>
-    public Matrix4x4 HeadMatrix(MiiPose pose) => HasBody ? pose.HeadMatrixForRender(BodyScale) * CharacterRotation : CharacterRotation;
+    public Matrix4x4 HeadMatrix(MiiPose pose) =>
+        HasBody
+            ? pose.HeadMatrixForRender(BodyScale) * CharacterRotation * Matrix4x4.CreateTranslation(StageOffset(pose))
+            : CharacterRotation;
+
+    /// <summary>Stage space (<see cref="MiiStage"/>, used by particles) → world.</summary>
+    public Matrix4x4 StageToWorld => CharacterRotation;
+
+    /// <summary>Same framing with the camera moved (e.g. part way through a camera transition).</summary>
+    public MiiRealtimeFrameSetup WithCamera(Vector3 position, Vector3 target, Vector3 up) =>
+        this with
+        {
+            CameraPosition = position,
+            CameraTarget = target,
+            CameraUp = up,
+            View = Matrix4x4.CreateLookAt(position, target, up),
+        };
+
+    private Vector3 StageOffset(MiiPose pose) =>
+        HasBody ? Vector3.TransformNormal(MiiStage.TravelCorrection(pose, BodyScale), CharacterRotation) : Vector3.Zero;
 }

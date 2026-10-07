@@ -1,5 +1,6 @@
 using Avalonia.Interactivity;
 using Testably.Abstractions;
+using WheelWizard.MiiAnimations.Editor;
 using WheelWizard.Views.Components;
 using MiiFactory = WheelWizard.WiiManagement.MiiManagement.MiiFactory;
 
@@ -41,7 +42,8 @@ public partial class EditorStartPage : MiiEditorBaseControl
         newMii.CreatorName = oldMii.CreatorName;
 
         Editor.SetMii(newMii);
-        Editor.RefreshImage();
+        // The new Mii appears in the middle of the shuffle, at the randomize marker.
+        Editor.RefreshImage(MiiEditorReaction.Randomize, MiiEditorCues.Randomize);
     }
 
     private void CancelButton_OnClick(object? sender, RoutedEventArgs e) => Editor.Close();
@@ -55,5 +57,6 @@ public partial class EditorStartPage : MiiEditorBaseControl
         FavoriteButton.Classes.Clear();
         if (Editor.Mii.IsFavorite)
             FavoriteButton.Classes.Add("favorite");
+        Editor.React(Editor.Mii.IsFavorite ? MiiEditorReaction.Favorite : MiiEditorReaction.Unfavorite);
     }
 }

@@ -3,6 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using WheelWizard.CustomCharacters;
+using WheelWizard.MiiAnimations.Editor;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.WiiManagement.MiiManagement;
@@ -65,8 +66,12 @@ public partial class EditorGeneral : MiiEditorBaseControl
     // We only have to check if it's a female, since if it's not, we already know the other option is going to be the male
     private void IsGirl_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        Editor.Mii.IsGirl = GirlToggle.IsChecked == true;
-        Editor.RefreshImage();
+        var isGirl = GirlToggle.IsChecked == true;
+        if (Editor.Mii.IsGirl == isGirl)
+            return;
+        Editor.Mii.IsGirl = isGirl;
+        // The new body appears mid-animation, at the swap_gender marker.
+        Editor.RefreshImage(isGirl ? MiiEditorReaction.BecomeGirl : MiiEditorReaction.BecomeBoy, MiiEditorCues.SwapGender);
     }
 
     private void Name_TextChanged(object sender, TextChangedEventArgs e)
@@ -80,6 +85,9 @@ public partial class EditorGeneral : MiiEditorBaseControl
         var validationCreatorNameResult = ValidateCreatorName(CreatorName.Text);
         _hasCreatorNameError = validationCreatorNameResult.IsFailure;
         CreatorName.ErrorText = validationCreatorNameResult.Error?.Message ?? "";
+
+        if (sender == MiiName && !_hasMiiNameError && MiiName.Text?.Trim() != Editor.Mii.Name.ToString())
+            Editor.React(MiiEditorReaction.Name);
     }
 
     private OperationResult ValidateMiiName(string? _, string newName)
@@ -113,8 +121,10 @@ public partial class EditorGeneral : MiiEditorBaseControl
             ViewUtils.ShowSnackbar("Something went wrong while setting the height: " + heightResult.Error.Message);
             return;
         }
+        if (Editor.Mii.Height.Value == heightResult.Value.Value)
+            return;
         Editor.Mii.Height = heightResult.Value;
-        Editor.RefreshImage();
+        Editor.RefreshImage(MiiEditorReaction.BodyShape);
     }
 
     private void Width_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
@@ -130,14 +140,18 @@ public partial class EditorGeneral : MiiEditorBaseControl
             ViewUtils.ShowSnackbar("Something went wrong while setting the weight: " + weightResult.Error.Message);
             return;
         }
+        if (Editor.Mii.Weight.Value == weightResult.Value.Value)
+            return;
         Editor.Mii.Weight = weightResult.Value;
-        Editor.RefreshImage();
+        Editor.RefreshImage(MiiEditorReaction.BodyShape);
     }
 
     private void SetSkinColor(int index)
     {
+        if (Editor.Mii.MiiFavoriteColor == (MiiFavoriteColor)index)
+            return;
         Editor.Mii.MiiFavoriteColor = (MiiFavoriteColor)index;
-        Editor.RefreshImage();
+        Editor.RefreshImage(MiiEditorReaction.FavoriteColor);
     }
 
     private async void ComplexName_OnClick(object? sender, RoutedEventArgs e)

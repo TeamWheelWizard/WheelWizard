@@ -8,7 +8,11 @@ using WheelWizard.MiiRendering.Services;
 namespace WheelWizard.MiiRendering.Realtime;
 
 /// <summary>One frame for <see cref="MiiGpuRenderer"/>: a posed Mii plus how the CPU renderer would frame it.</summary>
-public sealed record MiiGpuFrame(MiiRealtimeFrameSetup Setup, MiiPose Pose, IReadOnlyList<HeadMeshData>? Head, string? HeadKey);
+public sealed record MiiGpuFrame(MiiRealtimeFrameSetup Setup, MiiPose Pose, IReadOnlyList<HeadMeshData>? Head, string? HeadKey)
+{
+    /// <summary>Particles in stage space (see <see cref="MiiAnim.Core.Evaluation.MiiStage"/>), drawn over the Mii.</summary>
+    public IReadOnlyList<Particle> Particles { get; init; } = [];
+}
 
 /// <summary>
 /// OpenGL renderer for one Mii (skinned body + FFL head) with the same shading as the CPU renderer.
@@ -21,6 +25,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     private readonly uint _bodyProgram;
     private readonly Dictionary<string, GpuMesh[]> _heads = new();
     private readonly Dictionary<MiiBodyModel, GpuMesh[]> _bodies = new();
+    private readonly ParticleRenderer? _particles;
 
     private sealed record GpuMesh(uint Vao, uint Vbo, uint Ebo, int IndexCount, uint Texture, HeadMeshData? Head, bool IsPants);
 
@@ -30,6 +35,15 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         var header = MiiShaders.Header(isEs);
         _headProgram = CreateProgram(header + MiiShaders.HeadVertex, header + MiiShaders.HeadFragment);
         _bodyProgram = CreateProgram(header + MiiShaders.BodyVertex, header + MiiShaders.BodyFragment);
+        try
+        {
+            _particles = new ParticleRenderer(gl, header);
+        }
+        catch (InvalidOperationException)
+        {
+            // Particles are an extra: still draw the Mii when their shader doesn't compile on this driver.
+            _particles = null;
+        }
     }
 
     public void Render(MiiGpuFrame? frame, int width, int height)
@@ -55,10 +69,16 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.FrontFace(FrontFaceDirection.Ccw);
 
         var setup = frame.Setup;
-        if (setup.HasBody)
-            DrawBody(frame, setup);
-        if (frame.Head is not null && frame.HeadKey is not null)
-            DrawHead(frame, setup);
+        if (frame.Pose.Visible)
+        {
+            if (setup.HasBody)
+                DrawBody(frame, setup);
+            if (frame.Head is not null && frame.HeadKey is not null)
+                DrawHead(frame, setup);
+        }
+
+        if (frame.Particles.Count > 0)
+            _particles?.Draw(frame.Particles, setup.StageToWorld, setup.View, setup.Projection);
 
         _gl.Disable(EnableCap.CullFace);
         _gl.BindVertexArray(0);
@@ -72,10 +92,11 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         SetLighting(_bodyProgram);
         SetMatrix(_bodyProgram, "uView", setup.View);
         SetMatrix(_bodyProgram, "uProj", setup.Projection);
+        var bodyMatrix = setup.BodyMatrixFor(frame.Pose);
         var bones = stackalloc float[16 * 16];
         for (var i = 0; i < MiiSkeletonInfo.BoneCount; i++)
         {
-            var m = frame.Pose.SkinMatrix[i] * setup.BodyMatrix;
+            var m = frame.Pose.SkinMatrix[i] * bodyMatrix;
             System.Runtime.CompilerServices.Unsafe.CopyBlock(bones + i * 16, &m, 64);
         }
 
@@ -379,5 +400,6 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _bodies.Clear();
         _gl.DeleteProgram(_headProgram);
         _gl.DeleteProgram(_bodyProgram);
+        _particles?.Dispose();
     }
 }

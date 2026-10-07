@@ -4,21 +4,95 @@ public sealed class MiiAnimation
 {
     public const int MiiDataLength = 74;
 
-    public string Name { get; set; } = "Untitled";
+    /// <summary>Set on an extra actor's motion: timing, events, actors and particles then belong to this animation.</summary>
+    private readonly MiiAnimation? _owner;
+    private string _name = "Untitled";
+    private int _fps = 60;
+    private int _length = 120;
+    private readonly List<AnimEvent> _events = [];
+    private readonly List<AnimActor> _actors = [];
+    private readonly List<ParticleEffect> _particles = [];
+
+    public MiiAnimation() { }
+
+    private MiiAnimation(MiiAnimation owner) => _owner = owner;
+
+    public string Name
+    {
+        get => _owner?.Name ?? _name;
+        set
+        {
+            if (_owner is null)
+                _name = value;
+            else
+                _owner.Name = value;
+        }
+    }
 
     /// <summary>Frames per second. Keys are on whole frames.</summary>
-    public int Fps { get; set; } = 60;
+    public int Fps
+    {
+        get => _owner?.Fps ?? _fps;
+        set
+        {
+            if (_owner is null)
+                _fps = value;
+            else
+                _owner.Fps = value;
+        }
+    }
 
     /// <summary>Loop length in frames. Playback wraps from <see cref="Length"/> back to frame 0.</summary>
-    public int Length { get; set; } = 120;
+    public int Length
+    {
+        get => _owner?.Length ?? _length;
+        set
+        {
+            if (_owner is null)
+                _length = value;
+            else
+                _owner.Length = value;
+        }
+    }
 
     /// <summary>Optional 74-byte Wii Mii the animation was authored with (preview only, players use their own Mii).</summary>
     public byte[]? AuthorMii { get; set; }
 
+    /// <summary>The main Mii's tracks (or, on an extra actor's <see cref="AnimActor.Motion"/>, that actor's).</summary>
     public Dictionary<TrackId, AnimCurve> Tracks { get; } = new();
 
     /// <summary>Named event markers, kept sorted by frame.</summary>
-    public List<AnimEvent> Events { get; } = [];
+    public List<AnimEvent> Events => _owner?.Events ?? _events;
+
+    /// <summary>Extra Miis (actor 1, 2, …). The main Mii is actor 0 and uses <see cref="Tracks"/>.</summary>
+    public List<AnimActor> Actors => _owner?.Actors ?? _actors;
+
+    /// <summary>Particle effects, fully described in the file (no app support needed).</summary>
+    public List<ParticleEffect> Particles => _owner?.Particles ?? _particles;
+
+    /// <summary>The animation that owns the timing, events, actors and particles (itself, unless this is an actor's motion).</summary>
+    public MiiAnimation Root => _owner ?? this;
+
+    /// <summary>Main Mii plus extra actors.</summary>
+    public int ActorCount => Actors.Count + 1;
+
+    /// <summary>Tracks of actor <paramref name="index"/>: 0 is the main Mii, 1+ the extra <see cref="Actors"/>.</summary>
+    public MiiAnimation ForActor(int index) => index <= 0 ? Root : Actors[index - 1].Motion;
+
+    /// <summary>Index of the actor with this name (case-insensitive), or -1.</summary>
+    public int FindActor(string name) =>
+        Actors.FindIndex(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase)) is var i and >= 0 ? i + 1 : -1;
+
+    /// <summary>Adds an extra Mii with no tracks yet.</summary>
+    public AnimActor AddActor(string name)
+    {
+        name = name.Trim();
+        if (name.Length > AnimActor.MaxNameLength)
+            name = name[..AnimActor.MaxNameLength];
+        var actor = new AnimActor(name, new MiiAnimation(Root));
+        Actors.Add(actor);
+        return actor;
+    }
 
     /// <summary>Adds an event (or renames the one already on that frame with the same name) and keeps the list sorted.</summary>
     public void AddEvent(int frame, string name)
@@ -78,26 +152,45 @@ public sealed class MiiAnimation
         return ChannelInfo.IsDiscrete(id.Channel) ? curve.EvaluateStepped(frame, defaultValue) : curve.Evaluate(frame, defaultValue);
     }
 
-    /// <summary>Removes empty tracks.</summary>
+    /// <summary>Removes empty tracks (of every actor).</summary>
     public void Prune()
     {
-        foreach (var id in Tracks.Where(t => t.Value.Count == 0).Select(t => t.Key).ToList())
-            Tracks.Remove(id);
+        for (var actor = 0; actor < ActorCount; actor++)
+        {
+            var tracks = ForActor(actor).Tracks;
+            foreach (var id in tracks.Where(t => t.Value.Count == 0).Select(t => t.Key).ToList())
+                tracks.Remove(id);
+        }
     }
 
+    /// <summary>Deep copy of the whole animation (cloning an actor's motion clones the animation it belongs to).</summary>
     public MiiAnimation Clone()
     {
+        var source = Root;
         var clone = new MiiAnimation
         {
-            Name = Name,
-            Fps = Fps,
-            Length = Length,
-            AuthorMii = AuthorMii?.ToArray(),
+            Name = source.Name,
+            Fps = source.Fps,
+            Length = source.Length,
+            AuthorMii = source.AuthorMii?.ToArray(),
         };
-        foreach (var (id, curve) in Tracks)
-            clone.Tracks[id] = curve.Clone();
-        clone.Events.AddRange(Events);
+        CopyTracks(source, clone);
+        clone.Events.AddRange(source.Events);
+        foreach (var actor in source.Actors)
+        {
+            var copy = clone.AddActor(actor.Name);
+            copy.PreviewMii = actor.PreviewMii?.ToArray();
+            CopyTracks(actor.Motion, copy.Motion);
+        }
+
+        clone.Particles.AddRange(source.Particles.Select(p => p.Clone()));
         return clone;
+    }
+
+    private static void CopyTracks(MiiAnimation from, MiiAnimation to)
+    {
+        foreach (var (id, curve) in from.Tracks)
+            to.Tracks[id] = curve.Clone();
     }
 
     /// <summary>Wraps a time in seconds into a frame position inside the loop.</summary>

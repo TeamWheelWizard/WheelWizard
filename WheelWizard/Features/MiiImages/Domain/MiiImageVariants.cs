@@ -40,15 +40,6 @@ public static class MiiImageVariants
         CachePriority = CacheItemPriority.Low,
     };
 
-    public static readonly MiiImageSpecifications MiiEditorSmall = new()
-    {
-        Name = "MiiEditorPreviewSmall",
-        Expression = MiiImageSpecifications.FaceExpression.normal,
-        Type = MiiImageSpecifications.BodyType.face,
-        Size = MiiImageSpecifications.ImageSize.medium,
-        ExpirationSeconds = TimeSpan.Zero,
-        CachePriority = CacheItemPriority.Low,
-    };
     public static readonly MiiImageSpecifications MiiEditorPreviewCarousel = new()
     {
         Name = "MiiEditorPreviewCarousel",

@@ -177,6 +177,12 @@ public sealed class MiiRig
         pose.HeadMatrix = Matrix4x4.CreateTranslation(MiiBodyModel.HeadRestPosition) * restHeadInverse * pose.BoneMatrix[head];
 
         pose.Expression = MiiExpressionInfo.FromValue(Sample(TrackId.Expression));
+        pose.Visible = Sample(TrackId.Visible) >= 0.5f;
+        pose.RootTravel = new Vector3(
+            Sample(TrackId.Bone(MiiBone.Root, Channel.PosX)),
+            Sample(TrackId.Bone(MiiBone.Root, Channel.PosY)),
+            Sample(TrackId.Bone(MiiBone.Root, Channel.PosZ))
+        );
         return pose;
     }
 

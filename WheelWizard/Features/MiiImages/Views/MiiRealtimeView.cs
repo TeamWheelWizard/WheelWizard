@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Numerics;
 using Avalonia;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
@@ -8,6 +9,7 @@ using MiiAnim.Core.Animation;
 using MiiAnim.Core.Evaluation;
 using MiiAnim.Core.Rig;
 using Silk.NET.OpenGL;
+using WheelWizard.MiiAnimations.Playback;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiRendering.Realtime;
@@ -18,15 +20,19 @@ namespace WheelWizard.MiiImages.Views;
 
 /// <summary>
 /// Realtime (GPU) Mii view: draws a Mii with OpenGL on a transparent background, so it can be layered over any UI,
-/// and plays a <see cref="MiiAnimation"/> at the display's frame rate. Framing, lighting and colours match the CPU
-/// renderer for the same <see cref="Specifications"/>.
+/// and plays Mii animations (with their particles) at the display's frame rate. Framing, lighting and colours match
+/// the CPU renderer for the same <see cref="Specifications"/>.
 /// <para>
-/// If OpenGL isn't available <see cref="RealtimeUnavailable"/> fires; callers can fall back to the CPU renderer.
+/// Play a single clip with <see cref="Animation"/>, or drive <see cref="Player"/> directly to cross-fade between
+/// clips. If OpenGL isn't available <see cref="RealtimeUnavailable"/> fires; callers can fall back to the CPU renderer.
 /// </para>
 /// </summary>
 public sealed class MiiRealtimeView : OpenGlControlBase
 {
     private static readonly TimeSpan InitTimeout = TimeSpan.FromSeconds(3);
+
+    /// <summary>Centre of the FFL head in head-mesh units (the head is roughly an ellipsoid around it).</summary>
+    private static readonly Vector3 HeadCenter = new(0f, 35f, -3.7f);
 
     private readonly IMiiNativeRenderer _renderer;
     private readonly Stopwatch _clock = new();
@@ -34,6 +40,10 @@ public sealed class MiiRealtimeView : OpenGlControlBase
     private readonly ConcurrentDictionary<string, byte> _building = new();
     private readonly Dictionary<bool, MiiRig> _rigs = new();
     private readonly SemaphoreSlim _buildGate = new(1, 1);
+    private readonly MiiAnimationPlayer _player = new();
+    private readonly HashSet<MiiExpression> _preloadedExpressions = [];
+    private readonly Dictionary<MiiAnimation, RigParticleStage> _particleStages = new();
+    private readonly List<Particle> _particles = [];
 
     private MiiGpuRenderer? _gpu;
     private bool _initialized;
@@ -47,15 +57,34 @@ public sealed class MiiRealtimeView : OpenGlControlBase
     private string? _lastStudio;
     private MiiGpuFrame? _lastFrame;
     private MiiAnimation? _animation;
-    private double _playheadFrames;
-    private double _lastEventFrame = -1;
+    private MiiAnimation? _headsRequestedFor;
+    private bool _loop = true;
     private TimeSpan _lastTick;
-    private bool _finished;
+
+    private (Vector3 Position, Vector3 Target, Vector3 Up)? _camera;
+    private (Vector3 Position, Vector3 Target, Vector3 Up)? _cameraFrom;
+    private TimeSpan _cameraTransitionStart;
+    private TimeSpan _cameraTransitionLength;
+
+    private bool _particleStagesFemale;
+    private Vector3 _particleBodyScale = MiiStage.DefaultBodyScale;
+    private Vector3 _particleColor = Vector3.One;
 
     public MiiRealtimeView(IMiiNativeRenderer renderer)
     {
         _renderer = renderer;
         _clock.Start();
+        _player.EventReached += (clip, animEvent) =>
+        {
+            ClipEvent?.Invoke(clip, animEvent);
+            AnimationEvent?.Invoke(animEvent);
+        };
+        _player.Finished += clip =>
+        {
+            ClipFinished?.Invoke(clip);
+            if (ReferenceEquals(clip, _animation))
+                AnimationFinished?.Invoke();
+        };
     }
 
     /// <summary>Camera framing, character rotation and zoom, same meaning as for rendered images.</summary>
@@ -67,26 +96,65 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             Size = MiiImageSpecifications.ImageSize.medium,
         };
 
-    public bool IsPlaying { get; set; } = true;
+    /// <summary>Plays the animations with cross-fades and an additive look layer. See <see cref="MiiAnimationPlayer"/>.</summary>
+    public MiiAnimationPlayer Player => _player;
 
-    public double Speed { get; set; } = 1;
+    public bool IsPlaying
+    {
+        get => !_player.IsPaused;
+        set
+        {
+            _player.IsPaused = !value;
+            RequestNextFrameRendering();
+        }
+    }
 
-    /// <summary>Loop the animation, or stop on its last frame (and raise <see cref="AnimationFinished"/>).</summary>
-    public bool Loop { get; set; } = true;
+    public double Speed
+    {
+        get => _player.Speed;
+        set => _player.Speed = value;
+    }
+
+    /// <summary>Loop <see cref="Animation"/>, or stop on its last frame (and raise <see cref="AnimationFinished"/>).</summary>
+    public bool Loop
+    {
+        get => _loop;
+        set
+        {
+            _loop = value;
+            if (_animation is not null && ReferenceEquals(_player.Current, _animation))
+                Restart();
+        }
+    }
+
+    /// <summary>Keep drawing every display frame even when nothing animates (e.g. while the caller eases the camera).</summary>
+    public bool ContinuousRendering { get; set; }
 
     /// <summary>Playhead in frames (unwrapped while looping).</summary>
-    public double PlayheadFrames => _playheadFrames;
+    public double PlayheadFrames => _player.Frame;
 
     public bool IsRealtimeAvailable => _initialized && _gpu is not null;
 
     /// <summary>Frames drawn so far (for an FPS readout).</summary>
     public long RenderedFrames { get; private set; }
 
+    /// <summary>The pose and framing of the frame drawn last, e.g. for hit testing. Null before the first frame.</summary>
+    public MiiGpuFrame? LastFrame => _lastFrame;
+
     /// <summary>Fired (on the UI thread) for every event marker playback passes.</summary>
     public event Action<AnimEvent>? AnimationEvent;
 
-    /// <summary>Fired once when a non-looping animation reaches its end.</summary>
+    /// <summary>Like <see cref="AnimationEvent"/>, with the clip the event belongs to (for callers that play several).</summary>
+    public event Action<MiiAnimation, AnimEvent>? ClipEvent;
+
+    /// <summary>Fired once when a non-looping <see cref="Animation"/> reaches its end.</summary>
     public event Action? AnimationFinished;
+
+    /// <summary>Fired once when any one-shot clip played on <see cref="Player"/> reaches its end.</summary>
+    public event Action<MiiAnimation>? ClipFinished;
+
+    /// <summary>Fired on the UI thread at the start of every drawn frame with the seconds since the previous one.</summary>
+    public event Action<double>? FrameUpdating;
 
     /// <summary>Fired once each time a newly set Mii is first drawn (its head finished building), with its studio data.</summary>
     public event Action<string>? MiiShown;
@@ -124,6 +192,18 @@ public sealed class MiiRealtimeView : OpenGlControlBase
     {
         if (Serialize(mii) is { } studio)
             Remember(studio, prewarm: true);
+    }
+
+    /// <summary>Builds the faces <paramref name="clip"/> uses ahead of time, so they show as soon as it plays.</summary>
+    public void Preload(MiiAnimation clip)
+    {
+        var added = MiiAnimationPlayer.ExpressionsOf(clip).Where(_preloadedExpressions.Add).ToList();
+        if (added.Count == 0)
+            return;
+        lock (_recentStudios)
+            foreach (var studio in _recentStudios.ToList())
+            foreach (var expression in added)
+                RequestHead(studio, expression);
     }
 
     private const int RecentMiiCount = 3;
@@ -166,26 +246,26 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             return _recentStudios.Contains(studio) && (studio == _studioData || _prewarmedStudios.Contains(studio));
     }
 
+    /// <summary>A single animation to play (looping per <see cref="Loop"/>). Setting it starts it from the beginning.</summary>
     public MiiAnimation? Animation
     {
         get => _animation;
         set
         {
             _animation = value;
+            if (value is not null)
+                Preload(value);
             Restart();
-            lock (_recentStudios)
-                foreach (var studio in _recentStudios.ToList())
-                foreach (var expression in UsedExpressions())
-                    RequestHead(studio, expression);
         }
     }
 
-    /// <summary>Starts the animation from the beginning (events on frame 0 fire again).</summary>
+    /// <summary>Starts <see cref="Animation"/> from the beginning (events on frame 0 fire again).</summary>
     public void Restart()
     {
-        _playheadFrames = 0;
-        _lastEventFrame = -1;
-        _finished = false;
+        if (_animation is { } animation)
+            _player.Play(animation, _loop, fadeSeconds: 0);
+        else
+            _player.Stop(fadeSeconds: 0);
         _lastTick = _clock.Elapsed;
         RequestNextFrameRendering();
     }
@@ -193,18 +273,68 @@ public sealed class MiiRealtimeView : OpenGlControlBase
     /// <summary>Jumps to a frame without firing the events in between.</summary>
     public void Seek(double frame)
     {
-        _playheadFrames = Math.Max(0, frame);
-        _lastEventFrame = _playheadFrames;
-        _finished = false;
+        _player.Seek(frame);
         RequestNextFrameRendering();
     }
 
     /// <summary>Redraw after changing <see cref="Specifications"/> or other settings.</summary>
     public void Invalidate() => RequestNextFrameRendering();
 
+    /// <summary>Changes <see cref="Specifications"/> and glides the camera to its framing over <paramref name="duration"/>.</summary>
+    public void TransitionTo(MiiImageSpecifications specifications, TimeSpan duration)
+    {
+        Specifications = specifications;
+        _cameraFrom = duration > TimeSpan.Zero ? _camera : null;
+        _cameraTransitionStart = _clock.Elapsed;
+        _cameraTransitionLength = duration;
+        RequestNextFrameRendering();
+    }
+
+    private bool IsCameraMoving => _cameraFrom is not null && _clock.Elapsed - _cameraTransitionStart < _cameraTransitionLength;
+
+    #region Screen geometry (of the last drawn frame)
+
+    /// <summary>Where a point in stage space (see <see cref="MiiStage"/>) appears in this control, or null when behind the camera.</summary>
+    public Point? ProjectToScreen(Vector3 stagePoint)
+    {
+        if (_lastFrame is not { } frame)
+            return null;
+        var world = Vector3.Transform(stagePoint, frame.Setup.StageToWorld);
+        var clip = Vector4.Transform(new Vector4(world, 1f), frame.Setup.View * frame.Setup.Projection);
+        if (clip.W <= 1e-4f)
+            return null;
+        return new Point((clip.X / clip.W * 0.5 + 0.5) * Bounds.Width, (0.5 - clip.Y / clip.W * 0.5) * Bounds.Height);
+    }
+
+    /// <summary>Stage position of a bone in the last drawn pose.</summary>
+    public Vector3? BoneOnStage(MiiBone bone) => _lastFrame is { } frame ? MiiStage.PointOf(frame.Pose, frame.Setup.BodyScale, bone) : null;
+
+    /// <summary>Stage position of the middle of the head in the last drawn pose.</summary>
+    public Vector3? HeadCenterOnStage() =>
+        _lastFrame is { } frame ? Vector3.Transform(HeadCenter, MiiStage.HeadToStage(frame.Pose, frame.Setup.BodyScale)) : null;
+
+    /// <summary>The camera ray through a point of this control, in stage space.</summary>
+    public (Vector3 Origin, Vector3 Direction)? ScreenRay(Point point)
+    {
+        if (_lastFrame is not { } frame || Bounds.Width <= 0 || Bounds.Height <= 0)
+            return null;
+        if (!Matrix4x4.Invert(frame.Setup.StageToWorld * frame.Setup.View * frame.Setup.Projection, out var inverse))
+            return null;
+        var x = (float)(point.X / Bounds.Width * 2 - 1);
+        var y = (float)(1 - point.Y / Bounds.Height * 2);
+        var near = Vector4.Transform(new Vector4(x, y, -1f, 1f), inverse);
+        var far = Vector4.Transform(new Vector4(x, y, 1f, 1f), inverse);
+        var origin = new Vector3(near.X, near.Y, near.Z) / near.W;
+        var end = new Vector3(far.X, far.Y, far.Z) / far.W;
+        return (origin, Vector3.Normalize(end - origin));
+    }
+
+    #endregion
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        _lastTick = _clock.Elapsed;
         // Some systems never give us a GL context (and never call OnOpenGlInit); report that too. Only time spent
         // visible counts, since a hidden control is never asked to render.
         _initWatchdog?.Stop();
@@ -282,38 +412,30 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             return;
         }
 
-        if (IsPlaying && _animation is not null && !_finished)
+        if (_player.IsAnimating || IsCameraMoving || ContinuousRendering)
             RequestNextFrameRendering();
     }
 
     private MiiGpuFrame? BuildFrame(double deltaSeconds, float aspect)
     {
+        FrameUpdating?.Invoke(deltaSeconds);
+        _player.Update(deltaSeconds);
+        // Raise events after this frame, so handlers can change the Mii or play the next clip without re-entering.
+        Dispatcher.UIThread.Post(_player.RaiseEvents);
+
         if (_mii is null || _studioData is null)
             return null;
 
-        var rig = RigFor(_mii);
-        var pose = rig.RestPose;
-        if (_animation is { } animation)
+        // A clip just started: build its faces now, while its first frames play with the ones that are ready.
+        if (!ReferenceEquals(_player.Current, _headsRequestedFor))
         {
-            if (IsPlaying && !_finished)
-                _playheadFrames += deltaSeconds * animation.Fps * Speed;
-            if (!Loop && _playheadFrames >= animation.Length)
-            {
-                _playheadFrames = animation.Length;
-                if (!_finished)
-                {
-                    _finished = true;
-                    Dispatcher.UIThread.Post(() => AnimationFinished?.Invoke());
-                }
-            }
-
-            foreach (var animEvent in animation.EventsBetween(_lastEventFrame, _playheadFrames, Loop).ToList())
-                Dispatcher.UIThread.Post(() => AnimationEvent?.Invoke(animEvent));
-            _lastEventFrame = _playheadFrames;
-
-            var frame = Loop ? animation.FrameAtTime(_playheadFrames / Math.Max(1, animation.Fps)) : (float)_playheadFrames;
-            pose = rig.Evaluate(animation, frame);
+            _headsRequestedFor = _player.Current;
+            if (_player.Current is { } clip)
+                foreach (var expression in MiiAnimationPlayer.ExpressionsOf(clip))
+                    RequestHead(_studioData, expression);
         }
+
+        var pose = _player.Evaluate(RigFor(_mii));
 
         // Use the pose's face when it's ready, otherwise the default face (built first). While the new Mii's head is
         // still building, keep drawing the previous Mii so the view never blinks empty.
@@ -331,7 +453,8 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             Dispatcher.UIThread.Post(() => MiiShown?.Invoke(shown!));
         }
         _lastStudio = _studioData;
-        return _lastFrame = new MiiGpuFrame(setup.Value, pose, head, key);
+        var frameSetup = MoveCamera(setup.Value);
+        return _lastFrame = new MiiGpuFrame(frameSetup, pose, head, key) { Particles = Particles(frameSetup) };
     }
 
     private MiiGpuFrame? PreviousMiiFrame(MiiPose pose, float aspect)
@@ -342,9 +465,66 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             return null;
         // The previous Mii may have the other body; only reuse the pose when it fits.
         if (last.Setup.Female != _mii?.IsGirl)
-            pose = RigFor(last.Setup.Female).RestPose;
+            pose = _player.Evaluate(RigFor(last.Setup.Female));
         var setup = _renderer.GetRealtimeFrameSetup(_lastStudio, Specifications, aspect);
-        return setup.IsSuccess ? last with { Setup = setup.Value, Pose = pose, Head = head } : null;
+        if (setup.IsFailure)
+            return null;
+        var frameSetup = MoveCamera(setup.Value);
+        return _lastFrame = last with { Setup = frameSetup, Pose = pose, Head = head, Particles = Particles(frameSetup) };
+    }
+
+    /// <summary>Applies a running camera transition and remembers where the camera is.</summary>
+    private MiiRealtimeFrameSetup MoveCamera(MiiRealtimeFrameSetup setup)
+    {
+        if (IsCameraMoving && _cameraFrom is { } from)
+        {
+            var t = (float)((_clock.Elapsed - _cameraTransitionStart) / _cameraTransitionLength);
+            t = t * t * t * (t * (t * 6f - 15f) + 10f);
+            setup = setup.WithCamera(
+                Vector3.Lerp(from.Position, setup.CameraPosition, t),
+                Vector3.Lerp(from.Target, setup.CameraTarget, t),
+                Vector3.Normalize(Vector3.Lerp(from.Up, setup.CameraUp, t))
+            );
+        }
+        else
+        {
+            _cameraFrom = null;
+        }
+
+        _camera = (setup.CameraPosition, setup.CameraTarget, setup.CameraUp);
+        return setup;
+    }
+
+    private List<Particle> Particles(MiiRealtimeFrameSetup setup)
+    {
+        if (setup.Female != _particleStagesFemale)
+        {
+            _particleStagesFemale = setup.Female;
+            _particleStages.Clear();
+        }
+
+        _particleBodyScale = setup.BodyScale;
+        _particleColor = new Vector3(setup.BodyColor.X, setup.BodyColor.Y, setup.BodyColor.Z);
+        _particles.Clear();
+        _player.CollectParticles(ParticleStage, _particles);
+        return _particles.Count == 0 ? [] : _particles.ToList();
+    }
+
+    private RigParticleStage ParticleStage(MiiAnimation clip)
+    {
+        if (!_particleStages.TryGetValue(clip, out var stage))
+        {
+            if (_particleStages.Count > 16)
+                _particleStages.Clear();
+            _particleStages[clip] = stage = new RigParticleStage(
+                clip,
+                _ => RigFor(_particleStagesFemale),
+                _ => _particleBodyScale,
+                _ => _particleColor
+            );
+        }
+
+        return stage;
     }
 
     private MiiRig RigFor(Mii mii) => RigFor(mii.IsGirl);
@@ -368,8 +548,15 @@ public sealed class MiiRealtimeView : OpenGlControlBase
 
     private static string HeadKey(string studio, MiiExpression expression) => $"{studio}|{(int)expression}";
 
-    private IEnumerable<MiiExpression> UsedExpressions() =>
-        _animation?.TryGetCurve(TrackId.Expression)?.Keys.Select(k => MiiExpressionInfo.FromValue(k.Value)).Distinct() ?? [];
+    private IEnumerable<MiiExpression> UsedExpressions()
+    {
+        var used = new HashSet<MiiExpression>(_preloadedExpressions);
+        if (_animation is { } animation)
+            used.UnionWith(MiiAnimationPlayer.ExpressionsOf(animation));
+        if (_player.Current is { } current)
+            used.UnionWith(MiiAnimationPlayer.ExpressionsOf(current));
+        return used;
+    }
 
     /// <summary>Builds a head in the background (one at a time so the UI stays smooth).</summary>
     private void RequestHead(string studio, MiiExpression expression)
