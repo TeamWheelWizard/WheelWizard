@@ -1,0 +1,569 @@
+using System.ComponentModel;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
+using WheelWizard.RrRooms;
+using WheelWizard.WheelWizardData.ViewModels;
+
+namespace WheelWizard.WheelWizardData.Views;
+
+public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
+{
+    private const int DefaultHistoryDays = 30;
+    private const int lifetimeDays = 999;
+    private const double GraphWidth = 1000;
+    private const double GraphHeight = 260;
+
+    private readonly VrHistoryViewModel _model;
+
+    private bool _isLoading;
+    private string _errorMessage = string.Empty;
+    private string _emptyStateText = "No VR history found for this range yet.";
+    private int _startingVr;
+    private int _endingVr;
+    private int _totalChange;
+    private int _biggestGain;
+    private int _biggestDrop;
+    private int _entriesCount;
+    private string _dateRangeText = string.Empty;
+    private bool _hasData;
+    private int _reloadVersion;
+    private bool _isInitializingDaysDropdown;
+    private int _selectedHistoryDays = DefaultHistoryDays;
+    private bool _useMatchesAsXAxis;
+    private RwfcPlayerVrHistoryResponse? _lastHistoryResponse;
+    private Geometry? _graphPath;
+    private Geometry? _graphAreaPath;
+    private string _graphStartLabel = string.Empty;
+    private string _graphMidLabel = string.Empty;
+    private string _graphEndLabel = string.Empty;
+    private string _graphMaxVrText = "--";
+    private string _graphMinVrText = "--";
+
+    public static readonly StyledProperty<string?> FriendCodeProperty = AvaloniaProperty.Register<VrHistoryGraph, string?>(
+        nameof(FriendCode),
+        string.Empty
+    );
+
+    static VrHistoryGraph()
+    {
+        FriendCodeProperty.Changed.AddClassHandler<VrHistoryGraph>((graph, _) => graph.TriggerHistoryReload());
+    }
+
+    public bool UseMatchesAsXAxis
+    {
+        get => _useMatchesAsXAxis;
+        set
+        {
+            if (_useMatchesAsXAxis == value)
+                return;
+
+            _useMatchesAsXAxis = value;
+            OnPropertyChanged(nameof(UseMatchesAsXAxis));
+
+            if (_lastHistoryResponse != null)
+                ApplyHistoryData(_lastHistoryResponse, _selectedHistoryDays);
+        }
+    }
+
+    public string? FriendCode
+    {
+        get => GetValue(FriendCodeProperty);
+        set => SetValue(FriendCodeProperty, value);
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set
+        {
+            _isLoading = value;
+            OnPropertyChanged(nameof(IsLoading));
+            OnPropertyChanged(nameof(ShowNoDataState));
+        }
+    }
+
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set
+        {
+            _errorMessage = value;
+            OnPropertyChanged(nameof(ErrorMessage));
+            OnPropertyChanged(nameof(HasError));
+            OnPropertyChanged(nameof(ShowNoDataState));
+        }
+    }
+
+    public string EmptyStateText
+    {
+        get => _emptyStateText;
+        set
+        {
+            _emptyStateText = value;
+            OnPropertyChanged(nameof(EmptyStateText));
+        }
+    }
+
+    public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
+
+    public int StartingVr
+    {
+        get => _startingVr;
+        set
+        {
+            _startingVr = value;
+            OnPropertyChanged(nameof(StartingVr));
+        }
+    }
+
+    public int EndingVr
+    {
+        get => _endingVr;
+        set
+        {
+            _endingVr = value;
+            OnPropertyChanged(nameof(EndingVr));
+        }
+    }
+
+    public int TotalChange
+    {
+        get => _totalChange;
+        set
+        {
+            _totalChange = value;
+            OnPropertyChanged(nameof(TotalChange));
+            OnPropertyChanged(nameof(TotalChangeText));
+            OnPropertyChanged(nameof(IsTotalChangeGain));
+            OnPropertyChanged(nameof(IsTotalChangeLoss));
+            OnPropertyChanged(nameof(IsTotalChangeNeutral));
+        }
+    }
+
+    public int BiggestGain
+    {
+        get => _biggestGain;
+        set
+        {
+            _biggestGain = value;
+            OnPropertyChanged(nameof(BiggestGain));
+            OnPropertyChanged(nameof(BiggestGainText));
+        }
+    }
+
+    public int BiggestDrop
+    {
+        get => _biggestDrop;
+        set
+        {
+            _biggestDrop = value;
+            OnPropertyChanged(nameof(BiggestDrop));
+            OnPropertyChanged(nameof(BiggestDropText));
+        }
+    }
+
+    public int EntriesCount
+    {
+        get => _entriesCount;
+        set
+        {
+            _entriesCount = value;
+            OnPropertyChanged(nameof(EntriesCount));
+        }
+    }
+
+    public string DateRangeText
+    {
+        get => _dateRangeText;
+        set
+        {
+            _dateRangeText = value;
+            OnPropertyChanged(nameof(DateRangeText));
+        }
+    }
+
+    public bool HasData
+    {
+        get => _hasData;
+        set
+        {
+            _hasData = value;
+            OnPropertyChanged(nameof(HasData));
+            OnPropertyChanged(nameof(ShowNoDataState));
+        }
+    }
+
+    public Geometry? GraphPath
+    {
+        get => _graphPath;
+        set
+        {
+            _graphPath = value;
+            OnPropertyChanged(nameof(GraphPath));
+        }
+    }
+
+    public Geometry? GraphAreaPath
+    {
+        get => _graphAreaPath;
+        set
+        {
+            _graphAreaPath = value;
+            OnPropertyChanged(nameof(GraphAreaPath));
+        }
+    }
+
+    public string GraphStartLabel
+    {
+        get => _graphStartLabel;
+        set
+        {
+            _graphStartLabel = value;
+            OnPropertyChanged(nameof(GraphStartLabel));
+        }
+    }
+
+    public string GraphMidLabel
+    {
+        get => _graphMidLabel;
+        set
+        {
+            _graphMidLabel = value;
+            OnPropertyChanged(nameof(GraphMidLabel));
+        }
+    }
+
+    public string GraphEndLabel
+    {
+        get => _graphEndLabel;
+        set
+        {
+            _graphEndLabel = value;
+            OnPropertyChanged(nameof(GraphEndLabel));
+        }
+    }
+
+    public string GraphMaxVrText
+    {
+        get => _graphMaxVrText;
+        set
+        {
+            _graphMaxVrText = value;
+            OnPropertyChanged(nameof(GraphMaxVrText));
+        }
+    }
+
+    public string GraphMinVrText
+    {
+        get => _graphMinVrText;
+        set
+        {
+            _graphMinVrText = value;
+            OnPropertyChanged(nameof(GraphMinVrText));
+        }
+    }
+
+    public bool ShowNoDataState => !IsLoading && !HasError && !HasData;
+
+    public string TotalChangeText => FormatSignedValue(TotalChange);
+
+    public string BiggestGainText => FormatSignedValue(BiggestGain);
+
+    public string BiggestDropText => FormatSignedValue(BiggestDrop);
+
+    public bool IsTotalChangeGain => TotalChange > 0;
+
+    public bool IsTotalChangeLoss => TotalChange < 0;
+
+    public bool IsTotalChangeNeutral => TotalChange == 0;
+
+    public VrHistoryGraph(VrHistoryViewModel model)
+    {
+        _model = model;
+        InitializeComponent();
+        PopulateHistoryDaysDropdown();
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _model.PropertyChanged += Model_OnPropertyChanged;
+        TriggerHistoryReload();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        ++_reloadVersion;
+        _model.PropertyChanged -= Model_OnPropertyChanged;
+        _model.CancelPending();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void PopulateHistoryDaysDropdown()
+    {
+        _isInitializingDaysDropdown = true;
+        HistoryDaysDropdown.Items.Clear();
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(1, t("time.last_24_hours")));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(7, t("time.last_7_days")));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(30, t("time.last_30_days")));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(60, t("time.last_60_days")));
+        HistoryDaysDropdown.Items.Add(new HistoryDaysOption(999, t("time.lifetime"))); // i think this option could make sense
+
+        foreach (var item in HistoryDaysDropdown.Items.OfType<HistoryDaysOption>())
+        {
+            if (item.Days != DefaultHistoryDays)
+                continue;
+
+            HistoryDaysDropdown.SelectedItem = item;
+            break;
+        }
+
+        _isInitializingDaysDropdown = false;
+    }
+
+    private void TriggerHistoryReload()
+    {
+        if (!this.IsAttachedToVisualTree())
+            return;
+
+        var reloadVersion = Interlocked.Increment(ref _reloadVersion);
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                if (reloadVersion != _reloadVersion || !this.IsAttachedToVisualTree())
+                    return;
+
+                _ = ReloadHistoryAsync();
+            },
+            DispatcherPriority.Background
+        );
+    }
+
+    private Task ReloadHistoryAsync() => _model.LoadAsync(FriendCode, _selectedHistoryDays);
+
+    private void Model_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        IsLoading = _model.IsLoading;
+        ErrorMessage = _model.Error?.Message ?? string.Empty;
+        if (IsLoading)
+            return;
+        if (!_model.HasFriendCode)
+        {
+            SetNoFriendCodeState();
+            return;
+        }
+        if (_model.History is { } history)
+            ApplyHistoryData(history, _model.HistoryDays);
+        else
+        {
+            HasData = false;
+            ResetGraph();
+            ErrorMessage = _model.Error?.Message ?? t("message_error.failed_vr_history");
+        }
+    }
+
+    private void SetNoFriendCodeState()
+    {
+        IsLoading = false;
+        ErrorMessage = string.Empty;
+        HasData = false;
+        EmptyStateText = t("empty_content.no_vr_history");
+        DateRangeText = string.Empty;
+        StartingVr = 0;
+        EndingVr = 0;
+        TotalChange = 0;
+        BiggestGain = 0;
+        BiggestDrop = 0;
+        EntriesCount = 0;
+        ResetGraph();
+    }
+
+    private void ApplyHistoryData(RwfcPlayerVrHistoryResponse historyResponse, int days)
+    {
+        _lastHistoryResponse = historyResponse;
+        EmptyStateText = t("empty_content.no_vr_history_range");
+        StartingVr = historyResponse.StartingVr;
+        EndingVr = historyResponse.EndingVr;
+        TotalChange = historyResponse.TotalVrChange;
+
+        var orderedByDate = historyResponse.History.OrderBy(entry => entry.Date).ToList();
+        EntriesCount = orderedByDate.Count;
+
+        var gains = orderedByDate.Where(entry => entry.VrChange > 0).Select(entry => entry.VrChange).DefaultIfEmpty(0);
+        var losses = orderedByDate.Where(entry => entry.VrChange < 0).Select(entry => entry.VrChange).DefaultIfEmpty(0);
+        BiggestGain = gains.Max();
+        BiggestDrop = losses.Min();
+
+        string dateFormat = (historyResponse.FromDate.Year != historyResponse.ToDate.Year) ? "MMM d, yyyy" : "MMM d"; // to consider if you want to show the year if it goes over
+        var fromDate = historyResponse.FromDate.ToLocalTime().ToString(dateFormat);
+        var toDate = historyResponse.ToDate.ToLocalTime().ToString("MMM d"); // also if you wanna only show the year from the old date since the current one is always now
+        DateRangeText =
+            days == lifetimeDays
+                ? t("time.lifetime_history")
+                : t(
+                    "time.past_n_days_with_range",
+                    new
+                    {
+                        days = days,
+                        fromDate = fromDate,
+                        toDate = toDate,
+                    }
+                );
+        // also suggestion to add a vr peak
+
+        if (orderedByDate.Count == 0)
+        {
+            HasData = false;
+            ResetGraph();
+            return;
+        }
+
+        var graphStart = orderedByDate[0].Date;
+        var graphEnd = orderedByDate[^1].Date;
+        var totalSeconds = Math.Max(1, (graphEnd - graphStart).TotalSeconds);
+
+        var minVr = orderedByDate.Min(entry => entry.TotalVr);
+        var maxVr = orderedByDate.Max(entry => entry.TotalVr);
+        var vrRange = Math.Max(1, maxVr - minVr);
+
+        GraphMinVrText = minVr.ToString("N0");
+        GraphMaxVrText = maxVr.ToString("N0");
+
+        if (UseMatchesAsXAxis)
+        {
+            var match = t("attribute.match");
+            GraphStartLabel = $"{match} 1";
+            GraphMidLabel = $"{match} {(orderedByDate.Count / 2) + 1}";
+            GraphEndLabel = $"{match} {orderedByDate.Count}";
+        }
+        else
+        {
+            var labelFormat = days >= 7 ? "MMM d" : "MMM d HH:mm";
+            GraphStartLabel = graphStart.ToLocalTime().ToString(labelFormat);
+            GraphMidLabel = graphStart.AddSeconds(totalSeconds / 2).ToLocalTime().ToString(labelFormat);
+            GraphEndLabel = graphEnd.ToLocalTime().ToString(labelFormat);
+        }
+
+        var points = orderedByDate
+            .Select(
+                (entry, i) =>
+                {
+                    double x;
+                    if (UseMatchesAsXAxis)
+                    {
+                        x = orderedByDate.Count > 1 ? (double)i / (orderedByDate.Count - 1) * GraphWidth : 0;
+                    }
+                    else
+                    {
+                        var seconds = (entry.Date - graphStart).TotalSeconds;
+                        x = seconds / totalSeconds * GraphWidth;
+                    }
+
+                    var y = GraphHeight - (entry.TotalVr - minVr) / (double)vrRange * GraphHeight;
+                    return new Point(x, y);
+                }
+            )
+            .ToList();
+
+        GraphPath = BuildLineGeometry(points);
+        GraphAreaPath = BuildAreaGeometry(points);
+        HasData = points.Count > 0;
+    }
+
+    private void ResetGraph()
+    {
+        _lastHistoryResponse = null;
+        GraphPath = null;
+        GraphAreaPath = null;
+        GraphStartLabel = string.Empty;
+        GraphMidLabel = string.Empty;
+        GraphEndLabel = string.Empty;
+        GraphMaxVrText = "--";
+        GraphMinVrText = "--";
+    }
+
+    private static Geometry? BuildLineGeometry(IReadOnlyList<Point> points)
+    {
+        if (points.Count == 0)
+            return null;
+
+        var figure = new PathFigure
+        {
+            StartPoint = points[0],
+            IsFilled = false,
+            IsClosed = false,
+            Segments = [],
+        };
+
+        for (var i = 1; i < points.Count; i++)
+            figure.Segments.Add(new LineSegment { Point = points[i] });
+
+        var geometry = new PathGeometry { Figures = [] };
+        geometry.Figures.Add(figure);
+        return geometry;
+    }
+
+    private static Geometry? BuildAreaGeometry(IReadOnlyList<Point> points)
+    {
+        if (points.Count == 0)
+            return null;
+
+        var figure = new PathFigure
+        {
+            StartPoint = new Point(0, GraphHeight),
+            IsFilled = true,
+            IsClosed = true,
+            Segments = [],
+        };
+
+        foreach (var point in points)
+            figure.Segments.Add(new LineSegment { Point = point });
+
+        figure.Segments.Add(new LineSegment { Point = new Point(GraphWidth, GraphHeight) });
+
+        var geometry = new PathGeometry { Figures = [] };
+        geometry.Figures.Add(figure);
+        return geometry;
+    }
+
+    private void HistoryDaysDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializingDaysDropdown)
+            return;
+
+        if (HistoryDaysDropdown.SelectedItem is not HistoryDaysOption option)
+            return;
+
+        if (_selectedHistoryDays == option.Days)
+            return;
+
+        _selectedHistoryDays = option.Days;
+        TriggerHistoryReload();
+    }
+
+    private static string FormatSignedValue(int value)
+    {
+        if (value > 0)
+            return $"+{value:N0}";
+
+        return value.ToString("N0");
+    }
+
+    public new event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+public sealed class HistoryDaysOption(int days, string label)
+{
+    public int Days { get; } = days;
+    public string Label { get; } = label;
+
+    public override string ToString() => Label;
+}

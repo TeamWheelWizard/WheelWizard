@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             x:Class="WheelWizard.WiiManagement.MiiManagement.Views.Dialogs.MiiEditor.EditorFacialHair">
+    <!-- FOR EVERY EDITOR PAGE -->
+    <Grid RowDefinitions="40,*">
+        <!-- Updated Title -->
+        <TextBlock Classes="BodyText" Margin="10" Text="{loc:T attribute.mii_section.facial_hair}" HorizontalAlignment="Right" />
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
+        <components:LinkButton Grid.Row="0" Text="{loc:T action.back}" IconData="{StaticResource ArrowLeft}"
+                                    Click="BackButton_OnClick" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"
+                                    Foreground="{StaticResource TitleTextColor}" FontSize="16"
+                                    HoverForeground="{StaticResource Primary200}"/>
+
+        <!-- END OF EVERY EDITOR PAGE -->
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Spacing="15">
+                <!-- The list of elements you want to edit in this page -->
+
+                <StackPanel> <!-- Hair Color -->
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.hair_color}"/>
+                    <UniformGrid Columns="5" x:Name="HairColorGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
+                </StackPanel>
+
+
+                <StackPanel> <!-- Mustache Type -->
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.mustache_type}"/>
+                    <UniformGrid Columns="5" x:Name="MustacheTypesGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
+                </StackPanel>
+                
+                <StackPanel x:Name="MustacheTransformOptions">
+                     <!-- Vertical Position (Up/Down) -->
+                    <StackPanel>
+                        <components:FormFieldLabel Text="{loc:T attribute.mii.mustache_vertical_position}"/>
+                        <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                <components:Button x:Name="VerticalDecreaseButton" IconData="{StaticResource ArrowUp}" IconSize="14" Padding="4" Click="VerticalDecrease_Click" />
+                                <TextBlock x:Name="VerticalValueText" Classes="BodyText" MinWidth="30" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                <components:Button x:Name="VerticalIncreaseButton" IconData="{StaticResource  ArrowDown}" IconSize="14" Padding="4"  Click="VerticalIncrease_Click"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Size (Zoom In/Out) -->
+                    <StackPanel>
+                        <components:FormFieldLabel Text="{loc:T attribute.mii.mustache_size}"/>
+                        <Border Background="{StaticResource Neutral950}" CornerRadius="6" Padding="2" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                <components:Button x:Name="SizeDecreaseButton" IconData="{StaticResource MinMark}" IconSize="14" Padding="4" Click="SizeDecrease_Click"/>
+                                <TextBlock x:Name="SizeValueText" Classes="BodyText" MinWidth="30" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                <components:Button x:Name="SizeIncreaseButton" IconData="{StaticResource  PlusMark}" IconSize="14" Padding="4" Click="SizeIncrease_Click"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+                
+                <StackPanel> <!-- Beard Type -->
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.beard_type}"/>
+                    <UniformGrid Columns="5" x:Name="BeardTypesGrid">
+                        <!-- Generated elements -->
+                    </UniformGrid>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>

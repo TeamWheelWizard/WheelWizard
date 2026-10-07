@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using WheelWizard.Shared.Polling;
-using WheelWizard.Views.Diagnostics;
+using WheelWizard.Views.DesignTime.Diagnostics;
 
 namespace WheelWizard.Test.Shared.Polling;
 

@@ -199,12 +199,11 @@ public class MultiColoredIcon : TemplatedControl
                 continue;
 
             // From here we know that the color is indeed a template color
-            var newColorProperty = GetType().GetProperty($"Color{i}");
-            var propertyValue = newColorProperty?.GetValue(this);
+            var propertyValue = GetValue(PaletteProperties[i - 1]);
             if (propertyValue == null)
                 return UndefinedColorsTransparent ? Brushes.Transparent : originalBrush;
 
-            return (IBrush)propertyValue;
+            return propertyValue;
         }
         return originalBrush;
     }
@@ -213,7 +212,27 @@ public class MultiColoredIcon : TemplatedControl
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property != ProcessedIconDataProperty)
+        if (
+            change.Property == IconDataProperty
+            || change.Property == UndefinedColorsTransparentProperty
+            || PaletteProperties.Contains(change.Property)
+        )
             UpdateDrawingColors();
     }
+
+    private static readonly StyledProperty<IBrush?>[] PaletteProperties =
+    [
+        Color1Property,
+        Color2Property,
+        Color3Property,
+        Color4Property,
+        Color5Property,
+        Color6Property,
+        Color7Property,
+        Color8Property,
+        Color9Property,
+        Color10Property,
+        Color11Property,
+        Color12Property,
+    ];
 }

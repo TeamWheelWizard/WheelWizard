@@ -1,0 +1,329 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:animation="clr-namespace:Avalonia.Animation;assembly=Avalonia.Base"
+             xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+             x:Class="WheelWizard.WheelWizardData.Views.UserProfilePage"
+             x:DataType="community:UserProfilePage"
+        xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
+        xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
+    <UserControl.Styles>
+        <Style Selector="Border.carouselDot">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="CornerRadius" Value="9999" />
+            <Setter Property="Background" Value="{StaticResource Neutral500}" />
+            <Setter Property="Opacity" Value="0.75" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Width" Duration="0:0:0.2" Easing="CircularEaseOut" />
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2" Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.carouselDot.active">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="Background" Value="{StaticResource Primary300}" />
+        </Style>
+        <Style Selector="Border.profileStatCard">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10" />
+        </Style>
+        <Style Selector="RadioButton.ProfileSelector">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="PART_ProfileSelectorBackground"
+                                Padding="10,6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent"
+                                BorderThickness="0"
+                                CornerRadius="0"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <TextBlock x:Name="PART_ProfileSelectorText"
+                                       Text="{TemplateBinding Content}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       FontWeight="{TemplateBinding FontWeight}"
+                                       TextAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style Selector="^:pointerover /template/ TextBlock#PART_ProfileSelectorText">
+                <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+            </Style>
+
+            <Style Selector="^[IsChecked=True] /template/ Border#PART_ProfileSelectorBackground">
+                <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            </Style>
+            <Style Selector="^[IsChecked=True] /template/ TextBlock#PART_ProfileSelectorText">
+                <Setter Property="Foreground" Value="White" />
+            </Style>
+
+            <Style Selector="^.First /template/ Border#PART_ProfileSelectorBackground">
+                <Setter Property="CornerRadius" Value="4,0,0,4" />
+            </Style>
+            <Style Selector="^.Last /template/ Border#PART_ProfileSelectorBackground">
+                <Setter Property="CornerRadius" Value="0,4,4,0" />
+            </Style>
+
+            <Style Selector="^[IsEnabled=False] /template/ TextBlock#PART_ProfileSelectorText">
+                <Setter Property="FontStyle" Value="Italic" />
+            </Style>
+            <Style Selector="^[IsEnabled=False]:pointerover /template/ Border#PART_ProfileSelectorBackground">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+            <Style Selector="^[IsEnabled=False]:pointerover /template/ TextBlock#PART_ProfileSelectorText">
+                <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+            </Style>
+        </Style>
+    </UserControl.Styles>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <!-- This is the total height as the (Title + infoSection) - (padding) -->
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <TextBlock Grid.Row="0" Text="{loc:T page_title.my_profiles}" HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Classes="PageTitleText" />
+
+        <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="18" Height="18" Margin="10,0,10,12"
+                    ToolTip.Tip="{loc:T hover.region_user_selection}" ToolTip.Placement="Top"
+                    ToolTip.ShowDelay="20">
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
+            </Border>
+            <ComboBox x:Name="RegionDropdown" Margin="3,0,0,10" MinWidth="160"
+                      HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,*">
+            <Border Grid.Row="0" Margin="0,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                    Background="{StaticResource Neutral900}" BorderThickness="1"
+                    CornerRadius="{StaticResource GlobalCornerRadius}"
+                    BorderBrush="{StaticResource Neutral900}" x:Name="CurrentUserProfile" ClipToBounds="true">
+                <Grid Margin="10" RowDefinitions="Auto,216,Auto" ClipToBounds="False">
+                    <Border Grid.Row="0"
+                            Margin="0,0,5,8"
+                            BorderBrush="{StaticResource Neutral600}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Background="{StaticResource Neutral950}"
+                            ClipToBounds="True">
+                        <UniformGrid Columns="4" x:Name="RadioButtons">
+                            <!-- DON'T ADD ANYTHING TO THIS PANEL OR YOU WILL RUIN THE LAYOUT -->
+                            <!-- WE ARE LAZY IN THE CODE, AND SO WE USE CHILD INDEXING TO GET THE RADIO BUTTONS -->
+                            <RadioButton Classes="ProfileSelector First"
+                                         Click="TopBarRadio_OnClick" Tag="0"
+                                         x:Name="Mii0" Content="{loc:T state.no_license}"
+                                         IsChecked="True" IsEnabled="False" />
+                            <RadioButton Classes="ProfileSelector"
+                                         Click="TopBarRadio_OnClick" Tag="1"
+                                         x:Name="Mii1" Content="{loc:T state.no_license}"
+                                         IsEnabled="False" />
+                            <RadioButton Classes="ProfileSelector"
+                                         Click="TopBarRadio_OnClick" Tag="2"
+                                         x:Name="Mii2" Content="{loc:T state.no_license}"
+                                         IsEnabled="False" />
+                            <RadioButton Classes="ProfileSelector Last"
+                                         Click="TopBarRadio_OnClick" Tag="3"
+                                         x:Name="Mii3" Content="{loc:T state.no_license}"
+                                         IsEnabled="False" />
+                        </UniformGrid>
+                    </Border>
+
+                    <!-- BACKGROUND & COLOR TRANSITION -->
+                    <Border Grid.Row="1" CornerRadius="99999"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
+                            IsVisible="{Binding IsOnline}" Height="200" Width="230"
+                            Background="{StaticResource Primary200}" Effect="blur(250)">
+                        <Border.Styles>
+                            <Style Selector="Border">
+                                <Style.Animations>
+                                    <Animation Duration="0:0:5" IterationCount="INFINITE">
+                                        <KeyFrame Cue="0%">
+                                            <Setter Property="RotateTransform.Angle" Value="0" />
+                                        </KeyFrame>
+                                        <KeyFrame Cue="100%">
+                                            <Setter Property="RotateTransform.Angle" Value="360" />
+                                        </KeyFrame>
+                                    </Animation>
+                                </Style.Animations>
+                            </Style>
+                        </Border.Styles>
+                    </Border>
+
+                    <Border Grid.Row="1" BorderBrush="{StaticResource Neutral600}"
+                            BorderThickness="1" Margin="0,0,5,10" CornerRadius="4" x:Name="PART_HeadBorderFace"
+                            Background="{StaticResource Neutral950}">
+                        <Grid>
+                            <miiImages:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                     LowQualitySpeedup="True"
+                                                     Mii="{Binding CurrentMii}"
+                                                     FallBackColor="{StaticResource Neutral700}"
+                                                     ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
+
+                            <StackPanel Margin="7" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <StackPanel Orientation="Horizontal">
+                                    <SelectableTextBlock Classes="TitleText" x:Name="ProfileAttribUserName" />
+                                    <components:LinkButton VerticalAlignment="Center" x:Name="EditMiiName"
+                                                                IconData="{StaticResource Pen}"
+                                                                Click="RenameMii_OnClick"
+                                                                Margin="7,0,0,0" IconSize="20"
+                                                                Foreground="{StaticResource Neutral500}"
+                                                                HoverForeground="{StaticResource Neutral400}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribFriendCode" />
+                                    <components:LinkButton VerticalAlignment="Center" x:Name="CopyFcButton"
+                                                                Click="CopyFriendCode_OnClick"
+                                                                IconData="{StaticResource Copy}"
+                                                                Margin="7,0,0,0" IconSize="20"
+                                                                Foreground="{StaticResource Neutral500}"
+                                                                HoverForeground="{StaticResource Neutral400}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <components:Button VerticalAlignment="Top" HorizontalAlignment="Right" Margin="6"
+                                               IconData="{StaticResource Shirt}" Click="OpenMiiSelector_Click"
+                                               IconSize="20" Padding="8" CornerRadius="9999" />
+
+                            <components:Button VerticalAlignment="Top" HorizontalAlignment="Right" Margin="6,46,6,0"
+                                               x:Name="ViewRoomButton"
+                                               IsVisible="{Binding HasCurrentUserRoom}"
+                                               Click="ViewRoom_OnClick"
+                                               IconData="{StaticResource Road}" IconSize="18"
+                                               Width="36" Height="36" Padding="0" CornerRadius="9999"
+                                               Background="{StaticResource Primary500}" Foreground="{StaticResource Primary50}" />
+
+                            <RadioButton Margin="8,0,0,8" x:Name="PrimaryCheckBox"
+                                         HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                         IsCheckedChanged="CheckBox_SetPrimaryUser" Classes="CheckBox">
+                                <components:FormFieldLabel Margin="0,2,0,0" Text="{loc:T option.make_primary}"
+                                                           TipText="{loc:T hover.primary_profile}" />
+                            </RadioButton>
+
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" Margin="10,0,10,8"
+                                          VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                                <StackPanel Orientation="Horizontal" x:Name="BadgeContainer" Spacing="3" />
+                            </ScrollViewer>
+
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2" x:Name="CarouselNavigation" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          Margin="0,2,0,2" ColumnDefinitions="Auto,Auto,Auto" IsVisible="{Binding HasProfileInfo}">
+                        <components:Button Grid.Column="0" IconData="{StaticResource ArrowLeft}" IconSize="12"
+                                           Width="26" Height="26" Padding="0" Variant="Light"
+                                           VerticalAlignment="Center" Margin="0,0,8,0"
+                                           Click="PrevCarouselPage_OnClick" />
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" Spacing="6">
+                            <Border x:Name="CarouselDot0" Classes="carouselDot active" />
+                            <Border x:Name="CarouselDot1" Classes="carouselDot" />
+                        </StackPanel>
+
+                        <components:Button Grid.Column="2" IconData="{StaticResource ArrowRight}" IconSize="12"
+                                           Width="26" Height="26" Padding="0" Variant="Light"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"
+                                           Click="NextCarouselPage_OnClick" />
+                    </Grid>
+                </Grid>
+
+            </Border>
+
+            <Grid Grid.Row="1" x:Name="ProfileCarouselContainer" Margin="0,14,0,0">
+                <Carousel x:Name="ProfileInfoCarousel"
+                          SelectedIndex="{Binding ActiveInfoSlideIndex, Mode=TwoWay}">
+                    <Carousel.PageTransition>
+                        <animation:CompositePageTransition>
+                            <animation:PageSlide Duration="0:0:0.25" Orientation="Horizontal" />
+                            <animation:CrossFade Duration="0:0:0.25" />
+                        </animation:CompositePageTransition>
+                    </Carousel.PageTransition>
+                    <Carousel.Items>
+                        <Border Background="Transparent" BorderThickness="0" Padding="0">
+                            <ContentControl x:Name="HistoryHost" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                        </Border>
+
+                        <Border Background="Transparent" BorderThickness="0">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                                    <Border Grid.Column="0" Grid.Row="0" Classes="profileStatCard" Margin="0,0,4,4">
+                                        <StackPanel>
+                                            <components:FormFieldLabel Text="{loc:T attribute.vr_abbreviation}"
+                                                                       TipText="{loc:T attribute.vr_full}" />
+                                            <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribVr" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="1" Grid.Row="0" Classes="profileStatCard" Margin="4,0,0,4">
+                                        <StackPanel>
+                                            <components:FormFieldLabel Text="{loc:T attribute.br_abbreviation}"
+                                                                       TipText="{loc:T attribute.br_full}" />
+                                            <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribBr" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="0" Grid.Row="1" Classes="profileStatCard" Margin="0,4,4,0">
+                                        <StackPanel>
+                                            <components:FormFieldLabel Text="{loc:T attribute.total_games_won}" />
+                                            <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribTotalWins" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="1" Grid.Row="1" Classes="profileStatCard" Margin="4,4,0,0">
+                                        <StackPanel>
+                                            <components:FormFieldLabel Text="{loc:T attribute.total_games_played}" />
+                                            <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribTotalRaces" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <Grid Background="Transparent">
+                                <miiImages:Mii3DRender VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                                      Mii="{Binding CurrentMii}"
+                                                      Margin="0,0,0,15"
+                                                      ImageVariant="{x:Static miiVars:MiiImageVariants.FullBodyCarousel}"
+                                                      x:Name="CurrentUserCarousel" Height="250" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Carousel.Items>
+                </Carousel>
+            </Grid>
+
+            <!-- repurposing the common state text -->
+            <components:EmptyPageInfo Grid.RowSpan="2" x:Name="NoProfilesInfo"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Title="{loc:T state.no_profiles}"
+                                      BodyText="{loc:T empty_content.no_profiles}" />
+        </Grid>
+    </Grid>
+</UserControl>

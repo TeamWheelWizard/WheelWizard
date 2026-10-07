@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="520"
+             x:Class="WheelWizard.Views.DesignTime.KitchenSink.KitchenSinkInputFieldsPage"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <StackPanel Spacing="12">
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="Standard Input Field" />
+            <TextBox Width="320" PlaceholderText="Enter text here..." />
+            <TextBox Width="320" Classes="dark" PlaceholderText="Enter text here... (dark)" />
+            <TextBox Width="320" Text="Read-only example" IsReadOnly="True" />
+            <TextBox Width="320" PlaceholderText="Disabled input field" IsEnabled="False" />
+            <TextBox Width="320" Classes="dark" PlaceholderText="Disabled dark input field" IsEnabled="False" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Classes="TinyText" Text="Labeled Text Field" />
+            <components:TextField Width="320"
+                                          Label="Display Name"
+                                          TipText="This is the reusable labeled input with inline validation feedback."
+                                          PlaceholderText="Enter display name..."
+                                          Text="PlayerOne"
+                                          ErrorText="This name is already in use." />
+            <components:TextField Width="320"
+                                          Label="Display Name (Dark)"
+                                          Variant="Dark"
+                                          PlaceholderText="Enter display name..."
+                                          Text="PlayerOne"
+                                          ErrorText="This name is already in use." />
+            <components:TextField Width="320"
+                                          Label="Optional Note"
+                                          PlaceholderText="Optional..."
+                                          Text="Disabled text field"
+                                          IsEnabled="False" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

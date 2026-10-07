@@ -1,0 +1,158 @@
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Media;
+using WheelWizard.CustomCharacters;
+using WheelWizard.Views.Dialogs;
+using WheelWizard.Views.Shell;
+using WheelWizard.WiiManagement.MiiManagement;
+using WheelWizard.WiiManagement.MiiManagement.Domain;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+
+namespace WheelWizard.WiiManagement.MiiManagement.Views.Dialogs.MiiEditor;
+
+public partial class EditorGeneral : MiiEditorBaseControl
+{
+    private ICustomCharactersService CustomCharacters { get; }
+
+    private bool _hasMiiNameError;
+    private bool _hasCreatorNameError;
+
+    public EditorGeneral(ICustomCharactersService customCharacters, MiiEditorWindow ew)
+        : base(ew)
+    {
+        CustomCharacters = customCharacters;
+        InitializeComponent();
+        PopulateValues();
+    }
+
+    private void PopulateValues()
+    {
+        // random attributes:
+        MiiName.Text = Editor.Mii.Name.ToString();
+        CreatorName.Text = Editor.Mii.CreatorName.ToString();
+        GirlToggle.IsChecked = Editor.Mii.IsGirl;
+        LengthSlider.Value = Editor.Mii.Height.Value;
+        WidthSlider.Value = Editor.Mii.Weight.Value;
+        CreationDateText.Text = Editor.Mii.TryGetCreationDateUtc(out var creationDateUtc)
+            ? $"{creationDateUtc:yyyy-MM-dd HH:mm} UTC"
+            : "Unknown";
+
+        // Favorite color:
+        SetColorButtons(
+            MiiColorMappings.FavoriteColor.Count,
+            FavoriteColorGrid,
+            (index, button) =>
+            {
+                button.IsChecked = index == (int)Editor.Mii.MiiFavoriteColor;
+                button.Color1 = new SolidColorBrush(MiiColorMappings.FavoriteColor[(MiiFavoriteColor)index]);
+                button.Click += (_, _) => SetSkinColor(index);
+            }
+        );
+    }
+
+    protected override void BeforeBack()
+    {
+        // Rather than constantly making a new MiiName, we can also just set it when we return back to the start page
+        if (!_hasMiiNameError)
+            Editor.Mii.Name = new(MiiName.Text);
+        if (!_hasCreatorNameError)
+            Editor.Mii.CreatorName = new(CreatorName.Text);
+
+        Editor.RefreshImage();
+    }
+
+    // We only have to check if it's a female, since if it's not, we already know the other option is going to be the male
+    private void IsGirl_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        Editor.Mii.IsGirl = GirlToggle.IsChecked == true;
+        Editor.RefreshImage();
+    }
+
+    private void Name_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        // MiiName
+        var validationMiiNameResult = ValidateMiiName(null, MiiName.Text);
+        _hasMiiNameError = validationMiiNameResult.IsFailure;
+        MiiName.ErrorText = validationMiiNameResult.Error?.Message ?? "";
+
+        // CreatorName
+        var validationCreatorNameResult = ValidateCreatorName(CreatorName.Text);
+        _hasCreatorNameError = validationCreatorNameResult.IsFailure;
+        CreatorName.ErrorText = validationCreatorNameResult.Error?.Message ?? "";
+    }
+
+    private OperationResult ValidateMiiName(string? _, string newName)
+    {
+        var trimmedName = newName?.Trim() ?? string.Empty;
+        if (trimmedName.Length is > 10 or < 3)
+            return Fail(t("helper_note.name_must_between"));
+
+        return Ok();
+    }
+
+    private OperationResult ValidateCreatorName(string newName)
+    {
+        var trimmedName = newName?.Trim() ?? string.Empty;
+        if (trimmedName.Length > 10)
+            return Fail(t("helper_note.creator_name_less11"));
+
+        return Ok();
+    }
+
+    private void Length_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
+    {
+        var length = (int)LengthSlider.Value;
+        if (length > 127)
+            length = 127;
+        if (length < 0)
+            length = 0;
+        var heightResult = MiiScale.Create((byte)length);
+        if (heightResult.IsFailure)
+        {
+            ViewUtils.ShowSnackbar("Something went wrong while setting the height: " + heightResult.Error.Message);
+            return;
+        }
+        Editor.Mii.Height = heightResult.Value;
+        Editor.RefreshImage();
+    }
+
+    private void Width_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
+    {
+        var width = (int)WidthSlider.Value;
+        if (width > 127)
+            width = 127;
+        if (width < 0)
+            width = 0;
+        var weightResult = MiiScale.Create((byte)width);
+        if (weightResult.IsFailure)
+        {
+            ViewUtils.ShowSnackbar("Something went wrong while setting the weight: " + weightResult.Error.Message);
+            return;
+        }
+        Editor.Mii.Weight = weightResult.Value;
+        Editor.RefreshImage();
+    }
+
+    private void SetSkinColor(int index)
+    {
+        Editor.Mii.MiiFavoriteColor = (MiiFavoriteColor)index;
+        Editor.RefreshImage();
+    }
+
+    private async void ComplexName_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var textPopup = new TextInputWindow()
+            .SetMainText(t("question.enter_new_name.title"))
+            .SetExtraText(t("question.enter_new_name.extra", new { name = MiiName.Text ?? string.Empty }) ?? string.Empty)
+            .SetCustomCharacters(CustomCharacters.GetCustomCharacters(), initiallyOpen: true)
+            .SetValidation(ValidateMiiName)
+            .SetInitialText(MiiName.Text ?? string.Empty)
+            .SetPlaceholderText(t("placeholder.enter_mii_name"));
+        var newName = await textPopup.ShowDialog();
+
+        if (string.IsNullOrWhiteSpace(newName))
+            return;
+        MiiName.Text = newName;
+    }
+}

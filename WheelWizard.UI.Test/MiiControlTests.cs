@@ -7,10 +7,11 @@ using Avalonia.VisualTree;
 using NSubstitute;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
+using WheelWizard.MiiImages.Views;
 using WheelWizard.MiiRendering.Services;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Calendar;
-using WheelWizard.Views.Patterns;
+using WheelWizard.WheelWizardData.Views;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 

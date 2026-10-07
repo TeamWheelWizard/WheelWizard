@@ -1,4 +1,4 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
+<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:components1="clr-namespace:WheelWizard.Views.Components">
 
@@ -6,10 +6,10 @@
         <Border Padding="20" Background="{StaticResource Neutral950}">
             <StackPanel Spacing="5">
                 <components1:Button Width="150" Text="Default" Variant="Default"/>
-                <components1:Button Width="150" Text="Ugly Light" Variant="UglyLight"/>
-                <!-- Ugly light is not ugly actually, its just because i don't want you to use it unless strictly necessary-->
+                <components1:Button Width="150" Text="Light" Variant="Light"/>
+
                 <components1:Button Width="150" Text="Primary" Variant="Primary"/>
-                <components1:Button Width="150" Text="Compact" Variant="Primary" ButtonSize="Compact"/>
+                <components1:Button Width="150" Text="Compact" Variant="Primary" Size="Compact"/>
                 <components1:Button Width="150" Text="Secondary" Variant="Warning" />
                 <components1:Button Width="150" Text="Danger" Variant="Danger" FontSize="30"/>
                 <components1:Button x:Name="PlayButton"
@@ -33,7 +33,8 @@
     </Design.PreviewWith>
 
     <Style Selector="components1|Button">
-        <!-- Set Defaults -->
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="CornerRadius" Value="{DynamicResource GlobalCornerRadius}" />
@@ -46,20 +47,27 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
-                    <components1:IconLabel
+                    <Grid>
+                    <components1:IconLabel IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNull}}"
                         IconData="{TemplateBinding IconData}"
-                        IconSize="{TemplateBinding IconSize}"
+                        IconSize="{TemplateBinding IconSize}" IsIconLeft="{TemplateBinding IsIconLeft}"
                         Text="{TemplateBinding Text}"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                         Foreground="{TemplateBinding Foreground}"
                     />
+                    <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                        IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    </Grid>
                 </Border>
             </ControlTemplate>
         </Setter>
     </Style>
 
-    <Style Selector="components1|Button.Compact">
+    <Style Selector="components1|Button[Size=Compact]">
         <Setter Property="Height" Value="28" />
         <Setter Property="Padding" Value="10,6" />
         <Setter Property="IconSize" Value="16" />
@@ -74,79 +82,79 @@
     </Style>
 
     <!-- DEFAULT -->
-    <Style Selector="components1|Button.Default">
+    <Style Selector="components1|Button[Variant=Default]">
         <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
         <Setter Property="Background" Value="{StaticResource Neutral700}" />
     </Style>
-    <Style Selector="components1|Button.Default:pointerover">
+    <Style Selector="components1|Button[Variant=Default]:pointerover">
         <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
         <Setter Property="Background" Value="{StaticResource Neutral600}" />
     </Style>
-    <Style Selector="components1|Button.Default:pressed">
+    <Style Selector="components1|Button[Variant=Default]:pressed">
         <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
         <Setter Property="Background" Value="{StaticResource Neutral500}" />
     </Style>
     
     <!-- DANGER -->
-    <Style Selector="components1|Button.Danger">
+    <Style Selector="components1|Button[Variant=Danger]">
         <Setter Property="Foreground" Value="{StaticResource Danger100}" />
         <Setter Property="Background" Value="{StaticResource Danger700}" />
     </Style>
-    <Style Selector="components1|Button.Danger:pointerover">
+    <Style Selector="components1|Button[Variant=Danger]:pointerover">
         <Setter Property="Foreground" Value="{StaticResource Danger50}" />
         <Setter Property="Background" Value="{StaticResource Danger600}" />
     </Style>
-    <Style Selector="components1|Button.Danger:pressed">
+    <Style Selector="components1|Button[Variant=Danger]:pressed">
         <Setter Property="Foreground" Value="{StaticResource Danger50}" />
         <Setter Property="Background" Value="{StaticResource Danger400}" />
     </Style>
     
     <!-- WARNING -->
-    <Style Selector="components1|Button.Warning">
+    <Style Selector="components1|Button[Variant=Warning]">
         <Setter Property="Foreground" Value="{StaticResource Warning100}" />
         <Setter Property="Background" Value="{StaticResource Warning700}" />
     </Style>
-    <Style Selector="components1|Button.Warning:pointerover">
+    <Style Selector="components1|Button[Variant=Warning]:pointerover">
         <Setter Property="Foreground" Value="{StaticResource Warning50}" />
         <Setter Property="Background" Value="{StaticResource Warning600}" />
     </Style>
-    <Style Selector="components1|Button.Warning:pressed">
+    <Style Selector="components1|Button[Variant=Warning]:pressed">
         <Setter Property="Foreground" Value="{StaticResource Warning50}" />
         <Setter Property="Background" Value="{StaticResource Warning500}" />
     </Style>
     
     <!-- PRIMARY -->
-    <Style Selector="components1|Button.Primary">
+    <Style Selector="components1|Button[Variant=Primary]">
         <Setter Property="Foreground" Value="{StaticResource Primary50}" />
         <Setter Property="Background" Value="{StaticResource Primary700}" />
     </Style>
-    <Style Selector="components1|Button.Primary:pointerover">
+    <Style Selector="components1|Button[Variant=Primary]:pointerover">
         <Setter Property="Foreground" Value="{StaticResource Primary50}" />
         <Setter Property="Background" Value="{StaticResource Primary600}" />
     </Style>
-    <Style Selector="components1|Button.Primary:pressed">
+    <Style Selector="components1|Button[Variant=Primary]:pressed">
         <Setter Property="Foreground" Value="{StaticResource Primary50}" />
         <Setter Property="Background" Value="{StaticResource Primary500}" />
     </Style>
     
-    <!-- UGLY LIGHT -->
-    <Style Selector="components1|Button.UglyLight">
+    <!-- LIGHT -->
+    <Style Selector="components1|Button[Variant=Light]">
         <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
         <Setter Property="Background" Value="{StaticResource Neutral500}" />
     </Style>
-    <Style Selector="components1|Button.UglyLight:pointerover">
+    <Style Selector="components1|Button[Variant=Light]:pointerover">
         <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
         <Setter Property="Background" Value="{StaticResource Neutral400}" />
     </Style>
-    <Style Selector="components1|Button.UglyLight:pressed">
+    <Style Selector="components1|Button[Variant=Light]:pressed">
         <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
         <Setter Property="Background" Value="{StaticResource Neutral300}" />
     </Style>
         
-    <Style Selector="components1|Button:disabled /template/ Border">
+    <Style Selector="components1|Button:disabled">
         <Setter Property="Background" Value="{StaticResource Neutral800}" />
     </Style>
-    <Style Selector="components1|Button:disabled /template/ components1|IconLabel">
+    <Style Selector="components1|Button:disabled">
         <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
     </Style>
 </Styles>

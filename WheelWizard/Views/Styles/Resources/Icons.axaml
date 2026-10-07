@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:util="clr-namespace:WheelWizard.Styles.Util">
+                    xmlns:util="clr-namespace:WheelWizard.Views.DesignTime.Controls">
     <Design.PreviewWith>
         <Border Padding="20" Background="#8B91A5">
             <UniformGrid Columns="7">
@@ -75,8 +75,6 @@
 
                 <util:IconExampleComponent IconData="{DynamicResource ChevronUp}" IconName="ChevronUp" />
                 <util:IconExampleComponent IconData="{DynamicResource ChevronDown}" IconName="ChevronDown" />
-                <util:IconExampleComponent IconData="{DynamicResource TableBars}" IconName="TableBars" />
-                <util:IconExampleComponent IconData="{DynamicResource TableBlocks}" IconName="TableBlocks" />
                 <util:IconExampleComponent IconData="{DynamicResource Scroll}" IconName="Scroll" />
 
                 <util:IconExampleComponent IconData="{DynamicResource ArrowSwap}" IconName="ArrowSwap" />
@@ -171,8 +169,8 @@
 
     <StreamGeometry x:Key="ChevronUp">M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z</StreamGeometry>
     <StreamGeometry x:Key="ChevronDown">M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z</StreamGeometry>
-    <StreamGeometry x:Key="TableBars">M0 96C0 60.7 28.7 32 64 32l384 0c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96zm64 0l0 64 64 0 0-64L64 96zm384 0L192 96l0 64 256 0 0-64zM64 224l0 64 64 0 0-64-64 0zm384 0l-256 0 0 64 256 0 0-64zM64 352l0 64 64 0 0-64-64 0zm384 0l-256 0 0 64 256 0 0-64z</StreamGeometry>
-    <StreamGeometry x:Key="TableBlocks">M448 96l0 128-160 0 0-128 160 0zm0 192l0 128-160 0 0-128 160 0zM224 224L64 224 64 96l160 0 0 128zM64 288l160 0 0 128L64 416l0-128zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z</StreamGeometry>
+    <StreamGeometry x:Key="Rows3">M5 3 H19 A2 2 0 0 1 21 5 V19 A2 2 0 0 1 19 21 H5 A2 2 0 0 1 3 19 V5 A2 2 0 0 1 5 3 Z M3 9 H21 M3 15 H21</StreamGeometry>
+    <StreamGeometry x:Key="Grid2x2">M5 3 H19 A2 2 0 0 1 21 5 V19 A2 2 0 0 1 19 21 H5 A2 2 0 0 1 3 19 V5 A2 2 0 0 1 5 3 Z M12 3 V21 M3 12 H21</StreamGeometry>
     <StreamGeometry x:Key="Scroll">M0 80l0 48c0 17.7 14.3 32 32 32l16 0 48 0 0-80c0-26.5-21.5-48-48-48S0 53.5 0 80zM112 32c10 13.4 16 30 16 48l0 304c0 35.3 28.7 64 64 64s64-28.7 64-64l0-5.3c0-32.4 26.3-58.7 58.7-58.7L480 320l0-192c0-53-43-96-96-96L112 32zM464 480c61.9 0 112-50.1 112-112c0-8.8-7.2-16-16-16l-245.3 0c-14.7 0-26.7 11.9-26.7 26.7l0 5.3c0 53-43 96-96 96l176 0 96 0z</StreamGeometry>
 
     <StreamGeometry x:Key="ArrowSwap">M438.6 150.6c12.5-12.5 12.5-32.8 0-45.3l-96-96c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.7 96 32 96C14.3 96 0 110.3 0 128s14.3 32 32 32l306.7 0-41.4 41.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l96-96zm-333.3 352c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 416 416 416c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0 41.4-41.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3l96 96z</StreamGeometry>

@@ -1,0 +1,53 @@
+<dialogBase:PopupContent xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:loc="clr-namespace:WheelWizard.Localization"
+                   x:Class="WheelWizard.Views.Dialogs.TextInputWindow"
+        xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base">
+    <Grid RowDefinitions="Auto,Auto,Auto" Width="400">
+        <StackPanel Grid.Row="0" HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top" Margin="0,10">
+
+            <SelectableTextBlock Classes="TitleText" x:Name="MainTextBlock"
+                                 HorizontalAlignment="Left" TextWrapping="Wrap"
+                                 Foreground="{StaticResource FormFieldLabelColor}"
+                                 FontSize="18" />
+            <SelectableTextBlock Classes="BodyText" x:Name="ExtraTextBlock" FontSize="14"
+                                 TextWrapping="Wrap"
+                                 HorizontalAlignment="Left" Margin="0,10,0,0" />
+
+            <components:TextField x:Name="InputField" PlaceholderText="{loc:T placeholder.enter_text_here}"
+                                          Margin="0,5,0,0" Variant="Default" />
+        </StackPanel>
+
+        <components:LinkButton Grid.Row="1" x:Name="CustomCharsButton"
+                                    Foreground="{StaticResource Primary300}"
+                                    HoverForeground="{StaticResource Primary200}"
+                                    IconData="{StaticResource ArrowDown}"
+                                    IsIconLeft="False"
+                                    IsEnabled="True" Text="{loc:T action.view_custom_chars}" IsVisible="False"
+                                    Click="CustomCharsButton_Click" Margin="0,0,0,5" />
+        <UniformGrid Columns="10" Grid.Row="1" x:Name="CustomChars" IsVisible="False" Margin="0,0,0,5">
+            <!--This will be filled with buttons of all the special chars -->
+        </UniformGrid>
+
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}"
+                Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     x:Name="ButtonContainer" Margin="0,5,0,0">
+            <components:Button x:Name="CancelButton" Variant="Default"
+                               IsEnabled="True" Text="{loc:T action.cancel}"
+                               IconData="{StaticResource XMark}"
+                               Click="CancelButton_Click" Margin="0,0,5,0" />
+            <components:Button x:Name="SubmitButton" Variant="Primary"
+                               IsEnabled="False" Text="{loc:T action.submit}"
+                               IconData="{StaticResource CheckMark}"
+                               Click="SubmitButton_Click" Margin="5,0,0,0" />
+        </UniformGrid>
+    </Grid>
+</dialogBase:PopupContent>

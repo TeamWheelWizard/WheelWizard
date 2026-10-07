@@ -2,9 +2,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
+using WheelWizard.RrRooms.Views;
 using WheelWizard.Views.Components;
-using WheelWizard.Views.Patterns;
 using WheelWizard.WheelWizardData.Domain;
+using WheelWizard.WheelWizardData.Views;
 
 namespace WheelWizard.UI.Test;
 
@@ -29,7 +30,7 @@ public class BadgeBindingTests
         {
             window.Show();
             window.UpdateLayout();
-            Assert.Equal(initial, card.GetVisualDescendants().OfType<Badge>().Select(badge => badge.Variant));
+            Assert.Equal(initial, card.GetVisualDescendants().OfType<CommunityBadge>().Select(badge => badge.Variant));
 
             BadgeVariant[] replacement = [BadgeVariant.RrDev];
             if (card is FriendsListItem friend)
@@ -37,7 +38,7 @@ public class BadgeBindingTests
             else
                 ((PlayerListItem)card).BadgeVariants = replacement;
             window.UpdateLayout();
-            Assert.Equal(replacement, card.GetVisualDescendants().OfType<Badge>().Select(badge => badge.Variant));
+            Assert.Equal(replacement, card.GetVisualDescendants().OfType<CommunityBadge>().Select(badge => badge.Variant));
         }
         finally
         {

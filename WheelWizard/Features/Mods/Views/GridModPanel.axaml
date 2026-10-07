@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:patches="clr-namespace:WheelWizard.Features.Patches"
+             x:Class="WheelWizard.Mods.Views.GridModPanel"
+             x:DataType="mods:ModListItem"
+        xmlns:mods="clr-namespace:WheelWizard.Mods.Views">
+
+    <UserControl.Styles>
+        <Style Selector="Border#RootCardBorder">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Border#RootCardBorder:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+        <Style Selector="Border#RootCardBorder.Enabled">
+            <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+        </Style>
+        <Style Selector="Border#RootCardBorder.Enabled:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+        </Style>
+    </UserControl.Styles>
+    <Border x:Name="RootCardBorder" Classes.Enabled="{Binding Mod.IsEnabled}"
+            BorderThickness="1"
+            CornerRadius="8"
+            ClipToBounds="True" Margin="4" Height="134">
+        <Grid x:Name="CardSurface" RowDefinitions="80,52">
+            <!-- Image area -->
+            <Border x:Name="ThumbnailHeader" Grid.Row="0" Background="{StaticResource Neutral700}" ClipToBounds="True">
+                <Panel>
+                    <Image x:Name="ThumbnailImage" Source="{Binding Preview.Image}" Stretch="UniformToFill" />
+                    <Image x:Name="DisabledThumbnailImage" Source="{Binding Preview.GrayscaleImage}"
+                           Stretch="UniformToFill" IsVisible="False" />
+                    <PathIcon x:Name="CompatibilityWarning" Data="{StaticResource WarningTip}"
+                              Width="16" Height="16" Foreground="{StaticResource Danger500}" Margin="8" HorizontalAlignment="Right" VerticalAlignment="Top"
+                              IsVisible="{Binding Mod.HasIncompatibleFiles}" ToolTip.Placement="Top">
+                    <ToolTip.Tip>
+                        <StackPanel MaxWidth="300">
+                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource Neutral50}" />
+                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource Neutral100}" />
+                        </StackPanel>
+                    </ToolTip.Tip>
+                    </PathIcon>
+                    <!-- Placeholder icon when no image is loaded -->
+                    <PathIcon IsVisible="{Binding Preview.ShowPlaceholder}"
+                              Data="{StaticResource CubesStacked}"
+                              Width="36" Height="36"
+                              Foreground="{StaticResource Neutral500}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Panel>
+            </Border>
+
+            <Border Grid.Row="1" x:Name="EnabledBackgroundGlow" CornerRadius="99999"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" Height="70" Width="50"
+                    Background="{StaticResource Primary200}" Opacity="0.7" Effect="blur(130)"
+                    IsVisible="{Binding Mod.IsEnabled}" IsHitTestVisible="False" />
+
+            <!-- Fixed-height body keeps both enabled states and title lengths the same size. -->
+            <Grid x:Name="CardBody" Grid.Row="1" ColumnDefinitions="*,Auto" Margin="10,8">
+                <TextBlock x:Name="ModTitle" Text="{Binding Mod.Title}" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{StaticResource Neutral100}" TextTrimming="CharacterEllipsis"
+                           TextWrapping="Wrap" MaxLines="2" LineHeight="18" Height="36"
+                           Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
+                                    VerticalAlignment="Center">
+                            <TextBlock Text="#" FontSize="13"
+                                       Foreground="{StaticResource Neutral500}"
+                                       VerticalAlignment="Center" />
+                            <TextBox x:Name="PriorityTextBox"
+                                     Text="{Binding Mod.Priority, Mode=OneWay}"
+                                     Classes="dark"
+                                     MinWidth="30" MaxWidth="50"
+                                     MinHeight="28" Height="28"
+                                     VerticalAlignment="Center"
+                                     Padding="4,2"
+                                     HorizontalContentAlignment="Center"
+                                     TextChanged="PriorityText_OnTextChanged"
+                                     LostFocus="PriorityText_OnLostFocus"
+                                     KeyDown="PriorityText_OnKeyDown">
+                                <TextBox.Styles>
+                                    <Style Selector="TextBox /template/ DockPanel#PART_InnerDockPanel">
+                                        <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                    <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                        <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+                                    </Style>
+                                </TextBox.Styles>
+                            </TextBox>
+                        </StackPanel>
+            </Grid>
+        </Grid>
+
+    </Border>
+</UserControl>

@@ -1,0 +1,143 @@
+using System.ComponentModel;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
+using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Dialogs.Base;
+using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Navigation;
+using WheelWizard.WiiManagement;
+using WheelWizard.WiiManagement.MiiManagement;
+using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
+using WheelWizard.WiiManagement.MiiManagement.Views.Dialogs.MiiEditor;
+
+namespace WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
+
+public partial class MiiEditorWindow : PopupContent, INotifyPropertyChanged
+{
+    private IPageFactory Pages { get; }
+
+    // whether you want to save the Mii
+    public bool Result { get; private set; } = false;
+    private TaskCompletionSource<bool>? _tcs;
+
+    private Mii _mii = null!;
+    public Mii Mii
+    {
+        get => _mii;
+        private set
+        {
+            if (_mii != value)
+            {
+                _mii = value;
+                OnPropertyChanged(nameof(Mii));
+            }
+        }
+    }
+
+    private VisualizationType selectedVisualization = VisualizationType.Face;
+
+    public MiiEditorWindow(IPageFactory pages)
+        : base(true, false, false, t("popup_title.mii_editor"))
+    {
+        Pages = pages;
+        InitializeComponent();
+        DataContext = this;
+    }
+
+    protected override void BeforeOpen()
+    {
+        base.BeforeOpen();
+        SetEditorPage(typeof(EditorStartPage));
+    }
+
+    public void SetEditorPage(Type pageType)
+    {
+        EditorPresenter.Content = Pages.Create(pageType, this);
+        Window.WindowTitle = $"{t("popup_title.mii_editor")} - {Mii.Name}";
+    }
+
+    public MiiEditorWindow SetMii(Mii miiToEdit)
+    {
+        Window.WindowTitle = $"{t("popup_title.mii_editor")} - {miiToEdit.Name}";
+        var miiResult = miiToEdit.Clone();
+        if (miiResult.IsFailure)
+        {
+            DisableOpen(true);
+            MessageTranslationHelper.ShowMessage(
+                MessageTranslation.Error_MiiEditor_CantOpenEditor,
+                null,
+                new { error = miiResult.Error.Message }
+            );
+            return this;
+        }
+
+        Mii = miiResult.Value;
+        return this;
+    }
+
+    public void SignalSaveMii()
+    {
+        Result = true;
+        _tcs?.TrySetResult(true);
+        Close();
+    }
+
+    protected override void BeforeClose()
+    {
+        // If you want to return something different, then to the TrySetResult before you close it
+        _tcs?.TrySetResult(false);
+    }
+
+    public async Task<bool> AwaitAnswer()
+    {
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            return await Dispatcher.UIThread.InvokeAsync(() => AwaitAnswer());
+        }
+        _tcs = new();
+        Show(); // Or ShowDialog(parentWindow) if you need it to be modal
+        return await _tcs.Task;
+    }
+
+    public void RefreshImage()
+    {
+        if (selectedVisualization == VisualizationType.Carousel)
+            Mii3DRenderControl.RefreshCurrentMii();
+        else if (selectedVisualization == VisualizationType.Face)
+            MiiFaceImage.RefreshCurrentMii();
+    }
+
+    #region PropertyChanged
+
+    public new event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new(propertyName));
+    }
+
+    #endregion
+
+
+    private void SetVisualization(VisualizationType type)
+    {
+        if (!IsInitialized)
+            return;
+        VisualizationFace.IsVisible = type == VisualizationType.Face;
+        VisualizationCarousel.IsVisible = type == VisualizationType.Carousel;
+        selectedVisualization = type;
+        RefreshImage();
+    }
+
+    private void MiiFaceToggle_OnCheckedChanged(object? sender, RoutedEventArgs e) =>
+        ViewUtils.IfChecked(sender, () => SetVisualization(VisualizationType.Face));
+
+    private void MiiCarouselToggle_OnCheckedChanged(object? sender, RoutedEventArgs e) =>
+        ViewUtils.IfChecked(sender, () => SetVisualization(VisualizationType.Carousel));
+
+    private enum VisualizationType
+    {
+        Face,
+        Carousel,
+    }
+}

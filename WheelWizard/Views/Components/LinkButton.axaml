@@ -1,0 +1,47 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <Design.PreviewWith>
+        <components:LinkButton />
+    </Design.PreviewWith>
+
+    <Style Selector="components|LinkButton">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HoverForeground" Value="{Binding Foreground, RelativeSource={RelativeSource Self}}" />
+
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                    
+                    <components:IconLabel HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Text="{TemplateBinding Text}"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        FontSize="{TemplateBinding FontSize}"
+                                        IconSize="{TemplateBinding IconSize}"
+                                        IconData="{TemplateBinding IconData}"
+                                        IsUnderlined="{TemplateBinding IsUnderlined}"
+                                        IsIconLeft="{TemplateBinding IsIconLeft}">
+                        <components:IconLabel.Styles>
+                            <Style Selector="components|LinkButton:pointerover /template/ components|IconLabel">
+                                <Setter Property="Foreground" Value="{Binding HoverForeground, RelativeSource={RelativeSource AncestorType=components:LinkButton}}"/>
+                                <Setter Property="IsUnderlined" Value="True" />
+                            </Style>
+                        </components:IconLabel.Styles>
+                    </components:IconLabel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="components|LinkButton:disabled">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+</Styles>
