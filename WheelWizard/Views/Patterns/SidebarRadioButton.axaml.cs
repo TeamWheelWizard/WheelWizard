@@ -98,15 +98,12 @@ public partial class SidebarRadioButton : RadioButton
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
-        if (_hoverEffect == null)
+        if (_hoverEffect?.RenderTransform is not TranslateTransform transform)
             return;
 
         var position = e.GetPosition(this);
-
-        var left = position.X - (_hoverEffect.Width / 2);
-        var top = position.Y - (_hoverEffect.Height / 2);
-
-        _hoverEffect.Margin = new(left, top, 0, 0);
+        transform.X = position.X - _hoverEffect.Width / 2;
+        transform.Y = position.Y - _hoverEffect.Height / 2;
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)

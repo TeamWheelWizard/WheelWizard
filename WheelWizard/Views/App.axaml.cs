@@ -80,7 +80,8 @@ public class App : Application
         if (_createStartup is not null && ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            desktop.MainWindow = new SplashWindow();
+            // Activate from the dispatcher after the native event loop has started.
+            desktop.MainWindow = new SplashWindow { ShowActivated = false };
             desktop.MainWindow.Show();
             var shutdown = new CancellationTokenSource();
             var cancellationToken = shutdown.Token;
@@ -94,6 +95,7 @@ public class App : Application
                 {
                     try
                     {
+                        desktop.MainWindow?.Activate();
                         var startup = await _createStartup();
                         cancellationToken.ThrowIfCancellationRequested();
                         await startup.StartAsync(desktop, StartupOptions.Parse(desktop.Args ?? []), cancellationToken);

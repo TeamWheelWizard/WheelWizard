@@ -22,11 +22,12 @@
             </StackPanel>
         </Border>
     <Grid Grid.Row="1" x:Name="CompleteGrid">
-        <Border Background="{StaticResource  BackgroundColor}" CornerRadius="4"
+        <Border Background="{StaticResource  BackgroundColor}" CornerRadius="0,0,4,4"
                 x:Name="CompleteBorder"
                 BorderThickness="1" BorderBrush="{StaticResource BackgroundLineColor}">
             <Grid>
                 <ContentPresenter x:Name="PopupContent" ClipToBounds="False"
+                                  HorizontalContentAlignment="Stretch"
                                   Margin="{StaticResource EdgeGap}" />
             </Grid>
         </Border>

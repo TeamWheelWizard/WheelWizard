@@ -156,6 +156,12 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         EnableAllCheckbox.IsChecked = !ModManager.Mods.Select(mod => mod.IsEnabled).Contains(false);
     }
 
+    private void ModActionsMenu_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control { ContextMenu: { } menu } button)
+            menu.Open(button);
+    }
+
     private void BrowseMod_Click(object sender, RoutedEventArgs e)
     {
         var modPopup = Popups.Create<ModBrowserWindow>();
@@ -414,16 +420,20 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
             MessageTranslationHelper.ShowMessage(priorityResult.Error);
     }
 
-    private void ToggleModsPageView_OnClick(object? sender, RoutedEventArgs e)
+    private void ModsView_OnCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        var current = SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW);
-        SettingsService.Set(SettingsService.PREFERS_MODS_ROW_VIEW, !current);
+        if (sender is not RadioButton { IsChecked: true } button)
+            return;
+        var gridView = ReferenceEquals(button, GridViewButton);
+        if (SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW) == gridView)
+            return;
+        SettingsService.Set(SettingsService.PREFERS_MODS_ROW_VIEW, gridView);
         SetModsViewVariant();
     }
 
     private void SetModsViewVariant()
     {
-        Control[] elementsToSwapClasses = [ToggleButton, ModsListBox];
+        Control[] elementsToSwapClasses = [ModsListBox];
         var asRows = SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW);
 
         foreach (var elementToSwapClass in elementsToSwapClasses)
@@ -442,6 +452,8 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         // Toggle between list view (Blocks/arrows mode) and grid view (Rows/priority text mode)
         ModsListBox.IsVisible = !asRows;
         ModsGridView.IsVisible = asRows;
+        GridViewButton.IsChecked = asRows;
+        ListViewButton.IsChecked = !asRows;
     }
 
     private void PriorityText_OnKeyDown(object? sender, KeyEventArgs e)

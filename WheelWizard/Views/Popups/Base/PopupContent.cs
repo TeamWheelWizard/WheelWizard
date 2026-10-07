@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 
 namespace WheelWizard.Views.Popups.Base;
@@ -5,6 +6,7 @@ namespace WheelWizard.Views.Popups.Base;
 public abstract class PopupContent : UserControl
 {
     protected PopupWindow Window { get; private set; }
+    private double? _preferredContentWidth;
 
     protected PopupContent(bool allowClose, bool allowParentInteraction, bool isTopMost, string title = "")
     {
@@ -14,6 +16,20 @@ public abstract class PopupContent : UserControl
             BeforeClose = BeforeClose,
             BeforeOpen = BeforeOpen,
         };
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        if (_preferredContentWidth == null && Content is Control root && double.IsFinite(root.Width))
+        {
+            // A defined root width remains the popup's preferred size, but does not limit arrangement.
+            _preferredContentWidth = root.Width;
+            root.MinWidth = Math.Max(root.MinWidth, root.Width);
+            root.ClearValue(WidthProperty);
+        }
+
+        var measureWidth = Math.Min(availableSize.Width, _preferredContentWidth ?? double.PositiveInfinity);
+        return base.MeasureOverride(new Size(measureWidth, availableSize.Height));
     }
 
     protected virtual void BeforeClose() { } // Meant to be overwritten if needed

@@ -273,6 +273,31 @@ public class ApplicationCompositionTests
                 navigation.NavigateTo(page);
                 original.UpdateLayout();
                 Assert.IsType(page, navigation.CurrentPage);
+                if (navigation.CurrentPage is ModsPage modsPage)
+                {
+                    modsPage.HasMods = true;
+                    original.UpdateLayout();
+                    var gridView = modsPage.FindControl<MultiIconRadioButton>("GridViewButton")!;
+                    var listView = modsPage.FindControl<MultiIconRadioButton>("ListViewButton")!;
+                    var list = modsPage.FindControl<ListBox>("ModsListBox")!;
+                    var grid = modsPage.FindControl<ScrollViewer>("ModsGridView")!;
+                    gridView.IsChecked = true;
+                    Assert.True(grid.IsVisible);
+                    Assert.False(list.IsVisible);
+                    listView.IsChecked = true;
+                    Assert.True(list.IsVisible);
+                    Assert.False(grid.IsVisible);
+                    original.UpdateLayout();
+                    var viewToggle = modsPage.FindControl<Border>("ViewModeToggle")!;
+                    Assert.True(viewToggle.TranslatePoint(new Point(), modsPage)!.Value.Y > list.TranslatePoint(new Point(), modsPage)!.Value.Y);
+                    var enableAll = modsPage.FindControl<CheckBox>("EnableAllCheckbox")!;
+                    Assert.True(enableAll.TranslatePoint(new Point(), modsPage)!.Value.Y < list.TranslatePoint(new Point(), modsPage)!.Value.Y);
+                    var presenter = list.GetVisualDescendants().OfType<Avalonia.Controls.Presenters.ItemsPresenter>().Single();
+                    Assert.True(presenter.Margin.Bottom >= viewToggle.Bounds.Height + 12);
+                    var icon = listView.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Single();
+                    Assert.Equal(Avalonia.Media.Brushes.Transparent, icon.Fill);
+                    Assert.NotNull(icon.Stroke);
+                }
             }
             var room = new WheelWizard.Models.RRInfo.RrRoom
             {
