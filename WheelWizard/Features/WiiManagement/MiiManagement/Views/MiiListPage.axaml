@@ -1,0 +1,140 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             mc:Ignorable="d" d:DesignWidth="456" d:DesignHeight="776"
+             x:Class="WheelWizard.WiiManagement.MiiManagement.Views.MiiListPage"
+        xmlns:miis="clr-namespace:WheelWizard.WiiManagement.MiiManagement.Views">
+    <Grid x:Name="CompleteGrid" x:CompileBindings="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <!-- This is the total height as the (Title + infoSection) - (padding) -->
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        Spacing="8">
+                <TextBlock Text="{loc:T page_title.my_miis}"
+                           Classes="PageTitleText" />
+                <components:StateBox Text="0"
+                                     IconSize="0"
+                                     x:Name="ListItemCount"
+                                     VerticalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Margin="0,0,6,10"
+                        Orientation="Horizontal"
+                        Spacing="6"
+                        IsVisible="{Binding IsVisible, ElementName=VisibleWhenDb}">
+                <components:Button Text="" Click="FavMii_OnClick" x:Name="FavoriteMiiButton"
+                                   Variant="Default" Padding="10"
+                                   ToolTip.ShowDelay="0" ToolTip.Placement="Top">
+                    <components:Button.Styles>
+                        <Style Selector="components|Button">
+                            <Setter Property="IconData" Value="{StaticResource StarIcon}"/>
+                            <Setter Property="ToolTip.Tip" Value="{loc:T action.favorite}"/>
+                        </Style>
+                        <Style Selector="components|Button.UnFav">
+                            <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}"/>
+                            <Setter Property="ToolTip.Tip" Value="{loc:T action.unfavorite}"/>
+                        </Style>
+                    </components:Button.Styles>
+                </components:Button>
+                <components:Button Text="" Click="EditMii_OnClick" x:Name="EditMiisButton"
+                                   IconData="{StaticResource Pen}"
+                                   Variant="Default" Padding="10" IsVisible="False"
+                                   ToolTip.ShowDelay="0" ToolTip.Placement="Top"
+                                   ToolTip.Tip="{loc:T action.edit}" />
+                <components:Button Text="" Click="DuplicateMii_OnClick" x:Name="DuplicateMiisButton"
+                                   IconData="{StaticResource Duplicate}"
+                                   Variant="Default" Padding="10" IsVisible="False"
+                                   ToolTip.ShowDelay="0" ToolTip.Placement="Top"
+                                   ToolTip.Tip="{loc:T action.duplicate}" />
+                <components:Button Text="" Click="ExportMii_OnClick" x:Name="ExportMiisButton"
+                                   IconData="{StaticResource FileExport}"
+                                   Variant="Default" Padding="10" IsVisible="False"
+                                   ToolTip.ShowDelay="0" ToolTip.Placement="Top"
+                                   ToolTip.Tip="{loc:T action.export}" />
+                <components:Button Text="" Click="DeleteMii_OnClick" x:Name="DeleteMiisButton"
+                                   IconData="{StaticResource Trash}"
+                                   Variant="Danger" Padding="10" IsVisible="False"
+                                   ToolTip.ShowDelay="0" ToolTip.Placement="Top"
+                                   ToolTip.Tip="{loc:T action.delete}" />
+                <components:Button Text="" Click="ImportMii_OnClick" x:Name="ImportMiiButton"
+                                   IconData="{StaticResource FileImport}"
+                                   Variant="Default" Padding="10"
+                                   ToolTip.ShowDelay="0" ToolTip.Placement="Top"
+                                   ToolTip.Tip="{loc:T action.import}" />
+            </StackPanel>
+        </Grid>
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <components:EmptyPageInfo Grid.Row="1" x:Name="VisibleWhenNoDb"
+                                  HorizontalAlignment="Center" IsVisible="False"
+                                  Title="{loc:T empty_content.no_miis_title}"
+                                  BodyText="{loc:T empty_content.no_miis}" />
+
+        <Grid x:Name="VisibleWhenDb" Grid.Row="1">
+            <ListBox x:Name="MiiList" SelectionMode="Single" BorderThickness="0"
+                     Background="Transparent" Padding="0" ItemsSource="{Binding MiiRows}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <ItemsControl ItemsSource="{Binding Items}" HorizontalAlignment="Center">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="4" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <miis:MiiBlock Width="90" Height="90" Margin="8,10"
+                                                                Mii="{Binding Mii}" IsGlobal="{Binding IsGlobal}"
+                                                                GroupName="{Binding SelectionGroup}"
+                                                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                                Click="MiiBlock_OnClick">
+                                        <miis:MiiBlock.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="{Binding FavoriteActionHeader}"
+                                                          CommandParameter="{Binding}" Click="FavoriteContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                                <MenuItem Header="{loc:T action.edit}"
+                                                          CommandParameter="{Binding}" Click="EditContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                                <MenuItem Header="Duplicate"
+                                                          CommandParameter="{Binding}" Click="DuplicateContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                                <MenuItem Header="{loc:T action.export}"
+                                                          CommandParameter="{Binding}" Click="ExportContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                                <MenuItem Header="{loc:T action.delete}"
+                                                          CommandParameter="{Binding}" Click="DeleteContextMenu_OnClick"
+                                                          IsEnabled="{Binding HasMii}" />
+                                            </ContextMenu>
+                                        </miis:MiiBlock.ContextMenu>
+                                    </miis:MiiBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,161 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="444" d:DesignHeight="831"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components1="clr-namespace:WheelWizard.Views.Components"
+             x:Class="WheelWizard.Settings.Views.OtherSettings">
+
+    <Grid x:Name="DolphinBorder">
+        <StackPanel Margin="0,15,0,0">
+
+            <Grid Margin="0,-10,0,10" MinHeight="40" x:Name="DisabledWarningText">
+                <Border Background="{StaticResource Warning600}"
+                        CornerRadius="9999"
+                        Effect="blur(150)"
+                        Opacity="0.1" />
+                <Border Background="{StaticResource Neutral700}"
+                        BorderBrush="{StaticResource Warning500}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource GlobalCornerRadius}">
+                    <Grid ColumnDefinitions="40,*">
+                        <PathIcon Data="{StaticResource WarningTip}"
+                                  Foreground="{StaticResource Warning500}"
+                                  Width="20" />
+                        <SelectableTextBlock Grid.Column="1"
+                                             Margin="0,6,10,6"
+                                             Classes="BodyText"
+                                             VerticalAlignment="Center"
+                                             Text="{loc:T helper_text.topbar.location_warning}"
+                                             Foreground="{StaticResource Neutral200}" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <components1:FormFieldLabel Text="{loc:T section.retro_rewind}" Margin="0,0,0,4" />
+            <StackPanel Spacing="4" Margin="0,0,0,7">
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.launch_rr_on_startup}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.launch_rr_on_startup}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  x:Name="LaunchRrOnStartup"
+                                  Classes="SwitchDark"
+                                  IsChecked="False"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.retro_rewind_installation}" />
+                            <SelectableTextBlock x:Name="RetroRewindVersionText"
+                                       Classes="TinyText"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components1:Button Grid.Column="1"
+                                            x:Name="DolphinReinstallButton"
+                                            Variant="Warning"
+                                            ButtonSize="Compact"
+                                            IsEnabled="True"
+                                            IconData="{StaticResource Download}"
+                                            Text="{loc:T option.reinstall}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Click="Reinstall_RetroRewind" />
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.retro_rewind_folder}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.retro_rewind_folder}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components1:Button Grid.Column="1"
+                                            x:Name="OpenGameFolderButton"
+                                            Variant="Default"
+                                            ButtonSize="Compact"
+                                            IsEnabled="True"
+                                            IconData="{StaticResource Folder}"
+                                            Text="{loc:T action.open}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Click="GameFileFolder_Click" />
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <components1:FormFieldLabel Grid.Column="0"
+                                                    Margin="0,0,16,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Text="{loc:T option.save_folder}" />
+                        <components1:Button Grid.Column="1"
+                                            x:Name="OpenSaveFolderButton"
+                                            Variant="Default"
+                                            ButtonSize="Compact"
+                                            IsEnabled="True"
+                                            IconData="{StaticResource Folder}"
+                                            Text="{loc:T action.open}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Click="OpenSaveFolder_OnClick" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <components1:FormFieldLabel x:Name="RecompSectionLabel"
+                                        Text="{loc:T section.recomp}"
+                                        Margin="0,0,0,4" />
+            <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowSingle" x:Name="RecompBorder">
+                <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                    <StackPanel Grid.Column="0"
+                                Margin="0,0,16,0"
+                                Spacing="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                        <components1:FormFieldLabel Text="{loc:T option.enable_recomp}" />
+                        <SelectableTextBlock Classes="TinyText"
+                                   Text="{loc:T helper_text.enable_recomp}"
+                                   TextAlignment="Left"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <CheckBox Grid.Column="1"
+                              x:Name="EnableRecomp"
+                              Classes="SwitchDark"
+                              IsChecked="False"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <Border Classes="SettingsBottomSpacer" />
+        </StackPanel>
+    </Grid>
+</UserControl>

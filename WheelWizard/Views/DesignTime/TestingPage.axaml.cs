@@ -1,0 +1,150 @@
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using WheelWizard.CustomDistributions;
+using WheelWizard.CustomDistributions.Presentation;
+using WheelWizard.Launching;
+using WheelWizard.Models.Enums;
+using WheelWizard.Settings;
+using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Dialogs;
+
+namespace WheelWizard.Views.DesignTime;
+
+public partial class TestingPage : UserControl
+{
+    private WheelWizardStatus _status = WheelWizardStatus.Loading;
+    private bool _isBusy;
+
+    private ICustomDistributionSingletonService CustomDistributionSingletonService { get; }
+
+    private ISettingsManager SettingsService { get; }
+
+    private RrBetaLauncher LauncherService { get; }
+
+    public TestingPage(
+        ICustomDistributionSingletonService customDistributionSingletonService,
+        ISettingsManager settingsService,
+        RrBetaLauncher launcherService
+    )
+    {
+        CustomDistributionSingletonService = customDistributionSingletonService;
+        SettingsService = settingsService;
+        LauncherService = launcherService;
+        InitializeComponent();
+        UpdateStatusAsync();
+    }
+
+    private async void UpdateStatusAsync()
+    {
+        _status = WheelWizardStatus.Loading;
+        UpdateUi();
+
+        _status = await LauncherService.GetCurrentStatus();
+        UpdateUi();
+    }
+
+    private void UpdateUi()
+    {
+        var pathsReady = SettingsService.PathsSetupCorrectly();
+        var isInstalled = _status == WheelWizardStatus.Ready;
+
+        InstallButton.IsEnabled = pathsReady && !_isBusy;
+        InstallButton.IsVisible = !isInstalled;
+
+        DeleteButton.IsEnabled = !_isBusy && isInstalled;
+        DeleteButton.IsVisible = isInstalled;
+
+        LaunchButton.IsEnabled = !_isBusy && isInstalled;
+        LaunchButton.IsVisible = isInstalled;
+
+        StatusText.Text = _status switch
+        {
+            WheelWizardStatus.ConfigNotFinished => "Setup required. Configure paths in Settings.",
+            WheelWizardStatus.NotInstalled => "Not installed",
+            WheelWizardStatus.Ready => "Installed - Ready to play",
+            WheelWizardStatus.NoServer or WheelWizardStatus.NoServerButInstalled => "Server offline",
+            WheelWizardStatus.NoDolphinExtension => "No Dolphin extension",
+            WheelWizardStatus.NoRecompExtension => "No Wiicompiled extension",
+            WheelWizardStatus.OutOfDate => "Update available",
+            _ => "Checking status...",
+        };
+
+        StatusPill.Classes.Remove("ready");
+        StatusPill.Classes.Remove("warning");
+        StatusPill.Classes.Remove("danger");
+
+        switch (_status)
+        {
+            case WheelWizardStatus.Ready:
+                StatusPill.Classes.Add("ready");
+                break;
+            case WheelWizardStatus.ConfigNotFinished:
+            case WheelWizardStatus.OutOfDate:
+            case WheelWizardStatus.Loading:
+                StatusPill.Classes.Add("warning");
+                break;
+            case WheelWizardStatus.NoServer:
+            case WheelWizardStatus.NoDolphinExtension:
+            case WheelWizardStatus.NoRecompExtension:
+            case WheelWizardStatus.NoServerButInstalled:
+                StatusPill.Classes.Add("danger");
+                break;
+        }
+    }
+
+    private async void InstallButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_isBusy)
+            return;
+
+        _isBusy = true;
+        UpdateUi();
+
+        var installResult = await LauncherService.Install();
+        if (installResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(installResult.Error);
+
+        _isBusy = false;
+        UpdateStatusAsync();
+    }
+
+    private async void DeleteButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_isBusy)
+            return;
+
+        _isBusy = true;
+        UpdateUi();
+
+        var progressWindow = new ProgressWindow("Removing test build");
+        progressWindow.Show();
+        var removeResult = await CustomDistributionSingletonService.RetroRewindBeta.RemoveAsync(progressWindow);
+        progressWindow.Close();
+
+        if (removeResult.IsFailure)
+        {
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText("Unable to delete test build")
+                .SetInfoText(removeResult.Error.Message)
+                .ShowDialog();
+        }
+
+        _isBusy = false;
+        UpdateStatusAsync();
+    }
+
+    private async void LaunchButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_isBusy)
+            return;
+
+        _isBusy = true;
+        UpdateUi();
+        var launchResult = await LauncherService.Launch();
+        if (launchResult.IsFailure)
+            MessageTranslationHelper.ShowMessage(launchResult.Error);
+        _isBusy = false;
+        UpdateUi();
+    }
+}

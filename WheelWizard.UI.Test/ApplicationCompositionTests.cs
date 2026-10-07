@@ -12,17 +12,23 @@ using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Testably.Abstractions.Testing;
 using WheelWizard.ApplicationData;
+using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
+using WheelWizard.Mods.Views;
+using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
+using WheelWizard.Settings.Views;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Services;
-using WheelWizard.Views;
 using WheelWizard.Views.Components;
-using WheelWizard.Views.Navigation;
-using WheelWizard.Views.Pages;
-using WheelWizard.Views.Pages.Settings;
+using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Patterns;
-using WheelWizard.Views.Startup;
+using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Navigation;
+using WheelWizard.Views.Shell.Startup;
+using WheelWizard.Views.Shell.Views;
+using WheelWizard.WheelWizardData.Views;
+using WheelWizard.WiiManagement.MiiManagement.Views;
 using Button = Avalonia.Controls.Button;
 
 namespace WheelWizard.UI.Test;
@@ -289,9 +295,13 @@ public class ApplicationCompositionTests
                     Assert.False(grid.IsVisible);
                     original.UpdateLayout();
                     var viewToggle = modsPage.FindControl<Border>("ViewModeToggle")!;
-                    Assert.True(viewToggle.TranslatePoint(new Point(), modsPage)!.Value.Y > list.TranslatePoint(new Point(), modsPage)!.Value.Y);
+                    Assert.True(
+                        viewToggle.TranslatePoint(new Point(), modsPage)!.Value.Y > list.TranslatePoint(new Point(), modsPage)!.Value.Y
+                    );
                     var enableAll = modsPage.FindControl<CheckBox>("EnableAllCheckbox")!;
-                    Assert.True(enableAll.TranslatePoint(new Point(), modsPage)!.Value.Y < list.TranslatePoint(new Point(), modsPage)!.Value.Y);
+                    Assert.True(
+                        enableAll.TranslatePoint(new Point(), modsPage)!.Value.Y < list.TranslatePoint(new Point(), modsPage)!.Value.Y
+                    );
                     var presenter = list.GetVisualDescendants().OfType<Avalonia.Controls.Presenters.ItemsPresenter>().Single();
                     Assert.True(presenter.Margin.Bottom >= viewToggle.Bounds.Height + 12);
                     var icon = listView.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Single();

@@ -1,22 +1,22 @@
 using Avalonia;
-using Avalonia.Headless;
 using Avalonia.Controls;
-using WheelWizard.Models.Mods;
-using WheelWizard.Views.Pages;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using NSubstitute;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
+using WheelWizard.Models.Mods;
 using WheelWizard.Mods;
+using WheelWizard.Mods.ViewModels;
+using WheelWizard.Mods.Views;
+using WheelWizard.Mods.Views.Dialogs;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.Services;
-using WheelWizard.Views.ModManagement;
-using WheelWizard.Views.Navigation;
-using WheelWizard.Views.Patterns;
-using WheelWizard.Views.Popups.ModManagement;
+using WheelWizard.Views.Components;
+using WheelWizard.Views.Shell.Navigation;
 
 namespace WheelWizard.UI.Test;
 
@@ -25,10 +25,24 @@ public class ModBrowserPreviewTests
     [AvaloniaFact]
     public void DisabledGridCard_RestoresColorOnWholeCardHover_AndTracksEnabledState()
     {
-        using var preview = new ModPreviewViewModel(0, Substitute.For<IGameBananaSingletonService>(), Substitute.For<IGameBananaMediaService>());
-        var mod = new Mod { Title = "Test mod", IsEnabled = false, HasIncompatibleFiles = true };
+        using var preview = new ModPreviewViewModel(
+            0,
+            Substitute.For<IGameBananaSingletonService>(),
+            Substitute.For<IGameBananaMediaService>()
+        );
+        var mod = new Mod
+        {
+            Title = "Test mod",
+            IsEnabled = false,
+            HasIncompatibleFiles = true,
+        };
         var card = new GridModPanel { DataContext = new ModListItem(mod, false, false, preview) };
-        var window = new Window { Content = card, Width = 300, Height = 220 };
+        var window = new Window
+        {
+            Content = card,
+            Width = 300,
+            Height = 220,
+        };
         try
         {
             window.Show();

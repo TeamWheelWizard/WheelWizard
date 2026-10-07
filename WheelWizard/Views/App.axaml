@@ -105,7 +105,7 @@
                     Value="{OnPlatform Default={StaticResource DesktopWindowDecorations}, macOS={x:Null}}" />
         </Style>
         <!-- !!Only used for the designer!! -->
-        <StyleInclude Source="Styles/Util/MultiColorExampleComponent.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/DesignTime/Controls/MultiColorExampleComponent.axaml" />
         <!-- !!Only used for the designer!! -->
 
         <!-- STYLES -->
@@ -133,12 +133,12 @@
         <StyleInclude Source="Components/MemeNumberState.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
-        <StyleInclude Source="Patterns/ModBrowserListItem.axaml" />
-        <StyleInclude Source="Patterns/FriendsListItem.axaml" />
-        <StyleInclude Source="Patterns/PlayerListItem.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/Mods/Views/ModBrowserListItem.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/FriendsListItem.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/RrRooms/Views/PlayerListItem.axaml" />
         <StyleInclude Source="Components/Badge.axaml" />
-        <StyleInclude Source="Patterns/MiiBlock.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WiiManagement/MiiManagement/Views/MiiBlock.axaml" />
         <StyleInclude Source="Components/WheelTrail.axaml" />
-        <StyleInclude Source="Patterns/LeaderboardPodiumCard.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/LeaderboardPodiumCard.axaml" />
     </Application.Styles>
 </Application>

@@ -1,0 +1,34 @@
+<dialogBase:PopupContent xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:components="clr-namespace:WheelWizard.Views.Components"
+                   xmlns:loc="clr-namespace:WheelWizard.Localization"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   x:Class="WheelWizard.Views.Dialogs.YesNoWindow"
+        xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base">
+    <Grid Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="*,Auto">
+        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,10">
+            
+            <SelectableTextBlock Classes="TitleText" x:Name="MainTextBlock"
+                                 HorizontalAlignment="Left" TextWrapping="Wrap"
+                                 Foreground="{StaticResource FormFieldLabelColor}"
+                                 FontSize="18"/>
+            <SelectableTextBlock Classes="BodyText" x:Name="ExtraTextBlock"
+                                 FontSize="14" TextWrapping="Wrap"
+                                 HorizontalAlignment="Left" Margin="0,10,0,0" />
+        </StackPanel>
+        
+        <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     x:Name="ButtonContainer">
+            <components:Button x:Name="NoButton" Variant="Default"
+                               IsEnabled="True" Text="{loc:T action.no}"
+                               IconData="{StaticResource XMark}"
+                               Click="noButton_Click" Margin="0,0,5,0"/>
+            <components:Button x:Name="YesButton" Variant="Primary"
+                               IsEnabled="True" Text="{loc:T action.yes}"
+                               IconData="{StaticResource CheckMark}"
+                               Click="yesButton_Click" Margin="5,0,0,0"/>
+        </UniformGrid>
+    </Grid>
+</dialogBase:PopupContent>

@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             x:Class="WheelWizard.WiiManagement.MiiManagement.Views.Dialogs.MiiEditor.EditorStartPage"
+        xmlns:editor="clr-namespace:WheelWizard.WiiManagement.MiiManagement.Views.Dialogs.MiiEditor">
+    <Grid RowDefinitions="40,*,60">
+        <StackPanel Orientation="Horizontal"  Margin="10" Spacing="10">
+            <!-- EmptyStarIcon -->
+            <components:IconLabelButton Text="" VerticalAlignment="Center" x:Name="FavoriteButton" Click="FavoriteButton_OnClick">
+                
+                <components:IconLabelButton.Styles>
+                    <Style Selector="components|IconLabelButton">
+                        <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}" />
+                        <Setter Property="Foreground" Value="{StaticResource TitleTextColor}" />
+                        <Setter Property="HoverForeground" Value="{StaticResource Warning300}" />
+                    </Style>
+                    
+                    <Style Selector="components|IconLabelButton.favorite">
+                        <Setter Property="IconData" Value="{StaticResource StarIcon}" />
+                        <Setter Property="Foreground" Value="{StaticResource Warning500}" />
+                        <Setter Property="HoverForeground" Value="{StaticResource Warning300}" />
+                    </Style>
+                </components:IconLabelButton.Styles>
+            </components:IconLabelButton>
+            <SelectableTextBlock Classes="BodyText" x:Name="MiiName" />
+        </StackPanel>
+        
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1" />
+        <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}"
+                HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="1" />
+        
+        <components:Button Variant="Default" Grid.Row="2" Margin="10"  VerticalAlignment="Top" 
+                           HorizontalAlignment="Left" Padding="12,6" IconSize="28"
+                           IconData="{StaticResource Dice}" Click="RandomizeMii_OnClick" />
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="10"
+                    VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="10">
+            <components:Button Text="{loc:T action.cancel}" Variant="Warning"
+                               IconData="{StaticResource XMark}" Click="CancelButton_OnClick" />
+            <components:Button Text="{loc:T action.save}" Variant="Primary"
+                               x:Name="SaveButton"
+                               IconData="{StaticResource CheckMark}" Click="SaveButton_OnClick" />
+        </StackPanel>
+        
+        <ScrollViewer Grid.Row="1">
+            <StackPanel>
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.general}"
+                                            Type="{x:Type editor:EditorGeneral}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.face}"
+                                            Type="{x:Type editor:EditorFace}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.hair}"
+                                            Type="{x:Type editor:EditorHair}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.eyebrows}"
+                                            Type="{x:Type editor:EditorEyebrows}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.eyes}"
+                                            Type="{x:Type editor:EditorEyes}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.nose}"
+                                            Type="{x:Type editor:EditorNose}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.lips}"
+                                            Type="{x:Type editor:EditorLips}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.glasses}"
+                                            Type="{x:Type editor:EditorGlasses}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.facial_hair}"
+                                            Type="{x:Type editor:EditorFacialHair}" />
+                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.mole}"
+                                            Type="{x:Type editor:EditorMole}" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

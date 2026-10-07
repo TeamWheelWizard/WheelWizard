@@ -2,9 +2,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
+using WheelWizard.RrRooms.Views;
 using WheelWizard.Views.Components;
-using WheelWizard.Views.Patterns;
 using WheelWizard.WheelWizardData.Domain;
+using WheelWizard.WheelWizardData.Views;
 
 namespace WheelWizard.UI.Test;
 

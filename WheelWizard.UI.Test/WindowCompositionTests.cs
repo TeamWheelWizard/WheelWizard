@@ -7,8 +7,10 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using WheelWizard.Settings.Types;
-using WheelWizard.Views;
-using WheelWizard.Views.Popups.Base;
+using WheelWizard.Views.Dialogs;
+using WheelWizard.Views.Dialogs.Base;
+using WheelWizard.Views.Patterns;
+using WheelWizard.Views.Shell;
 
 namespace WheelWizard.UI.Test;
 
@@ -20,7 +22,12 @@ public class WindowCompositionTests
     public void SidebarHover_MovesGlowWithoutChangingLayout(double width)
     {
         var button = new WheelWizard.Views.Patterns.SidebarRadioButton { Text = "Home" };
-        var window = new Window { Width = width, Height = 46, Content = button };
+        var window = new Window
+        {
+            Width = width,
+            Height = 46,
+            Content = button,
+        };
         try
         {
             window.Show();
@@ -50,7 +57,7 @@ public class WindowCompositionTests
     [InlineData(500.0)]
     public void ProgressContent_KeepsDefinedMeasuredWidth_ButFillsExtraAvailableWidth(double preferredWidth)
     {
-        var content = new WheelWizard.Views.Popups.Generic.ProgressWindow("Download");
+        var content = new WheelWizard.Views.Dialogs.ProgressWindow("Download");
         Assert.IsType<Grid>(content.Content).Width = preferredWidth;
         content.SetGoal(new string('W', 150));
         content.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -68,7 +75,7 @@ public class WindowCompositionTests
     public void ProgressNativeClose_CancelsOnlyCancelableUserRequests(bool canCancel, bool programmatic)
     {
         using var cancellation = new CancellationTokenSource();
-        var content = new WheelWizard.Views.Popups.Generic.ProgressWindow("Download");
+        var content = new WheelWizard.Views.Dialogs.ProgressWindow("Download");
         if (canCancel)
             content.SetCancellationTokenSource(cancellation);
         content.Show();
@@ -76,7 +83,8 @@ public class WindowCompositionTests
         try
         {
             var args = CreateClosingArgs(programmatic);
-            typeof(PopupWindow).GetMethod("OnClosing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            typeof(PopupWindow)
+                .GetMethod("OnClosing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
                 .Invoke(popup, [args]);
             Assert.Equal(canCancel && !programmatic, cancellation.IsCancellationRequested);
             Assert.Equal(canCancel && !programmatic, content.WasCancellationRequested);

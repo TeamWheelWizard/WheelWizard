@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:util="clr-namespace:WheelWizard.Styles.Util">
+                    xmlns:util="clr-namespace:WheelWizard.Views.DesignTime.Controls">
     <Design.PreviewWith>
         <Border Padding="20" Background="#8B91A5">
             <UniformGrid Columns="7">

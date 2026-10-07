@@ -5,12 +5,13 @@ using Testably.Abstractions;
 using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationIntegration;
 using WheelWizard.ApplicationLifecycle.Logging;
+using WheelWizard.MiiImages.Views;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views;
-using WheelWizard.Views.Patterns;
-using WheelWizard.Views.Startup;
+using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Startup;
 
 namespace WheelWizard;
 

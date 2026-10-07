@@ -1,22 +1,23 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:WheelWizard.Localization"
-        xmlns:pages="clr-namespace:WheelWizard.Views.Pages"
-        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+        xmlns:components="clr-namespace:WheelWizard.Views.Components"
+        xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
+        xmlns:shellViews="clr-namespace:WheelWizard.Views.Shell.Views">
   <Design.PreviewWith>
     <Border Padding="2" Width="300" Background="{StaticResource Neutral600}">
       <StackPanel>
         <components:PopupListButton Text="{loc:T page_title.home}"
-                                     Type="{x:Type pages:HomePage}"/>
+                                     Type="{x:Type shellViews:HomePage}"/>
         <components:PopupListButton Text="{loc:T page_title.settings}"
-                                    Type="{x:Type pages:HomePage}"/>
+                                    Type="{x:Type shellViews:HomePage}"/>
         <components:PopupListButton Text="{loc:T page_title.friends}"
-                                    Type="{x:Type pages:HomePage}"/>  
+                                    Type="{x:Type shellViews:HomePage}"/>
         <components:PopupListButton Text="{loc:T page_title.mods}"
-                                    Type="{x:Type pages:HomePage}"/>
+                                    Type="{x:Type shellViews:HomePage}"/>
         <components:PopupListButton Text="{loc:T page_title.rooms}"
-                                    Type="{x:Type pages:RoomsPage}"/>
-                                  
+                                    Type="{x:Type rooms:RoomsPage}"/>
+
       </StackPanel>
     </Border>
   </Design.PreviewWith>
@@ -31,11 +32,11 @@
         <Border Background="{TemplateBinding Background}"
                 BorderThickness="0" >
           <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
-            
+
             <Border CornerRadius="99999" IsVisible="False" Opacity="0.3" Name="PART_HoverEffect"
                     HorizontalAlignment="Left" VerticalAlignment="Top"
                     Background="{StaticResource Primary200}" Height="50" Width="50" Effect="blur(150)">
-              
+
               <Border.Styles>
                 <Style Selector="Border">
                   <Style.Animations>
@@ -51,14 +52,14 @@
                 </Style>
               </Border.Styles>
             </Border>
-              
+
               <!-- Using icon lable since i am to bored to use the right component, just copied it over from the sidebar Radio button-->
             <components:IconLabel IconSize="0" FontSize="20"
                              Text="{TemplateBinding Text}"
                              Foreground="{TemplateBinding Foreground}"
                              HorizontalAlignment="Left" VerticalAlignment="Center"
                              Margin="10,0,10,0" />
-              
+
               <components:IconLabel x:Name="PART_ArrowIcon" IconSize="20"
                                     IsVisible="False"
                                     IconData="{StaticResource ArrowRight}"
@@ -70,7 +71,7 @@
       </ControlTemplate>
     </Setter>
   </Style>
-  
+
   <Style Selector="components|PopupListButton:pointerover">
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Background" Value="{StaticResource Neutral800}" />

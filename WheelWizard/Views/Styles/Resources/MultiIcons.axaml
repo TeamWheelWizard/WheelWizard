@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-                    xmlns:util="clr-namespace:WheelWizard.Styles.Util">
+                    xmlns:util="clr-namespace:WheelWizard.Views.DesignTime.Controls">
     
     <!-- You can toggle these to have a different designer view, Make sure to run the app after changing to apply it-->
     <sys:Boolean x:Key="ShowTemplateBaseColors">True</sys:Boolean>

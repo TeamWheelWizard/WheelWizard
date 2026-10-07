@@ -7,7 +7,8 @@ using Avalonia.Threading;
 using Serilog;
 using WheelWizard.ApplicationLifecycle;
 using WheelWizard.Views.Behaviors;
-using WheelWizard.Views.Startup;
+using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Startup;
 
 namespace WheelWizard.Views;
 
