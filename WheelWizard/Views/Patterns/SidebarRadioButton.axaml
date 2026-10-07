@@ -50,6 +50,14 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Stretch" />
             
+            <Border Name="PART_HoverEffect" CornerRadius="99999" IsVisible="False" Opacity="0.3"
+                    IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Background="{StaticResource Primary200}" Height="46" Width="46" Effect="blur(150)">
+              <Border.RenderTransform>
+                <TranslateTransform />
+              </Border.RenderTransform>
+            </Border>
+
             <components:IconLabel x:Name="RadioIcon" IconSize="25" FontSize="19"
                              IconData="{TemplateBinding IconData}"
                              Text="{TemplateBinding Text}"
@@ -88,11 +96,17 @@
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Background" Value="{StaticResource Neutral800}" />
     <Setter Property="Foreground" Value="{StaticResource Primary200}" />
+    <Style Selector="^ /template/ Border#PART_HoverEffect">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
   </Style>
 
   <Style Selector="patterns|SidebarRadioButton:checked">
     <Setter Property="Background" Value="{StaticResource Neutral950}" />
     <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+    <Style Selector="^ /template/ Border#PART_HoverEffect">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
     <Style Selector="^ /template/ Border#PART_SelectionIndicator">
       <Setter Property="Background" Value="{StaticResource Primary400}"/>
     </Style>
