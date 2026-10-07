@@ -121,24 +121,25 @@
         <StyleInclude Source="Components/MultiColoredIcon.axaml" />
         <StyleInclude Source="Components/MultiIconRadioButton.axaml" />
         <StyleInclude Source="Components/IconLabel.axaml" />
-        <StyleInclude Source="Components/IconLabelButton.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/Components/LinkButton.axaml" />
         <StyleInclude Source="Components/Button.axaml" />
-        <StyleInclude Source="Components/OptionButton.axaml" />
-        <StyleInclude Source="Components/StateBox.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/Components/TileButton.axaml" />
+        <StyleInclude Source="Components/StatusBadge.axaml" />
         <StyleInclude Source="Components/EmptyPageInfo.axaml" />
         <StyleInclude Source="Components/FormFieldLabel.axaml" />
+        <StyleInclude Source="Components/TextField.axaml" />
         <StyleInclude Source="Components/LoadingIcon.axaml" />
-        <StyleInclude Source="Patterns/SidebarRadioButton.axaml" />
-        <StyleInclude Source="Components/PopupListButton.axaml" />
-        <StyleInclude Source="Components/MemeNumberState.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/SidebarRadioButton.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/Components/ListActionButton.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityCountBadge.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
         <StyleInclude Source="avares://WheelWizard/Features/Mods/Views/ModBrowserListItem.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/FriendsListItem.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/RrRooms/Views/PlayerListItem.axaml" />
-        <StyleInclude Source="Components/Badge.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityBadge.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WiiManagement/MiiManagement/Views/MiiBlock.axaml" />
-        <StyleInclude Source="Components/WheelTrail.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/WheelTrail.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/LeaderboardPodiumCard.axaml" />
     </Application.Styles>
 </Application>

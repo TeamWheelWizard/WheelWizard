@@ -190,7 +190,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
             .SetPlaceholderText("0000-0000-0000")
             .SetButtonText(t("action.cancel"), t("action.submit"))
             .SetValidation((_, newText) => ValidateFriendCodeInput(newText))
-            .SetWarningValidation((_, newText) => ValidateFriendCodeWarning(newText))
             .ShowDialog();
 
         if (inputFriendCode == null)
@@ -252,23 +251,13 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         if (currentProfileId != 0 && currentProfileId == friendProfileId)
             return Fail("You cannot add your own friend code.");
 
-        return Ok();
-    }
-
-    private string? ValidateFriendCodeWarning(string? rawFriendCode)
-    {
-        var normalizedFriendCodeResult = NormalizeFriendCode(rawFriendCode ?? string.Empty);
-        if (normalizedFriendCodeResult.IsFailure)
-            return null;
-
-        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
         var duplicateFriend = GameLicenseService.ActiveCurrentFriends.Any(friend =>
         {
             var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
             return existingPid != 0 && existingPid == friendProfileId;
         });
 
-        return duplicateFriend ? "This friend is already in your list." : null;
+        return duplicateFriend ? Fail("This friend is already in your list.") : Ok();
     }
 
     private static OperationResult<string> NormalizeFriendCode(string friendCode)

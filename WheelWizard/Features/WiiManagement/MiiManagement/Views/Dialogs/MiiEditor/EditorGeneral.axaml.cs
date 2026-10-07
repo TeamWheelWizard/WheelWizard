@@ -74,12 +74,12 @@ public partial class EditorGeneral : MiiEditorBaseControl
         // MiiName
         var validationMiiNameResult = ValidateMiiName(null, MiiName.Text);
         _hasMiiNameError = validationMiiNameResult.IsFailure;
-        MiiName.ErrorMessage = validationMiiNameResult.Error?.Message ?? "";
+        MiiName.ErrorText = validationMiiNameResult.Error?.Message ?? "";
 
         // CreatorName
         var validationCreatorNameResult = ValidateCreatorName(CreatorName.Text);
         _hasCreatorNameError = validationCreatorNameResult.IsFailure;
-        CreatorName.ErrorMessage = validationCreatorNameResult.Error?.Message ?? "";
+        CreatorName.ErrorText = validationCreatorNameResult.Error?.Message ?? "";
     }
 
     private OperationResult ValidateMiiName(string? _, string newName)

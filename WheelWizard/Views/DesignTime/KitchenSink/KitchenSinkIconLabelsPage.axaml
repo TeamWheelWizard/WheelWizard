@@ -28,22 +28,22 @@
         </StackPanel>
 
         <StackPanel Spacing="8">
-            <TextBlock Classes="TinyText" Text="IconLabelButton" />
+            <TextBlock Classes="TinyText" Text="LinkButton" />
             <StackPanel Orientation="Horizontal" Spacing="24">
-                <components:IconLabelButton Text="Open docs"
+                <components:LinkButton Text="Open docs"
                                             IconData="{StaticResource ExternalLink}"
                                             IconSize="16"
                                             FontSize="15"
                                             Foreground="{StaticResource Neutral300}"
                                             HoverForeground="{StaticResource Neutral200}" />
-                <components:IconLabelButton Text="Underlined action"
+                <components:LinkButton Text="Underlined action"
                                             IconData="{StaticResource ArrowRight}"
                                             IsUnderlined="True"
                                             IconSize="16"
                                             FontSize="15"
                                             Foreground="{StaticResource Neutral300}"
                                             HoverForeground="{StaticResource Primary300}" />
-                <components:IconLabelButton Text="Icon on right"
+                <components:LinkButton Text="Icon on right"
                                             IconData="{StaticResource ExternalLink}"
                                             IsIconLeft="False"
                                             IconSize="16"

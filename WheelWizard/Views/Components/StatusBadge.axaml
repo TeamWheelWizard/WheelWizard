@@ -1,4 +1,4 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
+<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:conv="clr-namespace:WheelWizard.Views.Converters"
         xmlns:components1="clr-namespace:WheelWizard.Views.Components">
@@ -6,14 +6,14 @@
     <Design.PreviewWith>
         <Border Padding="20" Background="{StaticResource Neutral300}">
             <StackPanel Spacing="5">
-                <components1:StateBox Text="Active" IconSize="0"/>
-                <components1:StateBox Text="Dark" Variant="Dark" IconSize="0" />
-                <components1:StateBox Text="Success" Variant="Success" IconData="{StaticResource CheckMark}"/>
-                <components1:StateBox Text="Warning" Variant="Warning" IconData="{StaticResource WarningTip}"/>
-                <components1:StateBox Text="Danger" Variant="Danger" IconData="{StaticResource XMark}"/>
-                <components1:StateBox IconData="{StaticResource Hourglass}" 
+                <components1:StatusBadge Text="Active" IconSize="0"/>
+                <components1:StatusBadge Text="Dark" Variant="Dark" IconSize="0" />
+                <components1:StatusBadge Text="Success" Variant="Success" IconData="{StaticResource CheckMark}"/>
+                <components1:StatusBadge Text="Warning" Variant="Warning" IconData="{StaticResource WarningTip}"/>
+                <components1:StatusBadge Text="Danger" Variant="Danger" IconData="{StaticResource XMark}"/>
+                <components1:StatusBadge IconData="{StaticResource Hourglass}" 
                                      IconSize="14" Text="Cross"/>
-                <components1:StateBox x:Name="PlayerCountBox"  Text="0" IconSize="16"
+                <components1:StatusBadge x:Name="PlayerCountBox"  Text="0" IconSize="16"
                                      IconData="{StaticResource UserCouple}"
                                      TipText="Number of players in the game"
                                      HorizontalAlignment="Center"/>
@@ -21,7 +21,8 @@
         </Border>
     </Design.PreviewWith>
 
-    <Style Selector="components1|StateBox">
+    <Style Selector="components1|StatusBadge">
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Border x:Name="PART_StateBox_Root" 
@@ -55,6 +56,7 @@
                         <!-- Content (visible when Content is not null) -->
                         <ContentPresenter Grid.Column="2" x:Name="PART_ContentPresenter"
                                           Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
                                           IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}"
                                           VerticalAlignment="Center"/>
                     </Grid>
@@ -63,7 +65,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="components1|StateBox">
+    <Style Selector="components1|StatusBadge">
         <Style Selector="^ /template/ Border#PART_StateBox_Root">
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
         </Style>
@@ -82,69 +84,69 @@
 
 
 
-        <Style Selector="^.Dark /template/ Border#PART_StateBox_Root">
+        <Style Selector="^[Variant=Dark] /template/ Border#PART_StateBox_Root">
             <Setter Property="Background" Value="{StaticResource Neutral950}" />
         </Style>
-        <Style Selector="^.Dark /template/ TextBlock#PART_StateBox_Text">
+        <Style Selector="^[Variant=Dark] /template/ TextBlock#PART_StateBox_Text">
             <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
         </Style>
-        <Style Selector="^.Dark /template/ Path#PART_StateBox_IconPath">
+        <Style Selector="^[Variant=Dark] /template/ Path#PART_StateBox_IconPath">
             <Setter Property="Fill" Value="{StaticResource Neutral600}" />
         </Style>
-        <Style Selector="^.Dark:pointerover /template/ TextBlock#PART_StateBox_Text">
+        <Style Selector="^[Variant=Dark]:pointerover /template/ TextBlock#PART_StateBox_Text">
             <Setter Property="Foreground" Value="{StaticResource Neutral50}" />
         </Style>
-        <Style Selector="^.Dark:pointerover /template/ Path#PART_StateBox_IconPath">
+        <Style Selector="^[Variant=Dark]:pointerover /template/ Path#PART_StateBox_IconPath">
             <Setter Property="Fill" Value="{StaticResource Neutral400}" />
         </Style>
 
 
 
-        <Style Selector="^.Success /template/ Border#PART_StateBox_Root">
+        <Style Selector="^[Variant=Success] /template/ Border#PART_StateBox_Root">
             <Setter Property="Background" Value="{StaticResource Primary700}" />
         </Style>
-        <Style Selector="^.Success /template/ TextBlock#PART_StateBox_Text">
+        <Style Selector="^[Variant=Success] /template/ TextBlock#PART_StateBox_Text">
             <Setter Property="Foreground" Value="{StaticResource Primary200}" />
         </Style>
-        <Style Selector="^.Success /template/ Path#PART_StateBox_IconPath">
+        <Style Selector="^[Variant=Success] /template/ Path#PART_StateBox_IconPath">
             <Setter Property="Fill" Value="{StaticResource Primary200}" />
         </Style>
-        <Style Selector="^.Success:pointerover /template/ TextBlock#PART_StateBox_Text">
+        <Style Selector="^[Variant=Success]:pointerover /template/ TextBlock#PART_StateBox_Text">
             <Setter Property="Foreground" Value="{StaticResource Primary100}" />
         </Style>
-        <Style Selector="^.Success:pointerover /template/ Path#PART_StateBox_IconPath">
+        <Style Selector="^[Variant=Success]:pointerover /template/ Path#PART_StateBox_IconPath">
             <Setter Property="Fill" Value="{StaticResource Primary100}" />
         </Style>
         
-        <Style Selector="^.Warning /template/ Border#PART_StateBox_Root">
+        <Style Selector="^[Variant=Warning] /template/ Border#PART_StateBox_Root">
             <Setter Property="Background" Value="{StaticResource Warning700}" />
         </Style>
-        <Style Selector="^.Warning /template/ TextBlock#PART_StateBox_Text">
+        <Style Selector="^[Variant=Warning] /template/ TextBlock#PART_StateBox_Text">
             <Setter Property="Foreground" Value="{StaticResource Warning200}" />
         </Style>
-        <Style Selector="^.Warning /template/ Path#PART_StateBox_IconPath">
+        <Style Selector="^[Variant=Warning] /template/ Path#PART_StateBox_IconPath">
             <Setter Property="Fill" Value="{StaticResource Warning200}" />
         </Style>
-        <Style Selector="^.Warning:pointerover /template/ TextBlock#PART_StateBox_Text">
+        <Style Selector="^[Variant=Warning]:pointerover /template/ TextBlock#PART_StateBox_Text">
             <Setter Property="Foreground" Value="{StaticResource Warning100}" />
         </Style>
-        <Style Selector="^.Warning:pointerover /template/ Path#PART_StateBox_IconPath">
+        <Style Selector="^[Variant=Warning]:pointerover /template/ Path#PART_StateBox_IconPath">
             <Setter Property="Fill" Value="{StaticResource Warning100}" />
         </Style>
         
-        <Style Selector="^.Danger /template/ Border#PART_StateBox_Root">
+        <Style Selector="^[Variant=Danger] /template/ Border#PART_StateBox_Root">
             <Setter Property="Background" Value="{StaticResource Danger700}" />
         </Style>
-        <Style Selector="^.Danger /template/ TextBlock#PART_StateBox_Text">
+        <Style Selector="^[Variant=Danger] /template/ TextBlock#PART_StateBox_Text">
             <Setter Property="Foreground" Value="{StaticResource Danger200}" />
         </Style>
-        <Style Selector="^.Danger /template/ Path#PART_StateBox_IconPath">
+        <Style Selector="^[Variant=Danger] /template/ Path#PART_StateBox_IconPath">
             <Setter Property="Fill" Value="{StaticResource Danger200}" />
         </Style>
-        <Style Selector="^.Danger:pointerover /template/ TextBlock#PART_StateBox_Text">
+        <Style Selector="^[Variant=Danger]:pointerover /template/ TextBlock#PART_StateBox_Text">
             <Setter Property="Foreground" Value="{StaticResource Danger100}" />
         </Style>
-        <Style Selector="^.Danger:pointerover /template/ Path#PART_StateBox_IconPath">
+        <Style Selector="^[Variant=Danger]:pointerover /template/ Path#PART_StateBox_IconPath">
             <Setter Property="Fill" Value="{StaticResource Danger100}" />
         </Style>
     </Style>

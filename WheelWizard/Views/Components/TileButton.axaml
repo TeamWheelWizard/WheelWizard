@@ -1,22 +1,25 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
+<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:components1="clr-namespace:WheelWizard.Views.Components"
-        xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns">
+        xmlns:components1="clr-namespace:WheelWizard.Views.Components">
 
     <Design.PreviewWith>
         <Border Padding="20" Background="{StaticResource Neutral950}">
             <UniformGrid Columns="3">
-                <components1:OptionButton Text="Idk" IconData="{StaticResource Dice}"/>
-                <components1:OptionButton Text="Some option" IconData="{StaticResource Award}"/>
-                <components1:OptionButton Text="MORE"/>
-                <components1:OptionButton Text="Random Options"/>
-                <components1:OptionButton Text="not an option" IsEnabled="False"/>
+                <components1:TileButton Text="Idk" IconData="{StaticResource Dice}"/>
+                <components1:TileButton Text="Some option" IconData="{StaticResource Award}"/>
+                <components1:TileButton Text="MORE"/>
+                <components1:TileButton Text="Random Options"/>
+                <components1:TileButton Text="not an option" IsEnabled="False"/>
               </UniformGrid>
         </Border>
     </Design.PreviewWith>
 
-    <Style Selector="components1|OptionButton">
-        <!-- Set Defaults -->
+    <Style Selector="components1|TileButton">
+        <Setter Property="FontSize" Value="36" />
+        <Setter Property="Width" Value="150" />
+        <Setter Property="Height" Value="150" />
+        <Setter Property="IconSize" Value="70" />
+        <Setter Property="Margin" Value="6" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="CornerRadius" Value="{DynamicResource GlobalCornerRadius}" />
@@ -33,26 +36,10 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{TemplateBinding CornerRadius}">
-                        <Grid>
-                            <Border CornerRadius="99999" IsVisible="False" Opacity="0.3" x:Name="PART_HoverEffect"
-                                    HorizontalAlignment="Left" VerticalAlignment="Top"
-                                    Background="{StaticResource Primary200}" Height="60" Width="60" Effect="blur(150)">
-              
-                                <Border.Styles>
-                                    <Style Selector="Border">
-                                        <Style.Animations>
-                                            <Animation Duration="0:0:5" IterationCount="INFINITE">
-                                                <KeyFrame Cue="0%">
-                                                    <Setter Property="RotateTransform.Angle" Value="0"/>
-                                                </KeyFrame>
-                                                <KeyFrame Cue="100%">
-                                                    <Setter Property="RotateTransform.Angle" Value="360"/>
-                                                </KeyFrame>
-                                            </Animation>
-                                        </Style.Animations>
-                                    </Style>
-                                </Border.Styles>
-                            </Border>
+                        <Grid ClipToBounds="True">
+                            <Canvas IsHitTestVisible="False">
+                <components1:HoverGlow Name="PART_HoverEffect" CornerRadius="99999" IsVisible="False" Opacity="0.3" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{StaticResource Primary200}" Height="60" Width="60" Effect="blur(150)" />
+            </Canvas>
                             
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Border Background="Transparent"
@@ -84,17 +71,17 @@
         </Setter>
     </Style>
     
-    <Style Selector="components1|OptionButton:pointerover">
+    <Style Selector="components1|TileButton:pointerover">
         <Setter Property="Foreground" Value="{StaticResource Primary300}" />
         <Setter Property="Background" Value="{StaticResource Neutral800}" />
-        <Style Selector="^ /template/ Border#PART_HoverEffect">
+        <Style Selector="^ /template/ components1|HoverGlow#PART_HoverEffect">
             <Setter Property="IsVisible" Value="True"/>
         </Style>
         <Style Selector="^ /template/ TextBlock#TitleText">
             <Setter Property="Foreground" Value="{StaticResource Primary200}" />
         </Style>
     </Style>
-    <Style Selector="components1|OptionButton:pressed">
+    <Style Selector="components1|TileButton:pressed">
         <Setter Property="Foreground" Value="{StaticResource Primary200}" />
         <Setter Property="Background" Value="{StaticResource Neutral700}" />
         <Style Selector="^ /template/ TextBlock#TitleText">
@@ -102,7 +89,7 @@
         </Style>
     </Style>
         
-    <Style Selector="components1|OptionButton:disabled">
+    <Style Selector="components1|TileButton:disabled">
         <Setter Property="Background" Value="{StaticResource Neutral950}" />
         <Setter Property="Foreground" Value="{StaticResource Neutral700}" />
         <Style Selector="^ /template/ Border#PART_DisabledBorder">

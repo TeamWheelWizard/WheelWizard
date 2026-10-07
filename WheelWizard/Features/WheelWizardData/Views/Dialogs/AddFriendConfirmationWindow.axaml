@@ -34,7 +34,7 @@
                 <TextBlock Classes="BodyText" FontSize="14"
                            Foreground="{StaticResource Neutral300}"
                            Text="{Binding FriendCode}" />
-                <components:StateBox Text="{Binding FriendVr, StringFormat='VR {0}'}"
+                <components:StatusBadge Text="{Binding FriendVr, StringFormat='VR {0}'}"
                                      Variant="Success"
                                      IconSize="0"
                                      HorizontalAlignment="Left" />

@@ -22,8 +22,8 @@ using WheelWizard.Shared;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.DesignTime;
-using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Controls;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.Views.Shell.Startup;
 using WheelWizard.Views.Shell.Views;
@@ -241,7 +241,7 @@ public class ApplicationCompositionTests
             Assert.Equal(string.Empty, roomsButton.GetVisualDescendants().OfType<IconLabel>().Single().Text);
             Assert.Equal(19.5, roomsButton.GetVisualDescendants().OfType<IconLabel>().Single().Margin.Left);
             Assert.Equal(0, original.FindControl<TextBlock>("OtherSectionText")!.Opacity);
-            Assert.False(roomsButton.GetVisualDescendants().OfType<StateBox>().Single().IsVisible);
+            Assert.False(roomsButton.GetVisualDescendants().OfType<StatusBadge>().Single().IsVisible);
             toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             original.UpdateLayout();
             Assert.Equal(221, original.SidebarWidth);

@@ -279,7 +279,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         ProfileAttribTotalWins.Text = currentPlayer.Statistics.Performance.FirstPlaces.ToString();
 
         BadgeContainer.Children.Clear();
-        var badges = BadgeService.GetBadges(currentPlayer.FriendCode).Select(variant => new Badge { Variant = variant });
+        var badges = BadgeService.GetBadges(currentPlayer.FriendCode).Select(variant => new CommunityBadge { Variant = variant });
         foreach (var badge in badges)
         {
             badge.Height = 30;
@@ -410,7 +410,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_CouldNotFindRoom);
     }
 
-    private void CopyFriendCode_OnClick(object? sender, EventArgs e)
+    private void CopyFriendCode_OnClick(object? sender, RoutedEventArgs e)
     {
         if (currentPlayer?.FriendCode == null)
             return;
@@ -430,7 +430,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         return Ok();
     }
 
-    private async void RenameMii_OnClick(object? sender, EventArgs e)
+    private async void RenameMii_OnClick(object? sender, RoutedEventArgs e)
     {
         var oldName = CurrentMii?.Name.ToString();
         var extraText = t("question.enter_new_name.extra", new { name = oldName ?? string.Empty }) ?? string.Empty;

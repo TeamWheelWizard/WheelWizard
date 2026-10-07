@@ -534,10 +534,4 @@ public class MultiIconRadioButton : RadioButton
     }
 
     #endregion
-
-    public MultiIconRadioButton()
-    {
-        Width = 60;
-        Height = 60;
-    }
 }

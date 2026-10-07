@@ -19,7 +19,7 @@ public sealed class DolphinLaunchPresentation : IDolphinLaunchPresentation
     public async Task<DolphinVersionAction> ChooseOutdatedVersionActionAsync(string? version)
     {
         var popup = new YesNoWindow()
-            .SetButtonVariants(Button.ButtonsVariantType.Primary, Button.ButtonsVariantType.Danger)
+            .SetButtonVariants(ButtonVariant.Primary, ButtonVariant.Danger)
             .SetButtonText(t("action.update"), t("action.play_anyway"))
             .SetMainText(t("question.dolphin_outdated.title"))
             .SetExtraText(

@@ -226,10 +226,7 @@ public partial class RecompSettings : UserControl
             .SetMainText(t("question.recomp_share_dolphin_data.title"))
             .SetExtraText(t("question.recomp_share_dolphin_data.extra"))
             .SetButtonText(t("action.recomp_nand_share"), t("action.cancel"))
-            .SetButtonVariants(
-                WheelWizard.Views.Components.Button.ButtonsVariantType.Warning,
-                WheelWizard.Views.Components.Button.ButtonsVariantType.Default
-            )
+            .SetButtonVariants(WheelWizard.Views.Components.ButtonVariant.Warning, WheelWizard.Views.Components.ButtonVariant.Default)
             .AwaitAnswer();
         if (!confirmed)
         {
@@ -278,10 +275,7 @@ public partial class RecompSettings : UserControl
                 .SetMainText(t("question.recomp_overwrite_dolphin_clone.title"))
                 .SetExtraText(t("question.recomp_overwrite_dolphin_clone.extra"))
                 .SetButtonText(t("action.clone"), t("action.cancel"))
-                .SetButtonVariants(
-                    WheelWizard.Views.Components.Button.ButtonsVariantType.Warning,
-                    WheelWizard.Views.Components.Button.ButtonsVariantType.Default
-                )
+                .SetButtonVariants(WheelWizard.Views.Components.ButtonVariant.Warning, WheelWizard.Views.Components.ButtonVariant.Default)
                 .AwaitAnswer();
             if (!overwrite)
                 return;

@@ -368,21 +368,21 @@ public partial class ModContent : UserControl
         IsVisible = false;
     }
 
-    private void AuthorLink_Click(object? sender, EventArgs eventArgs)
+    private void AuthorLink_Click(object? sender, RoutedEventArgs eventArgs)
     {
         var profileUrl = CurrentMod?.Author.ProfileUrl;
         if (profileUrl != null)
             ViewUtils.OpenLink(profileUrl);
     }
 
-    private void GameBananaLink_Click(object? sender, EventArgs eventArgs)
+    private void GameBananaLink_Click(object? sender, RoutedEventArgs eventArgs)
     {
         var profileUrl = CurrentMod?.ProfileUrl;
         if (profileUrl != null)
             ViewUtils.OpenLink(profileUrl);
     }
 
-    private void ReportLink_Click(object? sender, EventArgs eventArgs)
+    private void ReportLink_Click(object? sender, RoutedEventArgs eventArgs)
     {
         var url = $"https://gamebanana.com/support/add?s=Mod.{CurrentMod?.Id}";
         ViewUtils.OpenLink(url);

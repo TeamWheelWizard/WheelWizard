@@ -2,20 +2,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:components="clr-namespace:WheelWizard.Views.Components">
     <Design.PreviewWith>
-        <components:IconLabelButton />
+        <components:LinkButton />
     </Design.PreviewWith>
 
-    <Style Selector="components|IconLabelButton">
+    <Style Selector="components|LinkButton">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand"/>
-        <!-- Setting it to transparent won't change the actual visual part. but ti does make the border react to :pointerover events -->
+        <Setter Property="HoverForeground" Value="{Binding Foreground, RelativeSource={RelativeSource Self}}" />
+
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Background="{TemplateBinding Background}"
+                <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}">
                     
-                    <components:IconLabel Text="{TemplateBinding Text}"
+                    <components:IconLabel HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Text="{TemplateBinding Text}"
                                         Foreground="{TemplateBinding Foreground}"
                                         FontSize="{TemplateBinding FontSize}"
                                         IconSize="{TemplateBinding IconSize}"
@@ -23,8 +31,8 @@
                                         IsUnderlined="{TemplateBinding IsUnderlined}"
                                         IsIconLeft="{TemplateBinding IsIconLeft}">
                         <components:IconLabel.Styles>
-                            <Style Selector="components|IconLabelButton:pointerover /template/ components|IconLabel">
-                                <Setter Property="Foreground" Value="{Binding HoverForeground, RelativeSource={RelativeSource AncestorType=components:IconLabelButton}}"/>
+                            <Style Selector="components|LinkButton:pointerover /template/ components|IconLabel">
+                                <Setter Property="Foreground" Value="{Binding HoverForeground, RelativeSource={RelativeSource AncestorType=components:LinkButton}}"/>
                                 <Setter Property="IsUnderlined" Value="True" />
                             </Style>
                         </components:IconLabel.Styles>
@@ -32,5 +40,8 @@
                 </Border>
             </ControlTemplate>
         </Setter>
+    </Style>
+    <Style Selector="components|LinkButton:disabled">
+        <Setter Property="Opacity" Value="0.5" />
     </Style>
 </Styles>

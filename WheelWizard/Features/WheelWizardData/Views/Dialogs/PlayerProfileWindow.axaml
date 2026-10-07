@@ -46,10 +46,10 @@
                         <TextBlock Text="{Binding Profile.FriendCode}" Classes="BodyText" FontSize="12"
                                    Foreground="{StaticResource Neutral400}" />
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <components:StateBox Text="{Binding Profile.Rank, StringFormat='Rank #{0}'}"
+                            <components:StatusBadge Text="{Binding Profile.Rank, StringFormat='Rank #{0}'}"
                                                  Variant="Success" IconSize="0" HorizontalAlignment="Left"
                                                  IsVisible="{Binding Profile.Rank, Converter={x:Static conv:NumberConverters.GreaterThan0}}" />
-                            <components:StateBox Text="Suspicious" Variant="Danger" IconSize="0"
+                            <components:StatusBadge Text="Suspicious" Variant="Danger" IconSize="0"
                                                  HorizontalAlignment="Left"
                                                  IsVisible="{Binding Profile.IsSuspicious}" />
                         </StackPanel>

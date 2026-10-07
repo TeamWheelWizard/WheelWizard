@@ -116,7 +116,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         }
     }
 
-    private void GoBackClick(object? sender, EventArgs eventArgs) => Navigation.NavigateTo<RoomsPage>();
+    private void GoBackClick(object? sender, RoutedEventArgs eventArgs) => Navigation.NavigateTo<RoomsPage>();
 
     private void CopyFriendCode_OnClick(object sender, RoutedEventArgs e)
     {

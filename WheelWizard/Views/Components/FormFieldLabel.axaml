@@ -24,7 +24,7 @@
                     
                      <Border Background="Transparent" Width="14" Height="14" 
                              ToolTip.Tip="{TemplateBinding TipText}"
-                             ToolTip.Placement="{Binding (ToolTip.Placement), RelativeSource={RelativeSource TemplatedParent}}"
+                             ToolTip.Placement="{TemplateBinding TipPlacement}"
                              ToolTip.ShowDelay="50">
                          <Border.RenderTransform>
                              <!-- This 1 pixel difference improves it exactly 271 x times -->

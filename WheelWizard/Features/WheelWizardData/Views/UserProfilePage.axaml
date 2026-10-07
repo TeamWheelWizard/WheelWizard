@@ -191,7 +191,7 @@
                             <StackPanel Margin="7" HorizontalAlignment="Left" VerticalAlignment="Top">
                                 <StackPanel Orientation="Horizontal">
                                     <SelectableTextBlock Classes="TitleText" x:Name="ProfileAttribUserName" />
-                                    <components:IconLabelButton VerticalAlignment="Center" x:Name="EditMiiName"
+                                    <components:LinkButton VerticalAlignment="Center" x:Name="EditMiiName"
                                                                 IconData="{StaticResource Pen}"
                                                                 Click="RenameMii_OnClick"
                                                                 Margin="7,0,0,0" IconSize="20"
@@ -200,7 +200,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <SelectableTextBlock Classes="BodyText" x:Name="ProfileAttribFriendCode" />
-                                    <components:IconLabelButton VerticalAlignment="Center" x:Name="CopyFcButton"
+                                    <components:LinkButton VerticalAlignment="Center" x:Name="CopyFcButton"
                                                                 Click="CopyFriendCode_OnClick"
                                                                 IconData="{StaticResource Copy}"
                                                                 Margin="7,0,0,0" IconSize="20"
@@ -239,7 +239,7 @@
                     <Grid Grid.Row="2" x:Name="CarouselNavigation" VerticalAlignment="Center" HorizontalAlignment="Center"
                           Margin="0,2,0,2" ColumnDefinitions="Auto,Auto,Auto" IsVisible="{Binding HasProfileInfo}">
                         <components:Button Grid.Column="0" IconData="{StaticResource ArrowLeft}" IconSize="12"
-                                           Width="26" Height="26" Padding="0" Variant="UglyLight"
+                                           Width="26" Height="26" Padding="0" Variant="Light"
                                            VerticalAlignment="Center" Margin="0,0,8,0"
                                            Click="PrevCarouselPage_OnClick" />
 
@@ -250,7 +250,7 @@
                         </StackPanel>
 
                         <components:Button Grid.Column="2" IconData="{StaticResource ArrowRight}" IconSize="12"
-                                           Width="26" Height="26" Padding="0" Variant="UglyLight"
+                                           Width="26" Height="26" Padding="0" Variant="Light"
                                            VerticalAlignment="Center" Margin="8,0,0,0"
                                            Click="NextCarouselPage_OnClick" />
                     </Grid>

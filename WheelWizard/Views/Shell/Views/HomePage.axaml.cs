@@ -7,6 +7,7 @@ using Avalonia.Media;
 using Testably.Abstractions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Shell.Controls;
 using WheelWizard.Views.Shell.ViewModels;
 
 namespace WheelWizard.Views.Shell.Views;

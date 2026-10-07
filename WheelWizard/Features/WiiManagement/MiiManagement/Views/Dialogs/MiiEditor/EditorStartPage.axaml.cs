@@ -21,10 +21,10 @@ public partial class EditorStartPage : MiiEditorBaseControl
 
     private void PopupPageButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is not PopupListButton button)
+        if (sender is not ListActionButton button)
             return;
 
-        if (button.Type is not { } pageType)
+        if (button.CommandParameter is not Type pageType)
             return;
 
         Editor.SetEditorPage(pageType);
@@ -48,7 +48,7 @@ public partial class EditorStartPage : MiiEditorBaseControl
 
     private void SaveButton_OnClick(object? sender, RoutedEventArgs e) => Editor.SignalSaveMii();
 
-    private void FavoriteButton_OnClick(object? sender, EventArgs e)
+    private void FavoriteButton_OnClick(object? sender, RoutedEventArgs e)
     {
         Editor.Mii.IsFavorite = !Editor.Mii.IsFavorite;
 

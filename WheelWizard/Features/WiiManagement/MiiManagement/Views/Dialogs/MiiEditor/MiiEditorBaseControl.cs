@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Shell;
@@ -13,7 +14,7 @@ public class MiiEditorBaseControl : UserControl
 
     protected MiiEditorBaseControl(MiiEditorWindow editor) => Editor = editor;
 
-    protected void BackButton_OnClick(object? sender, EventArgs e)
+    protected void BackButton_OnClick(object? sender, RoutedEventArgs e)
     {
         BeforeBack();
         Editor.SetEditorPage(typeof(EditorStartPage));

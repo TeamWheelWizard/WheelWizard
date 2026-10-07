@@ -5,7 +5,8 @@
         xmlns:components="using:WheelWizard.Views.Components"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
-        xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views">
+        xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
+        xmlns:communityControls="clr-namespace:WheelWizard.WheelWizardData.Views">
     <Design.PreviewWith>
         <StackPanel Background="{StaticResource Neutral950}">
             <rooms:PlayerListItem Width="428" Height="124"
@@ -87,7 +88,7 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate x:DataType="domain:BadgeVariant">
-                                                <components:Badge Variant="{Binding}" Width="30" Height="30" />
+                                                <communityControls:CommunityBadge Variant="{Binding}" Width="30" Height="30" />
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>

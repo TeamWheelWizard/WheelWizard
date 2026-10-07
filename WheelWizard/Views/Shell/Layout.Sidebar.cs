@@ -7,7 +7,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
-using WheelWizard.Views.Patterns;
+using WheelWizard.Views.Shell.Controls;
 
 namespace WheelWizard.Views.Shell;
 

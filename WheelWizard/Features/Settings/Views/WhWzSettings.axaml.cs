@@ -439,7 +439,7 @@ public partial class WhWzSettings : UserControl
     {
         completeIcon.IsVisible = isValid;
         warningIcon.IsVisible = !isValid;
-        changeButton.Variant = isValid ? SettingsButton.ButtonsVariantType.Default : SettingsButton.ButtonsVariantType.Warning;
+        changeButton.Variant = isValid ? ButtonVariant.Default : ButtonVariant.Warning;
     }
 
     private static bool CanOpenContainingFolder(string filePath)

@@ -2,29 +2,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:WheelWizard.Localization"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
-        xmlns:patterns="clr-namespace:WheelWizard.Views.Patterns"
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
-        xmlns:shellViews="clr-namespace:WheelWizard.Views.Shell.Views">
+        xmlns:shellViews="clr-namespace:WheelWizard.Views.Shell.Views"
+        xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls">
   <Design.PreviewWith>
     <Border Padding="2" Width="300" Background="{StaticResource Neutral600}">
       <StackPanel>
-        <patterns:SidebarRadioButton IconData="{StaticResource Home}" 
+        <shellControls:SidebarRadioButton IconData="{StaticResource Home}" 
                                      Text="{loc:T page_title.home}"
                                      PageType="{x:Type shellViews:HomePage}"/>
         
-        <patterns:SidebarRadioButton  IsChecked="True"
+        <shellControls:SidebarRadioButton  IsChecked="True"
                                    IconData="{StaticResource Settings}" 
                                    Text="{loc:T page_title.settings}"
                                    PageType="{x:Type shellViews:HomePage}"/>
         
-        <patterns:SidebarRadioButton IconData="{StaticResource Friends}" 
+        <shellControls:SidebarRadioButton IconData="{StaticResource Friends}" 
                                   Text="{loc:T page_title.friends}"
                                   PageType="{x:Type shellViews:HomePage}"
                                   BoxText="0/0"/>  
-        <patterns:SidebarRadioButton IconData="{StaticResource CubesStacked}" 
+        <shellControls:SidebarRadioButton IconData="{StaticResource CubesStacked}" 
                                   Text="{loc:T page_title.mods}"
                                   PageType="{x:Type shellViews:HomePage}"/>
-        <patterns:SidebarRadioButton IconData="{StaticResource RoomUsers}" 
+        <shellControls:SidebarRadioButton IconData="{StaticResource RoomUsers}" 
                                   Text="{loc:T page_title.rooms}"
                                   PageType="{x:Type rooms:RoomsPage}"/>
                                   
@@ -32,7 +32,7 @@
     </Border>
   </Design.PreviewWith>
 
-  <Style Selector="patterns|SidebarRadioButton">
+  <Style Selector="shellControls|SidebarRadioButton">
     <Setter Property="Background" Value="{DynamicResource Neutral900}" />
     <Setter Property="Foreground" Value="{DynamicResource Neutral400}" />
     <Setter Property="Height" Value="46" />
@@ -51,13 +51,9 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Stretch" />
             
-            <Border Name="PART_HoverEffect" CornerRadius="99999" IsVisible="False" Opacity="0.3"
-                    IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top"
-                    Background="{StaticResource Primary200}" Height="46" Width="46" Effect="blur(150)">
-              <Border.RenderTransform>
-                <TranslateTransform />
-              </Border.RenderTransform>
-            </Border>
+            <Canvas IsHitTestVisible="False">
+                <components:HoverGlow Name="PART_HoverEffect" CornerRadius="99999" IsVisible="False" Opacity="0.3" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{StaticResource Primary200}" Height="46" Width="46" Effect="blur(150)" />
+            </Canvas>
 
             <components:IconLabel x:Name="RadioIcon" IconSize="25" FontSize="19"
                              IconData="{TemplateBinding IconData}"
@@ -66,8 +62,8 @@
                              HorizontalAlignment="Left" VerticalAlignment="Center"
                              Margin="{TemplateBinding Padding}" />
 
-            <components:StateBox IsVisible="{TemplateBinding BoxText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                            x:Name="StateBox" Classes="Dark"
+            <components:StatusBadge IsVisible="{TemplateBinding BoxText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                            x:Name="StatusBadge" Variant="Dark"
                             Margin="0,0,10,0"
                             VerticalAlignment="Center" HorizontalAlignment="Right"
                             Text="{TemplateBinding BoxText}"
@@ -76,51 +72,40 @@
                             IconSize="{TemplateBinding BoxIconSize}"
                             TipText="{TemplateBinding BoxTip}"
             />
-            <!-- This will be added at a future date after patches is more stable this will turn on -->
-            <!-- <PathIcon Data="{StaticResource WarningTriangle}" -->
-            <!--           IsVisible="{TemplateBinding WarningVisible}" -->
-            <!--           ToolTip.Tip="{TemplateBinding WarningTip}" -->
-            <!--           ToolTip.Placement="Right" -->
-            <!--           Width="17" -->
-            <!--           Height="17" -->
-            <!--           Margin="0,0,12,0" -->
-            <!--           Foreground="{StaticResource Danger500}" -->
-            <!--           HorizontalAlignment="Right" -->
-            <!--           VerticalAlignment="Center" /> -->
           </Grid>
         </Border>
       </ControlTemplate>
     </Setter>
   </Style>
   
-  <Style Selector="patterns|SidebarRadioButton:pointerover">
+  <Style Selector="shellControls|SidebarRadioButton:pointerover">
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Background" Value="{StaticResource Neutral800}" />
     <Setter Property="Foreground" Value="{StaticResource Primary200}" />
-    <Style Selector="^ /template/ Border#PART_HoverEffect">
+    <Style Selector="^ /template/ components|HoverGlow#PART_HoverEffect">
       <Setter Property="IsVisible" Value="True" />
     </Style>
   </Style>
 
-  <Style Selector="patterns|SidebarRadioButton:checked">
+  <Style Selector="shellControls|SidebarRadioButton:checked">
     <Setter Property="Background" Value="{StaticResource Neutral950}" />
     <Setter Property="Foreground" Value="{StaticResource Primary300}" />
-    <Style Selector="^ /template/ Border#PART_HoverEffect">
+    <Style Selector="^ /template/ components|HoverGlow#PART_HoverEffect">
       <Setter Property="IsVisible" Value="False" />
     </Style>
     <Style Selector="^ /template/ Border#PART_SelectionIndicator">
       <Setter Property="Background" Value="{StaticResource Primary400}"/>
     </Style>
   </Style>
-  <Style Selector="patterns|SidebarRadioButton.compact">
+  <Style Selector="shellControls|SidebarRadioButton.compact">
     <Setter Property="ToolTip.Tip" Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
     <Setter Property="ToolTip.ShowDelay" Value="100" />
     <Setter Property="ToolTip.Placement" Value="Right" />
   </Style>
-  <Style Selector="patterns|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon">
+  <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon">
     <Setter Property="Text" Value="" />
   </Style>
-  <Style Selector="patterns|SidebarRadioButton.compact /template/ components|StateBox#StateBox">
+  <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|StatusBadge#StatusBadge">
     <Setter Property="IsVisible" Value="False" />
   </Style>
 </Styles>

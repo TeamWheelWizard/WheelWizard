@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:behaviorComp="clr-namespace:WheelWizard.Views.Patterns"
              mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="520"
-             x:Class="WheelWizard.Views.DesignTime.KitchenSink.KitchenSinkInputFieldsPage">
+             x:Class="WheelWizard.Views.DesignTime.KitchenSink.KitchenSinkInputFieldsPage"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
     <StackPanel Spacing="12">
         <StackPanel Spacing="8">
             <TextBlock Classes="TinyText" Text="Standard Input Field" />
@@ -16,34 +16,23 @@
         </StackPanel>
 
         <StackPanel Spacing="8">
-            <TextBlock Classes="TinyText" Text="FeedbackTextBox Behavior Component" />
-            <behaviorComp:FeedbackTextBox Width="320"
+            <TextBlock Classes="TinyText" Text="Labeled Text Field" />
+            <components:TextField Width="320"
                                           Label="Display Name"
                                           TipText="This is the reusable labeled input with inline validation feedback."
-                                          Watermark="Enter display name..."
+                                          PlaceholderText="Enter display name..."
                                           Text="PlayerOne"
-                                          ErrorMessage="This name is already in use." />
-            <behaviorComp:FeedbackTextBox Width="320"
+                                          ErrorText="This name is already in use." />
+            <components:TextField Width="320"
                                           Label="Display Name (Dark)"
                                           Variant="Dark"
-                                          Watermark="Enter display name..."
+                                          PlaceholderText="Enter display name..."
                                           Text="PlayerOne"
-                                          ErrorMessage="This name is already in use." />
-            <behaviorComp:FeedbackTextBox Width="320"
-                                          Label="Password"
-                                          Watermark="Choose a strong password..."
-                                          Text="hello123"
-                                          WarningMessage="This password is weak." />
-            <behaviorComp:FeedbackTextBox Width="320"
-                                          Label="Password (Dark)"
-                                          Variant="Dark"
-                                          Watermark="Choose a strong password..."
-                                          Text="hello123"
-                                          WarningMessage="This password is weak." />
-            <behaviorComp:FeedbackTextBox Width="320"
+                                          ErrorText="This name is already in use." />
+            <components:TextField Width="320"
                                           Label="Optional Note"
-                                          Watermark="Optional..."
-                                          Text="Disabled behavior component"
+                                          PlaceholderText="Optional..."
+                                          Text="Disabled text field"
                                           IsEnabled="False" />
         </StackPanel>
     </StackPanel>

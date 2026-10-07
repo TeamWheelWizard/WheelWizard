@@ -10,22 +10,22 @@
     <Grid RowDefinitions="40,*,60">
         <StackPanel Orientation="Horizontal"  Margin="10" Spacing="10">
             <!-- EmptyStarIcon -->
-            <components:IconLabelButton Text="" VerticalAlignment="Center" x:Name="FavoriteButton" Click="FavoriteButton_OnClick">
+            <components:LinkButton Text="" VerticalAlignment="Center" x:Name="FavoriteButton" Click="FavoriteButton_OnClick">
                 
-                <components:IconLabelButton.Styles>
-                    <Style Selector="components|IconLabelButton">
+                <components:LinkButton.Styles>
+                    <Style Selector="components|LinkButton">
                         <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}" />
                         <Setter Property="Foreground" Value="{StaticResource TitleTextColor}" />
                         <Setter Property="HoverForeground" Value="{StaticResource Warning300}" />
                     </Style>
                     
-                    <Style Selector="components|IconLabelButton.favorite">
+                    <Style Selector="components|LinkButton.favorite">
                         <Setter Property="IconData" Value="{StaticResource StarIcon}" />
                         <Setter Property="Foreground" Value="{StaticResource Warning500}" />
                         <Setter Property="HoverForeground" Value="{StaticResource Warning300}" />
                     </Style>
-                </components:IconLabelButton.Styles>
-            </components:IconLabelButton>
+                </components:LinkButton.Styles>
+            </components:LinkButton>
             <SelectableTextBlock Classes="BodyText" x:Name="MiiName" />
         </StackPanel>
         
@@ -48,26 +48,26 @@
         
         <ScrollViewer Grid.Row="1">
             <StackPanel>
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.general}"
-                                            Type="{x:Type editor:EditorGeneral}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.face}"
-                                            Type="{x:Type editor:EditorFace}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.hair}"
-                                            Type="{x:Type editor:EditorHair}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.eyebrows}"
-                                            Type="{x:Type editor:EditorEyebrows}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.eyes}"
-                                            Type="{x:Type editor:EditorEyes}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.nose}"
-                                            Type="{x:Type editor:EditorNose}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.lips}"
-                                            Type="{x:Type editor:EditorLips}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.glasses}"
-                                            Type="{x:Type editor:EditorGlasses}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.facial_hair}"
-                                            Type="{x:Type editor:EditorFacialHair}" />
-                <components:PopupListButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.mole}"
-                                            Type="{x:Type editor:EditorMole}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.general}"
+                                            CommandParameter="{x:Type editor:EditorGeneral}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.face}"
+                                            CommandParameter="{x:Type editor:EditorFace}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.hair}"
+                                            CommandParameter="{x:Type editor:EditorHair}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.eyebrows}"
+                                            CommandParameter="{x:Type editor:EditorEyebrows}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.eyes}"
+                                            CommandParameter="{x:Type editor:EditorEyes}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.nose}"
+                                            CommandParameter="{x:Type editor:EditorNose}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.lips}"
+                                            CommandParameter="{x:Type editor:EditorLips}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.glasses}"
+                                            CommandParameter="{x:Type editor:EditorGlasses}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.facial_hair}"
+                                            CommandParameter="{x:Type editor:EditorFacialHair}" />
+                <components:ListActionButton Click="PopupPageButton_OnClick" Text="{loc:T attribute.mii_section.mole}"
+                                            CommandParameter="{x:Type editor:EditorMole}" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

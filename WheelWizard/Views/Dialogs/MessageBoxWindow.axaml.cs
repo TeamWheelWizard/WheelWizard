@@ -27,7 +27,7 @@ public partial class MessageBoxWindow : PopupContent
     public MessageBoxWindow SetMessageType(MessageType newType)
     {
         messageType = newType;
-        CancelButton.Variant = messageType == MessageType.Message ? Button.ButtonsVariantType.Primary : Button.ButtonsVariantType.Default;
+        CancelButton.Variant = messageType == MessageType.Message ? ButtonVariant.Primary : ButtonVariant.Default;
 
         Window.WindowTitle = messageType.ToString();
         TitleBorder.Classes.Add(messageType.ToString());
@@ -60,7 +60,7 @@ public partial class MessageBoxWindow : PopupContent
         return this;
     }
 
-    private void MessageLink_OnClick(object? sender, EventArgs e) => ViewUtils.OpenLink((string)MessageLink.Tag!);
+    private void MessageLink_OnClick(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink((string)MessageLink.Tag!);
 
     public MessageBoxWindow SetTag(string extraText)
     {

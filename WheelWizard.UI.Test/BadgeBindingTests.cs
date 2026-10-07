@@ -30,7 +30,7 @@ public class BadgeBindingTests
         {
             window.Show();
             window.UpdateLayout();
-            Assert.Equal(initial, card.GetVisualDescendants().OfType<Badge>().Select(badge => badge.Variant));
+            Assert.Equal(initial, card.GetVisualDescendants().OfType<CommunityBadge>().Select(badge => badge.Variant));
 
             BadgeVariant[] replacement = [BadgeVariant.RrDev];
             if (card is FriendsListItem friend)
@@ -38,7 +38,7 @@ public class BadgeBindingTests
             else
                 ((PlayerListItem)card).BadgeVariants = replacement;
             window.UpdateLayout();
-            Assert.Equal(replacement, card.GetVisualDescendants().OfType<Badge>().Select(badge => badge.Variant));
+            Assert.Equal(replacement, card.GetVisualDescendants().OfType<CommunityBadge>().Select(badge => badge.Variant));
         }
         finally
         {

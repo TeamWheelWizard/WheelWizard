@@ -22,7 +22,7 @@
                         Spacing="8">
                 <TextBlock Text="{loc:T page_title.my_miis}"
                            Classes="PageTitleText" />
-                <components:StateBox Text="0"
+                <components:StatusBadge Text="0"
                                      IconSize="0"
                                      x:Name="ListItemCount"
                                      VerticalAlignment="Center" />

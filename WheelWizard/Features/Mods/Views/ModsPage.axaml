@@ -45,7 +45,7 @@
         <StackPanel Orientation="Horizontal" Spacing="8"
                     HorizontalAlignment="Left" VerticalAlignment="Bottom">
             <TextBlock Text="{Binding StoragePageTitle}" Classes="PageTitleText" />
-            <components:StateBox Text="0" IconSize="0" x:Name="ListItemCount"
+            <components:StatusBadge Text="0" IconSize="0" x:Name="ListItemCount"
                                  VerticalAlignment="Center" />
         </StackPanel>
         </StackPanel>
@@ -59,18 +59,17 @@
                 <components:Button x:Name="ModActionsButton" Grid.Column="1" Variant="Primary" Height="40"
                                    IconData="{StaticResource ChevronDown}" IconSize="16"
                                    Padding="10,10" CornerRadius="0,6,6,0"
-                                   AutomationProperties.Name="{loc:T action.browse}"
-                                   Click="ModActionsMenu_Click">
-                    <components:Button.ContextMenu>
-                        <ContextMenu Placement="BottomEdgeAlignedRight">
+                                   AutomationProperties.Name="{loc:T action.browse}">
+                    <components:Button.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedRight">
                             <MenuItem Header="{loc:T action.browse}" Click="BrowseMod_Click">
                                 <MenuItem.Icon><PathIcon Data="{StaticResource Search}" /></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{loc:T action.import}" Click="ImportMod_Click">
                                 <MenuItem.Icon><PathIcon Data="{StaticResource FileImport}" /></MenuItem.Icon>
                             </MenuItem>
-                        </ContextMenu>
-                    </components:Button.ContextMenu>
+                        </MenuFlyout>
+                    </components:Button.Flyout>
                 </components:Button>
                 <Border Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left"
                         VerticalAlignment="Center" Background="{StaticResource Primary50}"
@@ -91,18 +90,17 @@
                 <components:Button x:Name="EmptyModActionsButton" Grid.Column="1" Variant="Primary" Height="40"
                                    IconData="{StaticResource ChevronDown}" IconSize="16"
                                    Padding="10,10" CornerRadius="0,6,6,0"
-                                   AutomationProperties.Name="{loc:T action.browse}"
-                                   Click="ModActionsMenu_Click">
-                    <components:Button.ContextMenu>
-                        <ContextMenu Placement="BottomEdgeAlignedRight">
+                                   AutomationProperties.Name="{loc:T action.browse}">
+                    <components:Button.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedRight">
                             <MenuItem Header="{loc:T action.browse}" Click="BrowseMod_Click">
                                 <MenuItem.Icon><PathIcon Data="{StaticResource Search}" /></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{loc:T action.import}" Click="ImportMod_Click">
                                 <MenuItem.Icon><PathIcon Data="{StaticResource FileImport}" /></MenuItem.Icon>
                             </MenuItem>
-                        </ContextMenu>
-                    </components:Button.ContextMenu>
+                        </MenuFlyout>
+                    </components:Button.Flyout>
                 </components:Button>
                 <Border Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left"
                         VerticalAlignment="Center" Background="{StaticResource Primary50}"
@@ -208,7 +206,7 @@
                                         <StackPanel.Styles>
                                             <Style
                                                 Selector="ListBoxItem Border.BoxItemBackground:pointerover components|Button">
-                                                <Setter Property="Variant" Value="UglyLight" />
+                                                <Setter Property="Variant" Value="Light" />
                                             </Style>
                                         </StackPanel.Styles>
                                     </StackPanel>
@@ -223,7 +221,7 @@
                                     </StackPanel.Styles>
                                 </StackPanel>
 
-                                <!-- <components:StateBox Grid.Column="1" IconSize="0" Text="{Binding Priority}"
+                                <!-- <components:StatusBadge Grid.Column="1" IconSize="0" Text="{Binding Priority}"
                                                   TipText="Priority" Variant="Dark" TipPlacement="Top"
                                                   HorizontalAlignment="Right" VerticalAlignment="Center" /> -->
                             </Grid>

@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
-             xmlns:behavior="clr-namespace:WheelWizard.Views.Patterns"
              xmlns:loc="clr-namespace:WheelWizard.Localization"
              x:Class="WheelWizard.WiiManagement.MiiManagement.Views.Dialogs.MiiEditor.EditorGeneral">
     <!-- FOR EVERY EDITOR PAGE -->
@@ -12,7 +11,7 @@
         <TextBlock Classes="BodyText" Margin="10" Text="{loc:T attribute.mii_section.general}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1" />
-        <components:IconLabelButton Grid.Row="0" Text="{loc:T action.back}"
+        <components:LinkButton Grid.Row="0" Text="{loc:T action.back}"
                                     IconData="{StaticResource ArrowLeft}"
                                     Click="BackButton_OnClick" VerticalAlignment="Center" HorizontalAlignment="Left"
                                     Margin="10,0"
@@ -26,7 +25,7 @@
                 <StackPanel> <!-- Mii Name -->
                     <components:FormFieldLabel Text="{loc:T attribute.mii.name}" />
                     <Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto" VerticalAlignment="Top">
-                        <behavior:FeedbackTextBox x:Name="MiiName" Watermark="{loc:T placeholder.enter_mii_name}"
+                        <components:TextField x:Name="MiiName" PlaceholderText="{loc:T placeholder.enter_mii_name}"
                                                   TextChanged="Name_TextChanged" VerticalAlignment="Top"/>
                         <components:Button Grid.Column="1" Variant="Default" Margin="10,0,0,0"
                                            Padding="10,5" IconSize="23" VerticalAlignment="Top"
@@ -37,7 +36,7 @@
 
                 <StackPanel> <!-- Creator Name -->
                     <components:FormFieldLabel Text="{loc:T attribute.mii.creator_name}" />
-                    <behavior:FeedbackTextBox x:Name="CreatorName" Watermark="{loc:T helper_text.optional}"
+                    <components:TextField x:Name="CreatorName" PlaceholderText="{loc:T helper_text.optional}"
                                               TextChanged="Name_TextChanged" />
                 </StackPanel>
 

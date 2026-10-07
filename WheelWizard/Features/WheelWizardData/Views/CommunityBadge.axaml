@@ -1,43 +1,44 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
+<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="using:WheelWizard.Views.Components">
+        xmlns:controls="using:WheelWizard.Views.Components"
+        xmlns:communityControls="clr-namespace:WheelWizard.WheelWizardData.Views">
     <Design.PreviewWith>
         <Border Padding="2" Background="{StaticResource Neutral950}">
             <UniformGrid Columns="4">
                 <!-- Just so you know, the border is not necessary, its just here to also show the bounding box-->
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="WhWzDev" />
+                    <communityControls:CommunityBadge Variant="WhWzDev" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="RrDev" />
+                    <communityControls:CommunityBadge Variant="RrDev" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Translator" />
+                    <communityControls:CommunityBadge Variant="Translator" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="TranslatorLead" />
+                    <communityControls:CommunityBadge Variant="TranslatorLead" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Heart" />
+                    <communityControls:CommunityBadge Variant="Heart" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Firestarter_GoldWinner" />
+                    <communityControls:CommunityBadge Variant="Firestarter_GoldWinner" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Firestarter_SilverWinner" />
+                    <communityControls:CommunityBadge Variant="Firestarter_SilverWinner" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="Firestarter_BronzeWinner" />
+                    <communityControls:CommunityBadge Variant="Firestarter_BronzeWinner" />
                 </Border>
 
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="SummitShowdown_GoldWinner" />
+                    <communityControls:CommunityBadge Variant="SummitShowdown_GoldWinner" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="SummitShowdown_SilverWinner" />
+                    <communityControls:CommunityBadge Variant="SummitShowdown_SilverWinner" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <controls:Badge Variant="SummitShowdown_BronzeWinner" />
+                    <communityControls:CommunityBadge Variant="SummitShowdown_BronzeWinner" />
                 </Border>
             </UniformGrid>
         </Border>
@@ -53,7 +54,7 @@
         - LOOK OUT WITH USING UNIFORM STRETCH, IT WORKS BAD, DON'T TOUCH THE AWARDS, they are made with uniform stretch lol, and they work but they can fall apart easily
     -->
 
-    <Style Selector="controls|Badge">
+    <Style Selector="communityControls|CommunityBadge">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid>
@@ -69,7 +70,7 @@
         </Style>
     </Style>
 
-    <Style Selector="controls|Badge.WhWzDev">
+    <Style Selector="communityControls|CommunityBadge[Variant=WhWzDev]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
@@ -88,7 +89,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|Badge.RrDev">
+    <Style Selector="communityControls|CommunityBadge[Variant=RrDev]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
@@ -107,7 +108,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|Badge.TranslatorLead">
+    <Style Selector="communityControls|CommunityBadge[Variant=TranslatorLead]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
@@ -138,7 +139,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|Badge.Translator">
+    <Style Selector="communityControls|CommunityBadge[Variant=Translator]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
@@ -157,7 +158,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|Badge.Heart">
+    <Style Selector="communityControls|CommunityBadge[Variant=Heart]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
@@ -178,7 +179,7 @@
     </Style>
 
     <!-- FIRESTARTER BADGES -->
-    <Style Selector="controls|Badge.Firestarter_GoldWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=Firestarter_GoldWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -199,7 +200,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|Badge.Firestarter_SilverWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=Firestarter_SilverWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -220,7 +221,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|Badge.Firestarter_BronzeWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=Firestarter_BronzeWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -241,7 +242,7 @@
     </Style>
    
     <!-- SUMMIT SHOWDOWN BADGES -->
-    <Style Selector="controls|Badge.SummitShowdown_GoldWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=SummitShowdown_GoldWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -262,7 +263,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|Badge.SummitShowdown_SilverWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=SummitShowdown_SilverWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -283,7 +284,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|Badge.SummitShowdown_BronzeWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=SummitShowdown_BronzeWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -303,7 +304,7 @@
         </Setter>
     </Style>
         <!-- LEAFSTRUCK BADGES -->
-    <Style Selector="controls|Badge.Leafstruck_GoldWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=Leafstruck_GoldWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -324,7 +325,7 @@
         </Setter>
     </Style>
     
-    <Style Selector="controls|Badge.Leafstruck_SilverWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=Leafstruck_SilverWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -345,7 +346,7 @@
         </Setter>
     </Style>
     
-    <Style Selector="controls|Badge.Leafstruck_BronzeWinner">
+    <Style Selector="communityControls|CommunityBadge[Variant=Leafstruck_BronzeWinner]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">

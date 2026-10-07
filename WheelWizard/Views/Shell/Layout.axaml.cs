@@ -20,7 +20,7 @@ using WheelWizard.Settings.Views;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Dialogs;
-using WheelWizard.Views.Patterns;
+using WheelWizard.Views.Shell.Controls;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.Views.Shell.Views;
 using WheelWizard.WheelWizardData;
@@ -513,7 +513,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void Support_Click(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
-    private void SupportUs_OnClick(object? sender, EventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
+    private void SupportUs_OnClick(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
     public bool CompleteContentEnabled => InteractionContent.IsEnabled;
 
@@ -534,7 +534,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void About_Click(object? sender, RoutedEventArgs e) => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
 
-    private void CloseSnackbar_OnClick(object? sender, EventArgs e)
+    private void CloseSnackbar_OnClick(object? sender, RoutedEventArgs e)
     {
         Snackbar.Classes.Remove("show");
         Snackbar.IsVisible = false;

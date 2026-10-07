@@ -15,6 +15,7 @@ using WheelWizard.Mods.Views.Dialogs;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Desktop.Storage;
 using WheelWizard.Shared.MessageTranslations;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 
@@ -154,12 +155,6 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     private void UpdateEnableAllCheckboxState()
     {
         EnableAllCheckbox.IsChecked = !ModManager.Mods.Select(mod => mod.IsEnabled).Contains(false);
-    }
-
-    private void ModActionsMenu_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is Control { ContextMenu: { } menu } button)
-            menu.Open(button);
     }
 
     private void BrowseMod_Click(object sender, RoutedEventArgs e)
@@ -383,7 +378,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         if (mod == null || e.Source is not TextBox textBox)
             return;
 
-        // We intentionally don't use the FeedbackTextBox here since that component is a bit to big for this use case.
+        // We intentionally don't use the TextField here since that component is a bit to big for this use case.
         if (int.TryParse(textBox.Text, out _))
             textBox.Classes.Remove("error");
         else if (!textBox.Classes.Contains("error"))

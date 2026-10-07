@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using WheelWizard.Branding;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Shared;
@@ -38,7 +39,7 @@ public partial class AppInfo : UserControl
         ReleaseText.Text = $"{part1} - {part2}";
     }
 
-    private void OpenLick_OnClick(object? sender, EventArgs e)
+    private void OpenLick_OnClick(object? sender, RoutedEventArgs e)
     {
         if (sender is not TemplatedControl control)
             return;

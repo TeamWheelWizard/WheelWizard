@@ -4,7 +4,7 @@ using Avalonia.Controls.Primitives;
 
 namespace WheelWizard.Views.Components;
 
-public class FormFieldLabel : UserControl
+public class FormFieldLabel : TemplatedControl
 {
     public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<FormFieldLabel, string>(nameof(Text));
 
@@ -31,15 +31,5 @@ public class FormFieldLabel : UserControl
     {
         get => GetValue(TipPlacementProperty);
         set => SetValue(TipPlacementProperty, value);
-    }
-
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-    {
-        base.OnPropertyChanged(change);
-
-        if (change.Property != TipPlacementProperty)
-            return;
-
-        ToolTip.SetPlacement(this, TipPlacement);
     }
 }

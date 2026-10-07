@@ -1,68 +1,69 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+        xmlns:components="clr-namespace:WheelWizard.Views.Components"
+        xmlns:communityControls="clr-namespace:WheelWizard.WheelWizardData.Views">
 
     <Design.PreviewWith>
         <Border Padding="20" Background="{StaticResource Neutral950}">
             <StackPanel Spacing="40" Orientation="Horizontal">
                 <StackPanel Spacing="10">
-                    <components:MemeNumberState Text="10" IconSize="0" Enable67="False" Enable69="False"/>
-                    <components:MemeNumberState Text="69" IconSize="0" Enable67="False" Enable69="False"/>
-                    <components:MemeNumberState Text="67" IconSize="0" Enable67="False" Enable69="False"/>
+                    <communityControls:CommunityCountBadge Text="10" IconSize="0" Enable67="False" Enable69="False"/>
+                    <communityControls:CommunityCountBadge Text="69" IconSize="0" Enable67="False" Enable69="False"/>
+                    <communityControls:CommunityCountBadge Text="67" IconSize="0" Enable67="False" Enable69="False"/>
                 </StackPanel>
                 
                 <StackPanel Spacing="10">
-                    <components:MemeNumberState Text="10" IconSize="0" />
-                    <components:MemeNumberState Text="69" IconSize="0" />
-                    <components:MemeNumberState Text="67" IconSize="0" />
+                    <communityControls:CommunityCountBadge Text="10" IconSize="0" />
+                    <communityControls:CommunityCountBadge Text="69" IconSize="0" />
+                    <communityControls:CommunityCountBadge Text="67" IconSize="0" />
                 </StackPanel>
                 
                 <StackPanel Spacing="10">
-                    <components:MemeNumberState IconData="{StaticResource Award}" Text="10" />
-                    <components:MemeNumberState IconData="{StaticResource Award}" Text="69" />
-                    <components:MemeNumberState IconData="{StaticResource Award}" Text="67" />
+                    <communityControls:CommunityCountBadge IconData="{StaticResource Award}" Text="10" />
+                    <communityControls:CommunityCountBadge IconData="{StaticResource Award}" Text="69" />
+                    <communityControls:CommunityCountBadge IconData="{StaticResource Award}" Text="67" />
                 </StackPanel>
             </StackPanel>
 
         </Border>
     </Design.PreviewWith>
 
-    <Style Selector="components|MemeNumberState">
+    <Style Selector="communityControls|CommunityCountBadge">
         <Setter Property="Template">
             <ControlTemplate>
                 <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
 
                     <Panel>
                         <!-- Normal State -->
-                        <components:StateBox x:Name="PART_StateBox"
+                        <components:StatusBadge x:Name="PART_StateBox"
                                              IconData="{TemplateBinding IconData}"
                                              IconSize="{TemplateBinding IconSize}"
                                              Text="{TemplateBinding Text}"
-                                             FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=components:MemeNumberState}}"
+                                             FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=communityControls:CommunityCountBadge}}"
                                              Variant="{TemplateBinding Variant}"
                                              TipText="{TemplateBinding TipText}" />
 
                         <!-- 67 Special State -->
-                        <components:StateBox x:Name="PART_SpecialBadge"
+                        <components:StatusBadge x:Name="PART_SpecialBadge"
                                              IconData="{TemplateBinding IconData}"
                                              IconSize="{TemplateBinding IconSize}"
                                              Variant="{TemplateBinding Variant}"
-                                             FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=components:MemeNumberState}}"
+                                             FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=communityControls:CommunityCountBadge}}"
                                              TipText="{TemplateBinding TipText}"
                                              IsVisible="False">
-                            <components:StateBox.Content>
+                            <components:StatusBadge.Content>
                                 <Grid ColumnDefinitions="Auto, Auto">
                                     <TextBlock Text="6" Classes="BobUp"
                                                Foreground="{StaticResource Warning100}"
-                                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=components:MemeNumberState}}"
+                                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=communityControls:CommunityCountBadge}}"
                                                VerticalAlignment="Center" />
                                     <TextBlock Grid.Column="1" Text="7" Classes="BobDown" Margin="1,0,0,0"
                                                Foreground="{StaticResource Warning100}"
-                                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=components:MemeNumberState}}"
+                                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=communityControls:CommunityCountBadge}}"
                                                VerticalAlignment="Center" />
                                 </Grid>
-                            </components:StateBox.Content>
-                        </components:StateBox>
+                            </components:StatusBadge.Content>
+                        </components:StatusBadge>
                     </Panel>
 
                     <components:FormFieldLabel Foreground="{StaticResource Primary400}"

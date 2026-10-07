@@ -91,15 +91,14 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
             _ => t("state.loading"),
         };
 
-    public Button.ButtonsVariantType ButtonVariant =>
+    public ButtonVariant ButtonVariant =>
         _status switch
         {
-            WheelWizardStatus.NoServer or WheelWizardStatus.NoRecompExtension or WheelWizardStatus.NoDolphinExtension => Button
-                .ButtonsVariantType
-                .Danger,
-            WheelWizardStatus.Ready => Button.ButtonsVariantType.Primary,
-            WheelWizardStatus.Loading => Button.ButtonsVariantType.Default,
-            _ => Button.ButtonsVariantType.Warning,
+            WheelWizardStatus.NoServer or WheelWizardStatus.NoRecompExtension or WheelWizardStatus.NoDolphinExtension =>
+                ButtonVariant.Danger,
+            WheelWizardStatus.Ready => ButtonVariant.Primary,
+            WheelWizardStatus.Loading => ButtonVariant.Default,
+            _ => ButtonVariant.Warning,
         };
 
     public string IconName =>

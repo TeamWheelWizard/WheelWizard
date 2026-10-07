@@ -42,13 +42,13 @@
                            Classes="PageTitleText" Margin="3" />
 
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
-                    <components:StateBox x:Name="LikesCountBox" Text="0" TipText="{loc:T attribute.likes}"
+                    <components:StatusBadge x:Name="LikesCountBox" Text="0" TipText="{loc:T attribute.likes}"
                                          IconData="{StaticResource Heart}"
                                          TipPlacement="Top" Margin="3" />
-                    <components:StateBox x:Name="ViewsCountBox" Text="0" TipText="{loc:T attribute.views}"
+                    <components:StatusBadge x:Name="ViewsCountBox" Text="0" TipText="{loc:T attribute.views}"
                                          IconData="{StaticResource Eye}"
                                          TipPlacement="Top" Margin="3" />
-                    <components:StateBox x:Name="DownloadsCountBox" Text="0" TipText="{loc:T attribute.downloads}"
+                    <components:StatusBadge x:Name="DownloadsCountBox" Text="0" TipText="{loc:T attribute.downloads}"
                                          IconData="{StaticResource Download}"
                                          TipPlacement="Top" Margin="3" />
                 </StackPanel>
@@ -59,13 +59,13 @@
             <Grid Grid.Row="1">
                 <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Top" HorizontalAlignment="Left">
-                    <components:IconLabelButton
+                    <components:LinkButton
                         Foreground="{StaticResource Primary300}"
                         HoverForeground="{StaticResource Primary200}"
                         Text="somebody" x:Name="AuthorButton"
                         IconData="{StaticResource User}"
                         IconSize="16" FontSize="13" Click="AuthorLink_Click" />
-                    <components:IconLabelButton Margin="10,0,0,0"
+                    <components:LinkButton Margin="10,0,0,0"
                                                 Foreground="{StaticResource Primary300}"
                                                 HoverForeground="{StaticResource Primary200}"
                                                 IsIconLeft="False" Text="{loc:T action.gamebanana_page}"
@@ -86,7 +86,7 @@
                         Click="UnInstall_Click" />
                 </StackPanel>
 
-                <components:IconLabelButton Foreground="{StaticResource Danger400}"
+                <components:LinkButton Foreground="{StaticResource Danger400}"
                                             HoverForeground="{StaticResource Danger300}"
                                             Text="{loc:T action.report}" x:Name="ReportButton"
                                             HorizontalAlignment="Right" VerticalAlignment="Top" IsIconLeft="False"

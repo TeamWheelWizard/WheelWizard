@@ -9,8 +9,8 @@ using Avalonia.VisualTree;
 using WheelWizard.Settings.Types;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Dialogs.Base;
-using WheelWizard.Views.Patterns;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Controls;
 
 namespace WheelWizard.UI.Test;
 
@@ -21,7 +21,7 @@ public class WindowCompositionTests
     [InlineData(221.0)]
     public void SidebarHover_MovesGlowWithoutChangingLayout(double width)
     {
-        var button = new WheelWizard.Views.Patterns.SidebarRadioButton { Text = "Home" };
+        var button = new WheelWizard.Views.Shell.Controls.SidebarRadioButton { Text = "Home" };
         var window = new Window
         {
             Width = width,

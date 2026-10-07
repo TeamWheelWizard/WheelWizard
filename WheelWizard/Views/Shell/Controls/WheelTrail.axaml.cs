@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 
-namespace WheelWizard.Views.Components
+namespace WheelWizard.Views.Shell.Controls
 {
     public class WheelTrail : TemplatedControl
     {

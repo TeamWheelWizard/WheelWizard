@@ -1,12 +1,12 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls.Primitives;
 using WheelWizard.WheelWizardData.Domain;
 
-namespace WheelWizard.Views.Components;
+namespace WheelWizard.WheelWizardData.Views;
 
-public class Badge : TemplatedControl
+public class CommunityBadge : TemplatedControl
 {
-    public static readonly Dictionary<BadgeVariant, string> BadgeToolTip = new()
+    private static readonly Dictionary<BadgeVariant, string> BadgeToolTip = new()
     {
         { BadgeVariant.None, "This is not a badge" },
         { BadgeVariant.WhWzDev, "Wheel Wizard Developer (hiii!)" },
@@ -26,7 +26,7 @@ public class Badge : TemplatedControl
         { BadgeVariant.Leafstruck_BronzeWinner, "Leafstruck Tournament Runner-Up" },
     };
 
-    public static readonly StyledProperty<string> HoverTipProperty = AvaloniaProperty.Register<Badge, string>(
+    public static readonly StyledProperty<string> HoverTipProperty = AvaloniaProperty.Register<CommunityBadge, string>(
         nameof(HoverTip),
         BadgeToolTip[BadgeVariant.None]
     );
@@ -37,7 +37,9 @@ public class Badge : TemplatedControl
         set => SetValue(HoverTipProperty, value);
     }
 
-    public static readonly StyledProperty<BadgeVariant> VariantProperty = AvaloniaProperty.Register<Badge, BadgeVariant>(nameof(Variant));
+    public static readonly StyledProperty<BadgeVariant> VariantProperty = AvaloniaProperty.Register<CommunityBadge, BadgeVariant>(
+        nameof(Variant)
+    );
 
     public BadgeVariant Variant
     {
@@ -45,16 +47,9 @@ public class Badge : TemplatedControl
         set => SetValue(VariantProperty, value);
     }
 
-    private void UpdateStyleClasses(BadgeVariant variant)
+    private void UpdateTooltip(BadgeVariant variant)
     {
-        var types = Enum.GetValues<BadgeVariant>();
-        foreach (var enumType in types)
-        {
-            Classes.Remove(enumType.ToString());
-        }
-
-        Classes.Add(variant.ToString());
-        HoverTip = BadgeToolTip[variant];
+        HoverTip = BadgeToolTip.GetValueOrDefault(variant, BadgeToolTip[BadgeVariant.None]);
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -62,6 +57,6 @@ public class Badge : TemplatedControl
         base.OnPropertyChanged(change);
 
         if (change.Property == VariantProperty)
-            UpdateStyleClasses(change.GetNewValue<BadgeVariant>());
+            UpdateTooltip(change.GetNewValue<BadgeVariant>());
     }
 }

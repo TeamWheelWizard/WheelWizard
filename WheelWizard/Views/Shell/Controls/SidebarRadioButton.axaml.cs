@@ -1,16 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Input;
 using Avalonia.Media;
 using WheelWizard.Views.Shell.Views;
 
-namespace WheelWizard.Views.Patterns;
+namespace WheelWizard.Views.Shell.Controls;
 
-public partial class SidebarRadioButton : RadioButton
+public class SidebarRadioButton : RadioButton
 {
-    private Border? _hoverEffect;
-
     public static readonly StyledProperty<Geometry> IconDataProperty = AvaloniaProperty.Register<SidebarRadioButton, Geometry>(
         nameof(IconData)
     );
@@ -73,55 +69,11 @@ public partial class SidebarRadioButton : RadioButton
         set => SetValue(BoxIconSizeProperty, value);
     }
 
-    //todo: after patches is more stable, uncomment this
-
-    // public static readonly StyledProperty<bool> WarningVisibleProperty = AvaloniaProperty.Register<SidebarRadioButton, bool>(
-    //     nameof(WarningVisible)
-    // );
-    //
-    // public bool WarningVisible
-    // {
-    //     get => GetValue(WarningVisibleProperty);
-    //     set => SetValue(WarningVisibleProperty, value);
-    // }
-    //
-    // public static readonly StyledProperty<string> WarningTipProperty = AvaloniaProperty.Register<SidebarRadioButton, string>(
-    //     nameof(WarningTip)
-    // );
-    //
-    // public string WarningTip
-    // {
-    //     get => GetValue(WarningTipProperty);
-    //     set => SetValue(WarningTipProperty, value);
-    // }
-
-    protected override void OnPointerMoved(PointerEventArgs e)
-    {
-        base.OnPointerMoved(e);
-        if (_hoverEffect?.RenderTransform is not TranslateTransform transform)
-            return;
-
-        var position = e.GetPosition(this);
-        transform.X = position.X - _hoverEffect.Width / 2;
-        transform.Y = position.Y - _hoverEffect.Height / 2;
-    }
-
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-        _hoverEffect = e.NameScope.Find<Border>("PART_HoverEffect");
-    }
-
     public event EventHandler<Type>? NavigationRequested;
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    protected override void OnClick()
     {
-        base.OnPointerPressed(e);
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            return;
-
-        PageType ??= typeof(NotFoundPage);
-
-        NavigationRequested?.Invoke(this, PageType);
+        base.OnClick();
+        NavigationRequested?.Invoke(this, PageType ?? typeof(NotFoundPage));
     }
 }

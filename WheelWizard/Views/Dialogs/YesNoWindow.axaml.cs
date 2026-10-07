@@ -49,7 +49,7 @@ public partial class YesNoWindow : PopupContent
         return this;
     }
 
-    public YesNoWindow SetButtonVariants(Button.ButtonsVariantType yesVariant, Button.ButtonsVariantType noVariant)
+    public YesNoWindow SetButtonVariants(ButtonVariant yesVariant, ButtonVariant noVariant)
     {
         YesButton.Variant = yesVariant;
         NoButton.Variant = noVariant;

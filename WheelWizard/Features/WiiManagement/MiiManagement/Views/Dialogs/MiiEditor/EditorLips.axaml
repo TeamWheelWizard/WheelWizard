@@ -12,7 +12,7 @@
         <TextBlock Classes="BodyText" Margin="10" Text="{loc:T attribute.mii_section.lips}" HorizontalAlignment="Right" />
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="1"/>
-        <components:IconLabelButton Grid.Row="0" Text="{loc:T action.back}" IconData="{StaticResource ArrowLeft}"
+        <components:LinkButton Grid.Row="0" Text="{loc:T action.back}" IconData="{StaticResource ArrowLeft}"
                                     Click="BackButton_OnClick" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0"
                                     Foreground="{StaticResource TitleTextColor}" FontSize="16"
                                     HoverForeground="{StaticResource Primary200}"/>

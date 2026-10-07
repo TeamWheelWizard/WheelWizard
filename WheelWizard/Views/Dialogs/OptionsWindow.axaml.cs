@@ -26,7 +26,7 @@ public partial class OptionsWindow : PopupContent
 
     public OptionsWindow AddOption(Geometry icon, string title, Action onClick, bool enabled = true)
     {
-        var button = new OptionButton()
+        var button = new TileButton()
         {
             IconData = icon,
             Text = title,

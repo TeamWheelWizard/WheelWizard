@@ -2,16 +2,17 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+using WheelWizard.Views.Components;
 
-namespace WheelWizard.Views.Components;
+namespace WheelWizard.WheelWizardData.Views;
 
-public class MemeNumberState : TemplatedControl
+public class CommunityCountBadge : TemplatedControl
 {
-    private StateBox? _stateBox;
-    private StateBox? _specialBadge;
+    private StatusBadge? _stateBox;
+    private StatusBadge? _specialBadge;
     private FormFieldLabel? _niceLabel;
 
-    public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<MemeNumberState, string>(nameof(Text), "0");
+    public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<CommunityCountBadge, string>(nameof(Text), "0");
 
     public string Text
     {
@@ -19,7 +20,7 @@ public class MemeNumberState : TemplatedControl
         set => SetValue(TextProperty, value);
     }
 
-    public static readonly StyledProperty<Geometry> IconDataProperty = AvaloniaProperty.Register<MemeNumberState, Geometry>(
+    public static readonly StyledProperty<Geometry> IconDataProperty = AvaloniaProperty.Register<CommunityCountBadge, Geometry>(
         nameof(IconData)
     );
 
@@ -29,7 +30,7 @@ public class MemeNumberState : TemplatedControl
         set => SetValue(IconDataProperty, value);
     }
 
-    public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<MemeNumberState, double>(
+    public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<CommunityCountBadge, double>(
         nameof(IconSize),
         20
     );
@@ -40,7 +41,7 @@ public class MemeNumberState : TemplatedControl
         set => SetValue(IconSizeProperty, value);
     }
 
-    public static readonly StyledProperty<string> TipTextProperty = AvaloniaProperty.Register<MemeNumberState, string>(nameof(TipText));
+    public static readonly StyledProperty<string> TipTextProperty = AvaloniaProperty.Register<CommunityCountBadge, string>(nameof(TipText));
 
     public string TipText
     {
@@ -48,18 +49,21 @@ public class MemeNumberState : TemplatedControl
         set => SetValue(TipTextProperty, value);
     }
 
-    public static readonly StyledProperty<StateBox.StateBoxVariantType> VariantProperty = AvaloniaProperty.Register<
-        MemeNumberState,
-        StateBox.StateBoxVariantType
-    >(nameof(Variant), StateBox.StateBoxVariantType.Default);
+    public static readonly StyledProperty<StatusVariant> VariantProperty = AvaloniaProperty.Register<CommunityCountBadge, StatusVariant>(
+        nameof(Variant),
+        StatusVariant.Default
+    );
 
-    public StateBox.StateBoxVariantType Variant
+    public StatusVariant Variant
     {
         get => GetValue(VariantProperty);
         set => SetValue(VariantProperty, value);
     }
 
-    public static readonly StyledProperty<bool> Enable67Property = AvaloniaProperty.Register<MemeNumberState, bool>(nameof(Enable67), true);
+    public static readonly StyledProperty<bool> Enable67Property = AvaloniaProperty.Register<CommunityCountBadge, bool>(
+        nameof(Enable67),
+        true
+    );
 
     public bool Enable67
     {
@@ -67,7 +71,10 @@ public class MemeNumberState : TemplatedControl
         set => SetValue(Enable67Property, value);
     }
 
-    public static readonly StyledProperty<bool> Enable69Property = AvaloniaProperty.Register<MemeNumberState, bool>(nameof(Enable69), true);
+    public static readonly StyledProperty<bool> Enable69Property = AvaloniaProperty.Register<CommunityCountBadge, bool>(
+        nameof(Enable69),
+        true
+    );
 
     public bool Enable69
     {
@@ -78,8 +85,8 @@ public class MemeNumberState : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _stateBox = e.NameScope.Find<StateBox>("PART_StateBox");
-        _specialBadge = e.NameScope.Find<StateBox>("PART_SpecialBadge");
+        _stateBox = e.NameScope.Find<StatusBadge>("PART_StateBox");
+        _specialBadge = e.NameScope.Find<StatusBadge>("PART_SpecialBadge");
         _niceLabel = e.NameScope.Find<FormFieldLabel>("PART_NiceLabel");
 
         UpdateState();
@@ -88,7 +95,7 @@ public class MemeNumberState : TemplatedControl
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == TextProperty)
+        if (change.Property == TextProperty || change.Property == Enable67Property || change.Property == Enable69Property)
         {
             UpdateState();
         }
@@ -105,8 +112,6 @@ public class MemeNumberState : TemplatedControl
         _niceLabel.IsVisible = false;
         _stateBox.IsVisible = true;
         _specialBadge.IsVisible = false;
-
-        _stateBox.Text = val; // Always ensure text is set for normal cases
 
         if (val == "69" && Enable69)
         {

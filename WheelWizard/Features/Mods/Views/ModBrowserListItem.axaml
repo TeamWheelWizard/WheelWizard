@@ -88,14 +88,14 @@
                         <!-- Icon -->
                         <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right"
                                     Orientation="Horizontal" Spacing="2" Margin="4">
-                            <components:StateBox Text="{TemplateBinding LikeCount}" TipText="Likes" 
+                            <components:StatusBadge Text="{TemplateBinding LikeCount}" TipText="Likes"
                                                  IconData="{StaticResource Heart}"
                                                  Margin="3" Variant="Dark"/>
-                            <components:StateBox Text="{TemplateBinding ViewCount}" TipText="Views" 
+                            <components:StatusBadge Text="{TemplateBinding ViewCount}" TipText="Views"
                                                  IconData="{StaticResource Eye}"
                                                  Margin="3" Variant="Dark"/>
                             <!-- Apparently its hard to get the downloads count without sending a request constantly
-                            <components:StateBox Text="{TemplateBinding DownloadCount}" TipText="Downloads" 
+                            <components:StatusBadge Text="{TemplateBinding DownloadCount}" TipText="Downloads"
                                                  IconData="{StaticResource Download}"
                                                  Margin="3" Variant="Dark"/> -->
                         </StackPanel>
@@ -128,7 +128,7 @@
                             <Style Selector="^ Border#PART_ImageBorder">
                                 <Setter Property="Background" Value="{StaticResource Neutral500}"/>
                             </Style>
-                            <Style Selector="^ components|StateBox">
+                            <Style Selector="^ components|StatusBadge">
                                 <Setter Property="Variant" Value="Default"/>
                             </Style>
                         </Style>

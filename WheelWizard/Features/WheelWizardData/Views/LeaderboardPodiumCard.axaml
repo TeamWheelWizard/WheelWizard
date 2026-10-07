@@ -135,7 +135,7 @@
                                         Background="{StaticResource Neutral950}"
                                         BorderBrush="{StaticResource Neutral700}"
                                         BorderThickness="1">
-                                    <components:Badge Variant="{TemplateBinding BadgeVariant}"
+                                    <community:CommunityBadge Variant="{TemplateBinding BadgeVariant}"
                                                       Width="20"
                                                       Height="20"
                                                       HorizontalAlignment="Center"
