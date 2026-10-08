@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using MiiAnim.Core.Animation;
 using Testably.Abstractions.RandomSystem;
 using WheelWizard.MiiAnimations.Library;
@@ -8,8 +9,9 @@ namespace WheelWizard.MiiAnimations.Editor;
 
 /// <summary>
 /// The Mii editor's animation state machine. The Mii idles (picking a new idle every loop), reacts to edits with
-/// one-shot clips, and goes back to idling when a reaction ends. Clips come from the "editor" folder
-/// of <see cref="IMiiAnimationLibrary"/>, so adding a variant is just adding a file to the right folder.
+/// one-shot clips, and goes back to idling when a reaction ends. Each reaction plays a random clip from the "editor"
+/// folder named after it (<see cref="MiiEditorReaction.FavoriteColor"/> → "editor/favorite_color"), so adding a
+/// variant is just adding a file to the right folder.
 /// <para>
 /// States: <b>Idle</b> → (edit) <b>Reacting</b> → (clip done) <b>Idle</b>. Reactions that change what the Mii looks
 /// like (gender, randomize) or end the editor (save) are <i>important</i>: edits don't interrupt them.
@@ -18,10 +20,9 @@ namespace WheelWizard.MiiAnimations.Editor;
 public sealed class MiiEditorDirector
 {
     private const string Root = "editor";
-    private const string CloseUpSuffix = "_upper";
     private const double IdleFadeSeconds = 0.6;
     private const double ReactionFadeSeconds = 0.2;
-    private const double FocusFadeSeconds = 0.5;
+    private const double HoldStillFadeSeconds = 0.5;
 
     /// <summary>The same edit reaction doesn't replay within this long after it ended, so rapid edits don't keep the Mii busy.</summary>
     private static readonly TimeSpan RepeatCooldown = TimeSpan.FromSeconds(1);
@@ -40,15 +41,14 @@ public sealed class MiiEditorDirector
     private readonly IRandom _random;
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly Dictionary<string, string> _lastPicked = new();
+    private readonly List<Waiter> _waiters = [];
 
     /// <summary>Barely-there breathing for <see cref="HoldStill"/>: the head stays where it is, so parts can be clicked and dragged.</summary>
     private static readonly MiiAnimation StillClip = CreateStillClip();
 
     private MiiAnimation? _idleClip;
     private bool _holdStill;
-    private MiiAnimation? _reactionClip;
-    private string? _reactionPath;
-    private MiiEditorReaction? _reaction;
+    private Reacting? _reacting;
     private MiiEditorReaction? _lastEnded;
     private TimeSpan _lastEndedAt;
 
@@ -61,23 +61,10 @@ public sealed class MiiEditorDirector
         _player.EventReached += OnClipEvent;
     }
 
-    /// <summary>An event marker of the playing reaction, e.g. <see cref="MiiEditorCues.SwapGender"/>.</summary>
-    public event Action<MiiEditorReaction, string>? Cue;
-
-    /// <summary>A reaction finished or was replaced. Anything still waiting for one of its cues should happen now.</summary>
-    public event Action<MiiEditorReaction>? ReactionEnded;
-
-    public MiiEditorFocus Focus { get; private set; } = MiiEditorFocus.Body;
-
-    /// <summary>The reaction playing, or null while idling.</summary>
-    public MiiEditorReaction? Reaction => _reaction;
-
-    public bool IsReacting => _reactionClip is not null;
-
     /// <summary>How much the Mii may look at the cursor right now (it's busy during reactions).</summary>
     public float LookWeight =>
-        _reactionClip is null ? 1f
-        : _reaction is { } reaction && Important.Contains(reaction) ? 0f
+        _reacting is not { } reacting ? 1f
+        : Important.Contains(reacting.Reaction) ? 0f
         : 0.4f;
 
     /// <summary>
@@ -92,17 +79,17 @@ public sealed class MiiEditorDirector
             if (_holdStill == value)
                 return;
             _holdStill = value;
-            if (_reactionClip is null)
-                PlayIdle(FocusFadeSeconds);
-            else if (value && !(_reaction is { } reaction && Important.Contains(reaction)))
-                EndReaction(playIdle: true, fadeSeconds: FocusFadeSeconds);
+            if (_reacting is not { } reacting)
+                PlayIdle(HoldStillFadeSeconds);
+            else if (value && !Important.Contains(reacting.Reaction))
+                EndReaction(playIdle: true, fadeSeconds: HoldStillFadeSeconds);
         }
     }
 
     /// <summary>Starts idling now, e.g. after a clip played straight on the player (like falling in) ended.</summary>
     public void Idle()
     {
-        if (_reactionClip is not null)
+        if (_reacting is not null)
             EndReaction(playIdle: false, fadeSeconds: 0);
         PlayIdle(IdleFadeSeconds);
     }
@@ -114,23 +101,6 @@ public sealed class MiiEditorDirector
             PlayIdle(0);
     }
 
-    /// <summary>Switches between the whole-Mii and close-up idles. A running reaction plays on.</summary>
-    public void SetFocus(MiiEditorFocus focus)
-    {
-        if (focus == Focus)
-            return;
-        Focus = focus;
-        if (_reactionClip is null)
-        {
-            PlayIdle(FocusFadeSeconds);
-            return;
-        }
-
-        // A whole-body reaction would walk out of a close-up; stop it there.
-        if (focus == MiiEditorFocus.Face && !IsCloseUp(_reactionPath!) && _reaction is { } reaction && !Important.Contains(reaction))
-            EndReaction(playIdle: true, fadeSeconds: FocusFadeSeconds);
-    }
-
     /// <summary>
     /// Plays a reaction to an edit. Returns false when the Mii is busy (an important reaction, or the same one is
     /// already playing or just ended) or there is no clip for it.
@@ -140,68 +110,65 @@ public sealed class MiiEditorDirector
         var important = Important.Contains(reaction);
         if (_holdStill && !important)
             return false;
-        if (_reaction is { } playing)
-        {
-            if (playing == reaction && !important)
-                return false;
-            if (Important.Contains(playing) && !important)
-                return false;
-        }
-
+        if (_reacting is { } playing && !important && (playing.Reaction == reaction || Important.Contains(playing.Reaction)))
+            return false;
         if (!important && _lastEnded == reaction && _clock.Elapsed - _lastEndedAt < RepeatCooldown)
             return false;
 
-        if (Pick(PoolFor(reaction), reaction.ToString()) is not { } picked)
+        if (Pick($"{Root}/{FolderOf(reaction)}") is not { } clip)
             return false;
 
-        Begin(reaction, picked);
+        if (_reacting is not null)
+            EndReaction(playIdle: false, fadeSeconds: 0);
+        _reacting = new(reaction, clip);
+        _player.Play(clip, loop: false, fadeSeconds: ReactionFadeSeconds);
         return true;
     }
 
-    /// <summary>Whether the playing reaction still has <paramref name="cue"/> ahead.</summary>
-    public bool WillCue(string cue) =>
-        _reactionClip is { } clip
-        && ReferenceEquals(_player.Current, clip)
-        && clip.Events.Any(e => e.Name == cue && e.Frame >= _player.Frame);
-
-    private void Begin(MiiEditorReaction reaction, (string Path, MiiAnimation Clip) picked)
+    /// <summary>
+    /// Completes when the playing reaction reaches the <paramref name="cue"/> marker, or its end when
+    /// <paramref name="cue"/> is null. Also completes when the reaction ends or is replaced before getting there, and
+    /// right away when nothing is playing or the cue isn't ahead.
+    /// </summary>
+    public Task WhenReached(string? cue = null)
     {
-        if (_reactionClip is not null)
-            EndReaction(playIdle: false, fadeSeconds: 0);
-        _reaction = reaction;
-        _reactionPath = picked.Path;
-        _reactionClip = picked.Clip;
-        _player.Play(picked.Clip, loop: false, fadeSeconds: ReactionFadeSeconds);
+        if (_reacting is not { Clip: var clip })
+            return Task.CompletedTask;
+        if (cue is not null && !(ReferenceEquals(_player.Current, clip) && clip.Events.Any(e => e.Name == cue && e.Frame >= _player.Frame)))
+            return Task.CompletedTask;
+
+        var waiter = new Waiter(clip, cue, new(TaskCreationOptions.RunContinuationsAsynchronously));
+        _waiters.Add(waiter);
+        return waiter.Done.Task;
     }
 
     private void EndReaction(bool playIdle, double fadeSeconds)
     {
-        var ended = _reaction;
-        _reactionClip = null;
-        _reactionPath = null;
-        _reaction = null;
+        var ended = _reacting!.Value;
+        _reacting = null;
         if (playIdle)
             PlayIdle(fadeSeconds);
-        if (ended is { } reaction)
-        {
-            _lastEnded = reaction;
-            _lastEndedAt = _clock.Elapsed;
-            ReactionEnded?.Invoke(reaction);
-        }
+        _lastEnded = ended.Reaction;
+        _lastEndedAt = _clock.Elapsed;
+        Release(waiter => ReferenceEquals(waiter.Clip, ended.Clip));
     }
 
     private void OnClipFinished(MiiAnimation clip)
     {
-        if (ReferenceEquals(clip, _reactionClip))
+        if (ReferenceEquals(clip, _reacting?.Clip))
             EndReaction(playIdle: true, fadeSeconds: IdleFadeSeconds);
         else if (ReferenceEquals(clip, _idleClip))
             PlayIdle(IdleFadeSeconds);
     }
 
-    private void OnClipEvent(MiiAnimation clip, AnimEvent animEvent)
+    private void OnClipEvent(MiiAnimation clip, AnimEvent animEvent) =>
+        Release(waiter => ReferenceEquals(waiter.Clip, clip) && waiter.Cue == animEvent.Name);
+
+    private void Release(Predicate<Waiter> match)
     {
-        if (ReferenceEquals(clip, _reactionClip) && _reaction is { } reaction)
-            Cue?.Invoke(reaction, animEvent.Name);
+        foreach (var waiter in _waiters.FindAll(match))
+            waiter.Done.TrySetResult();
+        _waiters.RemoveAll(match);
     }
 
     /// <summary>Idles are played once each (they all start and end in the same pose), then another one is picked.</summary>
@@ -214,53 +181,30 @@ public sealed class MiiEditorDirector
             return;
         }
 
-        var idles = _library.List($"{Root}/idle");
-        var wanted = idles.Where(path => IsCloseUp(path) == (Focus == MiiEditorFocus.Face)).ToList();
-        var picked = Pick(wanted.Count > 0 ? wanted : idles, "idle:" + Focus);
-        _idleClip = picked?.Clip;
-        if (picked is { } idle)
-            _player.Play(idle.Clip, loop: false, fadeSeconds);
+        _idleClip = Pick($"{Root}/idle");
+        if (_idleClip is not null)
+            _player.Play(_idleClip, loop: false, fadeSeconds);
         else
             _player.Stop(fadeSeconds);
     }
 
-    /// <summary>Clips for a reaction that suit the current focus (falling back to any of them).</summary>
-    private IReadOnlyList<string> PoolFor(MiiEditorReaction reaction)
-    {
-        var (folder, filter) = Source(reaction);
-        var all = _library.List($"{Root}/{folder}").Where(path => filter is null || filter(Path.GetFileName(path))).ToList();
-        var suited = all.Where(path => IsCloseUp(path) == (Focus == MiiEditorFocus.Face)).ToList();
-        return suited.Count > 0 ? suited : all;
-    }
+    /// <summary>FavoriteColor → "favorite_color".</summary>
+    private static string FolderOf(MiiEditorReaction reaction) =>
+        Regex.Replace(reaction.ToString(), "(?<=[a-z])(?=[A-Z])", "_").ToLowerInvariant();
 
-    private static (string Folder, Func<string, bool>? Filter) Source(MiiEditorReaction reaction) =>
-        reaction switch
-        {
-            MiiEditorReaction.Enter => ("enter", null),
-            MiiEditorReaction.BodyShape => ("body_shape", null),
-            MiiEditorReaction.Name => ("name", null),
-            MiiEditorReaction.FavoriteColor => ("favoritecolor", null),
-            MiiEditorReaction.Favorite => ("favorite", name => name.StartsWith("Favorite_selected", StringComparison.OrdinalIgnoreCase)),
-            MiiEditorReaction.Unfavorite => ("favorite", name => name.StartsWith("Favorite_removed", StringComparison.OrdinalIgnoreCase)),
-            MiiEditorReaction.Randomize => ("randomize", null),
-            MiiEditorReaction.Save => ("save", null),
-            MiiEditorReaction.BecomeGirl => ("gender", name => name.Equals("Become_girl", StringComparison.OrdinalIgnoreCase)),
-            MiiEditorReaction.BecomeBoy => ("gender", name => name.Equals("Become_boy", StringComparison.OrdinalIgnoreCase)),
-            _ => throw new ArgumentOutOfRangeException(nameof(reaction), reaction, null),
-        };
-
-    /// <summary>A random clip from the pool, avoiding the one picked from the same pool last time.</summary>
-    private (string Path, MiiAnimation Clip)? Pick(IReadOnlyList<string> pool, string poolKey)
+    /// <summary>A random clip from <paramref name="folder"/>, avoiding the one picked from it last time.</summary>
+    private MiiAnimation? Pick(string folder)
     {
-        _lastPicked.TryGetValue(poolKey, out var last);
+        var pool = _library.List(folder);
+        _lastPicked.TryGetValue(folder, out var last);
         var choices = pool.Where(path => path != last || pool.Count == 1).ToList();
         while (choices.Count > 0)
         {
             var path = choices[_random.Next(choices.Count)];
             if (_library.Get(path) is { } clip)
             {
-                _lastPicked[poolKey] = path;
-                return (path, clip);
+                _lastPicked[folder] = path;
+                return clip;
             }
             choices.Remove(path);
         }
@@ -283,5 +227,7 @@ public sealed class MiiEditorDirector
         return clip;
     }
 
-    private static bool IsCloseUp(string path) => path.EndsWith(CloseUpSuffix, StringComparison.OrdinalIgnoreCase);
+    private readonly record struct Reacting(MiiEditorReaction Reaction, MiiAnimation Clip);
+
+    private sealed record Waiter(MiiAnimation Clip, string? Cue, TaskCompletionSource Done);
 }

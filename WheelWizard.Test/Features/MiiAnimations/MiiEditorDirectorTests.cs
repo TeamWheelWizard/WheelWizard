@@ -27,20 +27,21 @@ public class MiiEditorDirectorTests
     public void Start_PlaysTheEntranceThenIdles()
     {
         _director.Start();
-        Assert.Equal(MiiEditorReaction.Enter, _director.Reaction);
+        var entered = _director.WhenReached();
+        Assert.False(entered.IsCompleted);
 
         Run(4);
 
-        Assert.Null(_director.Reaction);
+        Assert.True(entered.IsCompleted);
         Assert.StartsWith("Editor idle", _player.Current!.Name);
-        Assert.DoesNotContain("upper", _player.Current.Name);
     }
 
     [Fact]
-    public void FaceFocus_UsesCloseUpIdles()
+    public void HoldStill_StopsEditReactions()
     {
-        _director.SetFocus(MiiEditorFocus.Face);
-        Assert.EndsWith("upper", _player.Current!.Name);
+        _director.HoldStill = true;
+        Assert.False(_director.React(MiiEditorReaction.BodyShape));
+        Assert.True(_director.React(MiiEditorReaction.BecomeGirl));
     }
 
     [Fact]
@@ -54,31 +55,37 @@ public class MiiEditorDirectorTests
     }
 
     [Fact]
-    public void GenderSwap_CuesTheSwapAndIgnoresEdits()
+    public void GenderSwap_ReachesTheSwapAndIgnoresEdits()
     {
-        var cues = new List<string>();
-        _director.Cue += (_, cue) => cues.Add(cue);
-
         Assert.True(_director.React(MiiEditorReaction.BecomeGirl));
-        Assert.True(_director.WillCue(MiiEditorCues.SwapGender));
+        var swapped = _director.WhenReached(MiiEditorCues.SwapGender);
+        Assert.False(swapped.IsCompleted);
         Assert.False(_director.React(MiiEditorReaction.FavoriteColor));
 
         Run(1);
 
-        Assert.Contains(MiiEditorCues.SwapGender, cues);
-        Assert.False(_director.WillCue(MiiEditorCues.SwapGender));
+        Assert.True(swapped.IsCompleted);
+        Assert.True(_director.WhenReached(MiiEditorCues.SwapGender).IsCompleted);
     }
 
     [Fact]
-    public void ReactionEnded_FiresWhenAReactionIsReplaced()
+    public void WhenReached_CompletesForCuesTheClipDoesNotHave()
     {
-        var ended = new List<MiiEditorReaction>();
-        _director.ReactionEnded += ended.Add;
+        Assert.True(_director.React(MiiEditorReaction.BecomeGirl));
+        Assert.True(_director.WhenReached("no_such_cue").IsCompleted);
+    }
+
+    [Fact]
+    public void WhenReached_CompletesWhenTheReactionIsReplaced()
+    {
+        _director.React(MiiEditorReaction.Randomize);
+        var first = _director.WhenReached(MiiEditorCues.Randomize);
+        Assert.False(first.IsCompleted);
 
         _director.React(MiiEditorReaction.Randomize);
-        _director.React(MiiEditorReaction.Randomize);
 
-        Assert.Equal([MiiEditorReaction.Randomize], ended);
+        Assert.True(first.IsCompleted);
+        Assert.False(_director.WhenReached().IsCompleted);
     }
 
     [Fact]

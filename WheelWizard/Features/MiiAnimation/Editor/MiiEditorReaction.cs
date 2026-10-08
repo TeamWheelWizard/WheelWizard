@@ -14,7 +14,7 @@ public enum MiiEditorReaction
     /// <summary>A new random Mii. Show it at the <see cref="MiiEditorCues.Randomize"/> cue.</summary>
     Randomize,
 
-    /// <summary>The Mii was saved. Close the editor when it ends.</summary>
+    /// <summary>The Mii was saved. Close the editor when it ends (see <see cref="MiiEditorDirector.WhenReached"/>).</summary>
     Save,
 
     /// <summary>Show the girl at the <see cref="MiiEditorCues.SwapGender"/> cue.</summary>
@@ -31,21 +31,9 @@ public static class MiiEditorCues
     public const string Randomize = "randomize";
 }
 
-/// <summary>What the editor camera looks at.</summary>
-public enum MiiEditorFocus
-{
-    /// <summary>The whole Mii.</summary>
-    Body,
-
-    /// <summary>Head and shoulders, for the face menus. Only animations that keep the head in place play here.</summary>
-    Face,
-}
-
 /// <summary>Where the Mii was clicked.</summary>
 public enum MiiBodyPart
 {
     Head,
     Body,
-    LeftLeg,
-    RightLeg,
 }

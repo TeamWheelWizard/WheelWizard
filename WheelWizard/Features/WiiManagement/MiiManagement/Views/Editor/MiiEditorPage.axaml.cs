@@ -1215,16 +1215,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
         if (!_animate || _scene.Director is not { } director || !director.React(MiiEditorReaction.Save))
             return;
 
-        var done = new TaskCompletionSource();
-        void OnEnded(MiiEditorReaction reaction)
-        {
-            if (reaction == MiiEditorReaction.Save)
-                done.TrySetResult();
-        }
-
-        director.ReactionEnded += OnEnded;
-        await Task.WhenAny(done.Task, Task.Delay(SaveAnimationTimeout));
-        director.ReactionEnded -= OnEnded;
+        await Task.WhenAny(director.WhenReached(), Task.Delay(SaveAnimationTimeout));
     }
 
     #endregion

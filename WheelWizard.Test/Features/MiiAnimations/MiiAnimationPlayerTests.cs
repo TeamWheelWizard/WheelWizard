@@ -113,7 +113,7 @@ public class MiiAnimationPlayerTests
     public void Library_ReadsEveryShippedAnimation()
     {
         var library = new MiiAnimationLibrary(NullLogger<MiiAnimationLibrary>.Instance);
-        var folders = new[] { "editor/idle", "editor/gender", "editor/favoritecolor", "editor/save" };
+        var folders = new[] { "editor/idle", "editor/become_girl", "editor/favorite_color", "editor/save" };
 
         foreach (var folder in folders)
         {
@@ -122,7 +122,7 @@ public class MiiAnimationPlayerTests
             Assert.All(paths, path => Assert.NotNull(library.Get(path)));
         }
 
-        Assert.Equal(20, library.List("editor/idle").Count);
+        Assert.Equal(10, library.List("editor/idle").Count);
         Assert.Null(library.Get("editor/does_not_exist"));
     }
 
@@ -131,7 +131,7 @@ public class MiiAnimationPlayerTests
     {
         var library = new MiiAnimationLibrary(NullLogger<MiiAnimationLibrary>.Instance);
 
-        var effects = library.List("editor/favoritecolor").Select(library.Get).SelectMany(clip => clip!.Particles).ToList();
+        var effects = library.List("editor/favorite_color").Select(library.Get).SelectMany(clip => clip!.Particles).ToList();
 
         Assert.NotEmpty(effects);
         Assert.All(effects, effect => Assert.True(effect.Shape is { } shape && ParticleShape.IsSvg(shape.Svg)));

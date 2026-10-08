@@ -62,17 +62,6 @@ public sealed class MiiEditorScene : Grid
     /// <summary>Face parts get a bit of extra room around them for the mouse.</summary>
     private const float MaskPartPadding = 1.3f;
 
-    /// <summary>How the picker Miis come in: falling from the sky, launching up from below, or floating down on bubbles.</summary>
-    private static readonly string[] EntranceClips =
-    [
-        "editor/picker/Picker_fall_classic_drop",
-        "editor/picker/Picker_fall_somersault",
-        "editor/picker/Picker_fall_belly_flop",
-        "editor/picker/Picker_fall_flailing_float",
-        "shared/appear/Appear",
-        "shared/appear/Appear_balloon",
-    ];
-
     private static readonly MiiImageSpecifications BodyShot = MiiImageVariants.MiiEditorPreviewCarousel.Clone();
 
     /// <summary>
@@ -248,7 +237,9 @@ public sealed class MiiEditorScene : Grid
     /// <summary>Puts a random entrance on the Mii, paused on its first frame. False when there is none to play.</summary>
     private bool HoldEntrance(Actor actor)
     {
-        if (_library.Get(EntranceClips[_random.Next(EntranceClips.Length)]) is not { } clip)
+        // Falling from the sky or appearing; any clip dropped in these folders joins in.
+        string[] entrances = [.. _library.List("editor/picker"), .. _library.List("shared/appear")];
+        if (entrances.Length == 0 || _library.Get(entrances[_random.Next(entrances.Length)]) is not { } clip)
             return false;
         actor.Entrance = clip;
         actor.View.Preload(clip);
@@ -290,31 +281,20 @@ public sealed class MiiEditorScene : Grid
         foreach (var (actor, mii) in _actors.Zip([boy, girl]))
         {
             actor.Mii = mii;
-            var shown = new TaskCompletionSource();
-            if (Animate && actor.Director.React(MiiEditorReaction.Randomize) && actor.Director.WillCue(MiiEditorCues.Randomize))
-            {
-                actor.View.Prewarm(mii);
-                void OnCue(MiiEditorReaction reaction, string cue)
-                {
-                    if (cue != MiiEditorCues.Randomize)
-                        return;
-                    actor.Director.Cue -= OnCue;
-                    ShowOn(actor, mii);
-                    shown.TrySetResult();
-                }
-
-                actor.Director.Cue += OnCue;
-            }
+            if (Animate && actor.Director.React(MiiEditorReaction.Randomize))
+                waits.Add(ShowAtCueAsync(actor, mii));
             else
-            {
                 ShowOn(actor, mii);
-                shown.TrySetResult();
-            }
-
-            waits.Add(shown.Task);
         }
 
         await Task.WhenAny(Task.WhenAll(waits), Task.Delay(2500));
+
+        async Task ShowAtCueAsync(Actor actor, Mii mii)
+        {
+            actor.View.Prewarm(mii);
+            await actor.Director.WhenReached(MiiEditorCues.Randomize);
+            ShowOn(actor, mii);
+        }
     }
 
     /// <summary>Keeps the picked Mii and zooms in on it; the other one fades away.</summary>
@@ -385,15 +365,26 @@ public sealed class MiiEditorScene : Grid
             director?.React(r);
 
         showAtCue ??= _pending?.Cue;
-        if (showAtCue is not null && IsRealtime && director is not null && director.WillCue(showAtCue))
+        if (showAtCue is not null && IsRealtime && director?.WhenReached(showAtCue) is { IsCompleted: false } reached)
         {
             _pending = (copy, showAtCue);
             _actors[0].View.Prewarm(copy);
+            _ = ShowPendingAsync(copy, reached);
             return;
         }
 
         _pending = null;
         Show(copy, Animate ? change : null);
+    }
+
+    /// <summary>Shows <paramref name="mii"/> once <paramref name="reached"/> completes, unless a newer look replaced it.</summary>
+    private async Task ShowPendingAsync(Mii mii, Task reached)
+    {
+        await reached;
+        if (_actors.Count != 1 || _pending is not { } pending || !ReferenceEquals(pending.Mii, mii))
+            return;
+        _pending = null;
+        Show(mii, null);
     }
 
     public void SetFraming(MiiEditorFraming framing)
@@ -407,10 +398,7 @@ public sealed class MiiEditorScene : Grid
         ClearHover();
 
         if (Director is { } director)
-        {
-            director.SetFocus(framing == MiiEditorFraming.Head ? MiiEditorFocus.Face : MiiEditorFocus.Body);
             director.HoldStill = framing == MiiEditorFraming.Head;
-        }
 
         if (_fallback is { } fallback)
         {
@@ -426,14 +414,6 @@ public sealed class MiiEditorScene : Grid
         var shiftTo = framing == MiiEditorFraming.Info ? -Bounds.Width * InfoShift : 0;
         if (Math.Abs(shiftFrom - shiftTo) > 0.5 || previous == MiiEditorFraming.Info)
             _ = Tween(value => view.ScreenShiftX = value, shiftFrom, shiftTo, CameraTransition);
-    }
-
-    private void ShowPending()
-    {
-        if (_pending is not { } pending)
-            return;
-        _pending = null;
-        Show(pending.Mii, null);
     }
 
     private void Show(Mii mii, HeadPartChange? change)
@@ -481,16 +461,6 @@ public sealed class MiiEditorScene : Grid
                 actor.Entrance = null;
                 director.Idle();
             }
-        };
-        director.Cue += (_, cue) =>
-        {
-            if (_actors.Count == 1 && _pending is { } pending && pending.Cue == cue)
-                ShowPending();
-        };
-        director.ReactionEnded += _ =>
-        {
-            if (_actors.Count == 1)
-                ShowPending();
         };
         _actors.Add(actor);
         Children.Add(view);
@@ -725,7 +695,7 @@ public sealed class MiiEditorScene : Grid
             case MiiEditorFraming.Body
             or MiiEditorFraming.Info:
                 if (IsRealtime && _actors.Count == 1 && HitTestBody(_actors[0].View, ToView(_actors[0].View, point)) is { } part)
-                    BodyClicked?.Invoke(part == MiiBodyPart.Head ? MiiBodyPart.Head : MiiBodyPart.Body);
+                    BodyClicked?.Invoke(part);
                 break;
             case MiiEditorFraming.Head:
                 if (PartAt(point) is { } clicked)
