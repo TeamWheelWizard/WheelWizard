@@ -66,8 +66,23 @@ public class Program : IDesignerEntryPoint
     // X11 must opt in to drawn decorations for our extended title bars.
 #pragma warning disable AVALONIA_X11_CSD
     public static AppBuilder BuildAvaloniaApp() =>
-        AppBuilder.Configure<App>().UsePlatformDetect().With(new X11PlatformOptions { EnableDrawnDecorations = true }).WithInterFont();
+        AppBuilder
+            .Configure<App>()
+            .UsePlatformDetect()
+            .With(new X11PlatformOptions { EnableDrawnDecorations = true })
+            .With(MacOptions)
+            .WithInterFont();
 #pragma warning restore AVALONIA_X11_CSD
+
+    /// <summary>
+    /// macOS defaults to Metal, but the realtime Mii view draws with OpenGL and can only share the compositor's
+    /// context when that is OpenGL too. Metal stays as a fallback for systems without OpenGL.
+    /// </summary>
+    private static AvaloniaNativePlatformOptions MacOptions =>
+        new()
+        {
+            RenderingMode = [AvaloniaNativeRenderingMode.OpenGl, AvaloniaNativeRenderingMode.Metal, AvaloniaNativeRenderingMode.Software],
+        };
 
     /// <summary>
     /// Creates the logger, resetting the application data location once when its logs directory is unusable.
@@ -123,6 +138,7 @@ public class Program : IDesignerEntryPoint
             .Configure(() => new App(createStartup))
             .UsePlatformDetect()
             .With(new X11PlatformOptions { EnableDrawnDecorations = true })
+            .With(MacOptions)
             .WithInterFont();
 #pragma warning restore AVALONIA_X11_CSD
 
