@@ -162,6 +162,9 @@ public sealed class MiiEditorScene : Grid
         };
         PointerCaptureLost += (_, _) =>
         {
+            // Lost mid-drag (e.g. the window lost focus): the drag still ends.
+            if (_dragging && _press is { } press)
+                PartDragEnded?.Invoke(press.Part);
             _pressedAt = null;
             _dragging = false;
             _press = null;
@@ -1042,6 +1045,42 @@ public sealed class MiiEditorScene : Grid
             return null;
         var step = new Vector2((float)(end.X - start.X), (float)(end.Y - start.Y));
         return step.LengthSquared() < 0.01f ? null : step;
+    }
+
+    /// <summary>
+    /// Moves a dragged part on screen right away, by the steps its values moved since the drag started (the new head
+    /// is only built when the drag ends; see <see cref="MiiRealtimeView.BeginNudge"/>).
+    /// </summary>
+    public void NudgePart(MiiEditPart part, int down, int across)
+    {
+        if (!IsRealtime || _actors.Count != 1)
+            return;
+        var view = _actors[0].View;
+        var definition = MiiEditorParts.Get(part);
+        var vertical = definition.DragVertical;
+        var horizontal = definition.DragHorizontal;
+        var maskShift = (vertical?.MaskStep ?? Vector2.Zero) * down;
+        var meshShift = (vertical?.HeadStep ?? Vector3.Zero) * down + (horizontal?.HeadStep ?? Vector3.Zero) * across;
+        var spread = 0f;
+        if (horizontal is { Mirrored: true })
+            spread = horizontal.MaskStep.X * across;
+        else if (horizontal is not null)
+            maskShift += horizontal.MaskStep * across;
+        view.NudgePart(maskShift, spread, meshShift);
+    }
+
+    /// <summary>A part drag starts: the head on screen stays, and only the part moves until <see cref="EndNudge"/>.</summary>
+    public void BeginNudge(MiiEditPart part)
+    {
+        if (IsRealtime && _actors.Count == 1)
+            _actors[0].View.BeginNudge(MiiEditorParts.Get(part).RenderPart);
+    }
+
+    /// <summary>The drag is over: the dragged part's new head is built and replaces the moved one.</summary>
+    public void EndNudge()
+    {
+        if (IsRealtime && _actors.Count == 1)
+            _actors[0].View.EndNudge();
     }
 
     private void DragPart(Press press, Point point)

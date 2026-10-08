@@ -41,7 +41,13 @@ public sealed record HeadPass(string HeadKey, IReadOnlyList<HeadMeshData> Head)
     /// <summary>Shifts the mask texture (texture coordinates): positive X moves its content to the left.</summary>
     public Vector2 MaskUvOffset { get; init; }
 
+    /// <summary>Only draws the mask where it samples inside this area (min x, min y, max x, max y): e.g. one eye.</summary>
+    public Vector4? MaskUvClip { get; init; }
+
     public float Alpha { get; init; } = 1f;
+
+    /// <summary>Drawn after every other pass, faded ones included (e.g. the nose's outline over a sliding face part).</summary>
+    public bool OnTop { get; init; }
 
     /// <summary>Colour (rgb) and amount (a) to tint the shapes picked by <see cref="TintShapes"/> (all when null).</summary>
     public Vector4 Tint { get; init; }
@@ -66,6 +72,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     private readonly Dictionary<string, uint> _maskLayers = new();
     private readonly LinkedList<string> _maskLayerOrder = new();
     private const int MaxMaskLayers = 24;
+    private static readonly Vector4 NoClip = new(-1e9f, -1e9f, 1e9f, 1e9f);
     private readonly ParticleRenderer? _particles;
 
     // Offscreen layer for fading 3D things (see DrawFaded).
@@ -161,10 +168,10 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
             frame.HeadPasses ?? (frame.Head is not null && frame.HeadKey is not null ? [new HeadPass(frame.HeadKey, frame.Head)] : []);
 
         // Solid passes first, so the faded ones (a part sliding out or in) are hidden behind them where they should be.
-        var opaque = passes.Where(p => p.Alpha >= 0.999f).ToList();
+        var opaque = passes.Where(p => p.Alpha >= 0.999f && !p.OnTop).ToList();
         foreach (var pass in opaque)
             DrawHead(frame, setup, pass, pass.Alpha * fade);
-        var faded = passes.Where(p => p.Alpha < 0.999f).ToList();
+        var faded = passes.Where(p => p.Alpha < 0.999f && !p.OnTop).ToList();
         for (var i = 0; i < faded.Count; i++)
         {
             var pass = faded[i];
@@ -179,6 +186,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
                 DrawHead(frame, setup, pass, pass.Alpha * fade);
             }
         }
+
+        foreach (var pass in passes.Where(p => p.OnTop))
+            DrawHead(frame, setup, pass, pass.Alpha * fade);
     }
 
     /// <summary>Whether a pass only draws the face mask: a flat decal, which fades fine by plain blending.</summary>
@@ -380,6 +390,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
             SetVec4(_headProgram, "uTint", pass.TintShapes is null || pass.TintShapes(data.Shape) ? pass.Tint : Vector4.Zero);
             var uvOffset = isMask ? pass.MaskUvOffset : Vector2.Zero;
             _gl.Uniform2(_gl.GetUniformLocation(_headProgram, "uUvOffset"), uvOffset.X, uvOffset.Y);
+            SetVec4(_headProgram, "uUvClip", isMask && pass.MaskUvClip is { } clip ? clip : NoClip);
             if (data.CullMode == 1)
             {
                 _gl.Enable(EnableCap.CullFace);
@@ -474,9 +485,13 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     {
         foreach (var key in _heads.Keys.Where(k => !keep.Contains(k)).ToList())
         {
-            foreach (var mesh in _heads[key])
-                DeleteMesh(mesh);
+            var meshes = _heads[key];
             _heads.Remove(key);
+            // Shared with a head that stays: leave the meshes uploaded.
+            if (_heads.Values.Any(other => ReferenceEquals(other, meshes)))
+                continue;
+            foreach (var mesh in meshes)
+                DeleteMesh(mesh);
         }
     }
 
@@ -525,6 +540,12 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     {
         if (_heads.TryGetValue(key, out var existing))
             return existing;
+        // The same head under another key (e.g. a Mii that only got taller): share the uploaded meshes.
+        foreach (var uploaded in _heads.Values)
+        {
+            if (uploaded.Length > 0 && ReferenceEquals(uploaded[0].Head, data.FirstOrDefault()))
+                return _heads[key] = uploaded;
+        }
 
         var meshes = new List<GpuMesh>();
         foreach (var mesh in data)
@@ -673,7 +694,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
 
     public void Dispose()
     {
-        foreach (var mesh in _heads.Values.SelectMany(m => m).Concat(_bodies.Values.SelectMany(m => m)))
+        foreach (var mesh in _heads.Values.SelectMany(m => m).Distinct().Concat(_bodies.Values.SelectMany(m => m)))
             DeleteMesh(mesh);
         _heads.Clear();
         _bodies.Clear();

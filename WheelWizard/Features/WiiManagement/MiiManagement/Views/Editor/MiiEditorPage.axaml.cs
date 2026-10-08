@@ -129,6 +129,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
         _scene.PartDragged += OnPartDragged;
         _scene.PartDragEnded += _ =>
         {
+            _scene.EndNudge();
             _session?.EndMerge();
             _arrowAnchorDirty = true;
         };
@@ -669,6 +670,8 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
         if (_colors is null)
             return;
         _colorOpen = true;
+        // Closed it's just the round button; open it's a card holding every colour.
+        ColorPanel.Classes.Remove("Bare");
         var full = Math.Max(ColorPanelClosedWidth, BottomBar.Bounds.Width);
         AnimateWidth(ColorPanel, ColorPanel.Bounds.Width, full);
         SwatchScroller.Opacity = 1;
@@ -679,6 +682,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
     private void CloseColors(bool animate)
     {
         _colorOpen = false;
+        ColorPanel.Classes.Add("Bare");
         EndPreview();
         if (animate)
             AnimateWidth(ColorPanel, ColorPanel.Bounds.Width, ColorPanelClosedWidth);
@@ -827,6 +831,8 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
             SelectPart(part);
         _session?.EndMerge();
         _dragStart = _session is { } session ? MiiEditorSession.Copy(session.Mii) : null;
+        // Freezes the head on screen; the part then moves with the mouse (a head build per step would lag behind).
+        _scene.BeginNudge(part);
     }
 
     private void OnPartDragged(MiiEditPart part, int down, int across)
@@ -848,6 +854,15 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
             },
             mergeKey: "drag"
         );
+        if (_session is { } session)
+        {
+            static int Moved(MiiDragAxis? axis, Mii from, Mii to) => axis is null ? 0 : axis.Stepper.Get(to) - axis.Stepper.Get(from);
+            _scene.NudgePart(
+                part,
+                Moved(definition.DragVertical, start, session.Mii),
+                Moved(definition.DragHorizontal, start, session.Mii)
+            );
+        }
     }
 
     private void UndoButton_OnClick(object? sender, RoutedEventArgs e) => UndoRedo(undo: true);

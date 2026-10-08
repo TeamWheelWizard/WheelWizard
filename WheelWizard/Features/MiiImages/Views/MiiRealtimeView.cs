@@ -488,6 +488,8 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         }
 
         var pose = _player.Evaluate(RigFor(_mii));
+        if (NudgeFrame(pose, aspect) is { } nudged)
+            return nudged;
 
         // Use the pose's face when it's ready, otherwise the default face (built first). While the new Mii's head is
         // still building, keep drawing the previous Mii so the view never blinks empty.
@@ -621,6 +623,8 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         if (_heads.TryGetValue(key, out var head))
             return (head, key);
         RequestHead(_studioData!, expression);
+        if (_heads.TryGetValue(key, out head))
+            return (head, key);
         var fallback = HeadKey(_studioData!, MiiExpression.Normal);
         return _heads.TryGetValue(fallback, out var normal) ? (normal, fallback) : (null, null);
     }
@@ -641,7 +645,7 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
     private void RequestHead(string studio, MiiExpression expression)
     {
         var key = HeadKey(studio, expression);
-        if (_heads.ContainsKey(key) || !_building.TryAdd(key, 0))
+        if (_heads.ContainsKey(key) || ShareHead(studio, expression) || !_building.TryAdd(key, 0))
             return;
 
         _ = Task.Run(async () =>
@@ -649,7 +653,7 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             await _buildGate.WaitAsync();
             try
             {
-                if (!IsWanted(studio))
+                if (!IsWanted(studio) || IsNudgeSkipping(studio))
                     return;
                 var result = _renderer.BuildHeadModel(studio, (int)expression);
                 if (result.IsSuccess && IsWanted(studio))
@@ -663,6 +667,56 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             }
         });
     }
+
+    /// <summary>
+    /// A Mii that only differs in height or weight has the same head: reuse an already built one (so dragging the
+    /// height slider rescales the body right away instead of waiting for a head per step). True when shared.
+    /// </summary>
+    private bool ShareHead(string studio, MiiExpression expression)
+    {
+        if (HeadOnly(studio) is not { } identity)
+            return false;
+        string[] candidates;
+        lock (_recentStudios)
+            candidates = [.. _recentStudios.Append(_lastStudio).OfType<string>()];
+        foreach (var other in candidates)
+        {
+            if (other == studio || HeadOnly(other) != identity || !_heads.TryGetValue(HeadKey(other, expression), out var head))
+                continue;
+            _heads[HeadKey(studio, expression)] = head;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Studio data with the height and weight left out (they only change the body).</summary>
+    private static string? HeadOnly(string studio)
+    {
+        // Each byte is stored as (7 + (byte ^ previous stored byte)), after a leading "00".
+        if (studio.Length < 4 || studio.Length % 2 != 0)
+            return null;
+        var count = studio.Length / 2 - 1;
+        var bytes = new byte[count];
+        byte previous = 0;
+        for (var i = 0; i < count; i++)
+        {
+            if (!byte.TryParse(studio.AsSpan(2 + i * 2, 2), System.Globalization.NumberStyles.HexNumber, null, out var stored))
+                return null;
+            bytes[i] = (byte)((stored - 7) ^ previous);
+            previous = stored;
+        }
+
+        if (count > StudioHeightIndex)
+            bytes[StudioHeightIndex] = 0;
+        if (count > StudioWeightIndex)
+            bytes[StudioWeightIndex] = 0;
+        return Convert.ToHexString(bytes);
+    }
+
+    // Where MiiStudioDataSerializer puts the height and weight.
+    private const int StudioHeightIndex = 0x1E;
+    private const int StudioWeightIndex = 2;
 
     private void ReportUnavailable(string message)
     {

@@ -40,6 +40,12 @@
             <Setter Property="Opacity" Value="0" />
             <Setter Property="IsHitTestVisible" Value="False" />
         </Style>
+        <!-- Floating without a card behind it (the sliders, and the colour button while it's closed). -->
+        <Style Selector="Border.Floating.Bare">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BoxShadow" Value="none" />
+        </Style>
 
         <Style Selector="components|MultiIconRadioButton.Side">
             <Setter Property="Width" Value="46" />
@@ -188,7 +194,7 @@
         </Border>
 
         <!-- Body: height and weight, as two upright sliders with a figure at each end (tall/short, wide/thin). -->
-        <Border x:Name="BodyPanel" Grid.Row="0" Classes="Floating hidden" Padding="6,12"
+        <Border x:Name="BodyPanel" Grid.Row="0" Classes="Floating Bare hidden" Padding="6,12"
                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0">
             <StackPanel Orientation="Horizontal" Spacing="6">
                 <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.height}">
@@ -249,7 +255,7 @@
                 </ScrollViewer>
             </Border>
 
-            <Border x:Name="ColorPanel" Classes="Floating hidden" HorizontalAlignment="Right" Width="62" Padding="6"
+            <Border x:Name="ColorPanel" Classes="Floating Bare hidden" HorizontalAlignment="Right" Width="62" Padding="6"
                     ClipToBounds="True">
                 <Grid ColumnDefinitions="*,Auto">
                     <ScrollViewer x:Name="SwatchScroller" Opacity="0" HorizontalScrollBarVisibility="Auto"

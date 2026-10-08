@@ -67,7 +67,11 @@ public sealed partial class MiiRealtimeView
                 return;
             _highlightedPart = value;
             if (value is { } part && part.IsMaskPart() && _studioData is { } studio)
+            {
                 RequestMaskLayer(studio, MiiExpression.Normal, part.MaskLayer());
+                // The face without it too, so dragging it (see BeginNudge) can start right away.
+                RequestMaskLayer(studio, MiiExpression.Normal, MiiMaskLayers.All & ~part.MaskLayer());
+            }
             RequestNextFrameRendering();
         }
     }
@@ -206,7 +210,7 @@ public sealed partial class MiiRealtimeView
             bool MaskOnly(HeadShape shape) => shape == HeadShape.Mask;
             return
             [
-                new HeadPass(key, head) { Mask = new MaskLayerPass(withoutKey, without) },
+                new HeadPass(key, head) { Mask = new MaskLayerPass(withoutKey, without), Shapes = shape => !DrawnOverMask(shape) },
                 new HeadPass(oldKey, oldHead)
                 {
                     Shapes = MaskOnly,
@@ -221,6 +225,7 @@ public sealed partial class MiiRealtimeView
                     MaskUvOffset = new Vector2(-direction * MaskSlideDistance * (1f - p), 0f),
                     Alpha = p,
                 },
+                new HeadPass(key, head) { Shapes = DrawnOverMask, OnTop = true },
             ];
         }
 
@@ -252,6 +257,12 @@ public sealed partial class MiiRealtimeView
         );
         return passes;
     }
+
+    /// <summary>
+    /// See-through shapes drawn after the face mask (the nose's outline, the glasses): a pass that moves or swaps
+    /// the mask leaves them out, and they're drawn again after it, so they stay on top of the face like normal.
+    /// </summary>
+    private static bool DrawnOverMask(HeadShape shape) => shape is HeadShape.NoseLine or HeadShape.Glass;
 
     private static string MaskLayerKey(string studio, MiiExpression expression, MiiMaskLayers layers) =>
         $"{studio}|{(int)expression}|m{(int)layers}";

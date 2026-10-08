@@ -99,9 +99,12 @@ internal static class MiiShaders
             uniform vec4 uTint; // rgb = color to mix towards, a = mix amount
             uniform float uAlpha;
             uniform vec2 uUvOffset;
+            uniform vec4 uUvClip; // only texture coordinates inside (min xy, max zw) are drawn
             out vec4 fragColor;
             void main() {
-                vec4 t = uHasTex != 0 ? texture(uTex, vUv + uUvOffset) : vec4(1.0);
+                vec2 uv = vUv + uUvOffset;
+                if (uv.x < uUvClip.x || uv.y < uUvClip.y || uv.x > uUvClip.z || uv.y > uUvClip.w) discard;
+                vec4 t = uHasTex != 0 ? texture(uTex, uv) : vec4(1.0);
                 vec4 base;
                 if (uMode == 0) base = vec4(uColR.rgb, 1.0);
                 else if (uMode == 1) base = t;
