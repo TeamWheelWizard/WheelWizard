@@ -138,10 +138,6 @@
             <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
         
-        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <SelectableTextBlock x:Name="ReleaseText" HorizontalAlignment="Right" Classes="TinyText" Text="DEV BUILD"/>
-            <SelectableTextBlock x:Name="WhWzVersionText" HorizontalAlignment="Right" Classes="TinyText" Text="Example WhWz version 1.0.0" />
-            <SelectableTextBlock x:Name="RrVersionText" HorizontalAlignment="Right" Classes="TinyText" Text="Example RR version 1.0.0" />
-        </StackPanel>
+
     </Grid>
 </UserControl>

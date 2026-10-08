@@ -263,6 +263,51 @@ public class ApplicationCompositionTests
             settings.ENABLE_ANIMATIONS.Set(false, skipSave: true);
             toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
+            // Settings locks the main sidebar while keeping navigation inside the page body.
+            foreach (var initiallyCollapsed in new[] { false, true })
+            {
+                if (initiallyCollapsed)
+                    toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                navigation.NavigateTo<SettingsPage>();
+                original.UpdateLayout();
+                Assert.Equal(64, original.SidebarWidth);
+                Assert.Equal(initiallyCollapsed, settings.SIDEBAR_COLLAPSED.Get());
+                Assert.True(toggle.IsVisible);
+                Assert.False(toggle.IsEnabled);
+                Assert.True(original.FindControl<PathIcon>("SidebarLock")!.IsVisible);
+                Assert.False(original.FindControl<PathIcon>("SidebarChevron")!.IsVisible);
+                var settingsPage = Assert.IsType<SettingsPage>(navigation.CurrentPage);
+                var sidebarSurface = settingsPage.FindControl<Border>("SettingsNavigation")!;
+                var settingsBody = settingsPage.FindControl<Grid>("SettingsBody")!;
+                Assert.Same(settingsBody, sidebarSurface.Parent);
+                Assert.Equal(new Thickness(0, 0, 1, 0), sidebarSurface.BorderThickness);
+                Assert.Equal(0, sidebarSurface.CornerRadius.TopLeft);
+                Assert.Equal(157, sidebarSurface.Bounds.Width);
+                var headerDivider = settingsPage.FindControl<Grid>("SettingsRoot")!.Children.OfType<Border>()
+                    .Single(border => Grid.GetRow(border) == 0);
+                var dividerY = headerDivider.TranslatePoint(new Point(), original)!.Value.Y;
+                var firstSettingsButton = sidebarSurface.GetVisualDescendants().OfType<RadioButton>().First();
+                Assert.True(firstSettingsButton.TranslatePoint(new Point(), original)!.Value.Y >= dividerY);
+                var settingsTitle = settingsPage.FindControl<TextBlock>("SettingsTitle")!;
+                Assert.Equal(Avalonia.Layout.VerticalAlignment.Bottom, settingsTitle.VerticalAlignment);
+                Assert.Equal(Avalonia.Layout.VerticalAlignment.Bottom,
+                    settingsPage.FindControl<WheelWizard.Views.Components.Button>("DevButton")!.VerticalAlignment);
+                var sidebarAbout = sidebarSurface.GetVisualDescendants().OfType<RadioButton>()
+                    .Single(button => button.Tag?.ToString() == "AppInfo");
+                sidebarAbout.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Assert.IsType<AppInfo>(settingsPage.FindControl<ContentControl>("SettingsContent")!.Content);
+                // Navigating between settings destinations must preserve the original sidebar state.
+                navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
+                navigation.NavigateTo<HomePage>();
+                original.UpdateLayout();
+                Assert.Equal(initiallyCollapsed ? 64 : 221, original.SidebarWidth);
+                Assert.True(toggle.IsEnabled);
+                Assert.False(original.FindControl<PathIcon>("SidebarLock")!.IsVisible);
+                Assert.True(toggle.IsVisible);
+                if (initiallyCollapsed)
+                    toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            }
+
             Type[] pages =
             [
                 typeof(FriendsPage),
@@ -341,6 +386,7 @@ public class ApplicationCompositionTests
                 .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var other = Assert.IsType<SettingsPage>(navigation.CurrentPage);
             Assert.IsType<OtherSettings>(other.FindControl<ContentControl>("SettingsContent")!.Content);
+            navigation.NavigateTo<HomePage>();
             toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             windows.Refresh();
             Assert.Equal(64, Assert.IsType<Layout>(desktop.MainWindow).SidebarWidth);

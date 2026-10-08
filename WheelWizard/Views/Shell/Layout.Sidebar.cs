@@ -25,6 +25,7 @@ public partial class Layout
     }
 
     private bool _sidebarCollapsed;
+    private readonly SemaphoreSlim _sidebarAnimation = new(1, 1);
 
     /// <summary>A full-width page is open: the sidebar stays collapsed and its toggle is greyed out.</summary>
     private bool _sidebarLocked;
@@ -35,6 +36,8 @@ public partial class Layout
             return;
         _sidebarLocked = locked;
         SidebarToggle.Classes.Set("locked", locked);
+        SidebarChevron.IsVisible = !locked;
+        SidebarLock.IsVisible = locked;
         SidebarToggle.IsEnabled = !locked;
         // Leaving the page brings back how you had the sidebar.
         var collapsed = locked || SettingsService.SIDEBAR_COLLAPSED.Get();
@@ -65,6 +68,19 @@ public partial class Layout
     }
 
     private async Task SetSidebarCollapsedAsync(bool collapsed, bool animate)
+    {
+        await _sidebarAnimation.WaitAsync();
+        try
+        {
+            await AnimateSidebarAsync(collapsed, animate);
+        }
+        finally
+        {
+            _sidebarAnimation.Release();
+        }
+    }
+
+    private async Task AnimateSidebarAsync(bool collapsed, bool animate)
     {
         SidebarToggle.IsEnabled = false;
         _sidebarCollapsed = collapsed;

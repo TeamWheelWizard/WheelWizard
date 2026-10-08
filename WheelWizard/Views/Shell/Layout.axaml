@@ -64,7 +64,7 @@
     <Grid Grid.Row="1" ColumnDefinitions="221,*" RowDefinitions="0,17,18,96,*,80" x:Name="CompleteGrid"
           Background="{StaticResource FrameColor}">
 
-        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
+        <Border x:Name="ContentBackground" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
                 Background="{StaticResource BackgroundColor}" />
         <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="True">
@@ -396,6 +396,7 @@
                     <Setter Property="Cursor" Value="Arrow" />
                 </Style>
             </Button.Styles>
+            <Grid>
             <PathIcon x:Name="SidebarChevron" Width="8" Height="10"
                       Data="M 6,0 L 0,5 L 6,10 L 8,8 L 4,5 L 8,2 Z"
                       RenderTransformOrigin="50%,50%">
@@ -403,6 +404,8 @@
                     <RotateTransform Angle="0" />
                 </PathIcon.RenderTransform>
             </PathIcon>
+            <PathIcon x:Name="SidebarLock" Width="10" Height="11" Data="{StaticResource Lock}" IsVisible="False" />
+            </Grid>
         </Button>
 
         <!-- Snackbar -->

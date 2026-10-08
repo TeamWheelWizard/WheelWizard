@@ -33,6 +33,7 @@ public partial class SettingsPage : UserControl
         SettingsSignalBus = settingsSignalBus;
         Pages = pages;
         InitializeComponent();
+        VersionInfoSidebar.Content = Pages.Create<SettingsVersionInfo>();
         UpdateTabVisibility();
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingChanged);
 
@@ -40,7 +41,7 @@ public partial class SettingsPage : UserControl
 
         var initialSettingsPage = Pages.Create(initialPage ?? typeof(WhWzSettings));
         SettingsContent.Content = initialSettingsPage;
-        SetCheckedTopBarButton(initialSettingsPage);
+        SetCheckedSidebarButton(initialSettingsPage);
     }
 
     protected override void OnUnloaded(RoutedEventArgs e)
@@ -74,10 +75,10 @@ public partial class SettingsPage : UserControl
 
         var fallback = Pages.Create<WhWzSettings>();
         SettingsContent.Content = fallback;
-        SetCheckedTopBarButton(fallback);
+        SetCheckedSidebarButton(fallback);
     }
 
-    private void TopBarRadio_OnClick(object? sender, RoutedEventArgs e)
+    private void SidebarRadio_OnClick(object? sender, RoutedEventArgs e)
     {
         if (sender is not RadioButton radioButton)
             return;
@@ -92,7 +93,7 @@ public partial class SettingsPage : UserControl
         SettingsContent.Content = Pages.Create(type);
     }
 
-    private void SetCheckedTopBarButton(UserControl settingsPage)
+    private void SetCheckedSidebarButton(UserControl settingsPage)
     {
         foreach (var child in SettingPages.Children)
         {

@@ -317,7 +317,7 @@ public partial class Layout : BaseWindow, IPollingListener
         ContentArea.IsTransitionReversed = isDetailsToRooms || isEditorToMiis;
         ContentArea.Content = page;
         UpdateSidebarSelection(page);
-        _ = LockSidebarAsync(page is IFullWidthPage);
+        _ = LockSidebarAsync(page is IFullWidthPage || page is SettingsPage);
     }
 
     private void UpdateSidebarSelection(UserControl page)
