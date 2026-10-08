@@ -12,10 +12,13 @@ public static class RecompVideoConfig
     /// <summary>
     /// The graphics APIs WheelWizard offers, in the order they are shown. The backend enumerates more
     /// (auto, d3d11, opengl, ...), but only these actually run the game reliably, so nothing else is
-    /// ever offered; Linux has no DirectX, so only Vulkan remains there. A value outside this list
-    /// stays untouched until the user picks one of these.
+    /// ever offered; Linux has no DirectX, so only Vulkan remains there, and macOS only builds Metal.
+    /// A value outside this list stays untouched until the user picks one of these.
     /// </summary>
-    public static IReadOnlyList<string> OfferedGraphicsApis { get; } = RecompPlatform.IsLinux ? ["vulkan"] : ["d3d12", "vulkan"];
+    public static IReadOnlyList<string> OfferedGraphicsApis { get; } =
+        RecompPlatform.IsLinux ? ["vulkan"]
+        : RecompPlatform.IsMacOS ? ["metal"]
+        : ["d3d12", "vulkan"];
 
     /// <summary>The label for a graphics API value, for example <c>DirectX 12</c> for <c>d3d12</c>.</summary>
     public static string DescribeGraphicsApi(string api) =>
@@ -23,6 +26,7 @@ public static class RecompVideoConfig
         {
             "d3d12" => "DirectX 12",
             "vulkan" => "Vulkan",
+            "metal" => "Metal",
             _ => api,
         };
 

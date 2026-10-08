@@ -27,22 +27,31 @@ public sealed class RecompPaths(IApplicationDataLocation applicationData, IFileS
 {
     public const string InstallStateFileName = "install-state.json";
     private bool IsLinux => environment.IsLinux && RecompPlatform.LinuxReleaseAssetName(environment.OSArchitecture) is not null;
+    private bool IsMacOS => environment.IsMacOS;
+
+    // Linux and macOS both run a setup that keeps its products, Config.toml and NAND in its own backend folder.
+    private bool UsesBackendFolder => IsLinux || IsMacOS;
     private bool IsFlatpak => environment.IsFlatpakSandboxed(fileSystem);
     public string RootFolderPath => fileSystem.Path.Combine(applicationData.DirectoryPath, "Recomp");
     public string InstallFolderPath => fileSystem.Path.Combine(RootFolderPath, "Install");
-    public bool IsPortableInstall => !IsLinux;
+    public bool IsPortableInstall => !UsesBackendFolder;
     public string CacheFolderPath => fileSystem.Path.Combine(RootFolderPath, "Cache");
     public string UserDataFolderPath => fileSystem.Path.Combine(RootFolderPath, "UserData");
     public string InstallStateFilePath => fileSystem.Path.Combine(InstallFolderPath, InstallStateFileName);
     public string SetupFilePath =>
         IsFlatpak
             ? "/app/extensions/backends/wiicompiled/bin/wiicompiled-setup"
-            : fileSystem.Path.Combine(InstallFolderPath, IsLinux ? "WiiCompiled-Setup.AppImage" : RecompSetupCommandBuilder.SetupFileName);
+            : fileSystem.Path.Combine(
+                InstallFolderPath,
+                IsLinux ? "WiiCompiled-Setup.AppImage"
+                    : IsMacOS ? RecompPlatform.MacReleaseAssetName
+                    : RecompSetupCommandBuilder.SetupFileName
+            );
     public string LinuxBackendFolderPath =>
         fileSystem.Path.Combine(environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WiiCompiled");
     public string LinuxBackendStateFilePath => fileSystem.Path.Combine(LinuxBackendFolderPath, InstallStateFileName);
-    public string ConfigFilePath => fileSystem.Path.Combine(IsLinux ? LinuxBackendFolderPath : UserDataFolderPath, "Config.toml");
+    public string ConfigFilePath => fileSystem.Path.Combine(UsesBackendFolder ? LinuxBackendFolderPath : UserDataFolderPath, "Config.toml");
     public string NandCopyFolderPath => fileSystem.Path.Combine(RootFolderPath, "Nand");
     public string PortableMarkerFilePath => fileSystem.Path.Combine(RootFolderPath, "portable.txt");
-    public string PrivateNandFolderPath => fileSystem.Path.Combine(IsLinux ? LinuxBackendFolderPath : UserDataFolderPath, "NAND");
+    public string PrivateNandFolderPath => fileSystem.Path.Combine(UsesBackendFolder ? LinuxBackendFolderPath : UserDataFolderPath, "NAND");
 }
