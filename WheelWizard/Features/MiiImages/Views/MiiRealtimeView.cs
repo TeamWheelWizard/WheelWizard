@@ -27,7 +27,7 @@ namespace WheelWizard.MiiImages.Views;
 /// clips. If OpenGL isn't available <see cref="RealtimeUnavailable"/> fires; callers can fall back to the CPU renderer.
 /// </para>
 /// </summary>
-public sealed class MiiRealtimeView : OpenGlControlBase
+public sealed partial class MiiRealtimeView : OpenGlControlBase
 {
     private static readonly TimeSpan InitTimeout = TimeSpan.FromSeconds(3);
 
@@ -127,6 +127,48 @@ public sealed class MiiRealtimeView : OpenGlControlBase
         }
     }
 
+    /// <summary>
+    /// Moves the picture sideways by this many pixels (e.g. two Miis side by side in two views on top of each other).
+    /// The projection is shifted rather than the control, so picking and projecting points follow along.
+    /// </summary>
+    public double ScreenShiftX
+    {
+        get => _screenShiftX;
+        set
+        {
+            _screenShiftX = value;
+            RequestNextFrameRendering();
+        }
+    }
+
+    private double _screenShiftX;
+
+    /// <summary>Scales the picture around the middle of the view (like zooming, but without moving the camera).</summary>
+    public double ScreenScale
+    {
+        get => _screenScale;
+        set
+        {
+            _screenScale = value;
+            RequestNextFrameRendering();
+        }
+    }
+
+    private double _screenScale = 1;
+
+    /// <summary>Fades the whole Mii (0 = invisible).</summary>
+    public float Alpha
+    {
+        get => _alpha;
+        set
+        {
+            _alpha = Math.Clamp(value, 0f, 1f);
+            RequestNextFrameRendering();
+        }
+    }
+
+    private float _alpha = 1f;
+
     /// <summary>Keep drawing every display frame even when nothing animates (e.g. while the caller eases the camera).</summary>
     public bool ContinuousRendering { get; set; }
 
@@ -172,12 +214,22 @@ public sealed class MiiRealtimeView : OpenGlControlBase
     /// Shows a Mii. Pass <paramref name="studioData"/> when the caller already serialized it (e.g. with the April
     /// Fools' variant); otherwise it's serialized here. The previous Mii stays on screen until this one's head is built.
     /// </summary>
-    public void SetMii(Mii? mii, string? studioData)
+    public void SetMii(Mii? mii, string? studioData) => SetMii(mii, studioData, null);
+
+    /// <summary>
+    /// Like <see cref="SetMii(Mii?, string?)"/>, but when only one part of the head changed, that part swaps with a
+    /// short transition: it slides out one way while the new one slides in from the other side (see
+    /// <see cref="HeadPartChange"/>).
+    /// </summary>
+    public void SetMii(Mii? mii, string? studioData, HeadPartChange? change)
     {
         _mii = mii;
         studioData ??= mii is null ? null : Serialize(mii);
         if (studioData != _studioData)
+        {
+            BeginPartChange(change, _shownStudio ?? _lastStudio, studioData);
             _shownStudio = null;
+        }
         _studioData = studioData;
         if (studioData is not null)
             Remember(studioData, prewarm: false);
@@ -412,7 +464,7 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             return;
         }
 
-        if (_player.IsAnimating || IsCameraMoving || ContinuousRendering)
+        if (_player.IsAnimating || IsCameraMoving || ContinuousRendering || IsPartChanging)
             RequestNextFrameRendering();
     }
 
@@ -440,7 +492,7 @@ public sealed class MiiRealtimeView : OpenGlControlBase
         // Use the pose's face when it's ready, otherwise the default face (built first). While the new Mii's head is
         // still building, keep drawing the previous Mii so the view never blinks empty.
         var (head, key) = HeadFor(pose.Expression);
-        if (head is null)
+        if (head is null || !IsPartChangeReady(pose.Expression))
             return PreviousMiiFrame(pose, aspect);
 
         var setup = _renderer.GetRealtimeFrameSetup(_studioData, Specifications, aspect);
@@ -453,8 +505,14 @@ public sealed class MiiRealtimeView : OpenGlControlBase
             Dispatcher.UIThread.Post(() => MiiShown?.Invoke(shown!));
         }
         _lastStudio = _studioData;
-        var frameSetup = MoveCamera(setup.Value);
-        return _lastFrame = new MiiGpuFrame(frameSetup, pose, head, key) { Particles = Particles(frameSetup) };
+        var frameSetup = Shift(MoveCamera(setup.Value));
+        return _lastFrame = new MiiGpuFrame(frameSetup, pose, head, key)
+        {
+            Alpha = _alpha,
+            Particles = Particles(frameSetup),
+            HeadPasses = HeadPasses(pose.Expression, head!, key!),
+            BodyHoverMask = BodyHoverMask,
+        };
     }
 
     private MiiGpuFrame? PreviousMiiFrame(MiiPose pose, float aspect)
@@ -469,8 +527,29 @@ public sealed class MiiRealtimeView : OpenGlControlBase
         var setup = _renderer.GetRealtimeFrameSetup(_lastStudio, Specifications, aspect);
         if (setup.IsFailure)
             return null;
-        var frameSetup = MoveCamera(setup.Value);
-        return _lastFrame = last with { Setup = frameSetup, Pose = pose, Head = head, Particles = Particles(frameSetup) };
+        var frameSetup = Shift(MoveCamera(setup.Value));
+        return _lastFrame = last with
+        {
+            Alpha = _alpha,
+            Setup = frameSetup,
+            Pose = pose,
+            Head = head,
+            Particles = Particles(frameSetup),
+            HeadPasses = null,
+            BodyHoverMask = BodyHoverMask,
+        };
+    }
+
+    /// <summary>Applies <see cref="ScreenScale"/> and <see cref="ScreenShiftX"/> in clip space.</summary>
+    private MiiRealtimeFrameSetup Shift(MiiRealtimeFrameSetup setup)
+    {
+        if (_screenShiftX == 0 && _screenScale == 1 || Bounds.Width <= 0)
+            return setup;
+        var shift = Matrix4x4.Identity;
+        shift.M11 = (float)_screenScale;
+        shift.M22 = (float)_screenScale;
+        shift.M41 = (float)(2 * _screenShiftX / Bounds.Width);
+        return setup with { Projection = setup.Projection * shift };
     }
 
     /// <summary>Applies a running camera transition and remembers where the camera is.</summary>

@@ -26,6 +26,22 @@ public partial class Layout
 
     private bool _sidebarCollapsed;
 
+    /// <summary>A full-width page is open: the sidebar stays collapsed and its toggle is greyed out.</summary>
+    private bool _sidebarLocked;
+
+    private async Task LockSidebarAsync(bool locked)
+    {
+        if (locked == _sidebarLocked)
+            return;
+        _sidebarLocked = locked;
+        SidebarToggle.Classes.Set("locked", locked);
+        SidebarToggle.IsEnabled = !locked;
+        // Leaving the page brings back how you had the sidebar.
+        var collapsed = locked || SettingsService.SIDEBAR_COLLAPSED.Get();
+        if (collapsed != _sidebarCollapsed)
+            await SetSidebarCollapsedAsync(collapsed, SettingsService.ENABLE_ANIMATIONS.Get());
+    }
+
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -41,7 +57,7 @@ public partial class Layout
 
     private async void SidebarToggle_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (!SidebarToggle.IsEnabled)
+        if (!SidebarToggle.IsEnabled || _sidebarLocked)
             return;
 
         SettingsService.SIDEBAR_COLLAPSED.Set(!_sidebarCollapsed);
@@ -109,7 +125,7 @@ public partial class Layout
         await AnimateSidebarDetails(appearing: true, animate);
         SidebarBottomBar.IsHitTestVisible = true;
         SupportUsButton.IsHitTestVisible = true;
-        SidebarToggle.IsEnabled = true;
+        SidebarToggle.IsEnabled = !_sidebarLocked;
     }
 
     private async Task AnimateSidebarDetails(bool appearing, bool animate)

@@ -37,7 +37,42 @@ public sealed class HeadMeshData
     public required float SpecularPower { get; init; }
     public required int SpecularMode { get; init; }
     public required Vector3 RimColor { get; init; }
+
+    /// <summary>Which part of the head this is (see <see cref="HeadShape"/>).</summary>
+    public HeadShape Shape { get; init; }
 }
+
+/// <summary>The FFL shape a head draw call belongs to (FFL's modulate type).</summary>
+public enum HeadShape
+{
+    Faceline = 0,
+    Beard = 1,
+    Nose = 2,
+    Forehead = 3,
+    Hair = 4,
+    Cap = 5,
+
+    /// <summary>The face decals (eyes, eyebrows, mouth, mustache, mole) painted into one texture.</summary>
+    Mask = 6,
+    NoseLine = 7,
+    Glass = 8,
+}
+
+/// <summary>Parts painted into the face mask texture.</summary>
+[Flags]
+public enum MiiMaskLayers
+{
+    None = 0,
+    Eyes = 1,
+    Eyebrows = 2,
+    Mouth = 4,
+    Mustache = 8,
+    Mole = 16,
+    All = Eyes | Eyebrows | Mouth | Mustache | Mole,
+}
+
+/// <summary>A face mask texture with only some of its parts (RGBA8, same layout as the head's mask texture).</summary>
+public sealed record MiiMaskLayerTexture(byte[] Pixels, int Width, int Height);
 
 public sealed partial class NativeMiiRenderer
 {
@@ -120,11 +155,110 @@ public sealed partial class NativeMiiRenderer
                     SpecularPower = mesh.Material.SpecularPower,
                     SpecularMode = mesh.Material.SpecularMode,
                     RimColor = mesh.Material.RimColor,
+                    Shape = (HeadShape)mesh.DrawParam.modulateParam.type,
                 }
             );
         }
 
         return meshes;
+    }
+
+    /// <summary>
+    /// The face mask of a Mii with only <paramref name="layers"/> painted in (e.g. just the eyes, or everything but
+    /// them). Drawn on the head's mask mesh it lines up with the full mask, so parts can be animated on their own.
+    /// </summary>
+    public OperationResult<MiiMaskLayerTexture> BuildMaskLayer(string studioData, int expressionId, MiiMaskLayers layers)
+    {
+        var resourcePathResult = resourceLocator.GetFflResourcePath();
+        if (resourcePathResult.IsFailure)
+            return resourcePathResult.Error!;
+        var archiveResult = GetManagedArchive(resourcePathResult.Value);
+        if (archiveResult.IsFailure)
+            return archiveResult.Error!;
+        var charInfoResult = GetOrCreateCharInfo(studioData);
+        if (charInfoResult.IsFailure)
+            return charInfoResult.Error!;
+
+        // Same resolution as the head's own mask (BuildManagedDrawParams).
+        var request = BuildRequest(studioData, new MiiImageSpecifications { Size = MiiImageSpecifications.ImageSize.medium });
+        var resolution = request.Width <= 384 ? 256 : 512;
+        var generated = new List<IntPtr>();
+        using var arena = new RenderAllocationTracker();
+        try
+        {
+            var handle = BuildManagedMaskTexture(
+                archiveResult.Value,
+                charInfoResult.Value,
+                resolution,
+                expressionId,
+                new Dictionary<(int PartType, int Index), IntPtr>(),
+                generated,
+                arena,
+                layers
+            );
+            if (handle.IsFailure)
+                return handle.Error!;
+            // Nothing to paint: a fully transparent mask.
+            if (handle.Value == IntPtr.Zero || !TextureRegistry.TryGet(handle.Value, out var texture))
+                return new MiiMaskLayerTexture(new byte[resolution * resolution * 4], resolution, resolution);
+            return new MiiMaskLayerTexture(ToRgba(texture), texture.Width, texture.Height);
+        }
+        finally
+        {
+            foreach (var handle in generated)
+                TextureRegistry.RemoveTexture(handle);
+        }
+    }
+
+    /// <summary>
+    /// Where each face mask part of a Mii sits on the mask texture: one or two quads (left/right) of four corners in
+    /// texture coordinates (0..1, same as the mask mesh's UVs).
+    /// </summary>
+    public OperationResult<IReadOnlyDictionary<MiiMaskLayers, Vector2[][]>> GetMaskPartQuads(string studioData)
+    {
+        var charInfoResult = GetOrCreateCharInfo(studioData);
+        if (charInfoResult.IsFailure)
+            return charInfoResult.Error!;
+        var charInfo = charInfoResult.Value;
+        var parts = BuildRawMaskParts(charInfo);
+        var quads = new Dictionary<MiiMaskLayers, Vector2[][]>
+        {
+            [MiiMaskLayers.Eyes] = [MaskQuad(parts.EyeR), MaskQuad(parts.EyeL)],
+            [MiiMaskLayers.Eyebrows] = [MaskQuad(parts.EyebrowR), MaskQuad(parts.EyebrowL)],
+            [MiiMaskLayers.Mouth] = [MaskQuad(parts.Mouth)],
+            [MiiMaskLayers.Mustache] = charInfo.parts.mustacheType != 0 ? [MaskQuad(parts.MustacheR), MaskQuad(parts.MustacheL)] : [],
+            [MiiMaskLayers.Mole] = charInfo.parts.moleType != 0 ? [MaskQuad(parts.Mole)] : [],
+        };
+        return quads;
+    }
+
+    /// <summary>The corners of a mask part in mask texture coordinates (same placement as CreateRawMaskOverlayDrawParam).</summary>
+    private static Vector2[] MaskQuad(RawMaskPartDescriptor desc)
+    {
+        var posXAdd = desc.Origin switch
+        {
+            RawMaskOrigin.Center => -0.5f,
+            RawMaskOrigin.Left => -1f,
+            _ => 0f,
+        };
+        ReadOnlySpan<float> baseX = [1f, 1f, 0f, 0f];
+        ReadOnlySpan<float> baseY = [-0.5f, 0.5f, 0.5f, -0.5f];
+        var rad = desc.RotationDegrees * (MathF.PI / 180f);
+        var cos = MathF.Cos(rad);
+        var sin = MathF.Sin(rad);
+        const float texScaleX = 0.88961464f;
+        const float texScaleY = 0.9276675f;
+        var corners = new Vector2[4];
+        for (var i = 0; i < 4; i++)
+        {
+            var lx = baseX[i] + posXAdd;
+            var ly = baseY[i];
+            var xr = lx * desc.Scale.X * cos - ly * desc.Scale.Y * sin;
+            var yr = lx * desc.Scale.X * sin + ly * desc.Scale.Y * cos;
+            corners[i] = new Vector2((texScaleX * xr + desc.Position.X) / 64f, (texScaleY * yr + desc.Position.Y) / 64f);
+        }
+
+        return corners;
     }
 
     private static int[] ToTriangleList(int[] indices, uint primitiveType)

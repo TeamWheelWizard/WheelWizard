@@ -86,10 +86,6 @@
             <DependentUpon>ListActionButton.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Features\WiiManagement\MiiManagement\Views\Dialogs\MiiEditor\EditorEmpty.axaml.cs">
-            <DependentUpon>EditorEmpty.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
         <Compile Update="Features\WheelWizardData\Views\CommunityCountBadge.axaml.cs">
             <DependentUpon>CommunityCountBadge.axaml</DependentUpon>
         </Compile>

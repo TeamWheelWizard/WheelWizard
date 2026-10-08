@@ -47,7 +47,11 @@ public sealed class MiiEditorDirector
     private readonly Dictionary<string, string> _lastPicked = new();
     private readonly Queue<TimeSpan> _pokes = new();
 
+    /// <summary>Barely-there breathing for <see cref="HoldStill"/>: the head stays where it is, so parts can be clicked and dragged.</summary>
+    private static readonly MiiAnimation StillClip = CreateStillClip();
+
     private MiiAnimation? _idleClip;
+    private bool _holdStill;
     private MiiAnimation? _reactionClip;
     private string? _reactionPath;
     private MiiEditorReaction? _reaction;
@@ -84,6 +88,33 @@ public sealed class MiiEditorDirector
         : _reaction is { } reaction && Important.Contains(reaction) ? 0f
         : 0.4f;
 
+    /// <summary>
+    /// Keeps the Mii still (just breathing, no idles or edit reactions) while parts of it are being clicked and
+    /// dragged. Important reactions (gender swap, save) still play.
+    /// </summary>
+    public bool HoldStill
+    {
+        get => _holdStill;
+        set
+        {
+            if (_holdStill == value)
+                return;
+            _holdStill = value;
+            if (_reactionClip is null)
+                PlayIdle(FocusFadeSeconds);
+            else if (value && !(_reaction is { } reaction && Important.Contains(reaction)))
+                EndReaction(playIdle: true, fadeSeconds: FocusFadeSeconds);
+        }
+    }
+
+    /// <summary>Starts idling now, e.g. after a clip played straight on the player (like falling in) ended.</summary>
+    public void Idle()
+    {
+        if (_reactionClip is not null)
+            EndReaction(playIdle: false, fadeSeconds: 0);
+        PlayIdle(IdleFadeSeconds);
+    }
+
     /// <summary>Plays the editor's entrance (or just starts idling when there is none).</summary>
     public void Start()
     {
@@ -115,6 +146,8 @@ public sealed class MiiEditorDirector
     public bool React(MiiEditorReaction reaction)
     {
         var important = Important.Contains(reaction);
+        if (_holdStill && !important)
+            return false;
         if (_reaction is { } playing && !_isPoke)
         {
             if (playing == reaction && !important)
@@ -224,6 +257,13 @@ public sealed class MiiEditorDirector
     /// <summary>Idles are played once each (they all start and end in the same pose), then another one is picked.</summary>
     private void PlayIdle(double fadeSeconds)
     {
+        if (_holdStill)
+        {
+            _idleClip = StillClip;
+            _player.Play(StillClip, loop: true, fadeSeconds);
+            return;
+        }
+
         var idles = _library.List($"{Root}/idle");
         var wanted = idles.Where(path => IsCloseUp(path) == (Focus == MiiEditorFocus.Face)).ToList();
         var picked = Pick(wanted.Count > 0 ? wanted : idles, "idle:" + Focus);
@@ -284,6 +324,21 @@ public sealed class MiiEditorDirector
         }
 
         return null;
+    }
+
+    private static MiiAnimation CreateStillClip()
+    {
+        var clip = new MiiAnimation
+        {
+            Name = "Editor_hold_still",
+            Fps = 60,
+            Length = 240,
+        };
+        var breathe = clip.GetOrCreateCurve(TrackId.Bone(MiiAnim.Core.Rig.MiiBone.Root, Channel.PosY));
+        breathe.SetKey(0, 0f);
+        breathe.SetKey(120, -0.35f);
+        breathe.SetKey(240, 0f);
+        return clip;
     }
 
     private static bool IsCloseUp(string path) => path.EndsWith(CloseUpSuffix, StringComparison.OrdinalIgnoreCase);

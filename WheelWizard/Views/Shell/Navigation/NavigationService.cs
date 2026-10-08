@@ -9,7 +9,23 @@ public interface INavigationService
     void NavigateTo(Type pageType, params object[] arguments);
     void NavigateTo<T>(params object[] arguments)
         where T : UserControl;
+
+    /// <summary>Navigates without asking the current page (see <see cref="INavigationGuard"/>), e.g. after it saved.</summary>
+    void NavigateAway(Type pageType, params object[] arguments);
 }
+
+/// <summary>A page that may want to stop you from leaving it, e.g. because you'd lose unsaved work.</summary>
+public interface INavigationGuard
+{
+    /// <summary>Whether leaving now would lose something (also checked before closing the app).</summary>
+    bool HasUnsavedWork { get; }
+
+    /// <summary>Asks whether to leave anyway; only called when <see cref="HasUnsavedWork"/>.</summary>
+    Task<bool> ConfirmLeaveAsync();
+}
+
+/// <summary>A page that uses the whole window: the sidebar collapses (and can't be opened) while it's shown.</summary>
+public interface IFullWidthPage;
 
 public sealed class NavigationService(IPageFactory pages) : INavigationService
 {
@@ -19,6 +35,20 @@ public sealed class NavigationService(IPageFactory pages) : INavigationService
 
     public void NavigateTo(Type pageType, params object[] arguments)
     {
+        if (CurrentPage is INavigationGuard { HasUnsavedWork: true } guard)
+        {
+            _ = NavigateAfterConfirmAsync(guard, pageType, arguments);
+            return;
+        }
+
+        NavigateAway(pageType, arguments);
+    }
+
+    public void NavigateTo<T>(params object[] arguments)
+        where T : UserControl => NavigateTo(typeof(T), arguments);
+
+    public void NavigateAway(Type pageType, params object[] arguments)
+    {
         var generation = ++_generation;
         var page = pages.Create(pageType, arguments);
         if (generation != _generation)
@@ -27,6 +57,14 @@ public sealed class NavigationService(IPageFactory pages) : INavigationService
         PageChanged?.Invoke(this, page);
     }
 
-    public void NavigateTo<T>(params object[] arguments)
-        where T : UserControl => NavigateTo(typeof(T), arguments);
+    private async Task NavigateAfterConfirmAsync(INavigationGuard guard, Type pageType, object[] arguments)
+    {
+        var generation = _generation;
+        if (!await guard.ConfirmLeaveAsync())
+            return;
+        // Something else navigated while the question was open.
+        if (generation != _generation || !ReferenceEquals(CurrentPage, guard))
+            return;
+        NavigateAway(pageType, arguments);
+    }
 }

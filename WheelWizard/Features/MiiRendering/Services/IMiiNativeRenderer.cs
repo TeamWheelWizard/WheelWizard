@@ -1,3 +1,4 @@
+using System.Numerics;
 using Avalonia.Media.Imaging;
 using MiiAnim.Core.Evaluation;
 using WheelWizard.MiiImages.Domain;
@@ -34,6 +35,12 @@ public interface IMiiNativeRenderer
 
     /// <summary>GPU-ready head meshes (with textures) for the realtime renderer. Slow (~0.1 s); call off the UI thread.</summary>
     OperationResult<List<HeadMeshData>> BuildHeadModel(string studioData, int expressionId);
+
+    /// <summary>The face mask with only some parts painted in, for animating those parts on their own. Call off the UI thread.</summary>
+    OperationResult<MiiMaskLayerTexture> BuildMaskLayer(string studioData, int expressionId, MiiMaskLayers layers);
+
+    /// <summary>Where the face mask parts sit on the mask texture, in texture coordinates.</summary>
+    OperationResult<IReadOnlyDictionary<MiiMaskLayers, Vector2[][]>> GetMaskPartQuads(string studioData);
 
     /// <summary>Camera, matrices and colours for drawing a Mii on the GPU exactly like the CPU renderer frames it.</summary>
     OperationResult<MiiRealtimeFrameSetup> GetRealtimeFrameSetup(string studioData, MiiImageSpecifications specifications, float aspect);

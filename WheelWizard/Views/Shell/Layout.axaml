@@ -390,6 +390,11 @@
                 <Style Selector="Button#SidebarToggle:disabled">
                     <Setter Property="Opacity" Value="1" />
                 </Style>
+                <!-- A full-width page (the Mii editor) keeps the sidebar closed. -->
+                <Style Selector="Button#SidebarToggle.locked">
+                    <Setter Property="Opacity" Value="0.35" />
+                    <Setter Property="Cursor" Value="Arrow" />
+                </Style>
             </Button.Styles>
             <PathIcon x:Name="SidebarChevron" Width="8" Height="10"
                       Data="M 6,0 L 0,5 L 6,10 L 8,8 L 4,5 L 8,2 Z"

@@ -1457,7 +1457,8 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
         int expressionId,
         Dictionary<(int PartType, int Index), IntPtr> textureCache,
         List<IntPtr> generatedTextureHandles,
-        RenderAllocationTracker arena
+        RenderAllocationTracker arena,
+        MiiMaskLayers layers = MiiMaskLayers.All
     )
     {
         var expression = Math.Clamp(expressionId, 0, 18);
@@ -1470,7 +1471,7 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
         var parts = BuildRawMaskParts(charInfo);
         var overlays = new List<FflNativeInterop.FFLDrawParam>(capacity: 8);
 
-        if (charInfo.parts.mustacheType != 0)
+        if (charInfo.parts.mustacheType != 0 && layers.HasFlag(MiiMaskLayers.Mustache))
         {
             var mustacheTexture = LoadTextureHandle(
                 archive,
@@ -1497,6 +1498,7 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
             }
         }
 
+        if (layers.HasFlag(MiiMaskLayers.Mouth))
         {
             var mouthTexture = LoadTextureHandle(archive, textureCache, generatedTextureHandles, partType: 8, index: mouthIndex);
             if (mouthTexture.IsFailure)
@@ -1528,7 +1530,7 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
             }
         }
 
-        if (eyebrowIndex != 23)
+        if (eyebrowIndex != 23 && layers.HasFlag(MiiMaskLayers.Eyebrows))
         {
             var eyebrowTexture = LoadTextureHandle(archive, textureCache, generatedTextureHandles, partType: 3, index: eyebrowIndex);
             if (eyebrowTexture.IsFailure)
@@ -1549,6 +1551,7 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
             }
         }
 
+        if (layers.HasFlag(MiiMaskLayers.Eyes))
         {
             var eyeTextureR = LoadTextureHandle(archive, textureCache, generatedTextureHandles, partType: 2, index: eyeIndexR);
             if (eyeTextureR.IsFailure)
@@ -1610,7 +1613,7 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
             }
         }
 
-        if (charInfo.parts.moleType != 0)
+        if (charInfo.parts.moleType != 0 && layers.HasFlag(MiiMaskLayers.Mole))
         {
             var moleTexture = LoadTextureHandle(
                 archive,

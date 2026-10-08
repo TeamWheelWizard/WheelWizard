@@ -98,9 +98,10 @@ internal static class MiiShaders
             uniform int uHasTangent;
             uniform vec4 uTint; // rgb = color to mix towards, a = mix amount
             uniform float uAlpha;
+            uniform vec2 uUvOffset;
             out vec4 fragColor;
             void main() {
-                vec4 t = uHasTex != 0 ? texture(uTex, vUv) : vec4(1.0);
+                vec4 t = uHasTex != 0 ? texture(uTex, vUv + uUvOffset) : vec4(1.0);
                 vec4 base;
                 if (uMode == 0) base = vec4(uColR.rgb, 1.0);
                 else if (uMode == 1) base = t;

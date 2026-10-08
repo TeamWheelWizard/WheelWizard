@@ -12,7 +12,45 @@ public sealed record MiiGpuFrame(MiiRealtimeFrameSetup Setup, MiiPose Pose, IRea
 {
     /// <summary>Particles in stage space (see <see cref="MiiAnim.Core.Evaluation.MiiStage"/>), drawn over the Mii.</summary>
     public IReadOnlyList<Particle> Particles { get; init; } = [];
+
+    /// <summary>
+    /// When set, the head is drawn as these passes instead of just <see cref="Head"/> (e.g. a part sliding out while
+    /// its replacement slides in, or a highlighted part).
+    /// </summary>
+    public IReadOnlyList<HeadPass>? HeadPasses { get; init; }
+
+    /// <summary>Body parts drawn lighter (bit per <see cref="MiiBone"/>), e.g. under the cursor.</summary>
+    public int BodyHoverMask { get; init; }
+
+    /// <summary>Fades the whole Mii.</summary>
+    public float Alpha { get; init; } = 1f;
 }
+
+/// <summary>Draws (some of) the meshes of a head, optionally moved, faded, tinted or with another mask texture.</summary>
+public sealed record HeadPass(string HeadKey, IReadOnlyList<HeadMeshData> Head)
+{
+    /// <summary>Which shapes to draw; null draws all of them.</summary>
+    public Func<HeadShape, bool>? Shapes { get; init; }
+
+    /// <summary>Replaces the texture of the mask mesh (see <see cref="NativeMiiRenderer.BuildMaskLayer"/>).</summary>
+    public MaskLayerPass? Mask { get; init; }
+
+    /// <summary>Moves the meshes, in head model units.</summary>
+    public Vector3 Offset { get; init; }
+
+    /// <summary>Shifts the mask texture (texture coordinates): positive X moves its content to the left.</summary>
+    public Vector2 MaskUvOffset { get; init; }
+
+    public float Alpha { get; init; } = 1f;
+
+    /// <summary>Colour (rgb) and amount (a) to tint the shapes picked by <see cref="TintShapes"/> (all when null).</summary>
+    public Vector4 Tint { get; init; }
+
+    public Func<HeadShape, bool>? TintShapes { get; init; }
+}
+
+/// <summary>A mask texture to upload once and keep under <see cref="Key"/>.</summary>
+public sealed record MaskLayerPass(string Key, MiiMaskLayerTexture Texture);
 
 /// <summary>
 /// OpenGL renderer for one Mii (skinned body + FFL head) with the same shading as the CPU renderer.
@@ -25,6 +63,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     private readonly uint _bodyProgram;
     private readonly Dictionary<string, GpuMesh[]> _heads = new();
     private readonly Dictionary<MiiBodyModel, GpuMesh[]> _bodies = new();
+    private readonly Dictionary<string, uint> _maskLayers = new();
+    private readonly LinkedList<string> _maskLayerOrder = new();
+    private const int MaxMaskLayers = 24;
     private readonly ParticleRenderer? _particles;
 
     private sealed record GpuMesh(uint Vao, uint Vbo, uint Ebo, int IndexCount, uint Texture, HeadMeshData? Head, bool IsPants);
@@ -69,12 +110,19 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.FrontFace(FrontFaceDirection.Ccw);
 
         var setup = frame.Setup;
-        if (frame.Pose.Visible)
+        if (frame.Pose.Visible && frame.Alpha > 0.001f)
         {
             if (setup.HasBody)
                 DrawBody(frame, setup);
-            if (frame.Head is not null && frame.HeadKey is not null)
-                DrawHead(frame, setup);
+            if (frame.HeadPasses is { } passes)
+            {
+                foreach (var pass in passes)
+                    DrawHead(frame, setup, pass);
+            }
+            else if (frame.Head is not null && frame.HeadKey is not null)
+            {
+                DrawHead(frame, setup, new HeadPass(frame.HeadKey, frame.Head));
+            }
         }
 
         if (frame.Particles.Count > 0)
@@ -102,9 +150,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
 
         _gl.UniformMatrix4(_gl.GetUniformLocation(_bodyProgram, "uBones"), 16, false, bones);
         _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uHighlightMask"), 0);
-        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uHoverMask"), 0);
+        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uHoverMask"), frame.BodyHoverMask);
         SetVec4(_bodyProgram, "uTint", Vector4.Zero);
-        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uAlpha"), 1f);
+        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uAlpha"), frame.Alpha);
         _gl.Enable(EnableCap.CullFace);
         _gl.CullFace(TriangleFace.Back);
         foreach (var mesh in meshes)
@@ -117,20 +165,31 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         }
     }
 
-    private void DrawHead(MiiGpuFrame frame, MiiRealtimeFrameSetup setup)
+    private void DrawHead(MiiGpuFrame frame, MiiRealtimeFrameSetup setup, HeadPass pass)
     {
-        var meshes = GetHead(frame.HeadKey!, frame.Head!);
+        var alpha = pass.Alpha * frame.Alpha;
+        if (alpha <= 0.001f)
+            return;
+        var meshes = GetHead(pass.HeadKey, pass.Head);
+        var maskTexture = pass.Mask is { } layer ? GetMaskLayer(layer) : 0u;
         _gl.UseProgram(_headProgram);
         SetLighting(_headProgram);
         SetMatrix(_headProgram, "uView", setup.View);
         SetMatrix(_headProgram, "uProj", setup.Projection);
-        SetMatrix(_headProgram, "uModel", setup.HeadMatrix(frame.Pose));
-        SetVec4(_headProgram, "uTint", Vector4.Zero);
-        _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uAlpha"), 1f);
+        SetMatrix(_headProgram, "uModel", Matrix4x4.CreateTranslation(pass.Offset) * setup.HeadMatrix(frame.Pose));
+        _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uAlpha"), alpha);
         _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uTex"), 0);
+        // Faded passes blend over what is there without hiding what is drawn after them.
+        _gl.DepthMask(alpha >= 0.999f);
         foreach (var mesh in meshes)
         {
             var data = mesh.Head!;
+            if (pass.Shapes is { } shapes && !shapes(data.Shape))
+                continue;
+            var isMask = data.Shape == HeadShape.Mask;
+            SetVec4(_headProgram, "uTint", pass.TintShapes is null || pass.TintShapes(data.Shape) ? pass.Tint : Vector4.Zero);
+            var uvOffset = isMask ? pass.MaskUvOffset : Vector2.Zero;
+            _gl.Uniform2(_gl.GetUniformLocation(_headProgram, "uUvOffset"), uvOffset.X, uvOffset.Y);
             if (data.CullMode == 1)
             {
                 _gl.Enable(EnableCap.CullFace);
@@ -160,14 +219,64 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
             SetVec4(_headProgram, "uColG", data.ColorG);
             SetVec4(_headProgram, "uColB", data.ColorB);
             _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uHasTangent"), data.HasTangent ? 1 : 0);
-            _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uHasTex"), mesh.Texture != 0 ? 1 : 0);
+            var texture = isMask && maskTexture != 0 ? maskTexture : mesh.Texture;
+            _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uHasTex"), texture != 0 ? 1 : 0);
             _gl.ActiveTexture(TextureUnit.Texture0);
-            _gl.BindTexture(TextureTarget.Texture2D, mesh.Texture);
+            _gl.BindTexture(TextureTarget.Texture2D, texture);
             _gl.BindVertexArray(mesh.Vao);
             _gl.DrawElements(PrimitiveType.Triangles, (uint)mesh.IndexCount, DrawElementsType.UnsignedInt, null);
         }
 
         _gl.BindTexture(TextureTarget.Texture2D, 0);
+        _gl.DepthMask(true);
+    }
+
+    /// <summary>Uploads a mask layer the first time it is drawn; keeps the most recent few.</summary>
+    private uint GetMaskLayer(MaskLayerPass layer)
+    {
+        if (_maskLayers.TryGetValue(layer.Key, out var existing))
+        {
+            _maskLayerOrder.Remove(layer.Key);
+            _maskLayerOrder.AddFirst(layer.Key);
+            return existing;
+        }
+
+        var texture = UploadTexture(layer.Texture.Pixels, layer.Texture.Width, layer.Texture.Height, TextureWrapMode.ClampToEdge);
+        _maskLayers[layer.Key] = texture;
+        _maskLayerOrder.AddFirst(layer.Key);
+        while (_maskLayerOrder.Count > MaxMaskLayers)
+        {
+            var oldest = _maskLayerOrder.Last!.Value;
+            _maskLayerOrder.RemoveLast();
+            if (_maskLayers.Remove(oldest, out var old))
+                _gl.DeleteTexture(old);
+        }
+
+        return texture;
+    }
+
+    private uint UploadTexture(byte[] pixels, int width, int height, TextureWrapMode wrap)
+    {
+        var texture = _gl.GenTexture();
+        _gl.BindTexture(TextureTarget.Texture2D, texture);
+        fixed (byte* p = pixels)
+            _gl.TexImage2D(
+                TextureTarget.Texture2D,
+                0,
+                InternalFormat.Rgba8,
+                (uint)width,
+                (uint)height,
+                0,
+                PixelFormat.Rgba,
+                PixelType.UnsignedByte,
+                p
+            );
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
+        _gl.BindTexture(TextureTarget.Texture2D, 0);
+        return texture;
     }
 
     /// <summary>Frees uploaded heads that are no longer needed (e.g. after the Mii changed).</summary>
@@ -266,27 +375,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
 
             uint texture = 0;
             if (mesh.TexturePixels is { } pixels && mesh.TextureWidth > 0 && mesh.TextureHeight > 0)
-            {
-                texture = _gl.GenTexture();
-                _gl.BindTexture(TextureTarget.Texture2D, texture);
-                fixed (byte* p = pixels)
-                    _gl.TexImage2D(
-                        TextureTarget.Texture2D,
-                        0,
-                        InternalFormat.Rgba8,
-                        (uint)mesh.TextureWidth,
-                        (uint)mesh.TextureHeight,
-                        0,
-                        PixelFormat.Rgba,
-                        PixelType.UnsignedByte,
-                        p
-                    );
-                _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-                _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-                _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.MirroredRepeat);
-                _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.MirroredRepeat);
-                _gl.BindTexture(TextureTarget.Texture2D, 0);
-            }
+                texture = UploadTexture(pixels, mesh.TextureWidth, mesh.TextureHeight, TextureWrapMode.MirroredRepeat);
 
             meshes.Add(new GpuMesh(vao, vbo, ebo, mesh.Indices.Length, texture, mesh, false));
         }
@@ -398,6 +487,10 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
             DeleteMesh(mesh);
         _heads.Clear();
         _bodies.Clear();
+        foreach (var texture in _maskLayers.Values)
+            _gl.DeleteTexture(texture);
+        _maskLayers.Clear();
+        _maskLayerOrder.Clear();
         _gl.DeleteProgram(_headProgram);
         _gl.DeleteProgram(_bodyProgram);
         _particles?.Dispose();

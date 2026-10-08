@@ -27,6 +27,8 @@ using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WheelWizardData.Views;
 using WheelWizard.WiiManagement.GameLicense;
+using WheelWizard.WiiManagement.MiiManagement.Views;
+using WheelWizard.WiiManagement.MiiManagement.Views.Editor;
 
 namespace WheelWizard.Views.Shell;
 
@@ -112,8 +114,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
         Navigation.PageChanged += Navigation_OnPageChanged;
         foreach (var button in SidePanelButtons.Children.OfType<SidebarRadioButton>())
-            button.NavigationRequested += (_, pageType) => Navigation.NavigateTo(pageType);
-        SidebarCurrentUserProfile.ProfileRequested += (_, _) => Navigation.NavigateTo<UserProfilePage>();
+            button.NavigationRequested += (_, pageType) => NavigateFromSidebar(pageType);
+        SidebarCurrentUserProfile.ProfileRequested += (_, _) => NavigateFromSidebar(typeof(UserProfilePage));
         UpdateSidebarProfile();
 
         ClampSavedWindowScaleToCurrentScreen();
@@ -268,6 +270,35 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
 
+    /// <summary>
+    /// The current page may ask before letting you go (see <see cref="INavigationGuard"/>); until it does, the
+    /// sidebar keeps showing the page you're on.
+    /// </summary>
+    private void NavigateFromSidebar(Type pageType)
+    {
+        Navigation.NavigateTo(pageType);
+        if (Navigation.CurrentPage is { } current && current.GetType() != pageType)
+            UpdateSidebarSelection(current);
+    }
+
+    private bool _closeConfirmed;
+
+    protected override async void OnClosing(WindowClosingEventArgs e)
+    {
+        if (!_closeConfirmed && Navigation.CurrentPage is INavigationGuard { HasUnsavedWork: true } guard && InteractionContent.IsEnabled)
+        {
+            e.Cancel = true;
+            base.OnClosing(e);
+            if (!await guard.ConfirmLeaveAsync())
+                return;
+            _closeConfirmed = true;
+            Close();
+            return;
+        }
+
+        base.OnClosing(e);
+    }
+
     private void HeaderMinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void HeaderCloseButton_Click(object? sender, RoutedEventArgs e) => Close();
@@ -279,11 +310,14 @@ public partial class Layout : BaseWindow, IPollingListener
         var oldPage = ContentArea.Content as Control;
         var isRoomsToDetails = oldPage is RoomsPage && page is RoomDetailsPage;
         var isDetailsToRooms = oldPage is RoomDetailsPage && page is RoomsPage;
+        var isMiisToEditor = oldPage is MiiListPage && page is MiiEditorPage;
+        var isEditorToMiis = oldPage is MiiEditorPage && page is MiiListPage;
 
-        ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms ? RoomsPageTransition : null;
-        ContentArea.IsTransitionReversed = isDetailsToRooms;
+        ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms || isMiisToEditor || isEditorToMiis ? RoomsPageTransition : null;
+        ContentArea.IsTransitionReversed = isDetailsToRooms || isEditorToMiis;
         ContentArea.Content = page;
         UpdateSidebarSelection(page);
+        _ = LockSidebarAsync(page is IFullWidthPage);
     }
 
     private void UpdateSidebarSelection(UserControl page)
@@ -299,6 +333,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
             // TODO: make a better way to have these type of exceptions
             if (button.PageType == typeof(RoomsPage) && typeof(RoomDetailsPage) == page.GetType())
+                button.IsChecked = true;
+            if (button.PageType == typeof(MiiListPage) && page is MiiEditorPage)
                 button.IsChecked = true;
         }
     }
