@@ -165,6 +165,26 @@ internal static class MiiShaders
             }
             """;
 
+    // Lays an offscreen layer (premultiplied) over the frame at uAlpha: one triangle covering the screen.
+    public const string CompositeVertex = """
+        out vec2 vUv;
+        void main() {
+            vec2 corner = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+            vUv = corner;
+            gl_Position = vec4(corner * 2.0 - 1.0, 0.0, 1.0);
+        }
+        """;
+
+    public const string CompositeFragment = """
+        in vec2 vUv;
+        uniform sampler2D uTex;
+        uniform float uAlpha;
+        out vec4 fragColor;
+        void main() {
+            fragColor = texture(uTex, vUv) * uAlpha;
+        }
+        """;
+
     public const string LineVertex = """
         layout(location = 0) in vec3 aPos;
         layout(location = 1) in vec4 aColor;

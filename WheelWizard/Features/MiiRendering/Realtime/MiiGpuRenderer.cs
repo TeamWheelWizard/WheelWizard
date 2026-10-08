@@ -68,6 +68,15 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     private const int MaxMaskLayers = 24;
     private readonly ParticleRenderer? _particles;
 
+    // Offscreen layer for fading 3D things (see DrawFaded).
+    private readonly uint _compositeProgram;
+    private readonly uint _emptyVao;
+    private uint _layerFbo;
+    private uint _layerTexture;
+    private uint _layerDepth;
+    private (int Width, int Height) _layerSize;
+    private bool _layerBroken;
+
     private sealed record GpuMesh(uint Vao, uint Vbo, uint Ebo, int IndexCount, uint Texture, HeadMeshData? Head, bool IsPants);
 
     public MiiGpuRenderer(GL gl, bool isEs)
@@ -76,6 +85,8 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         var header = MiiShaders.Header(isEs);
         _headProgram = CreateProgram(header + MiiShaders.HeadVertex, header + MiiShaders.HeadFragment);
         _bodyProgram = CreateProgram(header + MiiShaders.BodyVertex, header + MiiShaders.BodyFragment);
+        _compositeProgram = CreateProgram(header + MiiShaders.CompositeVertex, header + MiiShaders.CompositeFragment);
+        _emptyVao = _gl.GenVertexArray();
         try
         {
             _particles = new ParticleRenderer(gl, header);
@@ -95,6 +106,8 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         if (frame is null)
             return;
+        // Where the frame goes (the UI's framebuffer), to come back to after drawing into the fade layer.
+        var target = (uint)_gl.GetInteger(GetPName.DrawFramebufferBinding);
 
         _gl.Enable(EnableCap.DepthTest);
         _gl.DepthFunc(DepthFunction.Lequal);
@@ -112,16 +125,15 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         var setup = frame.Setup;
         if (frame.Pose.Visible && frame.Alpha > 0.001f)
         {
-            if (setup.HasBody)
-                DrawBody(frame, setup);
-            if (frame.HeadPasses is { } passes)
+            // A fading Mii is drawn solid into the layer and then faded as a whole, so its insides don't show.
+            if (frame.Alpha < 0.999f && BeginLayer(width, height))
             {
-                foreach (var pass in passes)
-                    DrawHead(frame, setup, pass);
+                DrawMii(frame, setup, target, width, height, fade: 1f, layerFadedParts: false);
+                EndLayer(target, width, height, frame.Alpha);
             }
-            else if (frame.Head is not null && frame.HeadKey is not null)
+            else
             {
-                DrawHead(frame, setup, new HeadPass(frame.HeadKey, frame.Head));
+                DrawMii(frame, setup, target, width, height, frame.Alpha, layerFadedParts: frame.Alpha >= 0.999f);
             }
         }
 
@@ -133,7 +145,186 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.UseProgram(0);
     }
 
-    private void DrawBody(MiiGpuFrame frame, MiiRealtimeFrameSetup setup)
+    private void DrawMii(
+        MiiGpuFrame frame,
+        MiiRealtimeFrameSetup setup,
+        uint target,
+        int width,
+        int height,
+        float fade,
+        bool layerFadedParts
+    )
+    {
+        if (setup.HasBody)
+            DrawBody(frame, setup, fade);
+        IReadOnlyList<HeadPass> passes =
+            frame.HeadPasses ?? (frame.Head is not null && frame.HeadKey is not null ? [new HeadPass(frame.HeadKey, frame.Head)] : []);
+
+        // Solid passes first, so the faded ones (a part sliding out or in) are hidden behind them where they should be.
+        var opaque = passes.Where(p => p.Alpha >= 0.999f).ToList();
+        foreach (var pass in opaque)
+            DrawHead(frame, setup, pass, pass.Alpha * fade);
+        var faded = passes.Where(p => p.Alpha < 0.999f).ToList();
+        for (var i = 0; i < faded.Count; i++)
+        {
+            var pass = faded[i];
+            if (layerFadedParts && !IsFlat(pass))
+            {
+                // The faded passes that come after it hide it too: the part sliding in covers the one sliding out,
+                // instead of the old part showing through the half-faded new one.
+                DrawFaded(frame, setup, pass, [.. opaque, .. faded.Skip(i + 1)], target, width, height);
+            }
+            else
+            {
+                DrawHead(frame, setup, pass, pass.Alpha * fade);
+            }
+        }
+    }
+
+    /// <summary>Whether a pass only draws the face mask: a flat decal, which fades fine by plain blending.</summary>
+    private static bool IsFlat(HeadPass pass) =>
+        pass.Head.All(mesh => mesh.Shape == HeadShape.Mask || pass.Shapes is { } shapes && !shapes(mesh.Shape));
+
+    /// <summary>
+    /// Fades a 3D part (e.g. hair sliding out) without seeing into it. Blended directly, its back and insides would
+    /// show through its front (like the skin coloured inside of the hair). Instead it's drawn solid into an offscreen
+    /// layer, behind the depth of what's in front of it, and that layer is faded onto the frame.
+    /// </summary>
+    private void DrawFaded(
+        MiiGpuFrame frame,
+        MiiRealtimeFrameSetup setup,
+        HeadPass pass,
+        IReadOnlyList<HeadPass> occluders,
+        uint target,
+        int width,
+        int height
+    )
+    {
+        if (!BeginLayer(width, height))
+        {
+            DrawHead(frame, setup, pass, pass.Alpha);
+            return;
+        }
+
+        _gl.ColorMask(false, false, false, false);
+        if (setup.HasBody)
+            DrawBody(frame, setup, 1f);
+        // See-through glasses don't hide what's behind them.
+        foreach (var occluder in occluders)
+            DrawHead(frame, setup, occluder, 1f, skip: shape => shape == HeadShape.Glass);
+        _gl.ColorMask(true, true, true, true);
+
+        DrawHead(frame, setup, pass, 1f);
+        EndLayer(target, width, height, pass.Alpha);
+    }
+
+    /// <summary>Starts drawing into the (cleared) offscreen layer. False when the driver can't do that.</summary>
+    private bool BeginLayer(int width, int height)
+    {
+        if (_layerBroken)
+            return false;
+        if (_layerFbo == 0 || _layerSize != (width, height))
+        {
+            DeleteLayer();
+            _layerFbo = _gl.GenFramebuffer();
+            _gl.BindFramebuffer(FramebufferTarget.Framebuffer, _layerFbo);
+            _layerTexture = _gl.GenTexture();
+            _gl.BindTexture(TextureTarget.Texture2D, _layerTexture);
+            _gl.TexImage2D(
+                TextureTarget.Texture2D,
+                0,
+                InternalFormat.Rgba8,
+                (uint)width,
+                (uint)height,
+                0,
+                PixelFormat.Rgba,
+                PixelType.UnsignedByte,
+                null
+            );
+            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            _gl.BindTexture(TextureTarget.Texture2D, 0);
+            _gl.FramebufferTexture2D(
+                FramebufferTarget.Framebuffer,
+                FramebufferAttachment.ColorAttachment0,
+                TextureTarget.Texture2D,
+                _layerTexture,
+                0
+            );
+            _layerDepth = _gl.GenRenderbuffer();
+            _gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _layerDepth);
+            _gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, InternalFormat.DepthComponent24, (uint)width, (uint)height);
+            _gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+            _gl.FramebufferRenderbuffer(
+                FramebufferTarget.Framebuffer,
+                FramebufferAttachment.DepthAttachment,
+                RenderbufferTarget.Renderbuffer,
+                _layerDepth
+            );
+            _layerSize = (width, height);
+            if (_gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != GLEnum.FramebufferComplete)
+            {
+                // Plain blending from now on.
+                _layerBroken = true;
+                DeleteLayer();
+                return false;
+            }
+        }
+        else
+        {
+            _gl.BindFramebuffer(FramebufferTarget.Framebuffer, _layerFbo);
+        }
+
+        _gl.Viewport(0, 0, (uint)width, (uint)height);
+        _gl.ClearColor(0f, 0f, 0f, 0f);
+        _gl.ClearDepth(1f);
+        _gl.DepthMask(true);
+        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        return true;
+    }
+
+    /// <summary>Back to <paramref name="target"/>, and lays the layer over it at <paramref name="alpha"/>.</summary>
+    private void EndLayer(uint target, int width, int height, float alpha)
+    {
+        _gl.BindFramebuffer(FramebufferTarget.Framebuffer, target);
+        _gl.Viewport(0, 0, (uint)width, (uint)height);
+        _gl.Disable(EnableCap.DepthTest);
+        _gl.Disable(EnableCap.CullFace);
+        // The layer already holds premultiplied colour.
+        _gl.BlendFuncSeparate(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha, BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
+        _gl.UseProgram(_compositeProgram);
+        _gl.Uniform1(_gl.GetUniformLocation(_compositeProgram, "uTex"), 0);
+        _gl.Uniform1(_gl.GetUniformLocation(_compositeProgram, "uAlpha"), alpha);
+        _gl.ActiveTexture(TextureUnit.Texture0);
+        _gl.BindTexture(TextureTarget.Texture2D, _layerTexture);
+        _gl.BindVertexArray(_emptyVao);
+        _gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
+        _gl.BindTexture(TextureTarget.Texture2D, 0);
+
+        _gl.Enable(EnableCap.DepthTest);
+        _gl.BlendFuncSeparate(
+            BlendingFactor.SrcAlpha,
+            BlendingFactor.OneMinusSrcAlpha,
+            BlendingFactor.One,
+            BlendingFactor.OneMinusSrcAlpha
+        );
+    }
+
+    private void DeleteLayer()
+    {
+        if (_layerFbo != 0)
+            _gl.DeleteFramebuffer(_layerFbo);
+        if (_layerTexture != 0)
+            _gl.DeleteTexture(_layerTexture);
+        if (_layerDepth != 0)
+            _gl.DeleteRenderbuffer(_layerDepth);
+        _layerFbo = _layerTexture = _layerDepth = 0;
+        _layerSize = default;
+    }
+
+    private void DrawBody(MiiGpuFrame frame, MiiRealtimeFrameSetup setup, float alpha)
     {
         var meshes = GetBody(MiiBodyModel.Get(setup.Female));
         _gl.UseProgram(_bodyProgram);
@@ -152,7 +343,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uHighlightMask"), 0);
         _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uHoverMask"), frame.BodyHoverMask);
         SetVec4(_bodyProgram, "uTint", Vector4.Zero);
-        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uAlpha"), frame.Alpha);
+        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uAlpha"), alpha);
         _gl.Enable(EnableCap.CullFace);
         _gl.CullFace(TriangleFace.Back);
         foreach (var mesh in meshes)
@@ -165,9 +356,8 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         }
     }
 
-    private void DrawHead(MiiGpuFrame frame, MiiRealtimeFrameSetup setup, HeadPass pass)
+    private void DrawHead(MiiGpuFrame frame, MiiRealtimeFrameSetup setup, HeadPass pass, float alpha, Func<HeadShape, bool>? skip = null)
     {
-        var alpha = pass.Alpha * frame.Alpha;
         if (alpha <= 0.001f)
             return;
         var meshes = GetHead(pass.HeadKey, pass.Head);
@@ -184,7 +374,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         foreach (var mesh in meshes)
         {
             var data = mesh.Head!;
-            if (pass.Shapes is { } shapes && !shapes(data.Shape))
+            if (pass.Shapes is { } shapes && !shapes(data.Shape) || skip?.Invoke(data.Shape) == true)
                 continue;
             var isMask = data.Shape == HeadShape.Mask;
             SetVec4(_headProgram, "uTint", pass.TintShapes is null || pass.TintShapes(data.Shape) ? pass.Tint : Vector4.Zero);
@@ -493,6 +683,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _maskLayerOrder.Clear();
         _gl.DeleteProgram(_headProgram);
         _gl.DeleteProgram(_bodyProgram);
+        _gl.DeleteProgram(_compositeProgram);
+        _gl.DeleteVertexArray(_emptyVao);
+        DeleteLayer();
         _particles?.Dispose();
     }
 }
