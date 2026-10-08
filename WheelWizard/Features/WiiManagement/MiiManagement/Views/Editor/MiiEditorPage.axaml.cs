@@ -1190,8 +1190,6 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
 
         _saving = true;
         IsHitTestVisible = false;
-        await PlaySaveAnimationAsync();
-
         var result = _session.IsNew
             ? _miiDb.AddToDatabase(_session.Mii, _settings.Get<string>(_settings.MACADDRESS))
             : _miiDb.Update(_session.Mii);
@@ -1204,10 +1202,11 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
             return;
         }
 
+        await PlaySaveAnimationAsync();
         _navigation.NavigateAway(typeof(MiiListPage));
     }
 
-    /// <summary>The Mii takes a bow (back in the whole view) before the page closes.</summary>
+    /// <summary>The saved Mii takes a bow (back in the whole view) before the page closes.</summary>
     private async Task PlaySaveAnimationAsync()
     {
         CloseColors(animate: false);
@@ -1217,22 +1216,14 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
             return;
 
         var done = new TaskCompletionSource();
-        void OnCue(MiiEditorReaction reaction, string cue)
-        {
-            if (reaction == MiiEditorReaction.Save && cue == MiiEditorCues.Saved)
-                done.TrySetResult();
-        }
-
         void OnEnded(MiiEditorReaction reaction)
         {
             if (reaction == MiiEditorReaction.Save)
                 done.TrySetResult();
         }
 
-        director.Cue += OnCue;
         director.ReactionEnded += OnEnded;
         await Task.WhenAny(done.Task, Task.Delay(SaveAnimationTimeout));
-        director.Cue -= OnCue;
         director.ReactionEnded -= OnEnded;
     }
 

@@ -7,12 +7,12 @@ using WheelWizard.MiiAnimations.Playback;
 namespace WheelWizard.MiiAnimations.Editor;
 
 /// <summary>
-/// The Mii editor's animation state machine. The Mii idles (picking a new idle every loop), reacts to edits and
-/// clicks with one-shot clips, and goes back to idling when a reaction ends. Clips come from the "editor" folder
+/// The Mii editor's animation state machine. The Mii idles (picking a new idle every loop), reacts to edits with
+/// one-shot clips, and goes back to idling when a reaction ends. Clips come from the "editor" folder
 /// of <see cref="IMiiAnimationLibrary"/>, so adding a variant is just adding a file to the right folder.
 /// <para>
 /// States: <b>Idle</b> → (edit) <b>Reacting</b> → (clip done) <b>Idle</b>. Reactions that change what the Mii looks
-/// like (gender, randomize) or end the editor (save) are <i>important</i>: edits and clicks don't interrupt them.
+/// like (gender, randomize) or end the editor (save) are <i>important</i>: edits don't interrupt them.
 /// </para>
 /// </summary>
 public sealed class MiiEditorDirector
@@ -25,11 +25,6 @@ public sealed class MiiEditorDirector
 
     /// <summary>The same edit reaction doesn't replay within this long after it ended, so rapid edits don't keep the Mii busy.</summary>
     private static readonly TimeSpan RepeatCooldown = TimeSpan.FromSeconds(1);
-
-    /// <summary>This many clicks within <see cref="PokeWindow"/> get a "hey, stop that".</summary>
-    private const int PokesBeforeScold = 3;
-
-    private static readonly TimeSpan PokeWindow = TimeSpan.FromSeconds(5);
 
     private static readonly HashSet<MiiEditorReaction> Important =
     [
@@ -45,7 +40,6 @@ public sealed class MiiEditorDirector
     private readonly IRandom _random;
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly Dictionary<string, string> _lastPicked = new();
-    private readonly Queue<TimeSpan> _pokes = new();
 
     /// <summary>Barely-there breathing for <see cref="HoldStill"/>: the head stays where it is, so parts can be clicked and dragged.</summary>
     private static readonly MiiAnimation StillClip = CreateStillClip();
@@ -55,7 +49,6 @@ public sealed class MiiEditorDirector
     private MiiAnimation? _reactionClip;
     private string? _reactionPath;
     private MiiEditorReaction? _reaction;
-    private bool _isPoke;
     private MiiEditorReaction? _lastEnded;
     private TimeSpan _lastEndedAt;
 
@@ -76,7 +69,7 @@ public sealed class MiiEditorDirector
 
     public MiiEditorFocus Focus { get; private set; } = MiiEditorFocus.Body;
 
-    /// <summary>The reaction playing, or null while idling (clicks count as reactions too).</summary>
+    /// <summary>The reaction playing, or null while idling.</summary>
     public MiiEditorReaction? Reaction => _reaction;
 
     public bool IsReacting => _reactionClip is not null;
@@ -84,7 +77,6 @@ public sealed class MiiEditorDirector
     /// <summary>How much the Mii may look at the cursor right now (it's busy during reactions).</summary>
     public float LookWeight =>
         _reactionClip is null ? 1f
-        : _isPoke ? 0.15f
         : _reaction is { } reaction && Important.Contains(reaction) ? 0f
         : 0.4f;
 
@@ -148,7 +140,7 @@ public sealed class MiiEditorDirector
         var important = Important.Contains(reaction);
         if (_holdStill && !important)
             return false;
-        if (_reaction is { } playing && !_isPoke)
+        if (_reaction is { } playing)
         {
             if (playing == reaction && !important)
                 return false;
@@ -162,46 +154,7 @@ public sealed class MiiEditorDirector
         if (Pick(PoolFor(reaction), reaction.ToString()) is not { } picked)
             return false;
 
-        Begin(reaction, picked, isPoke: false);
-        return true;
-    }
-
-    /// <summary>Reacts to a click on the Mii. Ignored during important reactions.</summary>
-    public bool Poke(MiiBodyPart part)
-    {
-        if (_reaction is { } playing && !_isPoke && Important.Contains(playing))
-            return false;
-        // In a close-up only the head is in view, and only its flinch keeps it there.
-        if (Focus == MiiEditorFocus.Face && part != MiiBodyPart.Head)
-            return false;
-
-        var now = _clock.Elapsed;
-        _pokes.Enqueue(now);
-        while (_pokes.Count > 0 && now - _pokes.Peek() > PokeWindow)
-            _pokes.Dequeue();
-
-        var interactions = $"{Root}/interactions";
-        string[] pool;
-        if (_pokes.Count >= PokesBeforeScold && Focus == MiiEditorFocus.Body)
-        {
-            _pokes.Clear();
-            pool = [$"{interactions}/front_click/Front_click_mock_scold"];
-        }
-        else
-        {
-            pool = part switch
-            {
-                MiiBodyPart.Head => [$"{interactions}/flinch/Flinch_head"],
-                MiiBodyPart.LeftLeg => [$"{interactions}/flinch/Flinch_left_leg"],
-                MiiBodyPart.RightLeg => [$"{interactions}/flinch/Flinch_right_leg"],
-                // Mostly a flinch; sometimes something playful.
-                _ => [$"{interactions}/flinch/Flinch_body", .. _library.List($"{interactions}/front_click")],
-            };
-        }
-
-        if (Pick(pool, "poke:" + part) is not { } picked)
-            return false;
-        Begin(null, picked, isPoke: true);
+        Begin(reaction, picked);
         return true;
     }
 
@@ -211,12 +164,11 @@ public sealed class MiiEditorDirector
         && ReferenceEquals(_player.Current, clip)
         && clip.Events.Any(e => e.Name == cue && e.Frame >= _player.Frame);
 
-    private void Begin(MiiEditorReaction? reaction, (string Path, MiiAnimation Clip) picked, bool isPoke)
+    private void Begin(MiiEditorReaction reaction, (string Path, MiiAnimation Clip) picked)
     {
         if (_reactionClip is not null)
             EndReaction(playIdle: false, fadeSeconds: 0);
         _reaction = reaction;
-        _isPoke = isPoke;
         _reactionPath = picked.Path;
         _reactionClip = picked.Clip;
         _player.Play(picked.Clip, loop: false, fadeSeconds: ReactionFadeSeconds);
@@ -225,14 +177,12 @@ public sealed class MiiEditorDirector
     private void EndReaction(bool playIdle, double fadeSeconds)
     {
         var ended = _reaction;
-        var wasPoke = _isPoke;
         _reactionClip = null;
         _reactionPath = null;
         _reaction = null;
-        _isPoke = false;
         if (playIdle)
             PlayIdle(fadeSeconds);
-        if (ended is { } reaction && !wasPoke)
+        if (ended is { } reaction)
         {
             _lastEnded = reaction;
             _lastEndedAt = _clock.Elapsed;
@@ -296,14 +246,6 @@ public sealed class MiiEditorDirector
             MiiEditorReaction.Save => ("save", null),
             MiiEditorReaction.BecomeGirl => ("gender", name => name.Equals("Become_girl", StringComparison.OrdinalIgnoreCase)),
             MiiEditorReaction.BecomeBoy => ("gender", name => name.Equals("Become_boy", StringComparison.OrdinalIgnoreCase)),
-            MiiEditorReaction.Face => ("face", null),
-            MiiEditorReaction.Hair => ("hair", null),
-            MiiEditorReaction.Eyebrows or MiiEditorReaction.Eyes => ("eyes_eyebrows", null),
-            MiiEditorReaction.Nose => ("nose", null),
-            MiiEditorReaction.Mouth => ("mouth", null),
-            MiiEditorReaction.Glasses => ("glasses", null),
-            MiiEditorReaction.FacialHair => ("facial_hair", null),
-            MiiEditorReaction.Mole => ("mole", null),
             _ => throw new ArgumentOutOfRangeException(nameof(reaction), reaction, null),
         };
 

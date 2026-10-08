@@ -14,7 +14,7 @@ public enum MiiEditorReaction
     /// <summary>A new random Mii. Show it at the <see cref="MiiEditorCues.Randomize"/> cue.</summary>
     Randomize,
 
-    /// <summary>The Mii was saved. Close the editor at the <see cref="MiiEditorCues.Saved"/> cue.</summary>
+    /// <summary>The Mii was saved. Close the editor when it ends.</summary>
     Save,
 
     /// <summary>Show the girl at the <see cref="MiiEditorCues.SwapGender"/> cue.</summary>
@@ -22,15 +22,6 @@ public enum MiiEditorReaction
 
     /// <summary>Show the boy at the <see cref="MiiEditorCues.SwapGender"/> cue.</summary>
     BecomeBoy,
-    Face,
-    Hair,
-    Eyebrows,
-    Eyes,
-    Nose,
-    Mouth,
-    Glasses,
-    FacialHair,
-    Mole,
 }
 
 /// <summary>Event markers in the editor animations that the editor acts on.</summary>
@@ -38,7 +29,6 @@ public static class MiiEditorCues
 {
     public const string SwapGender = "swap_gender";
     public const string Randomize = "randomize";
-    public const string Saved = "saved";
 }
 
 /// <summary>What the editor camera looks at.</summary>

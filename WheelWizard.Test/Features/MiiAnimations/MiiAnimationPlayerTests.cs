@@ -113,7 +113,7 @@ public class MiiAnimationPlayerTests
     public void Library_ReadsEveryShippedAnimation()
     {
         var library = new MiiAnimationLibrary(NullLogger<MiiAnimationLibrary>.Instance);
-        var folders = new[] { "editor/idle", "editor/gender", "editor/favoritecolor", "editor/interactions/flinch" };
+        var folders = new[] { "editor/idle", "editor/gender", "editor/favoritecolor", "editor/save" };
 
         foreach (var folder in folders)
         {

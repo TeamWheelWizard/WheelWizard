@@ -37,28 +37,24 @@ public class MiiEditorDirectorTests
     }
 
     [Fact]
-    public void FaceFocus_UsesCloseUpClips()
+    public void FaceFocus_UsesCloseUpIdles()
     {
         _director.SetFocus(MiiEditorFocus.Face);
         Assert.EndsWith("upper", _player.Current!.Name);
-
-        Assert.True(_director.React(MiiEditorReaction.Hair));
-        Assert.Equal("Hair inspect upper", _player.Current!.Name);
     }
 
     [Fact]
     public void SameEdit_DoesNotRestartItsReaction()
     {
-        _director.SetFocus(MiiEditorFocus.Face);
-        Assert.True(_director.React(MiiEditorReaction.Eyes));
+        Assert.True(_director.React(MiiEditorReaction.BodyShape));
         var clip = _player.Current;
 
-        Assert.False(_director.React(MiiEditorReaction.Eyes));
+        Assert.False(_director.React(MiiEditorReaction.BodyShape));
         Assert.Same(clip, _player.Current);
     }
 
     [Fact]
-    public void GenderSwap_CuesTheSwapAndIgnoresEditsAndClicks()
+    public void GenderSwap_CuesTheSwapAndIgnoresEdits()
     {
         var cues = new List<string>();
         _director.Cue += (_, cue) => cues.Add(cue);
@@ -66,23 +62,11 @@ public class MiiEditorDirectorTests
         Assert.True(_director.React(MiiEditorReaction.BecomeGirl));
         Assert.True(_director.WillCue(MiiEditorCues.SwapGender));
         Assert.False(_director.React(MiiEditorReaction.FavoriteColor));
-        Assert.False(_director.Poke(MiiBodyPart.Head));
 
         Run(1);
 
         Assert.Contains(MiiEditorCues.SwapGender, cues);
         Assert.False(_director.WillCue(MiiEditorCues.SwapGender));
-    }
-
-    [Fact]
-    public void Clicks_FlinchTheClickedPartAndScoldWhenRepeated()
-    {
-        Assert.True(_director.Poke(MiiBodyPart.LeftLeg));
-        Assert.Equal("Flinch left leg", _player.Current!.Name);
-        Assert.True(_director.Poke(MiiBodyPart.Head));
-        Assert.Equal("Flinch head", _player.Current!.Name);
-        Assert.True(_director.Poke(MiiBodyPart.Head));
-        Assert.Equal("Front click mock scold", _player.Current!.Name);
     }
 
     [Fact]

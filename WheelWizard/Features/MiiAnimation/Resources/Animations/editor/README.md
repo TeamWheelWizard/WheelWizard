@@ -4,8 +4,6 @@ The editor contains one action folder per current editor control. Each newly cov
 
 The [idle folder](idle/README.md) contains twenty ambient loops: ten standing motions and ten fixed-body close-camera choices. They keep the selected face unchanged throughout and share a neutral loop pose. Idle authoring and its writer are separate from the action reactions below.
 
-The [interaction suite](interactions/README.md) adds three playful front-click reactions and separate backward flinches for the head, body, left leg and right leg. They return to the idle pose and keep the selected facial features unchanged.
-
 The new clips are authored in `tests/MiiAnim.Core.Tests/Authoring/EditorAnimations.cs`. `EditorAnimationWriter.WriteEditorAnimations` writes their exact relative paths through `WheelWizardSampleWriter.WriteRelative`. The full catalog now has 31 generated filenames in `EditorAnimations.All`.
 
 For the requested revisions, run only `EditorAnimationWriter.WriteRevisedEditorAnimations`. It uses `EditorAnimations.RevisedPaths` to write the 11 revised existing filenames plus `Favorite_removed_stomp.miianim`, preserving unrelated clips that may be undergoing manual edits. Hair and mouth filenames retain their original paths so existing open-file references remain useful, while their displayed animation names describe the new inspection motions.
@@ -27,12 +25,6 @@ For the requested revisions, run only `EditorAnimationWriter.WriteRevisedEditorA
 | enter | `Editor_enter_ready` | Low open hands, small welcome bow, then an attentive look. 2.4 s. |
 | body_shape | `Body_shape_stretch` | Plant both feet, gather low, and stretch the arms outward while looking up. 2.77 s. |
 | body_shape | `Body_shape_width_check` | Look down at the waist, frame the sides, then open the arms to compare width. 2.9 s. |
-| eyes_eyebrows | `Eyes_eyebrows_blink_test` | Curious alternating tilt, one slow blink, then a double blink. 2.4 s. |
-| eyes_eyebrows | `Eyes_eyebrows_wink_upper` | Close-up left wink, right wink, and blink with tiny tilts. 2.2 s. |
-| face | `Face_angle_check` | Low presenting palms and two deliberate three-quarter silhouette holds. 2.9 s. |
-| face | `Face_portrait_upper` | Slow small-angle portrait turns with a quiet blink between sides. 2.6 s. |
-| facial_hair | `Facial_hair_proud_chin` | Proud chin lift and side inspection, hands below and behind the beard. 2.9 s. |
-| facial_hair | `Facial_hair_inspect_upper` | Modest chin lift and two restrained inspection holds. 2.4 s. |
 | favorite | `Favorite_selected` | Excited gather, low open-armed thank-you, and a friendly two-eye smile. 2.8 s. |
 | favorite | `Favorite_removed` | Frustrated droop with three stationary purple overhead squiggles, then an accepting low shrug. 2.5 s. |
 | favorite | `Favorite_removed_stomp` | Shift onto the left foot, hold the right foot raised, stomp sharply with a small dust impact, then settle. Purple frustration lines mark the impact. 2.7 s. |
@@ -41,18 +33,8 @@ For the requested revisions, run only `EditorAnimationWriter.WriteRevisedEditorA
 | favoritecolor | `Shirt_color_surprise` | Preserved existing authored shirt-change surprise. |
 | gender | `Become_boy` | Preserved existing stomp, strength pose, and transformation timing. |
 | gender | `Become_girl` | Preserved existing hop twirl, transformation, and finishing wave. |
-| glasses | `Glasses_look_over` | Studious side glances, chin down then up, with a deliberate blink. Both arms stay at rest. 2.73 s. |
-| glasses | `Glasses_focus_upper` | Slower focusing turns and nods, one brief eight-frame blink, and hands fixed down. 3.53 s. |
-| hair | `Hair_swish` | Displayed as “Haircut inspection”: slow controlled turns with two 36-frame side holds and no swishing or hair physics. 3.6 s. |
-| hair | `Hair_inspect_upper` | Quiet side holds and small chin dips for a close hairstyle preview. 2.6 s. |
-| mole | `Mole_cheek_reveal` | Offer both cheeks, then hold a small front-facing tilt. 3 s. |
-| mole | `Mole_find_upper` | Searching micro-tilts and a front-on hold; the expression stays Normal. 2.4 s. |
-| mouth | `Mouth_say_hello` | Displayed as “Mouth angle inspection”: understated head angles and a held low palm-up gesture. Expression stays Normal throughout. 2.4 s. |
-| mouth | `Mouth_smile_test_upper` | Displayed as “Mouth close inspection”: small neck angles with fixed arms and body. Expression stays Normal throughout. 2.2 s. |
 | name | `Name_introduction` | Palm-up introduction with two speech beats and a greeting nod. 2.5 s. |
 | name | `Name_thinking` | Upward thinking glance, consideration of both sides, then a deciding nod. 3 s. |
-| nose | `Nose_profile_check` | Hold each profile to expose depth, with the hands low. 3 s. |
-| nose | `Nose_sniff_upper` | Two small sniff pulses and a tiny confirming nod. 2.2 s. |
 | randomize | `Randomize_shuffle` | Short side steps, a closed-eye swap beat, then a surprised reveal. 3.2 s. |
 | randomize | `Randomize_reveal` | Compress into a huddle, swap during a blink and a large body/head poof, then open out confidently with no wink. Particles are still alive at reveal and clear before done. 2.7 s. |
 | save | `Save_proud_bow` | Small finished-result bow and a low palm-up presentation. 2.9 s. |
