@@ -91,4 +91,41 @@ public static class MiiImageVariants
         ExpirationSeconds = TimeSpan.FromMinutes(10),
         InstanceCount = 1,
     };
+
+    /// <summary>
+    /// Animated friends card and sidebar portrait. The clips turn the Mii towards the card text themselves, so this
+    /// keeps only the camera tilt of <see cref="FriendsSideProfile"/>.
+    /// </summary>
+    public static readonly MiiImageSpecifications FriendsSideProfileLive = new()
+    {
+        Name = "FriendsSideProfileLive",
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.medium,
+        CameraRotate = new(12, 0, 0),
+    };
+
+    /// <summary>
+    /// Animated license card on the profile page: straight on, and raised so the card's bottom edge is the window sill
+    /// the profile window clips lean on.
+    /// </summary>
+    public static readonly MiiImageSpecifications CurrentUserWindowLive = new()
+    {
+        Name = "CurrentUserWindowLive",
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.medium,
+        CameraVerticalOffset = 6.5f,
+    };
+
+    /// <summary>
+    /// The leaderboard's podium stage (380 px tall): three whole Miis on their steps, with room under the lowest step for
+    /// its name and room above the winner for tall Miis and confetti.
+    /// </summary>
+    public static readonly MiiImageSpecifications PodiumStage = new()
+    {
+        Name = "PodiumStage",
+        Type = MiiImageSpecifications.BodyType.all_body,
+        Size = MiiImageSpecifications.ImageSize.medium,
+        CameraZoom = 1.32f,
+        CameraVerticalOffset = 10f,
+    };
 }

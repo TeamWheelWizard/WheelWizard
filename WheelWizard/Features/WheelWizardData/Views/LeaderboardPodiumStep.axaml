@@ -1,0 +1,174 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
+    <Design.PreviewWith>
+        <Border Background="{StaticResource Neutral950}" Padding="20,160,20,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Spacing="3">
+                <community:LeaderboardPodiumStep Classes="Silver" Width="110" Height="100" VerticalAlignment="Bottom"
+                                                 Rank="2" PlayerName="RoadRunner" VrText="18,611"
+                                                 ShowBadge="True" BadgeVariant="Translator" />
+                <community:LeaderboardPodiumStep Classes="Gold" Width="110" Height="122" VerticalAlignment="Bottom"
+                                                 Rank="1" PlayerName="Patchzy" VrText="19,402"
+                                                 ShowBadge="True" BadgeVariant="WhWzDev" />
+                <community:LeaderboardPodiumStep Classes="Bronze" Width="110" Height="82" VerticalAlignment="Bottom"
+                                                 Rank="3" PlayerName="WantToBeeMe" VrText="18,224" IsSuspicious="True" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="community|LeaderboardPodiumStep">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ClipToBounds="False">
+                    <!-- Light rising from the step behind the Mii standing on it. -->
+                    <Border x:Name="PART_Backlight"
+                            Width="96" Height="170" Margin="0,-150,0,0"
+                            HorizontalAlignment="Center" VerticalAlignment="Top"
+                            CornerRadius="9999" Opacity="0.15" Effect="blur(48)" IsHitTestVisible="False"
+                            Background="{TemplateBinding BorderBrush}" />
+
+                    <Border x:Name="PART_Face"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1,1,1,0"
+                            CornerRadius="10,10,0,0"
+                            ClipToBounds="True">
+                        <Grid>
+                            <!-- The lit top of the step the Mii stands on. -->
+                            <Border x:Name="PART_Top" Height="7" VerticalAlignment="Top" Opacity="0.4"
+                                    Background="{TemplateBinding BorderBrush}" />
+
+                            <TextBlock x:Name="PART_Numeral"
+                                       Text="{Binding Rank, RelativeSource={RelativeSource TemplatedParent}}"
+                                       FontSize="78" FontWeight="Black" Opacity="0.13"
+                                       HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-24"
+                                       Foreground="{TemplateBinding BorderBrush}" />
+
+                            <Border x:Name="PART_Shimmer" IsVisible="False" IsHitTestVisible="False"
+                                    Width="46" Height="260" Margin="-70,-60,0,0"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    RenderTransform="rotate(24deg)">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                        <GradientStop Color="#00FFFFFF" Offset="0" />
+                                        <GradientStop Color="#55FFFFFF" Offset="0.5" />
+                                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+
+                            <StackPanel Margin="6,13,6,4" Spacing="2" VerticalAlignment="Top">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+                                    <community:CommunityBadge Variant="{TemplateBinding BadgeVariant}"
+                                                              IsVisible="{TemplateBinding ShowBadge}"
+                                                              Width="16" Height="16" VerticalAlignment="Center" />
+                                    <TextBlock Text="{TemplateBinding PlayerName}"
+                                               FontWeight="Bold" FontSize="14" MaxWidth="92"
+                                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                                               Foreground="{TemplateBinding Foreground}" />
+                                    <PathIcon Data="{StaticResource WarningTip}" Width="12" Height="12"
+                                              VerticalAlignment="Center" Foreground="{StaticResource Danger400}"
+                                              IsVisible="{TemplateBinding IsSuspicious}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5">
+                                    <PathIcon Data="{StaticResource Chart}" Width="12" Height="12"
+                                              VerticalAlignment="Center" Foreground="{StaticResource Neutral300}" />
+                                    <TextBlock Text="{TemplateBinding VrText}" FontSize="12" FontWeight="SemiBold"
+                                               VerticalAlignment="Center" Foreground="{StaticResource Neutral200}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <!-- Brighten up under the cursor. -->
+    <Style Selector="community|LeaderboardPodiumStep /template/ Border#PART_Top">
+        <Setter Property="Transitions">
+            <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.2" Easing="CircularEaseOut" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="community|LeaderboardPodiumStep /template/ Border#PART_Backlight">
+        <Setter Property="Transitions">
+            <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.3" Easing="CircularEaseOut" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="community|LeaderboardPodiumStep:pointerover /template/ Border#PART_Top">
+        <Setter Property="Opacity" Value="0.75" />
+    </Style>
+    <Style Selector="community|LeaderboardPodiumStep:pointerover /template/ Border#PART_Backlight">
+        <Setter Property="Opacity" Value="0.28" />
+    </Style>
+
+    <Style Selector="community|LeaderboardPodiumStep.Gold">
+        <Setter Property="BorderBrush" Value="#EEC21E" />
+        <Setter Property="Background">
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                <GradientStop Color="#70C79A2A" Offset="0" />
+                <GradientStop Color="#245C4614" Offset="0.55" />
+                <GradientStop Color="#00342B12" Offset="1" />
+            </LinearGradientBrush>
+        </Setter>
+    </Style>
+    <Style Selector="community|LeaderboardPodiumStep.Silver">
+        <Setter Property="BorderBrush" Value="#B4A9B8D7" />
+        <Setter Property="Background">
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                <GradientStop Color="#5C8A9AB8" Offset="0" />
+                <GradientStop Color="#1E3C4659" Offset="0.55" />
+                <GradientStop Color="#00262B36" Offset="1" />
+            </LinearGradientBrush>
+        </Setter>
+    </Style>
+    <Style Selector="community|LeaderboardPodiumStep.Bronze">
+        <Setter Property="BorderBrush" Value="#C8D77E47" />
+        <Setter Property="Background">
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                <GradientStop Color="#5CB06A3E" Offset="0" />
+                <GradientStop Color="#1E52321F" Offset="0.55" />
+                <GradientStop Color="#00302018" Offset="1" />
+            </LinearGradientBrush>
+        </Setter>
+    </Style>
+
+    <!-- The winner's step shines: a slow pulse of the light behind the Mii and a glint sweeping over the step. -->
+    <Style Selector="community|LeaderboardPodiumStep.Gold /template/ Border#PART_Backlight">
+        <Style.Animations>
+            <Animation Duration="0:0:3.6" IterationCount="INFINITE" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0.16" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="Opacity" Value="0.3" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0.16" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="community|LeaderboardPodiumStep.Gold /template/ Border#PART_Shimmer">
+        <Setter Property="IsVisible" Value="True" />
+        <Style.Animations>
+            <Animation Duration="0:0:4.5" IterationCount="INFINITE" Easing="CubicEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.X" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="35%">
+                    <Setter Property="TranslateTransform.X" Value="230" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.X" Value="230" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+</Styles>

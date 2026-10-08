@@ -386,6 +386,12 @@ public sealed record MiiRealtimeFrameSetup(
     Vector3 CameraUp
 )
 {
+    /// <summary>
+    /// Moves the whole Mii (body, head and particles) in world space after everything else, e.g. to stand Miis of
+    /// different heights on the same podium step.
+    /// </summary>
+    public Vector3 Placement { get; init; }
+
     /// <summary>Body matrix for this pose: <see cref="BodyMatrix"/> plus the walk-distance correction (see <see cref="MiiStage"/>).</summary>
     public Matrix4x4 BodyMatrixFor(MiiPose pose) => BodyMatrix * Matrix4x4.CreateTranslation(StageOffset(pose));
 
@@ -393,10 +399,10 @@ public sealed record MiiRealtimeFrameSetup(
     public Matrix4x4 HeadMatrix(MiiPose pose) =>
         HasBody
             ? pose.HeadMatrixForRender(BodyScale) * CharacterRotation * Matrix4x4.CreateTranslation(StageOffset(pose))
-            : CharacterRotation;
+            : CharacterRotation * Matrix4x4.CreateTranslation(Placement);
 
     /// <summary>Stage space (<see cref="MiiStage"/>, used by particles) → world.</summary>
-    public Matrix4x4 StageToWorld => CharacterRotation;
+    public Matrix4x4 StageToWorld => CharacterRotation * Matrix4x4.CreateTranslation(Placement);
 
     /// <summary>Same framing with the camera moved (e.g. part way through a camera transition).</summary>
     public MiiRealtimeFrameSetup WithCamera(Vector3 position, Vector3 target, Vector3 up) =>
@@ -409,5 +415,5 @@ public sealed record MiiRealtimeFrameSetup(
         };
 
     private Vector3 StageOffset(MiiPose pose) =>
-        HasBody ? Vector3.TransformNormal(MiiStage.TravelCorrection(pose, BodyScale), CharacterRotation) : Vector3.Zero;
+        (HasBody ? Vector3.TransformNormal(MiiStage.TravelCorrection(pose, BodyScale), CharacterRotation) : Vector3.Zero) + Placement;
 }

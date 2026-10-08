@@ -169,25 +169,24 @@
                                        Classes="TinyText"
                                        Foreground="{StaticResource Neutral300}" />
 
-                            <Grid Grid.Row="2"
-                                  Margin="0,12,0,0"
-                                  RowDefinitions="Auto,16"
-                                  VerticalAlignment="Center"
-                                  ColumnDefinitions="*,1.1*,*">
-                                <community:LeaderboardPodiumCard Grid.Column="0"
-                                                                  Grid.Row="0"
-                                                                  Margin="4,16,4,0"
-                                                                  IsVisible="{Binding HasPodiumSecond}"
-                                                                  Classes="Silver EntrySecond FloatB"
-                                                                  Rank="{Binding PodiumSecond.Rank}"
-                                                                  PlacementLabel="{Binding PodiumSecond.PlacementLabel}"
-                                                                  PlayerName="{Binding PodiumSecond.Name}"
-                                                                  VrText="{Binding PodiumSecond.VrText}"
-                                                                  Mii="{Binding PodiumSecond.Mii}"
-                                                                  ShowBadge="{Binding PodiumSecond.HasBadge}"
-                                                                  BadgeVariant="{Binding PodiumSecond.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumSecond.IsSuspicious}">
-                                    <community:LeaderboardPodiumCard.ContextMenu>
+                            <!-- The top three stand on a podium in 3D. Pulled up a bit so confetti can fly over the header. -->
+                            <community:LeaderboardPodiumStage x:Name="PodiumStage"
+                                                              Grid.Row="2"
+                                                              Height="380"
+                                                              Margin="0,-24,0,0"
+                                                              First="{Binding PodiumFirst.Mii}"
+                                                              Second="{Binding PodiumSecond.Mii}"
+                                                              Third="{Binding PodiumThird.Mii}">
+                                <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="2"
+                                                                 Classes="Silver"
+                                                                 IsVisible="{Binding HasPodiumSecond}"
+                                                                 Rank="{Binding PodiumSecond.Rank}"
+                                                                 PlayerName="{Binding PodiumSecond.Name}"
+                                                                 VrText="{Binding PodiumSecond.VrText}"
+                                                                 ShowBadge="{Binding PodiumSecond.HasBadge}"
+                                                                 BadgeVariant="{Binding PodiumSecond.PrimaryBadge}"
+                                                                 IsSuspicious="{Binding PodiumSecond.IsSuspicious}">
+                                    <community:LeaderboardPodiumStep.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumSecond}">
                                             <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
@@ -201,24 +200,18 @@
                                             <MenuItem Header="View player on RWFC"
                                                       Click="ViewOnRwfc_OnClick" />
                                         </ContextMenu>
-                                    </community:LeaderboardPodiumCard.ContextMenu>
-                                </community:LeaderboardPodiumCard>
-
-                                <community:LeaderboardPodiumCard Grid.Column="1"
-                                                                  Grid.Row="0"
-                                                                  Margin="4,0,4,0"
-                                                                  IsVisible="{Binding HasPodiumFirst}"
-                                                                  Classes="Gold EntryFirst FloatA"
-                                                                  AvatarSize="122"
-                                                                  Rank="{Binding PodiumFirst.Rank}"
-                                                                  PlacementLabel="{Binding PodiumFirst.PlacementLabel}"
-                                                                  PlayerName="{Binding PodiumFirst.Name}"
-                                                                  VrText="{Binding PodiumFirst.VrText}"
-                                                                  Mii="{Binding PodiumFirst.Mii}"
-                                                                  ShowBadge="{Binding PodiumFirst.HasBadge}"
-                                                                  BadgeVariant="{Binding PodiumFirst.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumFirst.IsSuspicious}">
-                                    <community:LeaderboardPodiumCard.ContextMenu>
+                                    </community:LeaderboardPodiumStep.ContextMenu>
+                                </community:LeaderboardPodiumStep>
+                                <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="1"
+                                                                 Classes="Gold"
+                                                                 IsVisible="{Binding HasPodiumFirst}"
+                                                                 Rank="{Binding PodiumFirst.Rank}"
+                                                                 PlayerName="{Binding PodiumFirst.Name}"
+                                                                 VrText="{Binding PodiumFirst.VrText}"
+                                                                 ShowBadge="{Binding PodiumFirst.HasBadge}"
+                                                                 BadgeVariant="{Binding PodiumFirst.PrimaryBadge}"
+                                                                 IsSuspicious="{Binding PodiumFirst.IsSuspicious}">
+                                    <community:LeaderboardPodiumStep.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumFirst}">
                                             <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
@@ -232,23 +225,18 @@
                                             <MenuItem Header="View player on RWFC"
                                                       Click="ViewOnRwfc_OnClick" />
                                         </ContextMenu>
-                                    </community:LeaderboardPodiumCard.ContextMenu>
-                                </community:LeaderboardPodiumCard>
-
-                                <community:LeaderboardPodiumCard Grid.Column="2"
-                                                                  Grid.Row="0"
-                                                                  Margin="4,16,4,0"
-                                                                  IsVisible="{Binding HasPodiumThird}"
-                                                                  Classes="Bronze EntryThird FloatC"
-                                                                  Rank="{Binding PodiumThird.Rank}"
-                                                                  PlacementLabel="{Binding PodiumThird.PlacementLabel}"
-                                                                  PlayerName="{Binding PodiumThird.Name}"
-                                                                  VrText="{Binding PodiumThird.VrText}"
-                                                                  Mii="{Binding PodiumThird.Mii}"
-                                                                  ShowBadge="{Binding PodiumThird.HasBadge}"
-                                                                  BadgeVariant="{Binding PodiumThird.PrimaryBadge}"
-                                                                  IsSuspicious="{Binding PodiumThird.IsSuspicious}">
-                                    <community:LeaderboardPodiumCard.ContextMenu>
+                                    </community:LeaderboardPodiumStep.ContextMenu>
+                                </community:LeaderboardPodiumStep>
+                                <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="3"
+                                                                 Classes="Bronze"
+                                                                 IsVisible="{Binding HasPodiumThird}"
+                                                                 Rank="{Binding PodiumThird.Rank}"
+                                                                 PlayerName="{Binding PodiumThird.Name}"
+                                                                 VrText="{Binding PodiumThird.VrText}"
+                                                                 ShowBadge="{Binding PodiumThird.HasBadge}"
+                                                                 BadgeVariant="{Binding PodiumThird.PrimaryBadge}"
+                                                                 IsSuspicious="{Binding PodiumThird.IsSuspicious}">
+                                    <community:LeaderboardPodiumStep.ContextMenu>
                                         <ContextMenu DataContext="{Binding PodiumThird}">
                                             <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
@@ -262,9 +250,9 @@
                                             <MenuItem Header="View player on RWFC"
                                                       Click="ViewOnRwfc_OnClick" />
                                         </ContextMenu>
-                                    </community:LeaderboardPodiumCard.ContextMenu>
-                                </community:LeaderboardPodiumCard>
-                            </Grid>
+                                    </community:LeaderboardPodiumStep.ContextMenu>
+                                </community:LeaderboardPodiumStep>
+                            </community:LeaderboardPodiumStage>
                         </Grid>
                     </Border>
 

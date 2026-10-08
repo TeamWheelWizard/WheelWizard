@@ -127,6 +127,40 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
     private int _currentUserIndex;
     private int FocusedUser => SettingsService.Get<int>(SettingsService.FOCUSED_USER);
 
+    #region Mii animations
+
+    /// <summary>The first time the page opens the Mii takes its time to come to the window; after that it's quick.</summary>
+    private static bool _hasGreeted;
+
+    private static readonly string[] Greetings = ["profile/window/hello", "profile/window/funny"];
+    private static readonly string[] PopUp = ["profile/quick_appear/from_below"];
+    private static readonly string[] DropDown = ["profile/quick_exit/to_below"];
+
+    /// <summary>How often switching licenses pops the Mii up from below instead of sliding it in from the side.</summary>
+    private const double PopUpChance = 0.3;
+
+    private void GreetWithMii()
+    {
+        ProfileMii.ArriveWith(_hasGreeted ? PopUp : Greetings);
+        _hasGreeted = true;
+    }
+
+    /// <summary>
+    /// The current Mii leaves and the next one comes in, like a carousel: going to a license on the right, the Mii
+    /// slides out to the left and the next one comes in from the right (and the other way round).
+    /// </summary>
+    private void SwapMii(int direction)
+    {
+        if (direction == 0 || Random.Shared.NextDouble() < PopUpChance)
+            ProfileMii.ArriveWith(PopUp, DropDown);
+        else if (direction > 0)
+            ProfileMii.ArriveWith(["profile/quick_appear/from_right"], ["profile/quick_exit/to_left"]);
+        else
+            ProfileMii.ArriveWith(["profile/quick_appear/from_left"], ["profile/quick_exit/to_right"]);
+    }
+
+    #endregion
+
     public UserProfilePage(
         VrHistoryGraph historyGraph,
         ICustomCharactersService customCharacters,
@@ -155,6 +189,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         ResetMiiTopBar();
         ViewMii(FocusedUser);
         PopulateRegions();
+        GreetWithMii();
         UpdatePage();
         DataContext = this;
         UpdateCarouselIndicators();
@@ -337,6 +372,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
         ViewMii(0); // Just in case you have current user set as 4. and you change to a region where there are only 3 users.
         SetUserAsPrimary();
+        SwapMii(0);
         UpdatePage();
         var layout = ViewUtils.GetLayout();
         layout.UpdateFriendCount();
@@ -352,10 +388,21 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         if (oldIndex == _currentUserIndex)
             return;
 
+        SwapMii(_currentUserIndex - oldIndex);
         UpdatePage();
     }
 
-    private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) => ViewUtils.IfChecked(sender, () => SetUserAsPrimary());
+    private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) =>
+        ViewUtils.IfChecked(
+            sender,
+            () =>
+            {
+                if (FocusedUser == _currentUserIndex)
+                    return;
+                SetUserAsPrimary();
+                ProfileMii.Play("profile/make_primary");
+            }
+        );
 
     private void PrevCarouselPage_OnClick(object? sender, RoutedEventArgs e) => MoveCarouselPage(-1);
 
@@ -389,6 +436,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
             return;
         }
 
+        SwapMii(0);
         CurrentMii = selectedMii;
         GameLicenseService.LoadLicense();
         UpdatePage();
@@ -459,6 +507,8 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         GameLicenseService.LoadLicense();
         UpdatePage();
         UpdateSidebarProfileIfCurrentUser();
+        if (changeNameResult.IsSuccess)
+            ProfileMii.Play("profile/rename");
     }
 
     private void UpdateSidebarProfileIfCurrentUser()

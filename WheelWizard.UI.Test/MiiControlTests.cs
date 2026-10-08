@@ -5,10 +5,15 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using NSubstitute;
+using Testably.Abstractions;
+using WheelWizard.MiiAnimations;
+using WheelWizard.MiiAnimations.Library;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Settings;
+using WheelWizard.Settings.Types;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Calendar;
 using WheelWizard.WheelWizardData.Views;
@@ -49,7 +54,7 @@ public class MiiControlTests
                 card.IsOnline = online;
                 card.IsPending = pending;
                 window.UpdateLayout();
-                var control = Assert.Single(card.GetVisualDescendants().OfType<MiiImageLoader>());
+                var control = Assert.Single(card.GetVisualDescendants().OfType<MiiAnimatedImage>());
                 var view = Assert.Single(control.GetVisualDescendants().OfType<MiiImageView>());
                 Assert.Same(bitmap, Assert.Single(view.GeneratedImages));
                 var image = Assert.Single(view.GetVisualDescendants().OfType<Image>(), image => image.IsVisible && image.Source == bitmap);
@@ -86,7 +91,13 @@ public class MiiControlTests
             Height = 100,
             Interactive = false,
         };
-        var window = new Window { Content = new StackPanel { Children = { normal, hover, interactive } } };
+        var animated = new MiiAnimatedImage
+        {
+            Width = 100,
+            Height = 100,
+            Performance = MiiPerformances.SidebarPlayer,
+        };
+        var window = new Window { Content = new StackPanel { Children = { normal, hover, interactive, animated } } };
         try
         {
             window.Show();
@@ -98,6 +109,10 @@ public class MiiControlTests
             Assert.False(render.Interactive);
             interactive.Interactive = true;
             Assert.True(render.Interactive);
+            // Animations are off in these tests, so the animated Mii is its still picture.
+            var still = Assert.Single(animated.GetVisualDescendants().OfType<MiiImageView>());
+            Assert.True(still.IsVisible);
+            Assert.Empty(animated.GetVisualDescendants().OfType<MiiRealtimeView>());
             images.DidNotReceiveWithAnyArgs().GetImageAsync(default, default!);
         }
         finally
@@ -245,9 +260,16 @@ public class MiiControlTests
         images
             .GetImageAsync(Arg.Any<Mii>(), Arg.Any<MiiImageSpecifications>())
             .Returns(Task.FromResult((OperationResult<Bitmap>)new OperationError { Message = "No image" }));
-        new MiiControlThemes(images, Substitute.For<ISeasonalCalendar>(), nativeRenderer ?? Substitute.For<IMiiNativeRenderer>()).Install(
-            Application.Current!.Resources
-        );
+        var settings = Substitute.For<ISettingsManager>();
+        settings.ENABLE_ANIMATIONS.Returns(new WhWzSetting<bool>("EnableAnimations", false));
+        new MiiControlThemes(
+            images,
+            Substitute.For<ISeasonalCalendar>(),
+            nativeRenderer ?? Substitute.For<IMiiNativeRenderer>(),
+            Substitute.For<IMiiAnimationLibrary>(),
+            new RealRandomSystem(),
+            settings
+        ).Install(Application.Current!.Resources);
         return images;
     }
 }

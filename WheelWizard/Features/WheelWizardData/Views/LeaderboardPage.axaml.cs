@@ -4,11 +4,15 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Testably.Abstractions;
 using WheelWizard.Localization;
+using WheelWizard.MiiAnimations.Library;
+using WheelWizard.MiiRendering.Services;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Calendar;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Navigation;
@@ -182,7 +186,11 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         IRrLeaderboardSingletonService leaderboardService,
         IWhWzDataSingletonService badgeService,
         IGameLicenseSingletonService gameDataService,
-        ISettingsManager settingsManager
+        ISettingsManager settingsManager,
+        IMiiNativeRenderer miiRenderer,
+        IMiiAnimationLibrary miiAnimations,
+        ISeasonalCalendar calendar,
+        IRandomSystem random
     )
     {
         Popups = popups;
@@ -194,6 +202,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         SettingsManager = settingsManager;
         InitializeComponent();
         DataContext = this;
+        PodiumStage.Initialize(miiRenderer, miiAnimations, random.Random.Shared, calendar, settingsManager.ENABLE_ANIMATIONS.Get());
         RemainingPlayers.CollectionChanged += RemainingPlayers_OnCollectionChanged;
 
         Loaded += LeaderboardPage_Loaded;

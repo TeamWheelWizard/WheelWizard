@@ -37,10 +37,8 @@ public sealed class MiiEditorDirector
     ];
 
     private readonly MiiAnimationPlayer _player;
-    private readonly IMiiAnimationLibrary _library;
-    private readonly IRandom _random;
+    private readonly MiiClipPicker _picker;
     private readonly Stopwatch _clock = Stopwatch.StartNew();
-    private readonly Dictionary<string, string> _lastPicked = new();
     private readonly List<Waiter> _waiters = [];
 
     /// <summary>Barely-there breathing for <see cref="HoldStill"/>: the head stays where it is, so parts can be clicked and dragged.</summary>
@@ -55,8 +53,7 @@ public sealed class MiiEditorDirector
     public MiiEditorDirector(MiiAnimationPlayer player, IMiiAnimationLibrary library, IRandom random)
     {
         _player = player;
-        _library = library;
-        _random = random;
+        _picker = new MiiClipPicker(library, random);
         _player.Finished += OnClipFinished;
         _player.EventReached += OnClipEvent;
     }
@@ -115,7 +112,7 @@ public sealed class MiiEditorDirector
         if (!important && _lastEnded == reaction && _clock.Elapsed - _lastEndedAt < RepeatCooldown)
             return false;
 
-        if (Pick($"{Root}/{FolderOf(reaction)}") is not { } clip)
+        if (_picker.Pick($"{Root}/{FolderOf(reaction)}") is not { } clip)
             return false;
 
         if (_reacting is not null)
@@ -181,7 +178,7 @@ public sealed class MiiEditorDirector
             return;
         }
 
-        _idleClip = Pick($"{Root}/idle");
+        _idleClip = _picker.Pick($"{Root}/idle");
         if (_idleClip is not null)
             _player.Play(_idleClip, loop: false, fadeSeconds);
         else
@@ -191,26 +188,6 @@ public sealed class MiiEditorDirector
     /// <summary>FavoriteColor → "favorite_color".</summary>
     private static string FolderOf(MiiEditorReaction reaction) =>
         Regex.Replace(reaction.ToString(), "(?<=[a-z])(?=[A-Z])", "_").ToLowerInvariant();
-
-    /// <summary>A random clip from <paramref name="folder"/>, avoiding the one picked from it last time.</summary>
-    private MiiAnimation? Pick(string folder)
-    {
-        var pool = _library.List(folder);
-        _lastPicked.TryGetValue(folder, out var last);
-        var choices = pool.Where(path => path != last || pool.Count == 1).ToList();
-        while (choices.Count > 0)
-        {
-            var path = choices[_random.Next(choices.Count)];
-            if (_library.Get(path) is { } clip)
-            {
-                _lastPicked[folder] = path;
-                return clip;
-            }
-            choices.Remove(path);
-        }
-
-        return null;
-    }
 
     private static MiiAnimation CreateStillClip()
     {

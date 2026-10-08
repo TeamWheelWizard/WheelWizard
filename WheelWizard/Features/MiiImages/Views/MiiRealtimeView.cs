@@ -156,6 +156,22 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
 
     private double _screenScale = 1;
 
+    /// <summary>
+    /// Moves the whole Mii in the scene (render units, after the character rotation), e.g. to stand Miis of different
+    /// heights on the same podium step. Unlike <see cref="ScreenShiftX"/> this happens in 3D, before the camera.
+    /// </summary>
+    public Vector3 Placement
+    {
+        get => _placement;
+        set
+        {
+            _placement = value;
+            RequestNextFrameRendering();
+        }
+    }
+
+    private Vector3 _placement;
+
     /// <summary>Fades the whole Mii (0 = invisible).</summary>
     public float Alpha
     {
@@ -542,9 +558,11 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         };
     }
 
-    /// <summary>Applies <see cref="ScreenScale"/> and <see cref="ScreenShiftX"/> in clip space.</summary>
+    /// <summary>Applies <see cref="Placement"/>, and <see cref="ScreenScale"/> and <see cref="ScreenShiftX"/> in clip space.</summary>
     private MiiRealtimeFrameSetup Shift(MiiRealtimeFrameSetup setup)
     {
+        if (_placement != Vector3.Zero)
+            setup = setup with { Placement = _placement };
         if (_screenShiftX == 0 && _screenScale == 1 || Bounds.Width <= 0)
             return setup;
         var shift = Matrix4x4.Identity;

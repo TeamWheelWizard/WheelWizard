@@ -140,6 +140,6 @@
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityBadge.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WiiManagement/MiiManagement/Views/MiiBlock.axaml" />
         <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/WheelTrail.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/LeaderboardPodiumCard.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/LeaderboardPodiumStep.axaml" />
     </Application.Styles>
 </Application>

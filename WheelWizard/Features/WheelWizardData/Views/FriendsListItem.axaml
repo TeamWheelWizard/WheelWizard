@@ -4,6 +4,7 @@
         xmlns:loc="clr-namespace:WheelWizard.Localization"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+        xmlns:miiAnimations="using:WheelWizard.MiiAnimations"
         xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
         xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
     <Design.PreviewWith>
@@ -55,14 +56,15 @@
                         <Border Grid.Column="0" Background="{StaticResource Neutral700}"
                                 Width="78" HorizontalAlignment="Left"
                                 Margin="-10,-5,0,-5" CornerRadius="7,0,0,7" />
-                        <miiImages:MiiImageLoader Grid.Column="0" Margin="-43,-25,0,-5"
-                                                          Width="144" Height="144"
-                                                          HorizontalAlignment="Left"
-                                                          VerticalAlignment="Top"
-                                                          Mii="{TemplateBinding Mii}"
-                                                          FallBackColor="{StaticResource Neutral500}"
-                                                          ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}"
-                                                          LoadingColor="Transparent" />
+                        <!-- Performance (asleep when offline, awake when online) is set by the styles below. -->
+                        <miiImages:MiiAnimatedImage Grid.Column="0" Margin="-43,-25,0,-5"
+                                                    Width="144" Height="144"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Top"
+                                                    Mii="{TemplateBinding Mii}"
+                                                    FallBackColor="{StaticResource Neutral500}"
+                                                    ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfileLive}"
+                                                    LoadingColor="Transparent" />
 
                         <Border Grid.Column="0" Grid.ColumnSpan="2" Background="{StaticResource Neutral900}"
                                 Margin="-10,-5,0,-5" CornerRadius="7,0,0,7">
@@ -227,8 +229,17 @@
         <Setter Property="BorderBrush" Value="{StaticResource Warning500}" />
     </Style>
 
-    <Style Selector="community|FriendsListItem[IsPending=true] /template/ miiImages|MiiImageLoader">
-        <Setter Property="ImageVariant" Value="{x:Static miiVars:MiiImageVariants.FriendsSideProfilePending}" />
+    <Style Selector="community|FriendsListItem /template/ miiImages|MiiAnimatedImage">
+        <Setter Property="Performance" Value="{x:Static miiAnimations:MiiPerformances.FriendOffline}" />
+        <Setter Property="StillVariant" Value="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
+    </Style>
+    <Style Selector="community|FriendsListItem[IsOnline=true] /template/ miiImages|MiiAnimatedImage">
+        <Setter Property="Performance" Value="{x:Static miiAnimations:MiiPerformances.FriendOnline}" />
+    </Style>
+    <!-- Pending friends keep their (angry) still picture. -->
+    <Style Selector="community|FriendsListItem[IsPending=true] /template/ miiImages|MiiAnimatedImage">
+        <Setter Property="Performance" Value="{x:Null}" />
+        <Setter Property="StillVariant" Value="{x:Static miiVars:MiiImageVariants.FriendsSideProfilePending}" />
     </Style>
 
     <Style Selector="community|FriendsListItem[IsPending=true] /template/ components|Button#ViewRoomButton">

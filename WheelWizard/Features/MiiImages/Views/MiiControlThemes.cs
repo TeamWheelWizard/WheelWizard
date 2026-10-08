@@ -3,14 +3,24 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Styling;
+using Testably.Abstractions;
+using WheelWizard.MiiAnimations.Library;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Settings;
 using WheelWizard.Shared.Calendar;
 
 namespace WheelWizard.MiiImages.Views;
 
 /// <summary>Composes rendering views inside standard Avalonia control templates.</summary>
-public sealed class MiiControlThemes(IMiiImagesSingletonService images, ISeasonalCalendar calendar, IMiiNativeRenderer nativeRenderer)
+public sealed class MiiControlThemes(
+    IMiiImagesSingletonService images,
+    ISeasonalCalendar calendar,
+    IMiiNativeRenderer nativeRenderer,
+    IMiiAnimationLibrary animations,
+    IRandomSystem random,
+    ISettingsManager settings
+)
 {
     public void Install(IResourceDictionary resources)
     {
@@ -74,6 +84,30 @@ public sealed class MiiControlThemes(IMiiImagesSingletonService images, ISeasona
                                 MiiHoverView.HoverVariantProperty,
                                 control.GetObservable(MiiImageLoaderWithHover.HoverVariantProperty)
                             );
+                            view.Bind(BaseMiiImage.MiiProperty, control.GetObservable(MiiImageControl.MiiProperty));
+                            return view;
+                        }
+                    )
+                ),
+            },
+        };
+        resources[typeof(MiiAnimatedImage)] = new ControlTheme(typeof(MiiAnimatedImage))
+        {
+            Setters =
+            {
+                new Setter(
+                    TemplatedControl.TemplateProperty,
+                    new FuncControlTemplate<MiiAnimatedImage>(
+                        (control, scope) =>
+                        {
+                            var view = new MiiAnimatedView(images, calendar, nativeRenderer, animations, random.Random.Shared, settings);
+                            scope.Register("PART_Renderer", view);
+                            view.Bind(BaseMiiImage.ReloadMethodProperty, control.GetObservable(MiiImageControl.ReloadMethodProperty));
+                            view.Bind(MiiAnimatedView.ImageVariantProperty, control.GetObservable(MiiAnimatedImage.ImageVariantProperty));
+                            view.Bind(MiiAnimatedView.StillVariantProperty, control.GetObservable(MiiAnimatedImage.StillVariantProperty));
+                            view.Bind(MiiAnimatedView.PerformanceProperty, control.GetObservable(MiiAnimatedImage.PerformanceProperty));
+                            view.Bind(MiiAnimatedView.LoadingColorProperty, control.GetObservable(MiiAnimatedImage.LoadingColorProperty));
+                            view.Bind(MiiAnimatedView.FallBackColorProperty, control.GetObservable(MiiAnimatedImage.FallBackColorProperty));
                             view.Bind(BaseMiiImage.MiiProperty, control.GetObservable(MiiImageControl.MiiProperty));
                             return view;
                         }

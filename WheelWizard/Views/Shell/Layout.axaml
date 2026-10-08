@@ -7,6 +7,7 @@
         xmlns:loc="clr-namespace:WheelWizard.Localization"
         xmlns:components="clr-namespace:WheelWizard.Views.Components"
         xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+        xmlns:miiAnimations="using:WheelWizard.MiiAnimations"
         Height="876" Width="656" WindowStartupLocation="CenterScreen"
         WindowDecorations="Full"
         ExtendClientAreaToDecorationsHint="True"
@@ -101,16 +102,18 @@
                 </Grid>
             </Border>
 
-            <miiImages:MiiImageLoader x:Name="SidebarMii" Width="80"
-                                     Height="80"
-                                     Margin="-7,0,0,1"
-                                     HorizontalAlignment="Left"
-                                     VerticalAlignment="Bottom"
-                                     IsHitTestVisible="False"
-                                     LoadingColor="Transparent"
-                                     FallBackColor="{StaticResource Neutral600}"
-                                     Mii="{Binding Mii, ElementName=SidebarCurrentUserProfile}"
-                                     ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
+            <miiImages:MiiAnimatedImage x:Name="SidebarMii" Width="80"
+                                        Height="80"
+                                        Margin="-7,0,0,1"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
+                                        IsHitTestVisible="False"
+                                        LoadingColor="Transparent"
+                                        FallBackColor="{StaticResource Neutral600}"
+                                        Mii="{Binding Mii, ElementName=SidebarCurrentUserProfile}"
+                                        Performance="{x:Static miiAnimations:MiiPerformances.SidebarPlayer}"
+                                        ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfileLive}"
+                                        StillVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
         </Grid>
 
         <TextBlock Text="{loc:T category.general}" Classes="SidebarSectionText"

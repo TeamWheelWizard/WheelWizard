@@ -7,6 +7,7 @@
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:animation="clr-namespace:Avalonia.Animation;assembly=Avalonia.Base"
              xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+             xmlns:miiAnimations="using:WheelWizard.MiiAnimations"
              x:Class="WheelWizard.WheelWizardData.Views.UserProfilePage"
              x:DataType="community:UserProfilePage"
         xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
@@ -180,13 +181,16 @@
 
                     <Border Grid.Row="1" BorderBrush="{StaticResource Neutral600}"
                             BorderThickness="1" Margin="0,0,5,10" CornerRadius="4" x:Name="PART_HeadBorderFace"
-                            Background="{StaticResource Neutral950}">
+                            Background="{StaticResource Neutral950}" ClipToBounds="True">
                         <Grid>
-                            <miiImages:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                     LowQualitySpeedup="True"
-                                                     Mii="{Binding CurrentMii}"
-                                                     FallBackColor="{StaticResource Neutral700}"
-                                                     ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
+                            <!-- The card is a window the Mii stands behind: its bottom edge is the sill. -->
+                            <miiImages:MiiAnimatedImage x:Name="ProfileMii"
+                                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                        Mii="{Binding CurrentMii}"
+                                                        FallBackColor="{StaticResource Neutral700}"
+                                                        Performance="{x:Static miiAnimations:MiiPerformances.ProfileWindow}"
+                                                        ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserWindowLive}"
+                                                        StillVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
 
                             <StackPanel Margin="7" HorizontalAlignment="Left" VerticalAlignment="Top">
                                 <StackPanel Orientation="Horizontal">

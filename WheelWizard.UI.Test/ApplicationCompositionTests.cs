@@ -203,7 +203,7 @@ public class ApplicationCompositionTests
             Assert.Equal(dividerCenter, toggleCenter, 1);
             // Image positions follow intermediate widths, not just the collapsed/expanded state.
             original.SidebarWidth = (221d + 64d) / 2;
-            Assert.Equal(-12, original.FindControl<MiiImageLoader>("SidebarMii")!.Margin.Left);
+            Assert.Equal(-12, original.FindControl<MiiAnimatedImage>("SidebarMii")!.Margin.Left);
             Assert.Equal(5, original.FindControl<IconLabel>("TitleLabel")!.Margin.Left);
             Assert.Equal(
                 19.5,
@@ -283,16 +283,22 @@ public class ApplicationCompositionTests
                 Assert.Equal(new Thickness(0, 0, 1, 0), sidebarSurface.BorderThickness);
                 Assert.Equal(0, sidebarSurface.CornerRadius.TopLeft);
                 Assert.Equal(157, sidebarSurface.Bounds.Width);
-                var headerDivider = settingsPage.FindControl<Grid>("SettingsRoot")!.Children.OfType<Border>()
+                var headerDivider = settingsPage
+                    .FindControl<Grid>("SettingsRoot")!
+                    .Children.OfType<Border>()
                     .Single(border => Grid.GetRow(border) == 0);
                 var dividerY = headerDivider.TranslatePoint(new Point(), original)!.Value.Y;
                 var firstSettingsButton = sidebarSurface.GetVisualDescendants().OfType<RadioButton>().First();
                 Assert.True(firstSettingsButton.TranslatePoint(new Point(), original)!.Value.Y >= dividerY);
                 var settingsTitle = settingsPage.FindControl<TextBlock>("SettingsTitle")!;
                 Assert.Equal(Avalonia.Layout.VerticalAlignment.Bottom, settingsTitle.VerticalAlignment);
-                Assert.Equal(Avalonia.Layout.VerticalAlignment.Bottom,
-                    settingsPage.FindControl<WheelWizard.Views.Components.Button>("DevButton")!.VerticalAlignment);
-                var sidebarAbout = sidebarSurface.GetVisualDescendants().OfType<RadioButton>()
+                Assert.Equal(
+                    Avalonia.Layout.VerticalAlignment.Bottom,
+                    settingsPage.FindControl<WheelWizard.Views.Components.Button>("DevButton")!.VerticalAlignment
+                );
+                var sidebarAbout = sidebarSurface
+                    .GetVisualDescendants()
+                    .OfType<RadioButton>()
                     .Single(button => button.Tag?.ToString() == "AppInfo");
                 sidebarAbout.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Assert.IsType<AppInfo>(settingsPage.FindControl<ContentControl>("SettingsContent")!.Content);
