@@ -12,6 +12,11 @@
         <StreamGeometry x:Key="MiiEditorFeatureIcon">M12,2 A10,10 0 1 0 22,12 A10,10 0 0 0 12,2 Z M12,4 A8,8 0 1 1 4,12 A8,8 0 0 1 12,4 Z M5.6,13.4 L8.6,12.4 L9,13.5 L6,14.5 Z M6.4,15.6 L9.4,14.6 L9.8,15.7 L6.8,16.7 Z M18.4,13.4 L15.4,12.4 L15,13.5 L18,14.5 Z M17.6,15.6 L14.6,14.6 L14.2,15.7 L17.2,16.7 Z</StreamGeometry>
         <StreamGeometry x:Key="MiiEditorBiggerIcon">M3,3 L10,3 L10,5.4 L7.1,5.4 L10.9,9.2 L9.2,10.9 L5.4,7.1 L5.4,10 L3,10 Z M21,21 L14,21 L14,18.6 L16.9,18.6 L13.1,14.8 L14.8,13.1 L18.6,16.9 L18.6,14 L21,14 Z</StreamGeometry>
         <StreamGeometry x:Key="MiiEditorSmallerIcon">M10.5,10.5 L3.5,10.5 L3.5,8.1 L6.4,8.1 L2.6,4.3 L4.3,2.6 L8.1,6.4 L8.1,3.5 L10.5,3.5 Z M13.5,13.5 L20.5,13.5 L20.5,15.9 L17.6,15.9 L21.4,19.7 L19.7,21.4 L15.9,17.6 L15.9,20.5 L13.5,20.5 Z</StreamGeometry>
+        <!-- Figures at the ends of the body sliders. -->
+        <StreamGeometry x:Key="MiiEditorTallIcon">M9,4 A3,3 0 1 0 15,4 A3,3 0 1 0 9,4 Z M8.5,23 L8.5,11.5 A3.5,3.5 0 0 1 15.5,11.5 L15.5,23 Z</StreamGeometry>
+        <StreamGeometry x:Key="MiiEditorShortIcon">M9,11 A3,3 0 1 0 15,11 A3,3 0 1 0 9,11 Z M8.5,23 L8.5,18.5 A3.5,3.5 0 0 1 15.5,18.5 L15.5,23 Z</StreamGeometry>
+        <StreamGeometry x:Key="MiiEditorWideIcon">M9,5 A3,3 0 1 0 15,5 A3,3 0 1 0 9,5 Z M5,22 L5,13 A4,4 0 0 1 9,9 L15,9 A4,4 0 0 1 19,13 L19,22 Z</StreamGeometry>
+        <StreamGeometry x:Key="MiiEditorThinIcon">M9,5 A3,3 0 1 0 15,5 A3,3 0 1 0 9,5 Z M9.5,22 L9.5,11.5 A2.5,2.5 0 0 1 14.5,11.5 L14.5,22 Z</StreamGeometry>
         <StreamGeometry x:Key="MiiEditorChevronLeft">M15.4,3.4 L17.4,5.4 L10.8,12 L17.4,18.6 L15.4,20.6 L6.8,12 Z</StreamGeometry>
         <StreamGeometry x:Key="MiiEditorChevronRight">M8.6,3.4 L17.2,12 L8.6,20.6 L6.6,18.6 L13.2,12 L6.6,5.4 Z</StreamGeometry>
     </UserControl.Resources>
@@ -99,6 +104,25 @@
             <Setter Property="BorderBrush" Value="{StaticResource Danger400}" />
         </Style>
 
+        <!-- Upright body sliders. -->
+        <Style Selector="StackPanel.BodySlider">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Spacing" Value="4" />
+        </Style>
+        <Style Selector="StackPanel.BodySlider PathIcon">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+        </Style>
+        <Style Selector="StackPanel.BodySlider PathIcon.Low">
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+        </Style>
+        <Style Selector="StackPanel.BodySlider Slider">
+            <Setter Property="Height" Value="210" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+
         <!-- Colour swatches. -->
         <Style Selector="Button.Swatch">
             <Setter Property="Width" Value="34" />
@@ -163,14 +187,22 @@
             <StackPanel x:Name="ToolItems" Spacing="6" />
         </Border>
 
-        <!-- Body: height and weight. -->
-        <Border x:Name="BodyPanel" Grid.Row="0" Classes="Floating hidden" Width="190" Padding="14,10"
+        <!-- Body: height and weight, as two upright sliders with a figure at each end (tall/short, wide/thin). -->
+        <Border x:Name="BodyPanel" Grid.Row="0" Classes="Floating hidden" Padding="6,12"
                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0">
-            <StackPanel Spacing="4">
-                <components:FormFieldLabel Text="{loc:T attribute.mii.height}" />
-                <Slider x:Name="HeightSlider" Minimum="0" Maximum="127" ValueChanged="HeightSlider_OnValueChanged" />
-                <components:FormFieldLabel Text="{loc:T attribute.mii.width}" />
-                <Slider x:Name="WeightSlider" Minimum="0" Maximum="127" ValueChanged="WeightSlider_OnValueChanged" />
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.height}">
+                    <PathIcon Data="{StaticResource MiiEditorTallIcon}" />
+                    <Slider x:Name="HeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
+                            ValueChanged="HeightSlider_OnValueChanged" />
+                    <PathIcon Classes="Low" Data="{StaticResource MiiEditorShortIcon}" />
+                </StackPanel>
+                <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.width}">
+                    <PathIcon Data="{StaticResource MiiEditorWideIcon}" />
+                    <Slider x:Name="WeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
+                            ValueChanged="WeightSlider_OnValueChanged" />
+                    <PathIcon Classes="Low" Data="{StaticResource MiiEditorThinIcon}" />
+                </StackPanel>
             </StackPanel>
         </Border>
 
@@ -180,11 +212,15 @@
             <StackPanel Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock Classes="TitleText" FontSize="18" Text="{loc:T attribute.mii_section.info}" VerticalAlignment="Center" />
-                    <components:LinkButton x:Name="FavoriteButton" Grid.Column="1" IconData="{StaticResource EmptyStarIcon}"
-                                           IconSize="22" Foreground="{StaticResource Neutral400}"
+                    <!-- Icon and colour come from styles only: set on the button itself they'd win over .favorite. -->
+                    <components:LinkButton x:Name="FavoriteButton" Grid.Column="1" IconSize="22"
                                            HoverForeground="{StaticResource Warning300}" Click="FavoriteButton_OnClick"
                                            ToolTip.Tip="{loc:T action.favorite}">
                         <components:LinkButton.Styles>
+                            <Style Selector="components|LinkButton">
+                                <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}" />
+                                <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+                            </Style>
                             <Style Selector="components|LinkButton.favorite">
                                 <Setter Property="IconData" Value="{StaticResource StarIcon}" />
                                 <Setter Property="Foreground" Value="{StaticResource Warning500}" />

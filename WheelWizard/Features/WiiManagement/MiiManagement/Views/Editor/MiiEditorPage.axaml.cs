@@ -69,6 +69,9 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
     private bool _updatingFields;
     private Mii? _preview;
 
+    private (MiiEditPart Part, Size Size, Rect Rect)? _arrowAnchor;
+    private bool _arrowAnchorDirty;
+
     private readonly Button _previousButton;
     private readonly Button _nextButton;
     private readonly Dictionary<MiiEditPart, Button> _presenceButtons = new();
@@ -124,7 +127,11 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
         _scene.PartClicked += SelectPart;
         _scene.PartDragStarted += OnPartDragStarted;
         _scene.PartDragged += OnPartDragged;
-        _scene.PartDragEnded += _ => _session?.EndMerge();
+        _scene.PartDragEnded += _ =>
+        {
+            _session?.EndMerge();
+            _arrowAnchorDirty = true;
+        };
         _scene.FrameDrawn += PositionOverlay;
         _scene.FellBackToImages += () => PositionOverlay();
         _scene.PointerWheelChanged += Scene_OnPointerWheelChanged;
@@ -140,6 +147,10 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
             _presenceButtons[part] = button;
             Overlay.Children.Add(button);
         }
+
+        // Hidden until a drawn frame says where they go.
+        foreach (var child in Overlay.Children)
+            Hide(child);
 
         AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
         AddHandler(PointerPressedEvent, OnAnyPointerPressed, RoutingStrategies.Tunnel);
@@ -848,6 +859,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
         if (_session is null || !(undo ? _session.Undo() : _session.Redo()))
             return;
         _scene.Present(_session.Mii);
+        _arrowAnchorDirty = true;
         LoadFields();
         Refresh();
     }
@@ -951,9 +963,9 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
             && _scene.Framing == MiiEditorFraming.Head
             && _level is Level.HeadGroups or Level.HeadParts;
 
-        // Arrows beside the selected part.
+        // Arrows on both sides of the head, at the height of the selected part.
         var definition = _part is { } part ? MiiEditorParts.Get(part) : null;
-        Rect? rect = inHead && definition is { Variants: not null } && definition.IsPresent(mii!) ? _scene.PartRect(definition.Part) : null;
+        Rect? rect = inHead && definition is { Variants: not null } && definition.IsPresent(mii!) ? ArrowAnchor(definition.Part) : null;
         if (rect is { } r)
         {
             Place(_previousButton, new Point(r.Left - FloatingGap - _previousButton.Width, r.Center.Y - _previousButton.Height / 2));
@@ -989,6 +1001,38 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
             else
                 Hide(button);
         }
+    }
+
+    /// <summary>
+    /// The row the arrows sit on: as wide as the face, at the height of the part. It's measured once when the part
+    /// is selected and then stays put, so the arrows don't follow the breathing or jump when the next variant is a
+    /// different size (or, like bald hair, has nothing to measure). Only camera moves, resizes and moving the part
+    /// itself (dragging, undo) measure it again.
+    /// </summary>
+    private Rect? ArrowAnchor(MiiEditPart part)
+    {
+        var size = Overlay.Bounds.Size;
+        if (!_arrowAnchorDirty && !_scene.IsCameraMoving && _arrowAnchor is { } kept && kept.Part == part && kept.Size == size)
+            return kept.Rect;
+        if (_scene.FaceRect() is not { } face)
+            return _arrowAnchor is { } old && old.Part == part ? old.Rect : null;
+
+        var y = part switch
+        {
+            MiiEditPart.Hair => face.Top + face.Height * 0.08,
+            MiiEditPart.FaceShape or MiiEditPart.FaceFeature => face.Center.Y,
+            MiiEditPart.Beard => face.Bottom - face.Height * 0.15,
+            MiiEditPart.Glasses => (_scene.PartRect(part) ?? _scene.PartRect(MiiEditPart.Eyes))?.Center.Y,
+            _ => _scene.PartRect(part)?.Center.Y,
+        };
+        // A part that's just been added may not be drawn yet: try again next frame.
+        if (y is not { } row)
+            return _arrowAnchor is { } old && old.Part == part ? old.Rect : null;
+
+        var rect = new Rect(face.Left, row, face.Width, 0);
+        _arrowAnchor = (part, size, rect);
+        _arrowAnchorDirty = false;
+        return rect;
     }
 
     /// <summary>Where the add/remove button of an optional part goes: on the part, or where it would appear.</summary>

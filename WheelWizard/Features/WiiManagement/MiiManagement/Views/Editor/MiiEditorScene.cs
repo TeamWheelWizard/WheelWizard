@@ -37,7 +37,7 @@ public enum MiiEditorFraming
 
 /// <summary>
 /// The Mii editor's 3D stage: the realtime Mii (or a rendered image without OpenGL), its camera, and everything you
-/// do with the mouse on it. In the picker two Miis fall in and you pick one; in the editor you click the head or
+/// do with the mouse on it. In the picker two Miis come in and you pick one; in the editor you click the head or
 /// body to open their menus, and in the head close-up you hover, click and drag the parts of the face.
 /// The page owns the Mii and the menus; this only shows the Mii and reports what was clicked or dragged.
 /// </summary>
@@ -62,12 +62,15 @@ public sealed class MiiEditorScene : Grid
     /// <summary>Face parts get a bit of extra room around them for the mouse.</summary>
     private const float MaskPartPadding = 1.3f;
 
-    private static readonly string[] FallClips =
+    /// <summary>How the picker Miis come in: falling from the sky, launching up from below, or floating down on bubbles.</summary>
+    private static readonly string[] EntranceClips =
     [
         "editor/picker/Picker_fall_classic_drop",
         "editor/picker/Picker_fall_somersault",
         "editor/picker/Picker_fall_belly_flop",
         "editor/picker/Picker_fall_flailing_float",
+        "shared/appear/Appear",
+        "shared/appear/Appear_balloon",
     ];
 
     private static readonly MiiImageSpecifications BodyShot = MiiImageVariants.MiiEditorPreviewCarousel.Clone();
@@ -78,7 +81,12 @@ public sealed class MiiEditorScene : Grid
     /// </summary>
     private static readonly MiiImageSpecifications PickerShot = BodyShot;
 
-    private const double PickerScale = 0.55;
+    private const double PickerScale = 0.9;
+
+    /// <summary>How far each picker Mii sits from the middle: a share of the stage's height, at most of its width.</summary>
+    private const double PickerShiftPerHeight = 0.19;
+
+    private const double PickerMaxShift = 0.23;
 
     private static readonly MiiImageSpecifications HeadShot = new()
     {
@@ -118,7 +126,7 @@ public sealed class MiiEditorScene : Grid
     private sealed record Actor(MiiRealtimeView View, MiiEditorDirector Director, bool IsGirl)
     {
         public Mii? Mii { get; set; }
-        public MiiAnimation? Fall { get; set; }
+        public MiiAnimation? Entrance { get; set; }
     }
 
     /// <summary>What a press in the head close-up landed on, to tell a click from a drag of that part.</summary>
@@ -160,13 +168,18 @@ public sealed class MiiEditorScene : Grid
         };
     }
 
-    /// <summary>False for "reduce animations": no falling in, camera cuts instead of moves, parts swap instantly.</summary>
+    /// <summary>False for "reduce animations": no coming in, camera cuts instead of moves, parts swap instantly.</summary>
     public bool Animate { get; }
 
     /// <summary>False when OpenGL isn't available and the Mii is a rendered image (no clicking parts, no dragging).</summary>
     public bool IsRealtime => _fallback is null && _fallbackPicker is null;
 
     public MiiEditorFraming Framing => _framing;
+
+    private long _cameraSettlesAt;
+
+    /// <summary>Whether the camera is still moving to a new framing (so things on screen are still moving too).</summary>
+    public bool IsCameraMoving => Environment.TickCount64 < _cameraSettlesAt;
 
     /// <summary>The animation director of the Mii being edited (after picking).</summary>
     public MiiEditorDirector? Director => _actors.Count == 1 ? _actors[0].Director : null;
@@ -198,7 +211,7 @@ public sealed class MiiEditorScene : Grid
 
     #region Picker
 
-    /// <summary>Shows a boy on the left and a girl on the right falling from the sky.</summary>
+    /// <summary>Shows a boy on the left and a girl on the right coming in (falling from the sky, mostly).</summary>
     public void ShowPicker(Mii boy, Mii girl)
     {
         _framing = MiiEditorFraming.Picker;
@@ -212,8 +225,8 @@ public sealed class MiiEditorScene : Grid
         {
             var actor = _actors[i];
             var delay = TimeSpan.FromMilliseconds(i * 260);
-            // Wait in the sky (the first frame of the fall, above the picture) until the Mii is ready to drop.
-            var waiting = Animate ? HoldFall(actor) : false;
+            // Wait on the first frame (for a fall: in the sky, above the picture) until the Mii is ready to come in.
+            var waiting = Animate ? HoldEntrance(actor) : false;
             actor.View.MiiShown += Started;
             void Started(string _)
             {
@@ -229,29 +242,30 @@ public sealed class MiiEditorScene : Grid
         }
     }
 
-    /// <summary>Puts a random fall on the Mii, paused on its first frame. False when there is no fall to play.</summary>
-    private bool HoldFall(Actor actor)
+    /// <summary>Puts a random entrance on the Mii, paused on its first frame. False when there is none to play.</summary>
+    private bool HoldEntrance(Actor actor)
     {
-        if (_library.Get(FallClips[_random.Next(FallClips.Length)]) is not { } clip)
+        if (_library.Get(EntranceClips[_random.Next(EntranceClips.Length)]) is not { } clip)
             return false;
-        actor.Fall = clip;
+        actor.Entrance = clip;
         actor.View.Preload(clip);
         actor.View.Player.Play(clip, loop: false, fadeSeconds: 0);
         actor.View.IsPlaying = false;
         return true;
     }
 
-    /// <summary>Whether a picker Mii is still falling in.</summary>
-    private bool IsFalling => _actors.Any(a => a.Fall is not null);
+    /// <summary>Whether a picker Mii is still coming in.</summary>
+    private bool IsArriving => _actors.Any(a => a.Entrance is not null);
 
     private void LayoutPicker()
     {
         if (_framing != MiiEditorFraming.Picker || _actors.Count != 2)
             return;
-        // Both views cover the whole stage; each Mii is drawn at half size in the middle of its half.
-        var quarter = Bounds.Width / 4;
-        _actors[0].View.ScreenShiftX = -quarter;
-        _actors[1].View.ScreenShiftX = quarter;
+        // Both views cover the whole stage; each Mii is drawn a bit smaller, moved to its side of the middle. Their
+        // size follows the stage's height, so on a wide stage they stay close instead of drifting to the edges.
+        var shift = Math.Min(Bounds.Width * PickerMaxShift, Bounds.Height * PickerShiftPerHeight);
+        _actors[0].View.ScreenShiftX = -shift;
+        _actors[1].View.ScreenShiftX = shift;
         foreach (var actor in _actors)
             actor.View.ScreenScale = PickerScale;
     }
@@ -265,8 +279,8 @@ public sealed class MiiEditorScene : Grid
             return;
         }
 
-        // Let them land first; shuffling mid-air would yank them to the ground.
-        for (var i = 0; i < 80 && IsFalling; i++)
+        // Let them arrive first; shuffling mid-air would yank them to the ground.
+        for (var i = 0; i < 80 && IsArriving; i++)
             await Task.Delay(50);
 
         var waits = new List<Task>();
@@ -403,6 +417,7 @@ public sealed class MiiEditorScene : Grid
         }
 
         var view = _actors[0].View;
+        _cameraSettlesAt = Environment.TickCount64 + (long)(Animate ? CameraTransition.TotalMilliseconds : 0) + 150;
         view.TransitionTo(WithYaw(_shot, _yaw), Animate ? CameraTransition : TimeSpan.Zero);
         var shiftFrom = view.ScreenShiftX;
         var shiftTo = framing == MiiEditorFraming.Info ? -Bounds.Width * InfoShift : 0;
@@ -458,9 +473,9 @@ public sealed class MiiEditorScene : Grid
         view.RealtimeUnavailable += _ => SwitchToImages();
         view.Player.Finished += clip =>
         {
-            if (ReferenceEquals(clip, actor.Fall))
+            if (ReferenceEquals(clip, actor.Entrance))
             {
-                actor.Fall = null;
+                actor.Entrance = null;
                 director.Idle();
             }
         };
@@ -872,6 +887,25 @@ public sealed class MiiEditorScene : Grid
             return null;
         var view = _actors[0].View;
         var hits = view.PickHead(ToView(view, point));
+
+        // Brows and eyes win over the glasses and hair in front of them, which would otherwise hide them.
+        if (hits.Count > 0 && hits[0].Shape is HeadShape.Glass or HeadShape.Hair or HeadShape.Cap)
+        {
+            foreach (var candidate in hits)
+            {
+                if (candidate.Shape != HeadShape.Mask)
+                    continue;
+                if (
+                    MaskPartAt(candidate.Uv, [(MiiMaskLayers.Eyebrows, MiiEditPart.Eyebrows), (MiiMaskLayers.Eyes, MiiEditPart.Eyes)]) is
+                    { } behind
+                )
+                {
+                    hit = candidate;
+                    return behind;
+                }
+            }
+        }
+
         foreach (var candidate in hits)
         {
             hit = candidate;
@@ -901,20 +935,21 @@ public sealed class MiiEditorScene : Grid
         return null;
     }
 
-    private MiiEditPart? MaskPartAt(Vector2 uv)
+    /// <summary>Small parts first, so the mole wins over the cheek and the mustache over the mouth.</summary>
+    private static readonly (MiiMaskLayers Layer, MiiEditPart Part)[] MaskPartOrder =
+    [
+        (MiiMaskLayers.Mole, MiiEditPart.Mole),
+        (MiiMaskLayers.Eyes, MiiEditPart.Eyes),
+        (MiiMaskLayers.Eyebrows, MiiEditPart.Eyebrows),
+        (MiiMaskLayers.Mustache, MiiEditPart.Mustache),
+        (MiiMaskLayers.Mouth, MiiEditPart.Mouth),
+    ];
+
+    private MiiEditPart? MaskPartAt(Vector2 uv, (MiiMaskLayers Layer, MiiEditPart Part)[]? order = null)
     {
         if (MaskQuads() is not { } quads)
             return null;
-        // Small parts first, so the mole wins over the cheek and the mustache over the mouth.
-        (MiiMaskLayers Layer, MiiEditPart Part)[] order =
-        [
-            (MiiMaskLayers.Mole, MiiEditPart.Mole),
-            (MiiMaskLayers.Eyes, MiiEditPart.Eyes),
-            (MiiMaskLayers.Eyebrows, MiiEditPart.Eyebrows),
-            (MiiMaskLayers.Mustache, MiiEditPart.Mustache),
-            (MiiMaskLayers.Mouth, MiiEditPart.Mouth),
-        ];
-        foreach (var (layer, part) in order)
+        foreach (var (layer, part) in order ?? MaskPartOrder)
         {
             if (!quads.TryGetValue(layer, out var partQuads))
                 continue;
