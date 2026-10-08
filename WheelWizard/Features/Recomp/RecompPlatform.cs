@@ -5,9 +5,10 @@ namespace WheelWizard.Recomp;
 /// <summary>
 /// Which platforms the WiiCompiled integration runs on, and which setup asset each of them downloads.
 /// Windows drives <c>WiiCompiled-Setup.exe</c> through the v1 command-line contract. Linux drives the
-/// AppImage through its own subcommand interface (see <see cref="RecompLinuxInstallService"/>). Every
-/// other platform is unsupported, so <c>ISettingsManager.IsRecompModeActive()</c> is false there and
-/// nothing recomp-related is ever registered or shown.
+/// AppImage through its own subcommand interface (see <see cref="RecompLinuxInstallService"/>), and macOS
+/// drives the self-extracting <c>.run</c> with that same interface. Every other platform is unsupported, so
+/// <c>ISettingsManager.IsRecompModeActive()</c> is false elsewhere and nothing recomp-related is ever
+/// registered or shown.
 /// </summary>
 public static class RecompPlatform
 {
@@ -18,14 +19,28 @@ public static class RecompPlatform
     /// </summary>
     public static bool IsLinux { get; } = OperatingSystem.IsLinux() && LinuxReleaseAssetName(RuntimeInformation.OSArchitecture) is not null;
 
-    public static bool IsSupported => OperatingSystem.IsWindows() || IsLinux;
+    /// <summary>
+    /// Whether this is a macOS build. macOS downloads <see cref="MacReleaseAssetName"/>, a self-extracting
+    /// setup for both architectures that speaks the same subcommand interface as the Linux AppImage.
+    /// </summary>
+    public static bool IsMacOS { get; } = OperatingSystem.IsMacOS();
+
+    /// <summary>Whether this platform drives the setup through its subcommand interface (Linux and macOS).</summary>
+    public static bool UsesSubcommandSetup => IsLinux || IsMacOS;
+
+    public static bool IsSupported => OperatingSystem.IsWindows() || UsesSubcommandSetup;
+
+    /// <summary>The macOS release asset, fixed by the recomp's packaging workflow. It is also the installed host's name.</summary>
+    public const string MacReleaseAssetName = "WiiCompiled-Setup-macos.run";
 
     /// <summary>The name of the installed host copy inside Wheel Wizard's recomp install directory.</summary>
-    public static string SetupFileName => IsLinux ? "WiiCompiled-Setup.AppImage" : RecompSetupCommandBuilder.SetupFileName;
+    public static string SetupFileName =>
+        IsLinux ? "WiiCompiled-Setup.AppImage"
+        : IsMacOS ? MacReleaseAssetName
+        : RecompSetupCommandBuilder.SetupFileName;
 
     /// <summary>The release asset to download on this machine.</summary>
-    public static string ReleaseAssetName =>
-        IsLinux ? LinuxReleaseAssetName(RuntimeInformation.OSArchitecture)! : RecompSetupCommandBuilder.SetupFileName;
+    public static string ReleaseAssetName => IsLinux ? LinuxReleaseAssetName(RuntimeInformation.OSArchitecture)! : SetupFileName;
 
     /// <summary>
     /// The AppImage the recomp publishes for a Linux architecture, or <see langword="null"/> when it

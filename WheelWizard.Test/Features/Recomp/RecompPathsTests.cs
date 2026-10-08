@@ -60,4 +60,23 @@ public class RecompPathsTests
         Assert.Equal("/relocated/Recomp/Install/install-state.json", paths.InstallStateFilePath);
         Assert.Equal("/relocated/Recomp/Nand", paths.NandCopyFolderPath);
     }
+
+    [Fact]
+    public void MacLayout_KeepsBackendStateInApplicationSupport_AndInstallsTheDownloadedRun()
+    {
+        var fs = new MockFileSystem(options => options.SimulatingOperatingSystem(SimulationMode.MacOS));
+        var location = Substitute.For<IApplicationDataLocation>();
+        location.DirectoryPath.Returns("/first");
+        var environment = Substitute.For<IRuntimeEnvironment>();
+        environment.IsMacOS.Returns(true);
+        environment.OSArchitecture.Returns(Architecture.Arm64);
+        environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).Returns("/support");
+        var paths = new RecompPaths(location, fs, environment);
+
+        Assert.False(paths.IsPortableInstall);
+        Assert.Equal("/support/WiiCompiled/Config.toml", paths.ConfigFilePath);
+        Assert.Equal("/support/WiiCompiled/NAND", paths.PrivateNandFolderPath);
+        Assert.Equal("/support/WiiCompiled/install-state.json", paths.LinuxBackendStateFilePath);
+        Assert.Equal("/first/Recomp/Install/WiiCompiled-Setup-macos.run", paths.SetupFilePath);
+    }
 }
