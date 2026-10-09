@@ -1,5 +1,4 @@
-using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+﻿using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using WheelWizard.RrRooms.Views;
@@ -11,15 +10,11 @@ namespace WheelWizard.UI.Test;
 
 public class BadgeBindingTests
 {
-    [AvaloniaTheory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void Cards_DisplayAndRefreshSuppliedBadgesWithoutServiceLookup(bool isFriend)
+    [AvaloniaFact]
+    public void Cards_DisplayAndRefreshSuppliedBadgesWithoutServiceLookup()
     {
         BadgeVariant[] initial = [BadgeVariant.WhWzDev, BadgeVariant.Translator];
-        TemplatedControl card = isFriend
-            ? new FriendsListItem { BadgeVariants = initial, HasBadges = true }
-            : new PlayerListItem { BadgeVariants = initial, HasBadges = true };
+        var card = new PlayerListItem { BadgeVariants = initial, HasBadges = true };
         var window = new Window
         {
             Content = card,
@@ -33,10 +28,7 @@ public class BadgeBindingTests
             Assert.Equal(initial, card.GetVisualDescendants().OfType<CommunityBadge>().Select(badge => badge.Variant));
 
             BadgeVariant[] replacement = [BadgeVariant.RrDev];
-            if (card is FriendsListItem friend)
-                friend.BadgeVariants = replacement;
-            else
-                ((PlayerListItem)card).BadgeVariants = replacement;
+            card.BadgeVariants = replacement;
             window.UpdateLayout();
             Assert.Equal(replacement, card.GetVisualDescendants().OfType<CommunityBadge>().Select(badge => badge.Variant));
         }

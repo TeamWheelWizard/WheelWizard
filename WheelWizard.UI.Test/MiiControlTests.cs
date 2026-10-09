@@ -16,7 +16,6 @@ using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Calendar;
-using WheelWizard.WheelWizardData.Views;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
@@ -24,61 +23,6 @@ namespace WheelWizard.UI.Test;
 
 public class MiiControlTests
 {
-    [AvaloniaFact]
-    public async Task FriendPortrait_RemainsVisibleAndAnchoredWhenRowWidthChanges()
-    {
-        var images = InstallThemes();
-        using var bitmap = new WriteableBitmap(new PixelSize(512, 512), new Vector(96, 96));
-        var rendered = new TaskCompletionSource<OperationResult<Bitmap>>();
-        images.GetImageAsync(Arg.Any<Mii>(), Arg.Any<MiiImageSpecifications>()).Returns(rendered.Task);
-        var card = new FriendsListItem
-        {
-            Width = 428,
-            Height = 124,
-            Mii = MiiFactory.CreateRandomMii(new Testably.Abstractions.RealRandomSystem().Random.New(1)),
-        };
-        var window = new Window { Content = card };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            var portrait = Assert.Single(card.GetVisualDescendants().OfType<MiiImageView>());
-            var ready = portrait.WaitUntilLoadedAsync(CancellationToken.None);
-            Assert.False(ready.IsCompleted);
-            rendered.SetResult(bitmap);
-            await ready;
-            await portrait.WaitUntilLoadedAsync(CancellationToken.None);
-            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
-            foreach (var (online, pending) in new[] { (false, false), (true, false), (false, true) })
-            {
-                card.IsOnline = online;
-                card.IsPending = pending;
-                window.UpdateLayout();
-                var control = Assert.Single(card.GetVisualDescendants().OfType<MiiAnimatedImage>());
-                var view = Assert.Single(control.GetVisualDescendants().OfType<MiiImageView>());
-                Assert.Same(bitmap, Assert.Single(view.GeneratedImages));
-                var image = Assert.Single(view.GetVisualDescendants().OfType<Image>(), image => image.IsVisible && image.Source == bitmap);
-                var position = image.TranslatePoint(default, card)!.Value;
-                var visiblePortrait = new Rect(position, image.Bounds.Size).Intersect(new Rect(card.Bounds.Size));
-                Assert.True(
-                    visiblePortrait.Width >= 50 && visiblePortrait.Height >= 100,
-                    $"Portrait is clipped outside the card: {position}, {image.Bounds}; visible area {visiblePortrait}"
-                );
-                var portraitSize = image.Bounds.Size;
-                card.Width = 572;
-                window.UpdateLayout();
-                Assert.Equal(position, image.TranslatePoint(default, card)!.Value);
-                Assert.Equal(portraitSize, image.Bounds.Size);
-                card.Width = 428;
-                window.UpdateLayout();
-            }
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
     [AvaloniaFact]
     public void Templates_ConstructAllRenderingViewsWithoutAGlobalServiceProvider()
     {

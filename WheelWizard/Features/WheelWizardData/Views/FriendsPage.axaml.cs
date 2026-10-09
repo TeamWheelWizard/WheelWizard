@@ -1,23 +1,21 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
-using WheelWizard.Models;
-using WheelWizard.Mods.Views;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
-using WheelWizard.Shared.Services;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Navigation;
-using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Views.Dialogs;
-using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
@@ -44,10 +42,9 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
 
     private IMiiDbService MiiDbService { get; }
 
-    private IApiCaller<IRwfcApi> ApiCaller { get; }
-
     private ISettingsManager SettingsService { get; }
 
+    /// <summary>The friends to show, in order (filled in a few at a time when the page opens, see <see cref="ApplyFriendList"/>).</summary>
     public ObservableCollection<FriendProfile> FriendList
     {
         get => _friendlist;
@@ -58,13 +55,54 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         }
     }
 
+    private int _friendCount;
+    private int _onlineCount;
+
+    /// <summary>All friends, also the ones not in <see cref="FriendList"/> yet.</summary>
+    public int FriendCount
+    {
+        get => _friendCount;
+        private set
+        {
+            _friendCount = value;
+            OnPropertyChanged(nameof(FriendCount));
+        }
+    }
+
+    public int OnlineCount
+    {
+        get => _onlineCount;
+        private set
+        {
+            _onlineCount = value;
+            OnPropertyChanged(nameof(OnlineCount));
+        }
+    }
+
+    /// <summary>Names of the ways to sort, in the order of <see cref="SortIndex"/>.</summary>
+    public IReadOnlyList<string> SortOptions { get; } = Enum.GetValues<ListOrderCondition>().Select(SortName).ToList();
+
+    /// <summary>The picked way to sort (an index into <see cref="SortOptions"/>); setting it sorts the list.</summary>
+    public int SortIndex
+    {
+        get => (int)CurrentOrder;
+        set
+        {
+            if (value < 0 || value == (int)CurrentOrder)
+                return;
+            CurrentOrder = (ListOrderCondition)value;
+            OnPropertyChanged(nameof(SortIndex));
+            SortButton.Text = SortOptions[value];
+            UpdateFriendList();
+        }
+    }
+
     public FriendsPage(
         IPopupFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameLicenseService,
         IMiiDbService miiDbService,
-        IApiCaller<IRwfcApi> apiCaller,
         ISettingsManager settingsService
     )
     {
@@ -73,15 +111,13 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         LiveRooms = liveRooms;
         GameLicenseService = gameLicenseService;
         MiiDbService = miiDbService;
-        ApiCaller = apiCaller;
         SettingsService = settingsService;
         InitializeComponent();
         GameLicenseService.Subscribe(this);
         UpdateFriendList();
 
         DataContext = this;
-        FriendsListView.ItemsSource = FriendList;
-        PopulateSortingList();
+        SortButton.Text = SortOptions[SortIndex];
         HandleVisibility();
     }
 
@@ -104,7 +140,10 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     {
         _friends = GetSortedPlayerList();
         ApplyFriendList(Math.Max(FriendList.Count, CardsAtOnce));
-        ListItemCount.Text = _friends.Count.ToString();
+        FriendCount = _friends.Count;
+        OnlineCount = _friends.Count(friend => friend.IsOnline);
+        // The dot before "8 of 24 online" lights up while anyone is online.
+        CountLine.Classes.Set("AnyOnline", OnlineCount > 0);
         HandleVisibility();
     }
 
@@ -149,7 +188,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         var hasFriends = _friends.Count > 0;
         VisibleWhenNoFriends.IsVisible = !hasFriends;
         VisibleWhenFriends.IsVisible = hasFriends;
-        TopAddFriendButton.IsVisible = hasFriends;
     }
 
     private List<FriendProfile> GetSortedPlayerList()
@@ -157,7 +195,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         Func<FriendProfile, object> orderMethod = CurrentOrder switch
         {
             ListOrderCondition.VR => f => f.Vr,
-            ListOrderCondition.BR => f => f.Br,
             ListOrderCondition.NAME => f => f.NameOfMii,
             ListOrderCondition.WINS => f => f.Wins,
             ListOrderCondition.TOTAL_RACES => f => f.Losses + f.Wins,
@@ -166,215 +203,127 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         return GameLicenseService.ActiveCurrentFriends.OrderByDescending(orderMethod).ToList();
     }
 
-    private void PopulateSortingList()
-    {
-        foreach (ListOrderCondition type in Enum.GetValues(typeof(ListOrderCondition)))
+    private static string SortName(ListOrderCondition type) =>
+        type switch
         {
-            var name = type switch
-            {
-                // TODO: Should be replaced with actual translations
-                ListOrderCondition.VR => t("attribute.vr_full"),
-                ListOrderCondition.BR => t("attribute.br_full"),
-                ListOrderCondition.NAME => t("attribute.name"),
-                ListOrderCondition.WINS => t("attribute.wins"),
-                ListOrderCondition.TOTAL_RACES => t("attribute.races_played"),
-                ListOrderCondition.IS_ONLINE => t("attribute.is_online"),
-                _ => t("state.unknown"),
-            };
-
-            SortByDropdown.Items.Add(name);
-        }
-
-        SortByDropdown.SelectedIndex = (int)CurrentOrder;
-    }
-
-    private void SortByDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        CurrentOrder = (ListOrderCondition)SortByDropdown.SelectedIndex;
-        UpdateFriendList();
-    }
-
-    private async void AddFriend_OnClick(object? sender, RoutedEventArgs e)
-    {
-        var focusedUserIndex = SettingsService.Get<int>(SettingsService.FOCUSED_USER);
-        if (focusedUserIndex is < 0 or > 3)
-        {
-            ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        var activeUserPid = FriendCode.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
-        if (activeUserPid == 0)
-        {
-            ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        if (GameLicenseService.ActiveCurrentFriends.Count >= 30)
-        {
-            ViewUtils.ShowSnackbar("Your friend list is full.", ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        var inputFriendCode = await new TextInputWindow()
-            .SetMainText("Add Friend")
-            .SetExtraText("Enter a 12-digit friend code.")
-            .SetPlaceholderText("0000-0000-0000")
-            .SetButtonText(t("action.cancel"), t("action.submit"))
-            .SetValidation((_, newText) => ValidateFriendCodeInput(newText))
-            .ShowDialog();
-
-        if (inputFriendCode == null)
-            return;
-
-        var normalizedFriendCodeResult = NormalizeFriendCode(inputFriendCode);
-        if (normalizedFriendCodeResult.IsFailure)
-        {
-            ViewUtils.ShowSnackbar(normalizedFriendCodeResult.Error.Message, ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        var normalizedFriendCode = normalizedFriendCodeResult.Value;
-        var profileResult = await ApiCaller.CallApiAsync(rwfcApi => rwfcApi.GetPlayerProfileAsync(normalizedFriendCode));
-        if (profileResult.IsFailure || profileResult.Value == null)
-        {
-            ViewUtils.ShowSnackbar("Could not find that friend code online.", ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        var miiResult = MiiSerializer.Deserialize(profileResult.Value.MiiData);
-        if (miiResult.IsFailure)
-        {
-            ViewUtils.ShowSnackbar("This profile has no valid Mii data.", ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        var profile = WithFallbackFriendCode(profileResult.Value, normalizedFriendCode);
-        var shouldAdd = await new AddFriendConfirmationWindow(profile, miiResult.Value).AwaitAnswer();
-        if (!shouldAdd)
-            return;
-
-        var addResult = GameLicenseService.AddFriend(
-            focusedUserIndex,
-            normalizedFriendCode,
-            miiResult.Value,
-            (uint)Math.Max(profile.Vr, 0)
-        );
-
-        if (addResult.IsFailure)
-        {
-            ViewUtils.ShowSnackbar(addResult.Error.Message, ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        UpdateFriendList();
-        ViewUtils.GetLayout().UpdateFriendCount();
-        ViewUtils.ShowSnackbar($"Added {profile.Name} to your friend list.");
-    }
-
-    private OperationResult ValidateFriendCodeInput(string? rawFriendCode)
-    {
-        var normalizedFriendCodeResult = NormalizeFriendCode(rawFriendCode ?? string.Empty);
-        if (normalizedFriendCodeResult.IsFailure)
-            return normalizedFriendCodeResult.Error;
-
-        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCodeResult.Value);
-        var currentProfileId = FriendCode.FriendCodeToProfileId(GameLicenseService.ActiveUser.FriendCode);
-        if (currentProfileId != 0 && currentProfileId == friendProfileId)
-            return Fail("You cannot add your own friend code.");
-
-        var duplicateFriend = GameLicenseService.ActiveCurrentFriends.Any(friend =>
-        {
-            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
-            return existingPid != 0 && existingPid == friendProfileId;
-        });
-
-        return duplicateFriend ? Fail("This friend is already in your list.") : Ok();
-    }
-
-    private static OperationResult<string> NormalizeFriendCode(string friendCode)
-    {
-        if (string.IsNullOrWhiteSpace(friendCode))
-            return Fail("Friend code cannot be empty.");
-
-        var digits = new string(friendCode.Where(char.IsDigit).ToArray());
-        if (digits.Length != 12 || !ulong.TryParse(digits, out _))
-            return Fail("Friend code must be exactly 12 digits.");
-
-        var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
-        var profileId = FriendCode.FriendCodeToProfileId(formatted);
-        if (profileId == 0)
-            return Fail("Invalid friend code.");
-
-        return formatted;
-    }
-
-    private static PlayerProfileResponse WithFallbackFriendCode(PlayerProfileResponse profile, string fallbackFriendCode)
-    {
-        if (!string.IsNullOrWhiteSpace(profile.FriendCode))
-            return profile;
-
-        return new()
-        {
-            Pid = profile.Pid,
-            Name = profile.Name,
-            FriendCode = fallbackFriendCode,
-            Vr = profile.Vr,
-            Rank = profile.Rank,
-            LastSeen = profile.LastSeen,
-            IsSuspicious = profile.IsSuspicious,
-            VrStats = profile.VrStats,
-            MiiData = profile.MiiData,
+            ListOrderCondition.VR => t("attribute.vr_full"),
+            ListOrderCondition.NAME => t("attribute.name"),
+            ListOrderCondition.WINS => t("attribute.wins"),
+            ListOrderCondition.TOTAL_RACES => t("attribute.races_played"),
+            ListOrderCondition.IS_ONLINE => t("attribute.is_online"),
+            _ => t("state.unknown"),
         };
-    }
 
     private enum ListOrderCondition
     {
         IS_ONLINE,
         VR,
-        BR,
         NAME,
         WINS,
         TOTAL_RACES,
     }
 
-    private void CopyFriendCode_OnClick(object sender, RoutedEventArgs e)
+    #region Sorting
+
+    // Filled here rather than in the menu's Opening event: that one only fires for a right-click, not for Open().
+    private void SortButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
+        FillSortMenu();
+        SortMenu.Open(SortButton);
+    }
+
+    private void SortMenu_OnOpening(object? sender, CancelEventArgs e) => FillSortMenu();
+
+    /// <summary>Lists the ways to sort, the current one marked by colour and a check.</summary>
+    private void FillSortMenu()
+    {
+        var accent = this.FindResource("Primary300") is Color color ? new SolidColorBrush(color) : null;
+        SortMenu.Items.Clear();
+        for (var i = 0; i < SortOptions.Count; i++)
+        {
+            var index = i;
+            var item = new MenuItem { Header = SortOptions[index] };
+            if (index == SortIndex)
+            {
+                item.FontWeight = FontWeight.SemiBold;
+                item.Foreground = accent;
+                item.Icon = new PathIcon
+                {
+                    Data = this.FindResource("CheckMark") as Geometry,
+                    Width = 10,
+                    Height = 10,
+                    Foreground = accent,
+                };
+            }
+            item.Click += (_, _) => SortIndex = index;
+            SortMenu.Items.Add(item);
+        }
+    }
+
+    #endregion
+
+    #region Friend actions
+
+    private static FriendProfile? FriendOf(object? sender) => (sender as StyledElement)?.DataContext as FriendProfile;
+
+    /// <summary>A left click on a card opens the same menu a right-click does (its buttons handle their own clicks).</summary>
+    private void Card_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (sender is not Control card || e.InitialPressMouseButton != MouseButton.Left)
+            return;
+        if (!new Rect(card.Bounds.Size).Contains(e.GetPosition(card)))
+            return;
+        card.ContextMenu?.Open(card);
+        e.Handled = true;
+    }
+
+    private void ViewRoom_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (FriendOf(sender) is { } friend)
+            ViewRoom(friend.FriendCode);
+    }
+
+    private void CopyFriendCode_OnClick(object? sender, RoutedEventArgs e) => CopyFriendCode(FriendOf(sender));
+
+    private void ViewMii_OnClick(object? sender, RoutedEventArgs e) => ViewMii(FriendOf(sender));
+
+    private void ViewProfile_OnClick(object? sender, RoutedEventArgs e) => ViewProfile(FriendOf(sender));
+
+    private void ViewOnRwfc_OnClick(object? sender, RoutedEventArgs e) => ViewOnRwfc(FriendOf(sender));
+
+    private void RemoveFriend_OnClick(object? sender, RoutedEventArgs e) => RemoveFriend(FriendOf(sender));
+
+    private void CopyFriendCode(FriendProfile? selectedPlayer)
+    {
+        if (selectedPlayer is null)
             return;
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(selectedPlayer.FriendCode);
         ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
     }
 
-    private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)
+    private void ViewMii(FriendProfile? selectedPlayer)
     {
-        if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
-            return;
-        if (selectedPlayer.Mii == null)
+        if (selectedPlayer?.Mii == null)
             return;
         new MiiCarouselWindow().SetMii(selectedPlayer.Mii).Show();
     }
 
-    private void ViewProfile_OnClick(object sender, RoutedEventArgs e)
+    private void ViewProfile(FriendProfile? selectedPlayer)
     {
-        if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
-            return;
-        if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
+        if (string.IsNullOrEmpty(selectedPlayer?.FriendCode))
             return;
         Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode).Show();
     }
 
-    private void ViewOnRwfc_OnClick(object sender, RoutedEventArgs e)
+    private void ViewOnRwfc(FriendProfile? selectedPlayer)
     {
-        if (FriendsListView.SelectedItem is FriendProfile selectedPlayer)
+        if (selectedPlayer is not null)
             ViewUtils.OpenRwfcPlayer(selectedPlayer.FriendCode);
     }
 
-    private void RemoveFriend_OnClick(object sender, RoutedEventArgs e)
+    private void RemoveFriend(FriendProfile? selectedPlayer)
     {
-        if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
-            return;
-        if (string.IsNullOrWhiteSpace(selectedPlayer.FriendCode))
+        if (selectedPlayer is null || string.IsNullOrWhiteSpace(selectedPlayer.FriendCode))
             return;
 
         var focusedUserIndex = SettingsService.Get<int>(SettingsService.FOCUSED_USER);
@@ -396,7 +345,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         ViewUtils.ShowSnackbar($"Removed {selectedPlayer.NameOfMii} from your friend list.");
     }
 
-    private void ViewRoom_OnClick(string friendCode)
+    private void ViewRoom(string friendCode)
     {
         foreach (var room in LiveRooms.CurrentRooms)
         {
@@ -410,7 +359,10 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         MessageTranslationHelper.ShowMessage(MessageTranslation.Warning_CouldNotFindRoom);
     }
 
-    private void SaveMii_OnClick(object sender, RoutedEventArgs e)
+    #endregion
+
+    /// <summary>Copies the friend's Mii into "My Miis" (not offered in the menu).</summary>
+    private void SaveMii(FriendProfile? selectedPlayer)
     {
         if (!MiiDbService.Exists())
         {
@@ -418,9 +370,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
             return;
         }
 
-        if (FriendsListView.SelectedItem is not FriendProfile selectedPlayer)
-            return;
-        if (selectedPlayer.Mii == null)
+        if (selectedPlayer?.Mii == null)
             return;
 
         var desiredMii = selectedPlayer.Mii;
