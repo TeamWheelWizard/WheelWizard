@@ -123,6 +123,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private string _playerName = string.Empty;
     private string _vr = string.Empty;
+    private string _br = string.Empty;
     private string _wins = string.Empty;
     private string _racesPlayed = string.Empty;
     private BadgeVariant[] _badges = [];
@@ -139,6 +140,13 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
     {
         get => _vr;
         private set => Set(ref _vr, value);
+    }
+
+    /// <summary>The selected license's BR, formatted.</summary>
+    public string Br
+    {
+        get => _br;
+        private set => Set(ref _br, value);
     }
 
     /// <summary>Games won (first places), formatted.</summary>
@@ -216,6 +224,11 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     #endregion
 
+    /// <summary>
+    /// The card face is only this wide with the sidebar collapsed; the BR fills the room that leaves on its right.
+    /// </summary>
+    private const double BrStatMinWidth = 280;
+
     public UserProfilePage(
         VrHistoryGraph historyGraph,
         ICustomCharactersService customCharacters,
@@ -249,6 +262,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         DataContext = this;
         ProfileContent.SizeChanged += (_, _) => FitChart();
         ProfileBody.SizeChanged += (_, _) => FitChart();
+        CardFace.SizeChanged += (_, e) => BrStat.IsVisible = e.NewSize.Width >= BrStatMinWidth;
         // Make sure this action gets subscribed AFTER the PopulateRegions method
         RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
     }
@@ -343,6 +357,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         CurrentFriendCode = currentPlayer.FriendCode;
         PlayerName = currentPlayer.NameOfMii;
         Vr = currentPlayer.Vr.ToString("N0");
+        Br = currentPlayer.Br.ToString("N0");
         Wins = currentPlayer.Statistics.Performance.FirstPlaces.ToString("N0");
         RacesPlayed = currentPlayer.Statistics.RaceTotals.AllRacesCount.ToString("N0");
         CurrentMii = currentPlayer.Mii;
