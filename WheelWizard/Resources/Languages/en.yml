@@ -12,6 +12,7 @@ en:
     my_miis: "My Miis"
   attribute:
     status_online: "Online"
+    date: "Date"
     enabled: "Enabled"
     title: "Title"
     all: "All"
@@ -130,6 +131,7 @@ en:
     no_profiles: "No profiles"
     custom: "Custom"
     installed: "Installed"
+    primary: "Primary"
   action:
     play: "Play"
     open: "Open"
@@ -176,6 +178,7 @@ en:
     unfavorite: "Unfavorite"
     favorite: "Favorite"
     view_room: "View Room"
+    change_mii: "Change Mii"
     recomp_nand_copy: "Make a copy"
     recomp_nand_share: "Use directly"
     recomp_install_offline: "Install offline-only"

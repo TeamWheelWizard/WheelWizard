@@ -32,7 +32,7 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
     private int _reloadVersion;
     private bool _isInitializingDaysDropdown;
     private int _selectedHistoryDays = DefaultHistoryDays;
-    private bool _useMatchesAsXAxis;
+    private bool _useMatchesAsXAxis = true;
     private RwfcPlayerVrHistoryResponse? _lastHistoryResponse;
     private Geometry? _graphPath;
     private Geometry? _graphAreaPath;
@@ -62,10 +62,49 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
 
             _useMatchesAsXAxis = value;
             OnPropertyChanged(nameof(UseMatchesAsXAxis));
+            OnPropertyChanged(nameof(UseDateAsXAxis));
 
             if (_lastHistoryResponse != null)
                 ApplyHistoryData(_lastHistoryResponse, _selectedHistoryDays);
         }
+    }
+
+    /// <summary>The x-axis shows dates rather than matches (matches is the default).</summary>
+    public bool UseDateAsXAxis
+    {
+        get => !UseMatchesAsXAxis;
+        set => UseMatchesAsXAxis = !value;
+    }
+
+    public static readonly StyledProperty<string?> CurrentVrProperty = AvaloniaProperty.Register<VrHistoryGraph, string?>(
+        nameof(CurrentVr)
+    );
+
+    /// <summary>The player's VR right now, shown big above the graph when set.</summary>
+    public string? CurrentVr
+    {
+        get => GetValue(CurrentVrProperty);
+        set => SetValue(CurrentVrProperty, value);
+    }
+
+    public static readonly StyledProperty<string?> WinsProperty = AvaloniaProperty.Register<VrHistoryGraph, string?>(nameof(Wins));
+
+    /// <summary>Games won, shown small under the graph when set.</summary>
+    public string? Wins
+    {
+        get => GetValue(WinsProperty);
+        set => SetValue(WinsProperty, value);
+    }
+
+    public static readonly StyledProperty<string?> RacesPlayedProperty = AvaloniaProperty.Register<VrHistoryGraph, string?>(
+        nameof(RacesPlayed)
+    );
+
+    /// <summary>Races played, shown small under the graph when set.</summary>
+    public string? RacesPlayed
+    {
+        get => GetValue(RacesPlayedProperty);
+        set => SetValue(RacesPlayedProperty, value);
     }
 
     public string? FriendCode

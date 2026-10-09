@@ -1,10 +1,11 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using WheelWizard.CustomCharacters;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Models.Enums;
@@ -34,18 +35,19 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private INavigationService Navigation { get; }
 
-    private const int ProfileCarouselPageCount = 2;
-    private const int ProfileSelectorMaxCharacters = 12;
-
     private LicenseProfile? currentPlayer;
     private Mii? _currentMii;
     private bool _isOnline;
     private bool _hasCurrentUserRoom;
-    private bool _hasProfileInfo;
+    private bool _isPrimary;
     private string _currentFriendCode = string.Empty;
-    private int _activeInfoSlideIndex;
 
     private LiveRoomsService LiveRooms { get; }
+
+    private VrHistoryGraph HistoryGraph { get; }
+
+    /// <summary>The licenses with a Mii, in slot order, peeking over the profile card.</summary>
+    public ObservableCollection<LicenseTab> LicenseTabs { get; } = [];
 
     private IGameLicenseSingletonService GameLicenseService { get; }
 
@@ -89,13 +91,13 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         }
     }
 
-    public bool HasProfileInfo
+    public bool IsPrimary
     {
-        get => _hasProfileInfo;
+        get => _isPrimary;
         set
         {
-            _hasProfileInfo = value;
-            OnPropertyChanged(nameof(HasProfileInfo));
+            _isPrimary = value;
+            OnPropertyChanged(nameof(IsPrimary));
         }
     }
 
@@ -106,21 +108,6 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         {
             _currentFriendCode = value;
             OnPropertyChanged(nameof(CurrentFriendCode));
-        }
-    }
-
-    public int ActiveInfoSlideIndex
-    {
-        get => _activeInfoSlideIndex;
-        set
-        {
-            var normalizedIndex = NormalizeCarouselIndex(value);
-            if (_activeInfoSlideIndex == normalizedIndex)
-                return;
-
-            _activeInfoSlideIndex = normalizedIndex;
-            OnPropertyChanged(nameof(ActiveInfoSlideIndex));
-            UpdateCarouselIndicators();
         }
     }
 
@@ -183,16 +170,15 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         SettingsService = settingsService;
         SaveRegions = saveRegions;
         DistributionPaths = distributionPaths;
+        HistoryGraph = historyGraph;
         InitializeComponent();
         HistoryHost.Content = historyGraph;
         historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("CurrentFriendCode") { Source = this });
-        ResetMiiTopBar();
-        ViewMii(FocusedUser);
+        _currentUserIndex = FocusedUser;
         PopulateRegions();
         GreetWithMii();
         UpdatePage();
         DataContext = this;
-        UpdateCarouselIndicators();
         // Make sure this action gets subscribed AFTER the PopulateRegions method
         RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
     }
@@ -204,8 +190,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         {
             RegionDropdown.Items.Clear();
             PopulateRegions();
-            ResetMiiTopBar();
-            ViewMii(FocusedUser);
+            _currentUserIndex = FocusedUser;
             UpdatePage();
         }
         finally
@@ -246,93 +231,69 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     #region Update page
 
-    private void ResetMiiTopBar()
+    private void RefreshLicenseTabs()
     {
         var validUsers = GameLicenseService.HasAnyValidUsers;
-        HasProfileInfo = validUsers;
-        CurrentUserProfile.IsVisible = validUsers;
-        ProfileCarouselContainer.IsVisible = validUsers;
+        ProfileContent.IsVisible = validUsers;
         NoProfilesInfo.IsVisible = !validUsers;
         if (!validUsers)
         {
             CurrentFriendCode = string.Empty;
             HasCurrentUserRoom = false;
             IsOnline = false;
-            UpdateOnlineBorders();
-            ActiveInfoSlideIndex = 0;
         }
 
-        var data = GameLicenseService.LicenseCollection;
-        var userAmount = data.Users.Count;
-        for (var i = 0; i < userAmount; i++)
+        var licenses = GameLicenseService
+            .LicenseCollection.Users.Select((user, index) => (User: user, Index: index))
+            .Where(license => (license.User.Mii?.Name.ToString() ?? SettingValues.NoName) != SettingValues.NoLicense)
+            .ToList();
+
+        // Update the peekers in place, so their Miis keep going; only a different set of licenses starts over.
+        if (!licenses.Select(license => license.Index).SequenceEqual(LicenseTabs.Select(tab => tab.Index)))
         {
-            var radioButton = RadioButtons.Children[i] as RadioButton;
-            if (radioButton == null!)
-                continue;
-
-            var miiName = data.Users[i].Mii?.Name.ToString() ?? SettingValues.NoName;
-            var noLicense = miiName == SettingValues.NoLicense;
-
-            radioButton.IsEnabled = !noLicense;
-            var displayName = miiName switch
-            {
-                SettingValues.NoName => t("state.no_name"),
-                SettingValues.NoLicense => t("state.no_license"),
-                _ => miiName,
-            };
-            radioButton.Content = TrimProfileSelectorText(displayName);
+            LicenseTabs.Clear();
+            foreach (var license in licenses)
+                LicenseTabs.Add(new LicenseTab(license.Index));
         }
 
-        UpdateCarouselIndicators();
-    }
-
-    private static string TrimProfileSelectorText(string? text)
-    {
-        if (string.IsNullOrEmpty(text) || text.Length < ProfileSelectorMaxCharacters)
-            return text ?? string.Empty;
-
-        return $"{text[..(ProfileSelectorMaxCharacters - 1)]}...";
+        foreach (var (tab, (user, index)) in LicenseTabs.Zip(licenses))
+        {
+            var miiName = user.Mii?.Name.ToString() ?? SettingValues.NoName;
+            tab.DisplayName = miiName == SettingValues.NoName ? t("state.no_name") : miiName;
+            tab.Mii = user.Mii;
+            tab.IsPrimary = index == FocusedUser;
+            tab.IsSelected = index == _currentUserIndex;
+        }
     }
 
     private void UpdatePage()
     {
-        PrimaryCheckBox.IsChecked = FocusedUser == _currentUserIndex;
-
         currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
+        IsPrimary = FocusedUser == _currentUserIndex;
         CurrentFriendCode = currentPlayer.FriendCode;
         ProfileAttribFriendCode.Text = currentPlayer.FriendCode;
-        ProfileAttribFriendCode.IsVisible = !string.IsNullOrEmpty(currentPlayer.FriendCode);
+        FriendCodeRow.IsVisible = !string.IsNullOrEmpty(currentPlayer.FriendCode);
         ProfileAttribUserName.Text = currentPlayer.NameOfMii;
-        ProfileAttribVr.Text = currentPlayer.Vr.ToString();
-        ProfileAttribBr.Text = currentPlayer.Br.ToString();
+        HistoryGraph.CurrentVr = currentPlayer.Vr.ToString("N0");
+        HistoryGraph.Wins = currentPlayer.Statistics.Performance.FirstPlaces.ToString("N0");
+        HistoryGraph.RacesPlayed = currentPlayer.Statistics.RaceTotals.AllRacesCount.ToString("N0");
         CurrentMii = currentPlayer.Mii;
         IsOnline = currentPlayer.IsOnline;
         HasCurrentUserRoom = IsUserInLiveRoom(currentPlayer.FriendCode);
-        UpdateOnlineBorders();
-
-        ProfileAttribTotalRaces.Text = currentPlayer.Statistics.RaceTotals.AllRacesCount.ToString();
-        ProfileAttribTotalWins.Text = currentPlayer.Statistics.Performance.FirstPlaces.ToString();
 
         BadgeContainer.Children.Clear();
         var badges = BadgeService.GetBadges(currentPlayer.FriendCode).Select(variant => new CommunityBadge { Variant = variant });
         foreach (var badge in badges)
         {
-            badge.Height = 30;
-            badge.Width = 30;
+            badge.Height = 26;
+            badge.Width = 26;
             BadgeContainer.Children.Add(badge);
         }
 
-        ResetMiiTopBar();
+        RefreshLicenseTabs();
     }
 
     #endregion
-
-    private void ViewMii(int? mii = null)
-    {
-        _currentUserIndex = mii ?? _currentUserIndex;
-        if (RadioButtons.Children[_currentUserIndex] is RadioButton radioButton)
-            radioButton.IsChecked = true;
-    }
 
     private void SetUserAsPrimary()
     {
@@ -340,10 +301,8 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
             return;
 
         SettingsService.Set(SettingsService.FOCUSED_USER, _currentUserIndex);
-
-        PrimaryCheckBox.IsChecked = true;
-        // Even though it's true when this method is called, we still set it to true,
-        // since Avalonia has some weird ass cashing, It might just be that that is because this method is actually deprecated
+        IsPrimary = true;
+        RefreshLicenseTabs();
 
         //now we refresh the sidebar friend amount
         var layout = ViewUtils.GetLayout();
@@ -358,7 +317,6 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
             return;
 
         SettingsService.Set(SettingsService.RR_REGION, region);
-        ResetMiiTopBar();
         var loadResult = GameLicenseService.LoadLicense();
         if (loadResult.IsFailure)
         {
@@ -370,7 +328,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
             return;
         }
 
-        ViewMii(0); // Just in case you have current user set as 4. and you change to a region where there are only 3 users.
+        _currentUserIndex = 0; // Just in case you have current user set as 4. and you change to a region where there are only 3 users.
         SetUserAsPrimary();
         SwapMii(0);
         UpdatePage();
@@ -379,34 +337,25 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         layout.UpdateSidebarProfile();
     }
 
-    private void TopBarRadio_OnClick(object? sender, RoutedEventArgs e)
+    private void LicensePeeker_OnClick(object? sender, RoutedEventArgs e)
     {
+        if (sender is not Control { DataContext: LicenseTab tab } || tab.Index == _currentUserIndex)
+            return;
+
         var oldIndex = _currentUserIndex;
-
-        if (sender is not RadioButton button || !int.TryParse((string?)button.Tag, out _currentUserIndex))
-            return;
-        if (oldIndex == _currentUserIndex)
-            return;
-
-        SwapMii(_currentUserIndex - oldIndex);
+        _currentUserIndex = tab.Index;
+        SwapMii(tab.Index - oldIndex);
         UpdatePage();
     }
 
-    private void CheckBox_SetPrimaryUser(object sender, RoutedEventArgs e) =>
-        ViewUtils.IfChecked(
-            sender,
-            () =>
-            {
-                if (FocusedUser == _currentUserIndex)
-                    return;
-                SetUserAsPrimary();
-                ProfileMii.Play("profile/make_primary");
-            }
-        );
+    private void MakePrimary_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (FocusedUser == _currentUserIndex)
+            return;
 
-    private void PrevCarouselPage_OnClick(object? sender, RoutedEventArgs e) => MoveCarouselPage(-1);
-
-    private void NextCarouselPage_OnClick(object? sender, RoutedEventArgs e) => MoveCarouselPage(1);
+        SetUserAsPrimary();
+        ProfileMii.Play("profile/make_primary");
+    }
 
     private async void OpenMiiSelector_Click(object? sender, RoutedEventArgs e)
     {
@@ -519,46 +468,12 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         ViewUtils.GetLayout().UpdateSidebarProfile();
     }
 
-    private void MoveCarouselPage(int offset)
-    {
-        ActiveInfoSlideIndex += offset;
-    }
-
-    private static int NormalizeCarouselIndex(int index)
-    {
-        var normalized = index % ProfileCarouselPageCount;
-        return normalized < 0 ? normalized + ProfileCarouselPageCount : normalized;
-    }
-
-    private void UpdateCarouselIndicators()
-    {
-        SetDotActive(CarouselDot0, ActiveInfoSlideIndex == 0);
-        SetDotActive(CarouselDot1, ActiveInfoSlideIndex == 1);
-    }
-
-    private static void SetDotActive(Border dot, bool active)
-    {
-        if (active && !dot.Classes.Contains("active"))
-            dot.Classes.Add("active");
-        else if (!active && dot.Classes.Contains("active"))
-            dot.Classes.Remove("active");
-    }
-
     private bool IsUserInLiveRoom(string? friendCode)
     {
         if (string.IsNullOrWhiteSpace(friendCode))
             return false;
 
         return LiveRooms.CurrentRooms.Any(room => room.Players.Any(player => player.FriendCode == friendCode));
-    }
-
-    private void UpdateOnlineBorders()
-    {
-        var outerColor = IsOnline ? ViewUtils.Colors.Primary400 : ViewUtils.Colors.Neutral900;
-        var innerColor = IsOnline ? ViewUtils.Colors.Primary400 : ViewUtils.Colors.Neutral600;
-
-        CurrentUserProfile.BorderBrush = new SolidColorBrush(outerColor);
-        PART_HeadBorderFace.BorderBrush = new SolidColorBrush(innerColor);
     }
 
     #region PropertyChanged
@@ -571,4 +486,50 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
     }
 
     #endregion
+}
+
+/// <summary>A license with a Mii, peeking over the profile card.</summary>
+public sealed class LicenseTab(int index) : INotifyPropertyChanged
+{
+    private Mii? _mii;
+    private string _displayName = string.Empty;
+    private bool _isPrimary;
+    private bool _isSelected;
+
+    /// <summary>The license slot (0-3).</summary>
+    public int Index { get; } = index;
+
+    public Mii? Mii
+    {
+        get => _mii;
+        set => Set(ref _mii, value);
+    }
+
+    public string DisplayName
+    {
+        get => _displayName;
+        set => Set(ref _displayName, value);
+    }
+
+    public bool IsPrimary
+    {
+        get => _isPrimary;
+        set => Set(ref _isPrimary, value);
+    }
+
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set => Set(ref _isSelected, value);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void Set<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+            return;
+        field = value;
+        PropertyChanged?.Invoke(this, new(propertyName));
+    }
 }

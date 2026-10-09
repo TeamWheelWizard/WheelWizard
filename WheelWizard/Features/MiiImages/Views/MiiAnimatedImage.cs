@@ -89,6 +89,12 @@ public sealed class MiiAnimatedImage : MiiImageControl
     }
 
     private MiiAnimatedView? _view;
+
+    /// <summary>
+    /// Fired after every drawn frame of the live Mii with where its head is in this control, e.g. to keep a label on
+    /// it. Null when there's no live Mii to follow (a still picture, animations off, or no Mii).
+    /// </summary>
+    public event Action<MiiHeadOnScreen?>? HeadMoved;
     private (IReadOnlyList<string> Entrance, IReadOnlyList<string>? Exit)? _arrival;
 
     /// <summary>Plays a random clip from <paramref name="folders"/> once (a reaction), then the performance carries on.</summary>
@@ -109,11 +115,20 @@ public sealed class MiiAnimatedImage : MiiImageControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
+        if (_view is not null)
+            _view.HeadMoved -= OnHeadMoved;
         _view = e.NameScope.Find<MiiAnimatedView>("PART_Renderer");
+        if (_view is not null)
+            _view.HeadMoved += OnHeadMoved;
         if (_view is not null && _arrival is { } arrival)
         {
             _arrival = null;
             _view.ArriveWith(arrival.Entrance, arrival.Exit);
         }
     }
+
+    private void OnHeadMoved(MiiHeadOnScreen? head) => HeadMoved?.Invoke(head);
 }
+
+/// <summary>Where a live Mii's head is in its control: the middle of the head and the top of it (hair included).</summary>
+public readonly record struct MiiHeadOnScreen(Point Middle, Point Crown);

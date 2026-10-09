@@ -127,6 +127,18 @@ public static class MiiImageVariants
     };
 
     /// <summary>
+    /// A Mii peeking over the edge of a card (MiiPeeker): framed like <see cref="CurrentUserWindowLive"/>, so the view's
+    /// bottom edge is the edge the peek clips lean on, at a small size.
+    /// </summary>
+    public static readonly MiiImageSpecifications PeekLive = new()
+    {
+        Name = "PeekLive",
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.small,
+        CameraVerticalOffset = 6.5f,
+    };
+
+    /// <summary>
     /// The leaderboard's podium stage (380 px tall): three whole Miis on their steps, with room under the lowest step for
     /// its name and room above the winner for tall Miis and confetti.
     /// </summary>

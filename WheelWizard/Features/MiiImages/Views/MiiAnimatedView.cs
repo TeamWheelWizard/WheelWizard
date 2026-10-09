@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Numerics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -26,6 +27,11 @@ public sealed class MiiAnimatedView : BaseMiiImage
     private static readonly TimeSpan SettledAfter = TimeSpan.FromSeconds(1.5);
 
     private const double ExitFadeSeconds = 0.08;
+
+    /// <summary>Head-mesh points <see cref="HeadMoved"/> reports: the middle of the head and the top of a typical one (hair included).</summary>
+    private static readonly Vector3 HeadMiddle = new(0f, 35f, -3.7f);
+
+    private static readonly Vector3 HeadCrown = new(0f, 72f, -3.7f);
 
     /// <summary>Once OpenGL failed for one view it will for all of them; don't make every Mii try again.</summary>
     private static bool _realtimeUnavailable;
@@ -151,6 +157,9 @@ public sealed class MiiAnimatedView : BaseMiiImage
         if (IsImageAttached)
             RefreshCurrentMii();
     }
+
+    /// <summary>See <see cref="MiiAnimatedImage.HeadMoved"/>.</summary>
+    public event Action<MiiHeadOnScreen?>? HeadMoved;
 
     /// <summary>See <see cref="MiiAnimatedImage.Play"/>.</summary>
     public void Play(IReadOnlyList<string> folders)
@@ -328,6 +337,7 @@ public sealed class MiiAnimatedView : BaseMiiImage
             MaxFramesPerSecond = MaxFramesPerSecond,
         };
         _live.MiiShown += OnLiveMiiShown;
+        _live.FrameDrawn += OnLiveFrameDrawn;
         _live.RealtimeUnavailable += _ =>
         {
             _realtimeUnavailable = true;
@@ -347,10 +357,12 @@ public sealed class MiiAnimatedView : BaseMiiImage
         _performer?.Detach();
         _performer = null;
         live.MiiShown -= OnLiveMiiShown;
+        live.FrameDrawn -= OnLiveFrameDrawn;
         _host.Children.Remove(live);
         _live = null;
         _liveStudio = _shownStudio = null;
         _leaving = _waitingToShow = false;
+        HeadMoved?.Invoke(null);
     }
 
     private void ShowStill()
@@ -358,6 +370,25 @@ public sealed class MiiAnimatedView : BaseMiiImage
         _still.ImageVariant = StillVariant ?? ImageVariant;
         _still.Mii = _mii;
         _still.IsVisible = true;
+        HeadMoved?.Invoke(null);
+    }
+
+    private void OnLiveFrameDrawn()
+    {
+        if (
+            _live is not { LastFrame.Pose.Visible: true } live
+            || _studio is null
+            || live.HeadPointOnStage(HeadMiddle) is not { } middle
+            || live.HeadPointOnStage(HeadCrown) is not { } crown
+            || live.ProjectToScreen(middle) is not { } middleOnScreen
+            || live.ProjectToScreen(crown) is not { } crownOnScreen
+        )
+        {
+            HeadMoved?.Invoke(null);
+            return;
+        }
+
+        HeadMoved?.Invoke(new MiiHeadOnScreen(middleOnScreen, crownOnScreen));
     }
 
     private void ShowLive()

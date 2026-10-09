@@ -272,6 +272,9 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
     /// <summary>Fired on the UI thread at the start of every drawn frame with the seconds since the previous one.</summary>
     public event Action<double>? FrameUpdating;
 
+    /// <summary>Fired on the UI thread after every drawn frame; <see cref="LastFrame"/> is that frame.</summary>
+    public event Action? FrameDrawn;
+
     /// <summary>Fired once each time a newly set Mii is first drawn (its head finished building), with its studio data.</summary>
     public event Action<string>? MiiShown;
 
@@ -439,6 +442,10 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
     public Vector3? HeadCenterOnStage() =>
         _lastFrame is { } frame ? Vector3.Transform(HeadCenter, MiiStage.HeadToStage(frame.Pose, frame.Setup.BodyScale)) : null;
 
+    /// <summary>Stage position of a point on the head (head-mesh units, e.g. (0, 35, -3.7) is its middle) in the last drawn pose.</summary>
+    public Vector3? HeadPointOnStage(Vector3 headPoint) =>
+        _lastFrame is { } frame ? Vector3.Transform(headPoint, MiiStage.HeadToStage(frame.Pose, frame.Setup.BodyScale)) : null;
+
     /// <summary>The camera ray through a point of this control, in stage space.</summary>
     public (Vector3 Origin, Vector3 Direction)? ScreenRay(Point point)
     {
@@ -537,6 +544,8 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             ReportUnavailable(exception.Message);
             return;
         }
+
+        FrameDrawn?.Invoke();
 
         _lastRender = now;
         if (_player.IsAnimating || IsCameraMoving || ContinuousRendering || IsPartChanging || _fadeInStart is not null)

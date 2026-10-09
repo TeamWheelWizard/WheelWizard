@@ -11,144 +11,170 @@
              x:DataType="community:VrHistoryGraph"
         xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
     <UserControl.Styles>
-        <Style Selector="Border.profileStatCard">
-            <Setter Property="Background" Value="{StaticResource Neutral900}" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Padding" Value="10" />
+        <Style Selector="TextBlock.SummaryText">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.SmallStatValue">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.SmallStatLabel">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <!-- A smaller checkbox than the default one. -->
+        <Style Selector="CheckBox.Small">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+        </Style>
+        <Style Selector="CheckBox.Small /template/ Border#Border">
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+        <Style Selector="TextBlock.AxisText">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
         </Style>
     </UserControl.Styles>
-    <Border Padding="0"
-            Margin="0"
-            Background="Transparent"
-            BorderThickness="0"
-            DataContext="{Binding RelativeSource={RelativeSource AncestorType=community:VrHistoryGraph}}">
-        <Grid RowDefinitions="Auto,Auto,*">
-            <Grid Grid.Row="0"
-                  ColumnDefinitions="*,*,*"
-                  Margin="0,0,0,8">
-                <Border Grid.Column="0" Classes="profileStatCard" Margin="0,0,4,0">
-                    <StackPanel Spacing="1">
-                        <components:FormFieldLabel Text="{loc:T attribute.start_vr}" />
-                        <SelectableTextBlock Classes="BodyText" Text="{Binding StartingVr, StringFormat='{}{0:N0}'}" />
-                    </StackPanel>
-                </Border>
 
-                <Border Grid.Column="1" Classes="profileStatCard" Margin="4,0,4,0">
-                    <StackPanel Spacing="1">
-                        <components:FormFieldLabel Text="{loc:T attribute.end_vr}" />
-                        <SelectableTextBlock Classes="BodyText" Text="{Binding EndingVr, StringFormat='{}{0:N0}'}" />
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Column="2" Classes="profileStatCard" Margin="4,0,0,0">
-                    <StackPanel Spacing="1">
-                        <components:FormFieldLabel Text="{loc:T attribute.net_change}" />
-                        <SelectableTextBlock Classes="BodyText" 
-                                             Foreground="{StaticResource Primary400}"
-                                             IsVisible="{Binding IsTotalChangeGain}" 
-                                             Text="{Binding TotalChangeText}" />
-                        <SelectableTextBlock Classes="BodyText" 
-                                             Foreground="{StaticResource Danger400}"
-                                             IsVisible="{Binding IsTotalChangeLoss}" 
-                                             Text="{Binding TotalChangeText}" />
-                        <SelectableTextBlock Classes="BodyText" 
-                                             IsVisible="{Binding IsTotalChangeNeutral}" 
-                                             Text="{Binding TotalChangeText}" />
-                    </StackPanel>
-                </Border>
-            </Grid>
-
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="*,Auto"
-                  Margin="0,0,0,8">
-                <StackPanel Grid.Column="0">
+    <StackPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=community:VrHistoryGraph}}">
+        <!-- HEADER: title with the start -> end summary, range on the right -->
+        <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                <StackPanel Orientation="Horizontal" Spacing="8">
                     <components:FormFieldLabel Text="{loc:T attribute.vr_history}" />
-                    <TextBlock Classes="TinyText" FontSize="11" Text="{Binding DateRangeText}" />
+                    <components:LoadingIcon VerticalAlignment="Center" IsVisible="{Binding IsLoading}"
+                                            Width="14" Height="14" Foreground="{StaticResource Neutral500}" />
                 </StackPanel>
-
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                    <components:LoadingIcon Margin="3,3,6,3" VerticalAlignment="Center" IsVisible="{Binding IsLoading}" Width="18" Height="18" Foreground="{StaticResource Neutral500}" />
-                    
-                    <CheckBox Classes="Switch" 
-                              Content="{loc:T attribute.enable_matches}"
-                              IsChecked="{Binding UseMatchesAsXAxis}"
-                              FontSize="12"
-                              VerticalAlignment="Center"/>
-
-                    <ComboBox x:Name="HistoryDaysDropdown"
-                              MinWidth="145"
-                              VerticalAlignment="Center"
-                              SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
+                <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,2,0,0"
+                            IsVisible="{Binding CurrentVr, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                            ToolTip.Tip="{loc:T attribute.vr_full}" Background="Transparent">
+                    <SelectableTextBlock Text="{Binding CurrentVr}" FontSize="24" FontWeight="Bold"
+                                         Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
+                    <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom" Margin="0,0,0,4" />
                 </StackPanel>
-            </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasData}">
+                    <TextBlock Classes="SummaryText" Text="{Binding StartingVr, StringFormat='{}{0:N0}'}"
+                               ToolTip.Tip="{loc:T attribute.start_vr}" />
+                    <PathIcon Data="{StaticResource ArrowRight}" Width="9" Height="9"
+                              Foreground="{StaticResource Neutral600}" VerticalAlignment="Center" />
+                    <TextBlock Classes="SummaryText" Text="{Binding EndingVr, StringFormat='{}{0:N0}'}"
+                               ToolTip.Tip="{loc:T attribute.end_vr}" />
+                    <TextBlock Classes="SummaryText" FontWeight="SemiBold" Margin="4,0,0,0"
+                               Foreground="{StaticResource Primary400}"
+                               IsVisible="{Binding IsTotalChangeGain}"
+                               Text="{Binding TotalChangeText}"
+                               ToolTip.Tip="{loc:T attribute.net_change}" />
+                    <TextBlock Classes="SummaryText" FontWeight="SemiBold" Margin="4,0,0,0"
+                               Foreground="{StaticResource Danger400}"
+                               IsVisible="{Binding IsTotalChangeLoss}"
+                               Text="{Binding TotalChangeText}"
+                               ToolTip.Tip="{loc:T attribute.net_change}" />
+                    <TextBlock Classes="SummaryText" FontWeight="SemiBold" Margin="4,0,0,0"
+                               IsVisible="{Binding IsTotalChangeNeutral}"
+                               Text="{Binding TotalChangeText}"
+                               ToolTip.Tip="{loc:T attribute.net_change}" />
+                </StackPanel>
+            </StackPanel>
 
-            <Grid Grid.Row="2"
-                  VerticalAlignment="Stretch"
-                  HorizontalAlignment="Stretch">
-                <Border IsVisible="{Binding HasData}"
-                        Background="{StaticResource Neutral900}"
-                        BorderBrush="{StaticResource Neutral900}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="8"
-                        Margin="0,0,0,8"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch">
-                    <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="TinyText" FontSize="11"
-                                   Text="{Binding GraphMaxVrText}" Margin="0,0,8,0" />
-                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="TinyText" FontSize="11"
-                                   Text="{Binding GraphMinVrText}" Margin="0,0,8,0" VerticalAlignment="Bottom" />
-
-                        <Border Grid.Row="0"
-                                Grid.Column="1"
-                                Background="{StaticResource Neutral950}"
-                                BorderBrush="{StaticResource Neutral900}"
-                                BorderThickness="1"
-                                CornerRadius="6"
-                                Padding="8">
-                            <Grid>
-                                <Border Background="{StaticResource Neutral800}" Height="1" VerticalAlignment="Top" />
-                                <Border Background="{StaticResource Neutral800}" Height="1" VerticalAlignment="Center" />
-                                <Border Background="{StaticResource Neutral800}" Height="1" VerticalAlignment="Bottom" />
-                                <Border Background="{StaticResource Neutral800}" Width="1" HorizontalAlignment="Left" />
-                                <Border Background="{StaticResource Neutral800}" Width="1" HorizontalAlignment="Center" />
-                                <Border Background="{StaticResource Neutral800}" Width="1" HorizontalAlignment="Right" />
-                                <Path Data="{Binding GraphAreaPath}" Opacity="0.30" Stretch="Fill">
-                                    <Path.Fill>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                            <GradientStop Color="{StaticResource Primary300}" Offset="0" />
-                                            <GradientStop Color="{StaticResource Primary700}" Offset="1" />
-                                        </LinearGradientBrush>
-                                    </Path.Fill>
-                                </Path>
-                                <Path Data="{Binding GraphPath}" Stroke="{StaticResource Primary400}" StrokeThickness="2"
-                                      StrokeLineCap="Round" Stretch="Fill" />
-                            </Grid>
-                        </Border>
-
-                        <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,*,*" Margin="8,6,0,0">
-                            <TextBlock Grid.Column="0" Classes="TinyText" FontSize="11" Text="{Binding GraphStartLabel}" />
-                            <TextBlock Grid.Column="1" Classes="TinyText" FontSize="11" Text="{Binding GraphMidLabel}" HorizontalAlignment="Center" />
-                            <TextBlock Grid.Column="2" Classes="TinyText" FontSize="11" Text="{Binding GraphEndLabel}" HorizontalAlignment="Right" />
-                        </Grid>
-                    </Grid>
-                </Border>
-                
-                <components:EmptyPageInfo IsVisible="{Binding HasError}"
-                                          Title="{loc:T empty_content.no_vr_history_title}"
-                                          IconData="{StaticResource Chart}"
-                                          BodyText="{Binding ErrorMessage}"
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center" />
-                
-                <components:EmptyPageInfo IsVisible="{Binding ShowNoDataState}"
-                                          Title="{loc:T empty_content.no_vr_history_title}"
-                                          IconData="{StaticResource Chart}"
-                                          BodyText="{Binding EmptyStateText}"
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center" />
-            </Grid>
+            <ComboBox Grid.Column="1" x:Name="HistoryDaysDropdown"
+                      MinWidth="145"
+                      VerticalAlignment="Top"
+                      SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
         </Grid>
-    </Border>
+
+        <!-- CHART -->
+        <Grid Height="170" Margin="0,14,0,0">
+            <Grid IsVisible="{Binding HasData}" RowDefinitions="*,Auto" ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Row="0" Grid.Column="0" Classes="AxisText"
+                           Text="{Binding GraphMaxVrText}" Margin="0,-6,8,0" />
+                <TextBlock Grid.Row="0" Grid.Column="0" Classes="AxisText"
+                           Text="{Binding GraphMinVrText}" Margin="0,0,8,-6" VerticalAlignment="Bottom" />
+
+                <Grid Grid.Row="0" Grid.Column="1">
+                    <Border Background="{StaticResource Neutral900}" Height="1" VerticalAlignment="Top" />
+                    <Border Background="{StaticResource Neutral900}" Height="1" VerticalAlignment="Center" />
+                    <Border Background="{StaticResource Neutral900}" Height="1" VerticalAlignment="Bottom" />
+                    <Path Data="{Binding GraphAreaPath}" Opacity="0.25" Stretch="Fill">
+                        <Path.Fill>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="{StaticResource Primary300}" Offset="0" />
+                                <GradientStop Color="#0003826E" Offset="1" />
+                            </LinearGradientBrush>
+                        </Path.Fill>
+                    </Path>
+                    <Path Data="{Binding GraphPath}" Stroke="{StaticResource Primary400}" StrokeThickness="2"
+                          StrokeLineCap="Round" StrokeJoin="Round" Stretch="Fill" />
+                </Grid>
+
+                <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,*,*" Margin="0,6,0,0">
+                    <TextBlock Grid.Column="0" Classes="AxisText" Text="{Binding GraphStartLabel}" />
+                    <TextBlock Grid.Column="1" Classes="AxisText" Text="{Binding GraphMidLabel}" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Classes="AxisText" Text="{Binding GraphEndLabel}" HorizontalAlignment="Right" />
+                </Grid>
+            </Grid>
+
+            <components:LoadingIcon Width="32" Height="32" Foreground="{StaticResource Neutral800}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <components:LoadingIcon.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="IsLoading" />
+                        <Binding Path="!HasData" />
+                    </MultiBinding>
+                </components:LoadingIcon.IsVisible>
+            </components:LoadingIcon>
+
+            <StackPanel IsVisible="{Binding HasError}" Spacing="4"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                <PathIcon Data="{StaticResource Chart}" Width="30" Height="30" Margin="0,0,0,6"
+                          Foreground="{StaticResource Neutral800}" />
+                <TextBlock Text="{loc:T empty_content.no_vr_history_title}" FontSize="14" FontWeight="Bold"
+                           Foreground="{StaticResource Neutral400}" HorizontalAlignment="Center" />
+                <TextBlock Text="{Binding ErrorMessage}" Classes="TinyText" MaxWidth="280"
+                           Foreground="{StaticResource Neutral500}"
+                           TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel IsVisible="{Binding ShowNoDataState}" Spacing="4"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                <PathIcon Data="{StaticResource Chart}" Width="30" Height="30" Margin="0,0,0,6"
+                          Foreground="{StaticResource Neutral800}" />
+                <TextBlock Text="{loc:T empty_content.no_vr_history_title}" FontSize="14" FontWeight="Bold"
+                           Foreground="{StaticResource Neutral400}" HorizontalAlignment="Center" />
+                <TextBlock Text="{Binding EmptyStateText}" Classes="TinyText" MaxWidth="280"
+                           Foreground="{StaticResource Neutral500}"
+                           TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Small stats on the left; the x-axis toggle on the right, under the axis it changes. -->
+        <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="4" Background="Transparent"
+                            ToolTip.Tip="{loc:T attribute.total_games_won}"
+                            IsVisible="{Binding Wins, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Classes="SmallStatValue" Text="{Binding Wins}" />
+                    <TextBlock Classes="SmallStatLabel" Text="{loc:T attribute.wins}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="4" Background="Transparent"
+                            ToolTip.Tip="{loc:T attribute.total_games_played}"
+                            IsVisible="{Binding RacesPlayed, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Classes="SmallStatValue" Text="{Binding RacesPlayed}" />
+                    <TextBlock Classes="SmallStatLabel" Text="{loc:T attribute.races_played}" />
+                </StackPanel>
+            </StackPanel>
+
+            <CheckBox Grid.Column="1" Classes="Small" VerticalAlignment="Center"
+                      Content="{loc:T attribute.date}"
+                      IsChecked="{Binding UseDateAsXAxis}" />
+        </Grid>
+    </StackPanel>
 </UserControl>

@@ -1,0 +1,65 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+        xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views">
+    <Design.PreviewWith>
+        <StackPanel Background="{StaticResource Neutral950}" Width="420">
+            <UniformGrid Rows="1" Height="96" Margin="0,30,0,0">
+                <miiImages:MiiPeeker Content="patchzy" IsActive="True" />
+                <miiImages:MiiPeeker Content="Bee" />
+                <miiImages:MiiPeeker Content="patch-she" />
+            </UniformGrid>
+            <Border Height="60" Background="{StaticResource Neutral900}" CornerRadius="12" />
+        </StackPanel>
+    </Design.PreviewWith>
+
+    <Style Selector="miiImages|MiiPeeker">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <!-- The background takes the hover over the whole spot, not just over the Mii. -->
+                <Panel Background="{TemplateBinding Background}" ClipToBounds="False">
+                    <miiImages:MiiAnimatedImage x:Name="PART_Mii"
+                                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                Mii="{TemplateBinding Mii}"
+                                                LoadingColor="Transparent"
+                                                FallBackColor="{StaticResource Neutral700}"
+                                                MaxFramesPerSecond="30"
+                                                ImageVariant="{x:Static miiVars:MiiImageVariants.PeekLive}" />
+
+                    <!-- The nametag: just the name, placed on the Mii's head from code. -->
+                    <ContentPresenter x:Name="PART_Tag"
+                                      HorizontalAlignment="Left" VerticalAlignment="Top"
+                                      IsHitTestVisible="False"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      FontSize="{TemplateBinding FontSize}"
+                                      HorizontalContentAlignment="Center" />
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="miiImages|MiiPeeker /template/ ContentPresenter#PART_Tag">
+        <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="miiImages|MiiPeeker:pointerover /template/ ContentPresenter#PART_Tag">
+        <Setter Property="Foreground" Value="{StaticResource Neutral50}" />
+    </Style>
+    <Style Selector="miiImages|MiiPeeker:focus-visible /template/ ContentPresenter#PART_Tag">
+        <Setter Property="Foreground" Value="{StaticResource Neutral50}" />
+    </Style>
+    <!-- Last, so the picked one stays teal while hovered or focused. -->
+    <Style Selector="miiImages|MiiPeeker:active /template/ ContentPresenter#PART_Tag">
+        <Setter Property="Foreground" Value="{StaticResource Primary400}" />
+    </Style>
+    <Style Selector="miiImages|MiiPeeker:disabled">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+</Styles>

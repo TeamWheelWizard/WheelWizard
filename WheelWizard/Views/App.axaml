@@ -141,5 +141,6 @@
         <StyleInclude Source="avares://WheelWizard/Features/WiiManagement/MiiManagement/Views/MiiBlock.axaml" />
         <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/WheelTrail.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/LeaderboardPodiumStep.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/MiiImages/Views/MiiPeeker.axaml" />
     </Application.Styles>
 </Application>
