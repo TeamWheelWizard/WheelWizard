@@ -267,11 +267,14 @@ public sealed partial class MiiRealtimeView
     private static string MaskLayerKey(string studio, MiiExpression expression, MiiMaskLayers layers) =>
         $"{studio}|{(int)expression}|m{(int)layers}";
 
-    /// <summary>Builds a mask layer in the background (sharing the head builder's queue).</summary>
+    /// <summary>
+    /// Gets a mask layer (some face parts, or a whole face of another expression): from the shared store, or built in
+    /// its background queue.
+    /// </summary>
     private void RequestMaskLayer(string studio, MiiExpression expression, MiiMaskLayers layers)
     {
         var key = MaskLayerKey(studio, expression, layers);
-        if (_maskLayers.ContainsKey(key) || !_buildingMaskLayers.TryAdd(key, 0))
+        if (_maskLayers.ContainsKey(key))
             return;
 
         // Drop layers of Miis that aren't around any more.
@@ -285,27 +288,32 @@ public sealed partial class MiiRealtimeView
                 _maskLayers.TryRemove(stale, out _);
         }
 
-        _ = Task.Run(async () =>
+        if (_store.TryGetMask(studio, (int)expression, layers, Detail, out var stored))
         {
-            await _buildGate.WaitAsync();
-            try
+            _maskLayers[key] = stored!;
+            return;
+        }
+
+        if (!_buildingMaskLayers.TryAdd(key, 0))
+            return;
+        _store.RequestMask(
+            studio,
+            (int)expression,
+            layers,
+            Detail,
+            wanted: () =>
             {
-                bool recent;
                 lock (_recentStudios)
-                    recent = _recentStudios.Contains(studio) || studio == _lastStudio;
-                if (!recent)
-                    return;
-                var result = _renderer.BuildMaskLayer(studio, (int)expression, layers);
-                if (result.IsSuccess)
-                    _maskLayers[key] = result.Value;
-            }
-            finally
+                    return _recentStudios.Contains(studio) || studio == _lastStudio;
+            },
+            done: mask =>
             {
-                _buildGate.Release();
+                if (mask is not null)
+                    _maskLayers[key] = mask;
                 _buildingMaskLayers.TryRemove(key, out _);
                 Dispatcher.UIThread.Post(RequestNextFrameRendering);
             }
-        });
+        );
     }
 
     #region Picking and projecting head points (of the last drawn frame)

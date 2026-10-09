@@ -73,6 +73,13 @@
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     </Style>
                 </ListBox.Styles>
+                <!-- Not virtualized: a friend list holds at most 30, and a virtualizing panel rebuilds each card (and
+                     restarts its live 3D Mii) every time it's scrolled back into view. -->
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="domain:FriendProfile">
                         <community:FriendsListItem HorizontalAlignment="Stretch" Height="124"

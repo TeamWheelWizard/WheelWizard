@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Threading;
 using MiiAnim.Core.Animation;
 using Testably.Abstractions.RandomSystem;
 using WheelWizard.MiiAnimations.Library;
@@ -49,6 +50,12 @@ public sealed class MiiAnimatedView : BaseMiiImage
     private bool _leaving;
     private bool _waitingToShow;
 
+    /// <summary>
+    /// Whether it has been on screen. Starting OpenGL for a Mii is the expensive part, so in a long list that only
+    /// happens once a card is scrolled to (and then it's kept).
+    /// </summary>
+    private bool _seen;
+
     public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty =
         MiiAnimatedImage.ImageVariantProperty.AddOwner<MiiAnimatedView>();
 
@@ -74,6 +81,15 @@ public sealed class MiiAnimatedView : BaseMiiImage
     {
         get => GetValue(PerformanceProperty);
         set => SetValue(PerformanceProperty, value);
+    }
+
+    public static readonly StyledProperty<double> MaxFramesPerSecondProperty =
+        MiiAnimatedImage.MaxFramesPerSecondProperty.AddOwner<MiiAnimatedView>();
+
+    public double MaxFramesPerSecond
+    {
+        get => GetValue(MaxFramesPerSecondProperty);
+        set => SetValue(MaxFramesPerSecondProperty, value);
     }
 
     public static readonly StyledProperty<IBrush> LoadingColorProperty = MiiAnimatedImage.LoadingColorProperty.AddOwner<MiiAnimatedView>();
@@ -114,6 +130,26 @@ public sealed class MiiAnimatedView : BaseMiiImage
         _still.MiiImageLoaded += (_, _) => MiiLoaded = true;
         _host.Children.Add(_still);
         Content = _host;
+        EffectiveViewportChanged += (_, e) =>
+        {
+            _viewport = e.EffectiveViewport;
+            CheckSeen();
+        };
+        SizeChanged += (_, _) => CheckSeen();
+    }
+
+    private Rect? _viewport;
+
+    /// <summary>Starts the live Mii the first time any of it is on screen.</summary>
+    private void CheckSeen()
+    {
+        if (_seen || _viewport is not { } viewport || Bounds.Width <= 0 || Bounds.Height <= 0)
+            return;
+        if (!new Rect(Bounds.Size).Intersects(viewport))
+            return;
+        _seen = true;
+        if (IsImageAttached)
+            RefreshCurrentMii();
     }
 
     /// <summary>See <see cref="MiiAnimatedImage.Play"/>.</summary>
@@ -134,6 +170,8 @@ public sealed class MiiAnimatedView : BaseMiiImage
             live.Specifications = ImageVariant;
             live.Invalidate();
         }
+        else if (change.Property == MaxFramesPerSecondProperty && _live is { } capped)
+            capped.MaxFramesPerSecond = MaxFramesPerSecond;
         else if (change.Property == StillVariantProperty || change.Property == ImageVariantProperty)
         {
             if (_still.IsVisible)
@@ -187,7 +225,9 @@ public sealed class MiiAnimatedView : BaseMiiImage
             return;
         if (_live is null)
         {
-            ShowStill();
+            // Not started yet because it hasn't been on screen: nothing to show (and no still picture to render).
+            if (!WantsLive)
+                ShowStill();
             return;
         }
 
@@ -216,11 +256,13 @@ public sealed class MiiAnimatedView : BaseMiiImage
     }
 
     /// <summary>Realtime when there's something to perform, OpenGL works and animations are on; otherwise a still image.</summary>
+    private bool WantsLive => Performance is not null && !_realtimeUnavailable && _settings.ENABLE_ANIMATIONS.Get();
+
     private void UpdateMode()
     {
-        var live = Performance is not null && !_realtimeUnavailable && _settings.ENABLE_ANIMATIONS.Get();
-        if (live && _live is null)
-            CreateLive();
+        var live = WantsLive;
+        if (live && _live is null && _seen)
+            QueueStart();
         else if (!live && _live is not null)
         {
             RemoveLive();
@@ -228,9 +270,63 @@ public sealed class MiiAnimatedView : BaseMiiImage
         }
     }
 
+    /// <summary>Views waiting to start their live Mii, see <see cref="QueueStart"/>.</summary>
+    private static readonly Queue<MiiAnimatedView> Starting = new();
+
+    private static bool _starting;
+    private bool _queued;
+
+    /// <summary>
+    /// A live Mii starts OpenGL on its first frame, which takes a moment on the UI thread. When many show up at once
+    /// (opening the friends page) they start one per frame, so the page opens right away and they appear one by one.
+    /// </summary>
+    private void QueueStart()
+    {
+        if (_queued)
+            return;
+        _queued = true;
+        Starting.Enqueue(this);
+        if (!_starting)
+        {
+            _starting = true;
+            StartNext();
+        }
+    }
+
+    private static void StartNext()
+    {
+        TopLevel? topLevel = null;
+        while (Starting.TryDequeue(out var view))
+        {
+            view._queued = false;
+            if (!view.IsImageAttached || !view._seen || !view.WantsLive || view._live is not null)
+                continue;
+            view.CreateLive();
+            view.OnMiiChanged(view._mii);
+            topLevel = TopLevel.GetTopLevel(view);
+            break;
+        }
+
+        if (Starting.Count == 0)
+            _starting = false;
+        else if (topLevel is not null)
+            topLevel.RequestAnimationFrame(_ => StartNext());
+        else
+            Dispatcher.UIThread.Post(StartNext, DispatcherPriority.Background);
+    }
+
     private void CreateLive()
     {
-        _live = new MiiRealtimeView(_renderer) { IsHitTestVisible = false, Specifications = ImageVariant };
+        // These Miis are small and often many at once (lists): small face textures, a capped frame rate, and a
+        // fade in of the right Mii rather than showing the previous one while it loads.
+        _live = new MiiRealtimeView(_renderer)
+        {
+            IsHitTestVisible = false,
+            Specifications = ImageVariant,
+            Detail = MiiHeadDetail.Small,
+            ShowsPreviousMii = false,
+            MaxFramesPerSecond = MaxFramesPerSecond,
+        };
         _live.MiiShown += OnLiveMiiShown;
         _live.RealtimeUnavailable += _ =>
         {

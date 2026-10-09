@@ -40,6 +40,16 @@ public static class MiiImageVariants
         CachePriority = CacheItemPriority.Low,
     };
 
+    /// <summary>The 50 px round avatars in player lists (rooms, leaderboard): a tiny render is sharp enough and 3-4x quicker.</summary>
+    public static readonly MiiImageSpecifications PlayerListAvatar = new()
+    {
+        Name = "PlayerListAvatar",
+        Expression = MiiImageSpecifications.FaceExpression.normal,
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.tiny,
+        CachePriority = CacheItemPriority.Low,
+    };
+
     public static readonly MiiImageSpecifications MiiEditorPreviewCarousel = new()
     {
         Name = "MiiEditorPreviewCarousel",

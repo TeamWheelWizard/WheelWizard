@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Numerics;
 using Avalonia;
+using Avalonia.Layout;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Threading;
@@ -36,10 +37,12 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
 
     private readonly IMiiNativeRenderer _renderer;
     private readonly Stopwatch _clock = new();
+
+    /// <summary>Normal-faced heads by <see cref="HeadKey"/>; other expressions are face masks drawn on them.</summary>
     private readonly ConcurrentDictionary<string, IReadOnlyList<HeadMeshData>> _heads = new();
     private readonly ConcurrentDictionary<string, byte> _building = new();
     private readonly Dictionary<bool, MiiRig> _rigs = new();
-    private readonly SemaphoreSlim _buildGate = new(1, 1);
+    private readonly MiiHeadStore _store;
     private readonly MiiAnimationPlayer _player = new();
     private readonly HashSet<MiiExpression> _preloadedExpressions = [];
     private readonly Dictionary<MiiAnimation, RigParticleStage> _particleStages = new();
@@ -73,6 +76,8 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
     public MiiRealtimeView(IMiiNativeRenderer renderer)
     {
         _renderer = renderer;
+        _store = MiiHeadStore.For(renderer);
+        EffectiveViewportChanged += OnEffectiveViewportChanged;
         _clock.Start();
         _player.EventReached += (clip, animEvent) =>
         {
@@ -185,6 +190,59 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
 
     private float _alpha = 1f;
 
+    /// <summary>
+    /// How sharp the face textures are. <see cref="MiiHeadDetail.Small"/> builds and uploads a quarter of the pixels,
+    /// plenty for Miis drawn small (lists, cards). Set it before the first Mii.
+    /// </summary>
+    public MiiHeadDetail Detail { get; set; } = MiiHeadDetail.Full;
+
+    /// <summary>
+    /// While a newly set Mii's head is still building, keep drawing the previous Mii (the default, so e.g. the editor
+    /// never blinks empty). Off, the view stays empty and fades the new Mii in once it's ready: right for lists,
+    /// where the previous Mii is somebody else.
+    /// </summary>
+    public bool ShowsPreviousMii { get; set; } = true;
+
+    private static readonly TimeSpan FadeInLength = TimeSpan.FromMilliseconds(180);
+    private TimeSpan? _fadeInStart;
+
+    /// <summary>
+    /// Draw at most this many frames a second while animating (0 = every display frame). Small, calm Miis look the
+    /// same at 30 and cost a fraction on a 144 Hz screen, especially with many of them on screen.
+    /// </summary>
+    public double MaxFramesPerSecond { get; set; }
+
+    private TimeSpan _lastRender;
+    private bool _waitingForFrame;
+
+    /// <summary>Scrolled out of sight (e.g. in a list): stop drawing until it comes back.</summary>
+    private bool _outOfView;
+
+    private Rect? _viewport;
+
+    private void OnEffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)
+    {
+        _viewport = e.EffectiveViewport;
+        UpdateOutOfView();
+    }
+
+    protected override void OnSizeChanged(Avalonia.Controls.SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        UpdateOutOfView();
+    }
+
+    private void UpdateOutOfView()
+    {
+        // Not laid out yet counts as in view, so it's never stuck waiting for a viewport that doesn't change.
+        var outOfView = _viewport is { } viewport && Bounds.Width > 0 && Bounds.Height > 0 && !new Rect(Bounds.Size).Intersects(viewport);
+        if (outOfView == _outOfView)
+            return;
+        _outOfView = outOfView;
+        if (!outOfView)
+            RequestNextFrameRendering();
+    }
+
     /// <summary>Keep drawing every display frame even when nothing animates (e.g. while the caller eases the camera).</summary>
     public bool ContinuousRendering { get; set; }
 
@@ -271,7 +329,7 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         lock (_recentStudios)
             foreach (var studio in _recentStudios.ToList())
             foreach (var expression in added)
-                RequestHead(studio, expression);
+                RequestFace(studio, expression);
     }
 
     private const int RecentMiiCount = 3;
@@ -299,9 +357,9 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             _retainHeads = _heads.Keys.ToHashSet();
         }
 
-        RequestHead(studio, MiiExpression.Normal);
+        RequestHead(studio);
         foreach (var expression in UsedExpressions())
-            RequestHead(studio, expression);
+            RequestFace(studio, expression);
     }
 
     /// <summary>
@@ -480,8 +538,38 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             return;
         }
 
-        if (_player.IsAnimating || IsCameraMoving || ContinuousRendering || IsPartChanging)
+        _lastRender = now;
+        if (_player.IsAnimating || IsCameraMoving || ContinuousRendering || IsPartChanging || _fadeInStart is not null)
+            RequestNextFrame();
+    }
+
+    /// <summary>Asks for the next frame, no sooner than <see cref="MaxFramesPerSecond"/> allows.</summary>
+    private void RequestNextFrame()
+    {
+        if (_outOfView)
+            return;
+        if (MaxFramesPerSecond <= 0 || Avalonia.Controls.TopLevel.GetTopLevel(this) is not { } topLevel)
+        {
             RequestNextFrameRendering();
+            return;
+        }
+
+        if (_waitingForFrame)
+            return;
+        _waitingForFrame = true;
+        topLevel.RequestAnimationFrame(OnAnimationFrame);
+    }
+
+    /// <summary>Called every display frame while waiting: draws once enough time passed (staying in step with vsync).</summary>
+    private void OnAnimationFrame(TimeSpan _)
+    {
+        _waitingForFrame = false;
+        // A little early is fine: the display frame after this one would be later than wanted.
+        var interval = TimeSpan.FromSeconds(1 / MaxFramesPerSecond) - TimeSpan.FromMilliseconds(4);
+        if (_clock.Elapsed - _lastRender >= interval)
+            RequestNextFrameRendering();
+        else
+            RequestNextFrame();
     }
 
     private MiiGpuFrame? BuildFrame(double deltaSeconds, float aspect)
@@ -489,7 +577,8 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         FrameUpdating?.Invoke(deltaSeconds);
         _player.Update(deltaSeconds);
         // Raise events after this frame, so handlers can change the Mii or play the next clip without re-entering.
-        Dispatcher.UIThread.Post(_player.RaiseEvents);
+        if (_player.HasPendingEvents)
+            Dispatcher.UIThread.Post(_player.RaiseEvents);
 
         if (_mii is null || _studioData is null)
             return null;
@@ -500,7 +589,7 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             _headsRequestedFor = _player.Current;
             if (_player.Current is { } clip)
                 foreach (var expression in MiiAnimationPlayer.ExpressionsOf(clip))
-                    RequestHead(_studioData, expression);
+                    RequestFace(_studioData, expression);
         }
 
         var pose = _player.Evaluate(RigFor(_mii));
@@ -508,10 +597,10 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             return nudged;
 
         // Use the pose's face when it's ready, otherwise the default face (built first). While the new Mii's head is
-        // still building, keep drawing the previous Mii so the view never blinks empty.
-        var (head, key) = HeadFor(pose.Expression);
+        // still building, keep drawing the previous Mii (or nothing, see ShowsPreviousMii).
+        var (head, key, face) = HeadFor(pose.Expression);
         if (head is null || !IsPartChangeReady(pose.Expression))
-            return PreviousMiiFrame(pose, aspect);
+            return ShowsPreviousMii ? PreviousMiiFrame(pose, aspect) : null;
 
         var setup = _renderer.GetRealtimeFrameSetup(_studioData, Specifications, aspect);
         if (setup.IsFailure)
@@ -521,16 +610,45 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         {
             var shown = _shownStudio = _studioData;
             Dispatcher.UIThread.Post(() => MiiShown?.Invoke(shown!));
+            if (!ShowsPreviousMii)
+                _fadeInStart = _clock.Elapsed;
         }
         _lastStudio = _studioData;
         var frameSetup = Shift(MoveCamera(setup.Value));
         return _lastFrame = new MiiGpuFrame(frameSetup, pose, head, key)
         {
-            Alpha = _alpha,
+            Alpha = _alpha * FadeIn(),
             Particles = Particles(frameSetup),
-            HeadPasses = HeadPasses(pose.Expression, head!, key!),
+            HeadPasses = WithFace(HeadPasses(pose.Expression, head!, key!), head!, key!, face),
             BodyHoverMask = BodyHoverMask,
         };
+    }
+
+    /// <summary>How far a newly shown Mii has faded in (1 when it's not fading).</summary>
+    private float FadeIn()
+    {
+        if (_fadeInStart is not { } start)
+            return 1f;
+        var t = (float)((_clock.Elapsed - start) / FadeInLength);
+        if (t < 1f)
+            return t * t * (3f - 2f * t);
+        _fadeInStart = null;
+        return 1f;
+    }
+
+    /// <summary>Draws the head's face mask as <paramref name="face"/> (another expression), if there is one.</summary>
+    private static IReadOnlyList<HeadPass>? WithFace(
+        IReadOnlyList<HeadPass>? passes,
+        IReadOnlyList<HeadMeshData> head,
+        string key,
+        MaskLayerPass? face
+    )
+    {
+        if (face is null)
+            return passes;
+        if (passes is null)
+            return [new HeadPass(key, head) { Mask = face }];
+        return passes.Select(pass => pass.Mask is null ? pass with { Mask = face } : pass).ToList();
     }
 
     private MiiGpuFrame? PreviousMiiFrame(MiiPose pose, float aspect)
@@ -635,16 +753,28 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         return rig;
     }
 
-    private (IReadOnlyList<HeadMeshData>? Head, string? Key) HeadFor(MiiExpression expression)
+    /// <summary>
+    /// The current Mii's head, and the face for <paramref name="expression"/> to draw on it (null for the normal face,
+    /// or while that face is still building: then the normal one shows meanwhile).
+    /// </summary>
+    private (IReadOnlyList<HeadMeshData>? Head, string? Key, MaskLayerPass? Face) HeadFor(MiiExpression expression)
     {
-        var key = HeadKey(_studioData!, expression);
-        if (_heads.TryGetValue(key, out var head))
-            return (head, key);
-        RequestHead(_studioData!, expression);
-        if (_heads.TryGetValue(key, out head))
-            return (head, key);
-        var fallback = HeadKey(_studioData!, MiiExpression.Normal);
-        return _heads.TryGetValue(fallback, out var normal) ? (normal, fallback) : (null, null);
+        var studio = _studioData!;
+        var key = HeadKey(studio, MiiExpression.Normal);
+        if (!_heads.TryGetValue(key, out var head))
+        {
+            RequestHead(studio);
+            if (!_heads.TryGetValue(key, out head))
+                return (null, null, null);
+        }
+
+        if (expression == MiiExpression.Normal)
+            return (head, key, null);
+        var faceKey = MaskLayerKey(studio, expression, MiiMaskLayers.All);
+        if (_maskLayers.TryGetValue(faceKey, out var face))
+            return (head, key, new MaskLayerPass(faceKey, face));
+        RequestFace(studio, expression);
+        return (head, key, null);
     }
 
     private static string HeadKey(string studio, MiiExpression expression) => $"{studio}|{(int)expression}";
@@ -659,38 +789,51 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         return used;
     }
 
-    /// <summary>Builds a head in the background (one at a time so the UI stays smooth).</summary>
-    private void RequestHead(string studio, MiiExpression expression)
+    /// <summary>
+    /// Gets a face ready: the head for the normal one, a face mask for the others (expressions only change the face
+    /// texture, so they're drawn on the same head instead of building a whole head each).
+    /// </summary>
+    private void RequestFace(string studio, MiiExpression expression)
     {
-        var key = HeadKey(studio, expression);
-        if (_heads.ContainsKey(key) || ShareHead(studio, expression) || !_building.TryAdd(key, 0))
-            return;
+        if (expression == MiiExpression.Normal)
+            RequestHead(studio);
+        else
+            RequestMaskLayer(studio, expression, MiiMaskLayers.All);
+    }
 
-        _ = Task.Run(async () =>
+    /// <summary>Gets the (normal-faced) head of a Mii: from the shared store, or built in its background queue.</summary>
+    private void RequestHead(string studio)
+    {
+        var key = HeadKey(studio, MiiExpression.Normal);
+        if (_heads.ContainsKey(key) || ShareHead(studio))
+            return;
+        if (_store.TryGetHead(studio, Detail, out var stored))
         {
-            await _buildGate.WaitAsync();
-            try
+            _heads[key] = stored;
+            return;
+        }
+
+        if (!_building.TryAdd(key, 0))
+            return;
+        _store.RequestHead(
+            studio,
+            Detail,
+            wanted: () => IsWanted(studio) && !IsNudgeSkipping(studio),
+            done: head =>
             {
-                if (!IsWanted(studio) || IsNudgeSkipping(studio))
-                    return;
-                var result = _renderer.BuildHeadModel(studio, (int)expression);
-                if (result.IsSuccess && IsWanted(studio))
-                    _heads[key] = result.Value;
-            }
-            finally
-            {
-                _buildGate.Release();
+                if (head is not null && IsWanted(studio))
+                    _heads[key] = head;
                 _building.TryRemove(key, out _);
                 Dispatcher.UIThread.Post(RequestNextFrameRendering);
             }
-        });
+        );
     }
 
     /// <summary>
     /// A Mii that only differs in height or weight has the same head: reuse an already built one (so dragging the
     /// height slider rescales the body right away instead of waiting for a head per step). True when shared.
     /// </summary>
-    private bool ShareHead(string studio, MiiExpression expression)
+    private bool ShareHead(string studio)
     {
         if (HeadOnly(studio) is not { } identity)
             return false;
@@ -699,9 +842,9 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             candidates = [.. _recentStudios.Append(_lastStudio).OfType<string>()];
         foreach (var other in candidates)
         {
-            if (other == studio || HeadOnly(other) != identity || !_heads.TryGetValue(HeadKey(other, expression), out var head))
+            if (other == studio || HeadOnly(other) != identity || !_heads.TryGetValue(HeadKey(other, MiiExpression.Normal), out var head))
                 continue;
-            _heads[HeadKey(studio, expression)] = head;
+            _heads[HeadKey(studio, MiiExpression.Normal)] = head;
             return true;
         }
 

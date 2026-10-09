@@ -103,11 +103,18 @@
                             </TextBlock.IsVisible>
                         </TextBlock>
 
+                        <!-- Soft glow: a gradient rather than a blur effect, which is costly to redraw next to the live Mii. -->
                         <Border Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" CornerRadius="99999"
-                                Opacity="0.5" HorizontalAlignment="Right"
-                                Background="{StaticResource Primary200}"
-                                Margin="0,-100,20,0"
-                                Height="175" Width="100" Effect="blur(250)">
+                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Margin="0,-100,-80,0"
+                                Height="340" Width="300" IsHitTestVisible="False">
+                            <Border.Background>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#308EFFE2" Offset="0" />
+                                    <GradientStop Color="#148EFFE2" Offset="0.5" />
+                                    <GradientStop Color="#008EFFE2" Offset="1" />
+                                </RadialGradientBrush>
+                            </Border.Background>
                             <Border.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="IsOnline" RelativeSource="{RelativeSource TemplatedParent}" />
@@ -116,7 +123,8 @@
                                 </MultiBinding>
                             </Border.IsVisible>
                             <Border.Styles>
-                                <Style Selector="Border">
+                                <!-- Only spins while shown: every card has these, mostly hidden. -->
+                                <Style Selector="Border[IsVisible=True]">
                                     <Style.Animations>
                                         <Animation Duration="0:0:5" IterationCount="INFINITE">
                                             <KeyFrame Cue="0%">
@@ -132,12 +140,20 @@
                         </Border>
 
                         <Border Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" CornerRadius="99999"
-                                Opacity="0.5" IsVisible="{TemplateBinding IsPending}" HorizontalAlignment="Right"
-                                Background="{StaticResource Warning200}"
-                                Margin="0,-100,20,0"
-                                Height="175" Width="100" Effect="blur(250)">
+                                IsVisible="{TemplateBinding IsPending}"
+                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Margin="0,-100,-80,0"
+                                Height="340" Width="300" IsHitTestVisible="False">
+                            <Border.Background>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#30FFF686" Offset="0" />
+                                    <GradientStop Color="#14FFF686" Offset="0.5" />
+                                    <GradientStop Color="#00FFF686" Offset="1" />
+                                </RadialGradientBrush>
+                            </Border.Background>
                             <Border.Styles>
-                                <Style Selector="Border">
+                                <!-- Only spins while shown: every card has these, mostly hidden. -->
+                                <Style Selector="Border[IsVisible=True]">
                                     <Style.Animations>
                                         <Animation Duration="0:0:5" IterationCount="INFINITE">
                                             <KeyFrame Cue="0%">

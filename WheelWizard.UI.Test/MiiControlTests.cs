@@ -254,14 +254,75 @@ public class MiiControlTests
         }
     }
 
-    private static IMiiImagesSingletonService InstallThemes(IMiiNativeRenderer? nativeRenderer = null)
+    [AvaloniaFact]
+    public void AnimatedMiis_OnlyStartTheirLiveViewOnceScrolledIntoView()
+    {
+        InstallThemes(animate: true);
+        var mii = MiiFactory.CreateRandomMii(new RealRandomSystem().Random.New(3));
+        var cards = Enumerable
+            .Range(0, 12)
+            .Select(_ => new MiiAnimatedImage
+            {
+                Width = 144,
+                Height = 144,
+                Mii = mii,
+                Performance = MiiPerformances.FriendOffline,
+            })
+            .ToList();
+        var panel = new StackPanel();
+        foreach (var card in cards)
+            panel.Children.Add(card);
+        var scroller = new ScrollViewer { Content = panel, Height = 300 };
+        var window = new Window
+        {
+            Content = scroller,
+            Width = 300,
+            Height = 300,
+        };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            static bool IsLive(MiiAnimatedImage card) => card.GetVisualDescendants().OfType<MiiRealtimeView>().Any();
+            Assert.True(IsLive(cards[0]));
+            Assert.False(IsLive(cards[^1]));
+            // Nothing is rendered for cards that wait to be seen (no still pictures either).
+            Assert.All(
+                cards.Where(card => !IsLive(card)),
+                card => Assert.Null(card.GetVisualDescendants().OfType<MiiImageView>().Single().Mii)
+            );
+
+            scroller.Offset = new Vector(0, panel.Bounds.Height);
+            window.UpdateLayout();
+            // Live Miis start one per frame.
+            for (var frame = 0; frame < cards.Count; frame++)
+            {
+                Avalonia.Headless.AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+                Dispatcher.UIThread.RunJobs();
+            }
+            Assert.True(IsLive(cards[^1]));
+            // Scrolled back and forth, a card keeps its live view.
+            var live = cards[0].GetVisualDescendants().OfType<MiiRealtimeView>().Single();
+            scroller.Offset = default;
+            window.UpdateLayout();
+            Assert.Same(live, cards[0].GetVisualDescendants().OfType<MiiRealtimeView>().Single());
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private static IMiiImagesSingletonService InstallThemes(IMiiNativeRenderer? nativeRenderer = null, bool animate = false)
     {
         var images = Substitute.For<IMiiImagesSingletonService>();
         images
             .GetImageAsync(Arg.Any<Mii>(), Arg.Any<MiiImageSpecifications>())
             .Returns(Task.FromResult((OperationResult<Bitmap>)new OperationError { Message = "No image" }));
         var settings = Substitute.For<ISettingsManager>();
-        settings.ENABLE_ANIMATIONS.Returns(new WhWzSetting<bool>("EnableAnimations", false));
+        settings.ENABLE_ANIMATIONS.Returns(new WhWzSetting<bool>("EnableAnimations", animate));
         new MiiControlThemes(
             images,
             Substitute.For<ISeasonalCalendar>(),

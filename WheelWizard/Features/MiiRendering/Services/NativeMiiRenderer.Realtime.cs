@@ -58,6 +58,16 @@ public enum HeadShape
     Glass = 8,
 }
 
+/// <summary>How sharp a head's textures are. Small heads (lists, cards) don't need the full-size face texture.</summary>
+public enum MiiHeadDetail
+{
+    /// <summary>512 px face texture.</summary>
+    Full,
+
+    /// <summary>256 px face texture: a quarter of the work to build and upload, for heads drawn up to ~250 px.</summary>
+    Small,
+}
+
 /// <summary>Parts painted into the face mask texture.</summary>
 [Flags]
 public enum MiiMaskLayers
@@ -92,7 +102,11 @@ public sealed partial class NativeMiiRenderer
     }
 
     /// <summary>Builds the head meshes for a Mii (studio data hex) and FFL expression id.</summary>
-    public OperationResult<List<HeadMeshData>> BuildHeadModel(string studioData, int expressionId)
+    public OperationResult<List<HeadMeshData>> BuildHeadModel(
+        string studioData,
+        int expressionId,
+        MiiHeadDetail detail = MiiHeadDetail.Full
+    )
     {
         var resourcePathResult = resourceLocator.GetFflResourcePath();
         if (resourcePathResult.IsFailure)
@@ -106,11 +120,7 @@ public sealed partial class NativeMiiRenderer
         if (charInfoResult.IsFailure)
             return charInfoResult.Error!;
 
-        var specifications = new MiiImageSpecifications
-        {
-            Size = MiiImageSpecifications.ImageSize.medium,
-            Type = MiiImageSpecifications.BodyType.all_body,
-        };
+        var specifications = new MiiImageSpecifications { Size = SizeFor(detail), Type = MiiImageSpecifications.BodyType.all_body };
         var request = BuildRequest(studioData, specifications);
         var cachedResult = GetOrCreateCachedHeadDrawParams(
             archiveResult.Value,
@@ -167,7 +177,12 @@ public sealed partial class NativeMiiRenderer
     /// The face mask of a Mii with only <paramref name="layers"/> painted in (e.g. just the eyes, or everything but
     /// them). Drawn on the head's mask mesh it lines up with the full mask, so parts can be animated on their own.
     /// </summary>
-    public OperationResult<MiiMaskLayerTexture> BuildMaskLayer(string studioData, int expressionId, MiiMaskLayers layers)
+    public OperationResult<MiiMaskLayerTexture> BuildMaskLayer(
+        string studioData,
+        int expressionId,
+        MiiMaskLayers layers,
+        MiiHeadDetail detail = MiiHeadDetail.Full
+    )
     {
         var resourcePathResult = resourceLocator.GetFflResourcePath();
         if (resourcePathResult.IsFailure)
@@ -180,7 +195,7 @@ public sealed partial class NativeMiiRenderer
             return charInfoResult.Error!;
 
         // Same resolution as the head's own mask (BuildManagedDrawParams).
-        var request = BuildRequest(studioData, new MiiImageSpecifications { Size = MiiImageSpecifications.ImageSize.medium });
+        var request = BuildRequest(studioData, new MiiImageSpecifications { Size = SizeFor(detail) });
         var resolution = request.Width <= 384 ? 256 : 512;
         var generated = new List<IntPtr>();
         using var arena = new RenderAllocationTracker();
@@ -282,9 +297,20 @@ public sealed partial class NativeMiiRenderer
         return list.ToArray();
     }
 
+    /// <summary>The image size whose mask resolution (see BuildManagedDrawParams) matches <paramref name="detail"/>.</summary>
+    private static MiiImageSpecifications.ImageSize SizeFor(MiiHeadDetail detail) =>
+        detail == MiiHeadDetail.Small ? MiiImageSpecifications.ImageSize.small : MiiImageSpecifications.ImageSize.medium;
+
     private static byte[] ToRgba(TextureData texture)
     {
         var rgba = new byte[texture.Width * texture.Height * 4];
+        // Masks and most part textures are RGBA8 already: copy them (reading texel by texel is ~10x slower).
+        if (texture.Format == FflNativeInterop.TextureFormatRgba8 && texture.PixelStride == 4 && texture.Pixels.Length >= rgba.Length)
+        {
+            Buffer.BlockCopy(texture.Pixels, 0, rgba, 0, rgba.Length);
+            return rgba;
+        }
+
         for (var y = 0; y < texture.Height; y++)
         for (var x = 0; x < texture.Width; x++)
         {

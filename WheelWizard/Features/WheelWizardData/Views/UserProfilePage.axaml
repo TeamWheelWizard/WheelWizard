@@ -189,6 +189,7 @@
                                                         Mii="{Binding CurrentMii}"
                                                         FallBackColor="{StaticResource Neutral700}"
                                                         Performance="{x:Static miiAnimations:MiiPerformances.ProfileWindow}"
+                                                        MaxFramesPerSecond="60"
                                                         ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserWindowLive}"
                                                         StillVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
 

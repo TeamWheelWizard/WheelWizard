@@ -75,6 +75,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     private static readonly Vector4 NoClip = new(-1e9f, -1e9f, 1e9f, 1e9f);
     private readonly ParticleRenderer? _particles;
 
+    /// <summary>Uniform locations never change after linking; asking the driver every draw adds up with many Miis.</summary>
+    private readonly Dictionary<(uint Program, string Name), int> _uniforms = new();
+
     // Offscreen layer for fading 3D things (see DrawFaded).
     private readonly uint _compositeProgram;
     private readonly uint _emptyVao;
@@ -305,8 +308,8 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         // The layer already holds premultiplied colour.
         _gl.BlendFuncSeparate(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha, BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
         _gl.UseProgram(_compositeProgram);
-        _gl.Uniform1(_gl.GetUniformLocation(_compositeProgram, "uTex"), 0);
-        _gl.Uniform1(_gl.GetUniformLocation(_compositeProgram, "uAlpha"), alpha);
+        _gl.Uniform1(Uniform(_compositeProgram, "uTex"), 0);
+        _gl.Uniform1(Uniform(_compositeProgram, "uAlpha"), alpha);
         _gl.ActiveTexture(TextureUnit.Texture0);
         _gl.BindTexture(TextureTarget.Texture2D, _layerTexture);
         _gl.BindVertexArray(_emptyVao);
@@ -349,11 +352,11 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
             System.Runtime.CompilerServices.Unsafe.CopyBlock(bones + i * 16, &m, 64);
         }
 
-        _gl.UniformMatrix4(_gl.GetUniformLocation(_bodyProgram, "uBones"), 16, false, bones);
-        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uHighlightMask"), 0);
-        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uHoverMask"), frame.BodyHoverMask);
+        _gl.UniformMatrix4(Uniform(_bodyProgram, "uBones"), 16, false, bones);
+        _gl.Uniform1(Uniform(_bodyProgram, "uHighlightMask"), 0);
+        _gl.Uniform1(Uniform(_bodyProgram, "uHoverMask"), frame.BodyHoverMask);
         SetVec4(_bodyProgram, "uTint", Vector4.Zero);
-        _gl.Uniform1(_gl.GetUniformLocation(_bodyProgram, "uAlpha"), alpha);
+        _gl.Uniform1(Uniform(_bodyProgram, "uAlpha"), alpha);
         _gl.Enable(EnableCap.CullFace);
         _gl.CullFace(TriangleFace.Back);
         foreach (var mesh in meshes)
@@ -377,8 +380,8 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         SetMatrix(_headProgram, "uView", setup.View);
         SetMatrix(_headProgram, "uProj", setup.Projection);
         SetMatrix(_headProgram, "uModel", Matrix4x4.CreateTranslation(pass.Offset) * setup.HeadMatrix(frame.Pose));
-        _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uAlpha"), alpha);
-        _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uTex"), 0);
+        _gl.Uniform1(Uniform(_headProgram, "uAlpha"), alpha);
+        _gl.Uniform1(Uniform(_headProgram, "uTex"), 0);
         // Faded passes blend over what is there without hiding what is drawn after them.
         _gl.DepthMask(alpha >= 0.999f);
         foreach (var mesh in meshes)
@@ -389,7 +392,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
             var isMask = data.Shape == HeadShape.Mask;
             SetVec4(_headProgram, "uTint", pass.TintShapes is null || pass.TintShapes(data.Shape) ? pass.Tint : Vector4.Zero);
             var uvOffset = isMask ? pass.MaskUvOffset : Vector2.Zero;
-            _gl.Uniform2(_gl.GetUniformLocation(_headProgram, "uUvOffset"), uvOffset.X, uvOffset.Y);
+            _gl.Uniform2(Uniform(_headProgram, "uUvOffset"), uvOffset.X, uvOffset.Y);
             SetVec4(_headProgram, "uUvClip", isMask && pass.MaskUvClip is { } clip ? clip : NoClip);
             if (data.CullMode == 1)
             {
@@ -415,13 +418,13 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
                 data.HasTangent ? data.SpecularMode : 0,
                 data.RimColor
             );
-            _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uMode"), data.ModulateMode);
+            _gl.Uniform1(Uniform(_headProgram, "uMode"), data.ModulateMode);
             SetVec4(_headProgram, "uColR", data.ColorR);
             SetVec4(_headProgram, "uColG", data.ColorG);
             SetVec4(_headProgram, "uColB", data.ColorB);
-            _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uHasTangent"), data.HasTangent ? 1 : 0);
+            _gl.Uniform1(Uniform(_headProgram, "uHasTangent"), data.HasTangent ? 1 : 0);
             var texture = isMask && maskTexture != 0 ? maskTexture : mesh.Texture;
-            _gl.Uniform1(_gl.GetUniformLocation(_headProgram, "uHasTex"), texture != 0 ? 1 : 0);
+            _gl.Uniform1(Uniform(_headProgram, "uHasTex"), texture != 0 ? 1 : 0);
             _gl.ActiveTexture(TextureUnit.Texture0);
             _gl.BindTexture(TextureTarget.Texture2D, texture);
             _gl.BindVertexArray(mesh.Vao);
@@ -636,7 +639,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
                 p.RimScale,
                 p.RimPower,
             };
-        _gl.Uniform1(_gl.GetUniformLocation(program, "uProfile"), 7, profile);
+        _gl.Uniform1(Uniform(program, "uProfile"), 7, profile);
     }
 
     private void SetMaterial(uint program, Vector3 ambient, Vector3 diffuse, Vector3 specular, float power, int specularMode, Vector3 rim)
@@ -645,43 +648,25 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         SetVec3(program, "uMatDiff", diffuse);
         SetVec3(program, "uMatSpec", specular);
         SetVec3(program, "uMatRim", rim);
-        _gl.Uniform1(_gl.GetUniformLocation(program, "uSpecPow"), power);
-        _gl.Uniform1(_gl.GetUniformLocation(program, "uSpecMode"), specularMode);
+        _gl.Uniform1(Uniform(program, "uSpecPow"), power);
+        _gl.Uniform1(Uniform(program, "uSpecMode"), specularMode);
+    }
+
+    private int Uniform(uint program, string name)
+    {
+        if (!_uniforms.TryGetValue((program, name), out var location))
+            _uniforms[(program, name)] = location = _gl.GetUniformLocation(program, name);
+        return location;
     }
 
     private void SetMatrix(uint program, string name, Matrix4x4 matrix) =>
-        _gl.UniformMatrix4(_gl.GetUniformLocation(program, name), 1, false, (float*)&matrix);
+        _gl.UniformMatrix4(Uniform(program, name), 1, false, (float*)&matrix);
 
-    private void SetVec3(uint program, string name, Vector3 v) => _gl.Uniform3(_gl.GetUniformLocation(program, name), v.X, v.Y, v.Z);
+    private void SetVec3(uint program, string name, Vector3 v) => _gl.Uniform3(Uniform(program, name), v.X, v.Y, v.Z);
 
-    private void SetVec4(uint program, string name, Vector4 v) => _gl.Uniform4(_gl.GetUniformLocation(program, name), v.X, v.Y, v.Z, v.W);
+    private void SetVec4(uint program, string name, Vector4 v) => _gl.Uniform4(Uniform(program, name), v.X, v.Y, v.Z, v.W);
 
-    private uint CreateProgram(string vertexSource, string fragmentSource)
-    {
-        var vs = Compile(ShaderType.VertexShader, vertexSource);
-        var fs = Compile(ShaderType.FragmentShader, fragmentSource);
-        var program = _gl.CreateProgram();
-        _gl.AttachShader(program, vs);
-        _gl.AttachShader(program, fs);
-        _gl.LinkProgram(program);
-        _gl.GetProgram(program, ProgramPropertyARB.LinkStatus, out var status);
-        if (status == 0)
-            throw new InvalidOperationException("Shader link failed: " + _gl.GetProgramInfoLog(program));
-        _gl.DeleteShader(vs);
-        _gl.DeleteShader(fs);
-        return program;
-    }
-
-    private uint Compile(ShaderType type, string source)
-    {
-        var shader = _gl.CreateShader(type);
-        _gl.ShaderSource(shader, source);
-        _gl.CompileShader(shader);
-        _gl.GetShader(shader, ShaderParameterName.CompileStatus, out var status);
-        if (status == 0)
-            throw new InvalidOperationException($"{type} compile failed: {_gl.GetShaderInfoLog(shader)}");
-        return shader;
-    }
+    private uint CreateProgram(string vertexSource, string fragmentSource) => GlPrograms.Create(_gl, vertexSource, fragmentSource, "Mii");
 
     private void DeleteMesh(GpuMesh mesh)
     {

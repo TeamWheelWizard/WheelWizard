@@ -57,7 +57,7 @@
                                                               LoadingColor="{StaticResource Neutral600}"
                                                               Mii="{TemplateBinding Mii}"
                                                               FallBackColor="{StaticResource Neutral600}"
-                                                              ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
+                                                              ImageVariant="{x:Static miiVars:MiiImageVariants.PlayerListAvatar}" />
                         </Border>
 
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">

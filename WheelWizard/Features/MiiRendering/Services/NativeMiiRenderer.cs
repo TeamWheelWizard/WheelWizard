@@ -190,7 +190,7 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
 
         try
         {
-            return await Task.Run(() => RenderToBuffer(mii, studioData, specifications, cancellationToken), cancellationToken);
+            return await MiiRenderWorkers.Run(() => RenderToBuffer(mii, studioData, specifications, cancellationToken), cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -211,7 +211,10 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
 
         try
         {
-            return await Task.Run(() => RenderToBuffer(mii, studioData, specifications, cancellationToken, pose), cancellationToken);
+            return await MiiRenderWorkers.Run(
+                () => RenderToBuffer(mii, studioData, specifications, cancellationToken, pose),
+                cancellationToken
+            );
         }
         catch (OperationCanceledException)
         {

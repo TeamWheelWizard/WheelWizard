@@ -281,32 +281,7 @@ internal sealed unsafe class ParticleRenderer : IDisposable
         return texture;
     }
 
-    private uint Link(string vertexSource, string fragmentSource)
-    {
-        uint Compile(ShaderType type, string source)
-        {
-            var shader = _gl.CreateShader(type);
-            _gl.ShaderSource(shader, source);
-            _gl.CompileShader(shader);
-            _gl.GetShader(shader, ShaderParameterName.CompileStatus, out var ok);
-            if (ok == 0)
-                throw new InvalidOperationException($"Particle {type} failed: {_gl.GetShaderInfoLog(shader)}");
-            return shader;
-        }
-
-        var vertex = Compile(ShaderType.VertexShader, vertexSource);
-        var fragment = Compile(ShaderType.FragmentShader, fragmentSource);
-        var program = _gl.CreateProgram();
-        _gl.AttachShader(program, vertex);
-        _gl.AttachShader(program, fragment);
-        _gl.LinkProgram(program);
-        _gl.GetProgram(program, ProgramPropertyARB.LinkStatus, out var linked);
-        _gl.DeleteShader(vertex);
-        _gl.DeleteShader(fragment);
-        if (linked == 0)
-            throw new InvalidOperationException($"Particle shader link failed: {_gl.GetProgramInfoLog(program)}");
-        return program;
-    }
+    private uint Link(string vertexSource, string fragmentSource) => GlPrograms.Create(_gl, vertexSource, fragmentSource, "Particle");
 
     public void Dispose()
     {

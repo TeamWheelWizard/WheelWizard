@@ -34,10 +34,18 @@ public interface IMiiNativeRenderer
     );
 
     /// <summary>GPU-ready head meshes (with textures) for the realtime renderer. Slow (~0.1 s); call off the UI thread.</summary>
-    OperationResult<List<HeadMeshData>> BuildHeadModel(string studioData, int expressionId);
+    OperationResult<List<HeadMeshData>> BuildHeadModel(string studioData, int expressionId, MiiHeadDetail detail = MiiHeadDetail.Full);
 
-    /// <summary>The face mask with only some parts painted in, for animating those parts on their own. Call off the UI thread.</summary>
-    OperationResult<MiiMaskLayerTexture> BuildMaskLayer(string studioData, int expressionId, MiiMaskLayers layers);
+    /// <summary>
+    /// The face mask with only some parts painted in, for animating those parts on their own (or all of them, to show
+    /// another expression on an already built head). Call off the UI thread.
+    /// </summary>
+    OperationResult<MiiMaskLayerTexture> BuildMaskLayer(
+        string studioData,
+        int expressionId,
+        MiiMaskLayers layers,
+        MiiHeadDetail detail = MiiHeadDetail.Full
+    );
 
     /// <summary>Where the face mask parts sit on the mask texture, in texture coordinates.</summary>
     OperationResult<IReadOnlyDictionary<MiiMaskLayers, Vector2[][]>> GetMaskPartQuads(string studioData);

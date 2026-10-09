@@ -51,6 +51,21 @@ public sealed class MiiAnimatedImage : MiiImageControl
         set => SetValue(PerformanceProperty, value);
     }
 
+    public static readonly StyledProperty<double> MaxFramesPerSecondProperty = AvaloniaProperty.Register<MiiAnimatedImage, double>(
+        nameof(MaxFramesPerSecond),
+        30
+    );
+
+    /// <summary>
+    /// Frame rate cap of the animated Mii. 30 suits calm idles and keeps lists of Miis cheap; use 0 (display rate)
+    /// for big, quick motion.
+    /// </summary>
+    public double MaxFramesPerSecond
+    {
+        get => GetValue(MaxFramesPerSecondProperty);
+        set => SetValue(MaxFramesPerSecondProperty, value);
+    }
+
     public static readonly StyledProperty<IBrush> LoadingColorProperty = AvaloniaProperty.Register<MiiAnimatedImage, IBrush>(
         nameof(LoadingColor),
         new SolidColorBrush(ViewUtils.Colors.Neutral900)

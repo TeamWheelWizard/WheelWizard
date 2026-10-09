@@ -202,6 +202,9 @@ public sealed class MiiAnimationPlayer
         }
     }
 
+    /// <summary>Whether <see cref="Update"/> collected events or finishes for <see cref="RaiseEvents"/>.</summary>
+    public bool HasPendingEvents => _pendingEvents.Count > 0 || _pendingFinished.Count > 0;
+
     /// <summary>Raises the events and finishes collected by <see cref="Update"/>.</summary>
     public void RaiseEvents()
     {

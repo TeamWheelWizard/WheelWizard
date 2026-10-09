@@ -275,6 +275,8 @@ public sealed class LeaderboardPodiumStage : Panel
             IsHitTestVisible = false,
             Specifications = Shot,
             Placement = HeightCorrection(place, mii),
+            // Heads are small on the stage; the motion (drops, confetti) is quick, so no frame cap.
+            Detail = MiiHeadDetail.Small,
         };
         view.SetMii(mii, studio);
         view.MiiShown += _ =>

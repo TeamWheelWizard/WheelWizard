@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using WheelWizard.Models;
 using WheelWizard.Mods.Views;
 using WheelWizard.RrRooms;
@@ -91,30 +92,61 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         UpdateFriendList();
     }
 
+    /// <summary>Cards built right away when the page opens (a screenful); the rest follow in the background.</summary>
+    private const int CardsAtOnce = 6;
+
+    /// <summary>The friends to show, in order. <see cref="FriendList"/> catches up with it card by card.</summary>
+    private List<FriendProfile> _friends = [];
+
+    private bool _addingCards;
+
     private void UpdateFriendList()
     {
-        var newList = GetSortedPlayerList();
-        // Instead of setting entire list every single time, we just update the indexes accordingly, which is faster
-        for (var i = 0; i < newList.Count; i++)
-        {
-            if (i < FriendList.Count)
-                FriendList[i] = newList[i];
-            else
-                FriendList.Add(newList[i]);
-        }
-
-        while (FriendList.Count > newList.Count)
-        {
-            FriendList.RemoveAt(FriendList.Count - 1);
-        }
-
-        ListItemCount.Text = FriendList.Count.ToString();
+        _friends = GetSortedPlayerList();
+        ApplyFriendList(Math.Max(FriendList.Count, CardsAtOnce));
+        ListItemCount.Text = _friends.Count.ToString();
         HandleVisibility();
+    }
+
+    /// <summary>
+    /// Shows the first <paramref name="count"/> friends, updating the list in place: a card (with its live Mii) is only
+    /// built for a friend that's new to the list, not on every refresh or when friends just change places. A card
+    /// takes a while to build, so the ones further down are added one at a time while the page is idle, instead of
+    /// all of them holding up the page opening.
+    /// </summary>
+    private void ApplyFriendList(int count)
+    {
+        count = Math.Min(count, _friends.Count);
+        for (var i = 0; i < count; i++)
+        {
+            var current = FriendList.IndexOf(_friends[i]);
+            if (current == i)
+                continue;
+            if (current > i)
+                FriendList.Move(current, i);
+            else
+                FriendList.Insert(i, _friends[i]);
+        }
+
+        while (FriendList.Count > count)
+            FriendList.RemoveAt(FriendList.Count - 1);
+
+        if (FriendList.Count >= _friends.Count || _addingCards)
+            return;
+        _addingCards = true;
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                _addingCards = false;
+                ApplyFriendList(FriendList.Count + 1);
+            },
+            DispatcherPriority.Background
+        );
     }
 
     private void HandleVisibility()
     {
-        var hasFriends = FriendList.Count > 0;
+        var hasFriends = _friends.Count > 0;
         VisibleWhenNoFriends.IsVisible = !hasFriends;
         VisibleWhenFriends.IsVisible = hasFriends;
         TopAddFriendButton.IsVisible = hasFriends;

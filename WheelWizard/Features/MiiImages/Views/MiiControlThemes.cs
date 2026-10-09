@@ -106,6 +106,10 @@ public sealed class MiiControlThemes(
                             view.Bind(MiiAnimatedView.ImageVariantProperty, control.GetObservable(MiiAnimatedImage.ImageVariantProperty));
                             view.Bind(MiiAnimatedView.StillVariantProperty, control.GetObservable(MiiAnimatedImage.StillVariantProperty));
                             view.Bind(MiiAnimatedView.PerformanceProperty, control.GetObservable(MiiAnimatedImage.PerformanceProperty));
+                            view.Bind(
+                                MiiAnimatedView.MaxFramesPerSecondProperty,
+                                control.GetObservable(MiiAnimatedImage.MaxFramesPerSecondProperty)
+                            );
                             view.Bind(MiiAnimatedView.LoadingColorProperty, control.GetObservable(MiiAnimatedImage.LoadingColorProperty));
                             view.Bind(MiiAnimatedView.FallBackColorProperty, control.GetObservable(MiiAnimatedImage.FallBackColorProperty));
                             view.Bind(BaseMiiImage.MiiProperty, control.GetObservable(MiiImageControl.MiiProperty));
