@@ -58,9 +58,16 @@ public sealed class MiiEditorDirector
         _player.EventReached += OnClipEvent;
     }
 
+    /// <summary>
+    /// False when animations are turned off: the Mii stands still in its rest pose, with no idles, no reactions and no
+    /// looking at the cursor.
+    /// </summary>
+    public bool Animate { get; init; } = true;
+
     /// <summary>How much the Mii may look at the cursor right now (it's busy during reactions).</summary>
     public float LookWeight =>
-        _reacting is not { } reacting ? 1f
+        !Animate ? 0f
+        : _reacting is not { } reacting ? 1f
         : Important.Contains(reacting.Reaction) ? 0f
         : 0.4f;
 
@@ -104,6 +111,8 @@ public sealed class MiiEditorDirector
     /// </summary>
     public bool React(MiiEditorReaction reaction)
     {
+        if (!Animate)
+            return false;
         var important = Important.Contains(reaction);
         if (_holdStill && !important)
             return false;
@@ -171,6 +180,13 @@ public sealed class MiiEditorDirector
     /// <summary>Idles are played once each (they all start and end in the same pose), then another one is picked.</summary>
     private void PlayIdle(double fadeSeconds)
     {
+        if (!Animate)
+        {
+            _idleClip = null;
+            _player.Stop(fadeSeconds: 0);
+            return;
+        }
+
         if (_holdStill)
         {
             _idleClip = StillClip;

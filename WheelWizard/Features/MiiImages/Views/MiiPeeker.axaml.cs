@@ -11,7 +11,7 @@ namespace WheelWizard.MiiImages.Views;
 
 /// <summary>
 /// A Mii peeking over the edge of whatever sits right below it (a card, a panel): its lower body hides behind that
-/// edge, which is this control's bottom edge. It dozes on the edge and wakes up while hovered or keyboard-focused.
+/// edge, which is this control's bottom edge. It dozes on the edge and is awake while it's the active one, hovered or keyboard-focused.
 /// <para>
 /// The <see cref="ContentControl.Content"/> is a nametag that rides on the Mii's head (it follows the head as it
 /// moves), drawn upright above the head and so partly above this control: leave some room there. It's a button, so
@@ -31,7 +31,7 @@ public class MiiPeeker : Button
 
     public static readonly StyledProperty<bool> IsActiveProperty = AvaloniaProperty.Register<MiiPeeker, bool>(nameof(IsActive));
 
-    /// <summary>The picked one of a group (shows as <c>:active</c>, e.g. a highlighted nametag).</summary>
+    /// <summary>The picked one of a group: stays awake, and shows as <c>:active</c> (e.g. a highlighted nametag).</summary>
     public bool IsActive
     {
         get => GetValue(IsActiveProperty);
@@ -74,15 +74,23 @@ public class MiiPeeker : Button
 
     static MiiPeeker()
     {
-        IsActiveProperty.Changed.AddClassHandler<MiiPeeker>((peeker, _) => peeker.PseudoClasses.Set(":active", peeker.IsActive));
+        IsActiveProperty.Changed.AddClassHandler<MiiPeeker>(
+            (peeker, _) =>
+            {
+                peeker.PseudoClasses.Set(":active", peeker.IsActive);
+                peeker.UpdatePerformance();
+            }
+        );
         AsleepPerformanceProperty.Changed.AddClassHandler<MiiPeeker>((peeker, _) => peeker.UpdatePerformance());
         AwakePerformanceProperty.Changed.AddClassHandler<MiiPeeker>((peeker, _) => peeker.UpdatePerformance());
     }
 
     protected override Type StyleKeyOverride => typeof(MiiPeeker);
 
-    /// <summary>Hovered, or focused with the keyboard (clicking focuses it too, which shouldn't keep it awake).</summary>
-    public bool IsAwake => IsPointerOver || IsFocused && PseudoClasses.Contains(":focus-visible");
+    /// <summary>
+    /// The active one, hovered, or focused with the keyboard (clicking focuses it too, which shouldn't keep it awake).
+    /// </summary>
+    public bool IsAwake => IsActive || IsPointerOver || IsFocused && PseudoClasses.Contains(":focus-visible");
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {

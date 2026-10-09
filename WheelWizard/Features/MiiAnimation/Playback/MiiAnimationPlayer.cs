@@ -103,6 +103,12 @@ public sealed class MiiAnimationPlayer
     public event Action<MiiAnimation>? Finished;
 
     /// <summary>
+    /// Raised when playback changes from outside the frame loop (a clip starts, stops or jumps), so a view that stopped
+    /// drawing because nothing moved draws again.
+    /// </summary>
+    public event Action? Changed;
+
+    /// <summary>
     /// Starts <paramref name="clip"/> from the beginning, cross-fading from whatever is showing now.
     /// One-shot clips hold their last frame when done; <see cref="Finished"/> tells you when to play the next one.
     /// </summary>
@@ -110,6 +116,7 @@ public sealed class MiiAnimationPlayer
     {
         FadeOutCurrent(fadeSeconds);
         _current = new Track(clip, loop);
+        Changed?.Invoke();
     }
 
     /// <summary>Fades back to the rest pose.</summary>
@@ -117,10 +124,15 @@ public sealed class MiiAnimationPlayer
     {
         FadeOutCurrent(fadeSeconds);
         _current = null;
+        Changed?.Invoke();
     }
 
     /// <summary>Jumps within the current clip without firing the events in between.</summary>
-    public void Seek(double frame) => _current?.JumpTo(Math.Max(0, frame));
+    public void Seek(double frame)
+    {
+        _current?.JumpTo(Math.Max(0, frame));
+        Changed?.Invoke();
+    }
 
     private void FadeOutCurrent(double fadeSeconds)
     {

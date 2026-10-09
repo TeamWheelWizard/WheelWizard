@@ -115,8 +115,6 @@ public partial class WhWzSettings : UserControl
         if (!WindowScaleDropdown.Items.Contains(selectedItemText))
             WindowScaleDropdown.Items.Add(selectedItemText);
         WindowScaleDropdown.SelectedItem = selectedItemText;
-
-        EnableAnimations.IsChecked = (bool)SettingsService.ENABLE_ANIMATIONS.Get();
     }
 
     private void RefreshLanguageDropdown()
@@ -843,7 +841,4 @@ public partial class WhWzSettings : UserControl
             _mainWindow.Refresh();
         }
     }
-
-    private void EnableAnimations_OnClick(object sender, RoutedEventArgs e) =>
-        SettingsEditing.Set(SettingsService, SettingsService.ENABLE_ANIMATIONS, EnableAnimations.IsChecked == true);
 }

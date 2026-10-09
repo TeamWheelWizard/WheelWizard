@@ -226,29 +226,6 @@
                         Margin="0,0,0,7">
                 <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
-                        <StackPanel Grid.Column="0"
-                                    Margin="0,0,16,0"
-                                    Spacing="3"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center">
-                            <components1:FormFieldLabel Text="{loc:T option.enable_animations}" />
-                            <SelectableTextBlock Classes="TinyText"
-                                       Text="{loc:T helper_text.enable_animations}"
-                                       TextAlignment="Left"
-                                       TextWrapping="Wrap" />
-                        </StackPanel>
-                        <CheckBox Grid.Column="1"
-                                  x:Name="EnableAnimations"
-                                  Classes="SwitchDark"
-                                  IsChecked="True"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Center"
-                                  Click="EnableAnimations_OnClick" />
-                    </Grid>
-                </Border>
-
-                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
-                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <components1:FormFieldLabel Grid.Column="0"
                                                     Margin="0,0,16,0"
                                                     HorizontalAlignment="Left"

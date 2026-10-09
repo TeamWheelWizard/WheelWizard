@@ -76,35 +76,16 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
         set => UseMatchesAsXAxis = !value;
     }
 
-    public static readonly StyledProperty<string?> CurrentVrProperty = AvaloniaProperty.Register<VrHistoryGraph, string?>(
-        nameof(CurrentVr)
+    public static readonly StyledProperty<double> ChartHeightProperty = AvaloniaProperty.Register<VrHistoryGraph, double>(
+        nameof(ChartHeight),
+        170
     );
 
-    /// <summary>The player's VR right now, shown big above the graph when set.</summary>
-    public string? CurrentVr
+    /// <summary>Height of the chart itself (the header and the axis labels come on top of it).</summary>
+    public double ChartHeight
     {
-        get => GetValue(CurrentVrProperty);
-        set => SetValue(CurrentVrProperty, value);
-    }
-
-    public static readonly StyledProperty<string?> WinsProperty = AvaloniaProperty.Register<VrHistoryGraph, string?>(nameof(Wins));
-
-    /// <summary>Games won, shown small under the graph when set.</summary>
-    public string? Wins
-    {
-        get => GetValue(WinsProperty);
-        set => SetValue(WinsProperty, value);
-    }
-
-    public static readonly StyledProperty<string?> RacesPlayedProperty = AvaloniaProperty.Register<VrHistoryGraph, string?>(
-        nameof(RacesPlayed)
-    );
-
-    /// <summary>Races played, shown small under the graph when set.</summary>
-    public string? RacesPlayed
-    {
-        get => GetValue(RacesPlayedProperty);
-        set => SetValue(RacesPlayedProperty, value);
+        get => GetValue(ChartHeightProperty);
+        set => SetValue(ChartHeightProperty, value);
     }
 
     public string? FriendCode

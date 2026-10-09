@@ -58,6 +58,8 @@
                              Click="SidebarRadio_OnClick" Content="WiiCompiled" IsVisible="False" />
                 <RadioButton x:Name="VideoSettingsTab" Classes="SettingsNavigationItem" Tag="VideoSettings"
                              Click="SidebarRadio_OnClick" Content="{loc:T category.dolphin}"/>
+                <RadioButton Classes="SettingsNavigationItem" Tag="GraphicsSettings"
+                             Click="SidebarRadio_OnClick" Content="{loc:T category.graphics}" />
                 <RadioButton Classes="SettingsNavigationItem" Tag="OtherSettings"
                              Click="SidebarRadio_OnClick" Content="{loc:T category.other}" />
                 <RadioButton Classes="SettingsNavigationItem" Tag="AppInfo"

@@ -19,7 +19,7 @@ using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData;
-using WheelWizard.WheelWizardData.Views;
+using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
@@ -108,7 +108,50 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         {
             _currentFriendCode = value;
             OnPropertyChanged(nameof(CurrentFriendCode));
+            OnPropertyChanged(nameof(HasFriendCode));
         }
+    }
+
+    public bool HasFriendCode => !string.IsNullOrEmpty(CurrentFriendCode);
+
+    private string _playerName = string.Empty;
+    private string _vr = string.Empty;
+    private string _wins = string.Empty;
+    private string _racesPlayed = string.Empty;
+    private BadgeVariant[] _badges = [];
+
+    /// <summary>The selected license's Mii name.</summary>
+    public string PlayerName
+    {
+        get => _playerName;
+        private set => Set(ref _playerName, value);
+    }
+
+    /// <summary>The selected license's VR, formatted (e.g. "58,850").</summary>
+    public string Vr
+    {
+        get => _vr;
+        private set => Set(ref _vr, value);
+    }
+
+    /// <summary>Games won (first places), formatted.</summary>
+    public string Wins
+    {
+        get => _wins;
+        private set => Set(ref _wins, value);
+    }
+
+    public string RacesPlayed
+    {
+        get => _racesPlayed;
+        private set => Set(ref _racesPlayed, value);
+    }
+
+    /// <summary>The selected license's community badges (show each with a <see cref="CommunityBadge"/>).</summary>
+    public BadgeVariant[] Badges
+    {
+        get => _badges;
+        private set => Set(ref _badges, value);
     }
 
     private int _currentUserIndex;
@@ -128,7 +171,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private void GreetWithMii()
     {
-        ProfileMii.ArriveWith(_hasGreeted ? PopUp : Greetings);
+        LicenseMii.ArriveWith(_hasGreeted ? PopUp : Greetings);
         _hasGreeted = true;
     }
 
@@ -139,11 +182,29 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
     private void SwapMii(int direction)
     {
         if (direction == 0 || Random.Shared.NextDouble() < PopUpChance)
-            ProfileMii.ArriveWith(PopUp, DropDown);
+            LicenseMii.ArriveWith(PopUp, DropDown);
         else if (direction > 0)
-            ProfileMii.ArriveWith(["profile/quick_appear/from_right"], ["profile/quick_exit/to_left"]);
+            LicenseMii.ArriveWith(["profile/quick_appear/from_right"], ["profile/quick_exit/to_left"]);
         else
-            ProfileMii.ArriveWith(["profile/quick_appear/from_left"], ["profile/quick_exit/to_right"]);
+            LicenseMii.ArriveWith(["profile/quick_appear/from_left"], ["profile/quick_exit/to_right"]);
+    }
+
+    #endregion
+
+    #region VR history size
+
+    /// <summary>The chart takes the room left at the bottom of the page, between these heights.</summary>
+    private const double MinChartHeight = 170;
+
+    private const double MaxChartHeight = 280;
+
+    private void FitChart()
+    {
+        var used = ProfileBody.Bounds.Height + ProfileBody.Margin.Top + ProfileBody.Margin.Bottom;
+        var spare = ProfileContent.Bounds.Height - used;
+        var height = Math.Clamp(Math.Floor(HistoryGraph.ChartHeight + spare), MinChartHeight, MaxChartHeight);
+        if (Math.Abs(height - HistoryGraph.ChartHeight) >= 1)
+            HistoryGraph.ChartHeight = height;
     }
 
     #endregion
@@ -179,6 +240,8 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         GreetWithMii();
         UpdatePage();
         DataContext = this;
+        ProfileContent.SizeChanged += (_, _) => FitChart();
+        ProfileBody.SizeChanged += (_, _) => FitChart();
         // Make sure this action gets subscribed AFTER the PopulateRegions method
         RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
     }
@@ -271,24 +334,14 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         currentPlayer = GameLicenseService.GetUserData(_currentUserIndex);
         IsPrimary = FocusedUser == _currentUserIndex;
         CurrentFriendCode = currentPlayer.FriendCode;
-        ProfileAttribFriendCode.Text = currentPlayer.FriendCode;
-        FriendCodeRow.IsVisible = !string.IsNullOrEmpty(currentPlayer.FriendCode);
-        ProfileAttribUserName.Text = currentPlayer.NameOfMii;
-        HistoryGraph.CurrentVr = currentPlayer.Vr.ToString("N0");
-        HistoryGraph.Wins = currentPlayer.Statistics.Performance.FirstPlaces.ToString("N0");
-        HistoryGraph.RacesPlayed = currentPlayer.Statistics.RaceTotals.AllRacesCount.ToString("N0");
+        PlayerName = currentPlayer.NameOfMii;
+        Vr = currentPlayer.Vr.ToString("N0");
+        Wins = currentPlayer.Statistics.Performance.FirstPlaces.ToString("N0");
+        RacesPlayed = currentPlayer.Statistics.RaceTotals.AllRacesCount.ToString("N0");
         CurrentMii = currentPlayer.Mii;
         IsOnline = currentPlayer.IsOnline;
         HasCurrentUserRoom = IsUserInLiveRoom(currentPlayer.FriendCode);
-
-        BadgeContainer.Children.Clear();
-        var badges = BadgeService.GetBadges(currentPlayer.FriendCode).Select(variant => new CommunityBadge { Variant = variant });
-        foreach (var badge in badges)
-        {
-            badge.Height = 26;
-            badge.Width = 26;
-            BadgeContainer.Children.Add(badge);
-        }
+        Badges = BadgeService.GetBadges(currentPlayer.FriendCode).ToArray();
 
         RefreshLicenseTabs();
     }
@@ -354,10 +407,10 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
             return;
 
         SetUserAsPrimary();
-        ProfileMii.Play("profile/make_primary");
+        LicenseMii.Play("profile/make_primary");
     }
 
-    private async void OpenMiiSelector_Click(object? sender, RoutedEventArgs e)
+    private async void ChangeMii_OnClick(object? sender, RoutedEventArgs e)
     {
         var availableMiis = MiiDbService.GetAllMiis();
         if (!availableMiis.Any())
@@ -457,7 +510,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         UpdatePage();
         UpdateSidebarProfileIfCurrentUser();
         if (changeNameResult.IsSuccess)
-            ProfileMii.Play("profile/rename");
+            LicenseMii.Play("profile/rename");
     }
 
     private void UpdateSidebarProfileIfCurrentUser()
@@ -485,10 +538,18 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new(propertyName));
     }
 
+    private void Set<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+            return;
+        field = value;
+        OnPropertyChanged(propertyName);
+    }
+
     #endregion
 }
 
-/// <summary>A license with a Mii, peeking over the profile card.</summary>
+/// <summary>A license with a Mii, peeking over the license card.</summary>
 public sealed class LicenseTab(int index) : INotifyPropertyChanged
 {
     private Mii? _mii;

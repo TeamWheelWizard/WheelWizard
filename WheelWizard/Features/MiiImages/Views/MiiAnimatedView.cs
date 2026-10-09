@@ -216,12 +216,27 @@ public sealed class MiiAnimatedView : BaseMiiImage
         OnMiiChanged(Mii);
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _settings.ENABLE_ANIMATIONS.Changed += OnAnimationsSettingChanged;
+    }
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
+        _settings.ENABLE_ANIMATIONS.Changed -= OnAnimationsSettingChanged;
         // A list may hand this card a different Mii when it comes back; start that one fresh.
         RemoveLive();
     }
+
+    /// <summary>Animations turned off or on: becomes a still picture, or comes back to life.</summary>
+    private void OnAnimationsSettingChanged(Settings.Types.Setting _) =>
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (IsImageAttached)
+                UpdateMode();
+        });
 
     protected override void OnMiiChanged(Mii? newMii)
     {

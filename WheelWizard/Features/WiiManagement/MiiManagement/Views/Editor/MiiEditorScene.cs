@@ -450,7 +450,7 @@ public sealed class MiiEditorScene : Grid
     private Actor AddActor(Mii mii, bool isGirl)
     {
         var view = new MiiRealtimeView(_renderer) { IsHitTestVisible = false, Specifications = _shot };
-        var director = new MiiEditorDirector(view.Player, _library, _random);
+        var director = new MiiEditorDirector(view.Player, _library, _random) { Animate = Animate };
         var actor = new Actor(view, director, isGirl) { Mii = mii };
         view.FrameUpdating += delta => OnFrame(actor, delta);
         view.RealtimeUnavailable += _ => SwitchToImages();

@@ -691,6 +691,7 @@ en:
     must_set_game_path: "You must select your Mario Kart Wii game file before you can start playing WiiCompiled"
   category:
     dolphin: "Dolphin"
+    graphics: "Graphics"
     about: "About"
     other: "Other"
     general: "General"

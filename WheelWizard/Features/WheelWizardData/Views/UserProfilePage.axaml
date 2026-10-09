@@ -7,13 +7,14 @@
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
              xmlns:miiAnimations="using:WheelWizard.MiiAnimations"
+             xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
+             xmlns:domain="clr-namespace:WheelWizard.WheelWizardData.Domain"
              x:Class="WheelWizard.WheelWizardData.Views.UserProfilePage"
              x:DataType="community:UserProfilePage"
-        xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
         xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
     <UserControl.Styles>
-        <!-- MII WINDOW -->
-        <Style Selector="Border.ProfileWindow">
+        <!-- THE LICENSE: one card, photo on the left, the card face on the right -->
+        <Style Selector="Border.License">
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
             <Setter Property="BorderBrush" Value="{StaticResource Neutral900}" />
             <Setter Property="BorderThickness" Value="1" />
@@ -25,18 +26,29 @@
                 </Transitions>
             </Setter>
         </Style>
-        <Style Selector="Border.ProfileWindow.Online">
+        <Style Selector="Border.License.Online">
             <Setter Property="BorderBrush" Value="{StaticResource Primary600}" />
         </Style>
 
-        <Style Selector="components|Button.WindowAction">
-            <Setter Property="Width" Value="34" />
-            <Setter Property="Height" Value="34" />
+        <Style Selector="components|Button.PhotoAction">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="IconSize" Value="18" />
+            <Setter Property="IconSize" Value="16" />
             <Setter Property="CornerRadius" Value="9999" />
         </Style>
 
+        <Style Selector="TextBlock.StatValue">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.StatLabel">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
     </UserControl.Styles>
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -67,10 +79,10 @@
         <ScrollViewer Grid.Row="1" x:Name="ProfileContent" Margin="0,0,0,1"
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- Room at the top for the nametags on the peeking Miis. -->
-            <StackPanel Margin="4,34,4,20">
+            <StackPanel x:Name="ProfileBody" Margin="4,34,4,20">
 
-                <!-- LICENSES: their Miis peek over the top of the card and hide behind it -->
-                <ItemsControl x:Name="LicensePeekers" ItemsSource="{Binding LicenseTabs}" Height="96">
+                <!-- LICENSES: their Miis peek over the top of the license and hide behind it -->
+                <ItemsControl ItemsSource="{Binding LicenseTabs}" Height="96">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Rows="1" />
@@ -91,123 +103,175 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- MII WINDOW -->
-                <Border Classes="ProfileWindow" Classes.Online="{Binding IsOnline}" Height="216">
-                    <Grid>
-                        <!-- Soft light behind the Mii while it's online. A gradient rather than a blur effect,
-                             which is costly to redraw next to the live Mii. -->
-                        <Border Width="340" Height="300" CornerRadius="9999"
-                                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-140"
-                                IsVisible="{Binding IsOnline}" IsHitTestVisible="False">
-                            <Border.Background>
-                                <RadialGradientBrush>
-                                    <GradientStop Color="#448EFFE2" Offset="0" />
-                                    <GradientStop Color="#188EFFE2" Offset="0.5" />
-                                    <GradientStop Color="#008EFFE2" Offset="1" />
-                                </RadialGradientBrush>
-                            </Border.Background>
-                            <Border.Styles>
-                                <Style Selector="Border[IsVisible=True]">
-                                    <Style.Animations>
-                                        <Animation Duration="0:0:3" IterationCount="INFINITE"
-                                                   PlaybackDirection="Alternate" Easing="SineEaseInOut">
-                                            <KeyFrame Cue="0%">
-                                                <Setter Property="Opacity" Value="0.65" />
-                                            </KeyFrame>
-                                            <KeyFrame Cue="100%">
-                                                <Setter Property="Opacity" Value="1" />
-                                            </KeyFrame>
-                                        </Animation>
-                                    </Style.Animations>
-                                </Style>
-                            </Border.Styles>
-                        </Border>
+                <!-- THE LICENSE. Fixed height: the photo has to stay at least as wide as it is tall, or the Mii no
+                     longer lines up with the bottom edge it stands behind. -->
+                <Border Classes="License" Classes.Online="{Binding IsOnline}" Height="176">
+                    <Grid ColumnDefinitions="176,*">
 
-                        <!-- The card is a window the Mii stands behind: its bottom edge is the sill. -->
-                        <miiImages:MiiAnimatedImage x:Name="ProfileMii"
-                                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                    Mii="{Binding CurrentMii}"
-                                                    FallBackColor="{StaticResource Neutral700}"
-                                                    Performance="{x:Static miiAnimations:MiiPerformances.ProfileWindow}"
-                                                    MaxFramesPerSecond="60"
-                                                    ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserWindowLive}"
-                                                    StillVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
+                        <!-- PHOTO: the Mii stands behind the card's bottom edge, like in a window -->
+                        <Panel Grid.Column="0" ClipToBounds="True">
+                            <Panel.Background>
+                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                    <GradientStop Color="{StaticResource Neutral800}" Offset="0" />
+                                    <GradientStop Color="#3A3D49" Offset="1" />
+                                </LinearGradientBrush>
+                            </Panel.Background>
 
-                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12,10"
-                                    Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsOnline}">
-                            <Ellipse Width="7" Height="7" Fill="{StaticResource Primary300}" VerticalAlignment="Center" />
-                            <TextBlock Text="{loc:T attribute.status_online}" FontSize="12"
-                                       Foreground="{StaticResource Primary200}" VerticalAlignment="Center" />
-                        </StackPanel>
+                            <!-- Soft light behind the Mii while it's online. A gradient rather than a blur effect,
+                                 which is costly to redraw next to the live Mii. -->
+                            <Border Width="260" Height="240" CornerRadius="9999"
+                                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-120"
+                                    IsVisible="{Binding IsOnline}" IsHitTestVisible="False">
+                                <Border.Background>
+                                    <RadialGradientBrush>
+                                        <GradientStop Color="#448EFFE2" Offset="0" />
+                                        <GradientStop Color="#188EFFE2" Offset="0.5" />
+                                        <GradientStop Color="#008EFFE2" Offset="1" />
+                                    </RadialGradientBrush>
+                                </Border.Background>
+                                <Border.Styles>
+                                    <Style Selector="Border[IsVisible=True]">
+                                        <Style.Animations>
+                                            <Animation Duration="0:0:3" IterationCount="INFINITE"
+                                                       PlaybackDirection="Alternate" Easing="SineEaseInOut">
+                                                <KeyFrame Cue="0%">
+                                                    <Setter Property="Opacity" Value="0.65" />
+                                                </KeyFrame>
+                                                <KeyFrame Cue="100%">
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </KeyFrame>
+                                            </Animation>
+                                        </Style.Animations>
+                                    </Style>
+                                </Border.Styles>
+                            </Border>
 
-                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8" Spacing="6">
-                            <components:Button Classes="WindowAction"
-                                               IconData="{StaticResource Shirt}"
-                                               ToolTip.Tip="{loc:T action.change_mii}"
-                                               Click="OpenMiiSelector_Click" />
-                            <components:Button Classes="WindowAction" x:Name="ViewRoomButton"
-                                               Variant="Primary"
-                                               IconData="{StaticResource Road}"
-                                               ToolTip.Tip="{loc:T action.view_room}"
-                                               IsVisible="{Binding HasCurrentUserRoom}"
-                                               Click="ViewRoom_OnClick" />
-                        </StackPanel>
+                            <miiImages:MiiAnimatedImage x:Name="LicenseMii"
+                                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                        Mii="{Binding CurrentMii}"
+                                                        LoadingColor="Transparent"
+                                                        FallBackColor="{StaticResource Neutral600}"
+                                                        Performance="{x:Static miiAnimations:MiiPerformances.ProfileWindow}"
+                                                        MaxFramesPerSecond="60"
+                                                        ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserWindowLive}"
+                                                        StillVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
 
-                        <StackPanel x:Name="BadgeContainer" Orientation="Horizontal" Spacing="3"
-                                    HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" />
+                            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="11,10"
+                                        Orientation="Horizontal" Spacing="5" IsVisible="{Binding IsOnline}">
+                                <Ellipse Width="7" Height="7" Fill="{StaticResource Primary300}" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T attribute.status_online}" FontSize="12"
+                                           Foreground="{StaticResource Primary200}" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="7" Spacing="6">
+                                <components:Button Classes="PhotoAction"
+                                                   IconData="{StaticResource Shirt}"
+                                                   ToolTip.Tip="{loc:T action.change_mii}"
+                                                   Click="ChangeMii_OnClick" />
+                                <components:Button Classes="PhotoAction"
+                                                   Variant="Primary"
+                                                   IconData="{StaticResource Road}"
+                                                   ToolTip.Tip="{loc:T action.view_room}"
+                                                   IsVisible="{Binding HasCurrentUserRoom}"
+                                                   Click="ViewRoom_OnClick" />
+                            </StackPanel>
+                        </Panel>
+
+                        <!-- CARD FACE -->
+                        <Grid Grid.Column="1" Margin="18,15,14,13" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
+
+                            <!-- Name. Left aligned, so a long name trims instead of pushing the pen away. -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                                <SelectableTextBlock Grid.Column="0" Text="{Binding PlayerName}"
+                                                     FontSize="20" FontWeight="Bold"
+                                                     Foreground="{StaticResource Neutral50}"
+                                                     TextTrimming="CharacterEllipsis"
+                                                     VerticalAlignment="Center" />
+                                <components:LinkButton Grid.Column="1" VerticalAlignment="Center" Margin="8,1,0,0"
+                                                       IconData="{StaticResource Pen}" IconSize="13"
+                                                       ToolTip.Tip="{loc:T action.rename}"
+                                                       Click="RenameMii_OnClick"
+                                                       Foreground="{StaticResource Neutral600}"
+                                                       HoverForeground="{StaticResource Neutral300}" />
+                            </Grid>
+
+                            <!-- Friend code: the license number -->
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="0,1,0,0"
+                                        IsVisible="{Binding HasFriendCode}">
+                                <SelectableTextBlock Text="{Binding CurrentFriendCode}" FontSize="13"
+                                                     LetterSpacing="0.6"
+                                                     Foreground="{StaticResource Neutral400}"
+                                                     VerticalAlignment="Center" />
+                                <components:LinkButton VerticalAlignment="Center"
+                                                       IconData="{StaticResource Copy}" IconSize="12"
+                                                       ToolTip.Tip="{loc:T action.copy_friend_code}"
+                                                       Click="CopyFriendCode_OnClick"
+                                                       Foreground="{StaticResource Neutral600}"
+                                                       HoverForeground="{StaticResource Neutral300}" />
+                            </StackPanel>
+
+                            <!-- VR: the number that matters -->
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="5"
+                                        Background="Transparent" ToolTip.Tip="{loc:T attribute.vr_full}">
+                                <SelectableTextBlock Text="{Binding Vr}" FontSize="30" FontWeight="Bold"
+                                                     Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
+                                <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom"
+                                           Margin="0,0,0,6" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="14" Margin="0,-1,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="4" Background="Transparent"
+                                            ToolTip.Tip="{loc:T attribute.total_games_won}">
+                                    <TextBlock Classes="StatValue" Text="{Binding Wins}" />
+                                    <TextBlock Classes="StatLabel" Text="{loc:T attribute.wins}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="4" Background="Transparent"
+                                            ToolTip.Tip="{loc:T attribute.total_games_played}">
+                                    <TextBlock Classes="StatValue" Text="{Binding RacesPlayed}" />
+                                    <TextBlock Classes="StatLabel" Text="{loc:T attribute.races_played}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Footer: primary on the left, badges (the endorsements) on the right -->
+                            <Grid Grid.Row="5" ColumnDefinitions="*,Auto" Margin="0,12,0,0" MinHeight="24">
+                                <Panel Grid.Column="0" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding IsPrimary}"
+                                                Background="Transparent" ToolTip.Tip="{loc:T hover.primary_profile}">
+                                        <PathIcon Data="{StaticResource StarIcon}" Width="11" Height="11"
+                                                  Foreground="{StaticResource Primary400}" VerticalAlignment="Center" />
+                                        <TextBlock Text="{loc:T state.primary}" FontSize="12" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource Primary300}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <components:LinkButton Text="{loc:T option.make_primary}" FontSize="12"
+                                                           IconData="{StaticResource EmptyStarIcon}" IconSize="11"
+                                                           ToolTip.Tip="{loc:T hover.primary_profile}"
+                                                           Foreground="{StaticResource Neutral400}"
+                                                           HoverForeground="{StaticResource Neutral200}"
+                                                           IsVisible="{Binding !IsPrimary}"
+                                                           Click="MakePrimary_OnClick" />
+                                </Panel>
+
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding Badges}"
+                                              VerticalAlignment="Center" Margin="8,0,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="4" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="domain:BadgeVariant">
+                                            <community:CommunityBadge Variant="{Binding}" Width="24" Height="24" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Border>
 
-                <!-- NAME & FRIEND CODE -->
-                <Grid ColumnDefinitions="*,Auto" Margin="2,14,2,0">
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <SelectableTextBlock x:Name="ProfileAttribUserName"
-                                                 FontSize="22" FontWeight="Bold"
-                                                 Foreground="{StaticResource Neutral50}"
-                                                 VerticalAlignment="Center" />
-                            <components:LinkButton VerticalAlignment="Center" x:Name="EditMiiName"
-                                                   IconData="{StaticResource Pen}" IconSize="14"
-                                                   ToolTip.Tip="{loc:T action.rename}"
-                                                   Click="RenameMii_OnClick"
-                                                   Foreground="{StaticResource Neutral600}"
-                                                   HoverForeground="{StaticResource Neutral300}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="6" x:Name="FriendCodeRow">
-                            <SelectableTextBlock x:Name="ProfileAttribFriendCode" FontSize="13"
-                                                 Foreground="{StaticResource Neutral400}"
-                                                 VerticalAlignment="Center" />
-                            <components:LinkButton VerticalAlignment="Center" x:Name="CopyFcButton"
-                                                   IconData="{StaticResource Copy}" IconSize="12"
-                                                   ToolTip.Tip="{loc:T action.copy_friend_code}"
-                                                   Click="CopyFriendCode_OnClick"
-                                                   Foreground="{StaticResource Neutral600}"
-                                                   HoverForeground="{StaticResource Neutral300}" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <Panel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding IsPrimary}"
-                                    Background="Transparent" ToolTip.Tip="{loc:T hover.primary_profile}">
-                            <PathIcon Data="{StaticResource StarIcon}" Width="12" Height="12"
-                                      Foreground="{StaticResource Primary400}" VerticalAlignment="Center" />
-                            <TextBlock Text="{loc:T state.primary}" FontSize="13" FontWeight="SemiBold"
-                                       Foreground="{StaticResource Primary300}" VerticalAlignment="Center" />
-                        </StackPanel>
-                        <components:LinkButton Text="{loc:T option.make_primary}" FontSize="13"
-                                               IconData="{StaticResource EmptyStarIcon}" IconSize="12"
-                                               ToolTip.Tip="{loc:T hover.primary_profile}"
-                                               Foreground="{StaticResource Neutral400}"
-                                               HoverForeground="{StaticResource Neutral200}"
-                                               IsVisible="{Binding !IsPrimary}"
-                                               Click="MakePrimary_OnClick" />
-                    </Panel>
-                </Grid>
-
-                <Border Background="{StaticResource BackgroundLineColor}" Height="1" Opacity="0.6" Margin="2,16,2,16" />
-
-                <!-- VR HISTORY -->
-                <ContentControl x:Name="HistoryHost" HorizontalContentAlignment="Stretch" Margin="2,0" />
+                <!-- VR HISTORY: gets the rest of the page (the chart grows to fill it, see code-behind) -->
+                <ContentControl x:Name="HistoryHost" HorizontalContentAlignment="Stretch" Margin="2,26,2,0" />
             </StackPanel>
         </ScrollViewer>
 

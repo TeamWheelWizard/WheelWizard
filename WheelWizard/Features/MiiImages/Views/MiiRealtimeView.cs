@@ -90,6 +90,9 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             if (ReferenceEquals(clip, _animation))
                 AnimationFinished?.Invoke();
         };
+        // A clip that starts after the last one ended (e.g. the next idle) has to be drawn: nothing moved, so the view
+        // may have stopped asking for frames.
+        _player.Changed += RequestNextFrame;
     }
 
     /// <summary>Camera framing, character rotation and zoom, same meaning as for rendered images.</summary>
