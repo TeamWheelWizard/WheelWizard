@@ -7,6 +7,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using WheelWizard.Settings.Views;
 using WheelWizard.Views.Shell.Controls;
 
 namespace WheelWizard.Views.Shell;
@@ -27,7 +28,7 @@ public partial class Layout
     private bool _sidebarCollapsed;
     private readonly SemaphoreSlim _sidebarAnimation = new(1, 1);
 
-    /// <summary>A full-width page is open: the sidebar stays collapsed and its toggle is greyed out.</summary>
+    /// <summary>A full-width page is open: the sidebar stays collapsed and its toggle shows a lock.</summary>
     private bool _sidebarLocked;
 
     private async Task LockSidebarAsync(bool locked)
@@ -51,6 +52,8 @@ public partial class Layout
         if (change.Property == SidebarWidthProperty && CompleteGrid != null)
         {
             CompleteGrid.ColumnDefinitions[0].Width = new GridLength(SidebarWidth);
+            if (ContentArea.Content is SettingsPage settingsPage)
+                settingsPage.UpdateNavigationWidth(SidebarWidth);
             // Follow the animated width so the portrait does not jump when labels are hidden.
             var collapsedProgress = Math.Clamp((221 - SidebarWidth) / (221 - 64), 0, 1);
             SidebarMii.Margin = new Thickness(-7 - 10 * collapsedProgress, 0, 0, 1);

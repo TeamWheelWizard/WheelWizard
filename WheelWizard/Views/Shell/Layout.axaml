@@ -395,7 +395,6 @@
                 </Style>
                 <!-- A full-width page (the Mii editor) keeps the sidebar closed. -->
                 <Style Selector="Button#SidebarToggle.locked">
-                    <Setter Property="Opacity" Value="0.35" />
                     <Setter Property="Cursor" Value="Arrow" />
                 </Style>
             </Button.Styles>

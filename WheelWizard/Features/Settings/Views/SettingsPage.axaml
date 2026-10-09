@@ -22,6 +22,7 @@
 
         <Grid Grid.Row="1" x:Name="SettingsBody" ColumnDefinitions="157,*" Margin="0,0,0,1">
         <Border x:Name="SettingsNavigation" Background="{StaticResource BackgroundColor}"
+                ClipToBounds="True"
                 BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,0,1,0"
                 CornerRadius="0">
             <Border.Styles>
@@ -49,7 +50,7 @@
                     <Setter Property="Foreground" Value="{StaticResource Primary400}" />
                 </Style>
             </Border.Styles>
-            <Grid RowDefinitions="*,Auto">
+            <Grid RowDefinitions="*,Auto" Width="157" HorizontalAlignment="Right">
             <ScrollViewer Grid.Row="0" Margin="8,8,8,12" HorizontalScrollBarVisibility="Disabled">
             <StackPanel Orientation="Vertical" x:Name="SettingPages" VerticalAlignment="Top" HorizontalAlignment="Stretch" Spacing="4">
                 <RadioButton Classes="SettingsNavigationItem" Tag="WhWzSettings"

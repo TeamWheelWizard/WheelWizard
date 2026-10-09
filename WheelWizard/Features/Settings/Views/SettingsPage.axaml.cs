@@ -11,6 +11,9 @@ namespace WheelWizard.Settings.Views;
 
 public partial class SettingsPage : UserControl
 {
+    public void UpdateNavigationWidth(double mainSidebarWidth) =>
+        SettingsBody.ColumnDefinitions[0].Width = new GridLength(Math.Clamp(221 - mainSidebarWidth, 0, 157));
+
     private IPopupFactory Popups { get; }
 
     private ISettingsManager SettingsService { get; }

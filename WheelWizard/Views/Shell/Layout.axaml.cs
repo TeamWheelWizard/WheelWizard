@@ -315,6 +315,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
         ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms || isMiisToEditor || isEditorToMiis ? RoomsPageTransition : null;
         ContentArea.IsTransitionReversed = isDetailsToRooms || isEditorToMiis;
+        if (page is SettingsPage settingsPage)
+            settingsPage.UpdateNavigationWidth(SettingsService.ENABLE_ANIMATIONS.Get() ? SidebarWidth : 64);
         ContentArea.Content = page;
         UpdateSidebarSelection(page);
         _ = LockSidebarAsync(page is IFullWidthPage || page is SettingsPage);

@@ -276,6 +276,7 @@ public class ApplicationCompositionTests
                 Assert.False(toggle.IsEnabled);
                 Assert.True(original.FindControl<PathIcon>("SidebarLock")!.IsVisible);
                 Assert.False(original.FindControl<PathIcon>("SidebarChevron")!.IsVisible);
+                Assert.Equal(1, toggle.Opacity);
                 var settingsPage = Assert.IsType<SettingsPage>(navigation.CurrentPage);
                 var sidebarSurface = settingsPage.FindControl<Border>("SettingsNavigation")!;
                 var settingsBody = settingsPage.FindControl<Grid>("SettingsBody")!;
@@ -283,6 +284,16 @@ public class ApplicationCompositionTests
                 Assert.Equal(new Thickness(0, 0, 1, 0), sidebarSurface.BorderThickness);
                 Assert.Equal(0, sidebarSurface.CornerRadius.TopLeft);
                 Assert.Equal(157, sidebarSurface.Bounds.Width);
+                var settingsContent = settingsPage.FindControl<ContentControl>("SettingsContent")!;
+                var contentX = settingsContent.TranslatePoint(new Point(), original)!.Value.X;
+                foreach (var width in new[] { 221d, 180d, 120d, 64d })
+                {
+                    original.SidebarWidth = width;
+                    original.UpdateLayout();
+                    Assert.Equal(221 - width, sidebarSurface.Bounds.Width);
+                    Assert.Equal(contentX, settingsContent.TranslatePoint(new Point(), original)!.Value.X, precision: 1);
+                }
+                Assert.True(sidebarSurface.ClipToBounds);
                 var headerDivider = settingsPage
                     .FindControl<Grid>("SettingsRoot")!
                     .Children.OfType<Border>()
