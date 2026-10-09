@@ -148,7 +148,7 @@
 
                             <miiImages:MiiAnimatedImage x:Name="LicenseMii"
                                                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                        Mii="{Binding CurrentMii}"
+                                                        Mii="{Binding PhotoMii}"
                                                         LoadingColor="Transparent"
                                                         FallBackColor="{StaticResource Neutral600}"
                                                         Performance="{x:Static miiAnimations:MiiPerformances.ProfileWindow}"

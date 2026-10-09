@@ -349,7 +349,6 @@
                                                   Click="ViewRoom_OnClick" />
                                         <Separator IsVisible="{Binding IsOnline}" />
                                         <MenuItem Header="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" />
-                                        <MenuItem Header="{loc:T action.view_mii}" Click="ViewMii_OnClick" />
                                         <MenuItem Header="{loc:T action.view_profile}" Click="ViewProfile_OnClick" />
                                         <MenuItem Header="View player on RWFC" Click="ViewOnRwfc_OnClick" />
                                         <Separator />

@@ -128,7 +128,6 @@ it:
     browse: "Cerca"
     view_mod: "Visualizza"
     save_external_mii: "Aggiungi Mii a \"I Miei Mii\""
-    view_mii: "Vedi Mii"
     duplicate: "Duplica"
     back: "Ritorna"
     unfavorite: "Rimuovi dai Favoriti"
@@ -165,7 +164,6 @@ it:
     mod_browser: "Ricercatore delle mod"
     mii_selector: "Selettore Mi"
     mii_editor: "Creatore Mii"
-    mii_carousel: "Visualizzatore Mii"
   text:
     made_by_string: |-
       Fatto da: %{firstAuthor}

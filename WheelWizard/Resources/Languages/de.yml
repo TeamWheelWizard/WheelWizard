@@ -146,7 +146,6 @@ de:
     change: "Ändern"
     view_mod: "Mod ansehen"
     save_external_mii: "Mii zu \"Meine Miis\" hinzufügen"
-    view_mii: "Mii ansehen"
     view_profile: "Profil ansehen"
     duplicate: "Duplizieren"
     back: "Zurück"
@@ -187,7 +186,6 @@ de:
     mod_browser: "Mod Browser"
     mii_selector: "Mii auswählen"
     mii_editor: "Mii Maker"
-    mii_carousel: "Mii-Vorschau"
   text:
     made_by_string: |-
       Erstellt von: %{firstAuthor}

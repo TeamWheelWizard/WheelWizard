@@ -8,6 +8,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using WheelWizard.CustomCharacters;
 using WheelWizard.CustomDistributions;
+using WheelWizard.MiiImages.Domain;
 using WheelWizard.Models.Enums;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
@@ -37,6 +38,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private LicenseProfile? currentPlayer;
     private Mii? _currentMii;
+    private Mii? _photoMii;
     private bool _isOnline;
     private bool _hasCurrentUserRoom;
     private bool _isPrimary;
@@ -67,9 +69,14 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         set
         {
             _currentMii = value;
+            _photoMii = LockedMii.For(value);
             OnPropertyChanged(nameof(CurrentMii));
+            OnPropertyChanged(nameof(PhotoMii));
         }
     }
+
+    /// <summary>The Mii in the license photo: <see cref="CurrentMii"/>, or the locked Mii when the license has none.</summary>
+    public Mii? PhotoMii => _photoMii;
 
     public bool IsOnline
     {
@@ -323,7 +330,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         {
             var miiName = user.Mii?.Name.ToString() ?? SettingValues.NoName;
             tab.DisplayName = miiName == SettingValues.NoName ? t("state.no_name") : miiName;
-            tab.Mii = user.Mii;
+            tab.Mii = LockedMii.For(user.Mii);
             tab.IsPrimary = index == FocusedUser;
             tab.IsSelected = index == _currentUserIndex;
         }

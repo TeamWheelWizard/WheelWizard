@@ -23,7 +23,6 @@ using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
-using WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
 
 namespace WheelWizard.WheelWizardData.Views;
 
@@ -456,15 +455,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(player.FriendCode);
         ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
-    }
-
-    private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)
-    {
-        var player = GetContextPlayer(sender);
-        if (player?.FirstMii == null)
-            return;
-
-        new MiiCarouselWindow().SetMii(player.FirstMii).Show();
     }
 
     private void ViewProfile_OnClick(object sender, RoutedEventArgs e)

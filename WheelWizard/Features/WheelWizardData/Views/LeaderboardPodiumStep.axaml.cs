@@ -6,7 +6,8 @@ namespace WheelWizard.WheelWizardData.Views;
 
 /// <summary>
 /// One step of the leaderboard podium with its player's name and VR. Its Mii stands on top of it, drawn by the
-/// <see cref="LeaderboardPodiumStage"/> it's placed in. Style it with the Gold, Silver or Bronze class.
+/// <see cref="LeaderboardPodiumStage"/> it's placed in. Style it with the Gold, Silver or Bronze class; the stage adds
+/// Lit once the Mii has landed, which turns on the light behind it.
 /// </summary>
 public class LeaderboardPodiumStep : TemplatedControl
 {

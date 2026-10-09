@@ -1149,12 +1149,17 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPa
             Focus();
     }
 
-    /// <summary>Scrolling out of the head close-up goes back to the whole Mii.</summary>
+    /// <summary>Scrolling in on the whole Mii goes to the head close-up, and scrolling out goes back.</summary>
     private void Scene_OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
     {
         if (e.Delta.Y < 0 && _level is Level.HeadGroups or Level.HeadParts)
         {
             ZoomOut();
+            e.Handled = true;
+        }
+        else if (e.Delta.Y > 0 && _level == Level.Overview && _session is not null)
+        {
+            OpenHead();
             e.Handled = true;
         }
     }

@@ -54,6 +54,23 @@ internal static class MiiShaders
         }
         """;
 
+    // The locked look (see LockedMii): grey, with fine scan lines drifting down over it and a soft bright band
+    // sweeping up and down. In screen space, so it reads as a projection over the Mii rather than a pattern on it.
+    private const string Locked = """
+
+        uniform vec4 uLocked; // x: 1 when locked, y: seconds, z: pixels between scan lines, w: view height in pixels
+
+        vec3 locked(vec3 color)
+        {
+            if (uLocked.x < 0.5) return color;
+            float grey = dot(color, vec3(0.299, 0.587, 0.114));
+            float line = 0.5 + 0.5 * cos(6.2831853 * (gl_FragCoord.y / uLocked.z + uLocked.y * 2.0));
+            float band = (gl_FragCoord.y / uLocked.w - (0.5 + 0.45 * sin(uLocked.y * 1.4))) * 8.0;
+            float glow = exp(-band * band);
+            return clamp(vec3(grey * (0.86 + 0.14 * line) + glow * (0.16 + 0.1 * line)), 0.0, 1.0);
+        }
+        """;
+
     public const string HeadVertex = """
         layout(location = 0) in vec3 aPos;
         layout(location = 1) in vec3 aNormal;
@@ -82,6 +99,7 @@ internal static class MiiShaders
 
     public const string HeadFragment =
         Lighting
+        + Locked
         + """
 
             in vec3 vViewPos;
@@ -115,7 +133,7 @@ internal static class MiiShaders
                 else base = vec4(1.0);
                 if (uMode != 0 && base.a <= 0.0) discard;
                 vec3 lit = shade(base.rgb, vViewPos, vNormal, uHasTangent != 0 ? vTangent : vec3(0.0), vParam);
-                lit = mix(lit, uTint.rgb, uTint.a);
+                lit = locked(mix(lit, uTint.rgb, uTint.a));
                 fragColor = vec4(lit, clamp(base.a, 0.0, 1.0) * uAlpha);
             }
             """;
@@ -149,6 +167,7 @@ internal static class MiiShaders
 
     public const string BodyFragment =
         Lighting
+        + Locked
         + """
 
             in vec3 vViewPos;
@@ -163,7 +182,7 @@ internal static class MiiShaders
                 vec3 lit = shade(uColor.rgb, vViewPos, vNormal, vec3(0.0), vec4(1.0, 1.0, 0.0, 1.0));
                 lit = mix(lit, lit * vec3(1.25, 1.05, 0.55) + vec3(0.18, 0.1, 0.0), vHighlight * 0.6);
                 lit = mix(lit, vec3(1.0), vHover * (1.0 - vHighlight) * 0.25);
-                lit = mix(lit, uTint.rgb, uTint.a);
+                lit = locked(mix(lit, uTint.rgb, uTint.a));
                 fragColor = vec4(lit, uAlpha);
             }
             """;

@@ -19,7 +19,6 @@ using WheelWizard.WheelWizardData.Views.Dialogs;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
-using WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
 
 namespace WheelWizard.WheelWizardData.Views;
 
@@ -285,8 +284,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
 
     private void CopyFriendCode_OnClick(object? sender, RoutedEventArgs e) => CopyFriendCode(FriendOf(sender));
 
-    private void ViewMii_OnClick(object? sender, RoutedEventArgs e) => ViewMii(FriendOf(sender));
-
     private void ViewProfile_OnClick(object? sender, RoutedEventArgs e) => ViewProfile(FriendOf(sender));
 
     private void ViewOnRwfc_OnClick(object? sender, RoutedEventArgs e) => ViewOnRwfc(FriendOf(sender));
@@ -299,13 +296,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
             return;
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(selectedPlayer.FriendCode);
         ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
-    }
-
-    private void ViewMii(FriendProfile? selectedPlayer)
-    {
-        if (selectedPlayer?.Mii == null)
-            return;
-        new MiiCarouselWindow().SetMii(selectedPlayer.Mii).Show();
     }
 
     private void ViewProfile(FriendProfile? selectedPlayer)

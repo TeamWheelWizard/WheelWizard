@@ -180,6 +180,23 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
 
     private Vector3 _placement;
 
+    /// <summary>
+    /// Turns the camera around what it looks at, in degrees: X sideways (positive turns the Mii's face to the right of
+    /// the screen), Y up and down (positive tilts it down). Unlike the rotations in <see cref="Specifications"/> this
+    /// isn't rounded to whole degrees, so it can follow the mouse smoothly.
+    /// </summary>
+    public Vector2 Orbit
+    {
+        get => _orbit;
+        set
+        {
+            _orbit = value;
+            RequestNextFrameRendering();
+        }
+    }
+
+    private Vector2 _orbit;
+
     /// <summary>Fades the whole Mii (0 = invisible).</summary>
     public float Alpha
     {
@@ -551,7 +568,8 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         FrameDrawn?.Invoke();
 
         _lastRender = now;
-        if (_player.IsAnimating || IsCameraMoving || ContinuousRendering || IsPartChanging || _fadeInStart is not null)
+        // A locked Mii's scan lines keep moving, even while it stands still.
+        if (_player.IsAnimating || IsCameraMoving || ContinuousRendering || IsPartChanging || _fadeInStart is not null || _mii is LockedMii)
             RequestNextFrame();
     }
 
@@ -599,7 +617,7 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         if (!ReferenceEquals(_player.Current, _headsRequestedFor))
         {
             _headsRequestedFor = _player.Current;
-            if (_player.Current is { } clip)
+            if (_player.Current is { } clip && _mii is not LockedMii)
                 foreach (var expression in MiiAnimationPlayer.ExpressionsOf(clip))
                     RequestFace(_studioData, expression);
         }
@@ -609,9 +627,12 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
             return nudged;
 
         // Use the pose's face when it's ready, otherwise the default face (built first). While the new Mii's head is
-        // still building, keep drawing the previous Mii (or nothing, see ShowsPreviousMii).
-        var (head, key, face) = HeadFor(pose.Expression);
-        if (head is null || !IsPartChangeReady(pose.Expression))
+        // still building, keep drawing the previous Mii (or nothing, see ShowsPreviousMii). A locked Mii's face is
+        // always its question mark.
+        var locked = _mii is LockedMii;
+        var lockedFace = locked ? LockedFace(_studioData) : null;
+        var (head, key, face) = HeadFor(locked ? MiiExpression.Normal : pose.Expression);
+        if (head is null || !IsPartChangeReady(pose.Expression) || locked && lockedFace is null)
             return ShowsPreviousMii ? PreviousMiiFrame(pose, aspect) : null;
 
         var setup = _renderer.GetRealtimeFrameSetup(_studioData, Specifications, aspect);
@@ -630,9 +651,12 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
         return _lastFrame = new MiiGpuFrame(frameSetup, pose, head, key)
         {
             Alpha = _alpha * FadeIn(),
-            Particles = Particles(frameSetup),
-            HeadPasses = WithFace(HeadPasses(pose.Expression, head!, key!), head!, key!, face),
+            Particles = lockedFace is null ? Particles(frameSetup) : [],
+            HeadPasses = lockedFace is null
+                ? WithFace(HeadPasses(pose.Expression, head!, key!), head!, key!, face)
+                : LockedPasses(head!, key!, lockedFace),
             BodyHoverMask = BodyHoverMask,
+            Locked = lockedFace is null ? null : LockedLookNow(),
         };
     }
 
@@ -705,6 +729,16 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
     /// <summary>Applies a running camera transition and remembers where the camera is.</summary>
     private MiiRealtimeFrameSetup MoveCamera(MiiRealtimeFrameSetup setup)
     {
+        if (_orbit != Vector2.Zero)
+        {
+            var offset = setup.CameraPosition - setup.CameraTarget;
+            var right = Vector3.Normalize(Vector3.Cross(-offset, setup.CameraUp));
+            var turn =
+                Quaternion.CreateFromAxisAngle(setup.CameraUp, -_orbit.X * MathF.PI / 180f)
+                * Quaternion.CreateFromAxisAngle(right, -_orbit.Y * MathF.PI / 180f);
+            setup = setup.WithCamera(setup.CameraTarget + Vector3.Transform(offset, turn), setup.CameraTarget, setup.CameraUp);
+        }
+
         if (IsCameraMoving && _cameraFrom is { } from)
         {
             var t = (float)((_clock.Elapsed - _cameraTransitionStart) / _cameraTransitionLength);

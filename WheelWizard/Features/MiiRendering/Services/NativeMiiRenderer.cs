@@ -252,8 +252,12 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
             return charInfoResult.Error!;
 
         var charInfo = charInfoResult.Value;
-        // MiiExpression values are FFL expression ids.
-        var expressionId = pose != null ? (int)pose.Expression : MapExpression(request.Expression);
+        // MiiExpression values are FFL expression ids. A locked Mii has no expressions: its face is a question mark.
+        var locked = mii is LockedMii;
+        var expressionId =
+            locked ? FflNativeInterop.FflExpressionNormal
+            : pose != null ? (int)pose.Expression
+            : MapExpression(request.Expression);
 
         var cachedHeadResult = GetOrCreateCachedHeadDrawParams(
             archiveResult.Value,
@@ -269,6 +273,8 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
         var drawMeshes = cachedHeadResult.Value.DrawMeshes;
         if (drawMeshes.Count == 0)
             return Fail("Managed renderer produced no drawable meshes for this Mii.");
+        if (locked)
+            drawMeshes = WithLockedFace(drawMeshes, studioData, charInfo, request.Width <= 384 ? 256 : 512);
 
         var viewParameters = ResolveViewParameters(request, charInfo);
         var bodyRenderData =
@@ -350,6 +356,8 @@ public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resou
             );
         }
 
+        if (locked)
+            TurnGrey(pixels);
         return new NativeMiiPixelBuffer(outputWidth, outputHeight, pixels);
     }
 

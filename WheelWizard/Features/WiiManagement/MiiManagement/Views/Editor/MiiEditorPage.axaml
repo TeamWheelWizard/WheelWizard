@@ -150,15 +150,15 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid x:Name="Root" RowDefinitions="*,Auto">
+    <Grid x:Name="Root">
         <!-- The 3D Mii (MiiEditorScene) is added here in code. -->
-        <Panel x:Name="StageHost" Grid.Row="0" ClipToBounds="False" />
+        <Panel x:Name="StageHost" ClipToBounds="False" />
 
         <!-- Buttons that float next to parts of the Mii (positioned every frame). -->
-        <Canvas x:Name="Overlay" Grid.Row="0" ClipToBounds="False" />
+        <Canvas x:Name="Overlay" ClipToBounds="False" />
 
         <!-- Back to My Miis, like going back from a room's details. -->
-        <components:LinkButton x:Name="BackButton" Grid.Row="0"
+        <components:LinkButton x:Name="BackButton"
                                IconData="{StaticResource ArrowLeft}"
                                Text="{loc:T page_title.my_miis}"
                                Foreground="{StaticResource TitleTextColor}"
@@ -166,7 +166,7 @@
                                VerticalAlignment="Top" HorizontalAlignment="Left"
                                FontSize="16" Click="BackButton_OnClick" />
 
-        <StackPanel x:Name="TopActions" Grid.Row="0" Orientation="Horizontal" Spacing="6"
+        <StackPanel x:Name="TopActions" Orientation="Horizontal" Spacing="6"
                     HorizontalAlignment="Right" VerticalAlignment="Top">
             <Button x:Name="UndoButton" Classes="Round" Click="UndoButton_OnClick"
                     ToolTip.Tip="{loc:T action.undo}">
@@ -182,19 +182,19 @@
         </StackPanel>
 
         <!-- The floating sidebar: Head / Body / Info, then the head groups, then a group's parts. -->
-        <Border x:Name="SidebarPanel" Grid.Row="0" Classes="Floating"
+        <Border x:Name="SidebarPanel" Classes="Floating"
                 HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,40,0,0">
             <StackPanel x:Name="SidebarItems" Spacing="2" />
         </Border>
 
         <!-- Size / rotate / flip for the selected part. -->
-        <Border x:Name="ToolPanel" Grid.Row="0" Classes="Floating hidden"
+        <Border x:Name="ToolPanel" Classes="Floating hidden"
                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0" Padding="5">
             <StackPanel x:Name="ToolItems" Spacing="6" />
         </Border>
 
         <!-- Body: height and weight, as two upright sliders with a figure at each end (tall/short, wide/thin). -->
-        <Border x:Name="BodyPanel" Grid.Row="0" Classes="Floating Bare hidden" Padding="6,12"
+        <Border x:Name="BodyPanel" Classes="Floating Bare hidden" Padding="6,12"
                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0">
             <StackPanel Orientation="Horizontal" Spacing="6">
                 <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.height}">
@@ -213,7 +213,7 @@
         </Border>
 
         <!-- Info: names and favorite. -->
-        <Border x:Name="InfoCard" Grid.Row="0" Classes="Floating hidden" Width="236" Padding="14,12"
+        <Border x:Name="InfoCard" Classes="Floating hidden" Width="236" Padding="14,12"
                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0">
             <StackPanel Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
@@ -247,8 +247,8 @@
             </StackPanel>
         </Border>
 
-        <!-- Bottom: every variant of the selected part, and the colour button in the corner. -->
-        <Grid x:Name="BottomBar" Grid.Row="1" Height="78" Margin="0,8,0,0">
+        <!-- Bottom, over the Mii: every variant of the selected part, and the colour button in the corner. -->
+        <Grid x:Name="BottomBar" Height="78" VerticalAlignment="Bottom">
             <Border x:Name="VariantPanel" Classes="Floating hidden" Margin="0,0,70,0" Padding="4">
                 <ScrollViewer x:Name="VariantScroller" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                     <StackPanel x:Name="VariantItems" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" />
@@ -277,7 +277,7 @@
                                Text="{loc:T action.surprise_me}" Click="DiceButton_OnClick" />
         </Grid>
 
-        <StackPanel x:Name="PickerHint" Grid.Row="0" IsVisible="False" IsHitTestVisible="False"
+        <StackPanel x:Name="PickerHint" IsVisible="False" IsHitTestVisible="False"
                     HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,36,0,0" Spacing="2">
             <TextBlock Classes="TitleText" FontSize="22" HorizontalAlignment="Center" Text="{loc:T text.pick_your_mii}" />
             <TextBlock Classes="BodyText" HorizontalAlignment="Center" Foreground="{StaticResource Neutral400}"

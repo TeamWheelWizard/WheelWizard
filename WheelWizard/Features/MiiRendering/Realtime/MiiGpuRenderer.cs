@@ -24,7 +24,14 @@ public sealed record MiiGpuFrame(MiiRealtimeFrameSetup Setup, MiiPose Pose, IRea
 
     /// <summary>Fades the whole Mii.</summary>
     public float Alpha { get; init; } = 1f;
+
+    /// <summary>Draws the Mii locked (see <see cref="MiiImages.Domain.LockedMii"/>): grey, with scan lines moving over it.</summary>
+    public LockedLook? Locked { get; init; }
 }
+
+/// <param name="Seconds">How far the scan lines have moved along.</param>
+/// <param name="LinePitch">Pixels from one scan line to the next.</param>
+public readonly record struct LockedLook(float Seconds, float LinePitch);
 
 /// <summary>Draws (some of) the meshes of a head, optionally moved, faded, tinted or with another mask texture.</summary>
 public sealed record HeadPass(string HeadKey, IReadOnlyList<HeadMeshData> Head)
@@ -87,6 +94,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     private (int Width, int Height) _layerSize;
     private bool _layerBroken;
 
+    /// <summary>Height of the frame being drawn, in pixels.</summary>
+    private int _height;
+
     private sealed record GpuMesh(uint Vao, uint Vbo, uint Ebo, int IndexCount, uint Texture, HeadMeshData? Head, bool IsPants);
 
     public MiiGpuRenderer(GL gl, bool isEs)
@@ -110,6 +120,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
 
     public void Render(MiiGpuFrame? frame, int width, int height)
     {
+        _height = height;
         _gl.Viewport(0, 0, (uint)width, (uint)height);
         _gl.ClearColor(0f, 0f, 0f, 0f);
         _gl.ClearDepth(1f);
@@ -356,6 +367,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.Uniform1(Uniform(_bodyProgram, "uHighlightMask"), 0);
         _gl.Uniform1(Uniform(_bodyProgram, "uHoverMask"), frame.BodyHoverMask);
         SetVec4(_bodyProgram, "uTint", Vector4.Zero);
+        SetLocked(_bodyProgram, frame);
         _gl.Uniform1(Uniform(_bodyProgram, "uAlpha"), alpha);
         _gl.Enable(EnableCap.CullFace);
         _gl.CullFace(TriangleFace.Back);
@@ -382,6 +394,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         SetMatrix(_headProgram, "uModel", Matrix4x4.CreateTranslation(pass.Offset) * setup.HeadMatrix(frame.Pose));
         _gl.Uniform1(Uniform(_headProgram, "uAlpha"), alpha);
         _gl.Uniform1(Uniform(_headProgram, "uTex"), 0);
+        SetLocked(_headProgram, frame);
         // Faded passes blend over what is there without hiding what is drawn after them.
         _gl.DepthMask(alpha >= 0.999f);
         foreach (var mesh in meshes)
@@ -651,6 +664,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.Uniform1(Uniform(program, "uSpecPow"), power);
         _gl.Uniform1(Uniform(program, "uSpecMode"), specularMode);
     }
+
+    private void SetLocked(uint program, MiiGpuFrame frame) =>
+        SetVec4(program, "uLocked", frame.Locked is { } locked ? new Vector4(1f, locked.Seconds, locked.LinePitch, _height) : Vector4.Zero);
 
     private int Uniform(uint program, string name)
     {

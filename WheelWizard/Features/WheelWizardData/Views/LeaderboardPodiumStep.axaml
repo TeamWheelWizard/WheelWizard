@@ -22,12 +22,14 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid ClipToBounds="False">
-                    <!-- Light rising from the step behind the Mii standing on it. -->
-                    <Border x:Name="PART_Backlight"
-                            Width="96" Height="170" Margin="0,-150,0,0"
-                            HorizontalAlignment="Center" VerticalAlignment="Top"
-                            CornerRadius="9999" Opacity="0.15" Effect="blur(48)" IsHitTestVisible="False"
-                            Background="{TemplateBinding BorderBrush}" />
+                    <!-- Light rising from the step behind the Mii standing on it (once it's landed: see .Lit). -->
+                    <Panel x:Name="PART_Glow" IsHitTestVisible="False">
+                        <Border x:Name="PART_Backlight"
+                                Width="96" Height="170" Margin="0,-150,0,0"
+                                HorizontalAlignment="Center" VerticalAlignment="Top"
+                                CornerRadius="9999" Opacity="0.15" Effect="blur(48)"
+                                Background="{TemplateBinding BorderBrush}" />
+                    </Panel>
 
                     <Border x:Name="PART_Face"
                             Background="{TemplateBinding Background}"
@@ -84,6 +86,19 @@
                 </Grid>
             </ControlTemplate>
         </Setter>
+    </Style>
+
+    <!-- The light fades in when the step's Mii has landed on it. -->
+    <Style Selector="community|LeaderboardPodiumStep /template/ Panel#PART_Glow">
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.8" Easing="SineEaseInOut" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="community|LeaderboardPodiumStep.Lit /template/ Panel#PART_Glow">
+        <Setter Property="Opacity" Value="1" />
     </Style>
 
     <!-- Brighten up under the cursor. -->

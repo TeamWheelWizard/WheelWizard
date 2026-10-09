@@ -81,6 +81,12 @@ public sealed class LeaderboardPodiumStage : Panel
 
     private static readonly TimeSpan StepStagger = TimeSpan.FromMilliseconds(110);
 
+    /// <summary>The light behind a Mii comes on this long after it landed on its step.</summary>
+    private static readonly TimeSpan GlowDelay = TimeSpan.FromSeconds(1);
+
+    /// <summary>The entrance event marking the moment a Mii lands on its step.</summary>
+    private const string LandedEvent = "landed";
+
     /// <summary>Don't keep everyone waiting on a Mii whose head takes long to build.</summary>
     private static readonly TimeSpan ShowTimeout = TimeSpan.FromSeconds(1.5);
 
@@ -103,6 +109,7 @@ public sealed class LeaderboardPodiumStage : Panel
     private Size _cameraSize;
     private MiiAnimation? _scene;
     private bool _showQueued;
+    private int _show;
     private DispatcherTimer? _showTimeout;
 
     /// <summary>One place on the podium: its Mii in 3D, or as a picture without animations.</summary>
@@ -243,11 +250,20 @@ public sealed class LeaderboardPodiumStage : Panel
             return;
 
         ClearActors();
+        _show++;
+        foreach (var step in Children.Where(c => GetPlace(c) is >= 1 and <= 3))
+            step.Classes.Set("Lit", false);
+
         Mii?[] miis = [First, Second, Third];
         var live = _animate && !_realtimeUnavailable;
         for (var place = 0; place < 3; place++)
+        {
             if (miis[place] is { } mii)
                 _actors[place] = live ? CreateLive(place, mii) : CreateStill(place, mii);
+            // Nobody to wait for: an empty step, or a picture that's there as soon as its step is up.
+            if (!live || _actors[place] is null)
+                Light(place, _actors[place] is not null && _animate ? StepRise + GlowDelay : TimeSpan.Zero);
+        }
 
         // Draw the winner last, so its confetti falls in front of the others.
         foreach (var place in new[] { 2, 1, 0 })
@@ -287,6 +303,11 @@ public sealed class LeaderboardPodiumStage : Panel
         };
         view.RealtimeUnavailable += _ => SwitchToStills();
         view.ClipFinished += clip => OnClipFinished(actor, clip);
+        view.ClipEvent += (clip, animEvent) =>
+        {
+            if (ReferenceEquals(clip, actor.Entrance) && animEvent.Name == LandedEvent)
+                Light(place, GlowDelay);
+        };
 
         // Wait out of sight on the entrance's first frame until everyone's head is built, then drop in together.
         if (_picker!.Pick($"leaderboard/enter/{Roles[place]}") is { } entrance)
@@ -330,14 +351,24 @@ public sealed class LeaderboardPodiumStage : Panel
         _showTimeout.Stop();
         _showTimeout = null;
         foreach (var actor in _actors)
-            if (actor?.View is { } view)
-                view.IsPlaying = true;
+        {
+            if (actor?.View is not { } view)
+                continue;
+            view.IsPlaying = true;
+            if (actor.Entrance is null)
+                Light(actor.Place, GlowDelay);
+        }
+
         if (_actors.FirstOrDefault(a => a?.View is not null) is { Entrance: null })
             StartScene();
     }
 
     private void OnClipFinished(Actor actor, MiiAnimation clip)
     {
+        // An entrance without a landing marker: it's landed once it's over.
+        if (ReferenceEquals(clip, actor.Entrance) && clip.Events.All(e => e.Name != LandedEvent))
+            Light(actor.Place, GlowDelay);
+
         // The first Mii still standing directs: when its entrance or scene ends, everyone starts the next scene.
         if (!ReferenceEquals(actor, _actors.FirstOrDefault(a => a?.View is not null)))
             return;
@@ -377,6 +408,25 @@ public sealed class LeaderboardPodiumStage : Panel
                 continue;
             if (Math.Abs(view.PlayheadFrames - lead.PlayheadFrames) > MaxDrift)
                 view.Seek(lead.PlayheadFrames);
+        }
+    }
+
+    /// <summary>Turns on the light behind a place's step after <paramref name="delay"/> (unless the show started over by then).</summary>
+    private void Light(int place, TimeSpan delay)
+    {
+        var show = _show;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (delay > TimeSpan.Zero)
+                DispatcherTimer.RunOnce(TurnOn, delay);
+            else
+                TurnOn();
+        });
+
+        void TurnOn()
+        {
+            if (show == _show && Children.FirstOrDefault(c => GetPlace(c) == place + 1) is { } step)
+                step.Classes.Set("Lit", true);
         }
     }
 

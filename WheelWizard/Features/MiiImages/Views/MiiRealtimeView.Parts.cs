@@ -485,6 +485,39 @@ public sealed partial class MiiRealtimeView
         return wa >= epsilon && wb >= epsilon && wc >= epsilon ? new Vector3(wa, wb, wc) : null;
     }
 
+    /// <summary>
+    /// Whether a face part is painted (not see-through) at mask texture coordinates <paramref name="uv"/>, or within
+    /// <paramref name="radius"/> of it. Null while that part's layer is still being built (asking starts building it).
+    /// </summary>
+    public bool? IsMaskLayerPainted(MiiMaskLayers layer, Vector2 uv, float radius = 0f)
+    {
+        if (_studioData is not { } studio)
+            return null;
+        if (!_maskLayers.TryGetValue(MaskLayerKey(studio, MiiExpression.Normal, layer), out var mask))
+        {
+            RequestMaskLayer(studio, MiiExpression.Normal, layer);
+            return null;
+        }
+
+        if (mask.Width <= 0 || mask.Height <= 0)
+            return false;
+        var centerX = (int)(uv.X * (mask.Width - 1));
+        var centerY = (int)(uv.Y * (mask.Height - 1));
+        var reach = (int)MathF.Ceiling(radius * mask.Width);
+        for (var y = centerY - reach; y <= centerY + reach; y++)
+        for (var x = centerX - reach; x <= centerX + reach; x++)
+        {
+            if (x < 0 || y < 0 || x >= mask.Width || y >= mask.Height)
+                continue;
+            if ((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY) > reach * reach)
+                continue;
+            if (mask.Pixels[(y * mask.Width + x) * 4 + 3] > 64)
+                return true;
+        }
+
+        return false;
+    }
+
     private static float SampleAlpha(HeadMeshData mesh, Vector2 uv, bool alphaInRed)
     {
         if (mesh.TexturePixels is not { } pixels || mesh.TextureWidth <= 0 || mesh.TextureHeight <= 0)

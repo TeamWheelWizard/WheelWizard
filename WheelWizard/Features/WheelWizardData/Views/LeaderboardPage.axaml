@@ -190,8 +190,6 @@
                                         <ContextMenu DataContext="{Binding PodiumSecond}">
                                             <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{loc:T action.view_mii}"
-                                                      Click="OpenCarousel_OnClick" />
                                             <MenuItem Header="{loc:T action.add_friend}"
                                                       Click="AddFriend_OnClick" />
                                             <Separator />
@@ -215,8 +213,6 @@
                                         <ContextMenu DataContext="{Binding PodiumFirst}">
                                             <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{loc:T action.view_mii}"
-                                                      Click="OpenCarousel_OnClick" />
                                             <MenuItem Header="{loc:T action.add_friend}"
                                                       Click="AddFriend_OnClick" />
                                             <Separator />
@@ -240,8 +236,6 @@
                                         <ContextMenu DataContext="{Binding PodiumThird}">
                                             <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{loc:T action.view_mii}"
-                                                      Click="OpenCarousel_OnClick" />
                                             <MenuItem Header="{loc:T action.add_friend}"
                                                       Click="AddFriend_OnClick" />
                                             <Separator />
@@ -274,8 +268,6 @@
                                         <ContextMenu>
                                             <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
-                                            <MenuItem Header="{loc:T action.view_mii}"
-                                                      Click="OpenCarousel_OnClick" />
                                             <MenuItem Header="{loc:T action.add_friend}"
                                                       Click="AddFriend_OnClick" />
                                             <Separator />

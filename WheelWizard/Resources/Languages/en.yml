@@ -166,7 +166,6 @@ en:
     change: "Change"
     view_mod: "View Mod"
     save_external_mii: "Add Mii to \"My Miis\""
-    view_mii: "View Mii"
     view_profile: "View Profile"
     duplicate: "Duplicate"
     back: "Back"
@@ -213,7 +212,6 @@ en:
     mod_browser: "Mod Browser"
     mii_selector: "Mii Selector"
     mii_editor: "Mii Editor"
-    mii_carousel: "Mii Carousel"
   text:
     made_by_string: |-
       Made by: %{firstAuthor}

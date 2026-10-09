@@ -95,6 +95,26 @@ public sealed class MiiHeadStore
             value => done(value as MiiMaskLayerTexture)
         );
 
+    public static string LockedMaskKey(string studio, MiiHeadDetail detail) => $"l{(int)detail}|{studio}";
+
+    public bool TryGetLockedMask(string studio, MiiHeadDetail detail, out MiiMaskLayerTexture? mask)
+    {
+        mask = TryGet(LockedMaskKey(studio, detail)) as MiiMaskLayerTexture;
+        return mask is not null;
+    }
+
+    /// <summary>Like <see cref="RequestMask"/>, for the question mark face of a locked Mii.</summary>
+    public void RequestLockedMask(string studio, MiiHeadDetail detail, Func<bool> wanted, Action<MiiMaskLayerTexture?> done) =>
+        Request(
+            LockedMaskKey(studio, detail),
+            renderer =>
+                renderer.BuildLockedMaskLayer(studio, detail) is { IsSuccess: true } mask
+                    ? (mask.Value, mask.Value.Pixels.Length)
+                    : (null, 0),
+            wanted,
+            value => done(value as MiiMaskLayerTexture)
+        );
+
     private object? TryGet(string key)
     {
         lock (_lock)

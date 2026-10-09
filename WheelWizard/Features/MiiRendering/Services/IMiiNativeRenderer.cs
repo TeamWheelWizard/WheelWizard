@@ -47,6 +47,9 @@ public interface IMiiNativeRenderer
         MiiHeadDetail detail = MiiHeadDetail.Full
     );
 
+    /// <summary>The face mask of a locked Mii (see <see cref="LockedMii"/>): one big question mark. Call off the UI thread.</summary>
+    OperationResult<MiiMaskLayerTexture> BuildLockedMaskLayer(string studioData, MiiHeadDetail detail = MiiHeadDetail.Full);
+
     /// <summary>Where the face mask parts sit on the mask texture, in texture coordinates.</summary>
     OperationResult<IReadOnlyDictionary<MiiMaskLayers, Vector2[][]>> GetMaskPartQuads(string studioData);
 

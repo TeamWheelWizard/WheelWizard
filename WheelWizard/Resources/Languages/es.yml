@@ -142,7 +142,6 @@ es:
     change: "Cambiar"
     view_mod: "Ver Mod"
     save_external_mii: "Añadir Mii a \"Mis Miis\""
-    view_mii: "Ver Mii"
     duplicate: "Duplicar"
     back: "Atrás"
     unfavorite: "Quitar de Favoritos"
@@ -624,7 +623,6 @@ es:
     mod_browser: "Buscador de Mods"
     mii_selector: "Selector de Miis"
     mii_editor: "Editor de Miis"
-    mii_carousel: "Plantilla de Miis"
   file_picker:
     select_mod_file: "Seleccionar Archivo de Mod"
   patch:

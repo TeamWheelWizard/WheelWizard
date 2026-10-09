@@ -50,6 +50,12 @@ public sealed class MiiEditorScene : Grid
     private const float DragDegreesPerPixel = 0.6f;
     private const float YawReturnSpeed = 5f;
 
+    // Turning the head in the close-up: it follows the mouse with more and more resistance up to these angles, and
+    // turns back when let go.
+    private const float MaxHeadTurn = 30f;
+    private const float MaxHeadTilt = 10f;
+    private const float HeadTurnDegreesPerPixel = 0.3f;
+
     /// <summary>How much of the width the Mii moves aside for the info card.</summary>
     private const double InfoShift = 0.2;
 
@@ -59,8 +65,10 @@ public sealed class MiiEditorScene : Grid
     private const float MaxLookUp = 25f;
     private const float MaxLookDown = 20f;
 
-    /// <summary>Face parts get a bit of extra room around them for the mouse.</summary>
-    private const float MaskPartPadding = 1.3f;
+    /// <summary>How close the mouse has to be to a painted bit of a face part (mask texture units; the mole is tiny).</summary>
+    private const float MaskPartReach = 0.008f;
+
+    private const float MoleReach = 0.02f;
 
     private static readonly MiiImageSpecifications BodyShot = MiiImageVariants.MiiEditorPreviewCarousel.Clone();
 
@@ -101,6 +109,12 @@ public sealed class MiiEditorScene : Grid
     private MiiImageSpecifications _shot = BodyShot;
     private float _yaw;
     private float _targetYaw;
+
+    /// <summary>How far the head close-up is turned (degrees), and how far the mouse would turn it without resistance.</summary>
+    private Vector2 _headTurn;
+
+    private Vector2 _headTurnPulled;
+
     private Mii? _shown;
     private string? _shownStudio;
     private (Mii Mii, string Cue)? _pending;
@@ -407,6 +421,8 @@ public sealed class MiiEditorScene : Grid
             return;
         }
 
+        if (framing == MiiEditorFraming.Head)
+            PrepareMaskLayers();
         var view = _actors[0].View;
         _cameraSettlesAt = Environment.TickCount64 + (long)(Animate ? CameraTransition.TotalMilliseconds : 0) + 150;
         view.TransitionTo(WithYaw(_shot, _yaw), Animate ? CameraTransition : TimeSpan.Zero);
@@ -553,6 +569,14 @@ public sealed class MiiEditorScene : Grid
             actor.View.Specifications = WithYaw(_shot, _yaw);
         }
 
+        if (editing && !IsTurningHead && _headTurn != Vector2.Zero)
+        {
+            _headTurn *= MathF.Exp(-YawReturnSpeed * (float)deltaSeconds);
+            if (_headTurn.LengthSquared() < 1e-4f)
+                _headTurn = Vector2.Zero;
+            actor.View.Orbit = _headTurn;
+        }
+
         var look = actor.View.Player.Look;
         // Still in the close-up, so parts stay put under the mouse.
         look.TargetWeight = _framing == MiiEditorFraming.Head ? 0f : actor.Director.LookWeight;
@@ -618,8 +642,13 @@ public sealed class MiiEditorScene : Grid
             if (!_dragging && Distance(point, pressedAt) > DragThreshold)
             {
                 _dragging = true;
+                // Parts that can't be moved (hair, the face itself) turn the head instead.
+                if (_press is { VerticalStep: null, HorizontalStep: null })
+                    _press = null;
                 if (_press is { } press)
                     PartDragStarted?.Invoke(press.Part);
+                else if (IsTurningHead)
+                    _headTurnPulled = new Vector2(Unresisted(_headTurn.X, MaxHeadTurn), Unresisted(_headTurn.Y, MaxHeadTilt));
             }
 
             if (_dragging)
@@ -628,18 +657,15 @@ public sealed class MiiEditorScene : Grid
                     DragPart(press, point);
                 else if (_framing is MiiEditorFraming.Body or MiiEditorFraming.Info && _actors.Count == 1)
                     RotateBy(point, pressedAt);
+                else if (IsTurningHead)
+                    TurnHeadBy(point, pressedAt);
             }
         }
 
         if (!_dragging)
             UpdateHover(point);
         else
-            Cursor = _press switch
-            {
-                null => new Cursor(StandardCursorType.SizeWestEast),
-                { VerticalStep: null, HorizontalStep: null } => Cursor.Default,
-                _ => new Cursor(StandardCursorType.SizeAll),
-            };
+            Cursor = new Cursor(_press is null && !IsTurningHead ? StandardCursorType.SizeWestEast : StandardCursorType.SizeAll);
         foreach (var actor in _actors)
             actor.View.Invalidate();
     }
@@ -651,6 +677,23 @@ public sealed class MiiEditorScene : Grid
         _pressedAt = point;
         _actors[0].View.Specifications = WithYaw(_shot, _yaw);
     }
+
+    /// <summary>Dragging in the head close-up, but not a part that moves: the head turns (up to a point).</summary>
+    private bool IsTurningHead => _dragging && _press is null && _framing == MiiEditorFraming.Head && IsRealtime && _actors.Count == 1;
+
+    private void TurnHeadBy(Point point, Point pressedAt)
+    {
+        _headTurnPulled += new Vector2((float)(point.X - pressedAt.X), (float)(point.Y - pressedAt.Y)) * HeadTurnDegreesPerPixel;
+        _pressedAt = point;
+        _headTurn = new Vector2(Resisted(_headTurnPulled.X, MaxHeadTurn), Resisted(_headTurnPulled.Y, MaxHeadTilt));
+        _actors[0].View.Orbit = _headTurn;
+    }
+
+    /// <summary>Follows <paramref name="pulled"/> at first, then gives way less and less, never past <paramref name="max"/>.</summary>
+    private static float Resisted(float pulled, float max) => max * MathF.Tanh(pulled / max);
+
+    /// <summary>The pull that <see cref="Resisted"/> turns into <paramref name="angle"/> (to grab a head that's turning back).</summary>
+    private static float Unresisted(float angle, float max) => max * MathF.Atanh(Math.Clamp(angle / max, -0.99f, 0.99f));
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
@@ -700,6 +743,8 @@ public sealed class MiiEditorScene : Grid
             case MiiEditorFraming.Head:
                 if (PartAt(point) is { } clicked)
                     PartClicked?.Invoke(clicked);
+                else if (BodyAt(point))
+                    BodyClicked?.Invoke(MiiBodyPart.Body);
                 break;
         }
     }
@@ -756,9 +801,12 @@ public sealed class MiiEditorScene : Grid
             case MiiEditorFraming.Head:
             {
                 var part = IsRealtime ? PartAt(point) : null;
+                var body = part is null && BodyAt(point);
                 _hoveredPart = part;
                 UpdateHighlight();
-                Cursor = part is not null ? new Cursor(StandardCursorType.Hand) : Cursor.Default;
+                if (_actors.Count == 1)
+                    _actors[0].View.BodyHoverMask = body ? AllBodyBones : 0;
+                Cursor = part is not null || body ? new Cursor(StandardCursorType.Hand) : Cursor.Default;
                 break;
             }
         }
@@ -796,6 +844,12 @@ public sealed class MiiEditorScene : Grid
 
     private Point ToView(Visual view, Point point) => this.TranslatePoint(point, view) ?? point;
 
+    /// <summary>Whether the body (below the head) is under a point of the head close-up.</summary>
+    private bool BodyAt(Point point) =>
+        IsRealtime
+        && _actors.Count == 1
+        && HitTestBody(_actors[0].View, ToView(_actors[0].View, point), includeHead: false) == MiiBodyPart.Body;
+
     private int? ActorAt(Point point)
     {
         if (_framing != MiiEditorFraming.Picker || _fallbackPicker is not null)
@@ -815,14 +869,14 @@ public sealed class MiiEditorScene : Grid
     #region Hit testing
 
     /// <summary>Which part of the Mii is under a point of the view (from the last drawn pose).</summary>
-    private static MiiBodyPart? HitTestBody(MiiRealtimeView view, Point point)
+    private static MiiBodyPart? HitTestBody(MiiRealtimeView view, Point point, bool includeHead = true)
     {
         if (view.LastFrame is null)
             return null;
 
         Point? Screen(MiiBone bone) => view.BoneOnStage(bone) is { } stage ? view.ProjectToScreen(stage) : null;
 
-        if (view.HeadCenterOnStage() is { } headCenter && view.ProjectToScreen(headCenter) is { } head)
+        if (includeHead && view.HeadCenterOnStage() is { } headCenter && view.ProjectToScreen(headCenter) is { } head)
         {
             var top = view.ProjectToScreen(headCenter + new Vector3(0, 30f, 0));
             var radius = top is { } t ? Distance(head, t) : 0;
@@ -918,20 +972,34 @@ public sealed class MiiEditorScene : Grid
         (MiiMaskLayers.Mouth, MiiEditPart.Mouth),
     ];
 
+    /// <summary>The face part painted under a point of the face (not just somewhere on its see-through card).</summary>
     private MiiEditPart? MaskPartAt(Vector2 uv, (MiiMaskLayers Layer, MiiEditPart Part)[]? order = null)
     {
         if (MaskQuads() is not { } quads)
             return null;
+        var view = _actors[0].View;
         foreach (var (layer, part) in order ?? MaskPartOrder)
         {
             if (!quads.TryGetValue(layer, out var partQuads))
                 continue;
-            var padding = layer == MiiMaskLayers.Mole ? 2.2f : MaskPartPadding;
-            if (partQuads.Any(quad => InsideQuad(uv, quad, padding)))
+            // The card is a quick first check; until the part's own layer is built it's all there is to go by.
+            var padding = layer == MiiMaskLayers.Mole ? 2.2f : 1.3f;
+            if (!partQuads.Any(quad => InsideQuad(uv, quad, padding)))
+                continue;
+            if (view.IsMaskLayerPainted(layer, uv, layer == MiiMaskLayers.Mole ? MoleReach : MaskPartReach) ?? true)
                 return part;
         }
 
         return null;
+    }
+
+    /// <summary>Starts building the face part layers, so the first hover in the close-up can already use them.</summary>
+    private void PrepareMaskLayers()
+    {
+        if (!IsRealtime || _actors.Count != 1)
+            return;
+        foreach (var (layer, _) in MaskPartOrder)
+            _actors[0].View.IsMaskLayerPainted(layer, Vector2.Zero);
     }
 
     private IReadOnlyDictionary<MiiMaskLayers, Vector2[][]>? MaskQuads()
