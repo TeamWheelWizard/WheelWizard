@@ -79,7 +79,7 @@
         <EmbeddedResource Include="Features\MiiAnimation\Resources\MaleBody.glb" LogicalName="MiiAnim.Core.Assets.MaleBody.glb" />
         <EmbeddedResource Include="Features\MiiAnimation\Resources\FemaleBody.glb" LogicalName="MiiAnim.Core.Assets.FemaleBody.glb" />
         <!-- Animations made with the Mii Animator, loaded by MiiAnimationLibrary as "editor/idle/Editor_idle_calm_breathing" etc. -->
-        <EmbeddedResource Include="Features\MiiAnimation\Resources\Animations\**\*.miianim" LogicalName="MiiAnimations/%(RecursiveDir)%(Filename)" />
+        <EmbeddedResource Include="Resources\Animations\**\*.miianim" LogicalName="MiiAnimations/%(RecursiveDir)%(Filename)" />
 
         <!-- Compile Items -->
         <Compile Update="Views\Components\ListActionButton.axaml.cs">
@@ -106,6 +106,7 @@
 
     <ItemGroup>
         <AvaloniaResource Include="..\Flatpak\io.github.TeamWheelWizard.WheelWizard.png" Link="Resources\Images\AppIcon.png" />
+        <AvaloniaResource Include="Resources\Images\WiiCompiled.png" />
     </ItemGroup>
 
     <ItemGroup Label="Mii Rendering Resources">

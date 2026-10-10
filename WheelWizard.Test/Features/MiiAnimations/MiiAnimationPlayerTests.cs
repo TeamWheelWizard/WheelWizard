@@ -115,6 +115,14 @@ public class MiiAnimationPlayerTests
         var library = new MiiAnimationLibrary(NullLogger<MiiAnimationLibrary>.Instance);
         var folders = new[] { "editor/idle", "editor/become_girl", "editor/favorite_color", "editor/save" };
 
+        var shippedPaths = typeof(MiiAnimationLibrary)
+            .Assembly.GetManifestResourceNames()
+            .Where(name => name.StartsWith("MiiAnimations/", StringComparison.Ordinal))
+            .Select(name => name["MiiAnimations/".Length..].Replace('\\', '/'))
+            .ToArray();
+        Assert.NotEmpty(shippedPaths);
+        Assert.All(shippedPaths, path => Assert.NotNull(library.Get(path)));
+
         foreach (var folder in folders)
         {
             var paths = library.List(folder);
@@ -122,7 +130,6 @@ public class MiiAnimationPlayerTests
             Assert.All(paths, path => Assert.NotNull(library.Get(path)));
         }
 
-        Assert.Equal(10, library.List("editor/idle").Count);
         Assert.Null(library.Get("editor/does_not_exist"));
     }
 

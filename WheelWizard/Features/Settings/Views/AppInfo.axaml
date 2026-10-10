@@ -6,7 +6,12 @@
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              x:Class="WheelWizard.Settings.Views.AppInfo"
         xmlns:communityControls="clr-namespace:WheelWizard.WheelWizardData.Views">
-    <Grid>
+    <UserControl.Styles>
+        <Style Selector="SelectableTextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+    </UserControl.Styles>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,5,0,0">
             
             <!-- WHWZ DEVS -->
@@ -19,8 +24,8 @@
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Team Wheel Wizard" Margin="0,0,0,2"/>
                         <SelectableTextBlock Classes="TinyText" Text="This application is created by Patchzy and WantToBeeMe." />
-                        <SelectableTextBlock Classes="TinyText" Text="Thanks to the contributors, we managed to make it even better:" />
-                        <SelectableTextBlock Classes="TinyText" Text="Ruben, Lasagna, Matellush" />
+                        <SelectableTextBlock Classes="TinyText" Text="Thanks to the contributors, we managed to make it even " />
+                        <SelectableTextBlock Classes="TinyText" Text="better: Ruben, Lasagna, Matellush, Jamie" />
                     </StackPanel>
                 </Grid>
             </Border>
@@ -34,12 +39,15 @@
                     
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Team Retro Rewind" Margin="0,0,0,2"/>
-                        <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard was made to set up Retro Rewind quick and easy." />
-                        <SelectableTextBlock Classes="TinyText" Text="Thanks to ZPL and all other contributors for creating Retro Rewind." />
+                        <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard was made to set up Retro Rewind" />
+                        <SelectableTextBlock Classes="TinyText" Text=" quick and easy. Thanks to ZPL and all other " />
+                        <SelectableTextBlock Classes="TinyText" Text="contributors for creating Retro Rewind." />
                     </StackPanel>
                 </Grid>
             </Border>
             
+
+
             <!-- TRANSLATORS -->
             <Border Classes="AboutBlockStyle" Margin="0,10,0,0">
                 <Grid ColumnDefinitions="60,*">
@@ -50,10 +58,11 @@
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Translator Team" Margin="0,0,0,2"/>
                         <SelectableTextBlock Classes="TinyText" Text="The entire Translation is being managed by Eppe." />
-                        <SelectableTextBlock Classes="TinyText" Text="You can use Wheel Wizard and Retro Rewind in multiple languages" />
-                        <SelectableTextBlock Classes="TinyText" Text="thanks to her and the entire translator team." />
-                        <SelectableTextBlock Classes="TinyText" Text="If you are willing to translate for Retro Rewind and Wheel Wizard, " />
-                        <SelectableTextBlock Classes="TinyText" Text="be sure to reach out to Eppe or WantToBeeMe :)" />
+                        <SelectableTextBlock Classes="TinyText" Text="You can use Wheel Wizard and Retro Rewind in multiple " />
+                        <SelectableTextBlock Classes="TinyText" Text="languages thanks to her and the entire translator team. " />
+                        <SelectableTextBlock Classes="TinyText" Text="If you are willing to translate for Retro Rewind " />
+                        <SelectableTextBlock Classes="TinyText" Text="and Wheel Wizard, be sure to reach out to" />
+                        <SelectableTextBlock Classes="TinyText" Text="Eppe or WantToBeeMe :)" />
                     </StackPanel>
                     
                 </Grid>
@@ -69,19 +78,18 @@
                     
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Roboto Classic Font" Margin="0,0,0,2"/>
-                        <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard uses the Roboto font. This Font Software is "/>
-                        <StackPanel Orientation="Horizontal">
-                            <SelectableTextBlock Classes="TinyText" Text="licensed under the"/>
-                            <components:LinkButton Text=" SIL Open Font License, Version 1.1" FontSize="12"
+                        <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard uses the Roboto font, licensed under"/>
+                        <WrapPanel Orientation="Horizontal">
+                            <components:LinkButton Text="SIL Open Font License, Version 1.1" FontSize="12"
                                                         Foreground="{StaticResource Primary300}"
                                                         HoverForeground="{StaticResource Primary200}"
                                                         IsUnderlined="True"  Tag="https://openfontlicense.org/open-font-license-official-text/" 
                                                         Click="OpenLick_OnClick"
                                                         />
                             <SelectableTextBlock Classes="TinyText" Text="."/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <SelectableTextBlock Classes="TinyText" Text="Copyright 2011 The Roboto Project Authors ("/>
+                        </WrapPanel>
+                        <WrapPanel Orientation="Horizontal">
+                            <SelectableTextBlock Classes="TinyText" Text="© 2011 The Roboto Project Authors ("/>
                             <components:LinkButton Text="source code" FontSize="12"
                                                         Foreground="{StaticResource Primary300}"
                                                         HoverForeground="{StaticResource Primary200}"
@@ -89,7 +97,7 @@
                                                         Click="OpenLick_OnClick"
                             />
                             <SelectableTextBlock Classes="TinyText" Text=")"/>
-                        </StackPanel>
+                        </WrapPanel>
                     
                     </StackPanel>
                 </Grid>
@@ -106,7 +114,7 @@
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Wheel Wizard icons" Margin="0,0,0,2"/>
                        
-                        <StackPanel Orientation="Horizontal">
+                        <WrapPanel Orientation="Horizontal">
                             <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard uses icons from" />
                             <components:LinkButton Text=" Game Icons" FontSize="12"
                                                         Foreground="{StaticResource Primary300}"
@@ -114,9 +122,10 @@
                                                         IsUnderlined="True"  Tag="https://game-icons.net/about.html" 
                                                         Click="OpenLick_OnClick"
                             />
-                            <SelectableTextBlock Classes="TinyText" Text=". Specifically the"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                            <SelectableTextBlock Classes="TinyText" Text="."/>
+                        </WrapPanel>
+                        <WrapPanel Orientation="Horizontal">
+                            <SelectableTextBlock Classes="TinyText" Text="The"/>
                             <components:LinkButton Text=" Car Wheel icon" FontSize="12"
                                                         Foreground="{StaticResource Primary300}"
                                                         HoverForeground="{StaticResource Primary200}"
@@ -130,8 +139,27 @@
                                                         IsUnderlined="True"  Tag="https://game-icons.net/1x1/delapouite/flat-tire.html" 
                                                         Click="OpenLick_OnClick"
                             />
-                            <SelectableTextBlock Classes="TinyText" Text=", both created by Delapouite"/>
-                        </StackPanel>
+                            <SelectableTextBlock Classes="TinyText" Text="."/>
+                        </WrapPanel>
+                        <SelectableTextBlock Classes="TinyText" Text="Both icons were created by Delapouite."/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <Border Classes="AboutBlockStyle" Margin="0,10,0,0">
+                <Grid ColumnDefinitions="60,*">
+                    <Image Source="avares://WheelWizard/Resources/Images/WiiCompiled.png"
+                           Width="44" Height="44" Margin="-2" Stretch="Uniform"
+                           HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    <Border Grid.Column="0" Classes="AboutBlockLineStyle" HorizontalAlignment="Right"/>
+                    <StackPanel Grid.Column="1">
+                        <components:FormFieldLabel Text="Mariokart WiiCompiled" Margin="0,0,0,2"/>
+                        <SelectableTextBlock Classes="TinyText" Text="A native PC port of Mario Kart Wii," />
+                        <SelectableTextBlock Classes="TinyText" Text="made with static recompilation by Patchzy." />
+                        <components:LinkButton Text="View WiiCompiled on GitHub" FontSize="12"
+                                               Foreground="{StaticResource Primary300}"
+                                               HoverForeground="{StaticResource Primary200}"
+                                               IsUnderlined="True" Tag="https://github.com/patchzyy/wiicompiled"
+                                               HorizontalAlignment="Left" Click="OpenLick_OnClick" />
                     </StackPanel>
                 </Grid>
             </Border>
@@ -139,5 +167,5 @@
         </StackPanel>
         
 
-    </Grid>
+    </ScrollViewer>
 </UserControl>

@@ -2,7 +2,7 @@ using WheelWizard.MiiAnimations.Playback;
 
 namespace WheelWizard.MiiAnimations;
 
-/// <summary>What the Miis around the app do (folders of Features/MiiAnimation/Resources/Animations).</summary>
+/// <summary>What the Miis around the app do (folders of Resources/Animations).</summary>
 public static class MiiPerformances
 {
     /// <summary>A friends card of a friend who's online: awake, and waving at you now and then.</summary>
