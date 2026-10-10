@@ -76,7 +76,7 @@
         <Style Selector="^[Tone=Brand][Variant=Button]">
             <Setter Property="Background" Value="{StaticResource Brand400}" />
             <Setter Property="BorderBrush" Value="{StaticResource Brand600}" />
-            <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
+            <Setter Property="Foreground" Value="White" />
             <Style Selector="^ /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="Background" Value="{StaticResource Brand100}" /><Setter Property="Width" Value="64" /><Setter Property="Height" Value="64" /><Setter Property="Opacity" Value="0.55" /><Setter Property="Effect" Value="blur(60)" /></Style>
         </Style>
         <Style Selector="^[Tone=Brand][Variant=Button]:pointerover"><Setter Property="BorderBrush" Value="{StaticResource Brand400}" /></Style>

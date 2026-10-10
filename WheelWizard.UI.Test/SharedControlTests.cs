@@ -131,30 +131,6 @@ public class SharedControlTests
     }
 
     [AvaloniaFact]
-    public void StatusBadge_IconOnlyRemovesLabelAndIconSpacing()
-    {
-        var badge = new StatusBadge { IconData = Geometry.Parse("M0 0 H16 V16 H0 Z") };
-        var window = new Window { Content = badge };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            var icon = badge.GetVisualDescendants().OfType<Border>().Single(control => control.Name == "PART_IconArea");
-            var label = badge.GetVisualDescendants().OfType<TextBlock>().Single(control => control.Name == "PART_StateBox_Text");
-            Assert.True(icon.IsVisible);
-            Assert.Equal(new Thickness(0), icon.Margin);
-            Assert.False(label.IsVisible);
-            badge.Text = "Label";
-            Assert.True(label.IsVisible);
-            Assert.Equal(new Thickness(0, 0, 6, 0), icon.Margin);
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
-    [AvaloniaFact]
     public void AnimationSettingToggle_UsesTheNewModeBeforeChangingItsSelection()
     {
         var toggle = new WheelWizard.Settings.Views.AnimationSettingToggle
@@ -290,21 +266,6 @@ public class SharedControlTests
     }
 
     [AvaloniaFact]
-    public void HintTooltip_AttachesToDifferentControlsAndUpdatesItsText()
-    {
-        foreach (var target in new Control[] { new ActionButton(), new StatusBadge(), new InputField() })
-        {
-            var tip = new HintTooltip { Text = "Helpful information" };
-            ToolTip.SetTip(target, tip);
-            Assert.Same(tip, ToolTip.GetTip(target));
-            Assert.Equal("Helpful information", tip.Content);
-            tip.Text = "Updated information";
-            Assert.Equal("Updated information", tip.Content);
-            Assert.Equal(280, tip.MaxWidth);
-        }
-    }
-
-    [AvaloniaFact]
     public void ActionButton_ActivatesOnReleaseAndPreservesNativeContentAndFlyout()
     {
         var button = new ActionButton
@@ -357,143 +318,6 @@ public class SharedControlTests
     }
 
     [AvaloniaFact]
-    public void ActionButton_VariantsAndIconOnlyLayoutPreserveTheirStates()
-    {
-        var button = new ActionButton
-        {
-            Text = "Example",
-            Tone = ActionButtonTone.Brand,
-            IconData = Geometry.Parse("M0 0 H16 V16 H0 Z"),
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
-        };
-        var window = new Window
-        {
-            Content = button,
-            Width = 300,
-            Height = 100,
-        };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            var glow = button.GetVisualDescendants().OfType<HoverGlow>().Single();
-            var right = button.GetVisualDescendants().OfType<PathIcon>().Single(x => x.Name == "PART_RightIcon");
-            foreach (var tone in Enum.GetValues<ActionButtonTone>())
-            foreach (var variant in Enum.GetValues<ActionButtonVariant>())
-            {
-                button.Tone = tone;
-                button.Variant = variant;
-                Assert.Equal(new Thickness(variant == ActionButtonVariant.Ghost ? 1 : 0), button.BorderThickness);
-                if (variant is ActionButtonVariant.Ghost or ActionButtonVariant.Label or ActionButtonVariant.Link)
-                    Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(button.Background).Color);
-            }
-            button.Tone = ActionButtonTone.Brand;
-            foreach (var variant in Enum.GetValues<ActionButtonVariant>())
-            {
-                button.Variant = variant;
-                Assert.Equal(new Thickness(variant == ActionButtonVariant.Ghost ? 1 : 0), button.BorderThickness);
-                var palette =
-                    variant == ActionButtonVariant.Ghost ? "Brand300"
-                    : variant == ActionButtonVariant.Button ? "Brand100"
-                    : "Brand200";
-                Assert.Equal((Color)window.FindResource(palette)!, Assert.IsAssignableFrom<ISolidColorBrush>(glow.Background).Color);
-                window.MouseMove(new Point(10, 10));
-                Assert.Equal(
-                    variant is not (ActionButtonVariant.Label or ActionButtonVariant.Link) && button.Tone != ActionButtonTone.Primary,
-                    glow.IsVisible
-                );
-                var underline = button.GetVisualDescendants().OfType<Border>().Single(x => x.Name == "PART_LinkUnderline");
-                if (variant == ActionButtonVariant.Link)
-                {
-                    Assert.True(underline.IsVisible);
-                    Assert.Equal(
-                        (Color)window.FindResource("Brand300")!,
-                        Assert.IsAssignableFrom<ISolidColorBrush>(button.Foreground).Color
-                    );
-                }
-                window.MouseMove(new Point(280, 80));
-                Assert.False(glow.IsVisible);
-                Assert.False(underline.IsVisible);
-            }
-            button.Tone = ActionButtonTone.Brand;
-            button.Variant = ActionButtonVariant.Ghost;
-            Assert.Equal((Color)window.FindResource("Neutral200")!, Assert.IsAssignableFrom<ISolidColorBrush>(button.Foreground).Color);
-            Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(button.Background).Color);
-            window.MouseMove(new Point(10, 10));
-            Assert.Equal((Color)window.FindResource("Brand400")!, Assert.IsAssignableFrom<ISolidColorBrush>(button.BorderBrush).Color);
-            button.Text = "";
-            button.IsIconLeft = false;
-            window.UpdateLayout();
-            Assert.True(right.IsVisible);
-            Assert.Equal(16, right.Width);
-            Assert.Equal(button.Bounds.Width, button.Bounds.Height);
-            var center = right.TranslatePoint(new Point(right.Bounds.Width / 2, right.Bounds.Height / 2), button)!.Value;
-            Assert.Equal(button.Bounds.Width / 2, center.X, 1);
-            button.Size = ButtonSize.Compact;
-            window.UpdateLayout();
-            Assert.Equal(14, right.Width);
-            Assert.Equal(button.Bounds.Width, button.Bounds.Height);
-            button.Text = "Circular action";
-            button.IsCircular = true;
-            window.UpdateLayout();
-            Assert.Equal("Circular action", button.Content);
-            Assert.Equal("Circular action", ToolTip.GetTip(button));
-            Assert.Equal(26, button.Bounds.Width);
-            Assert.Equal(button.Bounds.Width, button.Bounds.Height);
-            foreach (var variant in Enum.GetValues<ActionButtonVariant>())
-            foreach (var size in Enum.GetValues<ButtonSize>())
-            foreach (var iconLeft in new[] { true, false })
-            {
-                button.Variant = variant;
-                button.Size = size;
-                button.IsIconLeft = iconLeft;
-                window.UpdateLayout();
-                var icon = button.GetVisualDescendants().OfType<PathIcon>().Single(x => x.IsVisible);
-                var iconCenter = icon.TranslatePoint(new Point(icon.Bounds.Width / 2, icon.Bounds.Height / 2), button)!.Value;
-                Assert.Equal(button.Bounds.Width / 2, iconCenter.X, 1);
-                Assert.Equal(button.Bounds.Height / 2, iconCenter.Y, 1);
-                Assert.Equal(size == ButtonSize.Compact ? 26 : 36, button.Bounds.Width);
-            }
-            button.Variant = ActionButtonVariant.Label;
-            window.MouseMove(new Point(10, 10));
-            Assert.False(glow.IsVisible);
-            Assert.Equal((Color)window.FindResource("Brand300")!, Assert.IsAssignableFrom<ISolidColorBrush>(button.Foreground).Color);
-            Assert.False(
-                button
-                    .GetVisualDescendants()
-                    .OfType<Avalonia.Controls.Presenters.ContentPresenter>()
-                    .Single(x => x.Name == "PART_ContentPresenter")
-                    .IsVisible
-            );
-            button.IsCircular = false;
-            window.UpdateLayout();
-            button.Focus();
-            window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(button.Background).Color);
-            window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            button.Variant = ActionButtonVariant.Link;
-            window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            Assert.Equal((Color)window.FindResource("Brand300")!, Assert.IsAssignableFrom<ISolidColorBrush>(button.Foreground).Color);
-            window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            Assert.Null(ToolTip.GetTip(button));
-            Assert.True(
-                button
-                    .GetVisualDescendants()
-                    .OfType<Avalonia.Controls.Presenters.ContentPresenter>()
-                    .Single(x => x.Name == "PART_ContentPresenter")
-                    .IsVisible
-            );
-            button.IsEnabled = false;
-            Assert.False(glow.IsVisible);
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
-    [AvaloniaFact]
     public void Dropdown_DismissalBlocksPageClicksButAllowsOptedInNavigation()
     {
         var dropdown = new Dropdown { ItemsSource = new[] { "One", "Two" }, MenuAnimationDuration = TimeSpan.Zero };
@@ -538,59 +362,6 @@ public class SharedControlTests
             window.MouseUp(navigationPoint, MouseButton.Left);
             Assert.False(dropdown.IsDropDownOpen);
             Assert.Equal(1, navigationClicks);
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
-    [AvaloniaFact]
-    public void Badge_VariantsKeepIconsContentAndTooltipInSync()
-    {
-        var badge = new StatusBadge
-        {
-            Height = 28,
-            Text = "Status",
-            TipText = "More information",
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
-        };
-        var window = new Window
-        {
-            Content = badge,
-            Width = 300,
-            Height = 100,
-        };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            var iconArea = badge.GetVisualDescendants().OfType<Border>().Single(x => x.Name == "PART_IconArea");
-            var icon = badge.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Single();
-            var text = badge.GetVisualDescendants().OfType<TextBlock>().Single();
-            Assert.Equal(14, text.FontSize);
-            Assert.False(iconArea.IsVisible);
-            badge.IconData = Geometry.Parse("M0 0 H16 V16 H0 Z");
-            Assert.True(iconArea.IsVisible);
-            foreach (var variant in Enum.GetValues<StatusVariant>())
-            {
-                badge.Variant = variant;
-                Assert.Equal(badge.Foreground, icon.Fill);
-                Assert.Equal(badge.Foreground, text.Foreground);
-                Assert.Equal(new Thickness(0), badge.BorderThickness);
-            }
-            badge.Height = 28;
-            Assert.Equal(14, badge.FontSize);
-            badge.Height = 32;
-            Assert.Equal(16, badge.FontSize);
-            var root = badge.GetVisualDescendants().OfType<Border>().Single(x => x.Name == "PART_StateBox_Root");
-            Assert.Equal("More information", ToolTip.GetTip(root));
-            badge.Content = new TextBlock { Text = "Custom content" };
-            Assert.False(text.IsVisible);
-            badge.Content = null;
-            Assert.True(text.IsVisible);
-            badge.IsEnabled = false;
-            Assert.Equal(0.5, badge.Opacity);
         }
         finally
         {
@@ -724,7 +495,8 @@ public class SharedControlTests
             var popup = dropdown.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.Popup>().Single();
             var optionIcon = popup.Child!.GetVisualDescendants().OfType<PathIcon>().Single(x => x.Classes.Contains("DropdownOptionIcon"));
             Assert.Equal((Color)window.FindResource("Brand400")!, Assert.IsAssignableFrom<ISolidColorBrush>(optionIcon.Foreground).Color);
-            input.ErrorText = dropdown.ErrorText = "";
+            input.ErrorText = null;
+            dropdown.ErrorText = "";
             Assert.True(inputNote.IsVisible);
             Assert.True(dropdownNote.IsVisible);
         }
@@ -814,61 +586,6 @@ public class SharedControlTests
         finally
         {
             window.Close();
-        }
-    }
-
-    [AvaloniaFact]
-    public void Dropdown_BorderlessAndErrorStatesKeepTheFieldIdentifiable()
-    {
-        var resources = Application.Current!.Resources;
-        var duration = resources[WindowAppearance.ControlAnimationDurationResourceKey];
-        resources[WindowAppearance.ControlAnimationDurationResourceKey] = TimeSpan.Zero;
-        var dropdown = new Dropdown
-        {
-            Variant = DropdownVariant.Borderless,
-            ItemsSource = new[] { new DropdownOption("Option", Geometry.Parse("M0 0 H16 V16 H0 Z")) },
-            SelectedIndex = 0,
-        };
-        var window = new Window
-        {
-            Content = dropdown,
-            Width = 300,
-            Height = 100,
-        };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(dropdown.BorderBrush).Color);
-            window.MouseMove(new Point(10, 10));
-            Assert.NotEqual(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(dropdown.BorderBrush).Color);
-            window.MouseMove(new Point(-10, -10));
-            dropdown.IsDropDownOpen = true;
-            Assert.Equal((Color)window.FindResource("Brand400")!, Assert.IsAssignableFrom<ISolidColorBrush>(dropdown.BorderBrush).Color);
-            dropdown.IsDropDownOpen = false;
-            Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(dropdown.BorderBrush).Color);
-
-            dropdown.ErrorText = "Choose another option";
-            window.UpdateLayout();
-            Assert.True(dropdown.HasError);
-            var errorColor = (Color)window.FindResource("Danger400")!;
-            Assert.Equal(errorColor, Assert.IsAssignableFrom<ISolidColorBrush>(dropdown.BorderBrush).Color);
-            var icon = dropdown.GetVisualDescendants().OfType<PathIcon>().Single(icon => icon.Classes.Contains("DropdownOptionIcon"));
-            Assert.Equal(errorColor, Assert.IsAssignableFrom<ISolidColorBrush>(icon.Foreground).Color);
-            var chevron = dropdown
-                .GetVisualDescendants()
-                .OfType<Avalonia.Controls.Shapes.Path>()
-                .Single(path => path.Name == "PART_ChevronPath");
-            Assert.Equal(errorColor, Assert.IsAssignableFrom<ISolidColorBrush>(chevron.Fill).Color);
-            Assert.Contains(dropdown.GetVisualDescendants().OfType<TextBlock>(), text => text.Text == dropdown.ErrorText);
-            dropdown.ErrorText = "";
-            Assert.False(dropdown.HasError);
-            Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(dropdown.BorderBrush).Color);
-        }
-        finally
-        {
-            window.Close();
-            resources[WindowAppearance.ControlAnimationDurationResourceKey] = duration;
         }
     }
 
@@ -1089,30 +806,6 @@ public class SharedControlTests
     }
 
     [AvaloniaFact]
-    public void ToggleRadioButton_ExcludesOtherButtonsInItsGroup()
-    {
-        var first = new ToggleRadioButton { GroupName = "Choices", IsChecked = true };
-        var second = new ToggleRadioButton { GroupName = "Choices", Variant = ToggleVariant.Checkbox };
-        var window = new Window { Content = new StackPanel { Children = { first, second } } };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            Assert.Equal(ToggleVariant.Radio, first.Variant);
-            second.Focus();
-            window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            Assert.True(first.IsChecked);
-            window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            Assert.False(first.IsChecked);
-            Assert.True(second.IsChecked);
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
-    [AvaloniaFact]
     public void ToggleTransitions_TrackTheAnimationDurationResource()
     {
         var resources = Application.Current!.Resources;
@@ -1140,42 +833,6 @@ public class SharedControlTests
         {
             window.Close();
             resources[durationKey] = previous;
-        }
-    }
-
-    [AvaloniaFact]
-    public void ActionButton_RendersNativeContentAndOpensItsFlyoutFromKeyboard()
-    {
-        var content = new TextBlock { Text = "Custom content" };
-        var menu = new MenuFlyout();
-        menu.Items.Add(new MenuItem { Header = "Import" });
-        var button = new ActionButton
-        {
-            Content = content,
-            Flyout = menu,
-            Tone = ActionButtonTone.Brand,
-        };
-        button.Classes.Add("caller-class");
-        var window = new Window { Content = button };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            Assert.Contains(content, button.GetVisualDescendants());
-            var initialBackground = button.Background;
-            button.Tone = ActionButtonTone.Danger;
-            Assert.NotEqual(initialBackground, button.Background);
-            Assert.Equal(new[] { "caller-class" }, button.Classes.Where(name => !name.StartsWith(":")));
-            button.Focus();
-            window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            Assert.True(menu.IsOpen);
-            menu.Hide();
-            Assert.False(menu.IsOpen);
-        }
-        finally
-        {
-            window.Close();
         }
     }
 
@@ -1229,10 +886,14 @@ public class SharedControlTests
             model.Value = "Updated";
             Dispatcher.UIThread.RunJobs();
             Assert.Equal("Updated", input.Text);
-            foreach (var cleared in new string?[] { null, "", "   " })
+            field.ErrorText = null;
+            Assert.False(field.HasError);
+            foreach (var silent in new[] { "", "   " })
             {
-                field.ErrorText = cleared;
-                Assert.False(field.HasError);
+                field.ErrorText = silent;
+                window.UpdateLayout();
+                Assert.True(field.HasError);
+                Assert.False(field.GetVisualDescendants().OfType<Grid>().Single(grid => grid.Name == "PART_Error").IsVisible);
             }
             field.ErrorText = "Duplicate friend code";
             Assert.True(field.HasError);

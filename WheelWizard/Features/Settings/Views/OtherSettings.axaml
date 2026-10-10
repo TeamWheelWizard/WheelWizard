@@ -72,7 +72,7 @@
                         </StackPanel>
                         <components1:ActionButton Grid.Column="1"
                                             x:Name="DolphinReinstallButton"
-                                            Tone="Primary"
+                                            Tone="Danger"
                                             Size="Compact"
                                             IsEnabled="True"
                                             IconData="{StaticResource Download}"

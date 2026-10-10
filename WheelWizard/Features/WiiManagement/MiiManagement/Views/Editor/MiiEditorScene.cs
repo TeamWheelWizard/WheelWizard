@@ -592,7 +592,7 @@ public sealed class MiiEditorScene : Grid
     private MiiRealtimeFrameSetup? FloorFrame()
     {
         var frame = _floorView?.LastCameraSetup ?? _imageFloorFrame;
-        if (frame is null || _pickerFloorBlend == 0)
+        if (frame is null)
             return frame;
 
         // Picker Miis are scaled about the viewport centre, lifting their feet by this same amount.
@@ -600,7 +600,8 @@ public sealed class MiiEditorScene : Grid
         if (ground.W <= 0.001f)
             return frame;
         var lift = (float)(-(ground.Y / ground.W) * (1 - PickerScale) * _pickerFloorBlend);
-        return frame with { Projection = frame.Projection * Matrix4x4.CreateTranslation(0, lift, 0) };
+        var shift = (float)(2 * (_floorView?.ScreenShiftX ?? 0) / Math.Max(1, Bounds.Width));
+        return frame with { Projection = frame.Projection * Matrix4x4.CreateTranslation(shift, lift, 0) };
     }
 
     private void ConfigureImageFloor(Mii3DRender image)

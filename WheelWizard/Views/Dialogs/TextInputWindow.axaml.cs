@@ -116,7 +116,7 @@ public partial class TextInputWindow : PopupContent
         var hasError = !string.IsNullOrWhiteSpace(validationError);
 
         SubmitButton.IsEnabled = !hasError;
-        InputField.ErrorText = hasError ? validationError! : string.Empty;
+        InputField.ErrorText = hasError ? validationError! : null;
     }
 
     private void CustomCharsButton_Click(object sender, RoutedEventArgs e)

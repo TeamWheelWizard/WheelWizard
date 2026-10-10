@@ -28,7 +28,7 @@ public sealed class MiiEditorFloor : Control
     {
         _frame = frame;
         IsHitTestVisible = false;
-        ClipToBounds = true;
+        ClipToBounds = false;
     }
 
     public override void Render(DrawingContext context)
@@ -58,6 +58,8 @@ public sealed class MiiEditorFloor : Control
         var patch = new Rect(center.Value.X - width / 2, center.Value.Y - height / 2, width, height);
         if (!patch.Intersects(new Rect(Bounds.Size)))
             return;
+        var drawingBounds = new Rect(-10, 0, Bounds.Width + 20, Bounds.Height);
+        using (context.PushClip(drawingBounds))
         using (context.PushOpacityMask(Fade, patch))
         {
             // The SVG's 180 x 180 canvas represents the ground plane from -90 to +90.
@@ -83,7 +85,7 @@ public sealed class MiiEditorFloor : Control
             );
             ground = SKMatrix.Concat(SKMatrix.CreateScale(PatternZoom, PatternZoom), ground);
             ground = SKMatrix.Concat(TextureRotation(frame.CharacterRotation), ground);
-            context.Custom(new FloorDrawing(picture, SKMatrix.Concat(projection, ground), new Rect(Bounds.Size), tileColor));
+            context.Custom(new FloorDrawing(picture, SKMatrix.Concat(projection, ground), drawingBounds, tileColor));
         }
     }
 

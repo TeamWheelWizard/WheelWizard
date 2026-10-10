@@ -246,7 +246,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
 
     private void SetEditorChromeVisible(bool visible)
     {
-        foreach (var control in new Control[] { SidebarPanel, TopActions })
+        foreach (var control in new Control[] { SidebarPanel, TopActions, TitleNameField })
         {
             control.Opacity = visible ? 1 : 0;
             control.IsHitTestVisible = visible;
@@ -898,6 +898,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         HeightSlider.Value = mii.Height.Value;
         WeightSlider.Value = mii.Weight.Value;
         NameField.Text = mii.Name.ToString();
+        NameField.ErrorText = TitleNameField.ErrorText = null;
         CreatorField.Text = mii.CreatorName.ToString();
         FavoriteButton.Classes.Set("favorite", mii.IsFavorite);
         _updatingFields = false;
@@ -933,7 +934,8 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             return;
         var name = NameField.Text?.Trim() ?? string.Empty;
         var valid = ValidateName(name);
-        NameField.ErrorText = valid.IsFailure ? valid.Error.Message : string.Empty;
+        NameField.ErrorText = valid.IsFailure ? valid.Error.Message : null;
+        TitleNameField.ErrorText = valid.IsFailure ? string.Empty : null;
         if (valid.IsFailure || name == _session.Mii.Name.ToString())
             return;
         if (_session.Change(m => MiiName.Create(name) is { IsSuccess: true } result && (m.Name = result.Value) is not null, "name"))
@@ -946,7 +948,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             return;
         var name = CreatorField.Text?.Trim() ?? string.Empty;
         var valid = name.Length > 10 ? Fail(t("helper_note.creator_name_less11")) : Ok();
-        CreatorField.ErrorText = valid.IsFailure ? valid.Error.Message : string.Empty;
+        CreatorField.ErrorText = valid.IsFailure ? valid.Error.Message : null;
         if (valid.IsFailure || name == _session.Mii.CreatorName.ToString())
             return;
         _session.Change(m => MiiName.Create(name) is { IsSuccess: true } result && (m.CreatorName = result.Value) is not null, "creator");
@@ -1192,6 +1194,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         {
             OpenSection(Section.Info);
             NameField.ErrorText = t("helper_note.name_must_between");
+            TitleNameField.ErrorText = string.Empty;
             NameField.Focus();
             return;
         }

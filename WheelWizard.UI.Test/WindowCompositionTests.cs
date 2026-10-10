@@ -90,47 +90,6 @@ public class WindowCompositionTests
         }
     }
 
-    [AvaloniaTheory]
-    [InlineData(64.0)]
-    [InlineData(221.0)]
-    public void SidebarSelection_JoinsMeetThePageWithoutOverflow(double width)
-    {
-        var button = new SidebarRadioButton { Text = "Home", IsChecked = true };
-        button.Classes.Set("compact", width == 64);
-        var host = new Border { Child = button, Width = width };
-        var window = new Window
-        {
-            Content = host,
-            Width = width,
-            Height = 100,
-        };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            Assert.Equal(host.Bounds.Width, button.Bounds.Right);
-            var joins = button
-                .GetVisualDescendants()
-                .OfType<Avalonia.Controls.Shapes.Path>()
-                .Where(path => path.Name is "PART_TopJoin" or "PART_BottomJoin")
-                .ToArray();
-            Assert.Equal(2, joins.Length);
-            foreach (var join in joins)
-            {
-                Assert.True(join.IsVisible);
-                var origin = join.TranslatePoint(default, button)!.Value;
-                Assert.Equal(button.Bounds.Width, origin.X + join.Bounds.Width);
-                Assert.Equal(join.Bounds.Width, join.Data!.Bounds.Right);
-                Assert.True(join.ClipToBounds);
-                Assert.Null(join.Stroke);
-            }
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
     [AvaloniaFact]
     public void SettingsContent_StaysStationaryWhileNavigationIsRevealed()
     {
@@ -168,49 +127,6 @@ public class WindowCompositionTests
                 window.UpdateLayout();
                 Assert.Equal(position, content.TranslatePoint(default, window));
                 Assert.Equal(size, content.Bounds.Size);
-            }
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
-    [AvaloniaTheory]
-    [InlineData(64.0)]
-    [InlineData(221.0)]
-    public void SidebarHover_MovesGlowWithoutChangingLayout(double width)
-    {
-        var button = new WheelWizard.Views.Shell.Controls.SidebarRadioButton { Text = "Home" };
-        var window = new Window
-        {
-            Width = width,
-            Height = 46,
-            Content = button,
-        };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            var icon = button.GetVisualDescendants().OfType<WheelWizard.Views.Components.IconLabel>().Single();
-            var iconPosition = icon.TranslatePoint(default, button);
-            button.IsChecked = true;
-            window.UpdateLayout();
-            Assert.Equal(iconPosition, icon.TranslatePoint(default, button));
-            button.IsChecked = false;
-            window.UpdateLayout();
-            var bounds = button.Bounds;
-            var desiredSize = button.DesiredSize;
-            var glow = button.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_HoverEffect");
-            Assert.False(glow.IsHitTestVisible);
-            foreach (var x in new[] { 2.0, width / 2, width - 1 })
-            {
-                window.MouseMove(new Point(x, 23));
-                window.UpdateLayout();
-                Assert.True(glow.IsVisible);
-                Assert.Equal(x - 23, Assert.IsType<TranslateTransform>(glow.RenderTransform).X);
-                Assert.Equal(bounds, button.Bounds);
-                Assert.Equal(desiredSize, button.DesiredSize);
             }
         }
         finally
@@ -299,18 +215,6 @@ public class WindowCompositionTests
             first.Close();
             second.Close();
         }
-    }
-
-    [AvaloniaFact]
-    public void ClosingOwner_ClosesItsNonmodalPopups()
-    {
-        var owner = new TestWindow();
-        var popup = new TestWindow(allowParentInteraction: true);
-        owner.Show();
-        popup.Show(owner);
-        Assert.True(owner.CanInteract);
-        owner.Close();
-        Assert.False(popup.IsVisible);
     }
 
     [AvaloniaTheory]

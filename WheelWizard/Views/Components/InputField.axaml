@@ -75,7 +75,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource Danger400}" />
             <Style Selector="^ /template/ PathIcon#PART_Icon"><Setter Property="Foreground" Value="{StaticResource Danger400}" /></Style>
         </Style>
-        <Style Selector="^:has-error /template/ Grid#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^:has-error-text /template/ Grid#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
         <Style Selector="^:disabled, ^[Variant=Borderless]:disabled">
             <Setter Property="Foreground" Value="{StaticResource Neutral600}" />
             <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />

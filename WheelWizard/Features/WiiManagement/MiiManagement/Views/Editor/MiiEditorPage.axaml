@@ -135,14 +135,33 @@
                                VerticalAlignment="Top" HorizontalAlignment="Left"
                                FontSize="16" Click="BackButton_OnClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
 
-        <StackPanel x:Name="TopActions" Orientation="Horizontal" Spacing="6"
-                    HorizontalAlignment="Right" VerticalAlignment="Top">
+        <Grid ColumnDefinitions="*,Auto">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{StaticResource TopRowSize}" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+        <Grid x:Name="TitleNameHost" Grid.Row="0" Grid.Column="0" Margin="3,12,12,12" VerticalAlignment="Bottom">
+        <TextBlock x:Name="TitleNameMeasure" Text="{Binding Text, ElementName=NameField}"
+                   FontSize="23" FontWeight="Bold" FontFamily="{Binding FontFamily, ElementName=TitleNameField}"
+                   Padding="2,0" MinWidth="16" HorizontalAlignment="Left" Opacity="0" IsHitTestVisible="False" />
+        <components:InputField x:Name="TitleNameField" Variant="Borderless"
+                               Width="{Binding Bounds.Width, ElementName=TitleNameMeasure}"
+                               MaxWidth="{Binding Bounds.Width, ElementName=TitleNameHost}"
+                               Text="{Binding Text, ElementName=NameField, Mode=TwoWay}"
+                               Placeholder="{loc:T placeholder.enter_mii_name}"
+                               FontSize="23" FontWeight="Bold" Foreground="{StaticResource Neutral400}"
+                               Padding="0" MinHeight="0" MinWidth="0" HorizontalAlignment="Left"
+                               VerticalAlignment="Bottom" />
+        </Grid>
+        <StackPanel x:Name="TopActions" Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,3,12"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <components:ActionButton x:Name="UndoButton" IsCircular="True" Variant="Ghost" Tone="Brand" IconData="{StaticResource RotateLeft}" Click="UndoButton_OnClick" ToolTip.Tip="{loc:T action.undo}" />
             <components:ActionButton x:Name="RedoButton" IsCircular="True" Variant="Ghost" Tone="Brand" IconData="{StaticResource RotateRight}" Click="RedoButton_OnClick" ToolTip.Tip="{loc:T action.redo}" />
             <components:ActionButton x:Name="SaveButton" Tone="Brand" Margin="4,0,0,0"
                                IconData="{StaticResource CheckMark}"
                                Text="{loc:T action.save}" Click="SaveButton_OnClick" />
         </StackPanel>
+        </Grid>
 
         <!-- The floating sidebar: Head / Body / Info, then the head groups, then a group's parts. -->
         <Border x:Name="SidebarPanel" Classes="Floating"

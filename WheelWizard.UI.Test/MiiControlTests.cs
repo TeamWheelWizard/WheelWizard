@@ -24,6 +24,67 @@ namespace WheelWizard.UI.Test;
 public class MiiControlTests
 {
     [AvaloniaFact]
+    public async Task EditorName_HeaderAndInfoMirrorEditsAndUndo()
+    {
+        InstallThemes();
+        var settings = Substitute.For<ISettingsManager>();
+        settings.ENABLE_ANIMATIONS.Returns(new WhWzSetting<bool>("EnableAnimations", false));
+        var page = new WheelWizard.WiiManagement.MiiManagement.Views.Editor.MiiEditorPage(
+            Substitute.For<WheelWizard.Views.Shell.Navigation.INavigationService>(),
+            Substitute.For<IMiiDbService>(),
+            settings,
+            Substitute.For<IMiiNativeRenderer>(),
+            Substitute.For<IMiiAnimationLibrary>(),
+            Substitute.For<ISeasonalCalendar>(),
+            new RealRandomSystem(),
+            new WheelWizard.WiiManagement.MiiManagement.Views.Editor.MiiEditorRequest(MiiFactory.CreateDefaultMale())
+        );
+        var header = page.FindControl<WheelWizard.Views.Components.InputField>("TitleNameField")!;
+        var info = page.FindControl<WheelWizard.Views.Components.InputField>("NameField")!;
+        Assert.Equal(info.Text, header.Text);
+        header.Text = "Header";
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        Assert.Equal("Header", info.Text);
+        info.Text = "Info";
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        Assert.Equal("Info", header.Text);
+        header.Text = "X";
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        Assert.Equal("X", info.Text);
+        Assert.True(info.HasError);
+        Assert.Equal(string.Empty, header.ErrorText);
+        Assert.True(header.HasError);
+        page.FindControl<WheelWizard.Views.Components.ActionButton>("UndoButton")!
+            .RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        Assert.Equal(info.Text, header.Text);
+        Assert.NotEqual("X", header.Text);
+        var window = new Window
+        {
+            Content = page,
+            Width = 572,
+            Height = 700,
+        };
+        try
+        {
+            window.Show();
+            header.Text = "Short";
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            window.UpdateLayout();
+            var shortWidth = header.Bounds.Width;
+            header.Text = "LongerName";
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            window.UpdateLayout();
+            Assert.True(header.Bounds.Width > shortWidth, $"Short: {shortWidth}; long: {header.Bounds.Width}");
+            Assert.True(header.Bounds.Right < page.FindControl<StackPanel>("TopActions")!.Bounds.Left);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task Podium_WithoutAnimations_CentersStillsOnTheirSteps()
     {
         InstallThemes();

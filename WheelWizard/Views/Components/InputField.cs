@@ -43,7 +43,7 @@ public class InputField : TextBox
         get => GetValue(NoteProperty);
         set => SetValue(NoteProperty, value);
     }
-    public bool HasError => !string.IsNullOrWhiteSpace(ErrorText);
+    public bool HasError => ErrorText is not null;
     public static readonly StyledProperty<Geometry?> IconDataProperty = AvaloniaProperty.Register<InputField, Geometry?>(nameof(IconData));
     public static readonly StyledProperty<string?> PlaceholderProperty = AvaloniaProperty.Register<InputField, string?>(
         nameof(Placeholder)
@@ -59,6 +59,8 @@ public class InputField : TextBox
         get => GetValue(PlaceholderProperty);
         set => SetValue(PlaceholderProperty, value);
     }
+
+    /// <summary>Null clears the error; empty text marks the field invalid without a message.</summary>
     public string? ErrorText
     {
         get => GetValue(ErrorTextProperty);
@@ -82,6 +84,7 @@ public class InputField : TextBox
         if (change.Property == ErrorTextProperty || change.Property == NoteProperty)
         {
             PseudoClasses.Set(":has-error", HasError);
+            PseudoClasses.Set(":has-error-text", !string.IsNullOrWhiteSpace(ErrorText));
             PseudoClasses.Set(":has-note", !HasError && !string.IsNullOrWhiteSpace(Note));
         }
     }
