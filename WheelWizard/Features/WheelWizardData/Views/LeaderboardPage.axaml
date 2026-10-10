@@ -56,14 +56,6 @@
         <Style Selector="rooms|PlayerListItem:pointerover /template/ Border.BoxItemBackground">
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
-        <Style Selector="rooms|PlayerListItem /template/ Border#PART_TopLabelBadge">
-            <Setter Property="Background" Value="{StaticResource Neutral800}" />
-            <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-        <Style Selector="rooms|PlayerListItem /template/ TextBlock#PART_TopLabelText">
-            <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
-        </Style>
     </UserControl.Styles>
 
     <Grid>
@@ -82,15 +74,17 @@
                    VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
 
-        <Grid Grid.Row="1">
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+
+        <Grid Grid.Row="1" Margin="0,0,0,1">
             <StackPanel IsVisible="{Binding IsLoading}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Margin="20"
                         Spacing="10">
-                <components:LoadingIcon Width="68"
+                <components:Spinner Width="68"
                                         Height="68"
-                                        Foreground="{StaticResource Neutral700}"
                                         HorizontalAlignment="Center" />
                 <TextBlock Text="{loc:T state.loading_leaderboard}"
                            Classes="BodyText"
@@ -117,8 +111,8 @@
                            Width="310"
                            TextAlignment="Center"
                            HorizontalAlignment="Center" />
-                <components:Button Text="{loc:T action.retry}"
-                                   Variant="Primary"
+                <components:ActionButton Text="{loc:T action.retry}"
+                                   Tone="Brand"
                                    IconData="{StaticResource Refresh}"
                                    Width="160"
                                    HorizontalAlignment="Center"
@@ -132,8 +126,8 @@
                 <components:EmptyPageInfo Title="{loc:T empty_content.no_leaderboard_title}"
                                           BodyText="{loc:T empty_content.no_leaderboard}"
                                           IconData="{StaticResource Award}" />
-                <components:Button Text="{loc:T action.refresh}"
-                                   Variant="Primary"
+                <components:ActionButton Text="{loc:T action.refresh}"
+                                   Tone="Brand"
                                    IconData="{StaticResource Refresh}"
                                    Width="170"
                                    HorizontalAlignment="Center"
@@ -148,30 +142,17 @@
                 <StackPanel Spacing="10"
                             Margin="0,0,0,12">
                     <Border>
-                        <Grid RowDefinitions="Auto,Auto,Auto"
+                        <Grid RowDefinitions="Auto,Auto"
                               ClipToBounds="False">
-                            <StackPanel Orientation="Horizontal"
-                                        Spacing="7"
-                                        VerticalAlignment="Center">
-                                <PathIcon Data="{StaticResource StarIcon}"
-                                          Width="14"
-                                          Height="14"
-                                          Foreground="{StaticResource Warning500}" />
-                                <TextBlock Text="{loc:T text.top_3_podium}"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Foreground="White" />
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Ellipse Width="7" Height="7" Fill="{StaticResource Brand300}" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T text.live_rwfc}" Classes="TinyText"
+                                           Foreground="{StaticResource Neutral300}" VerticalAlignment="Center" />
                             </StackPanel>
-
-                            <TextBlock Grid.Row="1"
-                                       Margin="0,4,0,0"
-                                       Text="{loc:T text.live_rwfc}"
-                                       Classes="TinyText"
-                                       Foreground="{StaticResource Neutral300}" />
 
                             <!-- The top three stand on a podium in 3D. Pulled up a bit so confetti can fly over the header. -->
                             <community:LeaderboardPodiumStage x:Name="PodiumStage"
-                                                              Grid.Row="2"
+                                                              Grid.Row="1"
                                                               Height="380"
                                                               Margin="0,-24,0,0"
                                                               First="{Binding PodiumFirst.Mii}"
@@ -263,7 +244,7 @@
                                                            IsOpenHost="{Binding IsOpenHost}"
                                                            HasBadges="{Binding HasBadges}" BadgeVariants="{Binding BadgeVariants}"
                                                            IsTopPlayer="True"
-                                                           TopLabel="{Binding TopLabel}">
+                                                           TopLabel="{Binding TopLabel}" TopLabelVariant="{Binding RankBadgeVariant}">
                                     <rooms:PlayerListItem.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="{loc:T action.copy_friend_code}"

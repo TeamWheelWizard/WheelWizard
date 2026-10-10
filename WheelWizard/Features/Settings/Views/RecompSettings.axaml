@@ -51,7 +51,7 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <ComboBox Grid.Column="1"
+                        <components:Dropdown Grid.Column="1"
                                   x:Name="ResolutionDropdown"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
@@ -71,7 +71,7 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <ComboBox Grid.Column="1"
+                        <components:Dropdown Grid.Column="1"
                                   x:Name="GraphicsApiDropdown"
                                   PlaceholderText="Auto"
                                   HorizontalAlignment="Right"
@@ -86,9 +86,9 @@
                                                    HorizontalAlignment="Left"
                                                    VerticalAlignment="Center"
                                                    Text="{loc:T option.show_fps}" />
-                        <CheckBox Grid.Column="1"
+                        <components:ToggleCheckBox Grid.Column="1"
                                   x:Name="ShowFps"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
                     </Grid>
@@ -107,9 +107,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <CheckBox Grid.Column="1"
+                        <components:ToggleCheckBox Grid.Column="1"
                                   x:Name="PreventStutters"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
                     </Grid>
@@ -145,9 +145,9 @@
                                                  TextAlignment="Left"
                                                  TextWrapping="Wrap" />
                         </StackPanel>
-                        <CheckBox Grid.Column="1"
+                        <components:ToggleCheckBox Grid.Column="1"
                                   x:Name="ShareDolphinData"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
                     </Grid>
@@ -170,9 +170,9 @@
                                                  TextAlignment="Left"
                                                  TextWrapping="Wrap" />
                         </StackPanel>
-                        <components:Button Grid.Column="1"
+                        <components:ActionButton Grid.Column="1"
                                            x:Name="CloneDolphinDataButton"
-                                           Variant="Default"
+                                           Tone="Secondary"
                                            Size="Compact"
                                            Text="{loc:T action.clone}"
                                            IconData="{StaticResource Duplicate}"
@@ -195,9 +195,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <components:Button Grid.Column="1"
+                        <components:ActionButton Grid.Column="1"
                                            x:Name="OpenInstallFolder"
-                                           Variant="Default"
+                                           Tone="Secondary"
                                            Size="Compact"
                                            IconData="{StaticResource Folder}"
                                            Text="{loc:T action.open}"
@@ -220,9 +220,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <components:Button Grid.Column="1"
+                        <components:ActionButton Grid.Column="1"
                                            x:Name="UninstallButton"
-                                           Variant="Danger"
+                                           Tone="Danger"
                                            Size="Compact"
                                            IconData="{StaticResource Trash}"
                                            Text="{loc:T action.un_install}"

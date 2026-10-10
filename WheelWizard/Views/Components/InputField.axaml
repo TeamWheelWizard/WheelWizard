@@ -1,0 +1,85 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <Style Selector="components|InputField">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="MinWidth" Value="140" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+        <Setter Property="PlaceholderForeground" Value="{StaticResource Neutral500}" />
+        <Setter Property="CaretBrush" Value="{StaticResource Neutral50}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource Brand400}" />
+        <Setter Property="SelectionForegroundBrush" Value="White" />
+        <Setter Property="Background" Value="{StaticResource Neutral950}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DataValidationErrors>
+                    <StackPanel>
+                        <Border Name="PART_Field" MinHeight="{TemplateBinding MinHeight}" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}">
+                            <Border.Transitions><Transitions><BrushTransition Property="BorderBrush" Duration="{DynamicResource ControlAnimationDuration}" /></Transitions></Border.Transitions>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Grid Name="PART_IconArea" ColumnDefinitions="16" Margin="0,0,10,0"
+                                      IsVisible="{Binding IconData, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <PathIcon Name="PART_Icon" Data="{TemplateBinding IconData}" Width="16" Height="16" VerticalAlignment="Center" Foreground="{StaticResource Neutral400}" />
+                                </Grid>
+                                <ScrollViewer Grid.Column="1" Name="PART_ScrollViewer"
+                                              HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                              VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+                                    <Panel>
+                                        <TextBlock Name="PART_Placeholder" Text="{TemplateBinding PlaceholderText}" Foreground="{TemplateBinding PlaceholderForeground}"
+                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}" TextWrapping="{TemplateBinding TextWrapping}">
+                                            <TextBlock.IsVisible>
+                                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                    <Binding ElementName="PART_TextPresenter" Path="PreeditText" Converter="{x:Static StringConverters.IsNullOrEmpty}" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Text" Converter="{x:Static StringConverters.IsNullOrEmpty}" />
+                                                </MultiBinding>
+                                            </TextBlock.IsVisible>
+                                        </TextBlock>
+                                        <TextPresenter Name="PART_TextPresenter" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                       CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}" CaretBrush="{TemplateBinding CaretBrush}"
+                                                       CaretIndex="{TemplateBinding CaretIndex}" LineHeight="{TemplateBinding LineHeight}"
+                                                       LetterSpacing="{TemplateBinding LetterSpacing}" PasswordChar="{TemplateBinding PasswordChar}"
+                                                       RevealPassword="{TemplateBinding RevealPassword}" SelectionBrush="{TemplateBinding SelectionBrush}"
+                                                       SelectionEnd="{TemplateBinding SelectionEnd}" SelectionStart="{TemplateBinding SelectionStart}"
+                                                       SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                                       Text="{TemplateBinding Text, Mode=TwoWay}" TextAlignment="{TemplateBinding TextAlignment}"
+                                                       TextWrapping="{TemplateBinding TextWrapping}" />
+                                    </Panel>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                        <Grid Name="PART_Error" ColumnDefinitions="15,*" ColumnSpacing="8" Margin="4,4,0,0" IsVisible="False">
+                            <PathIcon Data="{StaticResource WarningTip}" Width="15" Height="15" Foreground="{StaticResource Danger400}" />
+                            <TextBlock Grid.Column="1" Text="{TemplateBinding ErrorText}" FontSize="13" Foreground="{StaticResource Danger400}" TextWrapping="Wrap" />
+                        </Grid>
+                        <TextBlock Name="PART_Note" Text="{TemplateBinding Note}" Foreground="{StaticResource Neutral400}" FontSize="13" TextWrapping="Wrap" Margin="4,4,0,0" IsVisible="False" />
+                    </StackPanel>
+                </DataValidationErrors>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^[Variant=Borderless]"><Setter Property="BorderBrush" Value="Transparent" /><Setter Property="Background" Value="Transparent" /><Setter Property="MinHeight" Value="30" /><Setter Property="Padding" Value="8,5" /></Style>
+        <Style Selector="^:has-note /template/ TextBlock#PART_Note"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^:pointerover, ^[Variant=Borderless]:pointerover"><Setter Property="BorderBrush" Value="{StaticResource Neutral500}" /></Style>
+        <Style Selector="^:focus, ^[Variant=Borderless]:focus">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+            <Style Selector="^ /template/ PathIcon#PART_Icon"><Setter Property="Foreground" Value="{StaticResource Brand400}" /></Style>
+        </Style>
+        <Style Selector="^:has-error, ^:error, ^[Variant=Borderless]:has-error, ^[Variant=Borderless]:error">
+            <Setter Property="BorderBrush" Value="{StaticResource Danger400}" />
+            <Style Selector="^ /template/ PathIcon#PART_Icon"><Setter Property="Foreground" Value="{StaticResource Danger400}" /></Style>
+        </Style>
+        <Style Selector="^:has-error /template/ Grid#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^:disabled, ^[Variant=Borderless]:disabled">
+            <Setter Property="Foreground" Value="{StaticResource Neutral600}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
+            <Style Selector="^ /template/ PathIcon#PART_Icon"><Setter Property="Foreground" Value="{StaticResource Neutral600}" /></Style>
+        </Style>
+    </Style>
+</Styles>

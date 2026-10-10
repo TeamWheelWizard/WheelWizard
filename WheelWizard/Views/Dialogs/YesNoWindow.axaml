@@ -21,14 +21,14 @@
         
         <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                      x:Name="ButtonContainer">
-            <components:Button x:Name="NoButton" Variant="Default"
+            <components:ActionButton x:Name="NoButton"
                                IsEnabled="True" Text="{loc:T action.no}"
                                IconData="{StaticResource XMark}"
-                               Click="noButton_Click" Margin="0,0,5,0"/>
-            <components:Button x:Name="YesButton" Variant="Primary"
+                               Click="noButton_Click" Margin="0,0,5,0" Tone="Secondary"/>
+            <components:ActionButton x:Name="YesButton"
                                IsEnabled="True" Text="{loc:T action.yes}"
                                IconData="{StaticResource CheckMark}"
-                               Click="yesButton_Click" Margin="5,0,0,0"/>
+                               Click="yesButton_Click" Margin="5,0,0,0" Tone="Brand"/>
         </UniformGrid>
     </Grid>
 </dialogBase:PopupContent>

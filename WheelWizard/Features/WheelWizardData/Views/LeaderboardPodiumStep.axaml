@@ -75,8 +75,10 @@
                                               IsVisible="{TemplateBinding IsSuspicious}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5">
-                                    <PathIcon Data="{StaticResource Chart}" Width="12" Height="12"
-                                              VerticalAlignment="Center" Foreground="{StaticResource Neutral300}" />
+                                    <Viewbox Width="12" Height="12" VerticalAlignment="Center">
+                                        <Path Width="24" Height="24" Data="M3 3v16a2 2 0 0 0 2 2h16 M7 16c.5-2 1.5-7 4-7 2 0 2 3 4 3 2.5 0 4.5-5 5-7"
+                                              Stroke="{StaticResource Neutral300}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round" />
+                                    </Viewbox>
                                     <TextBlock Text="{TemplateBinding VrText}" FontSize="12" FontWeight="SemiBold"
                                                VerticalAlignment="Center" Foreground="{StaticResource Neutral200}" />
                                 </StackPanel>

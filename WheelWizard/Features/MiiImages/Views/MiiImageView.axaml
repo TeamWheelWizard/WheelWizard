@@ -12,17 +12,16 @@
     <components:AspectGrid x:Name="MiiImageContainer" ClipToBounds="True" ColumnDefinitions="*,3*,*"
                              RowDefinitions="*,3*,*"
                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-        <components:LoadingIcon HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="MiiLoadingIcon"
-                                Foreground="{Binding LoadingColor, ElementName=Self}" Grid.Column="1" Grid.Row="1" >
-            <components:LoadingIcon.IsVisible>
+        <components:Spinner HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="MiiLoadingIcon" Grid.Column="1" Grid.Row="1" >
+            <components:Spinner.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="MiiLoaded" ElementName="Self"
                              Converter="{x:Static BoolConverters.Not}"/>
                     <Binding Path="GeneratedImages" ElementName="Self"
                              Converter="{x:Static conv:CollectionConverters.FirstIsNull}" />
                 </MultiBinding>
-            </components:LoadingIcon.IsVisible>
-        </components:LoadingIcon>
+            </components:Spinner.IsVisible>
+        </components:Spinner>
         
         <Path HorizontalAlignment="Center" VerticalAlignment="Bottom" Stretch="Uniform"
                 Grid.ColumnSpan="3" Grid.Column="0" Grid.RowSpan="2" Grid.Row="1"

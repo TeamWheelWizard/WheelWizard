@@ -1,0 +1,194 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <Style Selector="components|ToggleCheckBox">
+        <Setter Property="SelectionPreviewEnabled" Value="{DynamicResource ControlAnimationsEnabled}" />
+    </Style>
+    <Style Selector="components|ToggleRadioButton">
+        <Setter Property="SelectionPreviewEnabled" Value="{DynamicResource ControlAnimationsEnabled}" />
+    </Style>
+    <Style Selector="components|ToggleCheckBox, components|ToggleRadioButton">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />
+        <Setter Property="ClickMode" Value="Release" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+        <Setter Property="Background" Value="{StaticResource Neutral950}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
+        <Setter Property="CornerRadius" Value="5" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Border Name="PART_Indicator" Width="20" Height="20" BorderThickness="1"
+                            Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            CornerRadius="{TemplateBinding CornerRadius}" VerticalAlignment="Center">
+                        <Border.Transitions>
+                            <Transitions>
+                                <BrushTransition Property="Background" Duration="{DynamicResource ControlAnimationDuration}" />
+                                <BrushTransition Property="BorderBrush" Duration="{DynamicResource ControlAnimationDuration}" />
+                            </Transitions>
+                        </Border.Transitions>
+                        <Grid Name="PART_Mark" Opacity="0">
+                            <Grid.Transitions>
+                                <Transitions>
+                                    <DoubleTransition Property="Opacity" Duration="{DynamicResource ControlAnimationDuration}" />
+                                </Transitions>
+                            </Grid.Transitions>
+                            <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Canvas Width="24" Height="24">
+                                    <Path Name="PART_Check" Data="M20 6 L9 17 L5 13" RenderTransform="translate(-0.5px, 0.5px)"
+                                          Stroke="{StaticResource Neutral300}" StrokeThickness="3.5"
+                                          StrokeLineCap="Round" StrokeJoin="Round" />
+                                </Canvas>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+                    <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" RecognizesAccessKey="True"
+                                      Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:is(components|ToggleCheckBox)[Variant=Radio], ^:is(components|ToggleRadioButton)[Variant=Radio]">
+            <Setter Property="CornerRadius" Value="100" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Grid Width="20" Height="20" VerticalAlignment="Center">
+                            <Border Name="PART_Indicator" CornerRadius="100" BorderThickness="1"
+                                    Background="{StaticResource Neutral950}" BorderBrush="{StaticResource Neutral600}" />
+                            <Border Name="PART_Ring" CornerRadius="100" BorderThickness="0"
+                                    BorderBrush="{StaticResource Brand400}">
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <ThicknessTransition Property="BorderThickness"
+                                                             Duration="{DynamicResource ControlAnimationDuration}" Easing="CubicEaseOut" />
+                                    </Transitions>
+                                </Border.Transitions>
+                            </Border>
+                            <Grid Name="PART_RadioMark" RenderTransform="scale(0)">
+                                <Grid.Transitions>
+                                    <Transitions>
+                                        <TransformOperationsTransition Property="RenderTransform"
+                                                                       Duration="{DynamicResource ControlAnimationDuration}" Easing="CubicEaseOut" />
+                                    </Transitions>
+                                </Grid.Transitions>
+                                <Ellipse Name="PART_Dot" Width="8" Height="8" Fill="{StaticResource Neutral300}"
+                                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                        <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" RecognizesAccessKey="True"
+                                          Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#PART_Indicator">
+                <Setter Property="BorderBrush" Value="{StaticResource Neutral400}" />
+            </Style>
+        </Style>
+        <Style Selector="^:is(components|ToggleCheckBox)[Variant=Switch], ^:is(components|ToggleRadioButton)[Variant=Switch]">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Name="PART_Indicator" Width="38" Height="22" BorderThickness="1" CornerRadius="11"
+                                Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                VerticalAlignment="Center">
+                            <Border.Transitions>
+                                <Transitions>
+                                    <BrushTransition Property="Background" Duration="{DynamicResource ControlAnimationDuration}" />
+                                    <BrushTransition Property="BorderBrush" Duration="{DynamicResource ControlAnimationDuration}" />
+                                </Transitions>
+                            </Border.Transitions>
+                            <Ellipse Name="PART_Thumb" Width="16" Height="16" Margin="2,0,0,0"
+                                     Fill="{StaticResource Neutral300}" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                     RenderTransform="translate(0px, 0px)">
+                                <Ellipse.Transitions>
+                                    <Transitions>
+                                        <TransformOperationsTransition Property="RenderTransform"
+                                                                       Duration="{DynamicResource ControlAnimationDuration}"
+                                                                       Easing="CubicEaseOut" />
+                                        <BrushTransition Property="Fill" Duration="{DynamicResource ControlAnimationDuration}" />
+                                    </Transitions>
+                                </Ellipse.Transitions>
+                            </Ellipse>
+                        </Border>
+                        <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" RecognizesAccessKey="True"
+                                          Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="^:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand300}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Path#PART_Check, ^:checked /template/ Path#PART_Check, ^:pressed /template/ Path#PART_Check">
+            <Setter Property="Stroke" Value="{StaticResource Neutral50}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Ellipse, ^:checked /template/ Ellipse, ^:pressed /template/ Ellipse">
+            <Setter Property="Fill" Value="{StaticResource Neutral50}" />
+        </Style>
+        <Style Selector="^:is(components|ToggleCheckBox)[SelectionPreviewEnabled=True]:pointerover /template/ Grid#PART_RadioMark, ^:is(components|ToggleRadioButton)[SelectionPreviewEnabled=True]:pointerover /template/ Grid#PART_RadioMark, ^:checked /template/ Grid#PART_RadioMark">
+            <Setter Property="RenderTransform" Value="scale(1)" />
+        </Style>
+        <Style Selector="^:checked">
+            <Setter Property="Background" Value="{StaticResource Brand400}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+            <Style Selector="^ /template/ Grid#PART_Mark">
+                <Setter Property="Opacity" Value="1" />
+            </Style>
+            <Style Selector="^ /template/ Ellipse#PART_Thumb">
+                <Setter Property="RenderTransform" Value="translate(16px, 0px)" />
+            </Style>
+            <Style Selector="^ /template/ Border#PART_Ring">
+                <Setter Property="BorderThickness" Value="10" />
+            </Style>
+        </Style>
+        <Style Selector="^:checked:pointerover">
+            <Setter Property="Background" Value="{StaticResource Brand300}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand300}" />
+        </Style>
+        <Style Selector="^:focus-visible">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand100}" />
+            <Style Selector="^ /template/ Border#PART_Indicator">
+                <Setter Property="BorderBrush" Value="{StaticResource Brand100}" />
+            </Style>
+        </Style>
+        <Style Selector="^:is(components|ToggleCheckBox)[SelectionPreviewEnabled=True]:pressed, ^:is(components|ToggleRadioButton)[SelectionPreviewEnabled=True]:pressed">
+            <Setter Property="Background" Value="{StaticResource Neutral950}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral400}" />
+            <Style Selector="^ /template/ Border#PART_Indicator">
+                <Setter Property="BorderBrush" Value="{StaticResource Neutral400}" />
+            </Style>
+            <Style Selector="^ /template/ Grid#PART_Mark">
+                <Setter Property="Opacity" Value="1" />
+            </Style>
+            <Style Selector="^ /template/ Ellipse#PART_Thumb">
+                <Setter Property="RenderTransform" Value="translate(8px, 0px)" />
+            </Style>
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Cursor" Value="Arrow" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral600}" />
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="Opacity" Value="1" />
+            <Style Selector="^ /template/ Ellipse#PART_Dot, ^ /template/ Ellipse#PART_Thumb">
+                <Setter Property="Fill" Value="{StaticResource Neutral600}" />
+            </Style>
+            <Style Selector="^ /template/ Path#PART_Check">
+                <Setter Property="Stroke" Value="{StaticResource Neutral600}" />
+            </Style>
+            <Style Selector="^ /template/ Border#PART_Ring, ^ /template/ Border#PART_Indicator">
+                <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            </Style>
+        </Style>
+        <Style Selector="^:disabled:checked">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+        </Style>
+    </Style>
+</Styles>
+

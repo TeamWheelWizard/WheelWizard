@@ -24,6 +24,28 @@ namespace WheelWizard.UI.Test;
 public class MiiControlTests
 {
     [AvaloniaFact]
+    public async Task Podium_WithoutMiis_KeepsItsLightsOff()
+    {
+        var stage = new WheelWizard.WheelWizardData.Views.LeaderboardPodiumStage();
+        for (var place = 1; place <= 3; place++)
+        {
+            var step = new WheelWizard.WheelWizardData.Views.LeaderboardPodiumStep();
+            WheelWizard.WheelWizardData.Views.LeaderboardPodiumStage.SetPlace(step, place);
+            stage.Children.Add(step);
+        }
+        stage.Initialize(
+            Substitute.For<IMiiNativeRenderer>(),
+            Substitute.For<IMiiAnimationLibrary>(),
+            new RealRandomSystem().Random.Shared,
+            Substitute.For<ISeasonalCalendar>(),
+            false
+        );
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        Assert.All(stage.Children, step => Assert.DoesNotContain("Lit", step.Classes));
+    }
+
+    [AvaloniaFact]
     public void Templates_ConstructAllRenderingViewsWithoutAGlobalServiceProvider()
     {
         var images = InstallThemes();

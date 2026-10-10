@@ -129,11 +129,23 @@ public class ApplicationCompositionTests
                 typeof(TestingPage),
                 typeof(SettingsPage),
             ];
+            var sidebar = original.FindControl<StackPanel>("SidePanelButtons")!;
+            var sidebarBounds = sidebar.Bounds;
+            var sidebarPosition = sidebar.TranslatePoint(default, original);
             foreach (var page in pages)
             {
                 navigation.NavigateTo(page);
                 original.UpdateLayout();
                 Assert.IsType(page, navigation.CurrentPage);
+                if (page == typeof(LeaderboardPage))
+                {
+                    Assert.Equal(sidebarBounds, sidebar.Bounds);
+                    Assert.Equal(sidebarPosition, sidebar.TranslatePoint(default, original));
+                    typeof(LeaderboardPage).GetProperty(nameof(LeaderboardPage.HasData))!.SetValue(navigation.CurrentPage, true);
+                    original.UpdateLayout();
+                    Assert.Equal(sidebarBounds, sidebar.Bounds);
+                    Assert.Equal(sidebarPosition, sidebar.TranslatePoint(default, original));
+                }
             }
             navigation.NavigateTo<HomePage>();
             windows.Refresh();

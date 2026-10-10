@@ -11,6 +11,9 @@
             <FontFamily x:Key="DefaultFont">avares://WheelWizard/Resources/Fonts/Roboto-Regular.ttf#Roboto, avares://WheelWizard/Resources/Fonts/ctmkf.ttf#CTMKF</FontFamily>
 
             <!-- CONSTANTS -->
+            <x:TimeSpan x:Key="ControlAnimationDuration">0:0:0.12</x:TimeSpan>
+            <x:TimeSpan x:Key="SegmentAnimationDuration">0:0:0.24</x:TimeSpan>
+            <x:Boolean x:Key="ControlAnimationsEnabled">True</x:Boolean>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="Styles/Resources/Constants.axaml" />
                 <ResourceInclude Source="Styles/Resources/Icons.axaml" />
@@ -55,7 +58,7 @@
                                                 IsVisible="{TemplateBinding HasTitleBar}">
                                         <Button x:Name="PART_MinimizeButton" Theme="{StaticResource FluentDrawnCaptionButton}"
                                                 WindowDecorationProperties.ElementRole="MinimizeButton">
-                                            <PathIcon Width="11" Height="11" Data="M0,5 H11 V6 H0 Z"
+                                            <PathIcon Width="11" Height="11" Data="{StaticResource Minimize}"
                                                       Foreground="{Binding $parent[Button].Foreground}" />
                                         </Button>
                                         <Button x:Name="PART_MaximizeButton" Theme="{StaticResource FluentDrawnCaptionButton}"
@@ -111,26 +114,24 @@
         <!-- STYLES -->
         <StyleInclude Source="Styles/Styles/ButtonStyles.axaml" />
         <StyleInclude Source="Styles/Styles/TextStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/ToggleButtonStyles.axaml" />
         <StyleInclude Source="Styles/Styles/MiscStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/TextBoxStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/DropdownStyles.axaml" />
         <StyleInclude Source="Styles/Styles/SliderStyles.axaml" />
 
         <!-- STANDARD COMPONENTS -->
         <StyleInclude Source="Components/MultiColoredIcon.axaml" />
         <StyleInclude Source="Components/MultiIconRadioButton.axaml" />
         <StyleInclude Source="Components/IconLabel.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Views/Components/LinkButton.axaml" />
-        <StyleInclude Source="Components/Button.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Views/Components/TileButton.axaml" />
+        <StyleInclude Source="Components/ActionButton.axaml" />
+        <StyleInclude Source="Components/SplitButton.axaml" />
+        <StyleInclude Source="Components/Toggle.axaml" />
+        <StyleInclude Source="Components/Dropdown.axaml" />
+        <StyleInclude Source="Components/InputField.axaml" />
         <StyleInclude Source="Components/StatusBadge.axaml" />
         <StyleInclude Source="Components/EmptyPageInfo.axaml" />
         <StyleInclude Source="Components/FormFieldLabel.axaml" />
-        <StyleInclude Source="Components/TextField.axaml" />
-        <StyleInclude Source="Components/LoadingIcon.axaml" />
+        <StyleInclude Source="Components/Spinner.axaml" />
+        <StyleInclude Source="Components/SegmentedControl.axaml" />
         <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/SidebarRadioButton.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Views/Components/ListActionButton.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityCountBadge.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->

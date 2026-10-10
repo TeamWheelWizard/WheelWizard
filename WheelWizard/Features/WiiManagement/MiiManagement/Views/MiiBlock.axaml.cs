@@ -6,13 +6,14 @@ using Avalonia.Interactivity;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiImages.Views;
+using WheelWizard.Views.Components;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WiiManagement.MiiManagement.Views;
 
-public class MiiBlock : RadioButton
+public class MiiBlock : ToggleRadioButton
 {
     private MiiImageLoaderWithHover? _miiImageLoader;
 

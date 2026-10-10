@@ -17,7 +17,7 @@
         <Border Background="{StaticResource FrameColor}" PointerPressed="TopBar_PointerPressed"
                 WindowDecorationProperties.ElementRole="TitleBar">
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="{OnPlatform Default='10,0,150,0', macOS='80,0,10,0'}" VerticalAlignment="Center">
-                <components:StatusBadge Text="Beta" Variant="Warning" IconSize="0" IsVisible="{Binding BetaFlag}" />
+                <components:StatusBadge Text="Beta" Variant="Warning" IsVisible="{Binding BetaFlag}" />
                 <TextBlock FontSize="16" Text="{Binding WindowTitle}" Foreground="{StaticResource Neutral300}" />
             </StackPanel>
         </Border>

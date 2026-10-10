@@ -197,8 +197,8 @@ public static class MiiEditorParts
             b.Color1 = new SolidColorBrush(ViewUtils.Colors.Neutral100);
             b.Color2 = skinBorder;
             b.Color3 = black;
-            b.Color4 = new SolidColorBrush(ViewUtils.Colors.Primary800);
-            b.Color5 = new SolidColorBrush(ViewUtils.Colors.Primary900);
+            b.Color4 = new SolidColorBrush(ViewUtils.Colors.Brand800);
+            b.Color5 = new SolidColorBrush(ViewUtils.Colors.Brand900);
         }
 
         void EyeIcon(MultiIconRadioButton b)
@@ -206,8 +206,8 @@ public static class MiiEditorParts
             b.Color1 = new SolidColorBrush(ViewUtils.Colors.Neutral50);
             b.Color2 = new SolidColorBrush(ViewUtils.Colors.Neutral950);
             b.SelectedColor2 = black;
-            b.Color3 = new SolidColorBrush(ViewUtils.Colors.Primary400);
-            b.SelectedColor3 = new SolidColorBrush(ViewUtils.Colors.Primary300);
+            b.Color3 = new SolidColorBrush(ViewUtils.Colors.Brand400);
+            b.SelectedColor3 = new SolidColorBrush(ViewUtils.Colors.Brand300);
         }
 
         void BrowIcon(MultiIconRadioButton b)

@@ -4,6 +4,9 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using Microsoft.Extensions.Logging.Abstractions;
+using NSubstitute;
+using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Dialogs.Base;
@@ -14,6 +17,77 @@ namespace WheelWizard.UI.Test;
 
 public class WindowCompositionTests
 {
+    [AvaloniaFact]
+    public void AppearanceResources_FollowTheAnimationSettingAndUnsubscribe()
+    {
+        var settings = Substitute.For<ISettingsManager>();
+        var animations = new WhWzSetting<bool>("Animations", false);
+        var scale = new WhWzSetting<double>("Scale", 1);
+        settings.ENABLE_ANIMATIONS.Returns(animations);
+        settings.WINDOW_SCALE.Returns(scale);
+        settings.Get<double>(scale).Returns(_ => scale.Get());
+        var signals = new SettingsSignalBus(NullLogger<SettingsSignalBus>.Instance);
+        var resources = new ResourceDictionary();
+        using var appearance = new WindowAppearance(settings, signals);
+        appearance.Install(resources);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.ControlAnimationDurationResourceKey]);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.SegmentAnimationDurationResourceKey]);
+        Assert.Equal(false, resources[WindowAppearance.ControlAnimationsEnabledResourceKey]);
+        animations.Set(true);
+        signals.Publish(animations);
+        Assert.Equal(TimeSpan.FromMilliseconds(120), resources[WindowAppearance.ControlAnimationDurationResourceKey]);
+        Assert.Equal(TimeSpan.FromMilliseconds(240), resources[WindowAppearance.SegmentAnimationDurationResourceKey]);
+        Assert.Equal(true, resources[WindowAppearance.ControlAnimationsEnabledResourceKey]);
+        animations.Set(false);
+        signals.Publish(animations);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.ControlAnimationDurationResourceKey]);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.SegmentAnimationDurationResourceKey]);
+        Assert.Equal(false, resources[WindowAppearance.ControlAnimationsEnabledResourceKey]);
+        appearance.Dispose();
+        animations.Set(true);
+        signals.Publish(animations);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.ControlAnimationDurationResourceKey]);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.SegmentAnimationDurationResourceKey]);
+    }
+
+    [AvaloniaFact]
+    public void SidebarLabels_SurviveRepeatedCollapseAndReattachment()
+    {
+        var button = new WheelWizard.Views.Shell.Controls.SidebarRadioButton { Text = "My Miis" };
+        var window = new Window
+        {
+            Content = button,
+            Width = 221,
+            Height = 46,
+        };
+        try
+        {
+            window.Show();
+            for (var cycle = 0; cycle < 3; cycle++)
+            {
+                button.Classes.Set("compact", true);
+                window.Width = 64;
+                window.UpdateLayout();
+                var icon = button.GetVisualDescendants().OfType<WheelWizard.Views.Components.IconLabel>().Single();
+                Assert.Equal(button.Text, icon.Text);
+                Assert.False(icon.GetVisualDescendants().OfType<TextBlock>().Single().IsVisible);
+                window.Content = null;
+                window.Content = button;
+                button.Text = $"My Miis {cycle}";
+                button.Classes.Set("compact", false);
+                window.Width = 221;
+                window.UpdateLayout();
+                var text = icon.GetVisualDescendants().OfType<TextBlock>().Single();
+                Assert.True(text.IsVisible);
+                Assert.Equal(button.Text, text.Text);
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [AvaloniaTheory]
     [InlineData(64.0)]
     [InlineData(221.0)]
@@ -29,6 +103,13 @@ public class WindowCompositionTests
         try
         {
             window.Show();
+            window.UpdateLayout();
+            var icon = button.GetVisualDescendants().OfType<WheelWizard.Views.Components.IconLabel>().Single();
+            var iconPosition = icon.TranslatePoint(default, button);
+            button.IsChecked = true;
+            window.UpdateLayout();
+            Assert.Equal(iconPosition, icon.TranslatePoint(default, button));
+            button.IsChecked = false;
             window.UpdateLayout();
             var bounds = button.Bounds;
             var desiredSize = button.DesiredSize;

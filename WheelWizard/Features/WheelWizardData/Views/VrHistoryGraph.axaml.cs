@@ -304,6 +304,9 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
     {
         _model = model;
         InitializeComponent();
+        HistoryAxisDropdown.Items.Add(t("attribute.enable_matches"));
+        HistoryAxisDropdown.Items.Add(t("attribute.date"));
+        HistoryAxisDropdown.SelectedIndex = UseMatchesAsXAxis ? 0 : 1;
         PopulateHistoryDaysDropdown();
     }
 
@@ -320,6 +323,11 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
         _model.PropertyChanged -= Model_OnPropertyChanged;
         _model.CancelPending();
         base.OnDetachedFromVisualTree(e);
+    }
+
+    private void HistoryAxisDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        UseMatchesAsXAxis = HistoryAxisDropdown.SelectedIndex == 0;
     }
 
     private void PopulateHistoryDaysDropdown()

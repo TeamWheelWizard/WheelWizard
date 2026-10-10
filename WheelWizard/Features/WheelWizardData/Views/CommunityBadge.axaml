@@ -76,13 +76,13 @@
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
                     <Border Grid.Row="0" Grid.Column="0"
                             Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
-                            Background="{StaticResource Primary100}" />
+                            Background="{StaticResource Brand100}" />
 
                     <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
-                            Background="{StaticResource Primary400}" />
+                            Background="{StaticResource Brand400}" />
 
                     <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Fill="{StaticResource Primary900}" Data="{StaticResource Code}"
+                          Fill="{StaticResource Brand900}" Data="{StaticResource Code}"
                           Stretch="Uniform" />
                 </Grid>
             </ControlTemplate>

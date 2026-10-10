@@ -13,14 +13,14 @@
     </UserControl.Styles>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,5,0,0">
-            
+
             <!-- WHWZ DEVS -->
             <Border Classes="AboutBlockStyle" Margin="0,10,0,0">
                 <Grid ColumnDefinitions="60,*">
                     <communityControls:CommunityBadge Variant="WhWzDev" VerticalAlignment="Center" HorizontalAlignment="Left"
                                       Width="38" Height="38" Margin="1,0,0,0"/>
                     <Border Grid.Column="0" Classes="AboutBlockLineStyle" HorizontalAlignment="Right"/>
-                    
+
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Team Wheel Wizard" Margin="0,0,0,2"/>
                         <SelectableTextBlock Classes="TinyText" Text="This application is created by Patchzy and WantToBeeMe." />
@@ -29,14 +29,14 @@
                     </StackPanel>
                 </Grid>
             </Border>
-            
+
             <!-- RR dEVS -->
             <Border Classes="AboutBlockStyle" Margin="0,10,0,0">
                 <Grid ColumnDefinitions="60,*">
                     <communityControls:CommunityBadge Variant="RrDev" VerticalAlignment="Center" HorizontalAlignment="Left"
                                       Width="38" Height="38" Margin="1,0,0,0"/>
                     <Border Grid.Column="0" Classes="AboutBlockLineStyle" HorizontalAlignment="Right"/>
-                    
+
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Team Retro Rewind" Margin="0,0,0,2"/>
                         <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard was made to set up Retro Rewind" />
@@ -45,7 +45,7 @@
                     </StackPanel>
                 </Grid>
             </Border>
-            
+
 
 
             <!-- TRANSLATORS -->
@@ -54,7 +54,7 @@
                     <communityControls:CommunityBadge Variant="Translator" VerticalAlignment="Center" HorizontalAlignment="Left"
                                       Width="38" Height="38" Margin="1,0,0,0"/>
                     <Border Grid.Column="0" Classes="AboutBlockLineStyle" HorizontalAlignment="Right"/>
-                    
+
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Translator Team" Margin="0,0,0,2"/>
                         <SelectableTextBlock Classes="TinyText" Text="The entire Translation is being managed by Eppe." />
@@ -64,10 +64,10 @@
                         <SelectableTextBlock Classes="TinyText" Text="and Wheel Wizard, be sure to reach out to" />
                         <SelectableTextBlock Classes="TinyText" Text="Eppe or WantToBeeMe :)" />
                     </StackPanel>
-                    
+
                 </Grid>
             </Border>
-            
+
             <!-- ROBOTO FONTS-->
             <Border Classes="AboutBlockStyle" Margin="0,10,0,0">
                 <Grid ColumnDefinitions="60,*">
@@ -75,34 +75,28 @@
                           HorizontalAlignment="Left" VerticalAlignment="Center"
                           Fill="{StaticResource Neutral500}" Width="40"/>
                     <Border Grid.Column="0" Classes="AboutBlockLineStyle" HorizontalAlignment="Right"/>
-                    
+
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Roboto Classic Font" Margin="0,0,0,2"/>
                         <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard uses the Roboto font, licensed under"/>
                         <WrapPanel Orientation="Horizontal">
-                            <components:LinkButton Text="SIL Open Font License, Version 1.1" FontSize="12"
-                                                        Foreground="{StaticResource Primary300}"
-                                                        HoverForeground="{StaticResource Primary200}"
-                                                        IsUnderlined="True"  Tag="https://openfontlicense.org/open-font-license-official-text/" 
+                            <components:ActionButton Text="SIL Open Font License, Version 1.1" FontSize="12"  Tag="https://openfontlicense.org/open-font-license-official-text/"
                                                         Click="OpenLick_OnClick"
-                                                        />
+                                                         Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
                             <SelectableTextBlock Classes="TinyText" Text="."/>
                         </WrapPanel>
                         <WrapPanel Orientation="Horizontal">
                             <SelectableTextBlock Classes="TinyText" Text="© 2011 The Roboto Project Authors ("/>
-                            <components:LinkButton Text="source code" FontSize="12"
-                                                        Foreground="{StaticResource Primary300}"
-                                                        HoverForeground="{StaticResource Primary200}"
-                                                        IsUnderlined="True" Tag="https://github.com/googlefonts/roboto-classic" 
+                            <components:ActionButton Text="source code" FontSize="12" Tag="https://github.com/googlefonts/roboto-classic"
                                                         Click="OpenLick_OnClick"
-                            />
+                             Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
                             <SelectableTextBlock Classes="TinyText" Text=")"/>
                         </WrapPanel>
-                    
+
                     </StackPanel>
                 </Grid>
             </Border>
-            
+
             <!-- WHEEL WIZARD ICONS -->
             <Border Classes="AboutBlockStyle" Margin="0,10,0,0">
                 <Grid ColumnDefinitions="60,*">
@@ -110,35 +104,26 @@
                           HorizontalAlignment="Left" VerticalAlignment="Center"
                           Fill="{StaticResource Neutral500}" Width="40"/>
                     <Border Grid.Column="0" Classes="AboutBlockLineStyle" HorizontalAlignment="Right"/>
-                    
+
                     <StackPanel Grid.Column="1">
                         <components:FormFieldLabel Text="Wheel Wizard icons" Margin="0,0,0,2"/>
-                       
+
                         <WrapPanel Orientation="Horizontal">
                             <SelectableTextBlock Classes="TinyText" Text="Wheel Wizard uses icons from" />
-                            <components:LinkButton Text=" Game Icons" FontSize="12"
-                                                        Foreground="{StaticResource Primary300}"
-                                                        HoverForeground="{StaticResource Primary200}"
-                                                        IsUnderlined="True"  Tag="https://game-icons.net/about.html" 
+                            <components:ActionButton Text=" Game Icons" FontSize="12"  Tag="https://game-icons.net/about.html"
                                                         Click="OpenLick_OnClick"
-                            />
+                             Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
                             <SelectableTextBlock Classes="TinyText" Text="."/>
                         </WrapPanel>
                         <WrapPanel Orientation="Horizontal">
                             <SelectableTextBlock Classes="TinyText" Text="The"/>
-                            <components:LinkButton Text=" Car Wheel icon" FontSize="12"
-                                                        Foreground="{StaticResource Primary300}"
-                                                        HoverForeground="{StaticResource Primary200}"
-                                                        IsUnderlined="True"  Tag="https://game-icons.net/1x1/delapouite/car-wheel.html" 
+                            <components:ActionButton Text=" Car Wheel icon" FontSize="12"  Tag="https://game-icons.net/1x1/delapouite/car-wheel.html"
                                                         Click="OpenLick_OnClick"
-                            />
+                             Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
                             <SelectableTextBlock Classes="TinyText" Text=" and the" />
-                            <components:LinkButton Text=" Flat Tire icon" FontSize="12"
-                                                        Foreground="{StaticResource Primary300}"
-                                                        HoverForeground="{StaticResource Primary200}"
-                                                        IsUnderlined="True"  Tag="https://game-icons.net/1x1/delapouite/flat-tire.html" 
+                            <components:ActionButton Text=" Flat Tire icon" FontSize="12"  Tag="https://game-icons.net/1x1/delapouite/flat-tire.html"
                                                         Click="OpenLick_OnClick"
-                            />
+                             Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
                             <SelectableTextBlock Classes="TinyText" Text="."/>
                         </WrapPanel>
                         <SelectableTextBlock Classes="TinyText" Text="Both icons were created by Delapouite."/>
@@ -155,17 +140,14 @@
                         <components:FormFieldLabel Text="Mariokart WiiCompiled" Margin="0,0,0,2"/>
                         <SelectableTextBlock Classes="TinyText" Text="A native PC port of Mario Kart Wii," />
                         <SelectableTextBlock Classes="TinyText" Text="made with static recompilation by Patchzy." />
-                        <components:LinkButton Text="View WiiCompiled on GitHub" FontSize="12"
-                                               Foreground="{StaticResource Primary300}"
-                                               HoverForeground="{StaticResource Primary200}"
-                                               IsUnderlined="True" Tag="https://github.com/patchzyy/wiicompiled"
-                                               HorizontalAlignment="Left" Click="OpenLick_OnClick" />
+                        <components:ActionButton Text="View WiiCompiled on GitHub" FontSize="12" Tag="https://github.com/patchzyy/wiicompiled"
+                                               HorizontalAlignment="Left" Click="OpenLick_OnClick"  Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
                     </StackPanel>
                 </Grid>
             </Border>
             <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
-        
+
 
     </ScrollViewer>
 </UserControl>

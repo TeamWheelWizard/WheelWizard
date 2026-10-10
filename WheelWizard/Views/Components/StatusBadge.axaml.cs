@@ -7,16 +7,19 @@ namespace WheelWizard.Views.Components;
 
 public enum StatusVariant
 {
-    Default,
+    Gray,
     Dark,
+    Brand,
     Success,
     Warning,
-    Danger,
+    Error,
+    Info,
+    Important,
 }
 
 public class StatusBadge : ContentControl
 {
-    public static readonly StyledProperty<string?> TextProperty = AvaloniaProperty.Register<StatusBadge, string?>(nameof(Text), "0");
+    public static readonly StyledProperty<string?> TextProperty = AvaloniaProperty.Register<StatusBadge, string?>(nameof(Text));
 
     public string? Text
     {
@@ -32,14 +35,6 @@ public class StatusBadge : ContentControl
         set => SetValue(IconDataProperty, value);
     }
 
-    public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<StatusBadge, double>(nameof(IconSize), 20);
-
-    public double IconSize
-    {
-        get => GetValue(IconSizeProperty);
-        set => SetValue(IconSizeProperty, value);
-    }
-
     public static readonly StyledProperty<string?> TipTextProperty = AvaloniaProperty.Register<StatusBadge, string?>(nameof(TipText));
 
     public string? TipText
@@ -50,7 +45,7 @@ public class StatusBadge : ContentControl
 
     public static readonly StyledProperty<StatusVariant> VariantProperty = AvaloniaProperty.Register<StatusBadge, StatusVariant>(
         nameof(Variant),
-        StatusVariant.Default
+        StatusVariant.Gray
     );
 
     public StatusVariant Variant
@@ -68,5 +63,14 @@ public class StatusBadge : ContentControl
     {
         get => GetValue(TipPlacementProperty);
         set => SetValue(TipPlacementProperty, value);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == TextProperty || change.Property == ContentProperty || change.Property == IconDataProperty)
+            PseudoClasses.Set(":icon-only", string.IsNullOrEmpty(Text) && Content is null);
+        if (change.Property == HeightProperty)
+            SetValue(FontSizeProperty, double.IsFinite(Height) ? Math.Clamp(Height / 2, 10, 18) : 12);
     }
 }

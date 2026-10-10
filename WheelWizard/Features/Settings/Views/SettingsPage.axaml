@@ -26,47 +26,22 @@
                 ClipToBounds="True"
                 BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,0,1,0"
                 CornerRadius="0">
-            <Border.Styles>
-                <Style Selector="RadioButton.SettingsNavigationItem">
-                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                    <Setter Property="HorizontalContentAlignment" Value="Left" />
-                    <Setter Property="Padding" Value="10,12" />
-                    <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="Cursor" Value="Hand" />
-                    <Setter Property="Template">
-                        <ControlTemplate>
-                            <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
-                                <ContentPresenter Content="{TemplateBinding Content}" TextBlock.Foreground="{TemplateBinding Foreground}"
-                                                  HorizontalAlignment="Left" />
-                            </Border>
-                        </ControlTemplate>
-                    </Setter>
-                </Style>
-                <Style Selector="RadioButton.SettingsNavigationItem:pointerover">
-                    <Setter Property="Background" Value="{StaticResource Neutral700}" />
-                </Style>
-                <Style Selector="RadioButton.SettingsNavigationItem:checked">
-                    <Setter Property="Background" Value="{StaticResource Neutral900}" />
-                    <Setter Property="Foreground" Value="{StaticResource Primary400}" />
-                </Style>
-            </Border.Styles>
             <Grid RowDefinitions="*,Auto" Width="157" HorizontalAlignment="Right">
             <ScrollViewer Grid.Row="0" Margin="8,8,8,12" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel Orientation="Vertical" x:Name="SettingPages" VerticalAlignment="Top" HorizontalAlignment="Stretch" Spacing="4">
-                <RadioButton Classes="SettingsNavigationItem" Tag="WhWzSettings"
-                             Click="SidebarRadio_OnClick" Content="Wheel Wizard" IsChecked="True" />
-                <RadioButton x:Name="RecompSettingsTab" Classes="SettingsNavigationItem" Tag="RecompSettings"
-                             Click="SidebarRadio_OnClick" Content="WiiCompiled" IsVisible="False" />
-                <RadioButton x:Name="VideoSettingsTab" Classes="SettingsNavigationItem" Tag="VideoSettings"
-                             Click="SidebarRadio_OnClick" Content="{loc:T category.dolphin}"/>
-                <RadioButton Classes="SettingsNavigationItem" Tag="AppearanceSettings"
-                             Click="SidebarRadio_OnClick" Content="{loc:T category.appearance}" />
-                <RadioButton Classes="SettingsNavigationItem" Tag="OtherSettings"
-                             Click="SidebarRadio_OnClick" Content="{loc:T category.other}" />
-                <RadioButton Classes="SettingsNavigationItem" Tag="AppInfo"
-                             Click="SidebarRadio_OnClick" Content="{loc:T category.about}" />
-            </StackPanel>
+            <components:SegmentedControl x:Name="SettingPages" Orientation="Vertical" HasBorder="False" Variant="Dark" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" SelectionChanged="SettingsNavigation_OnSelectionChanged">
+                <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="WhWzSettings"
+                              Text="Wheel Wizard" />
+                <components:SegmentOption x:Name="RecompSettingsTab" HorizontalContentAlignment="Left" Padding="10,12" Tag="RecompSettings"
+                              Text="WiiCompiled" IsVisible="False" />
+                <components:SegmentOption x:Name="VideoSettingsTab" HorizontalContentAlignment="Left" Padding="10,12" Tag="VideoSettings"
+                              Text="{loc:T category.dolphin}"/>
+                <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="AppearanceSettings"
+                              Text="{loc:T category.appearance}" />
+                <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="OtherSettings"
+                              Text="{loc:T category.other}" />
+                <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="AppInfo"
+                              Text="{loc:T category.about}" />
+            </components:SegmentedControl>
             </ScrollViewer>
             <ContentControl x:Name="VersionInfoSidebar" Grid.Row="1" Margin="8,12"
                             HorizontalContentAlignment="Left" />
@@ -76,8 +51,8 @@
         <ContentControl Grid.Column="1" x:Name="SettingsContent" Margin="10,0,0,0" />
         </Grid>
 
-        <components:Button Grid.Row="0" x:Name="DevButton" IsVisible="False"
-                           Variant="Warning" Text="Dev Tool" Margin="3,12"
+        <components:ActionButton Grid.Row="0" x:Name="DevButton" IsVisible="False"
+                           Variant="Ghost" Tone="Brand" Text="Dev Tool" Margin="3,12"
                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
                            IconData="{StaticResource Code}"
                            Click="DevButton_OnClick" />

@@ -24,31 +24,28 @@
             <StackPanel Spacing="6">
                 <TextBlock Text="Mii" Classes="TitleText" />
                 <TextBlock x:Name="MiiNameText" Classes="BodyText" />
-                <components:Button x:Name="ChooseMiiButton" Variant="Default" Text="Choose Mii"
-                                   IconSize="0" HorizontalAlignment="Stretch"
+                <components:ActionButton x:Name="ChooseMiiButton" Tone="Secondary" Text="Choose Mii" HorizontalAlignment="Stretch"
                                    Click="ChooseMii_OnClick" />
 
                 <TextBlock Text="Animation" Classes="TitleText" Margin="0,10,0,0" />
-                <components:Button Variant="Primary" Text="Load .miianim"
-                                   IconSize="0" HorizontalAlignment="Stretch"
+                <components:ActionButton Tone="Brand" Text="Load .miianim" HorizontalAlignment="Stretch"
                                    Click="LoadAnimation_OnClick" />
                 <TextBlock x:Name="InfoText" Classes="TinyText" TextWrapping="Wrap" />
 
                 <TextBlock Text="Playback" Classes="TitleText" Margin="0,10,0,0" />
                 <Grid ColumnDefinitions="*,6,*">
-                    <components:Button x:Name="PlayButton" Variant="Default" Text="Pause"
-                                       IconSize="0" HorizontalAlignment="Stretch"
+                    <components:ActionButton x:Name="PlayButton" Tone="Secondary" Text="Pause" HorizontalAlignment="Stretch"
                                        Click="PlayPause_OnClick" />
-                    <ComboBox x:Name="SpeedBox" Grid.Column="2" HorizontalAlignment="Stretch"
+                    <components:Dropdown x:Name="SpeedBox" Grid.Column="2" HorizontalAlignment="Stretch"
                               VerticalAlignment="Stretch" SelectionChanged="Speed_OnSelectionChanged" />
                 </Grid>
                 <Slider x:Name="FrameSlider" Minimum="0" Maximum="1" ValueChanged="FrameSlider_OnValueChanged" />
                 <TextBlock x:Name="FrameText" Classes="TinyText" />
 
                 <TextBlock Text="Events" Classes="TitleText" Margin="0,10,0,0" />
-                <CheckBox x:Name="SwapGenderToggle" Margin="0,2" IsChecked="True" Classes="Switch">
+                <components:ToggleCheckBox x:Name="SwapGenderToggle" Margin="0,2" IsChecked="True" Variant="Switch">
                     Act on swap_gender
-                </CheckBox>
+                </components:ToggleCheckBox>
                 <TextBlock x:Name="EventsText" Classes="TinyText" TextWrapping="Wrap" />
                 <TextBlock Classes="TinyText" TextWrapping="Wrap" Opacity="0.7"
                            Text="Drag the preview to orbit. The animation loops." />

@@ -72,9 +72,9 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
     private (MiiEditPart Part, Size Size, Rect Rect)? _arrowAnchor;
     private bool _arrowAnchorDirty;
 
-    private readonly Button _previousButton;
-    private readonly Button _nextButton;
-    private readonly Dictionary<MiiEditPart, Button> _presenceButtons = new();
+    private readonly ActionButton _previousButton;
+    private readonly ActionButton _nextButton;
+    private readonly Dictionary<MiiEditPart, ActionButton> _presenceButtons = new();
 
     private enum Level
     {
@@ -137,8 +137,10 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         _scene.FellBackToImages += () => PositionOverlay();
         _scene.PointerWheelChanged += Scene_OnPointerWheelChanged;
 
-        _previousButton = RoundButton("MiiEditorChevronLeft", "hover.mii_editor.previous", "Arrow", (_, _) => Cycle(-1));
-        _nextButton = RoundButton("MiiEditorChevronRight", "hover.mii_editor.next", "Arrow", (_, _) => Cycle(1));
+        _previousButton = RoundButton("Chevron", "hover.mii_editor.previous", "Arrow", (_, _) => Cycle(-1));
+        _nextButton = RoundButton("Chevron", "hover.mii_editor.next", "Arrow", (_, _) => Cycle(1));
+        _previousButton.RenderTransform = new RotateTransform(90);
+        _nextButton.RenderTransform = new RotateTransform(270);
         Overlay.Children.Add(_previousButton);
         Overlay.Children.Add(_nextButton);
         foreach (var part in new[] { MiiEditPart.Glasses, MiiEditPart.Mole, MiiEditPart.Beard, MiiEditPart.Mustache })
@@ -418,7 +420,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             IconGeo = FindGeometry(geometry),
             Color1 = new SolidColorBrush(ViewUtils.Colors.Neutral300),
             HoverColor1 = new SolidColorBrush(ViewUtils.Colors.Neutral50),
-            SelectedColor1 = new SolidColorBrush(ViewUtils.Colors.Primary300),
+            SelectedColor1 = new SolidColorBrush(ViewUtils.Colors.Brand300),
             IsChecked = isChecked,
             GroupName = "MiiEditorSidebar" + GetHashCode(),
             Padding = new Thickness(6),
@@ -519,16 +521,17 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         return button;
     }
 
-    private Button RoundButton(string geometry, string? tipKey, string? extraClass, EventHandler<RoutedEventArgs> click)
+    private ActionButton RoundButton(string geometry, string? tipKey, string? extraClass, EventHandler<RoutedEventArgs> click)
     {
-        var button = new Button
+        var button = new ActionButton
         {
-            Classes = { "Round" },
+            IsCircular = true,
+            Variant = extraClass is "Add" or "Remove" ? ActionButtonVariant.Button : ActionButtonVariant.Ghost,
+            Tone = extraClass == "Remove" ? ActionButtonTone.Danger : ActionButtonTone.Brand,
+            Size = extraClass is "Add" or "Remove" ? ButtonSize.Compact : ButtonSize.Regular,
             Focusable = false,
-            Content = new PathIcon { Data = FindGeometry(geometry) },
+            IconData = FindGeometry(geometry),
         };
-        if (extraClass is not null)
-            button.Classes.Add(extraClass);
         if (tipKey is not null)
             ToolTip.SetTip(button, t(tipKey));
         button.Click += click;
@@ -577,8 +580,10 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
                         Classes = { "BodyText" },
                         VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
                     };
-                    button = new ToggleButton
+                    button = new ToggleRadioButton
                     {
+                        Classes = { "MiiTextVariant" },
+                        GroupName = "MiiEditorVariants" + GetHashCode(),
                         Focusable = false,
                         Content = content,
                         Height = 46,
@@ -1003,10 +1008,8 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             }
 
             var present = optionalDefinition.IsPresent(mii!);
-            button.Classes.Set("Add", !present);
-            button.Classes.Set("Remove", present);
-            if (button.Content is PathIcon icon)
-                icon.Data = FindGeometry(present ? "MinMark" : "PlusMark");
+            button.Tone = present ? ActionButtonTone.Danger : ActionButtonTone.Brand;
+            button.IconData = FindGeometry(present ? "MinMark" : "PlusMark");
             ToolTip.SetTip(
                 button,
                 t(present ? "hover.mii_editor.remove" : "hover.mii_editor.add", new { part = t(optionalDefinition.TitleKey) })
@@ -1175,7 +1178,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             .SetMainText(t("question.leave_mii_editor.title"))
             .SetExtraText(t("question.leave_mii_editor.extra"))
             .SetButtonText(t("action.leave"), t("action.keep_editing"))
-            .SetButtonVariants(ButtonVariant.Danger, ButtonVariant.Default)
+            .SetButtonTones(ActionButtonTone.Danger, ActionButtonTone.Secondary)
             .AwaitAnswer();
 
     private void BackButton_OnClick(object? sender, RoutedEventArgs e) => _navigation.NavigateTo<MiiListPage>();

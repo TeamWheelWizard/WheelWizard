@@ -1,0 +1,182 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:WheelWizard.Localization"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <Style Selector="components|Dropdown">
+        <Setter Property="SearchPlaceholder" Value="{loc:T component.dropdown.search_placeholder}" />
+        <Setter Property="EmptyText" Value="{loc:T component.dropdown.empty}" />
+        <Setter Property="MenuAnimationDuration" Value="{DynamicResource ControlAnimationDuration}" />
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="MinWidth" Value="140" />
+        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+        <Setter Property="PlaceholderForeground" Value="{StaticResource Neutral500}" />
+        <Setter Property="Background" Value="{StaticResource Neutral950}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}" />
+        <Setter Property="MaxDropDownHeight" Value="240" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel />
+            </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DataValidationErrors>
+                    <StackPanel>
+                        <Border Name="PART_Field" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                            <Border.Transitions>
+                                <Transitions>
+                                    <BrushTransition Property="BorderBrush" Duration="{DynamicResource ControlAnimationDuration}" />
+                                </Transitions>
+                            </Border.Transitions>
+                            <Grid ColumnDefinitions="*,Auto" Margin="{TemplateBinding Padding}" ColumnSpacing="12">
+                                <TextBlock Text="{TemplateBinding PlaceholderText}" Foreground="{TemplateBinding PlaceholderForeground}"
+                                           VerticalAlignment="Center" IsVisible="{TemplateBinding SelectionBoxItem, Converter={x:Static ObjectConverters.IsNull}}" />
+                                <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                                <Viewbox Grid.Column="1" Name="PART_Chevron" Width="16" Height="16" VerticalAlignment="Center"
+                                         RenderTransformOrigin="50%,50%" RenderTransform="rotate(0deg)" IsHitTestVisible="False">
+                                    <Viewbox.Transitions>
+                                        <Transitions>
+                                            <TransformOperationsTransition Property="RenderTransform" Duration="{DynamicResource ControlAnimationDuration}" />
+                                        </Transitions>
+                                    </Viewbox.Transitions>
+                                    <Canvas Width="24" Height="24">
+                                        <Path Name="PART_ChevronPath" Data="{StaticResource Chevron}" Fill="{StaticResource Neutral400}" />
+                                    </Canvas>
+                                </Viewbox>
+                                <Popup Name="PART_Popup"
+                                       PlacementTarget="PART_Field" IsLightDismissEnabled="False" InheritsTransform="True"
+                                       MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                                       MaxHeight="{TemplateBinding MaxDropDownHeight}" WindowManagerAddShadowHint="False">
+                                    <Border Name="PART_Menu" Background="{StaticResource Neutral900}" BorderBrush="{StaticResource Neutral700}"
+                                            BorderThickness="1" CornerRadius="{StaticResource GlobalCornerRadius}" ClipToBounds="True"
+                                            RenderTransformOrigin="50%,0%" Padding="4" Margin="0,4,0,0">
+                                        <Grid RowDefinitions="Auto,*">
+                                            <Border Name="PART_SearchSection" Margin="4,4,4,8" IsVisible="{TemplateBinding Search}">
+                                                <components:InputField Name="PART_Search" Placeholder="{TemplateBinding SearchPlaceholder}" IconData="{StaticResource Search}" />
+                                            </Border>
+                                            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" IsScrollChainingEnabled="False">
+                                                <StackPanel>
+                                                    <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+                                                    <TextBlock Name="PART_Empty" Text="{TemplateBinding EmptyText}" Foreground="{StaticResource Neutral400}" FontSize="14" Margin="12,16" TextWrapping="Wrap" IsVisible="False" />
+                                                </StackPanel>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                        <Grid ColumnDefinitions="15,*" ColumnSpacing="8" IsVisible="{TemplateBinding HasError}" Margin="4,4,0,0">
+                            <PathIcon Data="{StaticResource WarningTip}" Foreground="{StaticResource Danger400}"
+                                      Width="15" Height="15" VerticalAlignment="Top" />
+                            <TextBlock Grid.Column="1" Text="{TemplateBinding ErrorText}" Foreground="{StaticResource Danger400}"
+                                       FontSize="13" TextWrapping="Wrap" />
+                        </Grid>
+                        <TextBlock Name="PART_Note" Text="{TemplateBinding Note}" Foreground="{StaticResource Neutral400}" FontSize="13" TextWrapping="Wrap" Margin="4,4,0,0" IsVisible="False" />
+                    </StackPanel>
+                </DataValidationErrors>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^[Variant=Borderless]">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Padding" Value="8,5" />
+        </Style>
+        <Style Selector="^:pointerover, ^[Variant=Borderless]:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
+        </Style>
+        <Style Selector="^:focus-visible, ^:dropdownopen, ^[Variant=Borderless]:focus-visible, ^[Variant=Borderless]:dropdownopen">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+        </Style>
+        <Style Selector="^:dropdownopen /template/ Viewbox#PART_Chevron">
+            <Setter Property="RenderTransform" Value="rotate(180deg)" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Foreground" Value="{StaticResource Neutral600}" />
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
+            <Setter Property="Cursor" Value="Arrow" />
+            <Style Selector="^ /template/ Path#PART_ChevronPath">
+                <Setter Property="Fill" Value="{StaticResource Neutral600}" />
+            </Style>
+        </Style>
+        <Style Selector="^:has-error, ^:error, ^[Variant=Borderless]:has-error, ^[Variant=Borderless]:error">
+            <Setter Property="BorderBrush" Value="{StaticResource Danger400}" />
+            <Style Selector="^ /template/ Path#PART_ChevronPath">
+                <Setter Property="Fill" Value="{StaticResource Danger400}" />
+            </Style>
+        </Style>
+    </Style>
+    <Style Selector="components|Dropdown /template/ ContentPresenter#PART_ContentPresenter PathIcon.DropdownOptionIcon">
+        <Setter Property="Foreground" Value="{StaticResource Brand400}" />
+    </Style>
+    <Style Selector="components|DropdownItem PathIcon.DropdownOptionIcon">
+        <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+    </Style>
+    <Style Selector="components|DropdownItem:selected:not(:pointerover) PathIcon.DropdownOptionIcon">
+        <Setter Property="Foreground" Value="{StaticResource Brand400}" />
+    </Style>
+    <Style Selector="components|Dropdown:has-error /template/ ContentPresenter#PART_ContentPresenter PathIcon.DropdownOptionIcon, components|Dropdown:error /template/ ContentPresenter#PART_ContentPresenter PathIcon.DropdownOptionIcon">
+        <Setter Property="Foreground" Value="{StaticResource Danger400}" />
+    </Style>
+    <Style Selector="components|DropdownItem:pointerover:not(:disabled) PathIcon.DropdownOptionIcon">
+        <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+    </Style>
+    <Style Selector="components|DropdownItem:disabled PathIcon.DropdownOptionIcon">
+        <Setter Property="Foreground" Value="{StaticResource Neutral600}" />
+    </Style>
+    <Style Selector="components|Dropdown:has-note /template/ TextBlock#PART_Note"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="components|DropdownItem">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}" CornerRadius="4" ClipToBounds="True">
+                    <Panel>
+                    <Canvas IsHitTestVisible="False">
+                        <components:HoverGlow Name="PART_HoverEffect" CornerRadius="99999" IsVisible="False" Opacity="0.3" Background="{StaticResource Brand200}" Height="46" Width="46" Effect="blur(150)" />
+                    </Canvas>
+                    <Grid ColumnDefinitions="*,12" ColumnSpacing="12" Margin="{TemplateBinding Padding}">
+                        <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}"
+                                          VerticalAlignment="Center" />
+                        <Path Grid.Column="1" Name="PART_SelectedCheck" Data="M20 6 L9 17 L5 13"
+                              Width="12" Height="12" Stretch="Uniform" Stroke="{StaticResource Brand400}"
+                              StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round" IsVisible="False"
+                              VerticalAlignment="Center" IsHitTestVisible="False" />
+                    </Grid>
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover:not(:disabled) /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^:pointerover, ^:selected, ^:focus-visible">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+        </Style>
+        <Style Selector="^:pointerover:not(:disabled), ^:selected">
+            <Setter Property="Foreground" Value="{StaticResource Brand300}" />
+        </Style>
+        <Style Selector="^:selected /template/ Path#PART_SelectedCheck">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:disabled">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral600}" />
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+    </Style>
+</Styles>

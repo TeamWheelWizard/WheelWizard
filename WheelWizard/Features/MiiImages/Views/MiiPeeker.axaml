@@ -57,7 +57,7 @@
     </Style>
     <!-- Last, so the picked one stays teal while hovered or focused. -->
     <Style Selector="miiImages|MiiPeeker:active /template/ ContentPresenter#PART_Tag">
-        <Setter Property="Foreground" Value="{StaticResource Primary400}" />
+        <Setter Property="Foreground" Value="{StaticResource Brand300}" />
     </Style>
     <Style Selector="miiImages|MiiPeeker:disabled">
         <Setter Property="Opacity" Value="0.5" />

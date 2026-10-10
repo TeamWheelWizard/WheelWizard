@@ -17,19 +17,19 @@
                        HorizontalAlignment="Left" Grid.Row="0" />
 
             <!-- Search Bar -->
-            <Grid Grid.Row="1" Margin="0,10,0,10" HorizontalAlignment="Stretch">
-                <TextBox Name="SearchTextBox" PlaceholderText="{loc:T placeholder.search_mod}" Grid.Column="0"
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,10,0,15" HorizontalAlignment="Stretch">
+                <components:InputField Name="SearchTextBox" IconData="{StaticResource Search}" Placeholder="{loc:T placeholder.search_mod}" Grid.Column="0"
                          KeyDown="SearchTextBox_OnKeyDown"
-                         Height="40" HorizontalAlignment="Stretch" Margin="0,0,60,5" />
+                         Height="40" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
 
-                <components:Button Text="" FontSize="16" Height="40" IconData="{StaticResource Search}"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   Click="Search_Click" Margin="10,0,0,5" />
+                <components:ActionButton Grid.Column="1" Text="" FontSize="16" Height="40" IconData="{StaticResource Search}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Top"
+                                   Click="Search_Click"  Tone="Secondary"/>
             </Grid>
 
-            <CheckBox Grid.Row="2"
+            <components:ToggleCheckBox Grid.Row="2"
                       x:Name="PatchesOnlyToggle"
-                      Classes="Switch"
+                      Variant="Switch"
                       Margin="0,0,0,8"
                       Content="Patches only"
                       Click="PatchesOnlyToggle_Click" />

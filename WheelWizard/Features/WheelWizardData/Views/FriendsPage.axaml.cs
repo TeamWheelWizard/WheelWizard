@@ -1,11 +1,10 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Threading;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
@@ -91,7 +90,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
                 return;
             CurrentOrder = (ListOrderCondition)value;
             OnPropertyChanged(nameof(SortIndex));
-            SortButton.Text = SortOptions[value];
             UpdateFriendList();
         }
     }
@@ -116,7 +114,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         UpdateFriendList();
 
         DataContext = this;
-        SortButton.Text = SortOptions[SortIndex];
         HandleVisibility();
     }
 
@@ -221,45 +218,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         WINS,
         TOTAL_RACES,
     }
-
-    #region Sorting
-
-    // Filled here rather than in the menu's Opening event: that one only fires for a right-click, not for Open().
-    private void SortButton_OnClick(object? sender, RoutedEventArgs e)
-    {
-        FillSortMenu();
-        SortMenu.Open(SortButton);
-    }
-
-    private void SortMenu_OnOpening(object? sender, CancelEventArgs e) => FillSortMenu();
-
-    /// <summary>Lists the ways to sort, the current one marked by colour and a check.</summary>
-    private void FillSortMenu()
-    {
-        var accent = this.FindResource("Primary300") is Color color ? new SolidColorBrush(color) : null;
-        SortMenu.Items.Clear();
-        for (var i = 0; i < SortOptions.Count; i++)
-        {
-            var index = i;
-            var item = new MenuItem { Header = SortOptions[index] };
-            if (index == SortIndex)
-            {
-                item.FontWeight = FontWeight.SemiBold;
-                item.Foreground = accent;
-                item.Icon = new PathIcon
-                {
-                    Data = this.FindResource("CheckMark") as Geometry,
-                    Width = 10,
-                    Height = 10,
-                    Foreground = accent,
-                };
-            }
-            item.Click += (_, _) => SortIndex = index;
-            SortMenu.Items.Add(item);
-        }
-    }
-
-    #endregion
 
     #region Friend actions
 

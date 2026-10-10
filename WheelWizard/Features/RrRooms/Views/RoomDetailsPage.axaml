@@ -31,13 +31,11 @@
             </PathIcon.IsVisible>
         </PathIcon>
      
-        <components:LinkButton Grid.Row="0"
+        <components:ActionButton Grid.Row="0"
                                     IconData="{StaticResource ArrowLeft}"
                                     Text="{loc:T page_title.rooms}"
-                                    Foreground="{StaticResource TitleTextColor}"
-                                    HoverForeground="{StaticResource Primary200}"
                                     VerticalAlignment="Top" HorizontalAlignment="Left"
-                                    FontSize="16" Click="GoBackClick" />
+                                    FontSize="16" Click="GoBackClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
 
         <Grid Grid.Row="1" ColumnDefinitions="*,*" RowDefinitions="*,*" Margin="10,0">
             <StackPanel
@@ -59,7 +57,7 @@
 
             <StackPanel Grid.Column="1" Grid.Row="1">
                 <components:FormFieldLabel Text="{loc:T attribute.average_room_vr}" Margin="0,0,2,0" />
-                <components:StatusBadge IconSize="0" Text="{Binding Room.AverageVr}" HorizontalAlignment="Left" />
+                <components:StatusBadge Text="{Binding Room.AverageVr}" HorizontalAlignment="Left" />
             </StackPanel>
         </Grid>
 
@@ -72,7 +70,7 @@
                 </Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
                     <components:FormFieldLabel Text="{loc:T list_title.players}" />
-                    <components:StatusBadge Text="{Binding Room.PlayerCount}" IconSize="0" />
+                    <components:StatusBadge Text="{Binding Room.PlayerCount}" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom" />

@@ -17,14 +17,14 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <!-- A smaller checkbox than the default one. -->
-        <Style Selector="CheckBox.Small">
+        <Style Selector="components|ToggleCheckBox.Small">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
         </Style>
-        <Style Selector="CheckBox.Small /template/ Border#Border">
+        <Style Selector="components|ToggleCheckBox.Small /template/ Border#PART_Indicator">
             <Setter Property="Width" Value="16" />
             <Setter Property="Height" Value="16" />
-            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="4" />
         </Style>
         <Style Selector="TextBlock.AxisText">
@@ -34,13 +34,13 @@
     </UserControl.Styles>
 
     <StackPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType=community:VrHistoryGraph}}">
-        <!-- HEADER: title with the start -> end summary, range on the right -->
-        <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+        <!-- HEADER: summary above the right-aligned graph controls. -->
+        <Grid RowDefinitions="Auto,Auto">
+            <StackPanel HorizontalAlignment="Left" Spacing="2">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <components:FormFieldLabel Text="{loc:T attribute.vr_history}" />
-                    <components:LoadingIcon VerticalAlignment="Center" IsVisible="{Binding IsLoading}"
-                                            Width="14" Height="14" Foreground="{StaticResource Neutral500}" />
+                    <components:Spinner VerticalAlignment="Center" IsVisible="{Binding IsLoading}"
+                                            Width="14" Height="14" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasData}">
                     <TextBlock Classes="SummaryText" Text="{Binding StartingVr, StringFormat='{}{0:N0}'}"
@@ -50,7 +50,7 @@
                     <TextBlock Classes="SummaryText" Text="{Binding EndingVr, StringFormat='{}{0:N0}'}"
                                ToolTip.Tip="{loc:T attribute.end_vr}" />
                     <TextBlock Classes="SummaryText" FontWeight="SemiBold" Margin="4,0,0,0"
-                               Foreground="{StaticResource Primary400}"
+                               Foreground="{StaticResource Brand400}"
                                IsVisible="{Binding IsTotalChangeGain}"
                                Text="{Binding TotalChangeText}"
                                ToolTip.Tip="{loc:T attribute.net_change}" />
@@ -66,10 +66,14 @@
                 </StackPanel>
             </StackPanel>
 
-            <ComboBox Grid.Column="1" x:Name="HistoryDaysDropdown"
-                      MinWidth="145"
-                      VerticalAlignment="Top"
-                      SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <components:Dropdown x:Name="HistoryDaysDropdown"
+                                     MinWidth="145"
+                                     VerticalAlignment="Top"
+                                     SelectionChanged="HistoryDaysDropdown_OnSelectionChanged" />
+                <components:Dropdown x:Name="HistoryAxisDropdown" MinWidth="105"
+                                     SelectionChanged="HistoryAxisDropdown_OnSelectionChanged" />
+            </StackPanel>
         </Grid>
 
         <!-- CHART -->
@@ -84,8 +88,8 @@
                     <Border Background="{StaticResource Neutral900}" Height="1" VerticalAlignment="Top" />
                     <Border Background="{StaticResource Neutral900}" Height="1" VerticalAlignment="Center" />
                     <Border Background="{StaticResource Neutral900}" Height="1" VerticalAlignment="Bottom" />
-                    <community:VrGraphAreaFill Points="{Binding GraphPoints}" Color="{StaticResource Primary400}" />
-                    <Path Data="{Binding GraphPath}" Stroke="{StaticResource Primary400}" StrokeThickness="2"
+                    <community:VrGraphAreaFill Points="{Binding GraphPoints}" Color="{StaticResource Brand400}" />
+                    <Path Data="{Binding GraphPath}" Stroke="{StaticResource Brand400}" StrokeThickness="2"
                           StrokeLineCap="Round" StrokeJoin="Round" Stretch="Fill" />
                 </Grid>
 
@@ -96,19 +100,19 @@
                 </Grid>
             </Grid>
 
-            <components:LoadingIcon Width="32" Height="32" Foreground="{StaticResource Neutral800}"
+            <components:Spinner Width="32" Height="32"
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
-                <components:LoadingIcon.IsVisible>
+                <components:Spinner.IsVisible>
                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                         <Binding Path="IsLoading" />
                         <Binding Path="!HasData" />
                     </MultiBinding>
-                </components:LoadingIcon.IsVisible>
-            </components:LoadingIcon>
+                </components:Spinner.IsVisible>
+            </components:Spinner>
 
             <StackPanel IsVisible="{Binding HasError}" Spacing="4"
                         HorizontalAlignment="Center" VerticalAlignment="Center">
-                <PathIcon Data="{StaticResource Chart}" Width="30" Height="30" Margin="0,0,0,6"
+                <PathIcon Data="{StaticResource Chart}" Width="80" Height="80" Margin="0,0,0,6"
                           Foreground="{StaticResource Neutral800}" />
                 <TextBlock Text="{loc:T empty_content.no_vr_history_title}" FontSize="14" FontWeight="Bold"
                            Foreground="{StaticResource Neutral400}" HorizontalAlignment="Center" />
@@ -119,7 +123,7 @@
 
             <StackPanel IsVisible="{Binding ShowNoDataState}" Spacing="4"
                         HorizontalAlignment="Center" VerticalAlignment="Center">
-                <PathIcon Data="{StaticResource Chart}" Width="30" Height="30" Margin="0,0,0,6"
+                <PathIcon Data="{StaticResource Chart}" Width="80" Height="80" Margin="0,0,0,6"
                           Foreground="{StaticResource Neutral800}" />
                 <TextBlock Text="{loc:T empty_content.no_vr_history_title}" FontSize="14" FontWeight="Bold"
                            Foreground="{StaticResource Neutral400}" HorizontalAlignment="Center" />
@@ -129,9 +133,5 @@
             </StackPanel>
         </Grid>
 
-        <!-- The x-axis toggle, under the axis it changes. -->
-        <CheckBox Classes="Small" HorizontalAlignment="Right" Margin="0,10,0,0"
-                  Content="{loc:T attribute.date}"
-                  IsChecked="{Binding UseDateAsXAxis}" />
     </StackPanel>
 </UserControl>

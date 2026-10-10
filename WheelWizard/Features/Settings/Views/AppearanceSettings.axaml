@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:settings="clr-namespace:WheelWizard.Settings.Views"
              xmlns:components1="clr-namespace:WheelWizard.Views.Components"
              mc:Ignorable="d" d:DesignWidth="444" d:DesignHeight="716"
              x:Class="WheelWizard.Settings.Views.AppearanceSettings">
@@ -20,7 +21,7 @@
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
                                                     Text="{loc:T option.window_scale}" />
-                        <ComboBox Grid.Column="1"
+                        <components1:Dropdown Grid.Column="1"
                                   x:Name="WindowScaleDropdown"
                                   SelectionChanged="WindowScaleDropdown_OnSelectionChanged"
                                   HorizontalAlignment="Right"
@@ -45,8 +46,8 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <ComboBox Grid.Column="1"
-                                  x:Name="WhWzLanguageDropdown"
+                        <components1:Dropdown Grid.Column="1"
+                                  x:Name="WhWzLanguageDropdown" Search="True"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center"
                                   ZIndex="2" />
@@ -67,9 +68,9 @@
                                                  TextAlignment="Left"
                                                  TextWrapping="Wrap" />
                         </StackPanel>
-                        <CheckBox Grid.Column="1"
+                        <settings:AnimationSettingToggle Grid.Column="1"
                                   x:Name="EnableAnimations"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
                                   IsChecked="True"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center"

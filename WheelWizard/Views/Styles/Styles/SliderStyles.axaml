@@ -29,7 +29,7 @@
 
     <Style Selector="Slider">
         <Setter Property="Background" Value="{StaticResource Neutral600}" />
-        <Setter Property="Foreground" Value="{StaticResource Primary400}" />
+        <Setter Property="Foreground" Value="{StaticResource Brand400}" />
         <Style Selector="^ /template/ Grid#HorizontalTemplate">
             <Setter Property="Height" Value="40" />
         </Style>
@@ -57,7 +57,7 @@
             <Setter Property="Background" Value="{StaticResource Neutral500}" />
         </Style>
         <Style Selector="^ RepeatButton#PART_DecreaseButton">
-            <Setter Property="Background" Value="{StaticResource Primary300}" />
+            <Setter Property="Background" Value="{StaticResource Brand300}" />
         </Style>
         <Style Selector="^ Border#PART_ThumbBorder">
             <Setter Property="Background" Value="{StaticResource Neutral400}" />
@@ -69,7 +69,7 @@
     
     <Style Selector="Slider:pressed /template/ Track#PART_Track">
         <Style Selector="^ Border#PART_ThumbBorder">
-            <Setter Property="Background" Value="{StaticResource Primary400}" />
+            <Setter Property="Background" Value="{StaticResource Brand400}" />
         </Style>
         <Style Selector="^ Ellipse#PART_ThumbDot">
             <Setter Property="Fill" Value="{StaticResource Neutral50}" />

@@ -48,9 +48,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <CheckBox Grid.Column="1"
+                        <components1:ToggleCheckBox Grid.Column="1"
                                   x:Name="LaunchRrOnStartup"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
                                   IsChecked="False"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
@@ -70,9 +70,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <components1:Button Grid.Column="1"
+                        <components1:ActionButton Grid.Column="1"
                                             x:Name="DolphinReinstallButton"
-                                            Variant="Warning"
+                                            Tone="Primary"
                                             Size="Compact"
                                             IsEnabled="True"
                                             IconData="{StaticResource Download}"
@@ -96,9 +96,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <components1:Button Grid.Column="1"
+                        <components1:ActionButton Grid.Column="1"
                                             x:Name="OpenGameFolderButton"
-                                            Variant="Default"
+                                            Tone="Secondary"
                                             Size="Compact"
                                             IsEnabled="True"
                                             IconData="{StaticResource Folder}"
@@ -116,9 +116,9 @@
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
                                                     Text="{loc:T option.save_folder}" />
-                        <components1:Button Grid.Column="1"
+                        <components1:ActionButton Grid.Column="1"
                                             x:Name="OpenSaveFolderButton"
-                                            Variant="Default"
+                                            Tone="Secondary"
                                             Size="Compact"
                                             IsEnabled="True"
                                             IconData="{StaticResource Folder}"
@@ -146,9 +146,9 @@
                                    TextAlignment="Left"
                                    TextWrapping="Wrap" />
                     </StackPanel>
-                    <CheckBox Grid.Column="1"
+                    <components1:ToggleCheckBox Grid.Column="1"
                               x:Name="EnableRecomp"
-                              Classes="SwitchDark"
+                              Variant="Switch"
                               IsChecked="False"
                               HorizontalAlignment="Right"
                               VerticalAlignment="Center" />

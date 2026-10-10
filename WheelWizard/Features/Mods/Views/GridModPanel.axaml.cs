@@ -7,6 +7,7 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 using WheelWizard.Models.Mods;
 using WheelWizard.Mods.Views;
+using WheelWizard.Views.Components;
 
 namespace WheelWizard.Mods.Views;
 
@@ -105,10 +106,10 @@ public partial class GridModPanel : UserControl
 
     private void PriorityText_OnLostFocus(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not ModListItem item || e.Source is not TextBox textBox)
+        if (DataContext is not ModListItem item || e.Source is not InputField textBox)
             return;
 
-        textBox.Classes.Remove("error");
+        textBox.ErrorText = null;
         if (int.TryParse(textBox.Text, out var newPriority))
             item.Mod.Priority = newPriority;
         else
@@ -117,13 +118,12 @@ public partial class GridModPanel : UserControl
 
     private void PriorityText_OnTextChanged(object? sender, TextChangedEventArgs e)
     {
-        if (e.Source is not TextBox textBox)
+        if (e.Source is not InputField textBox)
             return;
 
-        if (int.TryParse(textBox.Text, out _))
-            textBox.Classes.Remove("error");
-        else if (!textBox.Classes.Contains("error"))
-            textBox.Classes.Add("error");
+        textBox.ErrorText = int.TryParse(textBox.Text, out _)
+            ? null
+            : WheelWizard.Localization.TranslationFunctions.t("component.input.invalid_number");
     }
 
     private void PriorityText_OnKeyDown(object? sender, KeyEventArgs e)

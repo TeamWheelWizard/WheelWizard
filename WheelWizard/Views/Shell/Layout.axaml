@@ -49,7 +49,7 @@
                             AutomationProperties.Name="Minimize" Click="HeaderMinimizeButton_Click"
                             PointerPressed="WindowControl_PointerPressed"
                             WindowDecorationProperties.ElementRole="DecorationsElement">
-                        <PathIcon Data="{StaticResource MinMark}" Width="12" Height="12"
+                        <PathIcon Data="{StaticResource Minimize}" Width="12" Height="12"
                                   Foreground="{Binding $parent[Button].Foreground}" />
                     </Button>
                     <Button Width="30" Height="30" Classes="TopButton WindowControl CloseWindowControl"
@@ -75,8 +75,10 @@
                                          Margin="{StaticResource EdgeGap}" />
         </Grid>
 
+        <!-- Keep page content measurement independent of the sidebar rows. -->
+        <Grid x:Name="SidebarGrid" Grid.Column="0" Grid.RowSpan="6" RowDefinitions="0,17,18,96,*,80">
         <!-- Sidebar -->
-        <Grid Grid.Column="0" Grid.Row="3"
+        <Grid Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="3"
               Height="60"
               Margin="10,-12,10,0"
               VerticalAlignment="Top"
@@ -93,7 +95,7 @@
                 <Grid>
                     <Border CornerRadius="99999" IsVisible="False" Opacity="0.3" Name="SidebarProfileHoverEffect"
                             HorizontalAlignment="Left" VerticalAlignment="Top"
-                            Background="{StaticResource Primary200}" Height="46" Width="46" Effect="blur(150)" />
+                            Background="{StaticResource Brand200}" Height="46" Width="46" Effect="blur(150)" />
 
                     <community:CurrentUserProfile x:Name="SidebarCurrentUserProfile"
                                                  Margin="5,0"
@@ -118,7 +120,7 @@
 
         <TextBlock Text="{loc:T category.general}" Classes="SidebarSectionText"
                    VerticalAlignment="Bottom" Grid.Row="3" /> <!-- Repurposing this translation from settings -->
-        <StackPanel x:Name="SidePanelButtons" Grid.Column="0" Grid.Row="4" VerticalAlignment="Top">
+        <StackPanel x:Name="SidePanelButtons" Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="4" VerticalAlignment="Top">
             <shellControls:SidebarRadioButton IconData="{StaticResource Home}"
                                            Text="{loc:T page_title.home}"
                                            PageType="{x:Type shellViews:HomePage}"
@@ -157,20 +159,17 @@
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
         </StackPanel>
 
-        <components:LinkButton Grid.Column="0" Grid.Row="5"
+        <components:ActionButton Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="5"
                                     x:Name="SupportUsButton"
                                     IconData="{StaticResource CoffeeIcon}"
                                     Text="{loc:T action.link.support}"
-                                    Foreground="{StaticResource Neutral400}"
-                                    HoverForeground="{StaticResource Primary300}"
                                     FontSize="13"
-                                    IconSize="20"
                                     Click="SupportUs_OnClick"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Bottom"
-                                    Margin="15,0,0,52" />
+                                    Margin="15,0,0,52"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
 
-        <Border Grid.Column="0" Grid.Row="5" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+        <Border Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="5" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                 Margin="10,0,0,12" Cursor="Hand"
                 ToolTip.Tip="This only shows regions YOU have played on"
                 ToolTip.Placement="TopEdgeAlignedLeft" ToolTip.ShowDelay="20"
@@ -194,7 +193,7 @@
                     <Setter Property="Data" Value="{StaticResource ErrorTip}" />
                 </Style>
                 <Style Selector="Border.Success PathIcon">
-                    <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+                    <Setter Property="Foreground" Value="{StaticResource Brand300}" />
                     <Setter Property="Data" Value="{StaticResource SuccessTip}" />
                 </Style>
                 <Style Selector="Border.Info PathIcon">
@@ -215,7 +214,7 @@
             </Border.Styles>
         </Border>
 
-        <Grid Grid.Column="0" Grid.Row="5" ColumnDefinitions="28,8,28,8,28,8,*"
+        <Grid Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="5" ColumnDefinitions="28,8,28,8,28,8,*"
               VerticalAlignment="Bottom" Margin="10,0,13,12" x:Name="SidebarBottomBar">
             <Border Grid.Column="2"
                     x:Name="SidebarInfoButton"
@@ -366,7 +365,7 @@
             </Grid.Styles>
         </Grid>
 
-        <Button x:Name="SidebarToggle" Grid.Column="0" Grid.Row="3"
+        <Button x:Name="SidebarToggle" Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="3"
                 Width="26" Height="26" MinWidth="0" MinHeight="0" Padding="0"
                 Margin="0,0,-13,13.5" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                 UseLayoutRounding="False"
@@ -399,16 +398,18 @@
                 </Style>
             </Button.Styles>
             <Grid>
-            <PathIcon x:Name="SidebarChevron" Width="8" Height="10"
-                      Data="M 6,0 L 0,5 L 6,10 L 8,8 L 4,5 L 8,2 Z"
+            <PathIcon x:Name="SidebarChevron" Width="12" Height="12"
+                      Data="{StaticResource Chevron}"
                       RenderTransformOrigin="50%,50%">
                 <PathIcon.RenderTransform>
-                    <RotateTransform Angle="0" />
+                    <RotateTransform Angle="90" />
                 </PathIcon.RenderTransform>
             </PathIcon>
             <PathIcon x:Name="SidebarLock" Width="10" Height="11" Data="{StaticResource Lock}" IsVisible="False" />
             </Grid>
         </Button>
+
+        </Grid>
 
         <!-- Snackbar -->
         <Grid Grid.Column="1" Grid.Row="4" Grid.RowSpan="2" VerticalAlignment="Bottom"
@@ -427,11 +428,9 @@
                                x:Name="SnackbarText">
                         Example text
                     </TextBlock>
-                    <components:LinkButton Grid.Column="2" IconData="{StaticResource XMark}"
-                                                Foreground="{StaticResource Neutral400}"
+                    <components:ActionButton Grid.Column="2" IconData="{StaticResource XMark}"
                                                 Click="CloseSnackbar_OnClick" HorizontalAlignment="Center"
-                                                HoverForeground="{StaticResource Neutral100}"
-                                                Text="" IconSize="14" />
+                                                Text=""  Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
                 </Grid>
             </Border>
 
@@ -443,13 +442,13 @@
                 <Style Selector="Grid#Snackbar.success">
                     <Style Selector="^ PathIcon">
                         <Setter Property="Data" Value="{StaticResource SuccessTip}" />
-                        <Setter Property="Foreground" Value="{StaticResource Primary400}" />
+                        <Setter Property="Foreground" Value="{StaticResource Brand400}" />
                     </Style>
                     <Style Selector="^ Border#SnackbarBlur">
-                        <Setter Property="Background" Value="{StaticResource Primary300}" />
+                        <Setter Property="Background" Value="{StaticResource Brand300}" />
                     </Style>
                     <Style Selector="^ Border#SnackbarContainer">
-                        <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+                        <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
                     </Style>
                 </Style>
 

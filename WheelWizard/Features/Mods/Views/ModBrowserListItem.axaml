@@ -7,26 +7,26 @@
             <mods:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="My Title"
                                            ModAuthor="Me"/>
-            
+
             <mods:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="Some other mod with quite a long title"
                                            UsesPatches="true"
                                            ModAuthor="somebody else with also a long name and the name"/>
-            
+
             <mods:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="Coolest mod ever made"
                                            ModAuthor="random guy"
                                            Classes="TestSelected"/> <!-- Dont use this class in the code, it servers no real usefull purpose -->
-            
+
             <mods:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="My Title"
                                            ModAuthor="Me"/>
-            
+
             <mods:ModBrowserListItem Width="294" Height="89"
                                            ModTitle="LOADING"
                                            ModAuthor="LOADING"/>
         </StackPanel>
-      
+
     </Design.PreviewWith>
 
     <Style Selector="mods|ModBrowserListItem">
@@ -36,9 +36,9 @@
                     BorderThickness="0" CornerRadius="6" Background="{StaticResource Neutral900}">
                     <Grid ColumnDefinitions="1*, 2*">
                         <Border Grid.Column="1" Grid.Row="0" CornerRadius="99999"
-                                x:Name="PART_SelectedBlur" IsVisible="False" 
+                                x:Name="PART_SelectedBlur" IsVisible="False"
                                 Opacity="0.25" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Background="{StaticResource Primary200}" 
+                                Background="{StaticResource Brand200}"
                                 Height="150" Width="70" Effect="blur(150)">
                             <Border.Styles>
                                 <Style Selector="Border">
@@ -55,7 +55,7 @@
                                 </Style>
                             </Border.Styles>
                         </Border>
-                        
+
                         <!-- Image -->
                         <Border Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="PART_ImageBorder"
                                 CornerRadius="6,0,0,6" Background="{StaticResource Neutral700}"
@@ -64,9 +64,9 @@
                                    Stretch="UniformToFill" x:Name="ThumbnailImage"
                                    Source="{Binding Preview.Image, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Border>
-                    
-                     
-                        
+
+
+
                         <!-- Text -->
                         <StackPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="6">
                             <components:FormFieldLabel Text="{TemplateBinding ModTitle}" />
@@ -74,41 +74,33 @@
                                 <TextBlock Classes="TinyText" Text="By: " />
                                 <TextBlock Classes="TinyText" Text="{TemplateBinding ModAuthor}" />
                             </StackPanel>
-                            <Border x:Name="PART_PatchesBadge"
-                                    IsVisible="False"
-                                    Margin="0,6,0,0"
-                                    Padding="6,2"
-                                    Background="#1E5E3A"
-                                    CornerRadius="9999"
-                                    HorizontalAlignment="Left">
-                                <TextBlock Classes="TinyText" Text="Uses Patches!" Foreground="#D6FFE2" />
-                            </Border>
+                            <components:StatusBadge x:Name="PART_PatchesBadge" IsVisible="False" Margin="0,6,0,0" HorizontalAlignment="Left" Text="Uses Patches!" Variant="Brand" />
                         </StackPanel>
-                        
+
                         <!-- Icon -->
                         <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right"
                                     Orientation="Horizontal" Spacing="2" Margin="4">
                             <components:StatusBadge Text="{TemplateBinding LikeCount}" TipText="Likes"
                                                  IconData="{StaticResource Heart}"
-                                                 Margin="3" Variant="Dark"/>
+                                                 Margin="3" Variant="Gray"/>
                             <components:StatusBadge Text="{TemplateBinding ViewCount}" TipText="Views"
                                                  IconData="{StaticResource Eye}"
-                                                 Margin="3" Variant="Dark"/>
+                                                 Margin="3" Variant="Gray"/>
                             <!-- Apparently its hard to get the downloads count without sending a request constantly
                             <components:StatusBadge Text="{TemplateBinding DownloadCount}" TipText="Downloads"
                                                  IconData="{StaticResource Download}"
-                                                 Margin="3" Variant="Dark"/> -->
+                                                 Margin="3" Variant="Gray"/> -->
                         </StackPanel>
-                        
-                        <Border Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+
+                        <Border Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                 x:Name="PART_OverlayBorder" CornerRadius="5" BorderThickness="1" IsVisible="False"
-                                Background="Transparent" BorderBrush="{StaticResource Primary300}">
+                                Background="Transparent" BorderBrush="{StaticResource Brand300}">
                             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CornerRadius="3"
-                                    Background="{StaticResource Primary200}" Opacity="0.1"/>
+                                    Background="{StaticResource Brand200}" Opacity="0.1"/>
                         </Border>
-                        
+
                         <!-- Loading Icon -->
-                        <Border Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                        <Border Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                 x:Name="PART_OverlayLoading" CornerRadius="5" IsVisible="False">
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
@@ -116,12 +108,11 @@
                                     <GradientStop Color="{StaticResource Neutral950}" Offset="1.0" />
                                 </LinearGradientBrush>
                             </Border.Background>
-                            
-                            <components:LoadingIcon Width="50" Height="50" IsVisible="True" 
-                                                    Foreground="{StaticResource Neutral700}"/>
+
+                            <components:Spinner Width="50" Height="50" IsVisible="True"/>
                         </Border>
                     </Grid>
-                    
+
                     <Border.Styles>
                         <Style Selector="Border#PART_ModItemBorder:pointerover">
                             <Setter Property="Background" Value="{StaticResource Neutral700}"/>
@@ -129,10 +120,10 @@
                                 <Setter Property="Background" Value="{StaticResource Neutral500}"/>
                             </Style>
                             <Style Selector="^ components|StatusBadge">
-                                <Setter Property="Variant" Value="Default"/>
+                                <Setter Property="Variant" Value="Gray"/>
                             </Style>
                         </Style>
-                        
+
                         <Style Selector="ListBoxItem:selected Border#PART_ModItemBorder, mods|ModBrowserListItem.TestSelected Border#PART_ModItemBorder">
                             <Style Selector="^ Border#PART_OverlayBorder, ^ Border#PART_SelectedBlur">
                                 <Setter Property="IsVisible" Value="True"/>
@@ -144,11 +135,11 @@
                             <Style Selector="^ Border#PART_ImageBorder">
                                 <Setter Property="Background" Value="#28503B"/>
                             </Style>
-                            <Style Selector="^ Border#PART_PatchesBadge">
+                            <Style Selector="^ components|StatusBadge#PART_PatchesBadge">
                                 <Setter Property="IsVisible" Value="True"/>
                             </Style>
                         </Style>
-                        
+
                         <Style Selector="mods|ModBrowserListItem[ModTitle=LOADING][ModAuthor=LOADING] Border#PART_ModItemBorder">
                             <Style Selector="^ Border#PART_OverlayLoading">
                                 <Setter Property="IsVisible" Value="True"/>

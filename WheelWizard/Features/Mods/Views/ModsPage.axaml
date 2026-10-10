@@ -9,23 +9,6 @@
              x:Class="WheelWizard.Mods.Views.ModsPage"
              x:DataType="mods:ModsPage"
         xmlns:mods="clr-namespace:WheelWizard.Mods.Views">
-    <UserControl.Styles>
-        <Style Selector="components|MultiIconRadioButton.ModView /template/ Path#Part_SingleIcon">
-            <Setter Property="Stroke" Value="{Binding Color1, RelativeSource={RelativeSource TemplatedParent}}" />
-            <Setter Property="StrokeThickness" Value="2" />
-            <Setter Property="StrokeLineCap" Value="Round" />
-            <Setter Property="StrokeJoin" Value="Round" />
-            <Setter Property="Fill" Value="Transparent" />
-        </Style>
-        <Style Selector="components|MultiIconRadioButton.ModView:pointerover /template/ Path#Part_SingleIcon">
-            <Setter Property="Stroke" Value="{StaticResource Neutral300}" />
-            <Setter Property="Fill" Value="Transparent" />
-        </Style>
-        <Style Selector="components|MultiIconRadioButton.ModView:checked /template/ Path#Part_SingleIcon">
-            <Setter Property="Stroke" Value="{StaticResource Primary400}" />
-            <Setter Property="Fill" Value="Transparent" />
-        </Style>
-    </UserControl.Styles>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" MinHeight="95" />
@@ -38,43 +21,28 @@
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
 
         <StackPanel Grid.Row="0" Orientation="Vertical" VerticalAlignment="Bottom">
-            <CheckBox Classes="Switch" x:Name="EnableAllCheckbox"
+            <components:ToggleCheckBox Variant="Switch" x:Name="EnableAllCheckbox"
                       HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3,6,0,0" IsVisible="{Binding HasMods}"
                       Click="ToggleButton_OnIsCheckedChanged" Content="{loc:T action.enable_all}" />
 
         <StackPanel Orientation="Horizontal" Spacing="8"
                     HorizontalAlignment="Left" VerticalAlignment="Bottom">
             <TextBlock Text="{Binding StoragePageTitle}" Classes="PageTitleText" />
-            <components:StatusBadge Text="0" IconSize="0" x:Name="ListItemCount"
+            <components:StatusBadge Height="24" Padding="8,3" Text="0" x:Name="ListItemCount"
                                  VerticalAlignment="Center" />
         </StackPanel>
         </StackPanel>
 
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,12"
                     Orientation="Vertical" x:Name="TopBarButtons" Spacing="3">
-            <Grid ColumnDefinitions="Auto,Auto" IsVisible="{Binding HasMods}">
-                <components:Button Grid.Column="0" Variant="Primary" Height="40" CornerRadius="6,0,0,6"
-                                   Text="{loc:T action.browse}" IconData="{StaticResource Search}"
-                                   Click="BrowseMod_Click" />
-                <components:Button x:Name="ModActionsButton" Grid.Column="1" Variant="Primary" Height="40"
-                                   IconData="{StaticResource ChevronDown}" IconSize="16"
-                                   Padding="10,10" CornerRadius="0,6,6,0"
-                                   AutomationProperties.Name="{loc:T action.browse}">
-                    <components:Button.Flyout>
-                        <MenuFlyout Placement="BottomEdgeAlignedRight">
-                            <MenuItem Header="{loc:T action.browse}" Click="BrowseMod_Click">
-                                <MenuItem.Icon><PathIcon Data="{StaticResource Search}" /></MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="{loc:T action.import}" Click="ImportMod_Click">
-                                <MenuItem.Icon><PathIcon Data="{StaticResource FileImport}" /></MenuItem.Icon>
-                            </MenuItem>
-                        </MenuFlyout>
-                    </components:Button.Flyout>
-                </components:Button>
-                <Border Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left"
-                        VerticalAlignment="Center" Background="{StaticResource Primary50}"
-                        Opacity="0.25" IsHitTestVisible="False" />
-            </Grid>
+                        <components:SplitButton Text="{loc:T action.browse}" IconData="{StaticResource Search}" Tone="Brand" Height="40" Click="BrowseMod_Click" IsVisible="{Binding HasMods}">
+                <components:SplitButton.Flyout>
+                    <MenuFlyout>
+                        <components:SplitButtonItem Header="{loc:T action.browse}" IconData="{StaticResource Search}" Click="BrowseMod_Click" />
+                        <components:SplitButtonItem Header="{loc:T action.import}" IconData="{StaticResource FileImport}" Click="ImportMod_Click" />
+                    </MenuFlyout>
+                </components:SplitButton.Flyout>
+            </components:SplitButton>
         </StackPanel>
 
         <!-- Empty Mods Message -->
@@ -83,29 +51,14 @@
             <components:EmptyPageInfo Title="{loc:T empty_content.no_mods_title}"
                                       BodyText="{loc:T empty_content.no_mods}"
                                       HorizontalAlignment="Center" />
-            <Grid ColumnDefinitions="Auto,Auto" Margin="0,12" HorizontalAlignment="Center">
-                <components:Button Grid.Column="0" Variant="Primary" Height="40" CornerRadius="6,0,0,6"
-                                   Text="{loc:T action.browse}" IconData="{StaticResource Search}"
-                                   Click="BrowseMod_Click" />
-                <components:Button x:Name="EmptyModActionsButton" Grid.Column="1" Variant="Primary" Height="40"
-                                   IconData="{StaticResource ChevronDown}" IconSize="16"
-                                   Padding="10,10" CornerRadius="0,6,6,0"
-                                   AutomationProperties.Name="{loc:T action.browse}">
-                    <components:Button.Flyout>
-                        <MenuFlyout Placement="BottomEdgeAlignedRight">
-                            <MenuItem Header="{loc:T action.browse}" Click="BrowseMod_Click">
-                                <MenuItem.Icon><PathIcon Data="{StaticResource Search}" /></MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="{loc:T action.import}" Click="ImportMod_Click">
-                                <MenuItem.Icon><PathIcon Data="{StaticResource FileImport}" /></MenuItem.Icon>
-                            </MenuItem>
-                        </MenuFlyout>
-                    </components:Button.Flyout>
-                </components:Button>
-                <Border Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left"
-                        VerticalAlignment="Center" Background="{StaticResource Primary50}"
-                        Opacity="0.25" IsHitTestVisible="False" />
-            </Grid>
+                        <components:SplitButton Text="{loc:T action.browse}" IconData="{StaticResource Search}" Tone="Brand" Height="40" Click="BrowseMod_Click" Margin="0,15,0,0">
+                <components:SplitButton.Flyout>
+                    <MenuFlyout>
+                        <components:SplitButtonItem Header="{loc:T action.browse}" IconData="{StaticResource Search}" Click="BrowseMod_Click" />
+                        <components:SplitButtonItem Header="{loc:T action.import}" IconData="{StaticResource FileImport}" Click="ImportMod_Click" />
+                    </MenuFlyout>
+                </components:SplitButton.Flyout>
+            </components:SplitButton>
         </StackPanel>
 
         <Grid Grid.Row="1" x:Name="PageWithMods" RowDefinitions="Auto,*" IsVisible="{Binding HasMods}">
@@ -143,8 +96,8 @@
                                               Foreground="{StaticResource Neutral500}" />
                                 </Panel>
 
-                                <CheckBox Grid.Column="1" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
-                                          Classes="SwitchDark" Margin="0,5"
+                                <components:ToggleCheckBox Grid.Column="1" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
+                                          Variant="Switch" Margin="0,5"
                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Mod.Title}" FontSize="14"
                                            Foreground="{StaticResource Neutral100}"
@@ -157,23 +110,13 @@
                                 <!-- however, it works really weird if you do that -->
                                 <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right"
                                             VerticalAlignment="Center">
-                                    <TextBox Text="{Binding Mod.Priority, Mode=OneWay}" Classes="dark"
+                                    <components:InputField Text="{Binding Mod.Priority, Mode=OneWay}"
                                              TextChanged="PriorityText_OnTextChanged"
-                                             LostFocus="PriorityText_OnLostFocus" Padding="0"
+                                             LostFocus="PriorityText_OnLostFocus" HorizontalContentAlignment="Center"
                                              KeyDown="PriorityText_OnKeyDown"
                                              x:Name="VisibleWithRows"
-                                             MinWidth="25" MaxWidth="50" MinHeight="30" Height="30">
-                                        <TextBox.Styles>
-                                            <Style Selector="TextBox /template/ DockPanel#PART_InnerDockPanel">
-
-                                                <Setter Property="Margin" Value="0" />
-                                            </Style>
-                                            <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
-                                                <Setter Property="HorizontalAlignment" Value="Center" />
-                                                <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
-                                            </Style>
-                                        </TextBox.Styles>
-                                    </TextBox>
+                                             MinWidth="25" MaxWidth="50" MinHeight="28" Height="28" Padding="2,0" VerticalAlignment="Center" VerticalContentAlignment="Center">
+                                    </components:InputField>
 
                                     <Border Width="16" Margin="8,0" VerticalAlignment="Center">
                                         <PathIcon Data="{StaticResource WarningTip}" Width="16" Height="16"
@@ -192,23 +135,19 @@
                                         </PathIcon>
                                     </Border>
                                     <StackPanel Margin="10,0,0,0" Spacing="2" x:Name="VisibleWithBlocks">
-                                        <components:Button HorizontalAlignment="Right"
-                                                           IconData="{StaticResource ChevronUp}"
-                                                           IconSize="15" Padding="10,3"
+                                        <components:ActionButton Tone="Secondary" HorizontalAlignment="Right"
+                                                           Size="Compact" MinHeight="20" Height="20" Padding="6,0"
                                                            IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}"
-                                                           Click="ButtonUp_OnClick" />
-                                        <components:Button HorizontalAlignment="Right"
-                                                           IconData="{StaticResource ChevronDown}"
-                                                           IconSize="15" Padding="10,3"
+                                                           Click="ButtonUp_OnClick">
+                                            <PathIcon Data="{StaticResource Chevron}" Width="15" Height="15"
+                                                      RenderTransform="rotate(180deg)" RenderTransformOrigin="50%,50%" />
+                                        </components:ActionButton>
+                                        <components:ActionButton Tone="Secondary" HorizontalAlignment="Right"
+                                                           IconData="{StaticResource Chevron}" Size="Compact" MinHeight="20" Height="20" Padding="6,0"
                                                            IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}"
                                                            Click="ButtonDown_OnClick" />
 
-                                        <StackPanel.Styles>
-                                            <Style
-                                                Selector="ListBoxItem Border.BoxItemBackground:pointerover components|Button">
-                                                <Setter Property="Variant" Value="Light" />
-                                            </Style>
-                                        </StackPanel.Styles>
+
                                     </StackPanel>
 
                                     <StackPanel.Styles>
@@ -221,8 +160,8 @@
                                     </StackPanel.Styles>
                                 </StackPanel>
 
-                                <!-- <components:StatusBadge Grid.Column="1" IconSize="0" Text="{Binding Priority}"
-                                                  TipText="Priority" Variant="Dark" TipPlacement="Top"
+                                <!-- <components:StatusBadge Grid.Column="1" Text="{Binding Priority}"
+                                                  TipText="Priority" Variant="Gray" TipPlacement="Top"
                                                   HorizontalAlignment="Right" VerticalAlignment="Center" /> -->
                             </Grid>
                         </Border>
@@ -262,22 +201,11 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-            <Border Grid.Row="1" x:Name="ViewModeToggle" ZIndex="10" CornerRadius="6"
-                    Background="{StaticResource Neutral900}" Margin="0,0,12,12"
-                    HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                <StackPanel Orientation="Horizontal" Spacing="6" Margin="6">
-                    <components:MultiIconRadioButton x:Name="GridViewButton" Classes="ModView"
-                        GroupName="ModsView" Width="40" Height="40" IconGeo="{StaticResource Grid2x2}"
-                        Color1="{StaticResource Neutral400}" HoverColor1="{StaticResource Neutral300}"
-                        SelectedColor1="{StaticResource Primary400}" AutomationProperties.Name="Grid view"
-                        IsCheckedChanged="ModsView_OnCheckedChanged" />
-                    <components:MultiIconRadioButton x:Name="ListViewButton" Classes="ModView"
-                        GroupName="ModsView" Width="40" Height="40" IconGeo="{StaticResource Rows3}"
-                        Color1="{StaticResource Neutral400}" HoverColor1="{StaticResource Neutral300}"
-                        SelectedColor1="{StaticResource Primary400}" AutomationProperties.Name="List view"
-                        IsCheckedChanged="ModsView_OnCheckedChanged" />
-                </StackPanel>
-            </Border>
+            <components:SegmentedControl Grid.Row="1" x:Name="ViewModeToggle" ZIndex="10" Variant="Light"
+                Margin="0,0,12,12" HorizontalAlignment="Right" VerticalAlignment="Bottom" SelectionChanged="ModsView_OnSelectionChanged">
+                <components:SegmentOption x:Name="GridViewOption" IconData="{StaticResource Grid2x2}" AutomationProperties.Name="Grid view" ToolTip.Tip="Grid view" Width="40" Height="40" />
+                <components:SegmentOption x:Name="ListViewOption" IconData="{StaticResource Rows3}" AutomationProperties.Name="List view" ToolTip.Tip="List view" Width="40" Height="40" />
+            </components:SegmentedControl>
         </Grid>
 
         <!-- Drag-and-drop overlay canvas -->

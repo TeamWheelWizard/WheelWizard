@@ -300,7 +300,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
                 MarioKartWiiEnums.Regions.Japan => t("region.japan"),
                 _ => t("state.unknown"),
             };
-            var itemForRegionDropdown = new ComboBoxItem
+            var itemForRegionDropdown = new DropdownItem
             {
                 Content = name,
                 Tag = region,
@@ -388,7 +388,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private void RegionDropdown_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (RegionDropdown.SelectedItem is not ComboBoxItem { Tag: MarioKartWiiEnums.Regions region })
+        if (RegionDropdown.SelectedItem is not DropdownItem { Tag: MarioKartWiiEnums.Regions region })
             return;
 
         SettingsService.Set(SettingsService.RR_REGION, region);

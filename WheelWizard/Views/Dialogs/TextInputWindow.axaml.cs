@@ -3,7 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs.Base;
-using Button = WheelWizard.Views.Components.Button;
+using Button = WheelWizard.Views.Components.ActionButton;
 
 namespace WheelWizard.Views.Dialogs;
 
@@ -31,7 +31,7 @@ public partial class TextInputWindow : PopupContent
 
     public TextInputWindow SetPlaceholderText(string placeholder)
     {
-        InputField.PlaceholderText = placeholder;
+        InputField.Placeholder = placeholder;
         return this;
     }
 
@@ -88,10 +88,10 @@ public partial class TextInputWindow : PopupContent
 
         foreach (var c in characters)
         {
-            var button = new Button()
+            var button = new ActionButton()
             {
+                Tone = ActionButtonTone.Secondary,
                 Text = c.ToString(),
-                IconSize = 0,
                 FontSize = 24,
                 Padding = new(0),
                 Margin = new(1),

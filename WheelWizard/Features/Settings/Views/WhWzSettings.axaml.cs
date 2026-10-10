@@ -15,7 +15,7 @@ using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
-using SettingsButton = WheelWizard.Views.Components.Button;
+using SettingsButton = WheelWizard.Views.Components.ActionButton;
 
 namespace WheelWizard.Settings.Views;
 
@@ -360,7 +360,7 @@ public partial class WhWzSettings : UserControl
     {
         completeIcon.IsVisible = isValid;
         warningIcon.IsVisible = !isValid;
-        changeButton.Variant = isValid ? ButtonVariant.Default : ButtonVariant.Warning;
+        changeButton.Tone = isValid ? ActionButtonTone.Secondary : ActionButtonTone.Brand;
     }
 
     private static bool CanOpenContainingFolder(string filePath)

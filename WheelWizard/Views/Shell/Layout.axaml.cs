@@ -520,7 +520,7 @@ public partial class Layout : BaseWindow, IPollingListener
     private void SidebarProfileBlock_OnPointerEntered(object? sender, PointerEventArgs e)
     {
         SidebarProfileBlock.Background = GetResourceBrush("Neutral800");
-        SidebarProfileBlock.BorderBrush = GetResourceBrush("Primary400");
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Brand400");
         SidebarProfileHoverEffect.IsVisible = true;
     }
 

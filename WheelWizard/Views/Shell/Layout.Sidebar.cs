@@ -106,25 +106,24 @@ public partial class Layout
                 new DoubleTransition { Property = RotateTransform.AngleProperty, Duration = duration },
             }
             : null;
-        chevron.Angle = _sidebarCollapsed ? 180 : 0;
-        var startWidth = SidebarWidth;
+        chevron.Angle = _sidebarCollapsed ? 270 : 90;
         var targetWidth = _sidebarCollapsed ? 64d : 221d;
-        // Set the underlying value first so completing the animation cannot snap back.
+
+        // Keep the final width as the base value throughout the resize, with no animation handoff.
+        Transitions = animate
+            ? new Transitions
+            {
+                new DoubleTransition
+                {
+                    Property = SidebarWidthProperty,
+                    Duration = duration,
+                    Easing = new CubicEaseInOut(),
+                },
+            }
+            : null;
         SidebarWidth = targetWidth;
         if (animate)
-        {
-            var resize = new Animation
-            {
-                Duration = duration,
-                Easing = new CubicEaseInOut(),
-                Children =
-                {
-                    new KeyFrame { Cue = new Cue(0), Setters = { new Setter(SidebarWidthProperty, startWidth) } },
-                    new KeyFrame { Cue = new Cue(1), Setters = { new Setter(SidebarWidthProperty, targetWidth) } },
-                },
-            };
-            await resize.RunAsync(this);
-        }
+            await Task.Delay(duration);
         ApplySidebarContents(_sidebarCollapsed);
 
         SidebarBottomBar.ColumnDefinitions = new ColumnDefinitions(_sidebarCollapsed ? "*" : "28,8,28,8,28,8,*");
@@ -159,7 +158,7 @@ public partial class Layout
                     .GetVisualDescendants()
                     .OfType<TextBlock>()
                     .Where(text =>
-                        text.Classes.Contains("SidebarSectionText") && (text.Parent == CompleteGrid || text.Parent == SidePanelButtons)
+                        text.Classes.Contains("SidebarSectionText") && (text.Parent == SidebarGrid || text.Parent == SidePanelButtons)
                     )
             );
         foreach (var control in controls)

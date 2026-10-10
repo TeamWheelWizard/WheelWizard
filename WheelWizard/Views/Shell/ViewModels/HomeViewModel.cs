@@ -5,7 +5,6 @@ using WheelWizard.Models.Enums;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Calendar;
 using WheelWizard.Views.Components;
-using Button = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Views.Shell.ViewModels;
 
@@ -91,15 +90,17 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
             _ => t("state.loading"),
         };
 
-    public ButtonVariant ButtonVariant =>
+    public ActionButtonTone ButtonTone =>
         _status switch
         {
             WheelWizardStatus.NoServer or WheelWizardStatus.NoRecompExtension or WheelWizardStatus.NoDolphinExtension =>
-                ButtonVariant.Danger,
-            WheelWizardStatus.Ready => ButtonVariant.Primary,
-            WheelWizardStatus.Loading => ButtonVariant.Default,
-            _ => ButtonVariant.Warning,
+                ActionButtonTone.Danger,
+            WheelWizardStatus.Ready => ActionButtonTone.Brand,
+            WheelWizardStatus.Loading => ActionButtonTone.Secondary,
+            _ => ActionButtonTone.Primary,
         };
+
+    public bool IsLoading => IsBusy || Status == WheelWizardStatus.Loading;
 
     public string IconName =>
         _status switch
@@ -108,7 +109,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
             WheelWizardStatus.NoServerButInstalled or WheelWizardStatus.Ready => "Play",
             WheelWizardStatus.NoDolphin or WheelWizardStatus.ConfigNotFinished => "Settings",
             WheelWizardStatus.NotInstalled or WheelWizardStatus.OutOfDate => "Download",
-            _ => "Spinner",
+            _ => string.Empty,
         };
 
     public async Task RefreshAsync()

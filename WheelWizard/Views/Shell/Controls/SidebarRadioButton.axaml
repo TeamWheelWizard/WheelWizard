@@ -54,7 +54,7 @@
                     VerticalAlignment="Stretch" />
             
             <Canvas IsHitTestVisible="False">
-                <components:HoverGlow Name="PART_HoverEffect" CornerRadius="99999" IsVisible="False" Opacity="0.3" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{StaticResource Primary200}" Height="46" Width="46" Effect="blur(150)" />
+                <components:HoverGlow Name="PART_HoverEffect" CornerRadius="99999" IsVisible="False" Opacity="0.3" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{StaticResource Brand200}" Height="46" Width="46" Effect="blur(150)" />
             </Canvas>
 
             <components:IconLabel x:Name="RadioIcon" IconSize="25" FontSize="19"
@@ -71,7 +71,6 @@
                             Text="{TemplateBinding BoxText}"
                             TipPlacement="Top"
                             IconData="{TemplateBinding BoxIconData}"
-                            IconSize="{TemplateBinding BoxIconSize}"
                             TipText="{TemplateBinding BoxTip}"
             />
           </Grid>
@@ -99,7 +98,7 @@
   <Style Selector="shellControls|SidebarRadioButton:pointerover">
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Background" Value="{StaticResource Neutral800}" />
-    <Setter Property="Foreground" Value="{StaticResource Primary200}" />
+    <Setter Property="Foreground" Value="{StaticResource Brand200}" />
     <Style Selector="^ /template/ components|HoverGlow#PART_HoverEffect">
       <Setter Property="IsVisible" Value="True" />
     </Style>
@@ -108,12 +107,12 @@
   <Style Selector="shellControls|SidebarRadioButton:checked">
     <Setter Property="ZIndex" Value="1" />
     <Setter Property="Background" Value="{StaticResource Neutral950}" />
-    <Setter Property="Foreground" Value="{StaticResource Primary300}" />
+    <Setter Property="Foreground" Value="{StaticResource Brand300}" />
     <Style Selector="^ /template/ components|HoverGlow#PART_HoverEffect">
       <Setter Property="IsVisible" Value="False" />
     </Style>
     <Style Selector="^ /template/ Border#PART_SelectionIndicator">
-      <Setter Property="Background" Value="{StaticResource Primary400}"/>
+      <Setter Property="Background" Value="{StaticResource Brand400}"/>
     </Style>
     <Style Selector="^ /template/ Path#PART_TopJoin">
       <Setter Property="IsVisible" Value="True" />
@@ -127,8 +126,9 @@
     <Setter Property="ToolTip.ShowDelay" Value="100" />
     <Setter Property="ToolTip.Placement" Value="Right" />
   </Style>
-  <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon">
-    <Setter Property="Text" Value="" />
+  <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon /template/ TextBlock,
+                   shellControls|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon /template/ Rectangle">
+    <Setter Property="IsVisible" Value="False" />
   </Style>
   <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|StatusBadge#StatusBadge">
     <Setter Property="IsVisible" Value="False" />

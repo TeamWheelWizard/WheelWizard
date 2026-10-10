@@ -27,16 +27,10 @@
             </Setter>
         </Style>
         <Style Selector="Border.License.Online">
-            <Setter Property="BorderBrush" Value="{StaticResource Primary600}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand600}" />
         </Style>
 
-        <Style Selector="components|Button.PhotoAction">
-            <Setter Property="Width" Value="30" />
-            <Setter Property="Height" Value="30" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="IconSize" Value="16" />
-            <Setter Property="CornerRadius" Value="9999" />
-        </Style>
+
 
         <Style Selector="TextBlock.StatValue">
             <Setter Property="FontSize" Value="12" />
@@ -72,14 +66,14 @@
                 <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
             </Border>
-            <ComboBox x:Name="RegionDropdown" Margin="3,0,0,10" MinWidth="160"
+            <components:Dropdown x:Name="RegionDropdown" Margin="3,0,0,10" MinWidth="160"
                       HorizontalAlignment="Right" VerticalAlignment="Bottom" />
         </StackPanel>
 
         <ScrollViewer Grid.Row="1" x:Name="ProfileContent" Margin="0,0,0,1"
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- Room at the top for the nametags on the peeking Miis. -->
-            <StackPanel x:Name="ProfileBody" Margin="4,34,4,20">
+            <StackPanel x:Name="ProfileBody" Margin="4,23,4,20">
 
                 <!-- LICENSES: their Miis peek over the top of the license and hide behind it -->
                 <ItemsControl ItemsSource="{Binding LicenseTabs}" Height="96">
@@ -158,18 +152,18 @@
 
                             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="11,10"
                                         Orientation="Horizontal" Spacing="5" IsVisible="{Binding IsOnline}">
-                                <Ellipse Width="7" Height="7" Fill="{StaticResource Primary300}" VerticalAlignment="Center" />
+                                <Ellipse Width="7" Height="7" Fill="{StaticResource Brand300}" VerticalAlignment="Center" />
                                 <TextBlock Text="{loc:T attribute.status_online}" FontSize="12"
-                                           Foreground="{StaticResource Primary200}" VerticalAlignment="Center" />
+                                           Foreground="{StaticResource Brand200}" VerticalAlignment="Center" />
                             </StackPanel>
 
                             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="7" Spacing="6">
-                                <components:Button Classes="PhotoAction"
+                                <components:ActionButton Tone="Brand" Variant="Ghost" IsCircular="True"
                                                    IconData="{StaticResource Shirt}"
-                                                   ToolTip.Tip="{loc:T action.change_mii}"
+                                                   Text="{loc:T action.change_mii}"
                                                    Click="ChangeMii_OnClick" />
-                                <components:Button Classes="PhotoAction"
-                                                   Variant="Primary"
+                                <components:ActionButton IsCircular="True" Size="Compact"
+                                                   Tone="Brand"
                                                    IconData="{StaticResource Road}"
                                                    ToolTip.Tip="{loc:T action.view_room}"
                                                    IsVisible="{Binding HasCurrentUserRoom}"
@@ -187,12 +181,10 @@
                                                      Foreground="{StaticResource Neutral50}"
                                                      TextTrimming="CharacterEllipsis"
                                                      VerticalAlignment="Center" />
-                                <components:LinkButton Grid.Column="1" VerticalAlignment="Center" Margin="8,1,0,0"
-                                                       IconData="{StaticResource Pen}" IconSize="13"
+                                <components:ActionButton Grid.Column="1" VerticalAlignment="Center" Margin="8,1,0,0"
+                                                       IconData="{StaticResource Pen}"
                                                        ToolTip.Tip="{loc:T action.rename}"
-                                                       Click="RenameMii_OnClick"
-                                                       Foreground="{StaticResource Neutral600}"
-                                                       HoverForeground="{StaticResource Neutral300}" />
+                                                       Click="RenameMii_OnClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
                             </Grid>
 
                             <!-- Friend code: the license number -->
@@ -202,35 +194,32 @@
                                                      LetterSpacing="0.6"
                                                      Foreground="{StaticResource Neutral400}"
                                                      VerticalAlignment="Center" />
-                                <components:LinkButton VerticalAlignment="Center"
-                                                       IconData="{StaticResource Copy}" IconSize="12"
+                                <components:ActionButton VerticalAlignment="Center"
+                                                       IconData="{StaticResource Copy}"
                                                        ToolTip.Tip="{loc:T action.copy_friend_code}"
-                                                       Click="CopyFriendCode_OnClick"
-                                                       Foreground="{StaticResource Neutral600}"
-                                                       HoverForeground="{StaticResource Neutral300}" />
+                                                       Click="CopyFriendCode_OnClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
                             </StackPanel>
 
-                            <!-- VR: the number that matters. Sized to the number, so its tooltip only shows over it. -->
-                            <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="5" HorizontalAlignment="Left"
-                                        Background="Transparent" ToolTip.Tip="{loc:T attribute.vr_full}">
-                                <SelectableTextBlock Text="{Binding Vr}" FontSize="30" FontWeight="Bold"
-                                                     Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
-                                <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="13" FontWeight="SemiBold"
-                                           Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom"
-                                           Margin="0,0,0,6" />
-                            </StackPanel>
+                            <Grid Grid.Row="3" ColumnDefinitions="*,*">
+                                <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Left"
+                                            Background="Transparent" ToolTip.Tip="{loc:T attribute.vr_full}">
+                                    <SelectableTextBlock Text="{Binding Vr}" FontSize="30" FontWeight="Bold"
+                                                         Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
+                                    <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom"
+                                               Margin="0,0,0,6" />
+                                </StackPanel>
 
-                            <!-- BR on the right, only when the card is wide enough for it (the sidebar is collapsed). -->
-                            <StackPanel x:Name="BrStat" Grid.Row="3" Orientation="Horizontal" Spacing="5"
-                                        HorizontalAlignment="Right" IsVisible="False"
-                                        Background="Transparent" ToolTip.Tip="{loc:T attribute.br_full}">
-                                <SelectableTextBlock Text="{Binding Br}" FontSize="22" FontWeight="Bold"
-                                                     Foreground="{StaticResource Neutral300}" VerticalAlignment="Bottom"
-                                                     Margin="0,0,0,2" />
-                                <TextBlock Text="{loc:T attribute.br_abbreviation}" FontSize="13" FontWeight="SemiBold"
-                                           Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom"
-                                           Margin="0,0,0,6" />
-                            </StackPanel>
+                                <StackPanel x:Name="BrStat" Grid.Column="1" Orientation="Horizontal" Spacing="5"
+                                            HorizontalAlignment="Left" IsVisible="False"
+                                            Background="Transparent" ToolTip.Tip="{loc:T attribute.br_full}">
+                                    <SelectableTextBlock Text="{Binding Br}" FontSize="30" FontWeight="Bold"
+                                                         Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
+                                    <TextBlock Text="{loc:T attribute.br_abbreviation}" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom"
+                                               Margin="0,0,0,6" />
+                                </StackPanel>
+                            </Grid>
 
                             <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="14" Margin="0,-1,0,0">
                                 <StackPanel Orientation="Horizontal" Spacing="4" Background="Transparent"
@@ -248,20 +237,21 @@
                             <!-- Footer: primary on the left, badges (the endorsements) on the right -->
                             <Grid Grid.Row="5" ColumnDefinitions="*,Auto" Margin="0,12,0,0" MinHeight="24">
                                 <Panel Grid.Column="0" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding IsPrimary}"
-                                                Background="Transparent" ToolTip.Tip="{loc:T hover.primary_profile}">
-                                        <PathIcon Data="{StaticResource StarIcon}" Width="11" Height="11"
-                                                  Foreground="{StaticResource Primary400}" VerticalAlignment="Center" />
-                                        <TextBlock Text="{loc:T state.primary}" FontSize="12" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource Primary300}" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <components:LinkButton Text="{loc:T option.make_primary}" FontSize="12"
-                                                           IconData="{StaticResource EmptyStarIcon}" IconSize="11"
+                                    <components:ActionButton FontSize="12" HorizontalAlignment="Left"
+                                                           Classes.Primary="{Binding IsPrimary}"
                                                            ToolTip.Tip="{loc:T hover.primary_profile}"
-                                                           Foreground="{StaticResource Neutral400}"
-                                                           HoverForeground="{StaticResource Neutral200}"
-                                                           IsVisible="{Binding !IsPrimary}"
-                                                           Click="MakePrimary_OnClick" />
+                                                           Click="MakePrimary_OnClick" Tone="Brand" Variant="Link" Padding="0" MinHeight="0">
+                                        <components:ActionButton.Styles>
+                                            <Style Selector="components|ActionButton">
+                                                <Setter Property="Text" Value="{loc:T option.make_primary}" />
+                                                <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}" />
+                                            </Style>
+                                            <Style Selector="components|ActionButton.Primary">
+                                                <Setter Property="Text" Value="{loc:T state.primary}" />
+                                                <Setter Property="IconData" Value="{StaticResource StarIcon}" />
+                                            </Style>
+                                        </components:ActionButton.Styles>
+                                    </components:ActionButton>
                                 </Panel>
 
                                 <ItemsControl Grid.Column="1" ItemsSource="{Binding Badges}"

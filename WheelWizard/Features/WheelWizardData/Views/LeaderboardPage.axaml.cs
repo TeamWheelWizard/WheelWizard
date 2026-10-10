@@ -47,6 +47,11 @@ public sealed record LeaderboardPlayerItem
     public Mii? FirstMii => Mii;
     public bool HasBadges => HasBadge;
     public bool IsTopLeaderboardPlayer => true;
+    public WheelWizard.Views.Components.StatusVariant RankBadgeVariant =>
+        Rank is 4 or 5 ? WheelWizard.Views.Components.StatusVariant.Brand
+        : Rank is >= 6 and <= 10 ? WheelWizard.Views.Components.StatusVariant.Info
+        : WheelWizard.Views.Components.StatusVariant.Gray;
+
     public string TopLabel => t("placement.other", new { rank = Rank });
     public bool IsOpenHost => false;
 }

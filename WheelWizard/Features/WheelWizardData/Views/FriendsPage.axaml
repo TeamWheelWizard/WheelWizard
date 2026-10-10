@@ -36,10 +36,10 @@
             <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
         </Style>
         <Style Selector="Border.FriendCard.Online">
-            <Setter Property="BorderBrush" Value="{StaticResource Primary700}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand700}" />
         </Style>
         <Style Selector="Border.FriendCard.Online:pointerover">
-            <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
         </Style>
         <Style Selector="Border.FriendCard.Pending">
             <Setter Property="BorderBrush" Value="{StaticResource Warning800}" />
@@ -106,15 +106,14 @@
         </Style>
 
         <!-- View room: on the photo of a friend who's online -->
-        <Style Selector="Border.FriendCard components|Button.RoomButton">
+        <Style Selector="Border.FriendCard components|ActionButton.RoomButton">
             <Setter Property="IsVisible" Value="False" />
             <Setter Property="Width" Value="30" />
             <Setter Property="Height" Value="30" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="IconSize" Value="15" />
             <Setter Property="CornerRadius" Value="9999" />
         </Style>
-        <Style Selector="Border.FriendCard.Online:not(.Pending) components|Button.RoomButton">
+        <Style Selector="Border.FriendCard.Online:not(.Pending) components|ActionButton.RoomButton">
             <Setter Property="IsVisible" Value="True" />
         </Style>
 
@@ -148,7 +147,7 @@
             <Setter Property="Fill" Value="{StaticResource Neutral600}" />
         </Style>
         <Style Selector="Border.FriendCard.Online Ellipse.StatusDot">
-            <Setter Property="Fill" Value="{StaticResource Primary300}" />
+            <Setter Property="Fill" Value="{StaticResource Brand300}" />
         </Style>
         <Style Selector="Border.FriendCard.Pending Ellipse.StatusDot">
             <Setter Property="Fill" Value="{StaticResource Warning400}" />
@@ -172,7 +171,7 @@
             <Setter Property="Fill" Value="{StaticResource Neutral600}" />
         </Style>
         <Style Selector="StackPanel.AnyOnline Ellipse#OnlineDot">
-            <Setter Property="Fill" Value="{StaticResource Primary300}" />
+            <Setter Property="Fill" Value="{StaticResource Brand300}" />
         </Style>
     </UserControl.Styles>
 
@@ -218,16 +217,8 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <TextBlock Text="{loc:T attribute.sort_by}" FontSize="13" Foreground="{StaticResource Neutral500}"
                                VerticalAlignment="Center" TextWrapping="NoWrap" />
-                    <components:LinkButton x:Name="SortButton" FontSize="13" VerticalAlignment="Center"
-                                           IconData="{StaticResource ChevronDown}" IconSize="9" IsIconLeft="False"
-                                           Foreground="{StaticResource Neutral200}"
-                                           HoverForeground="{StaticResource Neutral50}"
-                                           Click="SortButton_OnClick">
-                        <components:LinkButton.ContextMenu>
-                            <ContextMenu x:Name="SortMenu" Placement="BottomEdgeAlignedRight"
-                                         Opening="SortMenu_OnOpening" />
-                        </components:LinkButton.ContextMenu>
-                    </components:LinkButton>
+                    <components:Dropdown Variant="Borderless" FontSize="13" MinWidth="0" VerticalAlignment="Center"
+                                         ItemsSource="{Binding SortOptions}" SelectedIndex="{Binding SortIndex, Mode=TwoWay}" />
                 </StackPanel>
             </Grid>
 
@@ -301,7 +292,7 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
 
-                                        <components:Button Classes="RoomButton" Variant="Primary"
+                                        <components:ActionButton Classes="RoomButton" Tone="Brand"
                                                            HorizontalAlignment="Right" VerticalAlignment="Top" Margin="7"
                                                            IconData="{StaticResource Road}"
                                                            ToolTip.Tip="{loc:T action.view_room}"
@@ -311,22 +302,20 @@
 
                                     <!-- NAME, FRIEND CODE, VR -->
                                     <StackPanel Grid.Row="1" Margin="12,9,10,11" Spacing="3">
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <TextBlock Grid.Column="0" Classes="FriendName" Text="{Binding NameOfMii}"
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Ellipse Grid.Column="0" Classes="StatusDot" Width="7" Height="7"
+                                                     Margin="0,0,6,0" VerticalAlignment="Center"
+                                                     ToolTip.Placement="Top" ToolTip.ShowDelay="20" />
+                                            <TextBlock Grid.Column="1" Classes="FriendName" Text="{Binding NameOfMii}"
                                                        VerticalAlignment="Center" />
-                                            <PathIcon Grid.Column="1" Classes="MoreHint" Data="{StaticResource ContextDots}"
+                                            <PathIcon Grid.Column="2" Classes="MoreHint" Data="{StaticResource ContextDots}"
                                                       Width="10" Height="12" Margin="6,0,0,0" VerticalAlignment="Center"
                                                       Foreground="{StaticResource Neutral500}" />
                                         </Grid>
 
                                         <Grid ColumnDefinitions="*,Auto">
-                                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6"
-                                                        VerticalAlignment="Center">
-                                                <Ellipse Classes="StatusDot" Width="7" Height="7"
-                                                         VerticalAlignment="Center"
-                                                         ToolTip.Placement="Top" ToolTip.ShowDelay="20" />
-                                                <TextBlock Classes="Status FriendCode" Text="{Binding FriendCode}" />
-                                            </StackPanel>
+                                            <TextBlock Grid.Column="0" Classes="Status FriendCode" Text="{Binding FriendCode}"
+                                                       VerticalAlignment="Center" />
 
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
                                                         Background="Transparent" VerticalAlignment="Center"
@@ -345,7 +334,7 @@
                                 <Border.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{loc:T action.view_room}" IsVisible="{Binding IsOnline}"
-                                                  FontWeight="SemiBold" Foreground="{StaticResource Primary300}"
+                                                  FontWeight="SemiBold" Foreground="{StaticResource Brand300}"
                                                   Click="ViewRoom_OnClick" />
                                         <Separator IsVisible="{Binding IsOnline}" />
                                         <MenuItem Header="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" />

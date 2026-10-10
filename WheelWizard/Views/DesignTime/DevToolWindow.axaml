@@ -6,17 +6,17 @@
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="WheelWizard.Views.DesignTime.DevToolWindow"
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base">
-    <Grid Width="440" MaxHeight="600">
+    <Grid Width="520" MaxHeight="600">
         <ScrollViewer>
             <StackPanel>
                 <!-- MONITORING BIT -->
                 <TextBlock Text="Monitoring" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <components:StatusBadge x:Name="MiiImagesCashed" Variant="Default" Text="0"
+                    <components:StatusBadge x:Name="MiiImagesCashed" Variant="Gray" Text="0"
                                          TipPlacement="Top" Margin="10,0,0,0"
                                          IconData="{StaticResource UserCircle}"
                                          TipText="Amount of Mii-images cashed in memory" />
-                    <components:StatusBadge x:Name="RrRefreshTimeLeft" Variant="Default" Text="0"
+                    <components:StatusBadge x:Name="RrRefreshTimeLeft" Variant="Gray" Text="0"
                                          TipPlacement="Top" Margin="10,0,0,0"
                                          IconData="{StaticResource Hourglass}"
                                          TipText="Time until the next RR rooms refresh" />
@@ -27,30 +27,28 @@
                 
                 <!-- TOOLS BIT -->
                 <TextBlock Text="Tools" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
-                <CheckBox Margin="0,2" IsChecked="False" Classes="Switch"
+                <components:ToggleCheckBox Margin="0,2" IsChecked="False" Variant="Switch"
                           x:Name="WhWzTopMost" Click="WhWzTopMost_OnClick">
                     Wheel Wizard always on top
-                </CheckBox>
+                </components:ToggleCheckBox>
 
-                <components:Button Variant="Primary" Text="Mii Channel" IconData="{StaticResource DolphinIcon}"
-                                   HorizontalAlignment="Left" Margin="0,2"
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" Margin="0,8" ColumnSpacing="8" RowSpacing="6">
+                <components:ActionButton Grid.Row="0" Grid.Column="0" Tone="Brand" Text="Mii Channel" IconData="{StaticResource DolphinIcon}"
+                                   HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="MiiChannel_OnClick" />
                 
-                <components:Button Variant="Default" Text="Show Mii Animator"
-                                   IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                <components:ActionButton Grid.Row="0" Grid.Column="1" Tone="Secondary" Text="Show Mii Animator" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="ShowMiiAnimator_OnClick" />
-                <components:Button Variant="Default" Text="Force enable layout"
-                                   IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                <components:ActionButton Grid.Row="1" Grid.Column="0" Tone="Secondary" Text="Force enable layout" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="ForceEnableLayout_OnClick" />
-                <components:Button Variant="Default" Text="Kitchen Sink"
-                                   IconData="{StaticResource Sink}" HorizontalAlignment="Left" Margin="0,2"
+                <components:ActionButton Grid.Row="1" Grid.Column="1" Tone="Secondary" Text="Kitchen Sink"
+                                   IconData="{StaticResource Sink}" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="KitchenSink_OnClick" />
-                <components:Button Variant="Default" Text="Clear Cache"
-                                   IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                <components:ActionButton Grid.Row="2" Grid.Column="0" Tone="Secondary" Text="Clear Cache" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="ClearCache_OnClick" />
-                <components:Button Variant="Warning" Text="Hide all dev things"
-                                   IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                <components:ActionButton Grid.Row="2" Grid.Column="1" Tone="Primary" Text="Hide all dev things" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="HideDevelopmentFeatures_OnClick" />
+                </Grid>
                 <Border Background="{StaticResource BackgroundLineColor}" Margin="-10,10" Height="1"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
                 
@@ -58,19 +56,15 @@
                 <!-- POPUP TESTS -->
                 <TextBlock Text="Popups" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
                 <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,0,0,4">
-                    <components:Button Variant="Default" Text="progress popup" x:Name="ProgressPopupTest"
-                                       IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                    <components:ActionButton Tone="Secondary" Text="progress popup" x:Name="ProgressPopupTest" HorizontalAlignment="Left" Margin="0,2"
                                        Click="TestProgressPopup_OnClick" />
-                    <components:Button Variant="Default" Text="message popups"
-                                       IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                    <components:ActionButton Tone="Secondary" Text="message popups" HorizontalAlignment="Left" Margin="0,2"
                                        Click="TestMessagePopups_OnClick" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,0,0,4">
-                    <components:Button Variant="Default" Text="Yes No popup" x:Name="YesNoPopupButton"
-                                       IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                    <components:ActionButton Tone="Secondary" Text="Yes No popup" x:Name="YesNoPopupButton" HorizontalAlignment="Left" Margin="0,2"
                                        Click="YesNoPopup_OnClick" />
-                    <components:Button Variant="Default" Text="Options popup" x:Name="OptionsPopupButton"
-                                       IconSize="0" HorizontalAlignment="Left" Margin="0,2"
+                    <components:ActionButton Tone="Secondary" Text="Options popup" x:Name="OptionsPopupButton" HorizontalAlignment="Left" Margin="0,2"
                                        Click="OptionsPopup_OnClick" />
                 </StackPanel>
             </StackPanel>

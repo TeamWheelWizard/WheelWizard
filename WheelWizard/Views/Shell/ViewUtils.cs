@@ -117,17 +117,17 @@ public static class ViewUtils
         public static Color Danger900 = GetColor("Danger900");
         public static Color Danger950 = GetColor("Danger950");
 
-        public static Color Primary50 = GetColor("Primary50");
-        public static Color Primary100 = GetColor("Primary100");
-        public static Color Primary200 = GetColor("Primary200");
-        public static Color Primary300 = GetColor("Primary300");
-        public static Color Primary400 = GetColor("Primary400");
-        public static Color Primary500 = GetColor("Primary500");
-        public static Color Primary600 = GetColor("Primary600");
-        public static Color Primary700 = GetColor("Primary700");
-        public static Color Primary800 = GetColor("Primary800");
-        public static Color Primary900 = GetColor("Primary900");
-        public static Color Primary950 = GetColor("Primary950");
+        public static Color Brand50 = GetColor("Brand50");
+        public static Color Brand100 = GetColor("Brand100");
+        public static Color Brand200 = GetColor("Brand200");
+        public static Color Brand300 = GetColor("Brand300");
+        public static Color Brand400 = GetColor("Brand400");
+        public static Color Brand500 = GetColor("Brand500");
+        public static Color Brand600 = GetColor("Brand600");
+        public static Color Brand700 = GetColor("Brand700");
+        public static Color Brand800 = GetColor("Brand800");
+        public static Color Brand900 = GetColor("Brand900");
+        public static Color Brand950 = GetColor("Brand950");
 
         public static Color Neutral50 = GetColor("Neutral50");
         public static Color Neutral100 = GetColor("Neutral100");

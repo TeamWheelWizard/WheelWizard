@@ -1,0 +1,145 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <Style Selector="components|ActionButton">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Padding" Value="14,7" />
+        <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="PART_Background" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+                    <Border.Transitions>
+                        <Transitions>
+                            <BrushTransition Property="Background" Duration="{DynamicResource ControlAnimationDuration}" />
+                            <BrushTransition Property="BorderBrush" Duration="{DynamicResource ControlAnimationDuration}" />
+                        </Transitions>
+                    </Border.Transitions>
+                    <Panel>
+                        <Border Name="PART_FocusRing" IsVisible="False" BorderThickness="1" BorderBrush="{StaticResource Brand300}" CornerRadius="{TemplateBinding CornerRadius}" IsHitTestVisible="False" />
+                        <Canvas IsHitTestVisible="False">
+                            <components:HoverGlow Name="PART_HoverEffect" IsVisible="False" Width="46" Height="46" CornerRadius="99999"
+                                                  Background="{StaticResource Brand200}" Opacity="0.3" Effect="blur(150)" />
+                        </Canvas>
+                        <Grid Name="PART_Label" ColumnDefinitions="Auto,Auto,Auto" Margin="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              IsHitTestVisible="False">
+                            <PathIcon Name="PART_LeftIcon" Data="{TemplateBinding IconData}" Width="16" Height="16"
+                                      Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center">
+                                <PathIcon.IsVisible><MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IconData" Converter="{x:Static ObjectConverters.IsNotNull}" />
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsLoading" Converter="{x:Static BoolConverters.Not}" />
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsIconLeft" />
+                                </MultiBinding></PathIcon.IsVisible>
+                            </PathIcon>
+                            <ContentPresenter Grid.Column="1" Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                            <Border Name="PART_LinkUnderline" Grid.Column="1" Height="1" VerticalAlignment="Bottom" Background="{TemplateBinding Foreground}" IsVisible="False" />
+                            <components:Spinner Name="PART_LeftSpinner" IsVisible="False" Width="16" Height="16" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                            <components:Spinner Name="PART_RightSpinner" Grid.Column="2" IsVisible="False" Width="16" Height="16" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                            <PathIcon Grid.Column="2" Name="PART_RightIcon" Data="{TemplateBinding IconData}" Width="16" Height="16"
+                                      Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center">
+                                <PathIcon.IsVisible><MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IconData" Converter="{x:Static ObjectConverters.IsNotNull}" />
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsLoading" Converter="{x:Static BoolConverters.Not}" />
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsIconLeft" Converter="{x:Static BoolConverters.Not}" />
+                                </MultiBinding></PathIcon.IsVisible>
+                            </PathIcon>
+                        </Grid>
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:has-label /template/ PathIcon#PART_LeftIcon"><Setter Property="Margin" Value="0,0,8,0" /></Style>
+        <Style Selector="^:has-label /template/ PathIcon#PART_RightIcon"><Setter Property="Margin" Value="8,0,0,0" /></Style>
+        <Style Selector="^[IsLoading=True][IsIconLeft=True] /template/ components|Spinner#PART_LeftSpinner, ^[IsLoading=True][IsIconLeft=False] /template/ components|Spinner#PART_RightSpinner"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^:has-label /template/ components|Spinner#PART_LeftSpinner"><Setter Property="Margin" Value="0,0,8,0" /></Style>
+        <Style Selector="^:has-label /template/ components|Spinner#PART_RightSpinner"><Setter Property="Margin" Value="8,0,0,0" /></Style>
+        <Style Selector="^[Size=Compact] /template/ components|Spinner"><Setter Property="Width" Value="14" /><Setter Property="Height" Value="14" /></Style>
+        <Style Selector="^[IsCircular=True] /template/ components|Spinner"><Setter Property="Margin" Value="0" /></Style>
+        <Style Selector="^[Size=Compact]"><Setter Property="MinHeight" Value="28" /><Setter Property="Padding" Value="10,4" /><Setter Property="FontSize" Value="13" /></Style>
+        <Style Selector="^[Size=Compact] /template/ PathIcon"><Setter Property="Width" Value="14" /><Setter Property="Height" Value="14" /></Style>
+        <Style Selector="^:icon-only /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="IsVisible" Value="False" /></Style>
+        <Style Selector="^:icon-only"><Setter Property="MinWidth" Value="36" /><Setter Property="Padding" Value="10" /></Style>
+        <Style Selector="^[Size=Compact]:icon-only"><Setter Property="MinWidth" Value="28" /><Setter Property="Padding" Value="7" /></Style>
+        <Style Selector="^:pointerover"><Setter Property="BorderBrush" Value="{StaticResource Neutral500}" /></Style>
+        <Style Selector="^:pressed"><Setter Property="Background" Value="{StaticResource Neutral800}" /></Style>
+        <Style Selector="^[Tone=Brand][Variant=Button]">
+            <Setter Property="Background" Value="{StaticResource Brand400}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand600}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
+            <Style Selector="^ /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="Background" Value="{StaticResource Brand100}" /><Setter Property="Width" Value="64" /><Setter Property="Height" Value="64" /><Setter Property="Opacity" Value="0.55" /><Setter Property="Effect" Value="blur(60)" /></Style>
+        </Style>
+        <Style Selector="^[Tone=Brand][Variant=Button]:pointerover"><Setter Property="BorderBrush" Value="{StaticResource Brand400}" /></Style>
+        <Style Selector="^[Tone=Brand][Variant=Button]:pressed"><Setter Property="Background" Value="{StaticResource Brand500}" /></Style>
+        <Style Selector="^[Tone=Danger][Variant=Button]">
+            <Setter Property="Background" Value="#8F2940" />
+            <Setter Property="BorderBrush" Value="{StaticResource Danger700}" />
+            <Setter Property="Foreground" Value="#FFE4E9" />
+            <Style Selector="^ /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="Background" Value="{StaticResource Danger300}" /><Setter Property="Width" Value="46" /><Setter Property="Height" Value="46" /><Setter Property="Opacity" Value="0.15" /><Setter Property="Effect" Value="blur(150)" /></Style>
+        </Style>
+        <Style Selector="^[Tone=Danger][Variant=Button]:pointerover"><Setter Property="BorderBrush" Value="{StaticResource Danger400}" /></Style>
+        <Style Selector="^[Tone=Danger][Variant=Button]:pressed"><Setter Property="Background" Value="#752236" /></Style>
+        <Style Selector="^[Tone=Primary][Variant=Button]">
+            <Setter Property="Background" Value="{StaticResource Neutral50}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
+        </Style>
+        <Style Selector="^[Tone=Primary][Variant=Button]:pressed"><Setter Property="Background" Value="{StaticResource Neutral200}" /></Style>
+        <Style Selector="^[Variant=Ghost]"><Setter Property="BorderThickness" Value="1" /><Setter Property="BorderBrush" Value="{StaticResource Neutral700}" /></Style>
+        <Style Selector="^[Tone=Primary][Variant=Ghost], ^[Tone=Primary][Variant=Label], ^[Tone=Primary][Variant=Link]">
+            <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{StaticResource Neutral50}" />
+        </Style>
+        <Style Selector="^[Tone=Primary][Variant=Ghost]:pointerover, ^[Tone=Primary][Variant=Ghost]:pressed"><Setter Property="BorderBrush" Value="{StaticResource Neutral50}" /></Style>
+        <Style Selector="^[Tone=Primary][Variant=Label]:pointerover:not(:disabled), ^[Tone=Primary][Variant=Label]:pressed:not(:disabled), ^[Tone=Primary][Variant=Link]:pointerover:not(:disabled), ^[Tone=Primary][Variant=Link]:pressed:not(:disabled)"><Setter Property="Foreground" Value="{StaticResource Neutral100}" /></Style>
+        <Style Selector="^[Tone=Primary][Variant=Ghost] /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="Background" Value="{StaticResource Neutral100}" /><Setter Property="Width" Value="51" /><Setter Property="Height" Value="51" /><Setter Property="Effect" Value="blur(115)" /><Setter Property="Opacity" Value="0.275" /></Style>
+        <Style Selector="^[Tone=Brand][Variant=Ghost], ^[Tone=Brand][Variant=Label], ^[Tone=Brand][Variant=Link]">
+            <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{StaticResource Brand400}" />
+        </Style>
+        <Style Selector="^[Tone=Brand][Variant=Ghost]"><Setter Property="Foreground" Value="{StaticResource Neutral200}" /></Style>
+        <Style Selector="^[Tone=Brand][Variant=Ghost]:pointerover, ^[Tone=Brand][Variant=Ghost]:pressed"><Setter Property="BorderBrush" Value="{StaticResource Brand400}" /></Style>
+        <Style Selector="^[Tone=Brand][Variant=Label]:pointerover:not(:disabled), ^[Tone=Brand][Variant=Label]:pressed:not(:disabled), ^[Tone=Brand][Variant=Link]:pointerover:not(:disabled), ^[Tone=Brand][Variant=Link]:pressed:not(:disabled)"><Setter Property="Foreground" Value="{StaticResource Brand300}" /></Style>
+        <Style Selector="^[Tone=Brand][Variant=Ghost] /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="Background" Value="{StaticResource Brand300}" /><Setter Property="Width" Value="51" /><Setter Property="Height" Value="51" /><Setter Property="Effect" Value="blur(115)" /><Setter Property="Opacity" Value="0.275" /></Style>
+        <Style Selector="^[Tone=Secondary][Variant=Ghost], ^[Tone=Secondary][Variant=Label], ^[Tone=Secondary][Variant=Link]">
+            <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+        </Style>
+        <Style Selector="^[Tone=Secondary][Variant=Link]"><Setter Property="Foreground" Value="{StaticResource Neutral400}" /></Style>
+        <Style Selector="^[Tone=Secondary][Variant=Ghost]:pointerover, ^[Tone=Secondary][Variant=Ghost]:pressed"><Setter Property="BorderBrush" Value="{StaticResource Neutral200}" /></Style>
+        <Style Selector="^[Tone=Secondary][Variant=Label]:pointerover:not(:disabled), ^[Tone=Secondary][Variant=Label]:pressed:not(:disabled), ^[Tone=Secondary][Variant=Link]:pointerover:not(:disabled), ^[Tone=Secondary][Variant=Link]:pressed:not(:disabled)"><Setter Property="Foreground" Value="{StaticResource Neutral100}" /></Style>
+        <Style Selector="^[Tone=Secondary][Variant=Link]:pointerover:not(:disabled), ^[Tone=Secondary][Variant=Link]:pressed:not(:disabled)"><Setter Property="Foreground" Value="{StaticResource Neutral300}" /></Style>
+        <Style Selector="^[Tone=Secondary][Variant=Ghost] /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="Background" Value="{StaticResource Neutral100}" /><Setter Property="Width" Value="51" /><Setter Property="Height" Value="51" /><Setter Property="Effect" Value="blur(115)" /><Setter Property="Opacity" Value="0.275" /></Style>
+        <Style Selector="^[Tone=Danger][Variant=Ghost], ^[Tone=Danger][Variant=Label], ^[Tone=Danger][Variant=Link]">
+            <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{StaticResource Danger400}" />
+        </Style>
+        <Style Selector="^[Tone=Danger][Variant=Ghost]:pointerover, ^[Tone=Danger][Variant=Ghost]:pressed"><Setter Property="BorderBrush" Value="{StaticResource Danger400}" /></Style>
+        <Style Selector="^[Tone=Danger][Variant=Label]:pointerover:not(:disabled), ^[Tone=Danger][Variant=Label]:pressed:not(:disabled), ^[Tone=Danger][Variant=Link]:pointerover:not(:disabled), ^[Tone=Danger][Variant=Link]:pressed:not(:disabled)"><Setter Property="Foreground" Value="{StaticResource Danger300}" /></Style>
+        <Style Selector="^[Tone=Danger][Variant=Ghost] /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="Background" Value="{StaticResource Danger300}" /><Setter Property="Width" Value="51" /><Setter Property="Height" Value="51" /><Setter Property="Effect" Value="blur(115)" /><Setter Property="Opacity" Value="0.275" /></Style>
+        <Style Selector="^[Variant=Ghost]:pressed"><Setter Property="Background"><SolidColorBrush Color="{StaticResource Neutral500}" Opacity="0.05" /></Setter></Style>
+        <Style Selector="^[Variant=Ghost]:icon-only"><Setter Property="Padding" Value="9" /></Style>
+        <Style Selector="^[Variant=Ghost][Size=Compact]:icon-only"><Setter Property="Padding" Value="6" /></Style>
+        <Style Selector="^[Variant=Label]:pressed, ^[Variant=Link]:pressed"><Setter Property="Background" Value="Transparent" /></Style>
+        <Style Selector="^[Variant=Link]:pointerover:not(:disabled):has-label /template/ Border#PART_LinkUnderline"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^[IsCircular=True]">
+            <Setter Property="CornerRadius" Value="999" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Width" Value="36" /><Setter Property="Height" Value="36" />
+            <Setter Property="ToolTip.Tip" Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
+        </Style>
+        <Style Selector="^[IsCircular=True][Size=Compact]"><Setter Property="Width" Value="26" /><Setter Property="Height" Value="26" /><Setter Property="MinWidth" Value="26" /><Setter Property="MinHeight" Value="26" /></Style>
+        <Style Selector="^[IsCircular=True] /template/ Grid#PART_Label"><Setter Property="Margin" Value="0" /><Setter Property="HorizontalAlignment" Value="Center" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+        <Style Selector="^[IsCircular=True] /template/ PathIcon"><Setter Property="Margin" Value="0" /></Style>
+        <Style Selector="^:focus-visible /template/ Border#PART_FocusRing"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^:focus-visible"><Setter Property="BorderBrush" Value="{StaticResource Brand400}" /></Style>
+        <Style Selector="^:pointerover:not(:disabled) /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^[Tone=Primary][Variant=Button]:pointerover /template/ components|HoverGlow#PART_HoverEffect, ^[Variant=Label]:pointerover /template/ components|HoverGlow#PART_HoverEffect, ^[Variant=Link]:pointerover /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="IsVisible" Value="False" /></Style>
+        <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.45" /><Setter Property="Cursor" Value="Arrow" /></Style>
+    </Style>
+</Styles>

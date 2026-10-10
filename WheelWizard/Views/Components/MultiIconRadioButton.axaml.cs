@@ -4,7 +4,7 @@ using Avalonia.Media;
 
 namespace WheelWizard.Views.Components;
 
-public class MultiIconRadioButton : RadioButton
+public class MultiIconRadioButton : ToggleRadioButton
 {
     #region MultiColoredIcon Colors
 

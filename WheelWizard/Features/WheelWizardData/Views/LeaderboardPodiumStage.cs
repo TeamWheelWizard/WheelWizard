@@ -4,7 +4,6 @@ using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using MiiAnim.Core.Animation;
 using MiiAnim.Core.Evaluation;
@@ -23,7 +22,7 @@ namespace WheelWizard.WheelWizardData.Views;
 
 /// <summary>
 /// The leaderboard's top three on a podium. Their Miis stand on the steps in realtime 3D: when the leaderboard loads
-/// the steps rise, the Miis drop onto them one by one (third, second, then the winner, who cheers in a burst of
+/// the steps appear, the Miis drop onto them one by one (third, second, then the winner, who cheers in a burst of
 /// confetti while the others clap), and then they play little scenes together, like high fives and copycat dances.
 /// <para>
 /// The steps are this panel's children (<see cref="LeaderboardPodiumStep"/>s), each placed under its Mii by
@@ -76,8 +75,8 @@ public sealed class LeaderboardPodiumStage : Panel
     private static readonly string[] Roles = ["first", "second", "third"];
     private const string Scenes = "leaderboard/scenes";
 
-    /// <summary>The steps rise one after another, lowest first.</summary>
-    private static readonly TimeSpan StepRise = TimeSpan.FromMilliseconds(520);
+    /// <summary>The steps fade in one after another, lowest first.</summary>
+    private static readonly TimeSpan StepFade = TimeSpan.FromMilliseconds(260);
 
     private static readonly TimeSpan StepStagger = TimeSpan.FromMilliseconds(110);
 
@@ -260,9 +259,9 @@ public sealed class LeaderboardPodiumStage : Panel
         {
             if (miis[place] is { } mii)
                 _actors[place] = live ? CreateLive(place, mii) : CreateStill(place, mii);
-            // Nobody to wait for: an empty step, or a picture that's there as soon as its step is up.
-            if (!live || _actors[place] is null)
-                Light(place, _actors[place] is not null && _animate ? StepRise + GlowDelay : TimeSpan.Zero);
+            // Still pictures need no entrance; empty steps stay unlit.
+            if (!live && _actors[place] is not null)
+                Light(place, _animate ? GlowDelay : TimeSpan.Zero);
         }
 
         // Draw the winner last, so its confetti falls in front of the others.
@@ -270,7 +269,7 @@ public sealed class LeaderboardPodiumStage : Panel
             if (_actors[place] is { } actor)
                 Children.Add((Control?)actor.View ?? actor.Still!);
 
-        RaiseSteps();
+        ShowSteps();
         if (live && _actors.Any(a => a is not null))
         {
             _showTimeout?.Stop();
@@ -430,8 +429,8 @@ public sealed class LeaderboardPodiumStage : Panel
         }
     }
 
-    /// <summary>The steps rise from below, lowest first.</summary>
-    private void RaiseSteps()
+    /// <summary>The steps appear in place, lowest first.</summary>
+    private void ShowSteps()
     {
         var steps = Children.Where(c => GetPlace(c) is >= 1 and <= 3).OrderByDescending(GetPlace).ToList();
         for (var i = 0; i < steps.Count; i++)
@@ -446,22 +445,20 @@ public sealed class LeaderboardPodiumStage : Panel
 
             step.Transitions = null;
             step.Opacity = 0;
-            step.RenderTransform = TransformOperations.Parse($"translateY({(int)(Bounds.Height * 0.45)}px)");
+            step.RenderTransform = null;
             var delay = StepStagger * i;
             DispatcherTimer.RunOnce(
                 () =>
                 {
                     step.Transitions =
                     [
-                        new TransformOperationsTransition
+                        new DoubleTransition
                         {
-                            Property = RenderTransformProperty,
-                            Duration = StepRise,
-                            Easing = new BackEaseOut(),
+                            Property = OpacityProperty,
+                            Duration = StepFade,
+                            Easing = new SineEaseInOut(),
                         },
-                        new DoubleTransition { Property = OpacityProperty, Duration = StepRise / 2 },
                     ];
-                    step.RenderTransform = TransformOperations.Parse("translateY(0px)");
                     step.Opacity = 1;
                 },
                 delay + TimeSpan.FromMilliseconds(16)

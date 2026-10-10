@@ -148,7 +148,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
             .SetMainText("Do you click yes or no")
             .AwaitAnswer();
 
-        YesNoPopupButton.Variant = yesNoWindow ? ButtonVariant.Primary : ButtonVariant.Danger;
+        YesNoPopupButton.Tone = yesNoWindow ? ActionButtonTone.Brand : ActionButtonTone.Danger;
     }
 
     private async void OptionsPopup_OnClick(object sender, RoutedEventArgs e)
@@ -161,7 +161,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
             .AddOption("Banana", "Not an Option", () => { }, false)
             .AwaitAnswer();
 
-        OptionsPopupButton.Variant = optionsWindow != null ? ButtonVariant.Warning : ButtonVariant.Danger;
+        OptionsPopupButton.Tone = optionsWindow != null ? ActionButtonTone.Primary : ActionButtonTone.Danger;
         OptionsPopupButton.Text = optionsWindow ?? "Clicked away";
     }
 

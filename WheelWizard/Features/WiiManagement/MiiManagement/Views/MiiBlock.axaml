@@ -102,13 +102,13 @@
         </Style>
         
         <Style Selector="^[IsChecked=True] /template/ Border#PART_MainBorder">
-            <Setter Property="BorderBrush" Value="{StaticResource Primary400}"></Setter>
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}"></Setter>
             <Style Selector="^ PathIcon#PART_AddIcon">
-                <Setter Property="Foreground" Value="{StaticResource Primary400}" />
+                <Setter Property="Foreground" Value="{StaticResource Brand400}" />
             </Style>
             <Style Selector="^ Border#PART_BackgroundBlur">
                 <Setter Property="IsVisible" Value="True" />
-                <Setter Property="Background" Value="{StaticResource Primary200}" />
+                <Setter Property="Background" Value="{StaticResource Brand200}" />
             </Style>
         </Style>
         <Style Selector="^:pointerover[IsChecked=True] /template/ Border#PART_MainBorder">

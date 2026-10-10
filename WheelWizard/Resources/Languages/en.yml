@@ -133,6 +133,7 @@ en:
     installed: "Installed"
     primary: "Primary"
   action:
+    more_actions: "More actions"
     play: "Play"
     open: "Open"
     play_offline: "Play Offline"
@@ -729,3 +730,10 @@ en:
       polish: "Polish"
       portuguese: "Portuguese"
       z_translators: "-"
+
+  component:
+    dropdown:
+      search_placeholder: "Search..."
+      empty: "No options found"
+    input:
+      invalid_number: "Enter a number"

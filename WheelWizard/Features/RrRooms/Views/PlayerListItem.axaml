@@ -95,13 +95,12 @@
                                 </ScrollViewer>
                             </Border>
 
-                            <components:Button x:Name="PART_JoinRoomButton"
+                            <components:ActionButton x:Name="PART_JoinRoomButton"
                                                Grid.Column="1"
                                                IsVisible="False"
-                                               Variant="Primary"
+                                               Tone="Brand"
                                                Text=""
                                                IconData="{StaticResource Road}"
-                                               IconSize="11"
                                                FontSize="12"
                                                Padding="8,5"
                                                Margin="0,0,8,0"
@@ -113,23 +112,14 @@
                                                ToolTip.VerticalOffset="0"
                                                ToolTip.ShowDelay="20" />
 
-                            <Border x:Name="PART_TopLabelBadge"
-                                    Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right"
-                                    IsVisible="{TemplateBinding IsTopPlayer}"
-                                    Padding="10,6" CornerRadius="8" Margin="0,0,10,0">
-                                <TextBlock x:Name="PART_TopLabelText"
-                                           Text="{TemplateBinding TopLabel}" FontWeight="SemiBold" FontSize="13"
-                                           />
-                            </Border>
+                            <components:StatusBadge x:Name="PART_TopLabelBadge" Grid.Column="2"
+                                    VerticalAlignment="Center" HorizontalAlignment="Right"
+                                    IsVisible="{TemplateBinding IsTopPlayer}" Margin="0,0,10,0"
+                                    Text="{TemplateBinding TopLabel}" Variant="{TemplateBinding TopLabelVariant}" />
 
-                            <PathIcon Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right"
-                                      IsVisible="{TemplateBinding IsOpenHost}"
-                                      Data="{StaticResource LockOpen}" Width="16" Height="16"
-                                      Foreground="{StaticResource Primary400}"
-                                      Margin="0,0,10,0"
-                                      ToolTip.Tip="Open Host"
-                                      ToolTip.Placement="Top"
-                                      ToolTip.ShowDelay="20" />
+                            <components:StatusBadge Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                IsVisible="{TemplateBinding IsOpenHost}" IconData="{StaticResource LockOpen}"
+                                Variant="Brand" Text="" Margin="0,0,10,0" ToolTip.Tip="Open Host" ToolTip.Placement="Top" ToolTip.ShowDelay="20" />
                         </Grid>
                     </Grid>
                 </Border>
@@ -137,16 +127,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="rooms|PlayerListItem /template/ Border#PART_TopLabelBadge">
-        <Setter Property="Background" Value="{StaticResource Primary600}" />
-        <Setter Property="BorderThickness" Value="0" />
-    </Style>
-
-    <Style Selector="rooms|PlayerListItem /template/ TextBlock#PART_TopLabelText">
-        <Setter Property="Foreground" Value="White" />
-    </Style>
-
-    <Style Selector="rooms|PlayerListItem[ShowJoinRoomButton=true][IsOnline=true] /template/ components|Button#PART_JoinRoomButton">
+    <Style Selector="rooms|PlayerListItem[ShowJoinRoomButton=true][IsOnline=true] /template/ components|ActionButton#PART_JoinRoomButton">
         <Setter Property="IsVisible" Value="True" />
     </Style>
 </Styles>

@@ -89,6 +89,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     private Border? _dragAdorner;
     private Border? _dropIndicatorLine;
     private IPointer? _capturedPointer;
+    private bool _viewInitialized;
     private const double DragThreshold = 5.0;
 
     public ModsPage(
@@ -109,11 +110,18 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         ModPatchConversionService = modPatchConversionService;
         ModManagerService = modManagerService;
         InitializeComponent();
+        GridViewOption.IconData = GridViewOption.IconData!.GetWidenedGeometry(
+            new Pen(Brushes.White, 2, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round)
+        );
+        ListViewOption.IconData = ListViewOption.IconData!.GetWidenedGeometry(
+            new Pen(Brushes.White, 2, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round)
+        );
         DataContext = this;
         Focusable = true;
         ModManager.PropertyChanged += OnModsChanged;
         _ = ReloadModsAndShowErrorsAsync();
         SetModsViewVariant();
+        _viewInitialized = true;
 
         // Apply priority edits as soon as the user clicks anywhere outside the textbox.
         AddHandler(PointerPressedEvent, OnPagePointerPressed, RoutingStrategies.Tunnel, true);
@@ -356,10 +364,10 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     private async void PriorityText_OnLostFocus(object? sender, RoutedEventArgs e)
     {
         var mod = GetParentsMod(e);
-        if (mod == null || e.Source is not TextBox textBox)
+        if (mod == null || e.Source is not InputField textBox)
             return;
 
-        textBox.Classes.Remove("error"); // In case this class has been added, then we remove it again
+        textBox.ErrorText = null;
         if (int.TryParse(textBox.Text, out var newPriority))
         {
             var priorityResult = await ModManager.SetPriorityAsync(mod, newPriority);
@@ -375,14 +383,12 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     private void PriorityText_OnTextChanged(object? sender, TextChangedEventArgs e)
     {
         var mod = GetParentsMod(e);
-        if (mod == null || e.Source is not TextBox textBox)
+        if (mod == null || e.Source is not InputField textBox)
             return;
 
-        // We intentionally don't use the TextField here since that component is a bit to big for this use case.
-        if (int.TryParse(textBox.Text, out _))
-            textBox.Classes.Remove("error");
-        else if (!textBox.Classes.Contains("error"))
-            textBox.Classes.Add("error");
+        textBox.ErrorText = int.TryParse(textBox.Text, out _)
+            ? null
+            : WheelWizard.Localization.TranslationFunctions.t("component.input.invalid_number");
     }
 
     private Mod? GetParentsMod(RoutedEventArgs eventArgs)
@@ -415,11 +421,11 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
             MessageTranslationHelper.ShowMessage(priorityResult.Error);
     }
 
-    private void ModsView_OnCheckedChanged(object? sender, RoutedEventArgs e)
+    private void ModsView_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is not RadioButton { IsChecked: true } button)
+        if (!_viewInitialized || ModsListBox is null || ViewModeToggle.SelectedIndex < 0)
             return;
-        var gridView = ReferenceEquals(button, GridViewButton);
+        var gridView = ViewModeToggle.SelectedIndex == 0;
         if (SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW) == gridView)
             return;
         SettingsService.Set(SettingsService.PREFERS_MODS_ROW_VIEW, gridView);
@@ -447,8 +453,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         // Toggle between list view (Blocks/arrows mode) and grid view (Rows/priority text mode)
         ModsListBox.IsVisible = !asRows;
         ModsGridView.IsVisible = asRows;
-        GridViewButton.IsChecked = asRows;
-        ListViewButton.IsChecked = !asRows;
+        ViewModeToggle.SelectedIndex = asRows ? 0 : 1;
     }
 
     private void PriorityText_OnKeyDown(object? sender, KeyEventArgs e)

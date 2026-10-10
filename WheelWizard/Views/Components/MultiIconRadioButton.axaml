@@ -36,7 +36,7 @@
                 <controls:MultiIconRadioButton IconGeo="{StaticResource Home}"
                                                Color1="{StaticResource Neutral400}"
                                                HoverColor1="{StaticResource Danger50}"
-                                               SelectedColor1="{StaticResource Primary400}"/>
+                                               SelectedColor1="{StaticResource Brand400}"/>
             </StackPanel>
         </Border>
        
@@ -55,7 +55,7 @@
                      <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
                             <Border CornerRadius="99999" HorizontalAlignment="Right" VerticalAlignment="Top"
                                     Opacity="0.6" IsVisible="False" x:Name="PART_BackgroundBlur"
-                                    Height="50" Width="30" Effect="blur(90)" Background="{StaticResource Primary200}">
+                                    Height="50" Width="30" Effect="blur(90)" Background="{StaticResource Brand200}">
                             </Border>
                          
                          <Border Background="Transparent"

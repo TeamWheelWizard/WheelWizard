@@ -17,11 +17,36 @@
         <StreamGeometry x:Key="MiiEditorShortIcon">M9,11 A3,3 0 1 0 15,11 A3,3 0 1 0 9,11 Z M8.5,23 L8.5,18.5 A3.5,3.5 0 0 1 15.5,18.5 L15.5,23 Z</StreamGeometry>
         <StreamGeometry x:Key="MiiEditorWideIcon">M9,5 A3,3 0 1 0 15,5 A3,3 0 1 0 9,5 Z M5,22 L5,13 A4,4 0 0 1 9,9 L15,9 A4,4 0 0 1 19,13 L19,22 Z</StreamGeometry>
         <StreamGeometry x:Key="MiiEditorThinIcon">M9,5 A3,3 0 1 0 15,5 A3,3 0 1 0 9,5 Z M9.5,22 L9.5,11.5 A2.5,2.5 0 0 1 14.5,11.5 L14.5,22 Z</StreamGeometry>
-        <StreamGeometry x:Key="MiiEditorChevronLeft">M15.4,3.4 L17.4,5.4 L10.8,12 L17.4,18.6 L15.4,20.6 L6.8,12 Z</StreamGeometry>
-        <StreamGeometry x:Key="MiiEditorChevronRight">M8.6,3.4 L17.2,12 L8.6,20.6 L6.6,18.6 L13.2,12 L6.6,5.4 Z</StreamGeometry>
     </UserControl.Resources>
 
     <UserControl.Styles>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant">
+            <Setter Property="Background" Value="{StaticResource Neutral600}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"
+                                          Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant:checked">
+            <Setter Property="Background" Value="{StaticResource Brand600}" />
+        </Style>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant:checked:pointerover">
+            <Setter Property="Background" Value="{StaticResource Brand700}" />
+        </Style>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant:disabled">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+        </Style>
         <!-- Floating panels over the Mii. -->
         <Style Selector="Border.Floating">
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
@@ -54,60 +79,6 @@
         <Style Selector="components|MultiIconRadioButton.Variant">
             <Setter Property="Width" Value="54" />
             <Setter Property="Height" Value="54" />
-        </Style>
-
-        <!-- Round buttons floating next to the Mii (arrows, add/remove, size and rotate). -->
-        <Style Selector="Button.Round">
-            <Setter Property="Width" Value="38" />
-            <Setter Property="Height" Value="38" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="CornerRadius" Value="19" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Background" Value="{StaticResource Neutral800}" />
-            <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="Button.Round /template/ ContentPresenter">
-            <Setter Property="CornerRadius" Value="19" />
-        </Style>
-        <Style Selector="Button.Round:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{StaticResource Primary600}" />
-            <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
-        </Style>
-        <Style Selector="Button.Round:pressed">
-            <Setter Property="RenderTransform" Value="scale(0.92)" />
-        </Style>
-        <Style Selector="Button.Round:disabled">
-            <Setter Property="Opacity" Value="0.35" />
-        </Style>
-        <Style Selector="Button.Round PathIcon">
-            <Setter Property="Width" Value="16" />
-            <Setter Property="Height" Value="16" />
-        </Style>
-        <Style Selector="Button.Round.Arrow">
-            <Setter Property="Background" Value="#CC1B1D22" />
-        </Style>
-        <Style Selector="Button.Round.Add">
-            <Setter Property="Width" Value="30" />
-            <Setter Property="Height" Value="30" />
-            <Setter Property="CornerRadius" Value="15" />
-            <Setter Property="Background" Value="{StaticResource Primary600}" />
-            <Setter Property="BorderBrush" Value="{StaticResource Primary300}" />
-        </Style>
-        <Style Selector="Button.Round.Remove">
-            <Setter Property="Width" Value="30" />
-            <Setter Property="Height" Value="30" />
-            <Setter Property="CornerRadius" Value="15" />
-            <Setter Property="Background" Value="{StaticResource Danger600}" />
-            <Setter Property="BorderBrush" Value="{StaticResource Danger400}" />
         </Style>
 
         <!-- Upright body sliders. -->
@@ -146,7 +117,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource Neutral200}" />
         </Style>
         <Style Selector="Button.Swatch.selected /template/ ContentPresenter">
-            <Setter Property="BorderBrush" Value="{StaticResource Primary300}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand300}" />
         </Style>
     </UserControl.Styles>
 
@@ -158,26 +129,18 @@
         <Canvas x:Name="Overlay" ClipToBounds="False" />
 
         <!-- Back to My Miis, like going back from a room's details. -->
-        <components:LinkButton x:Name="BackButton"
+        <components:ActionButton x:Name="BackButton"
                                IconData="{StaticResource ArrowLeft}"
                                Text="{loc:T page_title.my_miis}"
-                               Foreground="{StaticResource TitleTextColor}"
-                               HoverForeground="{StaticResource Primary200}"
                                VerticalAlignment="Top" HorizontalAlignment="Left"
-                               FontSize="16" Click="BackButton_OnClick" />
+                               FontSize="16" Click="BackButton_OnClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
 
         <StackPanel x:Name="TopActions" Orientation="Horizontal" Spacing="6"
                     HorizontalAlignment="Right" VerticalAlignment="Top">
-            <Button x:Name="UndoButton" Classes="Round" Click="UndoButton_OnClick"
-                    ToolTip.Tip="{loc:T action.undo}">
-                <PathIcon Data="{StaticResource RotateLeft}" />
-            </Button>
-            <Button x:Name="RedoButton" Classes="Round" Click="RedoButton_OnClick"
-                    ToolTip.Tip="{loc:T action.redo}">
-                <PathIcon Data="{StaticResource RotateRight}" />
-            </Button>
-            <components:Button x:Name="SaveButton" Variant="Primary" Margin="4,0,0,0"
-                               IconData="{StaticResource CheckMark}" IconSize="14"
+            <components:ActionButton x:Name="UndoButton" IsCircular="True" Variant="Ghost" Tone="Brand" IconData="{StaticResource RotateLeft}" Click="UndoButton_OnClick" ToolTip.Tip="{loc:T action.undo}" />
+            <components:ActionButton x:Name="RedoButton" IsCircular="True" Variant="Ghost" Tone="Brand" IconData="{StaticResource RotateRight}" Click="RedoButton_OnClick" ToolTip.Tip="{loc:T action.redo}" />
+            <components:ActionButton x:Name="SaveButton" Tone="Brand" Margin="4,0,0,0"
+                               IconData="{StaticResource CheckMark}"
                                Text="{loc:T action.save}" Click="SaveButton_OnClick" />
         </StackPanel>
 
@@ -219,29 +182,28 @@
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock Classes="TitleText" FontSize="18" Text="{loc:T attribute.mii_section.info}" VerticalAlignment="Center" />
                     <!-- Icon and colour come from styles only: set on the button itself they'd win over .favorite. -->
-                    <components:LinkButton x:Name="FavoriteButton" Grid.Column="1" IconSize="22"
-                                           HoverForeground="{StaticResource Warning300}" Click="FavoriteButton_OnClick"
-                                           ToolTip.Tip="{loc:T action.favorite}">
-                        <components:LinkButton.Styles>
-                            <Style Selector="components|LinkButton">
+                    <components:ActionButton x:Name="FavoriteButton" Grid.Column="1" Click="FavoriteButton_OnClick"
+                                           ToolTip.Tip="{loc:T action.favorite}" Tone="Brand" Variant="Link" Padding="0" MinHeight="0">
+                        <components:ActionButton.Styles>
+                            <Style Selector="components|ActionButton">
                                 <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}" />
                                 <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
                             </Style>
-                            <Style Selector="components|LinkButton.favorite">
+                            <Style Selector="components|ActionButton.favorite">
                                 <Setter Property="IconData" Value="{StaticResource StarIcon}" />
                                 <Setter Property="Foreground" Value="{StaticResource Warning500}" />
                             </Style>
-                        </components:LinkButton.Styles>
-                    </components:LinkButton>
+                        </components:ActionButton.Styles>
+                    </components:ActionButton>
                 </Grid>
                 <StackPanel>
                     <components:FormFieldLabel Text="{loc:T attribute.mii.name}" />
-                    <components:TextField x:Name="NameField" PlaceholderText="{loc:T placeholder.enter_mii_name}"
+                    <components:InputField x:Name="NameField" Placeholder="{loc:T placeholder.enter_mii_name}"
                                           TextChanged="NameField_OnTextChanged" />
                 </StackPanel>
                 <StackPanel>
                     <components:FormFieldLabel Text="{loc:T attribute.mii.creator_name}" />
-                    <components:TextField x:Name="CreatorField" PlaceholderText="{loc:T helper_text.optional}"
+                    <components:InputField x:Name="CreatorField" Placeholder="{loc:T helper_text.optional}"
                                           TextChanged="CreatorField_OnTextChanged" />
                 </StackPanel>
             </StackPanel>
@@ -271,10 +233,12 @@
             </Border>
 
             <!-- Picker: roll the dice instead of picking. -->
-            <components:Button x:Name="DiceButton" Variant="Default" IsVisible="False"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                               IconData="{StaticResource Dice}" IconSize="20"
-                               Text="{loc:T action.surprise_me}" Click="DiceButton_OnClick" />
+            <Grid ColumnDefinitions="*,2*,*" VerticalAlignment="Center">
+                <components:ActionButton x:Name="DiceButton" Grid.Column="1" Tone="Brand" Variant="Ghost" IsVisible="False"
+                                         HorizontalAlignment="Stretch"
+                                         IconData="{StaticResource Dice}"
+                                         Text="{loc:T action.surprise_me}" Click="DiceButton_OnClick" />
+            </Grid>
         </Grid>
 
         <StackPanel x:Name="PickerHint" IsVisible="False" IsHitTestVisible="False"
