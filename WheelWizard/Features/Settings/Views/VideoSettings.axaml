@@ -8,7 +8,7 @@
              x:Class="WheelWizard.Settings.Views.VideoSettings">
     
     <Grid x:Name="VideoBorder">
-        <StackPanel Margin="0,15,0,0">
+        <StackPanel Margin="0,10,0,0">
 
             <Grid Margin="0,-10,0,10" MinHeight="40" x:Name="DisabledWarningText">
                 <Border Background="{StaticResource Warning600}"
@@ -116,7 +116,7 @@
             </StackPanel>
 
             <!-- General Section -->
-            <components1:FormFieldLabel Text="{loc:T section.general}" Margin="0,0,0,4" />
+            <components1:FormFieldLabel Text="{loc:T section.general}" Margin="0,10,0,4" />
             <StackPanel Spacing="4" Margin="0,0,0,7">
                 <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">

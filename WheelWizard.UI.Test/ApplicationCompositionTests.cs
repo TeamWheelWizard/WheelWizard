@@ -385,6 +385,7 @@ public class ApplicationCompositionTests
             Type[] settingsPages =
             [
                 typeof(WhWzSettings),
+                typeof(AppearanceSettings),
                 typeof(VideoSettings),
                 typeof(OtherSettings),
                 typeof(RecompSettings),
@@ -395,6 +396,28 @@ public class ApplicationCompositionTests
                 navigation.NavigateTo<SettingsPage>(page);
                 original.UpdateLayout();
                 Assert.IsType<SettingsPage>(navigation.CurrentPage);
+                var settingsView = Assert.IsType<SettingsPage>(navigation.CurrentPage);
+                var settingsBody = settingsView.FindControl<Grid>("SettingsBody")!;
+                var bottomDivider = settingsView.FindControl<Border>("SettingsBottomDivider")!;
+                Assert.Equal(1, bottomDivider.Bounds.Height);
+                Assert.Equal(settingsView.FindControl<Grid>("SettingsRoot")!.Bounds.Width, bottomDivider.Bounds.Width);
+                Assert.Equal(bottomDivider.Bounds.Top, settingsBody.Bounds.Bottom);
+                Assert.True(settingsBody.ClipToBounds);
+                if (page == typeof(AppearanceSettings))
+                {
+                    var appearance = Assert.IsType<AppearanceSettings>(
+                        settingsView.FindControl<ContentControl>("SettingsContent")!.Content
+                    );
+                    Assert.NotNull(appearance.FindControl<ComboBox>("WindowScaleDropdown")!.SelectedItem);
+                    Assert.NotNull(appearance.FindControl<ComboBox>("WhWzLanguageDropdown")!.SelectedItem);
+                    Assert.Equal(settings.ENABLE_ANIMATIONS.Get(), appearance.FindControl<CheckBox>("EnableAnimations")!.IsChecked);
+                }
+                if (page == typeof(WhWzSettings))
+                    Assert.Null(
+                        Assert
+                            .IsType<WhWzSettings>(settingsView.FindControl<ContentControl>("SettingsContent")!.Content)
+                            .FindControl<ComboBox>("WindowScaleDropdown")
+                    );
             }
             var about = Assert.IsType<SettingsPage>(navigation.CurrentPage);
             var tabs = about.FindControl<StackPanel>("SettingPages")!;

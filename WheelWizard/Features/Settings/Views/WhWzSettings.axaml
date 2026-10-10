@@ -169,7 +169,7 @@
                     </Border>
                 </StackPanel>
 
-                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowSingle" Margin="0,8,0,0">
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowSingle" Margin="0,3,0,0">
                     <Grid ColumnDefinitions="*,Auto,Auto,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,16,0"
@@ -220,50 +220,6 @@
                 </Border>
             </StackPanel>
     
-            <components1:FormFieldLabel Text="{loc:T section.wh_wz_appearance}" Margin="0,10,0,4" />
-            <StackPanel x:Name="WhWzAppearance"
-                        Spacing="4"
-                        Margin="0,0,0,7">
-                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop">
-                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
-                        <components1:FormFieldLabel Grid.Column="0"
-                                                    Margin="0,0,16,0"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Text="{loc:T option.window_scale}" />
-                        <ComboBox Grid.Column="1"
-                                  x:Name="WindowScaleDropdown"
-                                  SelectionChanged="WindowScaleDropdown_OnSelectionChanged"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Center" />
-                    </Grid>
-                </Border>
-
-                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
-                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
-                        <StackPanel Grid.Column="0"
-                                    Margin="0,0,16,0"
-                                    Spacing="3"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center">
-                            <components1:FormFieldLabel Text="{loc:T option.wh_wz_language}" />
-                            <SelectableTextBlock Classes="TinyText"
-                                       Text="{loc:T helper_text.wh_wz_language}"
-                                       TextAlignment="Left"
-                                       TextWrapping="Wrap" />
-                            <SelectableTextBlock Classes="TinyText"
-                                       x:Name="TranslationsPercentageText"
-                                       TextAlignment="Left"
-                                       TextWrapping="Wrap" />
-                        </StackPanel>
-                        <ComboBox Grid.Column="1"
-                                  x:Name="WhWzLanguageDropdown"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Center"
-                                  ZIndex="2" />
-                    </Grid>
-                </Border>
-            </StackPanel>
             <Border Classes="SettingsBottomSpacer" />
         </StackPanel>
     </ScrollViewer>

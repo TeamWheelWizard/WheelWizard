@@ -12,15 +12,16 @@
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <!-- This is the total height as the (Title + infoSection) - (padding) -->
             <RowDefinition />
+            <RowDefinition Height="1" />
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+        <Border x:Name="SettingsBottomDivider" Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" ZIndex="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
         <TextBlock x:Name="SettingsTitle" Grid.Row="0" Text="{loc:T page_title.settings}" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
 
-        <Grid Grid.Row="1" x:Name="SettingsBody" ColumnDefinitions="157,*" Margin="0,0,0,1">
+        <Grid Grid.Row="1" x:Name="SettingsBody" ColumnDefinitions="157,*" ClipToBounds="True">
         <Border x:Name="SettingsNavigation" Background="{StaticResource BackgroundColor}"
                 ClipToBounds="True"
                 BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,0,1,0"
@@ -59,8 +60,8 @@
                              Click="SidebarRadio_OnClick" Content="WiiCompiled" IsVisible="False" />
                 <RadioButton x:Name="VideoSettingsTab" Classes="SettingsNavigationItem" Tag="VideoSettings"
                              Click="SidebarRadio_OnClick" Content="{loc:T category.dolphin}"/>
-                <RadioButton Classes="SettingsNavigationItem" Tag="GraphicsSettings"
-                             Click="SidebarRadio_OnClick" Content="{loc:T category.graphics}" />
+                <RadioButton Classes="SettingsNavigationItem" Tag="AppearanceSettings"
+                             Click="SidebarRadio_OnClick" Content="{loc:T category.appearance}" />
                 <RadioButton Classes="SettingsNavigationItem" Tag="OtherSettings"
                              Click="SidebarRadio_OnClick" Content="{loc:T category.other}" />
                 <RadioButton Classes="SettingsNavigationItem" Tag="AppInfo"

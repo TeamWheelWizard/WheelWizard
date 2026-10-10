@@ -9,7 +9,7 @@ using WheelWizard.Views.Shell.Navigation;
 
 namespace WheelWizard.Settings.Views;
 
-public partial class SettingsPage : UserControl
+public partial class SettingsPage : UserControl, ILockedSidebarPage
 {
     public void UpdateNavigationWidth(double mainSidebarWidth) =>
         SettingsBody.ColumnDefinitions[0].Width = new GridLength(Math.Clamp(221 - mainSidebarWidth, 0, 157));

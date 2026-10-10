@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
 using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationLifecycle.Logging;
 using WheelWizard.Dolphin.Discovery;
@@ -23,26 +22,15 @@ namespace WheelWizard.Settings.Views;
 public partial class WhWzSettings : UserControl
 {
     // #todo: move settings state and location-change workflows into a view model so this page mostly handles the controls.
-    private readonly IMainWindowService _mainWindow;
     private readonly IApplicationLogFiles _logFiles;
 
-    private sealed record LanguageDropdownItem(string Key, string DisplayName)
-    {
-        public override string ToString() => DisplayName;
-    }
-
-    private readonly bool _pageLoaded;
-    private bool _editingScale;
     private bool _isMovingAppData;
-    private bool _updatingLanguageDropdown;
 
     private IFilePickerService FilePicker { get; }
 
     private IDolphinPaths DolphinPaths { get; }
 
     private ISettingsManager SettingsService { get; }
-
-    private ISettingsLocalizationService LocalizationService { get; }
 
     private IDolphinSettingManager DolphinSettingsService { get; }
 
@@ -52,11 +40,9 @@ public partial class WhWzSettings : UserControl
 
     public WhWzSettings(
         IApplicationLogFiles logFiles,
-        IMainWindowService mainWindow,
         IFilePickerService filePicker,
         IDolphinPaths dolphinPaths,
         ISettingsManager settingsService,
-        ISettingsLocalizationService localizationService,
         IDolphinSettingManager dolphinSettingsService,
         IDolphinDiscoveryService dolphinDiscovery,
         IApplicationDataLocation applicationData
@@ -65,20 +51,15 @@ public partial class WhWzSettings : UserControl
         FilePicker = filePicker;
         DolphinPaths = dolphinPaths;
         SettingsService = settingsService;
-        LocalizationService = localizationService;
         DolphinSettingsService = dolphinSettingsService;
         DolphinDiscovery = dolphinDiscovery;
         ApplicationData = applicationData;
-        _mainWindow = mainWindow;
         _logFiles = logFiles;
         InitializeComponent();
         ConfigureLocationFieldsForActiveFrontend();
         UpdateLocationRows();
-        LoadSettings();
+        RefreshLocalizedCodeText();
         UpdateAppDataLocationUi();
-        _pageLoaded = true;
-
-        WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
     }
 
     private void ConfigureLocationFieldsForActiveFrontend()
@@ -92,60 +73,11 @@ public partial class WhWzSettings : UserControl
         ToolTip.SetTip(LocationWarningIcon, recompEnabled ? t("helper_text.must_set_game_path") : t("helper_text.must_set_paths"));
     }
 
-    private void LoadSettings()
-    {
-        // -----------------
-        // Wheel Wizard Language Dropdown
-        // -----------------
-        RefreshLanguageDropdown();
-        RefreshLocalizedCodeText();
-
-        // -----------------
-        // Window Scale settings
-        // -----------------
-        // IMPORTANT: Make sure that the number and percentage is always the last word in the string,
-        // If you don't want this, you should change the code below that parses the string back to an actual value
-
-        foreach (var scale in SettingValues.WindowScales)
-        {
-            WindowScaleDropdown.Items.Add(ScaleToString(scale));
-        }
-
-        var selectedItemText = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
-        if (!WindowScaleDropdown.Items.Contains(selectedItemText))
-            WindowScaleDropdown.Items.Add(selectedItemText);
-        WindowScaleDropdown.SelectedItem = selectedItemText;
-    }
-
-    private void RefreshLanguageDropdown()
-    {
-        var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-        _updatingLanguageDropdown = true;
-        try
-        {
-            WhWzLanguageDropdown.Items.Clear();
-            foreach (var (key, displayNameFactory) in SettingValues.WhWzLanguages)
-            {
-                WhWzLanguageDropdown.Items.Add(new LanguageDropdownItem(key, displayNameFactory()));
-            }
-
-            WhWzLanguageDropdown.SelectedItem = WhWzLanguageDropdown
-                .Items.OfType<LanguageDropdownItem>()
-                .FirstOrDefault(item => item.Key == currentWhWzLanguage);
-        }
-        finally
-        {
-            _updatingLanguageDropdown = false;
-        }
-    }
-
     private void RefreshLocalizedCodeText()
     {
         MarioKartHelperText.Text = t("helper_text.end_with_x") + " .iso/.gcm/.gcz/.ciso/.wbfs/.wia/.rvz";
         if (string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath))
             DolphinExecutableValueText.Text = GetDolphinExecutableHelperText();
-        TranslationsPercentageText.Text = t("text.language_translated_by", new { translators = t("value.language.z_translators") });
-        TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
     }
 
     private static string GetDolphinExecutableHelperText()
@@ -157,15 +89,6 @@ public partial class WhWzSettings : UserControl
         if (OperatingSystem.IsMacOS())
             return t("helper_text.select_dolphin_macos");
         return t("helper_text.select_dolphin_linux");
-    }
-
-    private static string ScaleToString(double scale)
-    {
-        var percentageString = (int)Math.Round(scale * 100) + "%";
-        if (SettingValues.WindowScales.Contains(scale))
-            return percentageString;
-
-        return t("state.custom") + ": " + percentageString;
     }
 
     private async void DolphinExeBrowse_OnClick(object sender, RoutedEventArgs e)
@@ -720,60 +643,6 @@ public partial class WhWzSettings : UserControl
         await ConfirmAndMoveAppDataAsync(ApplicationData.DefaultDirectoryPath);
     }
 
-    private async void WindowScaleDropdown_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_pageLoaded || _editingScale)
-            return;
-
-        _editingScale = true;
-        var selectedScale = WindowScaleDropdown.SelectedItem?.ToString() ?? "1";
-        var scale = double.Parse(selectedScale.Split(" ").Last().Replace("%", "")) / 100;
-        scale = ViewUtils.GetUsableWindowScale(scale, new Avalonia.Size(Layout.WindowWidth, Layout.WindowHeight), ViewUtils.GetLayout());
-        var selectedItemText = ScaleToString(scale);
-        if (!WindowScaleDropdown.Items.Contains(selectedItemText))
-            WindowScaleDropdown.Items.Add(selectedItemText);
-        WindowScaleDropdown.SelectedItem = selectedItemText;
-
-        if (!SettingsEditing.Set(SettingsService, SettingsService.WINDOW_SCALE, scale))
-        {
-            WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
-            _editingScale = false;
-            return;
-        }
-        var seconds = 10;
-
-        string ExtraScaleText() => t("question.apply_scale.extra", new { remainingTime = tTime(seconds) });
-
-        var yesNoWindow = new YesNoWindow()
-            .SetButtonText(t("action.apply"), t("action.revert"))
-            .SetMainText(t("question.apply_scale.title"))
-            .SetExtraText(ExtraScaleText());
-        // we want to now set up a timer every second to update the text, and at the last second close the window
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-
-        timer.Tick += (_, args) =>
-        {
-            seconds--;
-            yesNoWindow.SetExtraText(ExtraScaleText());
-            if (seconds != 0)
-                return;
-            yesNoWindow.Close();
-            timer.Stop();
-        };
-        timer.Start();
-
-        var yesNoAnswer = await yesNoWindow.AwaitAnswer();
-        if (yesNoAnswer)
-            SettingsEditing.Set(SettingsService, SettingsService.SAVED_WINDOW_SCALE, SettingsService.WINDOW_SCALE.Value);
-        else
-        {
-            SettingsService.WINDOW_SCALE.Set(SettingsService.SAVED_WINDOW_SCALE.Get());
-            WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
-        }
-
-        _editingScale = false;
-    }
-
     private async Task<string?> ResolveSelectedFolderPathAsync(IStorageFolder? folder)
     {
         if (folder == null)
@@ -794,51 +663,5 @@ public partial class WhWzSettings : UserControl
             .SetTitleText(t("message_error.data_folder_move.title"))
             .SetInfoText("Wheel Wizard couldn't resolve the selected folder. Please choose a different location.")
             .ShowDialog();
-    }
-
-    private async void WhWzLanguageDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (_updatingLanguageDropdown)
-            return;
-
-        if (WhWzLanguageDropdown.SelectedItem == null)
-            return;
-
-        if (WhWzLanguageDropdown.SelectedItem is not LanguageDropdownItem selectedLanguage)
-            return;
-
-        var currentLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-        if (selectedLanguage.Key == currentLanguage)
-            return;
-
-        var titleCurrent = t($"{currentLanguage}.question.apply_language_settings.title");
-        var titleTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.title");
-
-        var extraCurrent = t($"{currentLanguage}.question.apply_language_settings.extra");
-        var extraTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.extra");
-
-        // popup now shows its selection in both languages
-        var yesNoWindow = await new YesNoWindow()
-            .SetMainText($"{titleCurrent}\n\n{titleTarget}")
-            .SetExtraText($"{extraCurrent}\n\n{extraTarget}")
-            .SetButtonText(t("action.apply"), t("action.cancel"))
-            .AwaitAnswer();
-
-        if (!yesNoWindow)
-        {
-            var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-            WhWzLanguageDropdown.SelectedItem = WhWzLanguageDropdown
-                .Items.OfType<LanguageDropdownItem>()
-                .FirstOrDefault(item => item.Key == currentWhWzLanguage);
-            return; // We only want to change the setting if we really apply this change
-        }
-
-        if (SettingsEditing.Set(SettingsService, SettingsService.WW_LANGUAGE, selectedLanguage.Key))
-        {
-            LocalizationService.ApplyCurrentLanguage();
-            RefreshLanguageDropdown();
-            RefreshLocalizedCodeText();
-            _mainWindow.Refresh();
-        }
     }
 }

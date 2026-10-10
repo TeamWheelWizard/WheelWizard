@@ -42,6 +42,15 @@ public class MiiEditorPageTests
             window.Show();
             window.UpdateLayout();
 
+            var headerDivider = page.FindControl<Border>("EditorHeaderDivider")!;
+            var bottomDivider = page.FindControl<Border>("EditorBottomDivider")!;
+            Assert.True(headerDivider.IsVisible);
+            Assert.True(bottomDivider.IsVisible);
+            Assert.Equal(1, headerDivider.Bounds.Height);
+            Assert.Equal(1, bottomDivider.Bounds.Height);
+            Assert.Equal(page.Bounds.Width, headerDivider.Bounds.Width);
+            Assert.Equal(page.Bounds.Width, bottomDivider.Bounds.Width);
+
             // Picker first: no editor chrome yet.
             Assert.True(page.FindControl<StackPanel>("PickerHint")!.IsVisible);
             var dice = page.FindControl<Avalonia.Controls.Button>("DiceButton")!;
@@ -54,6 +63,8 @@ public class MiiEditorPageTests
             window.UpdateLayout();
 
             // Overview: Head, Body, Info.
+            Assert.True(headerDivider.IsVisible);
+            Assert.True(bottomDivider.IsVisible);
             var sidebar = page.FindControl<StackPanel>("SidebarItems")!;
             Assert.True(page.FindControl<Border>("SidebarPanel")!.IsHitTestVisible);
             Assert.Equal(3, Buttons(sidebar).Count);

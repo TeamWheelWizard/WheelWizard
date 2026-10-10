@@ -688,6 +688,7 @@ en:
     must_set_paths: "You must set these 3 paths before you can start playing Retro Rewind"
     must_set_game_path: "You must select your Mario Kart Wii game file before you can start playing WiiCompiled"
   category:
+    appearance: "Appearance"
     dolphin: "Dolphin"
     graphics: "Graphics"
     about: "About"

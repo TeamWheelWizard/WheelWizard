@@ -24,8 +24,8 @@ public interface INavigationGuard
     Task<bool> ConfirmLeaveAsync();
 }
 
-/// <summary>A page that uses the whole window: the sidebar collapses (and can't be opened) while it's shown.</summary>
-public interface IFullWidthPage;
+/// <summary>Implement on a page to keep the main sidebar collapsed and locked while it is shown. Leaving restores the user's preference.</summary>
+public interface ILockedSidebarPage;
 
 public sealed class NavigationService(IPageFactory pages) : INavigationService
 {

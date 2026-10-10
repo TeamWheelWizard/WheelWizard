@@ -283,5 +283,15 @@
             <TextBlock Classes="BodyText" HorizontalAlignment="Center" Foreground="{StaticResource Neutral400}"
                        Text="{loc:T text.pick_your_mii_extra}" />
         </StackPanel>
+        <Grid IsHitTestVisible="False" ZIndex="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{StaticResource TopRowSize}" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Border x:Name="EditorHeaderDivider" Grid.Row="0" Height="1" VerticalAlignment="Bottom"
+                    Background="{StaticResource BackgroundLineColor}" />
+            <Border x:Name="EditorBottomDivider" Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+                    Background="{StaticResource BackgroundLineColor}" />
+        </Grid>
     </Grid>
 </UserControl>

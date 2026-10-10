@@ -319,7 +319,7 @@ public partial class Layout : BaseWindow, IPollingListener
             settingsPage.UpdateNavigationWidth(SettingsService.ENABLE_ANIMATIONS.Get() ? SidebarWidth : 64);
         ContentArea.Content = page;
         UpdateSidebarSelection(page);
-        _ = LockSidebarAsync(page is IFullWidthPage || page is SettingsPage);
+        _ = LockSidebarAsync(page is ILockedSidebarPage);
     }
 
     private void UpdateSidebarSelection(UserControl page)

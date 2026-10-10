@@ -37,7 +37,7 @@ public sealed record MiiEditorRequest(Mii? Mii);
 /// can be clicked to select it, and dragged to move it. The selected part cycles with the floating arrows (or the
 /// strip of all its variants at the bottom) and has its colour behind the button in the corner.
 /// </summary>
-public partial class MiiEditorPage : UserControl, INavigationGuard, IFullWidthPage
+public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSidebarPage
 {
     /// <summary>Leave anyway if the save animation never reaches its "saved" marker.</summary>
     private static readonly TimeSpan SaveAnimationTimeout = TimeSpan.FromSeconds(4);
