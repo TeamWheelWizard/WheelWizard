@@ -32,7 +32,6 @@
 
             <!-- CONVERTERS -->
             <converters:IsEqualToConverter x:Key="IsEqualTo" />
-            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
             <ControlTheme x:Key="DesktopWindowDecorations" TargetType="WindowDrawnDecorations"
                           BasedOn="{StaticResource {x:Type WindowDrawnDecorations}}">
                 <Setter Property="Template">

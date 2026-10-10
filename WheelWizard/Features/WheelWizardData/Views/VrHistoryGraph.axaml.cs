@@ -62,18 +62,10 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
 
             _useMatchesAsXAxis = value;
             OnPropertyChanged(nameof(UseMatchesAsXAxis));
-            OnPropertyChanged(nameof(UseDateAsXAxis));
 
             if (_lastHistoryResponse != null)
                 ApplyHistoryData(_lastHistoryResponse, _selectedHistoryDays);
         }
-    }
-
-    /// <summary>The x-axis shows dates rather than matches (matches is the default).</summary>
-    public bool UseDateAsXAxis
-    {
-        get => !UseMatchesAsXAxis;
-        set => UseMatchesAsXAxis = !value;
     }
 
     public static readonly StyledProperty<double> ChartHeightProperty = AvaloniaProperty.Register<VrHistoryGraph, double>(

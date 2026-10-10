@@ -12,40 +12,6 @@
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
         xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
     <UserControl.Styles>
-        <Style Selector="Border.PodiumStep">
-            <Setter Property="CornerRadius" Value="8,8,0,0" />
-            <Setter Property="BorderThickness" Value="1,1,1,0" />
-            <Setter Property="VerticalAlignment" Value="Bottom" />
-            <Setter Property="BoxShadow" Value="0 8 18 0 #18000000" />
-        </Style>
-        <Style Selector="Border.PodiumStep.GoldStep">
-            <Setter Property="BorderBrush" Value="#90D8A443" />
-            <Setter Property="Background">
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#A86D5423" Offset="0" />
-                    <GradientStop Color="#1E1A1A1A" Offset="1" />
-                </LinearGradientBrush>
-            </Setter>
-        </Style>
-        <Style Selector="Border.PodiumStep.SilverStep">
-            <Setter Property="BorderBrush" Value="#7E8EA5D8" />
-            <Setter Property="Background">
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#805C6E8B" Offset="0" />
-                    <GradientStop Color="#1E1A1A1A" Offset="1" />
-                </LinearGradientBrush>
-            </Setter>
-        </Style>
-        <Style Selector="Border.PodiumStep.BronzeStep">
-            <Setter Property="BorderBrush" Value="#988D6A4A" />
-            <Setter Property="Background">
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#97594839" Offset="0" />
-                    <GradientStop Color="#1E1A1A1A" Offset="1" />
-                </LinearGradientBrush>
-            </Setter>
-        </Style>
-
         <!-- Match RoomDetailsPage entry background treatment for PlayerListItem -->
         <Style Selector="rooms|PlayerListItem /template/ Border.BoxItemBackground">
             <Setter Property="CornerRadius" Value="6" />
