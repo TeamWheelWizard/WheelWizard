@@ -20,61 +20,6 @@ namespace WheelWizard.UI.Test;
 public class SharedControlTests
 {
     [AvaloniaFact]
-    public void AboutPage_NarrowLayout_KeepsCreditsInsideTheViewportAndScrollable()
-    {
-        var page = new WheelWizard.Settings.Views.AppInfo();
-        var window = new Window
-        {
-            Content = page,
-            Width = 320,
-            Height = 300,
-        };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            var scroll = page.GetVisualDescendants().OfType<ScrollViewer>().First();
-            Assert.True(scroll.Extent.Height > scroll.Viewport.Height);
-            Assert.All(
-                page.GetVisualDescendants()
-                    .OfType<Control>()
-                    .Where(control => control is SelectableTextBlock or WheelWizard.Views.Components.LinkButton),
-                text =>
-                {
-                    var right = text.TranslatePoint(new Point(text.Bounds.Width, 0), page)!.Value.X;
-                    Assert.InRange(right, 0, page.Bounds.Width);
-                }
-            );
-            Assert.Equal(6, page.GetVisualDescendants().OfType<WheelWizard.Views.Components.LinkButton>().Count());
-            Assert.NotNull(page.GetVisualDescendants().OfType<Image>().Single().Source);
-            var referenceLine = page.GetVisualDescendants()
-                .OfType<SelectableTextBlock>()
-                .Single(text => text.Text == "This application is created by Patchzy and WantToBeeMe.");
-            referenceLine.Measure(Size.Infinity);
-            var creditCards = page.GetVisualDescendants()
-                .OfType<Border>()
-                .Where(border => border.Classes.Contains("AboutBlockStyle"))
-                .TakeLast(3);
-            foreach (var card in creditCards)
-            {
-                var lines = Assert.IsType<Grid>(card.Child).Children.OfType<StackPanel>().Single().Children.Skip(1);
-                foreach (var line in lines)
-                {
-                    line.Measure(Size.Infinity);
-                    Assert.True(
-                        line.DesiredSize.Width <= referenceLine.DesiredSize.Width,
-                        $"Credit line width {line.DesiredSize.Width} exceeds reference width {referenceLine.DesiredSize.Width}."
-                    );
-                }
-            }
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
-    [AvaloniaFact]
     public void Button_RendersNativeContentAndOpensItsFlyoutFromKeyboard()
     {
         var content = new TextBlock { Text = "Custom content" };

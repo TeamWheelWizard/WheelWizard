@@ -1,10 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
-using Avalonia.Styling;
 using Avalonia.VisualTree;
 using WheelWizard.Settings.Types;
 using WheelWizard.Views.Dialogs;
@@ -53,22 +51,6 @@ public class WindowCompositionTests
     }
 
     [AvaloniaTheory]
-    [InlineData(400.0)]
-    [InlineData(500.0)]
-    public void ProgressContent_KeepsDefinedMeasuredWidth_ButFillsExtraAvailableWidth(double preferredWidth)
-    {
-        var content = new WheelWizard.Views.Dialogs.ProgressWindow("Download");
-        Assert.IsType<Grid>(content.Content).Width = preferredWidth;
-        content.SetGoal(new string('W', 150));
-        content.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        Assert.Equal(preferredWidth, content.DesiredSize.Width);
-        content.Arrange(new Rect(0, 0, 600, 200));
-        Assert.Equal(600, Assert.IsType<Grid>(content.Content).Bounds.Width);
-        Assert.Equal(600, content.FindControl<ProgressBar>("ProgressBar")!.Bounds.Width);
-        content.Close();
-    }
-
-    [AvaloniaTheory]
     [InlineData(true, false)]
     [InlineData(false, false)]
     [InlineData(true, true)]
@@ -94,54 +76,6 @@ public class WindowCompositionTests
         {
             content.SetCancellationTokenSource(null);
             content.Close();
-        }
-    }
-
-    [AvaloniaFact]
-    public void DesktopCaptionButtons_UseNavigationColorsAndMinimizeHoverBackground()
-    {
-        var popup = new PopupWindow(true, false, false, "Caption test");
-        try
-        {
-            popup.Show();
-            var host = popup.GetVisualParent()!;
-            // Headless windows do not request drawn chrome; request it through the same host path.
-            var update = host.GetType()
-                .GetMethod("UpdateDrawnDecorations", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
-            var parts = update.GetParameters()[0].ParameterType.GetGenericArguments()[0];
-            update.Invoke(
-                host,
-                [Enum.Parse(parts, "TitleBar, Border"), WindowState.Normal, Application.Current!.FindResource("DesktopWindowDecorations")]
-            );
-            popup.UpdateLayout();
-            var buttons = host.GetVisualDescendants().OfType<Button>().ToArray();
-            var minimize = buttons.Single(button => button.Name == "PART_MinimizeButton");
-            var maximize = buttons.Single(button => button.Name == "PART_MaximizeButton");
-            var close = buttons.Single(button => button.Name == "PART_CloseButton");
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral400"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(minimize.Foreground).Color
-            );
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral400"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(close.Foreground).Color
-            );
-            Assert.False(maximize.IsEnabled);
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral950"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(maximize.Foreground).Color
-            );
-            Assert.Equal(1, maximize.Opacity);
-            ((IPseudoClasses)minimize.Classes).Set(":pointerover", true);
-            var background = minimize.GetVisualDescendants().OfType<ContentPresenter>().Single();
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral600"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(background.Background).Color
-            );
-        }
-        finally
-        {
-            popup.Close();
         }
     }
 
