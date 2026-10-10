@@ -35,7 +35,7 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
     private bool _useMatchesAsXAxis = true;
     private RwfcPlayerVrHistoryResponse? _lastHistoryResponse;
     private Geometry? _graphPath;
-    private Geometry? _graphAreaPath;
+    private IReadOnlyList<Point>? _graphPoints;
     private string _graphStartLabel = string.Empty;
     private string _graphMidLabel = string.Empty;
     private string _graphEndLabel = string.Empty;
@@ -226,13 +226,13 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
         }
     }
 
-    public Geometry? GraphAreaPath
+    public IReadOnlyList<Point>? GraphPoints
     {
-        get => _graphAreaPath;
+        get => _graphPoints;
         set
         {
-            _graphAreaPath = value;
-            OnPropertyChanged(nameof(GraphAreaPath));
+            _graphPoints = value;
+            OnPropertyChanged(nameof(GraphPoints));
         }
     }
 
@@ -489,7 +489,7 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
             .ToList();
 
         GraphPath = BuildLineGeometry(points);
-        GraphAreaPath = BuildAreaGeometry(points);
+        GraphPoints = points;
         HasData = points.Count > 0;
     }
 
@@ -497,7 +497,7 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
     {
         _lastHistoryResponse = null;
         GraphPath = null;
-        GraphAreaPath = null;
+        GraphPoints = null;
         GraphStartLabel = string.Empty;
         GraphMidLabel = string.Empty;
         GraphEndLabel = string.Empty;
@@ -520,29 +520,6 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
 
         for (var i = 1; i < points.Count; i++)
             figure.Segments.Add(new LineSegment { Point = points[i] });
-
-        var geometry = new PathGeometry { Figures = [] };
-        geometry.Figures.Add(figure);
-        return geometry;
-    }
-
-    private static Geometry? BuildAreaGeometry(IReadOnlyList<Point> points)
-    {
-        if (points.Count == 0)
-            return null;
-
-        var figure = new PathFigure
-        {
-            StartPoint = new Point(0, GraphHeight),
-            IsFilled = true,
-            IsClosed = true,
-            Segments = [],
-        };
-
-        foreach (var point in points)
-            figure.Segments.Add(new LineSegment { Point = point });
-
-        figure.Segments.Add(new LineSegment { Point = new Point(GraphWidth, GraphHeight) });
 
         var geometry = new PathGeometry { Figures = [] };
         geometry.Figures.Add(figure);
