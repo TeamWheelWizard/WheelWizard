@@ -277,6 +277,9 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
     /// <summary>The pose and framing of the frame drawn last, e.g. for hit testing. Null before the first frame.</summary>
     public MiiGpuFrame? LastFrame => _lastFrame;
 
+    /// <summary>The drawn camera framing before character-only screen shifts and scaling.</summary>
+    public MiiRealtimeFrameSetup? LastCameraSetup { get; private set; }
+
     /// <summary>Fired (on the UI thread) for every event marker playback passes.</summary>
     public event Action<AnimEvent>? AnimationEvent;
 
@@ -715,6 +718,7 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
     /// <summary>Applies <see cref="Placement"/>, and <see cref="ScreenScale"/> and <see cref="ScreenShiftX"/> in clip space.</summary>
     private MiiRealtimeFrameSetup Shift(MiiRealtimeFrameSetup setup)
     {
+        LastCameraSetup = setup;
         if (_placement != Vector3.Zero)
             setup = setup with { Placement = _placement };
         if (_screenShiftX == 0 && _screenScale == 1 || Bounds.Width <= 0)

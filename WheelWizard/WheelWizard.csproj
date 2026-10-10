@@ -107,6 +107,7 @@
     <ItemGroup>
         <AvaloniaResource Include="..\Flatpak\io.github.TeamWheelWizard.WheelWizard.png" Link="Resources\Images\AppIcon.png" />
         <AvaloniaResource Include="Resources\Images\WiiCompiled.png" />
+        <AvaloniaResource Include="Resources\Images\MiiEditorFloor.svg" />
     </ItemGroup>
 
     <ItemGroup Label="Mii Rendering Resources">

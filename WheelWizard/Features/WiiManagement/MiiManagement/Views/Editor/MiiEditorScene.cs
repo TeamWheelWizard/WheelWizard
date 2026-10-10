@@ -104,6 +104,10 @@ public sealed class MiiEditorScene : Grid
     private readonly Dictionary<string, IReadOnlyDictionary<MiiMaskLayers, Vector2[][]>> _maskQuads = new();
     private Mii3DRender? _fallback;
     private Grid? _fallbackPicker;
+    private readonly MiiEditorFloor _floor;
+    private MiiRealtimeView? _floorView;
+    private MiiRealtimeFrameSetup? _imageFloorFrame;
+    private double _pickerFloorBlend;
 
     private MiiEditorFraming _framing = MiiEditorFraming.Body;
     private MiiImageSpecifications _shot = BodyShot;
@@ -154,6 +158,8 @@ public sealed class MiiEditorScene : Grid
         // Transparent so the whole stage takes pointer input; the GL views themselves don't.
         Background = Brushes.Transparent;
         ClipToBounds = false;
+        _floor = new MiiEditorFloor(FloorFrame) { ZIndex = -1 };
+        Children.Add(_floor);
 
         PointerMoved += OnPointerMoved;
         PointerPressed += OnPointerPressed;
@@ -222,6 +228,7 @@ public sealed class MiiEditorScene : Grid
     {
         _framing = MiiEditorFraming.Picker;
         _shot = PickerShot;
+        _pickerFloorBlend = 1;
         AddActor(boy, isGirl: false);
         AddActor(girl, isGirl: true);
         LayoutPicker();
@@ -320,6 +327,7 @@ public sealed class MiiEditorScene : Grid
 
         var keep = _actors.First(a => a.IsGirl == girl);
         var drop = _actors.First(a => a.IsGirl != girl);
+        _floorView = keep.View;
         _hoveredActor = -1;
         foreach (var actor in _actors)
             Unhighlight(actor.View);
@@ -335,6 +343,8 @@ public sealed class MiiEditorScene : Grid
                 {
                     keep.View.ScreenShiftX = shift * (1 - t);
                     keep.View.ScreenScale = PickerScale + (1 - PickerScale) * t;
+                    _pickerFloorBlend = 1 - t;
+                    _floor.InvalidateVisual();
                 },
                 0,
                 1,
@@ -466,6 +476,8 @@ public sealed class MiiEditorScene : Grid
     private Actor AddActor(Mii mii, bool isGirl)
     {
         var view = new MiiRealtimeView(_renderer) { IsHitTestVisible = false, Specifications = _shot };
+        _floorView ??= view;
+        view.FrameDrawn += _floor.InvalidateVisual;
         var director = new MiiEditorDirector(view.Player, _library, _random) { Animate = Animate };
         var actor = new Actor(view, director, isGirl) { Mii = mii };
         view.FrameUpdating += delta => OnFrame(actor, delta);
@@ -490,9 +502,12 @@ public sealed class MiiEditorScene : Grid
             return;
         var miis = _actors.Select(a => a.Mii).ToList();
         foreach (var actor in _actors)
+        {
             Children.Remove(actor.View);
+        }
         var picking = _framing == MiiEditorFraming.Picker && miis.Count == 2;
         _actors.Clear();
+        _floorView = null;
 
         if (picking)
         {
@@ -506,6 +521,7 @@ public sealed class MiiEditorScene : Grid
                 ImageVariant = _framing == MiiEditorFraming.Head ? HeadShot : MiiImageVariants.MiiEditorPreviewCarousel,
                 IsHitTestVisible = false,
             };
+            ConfigureImageFloor(_fallback);
             Children.Add(_fallback);
             _pending = null;
             if ((_shown ?? miis.FirstOrDefault()) is { } mii)
@@ -517,6 +533,7 @@ public sealed class MiiEditorScene : Grid
 
     private void ShowFallbackPicker(Mii boy, Mii girl)
     {
+        _pickerFloorBlend = 1;
         if (_fallbackPicker is { } old)
             Children.Remove(old);
         _fallbackPicker = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*"), IsHitTestVisible = false };
@@ -529,6 +546,8 @@ public sealed class MiiEditorScene : Grid
                 Mii = mii,
             };
             SetColumn(image, column);
+            if (column == 0)
+                ConfigureImageFloor(image);
             _fallbackPicker.Children.Add(image);
         }
 
@@ -538,6 +557,16 @@ public sealed class MiiEditorScene : Grid
     /// <summary>After picking without OpenGL: the picked Mii as a rendered image.</summary>
     public void ShowEditorImage(Mii mii)
     {
+        _ = Tween(
+            value =>
+            {
+                _pickerFloorBlend = value;
+                _floor.InvalidateVisual();
+            },
+            _pickerFloorBlend,
+            0,
+            PickTransition
+        );
         if (_fallbackPicker is { } picker)
         {
             Children.Remove(picker);
@@ -545,15 +574,56 @@ public sealed class MiiEditorScene : Grid
         }
 
         _framing = MiiEditorFraming.Body;
-        _fallback ??= new Mii3DRender
+        if (_fallback is null)
         {
-            ReloadMethod = BaseMiiImage.ReloadMethodType.KeepInstanceUntilNew,
-            ImageVariant = MiiImageVariants.MiiEditorPreviewCarousel,
-            IsHitTestVisible = false,
-        };
+            _fallback = new Mii3DRender
+            {
+                ReloadMethod = BaseMiiImage.ReloadMethodType.KeepInstanceUntilNew,
+                ImageVariant = MiiImageVariants.MiiEditorPreviewCarousel,
+                IsHitTestVisible = false,
+            };
+            ConfigureImageFloor(_fallback);
+        }
         if (!Children.Contains(_fallback))
             Children.Add(_fallback);
         Show(mii, null);
+    }
+
+    private MiiRealtimeFrameSetup? FloorFrame()
+    {
+        var frame = _floorView?.LastCameraSetup ?? _imageFloorFrame;
+        if (frame is null || _pickerFloorBlend == 0)
+            return frame;
+
+        // Picker Miis are scaled about the viewport centre, lifting their feet by this same amount.
+        var ground = Vector4.Transform(new Vector4(0, 0, 0, 1), frame.View * frame.Projection);
+        if (ground.W <= 0.001f)
+            return frame;
+        var lift = (float)(-(ground.Y / ground.W) * (1 - PickerScale) * _pickerFloorBlend);
+        return frame with { Projection = frame.Projection * Matrix4x4.CreateTranslation(0, lift, 0) };
+    }
+
+    private void ConfigureImageFloor(Mii3DRender image)
+    {
+        image.SizeChanged += (_, _) => Update();
+        image.PropertyChanged += (_, change) =>
+        {
+            if (change.Property == Mii3DRender.ImageVariantProperty || change.Property == MiiImageControl.MiiProperty)
+                Update();
+        };
+        Update();
+
+        void Update()
+        {
+            _imageFloorFrame = null;
+            if (image.Mii is { } mii && Studio(mii) is { } studio && Bounds.Height > 0)
+            {
+                var result = _renderer.GetRealtimeFrameSetup(studio, image.ImageVariant, (float)(Bounds.Width / Bounds.Height));
+                if (result.IsSuccess)
+                    _imageFloorFrame = result.Value;
+            }
+            _floor.InvalidateVisual();
+        }
     }
 
     #endregion
