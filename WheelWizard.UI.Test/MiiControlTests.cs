@@ -24,6 +24,80 @@ namespace WheelWizard.UI.Test;
 public class MiiControlTests
 {
     [AvaloniaFact]
+    public async Task Podium_WithoutAnimations_CentersStillsOnTheirSteps()
+    {
+        InstallThemes();
+        var renderer = Substitute.For<IMiiNativeRenderer>();
+        var identity = System.Numerics.Matrix4x4.Identity;
+        renderer
+            .GetRealtimeFrameSetup(Arg.Any<string>(), Arg.Any<MiiImageSpecifications>(), Arg.Any<float>())
+            .Returns(
+                new MiiRealtimeFrameSetup(
+                    false,
+                    true,
+                    default,
+                    identity,
+                    identity,
+                    identity,
+                    System.Numerics.Matrix4x4.CreateScale(0.005f, 0.005f, 1),
+                    default,
+                    default,
+                    default,
+                    default,
+                    default
+                )
+            );
+        var stage = new WheelWizard.WheelWizardData.Views.LeaderboardPodiumStage
+        {
+            First = MiiFactory.CreateDefaultMale(),
+            Second = MiiFactory.CreateDefaultMale(),
+            Third = MiiFactory.CreateDefaultMale(),
+        };
+        var steps = Enumerable
+            .Range(1, 3)
+            .Select(place =>
+            {
+                var step = new WheelWizard.WheelWizardData.Views.LeaderboardPodiumStep();
+                WheelWizard.WheelWizardData.Views.LeaderboardPodiumStage.SetPlace(step, place);
+                stage.Children.Add(step);
+                return step;
+            })
+            .ToArray();
+        stage.Initialize(
+            renderer,
+            Substitute.For<IMiiAnimationLibrary>(),
+            new RealRandomSystem().Random.Shared,
+            Substitute.For<ISeasonalCalendar>(),
+            false
+        );
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        var window = new Window
+        {
+            Content = stage,
+            Width = 440,
+            Height = 380,
+        };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            var stills = stage.Children.OfType<MiiImageLoader>().ToArray();
+            Assert.Equal(3, stills.Length);
+            foreach (var (still, step) in stills.Zip(steps.Reverse()))
+            {
+                Assert.InRange(Math.Abs(still.Bounds.Center.X - step.Bounds.Center.X), 0, 1);
+                Assert.InRange(Math.Abs(still.Bounds.Y + still.Bounds.Height * 0.975 - step.Bounds.Y), 0, 1);
+                Assert.Equal(still.Bounds.Width, still.Bounds.Height);
+                Assert.True(still.DesiredSize.Width < stage.Bounds.Height);
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task Podium_WithoutMiis_KeepsItsLightsOff()
     {
         var stage = new WheelWizard.WheelWizardData.Views.LeaderboardPodiumStage();

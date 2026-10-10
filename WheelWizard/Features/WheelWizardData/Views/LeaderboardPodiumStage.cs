@@ -156,11 +156,16 @@ public sealed class LeaderboardPodiumStage : Panel
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        foreach (var child in Children)
-            child.Measure(availableSize);
         var width = double.IsInfinity(availableSize.Width) ? 440 : availableSize.Width;
         var height = double.IsInfinity(availableSize.Height) ? 380 : availableSize.Height;
-        return new Size(width, height);
+        var size = new Size(width, height);
+        foreach (var child in Children)
+        {
+            // Square image templates must be measured at their podium size, not the whole stage.
+            var actor = _actors.FirstOrDefault(a => a?.Still == child);
+            child.Measure(actor is null ? availableSize : StillBounds(actor.Place, size).Size);
+        }
+        return size;
     }
 
     protected override Size ArrangeOverride(Size finalSize)

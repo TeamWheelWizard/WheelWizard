@@ -54,9 +54,10 @@ public class WindowCompositionTests
     public void SidebarLabels_SurviveRepeatedCollapseAndReattachment()
     {
         var button = new WheelWizard.Views.Shell.Controls.SidebarRadioButton { Text = "My Miis" };
+        var host = new Border { Child = button, Width = 221 };
         var window = new Window
         {
-            Content = button,
+            Content = host,
             Width = 221,
             Height = 46,
         };
@@ -66,20 +67,107 @@ public class WindowCompositionTests
             for (var cycle = 0; cycle < 3; cycle++)
             {
                 button.Classes.Set("compact", true);
-                window.Width = 64;
+                host.Width = 64;
                 window.UpdateLayout();
+                Assert.Equal(64, button.Bounds.Width);
                 var icon = button.GetVisualDescendants().OfType<WheelWizard.Views.Components.IconLabel>().Single();
-                Assert.Equal(button.Text, icon.Text);
+                Assert.Null(icon.Text);
                 Assert.False(icon.GetVisualDescendants().OfType<TextBlock>().Single().IsVisible);
-                window.Content = null;
-                window.Content = button;
+                host.Child = null;
+                host.Child = button;
                 button.Text = $"My Miis {cycle}";
                 button.Classes.Set("compact", false);
-                window.Width = 221;
+                host.Width = 221;
                 window.UpdateLayout();
                 var text = icon.GetVisualDescendants().OfType<TextBlock>().Single();
                 Assert.True(text.IsVisible);
                 Assert.Equal(button.Text, text.Text);
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaTheory]
+    [InlineData(64.0)]
+    [InlineData(221.0)]
+    public void SidebarSelection_JoinsMeetThePageWithoutOverflow(double width)
+    {
+        var button = new SidebarRadioButton { Text = "Home", IsChecked = true };
+        button.Classes.Set("compact", width == 64);
+        var host = new Border { Child = button, Width = width };
+        var window = new Window
+        {
+            Content = host,
+            Width = width,
+            Height = 100,
+        };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            Assert.Equal(host.Bounds.Width, button.Bounds.Right);
+            var joins = button
+                .GetVisualDescendants()
+                .OfType<Avalonia.Controls.Shapes.Path>()
+                .Where(path => path.Name is "PART_TopJoin" or "PART_BottomJoin")
+                .ToArray();
+            Assert.Equal(2, joins.Length);
+            foreach (var join in joins)
+            {
+                Assert.True(join.IsVisible);
+                var origin = join.TranslatePoint(default, button)!.Value;
+                Assert.Equal(button.Bounds.Width, origin.X + join.Bounds.Width);
+                Assert.Equal(join.Bounds.Width, join.Data!.Bounds.Right);
+                Assert.True(join.ClipToBounds);
+                Assert.Null(join.Stroke);
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void SettingsContent_StaysStationaryWhileNavigationIsRevealed()
+    {
+        var pages = Substitute.For<WheelWizard.Views.Shell.Navigation.IPageFactory>();
+        pages.Create(Arg.Any<Type>(), Arg.Any<object[]>()).Returns(_ => new UserControl());
+        var page = new WheelWizard.Settings.Views.SettingsPage(
+            Substitute.For<IPopupFactory>(),
+            Substitute.For<ISettingsManager>(),
+            new SettingsSignalBus(NullLogger<SettingsSignalBus>.Instance),
+            pages
+        );
+        page.UpdateLayoutWidth(572);
+        var host = new Border
+        {
+            Child = page,
+            Width = 415,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+        };
+        var window = new Window
+        {
+            Content = host,
+            Width = 572,
+            Height = 700,
+        };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            var content = page.FindControl<ContentControl>("SettingsContent")!;
+            var position = content.TranslatePoint(default, window);
+            var size = content.Bounds.Size;
+            foreach (var width in new[] { 415.0, 430.0, 480.0, 540.0, 572.0 })
+            {
+                host.Width = width;
+                window.UpdateLayout();
+                Assert.Equal(position, content.TranslatePoint(default, window));
+                Assert.Equal(size, content.Bounds.Size);
             }
         }
         finally

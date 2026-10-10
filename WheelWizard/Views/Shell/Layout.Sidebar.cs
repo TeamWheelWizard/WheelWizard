@@ -7,7 +7,6 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
-using WheelWizard.Settings.Views;
 using WheelWizard.Views.Shell.Controls;
 
 namespace WheelWizard.Views.Shell;
@@ -52,8 +51,6 @@ public partial class Layout
         if (change.Property == SidebarWidthProperty && CompleteGrid != null)
         {
             CompleteGrid.ColumnDefinitions[0].Width = new GridLength(SidebarWidth);
-            if (ContentArea.Content is SettingsPage settingsPage)
-                settingsPage.UpdateNavigationWidth(SidebarWidth);
             // Follow the animated width so the portrait does not jump when labels are hidden.
             var collapsedProgress = Math.Clamp((221 - SidebarWidth) / (221 - 64), 0, 1);
             SidebarMii.Margin = new Thickness(-7 - 10 * collapsedProgress, 0, 0, 1);

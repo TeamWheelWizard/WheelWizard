@@ -28,6 +28,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="1" />
         </Grid.RowDefinitions>
         <Border Grid.Row="0"
                 Background="{StaticResource BackgroundLineColor}"
@@ -40,10 +41,10 @@
                    VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
 
-        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+        <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" ZIndex="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
 
-        <Grid Grid.Row="1" Margin="0,0,0,1">
+        <Grid Grid.Row="1">
             <StackPanel IsVisible="{Binding IsLoading}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"

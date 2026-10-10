@@ -5,9 +5,9 @@
              xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
-             x:Class="WheelWizard.Settings.Views.SettingsPage">
+             x:Class="WheelWizard.Settings.Views.SettingsPage" ClipToBounds="True">
 
-    <Grid x:Name="SettingsRoot">
+    <Grid x:Name="SettingsRoot" HorizontalAlignment="Right">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <!-- This is the total height as the (Title + infoSection) - (padding) -->

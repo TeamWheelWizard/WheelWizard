@@ -12,8 +12,8 @@ namespace WheelWizard.Settings.Views;
 
 public partial class SettingsPage : UserControl, ILockedSidebarPage
 {
-    public void UpdateNavigationWidth(double mainSidebarWidth) =>
-        SettingsBody.ColumnDefinitions[0].Width = new GridLength(Math.Clamp(221 - mainSidebarWidth, 0, 157));
+    // Reveal the navigation by clipping; keep the settings content stationary during the shell resize.
+    public void UpdateLayoutWidth(double availableWidth) => SettingsRoot.Width = availableWidth;
 
     private IPopupFactory Popups { get; }
 

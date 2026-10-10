@@ -82,9 +82,14 @@ public sealed class MiiEditorFloor : Control
                 )
             );
             ground = SKMatrix.Concat(SKMatrix.CreateScale(PatternZoom, PatternZoom), ground);
+            ground = SKMatrix.Concat(TextureRotation(frame.CharacterRotation), ground);
             context.Custom(new FloorDrawing(picture, SKMatrix.Concat(projection, ground), new Rect(Bounds.Size), tileColor));
         }
     }
+
+    // Rotate the pattern in the ground plane before applying its fixed tilt and camera projection.
+    private static SKMatrix TextureRotation(Matrix4x4 characterRotation) =>
+        SKMatrix.CreateRotation(-MathF.Atan2(characterRotation.M31, characterRotation.M11));
 
     private Point? Project(Vector3 point, Matrix4x4 matrix)
     {

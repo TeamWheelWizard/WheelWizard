@@ -59,7 +59,6 @@
 
             <components:IconLabel x:Name="RadioIcon" IconSize="25" FontSize="19"
                              IconData="{TemplateBinding IconData}"
-                             Text="{TemplateBinding Text}"
                              Foreground="{TemplateBinding Foreground}"
                              HorizontalAlignment="Left" VerticalAlignment="Center"
                              Margin="{TemplateBinding Padding}" />
@@ -75,15 +74,15 @@
             />
           </Grid>
         </Border>
-        <!-- Clip the 1px overlap at the sidebar edge so it hides seams without entering the page. -->
+        <!-- End the curve at the page edge; overlap only the straight edge inside the selected button. -->
         <Path x:Name="PART_TopJoin" IsHitTestVisible="False"
-              Width="6" Height="7" ClipToBounds="True" HorizontalAlignment="Right" VerticalAlignment="Top"
+              Width="7" Height="7" ClipToBounds="True" HorizontalAlignment="Right" VerticalAlignment="Top"
               Margin="0,-6,0,0" Fill="{DynamicResource Neutral950}"
-              Data="M 0,6 A 6,6 0 0 0 6,0 L 7,0 L 7,7 L 0,7 Z" />
+              Data="M 0,6 L 1,6 A 6,6 0 0 0 7,0 L 7,7 L 0,7 Z" />
         <Path x:Name="PART_BottomJoin" IsHitTestVisible="False"
-              Width="6" Height="7" ClipToBounds="True" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+              Width="7" Height="7" ClipToBounds="True" HorizontalAlignment="Right" VerticalAlignment="Bottom"
               Margin="0,0,0,-6" Fill="{DynamicResource Neutral950}"
-              Data="M 0,1 A 6,6 0 0 1 6,7 L 7,7 L 7,0 L 0,0 Z" />
+              Data="M 0,1 L 1,1 A 6,6 0 0 1 7,7 L 7,0 L 0,0 Z" />
         </Grid>
       </ControlTemplate>
     </Setter>
@@ -126,9 +125,11 @@
     <Setter Property="ToolTip.ShowDelay" Value="100" />
     <Setter Property="ToolTip.Placement" Value="Right" />
   </Style>
-  <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon /template/ TextBlock,
-                   shellControls|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon /template/ Rectangle">
-    <Setter Property="IsVisible" Value="False" />
+  <Style Selector="shellControls|SidebarRadioButton /template/ components|IconLabel#RadioIcon">
+    <Setter Property="Text" Value="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
+  </Style>
+  <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon">
+    <Setter Property="Text" Value="{x:Null}" />
   </Style>
   <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|StatusBadge#StatusBadge">
     <Setter Property="IsVisible" Value="False" />

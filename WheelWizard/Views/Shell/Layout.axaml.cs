@@ -100,6 +100,11 @@ public partial class Layout : BaseWindow, IPollingListener
         SettingsSignalBus = settingsSignalBus;
         ModManagerService = modManagerService;
         InitializeComponent();
+        CompleteGrid.SizeChanged += (_, e) =>
+        {
+            if (ContentArea.Content is SettingsPage settingsPage)
+                settingsPage.UpdateLayoutWidth(e.NewSize.Width - 64 - ContentArea.Margin.Left - ContentArea.Margin.Right);
+        };
         _autoUpdater = autoUpdater;
         _autoUpdater.UpdateAvailable += OnUpdateAvailable;
         UpdateVersionBadge();
@@ -316,7 +321,12 @@ public partial class Layout : BaseWindow, IPollingListener
         ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms || isMiisToEditor || isEditorToMiis ? RoomsPageTransition : null;
         ContentArea.IsTransitionReversed = isDetailsToRooms || isEditorToMiis;
         if (page is SettingsPage settingsPage)
-            settingsPage.UpdateNavigationWidth(SettingsService.ENABLE_ANIMATIONS.Get() ? SidebarWidth : 64);
+            settingsPage.UpdateLayoutWidth(
+                (CompleteGrid.Bounds.Width > 0 ? CompleteGrid.Bounds.Width : WindowWidth)
+                    - 64
+                    - ContentArea.Margin.Left
+                    - ContentArea.Margin.Right
+            );
         ContentArea.Content = page;
         UpdateSidebarSelection(page);
         _ = LockSidebarAsync(page is ILockedSidebarPage);
