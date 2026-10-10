@@ -76,14 +76,14 @@
             />
           </Grid>
         </Border>
-        <!-- Overlap the straight edges by 1px to hide antialiasing seams at fractional scales. -->
+        <!-- Clip the 1px overlap at the sidebar edge so it hides seams without entering the page. -->
         <Path x:Name="PART_TopJoin" IsHitTestVisible="False"
-              Width="7" Height="7" HorizontalAlignment="Right" VerticalAlignment="Top"
-              Margin="0,-6,-1,0" Fill="{DynamicResource Neutral950}"
+              Width="6" Height="7" ClipToBounds="True" HorizontalAlignment="Right" VerticalAlignment="Top"
+              Margin="0,-6,0,0" Fill="{DynamicResource Neutral950}"
               Data="M 0,6 A 6,6 0 0 0 6,0 L 7,0 L 7,7 L 0,7 Z" />
         <Path x:Name="PART_BottomJoin" IsHitTestVisible="False"
-              Width="7" Height="7" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-              Margin="0,0,-1,-6" Fill="{DynamicResource Neutral950}"
+              Width="6" Height="7" ClipToBounds="True" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+              Margin="0,0,0,-6" Fill="{DynamicResource Neutral950}"
               Data="M 0,1 A 6,6 0 0 1 6,7 L 7,7 L 7,0 L 0,0 Z" />
         </Grid>
       </ControlTemplate>
