@@ -366,6 +366,8 @@ public sealed class MiiEditorScene : Grid
     {
         _framing = MiiEditorFraming.Body;
         _shot = BodyShot;
+        // The floating buttons and part dragging go by what's shown, also before the first edit.
+        _shown = mii;
         var actor = AddActor(mii, mii.IsGirl);
         actor.View.MiiShown += Started;
         void Started(string _)
