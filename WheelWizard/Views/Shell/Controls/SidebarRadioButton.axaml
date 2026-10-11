@@ -57,11 +57,16 @@
                 <components:HoverGlow Name="PART_HoverEffect" CornerRadius="99999" IsVisible="False" Opacity="0.3" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{StaticResource Brand200}" Height="46" Width="46" Effect="blur(150)" />
             </Canvas>
 
-            <components:IconLabel x:Name="RadioIcon" IconSize="25" FontSize="19"
-                             IconData="{TemplateBinding IconData}"
-                             Foreground="{TemplateBinding Foreground}"
-                             HorizontalAlignment="Left" VerticalAlignment="Center"
-                             Margin="{TemplateBinding Padding}" />
+            <!-- The label always takes part in layout and only fades out while compact: hiding it (IsVisible)
+                 could leave its panel measured icon-wide after expanding, clipping the label away. -->
+            <StackPanel Orientation="Horizontal" Spacing="10"
+                        HorizontalAlignment="Left" VerticalAlignment="Center"
+                        Margin="{TemplateBinding Padding}">
+              <Path Data="{TemplateBinding IconData}" Fill="{TemplateBinding Foreground}"
+                    Width="25" Height="25" Stretch="Uniform" />
+              <TextBlock x:Name="PART_Label" Text="{TemplateBinding Text}" FontSize="19"
+                         Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+            </StackPanel>
 
             <components:StatusBadge IsVisible="{TemplateBinding BoxText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                             x:Name="StatusBadge" Variant="Dark"
@@ -125,11 +130,8 @@
     <Setter Property="ToolTip.ShowDelay" Value="100" />
     <Setter Property="ToolTip.Placement" Value="Right" />
   </Style>
-  <Style Selector="shellControls|SidebarRadioButton /template/ components|IconLabel#RadioIcon">
-    <Setter Property="Text" Value="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />
-  </Style>
-  <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|IconLabel#RadioIcon">
-    <Setter Property="Text" Value="{x:Null}" />
+  <Style Selector="shellControls|SidebarRadioButton.compact /template/ TextBlock#PART_Label">
+    <Setter Property="Opacity" Value="0" />
   </Style>
   <Style Selector="shellControls|SidebarRadioButton.compact /template/ components|StatusBadge#StatusBadge">
     <Setter Property="IsVisible" Value="False" />

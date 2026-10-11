@@ -600,7 +600,9 @@ public sealed class MiiEditorScene : Grid
         if (ground.W <= 0.001f)
             return frame;
         var lift = (float)(-(ground.Y / ground.W) * (1 - PickerScale) * _pickerFloorBlend);
-        var shift = (float)(2 * (_floorView?.ScreenShiftX ?? 0) / Math.Max(1, Bounds.Width));
+        // The picker's floor stays in the middle, between both Miis; the picked one glides onto it.
+        var screenShift = _pickerFloorBlend > 0 ? 0 : _floorView?.ScreenShiftX ?? 0;
+        var shift = (float)(2 * screenShift / Math.Max(1, Bounds.Width));
         return frame with { Projection = frame.Projection * Matrix4x4.CreateTranslation(shift, lift, 0) };
     }
 

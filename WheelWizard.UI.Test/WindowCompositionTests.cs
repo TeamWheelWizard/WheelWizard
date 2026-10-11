@@ -70,18 +70,17 @@ public class WindowCompositionTests
                 host.Width = 64;
                 window.UpdateLayout();
                 Assert.Equal(64, button.Bounds.Width);
-                var icon = button.GetVisualDescendants().OfType<WheelWizard.Views.Components.IconLabel>().Single();
-                Assert.Null(icon.Text);
-                Assert.False(icon.GetVisualDescendants().OfType<TextBlock>().Single().IsVisible);
+                var label = button.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "PART_Label");
+                Assert.Equal(0, label.Opacity);
                 host.Child = null;
                 host.Child = button;
                 button.Text = $"My Miis {cycle}";
                 button.Classes.Set("compact", false);
                 host.Width = 221;
                 window.UpdateLayout();
-                var text = icon.GetVisualDescendants().OfType<TextBlock>().Single();
-                Assert.True(text.IsVisible);
-                Assert.Equal(button.Text, text.Text);
+                label = button.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "PART_Label");
+                Assert.Equal(1, label.Opacity);
+                Assert.Equal(button.Text, label.Text);
             }
         }
         finally
