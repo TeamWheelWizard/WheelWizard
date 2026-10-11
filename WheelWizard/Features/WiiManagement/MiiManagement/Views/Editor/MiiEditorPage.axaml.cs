@@ -455,9 +455,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             return;
         var mii = _session.Mii;
         RebuildSidebar();
-
-        UndoButton.IsEnabled = _session.CanUndo;
-        RedoButton.IsEnabled = _session.CanRedo;
+        UpdateTopActions(_session);
 
         var definition = _part is { } part ? MiiEditorParts.Get(part) : null;
         RebuildTools(definition, mii);
@@ -758,8 +756,15 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
     {
         if (_session is null)
             return;
-        UndoButton.IsEnabled = _session.CanUndo;
-        RedoButton.IsEnabled = _session.CanRedo;
+        UpdateTopActions(_session);
+    }
+
+    /// <summary>Undo/redo follow the history; save is only worth pressing for a new Mii or one that differs from what's stored.</summary>
+    private void UpdateTopActions(MiiEditorSession session)
+    {
+        UndoButton.IsEnabled = session.CanUndo;
+        RedoButton.IsEnabled = session.CanRedo;
+        SaveButton.IsEnabled = session.IsNew || session.HasChanges;
     }
 
     /// <summary>Applies an edit to the Mii and shows it, optionally sliding the changed part.</summary>
