@@ -25,13 +25,6 @@ public sealed class AnimCurve
 
     public int Count => _keys.Count;
 
-    public AnimCurve Clone()
-    {
-        var clone = new AnimCurve();
-        clone._keys.AddRange(_keys);
-        return clone;
-    }
-
     /// <summary>Insert or replace the key at <paramref name="frame"/>, keeping existing easing when replacing.</summary>
     public void SetKey(int frame, float value, Interpolation? interpolation = null)
     {
@@ -70,33 +63,7 @@ public sealed class AnimCurve
             _keys.Insert(insertAt, key);
     }
 
-    public void ReplaceAt(int index, Keyframe key) => _keys[index] = key;
-
-    public bool RemoveKey(int frame)
-    {
-        var index = IndexOf(frame);
-        if (index < 0)
-            return false;
-        _keys.RemoveAt(index);
-        return true;
-    }
-
-    public int IndexOf(int frame) => _keys.FindIndex(k => k.Frame == frame);
-
-    public bool HasKeyAt(int frame) => IndexOf(frame) >= 0;
-
-    /// <summary>Moves a key to another frame; replaces any key already there.</summary>
-    public void MoveKey(int fromFrame, int toFrame)
-    {
-        var index = IndexOf(fromFrame);
-        if (index < 0 || fromFrame == toFrame)
-            return;
-        var key = _keys[index];
-        _keys.RemoveAt(index);
-        RemoveKey(toFrame);
-        key.Frame = toFrame;
-        SetKey(key);
-    }
+    private int IndexOf(int frame) => _keys.FindIndex(k => k.Frame == frame);
 
     private Interpolation InheritInterpolation(int frame)
     {
@@ -198,28 +165,6 @@ public sealed class AnimCurve
         var max0 = 3f * d0 / (key.Frame - prev.Frame);
         var max1 = 3f * d1 / (next.Frame - key.Frame);
         return slope > 0 ? MathF.Min(slope, MathF.Min(max0, max1)) : MathF.Max(slope, MathF.Max(max0, max1));
-    }
-
-    /// <summary>Handles that reproduce the current curve shape, used when switching a segment to Custom.</summary>
-    public (Vector2 Out, Vector2 In) SuggestHandles(int index)
-    {
-        if (index < 0 || index >= _keys.Count - 1)
-            return (new(1f / 3f, 0f), new(1f / 3f, 0f));
-        var a = _keys[index];
-        var b = _keys[index + 1];
-        var span = b.Frame - a.Frame;
-        switch (a.Interpolation)
-        {
-            case Interpolation.Custom:
-                return (a.HandleOut, a.HandleIn);
-            case Interpolation.Linear:
-            {
-                var dv = b.Value - a.Value;
-                return (new(1f / 3f, dv / 3f), new(1f / 3f, -dv / 3f));
-            }
-            default:
-                return (new(1f / 3f, AutoSlope(index) * span / 3f), new(1f / 3f, -AutoSlope(index + 1) * span / 3f));
-        }
     }
 
     private static float Hermite(float p0, float m0, float p1, float m1, float t)

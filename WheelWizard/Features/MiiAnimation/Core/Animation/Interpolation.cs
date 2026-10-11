@@ -30,51 +30,6 @@ public enum Interpolation : byte
 
 public static class InterpolationInfo
 {
-    public static readonly Interpolation[] Presets =
-    [
-        Interpolation.Smooth,
-        Interpolation.Linear,
-        Interpolation.Hold,
-        Interpolation.EaseIn,
-        Interpolation.EaseOut,
-        Interpolation.EaseInOut,
-        Interpolation.Snappy,
-        Interpolation.Overshoot,
-        Interpolation.Bouncy,
-    ];
-
-    public static string FriendlyName(Interpolation interpolation) =>
-        interpolation switch
-        {
-            Interpolation.Smooth => "Smooth",
-            Interpolation.Linear => "Linear",
-            Interpolation.Hold => "Hold",
-            Interpolation.EaseIn => "Ease In",
-            Interpolation.EaseOut => "Ease Out",
-            Interpolation.EaseInOut => "Ease In & Out",
-            Interpolation.Snappy => "Snappy",
-            Interpolation.Overshoot => "Overshoot",
-            Interpolation.Bouncy => "Bouncy",
-            Interpolation.Custom => "Custom Curve",
-            _ => interpolation.ToString(),
-        };
-
-    public static string Description(Interpolation interpolation) =>
-        interpolation switch
-        {
-            Interpolation.Smooth => "Natural motion that speeds up and slows down on its own.",
-            Interpolation.Linear => "Constant speed, robotic.",
-            Interpolation.Hold => "Stays put, then jumps to the next key.",
-            Interpolation.EaseIn => "Starts slow, ends fast.",
-            Interpolation.EaseOut => "Starts fast, ends slow.",
-            Interpolation.EaseInOut => "Slow start and slow end.",
-            Interpolation.Snappy => "Quick burst, then a soft settle.",
-            Interpolation.Overshoot => "Goes a little too far, then settles back.",
-            Interpolation.Bouncy => "Bounces into place.",
-            Interpolation.Custom => "Hand-shaped in the curve editor.",
-            _ => "",
-        };
-
     /// <summary>Maps 0..1 progress through an eased preset. Smooth/Custom are handled by the curve.</summary>
     public static float Ease(Interpolation interpolation, float u)
     {

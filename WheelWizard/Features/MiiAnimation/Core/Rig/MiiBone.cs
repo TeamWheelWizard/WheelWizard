@@ -63,41 +63,9 @@ public static class MiiSkeletonInfo
         "ankle_r",
     ];
 
-    private static readonly string[] FriendlyNames =
-    [
-        "Body",
-        "Hips",
-        "Chest",
-        "Head",
-        "Left Upper Arm",
-        "Left Forearm",
-        "Left Hand",
-        "Right Upper Arm",
-        "Right Forearm",
-        "Right Hand",
-        "Left Thigh",
-        "Left Shin",
-        "Left Foot",
-        "Right Thigh",
-        "Right Shin",
-        "Right Foot",
-    ];
-
     public static int Parent(MiiBone bone) => Parents[(int)bone];
 
     public static string GlbName(MiiBone bone) => GlbNames[(int)bone];
-
-    public static string FriendlyName(MiiBone bone) => FriendlyNames[(int)bone];
-
-    public static string FriendlyName(MiiLimb limb) =>
-        limb switch
-        {
-            MiiLimb.ArmL => "Left Arm",
-            MiiLimb.ArmR => "Right Arm",
-            MiiLimb.LegL => "Left Leg",
-            MiiLimb.LegR => "Right Leg",
-            _ => limb.ToString(),
-        };
 
     public static bool IsLeg(MiiLimb limb) => limb is MiiLimb.LegL or MiiLimb.LegR;
 
@@ -109,44 +77,6 @@ public static class MiiSkeletonInfo
             MiiLimb.ArmR => (MiiBone.ArmR1, MiiBone.ArmR2, MiiBone.HandR),
             MiiLimb.LegL => (MiiBone.LegL1, MiiBone.LegL2, MiiBone.FootL),
             _ => (MiiBone.LegR1, MiiBone.LegR2, MiiBone.FootR),
-        };
-
-    public static MiiLimb? LimbOf(MiiBone bone) =>
-        bone switch
-        {
-            MiiBone.ArmL1 or MiiBone.ArmL2 or MiiBone.HandL => MiiLimb.ArmL,
-            MiiBone.ArmR1 or MiiBone.ArmR2 or MiiBone.HandR => MiiLimb.ArmR,
-            MiiBone.LegL1 or MiiBone.LegL2 or MiiBone.FootL => MiiLimb.LegL,
-            MiiBone.LegR1 or MiiBone.LegR2 or MiiBone.FootR => MiiLimb.LegR,
-            _ => null,
-        };
-
-    /// <summary>Left/right counterpart, or the bone itself for center bones.</summary>
-    public static MiiBone Mirror(MiiBone bone) =>
-        bone switch
-        {
-            MiiBone.ArmL1 => MiiBone.ArmR1,
-            MiiBone.ArmL2 => MiiBone.ArmR2,
-            MiiBone.HandL => MiiBone.HandR,
-            MiiBone.ArmR1 => MiiBone.ArmL1,
-            MiiBone.ArmR2 => MiiBone.ArmL2,
-            MiiBone.HandR => MiiBone.HandL,
-            MiiBone.LegL1 => MiiBone.LegR1,
-            MiiBone.LegL2 => MiiBone.LegR2,
-            MiiBone.FootL => MiiBone.FootR,
-            MiiBone.LegR1 => MiiBone.LegL1,
-            MiiBone.LegR2 => MiiBone.LegL2,
-            MiiBone.FootR => MiiBone.FootL,
-            _ => bone,
-        };
-
-    public static MiiLimb Mirror(MiiLimb limb) =>
-        limb switch
-        {
-            MiiLimb.ArmL => MiiLimb.ArmR,
-            MiiLimb.ArmR => MiiLimb.ArmL,
-            MiiLimb.LegL => MiiLimb.LegR,
-            _ => MiiLimb.LegL,
         };
 
     /// <summary>Only the body root and hips may be translated; everything else is rotation/scale only.</summary>

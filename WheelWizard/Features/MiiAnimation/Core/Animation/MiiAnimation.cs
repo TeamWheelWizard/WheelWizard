@@ -79,10 +79,6 @@ public sealed class MiiAnimation
     /// <summary>Tracks of actor <paramref name="index"/>: 0 is the main Mii, 1+ the extra <see cref="Actors"/>.</summary>
     public MiiAnimation ForActor(int index) => index <= 0 ? Root : Actors[index - 1].Motion;
 
-    /// <summary>Index of the actor with this name (case-insensitive), or -1.</summary>
-    public int FindActor(string name) =>
-        Actors.FindIndex(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase)) is var i and >= 0 ? i + 1 : -1;
-
     /// <summary>Adds an extra Mii with no tracks yet.</summary>
     public AnimActor AddActor(string name)
     {
@@ -150,47 +146,6 @@ public sealed class MiiAnimation
         if (!Tracks.TryGetValue(id, out var curve) || curve.Count == 0)
             return defaultValue;
         return ChannelInfo.IsDiscrete(id.Channel) ? curve.EvaluateStepped(frame, defaultValue) : curve.Evaluate(frame, defaultValue);
-    }
-
-    /// <summary>Removes empty tracks (of every actor).</summary>
-    public void Prune()
-    {
-        for (var actor = 0; actor < ActorCount; actor++)
-        {
-            var tracks = ForActor(actor).Tracks;
-            foreach (var id in tracks.Where(t => t.Value.Count == 0).Select(t => t.Key).ToList())
-                tracks.Remove(id);
-        }
-    }
-
-    /// <summary>Deep copy of the whole animation (cloning an actor's motion clones the animation it belongs to).</summary>
-    public MiiAnimation Clone()
-    {
-        var source = Root;
-        var clone = new MiiAnimation
-        {
-            Name = source.Name,
-            Fps = source.Fps,
-            Length = source.Length,
-            AuthorMii = source.AuthorMii?.ToArray(),
-        };
-        CopyTracks(source, clone);
-        clone.Events.AddRange(source.Events);
-        foreach (var actor in source.Actors)
-        {
-            var copy = clone.AddActor(actor.Name);
-            copy.PreviewMii = actor.PreviewMii?.ToArray();
-            CopyTracks(actor.Motion, copy.Motion);
-        }
-
-        clone.Particles.AddRange(source.Particles.Select(p => p.Clone()));
-        return clone;
-    }
-
-    private static void CopyTracks(MiiAnimation from, MiiAnimation to)
-    {
-        foreach (var (id, curve) in from.Tracks)
-            to.Tracks[id] = curve.Clone();
     }
 
     /// <summary>Wraps a time in seconds into a frame position inside the loop.</summary>

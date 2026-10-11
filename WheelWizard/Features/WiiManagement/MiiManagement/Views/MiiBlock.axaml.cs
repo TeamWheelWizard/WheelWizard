@@ -15,8 +15,6 @@ namespace WheelWizard.WiiManagement.MiiManagement.Views;
 
 public class MiiBlock : ToggleRadioButton
 {
-    private MiiImageLoaderWithHover? _miiImageLoader;
-
     public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<MiiBlock, Mii?>(nameof(Mii));
 
     public Mii? Mii
@@ -49,37 +47,6 @@ public class MiiBlock : ToggleRadioButton
         set => SetValue(IsGlobalProperty, value);
     }
 
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-
-        _miiImageLoader = e.NameScope.Find<MiiImageLoaderWithHover>("PART_MiiImageLoader");
-
-        // Set hover variant immediately
-        if (_miiImageLoader != null)
-        {
-            // Create hover variant with smile expression
-            var hoverVariant = MiiImageVariants.MiiListTile.Clone();
-            hoverVariant.Name = "MiiBlockProfileHover";
-            hoverVariant.Expression = MiiImageSpecifications.FaceExpression.smile;
-            hoverVariant.ExpirationSeconds = TimeSpan.Zero;
-            _miiImageLoader.HoverVariant = hoverVariant;
-        }
-    }
-
-    private void SetupHoverVariant()
-    {
-        if (_miiImageLoader != null)
-        {
-            // Create hover variant with smile expression
-            var hoverVariant = MiiImageVariants.MiiListTile.Clone();
-            hoverVariant.Name = "MiiBlockProfileHover";
-            hoverVariant.Expression = MiiImageSpecifications.FaceExpression.smile;
-            hoverVariant.ExpirationSeconds = TimeSpan.Zero;
-            _miiImageLoader.HoverVariant = hoverVariant;
-        }
-    }
-
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -89,34 +56,10 @@ public class MiiBlock : ToggleRadioButton
             var mii = change.GetNewValue<Mii?>();
             MiiName = mii?.Name.ToString();
             IsFavorite = mii?.IsFavorite ?? false;
-
-            // Ensure hover variant is set when Mii changes
-            if (_miiImageLoader != null)
-            {
-                SetupHoverVariant();
-            }
         }
 
         Tag = MiiName ?? String.Empty;
         ClipToBounds = string.IsNullOrWhiteSpace(MiiName);
-    }
-
-    protected override void OnPointerEntered(PointerEventArgs e)
-    {
-        base.OnPointerEntered(e);
-        if (_miiImageLoader != null)
-        {
-            _miiImageLoader.IsHovered = true;
-        }
-    }
-
-    protected override void OnPointerExited(PointerEventArgs e)
-    {
-        base.OnPointerExited(e);
-        if (_miiImageLoader != null)
-        {
-            _miiImageLoader.IsHovered = false;
-        }
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

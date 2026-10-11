@@ -31,6 +31,17 @@ public static class MiiImageVariants
         ExpirationSeconds = TimeSpan.FromMinutes(8),
     };
 
+    /// <summary><see cref="MiiListTile"/> smiling, shown while a tile is hovered.</summary>
+    public static readonly MiiImageSpecifications MiiListTileHover = new()
+    {
+        Name = "MiiBlockProfileHover",
+        Expression = MiiImageSpecifications.FaceExpression.smile,
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.tiny,
+        CachePriority = CacheItemPriority.Low,
+        ExpirationSeconds = TimeSpan.Zero,
+    };
+
     public static readonly MiiImageSpecifications OnlinePlayerSmall = new()
     {
         Name = "OnlinePlayerSmall",

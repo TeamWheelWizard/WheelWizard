@@ -71,8 +71,6 @@ public sealed class MiiAnimationPlayer
     /// <summary>The clip playing (or holding its last frame), null for the rest pose.</summary>
     public MiiAnimation? Current => _current?.Clip;
 
-    public bool IsLooping => _current?.Loop ?? false;
-
     /// <summary>Whether the current one-shot clip reached its end (or nothing plays).</summary>
     public bool IsFinished => _current is null || _current.Finished;
 

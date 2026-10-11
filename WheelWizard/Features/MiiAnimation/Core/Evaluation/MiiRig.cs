@@ -67,13 +67,7 @@ public sealed class MiiRig
         RestPose = Evaluate(_ => float.NaN);
     }
 
-    public Vector3 RestWorldPosition(MiiBone bone) => _restWorldPosition[(int)bone];
-
-    public Quaternion RestWorldRotation(MiiBone bone) => _restWorldRotation[(int)bone];
-
-    /// <summary>Local axis a bone points along (dominant axis towards its child), used for squash/stretch.</summary>
-    public Vector3 BoneAxis(MiiBone bone) => _boneAxis[(int)bone];
-
+    /// <summary>Local axis each bone points along (dominant axis towards its child), used for squash/stretch.</summary>
     private void ComputeBoneAxes()
     {
         for (var i = 0; i < N; i++)
@@ -349,31 +343,6 @@ public sealed class MiiRig
     /// <summary>Euler rotation in degrees (X pitch, Y yaw, Z roll), applied roll → pitch → yaw.</summary>
     public static Quaternion EulerDegrees(float x, float y, float z) =>
         Quaternion.CreateFromYawPitchRoll(y * DegToRad, x * DegToRad, z * DegToRad);
-
-    /// <summary>Inverse of <see cref="EulerDegrees"/>.</summary>
-    public static Vector3 ToEulerDegrees(Quaternion q)
-    {
-        q = Quaternion.Normalize(q);
-        // Matches CreateFromYawPitchRoll (Y * X * Z).
-        var sinPitch = 2f * (q.W * q.X - q.Y * q.Z);
-        float pitch,
-            yaw,
-            roll;
-        if (MathF.Abs(sinPitch) >= 0.9999f)
-        {
-            pitch = MathF.CopySign(MathF.PI / 2f, sinPitch);
-            yaw = 2f * MathF.Atan2(q.Y, q.W);
-            roll = 0f;
-        }
-        else
-        {
-            pitch = MathF.Asin(sinPitch);
-            yaw = MathF.Atan2(2f * (q.W * q.Y + q.X * q.Z), 1f - 2f * (q.X * q.X + q.Y * q.Y));
-            roll = MathF.Atan2(2f * (q.W * q.Z + q.X * q.Y), 1f - 2f * (q.X * q.X + q.Z * q.Z));
-        }
-
-        return new Vector3(pitch, yaw, roll) / DegToRad;
-    }
 
     /// <summary>Rotation mapping the frame (dirA, normalA) onto (dirB, normalB).</summary>
     private static Quaternion FrameDelta(Vector3 dirA, Vector3 normalA, Vector3 dirB, Vector3 normalB)

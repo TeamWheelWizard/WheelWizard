@@ -333,116 +333,66 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         switch (_level)
         {
             case Level.Overview:
-                SidebarItems.Children.Add(
-                    SideButton(MiiEditorParts.Get(MiiEditPart.FaceShape), "attribute.mii_section.head", false, (_, _) => OpenHead())
-                );
-                SidebarItems.Children.Add(
-                    SideGeometryButton("Shirt", "attribute.mii_section.body", _section == Section.Body, (_, _) => OpenSection(Section.Body))
-                );
-                SidebarItems.Children.Add(
-                    SideGeometryButton(
-                        "InfoTip",
-                        "attribute.mii_section.info",
-                        _section == Section.Info,
-                        (_, _) => OpenSection(Section.Info)
-                    )
-                );
+                AddSideButton(MiiEditorParts.Get(MiiEditPart.FaceShape), "attribute.mii_section.head", false, OpenHead);
+                AddSideButton("Shirt", "attribute.mii_section.body", _section == Section.Body, () => OpenSection(Section.Body));
+                AddSideButton("InfoTip", "attribute.mii_section.info", _section == Section.Info, () => OpenSection(Section.Info));
                 if (_section == Section.Body)
                 {
-                    SidebarItems.Children.Add(Divider());
-                    SidebarItems.Children.Add(
-                        SideGeometryButton("PersonMale", "attribute.mii.gender_male", !mii.IsGirl, (_, _) => SetGender(false))
-                    );
-                    SidebarItems.Children.Add(
-                        SideGeometryButton("PersonFemale", "attribute.mii.gender_female", mii.IsGirl, (_, _) => SetGender(true))
-                    );
+                    SidebarItems.Children.Add(new Border { Classes = { "Divider" } });
+                    AddSideButton("PersonMale", "attribute.mii.gender_male", !mii.IsGirl, () => SetGender(false));
+                    AddSideButton("PersonFemale", "attribute.mii.gender_female", mii.IsGirl, () => SetGender(true));
                 }
 
                 break;
             case Level.HeadGroups:
-                SidebarItems.Children.Add(SideGeometryButton("ArrowLeft", "action.back", false, (_, _) => StepOut()));
-                SidebarItems.Children.Add(Divider());
+                AddSideButton("ArrowLeft", "action.back", false, StepOut);
+                SidebarItems.Children.Add(new Border { Classes = { "Divider" } });
                 foreach (var group in MiiEditorParts.Groups)
                 {
-                    var captured = group;
                     var definition = MiiEditorParts.Get(MiiEditorParts.GroupIconPart(group));
-                    SidebarItems.Children.Add(
-                        SideButton(definition, MiiEditorParts.GroupTitleKey(group), _group == group, (_, _) => OpenGroup(captured))
-                    );
+                    AddSideButton(definition, MiiEditorParts.GroupTitleKey(group), _group == group, () => OpenGroup(group));
                 }
 
                 break;
             case Level.HeadParts:
-                SidebarItems.Children.Add(SideGeometryButton("ArrowLeft", "action.back", false, (_, _) => StepOut()));
-                SidebarItems.Children.Add(Divider());
+                AddSideButton("ArrowLeft", "action.back", false, StepOut);
+                SidebarItems.Children.Add(new Border { Classes = { "Divider" } });
                 foreach (var definition in MiiEditorParts.PartsOf(_group!.Value))
-                {
-                    var captured = definition.Part;
-                    SidebarItems.Children.Add(
-                        SideButton(definition, definition.TitleKey, _part == definition.Part, (_, _) => SelectPart(captured))
-                    );
-                }
-
+                    AddSideButton(definition, definition.TitleKey, _part == definition.Part, () => SelectPart(definition.Part));
                 break;
         }
     }
 
-    private MultiIconRadioButton SideButton(
-        MiiPartDefinition definition,
-        string titleKey,
-        bool isChecked,
-        EventHandler<RoutedEventArgs> click
-    )
-    {
-        if (definition.Icon.StartsWith("MiiEditor"))
-            return SideGeometryButton(definition.Icon, titleKey, isChecked, click);
-        var button = new MultiIconRadioButton
-        {
-            Classes = { "Side" },
-            Focusable = false,
-            IconData = (DrawingImage)Application.Current!.FindResource(definition.Icon)!,
-            IsChecked = isChecked,
-            GroupName = "MiiEditorSidebar" + GetHashCode(),
-        };
-        definition.StyleIcon?.Invoke(button);
-        ToolTip.SetTip(button, t(titleKey));
-        ToolTip.SetPlacement(button, PlacementMode.Right);
-        button.Click += click;
-        return button;
-    }
+    private void AddSideButton(MiiPartDefinition definition, string titleKey, bool isChecked, Action click) =>
+        AddSideButton(definition.Icon, titleKey, isChecked, click, definition.StyleIcon);
 
-    private MultiIconRadioButton SideGeometryButton(string geometry, string titleKey, bool isChecked, EventHandler<RoutedEventArgs> click)
+    /// <summary>A sidebar button with a Mii part icon (coloured by <paramref name="styleIcon"/>) or a one-colour geometry.</summary>
+    private void AddSideButton(string icon, string titleKey, bool isChecked, Action click, Action<MultiIconRadioButton>? styleIcon = null)
     {
         var button = new MultiIconRadioButton
         {
             Classes = { "Side" },
             Focusable = false,
-            IconGeo = FindGeometry(geometry),
-            Color1 = new SolidColorBrush(ViewUtils.Colors.Neutral300),
-            HoverColor1 = new SolidColorBrush(ViewUtils.Colors.Neutral50),
-            SelectedColor1 = new SolidColorBrush(ViewUtils.Colors.Brand300),
             IsChecked = isChecked,
             GroupName = "MiiEditorSidebar" + GetHashCode(),
-            Padding = new Thickness(6),
         };
+        if (FindIcon(icon) is DrawingImage drawing)
+            button.IconData = drawing;
+        else
+        {
+            button.IconGeo = (Geometry)FindIcon(icon);
+            button.Classes.Add("Geometry");
+        }
+
+        styleIcon?.Invoke(button);
         ToolTip.SetTip(button, t(titleKey));
-        ToolTip.SetPlacement(button, PlacementMode.Right);
-        button.Click += click;
-        return button;
+        button.Click += (_, _) => click();
+        SidebarItems.Children.Add(button);
     }
 
-    private static Border Divider() =>
-        new()
-        {
-            Height = 1,
-            Margin = new Thickness(6, 3),
-            Background = new SolidColorBrush(ViewUtils.Colors.Neutral700),
-        };
-
-    private Geometry FindGeometry(string key) =>
-        this.TryFindResource(key, out var resource) && resource is Geometry geometry
-            ? geometry
-            : (Geometry)Application.Current!.FindResource(key)!;
+    /// <summary>An icon from the page's resources or the app's (also before the page is attached).</summary>
+    private object FindIcon(string key) =>
+        this.TryFindResource(key, out var resource) ? resource! : Application.Current!.FindResource(key)!;
 
     #endregion
 
@@ -528,7 +478,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             Tone = extraClass == "Remove" ? ActionButtonTone.Danger : ActionButtonTone.Brand,
             Size = extraClass is "Add" or "Remove" ? ButtonSize.Compact : ButtonSize.Regular,
             Focusable = false,
-            IconData = FindGeometry(geometry),
+            IconData = (Geometry)FindIcon(geometry),
         };
         if (tipKey is not null)
             ToolTip.SetTip(button, t(tipKey));
@@ -556,7 +506,6 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             for (var i = variants.First; i < variants.Count; i++)
             {
                 var index = i;
-                Control content;
                 ToggleButton button;
                 if (variants.IconPrefix is { } prefix)
                 {
@@ -564,31 +513,20 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
                     {
                         Classes = { "Variant" },
                         Focusable = false,
-                        IconData = (DrawingImage)Application.Current!.FindResource($"{prefix}{index:00}")!,
+                        IconData = (DrawingImage)FindIcon($"{prefix}{index:00}"),
                         GroupName = "MiiEditorVariants" + GetHashCode(),
                     };
-                    variants.StyleIcon?.Invoke(icon);
+                    definition.StyleIcon?.Invoke(icon);
                     button = icon;
                 }
                 else
                 {
-                    content = new TextBlock
-                    {
-                        Text = variants.Label?.Invoke(index) ?? index.ToString(),
-                        Classes = { "BodyText" },
-                        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                    };
                     button = new ToggleRadioButton
                     {
                         Classes = { "MiiTextVariant" },
                         GroupName = "MiiEditorVariants" + GetHashCode(),
                         Focusable = false,
-                        Content = content,
-                        Height = 46,
-                        Padding = new Thickness(12, 0),
-                        Margin = new Thickness(2, 0),
-                        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                        CornerRadius = new CornerRadius(10),
+                        Content = new TextBlock { Text = variants.Label?.Invoke(index) ?? index.ToString(), Classes = { "BodyText" } },
                     };
                 }
 
@@ -1016,7 +954,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
 
             var present = optionalDefinition.IsPresent(mii!);
             button.Tone = present ? ActionButtonTone.Danger : ActionButtonTone.Brand;
-            button.IconData = FindGeometry(present ? "MinMark" : "PlusMark");
+            button.IconData = (Geometry)FindIcon(present ? "MinMark" : "PlusMark");
             ToolTip.SetTip(
                 button,
                 t(present ? "hover.mii_editor.remove" : "hover.mii_editor.add", new { part = t(optionalDefinition.TitleKey) })

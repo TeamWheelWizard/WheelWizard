@@ -4,64 +4,20 @@ using Microsoft.Extensions.Caching.Memory;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.Shared.Calendar;
-using WheelWizard.Views.Shell;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.MiiImages.Views;
 
+/// <summary>
+/// The view behind <see cref="MiiImageLoader"/>. <see cref="BaseMiiImage.GeneratedImages"/> holds the image and,
+/// second, either the full-quality one (<see cref="LowQualitySpeedup"/>) or the hover one (<see cref="HoverVariant"/>).
+/// </summary>
 public partial class MiiImageView : BaseMiiImage
 {
-    private readonly ISeasonalCalendar Calendar;
+    private bool _hasLoadedHoverVariant;
 
-    #region properties
-
-    public static readonly StyledProperty<bool> LowQualitySpeedupProperty = AvaloniaProperty.Register<MiiImageView, bool>(
-        nameof(LowQualitySpeedup)
-    );
-
-    public bool LowQualitySpeedup
-    {
-        get => GetValue(LowQualitySpeedupProperty);
-        set => SetValue(LowQualitySpeedupProperty, value);
-    }
-
-    public static readonly StyledProperty<IBrush> LoadingColorProperty = AvaloniaProperty.Register<MiiImageView, IBrush>(
-        nameof(LoadingColor),
-        new SolidColorBrush(ViewUtils.Colors.Neutral900)
-    );
-
-    public IBrush LoadingColor
-    {
-        get => GetValue(LoadingColorProperty);
-        set => SetValue(LoadingColorProperty, value);
-    }
-
-    public static readonly StyledProperty<IBrush> FallBackColorProperty = AvaloniaProperty.Register<MiiImageView, IBrush>(
-        nameof(FallBackColor),
-        new SolidColorBrush(ViewUtils.Colors.Neutral700)
-    );
-
-    public IBrush FallBackColor
-    {
-        get => GetValue(FallBackColorProperty);
-        set => SetValue(FallBackColorProperty, value);
-    }
-
-    public static readonly StyledProperty<Thickness> ImageOnlyMarginProperty = AvaloniaProperty.Register<MiiImageView, Thickness>(
-        nameof(ImageOnlyMargin),
-        enableDataValidation: true
-    );
-
-    public Thickness ImageOnlyMargin
-    {
-        get => GetValue(ImageOnlyMarginProperty);
-        set => SetValue(ImageOnlyMarginProperty, value);
-    }
-
-    public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty = AvaloniaProperty.Register<
-        MiiImageView,
-        MiiImageSpecifications
-    >(nameof(ImageVariant), MiiImageVariants.OnlinePlayerSmall, coerce: CoerceVariant);
+    public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty =
+        MiiImageControl.ImageVariantProperty.AddOwner<MiiImageView>();
 
     public MiiImageSpecifications ImageVariant
     {
@@ -69,63 +25,117 @@ public partial class MiiImageView : BaseMiiImage
         set => SetValue(ImageVariantProperty, value);
     }
 
-    private static MiiImageSpecifications CoerceVariant(AvaloniaObject o, MiiImageSpecifications value)
+    public static readonly StyledProperty<bool> LowQualitySpeedupProperty =
+        MiiImageLoader.LowQualitySpeedupProperty.AddOwner<MiiImageView>();
+
+    public bool LowQualitySpeedup
     {
-        ((MiiImageView)o).OnVariantChanged(value);
-        return value;
+        get => GetValue(LowQualitySpeedupProperty);
+        set => SetValue(LowQualitySpeedupProperty, value);
     }
 
-    #endregion
+    public static readonly StyledProperty<Thickness> ImageOnlyMarginProperty =
+        MiiImageLoader.ImageOnlyMarginProperty.AddOwner<MiiImageView>();
+
+    public Thickness ImageOnlyMargin
+    {
+        get => GetValue(ImageOnlyMarginProperty);
+        set => SetValue(ImageOnlyMarginProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsHoveredProperty = MiiImageLoader.IsHoveredProperty.AddOwner<MiiImageView>();
+
+    public bool IsHovered
+    {
+        get => GetValue(IsHoveredProperty);
+        set => SetValue(IsHoveredProperty, value);
+    }
+
+    public static readonly StyledProperty<MiiImageSpecifications?> HoverVariantProperty =
+        MiiImageLoader.HoverVariantProperty.AddOwner<MiiImageView>();
+
+    public MiiImageSpecifications? HoverVariant
+    {
+        get => GetValue(HoverVariantProperty);
+        set => SetValue(HoverVariantProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> ShowSecondImageProperty = AvaloniaProperty.Register<MiiImageView, bool>(
+        nameof(ShowSecondImage)
+    );
+
+    /// <summary>Whether the second image (full quality, or the hover one while hovered) is the one shown.</summary>
+    public bool ShowSecondImage
+    {
+        get => GetValue(ShowSecondImageProperty);
+        private set => SetValue(ShowSecondImageProperty, value);
+    }
 
     public MiiImageView(IMiiImagesSingletonService images, ISeasonalCalendar calendar)
         : base(images)
     {
-        Calendar = calendar;
         InitializeComponent();
 
-        if (Calendar.IsAprilFirst)
+        if (calendar.IsAprilFirst)
             MiiImageContainer.RenderTransform = new RotateTransform(Random.Shared.NextDouble() * 360);
+
+        PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(GeneratedImages))
+                UpdateImageVisibility();
+        };
+        GeneratedImages.CollectionChanged += (_, _) => UpdateImageVisibility();
+        MiiImageLoaded += (_, _) => UpdateImageVisibility();
     }
 
-    public override void RefreshCurrentMii() => OnMiiChanged(Mii);
-
-    protected void OnVariantChanged(MiiImageSpecifications newSpecifications)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
-        List<MiiImageSpecifications> variants = [];
+        base.OnPropertyChanged(change);
 
-        if (LowQualitySpeedup)
+        if (change.Property == ImageVariantProperty || change.Property == HoverVariantProperty)
+            RefreshCurrentMii();
+        else if (change.Property == IsHoveredProperty)
+        {
+            if (IsHovered)
+                TryLoadHoverVariant();
+            UpdateImageVisibility();
+        }
+    }
+
+    protected override void OnMiiChanged(Mii? newMii) => RefreshCurrentMii();
+
+    public override void RefreshCurrentMii()
+    {
+        _hasLoadedHoverVariant = false;
+        if (HoverVariant is null && LowQualitySpeedup)
         {
             if (GeneratedImages.Count > 0)
                 GeneratedImages[0] = null;
             if (GeneratedImages.Count > 1)
                 GeneratedImages[1] = null;
             OnPropertyChanged(nameof(GeneratedImages));
-            variants.Add(GetLowQualityClone(newSpecifications));
+            ReloadImages(Mii, [GetLowQualityClone(ImageVariant), ImageVariant]);
+            return;
         }
 
-        variants.Add(newSpecifications);
-        ReloadImages(Mii, variants);
+        ReloadImages(Mii, [ImageVariant]);
+        if (IsHovered)
+            TryLoadHoverVariant();
     }
 
-    protected override void OnMiiChanged(Mii? newMii)
+    private void TryLoadHoverVariant()
     {
-        List<MiiImageSpecifications> variants = [];
+        if (Mii == null || HoverVariant == null || _hasLoadedHoverVariant)
+            return;
 
-        if (LowQualitySpeedup)
-        {
-            if (GeneratedImages.Count > 0)
-                GeneratedImages[0] = null;
-            if (GeneratedImages.Count > 1)
-                GeneratedImages[1] = null;
-            OnPropertyChanged(nameof(GeneratedImages));
-            variants.Add(GetLowQualityClone(ImageVariant));
-        }
-
-        variants.Add(ImageVariant);
-        ReloadImages(newMii, variants);
+        _hasLoadedHoverVariant = true;
+        ReloadImages(Mii, [ImageVariant, HoverVariant]);
     }
 
-    private MiiImageSpecifications GetLowQualityClone(MiiImageSpecifications specifications)
+    private void UpdateImageVisibility() =>
+        ShowSecondImage = GeneratedImages.Count > 1 && GeneratedImages[1] != null && (HoverVariant is null || IsHovered);
+
+    private static MiiImageSpecifications GetLowQualityClone(MiiImageSpecifications specifications)
     {
         var lowQualityClone = specifications.Clone();
         lowQualityClone.Size = MiiImageSpecifications.ImageSize.small;

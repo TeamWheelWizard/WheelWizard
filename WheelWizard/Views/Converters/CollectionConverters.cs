@@ -16,10 +16,4 @@ public static class CollectionConverters
     public static readonly IValueConverter Second = new FuncValueConverter<IEnumerable?, object?>(x =>
         x?.OfType<object?>().ElementAtOrDefault(1)
     );
-    public static readonly IValueConverter SecondIsNull = new FuncValueConverter<IEnumerable?, bool>(x =>
-        x?.OfType<object?>().ElementAtOrDefault(1) == null
-    );
-    public static readonly IValueConverter SecondIsNotNull = new FuncValueConverter<IEnumerable?, bool>(x =>
-        x?.OfType<object?>().ElementAtOrDefault(1) != null
-    );
 }

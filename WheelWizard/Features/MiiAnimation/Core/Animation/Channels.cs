@@ -80,14 +80,6 @@ public readonly record struct TrackTarget(TrackTargetKind Kind, byte Index)
         packed >= 0x80 ? Global
         : packed >= 0x40 ? new(TrackTargetKind.Limb, (byte)(packed & 0x3F))
         : new(TrackTargetKind.Bone, packed);
-
-    public string FriendlyName =>
-        Kind switch
-        {
-            TrackTargetKind.Bone => MiiSkeletonInfo.FriendlyName(AsBone),
-            TrackTargetKind.Limb => MiiSkeletonInfo.FriendlyName(AsLimb),
-            _ => "Face",
-        };
 }
 
 public readonly record struct TrackId(TrackTarget Target, Channel Channel)
@@ -140,44 +132,5 @@ public static class ChannelInfo
             Channel.IkBlend => MiiSkeletonInfo.DefaultIkBlend(id.Target.AsLimb),
             Channel.Visible => 1f,
             _ => 0f,
-        };
-
-    public static string FriendlyName(Channel channel) =>
-        channel switch
-        {
-            Channel.PosX => "Move X",
-            Channel.PosY => "Move Y",
-            Channel.PosZ => "Move Z",
-            Channel.RotX => "Rotate X",
-            Channel.RotY => "Rotate Y",
-            Channel.RotZ => "Rotate Z",
-            Channel.ScaleX => "Scale X",
-            Channel.ScaleY => "Scale Y",
-            Channel.ScaleZ => "Scale Z",
-            Channel.Stretch => "Squash / Stretch",
-            Channel.IkBlend => "IK ↔ FK",
-            Channel.TargetX => "Target X",
-            Channel.TargetY => "Target Y",
-            Channel.TargetZ => "Target Z",
-            Channel.TargetRotX => "Target Rotate X",
-            Channel.TargetRotY => "Target Rotate Y",
-            Channel.TargetRotZ => "Target Rotate Z",
-            Channel.Swivel => "Elbow/Knee Direction",
-            Channel.IkStretch => "Stretchy Limb",
-            Channel.Expression => "Expression",
-            Channel.Visible => "Visible",
-            _ => channel.ToString(),
-        };
-
-    /// <summary>
-    /// Sign to apply when mirroring left↔right. The rig's left/right bones are mirror images across the X=0 plane,
-    /// so X translations and Y/Z rotations flip.
-    /// </summary>
-    public static float MirrorSign(Channel channel) =>
-        channel switch
-        {
-            Channel.PosX or Channel.RotY or Channel.RotZ => -1f,
-            Channel.TargetX or Channel.TargetRotY or Channel.TargetRotZ or Channel.Swivel => -1f,
-            _ => 1f,
         };
 }

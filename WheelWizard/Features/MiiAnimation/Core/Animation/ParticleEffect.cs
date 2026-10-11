@@ -37,7 +37,6 @@ public enum ParticleTint : byte
 /// </summary>
 public sealed class ParticleEffect
 {
-    public const int MaxNameLength = 32;
     public const int MaxCount = 512;
 
     /// <summary>No bone: the Mii's spot on the ground (follows its Move X/Z).</summary>
@@ -144,6 +143,4 @@ public sealed class ParticleEffect
 
     /// <summary>Last frame a particle can still be alive on (for timelines).</summary>
     public int EndFrame(int fps) => StartFrame + Duration + (int)MathF.Ceiling(MathF.Max(LifeMin, LifeMax) * fps);
-
-    public ParticleEffect Clone() => (ParticleEffect)MemberwiseClone();
 }

@@ -26,33 +26,6 @@ public enum MiiExpression : byte
 
 public static class MiiExpressionInfo
 {
-    public static readonly MiiExpression[] All = Enum.GetValues<MiiExpression>();
-
-    public static string FriendlyName(MiiExpression expression) =>
-        expression switch
-        {
-            MiiExpression.Normal => "Default",
-            MiiExpression.Smile => "Smile",
-            MiiExpression.Anger => "Angry",
-            MiiExpression.Sorrow => "Sad",
-            MiiExpression.Surprise => "Surprised",
-            MiiExpression.Blink => "Eyes Closed",
-            MiiExpression.OpenMouth => "Open Mouth",
-            MiiExpression.SmileOpenMouth => "Big Smile",
-            MiiExpression.AngerOpenMouth => "Shouting",
-            MiiExpression.SorrowOpenMouth => "Crying",
-            MiiExpression.SurpriseOpenMouth => "Shocked",
-            MiiExpression.BlinkOpenMouth => "Eyes Closed, Mouth Open",
-            MiiExpression.WinkLeft => "Wink Left",
-            MiiExpression.WinkRight => "Wink Right",
-            MiiExpression.WinkLeftOpenMouth => "Wink Left, Mouth Open",
-            MiiExpression.WinkRightOpenMouth => "Wink Right, Mouth Open",
-            MiiExpression.LikeWinkLeft => "Cheeky Wink Left",
-            MiiExpression.LikeWinkRight => "Cheeky Wink Right",
-            MiiExpression.Frustrated => "Frustrated",
-            _ => expression.ToString(),
-        };
-
     /// <summary>
     /// Which of the Mii's own face parts an expression swaps out (FFL's expression table). Everything else,
     /// and every part with <see cref="MiiExpression.Normal"/>, is the Mii's own eyes, mouth and eyebrows.

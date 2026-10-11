@@ -44,12 +44,13 @@
                                       IsVisible="{TemplateBinding Mii, Converter={x:Static ObjectConverters.IsNull} }"
                                       Width="1000" Foreground="{StaticResource Neutral500}" />
                             
-                            <miiImages:MiiImageLoaderWithHover x:Name="PART_MiiImageLoader" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            <miiImages:MiiImageLoader x:Name="PART_MiiImageLoader" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                                                         IsVisible="{TemplateBinding Mii, Converter={x:Static ObjectConverters.IsNotNull} }"
                                                                         Mii="{TemplateBinding Mii}" ImageOnlyMargin="-4,-9,-4,0"
                                                                         FallBackColor="{StaticResource Neutral500}"
                                                                         LoadingColor="{StaticResource Neutral950}"
                                                                         ImageVariant="{x:Static miiVars:MiiImageVariants.MiiListTile}"
+                                                                        HoverVariant="{x:Static miiVars:MiiImageVariants.MiiListTileHover}"
                                                                         ReloadMethod="KeepAllUntilNew" />
                             
                             <PathIcon Data="{StaticResource StarIcon}" Height="17"
@@ -86,7 +87,7 @@
             <Setter Property="Opacity" Value="1" />
         </Style>
         
-        <Style Selector="^:pointerover /template/ miiImages|MiiImageLoaderWithHover#PART_MiiImageLoader">
+        <Style Selector="^:pointerover /template/ miiImages|MiiImageLoader#PART_MiiImageLoader">
             <Setter Property="IsHovered" Value="True" />
         </Style>
         

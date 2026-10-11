@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -185,7 +186,12 @@ public class MiiControlTests
     {
         var images = InstallThemes();
         var normal = new MiiImageLoader { Width = 100, Height = 100 };
-        var hover = new MiiImageLoaderWithHover { Width = 100, Height = 100 };
+        var hover = new MiiImageLoader
+        {
+            Width = 100,
+            Height = 100,
+            HoverVariant = MiiImageVariants.MiiListTileHover,
+        };
         var interactive = new Mii3DRender
         {
             Width = 100,
@@ -204,8 +210,13 @@ public class MiiControlTests
             window.Show();
             window.UpdateLayout();
 
-            Assert.Single(normal.GetVisualDescendants().OfType<MiiImageView>());
-            Assert.Single(hover.GetVisualDescendants().OfType<MiiHoverView>());
+            var normalView = Assert.Single(normal.GetVisualDescendants().OfType<MiiImageView>());
+            normal.FallBackColor = Brushes.Red;
+            normal.Margin = new Thickness(7);
+            Assert.Same(Brushes.Red, normalView.FallBackColor);
+            Assert.Equal(default, normalView.Margin);
+            var hoverView = Assert.Single(hover.GetVisualDescendants().OfType<MiiImageView>());
+            Assert.Same(MiiImageVariants.MiiListTileHover, hoverView.HoverVariant);
             var render = Assert.Single(interactive.GetVisualDescendants().OfType<MiiRenderView>());
             Assert.False(render.Interactive);
             interactive.Interactive = true;
@@ -290,7 +301,7 @@ public class MiiControlTests
         var normal = MiiImageVariants.MiiListTile.Clone();
         var hover = normal.Clone();
         hover.Name = "hover-test";
-        var control = new MiiImageLoaderWithHover
+        var control = new MiiImageLoader
         {
             Width = 100,
             Height = 100,

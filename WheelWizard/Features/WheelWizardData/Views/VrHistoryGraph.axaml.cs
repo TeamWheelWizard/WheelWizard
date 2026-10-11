@@ -18,29 +18,10 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
 
     private readonly VrHistoryViewModel _model;
 
-    private bool _isLoading;
-    private string _errorMessage = string.Empty;
-    private string _emptyStateText = "No VR history found for this range yet.";
-    private int _startingVr;
-    private int _endingVr;
-    private int _totalChange;
-    private int _biggestGain;
-    private int _biggestDrop;
-    private int _entriesCount;
-    private string _dateRangeText = string.Empty;
-    private bool _hasData;
     private int _reloadVersion;
     private bool _isInitializingDaysDropdown;
     private int _selectedHistoryDays = DefaultHistoryDays;
-    private bool _useMatchesAsXAxis = true;
     private RwfcPlayerVrHistoryResponse? _lastHistoryResponse;
-    private Geometry? _graphPath;
-    private IReadOnlyList<Point>? _graphPoints;
-    private string _graphStartLabel = string.Empty;
-    private string _graphMidLabel = string.Empty;
-    private string _graphEndLabel = string.Empty;
-    private string _graphMaxVrText = "--";
-    private string _graphMinVrText = "--";
 
     public static readonly StyledProperty<string?> FriendCodeProperty = AvaloniaProperty.Register<VrHistoryGraph, string?>(
         nameof(FriendCode),
@@ -52,21 +33,7 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
         FriendCodeProperty.Changed.AddClassHandler<VrHistoryGraph>((graph, _) => graph.TriggerHistoryReload());
     }
 
-    public bool UseMatchesAsXAxis
-    {
-        get => _useMatchesAsXAxis;
-        set
-        {
-            if (_useMatchesAsXAxis == value)
-                return;
-
-            _useMatchesAsXAxis = value;
-            OnPropertyChanged(nameof(UseMatchesAsXAxis));
-
-            if (_lastHistoryResponse != null)
-                ApplyHistoryData(_lastHistoryResponse, _selectedHistoryDays);
-        }
-    }
+    public bool UseMatchesAsXAxis { get; private set; } = true;
 
     public static readonly StyledProperty<double> ChartHeightProperty = AvaloniaProperty.Register<VrHistoryGraph, double>(
         nameof(ChartHeight),
@@ -86,197 +53,26 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
         set => SetValue(FriendCodeProperty, value);
     }
 
-    public bool IsLoading
-    {
-        get => _isLoading;
-        set
-        {
-            _isLoading = value;
-            OnPropertyChanged(nameof(IsLoading));
-            OnPropertyChanged(nameof(ShowNoDataState));
-        }
-    }
-
-    public string ErrorMessage
-    {
-        get => _errorMessage;
-        set
-        {
-            _errorMessage = value;
-            OnPropertyChanged(nameof(ErrorMessage));
-            OnPropertyChanged(nameof(HasError));
-            OnPropertyChanged(nameof(ShowNoDataState));
-        }
-    }
-
-    public string EmptyStateText
-    {
-        get => _emptyStateText;
-        set
-        {
-            _emptyStateText = value;
-            OnPropertyChanged(nameof(EmptyStateText));
-        }
-    }
-
+    // What the graph shows. It's all worked out at once (see Update), which then tells the bindings everything changed.
+    public bool IsLoading { get; private set; }
+    public string ErrorMessage { get; private set; } = string.Empty;
+    public string EmptyStateText { get; private set; } = "No VR history found for this range yet.";
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
-
-    public int StartingVr
-    {
-        get => _startingVr;
-        set
-        {
-            _startingVr = value;
-            OnPropertyChanged(nameof(StartingVr));
-        }
-    }
-
-    public int EndingVr
-    {
-        get => _endingVr;
-        set
-        {
-            _endingVr = value;
-            OnPropertyChanged(nameof(EndingVr));
-        }
-    }
-
-    public int TotalChange
-    {
-        get => _totalChange;
-        set
-        {
-            _totalChange = value;
-            OnPropertyChanged(nameof(TotalChange));
-            OnPropertyChanged(nameof(TotalChangeText));
-            OnPropertyChanged(nameof(IsTotalChangeGain));
-            OnPropertyChanged(nameof(IsTotalChangeLoss));
-            OnPropertyChanged(nameof(IsTotalChangeNeutral));
-        }
-    }
-
-    public int BiggestGain
-    {
-        get => _biggestGain;
-        set
-        {
-            _biggestGain = value;
-            OnPropertyChanged(nameof(BiggestGain));
-            OnPropertyChanged(nameof(BiggestGainText));
-        }
-    }
-
-    public int BiggestDrop
-    {
-        get => _biggestDrop;
-        set
-        {
-            _biggestDrop = value;
-            OnPropertyChanged(nameof(BiggestDrop));
-            OnPropertyChanged(nameof(BiggestDropText));
-        }
-    }
-
-    public int EntriesCount
-    {
-        get => _entriesCount;
-        set
-        {
-            _entriesCount = value;
-            OnPropertyChanged(nameof(EntriesCount));
-        }
-    }
-
-    public string DateRangeText
-    {
-        get => _dateRangeText;
-        set
-        {
-            _dateRangeText = value;
-            OnPropertyChanged(nameof(DateRangeText));
-        }
-    }
-
-    public bool HasData
-    {
-        get => _hasData;
-        set
-        {
-            _hasData = value;
-            OnPropertyChanged(nameof(HasData));
-            OnPropertyChanged(nameof(ShowNoDataState));
-        }
-    }
-
-    public Geometry? GraphPath
-    {
-        get => _graphPath;
-        set
-        {
-            _graphPath = value;
-            OnPropertyChanged(nameof(GraphPath));
-        }
-    }
-
-    public IReadOnlyList<Point>? GraphPoints
-    {
-        get => _graphPoints;
-        set
-        {
-            _graphPoints = value;
-            OnPropertyChanged(nameof(GraphPoints));
-        }
-    }
-
-    public string GraphStartLabel
-    {
-        get => _graphStartLabel;
-        set
-        {
-            _graphStartLabel = value;
-            OnPropertyChanged(nameof(GraphStartLabel));
-        }
-    }
-
-    public string GraphMidLabel
-    {
-        get => _graphMidLabel;
-        set
-        {
-            _graphMidLabel = value;
-            OnPropertyChanged(nameof(GraphMidLabel));
-        }
-    }
-
-    public string GraphEndLabel
-    {
-        get => _graphEndLabel;
-        set
-        {
-            _graphEndLabel = value;
-            OnPropertyChanged(nameof(GraphEndLabel));
-        }
-    }
-
-    public string GraphMaxVrText
-    {
-        get => _graphMaxVrText;
-        set
-        {
-            _graphMaxVrText = value;
-            OnPropertyChanged(nameof(GraphMaxVrText));
-        }
-    }
-
-    public string GraphMinVrText
-    {
-        get => _graphMinVrText;
-        set
-        {
-            _graphMinVrText = value;
-            OnPropertyChanged(nameof(GraphMinVrText));
-        }
-    }
+    public int StartingVr { get; private set; }
+    public int EndingVr { get; private set; }
+    public int TotalChange { get; private set; }
+    public int BiggestGain { get; private set; }
+    public int BiggestDrop { get; private set; }
+    public int EntriesCount { get; private set; }
+    public string DateRangeText { get; private set; } = string.Empty;
+    public bool HasData { get; private set; }
+    public Geometry? GraphPath { get; private set; }
+    public IReadOnlyList<Point>? GraphPoints { get; private set; }
+    public string GraphStartLabel { get; private set; } = string.Empty;
+    public string GraphMidLabel { get; private set; } = string.Empty;
+    public string GraphEndLabel { get; private set; } = string.Empty;
+    public string GraphMaxVrText { get; private set; } = "--";
+    public string GraphMinVrText { get; private set; } = "--";
 
     public bool ShowNoDataState => !IsLoading && !HasError && !HasData;
 
@@ -319,7 +115,13 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
 
     private void HistoryAxisDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        UseMatchesAsXAxis = HistoryAxisDropdown.SelectedIndex == 0;
+        var useMatches = HistoryAxisDropdown.SelectedIndex == 0;
+        if (UseMatchesAsXAxis == useMatches)
+            return;
+        UseMatchesAsXAxis = useMatches;
+        if (_lastHistoryResponse != null)
+            ApplyHistoryData(_lastHistoryResponse, _selectedHistoryDays);
+        NotifyAllChanged();
     }
 
     private void PopulateHistoryDaysDropdown()
@@ -365,6 +167,12 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
     private Task ReloadHistoryAsync() => _model.LoadAsync(FriendCode, _selectedHistoryDays);
 
     private void Model_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Update();
+        NotifyAllChanged();
+    }
+
+    private void Update()
     {
         IsLoading = _model.IsLoading;
         ErrorMessage = _model.Error?.Message ?? string.Empty;
@@ -551,10 +359,7 @@ public partial class VrHistoryGraph : UserControl, INotifyPropertyChanged
 
     public new event PropertyChangedEventHandler? PropertyChanged;
 
-    protected virtual void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    private void NotifyAllChanged() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 }
 
 public sealed class HistoryDaysOption(int days, string label)

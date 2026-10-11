@@ -57,8 +57,6 @@ public sealed record MiiVariants(int First, int Count, Func<Mii, int> Get, Func<
     /// <summary>Icon resource prefix (e.g. "MiiEye" for MiiEye00..), or null to show <see cref="Label"/> instead.</summary>
     public string? IconPrefix { get; init; }
 
-    public Action<MultiIconRadioButton>? StyleIcon { get; init; }
-
     public Func<int, string>? Label { get; init; }
 
     /// <summary>The type <paramref name="steps"/> away from the current one, wrapping around.</summary>
@@ -99,7 +97,10 @@ public sealed class MiiPartDefinition
     public HeadPart HighlightPart => RenderPart == HeadPart.Head ? HeadPart.Faceline : RenderPart;
     public required string TitleKey { get; init; }
 
-    /// <summary>Sidebar icon: a Mii part icon resource (styled by <see cref="StyleIcon"/>), or an editor geometry ("MiiEditor…").</summary>
+    /// <summary>
+    /// Sidebar icon: a Mii part icon resource (styled by <see cref="StyleIcon"/>, like the variant icons), or an editor
+    /// geometry ("MiiEditor…").
+    /// </summary>
     public required string Icon { get; init; }
 
     public Action<MultiIconRadioButton>? StyleIcon { get; init; }
@@ -240,21 +241,29 @@ public static class MiiEditorParts
             where TEnum : struct, Enum =>
             Enumerable.Range(0, mapping.Count).Select(i => mapping[(TEnum)Enum.ToObject(typeof(TEnum), i)]).ToList();
 
+        // Every part is validated as a whole: a setter rebuilds it with one value changed and stores it if it's legal.
+        static bool Apply<T>(OperationResult<T> result, Action<T> store)
+        {
+            if (result.IsFailure)
+                return false;
+            store(result.Value);
+            return true;
+        }
+
         // Face
         static bool SetFace(Mii mii, MiiFaceShape? shape = null, MiiSkinColor? skinColor = null, MiiFacialFeature? feature = null)
         {
             var c = mii.MiiFacialFeatures;
-            var result = MiiFacialFeatures.Create(
-                shape ?? c.FaceShape,
-                skinColor ?? c.SkinColor,
-                feature ?? c.FacialFeature,
-                c.MingleOff,
-                c.Downloaded
+            return Apply(
+                MiiFacialFeatures.Create(
+                    shape ?? c.FaceShape,
+                    skinColor ?? c.SkinColor,
+                    feature ?? c.FacialFeature,
+                    c.MingleOff,
+                    c.Downloaded
+                ),
+                v => mii.MiiFacialFeatures = v
             );
-            if (result.IsFailure)
-                return false;
-            mii.MiiFacialFeatures = result.Value;
-            return true;
         }
 
         yield return new MiiPartDefinition
@@ -268,7 +277,6 @@ public static class MiiEditorParts
             Variants = new MiiVariants(0, 8, m => (int)m.MiiFacialFeatures.FaceShape, (m, v) => SetFace(m, shape: (MiiFaceShape)v))
             {
                 IconPrefix = "MiiFace",
-                StyleIcon = FaceIcon,
             },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.SkinColor),
@@ -298,11 +306,10 @@ public static class MiiEditorParts
         static bool SetMole(Mii mii, bool? exists = null, int? size = null, int? vertical = null, int? horizontal = null)
         {
             var c = mii.MiiMole;
-            var result = MiiMole.Create(exists ?? c.Exists, size ?? c.Size, vertical ?? c.Vertical, horizontal ?? c.Horizontal);
-            if (result.IsFailure)
-                return false;
-            mii.MiiMole = result.Value;
-            return true;
+            return Apply(
+                MiiMole.Create(exists ?? c.Exists, size ?? c.Size, vertical ?? c.Vertical, horizontal ?? c.Horizontal),
+                v => mii.MiiMole = v
+            );
         }
 
         var moleVertical = new MiiStepper(0, 30, m => m.MiiMole.Vertical, (m, v) => SetMole(m, vertical: v));
@@ -331,11 +338,7 @@ public static class MiiEditorParts
         static bool SetHair(Mii mii, int? type = null, MiiHairColor? color = null, bool? flipped = null)
         {
             var c = mii.MiiHair;
-            var result = MiiHair.Create(type ?? c.HairType, color ?? c.MiiHairColor, flipped ?? c.HairFlipped);
-            if (result.IsFailure)
-                return false;
-            mii.MiiHair = result.Value;
-            return true;
+            return Apply(MiiHair.Create(type ?? c.HairType, color ?? c.MiiHairColor, flipped ?? c.HairFlipped), v => mii.MiiHair = v);
         }
 
         yield return new MiiPartDefinition
@@ -346,11 +349,7 @@ public static class MiiEditorParts
             TitleKey = "attribute.mii_section.hair",
             Icon = "MiiHair33",
             StyleIcon = HairIcon,
-            Variants = new MiiVariants(0, 72, m => m.MiiHair.HairType, (m, v) => SetHair(m, type: v))
-            {
-                IconPrefix = "MiiHair",
-                StyleIcon = HairIcon,
-            },
+            Variants = new MiiVariants(0, 72, m => m.MiiHair.HairType, (m, v) => SetHair(m, type: v)) { IconPrefix = "MiiHair" },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.HairColor),
                 m => (int)m.MiiHair.MiiHairColor,
@@ -372,18 +371,17 @@ public static class MiiEditorParts
         )
         {
             var c = mii.MiiEyes;
-            var result = MiiEye.Create(
-                type ?? c.Type,
-                rotation ?? c.Rotation,
-                vertical ?? c.Vertical,
-                color ?? c.Color,
-                size ?? c.Size,
-                spacing ?? c.Spacing
+            return Apply(
+                MiiEye.Create(
+                    type ?? c.Type,
+                    rotation ?? c.Rotation,
+                    vertical ?? c.Vertical,
+                    color ?? c.Color,
+                    size ?? c.Size,
+                    spacing ?? c.Spacing
+                ),
+                v => mii.MiiEyes = v
             );
-            if (result.IsFailure)
-                return false;
-            mii.MiiEyes = result.Value;
-            return true;
         }
 
         yield return new MiiPartDefinition
@@ -394,11 +392,7 @@ public static class MiiEditorParts
             TitleKey = "attribute.mii_section.eyes",
             Icon = "MiiEye02",
             StyleIcon = EyeIcon,
-            Variants = new MiiVariants(0, 48, m => m.MiiEyes.Type, (m, v) => SetEyes(m, type: v))
-            {
-                IconPrefix = "MiiEye",
-                StyleIcon = EyeIcon,
-            },
+            Variants = new MiiVariants(0, 48, m => m.MiiEyes.Type, (m, v) => SetEyes(m, type: v)) { IconPrefix = "MiiEye" },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.EyeColor),
                 m => (int)m.MiiEyes.Color,
@@ -428,18 +422,17 @@ public static class MiiEditorParts
         )
         {
             var c = mii.MiiEyebrows;
-            var result = MiiEyebrow.Create(
-                type ?? c.Type,
-                rotation ?? c.Rotation,
-                color ?? c.Color,
-                size ?? c.Size,
-                vertical ?? c.Vertical,
-                spacing ?? c.Spacing
+            return Apply(
+                MiiEyebrow.Create(
+                    type ?? c.Type,
+                    rotation ?? c.Rotation,
+                    color ?? c.Color,
+                    size ?? c.Size,
+                    vertical ?? c.Vertical,
+                    spacing ?? c.Spacing
+                ),
+                v => mii.MiiEyebrows = v
             );
-            if (result.IsFailure)
-                return false;
-            mii.MiiEyebrows = result.Value;
-            return true;
         }
 
         yield return new MiiPartDefinition
@@ -450,11 +443,7 @@ public static class MiiEditorParts
             TitleKey = "attribute.mii_section.eyebrows",
             Icon = "MiiEyebrow06",
             StyleIcon = BrowIcon,
-            Variants = new MiiVariants(0, 24, m => m.MiiEyebrows.Type, (m, v) => SetBrows(m, type: v))
-            {
-                IconPrefix = "MiiEyebrow",
-                StyleIcon = BrowIcon,
-            },
+            Variants = new MiiVariants(0, 24, m => m.MiiEyebrows.Type, (m, v) => SetBrows(m, type: v)) { IconPrefix = "MiiEyebrow" },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.HairColor),
                 m => (int)m.MiiEyebrows.Color,
@@ -476,11 +465,10 @@ public static class MiiEditorParts
         static bool SetGlasses(Mii mii, MiiGlassesType? type = null, MiiGlassesColor? color = null, int? size = null, int? vertical = null)
         {
             var c = mii.MiiGlasses;
-            var result = MiiGlasses.Create(type ?? c.Type, color ?? c.Color, size ?? c.Size, vertical ?? c.Vertical);
-            if (result.IsFailure)
-                return false;
-            mii.MiiGlasses = result.Value;
-            return true;
+            return Apply(
+                MiiGlasses.Create(type ?? c.Type, color ?? c.Color, size ?? c.Size, vertical ?? c.Vertical),
+                v => mii.MiiGlasses = v
+            );
         }
 
         var glassesColor = new SolidColorBrush(ViewUtils.Colors.Neutral600);
@@ -495,7 +483,6 @@ public static class MiiEditorParts
             Variants = new MiiVariants(1, 9, m => (int)m.MiiGlasses.Type, (m, v) => SetGlasses(m, type: (MiiGlassesType)v))
             {
                 IconPrefix = "MiiGlasses",
-                StyleIcon = b => SkinPartIcon(b, glassesColor),
             },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.GlassesColor),
@@ -517,11 +504,7 @@ public static class MiiEditorParts
         static bool SetNose(Mii mii, MiiNoseType? type = null, int? size = null, int? vertical = null)
         {
             var c = mii.MiiNose;
-            var result = MiiNose.Create(type ?? c.Type, size ?? c.Size, vertical ?? c.Vertical);
-            if (result.IsFailure)
-                return false;
-            mii.MiiNose = result.Value;
-            return true;
+            return Apply(MiiNose.Create(type ?? c.Type, size ?? c.Size, vertical ?? c.Vertical), v => mii.MiiNose = v);
         }
 
         yield return new MiiPartDefinition
@@ -535,7 +518,6 @@ public static class MiiEditorParts
             Variants = new MiiVariants(0, 12, m => (int)m.MiiNose.Type, (m, v) => SetNose(m, type: (MiiNoseType)v))
             {
                 IconPrefix = "MiiNose",
-                StyleIcon = NoseIcon,
             },
             Size = new MiiStepper(0, 8, m => m.MiiNose.Size, (m, v) => SetNose(m, size: v)),
             DragVertical = new MiiDragAxis(new MiiStepper(0, 18, m => m.MiiNose.Vertical, (m, v) => SetNose(m, vertical: v)))
@@ -548,11 +530,7 @@ public static class MiiEditorParts
         static bool SetLips(Mii mii, int? type = null, MiiLipColor? color = null, int? size = null, int? vertical = null)
         {
             var c = mii.MiiLips;
-            var result = MiiLip.Create(type ?? c.Type, color ?? c.Color, size ?? c.Size, vertical ?? c.Vertical);
-            if (result.IsFailure)
-                return false;
-            mii.MiiLips = result.Value;
-            return true;
+            return Apply(MiiLip.Create(type ?? c.Type, color ?? c.Color, size ?? c.Size, vertical ?? c.Vertical), v => mii.MiiLips = v);
         }
 
         yield return new MiiPartDefinition
@@ -563,11 +541,7 @@ public static class MiiEditorParts
             TitleKey = "attribute.mii_section.lips",
             Icon = "MiiMouth23",
             StyleIcon = MouthIcon,
-            Variants = new MiiVariants(0, 24, m => m.MiiLips.Type, (m, v) => SetLips(m, type: v))
-            {
-                IconPrefix = "MiiMouth",
-                StyleIcon = MouthIcon,
-            },
+            Variants = new MiiVariants(0, 24, m => m.MiiLips.Type, (m, v) => SetLips(m, type: v)) { IconPrefix = "MiiMouth" },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.LipBottomColor),
                 m => (int)m.MiiLips.Color,
@@ -591,17 +565,16 @@ public static class MiiEditorParts
         )
         {
             var c = mii.MiiFacialHair;
-            var result = MiiFacialHair.Create(
-                mustache ?? c.MiiMustacheType,
-                beard ?? c.MiiBeardType,
-                color ?? c.Color,
-                size ?? c.Size,
-                vertical ?? c.Vertical
+            return Apply(
+                MiiFacialHair.Create(
+                    mustache ?? c.MiiMustacheType,
+                    beard ?? c.MiiBeardType,
+                    color ?? c.Color,
+                    size ?? c.Size,
+                    vertical ?? c.Vertical
+                ),
+                v => mii.MiiFacialHair = v
             );
-            if (result.IsFailure)
-                return false;
-            mii.MiiFacialHair = result.Value;
-            return true;
         }
 
         var facialHairColors = new MiiColors(
@@ -620,7 +593,6 @@ public static class MiiEditorParts
             Variants = new MiiVariants(1, 4, m => (int)m.MiiFacialHair.MiiBeardType, (m, v) => SetFacialHair(m, beard: (MiiBeardType)v))
             {
                 IconPrefix = "MiiGoatee",
-                StyleIcon = b => SkinPartIcon(b, black),
             },
             Colors = facialHairColors,
             Presence = new MiiPresence(
@@ -645,7 +617,6 @@ public static class MiiEditorParts
             )
             {
                 IconPrefix = "MiiMustache",
-                StyleIcon = b => SkinPartIcon(b, black),
             },
             Colors = facialHairColors,
             Presence = new MiiPresence(

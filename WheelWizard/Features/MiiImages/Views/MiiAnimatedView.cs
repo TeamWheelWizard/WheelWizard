@@ -63,7 +63,7 @@ public sealed class MiiAnimatedView : BaseMiiImage
     private bool _seen;
 
     public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty =
-        MiiAnimatedImage.ImageVariantProperty.AddOwner<MiiAnimatedView>();
+        MiiImageControl.ImageVariantProperty.AddOwner<MiiAnimatedView>();
 
     public MiiImageSpecifications ImageVariant
     {
@@ -98,23 +98,6 @@ public sealed class MiiAnimatedView : BaseMiiImage
         set => SetValue(MaxFramesPerSecondProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush> LoadingColorProperty = MiiAnimatedImage.LoadingColorProperty.AddOwner<MiiAnimatedView>();
-
-    public IBrush LoadingColor
-    {
-        get => GetValue(LoadingColorProperty);
-        set => SetValue(LoadingColorProperty, value);
-    }
-
-    public static readonly StyledProperty<IBrush> FallBackColorProperty =
-        MiiAnimatedImage.FallBackColorProperty.AddOwner<MiiAnimatedView>();
-
-    public IBrush FallBackColor
-    {
-        get => GetValue(FallBackColorProperty);
-        set => SetValue(FallBackColorProperty, value);
-    }
-
     public MiiAnimatedView(
         IMiiImagesSingletonService images,
         ISeasonalCalendar calendar,
@@ -131,8 +114,8 @@ public sealed class MiiAnimatedView : BaseMiiImage
         _random = random;
         _settings = settings;
         _still = new MiiImageView(images, calendar) { IsVisible = false };
-        _still.Bind(MiiImageView.LoadingColorProperty, this.GetObservable(LoadingColorProperty));
-        _still.Bind(MiiImageView.FallBackColorProperty, this.GetObservable(FallBackColorProperty));
+        _still.Bind(LoadingColorProperty, this.GetObservable(LoadingColorProperty));
+        _still.Bind(FallBackColorProperty, this.GetObservable(FallBackColorProperty));
         _still.MiiImageLoaded += (_, _) => MiiLoaded = true;
         _host.Children.Add(_still);
         Content = _host;

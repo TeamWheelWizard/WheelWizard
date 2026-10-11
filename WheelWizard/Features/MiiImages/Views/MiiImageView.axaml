@@ -37,15 +37,15 @@
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
               Margin="{Binding ImageOnlyMargin, ElementName=Self}" Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Grid.RowSpan="3">
            
-            <!-- LowQuality (or Normal if low quality doesn't exist) -->
+            <!-- Normal (or low quality while the full one loads) -->
             <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                    Source="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.First }}"
-                   IsVisible="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.SecondIsNull }}"/>
+                   IsVisible="{Binding !ShowSecondImage, ElementName=Self}"/>
            
-            <!-- Normal (if low quality exists) -->
+            <!-- Full quality, or the hover expression while hovered -->
             <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                    Source="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.Second }}"
-                   IsVisible="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.SecondIsNotNull }}"/>
+                   IsVisible="{Binding ShowSecondImage, ElementName=Self}"/>
         </Grid>
      
     </components:AspectGrid>

@@ -55,10 +55,10 @@ public partial class MiiRenderView : BaseMiiImage
     private float _currentCameraVerticalOffset;
     private float _currentZoom = 1f;
 
-    public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty = AvaloniaProperty.Register<
-        MiiRenderView,
-        MiiImageSpecifications
-    >(nameof(ImageVariant), MiiImageVariants.OnlinePlayerSmall, coerce: CoerceVariant);
+    public static readonly StyledProperty<MiiImageSpecifications> ImageVariantProperty =
+        MiiImageControl.ImageVariantProperty.AddOwner<MiiRenderView>(
+            new StyledPropertyMetadata<MiiImageSpecifications>(coerce: CoerceVariant)
+        );
 
     public MiiImageSpecifications ImageVariant
     {
@@ -66,10 +66,8 @@ public partial class MiiRenderView : BaseMiiImage
         set => SetValue(ImageVariantProperty, value);
     }
 
-    public static readonly StyledProperty<bool> InteractiveProperty = AvaloniaProperty.Register<MiiRenderView, bool>(
-        nameof(Interactive),
-        true,
-        coerce: CoerceInteractive
+    public static readonly StyledProperty<bool> InteractiveProperty = Mii3DRender.InteractiveProperty.AddOwner<MiiRenderView>(
+        new StyledPropertyMetadata<bool>(coerce: CoerceInteractive)
     );
 
     public bool Interactive
