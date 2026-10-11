@@ -114,6 +114,9 @@ public class ApplicationCompositionTests
                 modsLoaded.SetResult(OperationResult.Ok());
             }
             var original = Assert.IsType<Layout>(desktop.MainWindow);
+            // The shell is fixed-size on every platform, including Linux tiling desktops.
+            Assert.False(original.CanResize);
+            Assert.False(original.CanMaximize);
             original.UpdateLayout();
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             var navigation = services.GetRequiredService<INavigationService>();

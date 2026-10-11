@@ -13,6 +13,7 @@
         x:DataType="dialogBase:PopupWindow"
         Title="{Binding WindowTitle}"
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base">
+    <!-- SizeToContent owns the entire frame size; modal content stays at its natural scale. -->
     <Grid x:Name="WindowFrame" RowDefinitions="30,*">
         <Border Background="{StaticResource FrameColor}" PointerPressed="TopBar_PointerPressed"
                 WindowDecorationProperties.ElementRole="TitleBar">

@@ -4,36 +4,21 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml.MarkupExtensions;
-using Avalonia.Media;
 using WheelWizard.Views.Shell;
 
 namespace WheelWizard.Views.Dialogs.Base;
 
 public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 {
-    public static readonly StyledProperty<double> RequestedWindowScaleProperty = AvaloniaProperty.Register<PopupWindow, double>(
-        nameof(RequestedWindowScale),
-        1
-    );
-
-    public double RequestedWindowScale
-    {
-        get => GetValue(RequestedWindowScaleProperty);
-        set => SetValue(RequestedWindowScaleProperty, value);
-    }
-
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => WindowFrame;
 
     private bool _disableOpening = false;
-    private bool _closed;
 
     public PopupWindow()
     {
         // Constructor is never used, however, UI elements must have a constructor with no params
         InitializeComponent();
-        this.Bind(RequestedWindowScaleProperty, new DynamicResourceExtension(WindowAppearance.ScaleResourceKey));
         DataContext = this;
         Loaded += PopupWindow_Loaded;
     }
@@ -106,7 +91,6 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
         AllowParentInteraction = allowParentInteraction;
 
         InitializeComponent();
-        this.Bind(RequestedWindowScaleProperty, new DynamicResourceExtension(WindowAppearance.ScaleResourceKey));
         DataContext = this;
 
         var mainWindow = TryGetVisibleMainWindow();
@@ -153,31 +137,6 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
         BeforeOpen();
     }
 
-    protected override void OnResized(WindowResizedEventArgs e)
-    {
-        base.OnResized(e);
-
-        if (_closed || CompleteBorder == null)
-            return;
-
-        CompleteBorder.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
-        var desiredSize = CompleteBorder.DesiredSize;
-        SetWindowSize(desiredSize);
-    }
-
-    public void SetWindowSize(Size size)
-    {
-        if (_closed)
-            return;
-        var scaleFactor = ViewUtils.GetUsableWindowScale(RequestedWindowScale, size, this, 30);
-        Width = size.Width * scaleFactor;
-        Height = size.Height * scaleFactor + 30;
-        CompleteGrid.RenderTransform = new ScaleTransform(scaleFactor, scaleFactor);
-        var marginXCorrection = ((scaleFactor * size.Width) - size.Width) / 2f;
-        var marginYCorrection = ((scaleFactor * size.Height) - size.Height) / 2f;
-        CompleteGrid.Margin = new(marginXCorrection, marginYCorrection);
-    }
-
     protected void TopBar_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
@@ -195,7 +154,6 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 
     protected override void OnClosed(EventArgs e)
     {
-        _closed = true;
         BeforeClose();
 
         base.OnClosed(e);

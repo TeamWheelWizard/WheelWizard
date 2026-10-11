@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -108,10 +107,6 @@ public partial class Layout : BaseWindow, IPollingListener
         _autoUpdater = autoUpdater;
         _autoUpdater.UpdateAvailable += OnUpdateAvailable;
         UpdateVersionBadge();
-
-        // Respects tiling window managers better if resizable.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            CanResize = true;
 
         Navigation.PageChanged += Navigation_OnPageChanged;
         foreach (var button in SidePanelButtons.Children.OfType<SidebarRadioButton>())

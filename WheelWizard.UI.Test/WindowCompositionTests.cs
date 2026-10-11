@@ -1,17 +1,25 @@
+using System.Linq.Expressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
-using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using WheelWizard.Models;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
+using WheelWizard.Shared;
+using WheelWizard.Shared.Services;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Dialogs.Base;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Controls;
+using WheelWizard.WheelWizardData.ViewModels;
+using WheelWizard.WheelWizardData.Views;
+using WheelWizard.WheelWizardData.Views.Dialogs;
 
 namespace WheelWizard.UI.Test;
 
@@ -164,26 +172,6 @@ public class WindowCompositionTests
     }
 
     [AvaloniaFact]
-    public void PopupScale_UsesApplicationResourcesWithoutAServiceProvider()
-    {
-        Application.Current!.Resources[WindowAppearance.ScaleResourceKey] = 1.5;
-        var popup = new PopupWindow(true, false, false, "Scale test");
-        try
-        {
-            popup.Show();
-            popup.UpdateLayout();
-            Assert.Equal(1.5, popup.RequestedWindowScale);
-            Application.Current.Resources[WindowAppearance.ScaleResourceKey] = 1.25;
-            Assert.Equal(1.25, popup.RequestedWindowScale);
-        }
-        finally
-        {
-            popup.Close();
-            Application.Current.Resources.Remove(WindowAppearance.ScaleResourceKey);
-        }
-    }
-
-    [AvaloniaFact]
     public void OwnedPopups_DisableOnlyTheirWindowGroup_AndRestoreInteraction()
     {
         var first = new TestWindow();
@@ -240,25 +228,48 @@ public class WindowCompositionTests
     }
 
     [AvaloniaTheory]
-    [InlineData(0.75)]
+    [InlineData(0.5)]
+    [InlineData(1.0)]
     [InlineData(1.5)]
-    public void Popup_TitleBarDoesNotScaleWithContent(double scale)
+    [InlineData(2.0)]
+    public void Popup_ContentDoesNotFollowMainWindowScale(double mainWindowScale)
     {
-        var popup = new PopupWindow(true, false, false, "Scale test") { RequestedWindowScale = scale };
+        var resources = Application.Current!.Resources;
+        var hadScale = resources.TryGetValue(WindowAppearance.ScaleResourceKey, out var previousScale);
+        resources[WindowAppearance.ScaleResourceKey] = 1.0;
+        var content = new SizedPopup();
+        var popup = content.Host;
         try
         {
-            popup.SetWindowSize(new Size(300, 200));
-            Assert.Equal(300 * scale, popup.Width);
-            Assert.Equal(200 * scale + 30, popup.Height);
+            content.Show();
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var size = popup.ClientSize;
+            var textBounds = content.Label.Bounds;
+            var buttonBounds = content.BottomButton.Bounds;
+
+            resources[WindowAppearance.ScaleResourceKey] = mainWindowScale;
+            popup.InvalidateMeasure();
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(size, popup.ClientSize);
+            Assert.Equal(textBounds, content.Label.Bounds);
+            Assert.Equal(buttonBounds, content.BottomButton.Bounds);
+            Assert.Equal(16, content.Label.FontSize);
             Assert.Equal(30, popup.ExtendClientAreaTitleBarHeightHint);
             Assert.Equal(WindowDecorations.Full, popup.WindowDecorations);
-            var root = Assert.IsType<Grid>(popup.Content);
-            Assert.Null(root.RenderTransform);
-            Assert.Equal(30, root.RowDefinitions[0].Height.Value);
+            Assert.Equal(SizeToContent.WidthAndHeight, popup.SizeToContent);
+            Assert.Null(popup.FindControl<Grid>("CompleteGrid")!.RenderTransform);
+            AssertInsideWindow(content.BottomButton, popup);
         }
         finally
         {
             popup.Close();
+            if (hadScale)
+                resources[WindowAppearance.ScaleResourceKey] = previousScale;
+            else
+                resources.Remove(WindowAppearance.ScaleResourceKey);
         }
     }
 
@@ -348,28 +359,162 @@ public class WindowCompositionTests
         }
     }
 
-    [AvaloniaTheory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void PopupSize_ScreenCapCanReduceScaleBelowConfiguredMinimum(bool constrainedWidth)
+    [AvaloniaFact]
+    public void Popup_AutoSizingFollowsContentGrowthAndShrinkage()
     {
-        var popup = new PopupWindow { RequestedWindowScale = SettingValues.MinWindowScale };
+        var content = new SizedPopup();
+        var popup = content.Host;
         try
         {
-            var screen = popup.Screens.Primary;
-            Assert.NotNull(screen);
-            var available = new Size(screen.WorkingArea.Width / screen.Scaling, screen.WorkingArea.Height / screen.Scaling);
-            var size = constrainedWidth
-                ? new Size(available.Width * 1.25 / SettingValues.MinWindowScale, 200)
-                : new Size(300, available.Height / SettingValues.MinWindowScale);
-            popup.SetWindowSize(size);
-            Assert.InRange(popup.Width, double.Epsilon, available.Width + 0.001);
-            Assert.InRange(popup.Height, 30, available.Height + 0.001);
-            Assert.True(popup.Width / size.Width < SettingValues.MinWindowScale);
+            content.Show();
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var initialSize = popup.ClientSize;
+            foreach (var height in new[] { 330.0, 200.0, 260.0, 200.0 })
+            {
+                content.Root.Height = height;
+                popup.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+                Assert.Equal(initialSize.Width, popup.ClientSize.Width);
+                Assert.Equal(initialSize.Height + height - 200, popup.ClientSize.Height);
+                Assert.Equal(16, content.Label.FontSize);
+                AssertInsideWindow(content.BottomButton, popup);
+            }
         }
         finally
         {
             popup.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void MessagePopup_GrowsForLateContentWithoutEnlargingItsTitle()
+    {
+        var content = new MessageBoxWindow().SetTitleText("A stable title").SetInfoText("Loading...");
+        try
+        {
+            content.Show();
+            var popup = Assert.IsType<PopupWindow>(TopLevel.GetTopLevel(content));
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var initialSize = popup.ClientSize;
+            var title = content.FindControl<SelectableTextBlock>("MessageTitleBlock")!;
+            var titleSize = title.Bounds.Size;
+            var titleFontSize = title.FontSize;
+
+            content.SetInfoText(string.Join("\n", Enumerable.Repeat("Information loaded after opening.", 15)));
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(popup.ClientSize.Height > initialSize.Height);
+            Assert.Equal(initialSize.Width, popup.ClientSize.Width);
+            Assert.Equal(titleSize, title.Bounds.Size);
+            Assert.Equal(titleFontSize, title.FontSize);
+            foreach (var button in content.GetVisualDescendants().OfType<Button>())
+                AssertInsideWindow(button, popup);
+        }
+        finally
+        {
+            content.Close();
+        }
+    }
+
+    private static void AssertInsideWindow(Control control, PopupWindow popup)
+    {
+        var position = control.TranslatePoint(default, popup)!.Value;
+        Assert.True(position.X >= 0 && position.Y >= 30);
+        Assert.True(position.X + control.Bounds.Width <= popup.ClientSize.Width);
+        Assert.True(position.Y + control.Bounds.Height <= popup.ClientSize.Height);
+    }
+
+    [AvaloniaFact]
+    public async Task PlayerProfilePopup_FitsLateProfileAndHistoryWithoutScalingContent()
+    {
+        var profileReady = new TaskCompletionSource<OperationResult<PlayerProfileResponse>>();
+        var historyReady = new TaskCompletionSource<OperationResult<RwfcPlayerVrHistoryResponse>>();
+        var caller = Substitute.For<IApiCaller<IRwfcApi>>();
+        caller.CallApiAsync(Arg.Any<Expression<Func<IRwfcApi, Task<PlayerProfileResponse>>>>()).Returns(profileReady.Task);
+        caller.CallApiAsync(Arg.Any<Expression<Func<IRwfcApi, Task<RwfcPlayerVrHistoryResponse>>>>()).Returns(historyReady.Task);
+        using var model = new VrHistoryViewModel(caller);
+        var history = new VrHistoryGraph(model);
+        var content = new PlayerProfileWindow(history, caller, "1234-5678-9012");
+        var loaded = new TaskCompletionSource();
+        content.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(content.IsLoading) && !content.IsLoading)
+                loaded.TrySetResult();
+        };
+        try
+        {
+            content.Show();
+            var popup = Assert.IsType<PopupWindow>(TopLevel.GetTopLevel(content));
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var initialWidth = popup.ClientSize.Width;
+            Assert.True(content.IsLoading);
+
+            profileReady.SetResult(new PlayerProfileResponse
+            {
+                Name = "Profile layout test",
+                FriendCode = "1234-5678-9012",
+                LastSeen = DateTime.UtcNow,
+                Vr = 12000,
+                Rank = 42,
+            });
+            await loaded.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var title = content.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Text == "Profile layout test");
+            var titleSize = title.Bounds.Size;
+            Assert.Equal(20, title.FontSize);
+            Assert.Equal(initialWidth, popup.ClientSize.Width);
+            AssertInsideWindow(title, popup);
+
+            historyReady.SetResult(new RwfcPlayerVrHistoryResponse
+            {
+                FromDate = DateTime.UtcNow.AddDays(-1),
+                ToDate = DateTime.UtcNow,
+                StartingVr = 11000,
+                EndingVr = 12000,
+                TotalVrChange = 1000,
+                History =
+                [
+                    new() { Date = DateTime.UtcNow.AddDays(-1), TotalVr = 11000 },
+                    new() { Date = DateTime.UtcNow, TotalVr = 12000, VrChange = 1000 },
+                ],
+            });
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(history.HasData);
+            Assert.False(history.IsLoading);
+            Assert.Equal(initialWidth, popup.ClientSize.Width);
+            Assert.Equal(titleSize, title.Bounds.Size);
+            Assert.Equal(20, title.FontSize);
+            AssertInsideWindow(title, popup);
+            AssertInsideWindow(content.GetVisualDescendants().OfType<ScrollViewer>().First(), popup);
+            Assert.Null(popup.FindControl<Grid>("CompleteGrid")!.RenderTransform);
+        }
+        finally
+        {
+            content.Close();
+        }
+    }
+
+    private sealed class SizedPopup : PopupContent
+    {
+        public PopupWindow Host => Window;
+        public Grid Root { get; }
+        public TextBlock Label { get; } = new() { Text = "Unscaled modal content", FontSize = 16 };
+        public Button BottomButton { get; } = new() { Content = "Bottom button" };
+
+        public SizedPopup() : base(true, false, false, "Scale test")
+        {
+            Root = new Grid { Width = 300, Height = 200, RowDefinitions = RowDefinitions.Parse("Auto,*,Auto") };
+            Grid.SetRow(BottomButton, 2);
+            Root.Children.Add(Label);
+            Root.Children.Add(BottomButton);
+            Content = Root;
         }
     }
 

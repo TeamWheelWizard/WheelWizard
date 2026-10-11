@@ -146,7 +146,9 @@ public class Program : IDesignerEntryPoint
         // NOTE: UseWayland() will prevent fallback to X11.
         if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") is not null)
         {
+#pragma warning disable AVALONIA_WAYLAND_FORCE_CSD
             builder = builder.With(new WaylandPlatformOptions { ForceDrawnDecorations = true }).UseWayland();
+#pragma warning restore AVALONIA_WAYLAND_FORCE_CSD
         }
 
         return builder;

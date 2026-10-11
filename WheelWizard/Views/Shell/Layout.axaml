@@ -12,7 +12,7 @@
         WindowDecorations="Full"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="30"
-        CanResize='False' Background="Transparent"
+        CanResize="False" CanMaximize="False" Background="Transparent"
         xmlns:mods="clr-namespace:WheelWizard.Mods.Views"
         xmlns:miis="clr-namespace:WheelWizard.WiiManagement.MiiManagement.Views"
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
