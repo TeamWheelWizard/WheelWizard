@@ -12,11 +12,9 @@
         <StreamGeometry x:Key="MiiEditorFeatureIcon">M12,2 A10,10 0 1 0 22,12 A10,10 0 0 0 12,2 Z M12,4 A8,8 0 1 1 4,12 A8,8 0 0 1 12,4 Z M5.6,13.4 L8.6,12.4 L9,13.5 L6,14.5 Z M6.4,15.6 L9.4,14.6 L9.8,15.7 L6.8,16.7 Z M18.4,13.4 L15.4,12.4 L15,13.5 L18,14.5 Z M17.6,15.6 L14.6,14.6 L14.2,15.7 L17.2,16.7 Z</StreamGeometry>
         <StreamGeometry x:Key="MiiEditorBiggerIcon">M3,3 L10,3 L10,5.4 L7.1,5.4 L10.9,9.2 L9.2,10.9 L5.4,7.1 L5.4,10 L3,10 Z M21,21 L14,21 L14,18.6 L16.9,18.6 L13.1,14.8 L14.8,13.1 L18.6,16.9 L18.6,14 L21,14 Z</StreamGeometry>
         <StreamGeometry x:Key="MiiEditorSmallerIcon">M10.5,10.5 L3.5,10.5 L3.5,8.1 L6.4,8.1 L2.6,4.3 L4.3,2.6 L8.1,6.4 L8.1,3.5 L10.5,3.5 Z M13.5,13.5 L20.5,13.5 L20.5,15.9 L17.6,15.9 L21.4,19.7 L19.7,21.4 L15.9,17.6 L15.9,20.5 L13.5,20.5 Z</StreamGeometry>
-        <!-- Figures at the ends of the body sliders. -->
-        <StreamGeometry x:Key="MiiEditorTallIcon">M9,4 A3,3 0 1 0 15,4 A3,3 0 1 0 9,4 Z M8.5,23 L8.5,11.5 A3.5,3.5 0 0 1 15.5,11.5 L15.5,23 Z</StreamGeometry>
-        <StreamGeometry x:Key="MiiEditorShortIcon">M9,11 A3,3 0 1 0 15,11 A3,3 0 1 0 9,11 Z M8.5,23 L8.5,18.5 A3.5,3.5 0 0 1 15.5,18.5 L15.5,23 Z</StreamGeometry>
-        <StreamGeometry x:Key="MiiEditorWideIcon">M9,5 A3,3 0 1 0 15,5 A3,3 0 1 0 9,5 Z M5,22 L5,13 A4,4 0 0 1 9,9 L15,9 A4,4 0 0 1 19,13 L19,22 Z</StreamGeometry>
-        <StreamGeometry x:Key="MiiEditorThinIcon">M9,5 A3,3 0 1 0 15,5 A3,3 0 1 0 9,5 Z M9.5,22 L9.5,11.5 A2.5,2.5 0 0 1 14.5,11.5 L14.5,22 Z</StreamGeometry>
+        <!-- Above the body sliders: a ruler for height, a hanging weight for weight. -->
+        <StreamGeometry x:Key="MiiEditorHeightIcon">M0 48C0 21.5 21.5 0 48 0L208 0c26.5 0 48 21.5 48 48l0 48-80 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l80 0 0 64-80 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l80 0 0 64-80 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l80 0 0 64-80 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l80 0 0 48c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 48z</StreamGeometry>
+        <StreamGeometry x:Key="MiiEditorWeightIcon">M224 96a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm122.5 32c3.5-10 5.5-20.8 5.5-32c0-53-43-96-96-96s-96 43-96 96c0 11.2 1.9 22 5.5 32L120 128c-22 0-41.2 15-46.6 36.4l-72 288c-3.6 14.3-.4 29.5 8.7 41.2S33.2 512 48 512l416 0c14.8 0 28.7-6.8 37.8-18.5s12.3-26.8 8.7-41.2l-72-288C427.2 143 408 128 386 128l-39.5 0z</StreamGeometry>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -101,16 +99,16 @@
         <!-- Upright body sliders. -->
         <Style Selector="StackPanel.BodySlider">
             <Setter Property="Width" Value="44" />
-            <Setter Property="Spacing" Value="4" />
+            <Setter Property="Spacing" Value="8" />
         </Style>
         <Style Selector="StackPanel.BodySlider PathIcon">
-            <Setter Property="Width" Value="26" />
-            <Setter Property="Height" Value="26" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
             <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
         </Style>
-        <Style Selector="StackPanel.BodySlider PathIcon.Low">
-            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+        <Style Selector="StackPanel.BodySlider:pointerover PathIcon">
+            <Setter Property="Foreground" Value="{StaticResource Brand300}" />
         </Style>
         <Style Selector="StackPanel.BodySlider Slider">
             <Setter Property="Height" Value="210" />
@@ -192,21 +190,19 @@
             <StackPanel x:Name="ToolItems" Spacing="6" />
         </Border>
 
-        <!-- Body: height and weight, as two upright sliders with a figure at each end (tall/short, wide/thin). -->
+        <!-- Body: height and weight, as two upright sliders with an icon on top. -->
         <Border x:Name="BodyPanel" Classes="Floating Bare hidden" Padding="6,12"
                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0">
             <StackPanel Orientation="Horizontal" Spacing="6">
                 <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.height}">
-                    <PathIcon Data="{StaticResource MiiEditorTallIcon}" />
+                    <PathIcon Data="{StaticResource MiiEditorHeightIcon}" />
                     <Slider x:Name="HeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
                             ValueChanged="HeightSlider_OnValueChanged" />
-                    <PathIcon Classes="Low" Data="{StaticResource MiiEditorShortIcon}" />
                 </StackPanel>
                 <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.width}">
-                    <PathIcon Data="{StaticResource MiiEditorWideIcon}" />
+                    <PathIcon Data="{StaticResource MiiEditorWeightIcon}" />
                     <Slider x:Name="WeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
                             ValueChanged="WeightSlider_OnValueChanged" />
-                    <PathIcon Classes="Low" Data="{StaticResource MiiEditorThinIcon}" />
                 </StackPanel>
             </StackPanel>
         </Border>

@@ -33,25 +33,26 @@
         <Style Selector="^ /template/ Grid#HorizontalTemplate">
             <Setter Property="Height" Value="40" />
         </Style>
-        <Style Selector="^ /template/ Thumb#thumb">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Border Width="26" Height="26" x:Name="PART_ThumbBorder"
-                                Background="{StaticResource Neutral500}"
-                                BorderBrush="Transparent"
-                                BorderThickness="10" Padding="1"
-                                CornerRadius="100">
-                            <Ellipse Width="10" Height="10" x:Name="PART_ThumbDot"
-                                     Fill="{StaticResource Neutral700}"
-                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Style>
-    
+    <!-- The vertical template names its thumb differently. -->
+    <Style Selector="Slider /template/ Thumb#thumb, Slider /template/ Thumb#SliderThumb">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Border Width="26" Height="26" x:Name="PART_ThumbBorder"
+                            Background="{StaticResource Neutral500}"
+                            BorderBrush="Transparent"
+                            BorderThickness="10" Padding="1"
+                            CornerRadius="100">
+                        <Ellipse Width="10" Height="10" x:Name="PART_ThumbDot"
+                                 Fill="{StaticResource Neutral700}"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style Selector="Slider:pointerover /template/ Track#PART_Track">
         <Style Selector="^ RepeatButton#PART_IncreaseButton">
             <Setter Property="Background" Value="{StaticResource Neutral500}" />
