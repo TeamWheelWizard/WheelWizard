@@ -146,7 +146,7 @@ public class Program : IDesignerEntryPoint
         // NOTE: UseWayland() will prevent fallback to X11.
         if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") is not null)
         {
-            builder = builder.UseWayland();
+            builder = builder.With(new WaylandPlatformOptions { ForceDrawnDecorations = true }).UseWayland();
         }
 
         return builder;
