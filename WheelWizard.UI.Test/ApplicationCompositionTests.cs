@@ -1,14 +1,19 @@
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq.Expressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Testably.Abstractions.Testing;
 using WheelWizard.ApplicationData;
+using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
 using WheelWizard.Mods.Views;
@@ -17,7 +22,10 @@ using WheelWizard.Settings;
 using WheelWizard.Settings.Views;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Services;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.DesignTime;
+using WheelWizard.Views.Dialogs;
+using WheelWizard.Views.Dialogs.Base;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Controls;
 using WheelWizard.Views.Shell.Navigation;
@@ -34,8 +42,13 @@ public class ApplicationCompositionTests
     [InlineData("ready")]
     [InlineData("timeout")]
     [InlineData("shutdown")]
-    public async Task MainWindowAndPages_ConstructWithoutStaticServiceInitialization_AndRefreshSafely(string completion)
+    public async Task MainWindowAndPages_ConstructWithoutStaticServiceInitialization_AndChangeLanguageInPlace(string completion)
     {
+        var previousLocalization = LocalizationProvider.Current;
+        var previousCulture = CultureInfo.CurrentCulture;
+        var previousUiCulture = CultureInfo.CurrentUICulture;
+        var previousDefaultCulture = CultureInfo.DefaultThreadCurrentCulture;
+        var previousDefaultUiCulture = CultureInfo.DefaultThreadCurrentUICulture;
         var fileSystem = new MockFileSystem();
         var directory = Path.Combine(Path.GetTempPath(), "wheelwizard-ui-composition");
         fileSystem.Directory.CreateDirectory(directory);
@@ -75,6 +88,8 @@ public class ApplicationCompositionTests
         services.GetRequiredService<MiiControlThemes>().Install(Application.Current!.Resources);
         services.GetRequiredService<WindowAppearance>().Install(Application.Current.Resources);
         var desktop = Substitute.For<IClassicDesktopStyleApplicationLifetime>();
+        PopupWindow? confirmation = null;
+        using var popupOpened = Window.WindowOpenedEvent.AddClassHandler<PopupWindow>((popup, _) => confirmation = popup);
         var windows = services.GetRequiredService<IMainWindowService>();
         try
         {
@@ -150,18 +165,63 @@ public class ApplicationCompositionTests
                     Assert.Equal(sidebarPosition, sidebar.TranslatePoint(default, original));
                 }
             }
-            navigation.NavigateTo<HomePage>();
-            windows.Refresh();
-            Assert.IsType<Layout>(desktop.MainWindow);
-            Assert.NotSame(original, desktop.MainWindow);
-            Assert.False(original.IsVisible);
-            Assert.True(desktop.MainWindow!.IsVisible);
+            navigation.NavigateTo<SettingsPage>(typeof(AppearanceSettings));
+            original.UpdateLayout();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            var settingsPage = Assert.IsType<SettingsPage>(navigation.CurrentPage);
+            var settingsContent = settingsPage.FindControl<ContentControl>("SettingsContent")!;
+            var appearance = Assert.IsType<AppearanceSettings>(settingsContent.Content);
+            var languages = appearance.FindControl<Dropdown>("WhWzLanguageDropdown")!;
+            Assert.Equal("Settings", settingsPage.FindControl<TextBlock>("SettingsTitle")!.Text);
+            // Cancel leaves both the setting and the selected language unchanged.
+            languages.SelectedIndex = 1;
+            var cancelPopup = Assert.IsType<PopupWindow>(confirmation);
+            var cancelQuestion = Assert.IsType<YesNoWindow>(cancelPopup.FindControl<ContentPresenter>("PopupContent")!.Content);
+            cancelQuestion.FindControl<ActionButton>("NoButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            Assert.Equal("en", settings.WW_LANGUAGE.Value);
+            Assert.Equal(0, languages.SelectedIndex);
+
+            foreach (var language in new[] { "nl", "de", "en" })
+            {
+                languages.SelectedItem = languages.Items.Single(item =>
+                    item!.ToString() == LocalizationProvider.GetLanguageDisplayName(language)
+                );
+                var popup = Assert.IsType<PopupWindow>(confirmation);
+                var question = Assert.IsType<YesNoWindow>(popup.FindControl<ContentPresenter>("PopupContent")!.Content);
+                question.FindControl<ActionButton>("YesButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+                original.UpdateLayout();
+                Assert.Equal(language, settings.WW_LANGUAGE.Value);
+                Assert.Equal(language, LocalizationProvider.Current.CurrentLanguage);
+                Assert.Same(original, desktop.MainWindow);
+                Assert.True(original.IsVisible);
+                Assert.True(original.CompleteContentEnabled);
+                Assert.Same(settingsPage, navigation.CurrentPage);
+                Assert.Same(appearance, settingsContent.Content);
+                Assert.Equal(
+                    LocalizationProvider.Translate("page_title.settings"),
+                    settingsPage.FindControl<TextBlock>("SettingsTitle")!.Text
+                );
+                Assert.Contains(
+                    appearance.GetVisualDescendants().OfType<FormFieldLabel>(),
+                    label => label.Text == LocalizationProvider.Translate("option.wh_wz_language")
+                );
+                Assert.Equal(LocalizationProvider.Translate("component.dropdown.search_placeholder"), languages.SearchPlaceholder);
+                Assert.Equal(LocalizationProvider.Translate("component.dropdown.empty"), languages.EmptyText);
+            }
             Assert.Equal(Avalonia.Controls.ShutdownMode.OnMainWindowClose, desktop.ShutdownMode);
+            desktop.DidNotReceive().Shutdown(Arg.Any<int>());
         }
         finally
         {
             desktop.MainWindow?.Close();
             desktop.MainWindow = null;
+            CultureInfo.CurrentCulture = previousCulture;
+            CultureInfo.CurrentUICulture = previousUiCulture;
+            CultureInfo.DefaultThreadCurrentCulture = previousDefaultCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = previousDefaultUiCulture;
+            LocalizationProvider.Use(previousLocalization);
         }
     }
 

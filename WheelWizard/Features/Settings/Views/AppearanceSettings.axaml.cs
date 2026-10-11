@@ -12,7 +12,6 @@ public partial class AppearanceSettings : UserControl
 {
     private ISettingsManager SettingsService { get; }
 
-    private readonly IMainWindowService _mainWindow;
     private readonly ISettingsLocalizationService LocalizationService;
     private readonly bool _pageLoaded;
     private bool _editingScale;
@@ -23,15 +22,10 @@ public partial class AppearanceSettings : UserControl
         public override string ToString() => DisplayName;
     }
 
-    public AppearanceSettings(
-        ISettingsManager settingsService,
-        ISettingsLocalizationService localizationService,
-        IMainWindowService mainWindow
-    )
+    public AppearanceSettings(ISettingsManager settingsService, ISettingsLocalizationService localizationService)
     {
         SettingsService = settingsService;
         LocalizationService = localizationService;
-        _mainWindow = mainWindow;
         InitializeComponent();
         EnableAnimations.IsChecked = SettingsService.ENABLE_ANIMATIONS.Get();
         LoadSettings();
@@ -56,15 +50,22 @@ public partial class AppearanceSettings : UserControl
         // IMPORTANT: Make sure that the number and percentage is always the last word in the string,
         // If you don't want this, you should change the code below that parses the string back to an actual value
 
-        foreach (var scale in SettingValues.WindowScales)
+        _editingScale = true;
+        try
         {
-            WindowScaleDropdown.Items.Add(ScaleToString(scale));
-        }
+            WindowScaleDropdown.Items.Clear();
+            foreach (var scale in SettingValues.WindowScales)
+                WindowScaleDropdown.Items.Add(ScaleToString(scale));
 
-        var selectedItemText = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
-        if (!WindowScaleDropdown.Items.Contains(selectedItemText))
-            WindowScaleDropdown.Items.Add(selectedItemText);
-        WindowScaleDropdown.SelectedItem = selectedItemText;
+            var selectedItemText = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
+            if (!WindowScaleDropdown.Items.Contains(selectedItemText))
+                WindowScaleDropdown.Items.Add(selectedItemText);
+            WindowScaleDropdown.SelectedItem = selectedItemText;
+        }
+        finally
+        {
+            _editingScale = false;
+        }
     }
 
     private void RefreshLanguageDropdown()
@@ -173,16 +174,12 @@ public partial class AppearanceSettings : UserControl
         if (selectedLanguage.Key == currentLanguage)
             return;
 
-        var titleCurrent = t($"{currentLanguage}.question.apply_language_settings.title");
-        var titleTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.title");
-
-        var extraCurrent = t($"{currentLanguage}.question.apply_language_settings.extra");
-        var extraTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.extra");
+        var promptCurrent = t($"{currentLanguage}.question.apply_language_settings.extra");
+        var promptTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.extra");
 
         // popup now shows its selection in both languages
         var yesNoWindow = await new YesNoWindow()
-            .SetMainText($"{titleCurrent}\n\n{titleTarget}")
-            .SetExtraText($"{extraCurrent}\n\n{extraTarget}")
+            .SetMainText($"{promptCurrent}\n\n{promptTarget}")
             .SetButtonText(t("action.apply"), t("action.cancel"))
             .AwaitAnswer();
 
@@ -198,9 +195,7 @@ public partial class AppearanceSettings : UserControl
         if (SettingsEditing.Set(SettingsService, SettingsService.WW_LANGUAGE, selectedLanguage.Key))
         {
             LocalizationService.ApplyCurrentLanguage();
-            RefreshLanguageDropdown();
-            RefreshTranslationCredit();
-            _mainWindow.Refresh();
+            LoadSettings();
         }
     }
 }
