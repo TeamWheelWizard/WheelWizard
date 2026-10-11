@@ -96,6 +96,12 @@
                     <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
                 </Style>
             </ControlTheme>
+            <ControlTheme x:Key="LinuxWindowDecorations" TargetType="WindowDrawnDecorations"
+                          BasedOn="{StaticResource DesktopWindowDecorations}">
+                <Style Selector="^:maximized /template/ Path#RestoreButtonPath">
+                    <Setter Property="Data" Value="M 0,0 H 12 V 12 H 0 Z M 2,2 V 10 H 10 V 2 Z" />
+                </Style>
+            </ControlTheme>
         </ResourceDictionary>
     </Application.Resources>
 
@@ -104,7 +110,7 @@
         <FluentTheme />
         <Style Selector=":is(Window)">
             <Setter Property="WindowDecorationsTheme"
-                    Value="{OnPlatform Default={StaticResource DesktopWindowDecorations}, macOS={x:Null}}" />
+                    Value="{OnPlatform Default={StaticResource DesktopWindowDecorations}, Linux={StaticResource LinuxWindowDecorations}, macOS={x:Null}}" />
         </Style>
         <!-- !!Only used for the designer!! -->
         <StyleInclude Source="avares://WheelWizard/Views/DesignTime/Controls/MultiColorExampleComponent.axaml" />
