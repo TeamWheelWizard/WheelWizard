@@ -15,7 +15,7 @@
     <Grid Width="540" MinHeight="400" MaxHeight="760">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20"
                     IsVisible="{Binding IsLoading}">
-            <components:LoadingIcon Width="72" Height="72" Foreground="{StaticResource Neutral700}" />
+            <components:Spinner Width="72" Height="72" />
             <TextBlock Text="Loading profile..." Classes="BodyText" FontSize="14" HorizontalAlignment="Center" />
         </StackPanel>
 
@@ -47,9 +47,9 @@
                                    Foreground="{StaticResource Neutral400}" />
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <components:StatusBadge Text="{Binding Profile.Rank, StringFormat='Rank #{0}'}"
-                                                 Variant="Success" IconSize="0" HorizontalAlignment="Left"
+                                                 Variant="Success" HorizontalAlignment="Left"
                                                  IsVisible="{Binding Profile.Rank, Converter={x:Static conv:NumberConverters.GreaterThan0}}" />
-                            <components:StatusBadge Text="Suspicious" Variant="Danger" IconSize="0"
+                            <components:StatusBadge Text="Suspicious" Variant="Error"
                                                  HorizontalAlignment="Left"
                                                  IsVisible="{Binding Profile.IsSuspicious}" />
                         </StackPanel>

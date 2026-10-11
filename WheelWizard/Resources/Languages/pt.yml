@@ -132,7 +132,6 @@ pt:
     browse: "Procurar"
     view_mod: "Ver Mod"
     save_external_mii: "Adicionar Mii aos \"Meus Miis\""
-    view_mii: "Ver Mii"
     duplicate: "Duplicar"
     back: "Voltar"
     unfavorite: "Tirar dos favoritos"
@@ -169,7 +168,6 @@ pt:
     mod_browser: "Navegador de mods"
     mii_selector: "Seletor Mii"
     mii_editor: "Editor Mii"
-    mii_carousel: "Carrosel Mii"
   text:
     made_by_string: |-
       Feito por: %{firstAuthor}

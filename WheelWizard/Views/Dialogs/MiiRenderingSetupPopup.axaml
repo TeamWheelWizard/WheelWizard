@@ -60,16 +60,14 @@
         <UniformGrid Grid.Row="4"
                      Columns="2"
                      Margin="0,24,0,0">
-            <components:Button x:Name="SkipButton"
+            <components:ActionButton x:Name="SkipButton"
                                Margin="0,0,6,0"
-                               Variant="Default"
                                Text="Skip"
-                               Click="SkipButton_OnClick" />
-            <components:Button x:Name="DownloadButton"
+                               Click="SkipButton_OnClick"  Tone="Secondary"/>
+            <components:ActionButton x:Name="DownloadButton"
                                Margin="0,0,0,0"
-                               Variant="Primary"
                                Text="Download"
-                               Click="DownloadButton_OnClick" />
+                               Click="DownloadButton_OnClick"  Tone="Brand"/>
         </UniformGrid>
     </Grid>
 </dialogBase:PopupContent>

@@ -31,6 +31,17 @@ public static class MiiImageVariants
         ExpirationSeconds = TimeSpan.FromMinutes(8),
     };
 
+    /// <summary><see cref="MiiListTile"/> smiling, shown while a tile is hovered.</summary>
+    public static readonly MiiImageSpecifications MiiListTileHover = new()
+    {
+        Name = "MiiBlockProfileHover",
+        Expression = MiiImageSpecifications.FaceExpression.smile,
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.tiny,
+        CachePriority = CacheItemPriority.Low,
+        ExpirationSeconds = TimeSpan.Zero,
+    };
+
     public static readonly MiiImageSpecifications OnlinePlayerSmall = new()
     {
         Name = "OnlinePlayerSmall",
@@ -40,15 +51,16 @@ public static class MiiImageVariants
         CachePriority = CacheItemPriority.Low,
     };
 
-    public static readonly MiiImageSpecifications MiiEditorSmall = new()
+    /// <summary>The 50 px round avatars in player lists (rooms, leaderboard): a tiny render is sharp enough and 3-4x quicker.</summary>
+    public static readonly MiiImageSpecifications PlayerListAvatar = new()
     {
-        Name = "MiiEditorPreviewSmall",
+        Name = "PlayerListAvatar",
         Expression = MiiImageSpecifications.FaceExpression.normal,
         Type = MiiImageSpecifications.BodyType.face,
-        Size = MiiImageSpecifications.ImageSize.medium,
-        ExpirationSeconds = TimeSpan.Zero,
+        Size = MiiImageSpecifications.ImageSize.tiny,
         CachePriority = CacheItemPriority.Low,
     };
+
     public static readonly MiiImageSpecifications MiiEditorPreviewCarousel = new()
     {
         Name = "MiiEditorPreviewCarousel",
@@ -99,5 +111,54 @@ public static class MiiImageVariants
         Size = MiiImageSpecifications.ImageSize.medium,
         ExpirationSeconds = TimeSpan.FromMinutes(10),
         InstanceCount = 1,
+    };
+
+    /// <summary>
+    /// Animated friends card and sidebar portrait. The clips turn the Mii towards the card text themselves, so this
+    /// keeps only the camera tilt of <see cref="FriendsSideProfile"/>.
+    /// </summary>
+    public static readonly MiiImageSpecifications FriendsSideProfileLive = new()
+    {
+        Name = "FriendsSideProfileLive",
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.medium,
+        CameraRotate = new(12, 0, 0),
+    };
+
+    /// <summary>
+    /// Animated license card on the profile page: straight on, and raised so the card's bottom edge is the window sill
+    /// the profile window clips lean on.
+    /// </summary>
+    public static readonly MiiImageSpecifications CurrentUserWindowLive = new()
+    {
+        Name = "CurrentUserWindowLive",
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.medium,
+        CameraVerticalOffset = 6.5f,
+    };
+
+    /// <summary>
+    /// A Mii peeking over the edge of a card (MiiPeeker): framed like <see cref="CurrentUserWindowLive"/>, so the view's
+    /// bottom edge is the edge the peek clips lean on, at a small size.
+    /// </summary>
+    public static readonly MiiImageSpecifications PeekLive = new()
+    {
+        Name = "PeekLive",
+        Type = MiiImageSpecifications.BodyType.face,
+        Size = MiiImageSpecifications.ImageSize.small,
+        CameraVerticalOffset = 6.5f,
+    };
+
+    /// <summary>
+    /// The leaderboard's podium stage (380 px tall): three whole Miis on their steps, with room under the lowest step for
+    /// its name and room above the winner for tall Miis and confetti.
+    /// </summary>
+    public static readonly MiiImageSpecifications PodiumStage = new()
+    {
+        Name = "PodiumStage",
+        Type = MiiImageSpecifications.BodyType.all_body,
+        Size = MiiImageSpecifications.ImageSize.medium,
+        CameraZoom = 1.32f,
+        CameraVerticalOffset = 10f,
     };
 }

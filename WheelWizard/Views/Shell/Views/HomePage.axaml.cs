@@ -64,7 +64,7 @@ public partial class HomePage : UserControl
 
     private void Model_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (this.FindResource(Model.IconName) is Geometry geometry)
+        if (!string.IsNullOrEmpty(Model.IconName) && this.FindResource(Model.IconName) is Geometry geometry)
             PlayButton.IconData = geometry;
         if (Model.Status == WheelWizardStatus.Ready && !Model.IsBusy)
             PlayEntranceAnimation();

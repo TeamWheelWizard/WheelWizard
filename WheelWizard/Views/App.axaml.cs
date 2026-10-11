@@ -23,14 +23,22 @@ public class App : Application
 
     public override void Initialize()
     {
+        // macOS reads the name before deferred visual resources load for the splash startup.
+        Name = "Wheel Wizard";
         if (_createStartup is null)
             LoadVisualResources();
+        InstallMacApplicationMenu();
     }
 
     internal void LoadVisualResources()
     {
         AvaloniaXamlLoader.Load(this);
         ToolTipBubbleBehavior.Initialize();
+    }
+
+    private void InstallMacApplicationMenu()
+    {
+        // Register before Avalonia exports the application menu; later replacement leaves its fallback active.
         if (OperatingSystem.IsMacOS())
         {
             var menu = new NativeMenu();

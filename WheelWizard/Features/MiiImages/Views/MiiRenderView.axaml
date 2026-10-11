@@ -10,15 +10,20 @@
             BorderThickness="1"
             x:Name="ImageBorder"
             BorderBrush="{StaticResource BackgroundLineColor}"
+            Background="Transparent"
             IsVisible="False"
             PointerPressed="ImageBorder_OnPointerPressed"
             PointerMoved="ImageBorder_OnPointerMoved"
             PointerReleased="ImageBorder_OnPointerReleased"
             PointerCaptureLost="ImageBorder_OnPointerCaptureLost"
             PointerWheelChanged="ImageBorder_OnPointerWheelChanged">
-        <Image x:Name="RenderImage"
-               HorizontalAlignment="Stretch"
-               VerticalAlignment="Stretch"
-               Stretch="Uniform"/>
+        <!-- The realtime (GPU) view is added here in code; RenderImage is the CPU fallback. -->
+        <Grid x:Name="RenderHost">
+            <Image x:Name="RenderImage"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"
+                   Stretch="Uniform"
+                   IsVisible="False"/>
+        </Grid>
     </Border>
 </UserControl>

@@ -18,7 +18,6 @@ using WheelWizard.WheelWizardData.Views.Dialogs;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
-using WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
 
 namespace WheelWizard.RrRooms.Views;
 
@@ -124,15 +123,6 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
             return;
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(selectedPlayer.FriendCode);
         ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
-    }
-
-    private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)
-    {
-        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
-            return;
-        if (selectedPlayer.FirstMii == null)
-            return;
-        new MiiCarouselWindow().SetMii(selectedPlayer.FirstMii).Show();
     }
 
     private void ViewProfile_OnClick(object sender, RoutedEventArgs e)

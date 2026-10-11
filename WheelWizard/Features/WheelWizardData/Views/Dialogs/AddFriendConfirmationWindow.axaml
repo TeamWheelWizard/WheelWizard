@@ -36,7 +36,6 @@
                            Text="{Binding FriendCode}" />
                 <components:StatusBadge Text="{Binding FriendVr, StringFormat='VR {0}'}"
                                      Variant="Success"
-                                     IconSize="0"
                                      HorizontalAlignment="Left" />
             </StackPanel>
         </Grid>
@@ -44,16 +43,14 @@
         <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" />
 
         <UniformGrid Grid.Row="3" Columns="2" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <components:Button Text="{loc:T action.cancel}"
-                               Variant="Default"
+            <components:ActionButton Text="{loc:T action.cancel}"
                                IconData="{StaticResource XMark}"
                                Margin="0,0,6,0"
-                               Click="Cancel_OnClick" />
-            <components:Button Text="Add Friend"
-                               Variant="Primary"
+                               Click="Cancel_OnClick"  Tone="Secondary"/>
+            <components:ActionButton Text="Add Friend"
                                IconData="{StaticResource CheckMark}"
                                Margin="6,0,0,0"
-                               Click="AddFriend_OnClick" />
+                               Click="AddFriend_OnClick"  Tone="Brand"/>
         </UniformGrid>
     </Grid>
 </dialogBase:PopupContent>

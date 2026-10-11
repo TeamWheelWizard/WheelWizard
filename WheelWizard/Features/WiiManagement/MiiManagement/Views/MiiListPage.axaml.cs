@@ -5,7 +5,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Testably.Abstractions;
 using WheelWizard.CustomCharacters;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Desktop.Storage;
@@ -13,18 +12,18 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 using WheelWizard.WiiManagement.MiiManagement.Views;
 using WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
+using WheelWizard.WiiManagement.MiiManagement.Views.Editor;
 
 namespace WheelWizard.WiiManagement.MiiManagement.Views;
 
 public partial class MiiListPage : UserControl
 {
-    private IPopupFactory Popups { get; }
-
     public ObservableCollection<MiiListRow> MiiRows { get; } = [];
     private readonly List<MiiListEntry> _miiEntries = [];
 
@@ -38,28 +37,26 @@ public partial class MiiListPage : UserControl
 
     private IFileSystem FileSystem { get; }
 
-    private IRandomSystem Random { get; }
-
     private ISettingsManager SettingsService { get; }
 
+    private INavigationService Navigation { get; }
+
     public MiiListPage(
-        IPopupFactory popups,
         IFilePickerService filePicker,
         ICustomCharactersService customCharactersService,
         IMiiDbService miiDbService,
         IMiiRepositoryService miiRepositoryService,
         IFileSystem fileSystem,
-        IRandomSystem random,
-        ISettingsManager settingsService
+        ISettingsManager settingsService,
+        INavigationService navigation
     )
     {
-        Popups = popups;
+        Navigation = navigation;
         FilePicker = filePicker;
         CustomCharactersService = customCharactersService;
         MiiDbService = miiDbService;
         MiiRepositoryService = miiRepositoryService;
         FileSystem = fileSystem;
-        Random = random;
         SettingsService = settingsService;
         InitializeComponent();
         DataContext = this;
@@ -428,54 +425,10 @@ public partial class MiiListPage : UserControl
         ViewUtils.ShowSnackbar(successMessage);
     }
 
-    private async void EditMii(Mii mii)
-    {
-        var window = Popups.Create<MiiEditorWindow>().SetMii(mii);
-        var save = await window.AwaitAnswer();
-        if (!save)
-            return;
+    // The editor saves the Mii itself and comes back to this page.
+    private void EditMii(Mii mii) => Navigation.NavigateTo<MiiEditorPage>(new MiiEditorRequest(mii));
 
-        var result = MiiDbService.Update(window.Mii);
-        if (result.IsFailure)
-        {
-            ViewUtils.ShowSnackbar(
-                t("snackbar_error.mii_failure_update", new { error = result.Error.Message })!,
-                ViewUtils.SnackbarType.Danger
-            );
-            return;
-        }
-
-        ReloadMiiList();
-    }
-
-    private async void CreateNewMii()
-    {
-        Mii? mii = null;
-        await new OptionsWindow()
-            .AddOption("Dice", t("action.randomize"), () => mii = MiiFactory.CreateRandomMii(Random.Random.Shared))
-            .AddOption("PersonMale", t("attribute.mii.gender_male"), () => mii = MiiFactory.CreateDefaultMale())
-            .AddOption("PersonFemale", t("attribute.mii.gender_female"), () => mii = MiiFactory.CreateDefaultFemale())
-            .AwaitAnswer();
-        if (mii == null)
-            return;
-
-        var window = Popups.Create<MiiEditorWindow>().SetMii(mii);
-        var save = await window.AwaitAnswer();
-        if (!save)
-            return;
-
-        var result = MiiDbService.AddToDatabase(window.Mii, SettingsService.Get<string>(SettingsService.MACADDRESS));
-        if (result.IsFailure)
-        {
-            ViewUtils.ShowSnackbar(
-                t("snackbar_error.mii_failure_create", new { error = result.Error.Message })!,
-                ViewUtils.SnackbarType.Danger
-            );
-            return;
-        }
-
-        ReloadMiiList();
-    }
+    private void CreateNewMii() => Navigation.NavigateTo<MiiEditorPage>(new MiiEditorRequest(null));
 
     private void DuplicateMii(Mii[] miis)
     {

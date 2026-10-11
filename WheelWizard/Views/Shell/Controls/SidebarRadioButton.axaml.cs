@@ -1,11 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.Shell.Views;
 
 namespace WheelWizard.Views.Shell.Controls;
 
-public class SidebarRadioButton : RadioButton
+public class SidebarRadioButton : ToggleRadioButton
 {
     public static readonly StyledProperty<Geometry> IconDataProperty = AvaloniaProperty.Register<SidebarRadioButton, Geometry>(
         nameof(IconData)

@@ -33,8 +33,8 @@
             </Border>
         </StackPanel>
 
-        <TextBox Grid.Row="0" Width="200"
-                 PlaceholderText="{loc:T placeholder.search_for_players}"
+        <components:InputField Grid.Row="0" Width="200" IconData="{StaticResource Search}"
+                 Placeholder="{loc:T placeholder.search_for_players}"
                  VerticalAlignment="Bottom"
                  TextChanged="PlayerSearchField_OnTextChanged"
                  HorizontalAlignment="Right"
@@ -51,8 +51,7 @@
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
                     <components:FormFieldLabel Text="{loc:T list_title.rooms}" />
-                    <communityControls:CommunityCountBadge Text="0" IconSize="0" x:Name="RoomsListItemCount"
-                                                IconData="{StaticResource Dice}" />
+                    <communityControls:CommunityCountBadge Text="0" x:Name="RoomsListItemCount" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom" />
@@ -103,7 +102,7 @@
 
                                 <components:StatusBadge Grid.Column="2" IconData="{StaticResource UserCouple}"
                                                      Text="{Binding PlayerCount}" VerticalAlignment="Center"
-                                                     Variant="Dark"
+                                                     Variant="Gray"
                                                      HorizontalAlignment="Right" Margin="0,0,10,0" />
                             </Grid>
 
@@ -126,7 +125,7 @@
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,6">
                     <components:FormFieldLabel Text="{loc:T list_title.players}" />
-                    <communityControls:CommunityCountBadge Text="0" IconSize="0" x:Name="PlayerListItemCount" />
+                    <communityControls:CommunityCountBadge Text="0" x:Name="PlayerListItemCount" />
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom" />

@@ -11,6 +11,9 @@
             <FontFamily x:Key="DefaultFont">avares://WheelWizard/Resources/Fonts/Roboto-Regular.ttf#Roboto, avares://WheelWizard/Resources/Fonts/ctmkf.ttf#CTMKF</FontFamily>
 
             <!-- CONSTANTS -->
+            <x:TimeSpan x:Key="ControlAnimationDuration">0:0:0.12</x:TimeSpan>
+            <x:TimeSpan x:Key="SegmentAnimationDuration">0:0:0.24</x:TimeSpan>
+            <x:Boolean x:Key="ControlAnimationsEnabled">True</x:Boolean>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="Styles/Resources/Constants.axaml" />
                 <ResourceInclude Source="Styles/Resources/Icons.axaml" />
@@ -29,7 +32,6 @@
 
             <!-- CONVERTERS -->
             <converters:IsEqualToConverter x:Key="IsEqualTo" />
-            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
             <ControlTheme x:Key="DesktopWindowDecorations" TargetType="WindowDrawnDecorations"
                           BasedOn="{StaticResource {x:Type WindowDrawnDecorations}}">
                 <Setter Property="Template">
@@ -55,7 +57,7 @@
                                                 IsVisible="{TemplateBinding HasTitleBar}">
                                         <Button x:Name="PART_MinimizeButton" Theme="{StaticResource FluentDrawnCaptionButton}"
                                                 WindowDecorationProperties.ElementRole="MinimizeButton">
-                                            <PathIcon Width="11" Height="11" Data="M0,5 H11 V6 H0 Z"
+                                            <PathIcon Width="11" Height="11" Data="{StaticResource Minimize}"
                                                       Foreground="{Binding $parent[Button].Foreground}" />
                                         </Button>
                                         <Button x:Name="PART_MaximizeButton" Theme="{StaticResource FluentDrawnCaptionButton}"
@@ -94,6 +96,12 @@
                     <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
                 </Style>
             </ControlTheme>
+            <ControlTheme x:Key="LinuxWindowDecorations" TargetType="WindowDrawnDecorations"
+                          BasedOn="{StaticResource DesktopWindowDecorations}">
+                <Style Selector="^:maximized /template/ Path#RestoreButtonPath">
+                    <Setter Property="Data" Value="M 0,0 H 12 V 12 H 0 Z M 2,2 V 10 H 10 V 2 Z" />
+                </Style>
+            </ControlTheme>
         </ResourceDictionary>
     </Application.Resources>
 
@@ -102,7 +110,7 @@
         <FluentTheme />
         <Style Selector=":is(Window)">
             <Setter Property="WindowDecorationsTheme"
-                    Value="{OnPlatform Default={StaticResource DesktopWindowDecorations}, macOS={x:Null}}" />
+                    Value="{OnPlatform Default={StaticResource DesktopWindowDecorations}, Linux={StaticResource LinuxWindowDecorations}, macOS={x:Null}}" />
         </Style>
         <!-- !!Only used for the designer!! -->
         <StyleInclude Source="avares://WheelWizard/Views/DesignTime/Controls/MultiColorExampleComponent.axaml" />
@@ -111,35 +119,33 @@
         <!-- STYLES -->
         <StyleInclude Source="Styles/Styles/ButtonStyles.axaml" />
         <StyleInclude Source="Styles/Styles/TextStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/ToggleButtonStyles.axaml" />
         <StyleInclude Source="Styles/Styles/MiscStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/TextBoxStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/DropdownStyles.axaml" />
         <StyleInclude Source="Styles/Styles/SliderStyles.axaml" />
 
         <!-- STANDARD COMPONENTS -->
         <StyleInclude Source="Components/MultiColoredIcon.axaml" />
         <StyleInclude Source="Components/MultiIconRadioButton.axaml" />
         <StyleInclude Source="Components/IconLabel.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Views/Components/LinkButton.axaml" />
-        <StyleInclude Source="Components/Button.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Views/Components/TileButton.axaml" />
+        <StyleInclude Source="Components/ActionButton.axaml" />
+        <StyleInclude Source="Components/SplitButton.axaml" />
+        <StyleInclude Source="Components/Toggle.axaml" />
+        <StyleInclude Source="Components/Dropdown.axaml" />
+        <StyleInclude Source="Components/InputField.axaml" />
         <StyleInclude Source="Components/StatusBadge.axaml" />
         <StyleInclude Source="Components/EmptyPageInfo.axaml" />
         <StyleInclude Source="Components/FormFieldLabel.axaml" />
-        <StyleInclude Source="Components/TextField.axaml" />
-        <StyleInclude Source="Components/LoadingIcon.axaml" />
+        <StyleInclude Source="Components/Spinner.axaml" />
+        <StyleInclude Source="Components/SegmentedControl.axaml" />
         <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/SidebarRadioButton.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Views/Components/ListActionButton.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityCountBadge.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
         <StyleInclude Source="avares://WheelWizard/Features/Mods/Views/ModBrowserListItem.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/FriendsListItem.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/RrRooms/Views/PlayerListItem.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityBadge.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WiiManagement/MiiManagement/Views/MiiBlock.axaml" />
         <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/WheelTrail.axaml" />
-        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/LeaderboardPodiumCard.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/LeaderboardPodiumStep.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/MiiImages/Views/MiiPeeker.axaml" />
     </Application.Styles>
 </Application>

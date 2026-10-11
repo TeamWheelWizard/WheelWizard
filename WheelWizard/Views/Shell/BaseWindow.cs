@@ -1,4 +1,6 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Threading;
 
 namespace WheelWizard.Views.Shell;
 
@@ -8,6 +10,8 @@ public abstract class BaseWindow : Window
 
     private int _disableCount = 0;
     private WindowLayer? _currentLayer;
+    private readonly Action<Size, Size>? _setWaylandSizeConstraints;
+    private bool _waylandSizeUpdateQueued;
 
     protected abstract Control InteractionOverlay { get; } // Just the visual part of the interaction
     protected abstract Control InteractionContent { get; } // The content that will be disabled when the overlay is shown
@@ -40,11 +44,39 @@ public abstract class BaseWindow : Window
 
     protected BaseWindow()
     {
+        var platform = PlatformImpl;
+        if (platform?.GetType().FullName == "Avalonia.Wayland.WindowImpl")
+        {
+            // Avalonia 12 makes the platform interface internal; bind only the pinned
+            // Wayland implementation's native size-hint method, without changing backends.
+            _setWaylandSizeConstraints = platform.GetType().GetMethod("SetMinMaxSize")?.CreateDelegate<Action<Size, Size>>(platform);
+        }
         Activated += (_, _) =>
         {
             if (OperatingSystem.IsMacOS())
                 Avalonia.Threading.Dispatcher.UIThread.Post(AttachMacWindowMenu, Avalonia.Threading.DispatcherPriority.Background);
         };
+    }
+
+    protected override void OnResized(WindowResizedEventArgs e)
+    {
+        base.OnResized(e);
+        if (CanResize || _setWaylandSizeConstraints == null || _waylandSizeUpdateQueued)
+            return;
+
+        // On Wayland, the compositor controls the visible window size. In particular,
+        // Hyprland does not resize a floating window just because its buffer grows.
+        // Publish the current size as native constraints for our fixed-size windows.
+        // Do not set Window.Min/MaxWidth/Height: that would prevent SizeToContent from
+        // measuring a dialog's next size when its content changes.
+        // Wait for layout and decoration changes to settle, and coalesce acknowledgements.
+        _waylandSizeUpdateQueued = true;
+        Dispatcher.UIThread.Post(() =>
+        {
+            _waylandSizeUpdateQueued = false;
+            if (IsVisible && !CanResize && PlatformImpl != null)
+                _setWaylandSizeConstraints(ClientSize, ClientSize);
+        }, DispatcherPriority.Background);
     }
 
     private void AttachMacWindowMenu()

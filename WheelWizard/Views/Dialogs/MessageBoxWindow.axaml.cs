@@ -2,7 +2,7 @@ using Avalonia.Interactivity;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs.Base;
 using WheelWizard.Views.Shell;
-using Button = WheelWizard.Views.Components.Button;
+using Button = WheelWizard.Views.Components.ActionButton;
 
 namespace WheelWizard.Views.Dialogs;
 
@@ -27,7 +27,7 @@ public partial class MessageBoxWindow : PopupContent
     public MessageBoxWindow SetMessageType(MessageType newType)
     {
         messageType = newType;
-        CancelButton.Variant = messageType == MessageType.Message ? ButtonVariant.Primary : ButtonVariant.Default;
+        CancelButton.Tone = messageType == MessageType.Message ? ActionButtonTone.Brand : ActionButtonTone.Secondary;
 
         Window.WindowTitle = messageType.ToString();
         TitleBorder.Classes.Add(messageType.ToString());

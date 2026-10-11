@@ -1,233 +1,361 @@
+using System.Collections;
+using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Media;
 using WheelWizard.Views.Components;
-using WheelWizard.Views.DesignTime.KitchenSink;
+using WheelWizard.Views.Shell.Navigation;
+using Spinner = WheelWizard.Views.Components.Spinner;
 
 namespace WheelWizard.Views.DesignTime;
 
-public partial class KitchenSinkPage : UserControl
+public partial class KitchenSinkPage : UserControl, ILockedSidebarPage
 {
-    private readonly SectionDefinition[] _sections =
+    private static readonly (string Name, Func<Control> Create)[] Components =
     [
-        SectionDefinition.Create<KitchenSinkTextStylesPage>(),
-        SectionDefinition.Create<KitchenSinkToggleButtonsPage>(),
-        SectionDefinition.Create<KitchenSinkInputFieldsPage>(),
-        SectionDefinition.Create<KitchenSinkDropdownsPage>(),
-        SectionDefinition.Create<KitchenSinkButtonsPage>(),
-        SectionDefinition.Create<KitchenSinkIconLabelsPage>(),
-        SectionDefinition.Create<KitchenSinkStateBoxesPage>(),
-        SectionDefinition.Create<KitchenSinkIconsPage>(),
+        ("Checkbox", () => CreateToggleExample(radio: false)),
+        ("Radio button", () => CreateToggleExample(radio: true)),
+        ("Dropdown", CreateDropdownExample),
+        ("Input field", CreateInputExample),
+        ("Badge", CreateBadgeExample),
+        ("Button", CreateButtonExample),
+        ("Tooltip", CreateTooltipExample),
+        ("Spinner", CreateSpinnerExample),
+        ("Segmented control", CreateSegmentedExample),
+        ("Split button", CreateSplitButtonExample),
     ];
-
-    // Add more configurable section groups here.
-    private readonly SectionCollectionDefinition[] _sectionCollections =
-    [
-        SectionCollectionDefinition.Create(
-            "Basic Components",
-            typeof(KitchenSinkTextStylesPage),
-            typeof(KitchenSinkToggleButtonsPage),
-            typeof(KitchenSinkInputFieldsPage),
-            typeof(KitchenSinkDropdownsPage),
-            typeof(KitchenSinkButtonsPage),
-            typeof(KitchenSinkIconLabelsPage),
-            typeof(KitchenSinkStateBoxesPage),
-            typeof(KitchenSinkIconsPage)
-        ),
-    ];
-
-    private readonly Dictionary<string, Border> _allSectionContainersById = [];
-    private readonly List<Border> _allSectionBorders = [];
-    private Border? _singleSectionBorder;
-    private bool _isInitializing;
-    private bool _useNeutral900Blocks = true;
 
     public KitchenSinkPage()
     {
         InitializeComponent();
-        BuildAllSections();
-        PopulateSections();
-        ApplyBlockBackgroundMode();
+        ComponentSelector.ItemsSource = Components.Select(component => component.Name).ToArray();
+        ComponentSelector.SelectedIndex = 0;
     }
 
-    private void BuildAllSections()
+    private void ComponentSelector_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        _allSectionContainersById.Clear();
-        _allSectionBorders.Clear();
-        AllSectionsContainer.Children.Clear();
-
-        foreach (var section in _sections)
-        {
-            var sectionView = section.CreatePage();
-            var sectionContainer = CreateSectionContainer(section.Label, section.Tooltip, sectionView, out var sectionBorder);
-            _allSectionContainersById[section.Id] = sectionContainer;
-            _allSectionBorders.Add(sectionBorder);
-            AllSectionsContainer.Children.Add(sectionContainer);
-        }
-    }
-
-    private static Border CreateSectionContainer(
-        string sectionName,
-        string? sectionTooltip,
-        Control sectionContent,
-        out Border sectionBorder
-    )
-    {
-        var header = new FormFieldLabel { Text = sectionName, TipText = sectionTooltip ?? string.Empty };
-        var divider = new Border();
-        divider.Classes.Add("KitchenSinkSectionDivider");
-        var body = new StackPanel { Spacing = 8 };
-        body.Children.Add(header);
-        body.Children.Add(divider);
-        body.Children.Add(sectionContent);
-
-        sectionBorder = new Border { Child = body };
-        sectionBorder.Classes.Add("KitchenSinkSectionBlock");
-        sectionBorder.VerticalAlignment = VerticalAlignment.Top;
-        sectionBorder.HorizontalAlignment = HorizontalAlignment.Stretch;
-        return sectionBorder;
-    }
-
-    private void PopulateSections()
-    {
-        _isInitializing = true;
-        SectionDropdown.Items.Clear();
-
-        foreach (var collection in _sectionCollections)
-            SectionDropdown.Items.Add(SectionDropdownItem.ForCollection(collection));
-
-        foreach (var section in _sections)
-            SectionDropdown.Items.Add(SectionDropdownItem.ForSection(section));
-
-        SectionDropdown.SelectedIndex = SectionDropdown.Items.Count > 0 ? 0 : -1;
-        _isInitializing = false;
-
-        ApplySelectedSection();
-    }
-
-    private void SectionDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (_isInitializing)
+        if (ToggleExamples is null || ComponentSelector.SelectedIndex < 0)
             return;
-
-        ApplySelectedSection();
+        ToggleExamples.Children.Clear();
+        ToggleExamples.Children.Add(Components[ComponentSelector.SelectedIndex].Create());
     }
+
+    private static Control CreateToggleExample(bool radio)
+    {
+        var title = radio ? "Radio button" : "Checkbox";
+        ToggleButton preview = radio
+            ? new ToggleRadioButton { Content = "Example radio button", GroupName = "KitchenSinkPreviews" }
+            : new ToggleCheckBox { Content = "Example checkbox" };
+        ToggleButton second = radio ? new ToggleRadioButton { GroupName = "KitchenSinkPreviews" } : new ToggleCheckBox();
+        second.Content = "Second button preview";
+        second.Bind(ToggleCheckBox.VariantProperty, new Binding(nameof(ToggleCheckBox.Variant)) { Source = preview });
+        preview.HorizontalAlignment = HorizontalAlignment.Left;
+        preview.VerticalAlignment = VerticalAlignment.Center;
+
+        return new Example(title, preview, title, new StackPanel { Spacing = 12, Children = { preview, second } })
+            .Text(nameof(preview.Content), preview.Content?.ToString())
+            .Switch(nameof(preview.IsChecked), "False")
+            .Switch(nameof(preview.IsEnabled), "True")
+            .Choice(
+                nameof(ToggleCheckBox.Variant),
+                preview.GetValue(ToggleCheckBox.VariantProperty).ToString(),
+                Enum.GetValues<ToggleVariant>()
+            )
+            .Build();
+    }
+
+    private static Control CreateDropdownExample()
+    {
+        var preview = new Dropdown
+        {
+            ItemsSource = new[]
+            {
+                new DropdownOption("First option", Geometry.Parse("M2 8 L8 2 L14 8 L8 14 Z")),
+                new DropdownOption("Second option"),
+                new DropdownOption("Third option", Geometry.Parse("M2 2 H14 V14 H2 Z")),
+                new DropdownOption("Disabled option", isEnabled: false),
+            },
+            PlaceholderText = "Choose an option",
+            MinWidth = 220,
+            HorizontalAlignment = HorizontalAlignment.Left,
+        };
+        return new Example("Dropdown", preview, "Dropdown")
+            .Text(nameof(preview.PlaceholderText), preview.PlaceholderText)
+            .Choice(nameof(preview.SelectedIndex), "-1", new[] { -1, 0, 1, 2 })
+            .Switch(nameof(preview.IsEnabled), "True")
+            .Choice(nameof(preview.Variant), "Bordered", Enum.GetValues<DropdownVariant>())
+            .Text(nameof(preview.Note), "")
+            .Switch(nameof(preview.Search), "False")
+            .Text(nameof(preview.SearchPlaceholder), preview.SearchPlaceholder ?? "Search...")
+            .Text(nameof(preview.EmptyText), preview.EmptyText ?? "No options found")
+            .Text(nameof(preview.ErrorText), "")
+            .Build();
+    }
+
+    private static Control CreateInputExample()
+    {
+        var preview = new InputField
+        {
+            Placeholder = "Enter some text",
+            Width = 260,
+            HorizontalAlignment = HorizontalAlignment.Left,
+        };
+        return new Example("Input field", preview, "Input field")
+            .Text(nameof(preview.Text), "")
+            .Text(nameof(preview.Placeholder), preview.Placeholder)
+            .Icon(nameof(preview.IconData))
+            .Text(nameof(preview.Note), "")
+            .Choice(nameof(preview.Variant), "Bordered", Enum.GetValues<InputFieldVariant>())
+            .Text(nameof(preview.ErrorText), "")
+            .Switch(nameof(preview.IsEnabled), "True")
+            .Switch(nameof(preview.IsReadOnly), "False")
+            .Build();
+    }
+
+    private static Control CreateBadgeExample()
+    {
+        var preview = new StatusBadge
+        {
+            Text = "Example badge",
+            Height = 24,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        return new Example("Badge", preview, "Badge")
+            .Text(nameof(preview.Text), preview.Text)
+            .Choice(nameof(preview.Variant), "Gray", Enum.GetValues<StatusVariant>())
+            .Choice(nameof(preview.Height), "24", new double[] { 24, 28, 32 })
+            .Icon(nameof(preview.IconData))
+            .Text(nameof(preview.TipText), "")
+            .Switch(nameof(preview.IsEnabled), "True")
+            .Build();
+    }
+
+    private static Control CreateButtonExample()
+    {
+        var preview = new ActionButton { Text = "Example button", HorizontalAlignment = HorizontalAlignment.Left };
+        var feedback = Label("Clicked 0 times");
+        var clicks = 0;
+        preview.Click += (_, _) => feedback.Text = $"Clicked {++clicks} times";
+        return new Example("Button", preview, "Button", new StackPanel { Spacing = 10, Children = { preview, feedback } })
+            .Text(nameof(preview.Text), preview.Text)
+            .Choice(nameof(preview.Variant), "Button", Enum.GetValues<ActionButtonVariant>())
+            .Choice(nameof(preview.Tone), "Primary", Enum.GetValues<ActionButtonTone>())
+            .Choice(nameof(preview.Size), "Regular", Enum.GetValues<ButtonSize>())
+            .Switch(nameof(preview.IsLoading), "False")
+            .Switch(nameof(preview.IsCircular), "False")
+            .Icon(nameof(preview.IconData))
+            .Switch(nameof(preview.IsIconLeft), "True")
+            .Switch(nameof(preview.IsEnabled), "True")
+            .Build();
+    }
+
+    private static Control CreateTooltipExample()
+    {
+        var tip = new HintTooltip { Text = "A tooltip can be attached to any control." };
+        var target = new ActionButton { Text = "Hover for a tooltip", HorizontalAlignment = HorizontalAlignment.Left };
+        ToolTip.SetTip(target, tip);
+        ToolTip.SetPlacement(target, PlacementMode.Top);
+        // Custom and AnchorAndGravity require positioning configuration beyond a placement choice.
+        var placement = new Dropdown
+        {
+            ItemsSource = Enum.GetValues<PlacementMode>()
+                .Where(mode => mode is not (PlacementMode.Custom or PlacementMode.AnchorAndGravity)),
+            SelectedItem = PlacementMode.Top,
+        };
+        placement.SelectionChanged += (_, _) =>
+        {
+            if (placement.SelectedItem is PlacementMode mode)
+                ToolTip.SetPlacement(target, mode);
+        };
+        return new Example("Tooltip", tip, content: target)
+            .Text(nameof(tip.Text), tip.Text)
+            .Choice(nameof(tip.MaxWidth), "280", new double[] { 180, 280, 360 })
+            .Row("Placement", "Top", placement)
+            .Build();
+    }
+
+    private static Control CreateSpinnerExample()
+    {
+        var preview = new Spinner();
+        preview.Bind(HeightProperty, new Binding(nameof(preview.Width)) { Source = preview });
+        return new Example("Spinner", preview).Choice(nameof(preview.Width), "24", new double[] { 16, 24, 32, 48 }).Build();
+    }
+
+    private static Control CreateSegmentedExample()
+    {
+        var preview = new SegmentedControl { HorizontalAlignment = HorizontalAlignment.Left, SelectedIndex = 0 };
+        preview.Items.Add(new SegmentOption { Text = "Grid", IconData = Icon("Grid2x2") });
+        preview.Items.Add(new SegmentOption { Text = "A longer option" });
+        var iconOnly = new SegmentOption { IconData = Icon("Search") };
+        AutomationProperties.SetName(iconOnly, "Search");
+        ToolTip.SetTip(iconOnly, "Search");
+        preview.Items.Add(iconOnly);
+        return new Example("Segmented control", preview)
+            .Choice(nameof(preview.SelectedIndex), "0", new[] { 0, 1, 2 })
+            .Switch(nameof(preview.IsEnabled), "True")
+            .Switch(nameof(preview.HasBorder), "True")
+            .Choice(nameof(preview.Orientation), "Horizontal", Enum.GetValues<Orientation>())
+            .Choice(nameof(preview.Variant), "Dark", Enum.GetValues<SegmentedControlVariant>())
+            .Build();
+    }
+
+    private static Control CreateSplitButtonExample()
+    {
+        var preview = new WheelWizard.Views.Components.SplitButton { Text = "Main action", HorizontalAlignment = HorizontalAlignment.Left };
+        var feedback = Label("Choose an action");
+        preview.Click += (_, _) => feedback.Text = "Main action clicked";
+        var action = new SplitButtonItem { Header = "Another action", IconData = Icon("Search") };
+        action.Click += (_, _) => feedback.Text = "Menu action clicked";
+        preview.Flyout = new MenuFlyout
+        {
+            Items =
+            {
+                action,
+                new SplitButtonItem { Header = "Unavailable action", IsEnabled = false },
+            },
+        };
+        return new Example("Split button", preview, content: new StackPanel { Spacing = 8, Children = { preview, feedback } })
+            .Text(nameof(preview.Text), "Main action")
+            .Choice(nameof(preview.Tone), "Primary", Enum.GetValues<ActionButtonTone>())
+            .Choice(nameof(preview.Size), "Regular", Enum.GetValues<ButtonSize>())
+            .Icon(nameof(preview.IconData))
+            .Switch(nameof(preview.IsEnabled), "True")
+            .Build();
+    }
+
+    private static Geometry Icon(string key) => (Geometry)Application.Current!.FindResource(key)!;
+
+    private static Dropdown CreateIconPicker()
+    {
+        var icons = new List<DropdownOption>();
+        void AddIcons(IResourceProvider provider)
+        {
+            if (provider is Avalonia.Markup.Xaml.Styling.ResourceInclude include)
+                AddIcons(include.Loaded);
+            else if (provider is ResourceDictionary dictionary)
+            {
+                // Resolve lazy XAML resources before checking their type.
+                foreach (var key in dictionary.Keys)
+                    if (key is string name && dictionary.TryGetResource(key, null, out var value) && value is Geometry geometry)
+                        icons.Add(new DropdownOption(name, geometry));
+                foreach (var merged in dictionary.MergedDictionaries)
+                    AddIcons(merged);
+            }
+        }
+        AddIcons(Application.Current!.Resources);
+        return new Dropdown
+        {
+            ItemsSource = icons.OrderBy(option => option.Text).Prepend(new DropdownOption("None")).ToList(),
+            Search = true,
+            SelectedValueBinding = new Binding(nameof(DropdownOption.Icon)),
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+        };
+    }
+
+    private static TextBlock Label(string text) =>
+        new()
+        {
+            Classes = { "TinyText" },
+            Text = text,
+            FontSize = 13,
+            TextWrapping = TextWrapping.Wrap,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
 
     private void BackgroundSwitch_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        _useNeutral900Blocks = BackgroundSwitch.IsChecked == true;
-        ApplyBlockBackgroundMode();
-    }
-
-    private void ApplySelectedSection()
-    {
-        var selectedItem = SectionDropdown.SelectedItem as SectionDropdownItem;
-        if (selectedItem == null)
-        {
-            AllSectionsScrollViewer.IsVisible = false;
-            SectionContent.IsVisible = false;
-            SectionContent.Content = null;
-            _singleSectionBorder = null;
-            return;
-        }
-
-        if (selectedItem.Collection is { } collection)
-        {
-            ShowCollection(collection);
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(selectedItem.SectionId))
+        if (ToggleCard is null)
             return;
 
-        ShowSingleSection(selectedItem.SectionId);
+        ToggleCard.Classes.Set("BlockBackground900", ((ToggleCheckBox)sender!).IsChecked == true);
     }
 
-    private void ShowCollection(SectionCollectionDefinition collection)
+    /// <summary>
+    /// A component preview above a table of its attributes, each with an editor bound two-way to <paramref name="target"/>.
+    /// With an <paramref name="automationName"/> the preview and editors are named for UI automation ("Button Text").
+    /// </summary>
+    private sealed class Example(string title, AvaloniaObject target, string? automationName = null, Control? content = null)
     {
-        foreach (var section in _sections)
+        private readonly StackPanel _rows = new() { Children = { Header() } };
+
+        public Example Text(string name, string? initial) => Bound(name, initial, new InputField(), TextBox.TextProperty);
+
+        public Example Switch(string name, string initial) =>
+            Bound(name, initial, new ToggleCheckBox { Variant = ToggleVariant.Switch }, ToggleButton.IsCheckedProperty);
+
+        public Example Choice(string name, string? initial, IEnumerable items) =>
+            Bound(
+                name,
+                initial,
+                new Dropdown { ItemsSource = items, HorizontalAlignment = HorizontalAlignment.Stretch },
+                SelectingItemsControl.SelectedItemProperty
+            );
+
+        public Example Icon(string name)
         {
-            if (_allSectionContainersById.TryGetValue(section.Id, out var sectionContainer))
-                sectionContainer.IsVisible = collection.Contains(section.Id);
+            var icons = CreateIconPicker();
+            Bound(name, "None", icons, SelectingItemsControl.SelectedValueProperty);
+            icons.SelectedIndex = 0;
+            return this;
         }
 
-        AllSectionsScrollViewer.IsVisible = true;
-        SectionContent.IsVisible = false;
-        _singleSectionBorder = null;
-        SectionContent.Content = null;
-
-        ApplyBlockBackgroundMode();
-    }
-
-    private void ShowSingleSection(string sectionId)
-    {
-        var sectionIndex = Array.FindIndex(_sections, x => x.Id == sectionId);
-        if (sectionIndex < 0)
+        public Example Row(string name, string? initial, Control editor)
         {
-            SectionContent.Content = null;
-            return;
+            if (automationName is not null)
+                AutomationProperties.SetName(editor, $"{automationName} {name}");
+            _rows.Children.Add(Cells(Label(name), Label(initial ?? ""), editor));
+            return this;
         }
 
-        var section = _sections[sectionIndex];
-        var sectionContainer = CreateSectionContainer(section.Label, section.Tooltip, section.CreatePage(), out var sectionBorder);
-        _singleSectionBorder = sectionBorder;
-        SectionContent.Content = new ScrollViewer
+        public StackPanel Build()
         {
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            HorizontalContentAlignment = HorizontalAlignment.Stretch,
-            VerticalContentAlignment = VerticalAlignment.Top,
-            Content = sectionContainer,
-        };
-
-        AllSectionsScrollViewer.IsVisible = false;
-        SectionContent.IsVisible = true;
-
-        ApplyBlockBackgroundMode();
-    }
-
-    private void ApplyBlockBackgroundMode()
-    {
-        foreach (var border in _allSectionBorders)
-            ApplyBackgroundClass(border);
-
-        if (_singleSectionBorder != null)
-            ApplyBackgroundClass(_singleSectionBorder);
-    }
-
-    private void ApplyBackgroundClass(Border border)
-    {
-        border.Classes.Set("BlockBackground900", _useNeutral900Blocks);
-    }
-
-    private readonly record struct SectionDefinition(string Id, string Label, string? Tooltip, Func<KitchenSinkSectionPageBase> CreatePage)
-    {
-        public static SectionDefinition Create<T>()
-            where T : KitchenSinkSectionPageBase, new()
-        {
-            var metadataInstance = new T();
-            return new(typeof(T).Name, metadataInstance.SectionName, metadataInstance.SectionTooltip, () => new T());
+            if (automationName is not null && target is Control preview)
+                AutomationProperties.SetName(preview, $"{automationName} preview");
+            return new StackPanel
+            {
+                Spacing = 8,
+                Children =
+                {
+                    new FormFieldLabel { Text = title },
+                    new Border
+                    {
+                        Child = content ?? (Control)target,
+                        MinHeight = 64,
+                        Padding = new(12),
+                    },
+                    new Border { Classes = { "KitchenSinkAttributeTable" }, Child = _rows },
+                },
+            };
         }
-    }
 
-    private readonly record struct SectionCollectionDefinition(string Label, HashSet<string> SectionIds)
-    {
-        public bool Contains(string sectionId) => SectionIds.Contains(sectionId);
-
-        public static SectionCollectionDefinition Create(string label, params Type[] sectionTypes)
+        private Example Bound(string name, string? initial, Control editor, AvaloniaProperty editorProperty)
         {
-            var sectionIds = sectionTypes.Select(static sectionType => sectionType.Name).ToHashSet(StringComparer.Ordinal);
-            return new(label, sectionIds);
+            editor.Bind(editorProperty, new Binding(name) { Source = target, Mode = BindingMode.TwoWay });
+            return Row(name, initial, editor);
         }
-    }
 
-    private sealed record SectionDropdownItem(string Label, string? SectionId, SectionCollectionDefinition? Collection)
-    {
-        public static SectionDropdownItem ForCollection(SectionCollectionDefinition collection) => new(collection.Label, null, collection);
+        private static Border Header()
+        {
+            var header = Cells(Label("Attribute"), Label("Initial value"), Label("Value"));
+            header.Classes.Add("KitchenSinkAttributeHeader");
+            header.BorderThickness = new(0);
+            return header;
+        }
 
-        public static SectionDropdownItem ForSection(SectionDefinition section) => new(section.Label, section.Id, null);
-
-        public override string ToString() => Label;
+        private static Border Cells(Control attribute, Control initialValue, Control editor)
+        {
+            var cells = new Grid { ColumnDefinitions = new("2*,*,2*"), ColumnSpacing = 12 };
+            cells.Children.Add(attribute);
+            Grid.SetColumn(initialValue, 1);
+            cells.Children.Add(initialValue);
+            Grid.SetColumn(editor, 2);
+            cells.Children.Add(editor);
+            return new Border { Classes = { "KitchenSinkAttributeRow" }, Child = cells };
+        }
     }
 }

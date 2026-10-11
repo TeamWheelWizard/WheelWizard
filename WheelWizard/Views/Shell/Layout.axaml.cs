@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -27,6 +26,8 @@ using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WheelWizardData.Views;
 using WheelWizard.WiiManagement.GameLicense;
+using WheelWizard.WiiManagement.MiiManagement.Views;
+using WheelWizard.WiiManagement.MiiManagement.Views.Editor;
 
 namespace WheelWizard.Views.Shell;
 
@@ -98,22 +99,19 @@ public partial class Layout : BaseWindow, IPollingListener
         SettingsSignalBus = settingsSignalBus;
         ModManagerService = modManagerService;
         InitializeComponent();
+        CompleteGrid.SizeChanged += (_, e) =>
+        {
+            if (ContentArea.Content is SettingsPage settingsPage)
+                settingsPage.UpdateLayoutWidth(e.NewSize.Width - 64 - ContentArea.Margin.Left - ContentArea.Margin.Right);
+        };
         _autoUpdater = autoUpdater;
         _autoUpdater.UpdateAvailable += OnUpdateAvailable;
         UpdateVersionBadge();
 
-        // Wayland does not expose the drawn caption buttons from our platform decoration template.
-        HeaderWindowControls.IsVisible =
-            OperatingSystem.IsLinux() && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
-
-        // Respects tiling window managers better if resizable.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            CanResize = true;
-
         Navigation.PageChanged += Navigation_OnPageChanged;
         foreach (var button in SidePanelButtons.Children.OfType<SidebarRadioButton>())
-            button.NavigationRequested += (_, pageType) => Navigation.NavigateTo(pageType);
-        SidebarCurrentUserProfile.ProfileRequested += (_, _) => Navigation.NavigateTo<UserProfilePage>();
+            button.NavigationRequested += (_, pageType) => NavigateFromSidebar(pageType);
+        SidebarCurrentUserProfile.ProfileRequested += (_, _) => NavigateFromSidebar(typeof(UserProfilePage));
         UpdateSidebarProfile();
 
         ClampSavedWindowScaleToCurrentScreen();
@@ -268,22 +266,55 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
 
-    private void HeaderMinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+    /// <summary>
+    /// The current page may ask before letting you go (see <see cref="INavigationGuard"/>); until it does, the
+    /// sidebar keeps showing the page you're on.
+    /// </summary>
+    private void NavigateFromSidebar(Type pageType)
+    {
+        Navigation.NavigateTo(pageType);
+        if (Navigation.CurrentPage is { } current && current.GetType() != pageType)
+            UpdateSidebarSelection(current);
+    }
 
-    private void HeaderCloseButton_Click(object? sender, RoutedEventArgs e) => Close();
+    private bool _closeConfirmed;
 
-    private static void WindowControl_PointerPressed(object? sender, PointerPressedEventArgs e) => e.Handled = true;
+    protected override async void OnClosing(WindowClosingEventArgs e)
+    {
+        if (!_closeConfirmed && Navigation.CurrentPage is INavigationGuard { HasUnsavedWork: true } guard && InteractionContent.IsEnabled)
+        {
+            e.Cancel = true;
+            base.OnClosing(e);
+            if (!await guard.ConfirmLeaveAsync())
+                return;
+            _closeConfirmed = true;
+            Close();
+            return;
+        }
+
+        base.OnClosing(e);
+    }
 
     public void NavigateToPage(UserControl page)
     {
         var oldPage = ContentArea.Content as Control;
         var isRoomsToDetails = oldPage is RoomsPage && page is RoomDetailsPage;
         var isDetailsToRooms = oldPage is RoomDetailsPage && page is RoomsPage;
+        var isMiisToEditor = oldPage is MiiListPage && page is MiiEditorPage;
+        var isEditorToMiis = oldPage is MiiEditorPage && page is MiiListPage;
 
-        ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms ? RoomsPageTransition : null;
-        ContentArea.IsTransitionReversed = isDetailsToRooms;
+        ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms || isMiisToEditor || isEditorToMiis ? RoomsPageTransition : null;
+        ContentArea.IsTransitionReversed = isDetailsToRooms || isEditorToMiis;
+        if (page is SettingsPage settingsPage)
+            settingsPage.UpdateLayoutWidth(
+                (CompleteGrid.Bounds.Width > 0 ? CompleteGrid.Bounds.Width : WindowWidth)
+                    - 64
+                    - ContentArea.Margin.Left
+                    - ContentArea.Margin.Right
+            );
         ContentArea.Content = page;
         UpdateSidebarSelection(page);
+        _ = LockSidebarAsync(page is ILockedSidebarPage);
     }
 
     private void UpdateSidebarSelection(UserControl page)
@@ -299,6 +330,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
             // TODO: make a better way to have these type of exceptions
             if (button.PageType == typeof(RoomsPage) && typeof(RoomDetailsPage) == page.GetType())
+                button.IsChecked = true;
+            if (button.PageType == typeof(MiiListPage) && page is MiiEditorPage)
                 button.IsChecked = true;
         }
     }
@@ -482,7 +515,7 @@ public partial class Layout : BaseWindow, IPollingListener
     private void SidebarProfileBlock_OnPointerEntered(object? sender, PointerEventArgs e)
     {
         SidebarProfileBlock.Background = GetResourceBrush("Neutral800");
-        SidebarProfileBlock.BorderBrush = GetResourceBrush("Primary400");
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Brand400");
         SidebarProfileHoverEffect.IsVisible = true;
     }
 

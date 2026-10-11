@@ -15,195 +15,195 @@
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye00}" IconName="MiiEye00"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye01}" IconName="MiiEye01"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye02}" IconName="MiiEye02"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye03}" IconName="MiiEye03"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye04}" IconName="MiiEye04"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye05}" IconName="MiiEye05"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye06}" IconName="MiiEye06"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye07}" IconName="MiiEye07"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye08}" IconName="MiiEye08"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye09}" IconName="MiiEye09"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye10}" IconName="MiiEye10"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye11}" IconName="MiiEye11"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye12}" IconName="MiiEye12"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye13}" IconName="MiiEye13"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye14}" IconName="MiiEye14"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye15}" IconName="MiiEye15"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye16}" IconName="MiiEye16"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye17}" IconName="MiiEye17"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye18}" IconName="MiiEye18"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye19}" IconName="MiiEye19"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye20}" IconName="MiiEye20"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye21}" IconName="MiiEye21"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye22}" IconName="MiiEye22"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye23}" IconName="MiiEye23"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye24}" IconName="MiiEye24"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye25}" IconName="MiiEye25"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye26}" IconName="MiiEye26"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye27}" IconName="MiiEye27"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye28}" IconName="MiiEye28"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye29}" IconName="MiiEye29"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye30}" IconName="MiiEye30"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye31}" IconName="MiiEye31"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye32}" IconName="MiiEye32"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye33}" IconName="MiiEye33"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye34}" IconName="MiiEye34"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye35}" IconName="MiiEye35"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye36}" IconName="MiiEye36"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye37}" IconName="MiiEye37"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye38}" IconName="MiiEye38"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye39}" IconName="MiiEye39"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye40}" IconName="MiiEye40"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye41}" IconName="MiiEye41"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye42}" IconName="MiiEye42"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye43}" IconName="MiiEye43"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye44}" IconName="MiiEye44"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye45}" IconName="MiiEye45"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye46}" IconName="MiiEye46"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
                 <util:MultiColorExampleComponent IconData="{DynamicResource MiiEye47}" IconName="MiiEye47"
                                                  Color1="{StaticResource Neutral50}"
                                                  Color2="{StaticResource Neutral950}"
-                                                 Color3="{StaticResource Primary700}" />
+                                                 Color3="{StaticResource Brand700}" />
             </UniformGrid>
         </Border>
     </Design.PreviewWith>

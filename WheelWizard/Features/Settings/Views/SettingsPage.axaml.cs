@@ -3,14 +3,18 @@ using Avalonia.Interactivity;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Views;
 using WheelWizard.Shared;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell.Navigation;
 
 namespace WheelWizard.Settings.Views;
 
-public partial class SettingsPage : UserControl
+public partial class SettingsPage : UserControl, ILockedSidebarPage
 {
+    // Reveal the navigation by clipping; keep the settings content stationary during the shell resize.
+    public void UpdateLayoutWidth(double availableWidth) => SettingsRoot.Width = availableWidth;
+
     private IPopupFactory Popups { get; }
 
     private ISettingsManager SettingsService { get; }
@@ -19,6 +23,7 @@ public partial class SettingsPage : UserControl
 
     private IPageFactory Pages { get; }
     private IDisposable? _settingsSignalSubscription;
+    private bool _navigationReady;
 
     public SettingsPage(
         IPopupFactory popups,
@@ -33,6 +38,7 @@ public partial class SettingsPage : UserControl
         SettingsSignalBus = settingsSignalBus;
         Pages = pages;
         InitializeComponent();
+        VersionInfoSidebar.Content = Pages.Create<SettingsVersionInfo>();
         UpdateTabVisibility();
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingChanged);
 
@@ -40,7 +46,8 @@ public partial class SettingsPage : UserControl
 
         var initialSettingsPage = Pages.Create(initialPage ?? typeof(WhWzSettings));
         SettingsContent.Content = initialSettingsPage;
-        SetCheckedTopBarButton(initialSettingsPage);
+        SetCheckedSidebarButton(initialSettingsPage);
+        _navigationReady = true;
     }
 
     protected override void OnUnloaded(RoutedEventArgs e)
@@ -74,32 +81,33 @@ public partial class SettingsPage : UserControl
 
         var fallback = Pages.Create<WhWzSettings>();
         SettingsContent.Content = fallback;
-        SetCheckedTopBarButton(fallback);
+        SetCheckedSidebarButton(fallback);
     }
 
-    private void TopBarRadio_OnClick(object? sender, RoutedEventArgs e)
+    private void SettingsNavigation_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is not RadioButton radioButton)
+        if (!_navigationReady || SettingsContent is null || SettingPages.SelectedItem is not SegmentOption radioButton)
             return;
 
         // Settings sub-pages stay in the nested Settings namespace.
         var settingsSubPagesNamespace = typeof(WhWzSettings).Namespace;
         var typeName = $"{settingsSubPagesNamespace}.{radioButton.Tag}";
         var type = Type.GetType(typeName);
-        if (type == null || !typeof(UserControl).IsAssignableFrom(type))
+        if (type == null || !typeof(UserControl).IsAssignableFrom(type) || SettingsContent.Content?.GetType() == type)
             return;
 
         SettingsContent.Content = Pages.Create(type);
     }
 
-    private void SetCheckedTopBarButton(UserControl settingsPage)
+    private void SetCheckedSidebarButton(UserControl settingsPage)
     {
-        foreach (var child in SettingPages.Children)
+        foreach (var child in SettingPages.Items)
         {
-            if (child is not RadioButton radioButton)
+            if (child is not SegmentOption radioButton)
                 continue;
 
-            radioButton.IsChecked = radioButton.Tag?.ToString() == settingsPage.GetType().Name;
+            if (radioButton.Tag?.ToString() == settingsPage.GetType().Name)
+                SettingPages.SelectedItem = radioButton;
         }
     }
 

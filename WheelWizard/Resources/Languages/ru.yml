@@ -128,7 +128,6 @@ ru:
     browse: "Выбрать"
     view_mod: "Просмотреть мод"
     save_external_mii: "Добавить Mii в раздел \"Мои Mii\""
-    view_mii: "Показать Mii"
     duplicate: "Дублировать"
     back: "Назад"
     unfavorite: "Убрать из избранного"
@@ -165,7 +164,6 @@ ru:
     mod_browser: "Браузер модов"
     mii_selector: "Выбор Mii"
     mii_editor: "Редактор Mii"
-    mii_carousel: "Карусель Mii"
   text:
     made_by_string: |-
       Создатели: %{firstAuthor}

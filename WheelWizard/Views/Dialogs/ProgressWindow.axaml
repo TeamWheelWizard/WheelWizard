@@ -15,11 +15,11 @@
         </Grid.RowDefinitions>
 
         <!-- Goal Description -->
-        <Border Grid.Row="0" Background="{StaticResource Primary500}" Margin="-10" >
+        <Border Grid.Row="0" Background="{StaticResource Brand500}" Margin="-10" >
             <SelectableTextBlock Margin="10" x:Name="GoalTextBlock"
                                  Classes="TitleText" FontSize="18"
                                  HorizontalAlignment="Left" VerticalAlignment="Center"
-                                 Foreground="{StaticResource Primary50}" />
+                                 Foreground="{StaticResource Brand50}" />
         </Border>
 
         <Grid Grid.Row="1" Margin="0,10" RowDefinitions="*,Auto,Auto">
@@ -36,18 +36,17 @@
                          Minimum="0" Maximum="100" Value="0"
                          IsIndeterminate="False"
                          BorderThickness="0"
-                         Foreground="{StaticResource Primary500}" 
+                         Foreground="{StaticResource Brand500}"
                          Background="{StaticResource BackgroundLineColor}"
                          Margin="0,10,0,0" />
 
-            <components:Button Grid.Row="2"
+            <components:ActionButton Grid.Row="2"
                                x:Name="CancelButton"
-                               Variant="Danger"
                                Text="{loc:T action.cancel}"
                                IsVisible="False"
                                HorizontalAlignment="Right"
                                Margin="0,10,0,0"
-                               Click="CancelButton_OnClick" />
+                               Click="CancelButton_OnClick"  Tone="Danger"/>
         </Grid>
     </Grid>
 </dialogBase:PopupContent>

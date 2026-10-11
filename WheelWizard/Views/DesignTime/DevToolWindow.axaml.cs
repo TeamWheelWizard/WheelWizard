@@ -29,12 +29,15 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     private DevelopmentRefreshService DevelopmentRefresh { get; }
     private INavigationService Navigation { get; }
 
+    private IPopupFactory Popups { get; }
+
     public DevToolWindow(
         IMemoryCache cache,
         IDolphinLaunchService dolphinLaunchService,
         LiveRoomsService liveRooms,
         DevelopmentRefreshService developmentRefresh,
-        INavigationService navigation
+        INavigationService navigation,
+        IPopupFactory popups
     )
         : base(true, true, true, "Dev Tool")
     {
@@ -43,6 +46,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
         LiveRooms = liveRooms;
         DevelopmentRefresh = developmentRefresh;
         Navigation = navigation;
+        Popups = popups;
         InitializeComponent();
         DevelopmentRefresh.Subscribe(this);
         LoadSettings();
@@ -66,6 +70,8 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     }
 
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
+
+    private void ShowMiiAnimator_OnClick(object sender, RoutedEventArgs e) => Popups.Create<MiiAnimatorDevWindow>().Show();
 
     private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
 
@@ -142,7 +148,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
             .SetMainText("Do you click yes or no")
             .AwaitAnswer();
 
-        YesNoPopupButton.Variant = yesNoWindow ? ButtonVariant.Primary : ButtonVariant.Danger;
+        YesNoPopupButton.Tone = yesNoWindow ? ActionButtonTone.Brand : ActionButtonTone.Danger;
     }
 
     private async void OptionsPopup_OnClick(object sender, RoutedEventArgs e)
@@ -155,7 +161,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
             .AddOption("Banana", "Not an Option", () => { }, false)
             .AwaitAnswer();
 
-        OptionsPopupButton.Variant = optionsWindow != null ? ButtonVariant.Warning : ButtonVariant.Danger;
+        OptionsPopupButton.Tone = optionsWindow != null ? ActionButtonTone.Primary : ActionButtonTone.Danger;
         OptionsPopupButton.Text = optionsWindow ?? "Clicked away";
     }
 

@@ -11,7 +11,7 @@
         xmlns:modDialogs="clr-namespace:WheelWizard.Mods.Views.Dialogs">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-        <components:LoadingIcon x:Name="LoadingView" Width="90" Height="90" IsVisible="False" />
+        <components:Spinner x:Name="LoadingView" Width="90" Height="90" IsVisible="False" />
 
         <components:EmptyPageInfo x:Name="NoDetailsView" IsVisible="False"
                                   Title="{loc:T empty_content.no_mod_selected_title}" BodyText="{loc:T empty_content.no_mod_selected}"
@@ -59,39 +59,28 @@
             <Grid Grid.Row="1">
                 <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Top" HorizontalAlignment="Left">
-                    <components:LinkButton
-                        Foreground="{StaticResource Primary300}"
-                        HoverForeground="{StaticResource Primary200}"
+                    <components:ActionButton
                         Text="somebody" x:Name="AuthorButton"
-                        IconData="{StaticResource User}"
-                        IconSize="16" FontSize="13" Click="AuthorLink_Click" />
-                    <components:LinkButton Margin="10,0,0,0"
-                                                Foreground="{StaticResource Primary300}"
-                                                HoverForeground="{StaticResource Primary200}"
+                        IconData="{StaticResource User}" FontSize="13" Click="AuthorLink_Click"  Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
+                    <components:ActionButton Margin="10,0,0,0"
                                                 IsIconLeft="False" Text="{loc:T action.gamebanana_page}"
-                                                IconData="{StaticResource ExternalLink}"
-                                                IconSize="16" FontSize="13" Click="GameBananaLink_Click" />
+                                                IconData="{StaticResource ExternalLink}" FontSize="13" Click="GameBananaLink_Click"  Tone="Brand" Variant="Link" Padding="0" MinHeight="0"/>
                 </StackPanel>
 
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom"
                             Orientation="Horizontal">
-                    <components:Button
-                        x:Name="InstallButton" Text="{loc:T action.install}"
-                        IconSize="0" Margin="3,0"
-                        Click="Install_Click" />
-                    <components:Button
-                        Variant="Warning"
-                        x:Name="UnInstallButton" Text="{loc:T action.un_install}"
-                        IconSize="0" Margin="3,0"
-                        Click="UnInstall_Click" />
+                    <components:ActionButton
+                        x:Name="InstallButton" Text="{loc:T action.install}" Margin="3,0"
+                        Click="Install_Click"  Tone="Brand"/>
+                    <components:ActionButton
+                        x:Name="UnInstallButton" Text="{loc:T action.un_install}" Margin="3,0"
+                        Click="UnInstall_Click"  Tone="Danger"/>
                 </StackPanel>
 
-                <components:LinkButton Foreground="{StaticResource Danger400}"
-                                            HoverForeground="{StaticResource Danger300}"
+                <components:ActionButton
                                             Text="{loc:T action.report}" x:Name="ReportButton"
                                             HorizontalAlignment="Right" VerticalAlignment="Top" IsIconLeft="False"
-                                            IconData="{StaticResource WarningTip}"
-                                            IconSize="16" FontSize="13" Click="ReportLink_Click" />
+                                            IconData="{StaticResource WarningTip}" FontSize="13" Click="ReportLink_Click"  Tone="Danger" Variant="Link" Padding="0" MinHeight="0"/>
             </Grid>
             <!-- OTHER HEADER STUFF END -->
 

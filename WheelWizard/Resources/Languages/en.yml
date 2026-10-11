@@ -12,6 +12,7 @@ en:
     my_miis: "My Miis"
   attribute:
     status_online: "Online"
+    date: "Date"
     enabled: "Enabled"
     title: "Title"
     all: "All"
@@ -92,6 +93,22 @@ en:
       glasses: "Glasses"
       facial_hair: "Facial Hair"
       mole: "Mole"
+      head: "Head"
+      body: "Body"
+      info: "Info"
+    mii_feature:
+      none: "None"
+      cheeks: "Rosy cheeks"
+      cheeks_and_eyes: "Rosy cheeks and eyes"
+      freckles: "Freckles"
+      baggy_eyes: "Baggy eyes"
+      chiseled: "Chiseled"
+      tired: "Tired"
+      chin: "Chin line"
+      eye_shadow: "Eye shadow"
+      stubble: "Stubble"
+      mouth_corners: "Mouth lines"
+      wrinkles: "Wrinkles"
     gender: "Gender"
     gender_female: "Female"
     gender_male: "Male"
@@ -114,7 +131,9 @@ en:
     no_profiles: "No profiles"
     custom: "Custom"
     installed: "Installed"
+    primary: "Primary"
   action:
+    more_actions: "More actions"
     play: "Play"
     open: "Open"
     play_offline: "Play Offline"
@@ -148,13 +167,18 @@ en:
     change: "Change"
     view_mod: "View Mod"
     save_external_mii: "Add Mii to \"My Miis\""
-    view_mii: "View Mii"
     view_profile: "View Profile"
     duplicate: "Duplicate"
     back: "Back"
+    undo: "Undo"
+    redo: "Redo"
+    leave: "Leave"
+    keep_editing: "Keep editing"
+    surprise_me: "Surprise me"
     unfavorite: "Unfavorite"
     favorite: "Favorite"
     view_room: "View Room"
+    change_mii: "Change Mii"
     recomp_nand_copy: "Make a copy"
     recomp_nand_share: "Use directly"
     recomp_install_offline: "Install offline-only"
@@ -189,7 +213,6 @@ en:
     mod_browser: "Mod Browser"
     mii_selector: "Mii Selector"
     mii_editor: "Mii Editor"
-    mii_carousel: "Mii Carousel"
   text:
     made_by_string: |-
       Made by: %{firstAuthor}
@@ -207,7 +230,20 @@ en:
     whole_file_override: "Whole-file override"
     top_3_podium: "Top 3 Podium"
     live_rwfc: "Live from RWFC"
+    pick_your_mii: "Pick your Mii"
+    pick_your_mii_extra: "Click one to start, or roll the dice."
   hover:
+    mii_editor:
+      previous: "Previous"
+      next: "Next"
+      bigger: "Bigger"
+      smaller: "Smaller"
+      rotate_left: "Rotate left"
+      rotate_right: "Rotate right"
+      flip: "Flip"
+      color: "Color"
+      add: "Add %{part}"
+      remove: "Remove %{part}"
     players_online:
       none: "There are currently no players online"
       one: "There is currently 1 player online"
@@ -300,6 +336,9 @@ en:
     recomp_finished: "WiiCompiled is ready to play"
     recomp_copying_nand: "Copying your Dolphin data"
   question:
+    leave_mii_editor:
+      title: "Leave without saving?"
+      extra: "Your changes to this Mii will be lost."
     recomp_uninstall:
       title: "Uninstall WiiCompiled?"
       extra_shared: "This removes the WiiCompiled installation. Your saves stay in Dolphin's Wii folder, and Retro Rewind stays installed."
@@ -650,7 +689,9 @@ en:
     must_set_paths: "You must set these 3 paths before you can start playing Retro Rewind"
     must_set_game_path: "You must select your Mario Kart Wii game file before you can start playing WiiCompiled"
   category:
+    appearance: "Appearance"
     dolphin: "Dolphin"
+    graphics: "Graphics"
     about: "About"
     other: "Other"
     general: "General"
@@ -689,3 +730,10 @@ en:
       polish: "Polish"
       portuguese: "Portuguese"
       z_translators: "-"
+
+  component:
+    dropdown:
+      search_placeholder: "Search..."
+      empty: "No options found"
+    input:
+      invalid_number: "Enter a number"

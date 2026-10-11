@@ -19,17 +19,15 @@
                                  TextWrapping="Wrap"
                                  HorizontalAlignment="Left" Margin="0,10,0,0" />
 
-            <components:TextField x:Name="InputField" PlaceholderText="{loc:T placeholder.enter_text_here}"
-                                          Margin="0,5,0,0" Variant="Default" />
+            <components:InputField x:Name="InputField" Placeholder="{loc:T placeholder.enter_text_here}"
+                                          Margin="0,5,0,0" Variant="Bordered" />
         </StackPanel>
 
-        <components:LinkButton Grid.Row="1" x:Name="CustomCharsButton"
-                                    Foreground="{StaticResource Primary300}"
-                                    HoverForeground="{StaticResource Primary200}"
+        <components:ActionButton Grid.Row="1" x:Name="CustomCharsButton"
                                     IconData="{StaticResource ArrowDown}"
                                     IsIconLeft="False"
                                     IsEnabled="True" Text="{loc:T action.view_custom_chars}" IsVisible="False"
-                                    Click="CustomCharsButton_Click" Margin="0,0,0,5" />
+                                    Click="CustomCharsButton_Click" Margin="0,0,0,5"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
         <UniformGrid Columns="10" Grid.Row="1" x:Name="CustomChars" IsVisible="False" Margin="0,0,0,5">
             <!--This will be filled with buttons of all the special chars -->
         </UniformGrid>
@@ -40,14 +38,14 @@
 
         <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                      x:Name="ButtonContainer" Margin="0,5,0,0">
-            <components:Button x:Name="CancelButton" Variant="Default"
+            <components:ActionButton x:Name="CancelButton"
                                IsEnabled="True" Text="{loc:T action.cancel}"
                                IconData="{StaticResource XMark}"
-                               Click="CancelButton_Click" Margin="0,0,5,0" />
-            <components:Button x:Name="SubmitButton" Variant="Primary"
+                               Click="CancelButton_Click" Margin="0,0,5,0"  Tone="Secondary"/>
+            <components:ActionButton x:Name="SubmitButton"
                                IsEnabled="False" Text="{loc:T action.submit}"
                                IconData="{StaticResource CheckMark}"
-                               Click="SubmitButton_Click" Margin="5,0,0,0" />
+                               Click="SubmitButton_Click" Margin="5,0,0,0"  Tone="Brand"/>
         </UniformGrid>
     </Grid>
 </dialogBase:PopupContent>

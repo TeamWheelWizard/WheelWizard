@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace WheelWizard.UI.Test;
 
@@ -25,7 +26,8 @@ public class ToolTipBubbleBehaviorTests
             Height = 100,
             Background = Avalonia.Media.Brushes.Transparent,
         };
-        ToolTip.SetTip(target, new ToolTip { Content = "Hover" });
+        ToolTip.SetTip(target, new WheelWizard.Views.Components.HintTooltip { Text = "Hover" });
+        ToolTip.SetPlacement(target, PlacementMode.BottomEdgeAlignedRight);
         var window = new Window
         {
             Content = target,
@@ -44,8 +46,13 @@ public class ToolTipBubbleBehaviorTests
             Assert.True(window.IsActive, "Window should be active");
             Assert.False(ToolTip.GetServiceEnabled(target), "Custom tooltip service should be initialized");
             Assert.True(ToolTip.GetIsOpen(target));
-            var tip = Assert.IsType<ToolTip>(ToolTip.GetTip(target));
+            Assert.Equal(PlacementMode.TopEdgeAlignedRight, ToolTip.GetPlacement(target));
+            var tip = Assert.IsType<WheelWizard.Views.Components.HintTooltip>(ToolTip.GetTip(target));
             Assert.Contains("BubbleAnimateIn", tip.Classes);
+            Assert.Contains("BubblePointerRight", tip.Classes);
+            Assert.True(
+                tip.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Single(path => path.Name == "PART_ToolTipTail").IsVisible
+            );
 
             window.MouseMove(new Point(1, 1));
             Dispatcher.UIThread.RunJobs();

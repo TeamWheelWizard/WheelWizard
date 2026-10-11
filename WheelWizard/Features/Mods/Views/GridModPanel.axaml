@@ -1,4 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:patches="clr-namespace:WheelWizard.Features.Patches"
              x:Class="WheelWizard.Mods.Views.GridModPanel"
@@ -16,10 +17,10 @@
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
         <Style Selector="Border#RootCardBorder.Enabled">
-            <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
         </Style>
         <Style Selector="Border#RootCardBorder.Enabled:pointerover">
-            <Setter Property="BorderBrush" Value="{StaticResource Primary400}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
             <Setter Property="Background" Value="{StaticResource Neutral800}" />
         </Style>
     </UserControl.Styles>
@@ -59,7 +60,7 @@
 
             <Border Grid.Row="1" x:Name="EnabledBackgroundGlow" CornerRadius="99999"
                     HorizontalAlignment="Right" VerticalAlignment="Top" Height="70" Width="50"
-                    Background="{StaticResource Primary200}" Opacity="0.7" Effect="blur(130)"
+                    Background="{StaticResource Brand200}" Opacity="0.7" Effect="blur(130)"
                     IsVisible="{Binding Mod.IsEnabled}" IsHitTestVisible="False" />
 
             <!-- Fixed-height body keeps both enabled states and title lengths the same size. -->
@@ -73,27 +74,18 @@
                             <TextBlock Text="#" FontSize="13"
                                        Foreground="{StaticResource Neutral500}"
                                        VerticalAlignment="Center" />
-                            <TextBox x:Name="PriorityTextBox"
+                            <components:InputField x:Name="PriorityTextBox"
                                      Text="{Binding Mod.Priority, Mode=OneWay}"
-                                     Classes="dark"
+
                                      MinWidth="30" MaxWidth="50"
-                                     MinHeight="28" Height="28"
+                                     MinHeight="28"
                                      VerticalAlignment="Center"
                                      Padding="4,2"
                                      HorizontalContentAlignment="Center"
                                      TextChanged="PriorityText_OnTextChanged"
                                      LostFocus="PriorityText_OnLostFocus"
                                      KeyDown="PriorityText_OnKeyDown">
-                                <TextBox.Styles>
-                                    <Style Selector="TextBox /template/ DockPanel#PART_InnerDockPanel">
-                                        <Setter Property="Margin" Value="0" />
-                                    </Style>
-                                    <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
-                                        <Setter Property="HorizontalAlignment" Value="Center" />
-                                        <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
-                                    </Style>
-                                </TextBox.Styles>
-                            </TextBox>
+                            </components:InputField>
                         </StackPanel>
             </Grid>
         </Grid>

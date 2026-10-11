@@ -4,11 +4,15 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Testably.Abstractions;
 using WheelWizard.Localization;
+using WheelWizard.MiiAnimations.Library;
+using WheelWizard.MiiRendering.Services;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Calendar;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Navigation;
@@ -19,7 +23,6 @@ using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
-using WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
 
 namespace WheelWizard.WheelWizardData.Views;
 
@@ -44,6 +47,11 @@ public sealed record LeaderboardPlayerItem
     public Mii? FirstMii => Mii;
     public bool HasBadges => HasBadge;
     public bool IsTopLeaderboardPlayer => true;
+    public WheelWizard.Views.Components.StatusVariant RankBadgeVariant =>
+        Rank is 4 or 5 ? WheelWizard.Views.Components.StatusVariant.Brand
+        : Rank is >= 6 and <= 10 ? WheelWizard.Views.Components.StatusVariant.Info
+        : WheelWizard.Views.Components.StatusVariant.Gray;
+
     public string TopLabel => t("placement.other", new { rank = Rank });
     public bool IsOpenHost => false;
 }
@@ -182,7 +190,11 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         IRrLeaderboardSingletonService leaderboardService,
         IWhWzDataSingletonService badgeService,
         IGameLicenseSingletonService gameDataService,
-        ISettingsManager settingsManager
+        ISettingsManager settingsManager,
+        IMiiNativeRenderer miiRenderer,
+        IMiiAnimationLibrary miiAnimations,
+        ISeasonalCalendar calendar,
+        IRandomSystem random
     )
     {
         Popups = popups;
@@ -194,6 +206,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         SettingsManager = settingsManager;
         InitializeComponent();
         DataContext = this;
+        PodiumStage.Initialize(miiRenderer, miiAnimations, random.Random.Shared, calendar, settingsManager.ENABLE_ANIMATIONS.Get());
         RemainingPlayers.CollectionChanged += RemainingPlayers_OnCollectionChanged;
 
         Loaded += LeaderboardPage_Loaded;
@@ -447,15 +460,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(player.FriendCode);
         ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
-    }
-
-    private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)
-    {
-        var player = GetContextPlayer(sender);
-        if (player?.FirstMii == null)
-            return;
-
-        new MiiCarouselWindow().SetMii(player.FirstMii).Show();
     }
 
     private void ViewProfile_OnClick(object sender, RoutedEventArgs e)

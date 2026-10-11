@@ -26,8 +26,12 @@ public partial class OptionsWindow : PopupContent
 
     public OptionsWindow AddOption(Geometry icon, string title, Action onClick, bool enabled = true)
     {
-        var button = new TileButton()
+        var button = new ActionButton()
         {
+            Tone = ActionButtonTone.Secondary,
+            Width = 150,
+            MinHeight = 48,
+            Margin = new Thickness(6),
             IconData = icon,
             Text = title,
             IsEnabled = enabled,

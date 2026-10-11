@@ -3,7 +3,6 @@ using WheelWizard.Launching;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
-using Button = WheelWizard.Views.Components.Button;
 
 namespace WheelWizard.Launching.Presentation;
 
@@ -19,7 +18,7 @@ public sealed class DolphinLaunchPresentation : IDolphinLaunchPresentation
     public async Task<DolphinVersionAction> ChooseOutdatedVersionActionAsync(string? version)
     {
         var popup = new YesNoWindow()
-            .SetButtonVariants(ButtonVariant.Primary, ButtonVariant.Danger)
+            .SetButtonTones(ActionButtonTone.Brand, ActionButtonTone.Danger)
             .SetButtonText(t("action.update"), t("action.play_anyway"))
             .SetMainText(t("question.dolphin_outdated.title"))
             .SetExtraText(
