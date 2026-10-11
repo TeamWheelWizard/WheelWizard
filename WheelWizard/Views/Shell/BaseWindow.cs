@@ -71,12 +71,15 @@ public abstract class BaseWindow : Window
         // measuring a dialog's next size when its content changes.
         // Wait for layout and decoration changes to settle, and coalesce acknowledgements.
         _waylandSizeUpdateQueued = true;
-        Dispatcher.UIThread.Post(() =>
-        {
-            _waylandSizeUpdateQueued = false;
-            if (IsVisible && !CanResize && PlatformImpl != null)
-                _setWaylandSizeConstraints(ClientSize, ClientSize);
-        }, DispatcherPriority.Background);
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                _waylandSizeUpdateQueued = false;
+                if (IsVisible && !CanResize && PlatformImpl != null)
+                    _setWaylandSizeConstraints(ClientSize, ClientSize);
+            },
+            DispatcherPriority.Background
+        );
     }
 
     private void AttachMacWindowMenu()

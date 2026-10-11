@@ -170,6 +170,7 @@ public class Dropdown : ComboBox
             .ToArray();
         if (e.Key is Key.Down or Key.Up)
         {
+            _menu?.UpdateLayout();
             if (options.Length > 0)
                 ContainerFromIndex(options[e.Key == Key.Down ? 0 : options.Length - 1])?.Focus(NavigationMethod.Directional);
             e.Handled = true;
@@ -236,7 +237,7 @@ public class Dropdown : ComboBox
         if (_searchInput is not null)
         {
             _searchInput.TextChanged -= SearchTextChanged;
-            _searchInput.KeyDown -= SearchKeyDown;
+            _searchInput.RemoveHandler(KeyDownEvent, SearchKeyDown);
         }
         CleanupMenu();
         if (_popup is not null)
@@ -247,7 +248,7 @@ public class Dropdown : ComboBox
         _searchInput = e.NameScope.Get<InputField>("PART_Search");
         _empty = e.NameScope.Get<TextBlock>("PART_Empty");
         _searchInput.TextChanged += SearchTextChanged;
-        _searchInput.KeyDown += SearchKeyDown;
+        _searchInput.AddHandler(KeyDownEvent, SearchKeyDown, RoutingStrategies.Tunnel);
         FilterOptions();
         _popup.Closed += OnPopupClosed;
         if (IsDropDownOpen)
@@ -344,9 +345,6 @@ public class Dropdown : ComboBox
             menu.UpdateLayout();
             menu.Measure(Size.Infinity);
             menu.Width = Math.Max(Bounds.Width, menu.DesiredSize.Width);
-            if (Search)
-                // Keep the native popup from resizing/repositioning on every search keystroke.
-                menu.Height = Math.Min(menu.DesiredSize.Height, Math.Max(0, MaxDropDownHeight - menu.Margin.Top - menu.Margin.Bottom));
         }
 
         if (MenuAnimationDuration > TimeSpan.Zero)

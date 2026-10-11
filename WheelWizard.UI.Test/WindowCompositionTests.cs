@@ -453,14 +453,16 @@ public class WindowCompositionTests
             var initialWidth = popup.ClientSize.Width;
             Assert.True(content.IsLoading);
 
-            profileReady.SetResult(new PlayerProfileResponse
-            {
-                Name = "Profile layout test",
-                FriendCode = "1234-5678-9012",
-                LastSeen = DateTime.UtcNow,
-                Vr = 12000,
-                Rank = 42,
-            });
+            profileReady.SetResult(
+                new PlayerProfileResponse
+                {
+                    Name = "Profile layout test",
+                    FriendCode = "1234-5678-9012",
+                    LastSeen = DateTime.UtcNow,
+                    Vr = 12000,
+                    Rank = 42,
+                }
+            );
             await loaded.Task.WaitAsync(TimeSpan.FromSeconds(3));
             popup.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -470,19 +472,26 @@ public class WindowCompositionTests
             Assert.Equal(initialWidth, popup.ClientSize.Width);
             AssertInsideWindow(title, popup);
 
-            historyReady.SetResult(new RwfcPlayerVrHistoryResponse
-            {
-                FromDate = DateTime.UtcNow.AddDays(-1),
-                ToDate = DateTime.UtcNow,
-                StartingVr = 11000,
-                EndingVr = 12000,
-                TotalVrChange = 1000,
-                History =
-                [
-                    new() { Date = DateTime.UtcNow.AddDays(-1), TotalVr = 11000 },
-                    new() { Date = DateTime.UtcNow, TotalVr = 12000, VrChange = 1000 },
-                ],
-            });
+            historyReady.SetResult(
+                new RwfcPlayerVrHistoryResponse
+                {
+                    FromDate = DateTime.UtcNow.AddDays(-1),
+                    ToDate = DateTime.UtcNow,
+                    StartingVr = 11000,
+                    EndingVr = 12000,
+                    TotalVrChange = 1000,
+                    History =
+                    [
+                        new() { Date = DateTime.UtcNow.AddDays(-1), TotalVr = 11000 },
+                        new()
+                        {
+                            Date = DateTime.UtcNow,
+                            TotalVr = 12000,
+                            VrChange = 1000,
+                        },
+                    ],
+                }
+            );
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             popup.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -508,9 +517,15 @@ public class WindowCompositionTests
         public TextBlock Label { get; } = new() { Text = "Unscaled modal content", FontSize = 16 };
         public Button BottomButton { get; } = new() { Content = "Bottom button" };
 
-        public SizedPopup() : base(true, false, false, "Scale test")
+        public SizedPopup()
+            : base(true, false, false, "Scale test")
         {
-            Root = new Grid { Width = 300, Height = 200, RowDefinitions = RowDefinitions.Parse("Auto,*,Auto") };
+            Root = new Grid
+            {
+                Width = 300,
+                Height = 200,
+                RowDefinitions = RowDefinitions.Parse("Auto,*,Auto"),
+            };
             Grid.SetRow(BottomButton, 2);
             Root.Children.Add(Label);
             Root.Children.Add(BottomButton);

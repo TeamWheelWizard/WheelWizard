@@ -193,6 +193,7 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         UpdateModsButtonText();
         UpdateMadeByText();
+        UpdatePlayerAndRoomCount();
         UpdateLiveAlert();
     }
 
