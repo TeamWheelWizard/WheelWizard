@@ -23,6 +23,8 @@ public class App : Application
 
     public override void Initialize()
     {
+        // macOS reads the name before deferred visual resources load for the splash startup.
+        Name = "Wheel Wizard";
         if (_createStartup is null)
             LoadVisualResources();
     }
