@@ -169,6 +169,8 @@ public class ApplicationCompositionTests
             original.UpdateLayout();
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             var settingsPage = Assert.IsType<SettingsPage>(navigation.CurrentPage);
+            var versionInfo = Assert.IsType<SettingsVersionInfo>(settingsPage.FindControl<ContentControl>("VersionInfoSidebar")!.Content);
+            Assert.Contains(versionInfo.FindControl<SelectableTextBlock>("ReleaseText")!.Text, new[] { "Dev", "Release" });
             var settingsContent = settingsPage.FindControl<ContentControl>("SettingsContent")!;
             var appearance = Assert.IsType<AppearanceSettings>(settingsContent.Content);
             var languages = appearance.FindControl<Dropdown>("WhWzLanguageDropdown")!;
