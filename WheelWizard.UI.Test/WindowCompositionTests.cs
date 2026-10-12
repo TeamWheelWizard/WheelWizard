@@ -1,17 +1,21 @@
 using System.Linq.Expressions;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using WheelWizard.AutoUpdating.Presentation;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Dialogs.Base;
@@ -25,6 +29,81 @@ namespace WheelWizard.UI.Test;
 
 public class WindowCompositionTests
 {
+    [AvaloniaTheory]
+    [InlineData("TitleBar")]
+    [InlineData("TitleBar, Border")]
+    [InlineData("TitleBar, Border, Shadow")]
+    public void LinuxCaptionButtons_FitTheCustomTitleBar(string decorationParts)
+    {
+        var popup = new PopupWindow(true, false, false, "Linux header");
+        try
+        {
+            popup.Show();
+            // Exercise the pinned framework's drawn decorations under the headless backend.
+            var host = typeof(TopLevel)
+                .GetProperty("TopLevelHost", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .GetValue(popup)!;
+            var theme = (ControlTheme)Application.Current!.Resources["LinuxWindowDecorations"]!;
+            var update = host.GetType()
+                .GetMethod(
+                    "UpdateDrawnDecorations",
+                    System.Reflection.BindingFlags.Instance
+                        | System.Reflection.BindingFlags.Public
+                        | System.Reflection.BindingFlags.NonPublic
+                )!;
+            var partsType = Nullable.GetUnderlyingType(update.GetParameters()[0].ParameterType)!;
+            var parts = Enum.Parse(partsType, decorationParts);
+            update.Invoke(host, [parts, WindowState.Normal, theme]);
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var buttons = ((Visual)host)
+                .GetVisualDescendants()
+                .OfType<Button>()
+                .Where(button => button.Name is "PART_MinimizeButton" or "PART_MaximizeButton" or "PART_CloseButton")
+                .ToList();
+            Assert.NotEmpty(buttons);
+            foreach (var button in buttons)
+            {
+                Assert.Equal(30, button.Bounds.Width);
+                Assert.Equal(30, button.Bounds.Height);
+                Assert.Equal(0, button.Margin.Top);
+                var position = button.TranslatePoint(default, popup)!.Value;
+                Assert.Equal(0, position.Y);
+                Assert.True(position.X + button.Bounds.Width <= popup.ClientSize.Width);
+            }
+            var captionPanel = buttons[0].Parent as StackPanel;
+            Assert.NotNull(captionPanel);
+            Assert.Equal(new Thickness(0), captionPanel.Margin);
+        }
+        finally
+        {
+            popup.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task LinuxManualUpdate_DirectsUsersToTheirPackageManager()
+    {
+        var environment = Substitute.For<IRuntimeEnvironment>();
+        environment.IsLinux.Returns(true);
+        PopupWindow? popup = null;
+        using var opened = Window.WindowOpenedEvent.AddClassHandler<PopupWindow>((window, _) => popup = window);
+        try
+        {
+            await new UpdatePresentation(environment).ShowManualUpdateAsync("2.0.0", "1.0.0");
+            var content = Assert.IsType<MessageBoxWindow>(popup!.FindControl<ContentPresenter>("PopupContent")!.Content);
+            Assert.Contains("through your package manager", content.FindControl<SelectableTextBlock>("MessageInformationBlock")!.Text);
+            Assert.Equal(
+                "https://github.com/TeamWheelWizard/WheelWizard/releases",
+                content.FindControl<WheelWizard.Views.Components.ActionButton>("MessageLink")!.Text
+            );
+        }
+        finally
+        {
+            popup?.Close();
+        }
+    }
+
     [AvaloniaFact]
     public void AppearanceResources_FollowTheAnimationSettingAndUnsubscribe()
     {

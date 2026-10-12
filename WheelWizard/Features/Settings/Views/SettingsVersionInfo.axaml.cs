@@ -22,18 +22,7 @@ public partial class SettingsVersionInfo : UserControl
 
         RrVersionText.Text = "RR: " + CustomDistributionSingletonService.RetroRewind.GetCurrentVersion();
 
-        var part1 = DevelopmentMode.IsEnabled ? "Dev" : "Release";
-        var part2 = "Unknown OS";
-        // We intentionally use preprocessor directives (#if, #elif, #endif) instead of Environment.OSVersion
-        // because 'part2' represents the OS this code was built for, not the OS it is currently running on.
-#if WINDOWS
-        part2 = "Windows";
-#elif LINUX
-        part2 = "Linux";
-#elif MACOS
-        part2 = "Macos";
-#endif
-        ReleaseText.Text = $"{part1} - {part2}";
+        ReleaseText.Text = DevelopmentMode.IsEnabled ? "Dev" : "Release";
     }
 
     protected override void OnInitialized()

@@ -98,8 +98,14 @@
             </ControlTheme>
             <ControlTheme x:Key="LinuxWindowDecorations" TargetType="WindowDrawnDecorations"
                           BasedOn="{StaticResource DesktopWindowDecorations}">
-                <Style Selector="^:maximized /template/ Path#RestoreButtonPath">
-                    <Setter Property="Data" Value="M 0,0 H 12 V 12 H 0 Z M 2,2 V 10 H 10 V 2 Z" />
+                <!-- The client fills the window; Linux's drawn frame/shadow would inset only the caption buttons. -->
+                <Setter Property="DefaultFrameThickness" Value="0" />
+                <Setter Property="DefaultShadowThickness" Value="0" />
+                <Style Selector="^:has-border /template/ StackPanel#PART_OverlayPanel">
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+                <Style Selector="^:has-border /template/ Panel#PART_TitleBar">
+                    <Setter Property="Margin" Value="0" />
                 </Style>
             </ControlTheme>
         </ResourceDictionary>
