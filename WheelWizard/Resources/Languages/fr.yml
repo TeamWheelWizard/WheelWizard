@@ -136,7 +136,6 @@ fr:
     change: "Changer"
     view_mod: "Détails du Mod"
     save_external_mii: "Ajouter un Mii dans \"Mes Miis\""
-    view_mii: "Voir le Mii"
     duplicate: "Dupliquer"
     back: "Retour"
     unfavorite: "Retirer des favoris"
@@ -176,7 +175,6 @@ fr:
     mod_browser: "Navigateur de mods"
     mii_selector: "Sélecteur de Mii"
     mii_editor: "Éditeur de Mii"
-    mii_carousel: "Vue d'ensemble des Miis"
   text:
     made_by_string: |-
       Fait par: %{firstAuthor}

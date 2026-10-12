@@ -12,12 +12,13 @@ using WheelWizard.GameBanana;
 using WheelWizard.GitHub;
 using WheelWizard.Launching;
 using WheelWizard.Localization;
+using WheelWizard.MiiAnimations;
 using WheelWizard.MiiImages;
 using WheelWizard.Mods;
 using WheelWizard.Recomp;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
-using WheelWizard.Views;
+using WheelWizard.Views.Shell;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 
@@ -45,6 +46,7 @@ public static class SetupExtensions
         services.AddWiiManagement();
         services.AddGameBanana();
         services.AddMiiImages();
+        services.AddMiiAnimations();
         services.AddCustomDistributionService();
         services.AddArchives();
         services.AddPatches();

@@ -1,0 +1,48 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:loc="clr-namespace:WheelWizard.Localization" xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <Styles.Resources>
+        <ControlTheme x:Key="SplitButtonMenu" TargetType="MenuFlyoutPresenter">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel /></ItemsPanelTemplate></Setter>
+            <Setter Property="Template"><ControlTemplate>
+                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}">
+                    <ScrollViewer MaxHeight="240" HorizontalScrollBarVisibility="Disabled"><ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" /></ScrollViewer>
+                </Border>
+            </ControlTemplate></Setter>
+        </ControlTheme>
+    </Styles.Resources>
+    <Style Selector="components|SplitButton">
+        <Setter Property="Template"><ControlTemplate>
+            <Grid ColumnDefinitions="*,Auto">
+                <components:ActionButton Name="PART_PrimaryButton" Text="{TemplateBinding Text}" IconData="{TemplateBinding IconData}" Tone="{TemplateBinding Tone}" Size="{TemplateBinding Size}" CornerRadius="6,0,0,6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                <components:ActionButton Name="PART_SecondaryButton" Grid.Column="1" IconData="{StaticResource Chevron}" Tone="{TemplateBinding Tone}" Size="{TemplateBinding Size}" CornerRadius="0,6,6,0" VerticalAlignment="Stretch" AutomationProperties.Name="{loc:T action.more_actions}" />
+                <Border Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{StaticResource Neutral200}" Opacity="0.25" IsHitTestVisible="False" />
+            </Grid>
+        </ControlTemplate></Setter>
+    </Style>
+    <Style Selector="components|SplitButtonItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template"><ControlTemplate>
+            <Border Background="{TemplateBinding Background}" CornerRadius="4" ClipToBounds="True">
+                <Panel>
+                    <Canvas IsHitTestVisible="False"><components:HoverGlow Name="PART_HoverEffect" Width="46" Height="46" Background="{StaticResource Brand200}" Opacity="0.3" Effect="blur(150)" IsVisible="False" /></Canvas>
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="{TemplateBinding Padding}" IsHitTestVisible="False">
+                        <PathIcon Data="{TemplateBinding IconData}" Width="16" Height="16" Foreground="{StaticResource Neutral400}" IsVisible="{TemplateBinding IconData, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                        <ContentPresenter Content="{TemplateBinding Header}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Panel>
+            </Border>
+        </ControlTemplate></Setter>
+        <Style Selector="^:pointerover:not(:disabled), ^:selected"><Setter Property="Background" Value="{StaticResource Neutral800}" /><Setter Property="Foreground" Value="{StaticResource Brand300}" /></Style>
+        <Style Selector="^:pointerover:not(:disabled) /template/ components|HoverGlow#PART_HoverEffect"><Setter Property="IsVisible" Value="True" /></Style>
+        <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.45" /><Setter Property="Cursor" Value="Arrow" /></Style>
+    </Style>
+</Styles>

@@ -1,0 +1,43 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <Style Selector="components|SegmentedControl">
+        <Setter Property="Background" Value="{StaticResource Neutral950}" />
+        <Setter Property="Padding" Value="4" /><Setter Property="CornerRadius" Value="6" />
+        <Setter Property="BorderThickness" Value="1" /><Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+        <Setter Property="SelectionMode" Value="Single,AlwaysSelected" />
+        <Setter Property="ItemsPanel"><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></Setter>
+        <Setter Property="Template"><ControlTemplate>
+            <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}">
+                <Panel>
+                    <Canvas IsHitTestVisible="False"><Border Name="PART_SelectionIndicator" Background="{StaticResource Neutral900}" CornerRadius="4" IsVisible="False">
+                        <Border.RenderTransform><TranslateTransform><TranslateTransform.Transitions><Transitions>
+                            <DoubleTransition Property="X" Duration="{DynamicResource SegmentAnimationDuration}" Easing="CubicEaseInOut" />
+                            <DoubleTransition Property="Y" Duration="{DynamicResource SegmentAnimationDuration}" Easing="CubicEaseInOut" />
+                        </Transitions></TranslateTransform.Transitions></TranslateTransform></Border.RenderTransform>
+                    </Border></Canvas>
+                    <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+                </Panel>
+            </Border>
+        </ControlTemplate></Setter>
+        <Style Selector="^[HasBorder=False]"><Setter Property="BorderThickness" Value="0" /></Style>
+        <Style Selector="^[Orientation=Vertical]"><Setter Property="ItemsPanel"><ItemsPanelTemplate><UniformGrid Columns="1" /></ItemsPanelTemplate></Setter></Style>
+        <Style Selector="^[Variant=Light]"><Setter Property="Background" Value="{StaticResource Neutral900}" /></Style>
+        <Style Selector="^[Variant=Light] /template/ Border#PART_SelectionIndicator"><Setter Property="Background" Value="{StaticResource Neutral950}" /></Style>
+    </Style>
+    <Style Selector="components|SegmentOption">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" /><Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{StaticResource Neutral300}" /><Setter Property="Padding" Value="12,8" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template"><ControlTemplate>
+            <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" IsHitTestVisible="False">
+                    <PathIcon Data="{TemplateBinding IconData}" Width="16" Height="16" Foreground="{TemplateBinding Foreground}" IsVisible="{TemplateBinding IconData, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    <ContentPresenter Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                </StackPanel>
+            </Border>
+        </ControlTemplate></Setter>
+        <Style Selector="^:pointerover, ^:selected"><Setter Property="Foreground" Value="{StaticResource Brand300}" /></Style>
+        <Style Selector="^:focus-visible"><Setter Property="Foreground" Value="{StaticResource Brand200}" /></Style>
+        <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.45" /><Setter Property="Cursor" Value="Arrow" /></Style>
+    </Style>
+</Styles>

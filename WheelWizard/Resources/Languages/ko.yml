@@ -128,7 +128,6 @@ ko:
     browse: "검색"
     view_mod: "모드 보기"
     save_external_mii: "\"나만의 Mii\"에 Mii 추가하기"
-    view_mii: "Mii 보기"
     duplicate: "복사"
     back: "뒤로 가기"
     unfavorite: "즐겨찾기 해제"
@@ -165,7 +164,6 @@ ko:
     mod_browser: "모드 브라우저"
     mii_selector: "Mii 셀렉터"
     mii_editor: "Mii 에디터"
-    mii_carousel: "Mii 슬라이더"
   text:
     made_by_string: |-
       만든이: %{firstAuthor}

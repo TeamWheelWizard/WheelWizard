@@ -56,7 +56,8 @@ public class MiiImagesSingletonService : IMiiImagesSingletonService, IDisposable
             return data.Error ?? Fail("Mii studio serialization failed.");
         }
 
-        var miiConfigKey = data.Value + specifications;
+        // A locked Mii looks nothing like a real Mii with the same data.
+        var miiConfigKey = data.Value + specifications + (mii is LockedMii ? "|locked" : string.Empty);
         if (!ShouldCache(specifications))
             return await RenderWithoutCacheAsync(mii, data.Value, specifications);
 

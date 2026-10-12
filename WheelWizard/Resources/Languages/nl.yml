@@ -128,7 +128,6 @@ nl:
     browse: "Zoeken"
     view_mod: "Bekijk mod"
     save_external_mii: "Voeg Mii toe aan \"Mijn Mii's\""
-    view_mii: "Bekijk Mii"
     duplicate: "Dupliceer"
     back: "Terug"
     unfavorite: "Verwijder uit favorieten"
@@ -165,7 +164,6 @@ nl:
     mod_browser: "Mod-browser"
     mii_selector: "Mii-selector"
     mii_editor: "Mii-editor"
-    mii_carousel: "Mii-carrousel"
   text:
     made_by_string: |-
       Gemaakt door %{firstAuthor}

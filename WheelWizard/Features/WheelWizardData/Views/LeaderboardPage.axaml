@@ -1,0 +1,236 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d"
+             d:DesignWidth="477"
+             d:DesignHeight="700"
+             x:Class="WheelWizard.WheelWizardData.Views.LeaderboardPage"
+             x:DataType="community:LeaderboardPage"
+        xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
+        xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
+    <UserControl.Styles>
+        <!-- Match RoomDetailsPage entry background treatment for PlayerListItem -->
+        <Style Selector="rooms|PlayerListItem /template/ Border.BoxItemBackground">
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Margin" Value="0,3" />
+            <Setter Property="Padding" Value="7,0" />
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+        </Style>
+        <Style Selector="rooms|PlayerListItem:pointerover /template/ Border.BoxItemBackground">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="1" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0"
+                Background="{StaticResource BackgroundLineColor}"
+                Height="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+
+        <TextBlock Grid.Row="0"
+                   Text="{loc:T page_title.leaderboard}"
+                   VerticalAlignment="Bottom"
+                   Classes="PageTitleText" />
+
+        <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" ZIndex="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+
+        <Grid Grid.Row="1">
+            <StackPanel IsVisible="{Binding IsLoading}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="20"
+                        Spacing="10">
+                <components:Spinner Width="68"
+                                        Height="68"
+                                        HorizontalAlignment="Center" />
+                <TextBlock Text="{loc:T state.loading_leaderboard}"
+                           Classes="BodyText"
+                           FontSize="14"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel IsVisible="{Binding HasError}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="20"
+                        Spacing="10">
+                <PathIcon Data="{StaticResource WarningTriangle}"
+                          Width="56"
+                          Height="56"
+                          Foreground="{StaticResource Danger500}"
+                          HorizontalAlignment="Center" />
+                <TextBlock Text="{loc:T message_error.failed_load_leaderboard}"
+                           Classes="TitleText"
+                           FontSize="18"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Classes="BodyText"
+                           Width="310"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center" />
+                <components:ActionButton Text="{loc:T action.retry}"
+                                   Tone="Brand"
+                                   IconData="{StaticResource Refresh}"
+                                   Width="160"
+                                   HorizontalAlignment="Center"
+                                   Click="RetryButton_OnClick" />
+            </StackPanel>
+
+            <StackPanel IsVisible="{Binding HasNoData}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="10">
+                <components:EmptyPageInfo Title="{loc:T empty_content.no_leaderboard_title}"
+                                          BodyText="{loc:T empty_content.no_leaderboard}"
+                                          IconData="{StaticResource Award}" />
+                <components:ActionButton Text="{loc:T action.refresh}"
+                                   Tone="Brand"
+                                   IconData="{StaticResource Refresh}"
+                                   Width="170"
+                                   HorizontalAlignment="Center"
+                                   Click="RetryButton_OnClick" />
+            </StackPanel>
+
+            <ScrollViewer IsVisible="{Binding HasData}"
+                          Margin="10,10,10,0"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto"
+                          IsScrollInertiaEnabled="True">
+                <StackPanel Spacing="10"
+                            Margin="0,0,0,12">
+                    <Border>
+                        <Grid RowDefinitions="Auto,Auto"
+                              ClipToBounds="False">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Ellipse Width="7" Height="7" Fill="{StaticResource Brand300}" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T text.live_rwfc}" Classes="TinyText"
+                                           Foreground="{StaticResource Neutral300}" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- The top three stand on a podium in 3D. Pulled up a bit so confetti can fly over the header. -->
+                            <community:LeaderboardPodiumStage x:Name="PodiumStage"
+                                                              Grid.Row="1"
+                                                              Height="380"
+                                                              Margin="0,-24,0,0"
+                                                              First="{Binding PodiumFirst.Mii}"
+                                                              Second="{Binding PodiumSecond.Mii}"
+                                                              Third="{Binding PodiumThird.Mii}">
+                                <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="2"
+                                                                 Classes="Silver"
+                                                                 IsVisible="{Binding HasPodiumSecond}"
+                                                                 Rank="{Binding PodiumSecond.Rank}"
+                                                                 PlayerName="{Binding PodiumSecond.Name}"
+                                                                 VrText="{Binding PodiumSecond.VrText}"
+                                                                 ShowBadge="{Binding PodiumSecond.HasBadge}"
+                                                                 BadgeVariant="{Binding PodiumSecond.PrimaryBadge}"
+                                                                 IsSuspicious="{Binding PodiumSecond.IsSuspicious}">
+                                    <community:LeaderboardPodiumStep.ContextMenu>
+                                        <ContextMenu DataContext="{Binding PodiumSecond}">
+                                            <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                      Click="CopyFriendCode_OnClick" />
+                                            <MenuItem Header="{loc:T action.add_friend}"
+                                                      Click="AddFriend_OnClick" />
+                                            <Separator />
+                                            <MenuItem Header="{loc:T action.view_profile}"
+                                                      Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="View player on RWFC"
+                                                      Click="ViewOnRwfc_OnClick" />
+                                        </ContextMenu>
+                                    </community:LeaderboardPodiumStep.ContextMenu>
+                                </community:LeaderboardPodiumStep>
+                                <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="1"
+                                                                 Classes="Gold"
+                                                                 IsVisible="{Binding HasPodiumFirst}"
+                                                                 Rank="{Binding PodiumFirst.Rank}"
+                                                                 PlayerName="{Binding PodiumFirst.Name}"
+                                                                 VrText="{Binding PodiumFirst.VrText}"
+                                                                 ShowBadge="{Binding PodiumFirst.HasBadge}"
+                                                                 BadgeVariant="{Binding PodiumFirst.PrimaryBadge}"
+                                                                 IsSuspicious="{Binding PodiumFirst.IsSuspicious}">
+                                    <community:LeaderboardPodiumStep.ContextMenu>
+                                        <ContextMenu DataContext="{Binding PodiumFirst}">
+                                            <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                      Click="CopyFriendCode_OnClick" />
+                                            <MenuItem Header="{loc:T action.add_friend}"
+                                                      Click="AddFriend_OnClick" />
+                                            <Separator />
+                                            <MenuItem Header="{loc:T action.view_profile}"
+                                                      Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="View player on RWFC"
+                                                      Click="ViewOnRwfc_OnClick" />
+                                        </ContextMenu>
+                                    </community:LeaderboardPodiumStep.ContextMenu>
+                                </community:LeaderboardPodiumStep>
+                                <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="3"
+                                                                 Classes="Bronze"
+                                                                 IsVisible="{Binding HasPodiumThird}"
+                                                                 Rank="{Binding PodiumThird.Rank}"
+                                                                 PlayerName="{Binding PodiumThird.Name}"
+                                                                 VrText="{Binding PodiumThird.VrText}"
+                                                                 ShowBadge="{Binding PodiumThird.HasBadge}"
+                                                                 BadgeVariant="{Binding PodiumThird.PrimaryBadge}"
+                                                                 IsSuspicious="{Binding PodiumThird.IsSuspicious}">
+                                    <community:LeaderboardPodiumStep.ContextMenu>
+                                        <ContextMenu DataContext="{Binding PodiumThird}">
+                                            <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                      Click="CopyFriendCode_OnClick" />
+                                            <MenuItem Header="{loc:T action.add_friend}"
+                                                      Click="AddFriend_OnClick" />
+                                            <Separator />
+                                            <MenuItem Header="{loc:T action.view_profile}"
+                                                      Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="View player on RWFC"
+                                                      Click="ViewOnRwfc_OnClick" />
+                                        </ContextMenu>
+                                    </community:LeaderboardPodiumStep.ContextMenu>
+                                </community:LeaderboardPodiumStep>
+                            </community:LeaderboardPodiumStage>
+                        </Grid>
+                    </Border>
+
+                    <ItemsControl ItemsSource="{Binding RemainingPlayers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="community:LeaderboardPlayerItem">
+                                <rooms:PlayerListItem UserName="{Binding Name}"
+                                                           FriendCode="{Binding FriendCode}"
+                                                           Vr="{Binding VrDisplay}"
+                                                           Mii="{Binding FirstMii}"
+                                                           IsOnline="{Binding IsOnline}"
+                                                           ShowJoinRoomButton="True"
+                                                           JoinRoomAction="JoinRoom_OnClick"
+                                                           IsOpenHost="{Binding IsOpenHost}"
+                                                           HasBadges="{Binding HasBadges}" BadgeVariants="{Binding BadgeVariants}"
+                                                           IsTopPlayer="True"
+                                                           TopLabel="{Binding TopLabel}" TopLabelVariant="{Binding RankBadgeVariant}">
+                                    <rooms:PlayerListItem.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="{loc:T action.copy_friend_code}"
+                                                      Click="CopyFriendCode_OnClick" />
+                                            <MenuItem Header="{loc:T action.add_friend}"
+                                                      Click="AddFriend_OnClick" />
+                                            <Separator />
+                                            <MenuItem Header="{loc:T action.view_profile}"
+                                                      Click="ViewProfile_OnClick" />
+                                            <MenuItem Header="View player on RWFC"
+                                                      Click="ViewOnRwfc_OnClick" />
+                                        </ContextMenu>
+                                    </rooms:PlayerListItem.ContextMenu>
+                                </rooms:PlayerListItem>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

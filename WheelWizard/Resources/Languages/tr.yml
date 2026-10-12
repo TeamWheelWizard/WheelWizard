@@ -128,7 +128,6 @@ tr:
     browse: "Gözat"
     view_mod: "Modu Görüntüle"
     save_external_mii: "Mii'yi \"Benim Mii'lerim\"'e ekle"
-    view_mii: "Mii'yi Görüntüle"
     duplicate: "Çoğalt"
     back: "Geri"
     unfavorite: "Favoriyi kaldır"
@@ -165,7 +164,6 @@ tr:
     mod_browser: "Mod Gezgini"
     mii_selector: "Mii Seçici"
     mii_editor: "Mii Düzenleyicisi"
-    mii_carousel: "Mii Görüntüleyicisi"
   text:
     made_by_string: |-
       Yapımcı: %{firstAuthor}

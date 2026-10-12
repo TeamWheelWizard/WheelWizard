@@ -1,0 +1,293 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             mc:Ignorable="d" d:DesignWidth="580" d:DesignHeight="820"
+             x:Class="WheelWizard.WiiManagement.MiiManagement.Views.Editor.MiiEditorPage"
+             Focusable="True" ClipToBounds="False">
+    <UserControl.Resources>
+        <StreamGeometry x:Key="MiiEditorMoleIcon">M12,2 A10,10 0 1 0 22,12 A10,10 0 0 0 12,2 Z M12,4 A8,8 0 1 1 4,12 A8,8 0 0 1 12,4 Z M13.8,14 A1.9,1.9 0 1 0 17.6,14 A1.9,1.9 0 1 0 13.8,14 Z</StreamGeometry>
+        <StreamGeometry x:Key="MiiEditorFeatureIcon">M12,2 A10,10 0 1 0 22,12 A10,10 0 0 0 12,2 Z M12,4 A8,8 0 1 1 4,12 A8,8 0 0 1 12,4 Z M5.6,13.4 L8.6,12.4 L9,13.5 L6,14.5 Z M6.4,15.6 L9.4,14.6 L9.8,15.7 L6.8,16.7 Z M18.4,13.4 L15.4,12.4 L15,13.5 L18,14.5 Z M17.6,15.6 L14.6,14.6 L14.2,15.7 L17.2,16.7 Z</StreamGeometry>
+        <StreamGeometry x:Key="MiiEditorBiggerIcon">M3,3 L10,3 L10,5.4 L7.1,5.4 L10.9,9.2 L9.2,10.9 L5.4,7.1 L5.4,10 L3,10 Z M21,21 L14,21 L14,18.6 L16.9,18.6 L13.1,14.8 L14.8,13.1 L18.6,16.9 L18.6,14 L21,14 Z</StreamGeometry>
+        <StreamGeometry x:Key="MiiEditorSmallerIcon">M10.5,10.5 L3.5,10.5 L3.5,8.1 L6.4,8.1 L2.6,4.3 L4.3,2.6 L8.1,6.4 L8.1,3.5 L10.5,3.5 Z M13.5,13.5 L20.5,13.5 L20.5,15.9 L17.6,15.9 L21.4,19.7 L19.7,21.4 L15.9,17.6 L15.9,20.5 L13.5,20.5 Z</StreamGeometry>
+        <!-- Above the body sliders: a ruler for height, a hanging weight for weight. -->
+        <StreamGeometry x:Key="MiiEditorHeightIcon">M0 48C0 21.5 21.5 0 48 0L208 0c26.5 0 48 21.5 48 48l0 48-80 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l80 0 0 64-80 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l80 0 0 64-80 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l80 0 0 64-80 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l80 0 0 48c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 48z</StreamGeometry>
+        <StreamGeometry x:Key="MiiEditorWeightIcon">M224 96a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm122.5 32c3.5-10 5.5-20.8 5.5-32c0-53-43-96-96-96s-96 43-96 96c0 11.2 1.9 22 5.5 32L120 128c-22 0-41.2 15-46.6 36.4l-72 288c-3.6 14.3-.4 29.5 8.7 41.2S33.2 512 48 512l416 0c14.8 0 28.7-6.8 37.8-18.5s12.3-26.8 8.7-41.2l-72-288C427.2 143 408 128 386 128l-39.5 0z</StreamGeometry>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant">
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Background" Value="{StaticResource Neutral600}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"
+                                          Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant:checked">
+            <Setter Property="Background" Value="{StaticResource Brand600}" />
+        </Style>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant:checked:pointerover">
+            <Setter Property="Background" Value="{StaticResource Brand700}" />
+        </Style>
+        <Style Selector="components|ToggleRadioButton.MiiTextVariant:disabled">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+        </Style>
+        <!-- Floating panels over the Mii. -->
+        <Style Selector="Border.Floating">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="BoxShadow" Value="0 6 22 0 #59000000" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CubicEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.Floating.hidden">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+        </Style>
+        <!-- Floating without a card behind it (the sliders, and the colour button while it's closed). -->
+        <Style Selector="Border.Floating.Bare">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BoxShadow" Value="none" />
+        </Style>
+
+        <Style Selector="components|MultiIconRadioButton.Side">
+            <Setter Property="Width" Value="46" />
+            <Setter Property="Height" Value="46" />
+            <Setter Property="ToolTip.Placement" Value="Right" />
+        </Style>
+        <Style Selector="components|MultiIconRadioButton.Side.Geometry">
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Color1" Value="{StaticResource Neutral300}" />
+            <Setter Property="HoverColor1" Value="{StaticResource Neutral50}" />
+            <Setter Property="SelectedColor1" Value="{StaticResource Brand300}" />
+        </Style>
+        <Style Selector="Border.Divider">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Margin" Value="6,3" />
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+        <Style Selector="components|MultiIconRadioButton.Variant">
+            <Setter Property="Width" Value="54" />
+            <Setter Property="Height" Value="54" />
+        </Style>
+
+        <!-- Upright body sliders. -->
+        <Style Selector="StackPanel.BodySlider">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Spacing" Value="8" />
+        </Style>
+        <Style Selector="StackPanel.BodySlider PathIcon">
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+        </Style>
+        <Style Selector="StackPanel.BodySlider:pointerover PathIcon">
+            <Setter Property="Foreground" Value="{StaticResource Brand300}" />
+        </Style>
+        <Style Selector="StackPanel.BodySlider Slider">
+            <Setter Property="Height" Value="210" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+
+        <!-- Colour swatches. -->
+        <Style Selector="Button.Swatch">
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="CornerRadius" Value="17" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+        </Style>
+        <Style Selector="Button.Swatch /template/ ContentPresenter">
+            <Setter Property="CornerRadius" Value="17" />
+        </Style>
+        <Style Selector="Button.Swatch:pointerover /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral200}" />
+        </Style>
+        <Style Selector="Button.Swatch.selected /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand300}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid x:Name="Root">
+        <!-- The 3D Mii (MiiEditorScene) is added here in code. -->
+        <Panel x:Name="StageHost" ClipToBounds="False" />
+
+        <!-- Buttons that float next to parts of the Mii (positioned every frame). -->
+        <Canvas x:Name="Overlay" ClipToBounds="False" />
+
+        <!-- Back to My Miis, like going back from a room's details. -->
+        <components:ActionButton x:Name="BackButton"
+                               IconData="{StaticResource ArrowLeft}"
+                               Text="{loc:T page_title.my_miis}"
+                               VerticalAlignment="Top" HorizontalAlignment="Left"
+                               FontSize="16" Click="BackButton_OnClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
+
+        <Grid ColumnDefinitions="*,Auto">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{StaticResource TopRowSize}" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+        <Grid x:Name="TitleNameHost" Grid.Row="0" Grid.Column="0" Margin="3,12,12,12" VerticalAlignment="Bottom">
+        <TextBlock x:Name="TitleNameMeasure" Text="{Binding Text, ElementName=NameField}"
+                   FontSize="23" FontWeight="Bold" FontFamily="{Binding FontFamily, ElementName=TitleNameField}"
+                   Padding="2,0" MinWidth="16" HorizontalAlignment="Left" Opacity="0" IsHitTestVisible="False" />
+        <components:InputField x:Name="TitleNameField" Variant="Borderless"
+                               Width="{Binding Bounds.Width, ElementName=TitleNameMeasure}"
+                               MaxWidth="{Binding Bounds.Width, ElementName=TitleNameHost}"
+                               Text="{Binding Text, ElementName=NameField, Mode=TwoWay}"
+                               Placeholder="{loc:T placeholder.enter_mii_name}"
+                               FontSize="23" FontWeight="Bold" Foreground="{StaticResource Neutral400}"
+                               Padding="0" MinHeight="0" MinWidth="0" HorizontalAlignment="Left"
+                               VerticalAlignment="Bottom" />
+        </Grid>
+        <StackPanel x:Name="TopActions" Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,3,12"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <components:ActionButton x:Name="UndoButton" IsCircular="True" Variant="Ghost" Tone="Brand" IconData="{StaticResource RotateLeft}" Click="UndoButton_OnClick" ToolTip.Tip="{loc:T action.undo}" />
+            <components:ActionButton x:Name="RedoButton" IsCircular="True" Variant="Ghost" Tone="Brand" IconData="{StaticResource RotateRight}" Click="RedoButton_OnClick" ToolTip.Tip="{loc:T action.redo}" />
+            <components:ActionButton x:Name="SaveButton" Tone="Brand" Margin="4,0,0,0"
+                               IconData="{StaticResource CheckMark}"
+                               Text="{loc:T action.save}" Click="SaveButton_OnClick" />
+        </StackPanel>
+        </Grid>
+
+        <!-- The floating sidebar: Head / Body / Info, then the head groups, then a group's parts. -->
+        <Border x:Name="SidebarPanel" Classes="Floating"
+                HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,40,0,0">
+            <StackPanel x:Name="SidebarItems" Spacing="2" />
+        </Border>
+
+        <!-- Size / rotate / flip for the selected part. -->
+        <Border x:Name="ToolPanel" Classes="Floating hidden"
+                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0" Padding="5">
+            <StackPanel x:Name="ToolItems" Spacing="6" />
+        </Border>
+
+        <!-- Body: height and weight, as two upright sliders with an icon on top. -->
+        <Border x:Name="BodyPanel" Classes="Floating Bare hidden" Padding="6,12"
+                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.height}">
+                    <PathIcon Data="{StaticResource MiiEditorHeightIcon}" />
+                    <Slider x:Name="HeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
+                            ValueChanged="HeightSlider_OnValueChanged" />
+                </StackPanel>
+                <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.width}">
+                    <PathIcon Data="{StaticResource MiiEditorWeightIcon}" />
+                    <Slider x:Name="WeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
+                            ValueChanged="WeightSlider_OnValueChanged" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Info: names and favorite. -->
+        <Border x:Name="InfoCard" Classes="Floating hidden" Width="236" Padding="14,12"
+                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,0,0">
+            <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Classes="TitleText" FontSize="18" Text="{loc:T attribute.mii_section.info}" VerticalAlignment="Center" />
+                    <!-- Icon and colour come from styles only: set on the button itself they'd win over .favorite. -->
+                    <components:ActionButton x:Name="FavoriteButton" Grid.Column="1" Click="FavoriteButton_OnClick"
+                                           ToolTip.Tip="{loc:T action.favorite}" Tone="Brand" Variant="Link" Padding="0" MinHeight="0">
+                        <components:ActionButton.Styles>
+                            <Style Selector="components|ActionButton">
+                                <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}" />
+                                <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+                            </Style>
+                            <Style Selector="components|ActionButton.favorite">
+                                <Setter Property="IconData" Value="{StaticResource StarIcon}" />
+                                <Setter Property="Foreground" Value="{StaticResource Warning500}" />
+                            </Style>
+                        </components:ActionButton.Styles>
+                    </components:ActionButton>
+                </Grid>
+                <StackPanel>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.name}" />
+                    <components:InputField x:Name="NameField" Placeholder="{loc:T placeholder.enter_mii_name}"
+                                          TextChanged="NameField_OnTextChanged" />
+                </StackPanel>
+                <StackPanel>
+                    <components:FormFieldLabel Text="{loc:T attribute.mii.creator_name}" />
+                    <components:InputField x:Name="CreatorField" Placeholder="{loc:T helper_text.optional}"
+                                          TextChanged="CreatorField_OnTextChanged" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Bottom, over the Mii: every variant of the selected part, and the colour button in the corner. -->
+        <Grid x:Name="BottomBar" Height="78" VerticalAlignment="Bottom">
+            <Border x:Name="VariantPanel" Classes="Floating hidden" Margin="0,0,70,0" Padding="4">
+                <ScrollViewer x:Name="VariantScroller" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="VariantItems" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" />
+                </ScrollViewer>
+            </Border>
+
+            <Border x:Name="ColorPanel" Classes="Floating Bare hidden" HorizontalAlignment="Right" Width="62" Padding="6"
+                    ClipToBounds="True">
+                <Grid ColumnDefinitions="*,Auto">
+                    <ScrollViewer x:Name="SwatchScroller" Opacity="0" HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Disabled" Margin="4,0,8,0">
+                        <StackPanel x:Name="SwatchItems" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" />
+                    </ScrollViewer>
+                    <Button x:Name="ColorButton" Grid.Column="1" Classes="Swatch" Width="48" Height="48" CornerRadius="24"
+                            Click="ColorButton_OnClick" ToolTip.Tip="{loc:T hover.mii_editor.color}">
+                        <Border x:Name="ColorDot" Width="36" Height="36" CornerRadius="18" BorderThickness="2"
+                                BorderBrush="{StaticResource Neutral900}" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Picker: roll the dice instead of picking. -->
+            <Grid ColumnDefinitions="*,2*,*" VerticalAlignment="Center">
+                <components:ActionButton x:Name="DiceButton" Grid.Column="1" Tone="Brand" Variant="Ghost" IsVisible="False"
+                                         HorizontalAlignment="Stretch"
+                                         IconData="{StaticResource Dice}"
+                                         Text="{loc:T action.surprise_me}" Click="DiceButton_OnClick" />
+            </Grid>
+        </Grid>
+
+        <StackPanel x:Name="PickerHint" IsVisible="False" IsHitTestVisible="False"
+                    HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,36,0,0" Spacing="2">
+            <TextBlock Classes="TitleText" FontSize="22" HorizontalAlignment="Center" Text="{loc:T text.pick_your_mii}" />
+            <TextBlock Classes="BodyText" HorizontalAlignment="Center" Foreground="{StaticResource Neutral400}"
+                       Text="{loc:T text.pick_your_mii_extra}" />
+        </StackPanel>
+        <Grid IsHitTestVisible="False" ZIndex="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{StaticResource TopRowSize}" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Border x:Name="EditorHeaderDivider" Grid.Row="0" Height="1" VerticalAlignment="Bottom"
+                    Background="{StaticResource BackgroundLineColor}" />
+            <Border x:Name="EditorBottomDivider" Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+                    Background="{StaticResource BackgroundLineColor}" />
+        </Grid>
+    </Grid>
+</UserControl>

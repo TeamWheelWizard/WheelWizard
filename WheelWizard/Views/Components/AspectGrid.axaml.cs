@@ -3,62 +3,37 @@ using Avalonia.Controls;
 
 namespace WheelWizard.Views.Components;
 
-public partial class AspectGrid : Grid
+public class AspectGrid : Grid
 {
-    #region Properties
-
-    /// <summary>
-    /// Defines the AspectRatio property.
-    /// </summary>
     public static readonly StyledProperty<double> AspectRatioProperty = AvaloniaProperty.Register<AspectGrid, double>(
         nameof(AspectRatio),
-        1.0
+        1,
+        validate: value => double.IsFinite(value) && value > 0
     );
 
-    /// <summary>
-    /// Gets or sets the aspect ratio. Default is 1.0 (square).
-    /// </summary>
+    static AspectGrid() => AffectsMeasure<AspectGrid>(AspectRatioProperty);
+
     public double AspectRatio
     {
         get => GetValue(AspectRatioProperty);
         set => SetValue(AspectRatioProperty, value);
     }
 
-    /// <summary>
-    /// Defines the UseMaxDimension property.
-    /// </summary>
-    public static readonly StyledProperty<bool> UseMaxDimensionProperty = AvaloniaProperty.Register<AspectGrid, bool>(
-        nameof(UseMaxDimension)
-    );
-
-    /// <summary>
-    /// Gets or sets whether to use the maximum dimension for sizing.
-    /// If true, uses the larger of width/height. If false, uses the smaller.
-    /// </summary>
-    public bool UseMaxDimension
+    protected override Size MeasureOverride(Size availableSize)
     {
-        get => GetValue(UseMaxDimensionProperty);
-        set => SetValue(UseMaxDimensionProperty, value);
+        var fitted = Fit(availableSize);
+        var desired = base.MeasureOverride(fitted);
+        if (double.IsFinite(fitted.Width) && double.IsFinite(fitted.Height))
+            return fitted;
+        var height = Math.Max(desired.Width / AspectRatio, desired.Height);
+        return new Size(height * AspectRatio, height);
     }
 
-    #endregion
+    protected override Size ArrangeOverride(Size finalSize) => base.ArrangeOverride(Fit(finalSize));
 
-    public AspectGrid()
+    private Size Fit(Size size)
     {
-        InitializeComponent();
-    }
-
-    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        if (e.NewSize.Width <= 0 || e.NewSize.Height <= 0)
-            return;
-
-        var heightSize = UseMaxDimension
-            ? Math.Max(e.NewSize.Width / AspectRatio, e.NewSize.Height)
-            : Math.Min(e.NewSize.Width / AspectRatio, e.NewSize.Height);
-
-        // Set both width and height to the larger dimension to create a square
-        Width = heightSize * AspectRatio;
-        Height = heightSize;
+        var height = Math.Min(size.Width / AspectRatio, size.Height);
+        return new Size(height * AspectRatio, height);
     }
 }

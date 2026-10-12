@@ -3,22 +3,32 @@ using WheelWizard.AutoUpdating.Platforms;
 using WheelWizard.Branding;
 using WheelWizard.GitHub;
 using WheelWizard.GitHub.Domain;
+using WheelWizard.Shared.Platform;
 
 namespace WheelWizard.AutoUpdating;
 
 public interface IAutoUpdaterSingletonService
 {
-    public Task CheckForUpdatesAsync();
+    bool IsUpdateAvailable { get; }
+    event EventHandler? UpdateAvailable;
+    Task CheckForUpdatesAsync();
+    Task ShowAvailableUpdateAsync();
 }
 
 public class AutoUpdaterSingletonService(
     IUpdatePlatform updatePlatform,
     IBrandingSingletonService brandingService,
     IGitHubSingletonService gitHubService,
-    IUpdatePresentation presentation
+    IUpdatePresentation presentation,
+    IRuntimeEnvironment environment,
+    TimeProvider time
 ) : IAutoUpdaterSingletonService
 {
     private bool _manualUpdateShown;
+    private bool _updatePromptOpen;
+    private GithubRelease? _availableRelease;
+    public bool IsUpdateAvailable => _availableRelease is not null;
+    public event EventHandler? UpdateAvailable;
     private string CurrentVersion => brandingService.Branding.Version;
 
     public async Task CheckForUpdatesAsync()
@@ -27,26 +37,44 @@ public class AutoUpdaterSingletonService(
         if (latestRelease?.TagName is null)
             return;
 
-        var latestVersion = latestRelease.TagName.TrimStart('v');
-        if (!updatePlatform.SupportsAutomaticUpdate)
+        _availableRelease = latestRelease;
+        UpdateAvailable?.Invoke(this, EventArgs.Empty);
+        if (!updatePlatform.SupportsAutomaticUpdate && _manualUpdateShown)
+            return;
+
+        await ShowAvailableUpdateAsync();
+    }
+
+    public async Task ShowAvailableUpdateAsync()
+    {
+        if (_availableRelease is not { TagName: not null } latestRelease || _updatePromptOpen)
+            return;
+
+        _updatePromptOpen = true;
+        try
         {
-            if (!_manualUpdateShown)
+            var latestVersion = latestRelease.TagName.TrimStart('v');
+            if (!updatePlatform.SupportsAutomaticUpdate)
             {
                 _manualUpdateShown = true;
                 await presentation.ShowManualUpdateAsync(latestVersion, CurrentVersion);
+                return;
             }
-            return;
+
+            var asset = updatePlatform.GetAssetForCurrentPlatform(latestRelease);
+            if (asset is null || !await presentation.ConfirmUpdateAsync(latestVersion, CurrentVersion))
+                return;
+
+            var updateResult = await presentation.RunUpdateAsync(
+                (progress, cancellation) => updatePlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl, progress, cancellation)
+            );
+            if (updateResult.IsFailure)
+                await presentation.ShowUpdateFailureAsync(updateResult.Error.Message);
         }
-
-        var asset = updatePlatform.GetAssetForCurrentPlatform(latestRelease);
-        if (asset is null || !await presentation.ConfirmUpdateAsync(latestVersion, CurrentVersion))
-            return;
-
-        var updateResult = await presentation.RunUpdateAsync(
-            (progress, cancellation) => updatePlatform.ExecuteUpdateAsync(asset.BrowserDownloadUrl, progress, cancellation)
-        );
-        if (updateResult.IsFailure)
-            await presentation.ShowUpdateFailureAsync(updateResult.Error.Message);
+        finally
+        {
+            _updatePromptOpen = false;
+        }
     }
 
     private async Task<GithubRelease?> GetLatestReleaseAsync()
@@ -77,8 +105,14 @@ public class AutoUpdaterSingletonService(
             if (release.Prerelease)
                 continue;
 
-            var releaseVersion = SemVersion.Parse(release.TagName.TrimStart('v'), SemVersionStyles.Any);
+            if (!SemVersion.TryParse(release.TagName.TrimStart('v'), SemVersionStyles.Any, out var releaseVersion))
+                continue;
             if (releaseVersion.ComparePrecedenceTo(currentVersion) <= 0)
+                continue;
+
+            if (
+                environment.IsLinux && (release.PublishedAt is not { } publishedAt || time.GetUtcNow() - publishedAt < TimeSpan.FromDays(1))
+            )
                 continue;
 
             var asset = updatePlatform.GetAssetForCurrentPlatform(release);

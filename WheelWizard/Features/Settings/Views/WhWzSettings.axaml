@@ -1,0 +1,226 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components1="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="444" d:DesignHeight="716"
+             x:Class="WheelWizard.Settings.Views.WhWzSettings">
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <!-- File location settings -->
+            <StackPanel Margin="0,10,0,0">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                    <components1:FormFieldLabel Text="{loc:T section.location_paths}" />
+                    <Border x:Name="LocationWarningIcon"
+                            ToolTip.Tip="{loc:T helper_text.must_set_paths}"
+                            ToolTip.Placement="Top" ToolTip.ShowDelay="50">
+                        <PathIcon x:Name="WarningIcon" Foreground="{StaticResource Warning400}"
+                                  Data="{StaticResource WarningTriangle}"
+                                  Width="16" Height="16" />
+                    </Border>
+                </StackPanel>
+    
+                <StackPanel Spacing="4" Margin="0,0,0,7">
+                    <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowTop"
+                            x:Name="DolphinExecutableField"
+                            ClipToBounds="True">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="40">
+                            <PathIcon Grid.Column="0"
+                                      x:Name="DolphinExecutableCompleteIcon"
+                                      Data="{StaticResource SuccessTip}"
+                                      Foreground="{StaticResource Brand300}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <PathIcon Grid.Column="0"
+                                      x:Name="DolphinExecutableWarningIcon"
+                                      Data="{StaticResource WarningTip}"
+                                      Foreground="{StaticResource Warning400}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                                <components1:FormFieldLabel Text="{loc:T option.dolphin_emulator_exe}" />
+                                <SelectableTextBlock x:Name="DolphinExecutableValueText"
+                                                     Classes="TinyText"
+                                                     TextWrapping="Wrap" />
+                            </StackPanel>
+                            <components1:ActionButton Grid.Column="2"
+                                                x:Name="DolphinExecutableChangeButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text="{loc:T action.change}"
+                                                IconData="{StaticResource Pen}"
+                                                VerticalAlignment="Center"
+                                                Click="DolphinExeBrowse_OnClick" />
+                            <components1:ActionButton Grid.Column="3"
+                                                x:Name="DolphinExecutableOpenButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Folder}"
+                                                ToolTip.Tip="{loc:T action.open}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="DolphinExecutableOpen_OnClick" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle"
+                            x:Name="GameLocationBorder"
+                            ClipToBounds="True">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="40">
+                            <PathIcon Grid.Column="0"
+                                      x:Name="GameLocationCompleteIcon"
+                                      Data="{StaticResource SuccessTip}"
+                                      Foreground="{StaticResource Brand300}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <PathIcon Grid.Column="0"
+                                      x:Name="GameLocationWarningIcon"
+                                      Data="{StaticResource WarningTip}"
+                                      Foreground="{StaticResource Warning400}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                                <components1:FormFieldLabel Text="{loc:T option.mario_kart_game}" />
+                                <SelectableTextBlock Classes="TinyText"
+                                                     x:Name="MarioKartHelperText"
+                                                     TextWrapping="Wrap" />
+                            </StackPanel>
+                            <components1:ActionButton Grid.Column="2"
+                                                x:Name="GameLocationChangeButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text="{loc:T action.change}"
+                                                IconData="{StaticResource Pen}"
+                                                VerticalAlignment="Center"
+                                                Click="GameLocationBrowse_OnClick" />
+                            <components1:ActionButton Grid.Column="3"
+                                                x:Name="GameLocationOpenButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Folder}"
+                                                ToolTip.Tip="{loc:T action.open}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="GameLocationOpen_OnClick" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom"
+                            x:Name="DolphinUserFolderBorder"
+                            ClipToBounds="True">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="40">
+                            <PathIcon Grid.Column="0"
+                                      x:Name="DolphinUserFolderCompleteIcon"
+                                      Data="{StaticResource SuccessTip}"
+                                      Foreground="{StaticResource Brand300}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <PathIcon Grid.Column="0"
+                                      x:Name="DolphinUserFolderWarningIcon"
+                                      Data="{StaticResource WarningTip}"
+                                      Foreground="{StaticResource Warning400}"
+                                      Width="18" Height="18"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"
+                                      IsVisible="False" />
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                                <components1:FormFieldLabel x:Name="DolphinUserFolderLabel"
+                                                            Text="{loc:T option.dolphin_user_path}" />
+                            </StackPanel>
+                            <components1:ActionButton Grid.Column="2"
+                                                x:Name="DolphinUserFolderChangeButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text="{loc:T action.change}"
+                                                IconData="{StaticResource Pen}"
+                                                VerticalAlignment="Center"
+                                                Click="DolphinUserPathBrowse_OnClick" />
+                            <components1:ActionButton Grid.Column="3"
+                                                x:Name="DolphinUserFolderOpenButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Folder}"
+                                                ToolTip.Tip="{loc:T action.open}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="DolphinUserFolderOpen_OnClick" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowSingle" Margin="0,3,0,0">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components1:FormFieldLabel Text="{loc:T option.wheel_wizard_data_folder}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.wheel_wizard_data_folder}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       x:Name="AppDataLocationStatus" />
+                        </StackPanel>
+                        <components1:ActionButton Grid.Column="1"
+                                                x:Name="AppDataLocationChangeButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text="{loc:T action.change}"
+                                                IconData="{StaticResource Pen}"
+                                                VerticalAlignment="Center"
+                                                Click="AppDataLocationChange_OnClick" />
+                        <components1:ActionButton Grid.Column="2"
+                                                x:Name="AppDataLocationOpenButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Folder}"
+                                                ToolTip.Tip="{loc:T action.open}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="AppDataLocationOpen_OnClick" />
+                        <components1:ActionButton Grid.Column="3"
+                                                x:Name="AppDataLocationResetButton"
+                                                Tone="Secondary"
+                                                Size="Compact"
+                                                Text=""
+                                                IconData="{StaticResource Refresh}"
+                                                ToolTip.Tip="{loc:T option.reset_data_folder}"
+                                                ToolTip.Placement="Top"
+                                                ToolTip.ShowDelay="50"
+                                                Margin="6,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Click="AppDataLocationReset_OnClick" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+    
+            <Border Classes="SettingsBottomSpacer" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>WheelWizard</string>
+	<string>Wheel Wizard</string>
+	<key>CFBundleDisplayName</key>
+	<string>Wheel Wizard</string>
 	<key>CFBundleIdentifier</key>
 	<string>ga.gabema.WheelWizard</string>
 	<key>CFBundleShortVersionString</key>

@@ -20,14 +20,11 @@ public static class ApplicationLogging
     public static void LogStartup(ILogger logger)
     {
         var configuration = Shared.DevelopmentMode.IsEnabled ? "debug" : "release";
-        var platform = "unknown";
-#if WINDOWS
-        platform = "windows";
-#elif LINUX
-        platform = "linux";
-#elif MACOS
-        platform = "macos";
-#endif
+        var platform =
+            OperatingSystem.IsWindows() ? "windows"
+            : OperatingSystem.IsLinux() ? "linux"
+            : OperatingSystem.IsMacOS() ? "macos"
+            : "unknown";
         logger.Information("Application start [Configuration: {Configuration}, OS: {OS}]", configuration, platform);
     }
 }

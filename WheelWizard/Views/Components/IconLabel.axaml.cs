@@ -14,7 +14,7 @@ public class IconLabel : TemplatedControl
         set => SetValue(IconDataProperty, value);
     }
 
-    public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<IconLabel, double>(nameof(IconSize), 20.0); // Add a default value here
+    public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<IconLabel, double>(nameof(IconSize), 20.0);
 
     public double IconSize
     {
@@ -22,9 +22,9 @@ public class IconLabel : TemplatedControl
         set => SetValue(IconSizeProperty, value);
     }
 
-    public static readonly StyledProperty<object> TextProperty = AvaloniaProperty.Register<IconLabel, object>(nameof(Text));
+    public static readonly StyledProperty<string?> TextProperty = AvaloniaProperty.Register<IconLabel, string?>(nameof(Text));
 
-    public object Text
+    public string? Text
     {
         get => GetValue(TextProperty);
         set => SetValue(TextProperty, value);

@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using MiiAnim.Core.Evaluation;
+using MiiAnim.Core.Rig;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiRendering.Configuration;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -16,7 +18,7 @@ namespace WheelWizard.MiiRendering.Services;
 /// Native, fully-offline renderer entry point for Mii images.
 /// Uses FFL-generated geometry and texture data from FFLResHigh.dat.
 /// </summary>
-public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocator, IFileSystem fileSystem) : IMiiNativeRenderer
+public sealed partial class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocator, IFileSystem fileSystem) : IMiiNativeRenderer
 {
     // #todo: split resource loading, caching, geometry and rasterization into focused helpers so this renderer is easier to change.
     public sealed record NativeMiiRenderRequest(
@@ -188,7 +190,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
 
         try
         {
-            return await Task.Run(() => RenderToBuffer(mii, studioData, specifications, cancellationToken), cancellationToken);
+            return await MiiRenderWorkers.Run(() => RenderToBuffer(mii, studioData, specifications, cancellationToken), cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -196,11 +198,37 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         }
     }
 
+    public async Task<OperationResult<NativeMiiPixelBuffer>> RenderPosedBufferAsync(
+        Mii mii,
+        string studioData,
+        MiiImageSpecifications specifications,
+        MiiPose pose,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return Fail("Mii render cancelled.");
+
+        try
+        {
+            return await MiiRenderWorkers.Run(
+                () => RenderToBuffer(mii, studioData, specifications, cancellationToken, pose),
+                cancellationToken
+            );
+        }
+        catch (OperationCanceledException)
+        {
+            return Fail("Mii render cancelled.");
+        }
+    }
+
+    /// <param name="pose">When set, the skinned body is posed with it and the head follows its head bone and expression.</param>
     public OperationResult<NativeMiiPixelBuffer> RenderToBuffer(
         Mii mii,
         string studioData,
         MiiImageSpecifications specifications,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        MiiPose? pose = null
     )
     {
         if (mii == null)
@@ -224,7 +252,12 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             return charInfoResult.Error!;
 
         var charInfo = charInfoResult.Value;
-        var expressionId = MapExpression(request.Expression);
+        // MiiExpression values are FFL expression ids. A locked Mii has no expressions: its face is a question mark.
+        var locked = mii is LockedMii;
+        var expressionId =
+            locked ? FflNativeInterop.FflExpressionNormal
+            : pose != null ? (int)pose.Expression
+            : MapExpression(request.Expression);
 
         var cachedHeadResult = GetOrCreateCachedHeadDrawParams(
             archiveResult.Value,
@@ -240,9 +273,14 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         var drawMeshes = cachedHeadResult.Value.DrawMeshes;
         if (drawMeshes.Count == 0)
             return Fail("Managed renderer produced no drawable meshes for this Mii.");
+        if (locked)
+            drawMeshes = WithLockedFace(drawMeshes, studioData, charInfo, request.Width <= 384 ? 256 : 512);
 
         var viewParameters = ResolveViewParameters(request, charInfo);
-        var bodyRenderData = request.BodyType == MiiImageSpecifications.BodyType.face_only ? null : TryCreateBodyRenderData(charInfo);
+        var bodyRenderData =
+            request.BodyType == MiiImageSpecifications.BodyType.face_only ? null
+            : pose != null ? CreatePosedBodyRenderData(charInfo, pose)
+            : TryCreateBodyRenderData(charInfo);
         var frameWidth = request.Width;
         var frameHeight = RoundUpToEven((int)MathF.Ceiling(frameWidth * viewParameters.AspectHeightFactor));
         if (frameHeight <= 0)
@@ -272,7 +310,9 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             var headModelMatrix = baseRotationMatrix;
             if (bodyRenderData is { } bodyData)
             {
-                headModelMatrix = baseRotationMatrix * bodyData.HeadModelMatrix;
+                // A posed head can be offset sideways and rotated, so it must be placed before the character rotation.
+                headModelMatrix =
+                    pose != null ? bodyData.HeadModelMatrix * baseRotationMatrix : baseRotationMatrix * bodyData.HeadModelMatrix;
                 if (!viewParameters.IsCameraPositionAbsolute)
                 {
                     cameraPosition += bodyData.HeadTranslation;
@@ -316,6 +356,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             );
         }
 
+        if (locked)
+            TurnGrey(pixels);
         return new NativeMiiPixelBuffer(outputWidth, outputHeight, pixels);
     }
 
@@ -544,6 +586,51 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         var bodyColor = ReadFavoriteColorOrDefault(charInfo.favoriteColor);
         var pantsColor = new Vector4(0.2509804f, 0.2745099f, 0.30588239f, 1.0f);
         return new BodyRenderData(model.Meshes, bodyScaleMatrix, headTranslation, headModelMatrix, bodyColor, pantsColor);
+    }
+
+    /// <summary>
+    /// Skins the animatable 3DS body (same mesh as the static body) with <paramref name="pose"/>.
+    /// Vertices end up in the static body's units so the regular body rasterizer and camera work unchanged.
+    /// </summary>
+    private static BodyRenderData CreatePosedBodyRenderData(FflNativeInterop.FFLiCharInfo charInfo, MiiPose pose)
+    {
+        var gender = charInfo.gender % 2;
+        if (gender < 0)
+            gender += 2;
+
+        var body = MiiBodyModel.Get(female: gender == 1);
+        var toRenderUnits = Matrix4x4.CreateScale(MiiBodyModel.CanonicalToRenderUnits);
+        var meshes = new BodyMeshData[body.Meshes.Count];
+        for (var m = 0; m < meshes.Length; m++)
+        {
+            var source = body.Meshes[m];
+            var vertices = new BodyVertex[source.Positions.Length];
+            for (var v = 0; v < vertices.Length; v++)
+            {
+                var position = Vector3.Zero;
+                var normal = Vector3.Zero;
+                for (var k = 0; k < 4; k++)
+                {
+                    var weight = source.Weights[v * 4 + k];
+                    if (weight <= 0f)
+                        continue;
+                    var skin = pose.SkinMatrix[source.Joints[v * 4 + k]] * toRenderUnits;
+                    position += Vector3.Transform(source.Positions[v], skin) * weight;
+                    normal += Vector3.TransformNormal(source.Normals[v], skin) * weight;
+                }
+
+                vertices[v] = new BodyVertex(position, source.Texcoords[v], NormalizeOrDefault(normal, Vector3.UnitZ));
+            }
+
+            meshes[m] = new BodyMeshData(vertices, source.Indices, source.IsPants, Vector3.One, Vector3.Zero, Vector3.Zero);
+        }
+
+        var bodyScale = CalculateBodyScale(Math.Clamp((float)charInfo.build, 0f, 127f), Math.Clamp((float)charInfo.height, 0f, 127f));
+        var headModelMatrix = pose.HeadMatrixForRender(bodyScale);
+        var headTranslation = new Vector3(headModelMatrix.M41, headModelMatrix.M42, headModelMatrix.M43);
+        var bodyColor = ReadFavoriteColorOrDefault(charInfo.favoriteColor);
+        var pantsColor = new Vector4(0.2509804f, 0.2745099f, 0.30588239f, 1.0f);
+        return new BodyRenderData(meshes, Matrix4x4.CreateScale(bodyScale), headTranslation, headModelMatrix, bodyColor, pantsColor);
     }
 
     private static Vector3 CalculateBodyScale(float build, float height)
@@ -1381,7 +1468,8 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         int expressionId,
         Dictionary<(int PartType, int Index), IntPtr> textureCache,
         List<IntPtr> generatedTextureHandles,
-        RenderAllocationTracker arena
+        RenderAllocationTracker arena,
+        MiiMaskLayers layers = MiiMaskLayers.All
     )
     {
         var expression = Math.Clamp(expressionId, 0, 18);
@@ -1394,7 +1482,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
         var parts = BuildRawMaskParts(charInfo);
         var overlays = new List<FflNativeInterop.FFLDrawParam>(capacity: 8);
 
-        if (charInfo.parts.mustacheType != 0)
+        if (charInfo.parts.mustacheType != 0 && layers.HasFlag(MiiMaskLayers.Mustache))
         {
             var mustacheTexture = LoadTextureHandle(
                 archive,
@@ -1421,6 +1509,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             }
         }
 
+        if (layers.HasFlag(MiiMaskLayers.Mouth))
         {
             var mouthTexture = LoadTextureHandle(archive, textureCache, generatedTextureHandles, partType: 8, index: mouthIndex);
             if (mouthTexture.IsFailure)
@@ -1452,7 +1541,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             }
         }
 
-        if (eyebrowIndex != 23)
+        if (eyebrowIndex != 23 && layers.HasFlag(MiiMaskLayers.Eyebrows))
         {
             var eyebrowTexture = LoadTextureHandle(archive, textureCache, generatedTextureHandles, partType: 3, index: eyebrowIndex);
             if (eyebrowTexture.IsFailure)
@@ -1473,6 +1562,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             }
         }
 
+        if (layers.HasFlag(MiiMaskLayers.Eyes))
         {
             var eyeTextureR = LoadTextureHandle(archive, textureCache, generatedTextureHandles, partType: 2, index: eyeIndexR);
             if (eyeTextureR.IsFailure)
@@ -1534,7 +1624,7 @@ public sealed class NativeMiiRenderer(IMiiRenderingResourceLocator resourceLocat
             }
         }
 
-        if (charInfo.parts.moleType != 0)
+        if (charInfo.parts.moleType != 0 && layers.HasFlag(MiiMaskLayers.Mole))
         {
             var moleTexture = LoadTextureHandle(
                 archive,

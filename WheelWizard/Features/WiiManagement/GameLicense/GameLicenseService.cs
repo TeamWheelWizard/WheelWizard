@@ -21,6 +21,8 @@ namespace WheelWizard.WiiManagement.GameLicense;
 
 // big big thanks to https://kazuki-4ys.github.io/web_apps/FaceThief/ for the JS implementation
 // Also Refer to this documentation https://wiki.tockdom.com/wiki/Rksys.dat
+public sealed record RegionLicense(MarioKartWiiEnums.Regions Region, int Slot, string Name, string FriendCode);
+
 public interface IGameLicenseSingletonService
 {
     /// <summary>
@@ -32,6 +34,8 @@ public interface IGameLicenseSingletonService
     /// Loads the game data from the rksys.dat file.
     /// </summary>
     OperationResult LoadLicense();
+
+    IReadOnlyList<RegionLicense> GetRegionLicenses();
 
     /// <summary>
     /// Retrieves the user data for a specific index.
@@ -170,6 +174,39 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             foreach (var friend in user.Friends)
                 friend.IsOnline = _presence.IsOnline(friend.FriendCode);
         }
+    }
+
+    // Read menu summaries without changing the active region or loaded save data.
+    public IReadOnlyList<RegionLicense> GetRegionLicenses()
+    {
+        var result = new List<RegionLicense>();
+        foreach (var region in Enum.GetValues<MarioKartWiiEnums.Regions>().Where(r => r != MarioKartWiiEnums.Regions.None))
+        {
+            try
+            {
+                var path = _fileSystem.Path.Combine(_distributionPaths.SaveFolderPath, GameRegion.GetGameId(region), "rksys.dat");
+                if (!_fileSystem.File.Exists(path))
+                    continue;
+                var data = _fileSystem.File.ReadAllBytes(path);
+                if (data.Length != RksysSize || Encoding.ASCII.GetString(data, 0, RksysMagic.Length) != RksysMagic)
+                    continue;
+                for (var slot = 0; slot < MaxPlayerNum; slot++)
+                {
+                    var offset = RksysMagic.Length + slot * RkpdSize;
+                    if (Encoding.ASCII.GetString(data, offset, RkpdMagic.Length) != RkpdMagic)
+                        continue;
+                    var friendCode = FriendCode.GetFriendCode(data, offset + 0x5C);
+                    if (string.IsNullOrEmpty(friendCode) || friendCode == "0000-0000-0000")
+                        continue;
+                    var mii = _miiService.GetByAvatarId(BigEndianBinary.BufferToUint32(data, offset + 0x28));
+                    var name = mii.IsSuccess ? mii.Value.Name.ToString() : BigEndianBinary.GetUtf16String(data, offset + 0x14, 10);
+                    result.Add(new(region, slot, name, friendCode));
+                }
+            }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+        }
+        return result;
     }
 
     public OperationResult LoadLicense()

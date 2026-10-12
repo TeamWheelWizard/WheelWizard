@@ -1,0 +1,156 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using WheelWizard.Models.RRInfo;
+using WheelWizard.RrRooms;
+using WheelWizard.Shared.Polling;
+using WheelWizard.Views.Shell.Navigation;
+using WheelWizard.WheelWizardData;
+
+namespace WheelWizard.RrRooms.Views;
+
+public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingListener
+{
+    private INavigationService Navigation { get; }
+
+    private LiveRoomsService LiveRooms { get; }
+
+    private string? _searchQuery;
+
+    private readonly ObservableCollection<RrRoom> _rooms = [];
+
+    public ObservableCollection<RrRoom> Rooms
+    {
+        get => _rooms;
+        init
+        {
+            _rooms = value;
+            OnPropertyChanged(nameof(Rooms));
+        }
+    }
+
+    private readonly ObservableCollection<RrPlayer> _players = [];
+
+    public ObservableCollection<RrPlayer> Players
+    {
+        get => _players;
+        init
+        {
+            _players = value;
+            OnPropertyChanged(nameof(Players));
+        }
+    }
+
+    public RoomsPage(INavigationService navigation, LiveRoomsService liveRooms)
+    {
+        Navigation = navigation;
+        LiveRooms = liveRooms;
+        InitializeComponent();
+        DataContext = this;
+        LiveRooms.Subscribe(this);
+
+        OnUpdate(LiveRooms);
+        Unloaded += RoomsPage_Unloaded;
+    }
+
+    public void OnUpdate(ObservablePollingService sender)
+    {
+        if (sender is not LiveRoomsService liveRooms)
+            return;
+
+        Rooms.Clear();
+        var count = liveRooms.RoomCount;
+        EmptyRoomsView.IsVisible = count == 0;
+        RoomsListViewContainer.IsVisible = count != 0;
+        if (count == 0)
+            return;
+
+        foreach (var room in liveRooms.CurrentRooms)
+            Rooms.Add(room);
+
+        RoomsListItemCount.Text = liveRooms.CurrentRooms.Count.ToString();
+        PerformSearch(_searchQuery);
+    }
+
+    private void PerformSearch(string? query)
+    {
+        var isStringEmpty = string.IsNullOrWhiteSpace(query);
+        RoomsListViewContainer.IsVisible = isStringEmpty;
+        PlayerListViewContainer.IsVisible = !isStringEmpty;
+
+        if (isStringEmpty)
+            return;
+
+        var safeQuery = query ?? string.Empty;
+        Players.Clear();
+        var matchingPlayers = Rooms
+            .SelectMany(r => r.Players)
+            .Where(p =>
+                (p.Name?.Contains(safeQuery, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (p.FriendCode?.Contains(safeQuery, StringComparison.OrdinalIgnoreCase) ?? false)
+            )
+            .Distinct()
+            .ToList();
+
+        foreach (var player in matchingPlayers)
+            Players.Add(player);
+
+        PlayerListItemCount.Text = matchingPlayers.Count.ToString();
+    }
+
+    private void RoomsPage_Unloaded(object? sender, RoutedEventArgs e)
+    {
+        LiveRooms.Unsubscribe(this);
+    }
+
+    private void PlayerSearchField_OnTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (e.Source is not TextBox textBox)
+            return;
+        _searchQuery = textBox.Text;
+        PerformSearch(textBox.Text);
+    }
+
+    private void RoomsView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.Source is not ListBox listBox)
+            return;
+        if (listBox.SelectedItem is not RrRoom selectedRoom)
+            return;
+
+        Navigation.NavigateTo<RoomDetailsPage>(selectedRoom);
+        listBox.SelectedItem = null;
+        // Deselect the item immediately after navigating. This is important
+        // for a good user experience. Otherwise, the item stays selected,
+        // and if you navigate back, you can't re-select the same item.
+    }
+
+    private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.Source is not ListBox listBox)
+            return;
+        if (listBox.SelectedItem is not RrPlayer selectedRoom)
+            return;
+
+        var room = Rooms.FirstOrDefault(r => r.Players.Any(p => p.Equals(selectedRoom)));
+
+        if (room is not null)
+            Navigation.NavigateTo<RoomDetailsPage>(room);
+        listBox.SelectedItem = null;
+        // Deselect the item immediately after navigating. This is important
+        // for a good user experience. Otherwise, the item stays selected,
+        // and if you navigate back, you can't re-select the same item.
+    }
+
+    #region PropertyChanged
+
+    public new event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new(propertyName));
+    }
+
+    #endregion
+}

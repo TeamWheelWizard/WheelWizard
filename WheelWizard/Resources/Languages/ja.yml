@@ -128,7 +128,6 @@ ja:
     browse: "探す"
     view_mod: "Modを見る"
     save_external_mii: "Miiを\"自分のMii\"に追加する"
-    view_mii: "Miiを見る"
     duplicate: "コピー"
     back: "戻る"
     unfavorite: "お気に入り解除"
@@ -165,7 +164,6 @@ ja:
     mod_browser: "Modブラウザー"
     mii_selector: "Miiセレクター"
     mii_editor: "Miiエディター"
-    mii_carousel: "Miiスライダー"
   text:
     made_by_string: |-
       作成者: %{firstAuthor}

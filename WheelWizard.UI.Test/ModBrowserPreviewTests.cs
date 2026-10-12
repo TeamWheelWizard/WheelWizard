@@ -6,13 +6,13 @@ using NSubstitute;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
 using WheelWizard.Mods;
+using WheelWizard.Mods.ViewModels;
+using WheelWizard.Mods.Views;
+using WheelWizard.Mods.Views.Dialogs;
 using WheelWizard.Shared;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.Services;
-using WheelWizard.Views.ModManagement;
-using WheelWizard.Views.Navigation;
-using WheelWizard.Views.Patterns;
-using WheelWizard.Views.Popups.ModManagement;
+using WheelWizard.Views.Shell.Navigation;
 
 namespace WheelWizard.UI.Test;
 

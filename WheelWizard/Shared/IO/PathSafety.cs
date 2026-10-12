@@ -56,7 +56,7 @@ public static class PathSafety
         var safeSegments = new List<string>();
         foreach (var segment in segments)
         {
-            if (segment == ".." || segment.Contains(NativePath.VolumeSeparatorChar))
+            if (segment == ".." || segment.Contains(':'))
                 return false;
 
             safeSegments.Add(segment);

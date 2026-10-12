@@ -1,5 +1,5 @@
 using Serilog;
-using WheelWizard.Views.Popups.Generic;
+using WheelWizard.Views.Dialogs;
 
 namespace WheelWizard.Shared.MessageTranslations;
 

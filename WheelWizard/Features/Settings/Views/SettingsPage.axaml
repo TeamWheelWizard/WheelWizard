@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             x:Class="WheelWizard.Settings.Views.SettingsPage" ClipToBounds="True">
+
+    <Grid x:Name="SettingsRoot" HorizontalAlignment="Right">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <!-- This is the total height as the (Title + infoSection) - (padding) -->
+            <RowDefinition />
+            <RowDefinition Height="1" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border x:Name="SettingsBottomDivider" Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" ZIndex="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <TextBlock x:Name="SettingsTitle" Grid.Row="0" Text="{loc:T page_title.settings}" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                   Classes="PageTitleText" />
+
+        <Grid Grid.Row="1" x:Name="SettingsBody" ColumnDefinitions="157,*" ClipToBounds="True">
+        <Border x:Name="SettingsNavigation" Background="{StaticResource BackgroundColor}"
+                ClipToBounds="True"
+                BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,0,1,0"
+                CornerRadius="0">
+            <Grid RowDefinitions="*,Auto" Width="157" HorizontalAlignment="Right">
+            <ScrollViewer Grid.Row="0" Margin="8,8,8,12" HorizontalScrollBarVisibility="Disabled">
+            <components:SegmentedControl x:Name="SettingPages" Orientation="Vertical" HasBorder="False" Variant="Dark" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" SelectionChanged="SettingsNavigation_OnSelectionChanged">
+                <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="WhWzSettings"
+                              Text="Wheel Wizard" />
+                <components:SegmentOption x:Name="RecompSettingsTab" HorizontalContentAlignment="Left" Padding="10,12" Tag="RecompSettings"
+                              Text="WiiCompiled" IsVisible="False" />
+                <components:SegmentOption x:Name="VideoSettingsTab" HorizontalContentAlignment="Left" Padding="10,12" Tag="VideoSettings"
+                              Text="{loc:T category.dolphin}"/>
+                <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="AppearanceSettings"
+                              Text="{loc:T category.appearance}" />
+                <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="OtherSettings"
+                              Text="{loc:T category.other}" />
+                <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="AppInfo"
+                              Text="{loc:T category.about}" />
+            </components:SegmentedControl>
+            </ScrollViewer>
+            <ContentControl x:Name="VersionInfoSidebar" Grid.Row="1" Margin="8,12"
+                            HorizontalContentAlignment="Left" />
+            </Grid>
+        </Border>
+
+        <ContentControl Grid.Column="1" x:Name="SettingsContent" Margin="10,0,0,0" />
+        </Grid>
+
+        <components:ActionButton Grid.Row="0" x:Name="DevButton" IsVisible="False"
+                           Variant="Ghost" Tone="Brand" Text="Dev Tool" Margin="3,12"
+                           HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                           IconData="{StaticResource Code}"
+                           Click="DevButton_OnClick" />
+    </Grid>
+</UserControl>

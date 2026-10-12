@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="WheelWizard.Settings.Views.SettingsVersionInfo">
+        <StackPanel HorizontalAlignment="Left">
+            <SelectableTextBlock x:Name="ReleaseText" HorizontalAlignment="Left" Classes="TinyText" Text="DEV BUILD"/>
+            <SelectableTextBlock x:Name="WhWzVersionText" HorizontalAlignment="Left" Classes="TinyText" Text="Example WhWz version 1.0.0" />
+            <SelectableTextBlock x:Name="RrVersionText" HorizontalAlignment="Left" Classes="TinyText" Text="Example RR version 1.0.0" />
+        </StackPanel>
+</UserControl>

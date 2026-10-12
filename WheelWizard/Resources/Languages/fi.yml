@@ -142,7 +142,6 @@ fi:
     change: "Muuta"
     view_mod: "Näytä modi"
     save_external_mii: "Lisää Mii omiin Mii-hahmoihin"
-    view_mii: "Näytä Mii"
     duplicate: "Monista"
     back: "Takaisin"
     unfavorite: "Poista suosikeista"
@@ -182,7 +181,6 @@ fi:
     mod_browser: "Modiselain"
     mii_selector: "Miin valinta"
     mii_editor: "Mii-editori"
-    mii_carousel: "Miin katselu"
   text:
     made_by_string: |-
       Tehnyt: %{firstAuthor}

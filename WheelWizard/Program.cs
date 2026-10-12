@@ -5,12 +5,13 @@ using Testably.Abstractions;
 using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationIntegration;
 using WheelWizard.ApplicationLifecycle.Logging;
+using WheelWizard.MiiImages.Views;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views;
-using WheelWizard.Views.Patterns;
-using WheelWizard.Views.Startup;
+using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Startup;
 
 namespace WheelWizard;
 
@@ -20,26 +21,33 @@ public class Program : IDesignerEntryPoint
     [STAThread]
     public static void Main(string[] args)
     {
-        // Make sure this is the first action on startup!
-        SetupWorkingDirectory();
-
-        // Logging and feature paths share the same application-data location.
-        var applicationData = ApplicationDataComposition.CreateLocation(new RealFileSystem(), new RuntimeEnvironment());
-        var logFiles = new ApplicationLogFiles(applicationData, new LogFileFactory(new RealFileSystem()));
-        Log.Logger = CreateLoggerWithRecovery(applicationData, logFiles);
-        ApplicationLogging.LogStartup(Log.Logger);
-        RegisterGlobalExceptionLogging();
-
+        ServiceProvider? serviceProvider = null;
         try
         {
-            // Initialize the Avalonia application
-            var services = new ServiceCollection();
-            services.AddWheelWizardServices(applicationData);
-            services.AddSingleton(logFiles);
-            using var serviceProvider = services.BuildServiceProvider(
-                new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }
-            );
-            var builder = CreateWheelWizardApp(serviceProvider);
+            var builder = CreateWheelWizardApp(async () =>
+            {
+                serviceProvider = await Task.Run(() =>
+                {
+                    // Resolve paths before any application-data or logging work.
+                    SetupWorkingDirectory();
+                    var applicationData = ApplicationDataComposition.CreateLocation(new RealFileSystem(), new RuntimeEnvironment());
+                    var logFiles = new ApplicationLogFiles(applicationData, new LogFileFactory(new RealFileSystem()));
+                    Log.Logger = CreateLoggerWithRecovery(applicationData, logFiles);
+                    ApplicationLogging.LogStartup(Log.Logger);
+                    RegisterGlobalExceptionLogging();
+                    var services = new ServiceCollection();
+                    services.AddWheelWizardServices(applicationData);
+                    services.AddSingleton(logFiles);
+                    return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+                });
+                Logger.Sink = serviceProvider.GetRequiredService<AvaloniaLoggerAdapter>();
+                var app = (App)Application.Current!;
+                app.LoadVisualResources();
+                Setup(serviceProvider);
+                serviceProvider.GetRequiredService<MiiControlThemes>().Install(app.Resources);
+                serviceProvider.GetRequiredService<WindowAppearance>().Install(app.Resources);
+                return serviceProvider.GetRequiredService<IDesktopStartup>();
+            });
 
             // Start the application
             builder.StartWithClassicDesktopLifetime(args);
@@ -50,11 +58,31 @@ public class Program : IDesignerEntryPoint
         }
         finally
         {
+            serviceProvider?.Dispose();
             Log.CloseAndFlush();
         }
     }
 
-    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont();
+    // X11 must opt in to drawn decorations for our extended title bars.
+#pragma warning disable AVALONIA_X11_CSD
+    public static AppBuilder BuildAvaloniaApp() =>
+        AppBuilder
+            .Configure<App>()
+            .UsePlatformDetect()
+            .With(new X11PlatformOptions { EnableDrawnDecorations = true })
+            .With(MacOptions)
+            .WithInterFont();
+#pragma warning restore AVALONIA_X11_CSD
+
+    /// <summary>
+    /// macOS defaults to Metal, but the realtime Mii view draws with OpenGL and can only share the compositor's
+    /// context when that is OpenGL too. Metal stays as a fallback for systems without OpenGL.
+    /// </summary>
+    private static AvaloniaNativePlatformOptions MacOptions =>
+        new()
+        {
+            RenderingMode = [AvaloniaNativeRenderingMode.OpenGl, AvaloniaNativeRenderingMode.Metal, AvaloniaNativeRenderingMode.Software],
+        };
 
     /// <summary>
     /// Creates the logger, resetting the application data location once when its logs directory is unusable.
@@ -103,27 +131,27 @@ public class Program : IDesignerEntryPoint
     /// <summary>
     /// Configures the WheelWizard application.
     /// </summary>
-    private static AppBuilder CreateWheelWizardApp(IServiceProvider services)
+    private static AppBuilder CreateWheelWizardApp(Func<Task<IDesktopStartup>> createStartup)
     {
-        Logger.Sink = services.GetRequiredService<AvaloniaLoggerAdapter>();
+#pragma warning disable AVALONIA_X11_CSD
         var builder = AppBuilder
-            .Configure(() => new App(services.GetRequiredService<IDesktopStartup>()))
+            .Configure(() => new App(createStartup))
             .UsePlatformDetect()
+            .With(new X11PlatformOptions { EnableDrawnDecorations = true })
+            .With(MacOptions)
             .WithInterFont();
+#pragma warning restore AVALONIA_X11_CSD
 
         // https://docs.avaloniaui.net/docs/platform-specific-guides/linux#enabling-the-wayland-backend
         // NOTE: UseWayland() will prevent fallback to X11.
         if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") is not null)
         {
-            builder = builder.UseWayland();
+#pragma warning disable AVALONIA_WAYLAND_FORCE_CSD
+            builder = builder.With(new WaylandPlatformOptions { ForceDrawnDecorations = true }).UseWayland();
+#pragma warning restore AVALONIA_WAYLAND_FORCE_CSD
         }
 
-        return builder.AfterSetup(appBuilder =>
-        {
-            Setup(services);
-            services.GetRequiredService<MiiControlThemes>().Install(appBuilder.Instance!.Resources);
-            services.GetRequiredService<WindowAppearance>().Install(appBuilder.Instance.Resources);
-        });
+        return builder;
     }
 
     private static void SetupWorkingDirectory()

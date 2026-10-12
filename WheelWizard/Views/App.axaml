@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:WheelWizard.Views.Converters"
              x:Class="WheelWizard.Views.App"
+             Name="Wheel Wizard"
              RequestedThemeVariant="Default">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -10,6 +11,9 @@
             <FontFamily x:Key="DefaultFont">avares://WheelWizard/Resources/Fonts/Roboto-Regular.ttf#Roboto, avares://WheelWizard/Resources/Fonts/ctmkf.ttf#CTMKF</FontFamily>
 
             <!-- CONSTANTS -->
+            <x:TimeSpan x:Key="ControlAnimationDuration">0:0:0.12</x:TimeSpan>
+            <x:TimeSpan x:Key="SegmentAnimationDuration">0:0:0.24</x:TimeSpan>
+            <x:Boolean x:Key="ControlAnimationsEnabled">True</x:Boolean>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="Styles/Resources/Constants.axaml" />
                 <ResourceInclude Source="Styles/Resources/Icons.axaml" />
@@ -28,48 +32,126 @@
 
             <!-- CONVERTERS -->
             <converters:IsEqualToConverter x:Key="IsEqualTo" />
-            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+            <ControlTheme x:Key="DesktopWindowDecorations" TargetType="WindowDrawnDecorations"
+                          BasedOn="{StaticResource {x:Type WindowDrawnDecorations}}">
+                <Setter Property="Template">
+                    <WindowDrawnDecorationsTemplate>
+                        <WindowDrawnDecorationsContent>
+                            <WindowDrawnDecorationsContent.Underlay>
+                                <Panel x:Name="PART_UnderlayWrapper">
+                                    <Border x:Name="PART_WindowBorder" Background="Transparent"
+                                            BorderThickness="{TemplateBinding FrameThickness}"
+                                            BorderBrush="{StaticResource Neutral600}" IsHitTestVisible="False" />
+                                    <Panel x:Name="PART_TitleBar" VerticalAlignment="Top"
+                                           Height="{TemplateBinding TitleBarHeight}"
+                                           IsVisible="{TemplateBinding HasTitleBar}"
+                                           Background="{StaticResource FrameColor}"
+                                           WindowDecorationProperties.ElementRole="TitleBar" />
+                                </Panel>
+                            </WindowDrawnDecorationsContent.Underlay>
+                            <WindowDrawnDecorationsContent.Overlay>
+                                <Panel x:Name="PART_OverlayWrapper">
+                                    <StackPanel x:Name="PART_OverlayPanel" Orientation="Horizontal"
+                                                HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                Height="{TemplateBinding TitleBarHeight}"
+                                                IsVisible="{TemplateBinding HasTitleBar}">
+                                        <Button x:Name="PART_MinimizeButton" Theme="{StaticResource FluentDrawnCaptionButton}"
+                                                WindowDecorationProperties.ElementRole="MinimizeButton">
+                                            <PathIcon Width="11" Height="11" Data="{StaticResource Minimize}"
+                                                      Foreground="{Binding $parent[Button].Foreground}" />
+                                        </Button>
+                                        <Button x:Name="PART_MaximizeButton" Theme="{StaticResource FluentDrawnCaptionButton}"
+                                                WindowDecorationProperties.ElementRole="MaximizeButton">
+                                            <Viewbox Width="11" Height="11">
+                                                <Path x:Name="RestoreButtonPath" Stretch="Uniform"
+                                                      Fill="{Binding $parent[Button].Foreground}"
+                                                      Data="M2048 2048v-2048h-2048v2048h2048zM1843 1843h-1638v-1638h1638v1638z" />
+                                            </Viewbox>
+                                        </Button>
+                                        <Button x:Name="PART_CloseButton" Theme="{StaticResource FluentDrawnCaptionButton}"
+                                                Background="#ffe81123" BorderBrush="#fff1707a"
+                                                WindowDecorationProperties.ElementRole="CloseButton">
+                                            <PathIcon Width="11" Height="11" Data="{StaticResource XMark}"
+                                                      Foreground="{Binding $parent[Button].Foreground}" />
+                                        </Button>
+                                    </StackPanel>
+                                </Panel>
+                            </WindowDrawnDecorationsContent.Overlay>
+                        </WindowDrawnDecorationsContent>
+                    </WindowDrawnDecorationsTemplate>
+                </Setter>
+                <Style Selector="^ /template/ Button">
+                    <Setter Property="Width" Value="30" />
+                    <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+                </Style>
+                <Style Selector="^ /template/ Button:pointerover">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral50}" />
+                </Style>
+                <Style Selector="^ /template/ Button:disabled">
+                    <Setter Property="Foreground" Value="{StaticResource Neutral950}" />
+                    <Setter Property="Opacity" Value="1" />
+                </Style>
+                <Style Selector="^ /template/ Button#PART_MinimizeButton">
+                    <Setter Property="Background" Value="{StaticResource Neutral600}" />
+                    <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
+                </Style>
+            </ControlTheme>
+            <ControlTheme x:Key="LinuxWindowDecorations" TargetType="WindowDrawnDecorations"
+                          BasedOn="{StaticResource DesktopWindowDecorations}">
+                <!-- The client fills the window; Linux's drawn frame/shadow would inset only the caption buttons. -->
+                <Setter Property="DefaultFrameThickness" Value="0" />
+                <Setter Property="DefaultShadowThickness" Value="0" />
+                <Style Selector="^:has-border /template/ StackPanel#PART_OverlayPanel">
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+                <Style Selector="^:has-border /template/ Panel#PART_TitleBar">
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+            </ControlTheme>
         </ResourceDictionary>
     </Application.Resources>
 
 
     <Application.Styles>
         <FluentTheme />
+        <Style Selector=":is(Window)">
+            <Setter Property="WindowDecorationsTheme"
+                    Value="{OnPlatform Default={StaticResource DesktopWindowDecorations}, Linux={StaticResource LinuxWindowDecorations}, macOS={x:Null}}" />
+        </Style>
         <!-- !!Only used for the designer!! -->
-        <StyleInclude Source="Styles/Util/MultiColorExampleComponent.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/DesignTime/Controls/MultiColorExampleComponent.axaml" />
         <!-- !!Only used for the designer!! -->
 
         <!-- STYLES -->
         <StyleInclude Source="Styles/Styles/ButtonStyles.axaml" />
         <StyleInclude Source="Styles/Styles/TextStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/ToggleButtonStyles.axaml" />
         <StyleInclude Source="Styles/Styles/MiscStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/TextBoxStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/DropdownStyles.axaml" />
         <StyleInclude Source="Styles/Styles/SliderStyles.axaml" />
 
         <!-- STANDARD COMPONENTS -->
         <StyleInclude Source="Components/MultiColoredIcon.axaml" />
         <StyleInclude Source="Components/MultiIconRadioButton.axaml" />
         <StyleInclude Source="Components/IconLabel.axaml" />
-        <StyleInclude Source="Components/IconLabelButton.axaml" />
-        <StyleInclude Source="Components/Button.axaml" />
-        <StyleInclude Source="Components/OptionButton.axaml" />
-        <StyleInclude Source="Components/StateBox.axaml" />
+        <StyleInclude Source="Components/ActionButton.axaml" />
+        <StyleInclude Source="Components/SplitButton.axaml" />
+        <StyleInclude Source="Components/Toggle.axaml" />
+        <StyleInclude Source="Components/Dropdown.axaml" />
+        <StyleInclude Source="Components/InputField.axaml" />
+        <StyleInclude Source="Components/StatusBadge.axaml" />
         <StyleInclude Source="Components/EmptyPageInfo.axaml" />
         <StyleInclude Source="Components/FormFieldLabel.axaml" />
-        <StyleInclude Source="Components/LoadingIcon.axaml" />
-        <StyleInclude Source="Patterns/SidebarRadioButton.axaml" />
-        <StyleInclude Source="Components/PopupListButton.axaml" />
-        <StyleInclude Source="Components/MemeNumberState.axaml" />
+        <StyleInclude Source="Components/Spinner.axaml" />
+        <StyleInclude Source="Components/SegmentedControl.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/SidebarRadioButton.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityCountBadge.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
-        <StyleInclude Source="Patterns/ModBrowserListItem.axaml" />
-        <StyleInclude Source="Patterns/FriendsListItem.axaml" />
-        <StyleInclude Source="Patterns/PlayerListItem.axaml" />
-        <StyleInclude Source="Components/Badge.axaml" />
-        <StyleInclude Source="Patterns/MiiBlock.axaml" />
-        <StyleInclude Source="Components/WheelTrail.axaml" />
-        <StyleInclude Source="Patterns/LeaderboardPodiumCard.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/Mods/Views/ModBrowserListItem.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/RrRooms/Views/PlayerListItem.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityBadge.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WiiManagement/MiiManagement/Views/MiiBlock.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/WheelTrail.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/LeaderboardPodiumStep.axaml" />
+        <StyleInclude Source="avares://WheelWizard/Features/MiiImages/Views/MiiPeeker.axaml" />
     </Application.Styles>
 </Application>

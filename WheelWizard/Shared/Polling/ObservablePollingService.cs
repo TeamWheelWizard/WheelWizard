@@ -19,6 +19,7 @@ public abstract class ObservablePollingService(
     protected int SubscriberCount => _subscribers.Count;
     public double IntervalSeconds { get; } = intervalSeconds;
     public TimeSpan TimeUntilNextTick => _schedule == null ? TimeSpan.Zero : _nextTick - timeProvider.GetUtcNow();
+    public Task InitialUpdate { get; private set; } = Task.CompletedTask;
 
     public void Start()
     {
@@ -39,7 +40,7 @@ public abstract class ObservablePollingService(
             cancellation.Dispose();
             throw;
         }
-        _ = ExecuteAndNotifyAsync(token);
+        InitialUpdate = ExecuteAndNotifyAsync(token);
     }
 
     public void Stop()

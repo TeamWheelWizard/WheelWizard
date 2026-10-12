@@ -1,11 +1,28 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using WheelWizard.Shared.Polling;
-using WheelWizard.Views.Diagnostics;
+using WheelWizard.Views.DesignTime.Diagnostics;
 
 namespace WheelWizard.Test.Shared.Polling;
 
 public class ObservablePollingServiceTests
 {
+    [Fact]
+    public async Task InitialUpdate_CompletesAfterTheFirstPollNotifiesListeners()
+    {
+        var scheduler = new ManualScheduler();
+        using var service = new TestPolling(scheduler);
+        var pending = new TaskCompletionSource();
+        service.Execute = _ => pending.Task;
+        var listener = Substitute.For<IPollingListener>();
+        service.Subscribe(listener);
+        service.Start();
+        Assert.False(service.InitialUpdate.IsCompleted);
+        listener.DidNotReceive().OnUpdate(service);
+        pending.SetResult();
+        await service.InitialUpdate;
+        listener.Received(1).OnUpdate(service);
+    }
+
     [Fact]
     public async Task SlowPoll_DoesNotOverlap_AndStopSuppressesItsNotification()
     {

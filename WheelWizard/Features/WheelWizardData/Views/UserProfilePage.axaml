@@ -1,0 +1,286 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
+             xmlns:miiAnimations="using:WheelWizard.MiiAnimations"
+             xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
+             xmlns:domain="clr-namespace:WheelWizard.WheelWizardData.Domain"
+             x:Class="WheelWizard.WheelWizardData.Views.UserProfilePage"
+             x:DataType="community:UserProfilePage"
+        xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
+    <UserControl.Styles>
+        <!-- THE LICENSE: one card, photo on the left, the card face on the right -->
+        <Style Selector="Border.License">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="ClipToBounds" Value="True" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.25" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.License.Online">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand600}" />
+        </Style>
+
+
+
+        <Style Selector="TextBlock.StatValue">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.StatLabel">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <!-- This is the total height as the (Title + infoSection) - (padding) -->
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+        <TextBlock Grid.Row="0" Text="{loc:T page_title.my_profiles}" HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Classes="PageTitleText" />
+
+        <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="18" Height="18" Margin="10,0,10,12"
+                    ToolTip.Tip="{loc:T hover.region_user_selection}" ToolTip.Placement="Top"
+                    ToolTip.ShowDelay="20">
+                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
+            </Border>
+            <components:Dropdown x:Name="RegionDropdown" Margin="3,0,0,10" MinWidth="160"
+                      HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" x:Name="ProfileContent" Margin="0,0,0,1"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <!-- Room at the top for the nametags on the peeking Miis. -->
+            <StackPanel x:Name="ProfileBody" Margin="4,23,4,20">
+
+                <!-- LICENSES: their Miis peek over the top of the license and hide behind it -->
+                <ItemsControl ItemsSource="{Binding LicenseTabs}" Height="96">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="community:LicenseTab">
+                            <miiImages:MiiPeeker Mii="{Binding Mii}" IsActive="{Binding IsSelected}"
+                                                 Click="LicensePeeker_OnClick">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <PathIcon Data="{StaticResource StarIcon}" Width="9" Height="9"
+                                              VerticalAlignment="Center" IsVisible="{Binding IsPrimary}"
+                                              ToolTip.Tip="{loc:T hover.primary_profile}" />
+                                    <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </miiImages:MiiPeeker>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- THE LICENSE. Fixed height: the photo has to stay at least as wide as it is tall, or the Mii no
+                     longer lines up with the bottom edge it stands behind. -->
+                <Border Classes="License" Classes.Online="{Binding IsOnline}" Height="176">
+                    <Grid ColumnDefinitions="176,*">
+
+                        <!-- PHOTO: the Mii stands behind the card's bottom edge, like in a window -->
+                        <Panel Grid.Column="0" ClipToBounds="True">
+                            <Panel.Background>
+                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                    <GradientStop Color="{StaticResource Neutral800}" Offset="0" />
+                                    <GradientStop Color="#3A3D49" Offset="1" />
+                                </LinearGradientBrush>
+                            </Panel.Background>
+
+                            <!-- Soft light behind the Mii while it's online. A gradient rather than a blur effect,
+                                 which is costly to redraw next to the live Mii. -->
+                            <Border Width="260" Height="240" CornerRadius="9999"
+                                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-120"
+                                    IsVisible="{Binding IsOnline}" IsHitTestVisible="False">
+                                <Border.Background>
+                                    <RadialGradientBrush>
+                                        <GradientStop Color="#448EFFE2" Offset="0" />
+                                        <GradientStop Color="#188EFFE2" Offset="0.5" />
+                                        <GradientStop Color="#008EFFE2" Offset="1" />
+                                    </RadialGradientBrush>
+                                </Border.Background>
+                                <Border.Styles>
+                                    <Style Selector="Border[IsVisible=True]">
+                                        <Style.Animations>
+                                            <Animation Duration="0:0:3" IterationCount="INFINITE"
+                                                       PlaybackDirection="Alternate" Easing="SineEaseInOut">
+                                                <KeyFrame Cue="0%">
+                                                    <Setter Property="Opacity" Value="0.65" />
+                                                </KeyFrame>
+                                                <KeyFrame Cue="100%">
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </KeyFrame>
+                                            </Animation>
+                                        </Style.Animations>
+                                    </Style>
+                                </Border.Styles>
+                            </Border>
+
+                            <miiImages:MiiAnimatedImage x:Name="LicenseMii"
+                                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                        Mii="{Binding PhotoMii}"
+                                                        LoadingColor="Transparent"
+                                                        FallBackColor="{StaticResource Neutral600}"
+                                                        Performance="{x:Static miiAnimations:MiiPerformances.ProfileWindow}"
+                                                        MaxFramesPerSecond="60"
+                                                        ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserWindowLive}"
+                                                        StillVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
+
+                            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="11,10"
+                                        Orientation="Horizontal" Spacing="5" IsVisible="{Binding IsOnline}">
+                                <Ellipse Width="7" Height="7" Fill="{StaticResource Brand300}" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T attribute.status_online}" FontSize="12"
+                                           Foreground="{StaticResource Brand200}" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="7" Spacing="6">
+                                <components:ActionButton Tone="Brand" Variant="Ghost" IsCircular="True"
+                                                   IconData="{StaticResource Shirt}"
+                                                   Text="{loc:T action.change_mii}"
+                                                   Click="ChangeMii_OnClick" />
+                                <components:ActionButton IsCircular="True" Size="Compact"
+                                                   Tone="Brand"
+                                                   IconData="{StaticResource Road}"
+                                                   ToolTip.Tip="{loc:T action.view_room}"
+                                                   IsVisible="{Binding HasCurrentUserRoom}"
+                                                   Click="ViewRoom_OnClick" />
+                            </StackPanel>
+                        </Panel>
+
+                        <!-- CARD FACE -->
+                        <Grid x:Name="CardFace" Grid.Column="1" Margin="18,15,14,13" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
+
+                            <!-- Name. Left aligned, so a long name trims instead of pushing the pen away. -->
+                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                                <SelectableTextBlock Grid.Column="0" Text="{Binding PlayerName}"
+                                                     FontSize="20" FontWeight="Bold"
+                                                     Foreground="{StaticResource Neutral50}"
+                                                     TextTrimming="CharacterEllipsis"
+                                                     VerticalAlignment="Center" />
+                                <components:ActionButton Grid.Column="1" VerticalAlignment="Center" Margin="8,1,0,0"
+                                                       IconData="{StaticResource Pen}"
+                                                       ToolTip.Tip="{loc:T action.rename}"
+                                                       Click="RenameMii_OnClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
+                            </Grid>
+
+                            <!-- Friend code: the license number -->
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="0,1,0,0"
+                                        IsVisible="{Binding HasFriendCode}">
+                                <SelectableTextBlock Text="{Binding CurrentFriendCode}" FontSize="13"
+                                                     LetterSpacing="0.6"
+                                                     Foreground="{StaticResource Neutral400}"
+                                                     VerticalAlignment="Center" />
+                                <components:ActionButton VerticalAlignment="Center"
+                                                       IconData="{StaticResource Copy}"
+                                                       ToolTip.Tip="{loc:T action.copy_friend_code}"
+                                                       Click="CopyFriendCode_OnClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
+                            </StackPanel>
+
+                            <Grid Grid.Row="3" ColumnDefinitions="*,*">
+                                <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Left"
+                                            Background="Transparent" ToolTip.Tip="{loc:T attribute.vr_full}">
+                                    <SelectableTextBlock Text="{Binding Vr}" FontSize="30" FontWeight="Bold"
+                                                         Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
+                                    <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom"
+                                               Margin="0,0,0,6" />
+                                </StackPanel>
+
+                                <StackPanel x:Name="BrStat" Grid.Column="1" Orientation="Horizontal" Spacing="5"
+                                            HorizontalAlignment="Left" IsVisible="False"
+                                            Background="Transparent" ToolTip.Tip="{loc:T attribute.br_full}">
+                                    <SelectableTextBlock Text="{Binding Br}" FontSize="30" FontWeight="Bold"
+                                                         Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
+                                    <TextBlock Text="{loc:T attribute.br_abbreviation}" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom"
+                                               Margin="0,0,0,6" />
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="14" Margin="0,-1,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="4" Background="Transparent"
+                                            ToolTip.Tip="{loc:T attribute.total_games_won}">
+                                    <TextBlock Classes="StatValue" Text="{Binding Wins}" />
+                                    <TextBlock Classes="StatLabel" Text="{loc:T attribute.wins}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="4" Background="Transparent"
+                                            ToolTip.Tip="{loc:T attribute.total_games_played}">
+                                    <TextBlock Classes="StatValue" Text="{Binding RacesPlayed}" />
+                                    <TextBlock Classes="StatLabel" Text="{loc:T attribute.races_played}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Footer: primary on the left, badges (the endorsements) on the right -->
+                            <Grid Grid.Row="5" ColumnDefinitions="*,Auto" Margin="0,12,0,0" MinHeight="24">
+                                <Panel Grid.Column="0" VerticalAlignment="Center">
+                                    <components:ActionButton FontSize="12" HorizontalAlignment="Left"
+                                                           Classes.Primary="{Binding IsPrimary}"
+                                                           ToolTip.Tip="{loc:T hover.primary_profile}"
+                                                           Click="MakePrimary_OnClick" Tone="Brand" Variant="Link" Padding="0" MinHeight="0">
+                                        <components:ActionButton.Styles>
+                                            <Style Selector="components|ActionButton">
+                                                <Setter Property="Text" Value="{loc:T option.make_primary}" />
+                                                <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}" />
+                                            </Style>
+                                            <Style Selector="components|ActionButton.Primary">
+                                                <Setter Property="Text" Value="{loc:T state.primary}" />
+                                                <Setter Property="IconData" Value="{StaticResource StarIcon}" />
+                                            </Style>
+                                        </components:ActionButton.Styles>
+                                    </components:ActionButton>
+                                </Panel>
+
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding Badges}"
+                                              VerticalAlignment="Center" Margin="8,0,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="4" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="domain:BadgeVariant">
+                                            <community:CommunityBadge Variant="{Binding}" Width="24" Height="24" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- VR HISTORY: gets the rest of the page (the chart grows to fill it, see code-behind) -->
+                <ContentControl x:Name="HistoryHost" HorizontalContentAlignment="Stretch" Margin="2,26,2,0" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- repurposing the common state text -->
+        <components:EmptyPageInfo Grid.Row="1" x:Name="NoProfilesInfo"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Title="{loc:T state.no_profiles}"
+                                  BodyText="{loc:T empty_content.no_profiles}" />
+    </Grid>
+</UserControl>

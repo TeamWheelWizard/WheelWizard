@@ -1,4 +1,6 @@
-﻿using WheelWizard.AutoUpdating.Platforms;
+﻿using System.IO.Abstractions;
+using WheelWizard.AutoUpdating.Platforms;
+using WheelWizard.Shared.Platform;
 
 namespace WheelWizard.AutoUpdating;
 
@@ -13,13 +15,19 @@ public static class AutoUpdatingExtensions
 #if WINDOWS
         implementationType = typeof(WindowsUpdatePlatform);
 #elif LINUX
-        // We can enable this again once the auto updater has been fixed and tested
         implementationType = typeof(LinuxUpdatePlatform);
 #elif MACOS
         // MacOS updater
 #endif
 
-        services.AddSingleton(typeof(IUpdatePlatform), implementationType);
+        services.AddSingleton<IUpdatePlatform>(provider =>
+        {
+            // Flatpak owns its executable even when its build defines LINUX.
+            var platform = provider.GetRequiredService<IRuntimeEnvironment>().IsFlatpakSandboxed(provider.GetRequiredService<IFileSystem>())
+                ? typeof(FallbackUpdatePlatform)
+                : implementationType;
+            return (IUpdatePlatform)ActivatorUtilities.CreateInstance(provider, platform);
+        });
 
         return services;
     }
