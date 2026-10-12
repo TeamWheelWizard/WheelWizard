@@ -110,7 +110,7 @@
         <Style Selector="StackPanel.BodySlider:pointerover PathIcon">
             <Setter Property="Foreground" Value="{StaticResource Brand300}" />
         </Style>
-        <Style Selector="StackPanel.BodySlider Slider">
+        <Style Selector="StackPanel.BodySlider components|ValueSlider">
             <Setter Property="Height" Value="210" />
             <Setter Property="HorizontalAlignment" Value="Center" />
         </Style>
@@ -196,12 +196,12 @@
             <StackPanel Orientation="Horizontal" Spacing="6">
                 <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.height}">
                     <PathIcon Data="{StaticResource MiiEditorHeightIcon}" />
-                    <Slider x:Name="HeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
+                    <components:ValueSlider x:Name="HeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
                             ValueChanged="HeightSlider_OnValueChanged" />
                 </StackPanel>
                 <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.width}">
                     <PathIcon Data="{StaticResource MiiEditorWeightIcon}" />
-                    <Slider x:Name="WeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
+                    <components:ValueSlider x:Name="WeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
                             ValueChanged="WeightSlider_OnValueChanged" />
                 </StackPanel>
             </StackPanel>

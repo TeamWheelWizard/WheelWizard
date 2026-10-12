@@ -5,7 +5,7 @@
              xmlns:loc="clr-namespace:WheelWizard.Localization"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
              mc:Ignorable="d" d:DesignWidth="656" d:DesignHeight="876"
-             x:Class="WheelWizard.Settings.Views.SettingsPage" ClipToBounds="True">
+             x:Class="WheelWizard.Settings.Views.SettingsPage" ClipToBounds="False">
 
     <Grid x:Name="SettingsRoot" HorizontalAlignment="Right">
         <Grid.RowDefinitions>
@@ -21,13 +21,13 @@
         <TextBlock x:Name="SettingsTitle" Grid.Row="0" Text="{loc:T page_title.settings}" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
 
-        <Grid Grid.Row="1" x:Name="SettingsBody" ColumnDefinitions="157,*" ClipToBounds="True">
+        <Grid Grid.Row="1" x:Name="SettingsBody" ColumnDefinitions="157,*" ClipToBounds="False">
         <Border x:Name="SettingsNavigation" Background="{StaticResource BackgroundColor}"
                 ClipToBounds="True"
                 BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,0,1,0"
                 CornerRadius="0">
             <Grid RowDefinitions="*,Auto" Width="157" HorizontalAlignment="Right">
-            <ScrollViewer Grid.Row="0" Margin="8,8,8,12" HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer Grid.Row="0" Margin="8,8,10,12" HorizontalScrollBarVisibility="Disabled">
             <components:SegmentedControl x:Name="SettingPages" Orientation="Vertical" HasBorder="False" Variant="Dark" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" SelectionChanged="SettingsNavigation_OnSelectionChanged">
                 <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="WhWzSettings"
                               Text="Wheel Wizard" />

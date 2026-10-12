@@ -126,7 +126,6 @@
         <StyleInclude Source="Styles/Styles/ButtonStyles.axaml" />
         <StyleInclude Source="Styles/Styles/TextStyles.axaml" />
         <StyleInclude Source="Styles/Styles/MiscStyles.axaml" />
-        <StyleInclude Source="Styles/Styles/SliderStyles.axaml" />
 
         <!-- STANDARD COMPONENTS -->
         <StyleInclude Source="Components/MultiColoredIcon.axaml" />
@@ -141,6 +140,7 @@
         <StyleInclude Source="Components/EmptyPageInfo.axaml" />
         <StyleInclude Source="Components/FormFieldLabel.axaml" />
         <StyleInclude Source="Components/Spinner.axaml" />
+        <StyleInclude Source="Components/ValueSlider.axaml" />
         <StyleInclude Source="Components/SegmentedControl.axaml" />
         <StyleInclude Source="avares://WheelWizard/Views/Shell/Controls/SidebarRadioButton.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityCountBadge.axaml" />
