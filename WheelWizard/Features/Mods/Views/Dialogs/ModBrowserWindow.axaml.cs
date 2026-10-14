@@ -51,7 +51,7 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
         INavigationService navigation,
         IGameBananaMediaService media
     )
-        : base(true, false, false, t("popup_title.mod_browser"))
+        : base(true, false, false, t("popup_title.mod_browser"), useNativeWindow: true)
     {
         ModDetailViewer = modDetailViewer;
         GameBananaService = gameBananaService;

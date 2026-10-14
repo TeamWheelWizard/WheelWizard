@@ -12,6 +12,7 @@ public partial class TextInputWindow : PopupContent
     private string? _result;
     private TaskCompletionSource<string?>? _tcs;
     private string? _initialText;
+    private bool _requireChange;
     private Func<string?, string, OperationResult>? inputValidationFunc; // (oldText?, newText) => OperationResult
 
     // Constructor with dynamic label parameter
@@ -19,6 +20,7 @@ public partial class TextInputWindow : PopupContent
         : base(true, false, true, "Wheel Wizard")
     {
         InitializeComponent();
+        IsDismissible = true;
         InputField.TextChanged += InputField_TextChanged;
         UpdateSubmitButtonState();
     }
@@ -38,6 +40,20 @@ public partial class TextInputWindow : PopupContent
     public TextInputWindow SetExtraText(string extraText)
     {
         ExtraTextBlock.Text = extraText;
+        ExtraTextBlock.IsVisible = !string.IsNullOrWhiteSpace(extraText);
+        return this;
+    }
+
+    public TextInputWindow SetNote(string note)
+    {
+        InputField.Note = note;
+        return this;
+    }
+
+    public TextInputWindow SetRequireChange(bool requireChange = true)
+    {
+        _requireChange = requireChange;
+        UpdateSubmitButtonState();
         return this;
     }
 
@@ -115,7 +131,8 @@ public partial class TextInputWindow : PopupContent
 
         var hasError = !string.IsNullOrWhiteSpace(validationError);
 
-        SubmitButton.IsEnabled = !hasError;
+        SubmitButton.IsEnabled =
+            !hasError && (!_requireChange || !string.Equals(_initialText ?? string.Empty, inputText, StringComparison.Ordinal));
         InputField.ErrorText = hasError ? validationError! : null;
     }
 

@@ -508,7 +508,8 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         var extraText = t("question.enter_new_name.extra", new { name = oldName ?? string.Empty }) ?? string.Empty;
         var renamePopup = new TextInputWindow()
             .SetMainText(t("question.enter_new_name.title"))
-            .SetExtraText(extraText)
+            .SetNote(extraText)
+            .SetRequireChange()
             .SetCustomCharacters(CustomCharacters.GetCustomCharacters())
             .SetValidation(ValidateMiiName)
             .SetInitialText(oldName ?? "")

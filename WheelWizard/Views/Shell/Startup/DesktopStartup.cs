@@ -45,6 +45,7 @@ public sealed class DesktopStartup(
             cancellationToken.ThrowIfCancellationRequested();
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             _ = cleanup.CleanupStaleExtractionsAsync();
+            await windows.ShowAsync(desktop, cancellationToken);
             if (resources.GetResolvedResourcePath().IsFailure)
             {
                 var shouldContinue = await setup.ShowAsync().WaitAsync(cancellationToken);
@@ -56,7 +57,6 @@ public sealed class DesktopStartup(
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            await windows.ShowAsync(desktop, cancellationToken);
             licenses.LoadLicense();
             await startup.RunAsync(options, cancellationToken);
         }

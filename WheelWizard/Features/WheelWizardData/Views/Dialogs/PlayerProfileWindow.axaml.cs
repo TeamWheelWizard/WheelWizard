@@ -25,10 +25,11 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
     {
         ApiCaller = apiCaller;
         InitializeComponent();
+        IsDismissible = true;
         HistoryHost.Content = historyGraph;
         historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("Profile.FriendCode") { Source = this });
         DataContext = this;
-        Window.WindowTitle = friendCode;
+        PopupTitle = friendCode;
         LoadProfile(friendCode);
     }
 
@@ -125,7 +126,7 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
             if (result.IsSuccess && result.Value != null)
             {
                 Profile = result.Value;
-                Window.WindowTitle = Profile.Name;
+                PopupTitle = Profile.Name;
                 IsLoading = false;
             }
             else

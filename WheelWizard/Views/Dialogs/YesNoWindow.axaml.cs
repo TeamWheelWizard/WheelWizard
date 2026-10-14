@@ -22,6 +22,7 @@ public partial class YesNoWindow : PopupContent
         : base(true, false, true, "Wheel Wizard")
     {
         InitializeComponent();
+        IsDismissible = true;
         YesButton.Text = t("action.yes");
         NoButton.Text = t("action.no");
     }

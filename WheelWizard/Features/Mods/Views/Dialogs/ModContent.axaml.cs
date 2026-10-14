@@ -200,9 +200,9 @@ public partial class ModContent : UserControl
         if (CurrentMod == null)
             return;
 
-        var confirmation = await new YesNoWindow()
-            .SetMainText(t("question.install_mod.title", new { modName = CurrentMod.Name }) ?? CurrentMod.Name)
-            .AwaitAnswer();
+        var question = new YesNoWindow().SetMainText(t("question.install_mod.title", new { modName = CurrentMod.Name }) ?? CurrentMod.Name);
+        question.SetModalOwner(this);
+        var confirmation = await question.AwaitAnswer();
         if (!confirmation)
             return;
 
@@ -221,6 +221,7 @@ public partial class ModContent : UserControl
                 .SetMessageType(MessageBoxWindow.MessageType.Message)
                 .SetTitleText(t("message_success.mod_installed.title"))
                 .SetInfoText(t("message_success.mod_installed.extra", new { modName = CurrentMod.Name })!)
+                .SetModalOwner(this)
                 .Show();
         }
 
@@ -246,6 +247,7 @@ public partial class ModContent : UserControl
             return Fail("No downloadable files were found for this mod.");
 
         var progressWindow = new ProgressWindow(t("progress.downloading_mod", new { modName = CurrentMod.Name })!);
+        progressWindow.SetModalOwner(this);
         progressWindow.Show();
         progressWindow.SetExtraText(t("state.loading"));
 
@@ -273,6 +275,7 @@ public partial class ModContent : UserControl
             .SetInitialText(CurrentMod.Name)
             .SetValidation(ModManager.ValidateModName)
             .SetPlaceholderText(t("placeholder.enter_mod_name"));
+        popup.SetModalOwner(this);
         var modName = await popup.ShowDialog();
         if (modName == null)
         {

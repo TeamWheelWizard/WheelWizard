@@ -222,6 +222,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         var newTitle = await new TextInputWindow()
             .SetMainText(t("question.enter_mod_name.title"))
             .SetInitialText(oldTitle)
+            .SetRequireChange()
             .SetExtraText(t("question.enter_new_name.extra", new { name = oldTitle })!)
             .SetPlaceholderText(t("placeholder.enter_mod_name"))
             .SetValidation(ModManager.ValidateRenameModName)

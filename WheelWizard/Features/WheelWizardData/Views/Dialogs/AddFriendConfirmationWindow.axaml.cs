@@ -13,6 +13,7 @@ public partial class AddFriendConfirmationWindow : PopupContent
         : base(true, false, true, "Add Friend")
     {
         InitializeComponent();
+        IsDismissible = true;
     }
 
     public AddFriendConfirmationWindow(PlayerProfileResponse profile, Mii friendMii)

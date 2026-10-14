@@ -6,11 +6,14 @@
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="WheelWizard.Views.DesignTime.DevToolWindow"
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base">
-    <Grid Width="520" MaxHeight="600">
-        <ScrollViewer>
+    <Grid Width="520" MaxHeight="600" RowDefinitions="Auto,*">
+        <components:ModalHeading>
+            <TextBlock Text="Monitoring" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
+        </components:ModalHeading>
+        <ScrollViewer Grid.Row="1">
             <StackPanel>
                 <!-- MONITORING BIT -->
-                <TextBlock Text="Monitoring" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
+
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                     <components:StatusBadge x:Name="MiiImagesCashed" Variant="Gray" Text="0"
                                          TipPlacement="Top" Margin="10,0,0,0"
@@ -23,8 +26,8 @@
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Margin="-10,10" Height="1"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
-                
-                
+
+
                 <!-- TOOLS BIT -->
                 <TextBlock Text="Tools" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
                 <components:ToggleCheckBox Margin="0,2" IsChecked="False" Variant="Switch"
@@ -36,7 +39,7 @@
                 <components:ActionButton Grid.Row="0" Grid.Column="0" Tone="Brand" Text="Mii Channel" IconData="{StaticResource DolphinIcon}"
                                    HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="MiiChannel_OnClick" />
-                
+
                 <components:ActionButton Grid.Row="0" Grid.Column="1" Tone="Secondary" Text="Show Mii Animator" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="ShowMiiAnimator_OnClick" />
                 <components:ActionButton Grid.Row="1" Grid.Column="0" Tone="Secondary" Text="Force enable layout" HorizontalAlignment="Stretch" Margin="0,2"
@@ -51,8 +54,8 @@
                 </Grid>
                 <Border Background="{StaticResource BackgroundLineColor}" Margin="-10,10" Height="1"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
-                
-                
+
+
                 <!-- POPUP TESTS -->
                 <TextBlock Text="Popups" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
                 <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,0,0,4">

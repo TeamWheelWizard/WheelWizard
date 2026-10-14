@@ -11,14 +11,14 @@ public partial class ModIndependentWindow : PopupContent
     private INavigationService Navigation { get; }
 
     public ModIndependentWindow(ModContent modDetailViewer, INavigationService navigation, string windowTitle = "Mod Details")
-        : base(true, false, true, windowTitle)
+        : base(true, false, true, windowTitle, useNativeWindow: true)
     {
         ModDetailViewer = modDetailViewer;
         Navigation = navigation;
         InitializeComponent();
         ModDetailHost.Content = ModDetailViewer;
-        if (Window.WindowTitle == "Mod Details")
-            Window.WindowTitle = t("popup_title.mod_details");
+        if (PopupTitle == "Mod Details")
+            PopupTitle = t("popup_title.mod_details");
     }
 
     public async Task LoadModAsync(int modId, string? newDownloadUrl = null)

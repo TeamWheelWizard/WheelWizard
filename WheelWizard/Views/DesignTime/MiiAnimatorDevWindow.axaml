@@ -6,9 +6,12 @@
                    xmlns:base="clr-namespace:WheelWizard.Views.Dialogs.Base"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="520"
                    x:Class="WheelWizard.Views.DesignTime.MiiAnimatorDevWindow">
-    <Grid Width="780" Height="500" ColumnDefinitions="*,250">
+    <Grid Width="780" MinHeight="300" MaxHeight="500" ColumnDefinitions="*,250" RowDefinitions="Auto,*">
+        <components:ModalHeading Grid.ColumnSpan="2" Margin="0,0,0,12">
+            <TextBlock Classes="TitleText" Text="Mii Animator" />
+        </components:ModalHeading>
         <!-- Preview: drag to orbit -->
-        <Border Grid.Column="0" CornerRadius="8" ClipToBounds="True"
+        <Border Grid.Row="1" Grid.Column="0" CornerRadius="8" ClipToBounds="True"
                 Background="{StaticResource BackgroundLineColor}">
             <Grid x:Name="PreviewArea" Background="Transparent" Cursor="SizeAll"
                   PointerPressed="Preview_OnPointerPressed"
@@ -20,7 +23,7 @@
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Column="1" Margin="12,0,0,0">
+        <ScrollViewer Grid.Row="1" Grid.Column="1" Margin="12,0,0,0">
             <StackPanel Spacing="6">
                 <TextBlock Text="Mii" Classes="TitleText" />
                 <TextBlock x:Name="MiiNameText" Classes="BodyText" />

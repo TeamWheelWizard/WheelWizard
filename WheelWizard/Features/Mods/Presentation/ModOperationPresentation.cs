@@ -1,5 +1,6 @@
 using WheelWizard.Mods;
 using WheelWizard.Views.Dialogs;
+using WheelWizard.Views.Shell;
 
 namespace WheelWizard.Mods.Presentation;
 
@@ -10,6 +11,7 @@ public sealed class ModOperationPresentation : IModOperationPresentation
         bool canCancel = false
     )
     {
+        var owner = BaseWindow.GetModalOwner();
         using var cancellation = new CancellationTokenSource();
         ProgressWindow? window = null;
         var finished = false;
@@ -36,6 +38,7 @@ public sealed class ModOperationPresentation : IModOperationPresentation
             {
                 currentTitle = title;
                 window = new ProgressWindow(title);
+                window.SetModalOwner(owner);
                 if (canCancel)
                     window.SetCancellationTokenSource(cancellation);
                 window.Show();
