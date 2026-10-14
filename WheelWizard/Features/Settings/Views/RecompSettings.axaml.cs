@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Recomp;
@@ -12,6 +13,8 @@ namespace WheelWizard.Settings.Views;
 
 public partial class RecompSettings : UserControl
 {
+    private readonly IFileSystem fileSystem;
+
     private bool _loading;
 
     private IFilePickerService FilePicker { get; }
@@ -29,6 +32,7 @@ public partial class RecompSettings : UserControl
     private IRecompPaths RecompPaths { get; }
 
     public RecompSettings(
+        IFileSystem fileSystem,
         IFilePickerService filePicker,
         ISettingsManager settingsService,
         IRecompSettingManager recompSettingsFile,
@@ -38,6 +42,7 @@ public partial class RecompSettings : UserControl
         IRecompInstallService? recompInstallService = null
     )
     {
+        this.fileSystem = fileSystem;
         FilePicker = filePicker;
         SettingsService = settingsService;
         RecompSettingsFile = recompSettingsFile;
@@ -74,7 +79,7 @@ public partial class RecompSettings : UserControl
 
             var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
             InstallLocationText.Text = installFolder;
-            OpenInstallFolder.IsEnabled = installed && Directory.Exists(installFolder);
+            OpenInstallFolder.IsEnabled = installed && fileSystem.Directory.Exists(installFolder);
             UninstallButton.IsEnabled = installed;
             WiiCompiledVersionText.Text = t(
                 "helper_text.installed_version",
@@ -90,7 +95,7 @@ public partial class RecompSettings : UserControl
             SharedNandWarningIcon.IsVisible = sharingDolphinData;
 
             var cloneFolder = RecompPaths.NandCopyFolderPath;
-            DolphinCloneStatus.Text = Directory.Exists(cloneFolder)
+            DolphinCloneStatus.Text = fileSystem.Directory.Exists(cloneFolder)
                 ? t("status.recomp_dolphin_clone_available", new { path = cloneFolder })
                 : t("status.recomp_dolphin_clone_missing");
         }
@@ -269,7 +274,7 @@ public partial class RecompSettings : UserControl
         }
 
         var cloneFolder = RecompPaths.NandCopyFolderPath;
-        if (Directory.Exists(cloneFolder))
+        if (fileSystem.Directory.Exists(cloneFolder))
         {
             var overwrite = await new YesNoWindow()
                 .SetMainText(t("question.recomp_overwrite_dolphin_clone.title"))
@@ -329,7 +334,7 @@ public partial class RecompSettings : UserControl
     private void OpenInstallFolder_OnClick(object? sender, RoutedEventArgs e)
     {
         var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
-        if (Directory.Exists(installFolder))
+        if (fileSystem.Directory.Exists(installFolder))
             FilePicker.OpenFolderInFileManager(installFolder);
     }
 

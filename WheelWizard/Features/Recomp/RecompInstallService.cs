@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using WheelWizard.Models.Enums;
@@ -268,7 +268,7 @@ public sealed class RecompInstallService : IRecompInstallService
     {
         try
         {
-            var installRoot = Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(environment.InstallFolderPath));
+            var installRoot = fileSystem.Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(environment.InstallFolderPath));
             var parentFolderPath = fileSystem.Directory.GetParent(installRoot)?.FullName;
             if (parentFolderPath is null || !fileSystem.Directory.Exists(parentFolderPath))
                 return false;
@@ -846,8 +846,8 @@ public sealed class RecompInstallService : IRecompInstallService
 
         try
         {
-            var normalizedFirst = Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(first));
-            var normalizedSecond = Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(second));
+            var normalizedFirst = fileSystem.Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(first));
+            var normalizedSecond = fileSystem.Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(second));
             return normalizedFirst.Equals(normalizedSecond, StringComparison.OrdinalIgnoreCase);
         }
         catch (Exception exception)
