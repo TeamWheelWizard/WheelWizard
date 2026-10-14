@@ -48,6 +48,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
         Navigation = navigation;
         Popups = popups;
         InitializeComponent();
+        IsDismissible = true;
         DevelopmentRefresh.Subscribe(this);
         LoadSettings();
     }

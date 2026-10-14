@@ -88,8 +88,6 @@ public class ApplicationCompositionTests
         services.GetRequiredService<MiiControlThemes>().Install(Application.Current!.Resources);
         services.GetRequiredService<WindowAppearance>().Install(Application.Current.Resources);
         var desktop = Substitute.For<IClassicDesktopStyleApplicationLifetime>();
-        PopupWindow? confirmation = null;
-        using var popupOpened = Window.WindowOpenedEvent.AddClassHandler<PopupWindow>((popup, _) => confirmation = popup);
         var windows = services.GetRequiredService<IMainWindowService>();
         try
         {
@@ -177,9 +175,10 @@ public class ApplicationCompositionTests
             Assert.Equal("Settings", settingsPage.FindControl<TextBlock>("SettingsTitle")!.Text);
             // Cancel leaves both the setting and the selected language unchanged.
             languages.SelectedIndex = 1;
-            var cancelPopup = Assert.IsType<PopupWindow>(confirmation);
-            var cancelQuestion = Assert.IsType<YesNoWindow>(cancelPopup.FindControl<ContentPresenter>("PopupContent")!.Content);
+            var cancelQuestion = Assert.IsType<YesNoWindow>(original.Modals.TopModal);
+            var cancelClosed = cancelQuestion.ShowDialog();
             cancelQuestion.FindControl<ActionButton>("NoButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await cancelClosed.WaitAsync(TimeSpan.FromSeconds(2));
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             Assert.Equal("en", settings.WW_LANGUAGE.Value);
             Assert.Equal(0, languages.SelectedIndex);
@@ -189,9 +188,10 @@ public class ApplicationCompositionTests
                 languages.SelectedItem = languages.Items.Single(item =>
                     item!.ToString() == LocalizationProvider.GetLanguageDisplayName(language)
                 );
-                var popup = Assert.IsType<PopupWindow>(confirmation);
-                var question = Assert.IsType<YesNoWindow>(popup.FindControl<ContentPresenter>("PopupContent")!.Content);
+                var question = Assert.IsType<YesNoWindow>(original.Modals.TopModal);
+                var questionClosed = question.ShowDialog();
                 question.FindControl<ActionButton>("YesButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                await questionClosed.WaitAsync(TimeSpan.FromSeconds(2));
                 await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
                 original.UpdateLayout();
                 Assert.Equal(language, settings.WW_LANGUAGE.Value);

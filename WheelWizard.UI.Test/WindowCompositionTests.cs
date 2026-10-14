@@ -86,12 +86,12 @@ public class WindowCompositionTests
     {
         var environment = Substitute.For<IRuntimeEnvironment>();
         environment.IsLinux.Returns(true);
-        PopupWindow? popup = null;
-        using var opened = Window.WindowOpenedEvent.AddClassHandler<PopupWindow>((window, _) => popup = window);
+        var popup = new TestWindow { Width = 656, Height = 876 };
+        popup.Show();
         try
         {
             await new UpdatePresentation(environment).ShowManualUpdateAsync("2.0.0", "1.0.0");
-            var content = Assert.IsType<MessageBoxWindow>(popup!.FindControl<ContentPresenter>("PopupContent")!.Content);
+            var content = Assert.IsType<MessageBoxWindow>(popup.Modals.TopModal);
             Assert.Contains("through your package manager", content.FindControl<SelectableTextBlock>("MessageInformationBlock")!.Text);
             Assert.Equal(
                 "https://github.com/TeamWheelWizard/WheelWizard/releases",
@@ -221,32 +221,38 @@ public class WindowCompositionTests
         }
     }
 
-    [AvaloniaTheory]
-    [InlineData(true, false)]
-    [InlineData(false, false)]
-    [InlineData(true, true)]
-    public void ProgressNativeClose_CancelsOnlyCancelableUserRequests(bool canCancel, bool programmatic)
+    [AvaloniaFact]
+    public async Task ProgressDismissal_DoesNotCancelButExplicitCancelDoes()
     {
         using var cancellation = new CancellationTokenSource();
-        var content = new WheelWizard.Views.Dialogs.ProgressWindow("Download");
-        if (canCancel)
-            content.SetCancellationTokenSource(cancellation);
-        content.Show();
-        var popup = Assert.IsType<PopupWindow>(TopLevel.GetTopLevel(content));
+        var owner = new TestWindow { Width = 656, Height = 876 };
+        owner.Show();
+        var content = new ProgressWindow("Download").SetCancellationTokenSource(cancellation);
         try
         {
-            var args = CreateClosingArgs(programmatic);
-            typeof(PopupWindow)
-                .GetMethod("OnClosing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
-                .Invoke(popup, [args]);
-            Assert.Equal(canCancel && !programmatic, cancellation.IsCancellationRequested);
-            Assert.Equal(canCancel && !programmatic, content.WasCancellationRequested);
-            Assert.Equal(!programmatic, args.Cancel);
+            var closed = content.ShowDialog();
+            owner.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Same(owner, TopLevel.GetTopLevel(content));
+            owner.KeyPress(Avalonia.Input.Key.Escape, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.Escape, null);
+            owner.MouseDown(new Point(5, 50), Avalonia.Input.MouseButton.Left);
+            owner.MouseUp(new Point(5, 50), Avalonia.Input.MouseButton.Left);
+            Assert.False(cancellation.IsCancellationRequested);
+            Assert.Same(content, owner.Modals.TopModal);
+            var cancel = content.FindControl<WheelWizard.Views.Components.ActionButton>("CancelButton")!;
+            var point = cancel.TranslatePoint(new Point(cancel.Bounds.Width / 2, cancel.Bounds.Height / 2), owner)!.Value;
+            owner.MouseDown(point, Avalonia.Input.MouseButton.Left);
+            owner.MouseUp(point, Avalonia.Input.MouseButton.Left);
+            Assert.True(cancellation.IsCancellationRequested);
+            Assert.True(content.WasCancellationRequested);
+            Assert.Same(content, owner.Modals.TopModal);
+            content.Close();
+            await closed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.True(owner.CanInteract);
         }
         finally
         {
-            content.SetCancellationTokenSource(null);
-            content.Close();
+            owner.Close();
         }
     }
 
@@ -360,7 +366,7 @@ public class WindowCompositionTests
         {
             popup.Show();
             popup.UpdateLayout();
-            var frame = Assert.IsType<Grid>(popup.Content);
+            var frame = popup.FindControl<Grid>("WindowFrame")!;
             var overlay = popup.FindControl<Border>("DisabledDarkenEffect")!;
             popup.SetInteractable(false);
             popup.UpdateLayout();
@@ -470,13 +476,15 @@ public class WindowCompositionTests
     public void MessagePopup_GrowsForLateContentWithoutEnlargingItsTitle()
     {
         var content = new MessageBoxWindow().SetTitleText("A stable title").SetInfoText("Loading...");
+        var owner = new TestWindow { Width = 656, Height = 876 };
+        owner.Show();
         try
         {
             content.Show();
-            var popup = Assert.IsType<PopupWindow>(TopLevel.GetTopLevel(content));
+            var popup = Assert.IsType<TestWindow>(TopLevel.GetTopLevel(content));
             popup.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
-            var initialSize = popup.ClientSize;
+            var initialSize = content.Bounds.Size;
             var title = content.FindControl<SelectableTextBlock>("MessageTitleBlock")!;
             var titleSize = title.Bounds.Size;
             var titleFontSize = title.FontSize;
@@ -485,8 +493,8 @@ public class WindowCompositionTests
             popup.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.True(popup.ClientSize.Height > initialSize.Height);
-            Assert.Equal(initialSize.Width, popup.ClientSize.Width);
+            Assert.True(content.Bounds.Height > initialSize.Height);
+            Assert.Equal(initialSize.Width, content.Bounds.Width);
             Assert.Equal(titleSize, title.Bounds.Size);
             Assert.Equal(titleFontSize, title.FontSize);
             foreach (var button in content.GetVisualDescendants().OfType<Button>())
@@ -494,11 +502,11 @@ public class WindowCompositionTests
         }
         finally
         {
-            content.Close();
+            owner.Close();
         }
     }
 
-    private static void AssertInsideWindow(Control control, PopupWindow popup)
+    private static void AssertInsideWindow(Control control, Window popup)
     {
         var position = control.TranslatePoint(default, popup)!.Value;
         Assert.True(position.X >= 0 && position.Y >= 30);
@@ -523,10 +531,12 @@ public class WindowCompositionTests
             if (e.PropertyName == nameof(content.IsLoading) && !content.IsLoading)
                 loaded.TrySetResult();
         };
+        var owner = new TestWindow { Width = 656, Height = 876 };
+        owner.Show();
         try
         {
             content.Show();
-            var popup = Assert.IsType<PopupWindow>(TopLevel.GetTopLevel(content));
+            var popup = Assert.IsType<TestWindow>(TopLevel.GetTopLevel(content));
             popup.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             var initialWidth = popup.ClientSize.Width;
@@ -581,11 +591,12 @@ public class WindowCompositionTests
             Assert.Equal(20, title.FontSize);
             AssertInsideWindow(title, popup);
             AssertInsideWindow(content.GetVisualDescendants().OfType<ScrollViewer>().First(), popup);
-            Assert.Null(popup.FindControl<Grid>("CompleteGrid")!.RenderTransform);
+            Assert.Same(content, owner.Modals.TopModal);
+            Assert.False(owner.CanInteract);
         }
         finally
         {
-            content.Close();
+            owner.Close();
         }
     }
 
@@ -597,7 +608,7 @@ public class WindowCompositionTests
         public Button BottomButton { get; } = new() { Content = "Bottom button" };
 
         public SizedPopup()
-            : base(true, false, false, "Scale test")
+            : base(true, false, false, "Scale test", useNativeWindow: true)
         {
             Root = new Grid
             {

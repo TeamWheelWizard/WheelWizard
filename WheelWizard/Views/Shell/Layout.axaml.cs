@@ -38,6 +38,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => WindowFrame;
+    protected override Control ModalInteractionContent => CompleteGrid;
 
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
@@ -214,7 +215,10 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         var reloadResult = await ModManagerService.ReloadAsync();
         if (reloadResult.IsFailure)
+        {
+            await _loaded.Task;
             MessageTranslationHelper.ShowMessage(reloadResult.Error);
+        }
     }
 
     private void OnSettingSignal(SettingChangedSignal signal) => OnSettingChanged(signal.Setting);
@@ -279,6 +283,7 @@ public partial class Layout : BaseWindow, IPollingListener
     }
 
     private bool _closeConfirmed;
+    private bool _closePromptOpen;
 
     protected override async void OnClosing(WindowClosingEventArgs e)
     {
@@ -286,10 +291,20 @@ public partial class Layout : BaseWindow, IPollingListener
         {
             e.Cancel = true;
             base.OnClosing(e);
-            if (!await guard.ConfirmLeaveAsync())
+            if (_closePromptOpen)
                 return;
-            _closeConfirmed = true;
-            Close();
+            _closePromptOpen = true;
+            try
+            {
+                if (!await guard.ConfirmLeaveAsync())
+                    return;
+                _closeConfirmed = true;
+                Close();
+            }
+            finally
+            {
+                _closePromptOpen = false;
+            }
             return;
         }
 
@@ -438,7 +453,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private async void TitleLabel_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed || Modals.HasModals)
             return;
 
         e.Handled = true;
@@ -549,7 +564,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void SupportUs_OnClick(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
-    public bool CompleteContentEnabled => InteractionContent.IsEnabled;
+    public bool CompleteContentEnabled => ModalInteractionContent.IsEnabled;
 
     public void ShowAppInfo() => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
 

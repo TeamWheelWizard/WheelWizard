@@ -12,6 +12,7 @@ public partial class PopupWindow : BaseWindow, INotifyPropertyChanged
 {
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => WindowFrame;
+    protected override Control ModalInteractionContent => CompleteGrid;
 
     private bool _disableOpening = false;
 

@@ -13,14 +13,15 @@ public partial class OptionsWindow : PopupContent
     private TaskCompletionSource<string?>? _tcs;
 
     public OptionsWindow()
-        : base(true, false, true, "Wheel Wizard")
+        : base(true, false, true, "Choose an option")
     {
         InitializeComponent();
+        IsDismissible = true;
     }
 
     public OptionsWindow SetWindowTitle(string title)
     {
-        Window.WindowTitle = title;
+        PopupTitle = title;
         return this;
     }
 
@@ -58,12 +59,12 @@ public partial class OptionsWindow : PopupContent
     private void OptimizeColumns()
     {
         var childCount = OptionList.Children.Count;
-        OptionList.Columns = childCount;
-        if (childCount <= 4)
-            return;
-
-        // with 5, 6 or 9 items, a column width of 3 just looks better
-        OptionList.Columns = childCount is 5 or 6 or 9 ? 3 : 4;
+        // Keep the existing preferred arrangement while allowing narrower hosts to wrap.
+        var columns =
+            childCount <= 4 ? childCount
+            : childCount is 5 or 6 or 9 ? 3
+            : 4;
+        OptionList.MaxWidth = Math.Max(1, columns) * 162;
     }
 
     protected override void BeforeClose()

@@ -21,6 +21,7 @@ public partial class MessageBoxWindow : PopupContent
         : base(true, false, true, t("attribute.message"))
     {
         InitializeComponent();
+        IsDismissible = true;
         SetMessageType(messageType);
     }
 
@@ -29,7 +30,7 @@ public partial class MessageBoxWindow : PopupContent
         messageType = newType;
         CancelButton.Tone = messageType == MessageType.Message ? ActionButtonTone.Brand : ActionButtonTone.Secondary;
 
-        Window.WindowTitle = messageType.ToString();
+        PopupTitle = messageType.ToString();
         TitleBorder.Classes.Add(messageType.ToString());
         return this;
     }
@@ -48,7 +49,7 @@ public partial class MessageBoxWindow : PopupContent
 
     public MessageBoxWindow SetWindowTitle(string title)
     {
-        Window.WindowTitle = title;
+        PopupTitle = title;
         return this;
     }
 

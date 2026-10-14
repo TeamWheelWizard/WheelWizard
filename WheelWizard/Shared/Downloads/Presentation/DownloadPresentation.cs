@@ -53,6 +53,8 @@ public static class DownloadPresentation
         try
         {
             var result = await downloads.DownloadAsync(url, filePath, useExactPath, progress, cancellation.Token);
+            // An owner may have closed even when the backend returned a result instead of throwing.
+            cancellationToken.ThrowIfCancellationRequested();
             if (result.IsSuccess)
                 return result.Value;
 

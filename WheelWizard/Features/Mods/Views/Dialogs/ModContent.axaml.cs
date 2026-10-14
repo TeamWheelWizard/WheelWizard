@@ -195,65 +195,92 @@ public partial class ModContent : UserControl
         IsVisible = false;
     }
 
-    private async void Install_Click(object sender, RoutedEventArgs e)
+    private async void Install_Click(object sender, RoutedEventArgs e) => await InstallCurrentModAsync();
+
+    private async Task InstallCurrentModAsync()
     {
-        if (CurrentMod == null)
+        var mod = CurrentMod;
+        if (mod == null || TopLevel.GetTopLevel(this) is not BaseWindow { IsVisible: true } owner)
             return;
 
-        var confirmation = await new YesNoWindow()
-            .SetMainText(t("question.install_mod.title", new { modName = CurrentMod.Name }) ?? CurrentMod.Name)
-            .AwaitAnswer();
-        if (!confirmation)
-            return;
-
-        var installResult = await DownloadAndInstallCurrentModAsync();
-        if (installResult.IsFailure)
+        using var lifetime = new CancellationTokenSource();
+        void OwnerClosed(object? sender, EventArgs e) => lifetime.Cancel();
+        owner.Closed += OwnerClosed;
+        try
         {
-            MessageTranslationHelper.ShowMessage(
-                MessageTranslation.Error_ModDownloadFailed,
-                null,
-                new { error = installResult.Error.Message }
-            );
-        }
-        else
-        {
-            new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Message)
-                .SetTitleText(t("message_success.mod_installed.title"))
-                .SetInfoText(t("message_success.mod_installed.extra", new { modName = CurrentMod.Name })!)
-                .Show();
-        }
+            var question = new YesNoWindow().SetMainText(t("question.install_mod.title", new { modName = mod.Name }) ?? mod.Name);
+            question.SetModalOwner(owner);
+            var confirmation = await question.AwaitAnswer();
+            lifetime.Token.ThrowIfCancellationRequested();
+            if (!confirmation)
+                return;
 
-        _ = LoadModDetailsAsync(CurrentMod.Id);
+            var installResult = await DownloadAndInstallCurrentModAsync(owner, mod, lifetime.Token);
+            lifetime.Token.ThrowIfCancellationRequested();
+            if (installResult.IsFailure)
+            {
+                MessageTranslationHelper.ShowMessage(
+                    MessageTranslation.Error_ModDownloadFailed,
+                    null,
+                    new { error = installResult.Error.Message }
+                );
+            }
+            else
+            {
+                new MessageBoxWindow()
+                    .SetMessageType(MessageBoxWindow.MessageType.Message)
+                    .SetTitleText(t("message_success.mod_installed.title"))
+                    .SetInfoText(t("message_success.mod_installed.extra", new { modName = mod.Name })!)
+                    .SetModalOwner(owner)
+                    .Show();
+            }
+            await LoadModDetailsAsync(mod.Id, cancellationToken: lifetime.Token);
+        }
+        catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+        finally
+        {
+            owner.Closed -= OwnerClosed;
+        }
     }
 
-    private async Task<OperationResult> DownloadAndInstallCurrentModAsync()
+    private async Task<OperationResult> DownloadAndInstallCurrentModAsync(
+        BaseWindow owner,
+        GameBananaModDetails mod,
+        CancellationToken cancellationToken
+    )
     {
-        if (CurrentMod == null)
-            return Ok();
+        cancellationToken.ThrowIfCancellationRequested();
 
         var prepareResult = await PrepareToDownloadFile();
+        cancellationToken.ThrowIfCancellationRequested();
         if (prepareResult.IsFailure)
             return prepareResult.Error;
 
         var downloadUrls =
             OverrideDownloadUrl != null
                 ? [OverrideDownloadUrl]
-                : CurrentMod.Files?.Select(f => f.DownloadUrl).ToList()
-                    ?? CurrentMod.ArchivedFiles?.Select(f => f.DownloadUrl).ToList()
-                    ?? [];
+                : mod.Files?.Select(f => f.DownloadUrl).ToList() ?? mod.ArchivedFiles?.Select(f => f.DownloadUrl).ToList() ?? [];
         if (downloadUrls.Count == 0)
             return Fail("No downloadable files were found for this mod.");
 
-        var progressWindow = new ProgressWindow(t("progress.downloading_mod", new { modName = CurrentMod.Name })!);
+        var progressWindow = new ProgressWindow(t("progress.downloading_mod", new { modName = mod.Name })!);
+        progressWindow.SetModalOwner(owner);
         progressWindow.Show();
         progressWindow.SetExtraText(t("state.loading"));
 
         var url = downloadUrls.First();
         var fileName = GetFileNameFromUrl(url);
         var filePath = Path.Combine(ModPaths.DownloadFolderPath, fileName);
-        var downloadResult = await DownloadModFileAsync(url, filePath, progressWindow);
-        progressWindow.Close();
+        OperationResult<string?> downloadResult;
+        try
+        {
+            downloadResult = await DownloadModFileAsync(url, filePath, progressWindow, cancellationToken);
+        }
+        finally
+        {
+            progressWindow.Close();
+        }
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (downloadResult.IsFailure)
             return downloadResult.Error;
@@ -270,10 +297,12 @@ public partial class ModContent : UserControl
 
         var popup = new TextInputWindow()
             .SetMainText(t("attribute.name"))
-            .SetInitialText(CurrentMod.Name)
+            .SetInitialText(mod.Name)
             .SetValidation(ModManager.ValidateModName)
             .SetPlaceholderText(t("placeholder.enter_mod_name"));
+        popup.SetModalOwner(owner);
         var modName = await popup.ShowDialog();
+        cancellationToken.ThrowIfCancellationRequested();
         if (modName == null)
         {
             TryDeleteTempModsFolder();
@@ -294,9 +323,9 @@ public partial class ModContent : UserControl
         }
 
         var installResult = await ModPresentation.RunAsync(
-            (progress, _) =>
-                ModManager.InstallModFromFileAsync(downloadedFilePath, modName, CurrentMod.Author.Name, CurrentMod.Id, progress)
+            (progress, _) => ModManager.InstallModFromFileAsync(downloadedFilePath, modName, mod.Author.Name, mod.Id, progress)
         );
+        cancellationToken.ThrowIfCancellationRequested();
         if (installResult.IsFailure)
             return installResult.Error;
 
@@ -339,11 +368,16 @@ public partial class ModContent : UserControl
         }
     }
 
-    private async Task<OperationResult<string?>> DownloadModFileAsync(string url, string filePath, ProgressWindow progressWindow)
+    private async Task<OperationResult<string?>> DownloadModFileAsync(
+        string url,
+        string filePath,
+        ProgressWindow progressWindow,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            return await Downloads.DownloadToLocationAsync(url, filePath, progressWindow);
+            return await Downloads.DownloadToLocationAsync(url, filePath, progressWindow, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {

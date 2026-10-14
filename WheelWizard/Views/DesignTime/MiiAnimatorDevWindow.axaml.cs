@@ -88,6 +88,7 @@ public partial class MiiAnimatorDevWindow : PopupContent
         FilePicker = filePicker;
         FileSystem = fileSystem;
         InitializeComponent();
+        IsDismissible = true;
 
         // The realtime view is transparent: it sits on the preview's background like any other control.
         _realtime = new MiiRealtimeView(renderer) { IsHitTestVisible = false };
