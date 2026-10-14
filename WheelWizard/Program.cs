@@ -133,22 +133,28 @@ public class Program : IDesignerEntryPoint
     /// </summary>
     private static AppBuilder CreateWheelWizardApp(Func<Task<IDesktopStartup>> createStartup)
     {
+        var isFlatpak = new RuntimeEnvironment().IsFlatpakSandboxed(new RealFileSystem());
+        var flatpakAppId = isFlatpak ? Environment.GetEnvironmentVariable("FLATPAK_ID") : null;
 #pragma warning disable AVALONIA_X11_CSD
+        var x11Options = new X11PlatformOptions { EnableDrawnDecorations = true };
+#pragma warning restore AVALONIA_X11_CSD
+        x11Options.WmClass = flatpakAppId ?? x11Options.WmClass;
         var builder = AppBuilder
             .Configure(() => new App(createStartup))
             .UsePlatformDetect()
-            .With(new X11PlatformOptions { EnableDrawnDecorations = true })
+            .With(x11Options)
             .With(MacOptions)
             .WithInterFont();
-#pragma warning restore AVALONIA_X11_CSD
 
         // https://docs.avaloniaui.net/docs/platform-specific-guides/linux#enabling-the-wayland-backend
         // NOTE: UseWayland() will prevent fallback to X11.
         if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") is not null)
         {
 #pragma warning disable AVALONIA_WAYLAND_FORCE_CSD
-            builder = builder.With(new WaylandPlatformOptions { ForceDrawnDecorations = true }).UseWayland();
+            var waylandOptions = new WaylandPlatformOptions { ForceDrawnDecorations = true };
 #pragma warning restore AVALONIA_WAYLAND_FORCE_CSD
+            waylandOptions.AppId = flatpakAppId ?? waylandOptions.AppId;
+            builder = builder.With(waylandOptions).UseWayland();
         }
 
         return builder;
