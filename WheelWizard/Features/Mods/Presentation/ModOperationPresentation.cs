@@ -18,7 +18,7 @@ public sealed class ModOperationPresentation : IModOperationPresentation
         string? currentTitle = null;
         var progress = new Progress<ModOperationProgress>(update =>
         {
-            if (finished)
+            if (finished || !owner.IsVisible)
                 return;
 
             var title = update.Stage switch
