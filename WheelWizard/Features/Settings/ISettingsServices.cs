@@ -42,6 +42,7 @@ public interface ISettingsProperties
     Setting<string> GAME_LOCATION { get; }
     Setting<bool> DOLPHIN_MANAGED { get; }
     Setting<bool> ONBOARDING_COMPLETED { get; }
+    Setting<bool> ONBOARDING_STARTED { get; }
     Setting<bool> FORCE_WIIMOTE { get; }
     Setting<bool> LAUNCH_WITH_DOLPHIN { get; }
     Setting<bool> LAUNCH_RR_ON_STARTUP { get; }

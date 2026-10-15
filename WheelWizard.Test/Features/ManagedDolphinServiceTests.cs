@@ -73,6 +73,7 @@ public class ManagedDolphinServiceTests
             Settings.USER_FOLDER_PATH.Returns(UserFolder);
             Settings.DOLPHIN_MANAGED.Returns(Managed_);
             Settings.ONBOARDING_COMPLETED.Returns(new WhWzSetting<bool>("OnboardingCompleted", false));
+            Settings.ONBOARDING_STARTED.Returns(new WhWzSetting<bool>("OnboardingStarted", false));
             Settings.Get(Arg.Any<Setting<bool>>()).Returns(call => call.Arg<Setting<bool>>().Get());
             Settings.Get(Arg.Any<Setting<string>>()).Returns(call => call.Arg<Setting<string>>().Get());
             Settings

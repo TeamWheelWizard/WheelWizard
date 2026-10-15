@@ -68,6 +68,34 @@ public class OnboardingServiceTests
     }
 
     [Fact]
+    public void PathsSavedByAnUnfinishedOnboarding_DoNotCountAsAnEarlierSetup()
+    {
+        // The app was closed after picking a Dolphin and a game, before the onboarding finished.
+        var fixture = new Fixture();
+        fixture.Service.MarkStarted();
+        fixture.Location.Set("/own/Dolphin.exe", skipSave: true);
+        fixture.UserFolder.Set("/own/User", skipSave: true);
+        fixture.Settings.DolphinPathsSetupCorrectly().Returns(true);
+
+        fixture.Service.MarkCompletedIfAlreadySetUp();
+
+        Assert.False(fixture.Completed.Get());
+        Assert.True(fixture.Service.IsRequired);
+    }
+
+    [Fact]
+    public void StartingTheOnboarding_AfterItWasCompleted_ChangesNothing()
+    {
+        var fixture = new Fixture();
+        fixture.Completed.Set(true, skipSave: true);
+
+        fixture.Service.MarkStarted();
+
+        Assert.False(fixture.Started.Get());
+        Assert.False(fixture.Service.IsRequired);
+    }
+
+    [Fact]
     public void TheFlatpaksDefaultDolphinLocation_DoesNotCountAsSetUp()
     {
         var fixture = new Fixture(defaultLocation: "/app/extensions/backends/dolphin-emu/bin/dolphin-emu-wrapper");
@@ -120,6 +148,7 @@ public class OnboardingServiceTests
         public ISettingsManager Settings { get; } = Substitute.For<ISettingsManager>();
         public IServiceProvider Services { get; } = Substitute.For<IServiceProvider>();
         public WhWzSetting<bool> Completed { get; } = new("OnboardingCompleted", false);
+        public WhWzSetting<bool> Started { get; } = new("OnboardingStarted", false);
         public WhWzSetting<string> Game { get; }
         public WhWzSetting<string> Location { get; }
         public WhWzSetting<string> UserFolder { get; } = new("UserFolderPath", "");
@@ -133,6 +162,7 @@ public class OnboardingServiceTests
             Game = new WhWzSetting<string>("GameLocation", "").SetValidation(value => Fs.File.Exists(value));
             Location = new WhWzSetting<string>("DolphinLocation", defaultLocation).SetValidation(value => value.Length > 0);
             Settings.ONBOARDING_COMPLETED.Returns(Completed);
+            Settings.ONBOARDING_STARTED.Returns(Started);
             Settings.GAME_LOCATION.Returns(Game);
             Settings.DOLPHIN_LOCATION.Returns(Location);
             Settings.USER_FOLDER_PATH.Returns(UserFolder);

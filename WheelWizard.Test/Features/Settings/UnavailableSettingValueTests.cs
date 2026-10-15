@@ -79,6 +79,42 @@ public class UnavailableSettingValueTests
     }
 
     [Fact]
+    public void ARejectedFolder_DoesNotEraseTheRememberedOne()
+    {
+        var (_, path, other, fs) = Create("{\"Folder\":\"/usb/Dolphin\"}", value => value == "/home/Dolphin");
+
+        Assert.False(path.Set("/elsewhere/Dolphin"));
+        other.Set(true);
+
+        Assert.True(path.HasUnavailableValue);
+        Assert.Contains("\"Folder\": \"/usb/Dolphin\"", fs.File.ReadAllText(Config));
+    }
+
+    [Fact]
+    public void ValueSettingsWithANonDefaultDefault_AreWrittenAsTheyAre()
+    {
+        // default(T) is not "nothing remembered": a bool that defaults to true must not be saved as false.
+        var fs = new MockFileSystem();
+        fs.Directory.CreateDirectory("/config");
+        fs.File.WriteAllText(Config, "{}");
+        var manager = new WhWzSettingManager(NullLogger<WhWzSettingManager>.Instance, fs);
+        var animations = new WhWzSetting<bool>("EnableAnimations", true, setting => manager.SaveSettings(Config, setting));
+        var scale = new WhWzSetting<double>("WindowScale", 1.0, setting => manager.SaveSettings(Config, setting));
+        var other = new WhWzSetting<bool>("Other", false, setting => manager.SaveSettings(Config, setting));
+        manager.RegisterSetting(animations);
+        manager.RegisterSetting(scale);
+        manager.RegisterSetting(other);
+        manager.LoadSettings(Config);
+
+        other.Set(true);
+
+        Assert.False(animations.HasUnavailableValue);
+        var saved = fs.File.ReadAllText(Config);
+        Assert.Contains("\"EnableAnimations\": true", saved);
+        Assert.Contains("\"WindowScale\": 1", saved);
+    }
+
+    [Fact]
     public void AFolderThatIsThere_IsJustTheValue()
     {
         var (_, path, _, _) = Create("{\"Folder\":\"/home/Dolphin\"}", _ => true);

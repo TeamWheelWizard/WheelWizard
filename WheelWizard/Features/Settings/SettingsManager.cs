@@ -214,6 +214,8 @@ public class SettingsManager : ISettingsManager, IDisposable
         // While set, the Dolphin location and user folder are derived from the data folder on every start.
         DOLPHIN_MANAGED = RegisterWhWz("DolphinManaged", false);
         ONBOARDING_COMPLETED = RegisterWhWz("OnboardingCompleted", false);
+        // The onboarding saves paths as it goes; while it is unfinished those are its own, not an earlier setup.
+        ONBOARDING_STARTED = RegisterWhWz("OnboardingStarted", false);
         FORCE_WIIMOTE = RegisterWhWz("ForceWiimote", false);
         LAUNCH_WITH_DOLPHIN = RegisterWhWz("LaunchWithDolphin", false);
         LAUNCH_RR_ON_STARTUP = RegisterWhWz("LaunchRrOnStartup", false);
@@ -328,6 +330,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     public Setting<string> GAME_LOCATION { get; }
     public Setting<bool> DOLPHIN_MANAGED { get; }
     public Setting<bool> ONBOARDING_COMPLETED { get; }
+    public Setting<bool> ONBOARDING_STARTED { get; }
     public Setting<bool> FORCE_WIIMOTE { get; }
     public Setting<bool> LAUNCH_WITH_DOLPHIN { get; }
     public Setting<bool> LAUNCH_RR_ON_STARTUP { get; }

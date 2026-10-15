@@ -47,6 +47,12 @@ public interface IOnboardingService
     /// </summary>
     void MarkCompletedIfAlreadySetUp();
 
+    /// <summary>
+    /// Records that the onboarding is under way, so the paths it saves before it finishes are not taken for an
+    /// earlier setup when the app is closed halfway; the onboarding then comes back on the next start.
+    /// </summary>
+    void MarkStarted();
+
     bool IsWiiCompiledAvailable { get; }
     ManagedDolphinKind ManagedDolphinKind { get; }
 
@@ -107,15 +113,26 @@ public sealed class OnboardingService(
 
     // A settings file that could not be read says nothing about the user, and nothing could be saved over it anyway.
     public bool IsRequired =>
-        !settings.SettingsFileUnreadable && !settings.Get(settings.ONBOARDING_COMPLETED) && !WasSetUpBefore() && !IsSetupUsable();
+        !settings.SettingsFileUnreadable
+        && !settings.Get(settings.ONBOARDING_COMPLETED)
+        && (IsUnfinished || !WasSetUpBefore() && !IsSetupUsable());
 
     public void MarkCompletedIfAlreadySetUp()
     {
-        if (settings.SettingsFileUnreadable)
+        if (settings.SettingsFileUnreadable || IsUnfinished)
             return;
         if (!settings.Get(settings.ONBOARDING_COMPLETED) && (WasSetUpBefore() || IsSetupUsable()))
             settings.Set(settings.ONBOARDING_COMPLETED, true);
     }
+
+    public void MarkStarted()
+    {
+        if (!settings.Get(settings.ONBOARDING_COMPLETED))
+            settings.Set(settings.ONBOARDING_STARTED, true);
+    }
+
+    // The onboarding only ever starts when nothing was set up, so whatever is set now is what it set itself.
+    private bool IsUnfinished => settings.Get(settings.ONBOARDING_STARTED) && !settings.Get(settings.ONBOARDING_COMPLETED);
 
     /// <summary>
     /// Someone picked paths before, possibly before the onboarding existed. A path that does not resolve today

@@ -42,9 +42,13 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
     /// is not connected. It is never the setting's value. It tells that something was configured, and it is what
     /// gets written back until a new value is set, so an absent drive does not erase the choice.
     /// </summary>
-    public T? UnavailableValue { get; private set; }
+    public T? UnavailableValue => _hasUnavailable ? _unavailable : default;
 
-    public bool HasUnavailableValue => UnavailableValue is { } value && !EqualityComparer<T>.Default.Equals(value, DefaultValue);
+    // Tracked separately: for a value type, T? is plain T, so default(T) cannot stand for "nothing remembered".
+    public bool HasUnavailableValue => _hasUnavailable && !EqualityComparer<T>.Default.Equals(_unavailable, DefaultValue);
+
+    private T _unavailable = defaultValue;
+    private bool _hasUnavailable;
 
     public T Get() => Value;
 
@@ -52,14 +56,19 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
     {
         ArgumentNullException.ThrowIfNull(newValue);
         SaveError = null;
-        UnavailableValue = default;
         if (EqualityComparer<T>.Default.Equals(Value, newValue))
+        {
+            _hasUnavailable = false;
             return true;
+        }
         if (!SaveEvenIfNotValid && _validation?.Invoke(newValue) == false)
             return false;
 
+        // Only a value that is taken replaces the remembered one; a rejected or unsaved one leaves it as it was.
         var previous = Value;
+        var hadUnavailable = _hasUnavailable;
         Value = newValue;
+        _hasUnavailable = false;
         try
         {
             ApplyValue(skipSave);
@@ -67,6 +76,7 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             RestoreValueAfterSaveFailure(previous);
+            _hasUnavailable = hadUnavailable;
             SaveError = exception;
             return false;
         }
@@ -116,7 +126,9 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
     /// <summary>For the loaders, right after a stored value was rejected and the default put in its place.</summary>
     public void KeepUnavailable(T value)
     {
-        if (_retainsUnavailable)
-            UnavailableValue = value;
+        if (!_retainsUnavailable)
+            return;
+        _unavailable = value;
+        _hasUnavailable = true;
     }
 }

@@ -103,6 +103,7 @@ public partial class OnboardingPage : UserControl, IBlockingPage
         ExtensionCommandText.Text = "flatpak install flathub io.github.TeamWheelWizard.WheelWizard.Backend.DolphinEmu";
 
         _navigation.IsLocked = true;
+        _onboarding.MarkStarted();
         if (_onboarding.IsWiiCompiledAvailable)
             Show(Step.Choice);
         else
