@@ -12,6 +12,12 @@ public interface INavigationService
 
     /// <summary>Navigates without asking the current page (see <see cref="INavigationGuard"/>), e.g. after it saved.</summary>
     void NavigateAway(Type pageType, params object[] arguments);
+
+    /// <summary>
+    /// While set, only <see cref="NavigateAway"/> changes the page; sidebar links, menus and other requests are
+    /// ignored. The onboarding holds this until it finishes.
+    /// </summary>
+    bool IsLocked { get; set; }
 }
 
 /// <summary>A page that may want to stop you from leaving it, e.g. because you'd lose unsaved work.</summary>
@@ -27,14 +33,21 @@ public interface INavigationGuard
 /// <summary>Implement on a page to keep the main sidebar collapsed and locked while it is shown. Leaving restores the user's preference.</summary>
 public interface ILockedSidebarPage;
 
+/// <summary>A page that has to be finished first: the sidebar is also greyed out and cannot be used.</summary>
+public interface IBlockingPage : ILockedSidebarPage;
+
 public sealed class NavigationService(IPageFactory pages) : INavigationService
 {
     private int _generation;
     public UserControl? CurrentPage { get; private set; }
     public event EventHandler<UserControl>? PageChanged;
+    public bool IsLocked { get; set; }
 
     public void NavigateTo(Type pageType, params object[] arguments)
     {
+        if (IsLocked)
+            return;
+
         if (CurrentPage is INavigationGuard { HasUnsavedWork: true } guard)
         {
             _ = NavigateAfterConfirmAsync(guard, pageType, arguments);

@@ -10,6 +10,8 @@ public static class CustomDistributionsExtentions
         services.AddWhWzRefitApi<IRetroRewindApi>(RetroRewindEndpoints.BaseUrl);
 
         services.AddSingleton<ICustomDistributionPaths, CustomDistributionPaths>();
+        services.AddSingleton<IRetroRewindMigrationService, RetroRewindMigrationService>();
+        services.AddSingleton<IRetroRewindBackgroundInstall, RetroRewindBackgroundInstall>();
         services.AddSingleton<ICustomDistributionSingletonService, CustomDistributionSingletonService>();
         services.AddSingleton<RetroRewind>();
         services.AddSingleton<RetroRewindBeta>();

@@ -7,7 +7,9 @@ using WheelWizard.ApplicationLifecycle.Logging;
 using WheelWizard.DiscImages;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
+using WheelWizard.DolphinInstaller;
 using WheelWizard.Models.Enums;
+using WheelWizard.Recomp;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Desktop.Storage;
@@ -43,6 +45,10 @@ public partial class WhWzSettings : UserControl
 
     private IDiscImageService DiscImages { get; }
 
+    private IManagedDolphinService ManagedDolphin { get; }
+
+    private IServiceProvider Services { get; }
+
     public WhWzSettings(
         IApplicationLogFiles logFiles,
         IFilePickerService filePicker,
@@ -51,10 +57,14 @@ public partial class WhWzSettings : UserControl
         IDolphinSettingManager dolphinSettingsService,
         IDolphinDiscoveryService dolphinDiscovery,
         IApplicationDataLocation applicationData,
-        IDiscImageService discImages
+        IDiscImageService discImages,
+        IManagedDolphinService managedDolphin,
+        IServiceProvider services
     )
     {
         DiscImages = discImages;
+        ManagedDolphin = managedDolphin;
+        Services = services;
         FilePicker = filePicker;
         DolphinPaths = dolphinPaths;
         SettingsService = settingsService;
@@ -320,6 +330,10 @@ public partial class WhWzSettings : UserControl
             return false;
         }
 
+        // Picking a Dolphin or user folder by hand means the user now manages Dolphin themselves.
+        if ((setting == SettingsService.DOLPHIN_LOCATION || setting == SettingsService.USER_FOLDER_PATH) && ManagedDolphin.IsActive)
+            ManagedDolphin.Deactivate();
+
         UpdateLocationRows();
 
         await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Success_PathSettingsSaved);
@@ -383,15 +397,117 @@ public partial class WhWzSettings : UserControl
         );
 
         LocationWarningIcon.IsVisible = !SettingsService.PathsSetupCorrectly();
-        DolphinExecutableValueText.Text = string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath)
-            ? GetDolphinExecutableHelperText()
+        DolphinExecutableValueText.Text =
+            ManagedDolphin.IsActive ? ManagedDolphinText()
+            : string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath) ? GetDolphinExecutableHelperText()
             : DolphinPaths.ExecutablePath;
+        UpdateManagedDolphinActions();
         DolphinExecutableOpenButton.IsVisible = !OperatingSystem.IsLinux() || IsConfiguredExecutableFile(DolphinPaths.ExecutablePath);
         DolphinExecutableOpenButton.IsEnabled =
             DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(DolphinPaths.ExecutablePath);
         GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
         UpdateGameFileDetails();
         DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(DolphinPaths.UserFolderPath);
+    }
+
+    private string ManagedDolphinText()
+    {
+        var version = ManagedDolphin.Kind == ManagedDolphinKind.Portable ? ManagedDolphin.InstalledVersion : null;
+        return version is null ? t("onboarding.managed_dolphin_label") : $"{t("onboarding.managed_dolphin_label")} · {version}";
+    }
+
+    private void UpdateManagedDolphinActions()
+    {
+        var canManage = ManagedDolphin.Kind is ManagedDolphinKind.Portable or ManagedDolphinKind.Flatpak;
+        ManageDolphinButton.IsVisible = canManage && !ManagedDolphin.IsActive && !SettingsService.IsRecompModeActive();
+        RemoveManagedDolphinButton.IsVisible =
+            ManagedDolphin.Kind == ManagedDolphinKind.Portable && ManagedDolphin.IsInstalled && ManagedDolphin.CanRemove;
+        ManagedDolphinActions.IsVisible = ManageDolphinButton.IsVisible || RemoveManagedDolphinButton.IsVisible;
+    }
+
+    private async void ManageDolphin_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var confirmed = await new YesNoWindow()
+            .SetMainText(t("onboarding.managed_dolphin_switch"))
+            .SetExtraText(t("onboarding.managed_dolphin_switch_question"))
+            .AwaitAnswer();
+        if (!confirmed)
+            return;
+
+        // Read the current Dolphin's data folders before the switch points the settings elsewhere.
+        var sourceWii = SettingsService.USER_FOLDER_PATH.IsValid() ? DolphinPaths.WiiFolderPath : null;
+        var sourceConfig = SettingsService.USER_FOLDER_PATH.IsValid() ? DolphinPaths.ConfigFolderPath : null;
+
+        var window = new ProgressWindow(t("onboarding.dolphin_installing_title"));
+        OperationResult result;
+        try
+        {
+            window.Show();
+            var progress = new Progress<ManagedDolphinProgress>(value =>
+            {
+                window.SetExtraText(value.Message);
+                window.UpdateProgress(value.Percent);
+            });
+            result = ManagedDolphin.IsInstalled ? ManagedDolphin.Activate() : await ManagedDolphin.InstallAsync(progress);
+            if (result.IsSuccess && sourceWii is not null && sourceConfig is not null)
+                result = await Task.Run(() => ManagedDolphin.ImportUserData(sourceWii, sourceConfig));
+        }
+        finally
+        {
+            window.Close();
+        }
+
+        UpdateLocationRows();
+        if (result.IsFailure)
+        {
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText(t("onboarding.dolphin_install_failed"))
+                .SetInfoText(result.Error.Message)
+                .ShowDialog();
+            return;
+        }
+
+        RefreshLicensesAfterDolphinChange();
+    }
+
+    private async void RemoveManagedDolphin_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var size = await Task.Run(ManagedDolphin.GetInstalledSize);
+        var confirmed = await new YesNoWindow()
+            .SetMainText(t("onboarding.managed_dolphin_remove"))
+            .SetExtraText(t("onboarding.managed_dolphin_remove_question", new { size = $"{size / (1024d * 1024d):0} MB" }))
+            .AwaitAnswer();
+        if (!confirmed)
+            return;
+
+        var result = await Task.Run(ManagedDolphin.Remove);
+        UpdateLocationRows();
+        if (result.IsFailure)
+        {
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText(t("onboarding.managed_dolphin_remove"))
+                .SetInfoText(result.Error.Message)
+                .ShowDialog();
+        }
+    }
+
+    private static void RefreshLicensesAfterDolphinChange()
+    {
+        var layout = ViewUtils.GetLayout();
+        layout.UpdateSidebarProfile();
+        layout.UpdateFriendCount();
+    }
+
+    /// <summary>Everything Wheel Wizard derives from its data folder has to follow it to the new place.</summary>
+    private void FollowRelocatedDataFolder()
+    {
+        ManagedDolphin.SyncSettings();
+        var result = Services.GetService<IRecompDolphinDataService>()?.ApplyPathsToRecompConfig();
+        if (result is { IsFailure: true })
+            Serilog.Log.Warning("Could not update WiiCompiled after moving the data folder: {Message}", result.Error.Message);
+        UpdateLocationRows();
     }
 
     private static void SetLocationRowState(PathIcon completeIcon, PathIcon warningIcon, SettingsButton changeButton, bool isValid)
@@ -537,6 +653,7 @@ public partial class WhWzSettings : UserControl
             if (success)
             {
                 await HandleSuccessfulAppdataMoveAsync(details, errorMessage);
+                FollowRelocatedDataFolder();
             }
             else
             {

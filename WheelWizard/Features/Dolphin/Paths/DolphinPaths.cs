@@ -10,6 +10,10 @@ public interface IDolphinPaths
     string UserFolderPath { get; }
     string ConfigFolderPath { get; }
     bool HasCustomLoadFolder { get; }
+
+    /// <summary>Dolphin's Load folder setting as written, even when that folder is not there right now (an unplugged drive).</summary>
+    string ConfiguredLoadFolderPath { get; }
+
     string LoadFolderPath { get; }
     string WiiFolderPath { get; }
 }
@@ -21,6 +25,7 @@ public sealed class DolphinPaths(ISettingsManager settings, IDolphinPathResolver
     public string UserFolderPath => settings.Get<string>(settings.USER_FOLDER_PATH);
     public string ConfigFolderPath => Layout.ConfigFolderPath;
     public bool HasCustomLoadFolder => settings.LOAD_PATH.IsValid();
+    public string ConfiguredLoadFolderPath => settings.Get<string>(settings.LOAD_PATH);
     public string LoadFolderPath =>
         HasCustomLoadFolder ? settings.Get<string>(settings.LOAD_PATH) : fileSystem.Path.Combine(UserFolderPath, "Load");
     public string WiiFolderPath =>

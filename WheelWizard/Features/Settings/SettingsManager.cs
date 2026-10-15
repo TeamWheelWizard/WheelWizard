@@ -208,6 +208,10 @@ public class SettingsManager : ISettingsManager, IDisposable
         );
 
         GAME_LOCATION = RegisterWhWz("GameLocation", "", value => _fileSystem.File.Exists(value));
+        // Wheel Wizard installed this Dolphin into its own data folder (or, on native Linux, as a user Flatpak).
+        // While set, the Dolphin location and user folder are derived from the data folder on every start.
+        DOLPHIN_MANAGED = RegisterWhWz("DolphinManaged", false);
+        ONBOARDING_COMPLETED = RegisterWhWz("OnboardingCompleted", false);
         FORCE_WIIMOTE = RegisterWhWz("ForceWiimote", false);
         LAUNCH_WITH_DOLPHIN = RegisterWhWz("LaunchWithDolphin", false);
         LAUNCH_RR_ON_STARTUP = RegisterWhWz("LaunchRrOnStartup", false);
@@ -258,6 +262,9 @@ public class SettingsManager : ISettingsManager, IDisposable
         // The Wii data folder the runtime should use, written by RecompDolphinDataService after an
         // install and whenever the sharing choice changes. Empty/absent means the runtime's private NAND.
         RECOMP_NAND_ROOT = RegisterRecomp(("paths", "nand_root"), "");
+        // The Retro Rewind folder the runtime loads. The setup writes it once at install time, so Wheel
+        // Wizard rewrites it before every launch to follow a moved Retro Rewind or data folder.
+        RECOMP_RETRO_REWIND_ROOT = RegisterRecomp(("paths", "retro_rewind_root"), "");
         #endregion
 
         #region Virtual settings
@@ -312,6 +319,8 @@ public class SettingsManager : ISettingsManager, IDisposable
     public Setting<string> USER_FOLDER_PATH { get; }
     public Setting<string> DOLPHIN_LOCATION { get; }
     public Setting<string> GAME_LOCATION { get; }
+    public Setting<bool> DOLPHIN_MANAGED { get; }
+    public Setting<bool> ONBOARDING_COMPLETED { get; }
     public Setting<bool> FORCE_WIIMOTE { get; }
     public Setting<bool> LAUNCH_WITH_DOLPHIN { get; }
     public Setting<bool> LAUNCH_RR_ON_STARTUP { get; }
@@ -342,6 +351,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     public Setting<bool> RECOMP_SHOW_FPS { get; }
     public Setting<bool> RECOMP_PREVENT_STUTTERS { get; }
     public Setting<string> RECOMP_NAND_ROOT { get; }
+    public Setting<string> RECOMP_RETRO_REWIND_ROOT { get; }
     #endregion
 
     #region Public API

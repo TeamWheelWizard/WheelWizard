@@ -1,12 +1,39 @@
 using System.IO.Abstractions;
 using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
+using WheelWizard.Shared.IO;
 
 namespace WheelWizard.CustomDistributions;
 
 public interface ICustomDistributionPaths
 {
+    /// <summary>Where Retro Rewind lives right now: the managed folder, or a legacy install that has not been moved yet.</summary>
     string RootFolderPath { get; }
+
+    /// <summary>The single Wheel Wizard-owned Retro Rewind folder inside the data folder, for every frontend.</summary>
+    string ManagedRootFolderPath { get; }
+
+    /// <summary>
+    /// The pre-onboarding location inside Dolphin's Load folder, or <see langword="null"/> when no Dolphin
+    /// folder is configured. It stays active until <see cref="IRetroRewindMigrationService"/> has moved it.
+    /// </summary>
+    string? LegacyRootFolderPath { get; }
+
+    /// <summary>Whether a legacy install still holds Retro Rewind and is therefore the active root.</summary>
+    bool IsLegacyRootActive { get; }
+
+    /// <summary>
+    /// Whether "no legacy install" can be trusted right now: there is no Dolphin folder at all, or the folder that would
+    /// hold the legacy install can be read. An unplugged drive or an unreachable share cannot rule one out.
+    /// </summary>
+    bool CanRuleOutLegacyRoot { get; }
+
+    /// <summary>
+    /// Written into the managed root once the startup migration moved a legacy install there or found none,
+    /// so a Retro Rewind in some Dolphin's Load folder is never picked up after that.
+    /// </summary>
+    string MigratedMarkerFilePath { get; }
+
     string RetroRewindFolderPath { get; }
     string BetaFolderPath { get; }
     string PatchesFolderPath { get; }
@@ -26,12 +53,69 @@ public interface ICustomDistributionPaths
 public sealed class CustomDistributionPaths(IApplicationDataLocation applicationData, IDolphinPaths dolphin, IFileSystem fileSystem)
     : ICustomDistributionPaths
 {
-    // Both frontends share this installation. Recomp-only setups use launcher-owned data until
-    // a Dolphin user folder or valid custom Load folder has been configured.
-    public string RootFolderPath =>
+    public const string MigratedMarkerFileName = ".wheelwizard-moved";
+
+    // Both frontends share this installation. The launch descriptor passes the root to Dolphin explicitly,
+    // so it does not have to live in Dolphin's Load folder; older installs did, and keep working from
+    // there until the startup migration has moved them.
+    public string RootFolderPath => IsLegacyRootActive ? LegacyRootFolderPath! : ManagedRootFolderPath;
+    public string ManagedRootFolderPath => fileSystem.Path.Combine(applicationData.DirectoryPath, "RetroRewind");
+    public string MigratedMarkerFilePath => fileSystem.Path.Combine(ManagedRootFolderPath, MigratedMarkerFileName);
+
+    public string? LegacyRootFolderPath =>
         dolphin.HasCustomLoadFolder || !string.IsNullOrWhiteSpace(dolphin.UserFolderPath)
             ? fileSystem.Path.Combine(dolphin.LoadFolderPath, "Riivolution", "WheelWizard")
-            : fileSystem.Path.Combine(applicationData.DirectoryPath, "RetroRewind");
+            : null;
+
+    public bool IsLegacyRootActive
+    {
+        get
+        {
+            var legacy = LegacyRootFolderPath;
+            if (legacy is null || fileSystem.Path.PathsEqual(legacy, ManagedRootFolderPath))
+                return false;
+            try
+            {
+                return !fileSystem.File.Exists(MigratedMarkerFilePath)
+                    && fileSystem.Directory.Exists(legacy)
+                    && fileSystem.Directory.EnumerateFileSystemEntries(legacy).Any();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+
+    public bool CanRuleOutLegacyRoot
+    {
+        get
+        {
+            if (LegacyRootFolderPath is null)
+                return true;
+            // A custom Load folder that is configured but missing falls back to the user folder's Load folder,
+            // which would wrongly look empty.
+            if (!dolphin.HasCustomLoadFolder && !string.IsNullOrWhiteSpace(dolphin.ConfiguredLoadFolderPath))
+                return false;
+            return IsReadable(dolphin.HasCustomLoadFolder ? dolphin.LoadFolderPath : dolphin.UserFolderPath);
+        }
+    }
+
+    private bool IsReadable(string folder)
+    {
+        try
+        {
+            if (!fileSystem.Directory.Exists(folder))
+                return false;
+            _ = fileSystem.Directory.EnumerateFileSystemEntries(folder).Any();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public string RetroRewindFolderPath => fileSystem.Path.Combine(RootFolderPath, "RetroRewind6");
     public string BetaFolderPath => fileSystem.Path.Combine(RootFolderPath, "RRBeta");
     public string PatchesFolderPath => fileSystem.Path.Combine(RetroRewindFolderPath, "Patches");

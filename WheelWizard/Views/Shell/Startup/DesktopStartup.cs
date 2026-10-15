@@ -1,9 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using WheelWizard.ApplicationLifecycle;
 using WheelWizard.AutoUpdating;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Onboarding;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.WiiManagement.GameLicense;
 
@@ -31,6 +33,9 @@ public sealed class DesktopStartup(
     IMainWindowService windows,
     IGameLicenseSingletonService licenses,
     IApplicationStartup startup,
+    IStartupMaintenance maintenance,
+    IOnboardingService onboarding,
+    IManagedDolphinUpdatePrompt dolphinUpdates,
     ILogger<DesktopStartup> logger
 ) : IDesktopStartup
 {
@@ -45,6 +50,8 @@ public sealed class DesktopStartup(
             cancellationToken.ThrowIfCancellationRequested();
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             _ = cleanup.CleanupStaleExtractionsAsync();
+            var splash = desktop.MainWindow as SplashWindow;
+            await maintenance.RunAsync(status => Dispatcher.UIThread.Post(() => splash?.SetStatus(status)), cancellationToken);
             await windows.ShowAsync(desktop, cancellationToken);
             if (resources.GetResolvedResourcePath().IsFailure)
             {
@@ -59,6 +66,8 @@ public sealed class DesktopStartup(
             cancellationToken.ThrowIfCancellationRequested();
             licenses.LoadLicense();
             await startup.RunAsync(options, cancellationToken);
+            if (!onboarding.IsRequired)
+                await dolphinUpdates.OfferUpdateAsync(cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
         catch (Exception exception)

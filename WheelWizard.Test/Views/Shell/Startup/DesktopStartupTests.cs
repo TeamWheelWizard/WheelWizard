@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using WheelWizard.ApplicationLifecycle;
 using WheelWizard.AutoUpdating;
 using WheelWizard.MiiRendering.Services;
+using WheelWizard.Onboarding;
 using WheelWizard.Shared;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Startup;
@@ -118,6 +119,9 @@ public class DesktopStartupTests
                 Windows,
                 Substitute.For<IGameLicenseSingletonService>(),
                 Startup,
+                Substitute.For<IStartupMaintenance>(),
+                Substitute.For<IOnboardingService>(),
+                Substitute.For<IManagedDolphinUpdatePrompt>(),
                 NullLogger<DesktopStartup>.Instance
             );
     }
