@@ -35,12 +35,11 @@ public class ModDetailsTests
         var mod = CreateMod(1, string.Join(" ", Enumerable.Repeat("A very long mod title", 6)));
         api.GetModDetails(1).Returns(OperationResult.Ok(mod));
         var content = CreateContent(api);
-        var navigation = Substitute.For<INavigationService>();
         using var owner = new TestWindow { Width = width, Height = height };
         owner.Show();
         var nativeWindows = 0;
         using var opened = Window.WindowOpenedEvent.AddClassHandler<Window>((_, _) => nativeWindows++);
-        var modal = new ModIndependentWindow(content, navigation);
+        var modal = new ModIndependentWindow(content);
         modal.SetModalOwner(owner);
         var closed = modal.ShowDialog();
         await modal.LoadModAsync(1);
@@ -82,7 +81,6 @@ public class ModDetailsTests
         owner.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
         await closed.WaitAsync(TimeSpan.FromSeconds(2));
         Assert.False(owner.Modals.HasModals);
-        navigation.Received(1).NavigateTo<ModsPage>();
     }
 
     [AvaloniaFact]
@@ -120,7 +118,7 @@ public class ModDetailsTests
         var content = CreateContent(api, media);
         using var owner = new TestWindow();
         owner.Show();
-        var modal = new ModIndependentWindow(content, Substitute.For<INavigationService>());
+        var modal = new ModIndependentWindow(content);
         modal.SetModalOwner(owner);
         var closed = modal.ShowDialog();
         var loading = content.LoadModDetailsAsync(1);
@@ -158,7 +156,7 @@ public class ModDetailsTests
         var content = CreateContent(api, media);
         using var owner = new TestWindow { Width = width, Height = height };
         owner.Show();
-        var modal = new ModIndependentWindow(content, Substitute.For<INavigationService>());
+        var modal = new ModIndependentWindow(content);
         modal.SetModalOwner(owner);
         modal.Show();
         await content.LoadModDetailsAsync(1);
@@ -202,7 +200,7 @@ public class ModDetailsTests
         var content = CreateContent(api);
         using var owner = new TestWindow();
         owner.Show();
-        var modal = new ModIndependentWindow(content, Substitute.For<INavigationService>());
+        var modal = new ModIndependentWindow(content);
         modal.SetModalOwner(owner);
         modal.Show();
         await content.LoadModDetailsAsync(1);

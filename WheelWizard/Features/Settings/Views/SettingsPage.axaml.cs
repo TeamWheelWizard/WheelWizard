@@ -15,7 +15,7 @@ public partial class SettingsPage : UserControl, ILockedSidebarPage
     // Reveal the navigation by clipping; keep the settings content stationary during the shell resize.
     public void UpdateLayoutWidth(double availableWidth) => SettingsRoot.Width = availableWidth;
 
-    private IPopupFactory Popups { get; }
+    private IModalFactory Popups { get; }
 
     private ISettingsManager SettingsService { get; }
 
@@ -26,7 +26,7 @@ public partial class SettingsPage : UserControl, ILockedSidebarPage
     private bool _navigationReady;
 
     public SettingsPage(
-        IPopupFactory popups,
+        IModalFactory popups,
         ISettingsManager settingsService,
         ISettingsSignalBus settingsSignalBus,
         IPageFactory pages,

@@ -1,4 +1,4 @@
-<dialogBase:PopupContent xmlns="https://github.com/avaloniaui"
+<dialogBase:ModalContent xmlns="https://github.com/avaloniaui"
                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                          xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base"
                          x:Class="WheelWizard.Mods.Views.Dialogs.ModIndependentWindow">
@@ -6,4 +6,4 @@
         <ContentControl x:Name="ModDetailHost"
                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

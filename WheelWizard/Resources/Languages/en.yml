@@ -741,3 +741,21 @@ en:
       empty: "No options found"
     input:
       invalid_number: "Enter a number"
+
+  mod_browser:
+    title: "Browse mods"
+    my_mods: "My mods"
+    search_placeholder: "Search mods"
+    patches_only: "Patches only"
+    patches: "Patches"
+    retry: "Try again"
+    loading: "Loading mods…"
+    short_search: "Enter at least 2 characters to search."
+    load_error: "Couldn't load mods from GameBanana. Check your connection and try again."
+    empty_title: "No matching mods"
+    empty_body: "Try another search or adjust your filters."
+    filters: "Filters"
+    mod_type: "Mod type"
+    all_types: "All types"
+    apply_filters: "Apply filter"
+    types_error: "Couldn't load mod types. Reopen filters to try again."

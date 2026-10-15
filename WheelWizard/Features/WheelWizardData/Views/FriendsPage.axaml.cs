@@ -23,7 +23,7 @@ namespace WheelWizard.WheelWizardData.Views;
 
 public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
-    private IPopupFactory Popups { get; }
+    private IModalFactory Popups { get; }
 
     private INavigationService Navigation { get; }
 
@@ -95,7 +95,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     }
 
     public FriendsPage(
-        IPopupFactory popups,
+        IModalFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameLicenseService,

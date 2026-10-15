@@ -20,6 +20,23 @@ namespace WheelWizard.UI.Test;
 
 public class SharedControlTests
 {
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void InputField_EnterReleasesFocusExceptForMultiline(bool multiline)
+    {
+        var field = new InputField { AcceptsReturn = multiline };
+        using var window = new UiTestWindow { Content = field };
+        window.Show();
+        field.Focus();
+        var submitted = false;
+        field.KeyDown += (_, _) => submitted = true;
+        window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(submitted || multiline);
+        Assert.Equal(multiline, field.IsFocused);
+    }
+
     [AvaloniaFact]
     public void ButtonLoading_ReplacesItsIconAndPreservesItsLabel()
     {

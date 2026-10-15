@@ -1,0 +1,172 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:views="clr-namespace:WheelWizard.Mods.Views"
+             xmlns:vm="clr-namespace:WheelWizard.Mods.ViewModels"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             x:Class="WheelWizard.Mods.Views.ModBrowserPage" x:DataType="vm:ModBrowserViewModel">
+    <UserControl.Resources>
+        <StreamGeometry x:Key="ModFilterIcon">M3,4 L21,4 L14,12 L14,20 L10,18 L10,12 Z</StreamGeometry>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="FlyoutPresenter.ModFilters">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="20" />
+        </Style>
+        <Style Selector="ScrollViewer#ResultsScroll /template/ ScrollContentPresenter#PART_ContentPresenter">
+            <Setter Property="Grid.ColumnSpan" Value="1" />
+        </Style>
+        <Style Selector="ScrollViewer#ResultsScroll /template/ ScrollBar#PART_VerticalScrollBar">
+            <Setter Property="RenderTransform"><TranslateTransform X="0" /></Setter>
+        </Style>
+        <Style Selector="ScrollViewer#ResultsScroll /template/ Thumb">
+            <Setter Property="Background" Value="{StaticResource Neutral600}" />
+        </Style>
+        <Style Selector="Button.ModCard">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="1" ClipToBounds="True">
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.ModCard:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+        </Style>
+        <Style Selector="Button.ModCard:focus-visible">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+        </Style>
+    </UserControl.Styles>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid RowDefinitions="Auto,*">
+            <components:ActionButton x:Name="BackButton" Text="{loc:T mod_browser.my_mods}" IconData="{StaticResource ArrowLeft}"
+                                     Variant="Link" Tone="Secondary" FontSize="16" Padding="0" MinHeight="0"
+                                     HorizontalAlignment="Left" VerticalAlignment="Top" Click="Back_Click" />
+            <Grid Grid.Row="1" ColumnDefinitions="Auto,*" ColumnSpacing="16" VerticalAlignment="Bottom" Margin="3,0,3,12">
+                <TextBlock Text="{loc:T mod_browser.title}" Classes="PageTitleText" Margin="0" VerticalAlignment="Center" />
+                <Grid Grid.Column="1" ColumnDefinitions="*,Auto" ColumnSpacing="8" HorizontalAlignment="Stretch">
+                    <components:InputField x:Name="SearchInput" Text="{Binding SearchText, Mode=TwoWay}"
+                                           Placeholder="{loc:T mod_browser.search_placeholder}" IconData="{StaticResource Search}"
+                                           Height="36" KeyDown="Search_KeyDown" />
+                    <Grid Grid.Column="1">
+                        <components:ActionButton x:Name="FilterButton" IconData="{StaticResource ModFilterIcon}" Tone="Secondary"
+                                                 Width="36" Height="36" Padding="8" Click="Filter_Click"
+                                                 AutomationProperties.Name="{loc:T mod_browser.filters}">
+                            <Button.Flyout>
+                                <Flyout Placement="BottomEdgeAlignedRight" FlyoutPresenterClasses="ModFilters">
+                                    <StackPanel Width="250" Spacing="16">
+                                        <TextBlock Text="{loc:T mod_browser.filters}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource Neutral100}" />
+                                        <components:ToggleCheckBox x:Name="PatchesFilter" Content="{loc:T mod_browser.patches_only}"
+                                                                   IsChecked="{Binding DraftPatchesOnly, Mode=TwoWay}" />
+                                        <Border Height="1" Background="{StaticResource Neutral700}" />
+                                        <StackPanel Spacing="6">
+                                            <components:FormFieldLabel Text="{loc:T mod_browser.mod_type}" />
+                                            <components:Dropdown x:Name="ModTypeFilter" ItemsSource="{Binding ModTypes}"
+                                                                 SelectedItem="{Binding DraftModType, Mode=TwoWay}" />
+                                            <components:Spinner Width="18" Height="18" IsVisible="{Binding TypesLoading}" />
+                                            <TextBlock Text="{Binding TypesError}" IsVisible="{Binding TypesError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                       FontSize="12" Foreground="{StaticResource Danger400}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <Border Height="1" Background="{StaticResource Neutral700}" />
+                                        <components:ActionButton x:Name="ApplyFiltersButton" Text="{loc:T mod_browser.apply_filters}"
+                                                                 HorizontalAlignment="Stretch" Click="ApplyFilters_Click" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </components:ActionButton>
+                        <Border Width="18" Height="18" CornerRadius="9" Background="{StaticResource Brand400}"
+                                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-5,-5,0"
+                                IsVisible="{Binding HasFilters}" IsHitTestVisible="False">
+                            <TextBlock Text="{Binding ActiveFilterCount}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource Neutral950}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Border Grid.RowSpan="2" Height="1" VerticalAlignment="Bottom" Background="{StaticResource BackgroundLineColor}" />
+        </Grid>
+        <ScrollViewer Grid.Row="1" Margin="0,16,0,1" x:Name="ResultsScroll" ClipToBounds="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="14" Margin="4,0,4,20">
+                <ItemsControl x:Name="ResultsList" ItemsSource="{Binding Results}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ModBrowserItem">
+                            <Button Classes="ModCard" Margin="6,0,6,12" Click="Card_Click" Loaded="Card_Loaded"
+                                    AutomationProperties.Name="{Binding Mod.Name}">
+                                <StackPanel>
+                                    <Border Height="142" CornerRadius="6,6,0,0" ClipToBounds="True" Background="{StaticResource Neutral800}">
+                                        <Grid>
+                                            <PathIcon Data="{StaticResource CubesStacked}" Width="28" Height="28" Foreground="{StaticResource Neutral600}" />
+                                            <Image Source="{Binding Preview.Image}" Stretch="UniformToFill" />
+                                            <views:ModImagePlaceholder IsVisible="{Binding Preview.IsLoading}" />
+                                        </Grid>
+                                    </Border>
+                                    <StackPanel Margin="12,10" Spacing="8">
+                                        <TextBlock Text="{Binding Mod.Name}" Height="40" LineHeight="20" FontSize="15" FontWeight="SemiBold"
+                                                   TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Foreground="{StaticResource Neutral50}" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" Height="24">
+                                            <TextBlock Text="{Binding Mod.Author.Name}" FontSize="12" VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" Foreground="{StaticResource Neutral400}" />
+                                            <components:StatusBadge Grid.Column="1" Text="{loc:T mod_browser.patches}" Variant="Brand" IsVisible="{Binding Mod.UsesPatches}" />
+                                        </Grid>
+                                        <Border Height="1" Background="{StaticResource BackgroundLineColor}" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <TextBlock Text="{Binding Mod.RootCategory.Name}" FontSize="11" VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" Foreground="{StaticResource Neutral300}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                                    <PathIcon Data="{StaticResource Heart}" Width="12" Height="12" Foreground="{StaticResource Neutral500}" />
+                                                    <TextBlock Text="{Binding Mod.LikeCount, StringFormat={}{0:N0}}" FontSize="11" Foreground="{StaticResource Neutral400}" />
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                                    <PathIcon Data="{StaticResource Eye}" Width="12" Height="12" Foreground="{StaticResource Neutral500}" />
+                                                    <TextBlock Text="{Binding Mod.ViewCount, StringFormat={}{0:N0}}" FontSize="11" Foreground="{StaticResource Neutral400}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <StackPanel IsVisible="{Binding ShowInitialLoading}" Spacing="12" Margin="6,0">
+                    <views:ModImagePlaceholder Height="142" />
+                    <views:ModImagePlaceholder Height="18" Width="220" HorizontalAlignment="Left" />
+                    <views:ModImagePlaceholder Height="12" Width="150" HorizontalAlignment="Left" />
+                </StackPanel>
+                <components:EmptyPageInfo IsVisible="{Binding IsEmpty}" Title="{loc:T mod_browser.empty_title}"
+                                          BodyText="{loc:T mod_browser.empty_body}" />
+                <Border IsVisible="{Binding HasError}" Background="{StaticResource Neutral900}" CornerRadius="8" Padding="16" Margin="6,0">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="{Binding Error}" TextWrapping="Wrap" Foreground="{StaticResource Neutral200}" />
+                        <components:ActionButton Text="{loc:T mod_browser.retry}" Tone="Secondary" HorizontalAlignment="Left" Click="Retry_Click" />
+                    </StackPanel>
+                </Border>
+                <StackPanel IsVisible="{Binding IsLoading}" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" Margin="0,4,0,12">
+                    <components:Spinner Width="20" Height="20" />
+                    <TextBlock Text="{loc:T mod_browser.loading}" FontSize="12" VerticalAlignment="Center" Foreground="{StaticResource Neutral400}" />
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom" Background="{StaticResource BackgroundLineColor}" />
+    </Grid>
+</UserControl>

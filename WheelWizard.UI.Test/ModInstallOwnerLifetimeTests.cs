@@ -1,6 +1,5 @@
 using System.Reflection;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -52,11 +51,11 @@ public class ModInstallOwnerLifetimeTests
         var mod = ModTestFixture.CreateMod(123, "Test mod");
         mod.Files = [new() { FileName = "mod.zip", DownloadUrl = "https://example.com/mod.zip" }];
         typeof(ModContent).GetProperty("CurrentMod", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(content, mod);
-        var owner = new PopupWindow(true, false, false, "Mod viewer");
-        owner.FindControl<ContentPresenter>("PopupContent")!.Content = content;
+        using var owner = new UiTestHost();
+        owner.Body.Child = content;
         owner.Show();
         // Keep a second app window open: late failures must not surface there either.
-        var other = new PopupWindow(true, true, false, "Other window");
+        using var other = new UiTestHost();
         other.Show();
         try
         {
@@ -72,7 +71,7 @@ public class ModInstallOwnerLifetimeTests
             Assert.False(owner.IsVisible);
             if (detachContent)
             {
-                owner.FindControl<ContentPresenter>("PopupContent")!.Content = null;
+                owner.Body.Child = null;
                 Assert.Null(TopLevel.GetTopLevel(content));
             }
             else

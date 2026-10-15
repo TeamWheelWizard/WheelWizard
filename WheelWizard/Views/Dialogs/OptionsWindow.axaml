@@ -1,4 +1,4 @@
-<dialogBase:PopupContent xmlns="https://github.com/avaloniaui"
+<dialogBase:ModalContent xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,7 +9,7 @@
     <!-- Max Height is practically unreachable, no way that you have so many options -->
     <Grid MaxHeight="800" RowDefinitions="Auto,*">
         <components:ModalHeading Margin="0,0,0,12">
-            <TextBlock Classes="TitleText" Text="{ReflectionBinding PopupTitle, RelativeSource={RelativeSource AncestorType=dialogBase:PopupContent}}" TextWrapping="Wrap" />
+            <TextBlock Classes="TitleText" Text="{ReflectionBinding ModalTitle, RelativeSource={RelativeSource AncestorType=dialogBase:ModalContent}}" TextWrapping="Wrap" />
         </components:ModalHeading>
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
             <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="OptionList">
@@ -17,4 +17,4 @@
             </WrapPanel>
         </ScrollViewer>
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

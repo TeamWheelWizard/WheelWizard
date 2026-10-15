@@ -120,35 +120,20 @@ public class InAppModalTests
     }
 
     [AvaloniaFact]
-    public async Task ExplicitOwner_KeepsPromptInsideItsModWindow()
+    public async Task ExplicitOwner_KeepsPromptInOriginatingWindow()
     {
-        using var main = new ModalTestWindow();
-        main.Show();
-        var mod = new ModTestWindow(main);
-        mod.Show();
-        try
-        {
-            Layout(mod);
-            var size = mod.ClientSize;
-            var prompt = new MessageBoxWindow().SetTitleText("Mod question");
-            prompt.SetModalOwner(mod);
-            var closed = prompt.ShowDialog();
-            Layout(mod);
-            Assert.Same(mod, TopLevel.GetTopLevel(prompt));
-            Assert.Same(prompt, mod.Modals.TopModal);
-            Assert.False(main.Modals.HasModals);
-            Assert.Equal(size, mod.ClientSize);
-            prompt.Close();
-            await closed.WaitAsync(TimeSpan.FromSeconds(2));
-            Assert.False(main.CanInteract);
-            mod.Close();
-            Assert.True(main.CanInteract);
-        }
-        finally
-        {
-            mod.Close();
-            main.Close();
-        }
+        using var origin = new ModalTestWindow();
+        origin.Show();
+        using var other = new ModalTestWindow();
+        other.Show();
+        var prompt = new MessageBoxWindow().SetTitleText("Question");
+        prompt.SetModalOwner(origin);
+        var closed = prompt.ShowDialog();
+        Assert.Same(origin, TopLevel.GetTopLevel(prompt));
+        Assert.False(other.Modals.HasModals);
+        prompt.Close();
+        await closed.WaitAsync(TimeSpan.FromSeconds(2));
+        Assert.True(origin.CanInteract);
     }
 
     [AvaloniaTheory]
@@ -281,7 +266,7 @@ public class InAppModalTests
         using var owner = new ModalTestWindow();
         owner.Show();
         using var cancellation = new CancellationTokenSource();
-        PopupContent modal = progress
+        ModalContent modal = progress
             ? new ProgressWindow("Progress")
                 .SetCancellationTokenSource(cancellation)
                 .SetGoal(string.Join(" ", Enumerable.Repeat("Installing Retro Rewind", 10)))
@@ -391,15 +376,15 @@ public class InAppModalTests
     [InlineData(true)]
     public void SelectorAndOptionsTitles_BindToTheModalRatherThanTheSurroundingPage(bool selector)
     {
-        using var owner = new ModalTestWindow { DataContext = new { PopupTitle = "Wrong page title" } };
+        using var owner = new ModalTestWindow { DataContext = new { ModalTitle = "Wrong page title" } };
         owner.Show();
-        PopupContent modal = selector ? new MiiSelectorWindow() : new OptionsWindow().SetWindowTitle("Choose a Dolphin executable");
+        ModalContent modal = selector ? new MiiSelectorWindow() : new OptionsWindow().SetWindowTitle("Choose a Dolphin executable");
         modal.Show();
         Layout(owner);
         var heading = modal.GetVisualDescendants().OfType<ModalHeading>().Single();
         var title = Assert.IsType<TextBlock>(heading.Content);
         Assert.False(string.IsNullOrWhiteSpace(title.Text));
-        Assert.Equal(modal.PopupTitle, title.Text);
+        Assert.Equal(modal.ModalTitle, title.Text);
         Assert.NotEqual("Wrong page title", title.Text);
     }
 
@@ -499,12 +484,12 @@ public class InAppModalTests
         owner.UpdateLayout();
     }
 
-    private sealed class TestModal : PopupContent
+    private sealed class TestModal : ModalContent
     {
         public int ClosedCount { get; private set; }
 
         public TestModal()
-            : base(false, false, false, "Required action")
+            : base("Required action")
         {
             Content = new StackPanel
             {
@@ -518,20 +503,6 @@ public class InAppModalTests
         }
 
         protected override void BeforeClose() => ClosedCount++;
-    }
-
-    private sealed class ModTestWindow : PopupWindow
-    {
-        public ModTestWindow(Window owner)
-            : base(true, false, false, "Mod browser")
-        {
-            Owner = owner;
-            this.FindControl<Avalonia.Controls.Presenters.ContentPresenter>("PopupContent")!.Content = new Border
-            {
-                Width = 600,
-                Height = 600,
-            };
-        }
     }
 
     private sealed class ModalTestWindow : BaseWindow, IDisposable

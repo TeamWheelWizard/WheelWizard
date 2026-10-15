@@ -17,7 +17,7 @@ public sealed class ModalHost : Grid
 {
     private readonly BaseWindow _owner;
     private readonly List<Entry> _entries = [];
-    public PopupContent? TopModal => _entries.LastOrDefault()?.Content;
+    public ModalContent? TopModal => _entries.LastOrDefault()?.Content;
     public bool HasModals => _entries.Count != 0;
     internal double BackdropOpacity => 1 - _entries.Aggregate(1d, (remaining, entry) => remaining * (1 - 120d / 255 * entry.Layer.Opacity));
 
@@ -31,7 +31,7 @@ public sealed class ModalHost : Grid
         _owner.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
     }
 
-    public void Show(PopupContent content)
+    public void Show(ModalContent content)
     {
         var previousFocus = _owner.FocusManager?.GetFocusedElement();
         var backdrop = new Border { Background = new SolidColorBrush(Color.FromArgb(120, 0, 0, 0)) };
@@ -120,7 +120,7 @@ public sealed class ModalHost : Grid
         };
     }
 
-    public void Close(PopupContent content, Action closed, bool animate = true)
+    public void Close(ModalContent content, Action closed, bool animate = true)
     {
         var entry = _entries.FirstOrDefault(entry => entry.Content == content);
         if (entry == null)
@@ -203,7 +203,7 @@ public sealed class ModalHost : Grid
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        // Overlays must not contribute to SizeToContent on the retained native mod browser.
+        // Overlay content must not change the size of its application window.
         var size = new Size(
             double.IsFinite(availableSize.Width) ? availableSize.Width : _owner.ClientSize.Width,
             double.IsFinite(availableSize.Height) ? availableSize.Height : _owner.ClientSize.Height
@@ -247,7 +247,7 @@ public sealed class ModalHost : Grid
         }
     }
 
-    private sealed record Entry(PopupContent Content, Grid Layer, Border Panel, IInputElement? InitialFocus)
+    private sealed record Entry(ModalContent Content, Grid Layer, Border Panel, IInputElement? InitialFocus)
     {
         public IInputElement? PreviousFocus { get; set; } = InitialFocus;
         public bool IsClosing { get; set; }

@@ -23,7 +23,7 @@ namespace WheelWizard.RrRooms.Views;
 
 public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
-    private IPopupFactory Popups { get; } = null!;
+    private IModalFactory Popups { get; } = null!;
 
     private INavigationService Navigation { get; } = null!;
 
@@ -68,7 +68,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
     }
 
     public RoomDetailsPage(
-        IPopupFactory popups,
+        IModalFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameDataService,

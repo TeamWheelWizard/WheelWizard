@@ -1,4 +1,4 @@
-<dialogBase:PopupContent x:Class="WheelWizard.Views.Dialogs.ProgressWindow"
+<dialogBase:ModalContent x:Class="WheelWizard.Views.Dialogs.ProgressWindow"
                     xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -54,4 +54,4 @@
                            Margin="0,10,0,0"
                            Click="CancelButton_OnClick"  Tone="Danger"/>
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

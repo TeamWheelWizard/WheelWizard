@@ -4,7 +4,7 @@ using WheelWizard.Views.Dialogs;
 
 namespace WheelWizard.Mods.Presentation;
 
-public sealed class ModInstallRequestPresentation(IPopupFactory popups) : IModInstallRequestPresentation
+public sealed class ModInstallRequestPresentation(IModalFactory popups) : IModInstallRequestPresentation
 {
     public async Task ShowModAsync(ModInstallRequest request)
     {

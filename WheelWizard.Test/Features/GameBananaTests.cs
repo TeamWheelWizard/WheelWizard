@@ -15,7 +15,19 @@ namespace WheelWizard.Test.Features
         {
             _api = Substitute.For<IGameBananaApi>();
             _apiCaller = Substitute.For<IApiCaller<IGameBananaApi>>();
-            _service = new GameBananaSingletonService(_apiCaller);
+            _service = new GameBananaSingletonService(_apiCaller, new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions()));
+        }
+
+        [Fact]
+        public async Task GetModTypes_CachesSuccessfulResponsesOnly()
+        {
+            var types = new List<GameBananaModType> { new() { Id = 799, Name = "Tracks", Url = "https://gamebanana.com/mods/cats/799" } };
+            _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<List<GameBananaModType>>>>>())
+                .Returns(Fail("Offline"), Ok(types));
+            Assert.True((await _service.GetModTypes()).IsFailure);
+            Assert.Same(types, (await _service.GetModTypes()).Value);
+            Assert.Same(types, (await _service.GetModTypes()).Value);
+            await _apiCaller.Received(2).CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<List<GameBananaModType>>>>>());
         }
 
         [Fact]
@@ -136,21 +148,6 @@ namespace WheelWizard.Test.Features
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(expectedError, result.Error.Message);
-        }
-
-        [Fact]
-        public void GetLoadingPreview_ReturnsValidLoadingPreview()
-        {
-            // Act
-            var result = _service.GetLoadingPreview();
-
-            // Assert
-            Assert.Equal("LOADING", result.Name);
-            Assert.Equal("LOADING", result.Author.Name);
-            // The only 2 important properties are Name and Author.Name
-            // For all the other properties the values all don't matter
-            // These 2 properties are used in the ModBrowserListItem component, so if you want to change this, you will
-            // also have to change it there
         }
 
         [Fact]

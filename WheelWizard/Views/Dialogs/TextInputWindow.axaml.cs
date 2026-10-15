@@ -7,7 +7,7 @@ using Button = WheelWizard.Views.Components.ActionButton;
 
 namespace WheelWizard.Views.Dialogs;
 
-public partial class TextInputWindow : PopupContent
+public partial class TextInputWindow : ModalContent
 {
     private string? _result;
     private TaskCompletionSource<string?>? _tcs;
@@ -17,7 +17,7 @@ public partial class TextInputWindow : PopupContent
 
     // Constructor with dynamic label parameter
     public TextInputWindow()
-        : base(true, false, true, "Wheel Wizard")
+        : base("Wheel Wizard")
     {
         InitializeComponent();
         IsDismissible = true;

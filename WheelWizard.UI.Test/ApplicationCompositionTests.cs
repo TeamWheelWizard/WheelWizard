@@ -139,6 +139,7 @@ public class ApplicationCompositionTests
                 typeof(FriendsPage),
                 typeof(RoomsPage),
                 typeof(ModsPage),
+                typeof(ModBrowserPage),
                 typeof(MiiListPage),
                 typeof(LeaderboardPage),
                 typeof(UserProfilePage),

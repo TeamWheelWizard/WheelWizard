@@ -1,15 +1,19 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using NSubstitute;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
+using WheelWizard.Mods.ViewModels;
 using WheelWizard.Mods.Views;
 using WheelWizard.Mods.Views.Dialogs;
 using WheelWizard.Shared;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell.Navigation;
 
 namespace WheelWizard.UI.Test;
@@ -17,66 +21,196 @@ namespace WheelWizard.UI.Test;
 public class ModBrowserTests
 {
     [AvaloniaFact]
-    public async Task NativeBrowser_LoadsInitially_AndSearchesByEnterAndButton()
+    public async Task InfiniteScroll_AppendsEvenBatchesAndStopsAtTheEnd()
     {
         var api = Substitute.For<IGameBananaSingletonService>();
-        api.GetModSearchResults(Arg.Any<string>(), Arg.Any<int>()).Returns(call => OperationResult.Ok(Results(call.ArgAt<string>(0))));
-        var browser = CreateBrowser(api, Substitute.For<INavigationService>());
-        browser.Show();
-        try
-        {
-            Dispatcher.UIThread.RunJobs();
-            var list = browser.FindControl<ListBox>("ModListView")!;
-            await api.Received(1).GetModSearchResults("", 1);
-            Assert.Single(list.Items);
-
-            var input = browser.FindControl<InputField>("SearchTextBox")!;
-            input.Text = "  Mario  ";
-            input.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.Enter });
-            await api.Received(1).GetModSearchResults("Mario", 1);
-            Assert.Equal("Mario", Assert.IsType<ModSearchResult>(Assert.Single(list.Items)).Mod.Name);
-
-            input.Text = "Luigi";
-            ((Grid)input.Parent!).Children.OfType<ActionButton>().Single().RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            await api.Received(1).GetModSearchResults("Luigi", 1);
-            Assert.Equal("Luigi", Assert.IsType<ModSearchResult>(Assert.Single(list.Items)).Mod.Name);
-        }
-        finally
-        {
-            browser.Close();
-        }
+        var first = Results("First");
+        first.Records = Enumerable
+            .Range(1, 15)
+            .Select(id =>
+            {
+                var mod = Results($"Mod {id}").Records[0];
+                mod.Id = id;
+                mod.HasContentRatings = id <= 2;
+                return mod;
+            })
+            .ToList();
+        first.MetaData.IsComplete = false;
+        var last = Results("Last");
+        last.Records[0].Id = 16;
+        var finalMod = Results("Final").Records[0];
+        finalMod.Id = 17;
+        last.Records.Add(finalMod);
+        var pending = new TaskCompletionSource<OperationResult<GameBananaSearchResults>>();
+        api.GetModSearchResults("", 1).Returns(OperationResult.Ok(first));
+        api.GetModSearchResults("", 2).Returns(pending.Task);
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
+        var page = new ModBrowserPage(model, Substitute.For<INavigationService>(), Substitute.For<IModalFactory>());
+        using var owner = new UiTestHost { Height = 540 };
+        owner.Body.Child = page;
+        owner.Show();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(12, model.Results.Count);
+        var scroll = page.FindControl<ScrollViewer>("ResultsScroll")!;
+        scroll.Offset = new Vector(0, scroll.Extent.Height);
+        owner.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(model.IsLoading);
+        Assert.Equal(12, model.Results.Count);
+        pending.SetResult(OperationResult.Ok(last));
+        await Task.Yield();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(15, model.Results.Count);
+        Assert.False(model.CanLoadMore);
+        await api.Received(1).GetModSearchResults("", 2);
     }
 
     [AvaloniaFact]
-    public async Task ClosingBrowser_DiscardsPendingSearch_AndRefreshesMods()
+    public async Task Filters_ApplyTogetherAndDiscardUnappliedChanges()
+    {
+        var api = Substitute.For<IGameBananaSingletonService>();
+        var tracks = new GameBananaModType
+        {
+            Id = 799,
+            Name = "Tracks",
+            Url = "https://example.com/category",
+        };
+        api.GetModTypes().Returns(OperationResult.Ok(new List<GameBananaModType> { tracks }));
+        var response = Results("Track patch");
+        response.Records[0].Tags = [new() { Title = "Patches" }];
+        var other = Results("Skin patch").Records[0];
+        other.Id = 2;
+        other.RootCategory.ProfileUrl = "https://example.com/skins";
+        other.Tags = response.Records[0].Tags;
+        response.Records.Add(other);
+        api.GetModSearchResults("Patches", 1, 799).Returns(OperationResult.Ok(response));
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
+        await model.PrepareFiltersAsync();
+        model.DraftPatchesOnly = true;
+        model.DraftModType = tracks;
+        Assert.Equal(0, model.ActiveFilterCount);
+        await model.ApplyFiltersAsync();
+        Assert.Equal(2, model.ActiveFilterCount);
+        Assert.Equal("Track patch", Assert.Single(model.Results).Mod.Name);
+        model.DraftPatchesOnly = false;
+        await model.PrepareFiltersAsync();
+        Assert.True(model.DraftPatchesOnly);
+        await api.Received(1).GetModTypes();
+        model.Deactivate();
+    }
+
+    [AvaloniaTheory]
+    [InlineData(480)]
+    [InlineData(656)]
+    public async Task Browser_SearchesInPage_AndDetailsPreserveResults(double width)
+    {
+        var api = Substitute.For<IGameBananaSingletonService>();
+        api.GetModSearchResults(Arg.Any<string>(), 1).Returns(call => OperationResult.Ok(Results(call.ArgAt<string>(0))));
+        api.GetModDetails(1).Returns(OperationResult.Ok(ModTestFixture.CreateMod(1, "Selected mod")));
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
+        var navigation = Substitute.For<INavigationService>();
+        var factory = Substitute.For<IModalFactory>();
+        var modal = new ModIndependentWindow(ModTestFixture.CreateContent(api));
+        factory.Create<ModIndependentWindow>().Returns(modal);
+        var browser = new ModBrowserPage(model, navigation, factory);
+        using var owner = new UiTestHost { Width = width, Height = 540 };
+        owner.Body.Child = browser;
+        owner.Show();
+        Dispatcher.UIThread.RunJobs();
+        Assert.IsAssignableFrom<ILockedSidebarPage>(browser);
+        await api.Received(1).GetModSearchResults("", 1);
+        var input = browser.FindControl<InputField>("SearchInput")!;
+        input.Focus();
+        input.Text = "  Mario  ";
+        input.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.Enter });
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(input.IsFocused);
+        Assert.Equal("Mario", Assert.Single(model.Results).Mod.Name);
+        input.Text = "Luigi";
+        input.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.Enter });
+        Assert.Equal("Luigi", Assert.Single(model.Results).Mod.Name);
+        // Enough results to exercise scrolling while details are opened and closed.
+        var first = model.Results[0];
+        for (var i = 0; i < 5; i++)
+            model.Results.Add(first);
+        owner.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        var scroll = browser.FindControl<ScrollViewer>("ResultsScroll")!;
+        scroll.Offset = new Vector(0, 180);
+        owner.UpdateLayout();
+        var offset = scroll.Offset;
+        Assert.True(offset.Y > 0);
+        var cards = browser.GetVisualDescendants().OfType<Button>().Where(b => b.Classes.Contains("ModCard")).ToList();
+        Assert.All(cards, card => Assert.True(card.Bounds.Width <= browser.Bounds.Width));
+        var nativeWindows = 0;
+        using var opened = Window.WindowOpenedEvent.AddClassHandler<Window>((_, _) => nativeWindows++);
+        cards[0].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.Same(modal, owner.Modals.TopModal);
+        Assert.Equal(0, nativeWindows);
+        var closed = modal.ShowDialog();
+        modal.Close();
+        await closed.WaitAsync(TimeSpan.FromSeconds(2));
+        Assert.Same(browser, owner.Body.Child);
+        Assert.Equal(offset, scroll.Offset);
+        Assert.Equal(6, model.Results.Count);
+        Assert.Empty(navigation.ReceivedCalls());
+        browser.FindControl<ActionButton>("BackButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        navigation.Received(1).NavigateTo<ModsPage>();
+    }
+
+    [AvaloniaFact]
+    public async Task NewSearchAndLeavingPage_IgnorePendingResults()
     {
         var api = Substitute.For<IGameBananaSingletonService>();
         var pending = new TaskCompletionSource<OperationResult<GameBananaSearchResults>>();
-        api.GetModSearchResults("", 1).Returns(pending.Task);
-        var navigation = Substitute.For<INavigationService>();
-        var browser = CreateBrowser(api, navigation);
-        browser.Show();
-        try
-        {
-            Dispatcher.UIThread.RunJobs();
-            await api.Received(1).GetModSearchResults("", 1);
-            browser.Close();
-            pending.SetResult(OperationResult.Ok(Results("Late result")));
-            Dispatcher.UIThread.RunJobs();
-            Assert.Empty(browser.FindControl<ListBox>("ModListView")!.Items);
-            navigation.Received(1).NavigateTo<ModsPage>();
-        }
-        finally
-        {
-            browser.Close();
-        }
+        api.GetModSearchResults("old", 1).Returns(pending.Task);
+        api.GetModSearchResults("new", 1).Returns(OperationResult.Ok(Results("new")));
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>()) { SearchText = "old" };
+        var first = model.SearchAsync();
+        model.SearchText = "new";
+        await model.SearchAsync();
+        pending.SetResult(OperationResult.Ok(Results("old")));
+        await first;
+        Assert.Equal("new", Assert.Single(model.Results).Mod.Name);
+        pending = new();
+        api.GetModSearchResults("old", 1).Returns(pending.Task);
+        model.SearchText = "old";
+        var leaving = model.SearchAsync();
+        model.Deactivate();
+        pending.SetResult(OperationResult.Ok(Results("late")));
+        await leaving;
+        Assert.Empty(model.Results);
+        Assert.False(model.IsLoading);
     }
 
-    private static ModBrowserWindow CreateBrowser(IGameBananaSingletonService api, INavigationService navigation)
+    [AvaloniaFact]
+    public async Task FilteredBatch_RetainsPendingResultsWhenPageFails()
     {
-        var media = Substitute.For<IGameBananaMediaService>();
-        var content = ModTestFixture.CreateContent(api, media);
-        return new(content, api, navigation, media);
+        var api = Substitute.For<IGameBananaSingletonService>();
+        var response = Results("Patch");
+        response.MetaData.IsComplete = false;
+        response.Records[0].Tags = [new() { Title = "Patches" }];
+        response.Records.Add(Results("Ordinary mod").Records[0]);
+        api.GetModSearchResults("Patches", 1).Returns(OperationResult.Ok(response));
+        api.GetModSearchResults("Patches", 2).Returns((OperationResult<GameBananaSearchResults>)new OperationError { Message = "Offline" });
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>()) { PatchesOnly = true };
+        await model.SearchAsync();
+        Assert.Empty(model.Results);
+        Assert.True(model.HasError);
+        Assert.Empty(model.Results);
+        var next = Results("Second patch");
+        next.Records[0].Id = 2;
+        next.Records[0].Tags = [new() { Title = "Patches" }];
+        api.GetModSearchResults("Patches", 2).Returns(OperationResult.Ok(next));
+        await model.LoadMoreAsync();
+        Assert.Equal(2, model.Results.Count);
+        Assert.False(model.HasError);
+        Assert.False(model.CanLoadMore);
+        model.SearchText = "x";
+        await model.SearchAsync();
+        Assert.True(model.HasError);
+        await api.DidNotReceive().GetModSearchResults("x", 1);
+        model.Deactivate();
     }
 
     private static GameBananaSearchResults Results(string name) =>

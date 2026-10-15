@@ -11,14 +11,14 @@ using WheelWizard.WiiManagement.MiiManagement.Views;
 
 namespace WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
 
-public partial class MiiSelectorWindow : PopupContent
+public partial class MiiSelectorWindow : ModalContent
 {
     public Mii? Result { get; private set; } = null;
     private TaskCompletionSource<Mii?>? _tcs;
     private Mii? _initialMii;
 
     public MiiSelectorWindow()
-        : base(true, false, false, t("popup_title.mii_selector"))
+        : base(t("popup_title.mii_selector"))
     {
         InitializeComponent();
         IsDismissible = true;

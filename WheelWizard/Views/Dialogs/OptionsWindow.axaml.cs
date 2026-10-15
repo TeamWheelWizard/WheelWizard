@@ -7,13 +7,13 @@ using WheelWizard.Views.Dialogs.Base;
 
 namespace WheelWizard.Views.Dialogs;
 
-public partial class OptionsWindow : PopupContent
+public partial class OptionsWindow : ModalContent
 {
     public string? Result { get; private set; } = null;
     private TaskCompletionSource<string?>? _tcs;
 
     public OptionsWindow()
-        : base(true, false, true, "Choose an option")
+        : base("Choose an option")
     {
         InitializeComponent();
         IsDismissible = true;
@@ -21,7 +21,7 @@ public partial class OptionsWindow : PopupContent
 
     public OptionsWindow SetWindowTitle(string title)
     {
-        PopupTitle = title;
+        ModalTitle = title;
         return this;
     }
 
