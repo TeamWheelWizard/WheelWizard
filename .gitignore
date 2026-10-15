@@ -490,3 +490,5 @@ $RECYCLE.BIN/
 *.swp
 AGENTS.md
 /.dotnet
+
+.devenv/
