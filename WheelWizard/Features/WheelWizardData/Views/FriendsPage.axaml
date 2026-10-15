@@ -239,6 +239,7 @@
                                     Classes.Online="{Binding IsOnline}"
                                     Classes.Pending="{Binding IsPending}"
                                     PointerReleased="Card_OnPointerReleased">
+                                <Border CornerRadius="11" ClipToBounds="True">
                                 <Grid RowDefinitions="156,Auto">
 
                                     <!-- PHOTO -->
@@ -329,6 +330,8 @@
                                         </Grid>
                                     </StackPanel>
                                 </Grid>
+
+                                </Border>
 
                                 <!-- Everything you can do with a friend: on a click or a right-click of the card. -->
                                 <Border.ContextMenu>

@@ -421,7 +421,7 @@ public partial class Layout : BaseWindow, IPollingListener
             LiveStatusBorder.Classes.Add("Custom");
 
             // Find the PathIcon in the LiveStatusBorder and update it dynamically
-            if (LiveStatusBorder.Child is PathIcon pathIcon)
+            if (this.FindControl<PathIcon>("LiveStatusIcon") is { } pathIcon)
             {
                 // Parse the SVG path data
                 var geometry = Geometry.Parse(sender.Status.Icon!);
@@ -440,6 +440,8 @@ public partial class Layout : BaseWindow, IPollingListener
         }
         else
         {
+            LiveStatusIcon.ClearValue(PathIcon.DataProperty);
+            LiveStatusIcon.ClearValue(PathIcon.ForegroundProperty);
             // Use variant-based styling
             LiveStatusBorder.Classes.Add(sender.Status.Variant.ToString()!);
         }

@@ -19,9 +19,15 @@
             <Grid ColumnDefinitions="*,Auto">
                 <components:ActionButton Name="PART_PrimaryButton" Text="{TemplateBinding Text}" IconData="{TemplateBinding IconData}" Tone="{TemplateBinding Tone}" Size="{TemplateBinding Size}" CornerRadius="6,0,0,6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                 <components:ActionButton Name="PART_SecondaryButton" Grid.Column="1" IconData="{StaticResource Chevron}" Tone="{TemplateBinding Tone}" Size="{TemplateBinding Size}" CornerRadius="0,6,6,0" VerticalAlignment="Stretch" AutomationProperties.Name="{loc:T action.more_actions}" />
-                <Border Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{StaticResource Neutral200}" Opacity="0.25" IsHitTestVisible="False" />
+                <Border Name="PART_Separator" Grid.Column="1" Width="1" Height="16" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{StaticResource Neutral200}" Opacity="0.25" IsHitTestVisible="False" />
             </Grid>
         </ControlTemplate></Setter>
+    </Style>
+    <Style Selector="components|SplitButton[Size=Regular] /template/ components|ActionButton#PART_SecondaryButton">
+        <Setter Property="Margin" Value="1,0,0,0" />
+    </Style>
+    <Style Selector="components|SplitButton[Size=Regular] /template/ Border#PART_Separator">
+        <Setter Property="IsVisible" Value="False" />
     </Style>
     <Style Selector="components|SplitButtonItem">
         <Setter Property="Background" Value="Transparent" />
