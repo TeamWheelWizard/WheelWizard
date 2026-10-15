@@ -190,7 +190,6 @@ pl:
       other: "Jest teraz %{count} przyjaciół online"
     rooms_page_disclaimer: "Prosze pamiętaj, że ta strona nie daje możliwości dołączenia prosto do pokoju. By dołączyć do specyficznego pokoju musisz dołączyć poprzez przyjaciela lub mieć nadzieje, że uda ci się połączyć poprzez losowy serwer."
     friends_page_disclaimer: "By dodać przyjaciół musisz ich dodać w grze"
-    region_user_selection: "To tylko pokazuje regiony, w których TY grałeś."
   empty_content:
     no_profiles: "Musisz zagrać w gre przynajmniej raz by zobaczyć tu swoje profle"
     no_friends_title: "Brak przyjaciół!"

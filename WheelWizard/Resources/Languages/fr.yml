@@ -207,7 +207,6 @@ fr:
       Attention, cette page ne permet pas de rejoindre une salle directement.
       Pour rejoindre une salle spécifique, vous devez soit la rejoindre via un ami, soit espérer la rejoindre via les serveurs en ligne.
     friends_page_disclaimer: "Pour ajouter des amis, rendez-vous en jeu."
-    region_user_selection: "Ceci montre les régions dans lesquelles VOUS avez joué"
     primary_profile: "Le profil principal est utilisé en tant que référence dans Wheel Wizard"
   empty_content:
     no_profiles: "Vous devez lancer le jeu au moins une fois pour voir vos profils apparaître ici"
