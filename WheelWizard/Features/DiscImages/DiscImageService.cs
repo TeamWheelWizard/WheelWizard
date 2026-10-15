@@ -18,7 +18,7 @@ public interface IDiscImageService
 public sealed class DiscImageService(IFileSystem fileSystem) : IDiscImageService
 {
     private readonly object _cacheLock = new();
-    private (string Path, long Length, DateTime LastWrite, OperationResult<DiscImageInfo> Result)? _cache;
+    private (string Path, long Length, DateTime LastWrite, DiscImageInfo Info)? _cache;
 
     public IReadOnlyList<string> SupportedExtensions { get; } = Enum.GetValues<BlobType>().SelectMany(ExtensionsFor).ToArray();
 
@@ -55,12 +55,16 @@ public sealed class DiscImageService(IFileSystem fileSystem) : IDiscImageService
                     && cached.Length == file.Length
                     && cached.LastWrite == file.LastWriteTimeUtc
                 )
-                    return cached.Result;
+                    return cached.Info;
             }
 
             var result = Read(path);
-            lock (_cacheLock)
-                _cache = (path, file.Length, file.LastWriteTimeUtc, result);
+            // Failures aren't cached: a file that was briefly locked should read fine on the next call.
+            if (result.IsSuccess)
+            {
+                lock (_cacheLock)
+                    _cache = (path, file.Length, file.LastWriteTimeUtc, result.Value);
+            }
             return result;
         }
         catch (Exception ex)

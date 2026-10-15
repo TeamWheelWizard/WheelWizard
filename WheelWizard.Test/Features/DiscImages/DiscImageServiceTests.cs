@@ -48,6 +48,19 @@ public class DiscImageServiceTests
     }
 
     [Fact]
+    public void ReadInfo_RetriesAfterFileWasLocked()
+    {
+        var fs = Games();
+        var service = new DiscImageService(fs);
+        fs.File.WriteAllBytes("/games/game.iso", WiiDisc("RMCP01", "MarioKartWii"));
+
+        using (fs.File.Open("/games/game.iso", FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            Assert.True(service.ReadInfo("/games/game.iso").IsFailure);
+
+        Assert.Equal("RMCP01", service.ReadInfo("/games/game.iso").Value.GameId);
+    }
+
+    [Fact]
     public void SupportedExtensions_CoverWiiContainers()
     {
         var extensions = new DiscImageService(new MockFileSystem()).SupportedExtensions;
