@@ -41,6 +41,8 @@
         <PackageReference Include="Avalonia.HtmlRenderer" Version="12.0.0" />
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.22" />
         <PackageReference Include="Avalonia.Wayland" Version="12.1.4" />
+        <!-- SDL3 includes native gamepad runtimes for Windows, macOS and Linux desktop RIDs. -->
+        <PackageReference Include="ppy.SDL3-CS" Version="2026.1002.1" />
         <!-- Realtime (GPU) Mii rendering -->
         <PackageReference Include="Silk.NET.OpenGL" Version="2.22.0" />
         <!-- Draws the SVG particle images animations carry. 5.1.x is the last line built on Avalonia's SkiaSharp 3. -->

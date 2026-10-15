@@ -22,7 +22,7 @@ public class ModInstallOwnerLifetimeTests
     [InlineData(true, false)]
     [InlineData(false, true)]
     [InlineData(true, true)]
-    public async Task ClosedOwner_CancelsDownloadAndSuppressesLateSuccessOrFailureDialogs(bool downloadFails, bool detachContent)
+    public async Task ClosedSurface_CancelsDownloadAndSuppressesLateSuccessOrFailureDialogs(bool downloadFails, bool closeShell)
     {
         var manager = Substitute.For<IModManager>();
         var gameBanana = Substitute.For<IGameBananaSingletonService>();
@@ -52,8 +52,11 @@ public class ModInstallOwnerLifetimeTests
         mod.Files = [new() { FileName = "mod.zip", DownloadUrl = "https://example.com/mod.zip" }];
         typeof(ModContent).GetProperty("CurrentMod", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(content, mod);
         using var owner = new UiTestHost();
-        owner.Body.Child = content;
         owner.Show();
+        var surface = new ModSurface { Content = content };
+        surface.SetModalOwner(owner);
+        var surfaceClosed = surface.ShowDialog();
+        owner.UpdateLayout();
         // Keep a second app window open: late failures must not surface there either.
         using var other = new UiTestHost();
         other.Show();
@@ -66,16 +69,14 @@ public class ModInstallOwnerLifetimeTests
             var question = Assert.IsType<YesNoWindow>(owner.Modals.TopModal);
             question.FindControl<ActionButton>("YesButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var token = await started.Task.WaitAsync(TimeSpan.FromSeconds(2));
-            owner.Close();
-            Assert.True(token.IsCancellationRequested);
-            Assert.False(owner.IsVisible);
-            if (detachContent)
-            {
-                owner.Body.Child = null;
-                Assert.Null(TopLevel.GetTopLevel(content));
-            }
+            if (closeShell)
+                owner.Close();
             else
-                Assert.Same(owner, TopLevel.GetTopLevel(content));
+                surface.Close();
+            await surfaceClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.True(token.IsCancellationRequested);
+            Assert.Equal(!closeShell, owner.IsVisible);
+            Assert.Null(TopLevel.GetTopLevel(content));
             File.WriteAllText(Path.Combine(directory, "mod.zip"), "Downloaded test file");
             finished.SetResult(
                 downloadFails
@@ -98,4 +99,6 @@ public class ModInstallOwnerLifetimeTests
                 Directory.Delete(directory, true);
         }
     }
+
+    private sealed class ModSurface : ModalContent { }
 }

@@ -35,7 +35,12 @@ public class WindowCompositionTests
     [InlineData("TitleBar, Border, Shadow")]
     public void LinuxCaptionButtons_FitTheCustomTitleBar(string decorationParts)
     {
-        var popup = new TestWindow { ExtendClientAreaTitleBarHeightHint = 30 };
+        var popup = new TestWindow
+        {
+            Width = 656,
+            Height = 876,
+            ExtendClientAreaTitleBarHeightHint = 30,
+        };
         try
         {
             popup.Show();
@@ -229,22 +234,148 @@ public class WindowCompositionTests
     }
 
     [AvaloniaFact]
-    public void DisabledWindow_RejectsNativeCloseButAllowsCompletionAndShutdown()
+    public async Task NestedModals_StayInsideTheirOwner_AndRestoreInteraction()
     {
-        using var window = new TestWindow();
-        window.SetInteractable(false);
-        var native = CreateClosingArgs(false);
-        window.RequestClose(native);
-        Assert.True(native.Cancel);
-        foreach (var args in new[] { CreateClosingArgs(true), CreateClosingArgs(false, WindowCloseReason.ApplicationShutdown) })
+        var first = new TestWindow { Width = 656, Height = 876 };
+        var second = new TestWindow { Width = 656, Height = 876 };
+        first.Show();
+        second.Show();
+        var popup = new SizedPopup();
+        popup.SetModalOwner(first);
+        var nested = new MessageBoxWindow().SetTitleText("Nested question");
+        try
         {
-            window.RequestClose(args);
-            Assert.False(args.Cancel);
+            var popupClosed = popup.ShowDialog();
+            Assert.Same(first, TopLevel.GetTopLevel(popup));
+            Assert.False(first.CanInteract);
+            Assert.True(second.CanInteract);
+            nested.SetModalOwner(popup);
+            var nestedClosed = nested.ShowDialog();
+            Assert.Same(first, TopLevel.GetTopLevel(nested));
+            Assert.Same(nested, first.Modals.TopModal);
+            nested.Close();
+            await nestedClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.Same(popup, first.Modals.TopModal);
+            Assert.False(first.CanInteract);
+            popup.Close();
+            await popupClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.True(first.CanInteract);
         }
-        window.SetInteractable(true);
-        var allowed = CreateClosingArgs(false);
-        window.RequestClose(allowed);
-        Assert.False(allowed.Cancel);
+        finally
+        {
+            first.Close();
+            second.Close();
+        }
+    }
+
+    [AvaloniaTheory]
+    [InlineData(0.5)]
+    [InlineData(1.0)]
+    [InlineData(1.5)]
+    [InlineData(2.0)]
+    public void Popup_ContentDoesNotFollowMainWindowScale(double mainWindowScale)
+    {
+        var resources = Application.Current!.Resources;
+        var hadScale = resources.TryGetValue(WindowAppearance.ScaleResourceKey, out var previousScale);
+        resources[WindowAppearance.ScaleResourceKey] = 1.0;
+        var content = new SizedPopup();
+        var popup = new TestWindow { Width = 1280, Height = 720 };
+        popup.Show();
+        try
+        {
+            content.Show();
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var size = popup.ClientSize;
+            var textBounds = content.Label.Bounds;
+            var buttonBounds = content.BottomButton.Bounds;
+
+            resources[WindowAppearance.ScaleResourceKey] = mainWindowScale;
+            popup.InvalidateMeasure();
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(size, popup.ClientSize);
+            Assert.Equal(textBounds, content.Label.Bounds);
+            Assert.Equal(buttonBounds, content.BottomButton.Bounds);
+            Assert.Equal(16, content.Label.FontSize);
+            AssertInsideWindow(content.BottomButton, popup);
+        }
+        finally
+        {
+            popup.Close();
+            if (hadScale)
+                resources[WindowAppearance.ScaleResourceKey] = previousScale;
+            else
+                resources.Remove(WindowAppearance.ScaleResourceKey);
+        }
+    }
+
+    [AvaloniaFact]
+    public void DisabledWindows_RejectNativeCloseButAllowCompletionAndShutdown()
+    {
+        var main = new TestWindow();
+        (BaseWindow Window, Action<WindowClosingEventArgs> RequestClose)[] windows = [(main, main.RequestClose)];
+        foreach (var (window, requestClose) in windows)
+        {
+            try
+            {
+                window.SetInteractable(false);
+                var native = CreateClosingArgs(false);
+                requestClose(native);
+                Assert.True(native.Cancel);
+                foreach (
+                    var args in new[]
+                    {
+                        CreateClosingArgs(true),
+                        CreateClosingArgs(false, WindowCloseReason.OwnerWindowClosing),
+                        CreateClosingArgs(false, WindowCloseReason.ApplicationShutdown),
+                    }
+                )
+                {
+                    requestClose(args);
+                    Assert.False(args.Cancel);
+                }
+                window.SetInteractable(true);
+                var allowed = CreateClosingArgs(false);
+                requestClose(allowed);
+                Assert.False(allowed.Cancel);
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+    }
+
+    [AvaloniaFact]
+    public void Modal_FollowsContentGrowthAndShrinkage_WithinTheLandscapeViewport()
+    {
+        var content = new SizedPopup();
+        var popup = new TestWindow { Width = 1280, Height = 720 };
+        popup.Show();
+        try
+        {
+            content.Show();
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var initialSize = content.Bounds.Size;
+            foreach (var height in new[] { 330.0, 200.0, 900.0, 260.0, 200.0 })
+            {
+                content.Root.Height = height;
+                popup.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+                Assert.Equal(initialSize.Width, content.Bounds.Width);
+                Assert.True(content.Bounds.Height <= popup.ClientSize.Height - 48);
+                Assert.True(content.Bounds.Height <= height);
+                Assert.Equal(16, content.Label.FontSize);
+                AssertInsideWindow(content.BottomButton, popup);
+            }
+        }
+        finally
+        {
+            popup.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -361,6 +492,28 @@ public class WindowCompositionTests
         Assert.False(owner.CanInteract);
     }
 
+    private sealed class SizedPopup : ModalContent
+    {
+        public Grid Root { get; }
+        public TextBlock Label { get; } = new() { Text = "Unscaled modal content", FontSize = 16 };
+        public Button BottomButton { get; } = new() { Content = "Bottom button" };
+
+        public SizedPopup()
+            : base("Scale test")
+        {
+            Root = new Grid
+            {
+                Width = 300,
+                Height = 200,
+                RowDefinitions = RowDefinitions.Parse("Auto,*,Auto"),
+            };
+            Grid.SetRow(BottomButton, 2);
+            Root.Children.Add(Label);
+            Root.Children.Add(BottomButton);
+            Content = Root;
+        }
+    }
+
     private static WindowClosingEventArgs CreateClosingArgs(
         bool programmatic,
         WindowCloseReason reason = WindowCloseReason.WindowClosing
@@ -377,7 +530,6 @@ public class WindowCompositionTests
     private sealed class TestWindow : BaseWindow, IDisposable
     {
         public void Dispose() => Close();
-
         public void RequestClose(WindowClosingEventArgs args) => OnClosing(args);
 
         private readonly Border _overlay = new();

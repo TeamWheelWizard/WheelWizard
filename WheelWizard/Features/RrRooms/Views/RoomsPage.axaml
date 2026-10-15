@@ -9,7 +9,7 @@
              x:DataType="rooms:RoomsPage"
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
         xmlns:communityControls="clr-namespace:WheelWizard.WheelWizardData.Views">
-    <Grid>
+    <Grid x:Name="RoomsLayout">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <RowDefinition Height="Auto" />
@@ -41,6 +41,16 @@
                  Margin="10,0,10,10"
                  x:Name="PlayerSearchField" />
 
+        <StackPanel x:Name="CouchRoomActions" Grid.Row="1" IsVisible="False"
+                    HorizontalAlignment="Right" Margin="10,8" Orientation="Horizontal">
+            <Button Content="{loc:T action.view_room}" Tag="{Binding #RoomsView}" Click="OpenSelectedRoom_OnClick" MinHeight="44"
+                    IsVisible="{Binding #RoomsListViewContainer.IsVisible}"
+                    IsEnabled="{Binding #RoomsView.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <Button Content="{loc:T action.view_room}" Tag="{Binding #PlayerSearchResults}" Click="OpenSelectedRoom_OnClick" MinHeight="44"
+                    IsVisible="{Binding #PlayerListViewContainer.IsVisible}"
+                    IsEnabled="{Binding #PlayerSearchResults.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+
         <components:EmptyPageInfo Grid.Row="2" x:Name="EmptyRoomsView"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"
                                   Title="{loc:T empty_content.no_rooms_title}"
@@ -58,11 +68,12 @@
 
             </Grid>
 
-            <ListBox SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
+            <ListBox x:Name="RoomsView" SelectionMode="Single" Padding="0" ItemsSource="{Binding Rooms}"
                      Background="Transparent" BorderThickness="0" Grid.Row="1"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     SelectionChanged="RoomsView_SelectionChanged">
+                     SelectionChanged="RoomsView_SelectionChanged"
+                     KeyDown="RoomsView_OnKeyDown">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Classes="BoxItemBackground">
@@ -132,11 +143,12 @@
 
             </Grid>
 
-            <ListBox Grid.Row="1" SelectionMode="Single" BorderThickness="0"
+            <ListBox x:Name="PlayerSearchResults" Grid.Row="1" SelectionMode="Single" BorderThickness="0"
                      Padding="0" Margin="0" Background="Transparent" ItemsSource="{Binding Players}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     SelectionChanged="PlayerView_SelectionChanged">
+                     SelectionChanged="PlayerView_SelectionChanged"
+                     KeyDown="RoomsView_OnKeyDown">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <rooms:PlayerListItem

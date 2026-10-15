@@ -78,6 +78,18 @@
                     </Grid>
                 </Border>
             </StackPanel>
+            <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowSingle" Margin="0,0,0,7">
+                <Grid ColumnDefinitions="*,Auto" MinHeight="48">
+                    <StackPanel Margin="0,0,16,0" Spacing="3" VerticalAlignment="Center">
+                        <components1:FormFieldLabel Text="{loc:T couch.enabled}" />
+                        <SelectableTextBlock Classes="TinyText"
+                                             Text="{loc:T couch.description}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <components1:ToggleCheckBox x:Name="CouchViewToggle" Grid.Column="1" Variant="Switch"
+                                                AutomationProperties.Name="{loc:T couch.enabled}"
+                                                VerticalAlignment="Center" Click="CouchView_OnClick" />
+                </Grid>
+            </Border>
 
             <Border Classes="SettingsBottomSpacer" />
         </StackPanel>

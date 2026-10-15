@@ -20,11 +20,15 @@
     libxcb
     libxkbcommon
     wayland
+    # SDL gamepad hotplug/HID backends dynamically load these libraries.
+    udev
+    libusb1
+    dbus
   ];
 in {
   packages = [pkgs.dotnet-sdk_10] ++ linuxRuntimeLibraries;
 
-  # Avalonia's Linux native backends load these libraries at runtime.
+  # Avalonia and SDL's Linux native backends load these libraries at runtime.
   env.LD_LIBRARY_PATH = lib.makeLibraryPath linuxRuntimeLibraries;
 
   scripts.restore.exec = "dotnet restore WheelWizard.sln";

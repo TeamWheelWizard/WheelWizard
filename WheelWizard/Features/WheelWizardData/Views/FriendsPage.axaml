@@ -16,6 +16,20 @@
     <!-- THE FRIEND WALL: a grid of portrait cards. Online friends are awake in a lit, teal-rimmed portrait; offline
          ones sleep in a dimmed one; pending ones glare from a warm one. Click to view a profile; right-click for actions. -->
     <UserControl.Styles>
+        <Style Selector="UniformGrid.FriendWall">
+            <Setter Property="Columns" Value="2" />
+        </Style>
+        <Style Selector="UserControl.couch UniformGrid.FriendWall">
+            <Setter Property="Columns" Value="3" />
+        </Style>
+        <Style Selector="Button.CouchActions">
+            <Setter Property="IsVisible" Value="False" />
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="UserControl.couch Button.CouchActions">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
         <!-- CARD -->
         <Style Selector="Border.FriendCard">
             <Setter Property="Margin" Value="5" />
@@ -152,7 +166,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid>
+    <Grid x:Name="FriendsLayout">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <!-- This is the total height as the (Title + infoSection) - (padding) -->
@@ -207,7 +221,7 @@
                 <ItemsControl ItemsSource="{Binding FriendList}" Margin="0,0,0,10">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="2" VerticalAlignment="Top" />
+                            <UniformGrid Classes="FriendWall" VerticalAlignment="Top" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -302,6 +316,7 @@
                                                            FontSize="11" Foreground="{StaticResource Neutral500}" />
                                             </StackPanel>
                                         </Grid>
+                                        <Button Classes="CouchActions" Content="Friend actions" Click="FriendActions_OnClick" Margin="0,8,0,0" />
                                     </StackPanel>
                                 </Grid>
 

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
@@ -12,6 +13,7 @@ using WheelWizard.Shared.Polling;
 using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Views.Dialogs;
@@ -23,6 +25,7 @@ namespace WheelWizard.RrRooms.Views;
 
 public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
+    private readonly GridLength _desktopHeaderHeight;
     private IModalFactory Popups { get; } = null!;
 
     private INavigationService Navigation { get; } = null!;
@@ -62,6 +65,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
     public RoomDetailsPage()
     {
         InitializeComponent();
+        _desktopHeaderHeight = RoomLayout.RowDefinitions[0].Height;
         DataContext = this;
         Room = RrRoomFactory.Instance.Create(); // Create a fake room for design-time preview
         PlayersList = new(Room.Players);
@@ -84,6 +88,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         MiiDbService = miiDbService;
         SettingsService = settingsService;
         InitializeComponent();
+        _desktopHeaderHeight = RoomLayout.RowDefinitions[0].Height;
         DataContext = this;
         Room = room;
 
@@ -91,6 +96,26 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
 
         LiveRooms.Subscribe(this);
         Unloaded += RoomsDetailPage_Unloaded;
+        Loaded += (_, _) => LiveRooms.Subscribe(this);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property != CouchMode.IsEnabledProperty || RoomLayout is null)
+            return;
+
+        var couch = CouchMode.GetIsEnabled(this);
+        RoomLayout.ColumnDefinitions = couch ? new ColumnDefinitions("280,*") : new ColumnDefinitions("*");
+        RoomLayout.RowDefinitions[0].Height = couch ? new GridLength(72) : _desktopHeaderHeight;
+        RoomLayout.RowDefinitions[1].Height = couch ? GridLength.Auto : new GridLength(100);
+        Grid.SetColumn(RoomPlayers, couch ? 1 : 0);
+        Grid.SetRow(RoomPlayers, couch ? 1 : 2);
+        Grid.SetRowSpan(RoomPlayers, couch ? 2 : 1);
+        RoomSummary.Height = couch ? 110 : double.NaN;
+        RoomPlayers.RowDefinitions[0].Height = couch ? GridLength.Auto : new GridLength(1, GridUnitType.Star);
+        RoomPlayers.RowDefinitions[1].Height = new GridLength(couch ? 1 : 16, GridUnitType.Star);
+        CouchPlayerActions.IsVisible = couch;
     }
 
     public void OnUpdate(ObservablePollingService sender)
@@ -250,6 +275,8 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
 
     private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
+        if (CouchMode.GetIsEnabled(this))
+            return;
         if (e.Source is not ListBox listBox)
             return;
         listBox.ContextMenu?.Open();

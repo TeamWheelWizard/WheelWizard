@@ -108,6 +108,7 @@
 
         
     </UserControl.Styles>
+    <Grid>
     <Grid x:Name="CompleteGrid" IsEnabled="{Binding IsInteractable}">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
@@ -180,5 +181,30 @@
         <shellControls:WheelTrail Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" x:Name="HomeTrail5"
                                Width="137" Angle="-35" X="40" Y="30" ExtendedHeight="1000" IsVisible="False"
                                Background="{StaticResource Brand600}" Foreground="{StaticResource Brand800}" />
+    </Grid>
+        <ScrollViewer x:Name="CouchHome" IsVisible="False" IsEnabled="{Binding IsInteractable}"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <Grid ColumnDefinitions="3*,2*" Margin="24" MinHeight="320">
+                <Border Background="{StaticResource FrameColor}" CornerRadius="24" Padding="32" Margin="0,0,24,0">
+                    <StackPanel Spacing="24" VerticalAlignment="Center">
+                        <PathIcon Data="{StaticResource WheelIcon}" Width="160" Height="160"
+                                  Foreground="{StaticResource Brand400}" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding GameTitle}" FontSize="36" FontWeight="Bold" TextWrapping="Wrap" />
+                        <TextBlock Text="{loc:T page_title.home}" Classes="BodyText" />
+                    </StackPanel>
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="20">
+                    <TextBlock Text="{Binding GameTitle}" Classes="TitleText" TextWrapping="Wrap" />
+                    <components:ActionButton x:Name="CouchPlayButton" IsLoading="{Binding IsLoading}"
+                                             IsEnabled="{Binding CanExecuteMain}" Tone="{Binding ButtonTone}"
+                                             Text="{Binding ButtonText}" IconData="{StaticResource Play}"
+                                             MinHeight="64" HorizontalAlignment="Stretch" Click="PlayButton_Click" />
+                    <components:ActionButton Tone="Secondary" IsEnabled="{Binding CanLaunchDolphin}"
+                                             IsVisible="{Binding IsDolphinVisible}" Text="{loc:T action.launch_dolphin}"
+                                             MinHeight="56" IconData="{StaticResource DolphinIcon}"
+                                             HorizontalAlignment="Stretch" Click="DolphinButton_OnClick" />
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </UserControl>

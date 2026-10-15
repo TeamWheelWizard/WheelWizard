@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+        <Grid x:Name="ListHeader" Grid.Row="0" ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Bottom"
@@ -27,13 +27,17 @@
                                      VerticalAlignment="Center" />
             </StackPanel>
 
-            <StackPanel Grid.Column="1"
+            <ScrollViewer x:Name="ListActionsScroller" Grid.Column="1" VerticalAlignment="Bottom"
+                          HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="ListActions"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Margin="0,0,6,10"
                         Orientation="Horizontal"
                         Spacing="6"
                         IsVisible="{Binding IsVisible, ElementName=VisibleWhenDb}">
+                <CheckBox x:Name="MultipleSelection" Content="Select multiple" IsVisible="False"
+                          VerticalAlignment="Center" MinHeight="44" />
                 <components:ActionButton Text="" Click="FavMii_OnClick" x:Name="FavoriteMiiButton"
                                    Tone="Secondary"
                                    ToolTip.ShowDelay="0" ToolTip.Placement="Top">
@@ -74,6 +78,7 @@
                                    ToolTip.ShowDelay="0" ToolTip.Placement="Top"
                                    ToolTip.Tip="{loc:T action.import}" />
             </StackPanel>
+            </ScrollViewer>
         </Grid>
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
@@ -98,7 +103,7 @@
                         <ItemsControl ItemsSource="{Binding Items}" HorizontalAlignment="Center">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Columns="4" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                    <UniformGrid Columns="{Binding Columns}" HorizontalAlignment="Center" VerticalAlignment="Top" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>

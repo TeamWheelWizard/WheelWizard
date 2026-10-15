@@ -192,6 +192,13 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         _scene.ShowPicker(_pickBoy, _pickGirl);
         PickerHint.IsVisible = true;
         DiceButton.IsVisible = true;
+        CouchPickerActions.IsVisible = _couchLayout;
+        CouchEditorActions.IsVisible = false;
+        if (_couchLayout)
+        {
+            PickerHint.IsVisible = false;
+            DiceButton.IsVisible = false;
+        }
         SetEditorChromeVisible(false);
     }
 
@@ -224,6 +231,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             return;
         _picking = false;
         DiceButton.IsVisible = false;
+        CouchPickerActions.IsVisible = false;
         PickerHint.IsVisible = false;
 
         _session = new MiiEditorSession(picked, isNew: true);
@@ -250,6 +258,9 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
 
     private void SetEditorChromeVisible(bool visible)
     {
+        CouchEditorActions.IsVisible = visible;
+        SidebarPanel.IsVisible = !_couchLayout || visible;
+        BottomBar.IsVisible = !_couchLayout || visible;
         foreach (var control in new Control[] { SidebarPanel, TopActions, TitleNameField })
         {
             control.Opacity = visible ? 1 : 0;
@@ -329,6 +340,8 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
 
     private void RebuildSidebar()
     {
+        var focused = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Button;
+        var focusedLabel = _couchLayout && focused?.Parent == SidebarItems ? focused.Content as string : null;
         SidebarItems.Children.Clear();
         if (_session is null)
             return;
@@ -365,6 +378,15 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
                     AddSideButton(definition, definition.TitleKey, _part == definition.Part, () => SelectPart(definition.Part));
                 break;
         }
+        if (focusedLabel is not null)
+        {
+            var buttons = SidebarItems.Children.OfType<ToggleButton>();
+            var target =
+                buttons.FirstOrDefault(button => Equals(button.Content, focusedLabel))
+                ?? buttons.FirstOrDefault(button => button.IsChecked == true)
+                ?? buttons.FirstOrDefault();
+            target?.Focus(NavigationMethod.Directional);
+        }
     }
 
     private void AddSideButton(MiiPartDefinition definition, string titleKey, bool isChecked, Action click) =>
@@ -373,6 +395,19 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
     /// <summary>A sidebar button with a Mii part icon (coloured by <paramref name="styleIcon"/>) or a one-colour geometry.</summary>
     private void AddSideButton(string icon, string titleKey, bool isChecked, Action click, Action<MultiColoredIcon>? styleIcon = null)
     {
+        if (_couchLayout)
+        {
+            var native = new ToggleButton
+            {
+                Content = t(titleKey),
+                IsChecked = isChecked,
+                MinHeight = 48,
+                Margin = new Thickness(3),
+            };
+            native.Click += (_, _) => click();
+            SidebarItems.Children.Add(native);
+            return;
+        }
         var button = new MultiIconRadioButton
         {
             Classes = { "Side" },
@@ -423,6 +458,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         var definition = _part is { } part ? MiiEditorParts.Get(part) : null;
         RebuildTools(definition, mii);
         RebuildVariants(definition, mii);
+        RebuildCouchPartActions(definition, mii);
 
         var colors = _section == Section.Body ? MiiEditorParts.FavoriteColors : definition?.Colors;
         SetColors(colors, mii);
@@ -478,6 +514,11 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
     private Button Tool(string geometry, string tipKey, bool enabled, Action click)
     {
         var button = RoundButton(geometry, tipKey, null, (_, _) => click());
+        if (_couchLayout)
+        {
+            button.IsCircular = false;
+            button.Text = t(tipKey);
+        }
         button.IsEnabled = enabled;
         ToolTip.SetPlacement(button, PlacementMode.Left);
         return button;
@@ -491,7 +532,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             Variant = extraClass is "Add" or "Remove" ? ActionButtonVariant.Button : ActionButtonVariant.Ghost,
             Tone = extraClass == "Remove" ? ActionButtonTone.Danger : ActionButtonTone.Brand,
             Size = extraClass is "Add" or "Remove" ? ButtonSize.Compact : ButtonSize.Regular,
-            Focusable = false,
+            Focusable = _couchLayout,
             IconData = (Geometry)FindIcon(geometry),
         };
         if (tipKey is not null)
@@ -560,7 +601,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
                         Tag = index,
                         Height = 54,
                         Padding = new Thickness(6),
-                        Focusable = false,
+                        Focusable = _couchLayout,
                     };
                     var label = index == variants.NoneValue ? t("attribute.mii_feature.none") : variants.Label?.Invoke(index);
                     if (variants.IconPrefix is { } prefix)
@@ -639,7 +680,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
                         var swatch = new SegmentOption
                         {
                             Classes = { "Swatch" },
-                            Focusable = false,
+                            Focusable = _couchLayout,
                             Width = 54,
                             Height = 54,
                             Padding = new Thickness(10),
@@ -697,6 +738,8 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             return;
         _colorOpen = true;
         UpdateColorLayout(animate: true);
+        if (_couchLayout && SwatchItems.SelectedItem is SegmentOption swatch)
+            swatch.Focus(NavigationMethod.Directional);
     }
 
     private void VariantButton_OnClick(object? sender, RoutedEventArgs e)
@@ -706,9 +749,15 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
 
     private void CloseColors(bool animate)
     {
+        var restoreVariantFocus =
+            _couchLayout
+            && TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is Visual focused
+            && (focused == VariantButton || SwatchItems.IsVisualAncestorOf(focused));
         _colorOpen = false;
         EndPreview();
         UpdateColorLayout(animate);
+        if (restoreVariantFocus && VariantItems.SelectedItem is SegmentOption variant)
+            variant.Focus(NavigationMethod.Directional);
     }
 
     private void UpdateColorLayout(bool animate)
@@ -722,6 +771,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         VariantButton.IsVisible = showColors && hasVariants;
         VariantScroller.Opacity = showColors ? 0 : 1;
         VariantScroller.IsHitTestVisible = !showColors;
+        VariantItems.IsEnabled = !showColors;
         VariantScroller.IsVisible = hasVariants;
         var width = showColors
             ? Math.Max(0, SelectionContent.Bounds.Width - (hasVariants ? ColorPanelClosedWidth : 0))
@@ -1036,6 +1086,8 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
     /// <summary>Moves the floating arrows and add/remove buttons next to their parts (every frame).</summary>
     private void PositionOverlay()
     {
+        if (_couchLayout)
+            return;
         var mii = _session?.Mii;
         var inHead =
             mii is not null
@@ -1161,7 +1213,20 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         if (_level == Level.Picker || _session is null)
             return;
         // Typing a name: let the text box have its keys.
-        if (e.Source is TextBox)
+        if (
+            (e.Source as Visual)?.FindAncestorOfType<TextBox>(includeSelf: true) is not null
+            || (e.Source as Visual)?.FindAncestorOfType<Slider>(includeSelf: true) is not null
+        )
+            return;
+        // Focused couch controls use arrows for traversal; the scene/page owns direct part editing.
+        if (
+            _couchLayout
+            && e.Key is Key.Left or Key.Right or Key.Up or Key.Down
+            && (
+                (e.Source as Visual)?.FindAncestorOfType<Button>(includeSelf: true) is not null
+                || (e.Source as Visual)?.FindAncestorOfType<SegmentedControl>(includeSelf: true) is not null
+            )
+        )
             return;
 
         var ctrl = e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Meta);
@@ -1182,6 +1247,14 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
                 break;
             case Key.Right when _part is not null:
                 Cycle(1);
+                e.Handled = true;
+                break;
+            case Key.Up when _couchLayout && _part is { } upPart && MiiEditorParts.Get(upPart).DragVertical is { } up:
+                StepValue(up.Stepper, -1);
+                e.Handled = true;
+                break;
+            case Key.Down when _couchLayout && _part is { } downPart && MiiEditorParts.Get(downPart).DragVertical is { } down:
+                StepValue(down.Stepper, 1);
                 e.Handled = true;
                 break;
             case Key.Escape:
@@ -1205,7 +1278,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         }
 
         // Keep the keyboard shortcuts working after clicking around, but don't pull focus out of the text boxes.
-        if ((e.Source as Visual)?.FindAncestorOfType<TextBox>(includeSelf: true) is null)
+        if (!_couchLayout && (e.Source as Visual)?.FindAncestorOfType<TextBox>(includeSelf: true) is null)
             Focus();
     }
 

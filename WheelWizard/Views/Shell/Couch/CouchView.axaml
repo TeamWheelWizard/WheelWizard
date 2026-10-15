@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="WheelWizard.Views.Shell.Couch.CouchView"
+             FontSize="18">
+    <UserControl.Styles>
+        <Style Selector="Button.couch-navigation">
+            <Setter Property="MinHeight" Value="48" />
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0,0,0,3" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.couch-navigation.selected">
+            <Setter Property="Foreground" Value="{DynamicResource Brand300}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brand400}" />
+        </Style>
+        <Style Selector="Button:focus-visible">
+            <Setter Property="BorderBrush" Value="{DynamicResource Brand300}" />
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20,12,20,12" RowSpacing="12">
+        <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="NavigationButtons" Orientation="Horizontal" Spacing="4" />
+        </ScrollViewer>
+        <Border Grid.Row="1" Background="{DynamicResource BackgroundColor}"
+                CornerRadius="12" Padding="20" ClipToBounds="True">
+            <Grid x:Name="PageHost" />
+        </Border>
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <TextBlock x:Name="InputHints" VerticalAlignment="Center" FontSize="16"
+                       Foreground="{DynamicResource Neutral300}" TextWrapping="Wrap" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <Button x:Name="BackButton" MinHeight="44" Padding="16,8" />
+                <Button x:Name="FullscreenButton" MinHeight="44" Padding="16,8" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

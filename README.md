@@ -24,6 +24,28 @@
 
 Wheel Wizard, our mod manager, is created for the sole purpose of convenience. Technically, these mods and Retro Rewind are all doable without this app, but this app makes it possible with just a few clicks. It still has a lot of features in the planning stage and is fully in development, so keep an eye out for updates.
 
+## Desktop and Couch views
+
+The existing desktop layout remains available. Turn on **Settings → Appearance → Couch View** for a separate landscape presentation with larger actions, horizontal navigation, and controller support. Turn the same setting off to return to Desktop View. Your preference is saved; switching keeps the current page and unsaved edits. Close active dialogs before switching.
+
+For Steam shortcuts, add `--view=couch --fullscreen` to the launch arguments. `--view=desktop` overrides the saved preference for that launch. Couch view also works windowed and can be resized independently of the fixed desktop layout.
+
+| Action | Controller | Keyboard |
+|--------|------------|----------|
+| Move focus / edit native controls | D-pad or left stick | Arrow keys / Tab |
+| Activate | South face button | Enter / Space |
+| Back / dismiss | East face button | Escape |
+| Previous / next section | LB / RB | Page Up / Page Down |
+| Couch menu | Menu / Start | F10 |
+| Edit focused text | North face button (Y) or confirm | F2 |
+
+Couch view includes an in-window on-screen keyboard; text is applied on Submit and discarded on Cancel. The board provides ASCII letters, numbers, and punctuation; physical keyboards and clipboard input remain available for other characters. Mouse and touch remain usable.
+
+Startup, mod browsing/details, dialogs, menus, dropdowns, and tooltips are hosted within the main window to avoid separate application popup windows under gamescope. OS file/folder pickers, system menus, external browser links, and launched games remain external.
+
+Controller input uses bundled SDL3 runtimes and does not require Steam. On Linux, the process must have access to the controller's input/HID devices; sandbox packaging must grant the appropriate device access. If initialization fails, the couch menu reports the error. Controller input is suspended while Wheel Wizard is inactive and requires released buttons before resuming.
+
+
 ## Requirements
 
 In order to play, a Mario Kart Wii game backup, dumped by you, is required. Accepted formats are .iso, .gcm, .gcz, .ciso, .wbfs, .wia and .rvz. Depending on what you like to play, a specific game version may be required.

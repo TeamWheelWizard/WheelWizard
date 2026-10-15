@@ -20,7 +20,17 @@
         xmlns:shellViews="clr-namespace:WheelWizard.Views.Shell.Views"
         xmlns:design="clr-namespace:WheelWizard.Views.DesignTime"
         xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
-        xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls">
+        xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls"
+        xmlns:couch="clr-namespace:WheelWizard.Views.Shell.Couch">
+    <Window.Styles>
+        <Style Selector="Window.couch components|ActionButton:focus-visible /template/ Border#PART_FocusRing">
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
+        <Style Selector="Window.couch :is(Button):focus-visible, Window.couch ListBoxItem:focus-visible, Window.couch TextBox:focus-visible, Window.couch components|SegmentOption:focus-visible, Window.couch components|Dropdown:focus-visible">
+            <Setter Property="BorderBrush" Value="{DynamicResource Brand300}" />
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
+    </Window.Styles>
     <Grid x:Name="WindowFrame" RowDefinitions="30,*"
           Background="{StaticResource FrameColor}">
         <Border Grid.Row="0" Background="Transparent"
@@ -38,13 +48,14 @@
                 </StackPanel>
             </Grid>
         </Border>
-    <Grid Grid.Row="1" ColumnDefinitions="221,*" RowDefinitions="0,17,18,96,*,80" x:Name="CompleteGrid"
+    <Grid Grid.Row="1" x:Name="PresentationRoot">
+    <Grid ColumnDefinitions="221,*" RowDefinitions="0,17,18,96,*,80" x:Name="CompleteGrid"
           Background="{StaticResource FrameColor}">
 
         <Border x:Name="ContentBackground" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
                 Background="{StaticResource BackgroundColor}" />
-        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="True">
+        <Grid x:Name="DesktopContentHost" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="True">
             <TransitioningContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                          ClipToBounds="False"
                                          x:Name="ContentArea"
@@ -494,6 +505,8 @@
                 </Style>
             </Grid.Styles>
         </Grid>
+    </Grid>
+        <couch:CouchView x:Name="CouchPresentation" IsVisible="False" />
     </Grid>
         <Border Grid.RowSpan="2" ZIndex="999" IsVisible="False" IsHitTestVisible="False"
                 x:Name="DisabledDarkenEffect" Background="Black" Opacity="0.3" />

@@ -163,45 +163,54 @@ public class SharedControlTests
         {
             Content = split,
             Width = 300,
-            Height = 100,
+            Height = 300,
         };
-        window.Show();
-        window.UpdateLayout();
-        var primary = split.GetVisualDescendants().OfType<ActionButton>().Single(button => button.Name == "PART_PrimaryButton");
-        var secondary = split.GetVisualDescendants().OfType<ActionButton>().Single(button => button.Name == "PART_SecondaryButton");
-        primary.Focus();
-        window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, "");
-        window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, "");
-        Assert.Equal(1, mainClicks);
-        Assert.False(menu.IsOpen);
-        var point = secondary.TranslatePoint(new Point(secondary.Bounds.Width / 2, secondary.Bounds.Height / 2), window)!.Value;
-        window.MouseDown(point, MouseButton.Left);
-        window.MouseUp(point, MouseButton.Left);
-        Assert.True(menu.IsOpen);
-        Assert.NotNull(menu.FlyoutPresenterTheme);
-        Assert.Equal(1, mainClicks);
-        var popup = Assert.IsAssignableFrom<WindowBase>(TopLevel.GetTopLevel(item));
-        popup.UpdateLayout();
-        var itemPoint = item.TranslatePoint(new Point(item.Bounds.Width / 2, item.Bounds.Height / 2), popup)!.Value;
-        popup.MouseMove(itemPoint);
-        popup.MouseDown(itemPoint, MouseButton.Left);
-        popup.MouseUp(itemPoint, MouseButton.Left);
-        Assert.Equal(1, menuClicks);
-        Assert.Equal(1, mainClicks);
-        Assert.False(menu.IsOpen);
-        window.MouseDown(point, MouseButton.Left);
-        window.MouseUp(point, MouseButton.Left);
-        Assert.True(menu.IsOpen);
-        popup = Assert.IsAssignableFrom<WindowBase>(TopLevel.GetTopLevel(disabled));
-        popup.UpdateLayout();
-        var disabledPoint = disabled.TranslatePoint(new Point(disabled.Bounds.Width / 2, disabled.Bounds.Height / 2), popup)!.Value;
-        popup.MouseMove(disabledPoint);
-        popup.MouseDown(disabledPoint, MouseButton.Left);
-        popup.MouseUp(disabledPoint, MouseButton.Left);
-        Assert.Equal(1, menuClicks);
-        Assert.True(menu.IsOpen);
-        Assert.False(disabled.IsEffectivelyEnabled);
-        menu.Hide();
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            var primary = split.GetVisualDescendants().OfType<ActionButton>().Single(button => button.Name == "PART_PrimaryButton");
+            var secondary = split.GetVisualDescendants().OfType<ActionButton>().Single(button => button.Name == "PART_SecondaryButton");
+            primary.Focus();
+            window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, "");
+            window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, "");
+            Assert.Equal(1, mainClicks);
+            Assert.False(menu.IsOpen);
+            var point = secondary.TranslatePoint(new Point(secondary.Bounds.Width / 2, secondary.Bounds.Height / 2), window)!.Value;
+            window.MouseDown(point, MouseButton.Left);
+            window.MouseUp(point, MouseButton.Left);
+            Assert.True(menu.IsOpen);
+            Assert.NotNull(menu.FlyoutPresenterTheme);
+            Assert.Equal(1, mainClicks);
+            var popup = Assert.IsAssignableFrom<WindowBase>(TopLevel.GetTopLevel(item));
+            Assert.Same(window, popup);
+            popup.UpdateLayout();
+            var itemPoint = item.TranslatePoint(new Point(item.Bounds.Width / 2, item.Bounds.Height / 2), popup)!.Value;
+            popup.MouseMove(itemPoint);
+            popup.MouseDown(itemPoint, MouseButton.Left);
+            popup.MouseUp(itemPoint, MouseButton.Left);
+            Assert.Equal(1, menuClicks);
+            Assert.Equal(1, mainClicks);
+            Assert.False(menu.IsOpen);
+            window.MouseDown(point, MouseButton.Left);
+            window.MouseUp(point, MouseButton.Left);
+            Assert.True(menu.IsOpen);
+            popup = Assert.IsAssignableFrom<WindowBase>(TopLevel.GetTopLevel(disabled));
+            Assert.Same(window, popup);
+            popup.UpdateLayout();
+            var disabledPoint = disabled.TranslatePoint(new Point(disabled.Bounds.Width / 2, disabled.Bounds.Height / 2), popup)!.Value;
+            popup.MouseMove(disabledPoint);
+            popup.MouseDown(disabledPoint, MouseButton.Left);
+            popup.MouseUp(disabledPoint, MouseButton.Left);
+            Assert.Equal(1, menuClicks);
+            Assert.True(menu.IsOpen);
+            Assert.False(disabled.IsEffectivelyEnabled);
+            menu.Hide();
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -621,23 +630,31 @@ public class SharedControlTests
             Width = 800,
             Height = 400,
         };
-        window.Show();
-        window.UpdateLayout();
-        dropdown.IsDropDownOpen = true;
-        window.UpdateLayout();
-        var popup = dropdown.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.Popup>().Single();
-        Assert.Equal(PlacementMode.BottomEdgeAlignedRight, popup.Placement);
-        Assert.True(popup.Child!.Bounds.Width > dropdown.Bounds.Width);
-        var width = popup.Child.Bounds.Width;
-        dropdown.SelectedIndex = 39;
-        window.UpdateLayout();
-        Assert.Equal(width, popup.Child.Bounds.Width);
-        dropdown.IsDropDownOpen = false;
-        dropdown.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
-        window.UpdateLayout();
-        dropdown.IsDropDownOpen = true;
-        window.UpdateLayout();
-        Assert.Equal(PlacementMode.BottomEdgeAlignedLeft, popup.Placement);
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            dropdown.IsDropDownOpen = true;
+            window.UpdateLayout();
+            var popup = dropdown.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.Popup>().Single();
+            Assert.Same(window, TopLevel.GetTopLevel(popup.Child!));
+            Assert.Equal(PlacementMode.BottomEdgeAlignedRight, popup.Placement);
+            Assert.True(popup.Child!.Bounds.Width > dropdown.Bounds.Width);
+            var width = popup.Child.Bounds.Width;
+            dropdown.SelectedIndex = 39;
+            window.UpdateLayout();
+            Assert.Equal(width, popup.Child.Bounds.Width);
+            dropdown.IsDropDownOpen = false;
+            dropdown.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
+            window.UpdateLayout();
+            dropdown.IsDropDownOpen = true;
+            window.UpdateLayout();
+            Assert.Equal(PlacementMode.BottomEdgeAlignedLeft, popup.Placement);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -998,6 +1015,41 @@ public class SharedControlTests
             Assert.True(double.IsNaN(grid.Height));
         }
         Assert.Throws<ArgumentException>(() => grid.AspectRatio = 0);
+    }
+
+    [AvaloniaFact]
+    public void ContextMenu_OpensAndActivatesInsideItsOwnerWindow()
+    {
+        var target = new Button { Content = "Options" };
+        var item = new MenuItem { Header = "Choose" };
+        var menu = new ContextMenu { Items = { item } };
+        target.ContextMenu = menu;
+        var chosen = false;
+        item.Click += (_, _) => chosen = true;
+        var window = new Window
+        {
+            Width = 640,
+            Height = 360,
+            Content = target,
+        };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            menu.Open(target);
+            window.UpdateLayout();
+            Assert.True(menu.IsOpen);
+            Assert.Same(window, TopLevel.GetTopLevel(item));
+            var point = item.TranslatePoint(new Point(item.Bounds.Width / 2, item.Bounds.Height / 2), window)!.Value;
+            window.MouseDown(point, MouseButton.Left);
+            window.MouseUp(point, MouseButton.Left);
+            Assert.True(chosen);
+            Assert.False(menu.IsOpen);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     private sealed class InputModel : INotifyPropertyChanged

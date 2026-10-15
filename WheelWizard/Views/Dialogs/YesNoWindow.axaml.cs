@@ -83,7 +83,7 @@ public partial class YesNoWindow : ModalContent
             return await Dispatcher.UIThread.InvokeAsync(() => AwaitAnswer());
         }
         _tcs = new();
-        Show(); // Or ShowDialog(parentWindow) if you need it to be modal
+        Show();
         return await _tcs.Task;
     }
 }

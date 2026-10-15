@@ -91,6 +91,17 @@
         <Style Selector="components|SegmentOption.Swatch:pointerover Border.SwatchHighlight">
             <Setter Property="Opacity" Value="0.12" />
         </Style>
+        <Style Selector=".couch Border.Floating.hidden">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector=".couch ToggleButton:focus-visible">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral50}" />
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
+        <Style Selector=".couch components|SegmentOption:focus-visible /template/ Border">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral50}" />
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
     </UserControl.Styles>
 
     <Grid x:Name="Root">
@@ -107,7 +118,7 @@
                                VerticalAlignment="Top" HorizontalAlignment="Left"
                                FontSize="16" Click="BackButton_OnClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
 
-        <Grid ColumnDefinitions="*,Auto">
+        <Grid x:Name="EditorHeader" ColumnDefinitions="*,Auto">
             <Grid.RowDefinitions>
                 <RowDefinition Height="{StaticResource TopRowSize}" />
                 <RowDefinition />
@@ -138,7 +149,9 @@
         <!-- The floating sidebar: Head / Body / Info, then the head groups, then a group's parts. -->
         <Border x:Name="SidebarPanel" Classes="Floating"
                 HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,40,0,0">
-            <StackPanel x:Name="SidebarItems" Spacing="2" />
+            <ScrollViewer x:Name="SidebarScroller" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="SidebarItems" Spacing="2" />
+            </ScrollViewer>
         </Border>
 
         <!-- Size / rotate / flip for the selected part. -->
@@ -254,6 +267,38 @@
                     Background="{StaticResource BackgroundLineColor}" />
             <Border x:Name="EditorBottomDivider" Grid.Row="1" Height="1" VerticalAlignment="Bottom"
                     Background="{StaticResource BackgroundLineColor}" />
+        </Grid>
+
+        <!-- The same scene and editing panels move here in couch mode; the session is never recreated. -->
+        <Grid x:Name="CouchLayout" IsVisible="False" RowDefinitions="Auto,*" ColumnDefinitions="5*,6*">
+            <Grid Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
+                <components:ActionButton Text="{loc:T page_title.my_miis}" IconData="{StaticResource ArrowLeft}"
+                                         Tone="Secondary" Click="BackButton_OnClick" />
+                <TextBlock Grid.Column="1" Text="{Binding Text, ElementName=NameField}" Classes="TitleText"
+                           Margin="16,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <StackPanel x:Name="CouchEditorActions" Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                    <components:ActionButton Text="{loc:T action.undo}" Click="UndoButton_OnClick"
+                                             IsEnabled="{Binding IsEnabled, ElementName=UndoButton}" />
+                    <components:ActionButton Text="{loc:T action.redo}" Click="RedoButton_OnClick"
+                                             IsEnabled="{Binding IsEnabled, ElementName=RedoButton}" />
+                    <components:ActionButton Text="{loc:T action.save}" Tone="Brand" Click="SaveButton_OnClick"
+                                             IsEnabled="{Binding IsEnabled, ElementName=SaveButton}" />
+                </StackPanel>
+            </Grid>
+            <Panel x:Name="CouchStage" Grid.Row="1" ClipToBounds="True" Margin="0,0,20,0" />
+            <ScrollViewer Grid.Row="1" Grid.Column="1" HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="CouchPanels" Spacing="12" Margin="0,0,8,12">
+                    <StackPanel x:Name="CouchPickerActions" Spacing="8" IsVisible="False">
+                        <TextBlock Text="{loc:T text.pick_your_mii}" Classes="TitleText" TextWrapping="Wrap" />
+                        <Button Content="{loc:T attribute.mii.gender_male}" MinHeight="48" Click="PickBoy_OnClick" />
+                        <Button Content="{loc:T attribute.mii.gender_female}" MinHeight="48" Click="PickGirl_OnClick" />
+                        <Button Content="{loc:T action.surprise_me}" MinHeight="48" Click="DiceButton_OnClick"
+                                IsEnabled="{Binding IsEnabled, ElementName=DiceButton}" />
+                    </StackPanel>
+                    <WrapPanel x:Name="CouchPartActions" Orientation="Horizontal" />
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>

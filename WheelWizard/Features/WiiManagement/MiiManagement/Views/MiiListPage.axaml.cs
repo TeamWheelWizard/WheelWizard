@@ -12,6 +12,7 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
@@ -24,8 +25,10 @@ namespace WheelWizard.WiiManagement.MiiManagement.Views;
 
 public partial class MiiListPage : UserControl
 {
+    private readonly GridLength _desktopHeaderHeight;
     public ObservableCollection<MiiListRow> MiiRows { get; } = [];
     private readonly List<MiiListEntry> _miiEntries = [];
+    private int _columns = 4;
 
     private IFilePickerService FilePicker { get; }
 
@@ -59,6 +62,7 @@ public partial class MiiListPage : UserControl
         FileSystem = fileSystem;
         SettingsService = settingsService;
         InitializeComponent();
+        _desktopHeaderHeight = CompleteGrid.RowDefinitions[0].Height;
         DataContext = this;
 
         var miiDbExists = MiiDbService.Exists();
@@ -97,6 +101,7 @@ public partial class MiiListPage : UserControl
     {
         base.OnAttachedToVisualTree(e);
 
+        ApplyCouchLayout();
         // Subscribe to keyboard events to track Shift key state
         KeyDown += MiiListPage_KeyDown;
         KeyUp += MiiListPage_KeyUp;
@@ -107,6 +112,7 @@ public partial class MiiListPage : UserControl
         // Unsubscribe from keyboard events when control is detached
         KeyDown -= MiiListPage_KeyDown;
         KeyUp -= MiiListPage_KeyUp;
+        _isShiftPressed = false;
 
         base.OnDetachedFromVisualTree(e);
     }
@@ -125,6 +131,46 @@ public partial class MiiListPage : UserControl
             return;
 
         _isShiftPressed = false;
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == CouchMode.IsEnabledProperty && CompleteGrid is not null)
+            ApplyCouchLayout();
+        else if (change.Property == BoundsProperty && CompleteGrid is not null && CouchMode.GetIsEnabled(this))
+            UpdateColumns();
+    }
+
+    private void ApplyCouchLayout()
+    {
+        var couch = CouchMode.GetIsEnabled(this);
+        CompleteGrid.RowDefinitions[0].Height = couch ? new GridLength(132) : _desktopHeaderHeight;
+        Grid.SetRow(ListActionsScroller, couch ? 1 : 0);
+        Grid.SetColumn(ListActionsScroller, couch ? 0 : 1);
+        Grid.SetColumnSpan(ListActionsScroller, couch ? 2 : 1);
+        ListActionsScroller.HorizontalScrollBarVisibility = couch
+            ? Avalonia.Controls.Primitives.ScrollBarVisibility.Auto
+            : Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled;
+        ListActions.HorizontalAlignment = couch ? Avalonia.Layout.HorizontalAlignment.Left : Avalonia.Layout.HorizontalAlignment.Right;
+        MultipleSelection.IsVisible = couch;
+        FavoriteMiiButton.Text = couch ? t("action.favorite") : "";
+        EditMiisButton.Text = couch ? t("action.edit") : "";
+        DuplicateMiisButton.Text = couch ? t("action.duplicate") : "";
+        ExportMiisButton.Text = couch ? t("action.export") : "";
+        DeleteMiisButton.Text = couch ? t("action.delete") : "";
+        ImportMiiButton.Text = couch ? t("action.import") : "";
+        UpdateColumns();
+        ChangeTopButtons();
+    }
+
+    private void UpdateColumns()
+    {
+        var columns = CouchMode.GetIsEnabled(this) ? Math.Max(1, (int)(Bounds.Width / 108)) : 4;
+        if (_columns == columns)
+            return;
+        _columns = columns;
+        RebuildRows();
     }
 
     #endregion
@@ -150,10 +196,10 @@ public partial class MiiListPage : UserControl
     private void RebuildRows()
     {
         MiiRows.Clear();
-        for (var i = 0; i < _miiEntries.Count; i += 4)
+        for (var i = 0; i < _miiEntries.Count; i += _columns)
         {
-            var chunk = _miiEntries.Skip(i).Take(4).ToList();
-            MiiRows.Add(new MiiListRow(chunk));
+            var chunk = _miiEntries.Skip(i).Take(_columns).ToList();
+            MiiRows.Add(new MiiListRow(chunk, _columns));
         }
     }
 
@@ -231,7 +277,7 @@ public partial class MiiListPage : UserControl
             return;
         }
 
-        if (!_isShiftPressed)
+        if (!_isShiftPressed && !(CouchMode.GetIsEnabled(this) && MultipleSelection.IsChecked == true))
         {
             var shouldSelectThis = entry.IsSelected;
             foreach (var item in _miiEntries)
@@ -463,6 +509,10 @@ public partial class MiiListPage : UserControl
     private void ChangeTopButtons()
     {
         var selectedMiis = GetSelectedMiis();
+        if (CouchMode.GetIsEnabled(this))
+            FavoriteMiiButton.Text = t(
+                selectedMiis.Length > 0 && selectedMiis.All(mii => mii.IsFavorite) ? "action.unfavorite" : "action.favorite"
+            );
 
         if (selectedMiis.Length == 0)
         {
@@ -495,9 +545,10 @@ public partial class MiiListPage : UserControl
         command.Invoke(selectedMiis.Contains(mii) ? selectedMiis : [mii]);
     }
 
-    public sealed class MiiListRow(List<MiiListEntry> items)
+    public sealed class MiiListRow(List<MiiListEntry> items, int columns)
     {
         public IReadOnlyList<MiiListEntry> Items { get; } = items;
+        public int Columns { get; } = columns;
     }
 
     public sealed class MiiListEntry(Mii? mii, bool isAddEntry = false, bool isGlobal = false) : INotifyPropertyChanged

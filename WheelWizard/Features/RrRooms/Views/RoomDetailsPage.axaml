@@ -8,7 +8,7 @@
              x:Class="WheelWizard.RrRooms.Views.RoomDetailsPage"
              x:DataType="rooms:RoomDetailsPage"
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views">
-    <Grid>
+    <Grid x:Name="RoomLayout">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <RowDefinition Height="100" />
@@ -37,7 +37,7 @@
                                     VerticalAlignment="Top" HorizontalAlignment="Left"
                                     FontSize="16" Click="GoBackClick"  Tone="Secondary" Variant="Link" Padding="0" MinHeight="0"/>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,*" RowDefinitions="*,*" Margin="10,0">
+        <Grid Grid.Row="1" x:Name="RoomSummary" ColumnDefinitions="*,*" RowDefinitions="*,*" Margin="10,0">
             <StackPanel
                 Grid.Column="0">
                 <components:FormFieldLabel Text="{loc:T attribute.id}" Margin="0,0,2,0" />
@@ -61,7 +61,7 @@
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="2" RowDefinitions="*, 16*" Margin="10,0">
+        <Grid Grid.Row="2" x:Name="RoomPlayers" RowDefinitions="*, 16*" Margin="10,0">
             <Grid Grid.Row="0">
                 <Grid ColumnDefinitions="9*,6*,6*">
                     <components:FormFieldLabel Grid.Column="1" Text="{loc:T attribute.vr_abbreviation}"
@@ -106,5 +106,16 @@
                 </ListBox.ContextMenu>
             </ListBox>
         </Grid>
+        <ScrollViewer x:Name="CouchPlayerActions" Grid.Row="2" IsVisible="False"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="10,12"
+                      IsEnabled="{Binding #PlayersListView.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Player actions" Classes="TitleText" TextWrapping="Wrap" />
+                <Button Content="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
+                <Button Content="{loc:T action.add_friend}" Click="AddFriend_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
+                <Button Content="{loc:T action.view_profile}" Click="ViewProfile_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
+                <Button Content="View player on RWFC" Click="ViewOnRwfc_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

@@ -3,7 +3,7 @@
 - `Components/`: reusable rendering controls and ordinary UI state. No feature services, navigation, or workflows.
 - `Patterns/`: reusable interactions that coordinate controls and own a workflow. Composition alone does not make a pattern; create this folder when one is needed.
 - `Shell/`: application layout, navigation, startup, and controls specific to the shell.
-- `Dialogs/`: shared dialog workflows and their window infrastructure.
+- `Dialogs/`: shared dialog workflows and their in-window modal infrastructure.
 - `Styles/`: shared resources and styles for native Avalonia controls.
 - `DesignTime/`: previews, development tools, and the component gallery.
 - `Features/<feature>/Views/`: feature pages and feature-specific rendering controls. Their presentation models belong alongside their feature, not in shared components.
@@ -19,3 +19,17 @@ Prefer native Avalonia properties, events, commands, and flyouts. Add a custom p
 - `HoverGlow`: pointer-following decoration shared by button templates. Render transforms keep its movement out of layout.
 
 Use property selectors for appearance variants and pseudo-classes for interaction state. Preserve the caller's data context. Templates own presentation; callers own feature actions.
+
+## Desktop and Couch presentation
+
+`Layout` owns the single native application window. Its existing desktop composition and `Shell/Couch/CouchView` are alternative presentations, not separate application instances. `CouchMode.IsEnabled` is an inherited attached property: feature views use it to rearrange presentation while retaining their services and editing state.
+
+Mode switching synchronously moves the same `ContentArea` host between presentations. Do not navigate, recreate the current page, or refresh a selected profile to switch views. Detach/attach can occur in the same UI turn: pair subscriptions on attachment and defer terminal page-model disposal until the page remains detached. Capture desktop layout values while attached rather than resolving inherited resources during detachment.
+
+`NavigationService` and its unsaved-work guards remain the authority for route changes. `CouchInputController` maps SDL3 gamepads and keyboard actions to native control/focus semantics. A feature editor may consume directional input before shell focus traversal. Couch focus must stay visible, scrolling must reveal its target, and modal interaction must remain confined to the top modal.
+
+`ModalContent` always presents through the originating window's `ModalHost`. Call `SetModalOwner(originatingControl)` before asynchronous presentation; prompts owned by a closing modal close with it, without closing unrelated operations. Do not introduce native-window fallbacks for production dialogs. Framework popup/tooltip overlay hosting is configured in application styles, with platform overlay options where available. Native storage-provider portals and OS-managed menus are intentional external surfaces.
+
+`COUCH_VIEW` persists the presentation preference. `--view=couch` / `--view=desktop` override startup selection without rewriting it; `--fullscreen` applies when starting in couch mode. Fullscreen and presentation are independent. Returning to desktop restores its window geometry and scaling.
+
+The only user-facing presentation switch is **Settings → Appearance → Couch View**. Shell chrome and the controller menu link to settings rather than exposing another mode toggle.

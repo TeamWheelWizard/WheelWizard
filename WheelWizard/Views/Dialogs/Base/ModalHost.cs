@@ -1,14 +1,17 @@
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Couch;
 
 namespace WheelWizard.Views.Dialogs.Base;
 
@@ -29,6 +32,7 @@ public sealed class ModalHost : Grid
         ZIndex = 1000;
         Margin = new Thickness(0, Math.Max(0, _owner.ExtendClientAreaTitleBarHeightHint), 0, 0);
         _owner.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
+        _owner.AddHandler(GotFocusEvent, OnGotFocus);
     }
 
     public void Show(ModalContent content)
@@ -129,9 +133,17 @@ public sealed class ModalHost : Grid
         {
             entry.IsClosing = true;
             entry.OnClosed = closed;
+            content.NotifyClosing();
         }
         else if (animate)
             return;
+        // Complete explicitly owned prompts, but leave sibling operations alone.
+        var index = _entries.IndexOf(entry);
+        for (var i = _entries.Count - 1; i > index; i--)
+        {
+            if (_entries[i].Content.IsOwnedBy(content))
+                _entries[i].Content.CloseImmediately();
+        }
         var duration = animate ? GetAnimationDuration() : TimeSpan.Zero;
         if (duration <= TimeSpan.Zero)
         {
@@ -172,7 +184,7 @@ public sealed class ModalHost : Grid
         if (wasTop)
         {
             if (entry.PreviousFocus is Control { IsEffectivelyVisible: true, IsEffectivelyEnabled: true } previous)
-                previous.Focus();
+                previous.Focus(CouchMode.GetIsEnabled(_owner) ? NavigationMethod.Directional : NavigationMethod.Unspecified);
             else if (HasModals)
                 FocusTopModal();
         }
@@ -197,8 +209,11 @@ public sealed class ModalHost : Grid
             .OfType<Control>()
             .Where(control => control.Focusable && control.IsEffectivelyVisible && control.IsEffectivelyEnabled && control is not TextBlock)
             .ToList();
-        var target = candidates.OfType<TextBox>().FirstOrDefault() ?? candidates.FirstOrDefault();
-        (target ?? panel).Focus();
+        var target =
+            candidates.OfType<TextBox>().FirstOrDefault()
+            ?? candidates.FirstOrDefault(control => AutomationProperties.GetName(control) != "Close")
+            ?? candidates.FirstOrDefault();
+        (target ?? panel).Focus(CouchMode.GetIsEnabled(_owner) ? NavigationMethod.Directional : NavigationMethod.Unspecified);
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -229,6 +244,20 @@ public sealed class ModalHost : Grid
     {
         if (e.Property == OpacityProperty)
             _owner.UpdateModalChromeDimming();
+    }
+
+    private void OnGotFocus(object? sender, FocusChangedEventArgs e)
+    {
+        if (
+            TopModal != null
+            && !_entries[^1].IsClosing
+            && IsEffectivelyEnabled
+            && e.Source is Control focused
+            && focused != _entries[^1].Panel
+            && !focused.GetSelfAndLogicalAncestors().Contains(TopModal)
+            && !focused.GetVisualAncestors().Contains(_entries[^1].Panel)
+        )
+            FocusTopModal();
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)

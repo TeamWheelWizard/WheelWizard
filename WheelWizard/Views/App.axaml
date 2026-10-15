@@ -123,6 +123,12 @@
         <!-- !!Only used for the designer!! -->
 
         <!-- STYLES -->
+        <Style Selector="Popup">
+            <Setter Property="ShouldUseOverlayLayer" Value="True" />
+        </Style>
+        <Style Selector=":is(Control)">
+            <Setter Property="ToolTip.ShouldUseOverlayLayer" Value="True" />
+        </Style>
         <StyleInclude Source="Styles/Styles/ButtonStyles.axaml" />
         <StyleInclude Source="Styles/Styles/TextStyles.axaml" />
         <StyleInclude Source="Styles/Styles/MiscStyles.axaml" />

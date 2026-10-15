@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
@@ -15,6 +16,7 @@ using WheelWizard.Settings;
 using WheelWizard.Shared.Calendar;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
@@ -58,6 +60,7 @@ public sealed record LeaderboardPlayerItem
 
 public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 {
+    private readonly GridLength _desktopHeaderHeight;
     private IModalFactory Popups { get; }
 
     private INavigationService Navigation { get; }
@@ -205,6 +208,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         GameDataService = gameDataService;
         SettingsManager = settingsManager;
         InitializeComponent();
+        _desktopHeaderHeight = LeaderboardLayout.RowDefinitions[0].Height;
         DataContext = this;
         PodiumStage.Initialize(miiRenderer, miiAnimations, random.Random.Shared, calendar, settingsManager.ENABLE_ANIMATIONS.Get());
         RemainingPlayers.CollectionChanged += RemainingPlayers_OnCollectionChanged;
@@ -213,9 +217,40 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         Unloaded += LeaderboardPage_Unloaded;
     }
 
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property != CouchMode.IsEnabledProperty || LeaderboardLayout is null)
+            return;
+
+        var couch = CouchMode.GetIsEnabled(this);
+        Classes.Set("couch", couch);
+        LeaderboardLayout.RowDefinitions[0].Height = couch ? new GridLength(72) : _desktopHeaderHeight;
+        LeaderboardBody.ColumnDefinitions = couch ? new ColumnDefinitions("2*,3*") : new ColumnDefinitions("*");
+        LeaderboardBody.RowDefinitions = couch ? new RowDefinitions("*") : new RowDefinitions("Auto,Auto");
+        Grid.SetColumn(RemainingPlayersScroll, couch ? 1 : 0);
+        Grid.SetRow(RemainingPlayersScroll, couch ? 0 : 1);
+        RemainingPlayersScroll.Margin = couch ? new Thickness(16, 0, 0, 0) : new Thickness(0, 10, 0, 0);
+        LeaderboardScroll.VerticalScrollBarVisibility = couch
+            ? Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled
+            : Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
+        RemainingPlayersScroll.VerticalScrollBarVisibility = couch
+            ? Avalonia.Controls.Primitives.ScrollBarVisibility.Auto
+            : Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled;
+        PodiumStage.Height = couch ? 300 : 380;
+        CouchPodiumActions.IsVisible = couch;
+    }
+
+    private void PlayerActions_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: Control player })
+            player.ContextMenu?.Open(player);
+        e.Handled = true;
+    }
+
     private async void LeaderboardPage_Loaded(object? sender, RoutedEventArgs e)
     {
-        if (_hasLoadedOnce)
+        if (_hasLoadedOnce && !IsLoading)
             return;
 
         _hasLoadedOnce = true;
@@ -224,6 +259,9 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 
     private void LeaderboardPage_Unloaded(object? sender, RoutedEventArgs e)
     {
+        // A detached content host can return with the same page. Resume an interrupted load,
+        // but keep a completed leaderboard and its scroll/selection state.
+        _hasLoadedOnce = !IsLoading;
         CancelCurrentLoad();
     }
 

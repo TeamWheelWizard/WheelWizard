@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using WheelWizard.Models.Mods;
 using WheelWizard.Mods.ViewModels;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Shell.Couch;
 
 namespace WheelWizard.Mods.Views;
 
@@ -26,6 +27,19 @@ public partial class GridModPanel : UserControl
     public event EventHandler<PointerPressedEventArgs>? DragRequested;
 
     private void View_Click(object? sender, RoutedEventArgs e) => ViewRequested?.Invoke(this, e);
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == CouchMode.IsEnabledProperty)
+            ApplyPresentation();
+    }
+
+    private void ApplyPresentation()
+    {
+        Classes.Set("couch", CouchMode.GetIsEnabled(this));
+        Focusable = !CouchMode.GetIsEnabled(this);
+    }
 
     private void Drag_PointerPressed(object? sender, PointerPressedEventArgs e) => DragRequested?.Invoke(this, e);
 
@@ -64,6 +78,7 @@ public partial class GridModPanel : UserControl
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        ApplyPresentation();
         if (_observedMod != null)
         {
             _observedMod.PropertyChanged -= OnModChanged;

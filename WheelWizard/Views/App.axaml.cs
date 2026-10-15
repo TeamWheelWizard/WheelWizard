@@ -23,7 +23,7 @@ public class App : Application
 
     public override void Initialize()
     {
-        // macOS reads the name before deferred visual resources load for the splash startup.
+        // macOS reads the name before deferred visual resources load during startup.
         Name = "Wheel Wizard";
         if (_createStartup is null)
             LoadVisualResources();
@@ -89,9 +89,6 @@ public class App : Application
         if (_createStartup is not null && ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            // Activate from the dispatcher after the native event loop has started.
-            desktop.MainWindow = new SplashWindow { ShowActivated = false };
-            desktop.MainWindow.Show();
             var shutdown = new CancellationTokenSource();
             var cancellationToken = shutdown.Token;
             desktop.Exit += (_, _) =>
@@ -104,7 +101,6 @@ public class App : Application
                 {
                     try
                     {
-                        desktop.MainWindow?.Activate();
                         var startup = await _createStartup();
                         cancellationToken.ThrowIfCancellationRequested();
                         await startup.StartAsync(desktop, StartupOptions.Parse(desktop.Args ?? []), cancellationToken);

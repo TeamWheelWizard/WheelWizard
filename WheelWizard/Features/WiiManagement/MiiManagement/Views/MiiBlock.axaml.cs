@@ -7,6 +7,7 @@ using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -57,9 +58,39 @@ public class MiiBlock : ToggleRadioButton
             MiiName = mii?.Name.ToString();
             IsFavorite = mii?.IsFavorite ?? false;
         }
+        if (change.Property == CouchMode.IsEnabledProperty)
+        {
+            if (CouchMode.GetIsEnabled(this))
+                Focusable = true;
+            else
+                ClearValue(FocusableProperty);
+        }
 
         Tag = MiiName ?? String.Empty;
+        Avalonia.Automation.AutomationProperties.SetName(this, MiiName ?? "Create Mii");
         ClipToBounds = string.IsNullOrWhiteSpace(MiiName);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (CouchMode.GetIsEnabled(this) && e.Key is Key.Enter or Key.Space)
+        {
+            IsChecked = !IsChecked;
+            RaiseEvent(new RoutedEventArgs(ClickEvent));
+            e.Handled = true;
+            return;
+        }
+        base.OnKeyDown(e);
+    }
+
+    protected override void OnKeyUp(KeyEventArgs e)
+    {
+        if (CouchMode.GetIsEnabled(this) && e.Key is Key.Enter or Key.Space)
+        {
+            e.Handled = true;
+            return;
+        }
+        base.OnKeyUp(e);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

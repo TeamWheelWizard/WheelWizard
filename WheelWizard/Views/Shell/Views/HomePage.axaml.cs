@@ -4,10 +4,12 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Testably.Abstractions;
 using WheelWizard.Models.Enums;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Shell.Controls;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.ViewModels;
 
 namespace WheelWizard.Views.Shell.Views;
@@ -21,6 +23,7 @@ public partial class HomePage : UserControl
     private readonly WheelTrail[] _trails;
     private WheelTrailState _currentTrailState = WheelTrailState.Static_None;
     private bool _isAttached;
+    private bool _hasRefreshed;
     private readonly TaskCompletionSource _initialContent = new();
     public Task InitialContentReady => _initialContent.Task;
 
@@ -36,12 +39,30 @@ public partial class HomePage : UserControl
             ApplyDolphinTrailColors();
     }
 
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == CouchMode.IsEnabledProperty && CompleteGrid is not null)
+            ApplyPresentation();
+    }
+
+    private void ApplyPresentation()
+    {
+        var couch = CouchMode.GetIsEnabled(this);
+        CompleteGrid.IsVisible = !couch;
+        CouchHome.IsVisible = couch;
+    }
+
     protected override async void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         _isAttached = true;
+        ApplyPresentation();
         Model.PropertyChanged += Model_OnPropertyChanged;
         Model.MainActionStarted += Model_OnMainActionStarted;
+        if (_hasRefreshed)
+            return;
+        _hasRefreshed = true;
         try
         {
             await Model.RefreshAsync();
@@ -58,14 +79,26 @@ public partial class HomePage : UserControl
         _isAttached = false;
         Model.PropertyChanged -= Model_OnPropertyChanged;
         Model.MainActionStarted -= Model_OnMainActionStarted;
-        Model.Dispose();
+        // Moving the existing page between shell hosts detaches it briefly. Only a real
+        // navigation away should end the launch model's lifetime.
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                if (!_isAttached)
+                    Model.Dispose();
+            },
+            DispatcherPriority.Background
+        );
         base.OnDetachedFromVisualTree(e);
     }
 
     private void Model_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (!string.IsNullOrEmpty(Model.IconName) && this.FindResource(Model.IconName) is Geometry geometry)
+        {
             PlayButton.IconData = geometry;
+            CouchPlayButton.IconData = geometry;
+        }
         if (Model.Status == WheelWizardStatus.Ready && !Model.IsBusy)
             PlayEntranceAnimation();
     }

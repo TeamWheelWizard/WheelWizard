@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using WheelWizard.Views.Shell;
 
 namespace WheelWizard.Views.Dialogs.Base;
@@ -19,9 +20,13 @@ public abstract class ModalContent : UserControl
 
     private ModalHost? _host;
     private BaseWindow? _owner;
+    private ModalContent? _modalParent;
+    internal event EventHandler? Closing;
     private bool _disableOpening;
     private TaskCompletionSource? _completion;
     private double? _preferredContentWidth;
+    private double? _preferredContentHeight;
+    private double _constrainedContentHeight = double.NaN;
     private double? _preferredMinHeight;
 
     public string ModalTitle
@@ -62,6 +67,10 @@ public abstract class ModalContent : UserControl
             // Preserve the preferred width as data arrives, but allow small windows to constrain it.
             root.Width = Math.Min(availableSize.Width, _preferredContentWidth.Value);
         }
+        if (double.IsFinite(root.Height) && root.Height != _constrainedContentHeight)
+            _preferredContentHeight = root.Height;
+        if (_preferredContentHeight != null)
+            root.Height = _constrainedContentHeight = Math.Min(availableSize.Height, _preferredContentHeight.Value);
         _preferredMinHeight ??= root.MinHeight;
         root.MinHeight = Math.Min(availableSize.Height, _preferredMinHeight.Value);
         return base.MeasureOverride(availableSize);
@@ -77,7 +86,20 @@ public abstract class ModalContent : UserControl
         _owner =
             TopLevel.GetTopLevel(origin) as BaseWindow
             ?? throw new InvalidOperationException("The modal origin must be attached to an application window.");
+        _modalParent = origin.GetSelfAndVisualAncestors().OfType<ModalContent>().FirstOrDefault(modal => modal != this);
         return this;
+    }
+
+    internal void NotifyClosing() => Closing?.Invoke(this, EventArgs.Empty);
+
+    internal bool IsOwnedBy(ModalContent owner)
+    {
+        for (var parent = _modalParent; parent != null; parent = parent._modalParent)
+        {
+            if (parent == owner)
+                return true;
+        }
+        return false;
     }
 
     public void Show()

@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
@@ -13,6 +14,7 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData.Views.Dialogs;
 using WheelWizard.WiiManagement.GameLicense;
@@ -23,6 +25,7 @@ namespace WheelWizard.WheelWizardData.Views;
 
 public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
+    private readonly GridLength _desktopHeaderHeight;
     private IModalFactory Popups { get; }
 
     private INavigationService Navigation { get; }
@@ -110,11 +113,34 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         MiiDbService = miiDbService;
         SettingsService = settingsService;
         InitializeComponent();
+        _desktopHeaderHeight = FriendsLayout.RowDefinitions[0].Height;
         GameLicenseService.Subscribe(this);
         UpdateFriendList();
 
         DataContext = this;
         HandleVisibility();
+        Loaded += (_, _) => GameLicenseService.Subscribe(this);
+        Unloaded += (_, _) => GameLicenseService.Unsubscribe(this);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property != CouchMode.IsEnabledProperty || FriendsLayout is null)
+            return;
+
+        var couch = CouchMode.GetIsEnabled(this);
+        Classes.Set("couch", couch);
+        FriendsLayout.RowDefinitions[0].Height = couch ? new GridLength(72) : _desktopHeaderHeight;
+    }
+
+    private void FriendActions_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Control button)
+            return;
+        var card = button.GetVisualAncestors().OfType<Border>().FirstOrDefault(border => border.ContextMenu is not null);
+        card?.ContextMenu?.Open(card);
+        e.Handled = true;
     }
 
     public void OnUpdate(ObservablePollingService sender)

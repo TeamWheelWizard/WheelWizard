@@ -88,7 +88,7 @@ public static class ToolTipBubbleBehavior
         if (args.GetNewValue<bool>() || !OpenToolTips.TryGetValue(window, out var controls))
             return;
 
-        // Native tooltip popups must disappear immediately when their owner loses focus.
+        // Tooltips must disappear immediately when their owner loses focus.
         foreach (var control in controls.ToArray())
         {
             var state = GetState(control);

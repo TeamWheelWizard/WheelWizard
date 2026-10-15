@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -5,6 +6,7 @@ using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Couch;
 
 namespace WheelWizard.Settings.Views;
 
@@ -31,6 +33,32 @@ public partial class AppearanceSettings : UserControl
         LoadSettings();
         _pageLoaded = true;
         WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        RefreshCouchViewToggle();
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == CouchMode.IsEnabledProperty && CouchViewToggle is not null)
+            CouchViewToggle.IsChecked = CouchMode.GetIsEnabled(this);
+    }
+
+    private void RefreshCouchViewToggle()
+    {
+        CouchViewToggle.IsChecked = TopLevel.GetTopLevel(this) is Layout layout ? layout.IsCouchMode : SettingsService.COUCH_VIEW.Get();
+    }
+
+    private void CouchView_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TopLevel.GetTopLevel(this) is not Layout layout)
+            return;
+        layout.TogglePresentation();
+        CouchViewToggle.IsChecked = layout.IsCouchMode;
     }
 
     private void EnableAnimations_OnClick(object sender, RoutedEventArgs e) =>
