@@ -208,7 +208,6 @@ es:
       Atención. Esta página no tiene la funcionalidad de unirte a una sala directamente.
       Para unirte a una sala en específico, necesitarás unirte mediante un amigo, o con suerte, encontrando la sala en VS Mundial.
     friends_page_disclaimer: "Para añadir amigos necesitas añadirlos dentro del juego."
-    region_user_selection: "Esto solo muestra las regiones en las que TÚ has jugado."
     primary_profile: "El perfil principal es usado como referencia en Wheel Wizard."
   empty_content:
     no_profiles: "Tienes que jugar el juego mínimo una vez para poder ver aquí tus perfiles."

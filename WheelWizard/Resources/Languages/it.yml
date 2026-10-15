@@ -189,7 +189,6 @@ it:
       Attenzione, questa pagina non offre alcuna funzionalità per unirsi ad una stanza direttamente.
       Per unirsi ad una specifica stanza, dovrai farlo tramite un amico oppure sperare di unirti tramite i server online.
     friends_page_disclaimer: "Per aggiungere amici, devi farlo all'interno del gioco."
-    region_user_selection: "Questo fa vedere solo le regioni in cui TU hai giocato"
     primary_profile: "Il profilo primario è utilizzato come riferimento in Wheel Wizard"
   empty_content:
     no_profiles: "Devi aver giocato almeno una volta per vedere la lista dei tuoi profili qui"

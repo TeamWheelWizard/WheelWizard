@@ -211,7 +211,6 @@ fi:
       Huomioi, että tältä sivulta ei voi liittyä huoneeseen suoraan.
       Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
     friends_page_disclaimer: "Kavereiden lisääminen täytyy tehdä pelin sisällä."
-    region_user_selection: "Näyttää vain alueet, joilla itse olet pelannut"
     primary_profile: "Pääprofiilia käytetään viitteenä Wheel Wizardissa"
   empty_content:
     no_profiles: "Sinun on pelattava peliä vähintään kerran nähdäksesi profiilisi listalla"

@@ -189,7 +189,6 @@ tr:
       Lütfen bu sayfanın doğrudan bir odaya katılma işlevi sunmadığını unutmayın.
       Belirli bir odaya katılmak için bir arkadaşınız aracılığıyla katılmanız veya çevrimiçi sunuculara katılarak bu odaya girmeyi ummanız gerekecek.
     friends_page_disclaimer: "Arkadaş eklemek için onları oyunun içinde eklemeniz gerekiyor."
-    region_user_selection: "Bu sadece SİZİN oynadığıınız bölgeleri gösterir."
     primary_profile: "Ana profil, Wheel Wizard için referans olarak kullanılır."
   empty_content:
     no_profiles: "Profillerinizi burada görmek için oyunu en az bir kez oynamanız gerekiyor."

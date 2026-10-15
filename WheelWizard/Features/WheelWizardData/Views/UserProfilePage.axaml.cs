@@ -59,10 +59,6 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private ISettingsManager SettingsService { get; }
 
-    private ISaveRegionService SaveRegions { get; }
-
-    private ICustomDistributionPaths DistributionPaths { get; }
-
     public Mii? CurrentMii
     {
         get => _currentMii;
@@ -237,9 +233,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         IGameLicenseSingletonService gameLicenseService,
         IWhWzDataSingletonService badgeService,
         IMiiDbService miiDbService,
-        ISettingsManager settingsService,
-        ISaveRegionService saveRegions,
-        ICustomDistributionPaths distributionPaths
+        ISettingsManager settingsService
     )
     {
         CustomCharacters = customCharacters;
@@ -249,68 +243,23 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         BadgeService = badgeService;
         MiiDbService = miiDbService;
         SettingsService = settingsService;
-        SaveRegions = saveRegions;
-        DistributionPaths = distributionPaths;
         HistoryGraph = historyGraph;
         InitializeComponent();
         HistoryHost.Content = historyGraph;
         historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("CurrentFriendCode") { Source = this });
         _currentUserIndex = FocusedUser;
-        PopulateRegions();
         GreetWithMii();
         UpdatePage();
         DataContext = this;
         ProfileContent.SizeChanged += (_, _) => FitChart();
         ProfileBody.SizeChanged += (_, _) => FitChart();
         CardFace.SizeChanged += (_, e) => BrStat.IsVisible = e.NewSize.Width >= BrStatMinWidth;
-        // Make sure this action gets subscribed AFTER the PopulateRegions method
-        RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
     }
 
     internal void RefreshSelectedProfile()
     {
-        RegionDropdown.SelectionChanged -= RegionDropdown_SelectionChanged;
-        try
-        {
-            RegionDropdown.Items.Clear();
-            PopulateRegions();
-            _currentUserIndex = FocusedUser;
-            UpdatePage();
-        }
-        finally
-        {
-            RegionDropdown.SelectionChanged += RegionDropdown_SelectionChanged;
-        }
-    }
-
-    private void PopulateRegions()
-    {
-        var validRegions = SaveRegions.GetAvailableRegions(DistributionPaths.SaveFolderPath);
-        var currentRegion = SettingsService.Get<MarioKartWiiEnums.Regions>(SettingsService.RR_REGION);
-        foreach (var region in Enum.GetValues<MarioKartWiiEnums.Regions>())
-        {
-            if (region == MarioKartWiiEnums.Regions.None)
-                continue;
-
-            var name = region switch
-            {
-                MarioKartWiiEnums.Regions.Europe => t("region.europe"),
-                MarioKartWiiEnums.Regions.America => t("region.america"),
-                MarioKartWiiEnums.Regions.Korea => t("region.south_korea"),
-                MarioKartWiiEnums.Regions.Japan => t("region.japan"),
-                _ => t("state.unknown"),
-            };
-            var itemForRegionDropdown = new DropdownItem
-            {
-                Content = name,
-                Tag = region,
-                IsEnabled = validRegions.Contains(region),
-            };
-            RegionDropdown.Items.Add(itemForRegionDropdown);
-
-            if (currentRegion == region)
-                RegionDropdown.SelectedItem = itemForRegionDropdown;
-        }
+        _currentUserIndex = FocusedUser;
+        UpdatePage();
     }
 
     #region Update page
@@ -365,6 +314,11 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         HasCurrentUserRoom = IsUserInLiveRoom(currentPlayer.FriendCode);
         Badges = BadgeService.GetBadges(currentPlayer.FriendCode).ToArray();
 
+        // The region follows the game file, so it is shown rather than picked.
+        var region = SettingsService.Get<MarioKartWiiEnums.Regions>(SettingsService.RR_REGION);
+        RegionBadge.IsVisible = region != MarioKartWiiEnums.Regions.None;
+        RegionBadge.Text = GameRegion.GetDisplayName(region);
+
         RefreshLicenseTabs();
     }
 
@@ -384,32 +338,6 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         layout.UpdateFriendCount();
         layout.UpdateSidebarProfile();
         ViewUtils.ShowSnackbar(t("snackbar_success.profile_set_primary"));
-    }
-
-    private void RegionDropdown_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (RegionDropdown.SelectedItem is not DropdownItem { Tag: MarioKartWiiEnums.Regions region })
-            return;
-
-        SettingsService.Set(SettingsService.RR_REGION, region);
-        var loadResult = GameLicenseService.LoadLicense();
-        if (loadResult.IsFailure)
-        {
-            new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText("Failed to load game data")
-                .SetInfoText(loadResult.Error.Message)
-                .Show();
-            return;
-        }
-
-        _currentUserIndex = 0; // Just in case you have current user set as 4. and you change to a region where there are only 3 users.
-        SetUserAsPrimary();
-        SwapMii(0);
-        UpdatePage();
-        var layout = ViewUtils.GetLayout();
-        layout.UpdateFriendCount();
-        layout.UpdateSidebarProfile();
     }
 
     private void LicensePeeker_OnClick(object? sender, RoutedEventArgs e)
