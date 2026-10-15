@@ -168,6 +168,11 @@ public sealed class RecompDolphinDataService(
 
     private OperationResult ApplyNandRoot(string? nandFolderPath)
     {
+        // Sharing Dolphin's NAND while Dolphin's folder is out of reach (an unplugged drive): this runs before every
+        // launch now, and dropping the key would start the runtime on a new empty NAND instead of the shared one.
+        if (nandFolderPath is null && IsSharingEnabled)
+            return Ok();
+
         if (nandFolderPath is null)
         {
             recompSettings.RemoveTomlSetting(paths.ConfigFilePath, "paths", "nand_root");

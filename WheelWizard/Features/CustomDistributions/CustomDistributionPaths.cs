@@ -91,8 +91,11 @@ public sealed class CustomDistributionPaths(IApplicationDataLocation application
     {
         get
         {
+            // Nothing usable is set. That only rules a legacy install out when nothing is configured at all: a
+            // Dolphin or Load folder that was chosen but is not reachable right now (an unplugged drive) may hold it.
             if (LegacyRootFolderPath is null)
-                return true;
+                return string.IsNullOrWhiteSpace(dolphin.ConfiguredUserFolderPath)
+                    && string.IsNullOrWhiteSpace(dolphin.ConfiguredLoadFolderPath);
             // A custom Load folder that is configured but missing falls back to the user folder's Load folder,
             // which would wrongly look empty.
             if (!dolphin.HasCustomLoadFolder && !string.IsNullOrWhiteSpace(dolphin.ConfiguredLoadFolderPath))

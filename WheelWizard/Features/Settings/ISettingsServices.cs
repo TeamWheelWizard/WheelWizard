@@ -8,6 +8,9 @@ public interface IWhWzSettingManager
     void RegisterSetting(IWhWzSetting setting);
     void SaveSettings(string configPath, IWhWzSetting invokingSetting);
     void LoadSettings(string configPath);
+
+    /// <summary>The settings file exists but could not be read, so what the user had in it is unknown (and it is left untouched).</summary>
+    bool HadLoadError { get; }
 }
 
 public interface IDolphinSettingManager
@@ -87,6 +90,9 @@ public interface ISettingsManager : ISettingsProperties
     /// flag can never activate recomp behavior on a platform the recomp does not run on.
     /// </summary>
     bool IsRecompModeActive();
+
+    /// <summary>The settings file exists but could not be read; every setting is at its default and says nothing about the user.</summary>
+    bool SettingsFileUnreadable { get; }
 
     void LoadSettings();
 }

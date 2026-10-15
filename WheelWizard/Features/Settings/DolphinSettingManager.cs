@@ -85,7 +85,11 @@ public class DolphinSettingManager(IFileSystem fileSystem) : IDolphinSettingMana
                 {
                     var value = ReadValue(lines, setting.Section, setting.Name);
                     if (value == null || !setting.SetFromString(value, skipSave: true))
+                    {
                         setting.Reset(skipSave: true);
+                        if (value != null)
+                            setting.RememberUnavailable(value);
+                    }
                 }
             }
             _loaded = true;

@@ -35,6 +35,16 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
     public T Value { get; protected set; } = defaultValue;
     protected bool SaveEvenIfNotValid { get; private set; }
     private Func<T, bool>? _validation;
+    private bool _retainsUnavailable;
+
+    /// <summary>
+    /// What was stored for this setting when it was loaded but could not be used then, e.g. a folder on a drive that
+    /// is not connected. It is never the setting's value. It tells that something was configured, and it is what
+    /// gets written back until a new value is set, so an absent drive does not erase the choice.
+    /// </summary>
+    public T? UnavailableValue { get; private set; }
+
+    public bool HasUnavailableValue => UnavailableValue is { } value && !EqualityComparer<T>.Default.Equals(value, DefaultValue);
 
     public T Get() => Value;
 
@@ -42,6 +52,7 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
     {
         ArgumentNullException.ThrowIfNull(newValue);
         SaveError = null;
+        UnavailableValue = default;
         if (EqualityComparer<T>.Default.Equals(Value, newValue))
             return true;
         if (!SaveEvenIfNotValid && _validation?.Invoke(newValue) == false)
@@ -93,5 +104,19 @@ public abstract class Setting<T>(string name, T defaultValue) : Setting(name)
     {
         SaveEvenIfNotValid = enabled;
         return this;
+    }
+
+    /// <summary>Opts in to <see cref="UnavailableValue"/>; meant for settings that point at something outside the app.</summary>
+    public Setting<T> SetRetainUnavailable()
+    {
+        _retainsUnavailable = true;
+        return this;
+    }
+
+    /// <summary>For the loaders, right after a stored value was rejected and the default put in its place.</summary>
+    public void KeepUnavailable(T value)
+    {
+        if (_retainsUnavailable)
+            UnavailableValue = value;
     }
 }

@@ -105,10 +105,14 @@ public sealed class OnboardingService(
     private IRecompInstallService? RecompInstall => services.GetService<IRecompInstallService>();
     private IRecompDolphinDataService? RecompData => services.GetService<IRecompDolphinDataService>();
 
-    public bool IsRequired => !settings.Get(settings.ONBOARDING_COMPLETED) && !WasSetUpBefore() && !IsSetupUsable();
+    // A settings file that could not be read says nothing about the user, and nothing could be saved over it anyway.
+    public bool IsRequired =>
+        !settings.SettingsFileUnreadable && !settings.Get(settings.ONBOARDING_COMPLETED) && !WasSetUpBefore() && !IsSetupUsable();
 
     public void MarkCompletedIfAlreadySetUp()
     {
+        if (settings.SettingsFileUnreadable)
+            return;
         if (!settings.Get(settings.ONBOARDING_COMPLETED) && (WasSetUpBefore() || IsSetupUsable()))
             settings.Set(settings.ONBOARDING_COMPLETED, true);
     }
@@ -119,9 +123,11 @@ public sealed class OnboardingService(
     /// </summary>
     private bool WasSetUpBefore() => IsSet(settings.DOLPHIN_LOCATION) || IsSet(settings.USER_FOLDER_PATH) || IsSet(settings.GAME_LOCATION);
 
-    // The Flatpak defaults the Dolphin location to its bundled wrapper, which nobody picked.
+    // The Flatpak defaults the Dolphin location to its bundled wrapper, which nobody picked. A path that was
+    // picked but is not there today (a drive that is not plugged in) is not loaded as a value, yet it counts.
     private bool IsSet(Setting<string> setting) =>
-        settings.Get(setting) is { } value && !string.IsNullOrWhiteSpace(value) && value != setting.DefaultValue;
+        (settings.Get(setting) is { } value && !string.IsNullOrWhiteSpace(value) && value != setting.DefaultValue)
+        || setting.HasUnavailableValue;
 
     private bool IsSetupUsable()
     {

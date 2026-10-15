@@ -89,7 +89,8 @@ public class SettingsManager : ISettingsManager, IDisposable
                 }
 
                 return _fileSystem.File.Exists(pathOrCommand);
-            }
+            },
+            retainUnavailable: true
         );
 
         USER_FOLDER_PATH = RegisterWhWz(
@@ -204,10 +205,11 @@ public class SettingsManager : ISettingsManager, IDisposable
                 }
 
                 return true;
-            }
+            },
+            retainUnavailable: true
         );
 
-        GAME_LOCATION = RegisterWhWz("GameLocation", "", value => _fileSystem.File.Exists(value));
+        GAME_LOCATION = RegisterWhWz("GameLocation", "", value => _fileSystem.File.Exists(value), retainUnavailable: true);
         // Wheel Wizard installed this Dolphin into its own data folder (or, on native Linux, as a user Flatpak).
         // While set, the Dolphin location and user folder are derived from the data folder on every start.
         DOLPHIN_MANAGED = RegisterWhWz("DolphinManaged", false);
@@ -230,7 +232,12 @@ public class SettingsManager : ISettingsManager, IDisposable
         #region Dolphin settings
         NAND_ROOT_PATH = RegisterDolphin(("Dolphin.ini", "General", "NANDRootPath"), "", value => _fileSystem.Directory.Exists(value));
 
-        LOAD_PATH = RegisterDolphin(("Dolphin.ini", "General", "LoadPath"), "", value => _fileSystem.Directory.Exists(value));
+        LOAD_PATH = RegisterDolphin(
+            ("Dolphin.ini", "General", "LoadPath"),
+            "",
+            value => _fileSystem.Directory.Exists(value),
+            retainUnavailable: true
+        );
 
         VSYNC = RegisterDolphin(("GFX.ini", "Hardware", "VSync"), false);
         INTERNAL_RESOLUTION = RegisterDolphin(("GFX.ini", "Settings", "InternalResolution"), 1, value => value >= 0);
@@ -392,6 +399,8 @@ public class SettingsManager : ISettingsManager, IDisposable
 
     private OperationResult<SettingsValidationReport> ValidateDolphinPathSettings() => ValidatePathSettings(requireDolphin: true);
 
+    public bool SettingsFileUnreadable => _whWzSettingManager.HadLoadError;
+
     public bool IsRecompModeActive() => RecompPlatform.IsSupported && Get<bool>(ENABLE_RECOMP);
 
     private OperationResult<SettingsValidationReport> ValidatePathSettings(bool requireDolphin)
@@ -429,16 +438,19 @@ public class SettingsManager : ISettingsManager, IDisposable
             return;
 
         _whWzSettingManager.LoadSettings(_fileSystem.Path.Combine(_applicationData.DirectoryPath, "config.json"));
-        _dolphinSettingManager.LoadSettings(
-            _dolphinPaths.Resolve(Get<string>(DOLPHIN_LOCATION), Get<string>(USER_FOLDER_PATH)).ConfigFolderPath
-        );
+        // Where Dolphin keeps its config can depend on which Dolphin it is (Linux splits it from the data folder). A
+        // Dolphin that is not there today still says where its Dolphin.ini is, and the Load folder is written in it.
+        var dolphinLocation = Get<string>(DOLPHIN_LOCATION);
+        if (string.IsNullOrWhiteSpace(dolphinLocation))
+            dolphinLocation = DOLPHIN_LOCATION.UnavailableValue ?? "";
+        _dolphinSettingManager.LoadSettings(_dolphinPaths.Resolve(dolphinLocation, Get<string>(USER_FOLDER_PATH)).ConfigFolderPath);
         _recompSettingManager.LoadSettings(_recompPaths.ConfigFilePath);
         _hasLoadedSettings = true;
     }
     #endregion
 
     #region Registration Helpers
-    private WhWzSetting<T> RegisterWhWz<T>(string name, T defaultValue, Func<T, bool>? validation = null)
+    private WhWzSetting<T> RegisterWhWz<T>(string name, T defaultValue, Func<T, bool>? validation = null, bool retainUnavailable = false)
     {
         var setting = new WhWzSetting<T>(
             name,
@@ -447,13 +459,20 @@ public class SettingsManager : ISettingsManager, IDisposable
         );
         if (validation != null)
             setting.SetValidation(validation);
+        if (retainUnavailable)
+            setting.SetRetainUnavailable();
 
         _whWzSettingManager.RegisterSetting(setting);
         _ownedSettings.Add(setting);
         return setting;
     }
 
-    private DolphinSetting<T> RegisterDolphin<T>((string, string, string) location, T defaultValue, Func<T, bool>? validation = null)
+    private DolphinSetting<T> RegisterDolphin<T>(
+        (string, string, string) location,
+        T defaultValue,
+        Func<T, bool>? validation = null,
+        bool retainUnavailable = false
+    )
     {
         var setting = new DolphinSetting<T>(
             location,
@@ -466,6 +485,8 @@ public class SettingsManager : ISettingsManager, IDisposable
         );
         if (validation != null)
             setting.SetValidation(validation);
+        if (retainUnavailable)
+            setting.SetRetainUnavailable();
 
         _dolphinSettingManager.RegisterSetting(setting);
         _ownedSettings.Add(setting);
