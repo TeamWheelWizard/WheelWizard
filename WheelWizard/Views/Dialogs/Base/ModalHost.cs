@@ -203,7 +203,7 @@ public sealed class ModalHost : Grid
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        // Overlays must not contribute to SizeToContent on the two retained native mod windows.
+        // Overlays must not contribute to SizeToContent on the retained native mod browser.
         var size = new Size(
             double.IsFinite(availableSize.Width) ? availableSize.Width : _owner.ClientSize.Width,
             double.IsFinite(availableSize.Height) ? availableSize.Height : _owner.ClientSize.Height

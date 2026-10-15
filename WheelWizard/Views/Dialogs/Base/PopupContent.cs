@@ -29,7 +29,7 @@ public abstract class PopupContent : UserControl
     private double? _preferredContentWidth;
     private double? _preferredMinHeight;
 
-    // Only the mod browser and mod viewer opt into native hosting.
+    // Only the mod browser opts into native hosting.
     protected PopupWindow Window => _window ??= CreateNativeWindow();
 
     public string PopupTitle

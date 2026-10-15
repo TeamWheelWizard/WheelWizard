@@ -6,7 +6,6 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NSubstitute;
 using WheelWizard.GameBanana;
-using WheelWizard.GameBanana.Domain;
 using WheelWizard.Mods;
 using WheelWizard.Mods.Views.Dialogs;
 using WheelWizard.Shared;
@@ -50,7 +49,9 @@ public class ModInstallOwnerLifetimeTests
                 return finished.Task;
             });
         var content = new ModContent(manager, gameBanana, downloads, Substitute.For<IGameBananaMediaService>(), paths, presentation);
-        typeof(ModContent).GetProperty("CurrentMod", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(content, CreateMod());
+        var mod = ModTestFixture.CreateMod(123, "Test mod");
+        mod.Files = [new() { FileName = "mod.zip", DownloadUrl = "https://example.com/mod.zip" }];
+        typeof(ModContent).GetProperty("CurrentMod", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(content, mod);
         var owner = new PopupWindow(true, false, false, "Mod viewer");
         owner.FindControl<ContentPresenter>("PopupContent")!.Content = content;
         owner.Show();
@@ -98,33 +99,4 @@ public class ModInstallOwnerLifetimeTests
                 Directory.Delete(directory, true);
         }
     }
-
-    private static GameBananaModDetails CreateMod() =>
-        new()
-        {
-            Id = 123,
-            Name = "Test mod",
-            Version = "1",
-            ProfileUrl = "https://example.com/mod",
-            LikeCount = 0,
-            ViewCount = 0,
-            DateAdded = 0,
-            DateModified = 0,
-            IsObsolete = false,
-            Author = new GameBananaAuthor { Name = "Author", ProfileUrl = "https://example.com/author" },
-            Game = new GameBananaGame
-            {
-                Name = "Mario Kart Wii",
-                ProfileUrl = "https://example.com/game",
-                IconUrl = "",
-            },
-            Category = new GameBananaCategory { Name = "Maps", ProfileUrl = "https://example.com/maps" },
-            Text = "Test mod",
-            License = "",
-            DownloadCount = 0,
-            Files = new List<GameBananaModFiles>
-            {
-                new() { FileName = "mod.zip", DownloadUrl = "https://example.com/mod.zip" },
-            },
-        };
 }

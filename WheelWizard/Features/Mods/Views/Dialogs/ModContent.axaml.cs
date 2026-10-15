@@ -1,9 +1,10 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
-using WheelWizard.Mods;
+using WheelWizard.Mods.ViewModels;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.Downloads.Presentation;
 using WheelWizard.Shared.MessageTranslations;
@@ -11,8 +12,6 @@ using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 
 namespace WheelWizard.Mods.Views.Dialogs;
-
-public record ModItem(Bitmap FullImageUrl);
 
 public partial class ModContent : UserControl
 {
@@ -29,6 +28,7 @@ public partial class ModContent : UserControl
     private IModOperationPresentation ModPresentation { get; }
 
     private bool loadingVisual;
+    private CancellationTokenSource? _loadCancellation;
     private GameBananaModDetails? CurrentMod { get; set; }
     private string? OverrideDownloadUrl { get; set; }
 
@@ -50,9 +50,6 @@ public partial class ModContent : UserControl
         InitializeComponent();
         ResetVisibility();
         UnInstallButton.IsVisible = false;
-
-        DescriptionLabel.Text = t("attribute.description") + ":";
-        ImageLabel.Text = t("attribute.images") + ":";
     }
 
     private void ResetVisibility()
@@ -87,91 +84,153 @@ public partial class ModContent : UserControl
     /// <param name="cancellationToken">Cancellation token to cancel the loading of the current details.</param>
     public async Task<bool> LoadModDetailsAsync(int ModId, string? newDownloadUrl = null, CancellationToken cancellationToken = default)
     {
-        // Check if cancellation has been requested before starting
-        if (cancellationToken.IsCancellationRequested)
-            return false;
-        // Set the UI to show loading state
+        _loadCancellation?.Cancel();
+        using var load = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _loadCancellation = load;
+        var token = load.Token;
         loadingVisual = true;
+        CurrentMod = null;
+        ModTitle.Text = t("state.loading");
+        ReleaseImages();
         ResetVisibility();
-
-        // Retrieve the mod details.
-        // If GameBananaSearchHandler.GetModDetailsAsync supports cancellation,
-        // consider passing the token as a parameter.
-        var modDetailsResult = await GameBananaService.GetModDetails(ModId);
-        if (cancellationToken.IsCancellationRequested)
-            return false;
-
-        if (modDetailsResult.IsFailure)
+        try
         {
-            CurrentMod = null;
-            OverrideDownloadUrl = null;
-            NoDetailsView.Title = t("message_error.failed_retrieve_mod.title");
-            NoDetailsView.BodyText = modDetailsResult.Error.Message;
+            token.ThrowIfCancellationRequested();
+            var modDetailsResult = await GameBananaService.GetModDetails(ModId);
+            token.ThrowIfCancellationRequested();
+            if (modDetailsResult.IsFailure)
+            {
+                OverrideDownloadUrl = null;
+                NoDetailsView.Title = t("message_error.failed_retrieve_mod.title");
+                NoDetailsView.BodyText = modDetailsResult.Error.Message;
+                return false;
+            }
 
+            CurrentMod = modDetailsResult.Value;
+            ModTitle.Text = CurrentMod.Name;
+            AuthorName.Text = CurrentMod.Author.Name;
+            GameName.Text = CurrentMod.Game.Name;
+            CategoryBadge.Text = CurrentMod.Category.Name;
+            CategoryBadge.IsVisible = !string.IsNullOrWhiteSpace(CurrentMod.Category.Name);
+            VersionBadge.Text = CurrentMod.Version;
+            VersionBadge.IsVisible = !string.IsNullOrWhiteSpace(CurrentMod.Version);
+            LikesCountBox.Text = CurrentMod.LikeCount.ToString();
+            ViewsCountBox.Text = CurrentMod.ViewCount.ToString();
+            DownloadsCountBox.Text = CurrentMod.DownloadCount.ToString();
+            ModDescriptionHtmlPanel.Text = $"<body>{CurrentMod.Text}</body>";
+            OverrideDownloadUrl = newDownloadUrl;
+            UpdateDownloadButtonState(ModId);
+            DetailsScroll.Offset = default;
+
+            // Details and actions are usable while the gallery loads.
             loadingVisual = false;
             ResetVisibility();
-            return false;
-        }
+            var images = CurrentMod.PreviewMedia?.Images;
+            if (images == null || images.Count == 0)
+                return true;
 
-        CurrentMod = modDetailsResult.Value;
+            ImagesSection.IsVisible = true;
+            ImagesLoading.IsVisible = true;
+            foreach (var _ in images)
+                ImageCarousel.Items.Add(new ModScreenshotViewModel($"{t("attribute.images")} {ImageCarousel.Items.Count + 1}"));
+            ImageCarousel.SelectedIndex = 0;
+            UpdateGallerySelection();
+            for (var i = 0; i < images.Count; i++)
+            {
+                var image = images[i];
+                var screenshot = (ModScreenshotViewModel)ImageCarousel.Items[i]!;
+                token.ThrowIfCancellationRequested();
+                var imageResult = await Media.GetImageAsync($"{image.BaseUrl}/{image.File}", token);
+                token.ThrowIfCancellationRequested();
+                if (imageResult.IsFailure)
+                {
+                    screenshot.Complete(null);
+                    UpdateGallerySelection();
+                    continue;
+                }
 
-        // Update the UI with mod details
-        ModTitle.Text = CurrentMod.Name;
-        AuthorButton.Text = CurrentMod.Author.Name;
-        LikesCountBox.Text = CurrentMod.LikeCount.ToString();
-        ViewsCountBox.Text = CurrentMod.ViewCount.ToString();
-        DownloadsCountBox.Text = CurrentMod.DownloadCount.ToString();
-
-        // Wrap the mod description in a div tag so that CSS can be applied
-        ModDescriptionHtmlPanel.Text = $"<body>{CurrentMod.Text}</body>";
-        OverrideDownloadUrl = newDownloadUrl;
-        UpdateDownloadButtonState(ModId);
-
-        // Clear any previous images and reset banner visibility
-        ImageCarousel.Items.Clear();
-        BannerImage.IsVisible = false;
-
-        // If there are no images to load, finish up early
-        if (CurrentMod.PreviewMedia?.Images == null || !CurrentMod.PreviewMedia.Images.Any())
-        {
-            loadingVisual = false;
-            ResetVisibility();
+                Bitmap bitmap;
+                try
+                {
+                    using var stream = new MemoryStream(imageResult.Value, writable: false);
+                    bitmap = new Bitmap(stream);
+                }
+                catch (ArgumentException)
+                {
+                    // A bad remote image must not prevent viewing or installing the mod.
+                    screenshot.Complete(null);
+                    UpdateGallerySelection();
+                    continue;
+                }
+                screenshot.Complete(bitmap);
+                UpdateGallerySelection();
+            }
             return true;
         }
-
-        // Load images sequentially
-        foreach (var image in CurrentMod.PreviewMedia.Images)
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-            if (cancellationToken.IsCancellationRequested)
-                return false;
-
-            var fullImageUrl = $"{image.BaseUrl}/{image.File}";
-
-            var imageResult = await Media.GetImageAsync(fullImageUrl, cancellationToken);
-            if (imageResult.IsFailure)
-                continue;
-
-            using var memoryStream = new MemoryStream(imageResult.Value, writable: false);
-
-            // Create a bitmap from the memory stream
-            var bitmap = new Bitmap(memoryStream);
-
-            // Add the bitmap to the image carousel
-            ImageCarousel.Items.Add(new ModItem(bitmap));
-
-            // Set the first loaded image as the banner if not already set
-            if (BannerImage.IsVisible)
-                continue;
-
-            BannerImage.IsVisible = true;
-            BannerImage.Source = bitmap;
+            return false;
         }
+        finally
+        {
+            if (ReferenceEquals(_loadCancellation, load))
+            {
+                _loadCancellation = null;
+                loadingVisual = false;
+                ImagesLoading.IsVisible = false;
+                ImagesSection.IsVisible = ImageCarousel.Items.Count > 0;
+                ResetVisibility();
+            }
+        }
+    }
 
-        // Reset the loading state once all operations have completed
-        loadingVisual = false;
-        ResetVisibility();
+    private void ImageCarousel_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        UpdateGallerySelection();
+        if (ImageCarousel.SelectedIndex >= 0)
+            ImageCarousel.ScrollIntoView(ImageCarousel.SelectedIndex);
+    }
 
-        return true;
+    // Reveal thumbnails within their strip without scrolling the whole details page.
+    private void ImageCarousel_RequestBringIntoView(object? sender, RequestBringIntoViewEventArgs e) => e.Handled = true;
+
+    private void PreviousImage_Click(object? sender, RoutedEventArgs e) => ImageCarousel.SelectedIndex--;
+
+    private void NextImage_Click(object? sender, RoutedEventArgs e) => ImageCarousel.SelectedIndex++;
+
+    private void UpdateGallerySelection()
+    {
+        var index = ImageCarousel.SelectedIndex;
+        var count = ImageCarousel.Items.Count;
+        var selected = ImageCarousel.SelectedItem as ModScreenshotViewModel;
+        BannerImage.Source = selected?.Image;
+        // Keep the image's natural aspect ratio at the preferred height; XAML caps wide images to the viewport.
+        BannerFrame.Width = selected?.Image is { } image ? image.Size.Width / image.Size.Height * (BannerFrame.Height - 2) + 2 : 464;
+        BannerFrame.IsVisible = selected != null;
+        BannerLoading.IsVisible = selected?.IsLoading == true;
+        BannerUnavailable.IsVisible = selected?.HasFailed == true;
+        ImagePosition.Text = count == 0 ? "" : $"{index + 1} / {count}";
+        PreviousImage.IsEnabled = index > 0;
+        NextImage.IsEnabled = index >= 0 && index < count - 1;
+    }
+
+    private void ReleaseImages()
+    {
+        BannerImage.Source = null;
+        BannerFrame.IsVisible = false;
+        ImagesSection.IsVisible = false;
+        var images = ImageCarousel.Items.OfType<ModScreenshotViewModel>().ToArray();
+        ImageCarousel.Items.Clear();
+        UpdateGallerySelection();
+        foreach (var image in images)
+            image.Dispose();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _loadCancellation?.Cancel();
+        ReleaseImages();
+        base.OnDetachedFromVisualTree(e);
     }
 
     private void UpdateDownloadButtonState(int modId)
@@ -187,9 +246,10 @@ public partial class ModContent : UserControl
     /// </summary>
     private void ClearDetails()
     {
-        ImageCarousel.Items.Clear();
+        _loadCancellation?.Cancel();
+        ReleaseImages();
         ModTitle.Text = string.Empty;
-        AuthorButton.Text = t("state.unknown");
+        AuthorName.Text = t("state.unknown");
         LikesCountBox.Text = ViewsCountBox.Text = DownloadsCountBox.Text = "0";
         ModDescriptionHtmlPanel.Text = string.Empty;
         IsVisible = false;
@@ -205,7 +265,9 @@ public partial class ModContent : UserControl
 
         using var lifetime = new CancellationTokenSource();
         void OwnerClosed(object? sender, EventArgs e) => lifetime.Cancel();
+        void ViewerDetached(object? sender, VisualTreeAttachmentEventArgs e) => lifetime.Cancel();
         owner.Closed += OwnerClosed;
+        DetachedFromVisualTree += ViewerDetached;
         try
         {
             var question = new YesNoWindow().SetMainText(t("question.install_mod.title", new { modName = mod.Name }) ?? mod.Name);
@@ -240,6 +302,7 @@ public partial class ModContent : UserControl
         finally
         {
             owner.Closed -= OwnerClosed;
+            DetachedFromVisualTree -= ViewerDetached;
         }
     }
 
@@ -407,6 +470,12 @@ public partial class ModContent : UserControl
         var profileUrl = CurrentMod?.Author.ProfileUrl;
         if (profileUrl != null)
             ViewUtils.OpenLink(profileUrl);
+    }
+
+    private void GameLink_Click(object? sender, RoutedEventArgs e)
+    {
+        if (CurrentMod?.Game.ProfileUrl is { } url)
+            ViewUtils.OpenLink(url);
     }
 
     private void GameBananaLink_Click(object? sender, RoutedEventArgs eventArgs)

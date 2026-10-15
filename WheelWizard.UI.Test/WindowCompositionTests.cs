@@ -86,22 +86,15 @@ public class WindowCompositionTests
     {
         var environment = Substitute.For<IRuntimeEnvironment>();
         environment.IsLinux.Returns(true);
-        var popup = new TestWindow { Width = 656, Height = 876 };
+        using var popup = new TestWindow { Width = 656, Height = 876 };
         popup.Show();
-        try
-        {
-            await new UpdatePresentation(environment).ShowManualUpdateAsync("2.0.0", "1.0.0");
-            var content = Assert.IsType<MessageBoxWindow>(popup.Modals.TopModal);
-            Assert.Contains("through your package manager", content.FindControl<SelectableTextBlock>("MessageInformationBlock")!.Text);
-            Assert.Equal(
-                "https://github.com/TeamWheelWizard/WheelWizard/releases",
-                content.FindControl<WheelWizard.Views.Components.ActionButton>("MessageLink")!.Text
-            );
-        }
-        finally
-        {
-            popup?.Close();
-        }
+        await new UpdatePresentation(environment).ShowManualUpdateAsync("2.0.0", "1.0.0");
+        var content = Assert.IsType<MessageBoxWindow>(popup.Modals.TopModal);
+        Assert.Contains("through your package manager", content.FindControl<SelectableTextBlock>("MessageInformationBlock")!.Text);
+        Assert.Equal(
+            "https://github.com/TeamWheelWizard/WheelWizard/releases",
+            content.FindControl<WheelWizard.Views.Components.ActionButton>("MessageLink")!.Text
+        );
     }
 
     [AvaloniaFact]
@@ -142,37 +135,30 @@ public class WindowCompositionTests
     {
         var button = new WheelWizard.Views.Shell.Controls.SidebarRadioButton { Text = "My Miis" };
         var host = new Border { Child = button, Width = 221 };
-        var window = new Window
+        using var window = new UiTestWindow
         {
             Content = host,
             Width = 221,
             Height = 46,
         };
-        try
+        window.Show();
+        for (var cycle = 0; cycle < 3; cycle++)
         {
-            window.Show();
-            for (var cycle = 0; cycle < 3; cycle++)
-            {
-                button.Classes.Set("compact", true);
-                host.Width = 64;
-                window.UpdateLayout();
-                Assert.Equal(64, button.Bounds.Width);
-                var label = button.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "PART_Label");
-                Assert.Equal(0, label.Opacity);
-                host.Child = null;
-                host.Child = button;
-                button.Text = $"My Miis {cycle}";
-                button.Classes.Set("compact", false);
-                host.Width = 221;
-                window.UpdateLayout();
-                label = button.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "PART_Label");
-                Assert.Equal(1, label.Opacity);
-                Assert.Equal(button.Text, label.Text);
-            }
-        }
-        finally
-        {
-            window.Close();
+            button.Classes.Set("compact", true);
+            host.Width = 64;
+            window.UpdateLayout();
+            Assert.Equal(64, button.Bounds.Width);
+            var label = button.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "PART_Label");
+            Assert.Equal(0, label.Opacity);
+            host.Child = null;
+            host.Child = button;
+            button.Text = $"My Miis {cycle}";
+            button.Classes.Set("compact", false);
+            host.Width = 221;
+            window.UpdateLayout();
+            label = button.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "PART_Label");
+            Assert.Equal(1, label.Opacity);
+            Assert.Equal(button.Text, label.Text);
         }
     }
 
@@ -194,30 +180,23 @@ public class WindowCompositionTests
             Width = 415,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
         };
-        var window = new Window
+        using var window = new UiTestWindow
         {
             Content = host,
             Width = 572,
             Height = 700,
         };
-        try
+        window.Show();
+        window.UpdateLayout();
+        var content = page.FindControl<ContentControl>("SettingsContent")!;
+        var position = content.TranslatePoint(default, window);
+        var size = content.Bounds.Size;
+        foreach (var width in new[] { 415.0, 430.0, 480.0, 540.0, 572.0 })
         {
-            window.Show();
+            host.Width = width;
             window.UpdateLayout();
-            var content = page.FindControl<ContentControl>("SettingsContent")!;
-            var position = content.TranslatePoint(default, window);
-            var size = content.Bounds.Size;
-            foreach (var width in new[] { 415.0, 430.0, 480.0, 540.0, 572.0 })
-            {
-                host.Width = width;
-                window.UpdateLayout();
-                Assert.Equal(position, content.TranslatePoint(default, window));
-                Assert.Equal(size, content.Bounds.Size);
-            }
-        }
-        finally
-        {
-            window.Close();
+            Assert.Equal(position, content.TranslatePoint(default, window));
+            Assert.Equal(size, content.Bounds.Size);
         }
     }
 
@@ -225,44 +204,37 @@ public class WindowCompositionTests
     public async Task ProgressDismissal_DoesNotCancelButExplicitCancelDoes()
     {
         using var cancellation = new CancellationTokenSource();
-        var owner = new TestWindow { Width = 656, Height = 876 };
+        using var owner = new TestWindow { Width = 656, Height = 876 };
         owner.Show();
         var content = new ProgressWindow("Download").SetCancellationTokenSource(cancellation);
-        try
-        {
-            var closed = content.ShowDialog();
-            owner.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-            Assert.Same(owner, TopLevel.GetTopLevel(content));
-            owner.KeyPress(Avalonia.Input.Key.Escape, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.Escape, null);
-            owner.MouseDown(new Point(5, 50), Avalonia.Input.MouseButton.Left);
-            owner.MouseUp(new Point(5, 50), Avalonia.Input.MouseButton.Left);
-            Assert.False(cancellation.IsCancellationRequested);
-            Assert.Same(content, owner.Modals.TopModal);
-            var cancel = content.FindControl<WheelWizard.Views.Components.ActionButton>("CancelButton")!;
-            var point = cancel.TranslatePoint(new Point(cancel.Bounds.Width / 2, cancel.Bounds.Height / 2), owner)!.Value;
-            owner.MouseDown(point, Avalonia.Input.MouseButton.Left);
-            owner.MouseUp(point, Avalonia.Input.MouseButton.Left);
-            Assert.True(cancellation.IsCancellationRequested);
-            Assert.True(content.WasCancellationRequested);
-            Assert.Same(content, owner.Modals.TopModal);
-            content.Close();
-            await closed.WaitAsync(TimeSpan.FromSeconds(2));
-            Assert.True(owner.CanInteract);
-        }
-        finally
-        {
-            owner.Close();
-        }
+        var closed = content.ShowDialog();
+        owner.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Same(owner, TopLevel.GetTopLevel(content));
+        owner.KeyPress(Avalonia.Input.Key.Escape, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.Escape, null);
+        owner.MouseDown(new Point(5, 50), Avalonia.Input.MouseButton.Left);
+        owner.MouseUp(new Point(5, 50), Avalonia.Input.MouseButton.Left);
+        Assert.False(cancellation.IsCancellationRequested);
+        Assert.Same(content, owner.Modals.TopModal);
+        var cancel = content.FindControl<WheelWizard.Views.Components.ActionButton>("CancelButton")!;
+        var point = cancel.TranslatePoint(new Point(cancel.Bounds.Width / 2, cancel.Bounds.Height / 2), owner)!.Value;
+        owner.MouseDown(point, Avalonia.Input.MouseButton.Left);
+        owner.MouseUp(point, Avalonia.Input.MouseButton.Left);
+        Assert.True(cancellation.IsCancellationRequested);
+        Assert.True(content.WasCancellationRequested);
+        Assert.Same(content, owner.Modals.TopModal);
+        content.Close();
+        await closed.WaitAsync(TimeSpan.FromSeconds(2));
+        Assert.True(owner.CanInteract);
     }
 
     [AvaloniaFact]
     public void OwnedPopups_DisableOnlyTheirWindowGroup_AndRestoreInteraction()
     {
-        var first = new TestWindow();
-        var second = new TestWindow();
-        var popup = new TestWindow();
-        var nested = new TestWindow();
+        using var first = new TestWindow();
+        using var second = new TestWindow();
+        using var popup = new TestWindow();
+        using var nested = new TestWindow();
         try
         {
             first.Show();
@@ -294,7 +266,7 @@ public class WindowCompositionTests
     [InlineData(true)]
     public void PopupShow_PreservesOwnershipAndClosesWithItsOwner(bool allowParentInteraction)
     {
-        var owner = new TestWindow();
+        using var owner = new TestWindow();
         owner.Show();
         var popup = new OwnedPopup(owner, allowParentInteraction);
         try
@@ -405,7 +377,7 @@ public class WindowCompositionTests
     [AvaloniaFact]
     public void DisabledWindows_RejectNativeCloseButAllowCompletionAndShutdown()
     {
-        var main = new TestWindow();
+        using var main = new TestWindow();
         var popup = new ClosingPopup { CanClose = true };
         (BaseWindow Window, Action<WindowClosingEventArgs> RequestClose)[] windows =
         [
@@ -476,34 +448,27 @@ public class WindowCompositionTests
     public void MessagePopup_GrowsForLateContentWithoutEnlargingItsTitle()
     {
         var content = new MessageBoxWindow().SetTitleText("A stable title").SetInfoText("Loading...");
-        var owner = new TestWindow { Width = 656, Height = 876 };
+        using var owner = new TestWindow { Width = 656, Height = 876 };
         owner.Show();
-        try
-        {
-            content.Show();
-            var popup = Assert.IsType<TestWindow>(TopLevel.GetTopLevel(content));
-            popup.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-            var initialSize = content.Bounds.Size;
-            var title = content.FindControl<SelectableTextBlock>("MessageTitleBlock")!;
-            var titleSize = title.Bounds.Size;
-            var titleFontSize = title.FontSize;
+        content.Show();
+        var popup = Assert.IsType<TestWindow>(TopLevel.GetTopLevel(content));
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        var initialSize = content.Bounds.Size;
+        var title = content.FindControl<SelectableTextBlock>("MessageTitleBlock")!;
+        var titleSize = title.Bounds.Size;
+        var titleFontSize = title.FontSize;
 
-            content.SetInfoText(string.Join("\n", Enumerable.Repeat("Information loaded after opening.", 15)));
-            popup.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
+        content.SetInfoText(string.Join("\n", Enumerable.Repeat("Information loaded after opening.", 15)));
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
 
-            Assert.True(content.Bounds.Height > initialSize.Height);
-            Assert.Equal(initialSize.Width, content.Bounds.Width);
-            Assert.Equal(titleSize, title.Bounds.Size);
-            Assert.Equal(titleFontSize, title.FontSize);
-            foreach (var button in content.GetVisualDescendants().OfType<Button>())
-                AssertInsideWindow(button, popup);
-        }
-        finally
-        {
-            owner.Close();
-        }
+        Assert.True(content.Bounds.Height > initialSize.Height);
+        Assert.Equal(initialSize.Width, content.Bounds.Width);
+        Assert.Equal(titleSize, title.Bounds.Size);
+        Assert.Equal(titleFontSize, title.FontSize);
+        foreach (var button in content.GetVisualDescendants().OfType<Button>())
+            AssertInsideWindow(button, popup);
     }
 
     private static void AssertInsideWindow(Control control, Window popup)
@@ -531,73 +496,66 @@ public class WindowCompositionTests
             if (e.PropertyName == nameof(content.IsLoading) && !content.IsLoading)
                 loaded.TrySetResult();
         };
-        var owner = new TestWindow { Width = 656, Height = 876 };
+        using var owner = new TestWindow { Width = 656, Height = 876 };
         owner.Show();
-        try
-        {
-            content.Show();
-            var popup = Assert.IsType<TestWindow>(TopLevel.GetTopLevel(content));
-            popup.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-            var initialWidth = popup.ClientSize.Width;
-            Assert.True(content.IsLoading);
+        content.Show();
+        var popup = Assert.IsType<TestWindow>(TopLevel.GetTopLevel(content));
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        var initialWidth = popup.ClientSize.Width;
+        Assert.True(content.IsLoading);
 
-            profileReady.SetResult(
-                new PlayerProfileResponse
-                {
-                    Name = "Profile layout test",
-                    FriendCode = "1234-5678-9012",
-                    LastSeen = DateTime.UtcNow,
-                    Vr = 12000,
-                    Rank = 42,
-                }
-            );
-            await loaded.Task.WaitAsync(TimeSpan.FromSeconds(3));
-            popup.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-            var title = content.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Text == "Profile layout test");
-            var titleSize = title.Bounds.Size;
-            Assert.Equal(20, title.FontSize);
-            Assert.Equal(initialWidth, popup.ClientSize.Width);
-            AssertInsideWindow(title, popup);
+        profileReady.SetResult(
+            new PlayerProfileResponse
+            {
+                Name = "Profile layout test",
+                FriendCode = "1234-5678-9012",
+                LastSeen = DateTime.UtcNow,
+                Vr = 12000,
+                Rank = 42,
+            }
+        );
+        await loaded.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        var title = content.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Text == "Profile layout test");
+        var titleSize = title.Bounds.Size;
+        Assert.Equal(20, title.FontSize);
+        Assert.Equal(initialWidth, popup.ClientSize.Width);
+        AssertInsideWindow(title, popup);
 
-            historyReady.SetResult(
-                new RwfcPlayerVrHistoryResponse
-                {
-                    FromDate = DateTime.UtcNow.AddDays(-1),
-                    ToDate = DateTime.UtcNow,
-                    StartingVr = 11000,
-                    EndingVr = 12000,
-                    TotalVrChange = 1000,
-                    History =
-                    [
-                        new() { Date = DateTime.UtcNow.AddDays(-1), TotalVr = 11000 },
-                        new()
-                        {
-                            Date = DateTime.UtcNow,
-                            TotalVr = 12000,
-                            VrChange = 1000,
-                        },
-                    ],
-                }
-            );
-            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
-            popup.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-            Assert.True(history.HasData);
-            Assert.False(history.IsLoading);
-            Assert.Equal(initialWidth, popup.ClientSize.Width);
-            Assert.Equal(titleSize, title.Bounds.Size);
-            Assert.Equal(20, title.FontSize);
-            AssertInsideWindow(title, popup);
-            AssertInsideWindow(content.GetVisualDescendants().OfType<ScrollViewer>().First(), popup);
-            Assert.Same(content, owner.Modals.TopModal);
-            Assert.False(owner.CanInteract);
-        }
-        finally
-        {
-            owner.Close();
-        }
+        historyReady.SetResult(
+            new RwfcPlayerVrHistoryResponse
+            {
+                FromDate = DateTime.UtcNow.AddDays(-1),
+                ToDate = DateTime.UtcNow,
+                StartingVr = 11000,
+                EndingVr = 12000,
+                TotalVrChange = 1000,
+                History =
+                [
+                    new() { Date = DateTime.UtcNow.AddDays(-1), TotalVr = 11000 },
+                    new()
+                    {
+                        Date = DateTime.UtcNow,
+                        TotalVr = 12000,
+                        VrChange = 1000,
+                    },
+                ],
+            }
+        );
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(history.HasData);
+        Assert.False(history.IsLoading);
+        Assert.Equal(initialWidth, popup.ClientSize.Width);
+        Assert.Equal(titleSize, title.Bounds.Size);
+        Assert.Equal(20, title.FontSize);
+        AssertInsideWindow(title, popup);
+        AssertInsideWindow(content.GetVisualDescendants().OfType<ScrollViewer>().First(), popup);
+        Assert.Same(content, owner.Modals.TopModal);
+        Assert.False(owner.CanInteract);
     }
 
     private sealed class SizedPopup : PopupContent
@@ -650,8 +608,10 @@ public class WindowCompositionTests
         }
     }
 
-    private sealed class TestWindow : BaseWindow
+    private sealed class TestWindow : BaseWindow, IDisposable
     {
+        public void Dispose() => Close();
+
         public void RequestClose(WindowClosingEventArgs args) => OnClosing(args);
 
         private readonly Border _overlay = new();

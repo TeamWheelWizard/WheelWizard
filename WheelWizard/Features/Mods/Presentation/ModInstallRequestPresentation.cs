@@ -9,8 +9,9 @@ public sealed class ModInstallRequestPresentation(IPopupFactory popups) : IModIn
     public async Task ShowModAsync(ModInstallRequest request)
     {
         var popup = popups.Create<ModIndependentWindow>();
+        var closed = popup.ShowDialog();
         await popup.LoadModAsync(request.ModId, request.DownloadUrl);
-        await popup.ShowDialog();
+        await closed;
     }
 
     public void ShowError(string reason) =>

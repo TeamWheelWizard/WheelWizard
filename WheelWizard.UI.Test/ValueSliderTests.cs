@@ -19,32 +19,25 @@ public class ValueSliderTests
             Maximum = 127,
             Value = 64,
         };
-        var window = new Window
+        using var window = new UiTestWindow
         {
             Width = 300,
             Height = 300,
             Content = slider,
         };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            var track = Assert.Single(slider.GetVisualDescendants().OfType<Track>());
-            Assert.Equal(Orientation.Horizontal, track.Orientation);
-            track.Value = 80;
-            Assert.Equal(80, slider.Value);
+        window.Show();
+        window.UpdateLayout();
+        var track = Assert.Single(slider.GetVisualDescendants().OfType<Track>());
+        Assert.Equal(Orientation.Horizontal, track.Orientation);
+        track.Value = 80;
+        Assert.Equal(80, slider.Value);
 
-            slider.Orientation = Orientation.Vertical;
-            slider.Height = 220;
-            window.UpdateLayout();
-            track = Assert.Single(slider.GetVisualDescendants().OfType<Track>());
-            Assert.Equal(Orientation.Vertical, track.Orientation);
-            track.Value = 100;
-            Assert.Equal(100, slider.Value);
-        }
-        finally
-        {
-            window.Close();
-        }
+        slider.Orientation = Orientation.Vertical;
+        slider.Height = 220;
+        window.UpdateLayout();
+        track = Assert.Single(slider.GetVisualDescendants().OfType<Track>());
+        Assert.Equal(Orientation.Vertical, track.Orientation);
+        track.Value = 100;
+        Assert.Equal(100, slider.Value);
     }
 }

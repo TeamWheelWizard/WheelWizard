@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -193,16 +192,11 @@ public partial class ModBrowserWindow : PopupContent, INotifyPropertyChanged
 
     protected override void BeforeClose()
     {
+        // Native hosting reparents the content during opening, so release only on actual close.
         ReleaseResults();
         // Refresh installed mods after closing the browser.
         Navigation.NavigateTo<ModsPage>();
         base.BeforeClose();
-    }
-
-    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        ReleaseResults();
-        base.OnDetachedFromVisualTree(e);
     }
 
     private void ReleaseResults()

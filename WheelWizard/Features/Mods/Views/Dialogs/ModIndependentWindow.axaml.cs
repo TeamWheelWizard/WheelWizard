@@ -11,11 +11,12 @@ public partial class ModIndependentWindow : PopupContent
     private INavigationService Navigation { get; }
 
     public ModIndependentWindow(ModContent modDetailViewer, INavigationService navigation, string windowTitle = "Mod Details")
-        : base(true, false, true, windowTitle, useNativeWindow: true)
+        : base(true, false, true, windowTitle)
     {
         ModDetailViewer = modDetailViewer;
         Navigation = navigation;
         InitializeComponent();
+        IsDismissible = true;
         ModDetailHost.Content = ModDetailViewer;
         if (PopupTitle == "Mod Details")
             PopupTitle = t("popup_title.mod_details");
