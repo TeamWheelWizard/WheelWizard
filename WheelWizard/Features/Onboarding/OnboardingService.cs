@@ -27,6 +27,15 @@ public sealed record DetectedDolphinData(string UserFolderPath, string WiiFolder
 
 public sealed record GameFileCheck(bool IsValid, string Message);
 
+/// <summary>The settings picking a Dolphin or a WiiCompiled NAND writes, as they were before the pick.</summary>
+public sealed record FrontendSettingsSnapshot(
+    string DolphinLocation,
+    string UserFolderPath,
+    bool DolphinManaged,
+    bool RecompSharesDolphinData,
+    bool RecompCopiesDolphinNand
+);
+
 public interface IOnboardingService
 {
     /// <summary>Nothing was ever set up and the onboarding was never finished.</summary>
@@ -63,6 +72,11 @@ public interface IOnboardingService
     bool HasDolphinNandToOffer { get; }
 
     Task<OperationResult> ApplyNandChoiceAsync(RecompNandChoice choice);
+
+    /// <summary>Remembers the settings a frontend path writes, so backing out to the frontend choice can undo that path.</summary>
+    FrontendSettingsSnapshot CaptureFrontendSettings();
+
+    void RestoreFrontendSettings(FrontendSettingsSnapshot snapshot);
 
     /// <summary>Finishes the Dolphin path; Retro Rewind may still be downloading.</summary>
     OperationResult FinishDolphin();
@@ -253,6 +267,34 @@ public sealed class OnboardingService(
     public Task<OperationResult> ApplyNandChoiceAsync(RecompNandChoice choice) =>
         RecompData is { } data ? Task.Run(() => data.ApplyNandChoice(choice)) : Task.FromResult(Ok());
 
+    public FrontendSettingsSnapshot CaptureFrontendSettings() =>
+        new(
+            settings.Get(settings.DOLPHIN_LOCATION),
+            settings.Get(settings.USER_FOLDER_PATH),
+            settings.Get(settings.DOLPHIN_MANAGED),
+            settings.Get(settings.RECOMP_USE_DOLPHIN_DATA),
+            settings.Get(settings.RECOMP_COPY_DOLPHIN_NAND)
+        );
+
+    public void RestoreFrontendSettings(FrontendSettingsSnapshot snapshot)
+    {
+        // The location goes first: whether a user folder is valid depends on the Dolphin it belongs to.
+        Restore(settings.DOLPHIN_LOCATION, snapshot.DolphinLocation);
+        Restore(settings.USER_FOLDER_PATH, snapshot.UserFolderPath);
+        Restore(settings.DOLPHIN_MANAGED, snapshot.DolphinManaged);
+        Restore(settings.RECOMP_USE_DOLPHIN_DATA, snapshot.RecompSharesDolphinData);
+        Restore(settings.RECOMP_COPY_DOLPHIN_NAND, snapshot.RecompCopiesDolphinNand);
+    }
+
+    private void Restore<T>(Setting<T> setting, T value)
+    {
+        // Before the onboarding these are mostly unset, and the path validators reject an empty path.
+        if (EqualityComparer<T>.Default.Equals(value, setting.DefaultValue))
+            setting.Reset();
+        else
+            settings.Set(setting, value);
+    }
+
     public OperationResult FinishDolphin()
     {
         settings.Set(settings.ENABLE_RECOMP, false);
@@ -280,6 +322,8 @@ public sealed class OnboardingService(
         if (paths.IsFailure)
             return paths;
 
+        // Backing out of the install must not finish the onboarding behind the user's back.
+        cancellationToken.ThrowIfCancellationRequested();
         CreateMiiDatabase();
         return Complete();
     }

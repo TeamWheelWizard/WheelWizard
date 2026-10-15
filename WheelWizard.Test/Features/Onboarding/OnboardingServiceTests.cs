@@ -78,6 +78,42 @@ public class OnboardingServiceTests
         Assert.False(fixture.Completed.Get());
     }
 
+    [Fact]
+    public void RestoringFrontendSettings_UndoesAPickedDolphin_EvenToPathsTheValidatorsReject()
+    {
+        // Picking a Dolphin and then backing out to the choice must leave nothing behind, but an empty
+        // location is not a valid one to set while the Dolphin frontend is active.
+        var fixture = new Fixture();
+        var snapshot = fixture.Service.CaptureFrontendSettings();
+        fixture.Location.Set("/managed/Dolphin.exe", skipSave: true);
+        fixture.UserFolder.Set("/managed/User", skipSave: true);
+        fixture.Managed.Set(true, skipSave: true);
+        fixture.ShareNand.Set(true, skipSave: true);
+
+        fixture.Service.RestoreFrontendSettings(snapshot);
+
+        Assert.Equal("", fixture.Location.Get());
+        Assert.Equal("", fixture.UserFolder.Get());
+        Assert.False(fixture.Managed.Get());
+        Assert.False(fixture.ShareNand.Get());
+    }
+
+    [Fact]
+    public void RestoringFrontendSettings_PutsBackValuesThatWereSetBefore()
+    {
+        var fixture = new Fixture();
+        fixture.Location.Set("/own/Dolphin.exe", skipSave: true);
+        fixture.CopyNand.Set(true, skipSave: true);
+        var snapshot = fixture.Service.CaptureFrontendSettings();
+        fixture.Location.Set("/managed/Dolphin.exe", skipSave: true);
+        fixture.CopyNand.Set(false, skipSave: true);
+
+        fixture.Service.RestoreFrontendSettings(snapshot);
+
+        Assert.Equal("/own/Dolphin.exe", fixture.Location.Get());
+        Assert.True(fixture.CopyNand.Get());
+    }
+
     private sealed class Fixture
     {
         public MockFileSystem Fs { get; } = new(options => options.SimulatingOperatingSystem(SimulationMode.Linux));
@@ -87,21 +123,30 @@ public class OnboardingServiceTests
         public WhWzSetting<string> Game { get; }
         public WhWzSetting<string> Location { get; }
         public WhWzSetting<string> UserFolder { get; } = new("UserFolderPath", "");
+        public WhWzSetting<bool> Managed { get; } = new("DolphinManaged", false);
+        public WhWzSetting<bool> ShareNand { get; } = new("RecompUseDolphinData", false);
+        public WhWzSetting<bool> CopyNand { get; } = new("RecompCopyDolphinNand", false);
         public OnboardingService Service { get; }
 
         public Fixture(string defaultLocation = "")
         {
             Game = new WhWzSetting<string>("GameLocation", "").SetValidation(value => Fs.File.Exists(value));
-            Location = new WhWzSetting<string>("DolphinLocation", defaultLocation);
+            Location = new WhWzSetting<string>("DolphinLocation", defaultLocation).SetValidation(value => value.Length > 0);
             Settings.ONBOARDING_COMPLETED.Returns(Completed);
             Settings.GAME_LOCATION.Returns(Game);
             Settings.DOLPHIN_LOCATION.Returns(Location);
             Settings.USER_FOLDER_PATH.Returns(UserFolder);
+            Settings.DOLPHIN_MANAGED.Returns(Managed);
+            Settings.RECOMP_USE_DOLPHIN_DATA.Returns(ShareNand);
+            Settings.RECOMP_COPY_DOLPHIN_NAND.Returns(CopyNand);
             Settings.Get(Arg.Any<Setting<string>>()).Returns(call => call.Arg<Setting<string>>().Get());
             Settings.Get(Arg.Any<Setting<bool>>()).Returns(call => call.Arg<Setting<bool>>().Get());
             Settings
                 .Set(Arg.Any<Setting<bool>>(), Arg.Any<bool>(), Arg.Any<bool>())
                 .Returns(call => call.Arg<Setting<bool>>().Set(call.ArgAt<bool>(1), skipSave: true));
+            Settings
+                .Set(Arg.Any<Setting<string>>(), Arg.Any<string>(), Arg.Any<bool>())
+                .Returns(call => call.Arg<Setting<string>>().Set(call.ArgAt<string>(1), skipSave: true));
 
             Service = new OnboardingService(
                 Settings,

@@ -137,7 +137,11 @@ public sealed class ManagedDolphinService(
         {
             case ManagedDolphinKind.Portable:
                 var install = await InstallPortableAsync(progress, cancellationToken);
-                return install.IsFailure ? install : Activate();
+                if (install.IsFailure)
+                    return install;
+                // The last steps do not stop halfway, so a cancelled install can still complete. Whoever cancelled has
+                // moved on, so it stays installed without taking over the Dolphin settings.
+                return cancellationToken.IsCancellationRequested ? Fail("The Dolphin download was cancelled.") : Activate();
             case ManagedDolphinKind.Flatpak:
                 progress?.Report(new(t("onboarding.dolphin_installing"), 0));
                 var flatpak = await linuxInstaller.InstallFlatpakDolphin(

@@ -62,6 +62,16 @@ public partial class OnboardingPage : UserControl, IBlockingPage
     private string? _gameFile;
     private bool _busy;
 
+    // What the frontend choice looked like, so backing out to it undoes the path taken from there.
+    private FrontendSettingsSnapshot? _choiceSettings;
+
+    // The running install, which Back cancels. A cancelled one may still be unwinding, so the next waits for it.
+    private CancellationTokenSource? _installCancellation;
+    private Task _installRun = Task.CompletedTask;
+
+    // Set while an install is in a part that cannot be stopped halfway (a Flatpak install, WiiCompiled's setup).
+    private volatile bool _installUncancellable;
+
     public OnboardingPage(
         IOnboardingService onboarding,
         IRetroRewindBackgroundInstall retroRewind,
@@ -160,15 +170,33 @@ public partial class OnboardingPage : UserControl, IBlockingPage
         UpdateBackButton();
     }
 
-    private void UpdateBackButton() =>
-        BackButton.IsVisible =
-            !_busy && _history.Count > 0 && _step is not (Step.DolphinInstalling or Step.WiiCompiledInstalling or Step.DolphinImport);
+    // An install is backed out of by cancelling it; other work (detecting, importing, copying) is short.
+    private bool CanGoBack => _history.Count > 0 && (_installCancellation is not null ? !_installUncancellable : !_busy);
 
-    private void Back_OnClick(object? sender, RoutedEventArgs e)
+    private void UpdateBackButton() => BackButton.IsVisible = CanGoBack;
+
+    private void Back_OnClick(object? sender, RoutedEventArgs e) => GoBack();
+
+    private void GoBack()
     {
-        if (_busy || _history.Count == 0)
+        if (!CanGoBack)
             return;
-        Show(_history.Pop());
+
+        if (_installCancellation is { } install)
+        {
+            install.Cancel();
+            _installCancellation = null;
+            SetBusy(false);
+        }
+
+        var step = _history.Pop();
+        if (step == Step.Choice && _choiceSettings is { } settings)
+        {
+            _onboarding.RestoreFrontendSettings(settings);
+            _choiceSettings = null;
+        }
+
+        Show(step);
     }
 
     private void SetBusy(bool busy)
@@ -178,18 +206,69 @@ public partial class OnboardingPage : UserControl, IBlockingPage
         UpdateBackButton();
     }
 
+    private void SetInstallUncancellable(bool uncancellable)
+    {
+        _installUncancellable = uncancellable;
+        UpdateBackButton();
+    }
+
+    private void StartInstall(Func<CancellationToken, Task> install)
+    {
+        var cancellation = new CancellationTokenSource();
+        _installCancellation = cancellation;
+        _installRun = RunInstallAsync(_installRun, install, cancellation);
+    }
+
+    private async Task RunInstallAsync(Task previous, Func<CancellationToken, Task> install, CancellationTokenSource cancellation)
+    {
+        SetInstallUncancellable(false);
+        SetBusy(true);
+        StepRetryButton.IsVisible = false;
+        SelectOwnInsteadButton.IsVisible = false;
+        StepErrorText.IsVisible = false;
+        try
+        {
+            await previous;
+            cancellation.Token.ThrowIfCancellationRequested();
+            await install(cancellation.Token);
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+            // Back cancelled it and already moved on.
+        }
+        catch (Exception exception) when (!cancellation.IsCancellationRequested)
+        {
+            _logger.LogError(exception, "An onboarding install failed");
+            ShowStepError(exception.Message, allowOwnDolphin: _step == Step.DolphinInstalling);
+        }
+        finally
+        {
+            // Back already let go of a cancelled install, and a newer one may own the page by now.
+            if (_installCancellation == cancellation)
+            {
+                _installCancellation = null;
+                SetInstallUncancellable(false);
+                SetBusy(false);
+            }
+
+            cancellation.Dispose();
+        }
+    }
+
     #endregion
 
     #region Choice
 
     private void ChooseDolphin_OnClick(object? sender, RoutedEventArgs e)
     {
+        _choiceSettings = _onboarding.CaptureFrontendSettings();
         _frontend = Frontend.Dolphin;
         _ = EnterDolphinPathAsync(remember: true);
     }
 
     private void ChooseWiiCompiled_OnClick(object? sender, RoutedEventArgs e)
     {
+        _choiceSettings = _onboarding.CaptureFrontendSettings();
         _frontend = Frontend.WiiCompiled;
         GoTo(Step.GameFile);
     }
@@ -268,42 +347,48 @@ public partial class OnboardingPage : UserControl, IBlockingPage
     private void ManagedDolphin_OnClick(object? sender, RoutedEventArgs e)
     {
         GoTo(Step.DolphinInstalling);
-        _ = InstallManagedDolphinAsync();
+        StartInstall(InstallManagedDolphinAsync);
     }
 
-    private async Task InstallManagedDolphinAsync()
+    private async Task InstallManagedDolphinAsync(CancellationToken cancellationToken)
     {
-        SetBusy(true);
         ShowProgress(0, t("onboarding.dolphin_downloading"));
-        StepRetryButton.IsVisible = false;
-        SelectOwnInsteadButton.IsVisible = false;
-        StepErrorText.IsVisible = false;
-        try
-        {
-            // Look for the user's other Dolphin before the install points the settings at the managed one.
-            _detectedData ??= await Task.Run(_onboarding.DetectDolphinData);
-            var progress = new Progress<ManagedDolphinProgress>(value => ShowProgress(value.Percent, value.Message));
-            // Coming back to this step after an install must not download Dolphin a second time.
-            var result = _managedDolphin.IsInstalled ? _managedDolphin.Activate() : await _managedDolphin.InstallAsync(progress);
-            if (result.IsFailure)
-            {
-                ShowStepError($"{t("onboarding.dolphin_install_failed")} {result.Error.Message}", allowOwnDolphin: true);
-                return;
-            }
+        // Look for the user's other Dolphin before the install points the settings at the managed one.
+        _detectedData ??= await Task.Run(_onboarding.DetectDolphinData, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
 
-            if (_detectedData is not null)
-            {
-                ImportPathText.Text = _detectedData.UserFolderPath;
-                Show(Step.DolphinImport);
-            }
-            else
-            {
-                Show(Step.GameFile);
-            }
-        }
-        finally
+        OperationResult result;
+        // Coming back to this step after an install must not download Dolphin a second time.
+        if (_managedDolphin.IsInstalled)
+            result = _managedDolphin.Activate();
+        else
         {
-            SetBusy(false);
+            // A Flatpak install cannot be stopped halfway.
+            SetInstallUncancellable(_managedDolphin.Kind == ManagedDolphinKind.Flatpak);
+            var progress = new Progress<ManagedDolphinProgress>(value =>
+            {
+                if (!cancellationToken.IsCancellationRequested)
+                    ShowProgress(value.Percent, value.Message);
+            });
+            result = await _managedDolphin.InstallAsync(progress, cancellationToken);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        if (result.IsFailure)
+        {
+            ShowStepError($"{t("onboarding.dolphin_install_failed")} {result.Error.Message}", allowOwnDolphin: true);
+            return;
+        }
+
+        // Replacing the install step keeps it out of the history, so Back returns to where Dolphin was picked.
+        if (_detectedData is not null)
+        {
+            ImportPathText.Text = _detectedData.UserFolderPath;
+            Show(Step.DolphinImport);
+        }
+        else
+        {
+            Show(Step.GameFile);
         }
     }
 
@@ -366,16 +451,8 @@ public partial class OnboardingPage : UserControl, IBlockingPage
         return ShellQuoting.QuoteUnixArgument(file);
     }
 
-    private void SelectOwnInstead_OnClick(object? sender, RoutedEventArgs e)
-    {
-        if (_busy)
-            return;
-        // Leave the failed install behind; the source step is where the own Dolphin gets picked.
-        _history.Clear();
-        if (_onboarding.IsWiiCompiledAvailable)
-            _history.Push(Step.Choice);
-        Show(Step.DolphinSource);
-    }
+    // The managed install only starts from the source step, which is where the own Dolphin gets picked.
+    private void SelectOwnInstead_OnClick(object? sender, RoutedEventArgs e) => GoBack();
 
     private void ShowSourceError(string message)
     {
@@ -514,43 +591,52 @@ public partial class OnboardingPage : UserControl, IBlockingPage
         }
 
         GoTo(Step.WiiCompiledInstalling);
-        await InstallWiiCompiledAsync();
+        StartInstall(InstallWiiCompiledAsync);
     }
 
-    private async Task InstallWiiCompiledAsync()
+    private async Task InstallWiiCompiledAsync(CancellationToken cancellationToken)
     {
-        SetBusy(true);
-        StepRetryButton.IsVisible = false;
-        SelectOwnInsteadButton.IsVisible = false;
-        StepErrorText.IsVisible = false;
-        try
+        if (_retroRewind.State != BackgroundInstallState.Completed)
         {
-            if (_retroRewind.State != BackgroundInstallState.Completed)
+            ShowProgress(_retroRewind.Percent, t("onboarding.wiicompiled_waiting"));
+            // Backing out only stops the waiting; Retro Rewind keeps downloading for whichever path comes next.
+            var download = await _retroRewind.StartAsync().WaitAsync(cancellationToken);
+            if (download.IsFailure)
             {
-                ShowProgress(_retroRewind.Percent, t("onboarding.wiicompiled_waiting"));
-                var download = await _retroRewind.StartAsync();
-                if (download.IsFailure)
-                {
-                    ShowStepError(_retroRewind.ErrorMessage ?? t("onboarding.rr_failed"), allowOwnDolphin: false);
-                    return;
-                }
-            }
-
-            ShowProgress(0, t("onboarding.wiicompiled_title"));
-            var progress = new Progress<RecompInstallProgress>(value => ShowProgress(value.Percent, value.Message));
-            var result = await _onboarding.FinishWiiCompiledAsync(progress, CancellationToken.None);
-            if (result.IsFailure)
-            {
-                ShowStepError($"{t("onboarding.wiicompiled_failed")} {result.Error.Message}", allowOwnDolphin: false);
+                ShowStepError(_retroRewind.ErrorMessage ?? t("onboarding.rr_failed"), allowOwnDolphin: false);
                 return;
             }
         }
-        finally
+
+        ShowProgress(0, t("onboarding.wiicompiled_title"));
+        var progress = new InlineProgress<RecompInstallProgress>(value =>
         {
-            SetBusy(false);
+            // From here the setup rewrites installed files, so stopping it would leave a broken install. This runs on
+            // the installer's own thread, before the setup starts, so Back is gone by the time it could do harm.
+            if (!cancellationToken.IsCancellationRequested && value.Percent >= RecompSetupHostAcquirer.SetupPercentFloor)
+                _installUncancellable = true;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+                UpdateBackButton();
+                ShowProgress(value.Percent, value.Message);
+            });
+        });
+        var result = await _onboarding.FinishWiiCompiledAsync(progress, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (result.IsFailure)
+        {
+            ShowStepError($"{t("onboarding.wiicompiled_failed")} {result.Error.Message}", allowOwnDolphin: false);
+            return;
         }
 
         Finish(Ok());
+    }
+
+    private sealed class InlineProgress<T>(Action<T> report) : IProgress<T>
+    {
+        public void Report(T value) => report(value);
     }
 
     #endregion
@@ -576,12 +662,12 @@ public partial class OnboardingPage : UserControl, IBlockingPage
         if (_busy)
             return;
         if (_step == Step.DolphinInstalling)
-            _ = InstallManagedDolphinAsync();
+            StartInstall(InstallManagedDolphinAsync);
         else if (_step == Step.WiiCompiledInstalling)
         {
             if (_retroRewind.State == BackgroundInstallState.Failed)
                 _ = _retroRewind.RetryAsync();
-            _ = InstallWiiCompiledAsync();
+            StartInstall(InstallWiiCompiledAsync);
         }
     }
 
