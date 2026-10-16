@@ -40,7 +40,11 @@
                                            VerticalAlignment="Center" IsVisible="{TemplateBinding SelectionBoxItem, Converter={x:Static ObjectConverters.IsNull}}" />
                                 <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding SelectionBoxItem}"
                                                   ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  IsVisible="{TemplateBinding Multiple, Converter={x:Static BoolConverters.Not}}"
                                                   Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+                                <ItemsControl Name="PART_SelectedItems" ItemsSource="{TemplateBinding SelectedItems}" IsVisible="{TemplateBinding Multiple}" Margin="-2">
+                                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                </ItemsControl>
                                 <Viewbox Grid.Column="1" Name="PART_Chevron" Width="16" Height="16" VerticalAlignment="Center"
                                          RenderTransformOrigin="50%,50%" RenderTransform="rotate(0deg)" IsHitTestVisible="False">
                                     <Viewbox.Transitions>
@@ -118,6 +122,20 @@
     </Style>
     <Style Selector="components|Dropdown /template/ ContentPresenter#PART_ContentPresenter PathIcon.DropdownOptionIcon">
         <Setter Property="Foreground" Value="{StaticResource Brand400}" />
+    </Style>
+    <Style Selector="Border.DropdownSelectionBadge">
+        <Setter Property="Background"><SolidColorBrush Color="{StaticResource Brand400}" Opacity="0.12" /></Setter>
+        <Setter Property="BorderBrush"><SolidColorBrush Color="{StaticResource Brand400}" Opacity="0.3" /></Setter>
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="7,3,3,3" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="TextElement.Foreground" Value="{StaticResource Brand300}" />
+        <Setter Property="TextElement.FontSize" Value="12" />
+    </Style>
+    <Style Selector="Border.DropdownSelectionBadge PathIcon"><Setter Property="Foreground" Value="{StaticResource Brand300}" /></Style>
+    <Style Selector="components|ActionButton.DropdownRemove /template/ PathIcon">
+        <Setter Property="Width" Value="10" /><Setter Property="Height" Value="10" />
     </Style>
     <Style Selector="components|DropdownItem PathIcon.DropdownOptionIcon">
         <Setter Property="Foreground" Value="{StaticResource Neutral400}" />

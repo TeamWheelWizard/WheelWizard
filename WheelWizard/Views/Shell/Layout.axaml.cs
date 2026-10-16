@@ -11,6 +11,7 @@ using WheelWizard.Branding;
 using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
+using WheelWizard.Mods.Views;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
@@ -346,6 +347,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
             // TODO: make a better way to have these type of exceptions
             if (button.PageType == typeof(RoomsPage) && typeof(RoomDetailsPage) == page.GetType())
+                button.IsChecked = true;
+            if (button.PageType == typeof(ModsPage) && page is ModBrowserPage)
                 button.IsChecked = true;
             if (button.PageType == typeof(MiiListPage) && page is MiiEditorPage)
                 button.IsChecked = true;

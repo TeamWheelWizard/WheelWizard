@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="clr-namespace:WheelWizard.Views.Behaviors">
     <Design.PreviewWith>
         <Border Padding="20">
             <!-- Add Controls for Previewer Here -->
@@ -53,18 +54,25 @@
     </Styles.Resources>
 
     <Style Selector="ScrollViewer">
+        <Setter Property="behaviors:HorizontalPanBehavior.IsEnabled" Value="True" />
         <Setter Property="AllowAutoHide" Value="False" />
         <Setter Property="ClipToBounds" Value="False" />
     </Style>
     <Style Selector="ScrollViewer /template/ ScrollContentPresenter#PART_ContentPresenter">
         <Setter Property="Grid.ColumnSpan" Value="2" />
-        <Setter Property="Grid.RowSpan" Value="2" />
+        <Setter Property="Grid.RowSpan" Value="1" />
         <Setter Property="ClipToBounds" Value="True" />
     </Style>
     <Style Selector="ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar">
         <Setter Property="RenderTransform">
             <TranslateTransform X="11" />
         </Setter>
+    </Style>
+    <Style Selector="ScrollBar:horizontal /template/ Thumb">
+        <Setter Property="Background" Value="{StaticResource Neutral600}" />
+    </Style>
+    <Style Selector="ScrollBar:horizontal /template/ Thumb:pointerover, ScrollBar:horizontal /template/ Thumb:pressed">
+        <Setter Property="Background" Value="{StaticResource Neutral400}" />
     </Style>
     <Style Selector="ListBox">
         <Setter Property="ClipToBounds" Value="False" />

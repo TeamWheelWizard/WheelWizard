@@ -4,6 +4,14 @@ namespace WheelWizard.GameBanana.Domain;
 
 public interface IGameBananaApi
 {
+    [Get("/Mod/Index")]
+    Task<GameBananaSearchResults> GetMods(
+        [AliasAs("_aFilters[Generic_Game]")] int gameId,
+        [AliasAs("_aFilters[Generic_Category]")] int? categoryId,
+        [AliasAs("_nPage")] int page,
+        [AliasAs("_nPerpage")] int perPage = 12
+    );
+
     [Get("/Mod/{modId}/ProfilePage")]
     Task<GameBananaModDetails> GetModDetails(int modId);
 

@@ -46,7 +46,7 @@ public sealed class ModalHeading : ContentControl
                 AutomationProperties.SetName(close, "Close");
                 close.AttachedToVisualTree += (_, _) =>
                 {
-                    var modal = heading.FindAncestorOfType<PopupContent>();
+                    var modal = heading.FindAncestorOfType<ModalContent>();
                     if (modal == null)
                         return;
                     close.Bind(
@@ -56,13 +56,13 @@ public sealed class ModalHeading : ContentControl
                             Converter = BoolConverters.Or,
                             Bindings =
                             {
-                                new Binding(nameof(PopupContent.IsDismissible)) { Source = modal },
-                                new Binding(nameof(PopupContent.IsCancelable)) { Source = modal },
+                                new Binding(nameof(ModalContent.IsDismissible)) { Source = modal },
+                                new Binding(nameof(ModalContent.IsCancelable)) { Source = modal },
                             },
                         }
                     );
                 };
-                close.Click += (_, _) => heading.FindAncestorOfType<PopupContent>()?.RequestHeaderClose();
+                close.Click += (_, _) => heading.FindAncestorOfType<ModalContent>()?.RequestHeaderClose();
                 Grid.SetColumn(close, 1);
                 row.Children.Add(close);
                 return row;

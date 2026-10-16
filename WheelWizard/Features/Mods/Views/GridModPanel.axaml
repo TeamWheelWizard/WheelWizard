@@ -1,94 +1,85 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:components="clr-namespace:WheelWizard.Views.Components"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:mods="clr-namespace:WheelWizard.Mods.Views"
+             xmlns:vm="clr-namespace:WheelWizard.Mods.ViewModels"
              xmlns:patches="clr-namespace:WheelWizard.Features.Patches"
-             x:Class="WheelWizard.Mods.Views.GridModPanel"
-             x:DataType="mods:ModListItem"
-        xmlns:mods="clr-namespace:WheelWizard.Mods.Views">
-
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             x:Class="WheelWizard.Mods.Views.GridModPanel" x:DataType="vm:ModListItem">
     <UserControl.Styles>
+        <Style Selector="Border#RootCardBorder.Placeholder">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+        </Style>
         <Style Selector="Border#RootCardBorder">
-            <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
-            <Setter Property="Background" Value="{StaticResource Neutral900}" />
-            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
         </Style>
         <Style Selector="Border#RootCardBorder:pointerover">
             <Setter Property="BorderBrush" Value="{StaticResource Neutral500}" />
-            <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
-        <Style Selector="Border#RootCardBorder.Enabled">
-            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+        <Style Selector="Button.LibraryPreview">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" CornerRadius="6" ClipToBounds="True">
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
         </Style>
-        <Style Selector="Border#RootCardBorder.Enabled:pointerover">
-            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+        <Style Selector="Border#RootCardBorder:pointerover Button.LibraryPreview">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+        </Style>
+        <Style Selector="Button.LibraryPreview:focus-visible">
             <Setter Property="Background" Value="{StaticResource Neutral800}" />
         </Style>
     </UserControl.Styles>
-    <Border x:Name="RootCardBorder" Classes.Enabled="{Binding Mod.IsEnabled}"
-            BorderThickness="1"
-            CornerRadius="8"
-            ClipToBounds="True" Margin="4" Height="134">
-        <Grid x:Name="CardSurface" RowDefinitions="80,52">
-            <!-- Image area -->
-            <Border x:Name="ThumbnailHeader" Grid.Row="0" Background="{StaticResource Neutral700}" ClipToBounds="True">
-                <Panel>
-                    <Image x:Name="ThumbnailImage" Source="{Binding Preview.Image}" Stretch="UniformToFill" />
-                    <Image x:Name="DisabledThumbnailImage" Source="{Binding Preview.GrayscaleImage}"
-                           Stretch="UniformToFill" IsVisible="False" />
-                    <PathIcon x:Name="CompatibilityWarning" Data="{StaticResource WarningTip}"
-                              Width="16" Height="16" Foreground="{StaticResource Danger500}" Margin="8" HorizontalAlignment="Right" VerticalAlignment="Top"
-                              IsVisible="{Binding Mod.HasIncompatibleFiles}" ToolTip.Placement="Top">
-                    <ToolTip.Tip>
-                        <StackPanel MaxWidth="300">
-                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource Neutral50}" />
-                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}"
-                                       TextWrapping="Wrap"
-                                       Foreground="{StaticResource Neutral100}" />
-                        </StackPanel>
-                    </ToolTip.Tip>
-                    </PathIcon>
-                    <!-- Placeholder icon when no image is loaded -->
-                    <PathIcon IsVisible="{Binding Preview.ShowPlaceholder}"
-                              Data="{StaticResource CubesStacked}"
-                              Width="36" Height="36"
-                              Foreground="{StaticResource Neutral500}"
-                              HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Panel>
-            </Border>
-
-            <Border Grid.Row="1" x:Name="EnabledBackgroundGlow" CornerRadius="99999"
-                    HorizontalAlignment="Right" VerticalAlignment="Top" Height="70" Width="50"
-                    Background="{StaticResource Brand200}" Opacity="0.7" Effect="blur(130)"
-                    IsVisible="{Binding Mod.IsEnabled}" IsHitTestVisible="False" />
-
-            <!-- Fixed-height body keeps both enabled states and title lengths the same size. -->
-            <Grid x:Name="CardBody" Grid.Row="1" ColumnDefinitions="*,Auto" Margin="10,8">
-                <TextBlock x:Name="ModTitle" Text="{Binding Mod.Title}" FontSize="13" FontWeight="SemiBold"
-                           Foreground="{StaticResource Neutral100}" TextTrimming="CharacterEllipsis"
-                           TextWrapping="Wrap" MaxLines="2" LineHeight="18" Height="36"
-                           Margin="0,0,8,0" VerticalAlignment="Center" />
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
-                                    VerticalAlignment="Center">
-                            <TextBlock Text="#" FontSize="13"
-                                       Foreground="{StaticResource Neutral500}"
-                                       VerticalAlignment="Center" />
-                            <components:InputField x:Name="PriorityTextBox"
-                                     Text="{Binding Mod.Priority, Mode=OneWay}"
-
-                                     MinWidth="30" MaxWidth="50"
-                                     MinHeight="28"
-                                     VerticalAlignment="Center"
-                                     Padding="4,2"
-                                     HorizontalContentAlignment="Center"
-                                     TextChanged="PriorityText_OnTextChanged"
-                                     LostFocus="PriorityText_OnLostFocus"
-                                     KeyDown="PriorityText_OnKeyDown">
-                            </components:InputField>
-                        </StackPanel>
+    <Grid>
+        <Border Classes.Placeholder="{Binding IsPlaceholder}" x:Name="RootCardBorder" Background="{StaticResource Neutral900}" BorderThickness="1"
+                CornerRadius="8" Padding="1" Margin="6,0,6,12" ClipToBounds="True">
+            <Grid>
+                <Button x:Name="PreviewButton" Classes="LibraryPreview" Click="View_Click" AutomationProperties.Name="{Binding Mod.Title}">
+                    <StackPanel>
+                        <Border Height="108" CornerRadius="6,6,0,0" Background="{StaticResource Neutral800}" ClipToBounds="True">
+                            <Grid>
+                                <PathIcon IsVisible="{Binding Preview.ShowPlaceholder}" Data="{StaticResource CubesStacked}"
+                                          Width="30" Height="30" Foreground="{StaticResource Neutral600}" />
+                                <Image x:Name="ThumbnailImage" Source="{Binding Preview.Image}" Stretch="UniformToFill" />
+                                <Image x:Name="DisabledThumbnailImage" Source="{Binding Preview.GrayscaleImage}" Stretch="UniformToFill" IsVisible="False" />
+                                <mods:ModImagePlaceholder IsVisible="{Binding Preview.IsLoading}" />
+                                <components:StatusBadge Text="{loc:T mod_browser.patches}" Variant="Brand" IsVisible="{Binding HasPatches}"
+                                                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" />
+                                <Border HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8" Padding="5" CornerRadius="4"
+                                        Background="{StaticResource Neutral900}" IsVisible="{Binding Mod.HasIncompatibleFiles}">
+                                    <PathIcon Data="{StaticResource WarningTip}" Width="14" Height="14" Foreground="{StaticResource Danger500}"
+                                              ToolTip.Tip="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <TextBlock Text="{Binding Mod.Title}" Margin="10,9" Height="36" LineHeight="18" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Neutral100}" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                        <Border Height="1" Background="{StaticResource BackgroundLineColor}" Margin="10,0" />
+                        <Border Height="44" />
+                    </StackPanel>
+                </Button>
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6" Margin="10,8" VerticalAlignment="Bottom">
+                    <components:ToggleCheckBox x:Name="EnableSwitch" Variant="Switch" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
+                                               VerticalAlignment="Center" HorizontalAlignment="Left" Content="{loc:T attribute.enabled}" FontSize="11" />
+                    <components:InputField x:Name="PriorityTextBox" Grid.Column="1" Text="{Binding Mod.Priority, Mode=OneWay}"
+                                           Width="32" MinWidth="32" MinHeight="28" Height="28" Padding="2,0" HorizontalContentAlignment="Center"
+                                           ToolTip.Tip="{loc:T mod_library.priority}" AutomationProperties.Name="{loc:T mod_library.priority}"
+                                           TextChanged="PriorityText_OnTextChanged" LostFocus="PriorityText_OnLostFocus" KeyDown="PriorityText_OnKeyDown" />
+                    <Border x:Name="DragHandle" Grid.Column="2" Background="Transparent" Width="20" Cursor="SizeAll"
+                            PointerPressed="Drag_PointerPressed" ToolTip.Tip="{loc:T mod_library.reorder}">
+                        <PathIcon Data="{StaticResource Grip}" Width="12" Height="12" Foreground="{StaticResource Neutral500}" />
+                    </Border>
+                </Grid>
             </Grid>
-        </Grid>
-
-    </Border>
+        </Border>
+        <Rectangle IsVisible="{Binding IsPlaceholder}" IsHitTestVisible="False" Margin="6,0,6,12"
+                   RadiusX="8" RadiusY="8" Stroke="{StaticResource Brand400}" StrokeThickness="1.5" StrokeDashArray="4,3" />
+    </Grid>
 </UserControl>

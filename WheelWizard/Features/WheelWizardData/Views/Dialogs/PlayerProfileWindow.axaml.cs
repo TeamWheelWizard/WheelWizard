@@ -1,18 +1,20 @@
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Data;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views.Dialogs.Base;
+using WheelWizard.Views.Shell;
 using WheelWizard.WheelWizardData.Views;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WheelWizardData.Views.Dialogs;
 
-public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
+public partial class PlayerProfileWindow : ModalContent, INotifyPropertyChanged
 {
     private IApiCaller<IRwfcApi> ApiCaller { get; }
 
@@ -21,15 +23,16 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
     private string _errorMessage = string.Empty;
 
     public PlayerProfileWindow(VrHistoryGraph historyGraph, IApiCaller<IRwfcApi> apiCaller, string friendCode)
-        : base(true, true, false, "Player Profile")
+        : base("Player Profile")
     {
         ApiCaller = apiCaller;
         InitializeComponent();
         IsDismissible = true;
+        ProfileMii.ArriveWith(["profile/window/hello", "profile/window/funny"]);
         HistoryHost.Content = historyGraph;
         historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("Profile.FriendCode") { Source = this });
         DataContext = this;
-        PopupTitle = friendCode;
+        ModalTitle = friendCode;
         LoadProfile(friendCode);
     }
 
@@ -126,7 +129,7 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
             if (result.IsSuccess && result.Value != null)
             {
                 Profile = result.Value;
-                PopupTitle = Profile.Name;
+                ModalTitle = Profile.Name;
                 IsLoading = false;
             }
             else
@@ -135,6 +138,12 @@ public partial class PlayerProfileWindow : PopupContent, INotifyPropertyChanged
                 IsLoading = false;
             }
         });
+    }
+
+    private void ViewOnRwfc_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (Profile is { } profile)
+            ViewUtils.OpenRwfcPlayer(profile.FriendCode);
     }
 
     private static string FormatSignedValue(int value)

@@ -5,7 +5,7 @@ using WheelWizard.Views.Dialogs.Base;
 
 namespace WheelWizard.Views.Dialogs;
 
-public partial class MiiRenderingSetupPopup : PopupContent
+public partial class MiiRenderingSetupPopup : ModalContent
 {
     private ILogger<MiiRenderingSetupPopup> Logger { get; }
 
@@ -17,7 +17,7 @@ public partial class MiiRenderingSetupPopup : PopupContent
     private bool _skipRequested;
 
     public MiiRenderingSetupPopup(ILogger<MiiRenderingSetupPopup> logger, IMiiRenderingResourceInstaller resourceInstaller)
-        : base(true, false, true, "Wheel Wizard")
+        : base("Wheel Wizard")
     {
         Logger = logger;
         ResourceInstaller = resourceInstaller;

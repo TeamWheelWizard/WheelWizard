@@ -53,6 +53,7 @@ public class ModPreviewRetryTests
         await fixture.Model.LoadAsync();
 
         Assert.NotNull(fixture.Model.Image);
+        Assert.False(fixture.Model.IsLoading);
         Assert.False(fixture.Model.ShowPlaceholder);
         Assert.Equal(2, fixture.Model.Image.PixelSize.Width);
         Assert.Equal(3, fixture.Model.Image.PixelSize.Height);
@@ -159,7 +160,11 @@ public class ModPreviewRetryTests
             Mods.GetModDetails(42).Returns(Ok(Details()));
             Media.GetImageAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Ok(ImageBytes()));
             Model = new(42, Mods, Media);
-            Model.PropertyChanged += (_, _) => Notifications++;
+            Model.PropertyChanged += (_, e) =>
+            {
+                if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Model.Image))
+                    Notifications++;
+            };
         }
 
         public void Dispose() => Model.Dispose();

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 namespace WheelWizard.Views.Components;
@@ -10,6 +11,24 @@ namespace WheelWizard.Views.Components;
 public class InputField : TextBox
 {
     private TopLevel? _owner;
+
+    public InputField()
+    {
+        AddHandler(
+            KeyDownEvent,
+            (_, e) =>
+            {
+                if (e.Key == Key.Enter && !AcceptsReturn)
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        // Let submission handlers move focus first (for example, into a dialog).
+                        if (IsFocused)
+                            TopLevel.GetTopLevel(this)?.FocusManager?.Focus(null);
+                    });
+            },
+            RoutingStrategies.Bubble
+        );
+    }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {

@@ -3,10 +3,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
-using Avalonia.VisualTree;
 using WheelWizard.Models.Mods;
-using WheelWizard.Mods.Views;
+using WheelWizard.Mods.ViewModels;
 using WheelWizard.Views.Components;
 
 namespace WheelWizard.Mods.Views;
@@ -21,45 +19,15 @@ public partial class GridModPanel : UserControl
         DataContextChanged += OnDataContextChanged;
         RootCardBorder.PointerEntered += (_, _) => UpdateThumbnail();
         RootCardBorder.PointerExited += (_, _) => UpdateThumbnail();
-        CardSurface.SizeChanged += (_, _) => CardSurface.Clip = new RectangleGeometry(new Rect(CardSurface.Bounds.Size), 7, 7);
-        RootCardBorder.PointerPressed += OnCardPointerPressed;
-        RootCardBorder.PointerReleased += OnCardPointerReleased;
         Focusable = true;
-        KeyDown += OnCardKeyDown;
     }
 
-    private bool _cardPressed;
+    public event EventHandler<RoutedEventArgs>? ViewRequested;
+    public event EventHandler<PointerPressedEventArgs>? DragRequested;
 
-    private static bool IsPriorityInput(object? source) =>
-        source is Visual visual && (visual is TextBox || visual.GetVisualAncestors().OfType<TextBox>().Any());
+    private void View_Click(object? sender, RoutedEventArgs e) => ViewRequested?.Invoke(this, e);
 
-    private void OnCardPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        _cardPressed = e.GetCurrentPoint(RootCardBorder).Properties.IsLeftButtonPressed && !IsPriorityInput(e.Source);
-        if (_cardPressed)
-            Focus();
-    }
-
-    private void OnCardPointerReleased(object? sender, PointerReleasedEventArgs e)
-    {
-        var toggle =
-            _cardPressed && e.InitialPressMouseButton == MouseButton.Left && RootCardBorder.IsPointerOver && !IsPriorityInput(e.Source);
-        _cardPressed = false;
-        if (toggle && _observedMod != null)
-        {
-            _observedMod.IsEnabled = !_observedMod.IsEnabled;
-            e.Handled = true;
-        }
-    }
-
-    private void OnCardKeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Space && !IsPriorityInput(e.Source) && _observedMod != null)
-        {
-            _observedMod.IsEnabled = !_observedMod.IsEnabled;
-            e.Handled = true;
-        }
-    }
+    private void Drag_PointerPressed(object? sender, PointerPressedEventArgs e) => DragRequested?.Invoke(this, e);
 
     private async void OnDataContextChanged(object? sender, EventArgs e)
     {
