@@ -33,8 +33,6 @@ public partial class Layout
     private void InitializeCouchPresentation()
     {
         CouchPresentation.NavigationRequested += NavigateFromSidebar;
-        CouchPresentation.FullscreenRequested += ToggleCouchFullscreen;
-        CouchPresentation.BackRequested += GoCouchBack;
         CouchPresentation.ContentHost.SizeChanged += (_, _) => UpdateCurrentPageWidth();
     }
 

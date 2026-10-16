@@ -14,15 +14,10 @@ public partial class CouchView : UserControl
 {
     private readonly List<(Type Page, ActionButton Button)> _routes = [];
     public event Action<Type>? NavigationRequested;
-    public event Action? FullscreenRequested;
-    public event Action? BackRequested;
 
     public CouchView()
     {
         InitializeComponent();
-        FullscreenButton.Click += (_, _) => FullscreenRequested?.Invoke();
-        BackButton.Click += (_, _) => BackRequested?.Invoke();
-        RefreshLabels();
     }
 
     public Grid ContentHost => PageHost;
@@ -72,10 +67,5 @@ public partial class CouchView : UserControl
         (route.Button ?? _routes.FirstOrDefault().Button)?.Focus(NavigationMethod.Directional);
     }
 
-    public void RefreshLabels()
-    {
-        FullscreenButton.Text = t("couch.fullscreen");
-        BackButton.Text = t("action.back");
-        InputHints.Text = t("couch.input_hints");
-    }
+    public void RefreshLabels() => InputHints.RefreshLabels();
 }

@@ -41,7 +41,7 @@ For Steam shortcuts, add `--view=couch --fullscreen` to the launch arguments. `-
 
 Couch view includes an in-window on-screen keyboard; text is applied on Submit and discarded on Cancel. The board provides ASCII letters, numbers, and punctuation; physical keyboards and clipboard input remain available for other characters. Mouse and touch remain usable.
 
-The couch menu provides Resume, Settings, and fullscreen controls; text entry appears when a text field is focused. It uses the same controls and colors as Desktop View.
+The couch menu provides Resume, Settings, and fullscreen controls; text entry appears when a text field is focused. The footer is a noninteractive glyph legend, not a row of Back/fullscreen buttons. Back remains on the controller or Escape, and fullscreen remains in the menu. The footer, text-entry menu, and on-screen keyboard use subdued grey Steam Deck prompts from [Kenney Input Prompts](https://kenney.nl/assets/input-prompts), with short action labels. Only the required high-resolution images are bundled, together with their [CC0 license](WheelWizard/Resources/Images/ControllerPrompts/License.txt). SDL input handling does not depend on Steam.
 
 The Mii maker exposes gender selection, categories, variants, optional parts, movement, colors, and save actions as focusable controls. Confirm activates an action; focusing a name field does not open the keyboard until Confirm or Y. A slider's own axis adjusts its value; the perpendicular axis moves focus away. Back closes an open dropdown or color picker first, then steps out of the editor section before leaving the page. Unsaved edits still require confirmation before leaving.
 

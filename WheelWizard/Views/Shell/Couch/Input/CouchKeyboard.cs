@@ -95,7 +95,7 @@ internal sealed class CouchKeyboard : ModalContent
         actions.Children.Add(MakeButton(t("action.cancel"), Cancel));
         actions.Children.Add(MakeButton(t("couch.submit"), Submit, ActionButtonTone.Brand));
         body.Children.Add(actions);
-        body.Children.Add(new TextBlock { Text = t("couch.keyboard_hints"), Classes = { "BodyText" } });
+        body.Children.Add(new CouchInputHints(keyboard: true));
         Content = new ScrollViewer { Content = body, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
     }
 

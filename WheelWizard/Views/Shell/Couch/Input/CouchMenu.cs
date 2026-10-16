@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -27,7 +28,7 @@ internal sealed class CouchMenu : ModalContent
         var actions = new StackPanel { Spacing = 8 };
         _resume = Add(t("couch.resume"), () => { }, ActionButtonTone.Brand, icon: "Play");
         if (canEditText)
-            Add(t("couch.text_input_shortcut"), textInput);
+            Add(t("couch.text_input"), textInput, prompt: CouchPrompt.TextInput);
         Add(t("page_title.settings"), settings, enabled: canNavigate, icon: "Gear");
         Add(t("couch.toggle_fullscreen"), fullscreen, enabled: canNavigate);
         body.Children.Add(actions);
@@ -42,7 +43,8 @@ internal sealed class CouchMenu : ModalContent
             Action action,
             ActionButtonTone tone = ActionButtonTone.Secondary,
             bool enabled = true,
-            string? icon = null
+            string? icon = null,
+            CouchPrompt? prompt = null
         )
         {
             var button = new ActionButton
@@ -56,6 +58,20 @@ internal sealed class CouchMenu : ModalContent
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 IsEnabled = enabled,
             };
+            if (prompt is { } glyph)
+            {
+                button.Content = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        CouchInputGlyphs.Create(glyph, 24),
+                        new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center },
+                    },
+                };
+                AutomationProperties.SetName(button, label);
+            }
             button.Click += (_, _) =>
             {
                 // Remove this modal synchronously before navigation or text focus.

@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:couch="clr-namespace:WheelWizard.Views.Shell.Couch"
              x:Class="WheelWizard.Views.Shell.Couch.CouchView"
              FontSize="18">
     <UserControl.Styles>
@@ -28,14 +29,6 @@
                 CornerRadius="{StaticResource GlobalCornerRadius}" Padding="{StaticResource EdgeGap}" ClipToBounds="True">
             <Grid x:Name="PageHost" />
         </Border>
-        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="16">
-            <TextBlock x:Name="InputHints" Classes="BodyText" VerticalAlignment="Center" />
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                <components:ActionButton x:Name="BackButton" Tone="Secondary" Variant="Ghost"
-                                         IconData="{StaticResource ArrowLeft}" MinHeight="48" Padding="16,10" FontSize="16" />
-                <components:ActionButton x:Name="FullscreenButton" Tone="Secondary" Variant="Ghost"
-                                         MinHeight="48" Padding="16,10" FontSize="16" />
-            </StackPanel>
-        </Grid>
+        <couch:CouchInputHints x:Name="InputHints" Grid.Row="2" />
     </Grid>
 </UserControl>
