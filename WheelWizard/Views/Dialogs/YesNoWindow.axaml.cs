@@ -76,14 +76,6 @@ public partial class YesNoWindow : ModalContent
         _tcs?.TrySetResult(false);
     }
 
-    /// <summary>Yes, no, or <see langword="null"/> when the window was dismissed without picking either.</summary>
-    public async Task<bool?> AwaitWithChoiceAsync()
-    {
-        if (await AwaitAnswer())
-            return true;
-        return NoButtonClicked ? false : null;
-    }
-
     public async Task<bool> AwaitAnswer()
     {
         if (!Dispatcher.UIThread.CheckAccess())

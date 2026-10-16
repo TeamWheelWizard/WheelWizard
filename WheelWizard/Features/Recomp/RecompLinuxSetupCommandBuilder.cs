@@ -13,21 +13,21 @@ namespace WheelWizard.Recomp;
 public static class RecompLinuxSetupCommandBuilder
 {
     /// <summary>
-    /// Builds the install command. With <paramref name="gameFolderPath"/> the AppImage validates and reads
-    /// Wheel Wizard's extracted game in place; without it, it reuses the game it already knows and only
+    /// Builds the install command. With <paramref name="gameFilePath"/> the AppImage validates and
+    /// extracts the disc first; without it, it reuses the assets it already extracted and only
     /// retranslates and recompiles what changed, which is how a repair or a Retro Rewind update is run.
     /// </summary>
     public static IReadOnlyList<string> BuildInstallArguments(
-        string? gameFolderPath,
+        string? gameFilePath,
         string? retroRewindFolderPath,
         RecompRetroWfcPayloadMode retroWfcPayloadMode = RecompRetroWfcPayloadMode.Download
     )
     {
         var arguments = new List<string> { "install" };
-        if (!string.IsNullOrWhiteSpace(gameFolderPath))
+        if (!string.IsNullOrWhiteSpace(gameFilePath))
         {
-            arguments.Add("--game-dir");
-            arguments.Add(gameFolderPath);
+            arguments.Add("--game");
+            arguments.Add(gameFilePath);
         }
 
         // The AppImage requires exactly one payload option whenever a Retro Rewind source is passed,
@@ -53,12 +53,4 @@ public static class RecompLinuxSetupCommandBuilder
 
     /// <summary>Makes the AppImage print its own semantic version.</summary>
     public static IReadOnlyList<string> BuildVersionArguments() => ["--version"];
-
-    /// <summary>Points the installation at Wheel Wizard's extracted game without rebuilding anything.</summary>
-    public static IReadOnlyList<string> BuildLinkGameDirArguments(string gameFolderPath)
-    {
-        if (string.IsNullOrWhiteSpace(gameFolderPath))
-            throw new ArgumentException("The extracted game folder is required.", nameof(gameFolderPath));
-        return ["link-game-dir", "--game-dir", gameFolderPath, "--progress-json"];
-    }
 }

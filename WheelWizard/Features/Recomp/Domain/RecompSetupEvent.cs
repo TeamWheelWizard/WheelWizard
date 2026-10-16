@@ -16,18 +16,6 @@ public sealed record RecompSetupProgressEvent(string Stage, string Message, int 
 /// <c>{"type":"result","success":true,"version":"...","installDir":"..."}</c> or
 /// <c>{"type":"result","success":false,"error":"..."}</c>
 /// </summary>
-/// <summary>
-/// <c>{"type":"capabilities","capabilities":["game-dir"]}</c>, the answer to <c>--capabilities</c>. A setup too old
-/// to know the command rejects it instead, which counts as having none.
-/// </summary>
-public sealed record RecompCapabilitiesEvent(IReadOnlyList<string> Capabilities) : RecompSetupEvent
-{
-    /// <summary>Takes <c>--game-dir</c> and <c>--link-game-dir</c>: reads Wheel Wizard's extracted game in place.</summary>
-    public const string GameDir = "game-dir";
-
-    public bool Has(string capability) => Capabilities.Contains(capability, StringComparer.OrdinalIgnoreCase);
-}
-
 public sealed record RecompSetupResultEvent(bool Success, string? Version, string? InstallDir, string? Error) : RecompSetupEvent;
 
 /// <summary>

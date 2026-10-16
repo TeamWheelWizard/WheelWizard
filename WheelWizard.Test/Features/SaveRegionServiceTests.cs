@@ -1,5 +1,6 @@
 using Testably.Abstractions.Testing;
-using WheelWizard.GameFiles;
+using WheelWizard.DiscImages;
+using WheelWizard.DiscImages.Domain;
 using WheelWizard.Models.Enums;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
@@ -48,7 +49,9 @@ public class SaveRegionServiceTests
     public void ActiveRegion_FollowsGameFile_OverLastUsedRegion()
     {
         var fixture = Create(new MockFileSystem(), MarioKartWiiEnums.Regions.America);
-        fixture.Game.GetRegion().Returns(MarioKartWiiEnums.Regions.Europe);
+        fixture
+            .Discs.ReadInfo("/game.rvz")
+            .Returns((OperationResult<DiscImageInfo>)new DiscImageInfo("RMCP01", "MarioKartWii", 0, DiscImageFormat.Rvz));
 
         Assert.Equal(MarioKartWiiEnums.Regions.Europe, fixture.Service.ResolveActiveRegion("/saves"));
     }
@@ -57,7 +60,9 @@ public class SaveRegionServiceTests
     public void ActiveRegion_IgnoresOtherGames()
     {
         var fixture = Create(new MockFileSystem(), MarioKartWiiEnums.Regions.Japan);
-        fixture.Game.GetRegion().Returns(MarioKartWiiEnums.Regions.None);
+        fixture
+            .Discs.ReadInfo("/game.rvz")
+            .Returns((OperationResult<DiscImageInfo>)new DiscImageInfo("RWSJ01", "MARIO & SONIC", 0, DiscImageFormat.Rvz));
 
         Assert.Equal(MarioKartWiiEnums.Regions.Japan, fixture.Service.ResolveActiveRegion("/saves"));
     }
@@ -69,12 +74,12 @@ public class SaveRegionServiceTests
         fs.Directory.CreateDirectory("/saves/RMCK");
         fs.File.WriteAllText("/saves/RMCK/rksys.dat", "save");
         var fixture = Create(fs);
-        fixture.Game.GetRegion().Returns(MarioKartWiiEnums.Regions.None);
+        fixture.Discs.ReadInfo(Arg.Any<string>()).Returns((OperationResult<DiscImageInfo>)Fail("Game file not found"));
 
         Assert.Equal(MarioKartWiiEnums.Regions.Korea, fixture.Service.ResolveActiveRegion("/saves"));
     }
 
-    private static (SaveRegionService Service, IGameFilesService Game) Create(
+    private static (SaveRegionService Service, IDiscImageService Discs) Create(
         MockFileSystem fs,
         MarioKartWiiEnums.Regions lastRegion = MarioKartWiiEnums.Regions.None
     )
@@ -86,7 +91,7 @@ public class SaveRegionServiceTests
         settings.RR_REGION.Returns(region);
         settings.Get(gamePath).Returns(_ => (string)gamePath.Get());
         settings.Get(region).Returns(_ => (MarioKartWiiEnums.Regions)region.Get());
-        var game = Substitute.For<IGameFilesService>();
-        return (new SaveRegionService(fs, settings, game), game);
+        var discs = Substitute.For<IDiscImageService>();
+        return (new SaveRegionService(fs, settings, discs), discs);
     }
 }

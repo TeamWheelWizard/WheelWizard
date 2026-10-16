@@ -8,8 +8,6 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
-using WheelWizard.GameFiles;
-using WheelWizard.GameFiles.Views;
 using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
@@ -86,8 +84,6 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private IOnboardingService Onboarding { get; }
 
-    private IGameFilesService GameFiles { get; }
-
     public Layout(
         INavigationService navigation,
         LiveRoomsService liveRooms,
@@ -98,12 +94,10 @@ public partial class Layout : BaseWindow, IPollingListener
         ISettingsSignalBus settingsSignalBus,
         IModManager modManagerService,
         IAutoUpdaterSingletonService autoUpdater,
-        IOnboardingService onboarding,
-        IGameFilesService gameFiles
+        IOnboardingService onboarding
     )
     {
         Onboarding = onboarding;
-        GameFiles = gameFiles;
         Navigation = navigation;
         LiveRooms = liveRooms;
         LiveStatus = liveStatus;
@@ -158,8 +152,6 @@ public partial class Layout : BaseWindow, IPollingListener
             Navigation_OnPageChanged(this, page);
         else if (Onboarding.IsRequired)
             Navigation.NavigateTo<OnboardingPage>();
-        else if (IsGameSetupNeeded())
-            Navigation.NavigateTo<GameSetupPage>();
         else
             Navigation.NavigateTo<HomePage>();
         _loaded.TrySetResult();
@@ -286,33 +278,7 @@ public partial class Layout : BaseWindow, IPollingListener
     //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
     // }
 
-    private void Navigation_OnPageChanged(object? sender, UserControl page)
-    {
-        // Until the game files are usable only the setup page and Settings (to make room or move the data folder)
-        // can be shown; anything else goes back to the setup page.
-        if (page is not (GameSetupPage or SettingsPage or OnboardingPage) && IsGameSetupNeeded())
-        {
-            Navigation.NavigateAway(typeof(GameSetupPage));
-            return;
-        }
-
-        NavigateToPage(page);
-    }
-
-    private bool IsGameSetupNeeded()
-    {
-        try
-        {
-            // A game image that is not reachable right now (an unplugged drive) only stops playing, as it did before
-            // the extracted game existed: Home says so and links to Settings, and the rest of the app stays usable.
-            var status = GameFiles.GetStatus();
-            return !Onboarding.IsRequired && status.State != GameFilesState.ImageMissing && GameSetupPage.IsNeeded(status);
-        }
-        catch
-        {
-            return false;
-        }
-    }
+    private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
 
     /// <summary>
     /// The current page may ask before letting you go (see <see cref="INavigationGuard"/>); until it does, the

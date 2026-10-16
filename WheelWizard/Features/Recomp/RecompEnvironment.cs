@@ -1,6 +1,5 @@
 using System.IO.Abstractions;
 using WheelWizard.CustomDistributions;
-using WheelWizard.GameFiles;
 using WheelWizard.Settings;
 
 namespace WheelWizard.Recomp;
@@ -11,11 +10,8 @@ namespace WheelWizard.Recomp;
 /// </summary>
 public interface IRecompEnvironment
 {
-    /// <summary>Wheel Wizard's extracted game (the folder holding <c>DATA/</c>), which WiiCompiled reads in place.</summary>
-    string GameFolderPath { get; }
-
-    /// <summary>Whether the extracted game is there to hand over.</summary>
-    bool IsGameReady { get; }
+    /// <summary>The user's Mario Kart Wii disc image.</summary>
+    string GameFilePath { get; }
 
     /// <summary>The directory the recomp is installed into.</summary>
     string InstallFolderPath { get; }
@@ -68,13 +64,11 @@ public interface IRecompEnvironment
 public sealed class RecompEnvironment(
     IFileSystem fileSystem,
     IRecompPaths paths,
-    ICustomDistributionPaths distributionPaths,
-    IGameFilesPaths gameFiles
+    ISettingsManager settings,
+    ICustomDistributionPaths distributionPaths
 ) : IRecompEnvironment
 {
-    public string GameFolderPath => gameFiles.RootPath;
-
-    public bool IsGameReady => fileSystem.File.Exists(gameFiles.ManifestPath) && fileSystem.File.Exists(gameFiles.MainDolPath);
+    public string GameFilePath => settings.Get<string>(settings.GAME_LOCATION);
 
     public string InstallFolderPath => paths.InstallFolderPath;
 
@@ -116,13 +110,10 @@ public sealed class RecompLinuxEnvironment(
     IFileSystem fileSystem,
     IRecompPaths paths,
     ISettingsManager settings,
-    ICustomDistributionPaths distributionPaths,
-    IGameFilesPaths gameFiles
+    ICustomDistributionPaths distributionPaths
 ) : IRecompEnvironment
 {
-    public string GameFolderPath => gameFiles.RootPath;
-
-    public bool IsGameReady => fileSystem.File.Exists(gameFiles.ManifestPath) && fileSystem.File.Exists(gameFiles.MainDolPath);
+    public string GameFilePath => settings.Get<string>(settings.GAME_LOCATION);
 
     public string InstallFolderPath => paths.LinuxBackendFolderPath;
 

@@ -36,12 +36,6 @@ public class RecompInstallState
     /// </summary>
     public string? RetroWfcPayloadMode { get; set; }
 
-    /// <summary>
-    /// The extracted game folder (<c>…/GAME/DATA</c>) the installation reads its game data from. Empty for an
-    /// installation that still uses a copy of its own, which has to be pointed at Wheel Wizard's before it can launch.
-    /// </summary>
-    public string? GameDataDir { get; set; }
-
     /// <summary>Whether the installed Retro Rewind product was built without a Retro-WFC payload.</summary>
     public bool IsRetroWfcPayloadSkipped => string.Equals(RetroWfcPayloadMode, "skipped", StringComparison.OrdinalIgnoreCase);
 }
@@ -65,11 +59,8 @@ public enum RecompRetroWfcPayloadMode
 /// </summary>
 public sealed record RecompInstallRequest
 {
-    /// <summary>
-    /// Wheel Wizard's extracted game (the folder holding <c>DATA/</c>). WiiCompiled reads it in place instead of
-    /// extracting a copy of its own.
-    /// </summary>
-    public required string GameFolderPath { get; init; }
+    /// <summary>Path to the user's Mario Kart Wii disc image (WheelWizard's <c>GameLocation</c> setting).</summary>
+    public required string GameFilePath { get; init; }
 
     /// <summary>Directory the recomp should install into.</summary>
     public required string InstallFolderPath { get; init; }

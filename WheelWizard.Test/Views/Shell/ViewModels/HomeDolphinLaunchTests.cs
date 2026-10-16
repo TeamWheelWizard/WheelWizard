@@ -119,6 +119,7 @@ public class HomeDolphinLaunchTests
         public IDolphinVersionService Versions { get; } = Substitute.For<IDolphinVersionService>();
         public ILinuxDolphinInstaller Installer { get; } = Substitute.For<ILinuxDolphinInstaller>();
         public IDolphinLaunchPresentation Presentation { get; } = Substitute.For<IDolphinLaunchPresentation>();
+        public WhWzSetting<string> GamePath { get; } = new("GamePath", "/game.iso");
         public DolphinLaunchService Service { get; }
 
         public Fixture(bool windows = false, string command = "dolphin-emu")
@@ -132,9 +133,9 @@ public class HomeDolphinLaunchTests
             environment.GetFolderPath(Environment.SpecialFolder.UserProfile).Returns("/home/test");
             environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).Returns("/home/test/.config");
             environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).Returns("/home/test/.local/share");
-            var gameFiles = Substitute.For<WheelWizard.GameFiles.IGameFilesPaths>();
-            gameFiles.RootPath.Returns("/data/GAME");
-            gameFiles.ResolvedRootPath.Returns("/data/GAME");
+            var settings = Substitute.For<ISettingsManager>();
+            settings.GAME_LOCATION.Returns(GamePath);
+            settings.Get<string>(GamePath).Returns(_ => (string)GamePath.Get());
             var paths = Substitute.For<IDolphinPaths>();
             var user = windows ? @"C:\Dolphin User" : "/dolphin-user";
             paths.UserFolderPath.Returns(user);
@@ -144,7 +145,7 @@ public class HomeDolphinLaunchTests
             distribution.RootFolderPath.Returns("/distribution");
             distribution.LaunchJsonFilePath.Returns("/distribution/RR.json");
             Versions.CheckConfiguredDolphin().Returns((DolphinVersionStatus.Supported, "2606a"));
-            Service = new(paths, distribution, fs, environment, Processes, LinuxProcesses, Versions, Installer, Presentation, gameFiles);
+            Service = new(settings, paths, distribution, fs, environment, Processes, LinuxProcesses, Versions, Installer, Presentation);
         }
     }
 }

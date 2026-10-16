@@ -2,7 +2,6 @@ using System.IO.Abstractions;
 using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
-using WheelWizard.GameFiles;
 using WheelWizard.Models.Enums;
 using WheelWizard.Recomp;
 using WheelWizard.Settings.Types;
@@ -425,7 +424,7 @@ public class SettingsManager : ISettingsManager, IDisposable
                     new(SettingsValidationCode.InvalidDolphinLocation, DOLPHIN_LOCATION.Name, "Dolphin path or command is invalid.")
                 );
 
-            if (!IsGameAvailable())
+            if (!GAME_LOCATION.IsValid())
                 issues.Add(new(SettingsValidationCode.InvalidGameLocation, GAME_LOCATION.Name, "Game file path is invalid."));
 
             return Ok(new SettingsValidationReport(issues));
@@ -434,16 +433,6 @@ public class SettingsManager : ISettingsManager, IDisposable
         {
             return Fail(ex);
         }
-    }
-
-    /// <summary>
-    /// The extracted game is what gets played; once it is there the image it came from may be deleted or unplugged.
-    /// Before that, the picked image still counts, and the game setup page takes it from there.
-    /// </summary>
-    private bool IsGameAvailable()
-    {
-        var game = new GameFilesPaths(_applicationData, _fileSystem);
-        return (_fileSystem.File.Exists(game.ManifestPath) && _fileSystem.File.Exists(game.MainDolPath)) || GAME_LOCATION.IsValid();
     }
 
     public void LoadSettings()

@@ -8,8 +8,6 @@ using Microsoft.Extensions.Logging;
 using WheelWizard.CustomDistributions;
 using WheelWizard.DiscImages;
 using WheelWizard.DolphinInstaller;
-using WheelWizard.GameFiles;
-using WheelWizard.GameFiles.Views;
 using WheelWizard.Recomp;
 using WheelWizard.Recomp.Domain;
 using WheelWizard.Settings;
@@ -54,7 +52,6 @@ public partial class OnboardingPage : UserControl, IBlockingPage
     private readonly IDiscImageService _discImages;
     private readonly INavigationService _navigation;
     private readonly ISettingsManager _settings;
-    private readonly IGameFilesFlow _gameFilesFlow;
     private readonly ILogger<OnboardingPage> _logger;
 
     private readonly Stack<Step> _history = new();
@@ -83,12 +80,10 @@ public partial class OnboardingPage : UserControl, IBlockingPage
         IDiscImageService discImages,
         INavigationService navigation,
         ISettingsManager settings,
-        IGameFilesFlow gameFilesFlow,
         ILogger<OnboardingPage> logger
     )
     {
         _settings = settings;
-        _gameFilesFlow = gameFilesFlow;
         _onboarding = onboarding;
         _retroRewind = retroRewind;
         _managedDolphin = managedDolphin;
@@ -208,8 +203,7 @@ public partial class OnboardingPage : UserControl, IBlockingPage
     private void SetBusy(bool busy)
     {
         _busy = busy;
-        // While something installs (or the game extracts) the page stays usable, so Back can cancel it.
-        IsEnabled = !busy || _step is Step.DolphinInstalling or Step.WiiCompiledInstalling or Step.GameFile;
+        IsEnabled = !busy || _step is Step.DolphinInstalling or Step.WiiCompiledInstalling;
         UpdateBackButton();
     }
 
@@ -545,65 +539,13 @@ public partial class OnboardingPage : UserControl, IBlockingPage
     {
         if (_gameFile is null || _busy)
             return;
-        if (await ExtractGameAsync(_gameFile))
-            await ContinueAfterGameAsync();
-    }
-
-    /// <summary>
-    /// The game is played from an extracted copy, so it is extracted here, before anything else needs it. Back
-    /// cancels it like an install, which removes the unfinished extraction.
-    /// </summary>
-    private async Task<bool> ExtractGameAsync(string file)
-    {
-        var cancellation = new CancellationTokenSource();
-        _installCancellation = cancellation;
-        SetBusy(true);
-        SetGameExtracting(true);
-        try
+        var result = _onboarding.SetGameFile(_gameFile);
+        if (result.IsFailure)
         {
-            var progress = new Progress<GameExtractionProgress>(value =>
-            {
-                if (cancellation.IsCancellationRequested)
-                    return;
-                GameProgressBar.Value = Math.Clamp(value.Fraction * 100, 0, 100);
-                GameProgressText.Text = $"{value.Message} · {(int)(value.Fraction * 100)}%";
-            });
-            return await _gameFilesFlow.ChangeImageAsync(file, progress, cancellation.Token) && !cancellation.IsCancellationRequested;
+            ShowGameFile(_gameFile);
+            return;
         }
-        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
-        {
-            return false;
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, "Extracting the game failed");
-            return false;
-        }
-        finally
-        {
-            SetGameExtracting(false);
-            // Back already let go of a cancelled extraction and moved on.
-            if (_installCancellation == cancellation)
-            {
-                _installCancellation = null;
-                SetBusy(false);
-            }
 
-            cancellation.Dispose();
-        }
-    }
-
-    private void SetGameExtracting(bool extracting)
-    {
-        GameProgressPanel.IsVisible = extracting;
-        GameDropZone.IsEnabled = !extracting;
-        GameContinueButton.IsEnabled = !extracting && _gameFile is not null;
-        GameProgressBar.Value = 0;
-        GameProgressText.Text = t("game_files.extracting");
-    }
-
-    private async Task ContinueAfterGameAsync()
-    {
         if (_frontend == Frontend.Dolphin)
         {
             Finish(_onboarding.FinishDolphin());

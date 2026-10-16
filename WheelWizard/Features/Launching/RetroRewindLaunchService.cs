@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
-using WheelWizard.GameFiles;
 using WheelWizard.Mods;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Platform;
@@ -31,8 +30,7 @@ public sealed class RetroRewindLaunchService(
     IRetroRewindLaunchDescriptor descriptor,
     IRuntimeEnvironment environment,
     ILaunchPrompts prompts,
-    IModOperationPresentation modPresentation,
-    IGameFilesService gameFiles
+    IModOperationPresentation modPresentation
 ) : IRetroRewindLaunchService
 {
     private string QuotePath(string path) => ShellQuoting.QuoteArgument(path, environment.IsWindows);
@@ -41,8 +39,8 @@ public sealed class RetroRewindLaunchService(
     {
         try
         {
-            // Dolphin boots the extracted game; the game setup page keeps Home out of reach until it is ready.
-            if (!gameFiles.GetStatus().IsReady)
+            //case SHOULD be impossible since launch button should be disabled
+            if (!fileSystem.File.Exists(settings.Get<string>(settings.GAME_LOCATION)))
                 return Fail(t("message_warning.not_find_game.extra"));
 
             // Check first so a blocked launch does not kill Dolphin or prepare patches.

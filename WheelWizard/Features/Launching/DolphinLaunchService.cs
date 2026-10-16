@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
-using WheelWizard.GameFiles;
+using WheelWizard.Settings;
 using WheelWizard.Shared.IO;
 using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Processes;
@@ -19,6 +19,7 @@ public interface IDolphinLaunchService
 }
 
 public sealed class DolphinLaunchService(
+    ISettingsManager settings,
     IDolphinPaths paths,
     ICustomDistributionPaths distributionPaths,
     IFileSystem fileSystem,
@@ -27,8 +28,7 @@ public sealed class DolphinLaunchService(
     IUnixProcessService linuxProcesses,
     IDolphinVersionService versions,
     ILinuxDolphinInstaller installer,
-    IDolphinLaunchPresentation presentation,
-    IGameFilesPaths gameFiles
+    IDolphinLaunchPresentation presentation
 ) : IDolphinLaunchService
 {
     private string QuotePath(string path) => ShellQuoting.QuoteArgument(path, environment.IsWindows);
@@ -140,10 +140,8 @@ public sealed class DolphinLaunchService(
 
         // Read-only permissions on files where possible
 
-        // Dolphin boots the extracted game, so it needs the whole folder, and the folder a linked one points to.
-        AddFilesystemPerm(gameFiles.RootPath, ":ro");
-        if (gameFiles.IsLinked)
-            AddFilesystemPerm(gameFiles.ResolvedRootPath, ":ro");
+        if (!TryFixFlatpakPortalAccess(settings.Get<string>(settings.GAME_LOCATION), dolphinAppId, "-r"))
+            AddFilesystemPerm(settings.Get<string>(settings.GAME_LOCATION), ":ro");
         // We need to provide the directory where the `RR.json` is located in for portal access!
         if (!TryFixFlatpakPortalAccess(fileSystem.Path.GetDirectoryName(distributionPaths.LaunchJsonFilePath) ?? "", dolphinAppId, "-r"))
             AddFilesystemPerm(distributionPaths.LaunchJsonFilePath, ":ro");
