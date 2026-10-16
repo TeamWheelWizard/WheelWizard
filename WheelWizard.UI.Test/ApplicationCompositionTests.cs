@@ -86,6 +86,8 @@ public class ApplicationCompositionTests
         var settings = services.GetRequiredService<ISettingsManager>();
         settings.NAND_ROOT_PATH.Set(directory, skipSave: true);
         settings.LOAD_PATH.Set(directory, skipSave: true);
+        // This covers an existing install; the onboarding a fresh one opens with has its own coverage.
+        settings.ONBOARDING_COMPLETED.Set(true, skipSave: true);
         services.GetRequiredService<MiiControlThemes>().Install(Application.Current!.Resources);
         services.GetRequiredService<WindowAppearance>().Install(Application.Current.Resources);
         var desktop = Substitute.For<IClassicDesktopStyleApplicationLifetime>();

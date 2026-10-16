@@ -10,7 +10,12 @@ public sealed record DistributionProgress(
     bool? CanCancel = null
 );
 
-public sealed record DistributionOperation(IProgress<DistributionProgress>? Progress = null, CancellationToken CancellationToken = default)
+/// <param name="Unattended">Runs without asking anything, e.g. the onboarding's background install; questions take their safe default.</param>
+public sealed record DistributionOperation(
+    IProgress<DistributionProgress>? Progress = null,
+    CancellationToken CancellationToken = default,
+    bool Unattended = false
+)
 {
     public void Report(DistributionProgress progress) => Progress?.Report(progress);
 }

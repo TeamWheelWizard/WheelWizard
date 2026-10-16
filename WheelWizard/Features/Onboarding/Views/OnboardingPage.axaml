@@ -1,0 +1,235 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="800"
+             x:Class="WheelWizard.Onboarding.Views.OnboardingPage">
+    <UserControl.Styles>
+        <Style Selector="Button.Tile">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border x:Name="TileBorder"
+                            Background="{StaticResource Neutral800}"
+                            BorderBrush="{StaticResource Neutral600}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource GlobalCornerRadius}"
+                            Padding="14,12">
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.Tile:pointerover /template/ Border#TileBorder">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+        </Style>
+        <Style Selector="Button.Tile PathIcon">
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Margin" Value="2,0,14,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{StaticResource Brand300}" />
+        </Style>
+        <Style Selector="TextBlock.TileTitle">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
+        </Style>
+        <Style Selector="TextBlock.Muted">
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+        </Style>
+        <Style Selector="Border.InfoBox">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}" />
+            <Setter Property="Padding" Value="14,12" />
+        </Style>
+        <Style Selector="TextBlock.Error">
+            <Setter Property="Foreground" Value="{StaticResource Danger400}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <StackPanel Width="420" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+            <StackPanel Spacing="16">
+                <components:ActionButton x:Name="BackButton"
+                                         Variant="Link" Tone="Secondary" Padding="0" MinHeight="0"
+                                         HorizontalAlignment="Left"
+                                         IconData="{StaticResource ArrowLeft}"
+                                         Text="{loc:T onboarding.back}"
+                                         Click="Back_OnClick" />
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="TitleText" Classes="TitleText" TextWrapping="Wrap" />
+                    <TextBlock x:Name="BodyText" Classes="BodyText Muted" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- Dolphin or WiiCompiled -->
+                <StackPanel x:Name="ChoicePanel" Spacing="8">
+                    <Button Classes="Tile" Click="ChooseDolphin_OnClick">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource DolphinIcon}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="TileTitle" Text="{loc:T onboarding.choice_dolphin}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T onboarding.choice_dolphin_description}" />
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <Button Classes="Tile" Click="ChooseWiiCompiled_OnClick">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Image Source="avares://WheelWizard/Resources/Images/WiiCompiled.png"
+                                   Width="22" Height="22" Margin="2,0,14,0" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="TileTitle" Text="{loc:T onboarding.choice_wiicompiled}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T onboarding.choice_wiicompiled_description}" />
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                </StackPanel>
+
+                <!-- A Dolphin was found on this machine -->
+                <StackPanel x:Name="DetectedPanel" Spacing="12">
+                    <Border Classes="InfoBox">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource SuccessTip}" Foreground="{StaticResource Brand300}"
+                                      Width="18" Height="18" Margin="0,0,12,0" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock x:Name="DetectedVersionText" Classes="TileTitle" />
+                                <SelectableTextBlock x:Name="DetectedPathText" Classes="TinyText" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <components:ActionButton Tone="Brand" HorizontalAlignment="Stretch"
+                                             Text="{loc:T onboarding.continue}" Click="UseDetected_OnClick" />
+                    <components:ActionButton Variant="Link" Tone="Secondary" HorizontalAlignment="Center"
+                                             Text="{loc:T onboarding.dolphin_use_other}" Click="UseOtherDolphin_OnClick" />
+                </StackPanel>
+
+                <!-- Managed or own Dolphin -->
+                <StackPanel x:Name="SourcePanel" Spacing="8">
+                    <Button x:Name="ManagedTile" Classes="Tile" Click="ManagedDolphin_OnClick">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource Download}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="TileTitle" Text="{loc:T onboarding.dolphin_managed}" />
+                                <TextBlock x:Name="ManagedDescriptionText" Classes="TinyText" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <Button Classes="Tile" Click="OwnDolphin_OnClick">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource Folder}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="TileTitle" Text="{loc:T onboarding.dolphin_own}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T onboarding.dolphin_own_description}" />
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <components:ActionButton x:Name="EnterCommandButton" Variant="Link" Tone="Secondary"
+                                             HorizontalAlignment="Center"
+                                             Text="{loc:T onboarding.dolphin_enter_command}" Click="EnterCommand_OnClick" />
+                    <TextBlock x:Name="SourceErrorText" Classes="BodyText Error" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- Flatpak without its Dolphin extension -->
+                <StackPanel x:Name="MissingExtensionPanel" Spacing="12">
+                    <Border Classes="InfoBox">
+                        <SelectableTextBlock x:Name="ExtensionCommandText" Classes="BodyText" TextWrapping="Wrap"
+                                             FontFamily="monospace" />
+                    </Border>
+                </StackPanel>
+
+                <!-- Something is installing; also used for WiiCompiled -->
+                <StackPanel x:Name="ProgressPanel" Spacing="10">
+                    <ProgressBar x:Name="StepProgressBar" Minimum="0" Maximum="100" Height="8" />
+                    <TextBlock x:Name="StepProgressText" Classes="TinyText" TextWrapping="Wrap" />
+                    <TextBlock x:Name="StepErrorText" Classes="BodyText Error" TextWrapping="Wrap" />
+                    <components:ActionButton x:Name="StepRetryButton" Tone="Brand" HorizontalAlignment="Stretch"
+                                             IconData="{StaticResource Refresh}"
+                                             Text="{loc:T onboarding.retry}" Click="StepRetry_OnClick" />
+                    <components:ActionButton x:Name="SelectOwnInsteadButton" Variant="Link" Tone="Secondary"
+                                             HorizontalAlignment="Center"
+                                             Text="{loc:T onboarding.dolphin_select_own_instead}" Click="SelectOwnInstead_OnClick" />
+                </StackPanel>
+
+                <!-- Copy data from another Dolphin -->
+                <StackPanel x:Name="ImportPanel" Spacing="12">
+                    <Border Classes="InfoBox">
+                        <SelectableTextBlock x:Name="ImportPathText" Classes="TinyText" TextWrapping="Wrap" />
+                    </Border>
+                    <components:ActionButton x:Name="ImportButton" Tone="Brand" HorizontalAlignment="Stretch"
+                                             Text="{loc:T onboarding.import_use}" Click="Import_OnClick" />
+                    <components:ActionButton Tone="Secondary" HorizontalAlignment="Stretch"
+                                             Text="{loc:T onboarding.import_fresh}" Click="SkipImport_OnClick" />
+                    <TextBlock x:Name="ImportErrorText" Classes="BodyText Error" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- Game file -->
+                <StackPanel x:Name="GamePanel" Spacing="12">
+                    <Border x:Name="GameDropZone" Classes="InfoBox" Padding="14,18"
+                            DragDrop.AllowDrop="True">
+                        <StackPanel Spacing="8" HorizontalAlignment="Center">
+                            <components:ActionButton Tone="Secondary" HorizontalAlignment="Center"
+                                                     IconData="{StaticResource FileImport}"
+                                                     Text="{loc:T onboarding.game_pick}" Click="PickGame_OnClick" />
+                            <TextBlock Classes="TinyText" HorizontalAlignment="Center" Text="{loc:T onboarding.game_drop}" />
+                        </StackPanel>
+                    </Border>
+                    <Grid x:Name="GameResult" ColumnDefinitions="Auto,*">
+                        <PathIcon x:Name="GameResultIcon" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock x:Name="GameResultText" Grid.Column="1" Classes="BodyText" TextWrapping="Wrap" VerticalAlignment="Center" />
+                    </Grid>
+                    <components:ActionButton x:Name="GameContinueButton" Tone="Brand" HorizontalAlignment="Stretch"
+                                             Text="{loc:T onboarding.continue}" Click="GameContinue_OnClick" />
+                </StackPanel>
+
+                <!-- WiiCompiled: where its Wii data comes from -->
+                <StackPanel x:Name="NandPanel" Spacing="8">
+                    <Button Classes="Tile" Click="NandShare_OnClick">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource ArrowSwap}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="TileTitle" Text="{loc:T onboarding.nand_share}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T onboarding.nand_share_description}" />
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <Button Classes="Tile" Click="NandCopy_OnClick">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource FileImport}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="TileTitle" Text="{loc:T onboarding.nand_copy}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T onboarding.nand_copy_description}" />
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <Button Classes="Tile" Click="NandFresh_OnClick">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <PathIcon Data="{StaticResource Play}" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="TileTitle" Text="{loc:T onboarding.nand_fresh}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T onboarding.nand_fresh_description}" />
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <TextBlock x:Name="NandErrorText" Classes="BodyText Error" TextWrapping="Wrap" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- The background Retro Rewind download -->
+            <Grid x:Name="RetroRewindStatus" ColumnDefinitions="Auto,*,Auto" Margin="2,4,2,0">
+                <components:Spinner x:Name="RetroRewindSpinner" Width="14" Height="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+                <PathIcon x:Name="RetroRewindIcon" Width="14" Height="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+                <TextBlock x:Name="RetroRewindText" Grid.Column="1" Classes="TinyText" VerticalAlignment="Center" />
+                <components:ActionButton x:Name="RetroRewindRetryButton" Grid.Column="2"
+                                         Variant="Link" Tone="Brand" Padding="0" MinHeight="0"
+                                         Text="{loc:T onboarding.retry}" Click="RetroRewindRetry_OnClick" />
+            </Grid>
+        </StackPanel>
+    </Grid>
+</UserControl>

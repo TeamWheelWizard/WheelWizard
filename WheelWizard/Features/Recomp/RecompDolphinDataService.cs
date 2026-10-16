@@ -1,6 +1,8 @@
 using System.IO.Abstractions;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Settings;
+using WheelWizard.Settings.Types;
 
 namespace WheelWizard.Recomp;
 
@@ -25,7 +27,12 @@ public interface IRecompDolphinDataService
 
     OperationResult CopyNandForRecomp();
 
-    OperationResult ApplyNandToRecompConfig();
+    /// <summary>
+    /// Writes the NAND and Retro Rewind folders Wheel Wizard resolves today into the recomp's Config.toml.
+    /// Both move (sharing toggles, a relocated data folder, the Retro Rewind migration), and the runtime only
+    /// knows what this file says, so this runs before every launch as well as after each of those changes.
+    /// </summary>
+    OperationResult ApplyPathsToRecompConfig();
 }
 
 public sealed class RecompDolphinDataService(
@@ -33,7 +40,8 @@ public sealed class RecompDolphinDataService(
     IRecompSettingManager recompSettings,
     IFileSystem fileSystem,
     IDolphinDiscoveryService dolphinDiscovery,
-    IRecompPaths paths
+    IRecompPaths paths,
+    ICustomDistributionPaths distributionPaths
 ) : IRecompDolphinDataService
 {
     public bool IsSharingEnabled => settings.Get<bool>(settings.RECOMP_USE_DOLPHIN_DATA);
@@ -134,7 +142,7 @@ public sealed class RecompDolphinDataService(
         return Ok();
     }
 
-    public OperationResult ApplyNandToRecompConfig()
+    public OperationResult ApplyPathsToRecompConfig()
     {
         var nandFolderPath = NandFolderPath?.TrimEnd('\\', '/');
         try
@@ -143,26 +151,59 @@ public sealed class RecompDolphinDataService(
             // file is brand new and this manager may never have seen it. Without a file there is
             // nothing to configure yet, and the next successful install applies this again.
             recompSettings.ReloadSettings(paths.ConfigFilePath);
-
-            if (nandFolderPath is null)
-            {
-                recompSettings.RemoveTomlSetting(paths.ConfigFilePath, "paths", "nand_root");
-                settings.Set(settings.RECOMP_NAND_ROOT, "", skipSave: true);
+            if (!fileSystem.File.Exists(paths.ConfigFilePath))
                 return Ok();
-            }
 
-            // Reset before assigning so the write happens even when this process already holds the
-            // same value in memory - a reinstall recreates Config.toml without the key, and only
-            // an actual change would otherwise be saved.
-            settings.Set(settings.RECOMP_NAND_ROOT, "", skipSave: true);
-            return settings.Set(settings.RECOMP_NAND_ROOT, nandFolderPath)
-                ? Ok()
-                : Fail("Wheel Wizard could not save the Wii data folder to the WiiCompiled configuration.");
+            var nandResult = ApplyNandRoot(nandFolderPath);
+            if (nandResult.IsFailure)
+                return nandResult;
+
+            return ApplyRetroRewindRoot();
         }
         catch (Exception exception)
         {
             return Fail($"Wheel Wizard could not update the WiiCompiled configuration: {exception.Message}");
         }
+    }
+
+    private OperationResult ApplyNandRoot(string? nandFolderPath)
+    {
+        // Sharing Dolphin's NAND while Dolphin's folder is out of reach (an unplugged drive): this runs before every
+        // launch now, and dropping the key would start the runtime on a new empty NAND instead of the shared one.
+        if (nandFolderPath is null && IsSharingEnabled)
+            return Ok();
+
+        if (nandFolderPath is null)
+        {
+            recompSettings.RemoveTomlSetting(paths.ConfigFilePath, "paths", "nand_root");
+            settings.Set(settings.RECOMP_NAND_ROOT, "", skipSave: true);
+            return Ok();
+        }
+
+        return ForceWrite(settings.RECOMP_NAND_ROOT, nandFolderPath)
+            ? Ok()
+            : Fail("Wheel Wizard could not save the Wii data folder to the WiiCompiled configuration.");
+    }
+
+    private OperationResult ApplyRetroRewindRoot()
+    {
+        // Without an installed Retro Rewind the setup's own value is the only one there is, so keep it.
+        var retroRewindFolderPath = distributionPaths.RetroRewindFolderPath;
+        if (!fileSystem.Directory.Exists(retroRewindFolderPath))
+            return Ok();
+
+        return ForceWrite(settings.RECOMP_RETRO_REWIND_ROOT, fileSystem.Path.GetFullPath(retroRewindFolderPath).TrimEnd('\\', '/'))
+            ? Ok()
+            : Fail("Wheel Wizard could not save the Retro Rewind folder to the WiiCompiled configuration.");
+    }
+
+    // Reset before assigning so the write happens even when this process already holds the
+    // same value in memory - a reinstall recreates Config.toml without the key, and only
+    // an actual change would otherwise be saved.
+    private bool ForceWrite(Setting<string> setting, string value)
+    {
+        settings.Set(setting, "", skipSave: true);
+        return settings.Set(setting, value);
     }
 
     private void CopyDirectory(string sourceFolder, string destinationFolder)
@@ -209,6 +250,51 @@ public sealed class RecompDolphinDataService(
         catch
         {
             return null;
+        }
+    }
+}
+
+/// <summary>Where a fresh WiiCompiled install takes its Wii data from.</summary>
+public enum RecompNandChoice
+{
+    /// <summary>The runtime's own NAND; Dolphin's data is left alone.</summary>
+    Private,
+
+    /// <summary>Dolphin's live NAND, shared in place.</summary>
+    Share,
+
+    /// <summary>A Wheel Wizard-owned copy of Dolphin's NAND.</summary>
+    Copy,
+}
+
+public static class RecompNandChoices
+{
+    /// <summary>
+    /// Applies a fresh install's NAND choice. The launcher asks it in popups and the onboarding inline, so both
+    /// share this one definition of what each answer means.
+    /// </summary>
+    public static OperationResult ApplyNandChoice(this IRecompDolphinDataService data, RecompNandChoice choice)
+    {
+        switch (choice)
+        {
+            case RecompNandChoice.Share:
+                data.SetCopyEnabled(false);
+                data.SetSharingEnabled(true);
+                return Ok();
+            case RecompNandChoice.Copy:
+                var copyResult = data.CopyNandForRecomp();
+                if (copyResult.IsFailure)
+                    return copyResult;
+
+                // Flipped only after the copy durably exists, so a failed copy can never leave the settings
+                // pointing at a NAND that is not there.
+                data.SetCopyEnabled(true);
+                data.SetSharingEnabled(false);
+                return Ok();
+            default:
+                data.SetSharingEnabled(false);
+                data.SetCopyEnabled(false);
+                return Ok();
         }
     }
 }

@@ -321,7 +321,7 @@ public partial class RecompSettings : UserControl
         if (dolphinData is null)
             return;
 
-        var result = await Task.Run(dolphinData.ApplyNandToRecompConfig);
+        var result = await Task.Run(dolphinData.ApplyPathsToRecompConfig);
         if (result.IsFailure)
             MessageTranslationHelper.ShowMessage(result.Error);
     }

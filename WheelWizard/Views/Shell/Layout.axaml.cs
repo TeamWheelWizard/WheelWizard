@@ -12,6 +12,8 @@ using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
 using WheelWizard.Mods.Views;
+using WheelWizard.Onboarding;
+using WheelWizard.Onboarding.Views;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
@@ -80,6 +82,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private IModManager ModManagerService { get; }
 
+    private IOnboardingService Onboarding { get; }
+
     public Layout(
         INavigationService navigation,
         LiveRoomsService liveRooms,
@@ -89,9 +93,11 @@ public partial class Layout : BaseWindow, IPollingListener
         ISettingsManager settingsService,
         ISettingsSignalBus settingsSignalBus,
         IModManager modManagerService,
-        IAutoUpdaterSingletonService autoUpdater
+        IAutoUpdaterSingletonService autoUpdater,
+        IOnboardingService onboarding
     )
     {
+        Onboarding = onboarding;
         Navigation = navigation;
         LiveRooms = liveRooms;
         LiveStatus = liveStatus;
@@ -144,6 +150,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
         if (Navigation.CurrentPage is { } page)
             Navigation_OnPageChanged(this, page);
+        else if (Onboarding.IsRequired)
+            Navigation.NavigateTo<OnboardingPage>();
         else
             Navigation.NavigateTo<HomePage>();
         _loaded.TrySetResult();
@@ -332,6 +340,10 @@ public partial class Layout : BaseWindow, IPollingListener
         ContentArea.Content = page;
         UpdateSidebarSelection(page);
         _ = LockSidebarAsync(page is ILockedSidebarPage);
+        // A page that has to be finished first keeps the rest of the app visible but out of reach.
+        var blocking = page is IBlockingPage;
+        SidebarGrid.IsEnabled = !blocking;
+        SidebarGrid.Opacity = blocking ? 0.35 : 1;
     }
 
     private void UpdateSidebarSelection(UserControl page)

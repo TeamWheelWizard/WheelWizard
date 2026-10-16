@@ -45,6 +45,11 @@ public class RecompLauncher(
             if (preparation.IsFailure)
                 return preparation;
 
+            // The NAND and Retro Rewind folders can move between launches; Config.toml must follow them.
+            var pathsResult = await Task.Run(dolphinData.ApplyPathsToRecompConfig);
+            if (pathsResult.IsFailure)
+                return pathsResult;
+
             // The presentation scope closes before launching; the game session is not cancellable.
             return await installService.LaunchAsync(CancellationToken.None);
         }
@@ -66,7 +71,7 @@ public class RecompLauncher(
 
         // The recomp compiled without any NAND knowledge; pointing its Config.toml at the chosen
         // Wii data is what makes the choice real, and it applies on the very next launch.
-        return dolphinData.ApplyNandToRecompConfig();
+        return dolphinData.ApplyPathsToRecompConfig();
     }
 
     /// <summary>
@@ -81,7 +86,7 @@ public class RecompLauncher(
         if (updateResult.IsFailure)
             return updateResult;
 
-        return dolphinData.ApplyNandToRecompConfig();
+        return dolphinData.ApplyPathsToRecompConfig();
     }
 
     public async Task<WheelWizardStatus> GetCurrentStatus()
@@ -137,40 +142,21 @@ public class RecompLauncher(
         if (installService.IsInstalled)
             return Ok();
 
+        // There is no Dolphin data to offer, so the recomp simply starts with its own.
         var sourceNand = await Task.Run(() => dolphinData.SourceNandFolderPath);
         if (sourceNand is null)
-        {
-            // There is no Dolphin data to offer, so the recomp simply starts with its own.
-            dolphinData.SetSharingEnabled(false);
-            dolphinData.SetCopyEnabled(false);
-            return Ok();
-        }
+            return dolphinData.ApplyNandChoice(RecompNandChoice.Private);
 
-        var useDolphinData = await presentation.ConfirmUseDolphinDataAsync();
-        if (!useDolphinData)
-        {
-            dolphinData.SetSharingEnabled(false);
-            dolphinData.SetCopyEnabled(false);
-            return Ok();
-        }
+        if (!await presentation.ConfirmUseDolphinDataAsync())
+            return dolphinData.ApplyNandChoice(RecompNandChoice.Private);
 
-        var copyNand = await presentation.ConfirmCopyDolphinDataAsync();
-        if (!copyNand)
-        {
-            dolphinData.SetCopyEnabled(false);
-            dolphinData.SetSharingEnabled(true);
-            return Ok();
-        }
+        if (!await presentation.ConfirmCopyDolphinDataAsync())
+            return dolphinData.ApplyNandChoice(RecompNandChoice.Share);
 
-        var copyResult = await presentation.RunAsync(RecompOperationKind.CopyNand, _ => Task.Run(dolphinData.CopyNandForRecomp));
-        if (copyResult.IsFailure)
-            return copyResult;
-
-        // Flipped only after the copy durably exists, so a failed copy can never leave the settings
-        // pointing at a NAND that is not there.
-        dolphinData.SetCopyEnabled(true);
-        dolphinData.SetSharingEnabled(false);
-        return Ok();
+        return await presentation.RunAsync(
+            RecompOperationKind.CopyNand,
+            _ => Task.Run(() => dolphinData.ApplyNandChoice(RecompNandChoice.Copy))
+        );
     }
 
     private async Task<OperationResult> RunSetupAsync(RecompOperationKind kind)
