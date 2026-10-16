@@ -341,7 +341,7 @@ public partial class Layout : BaseWindow, IPollingListener
         UpdateSidebarSelection(page);
         _ = LockSidebarAsync(page is ILockedSidebarPage);
         if (IsCouchMode)
-            Dispatcher.UIThread.Post(CouchPresentation.FocusNavigation, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.Post(FocusCouchPage, DispatcherPriority.Loaded);
     }
 
     private void UpdateSidebarSelection(UserControl page)

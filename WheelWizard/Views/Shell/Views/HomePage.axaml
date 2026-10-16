@@ -185,7 +185,7 @@
         <ScrollViewer x:Name="CouchHome" IsVisible="False" IsEnabled="{Binding IsInteractable}"
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <Grid ColumnDefinitions="3*,2*" Margin="24" MinHeight="320">
-                <Border Background="{StaticResource FrameColor}" CornerRadius="24" Padding="32" Margin="0,0,24,0">
+                <Border Background="{StaticResource FrameColor}" CornerRadius="{StaticResource GlobalCornerRadius}" Padding="24" Margin="0,0,24,0">
                     <StackPanel Spacing="24" VerticalAlignment="Center">
                         <PathIcon Data="{StaticResource WheelIcon}" Width="160" Height="160"
                                   Foreground="{StaticResource Brand400}" HorizontalAlignment="Left" />

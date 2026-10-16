@@ -22,12 +22,12 @@
         <Style Selector="UserControl.couch UniformGrid.FriendWall">
             <Setter Property="Columns" Value="3" />
         </Style>
-        <Style Selector="Button.CouchActions">
+        <Style Selector="components|ActionButton.CouchActions">
             <Setter Property="IsVisible" Value="False" />
             <Setter Property="MinHeight" Value="44" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
-        <Style Selector="UserControl.couch Button.CouchActions">
+        <Style Selector="UserControl.couch components|ActionButton.CouchActions">
             <Setter Property="IsVisible" Value="True" />
         </Style>
         <!-- CARD -->
@@ -316,7 +316,7 @@
                                                            FontSize="11" Foreground="{StaticResource Neutral500}" />
                                             </StackPanel>
                                         </Grid>
-                                        <Button Classes="CouchActions" Content="Friend actions" Click="FriendActions_OnClick" Margin="0,8,0,0" />
+                                        <components:ActionButton Classes="CouchActions" Tone="Secondary" Variant="Ghost" Text="{loc:T action.more_actions}" Click="FriendActions_OnClick" Margin="0,8,0,0" />
                                     </StackPanel>
                                 </Grid>
 

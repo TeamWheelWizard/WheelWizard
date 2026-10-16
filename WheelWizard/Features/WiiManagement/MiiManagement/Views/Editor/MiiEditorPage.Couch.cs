@@ -1,7 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.VisualTree;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Shell.Couch;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -14,6 +17,102 @@ public partial class MiiEditorPage
     private bool _changingCouchLayout;
     private int[]? _desktopPanelIndices;
     private Control[]? _movablePanels;
+
+    public Control? CouchFocusTarget
+    {
+        get
+        {
+            if (!_couchLayout || _saving)
+                return null;
+            if (_level == Level.Picker)
+                return CouchPickerActions.Children.OfType<Button>().FirstOrDefault(IsCouchAction);
+            if (_colorOpen)
+                return SwatchItems.SelectedItem is SegmentOption selected && IsCouchAction(selected)
+                    ? selected
+                    : SwatchItems.Items.OfType<SegmentOption>().FirstOrDefault(IsCouchAction);
+            return SidebarItems.Children.OfType<ToggleButton>().FirstOrDefault(button => button.IsChecked == true && IsCouchAction(button))
+                ?? SidebarItems
+                    .Children.OfType<Button>()
+                    .FirstOrDefault(button => !Equals(button.Tag, "action.back") && IsCouchAction(button));
+        }
+    }
+
+    public bool TryGoBack()
+    {
+        if (_saving)
+            return false;
+        if (_colorOpen)
+        {
+            CloseColors(animate: true);
+            return true;
+        }
+        if (_level is not (Level.HeadParts or Level.HeadGroups) && (_level != Level.Overview || _section is null))
+            return false;
+        StepOut();
+        return true;
+    }
+
+    private bool IsCouchAction(Control control) =>
+        control is Button or TextBox or Slider or SegmentOption
+        && control.Focusable
+        && control.IsEffectivelyVisible
+        && control.IsEffectivelyEnabled
+        && this.IsVisualAncestorOf(control)
+        && !control
+            .GetVisualAncestors()
+            .OfType<Control>()
+            .Any(ancestor => ancestor.Opacity == 0 || !ancestor.IsHitTestVisible || ancestor.Classes.Contains("hidden"));
+
+    private (Control Container, object? Key, int Index)? CaptureCouchFocus()
+    {
+        if (!_couchLayout || TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is not Control focused)
+            return null;
+        if (focused is SegmentOption option && option.FindAncestorOfType<SegmentedControl>() is { } selection)
+            return (selection, focused.Tag, selection.Items.IndexOf(focused));
+        if (focused.Parent is not Panel panel || (panel != SidebarItems && panel != ToolItems && panel != CouchPartActions))
+            return null;
+        return (panel, focused.Tag, panel.Children.IndexOf(focused));
+    }
+
+    private void RestoreCouchFocus((Control Container, object? Key, int Index)? previous)
+    {
+        if (previous is not { } position)
+            return;
+        var count = position.Container is Panel panel ? panel.Children.Count : ((SegmentedControl)position.Container).Items.Count;
+        Control? target = null;
+        for (var index = 0; index < count && target is null; index++)
+        {
+            var child = ChildAt(index);
+            if (child is not null && Equals(child.Tag, position.Key) && IsCouchAction(child))
+                target = child;
+        }
+        if (target is null && position.Container == SidebarItems)
+            target = CouchFocusTarget;
+        if (target is null)
+        {
+            // At a bound or after removing an optional part, choose the closest enabled sibling.
+            var origin = Math.Clamp(position.Index, 0, Math.Max(0, count - 1));
+            for (var distance = 0; distance < count && target is null; distance++)
+            {
+                var after = origin + distance;
+                var before = origin - distance;
+                if (after < count && ChildAt(after) is { } next && IsCouchAction(next))
+                    target = next;
+                else if (before >= 0 && ChildAt(before) is { } prior && IsCouchAction(prior))
+                    target = prior;
+            }
+        }
+        Control? ChildAt(int index) =>
+            position.Container is Panel owner ? owner.Children[index] : ((SegmentedControl)position.Container).Items[index] as Control;
+        target?.Focus(NavigationMethod.Directional);
+    }
+
+    private void RecoverCouchFocus()
+    {
+        if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is Control focused && IsCouchAction(focused))
+            return;
+        CouchFocusTarget?.Focus(NavigationMethod.Directional);
+    }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
@@ -46,6 +145,7 @@ public partial class MiiEditorPage
         _changingCouchLayout = true;
         _couchLayout = couch;
         Classes.Set("couch", couch);
+        Focusable = !couch;
 
         var panels = _movablePanels ??= [SidebarPanel, ToolPanel, BodyPanel, InfoCard, BottomBar];
         if (couch)
@@ -74,6 +174,8 @@ public partial class MiiEditorPage
 
         CouchLayout.IsVisible = couch;
         EditorHeader.IsVisible = !couch;
+        EditorHeaderDivider.IsVisible = !couch;
+        EditorBottomDivider.IsVisible = !couch;
         BackButton.IsVisible = !couch;
         Overlay.IsVisible = !couch;
         PickerHint.IsVisible = !couch && _picking;
@@ -109,13 +211,16 @@ public partial class MiiEditorPage
         foreach (var swatch in SwatchItems.Items.OfType<SegmentOption>())
             swatch.Focusable = couch;
         Refresh();
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            if (couch)
+                RecoverCouchFocus();
+        });
         _changingCouchLayout = false;
     }
 
     private void RebuildCouchPartActions(MiiPartDefinition? definition, Mii mii)
     {
-        var focused = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Button;
-        var focusedLabel = focused?.Parent == CouchPartActions ? focused.Content as string : null;
         CouchPartActions.Children.Clear();
         if (!_couchLayout)
             return;
@@ -136,7 +241,8 @@ public partial class MiiEditorPage
                         new { part = t(definition.TitleKey) }
                     )!,
                     true,
-                    () => TogglePresence(definition.Part)
+                    () => TogglePresence(definition.Part),
+                    definition.Part
                 );
             if (definition.Variants is not null)
             {
@@ -145,8 +251,8 @@ public partial class MiiEditorPage
             }
             if (definition.IsPresent(mii))
             {
-                AddMovement(definition.DragVertical, t("couch.move_up"), t("couch.move_down"));
-                AddMovement(definition.DragHorizontal, t("couch.move_inward"), t("couch.move_outward"));
+                AddMovement(definition.DragVertical, "vertical", t("couch.move_up"), t("couch.move_down"));
+                AddMovement(definition.DragHorizontal, "horizontal", t("couch.move_inward"), t("couch.move_outward"));
             }
         }
         // Optional parts can also be added without a realtime part hit target.
@@ -157,32 +263,28 @@ public partial class MiiEditorPage
                 AddCouchPartAction(
                     t(optional.IsPresent(mii) ? "hover.mii_editor.remove" : "hover.mii_editor.add", new { part = t(optional.TitleKey) })!,
                     true,
-                    () => TogglePresence(part)
+                    () => TogglePresence(part),
+                    part
                 );
         }
-        if (focusedLabel is not null)
-        {
-            var buttons = CouchPartActions.Children.OfType<Button>();
-            var target =
-                buttons.FirstOrDefault(button => button.IsEnabled && Equals(button.Content, focusedLabel))
-                ?? buttons.FirstOrDefault(button => button.IsEnabled);
-            target?.Focus(Avalonia.Input.NavigationMethod.Directional);
-        }
 
-        void AddMovement(MiiDragAxis? axis, string decrease, string increase)
+        void AddMovement(MiiDragAxis? axis, string key, string decrease, string increase)
         {
             if (axis is null)
                 return;
-            AddCouchPartAction(decrease, axis.Stepper.CanStep(mii, -1), () => StepValue(axis.Stepper, -1));
-            AddCouchPartAction(increase, axis.Stepper.CanStep(mii, 1), () => StepValue(axis.Stepper, 1));
+            AddCouchPartAction(decrease, axis.Stepper.CanStep(mii, -1), () => StepValue(axis.Stepper, -1), key + "-decrease");
+            AddCouchPartAction(increase, axis.Stepper.CanStep(mii, 1), () => StepValue(axis.Stepper, 1), key + "-increase");
         }
     }
 
-    private void AddCouchPartAction(string label, bool enabled, Action action)
+    private void AddCouchPartAction(string label, bool enabled, Action action, object? key = null)
     {
-        var button = new Button
+        var button = new ActionButton
         {
-            Content = label,
+            Text = label,
+            Tag = key ?? label,
+            Tone = ActionButtonTone.Secondary,
+            Variant = ActionButtonVariant.Ghost,
             IsEnabled = enabled,
             MinHeight = 44,
             Margin = new Thickness(3),

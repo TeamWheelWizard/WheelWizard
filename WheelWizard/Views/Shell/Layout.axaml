@@ -23,6 +23,9 @@
         xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls"
         xmlns:couch="clr-namespace:WheelWizard.Views.Shell.Couch">
     <Window.Styles>
+        <Style Selector="Window.couch SelectableTextBlock">
+            <Setter Property="Focusable" Value="False" />
+        </Style>
         <Style Selector="Window.couch components|ActionButton:focus-visible /template/ Border#PART_FocusRing">
             <Setter Property="BorderThickness" Value="3" />
         </Style>

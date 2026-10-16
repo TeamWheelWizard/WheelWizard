@@ -145,6 +145,7 @@ public partial class MiiListPage : UserControl
     private void ApplyCouchLayout()
     {
         var couch = CouchMode.GetIsEnabled(this);
+        Classes.Set("couch", couch);
         CompleteGrid.RowDefinitions[0].Height = couch ? new GridLength(132) : _desktopHeaderHeight;
         Grid.SetRow(ListActionsScroller, couch ? 1 : 0);
         Grid.SetColumn(ListActionsScroller, couch ? 0 : 1);

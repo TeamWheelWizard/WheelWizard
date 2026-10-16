@@ -41,9 +41,13 @@ For Steam shortcuts, add `--view=couch --fullscreen` to the launch arguments. `-
 
 Couch view includes an in-window on-screen keyboard; text is applied on Submit and discarded on Cancel. The board provides ASCII letters, numbers, and punctuation; physical keyboards and clipboard input remain available for other characters. Mouse and touch remain usable.
 
+The couch menu provides Resume, Settings, and fullscreen controls; text entry appears when a text field is focused. It uses the same controls and colors as Desktop View.
+
+The Mii maker exposes gender selection, categories, variants, optional parts, movement, colors, and save actions as focusable controls. Confirm activates an action; focusing a name field does not open the keyboard until Confirm or Y. A slider's own axis adjusts its value; the perpendicular axis moves focus away. Back closes an open dropdown or color picker first, then steps out of the editor section before leaving the page. Unsaved edits still require confirmation before leaving.
+
 Startup, mod browsing/details, dialogs, menus, dropdowns, and tooltips are hosted within the main window to avoid separate application popup windows under gamescope. OS file/folder pickers, system menus, external browser links, and launched games remain external.
 
-Controller input uses bundled SDL3 runtimes and does not require Steam. On Linux, the process must have access to the controller's input/HID devices; sandbox packaging must grant the appropriate device access. If initialization fails, the couch menu reports the error. Controller input is suspended while Wheel Wizard is inactive and requires released buttons before resuming.
+Controller input uses bundled SDL3 runtimes and does not require Steam. On Linux, the process must have access to the controller's input/HID devices; sandbox packaging must grant the appropriate device access. If initialization fails, the couch menu reports the error. Controller input is suspended while Wheel Wizard is inactive. Buttons held across activation or a dialog boundary must be released before reuse; fresh presses are not delayed.
 
 
 ## Requirements

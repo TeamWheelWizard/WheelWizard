@@ -16,6 +16,8 @@ namespace WheelWizard.WiiManagement.MiiManagement.Views;
 
 public class MiiBlock : ToggleRadioButton
 {
+    private Key? _confirmKey;
+
     public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<MiiBlock, Mii?>(nameof(Mii));
 
     public Mii? Mii
@@ -75,8 +77,7 @@ public class MiiBlock : ToggleRadioButton
     {
         if (CouchMode.GetIsEnabled(this) && e.Key is Key.Enter or Key.Space)
         {
-            IsChecked = !IsChecked;
-            RaiseEvent(new RoutedEventArgs(ClickEvent));
+            _confirmKey ??= e.Key;
             e.Handled = true;
             return;
         }
@@ -88,9 +89,21 @@ public class MiiBlock : ToggleRadioButton
         if (CouchMode.GetIsEnabled(this) && e.Key is Key.Enter or Key.Space)
         {
             e.Handled = true;
+            if (_confirmKey == e.Key)
+            {
+                _confirmKey = null;
+                IsChecked = !IsChecked;
+                RaiseEvent(new RoutedEventArgs(ClickEvent));
+            }
             return;
         }
         base.OnKeyUp(e);
+    }
+
+    protected override void OnLostFocus(FocusChangedEventArgs e)
+    {
+        _confirmKey = null;
+        base.OnLostFocus(e);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

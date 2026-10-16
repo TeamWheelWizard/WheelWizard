@@ -31,7 +31,7 @@ public sealed class ModalHost : Grid
         ClipToBounds = true;
         ZIndex = 1000;
         Margin = new Thickness(0, Math.Max(0, _owner.ExtendClientAreaTitleBarHeightHint), 0, 0);
-        _owner.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
+        _owner.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Bubble);
         _owner.AddHandler(GotFocusEvent, OnGotFocus);
     }
 
@@ -183,10 +183,15 @@ public sealed class ModalHost : Grid
         UpdateStack();
         if (wasTop)
         {
-            if (entry.PreviousFocus is Control { IsEffectivelyVisible: true, IsEffectivelyEnabled: true } previous)
-                previous.Focus(CouchMode.GetIsEnabled(_owner) ? NavigationMethod.Directional : NavigationMethod.Unspecified);
-            else if (HasModals)
-                FocusTopModal();
+            if (
+                entry.PreviousFocus is not Control { IsEffectivelyVisible: true, IsEffectivelyEnabled: true } previous
+                || TopLevel.GetTopLevel(previous) != _owner
+                || !previous.Focus(CouchMode.GetIsEnabled(_owner) ? NavigationMethod.Directional : NavigationMethod.Unspecified)
+            )
+            {
+                if (HasModals)
+                    FocusTopModal();
+            }
         }
         entry.OnClosed?.Invoke();
     }
@@ -256,6 +261,7 @@ public sealed class ModalHost : Grid
             && focused != _entries[^1].Panel
             && !focused.GetSelfAndLogicalAncestors().Contains(TopModal)
             && !focused.GetVisualAncestors().Contains(_entries[^1].Panel)
+            && !PopupNavigation.IsInsideOwnedPopup(_owner, focused, TopModal)
         )
             FocusTopModal();
     }
@@ -266,7 +272,8 @@ public sealed class ModalHost : Grid
             return;
         if (e.Key == Key.Escape)
         {
-            TopModal.Dismiss();
+            if (!PopupNavigation.TryCloseTopPopup(_owner, TopModal))
+                TopModal.Dismiss();
             e.Handled = true;
         }
         else if (e.Key == Key.Tab && _owner.FocusManager?.GetFocusedElement() == null)

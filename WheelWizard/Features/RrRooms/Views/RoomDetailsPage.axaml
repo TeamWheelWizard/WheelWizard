@@ -110,11 +110,11 @@
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="10,12"
                       IsEnabled="{Binding #PlayersListView.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">
             <StackPanel Spacing="10">
-                <TextBlock Text="Player actions" Classes="TitleText" TextWrapping="Wrap" />
-                <Button Content="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
-                <Button Content="{loc:T action.add_friend}" Click="AddFriend_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
-                <Button Content="{loc:T action.view_profile}" Click="ViewProfile_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
-                <Button Content="View player on RWFC" Click="ViewOnRwfc_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
+                <TextBlock Text="{loc:T action.more_actions}" Classes="TitleText" TextWrapping="Wrap" />
+                <components:ActionButton Tone="Secondary" Variant="Ghost" Text="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
+                <components:ActionButton Tone="Secondary" Variant="Ghost" Text="{loc:T action.add_friend}" Click="AddFriend_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
+                <components:ActionButton Tone="Secondary" Variant="Ghost" Text="{loc:T action.view_profile}" Click="ViewProfile_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
+                <components:ActionButton Tone="Secondary" Variant="Ghost" Text="{loc:T couch.view_player_on_rwfc}" Click="ViewOnRwfc_OnClick" HorizontalAlignment="Stretch" MinHeight="44" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

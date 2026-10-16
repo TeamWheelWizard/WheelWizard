@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings.Views;
 using WheelWizard.Views.Shell.Couch;
@@ -26,6 +27,8 @@ public partial class Layout
     private IInputElement? _couchFocus;
 
     public bool IsCouchMode => CouchMode.GetIsEnabled(this);
+
+    internal Control? CouchPageFocusTarget => (Navigation.CurrentPage as ICouchNavigationPage)?.CouchFocusTarget;
 
     private void InitializeCouchPresentation()
     {
@@ -152,16 +155,39 @@ public partial class Layout
 
     private void RestorePresentationFocus(bool couch)
     {
-        var previous = couch ? _couchFocus : _desktopFocus;
+        var previous = couch ? _couchFocus ?? _desktopFocus : _desktopFocus;
         if (
             previous is Control { IsEffectivelyVisible: true, IsEffectivelyEnabled: true } control
             && ReferenceEquals(TopLevel.GetTopLevel(control), this)
+            && control.Focus(couch ? NavigationMethod.Directional : NavigationMethod.Unspecified)
         )
-            control.Focus(NavigationMethod.Directional);
+            return;
         else if (couch)
-            CouchPresentation.FocusNavigation();
+            FocusCouchPage();
         else
             SidePanelButtons.Children.OfType<Control>().FirstOrDefault(control => control.Focusable)?.Focus();
+    }
+
+    private void FocusCouchPage()
+    {
+        if (!IsCouchMode)
+            return;
+        var target = CouchPageFocusTarget;
+        // A page may load before its first measured bounds. Its explicit action target
+        // can already take native focus; don't replace it with chrome in that gap.
+        if (
+            target is { Focusable: true, IsEffectivelyVisible: true, IsEffectivelyEnabled: true }
+            && target.Focus(NavigationMethod.Directional)
+        )
+        {
+            target.BringIntoView();
+            return;
+        }
+        target = Navigation.CurrentPage?.GetVisualDescendants().OfType<Control>().FirstOrDefault(CouchInputController.IsCandidate);
+        if (target == null || !target.Focus(NavigationMethod.Directional))
+            CouchPresentation.FocusNavigation();
+        else
+            target.BringIntoView();
     }
 
     private void RefreshCouchNavigation()
@@ -195,12 +221,16 @@ public partial class Layout
     {
         if (!IsCouchMode)
             return;
+        if (Dialogs.Base.PopupNavigation.TryCloseTopPopup(this, Modals.TopModal ?? (Control)this))
+            return;
         if (Modals.TopModal is { } modal)
         {
             modal.Dismiss();
             return;
         }
         if (!PresentationRoot.IsEnabled)
+            return;
+        if (Navigation.CurrentPage is ICouchNavigationPage page && page.TryGoBack())
             return;
         switch (Navigation.CurrentPage)
         {

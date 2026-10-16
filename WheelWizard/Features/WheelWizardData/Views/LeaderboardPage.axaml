@@ -12,12 +12,12 @@
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
         xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
     <UserControl.Styles>
-        <Style Selector="Button.CouchActions">
+        <Style Selector="components|ActionButton.CouchActions">
             <Setter Property="IsVisible" Value="False" />
             <Setter Property="MinHeight" Value="44" />
             <Setter Property="MinWidth" Value="44" />
         </Style>
-        <Style Selector="UserControl.couch Button.CouchActions">
+        <Style Selector="UserControl.couch components|ActionButton.CouchActions">
             <Setter Property="IsVisible" Value="True" />
         </Style>
         <!-- Match RoomDetailsPage entry background treatment for PlayerListItem -->
@@ -191,11 +191,11 @@
                         </community:LeaderboardPodiumStep>
                     </community:LeaderboardPodiumStage>
                         <UniformGrid x:Name="CouchPodiumActions" Columns="3" IsVisible="False" Margin="0,8,0,0">
-                            <Button Content="{Binding PodiumSecond.Name}" Tag="{Binding #PodiumSecondStep}"
+                            <components:ActionButton Tone="Secondary" Variant="Ghost" Text="{Binding PodiumSecond.Name}" Tag="{Binding #PodiumSecondStep}"
                                     IsVisible="{Binding HasPodiumSecond}" Click="PlayerActions_OnClick" MinHeight="44" Margin="3" />
-                            <Button Content="{Binding PodiumFirst.Name}" Tag="{Binding #PodiumFirstStep}"
+                            <components:ActionButton Tone="Secondary" Variant="Ghost" Text="{Binding PodiumFirst.Name}" Tag="{Binding #PodiumFirstStep}"
                                     IsVisible="{Binding HasPodiumFirst}" Click="PlayerActions_OnClick" MinHeight="44" Margin="3" />
-                            <Button Content="{Binding PodiumThird.Name}" Tag="{Binding #PodiumThirdStep}"
+                            <components:ActionButton Tone="Secondary" Variant="Ghost" Text="{Binding PodiumThird.Name}" Tag="{Binding #PodiumThirdStep}"
                                     IsVisible="{Binding HasPodiumThird}" Click="PlayerActions_OnClick" MinHeight="44" Margin="3" />
                         </UniformGrid>
                     </StackPanel>
@@ -229,8 +229,8 @@
                                         </ContextMenu>
                                     </rooms:PlayerListItem.ContextMenu>
                                 </rooms:PlayerListItem>
-                                <Button Grid.Column="1" Classes="CouchActions" Content="⋯" Margin="8,3,0,3"
-                                        ToolTip.Tip="Player actions" Tag="{Binding #LeaderboardPlayerRow}" Click="PlayerActions_OnClick" />
+                                <components:ActionButton Grid.Column="1" Classes="CouchActions" Tone="Secondary" Variant="Ghost" Text="⋯" Margin="8,3,0,3"
+                                        AutomationProperties.Name="{loc:T action.more_actions}" ToolTip.Tip="{loc:T action.more_actions}" Tag="{Binding #LeaderboardPlayerRow}" Click="PlayerActions_OnClick" />
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

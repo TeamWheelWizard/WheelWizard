@@ -20,16 +20,15 @@ public sealed class CouchInputController : IDisposable
     private string? _backendError;
     private bool _backendErrorShown;
     private bool _accepting;
-    private bool _armed;
-    private long _neutralSince;
-    private CouchButtons _previous;
+    private readonly CouchButtonTracker _buttons = new();
     private CouchButtons _repeatDirection;
     private long _nextRepeat;
     private CouchButtons _lastControllerButtons;
     private long _lastControllerTime;
     private Control? _lastFocus;
     private Control? _lastScope;
-    private ComboBox? _openCombo;
+    private Avalonia.Controls.Primitives.Popup? OpenPopup =>
+        PopupNavigation.GetTopPopup(_window, _window.Modals.TopModal ?? (Control)_window);
     private bool _dispatching;
     private bool _disposed;
     private int _deviceGeneration;
@@ -52,7 +51,7 @@ public sealed class CouchInputController : IDisposable
         && _window.IsVisible
         && _window.Modals.IsEnabled
         && (_window.CompleteContentEnabled || _window.Modals.HasModals);
-    private Control Scope => _window.Modals.TopModal ?? (Control)_window;
+    private Control Scope => OpenPopup?.Child ?? _window.Modals.TopModal ?? (Control)_window;
     private Control? Focused => _window.FocusManager?.GetFocusedElement() as Control;
 
     private void OnTick(object? sender, EventArgs e)
@@ -66,7 +65,7 @@ public sealed class CouchInputController : IDisposable
             _backendErrorShown = false;
             _accepting = false;
             _pressedKeys.Clear();
-            Rearm();
+            ResetButtons(default);
             return;
         }
         if (!_backendAttempted)
@@ -89,57 +88,41 @@ public sealed class CouchInputController : IDisposable
             }
         }
 
-        var state = _backend?.Read() ?? CouchButtons.None;
-        if (_backend != null && _backend.Generation != _deviceGeneration)
-        {
+        var state = _backend?.Read() ?? default;
+        var devicesChanged = _backend != null && _backend.Generation != _deviceGeneration;
+        if (_backend != null)
             _deviceGeneration = _backend.Generation;
-            Rearm();
-        }
         if (!CanAccept)
         {
-            if (_accepting)
-            {
-                _pressedKeys.Clear();
-                Rearm();
-            }
+            _pressedKeys.Clear();
             _accepting = false;
+            ResetButtons(state.Held);
             return;
         }
-        if (!_accepting)
+        if (!_accepting || devicesChanged)
         {
             _accepting = true;
-            Rearm();
+            ResetButtons(state.Held);
+            _lastScope = Scope;
             EnsureFocus();
+            return;
         }
         if (_backendError != null && !_backendErrorShown)
         {
             _backendErrorShown = true;
             ShowMenu();
         }
-        if (_lastScope != Scope)
-        {
-            _lastScope = Scope;
-            Rearm();
-        }
+        var scopeChanged = _lastScope != Scope;
+        _lastScope = Scope;
+        if (scopeChanged)
+            _repeatDirection = CouchButtons.None;
         EnsureFocus();
         var now = Environment.TickCount64;
-        if (!_armed)
+        var input = _buttons.Update(state, scopeChanged);
+        var pressed = input.Pressed;
+        if (state.Buttons != CouchButtons.None)
         {
-            if (state != CouchButtons.None)
-                _neutralSince = 0;
-            else if (_neutralSince == 0)
-                _neutralSince = now;
-            else if (now - _neutralSince >= 120)
-                _armed = true;
-            _previous = state;
-            return;
-        }
-
-        var pressed = state & ~_previous;
-        _previous = state;
-        if (state != CouchButtons.None)
-        {
-            _lastControllerButtons = state;
+            _lastControllerButtons = state.Buttons;
             _lastControllerTime = now;
         }
         // Action priority avoids activating an action and changing page in the same frame.
@@ -157,10 +140,10 @@ public sealed class CouchInputController : IDisposable
             Confirm();
         else
         {
-            var direction = FirstDirection(state & Directions);
+            var direction = FirstDirection((input.Held | pressed) & Directions);
             if (direction == CouchButtons.None)
                 _repeatDirection = CouchButtons.None;
-            else if (direction != _repeatDirection)
+            else if (direction != _repeatDirection || (pressed & direction) != 0)
             {
                 _repeatDirection = direction;
                 _nextRepeat = now + 380;
@@ -174,11 +157,9 @@ public sealed class CouchInputController : IDisposable
         }
     }
 
-    private void Rearm()
+    private void ResetButtons(CouchButtons held)
     {
-        _armed = false;
-        _neutralSince = 0;
-        _previous = CouchButtons.None;
+        _buttons.Reset(held);
         _repeatDirection = CouchButtons.None;
         _lastControllerButtons = CouchButtons.None;
     }
@@ -228,7 +209,7 @@ public sealed class CouchInputController : IDisposable
         var action = KeyboardAction(e.Key);
         // Steam Input can deliver both an SDL button and a mapped keyboard key. Sample
         // before routing even when the keyboard event arrived before our timer tick.
-        var state = _backend?.Read(consumePresses: false) ?? CouchButtons.None;
+        var state = _backend?.Read(consumePresses: false).Buttons ?? CouchButtons.None;
         if (
             action != CouchButtons.None
             && ((state & action) != 0 || Environment.TickCount64 - _lastControllerTime < 180 && (_lastControllerButtons & action) != 0)
@@ -292,14 +273,12 @@ public sealed class CouchInputController : IDisposable
     {
         if (!CanAccept || e.Source is not Control target)
             return;
-        if (!IsWithin(target, Scope) && _openCombo?.IsDropDownOpen != true)
+        if (!IsWithin(target, Scope))
         {
             Dispatcher.UIThread.Post(EnsureFocus, DispatcherPriority.Input);
             return;
         }
         _lastFocus = target;
-        if (target is ComboBox combo)
-            _openCombo = combo;
         target.BringIntoView();
     }
 
@@ -311,28 +290,42 @@ public sealed class CouchInputController : IDisposable
         return false;
     }
 
-    private static bool IsCandidate(Control target) =>
-        target.Focusable
-        && target.IsTabStop
-        && target.IsEffectivelyVisible
-        && target.IsEffectivelyEnabled
-        && target.Bounds.Width > 0
-        && target.Bounds.Height > 0
-        && target is not TextBlock;
+    internal static bool IsCandidate(Control target)
+    {
+        if (
+            !target.Focusable
+            || !target.IsTabStop
+            || !target.IsEffectivelyVisible
+            || !target.IsEffectivelyEnabled
+            || !target.IsHitTestVisible
+            || target.Bounds.Width <= 0
+            || target.Bounds.Height <= 0
+            || target is TextBlock or TopLevel or Panel or ICouchNavigationPage
+        )
+            return false;
+        for (Visual? current = target; current != null; current = current.GetVisualParent())
+            if (current.Opacity <= 0)
+                return false;
+        return true;
+    }
 
     private void EnsureFocus()
     {
         if (!CanAccept)
             return;
         var scope = Scope;
-        if (_openCombo?.IsDropDownOpen == true)
-            return;
         var focused = Focused;
         if (focused != null && IsCandidate(focused) && IsWithin(focused, scope))
             return;
         if (_lastFocus != null && IsCandidate(_lastFocus) && IsWithin(_lastFocus, scope))
         {
             _lastFocus.Focus(NavigationMethod.Directional);
+            return;
+        }
+        if (scope == _window && _window.CouchPageFocusTarget is { } entry && IsCandidate(entry))
+        {
+            entry.Focus(NavigationMethod.Directional);
+            entry.BringIntoView();
             return;
         }
         foreach (var visual in scope.GetVisualDescendants())
@@ -351,67 +344,53 @@ public sealed class CouchInputController : IDisposable
         var current = Focused;
         if (current == null)
             return;
-        // A controller enters text with Confirm/Y; arrows leave ordinary text fields.
-        // Native editor arrows remain native on the OSK and on a physical keyboard.
-        if (controller && (current is not TextBox || Scope is CouchKeyboard))
+        // Only controls with an adjustment/selection model own directional input.
+        // Buttons use an explicitly scoped search, not a synthetic global arrow event.
+        var sliderAdjusts =
+            current is Slider slider
+            && (slider.Orientation == Avalonia.Layout.Orientation.Horizontal ? key is Key.Left or Key.Right : key is Key.Up or Key.Down);
+        if (
+            controller
+            && (OpenPopup != null || sliderAdjusts || (current is TextBox && Scope is CouchKeyboard && key is Key.Left or Key.Right))
+        )
         {
             var before = Focused;
             if (SendKey(current, key) || Focused != before)
             {
                 Focused?.BringIntoView();
-                if (controller && Focused is TextBox focusedText && Scope is not CouchKeyboard)
-                    ShowTextInput(focusedText);
                 return;
             }
         }
-        if (current.TranslatePoint(default, _window) is not { } origin)
-            return;
-        var center = origin + new Vector(current.Bounds.Width / 2, current.Bounds.Height / 2);
-        Control? best = null;
-        var bestScore = double.PositiveInfinity;
-        foreach (var visual in Scope.GetVisualDescendants())
+        var direction = key switch
         {
-            if (
-                visual is not Control candidate
-                || candidate == current
-                || !IsCandidate(candidate)
-                || IsWithin(candidate, current)
-                || candidate.TranslatePoint(default, _window) is not { } point
-            )
-                continue;
-            var dx = point.X + candidate.Bounds.Width / 2 - center.X;
-            var dy = point.Y + candidate.Bounds.Height / 2 - center.Y;
-            var forward = key switch
-            {
-                Key.Left => -dx,
-                Key.Right => dx,
-                Key.Up => -dy,
-                _ => dy,
-            };
-            if (forward <= 1)
-                continue;
-            var sideways = key is Key.Left or Key.Right ? Math.Abs(dy) : Math.Abs(dx);
-            var score = forward + sideways * 3 + sideways * sideways / forward;
-            if (score < bestScore)
-            {
-                best = candidate;
-                bestScore = score;
-            }
-        }
-        if (best == null)
-            return;
-        _dispatching = controller;
-        try
-        {
-            best.Focus(NavigationMethod.Directional);
-        }
-        finally
-        {
-            _dispatching = false;
-        }
-        best.BringIntoView();
-        if (controller && best is TextBox nextText && Scope is not CouchKeyboard)
-            ShowTextInput(nextText);
+            Key.Left => NavigationDirection.Left,
+            Key.Right => NavigationDirection.Right,
+            Key.Up => NavigationDirection.Up,
+            _ => NavigationDirection.Down,
+        };
+        MoveFocus(Scope, current, direction);
+    }
+
+    internal static bool MoveFocus(Control scope, Control current, NavigationDirection direction)
+    {
+        var next =
+            TopLevel
+                .GetTopLevel(scope)
+                ?.FocusManager?.FindNextElement(
+                    direction,
+                    new FindNextElementOptions
+                    {
+                        FocusedElement = current,
+                        SearchRoot = scope,
+                        // A clipped scroll child is still reachable; revealing it is part of focus.
+                        // Modal and popup boundaries are enforced by SearchRoot, not occlusion.
+                        IgnoreOcclusivity = true,
+                    }
+                ) as Control;
+        if (next == null || !IsCandidate(next) || !next.Focus(NavigationMethod.Directional))
+            return false;
+        next.BringIntoView();
+        return true;
     }
 
     private void Confirm()
@@ -422,28 +401,16 @@ public sealed class CouchInputController : IDisposable
             ShowTextInput(text);
             return;
         }
-        if (Focused is ComboBox combo)
-            _openCombo = combo;
         if (Focused is { } target)
             SendKey(target, target is Button ? Key.Space : Key.Enter);
     }
 
-    private void GoBack()
-    {
-        if (_openCombo?.IsDropDownOpen == true)
-        {
-            _openCombo.SetCurrentValue(ComboBox.IsDropDownOpenProperty, false);
-            _openCombo.Focus(NavigationMethod.Directional);
-            return;
-        }
-        if (_window.Modals.TopModal is { } modal)
-            modal.Dismiss();
-        else
-            _window.GoCouchBack();
-    }
+    private void GoBack() => _window.GoCouchBack();
 
     private void ChangeSection(int offset)
     {
+        if (OpenPopup != null)
+            return;
         if (!_window.Modals.HasModals)
         {
             _window.NavigateCouchSection(offset);
@@ -471,19 +438,16 @@ public sealed class CouchInputController : IDisposable
             existing.Close();
             return;
         }
+        PopupNavigation.TryCloseTopPopup(_window, _window.Modals.TopModal ?? (Control)_window);
         var textTarget = Focused as TextBox;
         var canNavigate = !_window.Modals.HasModals;
-        var status =
-            _backendError == null
-                ? t("couch.controller_status", new { devices = _backend?.DeviceCount ?? 0 })
-                : t("couch.controller_unavailable", new { error = _backendError });
+        var error = _backendError == null ? null : t("couch.controller_unavailable", new { error = _backendError });
         var menu = new CouchMenu(
-            status,
+            error,
             canNavigate,
             textTarget is { IsReadOnly: false },
             _window.ShowSettings,
             _window.ToggleCouchFullscreen,
-            _window.Close,
             () => ShowTextInput(textTarget)
         );
         menu.SetModalOwner(_window.Modals.TopModal ?? (Control)_window).Show();
@@ -522,11 +486,14 @@ internal static class CouchNativeInput
 {
     public static bool SendKey(Control target, Key key)
     {
+        // The router owns slider-axis navigation. Use Slider's native editing path,
+        // not its separate gamepad focus-engagement mode (which consumes Confirm/Back).
+        var device = target is Slider ? KeyDeviceType.Keyboard : KeyDeviceType.Gamepad;
         var down = new KeyEventArgs
         {
             RoutedEvent = InputElement.KeyDownEvent,
             Key = key,
-            KeyDeviceType = KeyDeviceType.Gamepad,
+            KeyDeviceType = device,
         };
         target.RaiseEvent(down);
         target.RaiseEvent(
@@ -534,7 +501,7 @@ internal static class CouchNativeInput
             {
                 RoutedEvent = InputElement.KeyUpEvent,
                 Key = key,
-                KeyDeviceType = KeyDeviceType.Gamepad,
+                KeyDeviceType = device,
             }
         );
         return down.Handled;

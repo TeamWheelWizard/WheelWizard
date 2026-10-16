@@ -91,6 +91,12 @@
         <Style Selector="components|SegmentOption.Swatch:pointerover Border.SwatchHighlight">
             <Setter Property="Opacity" Value="0.12" />
         </Style>
+        <Style Selector=".couch Border.Floating">
+            <!-- Hidden couch panels leave navigation immediately; fading them back must not invalidate restored focus. -->
+            <Setter Property="Transitions">
+                <Transitions />
+            </Setter>
+        </Style>
         <Style Selector=".couch Border.Floating.hidden">
             <Setter Property="IsVisible" Value="False" />
         </Style>
@@ -99,6 +105,10 @@
             <Setter Property="BorderThickness" Value="3" />
         </Style>
         <Style Selector=".couch components|SegmentOption:focus-visible /template/ Border">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral50}" />
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
+        <Style Selector=".couch components|ToggleRadioButton.MiiTextVariant:focus-visible /template/ Border">
             <Setter Property="BorderBrush" Value="{StaticResource Neutral50}" />
             <Setter Property="BorderThickness" Value="3" />
         </Style>
@@ -277,9 +287,9 @@
                 <TextBlock Grid.Column="1" Text="{Binding Text, ElementName=NameField}" Classes="TitleText"
                            Margin="16,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                 <StackPanel x:Name="CouchEditorActions" Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                    <components:ActionButton Text="{loc:T action.undo}" Click="UndoButton_OnClick"
+                    <components:ActionButton Text="{loc:T action.undo}" Tone="Secondary" Variant="Ghost" Click="UndoButton_OnClick"
                                              IsEnabled="{Binding IsEnabled, ElementName=UndoButton}" />
-                    <components:ActionButton Text="{loc:T action.redo}" Click="RedoButton_OnClick"
+                    <components:ActionButton Text="{loc:T action.redo}" Tone="Secondary" Variant="Ghost" Click="RedoButton_OnClick"
                                              IsEnabled="{Binding IsEnabled, ElementName=RedoButton}" />
                     <components:ActionButton Text="{loc:T action.save}" Tone="Brand" Click="SaveButton_OnClick"
                                              IsEnabled="{Binding IsEnabled, ElementName=SaveButton}" />
@@ -291,10 +301,13 @@
                 <StackPanel x:Name="CouchPanels" Spacing="12" Margin="0,0,8,12">
                     <StackPanel x:Name="CouchPickerActions" Spacing="8" IsVisible="False">
                         <TextBlock Text="{loc:T text.pick_your_mii}" Classes="TitleText" TextWrapping="Wrap" />
-                        <Button Content="{loc:T attribute.mii.gender_male}" MinHeight="48" Click="PickBoy_OnClick" />
-                        <Button Content="{loc:T attribute.mii.gender_female}" MinHeight="48" Click="PickGirl_OnClick" />
-                        <Button Content="{loc:T action.surprise_me}" MinHeight="48" Click="DiceButton_OnClick"
-                                IsEnabled="{Binding IsEnabled, ElementName=DiceButton}" />
+                        <components:ActionButton x:Name="PickBoyButton" Text="{loc:T attribute.mii.gender_male}"
+                                                 Tone="Secondary" MinHeight="48" Click="PickBoy_OnClick" />
+                        <components:ActionButton x:Name="PickGirlButton" Text="{loc:T attribute.mii.gender_female}"
+                                                 Tone="Secondary" MinHeight="48" Click="PickGirl_OnClick" />
+                        <components:ActionButton Text="{loc:T action.surprise_me}" Tone="Secondary" Variant="Ghost"
+                                                 MinHeight="48" Click="DiceButton_OnClick"
+                                                 IsEnabled="{Binding IsEnabled, ElementName=DiceButton}" />
                     </StackPanel>
                     <WrapPanel x:Name="CouchPartActions" Orientation="Horizontal" />
                 </StackPanel>

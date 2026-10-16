@@ -20,6 +20,10 @@
         <ApplicationIcon>car-wheel.ico</ApplicationIcon>
     </PropertyGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="WheelWizard.UI.Test" />
+    </ItemGroup>
+
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
         <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>

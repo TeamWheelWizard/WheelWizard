@@ -43,10 +43,10 @@
 
         <StackPanel x:Name="CouchRoomActions" Grid.Row="1" IsVisible="False"
                     HorizontalAlignment="Right" Margin="10,8" Orientation="Horizontal">
-            <Button Content="{loc:T action.view_room}" Tag="{Binding #RoomsView}" Click="OpenSelectedRoom_OnClick" MinHeight="44"
+            <components:ActionButton Tone="Brand" Text="{loc:T action.view_room}" Tag="{Binding #RoomsView}" Click="OpenSelectedRoom_OnClick" MinHeight="44"
                     IsVisible="{Binding #RoomsListViewContainer.IsVisible}"
                     IsEnabled="{Binding #RoomsView.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}" />
-            <Button Content="{loc:T action.view_room}" Tag="{Binding #PlayerSearchResults}" Click="OpenSelectedRoom_OnClick" MinHeight="44"
+            <components:ActionButton Tone="Brand" Text="{loc:T action.view_room}" Tag="{Binding #PlayerSearchResults}" Click="OpenSelectedRoom_OnClick" MinHeight="44"
                     IsVisible="{Binding #PlayerListViewContainer.IsVisible}"
                     IsEnabled="{Binding #PlayerSearchResults.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}" />
         </StackPanel>

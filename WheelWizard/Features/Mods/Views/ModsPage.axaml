@@ -65,10 +65,6 @@
         <Style Selector="mods|ModsPage.couch UniformGrid">
             <Setter Property="Columns" Value="3" />
         </Style>
-        <Style Selector="mods|ModsPage.couch components|ActionButton:focus-visible">
-            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
-            <Setter Property="BorderThickness" Value="2" />
-        </Style>
     </UserControl.Styles>
     <Grid>
         <Grid.RowDefinitions>
@@ -212,11 +208,11 @@
 
                                     </Grid>
                                     <StackPanel Grid.Column="3" Classes="CouchModActions" Orientation="Horizontal" Spacing="8" Margin="8,0" VerticalAlignment="Center">
-                                        <components:ActionButton Text="↑" AutomationProperties.Name="Move mod up" MinHeight="44"
+                                        <components:ActionButton Tone="Secondary" Variant="Ghost" IconData="{StaticResource ArrowUp}" AutomationProperties.Name="{loc:T couch.move_up}" MinHeight="44" MinWidth="44"
                                                                  IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}" Click="ButtonUp_OnClick" />
-                                        <components:ActionButton Text="↓" AutomationProperties.Name="Move mod down" MinHeight="44"
+                                        <components:ActionButton Tone="Secondary" Variant="Ghost" IconData="{StaticResource ArrowDown}" AutomationProperties.Name="{loc:T couch.move_down}" MinHeight="44" MinWidth="44"
                                                                  IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}" Click="ButtonDown_OnClick" />
-                                        <components:ActionButton Text="…" AutomationProperties.Name="Mod actions" MinHeight="44" Click="ModActions_OnClick" />
+                                        <components:ActionButton Tone="Secondary" Variant="Ghost" Text="…" AutomationProperties.Name="{loc:T action.more_actions}" MinHeight="44" MinWidth="44" Click="ModActions_OnClick" />
                                     </StackPanel>
                                 </Grid>
                             </Border>
@@ -243,11 +239,11 @@
                                 <StackPanel>
                                     <mods:GridModPanel ViewRequested="ViewMod_Click" DragRequested="DragHandle_PointerPressed" />
                                     <StackPanel Classes="CouchModActions" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="4,0,4,12">
-                                        <components:ActionButton Text="↑" AutomationProperties.Name="Move mod up" MinHeight="44"
+                                        <components:ActionButton Tone="Secondary" Variant="Ghost" IconData="{StaticResource ArrowUp}" AutomationProperties.Name="{loc:T couch.move_up}" MinHeight="44" MinWidth="44"
                                                                  IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}" Click="ButtonUp_OnClick" />
-                                        <components:ActionButton Text="↓" AutomationProperties.Name="Move mod down" MinHeight="44"
+                                        <components:ActionButton Tone="Secondary" Variant="Ghost" IconData="{StaticResource ArrowDown}" AutomationProperties.Name="{loc:T couch.move_down}" MinHeight="44" MinWidth="44"
                                                                  IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}" Click="ButtonDown_OnClick" />
-                                        <components:ActionButton Text="…" AutomationProperties.Name="Mod actions" MinHeight="44" Click="ModActions_OnClick" />
+                                        <components:ActionButton Tone="Secondary" Variant="Ghost" Text="…" AutomationProperties.Name="{loc:T action.more_actions}" MinHeight="44" MinWidth="44" Click="ModActions_OnClick" />
                                     </StackPanel>
                                 </StackPanel>
                                 <Border.ContextMenu>

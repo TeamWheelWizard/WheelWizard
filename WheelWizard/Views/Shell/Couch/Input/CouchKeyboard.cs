@@ -27,7 +27,7 @@ internal sealed class CouchKeyboard : ModalContent
         _submit = submit;
         IsDismissible = true;
         DismissAction = Cancel;
-        _editor = new TextBox
+        _editor = new InputField
         {
             Text = target.Text,
             PasswordChar = target.PasswordChar,
@@ -50,7 +50,12 @@ internal sealed class CouchKeyboard : ModalContent
             Width = 860,
             MaxWidth = 860,
         };
-        body.Children.Add(new TextBlock { Text = t("couch.text_input"), FontSize = 26 });
+        body.Children.Add(
+            new ModalHeading
+            {
+                Content = new TextBlock { Text = t("couch.text_input"), Classes = { "TitleText" } },
+            }
+        );
         body.Children.Add(_editor);
         var characters = new UniformGrid { Columns = 10, Rows = 5 };
         const string keys = "1234567890qwertyuiopasdfghjkl;zxcvbnm,./@_-+=!?():";
@@ -88,17 +93,18 @@ internal sealed class CouchKeyboard : ModalContent
         body.Children.Add(editing);
         var actions = new UniformGrid { Columns = 2 };
         actions.Children.Add(MakeButton(t("action.cancel"), Cancel));
-        actions.Children.Add(MakeButton(t("couch.submit"), Submit));
+        actions.Children.Add(MakeButton(t("couch.submit"), Submit, ActionButtonTone.Brand));
         body.Children.Add(actions);
-        body.Children.Add(new TextBlock { Text = t("couch.keyboard_hints"), TextWrapping = Avalonia.Media.TextWrapping.Wrap });
+        body.Children.Add(new TextBlock { Text = t("couch.keyboard_hints"), Classes = { "BodyText" } });
         Content = new ScrollViewer { Content = body, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
     }
 
-    private static ActionButton MakeButton(string text, Action action)
+    private static ActionButton MakeButton(string text, Action action, ActionButtonTone tone = ActionButtonTone.Secondary)
     {
         var button = new ActionButton
         {
             Text = text,
+            Tone = tone,
             MinHeight = 48,
             Margin = new Thickness(3),
             FontSize = 20,

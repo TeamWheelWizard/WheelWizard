@@ -3,6 +3,7 @@ using Avalonia.Input;
 using WheelWizard.Localization;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings.Views;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.Shell.Controls;
 using WheelWizard.WiiManagement.MiiManagement.Views;
 using WheelWizard.WiiManagement.MiiManagement.Views.Editor;
@@ -11,7 +12,7 @@ namespace WheelWizard.Views.Shell.Couch;
 
 public partial class CouchView : UserControl
 {
-    private readonly List<(Type Page, Button Button)> _routes = [];
+    private readonly List<(Type Page, ActionButton Button)> _routes = [];
     public event Action<Type>? NavigationRequested;
     public event Action? FullscreenRequested;
     public event Action? BackRequested;
@@ -37,7 +38,7 @@ public partial class CouchView : UserControl
 
     private void AddRoute(Type page, string label)
     {
-        var button = new Button { Content = label };
+        var button = new ActionButton { Text = label };
         button.Classes.Add("couch-navigation");
         button.Click += (_, _) => NavigationRequested?.Invoke(page);
         _routes.Add((page, button));
@@ -73,8 +74,8 @@ public partial class CouchView : UserControl
 
     public void RefreshLabels()
     {
-        FullscreenButton.Content = t("couch.fullscreen");
-        BackButton.Content = t("action.back");
+        FullscreenButton.Text = t("couch.fullscreen");
+        BackButton.Text = t("action.back");
         InputHints.Text = t("couch.input_hints");
     }
 }

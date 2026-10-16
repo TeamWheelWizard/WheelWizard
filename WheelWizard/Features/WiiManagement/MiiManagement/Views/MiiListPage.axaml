@@ -7,6 +7,16 @@
              mc:Ignorable="d" d:DesignWidth="456" d:DesignHeight="776"
              x:Class="WheelWizard.WiiManagement.MiiManagement.Views.MiiListPage"
         xmlns:miis="clr-namespace:WheelWizard.WiiManagement.MiiManagement.Views">
+    <UserControl.Styles>
+        <!-- Couch navigation addresses the actual tiles, not the ListBox's structural row containers. -->
+        <Style Selector=".couch ListBox#MiiList">
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="Continue" />
+            <Setter Property="Focusable" Value="False" />
+        </Style>
+        <Style Selector=".couch ListBoxItem">
+            <Setter Property="Focusable" Value="False" />
+        </Style>
+    </UserControl.Styles>
     <Grid x:Name="CompleteGrid" x:CompileBindings="False">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />

@@ -27,7 +27,6 @@ internal sealed class SdlGamepadBackend : IDisposable
     public int Generation { get; private set; }
     private bool _initialized;
     private CouchButtons _pendingPresses;
-    public int DeviceCount => _devices.Count;
 
     public SdlGamepadBackend()
     {
@@ -77,7 +76,7 @@ internal sealed class SdlGamepadBackend : IDisposable
         }
     }
 
-    public CouchButtons Read(bool consumePresses = true)
+    public CouchGamepadState Read(bool consumePresses = true)
     {
         SDL_PumpEvents();
         // SDL_Event is a 128-byte union; device id follows type/reserved/timestamp.
@@ -141,10 +140,10 @@ internal sealed class SdlGamepadBackend : IDisposable
             Generation++;
         }
         _disconnected.Clear();
-        buttons |= _pendingPresses;
+        var state = new CouchGamepadState(buttons, _pendingPresses);
         if (consumePresses)
             _pendingPresses = CouchButtons.None;
-        return buttons;
+        return state;
     }
 
     private static CouchButtons MapButton(byte button) =>
