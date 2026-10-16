@@ -34,8 +34,10 @@ public partial class ModBrowserPage : UserControl, ILockedSidebarPage
         };
         ResultsScroll.SizeChanged += (_, _) =>
         {
+            var columns = ResultsScroll.Bounds.Width >= 520 ? 2 : 1;
             if (ResultsList.ItemsPanelRoot is Avalonia.Controls.Primitives.UniformGrid grid)
-                grid.Columns = ResultsScroll.Bounds.Width >= 520 ? 2 : 1;
+                grid.Columns = columns;
+            LoadingGrid.Columns = columns;
         };
     }
 

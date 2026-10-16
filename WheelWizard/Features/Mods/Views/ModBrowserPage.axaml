@@ -63,10 +63,10 @@
                 <Grid Grid.Column="1" ColumnDefinitions="*,Auto" ColumnSpacing="8" HorizontalAlignment="Stretch">
                     <components:InputField x:Name="SearchInput" Text="{Binding SearchText, Mode=TwoWay}"
                                            Placeholder="{loc:T mod_browser.search_placeholder}" IconData="{StaticResource Search}"
-                                           Height="36" KeyDown="Search_KeyDown" />
+                                           Height="36" VerticalAlignment="Bottom" KeyDown="Search_KeyDown" />
                     <Grid Grid.Column="1">
                         <components:ActionButton x:Name="FilterButton" IconData="{StaticResource ModFilterIcon}" Tone="Secondary"
-                                                 Width="36" Height="36" Padding="8" Click="Filter_Click"
+                                                 Width="36" Height="36" Padding="8" Margin="0,5,5,0" Click="Filter_Click"
                                                  AutomationProperties.Name="{loc:T mod_browser.filters}">
                             <Button.Flyout>
                                 <Flyout Placement="BottomEdgeAlignedRight" FlyoutPresenterClasses="ModFilters">
@@ -100,9 +100,9 @@
                             </Button.Flyout>
                         </components:ActionButton>
                         <Border Width="18" Height="18" CornerRadius="9" Background="{StaticResource Brand400}"
-                                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-5,-5,0"
+                                HorizontalAlignment="Right" VerticalAlignment="Top"
                                 IsVisible="{Binding HasFilters}" IsHitTestVisible="False">
-                            <TextBlock Text="{Binding ActiveFilterCount}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource Neutral950}"
+                            <TextBlock Text="{Binding ActiveFilterCount}" FontSize="10" FontWeight="Bold" Foreground="White"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                     </Grid>
@@ -157,11 +157,68 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <StackPanel IsVisible="{Binding ShowInitialLoading}" Spacing="12" Margin="6,0">
-                    <views:ModImagePlaceholder Height="142" />
-                    <views:ModImagePlaceholder Height="18" Width="220" HorizontalAlignment="Left" />
-                    <views:ModImagePlaceholder Height="12" Width="150" HorizontalAlignment="Left" />
-                </StackPanel>
+                <UniformGrid x:Name="LoadingGrid" Columns="2" IsVisible="{Binding ShowInitialLoading}" IsHitTestVisible="False">
+                    <Border Background="{StaticResource Neutral900}" BorderBrush="{StaticResource Neutral800}"
+                            BorderThickness="1" CornerRadius="8" Padding="1" Margin="6,0,6,12" ClipToBounds="True">
+                        <StackPanel>
+                            <views:ModImagePlaceholder Height="142" />
+                            <StackPanel Margin="12,10" Spacing="8">
+                                <StackPanel Height="40" Spacing="7">
+                                    <views:ModImagePlaceholder Height="15" Margin="0,0,18,0" />
+                                    <views:ModImagePlaceholder Height="15" Margin="0,0,50,0" />
+                                </StackPanel>
+                                <views:ModImagePlaceholder Height="24" Margin="0,0,60,0" />
+                                <Border Height="1" Background="{StaticResource BackgroundLineColor}" />
+                                <views:ModImagePlaceholder Height="14" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="{StaticResource Neutral900}" BorderBrush="{StaticResource Neutral800}"
+                            BorderThickness="1" CornerRadius="8" Padding="1" Margin="6,0,6,12" ClipToBounds="True">
+                        <StackPanel>
+                            <views:ModImagePlaceholder Height="142" />
+                            <StackPanel Margin="12,10" Spacing="8">
+                                <StackPanel Height="40" Spacing="7">
+                                    <views:ModImagePlaceholder Height="15" Margin="0,0,18,0" />
+                                    <views:ModImagePlaceholder Height="15" Margin="0,0,50,0" />
+                                </StackPanel>
+                                <views:ModImagePlaceholder Height="24" Margin="0,0,60,0" />
+                                <Border Height="1" Background="{StaticResource BackgroundLineColor}" />
+                                <views:ModImagePlaceholder Height="14" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="{StaticResource Neutral900}" BorderBrush="{StaticResource Neutral800}"
+                            BorderThickness="1" CornerRadius="8" Padding="1" Margin="6,0,6,12" ClipToBounds="True">
+                        <StackPanel>
+                            <views:ModImagePlaceholder Height="142" />
+                            <StackPanel Margin="12,10" Spacing="8">
+                                <StackPanel Height="40" Spacing="7">
+                                    <views:ModImagePlaceholder Height="15" Margin="0,0,18,0" />
+                                    <views:ModImagePlaceholder Height="15" Margin="0,0,50,0" />
+                                </StackPanel>
+                                <views:ModImagePlaceholder Height="24" Margin="0,0,60,0" />
+                                <Border Height="1" Background="{StaticResource BackgroundLineColor}" />
+                                <views:ModImagePlaceholder Height="14" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="{StaticResource Neutral900}" BorderBrush="{StaticResource Neutral800}"
+                            BorderThickness="1" CornerRadius="8" Padding="1" Margin="6,0,6,12" ClipToBounds="True">
+                        <StackPanel>
+                            <views:ModImagePlaceholder Height="142" />
+                            <StackPanel Margin="12,10" Spacing="8">
+                                <StackPanel Height="40" Spacing="7">
+                                    <views:ModImagePlaceholder Height="15" Margin="0,0,18,0" />
+                                    <views:ModImagePlaceholder Height="15" Margin="0,0,50,0" />
+                                </StackPanel>
+                                <views:ModImagePlaceholder Height="24" Margin="0,0,60,0" />
+                                <Border Height="1" Background="{StaticResource BackgroundLineColor}" />
+                                <views:ModImagePlaceholder Height="14" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
                 <components:EmptyPageInfo IsVisible="{Binding IsEmpty}" Title="{loc:T mod_browser.empty_title}"
                                           BodyText="{loc:T mod_browser.empty_body}" />
                 <Border IsVisible="{Binding HasError}" Background="{StaticResource Neutral900}" CornerRadius="8" Padding="16" Margin="6,0">
