@@ -15,19 +15,7 @@ namespace WheelWizard.Test.Features
         {
             _api = Substitute.For<IGameBananaApi>();
             _apiCaller = Substitute.For<IApiCaller<IGameBananaApi>>();
-            _service = new GameBananaSingletonService(_apiCaller, new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions()));
-        }
-
-        [Fact]
-        public async Task GetModTypes_CachesSuccessfulResponsesOnly()
-        {
-            var types = new List<GameBananaModType> { new() { Id = 799, Name = "Tracks", Url = "https://gamebanana.com/mods/cats/799" } };
-            _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<List<GameBananaModType>>>>>())
-                .Returns(Fail("Offline"), Ok(types));
-            Assert.True((await _service.GetModTypes()).IsFailure);
-            Assert.Same(types, (await _service.GetModTypes()).Value);
-            Assert.Same(types, (await _service.GetModTypes()).Value);
-            await _apiCaller.Received(2).CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<List<GameBananaModType>>>>>());
+            _service = new GameBananaSingletonService(_apiCaller);
         }
 
         [Fact]
@@ -63,7 +51,7 @@ namespace WheelWizard.Test.Features
         }
 
         [Fact]
-        public async Task GetModSearchResults_WithEmptySearchTerm_UsesDefaultTerm()
+        public async Task GetModSearchResults_WithEmptySearchTerm_UsesCategoryCatalog()
         {
             // Arrange
             var emptySearchTerm = "";
@@ -84,7 +72,10 @@ namespace WheelWizard.Test.Features
                 .Returns(Ok(expectedResults));
 
             // Act
-            var result = await _service.GetModSearchResults(emptySearchTerm, page);
+            var result = await _service.GetModSearchResults(emptySearchTerm, page, 10082);
+            var request = (Expression<Func<IGameBananaApi, Task<GameBananaSearchResults>>>)_apiCaller.ReceivedCalls().Single().GetArguments()[0]!;
+            await request.Compile()(_api);
+            await _api.Received(1).GetMods(5896, 10082, 1, 12);
 
             // Assert
             Assert.True(result.IsSuccess);

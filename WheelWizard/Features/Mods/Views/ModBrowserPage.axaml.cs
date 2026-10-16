@@ -61,7 +61,7 @@ public partial class ModBrowserPage : UserControl, ILockedSidebarPage
         Search_Click(sender, e);
     }
 
-    private async void Filter_Click(object? sender, RoutedEventArgs e) => await _model.PrepareFiltersAsync();
+    private void Filter_Click(object? sender, RoutedEventArgs e) => _model.PrepareFilters();
 
     private async void ApplyFilters_Click(object? sender, RoutedEventArgs e)
     {

@@ -70,23 +70,32 @@
                                                  AutomationProperties.Name="{loc:T mod_browser.filters}">
                             <Button.Flyout>
                                 <Flyout Placement="BottomEdgeAlignedRight" FlyoutPresenterClasses="ModFilters">
-                                    <StackPanel Width="250" Spacing="16">
+                                    <ScrollViewer MaxHeight="560" HorizontalScrollBarVisibility="Disabled">
+                                    <StackPanel Width="290" Spacing="16">
                                         <TextBlock Text="{loc:T mod_browser.filters}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource Neutral100}" />
                                         <components:ToggleCheckBox x:Name="PatchesFilter" Content="{loc:T mod_browser.patches_only}"
                                                                    IsChecked="{Binding DraftPatchesOnly, Mode=TwoWay}" />
                                         <Border Height="1" Background="{StaticResource Neutral700}" />
                                         <StackPanel Spacing="6">
                                             <components:FormFieldLabel Text="{loc:T mod_browser.mod_type}" />
-                                            <components:Dropdown x:Name="ModTypeFilter" ItemsSource="{Binding ModTypes}"
-                                                                 SelectedItem="{Binding DraftModType, Mode=TwoWay}" />
-                                            <components:Spinner Width="18" Height="18" IsVisible="{Binding TypesLoading}" />
-                                            <TextBlock Text="{Binding TypesError}" IsVisible="{Binding TypesError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                                       FontSize="12" Foreground="{StaticResource Danger400}" TextWrapping="Wrap" />
+                                            <components:Dropdown x:Name="ModTypeFilter" ItemsSource="{Binding ModTypes}" Multiple="True"
+                                                                 PlaceholderText="{loc:T mod_browser.all_types}" SelectedItems="{Binding DraftModTypes}" />
+                                        </StackPanel>
+                                        <StackPanel Spacing="6" IsVisible="{Binding ShowSkinFilters}">
+                                            <components:FormFieldLabel Text="{loc:T mod_browser.skin_types}" />
+                                            <components:Dropdown x:Name="SkinTypeFilter" ItemsSource="{Binding SkinTypes}" Multiple="True" Search="True"
+                                                                 PlaceholderText="{loc:T mod_browser.all_skins}" SelectedItems="{Binding DraftSkinTypes}" />
+                                        </StackPanel>
+                                        <StackPanel Spacing="6" IsVisible="{Binding ShowUiFilters}">
+                                            <components:FormFieldLabel Text="{loc:T mod_browser.ui_types}" />
+                                            <components:Dropdown x:Name="UiTypeFilter" ItemsSource="{Binding UiTypes}" Multiple="True" Search="True"
+                                                                 PlaceholderText="{loc:T mod_browser.all_ui}" SelectedItems="{Binding DraftUiTypes}" />
                                         </StackPanel>
                                         <Border Height="1" Background="{StaticResource Neutral700}" />
                                         <components:ActionButton x:Name="ApplyFiltersButton" Text="{loc:T mod_browser.apply_filters}"
                                                                  HorizontalAlignment="Stretch" Click="ApplyFilters_Click" />
                                     </StackPanel>
+                                    </ScrollViewer>
                                 </Flyout>
                             </Button.Flyout>
                         </components:ActionButton>

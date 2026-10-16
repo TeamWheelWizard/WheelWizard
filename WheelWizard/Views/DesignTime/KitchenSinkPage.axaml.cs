@@ -91,6 +91,7 @@ public partial class KitchenSinkPage : UserControl, ILockedSidebarPage
             .Choice(nameof(preview.Variant), "Bordered", Enum.GetValues<DropdownVariant>())
             .Text(nameof(preview.Note), "")
             .Switch(nameof(preview.Search), "False")
+            .Switch(nameof(preview.Multiple), "False")
             .Text(nameof(preview.SearchPlaceholder), preview.SearchPlaceholder ?? "Search...")
             .Text(nameof(preview.EmptyText), preview.EmptyText ?? "No options found")
             .Text(nameof(preview.ErrorText), "")

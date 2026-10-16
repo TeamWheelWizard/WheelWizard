@@ -7,7 +7,7 @@ namespace WheelWizard.Mods.ViewModels;
 
 public sealed record ModBrowserItem(GameBananaModPreview Mod, ModPreviewViewModel Preview);
 
-public sealed class ModBrowserViewModel(IGameBananaSingletonService api, IGameBananaMediaService media) : INotifyPropertyChanged
+public sealed class ModBrowserViewModel : INotifyPropertyChanged
 {
     private CancellationTokenSource? _search;
     private string _query = "";
@@ -16,23 +16,37 @@ public sealed class ModBrowserViewModel(IGameBananaSingletonService api, IGameBa
     private bool _hasMore;
     private readonly Queue<GameBananaModPreview> _pending = new();
     private readonly HashSet<int> _seen = [];
-    private GameBananaModType? _modType;
+    private readonly IGameBananaSingletonService api;
+    private readonly IGameBananaMediaService media;
+    private GameBananaModType[] _types = [],
+        _skins = [],
+        _ui = [];
+    private int? _categoryId;
 
-    public ObservableCollection<GameBananaModType> ModTypes { get; } =
-        [
-            new()
-            {
-                Id = 0,
-                Name = t("mod_browser.all_types"),
-                Url = "",
-            },
-        ];
-    public GameBananaModType? ModType { get; set; }
+    public ModBrowserViewModel(IGameBananaSingletonService api, IGameBananaMediaService media)
+    {
+        this.api = api;
+        this.media = media;
+        DraftModTypes.CollectionChanged += (_, _) =>
+        {
+            if (!ShowSkinFilters)
+                DraftSkinTypes.Clear();
+            if (!ShowUiFilters)
+                DraftUiTypes.Clear();
+            Notify();
+        };
+    }
+
+    public IReadOnlyList<GameBananaModType> ModTypes => GameBananaModCategories.Types;
+    public IReadOnlyList<GameBananaModType> SkinTypes => GameBananaModCategories.Skins;
+    public IReadOnlyList<GameBananaModType> UiTypes => GameBananaModCategories.Ui;
+    public ObservableCollection<GameBananaModType> DraftModTypes { get; } = [];
+    public ObservableCollection<GameBananaModType> DraftSkinTypes { get; } = [];
+    public ObservableCollection<GameBananaModType> DraftUiTypes { get; } = [];
     public bool DraftPatchesOnly { get; set; }
-    public GameBananaModType? DraftModType { get; set; }
-    public bool TypesLoading { get; private set; }
-    public string? TypesError { get; private set; }
-    public int ActiveFilterCount => (PatchesOnly ? 1 : 0) + (ModType is { Id: > 0 } ? 1 : 0);
+    public bool ShowSkinFilters => DraftModTypes.Any(type => type.Id == 10080);
+    public bool ShowUiFilters => DraftModTypes.Any(type => type.Id == 2083);
+    public int ActiveFilterCount => (PatchesOnly ? 1 : 0) + _types.Length + _skins.Length + _ui.Length;
     public bool HasFilters => ActiveFilterCount > 0;
 
     public ObservableCollection<ModBrowserItem> Results { get; } = [];
@@ -48,33 +62,45 @@ public sealed class ModBrowserViewModel(IGameBananaSingletonService api, IGameBa
 
     public Task RetryAsync() => _search == null ? SearchAsync() : LoadMoreAsync();
 
-    public async Task PrepareFiltersAsync()
+    public void PrepareFilters()
     {
         DraftPatchesOnly = PatchesOnly;
-        DraftModType = ModType ?? ModTypes[0];
-        Notify();
-        if (ModTypes.Count > 1 || TypesLoading)
-            return;
-        TypesLoading = true;
-        TypesError = null;
-        Notify();
-        var response = await api.GetModTypes();
-        if (response.IsSuccess)
-        {
-            foreach (var type in response.Value.Where(type => !type.IsObsolete).OrderBy(type => type.Name))
-                ModTypes.Add(type);
-        }
-        else
-            TypesError = t("mod_browser.types_error");
-        TypesLoading = false;
+        DraftModTypes.Clear();
+        foreach (var type in _types)
+            DraftModTypes.Add(type);
+        DraftSkinTypes.Clear();
+        foreach (var type in _skins)
+            DraftSkinTypes.Add(type);
+        DraftUiTypes.Clear();
+        foreach (var type in _ui)
+            DraftUiTypes.Add(type);
         Notify();
     }
 
     public Task ApplyFiltersAsync()
     {
         PatchesOnly = DraftPatchesOnly;
-        ModType = DraftModType;
+        _types = DraftModTypes.ToArray();
+        _skins = DraftSkinTypes.ToArray();
+        _ui = DraftUiTypes.ToArray();
         return SearchAsync();
+    }
+
+    private bool MatchesCategories(GameBananaModPreview mod)
+    {
+        if (_types.Length == 0)
+            return true;
+        return _types.Any(type =>
+            type.Url == mod.RootCategory.ProfileUrl
+            && (
+                type.Id switch
+                {
+                    10080 => _skins.Length == 0 || _skins.Any(skin => skin.Url == mod.SubCategory?.ProfileUrl),
+                    2083 => _ui.Length == 0 || _ui.Any(ui => ui.Url == mod.SubCategory?.ProfileUrl),
+                    _ => true,
+                }
+            )
+        );
     }
 
     public async Task SearchAsync()
@@ -84,7 +110,16 @@ public sealed class ModBrowserViewModel(IGameBananaSingletonService api, IGameBa
         _page = 0;
         _query = SearchText.Trim();
         _patchesOnly = PatchesOnly;
-        _modType = ModType is { Id: > 0 } ? ModType : null;
+        // The API accepts one category: narrow to a parent for several children, or filter the full feed for several parents.
+        _categoryId =
+            _types.Length != 1
+                ? null
+                : _types[0].Id switch
+                {
+                    10080 when _skins.Length == 1 => _skins[0].Id,
+                    2083 when _ui.Length == 1 => _ui[0].Id,
+                    _ => _types[0].Id,
+                };
         _hasMore = true;
         if (_query.Length == 1)
         {
@@ -112,7 +147,7 @@ public sealed class ModBrowserViewModel(IGameBananaSingletonService api, IGameBa
             // API pages include excluded entries; buffer matching results into even batches.
             while (_pending.Count < 12 && _hasMore)
             {
-                var response = await api.GetModSearchResults(_query, _page + 1, _modType?.Id).WaitAsync(search.Token);
+                var response = await api.GetModSearchResults(_query, _page + 1, _categoryId).WaitAsync(search.Token);
                 if (search != _search)
                     return;
                 if (response.IsFailure)
@@ -128,7 +163,7 @@ public sealed class ModBrowserViewModel(IGameBananaSingletonService api, IGameBa
                         mod.ModelName != "Mod"
                         || mod.HasContentRatings
                         || (_patchesOnly && !mod.UsesPatches)
-                        || (_modType != null && mod.RootCategory.ProfileUrl != _modType.Url)
+                        || !MatchesCategories(mod)
                         || !_seen.Add(mod.Id)
                     )
                         continue;

@@ -739,6 +739,7 @@ en:
     dropdown:
       search_placeholder: "Search..."
       empty: "No options found"
+      remove: "Remove %{option}"
     input:
       invalid_number: "Enter a number"
 
@@ -758,4 +759,7 @@ en:
     mod_type: "Mod type"
     all_types: "All types"
     apply_filters: "Apply filter"
-    types_error: "Couldn't load mod types. Reopen filters to try again."
+    skin_types: "Characters and skins"
+    ui_types: "UI categories"
+    all_skins: "All characters and skins"
+    all_ui: "All UI categories"

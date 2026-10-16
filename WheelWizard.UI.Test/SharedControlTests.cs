@@ -20,6 +20,59 @@ namespace WheelWizard.UI.Test;
 
 public class SharedControlTests
 {
+    [AvaloniaFact]
+    public void Dropdown_MultipleSearchAddsBadgesAndRemovesWithoutClosing()
+    {
+        var required = new DropdownOption("You") { IsSelectionRequired = true };
+        var mario = new DropdownOption("Mario", Geometry.Parse("M0 0 H16 V16 H0 Z"));
+        var luigi = new DropdownOption("Luigi");
+        var selected = new System.Collections.ObjectModel.ObservableCollection<object>();
+        var dropdown = new Dropdown
+        {
+            Multiple = true,
+            Search = true,
+            ItemsSource = new[] { required, mario, luigi },
+            SelectedItems = selected,
+            Width = 280,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
+            MenuAnimationDuration = TimeSpan.Zero,
+        };
+        using var window = new UiTestWindow
+        {
+            Content = dropdown,
+            Width = 320,
+            Height = 360,
+        };
+        window.Show();
+        dropdown.IsDropDownOpen = true;
+        Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+        Assert.Equal(required, Assert.Single(selected));
+        var popup = dropdown.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.Popup>().Single();
+        var input = popup.Child!.GetVisualDescendants().OfType<InputField>().Single();
+        input.Text = "mar";
+        window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Contains(mario, selected);
+        Assert.True(dropdown.IsDropDownOpen);
+        Assert.False(dropdown.ContainerFromIndex(1)!.IsVisible);
+        input.Text = "lu";
+        window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
+        Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+        Assert.Equal(3, selected.Count);
+        var remove = dropdown.GetVisualDescendants().OfType<ActionButton>().First(button => button.Classes.Contains("DropdownRemove"));
+        var point = remove.TranslatePoint(new Point(10, 10), window)!.Value;
+        window.MouseDown(point, MouseButton.Left);
+        window.MouseUp(point, MouseButton.Left);
+        Assert.DoesNotContain(mario, selected);
+        Assert.Contains(required, selected);
+        Assert.True(dropdown.IsDropDownOpen);
+        selected.Clear();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(required, Assert.Single(selected));
+    }
+
     [AvaloniaTheory]
     [InlineData(false)]
     [InlineData(true)]

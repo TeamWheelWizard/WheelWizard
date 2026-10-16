@@ -21,6 +21,42 @@ namespace WheelWizard.UI.Test;
 public class ModBrowserTests
 {
     [AvaloniaFact]
+    public async Task Subcategories_CombineWithinEachSelectedType()
+    {
+        var api = Substitute.For<IGameBananaSingletonService>();
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
+        var response = Results("Mario");
+        response.Records = new[] { (10080, 10082), (10080, 10083), (10080, 10084), (2083, 2085), (2083, 2084), (799, 6534) }
+            .Select(
+                (category, i) =>
+                {
+                    var mod = Results($"Mod {i}").Records[0];
+                    mod.Id = i;
+                    mod.RootCategory.ProfileUrl = $"https://gamebanana.com/mods/cats/{category.Item1}";
+                    mod.SubCategory = new() { Name = "Subcategory", ProfileUrl = $"https://gamebanana.com/mods/cats/{category.Item2}" };
+                    return mod;
+                }
+            )
+            .ToList();
+        api.GetModSearchResults("", 1).Returns(OperationResult.Ok(response));
+        model.DraftModTypes.Add(model.ModTypes.Single(type => type.Id == 10080));
+        model.DraftModTypes.Add(model.ModTypes.Single(type => type.Id == 2083));
+        model.DraftSkinTypes.Add(model.SkinTypes.Single(type => type.Id == 10082));
+        model.DraftSkinTypes.Add(model.SkinTypes.Single(type => type.Id == 10083));
+        model.DraftUiTypes.Add(model.UiTypes.Single(type => type.Id == 2085));
+        await model.ApplyFiltersAsync();
+        Assert.Equal(new[] { 0, 1, 3 }, model.Results.Select(item => item.Mod.Id));
+        Assert.Equal(5, model.ActiveFilterCount);
+        model.DraftModTypes.Clear();
+        Assert.Empty(model.DraftSkinTypes);
+        Assert.Empty(model.DraftUiTypes);
+        model.PrepareFilters();
+        Assert.Equal(2, model.DraftSkinTypes.Count);
+        Assert.Single(model.DraftUiTypes);
+        model.Deactivate();
+    }
+
+    [AvaloniaFact]
     public async Task InfiniteScroll_AppendsEvenBatchesAndStopsAtTheEnd()
     {
         var api = Substitute.For<IGameBananaSingletonService>();
@@ -69,15 +105,10 @@ public class ModBrowserTests
     public async Task Filters_ApplyTogetherAndDiscardUnappliedChanges()
     {
         var api = Substitute.For<IGameBananaSingletonService>();
-        var tracks = new GameBananaModType
-        {
-            Id = 799,
-            Name = "Tracks",
-            Url = "https://example.com/category",
-        };
-        api.GetModTypes().Returns(OperationResult.Ok(new List<GameBananaModType> { tracks }));
+        var tracks = GameBananaModCategories.Types.Single(type => type.Id == 799);
         var response = Results("Track patch");
         response.Records[0].Tags = [new() { Title = "Patches" }];
+        response.Records[0].RootCategory.ProfileUrl = tracks.Url;
         var other = Results("Skin patch").Records[0];
         other.Id = 2;
         other.RootCategory.ProfileUrl = "https://example.com/skins";
@@ -85,17 +116,16 @@ public class ModBrowserTests
         response.Records.Add(other);
         api.GetModSearchResults("Patches", 1, 799).Returns(OperationResult.Ok(response));
         var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
-        await model.PrepareFiltersAsync();
+        model.PrepareFilters();
         model.DraftPatchesOnly = true;
-        model.DraftModType = tracks;
+        model.DraftModTypes.Add(tracks);
         Assert.Equal(0, model.ActiveFilterCount);
         await model.ApplyFiltersAsync();
         Assert.Equal(2, model.ActiveFilterCount);
         Assert.Equal("Track patch", Assert.Single(model.Results).Mod.Name);
         model.DraftPatchesOnly = false;
-        await model.PrepareFiltersAsync();
+        model.PrepareFilters();
         Assert.True(model.DraftPatchesOnly);
-        await api.Received(1).GetModTypes();
         model.Deactivate();
     }
 
