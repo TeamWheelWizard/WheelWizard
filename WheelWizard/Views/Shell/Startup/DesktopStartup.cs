@@ -21,7 +21,7 @@ public interface IMiiSetupPresentation
     Task<bool> ShowAsync();
 }
 
-public sealed class MiiSetupPresentation(IPopupFactory popups) : IMiiSetupPresentation
+public sealed class MiiSetupPresentation(IModalFactory popups) : IMiiSetupPresentation
 {
     public Task<bool> ShowAsync() => popups.Create<MiiRenderingSetupPopup>().ShowAndAwaitCompletionAsync();
 }

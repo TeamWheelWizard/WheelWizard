@@ -13,6 +13,7 @@ using WheelWizard.GameFiles.Views;
 using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
+using WheelWizard.Mods.Views;
 using WheelWizard.Onboarding;
 using WheelWizard.Onboarding.Views;
 using WheelWizard.RrRooms;
@@ -390,6 +391,8 @@ public partial class Layout : BaseWindow, IPollingListener
             // TODO: make a better way to have these type of exceptions
             if (button.PageType == typeof(RoomsPage) && typeof(RoomDetailsPage) == page.GetType())
                 button.IsChecked = true;
+            if (button.PageType == typeof(ModsPage) && page is ModBrowserPage)
+                button.IsChecked = true;
             if (button.PageType == typeof(MiiListPage) && page is MiiEditorPage)
                 button.IsChecked = true;
         }
@@ -464,7 +467,7 @@ public partial class Layout : BaseWindow, IPollingListener
             LiveStatusBorder.Classes.Add("Custom");
 
             // Find the PathIcon in the LiveStatusBorder and update it dynamically
-            if (LiveStatusBorder.Child is PathIcon pathIcon)
+            if (this.FindControl<PathIcon>("LiveStatusIcon") is { } pathIcon)
             {
                 // Parse the SVG path data
                 var geometry = Geometry.Parse(sender.Status.Icon!);
@@ -483,6 +486,8 @@ public partial class Layout : BaseWindow, IPollingListener
         }
         else
         {
+            LiveStatusIcon.ClearValue(PathIcon.DataProperty);
+            LiveStatusIcon.ClearValue(PathIcon.ForegroundProperty);
             // Use variant-based styling
             LiveStatusBorder.Classes.Add(sender.Status.Variant.ToString()!);
         }

@@ -9,6 +9,42 @@
              x:Class="WheelWizard.Mods.Views.ModsPage"
              x:DataType="mods:ModsPage"
         xmlns:mods="clr-namespace:WheelWizard.Mods.Views">
+    <UserControl.Styles>
+        <Style Selector="Button.LibraryTitle">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1" CornerRadius="0,6,6,0">
+                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.LibraryTitle:focus-visible">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+        </Style>
+        <Style Selector="Border.LibraryRow.Placeholder">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+        </Style>
+        <Style Selector="Border.LibraryRow">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Margin" Value="0,3" />
+            <Setter Property="ClipToBounds" Value="True" />
+        </Style>
+        <Style Selector="Panel.LibraryGrip, Grid.LibraryRowMain">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Panel.LibraryGrip:pointerover, Grid.LibraryRowMain:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+    </UserControl.Styles>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" MinHeight="95" />
@@ -20,22 +56,17 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
 
-        <StackPanel Grid.Row="0" Orientation="Vertical" VerticalAlignment="Bottom">
-            <components:ToggleCheckBox Variant="Switch" x:Name="EnableAllCheckbox"
-                      HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3,6,0,0" IsVisible="{Binding HasMods}"
-                      Click="ToggleButton_OnIsCheckedChanged" Content="{loc:T action.enable_all}" />
-
-        <StackPanel Orientation="Horizontal" Spacing="8"
-                    HorizontalAlignment="Left" VerticalAlignment="Bottom">
-            <TextBlock Text="{Binding StoragePageTitle}" Classes="PageTitleText" />
-            <components:StatusBadge Height="24" Padding="8,3" Text="0" x:Name="ListItemCount"
-                                 VerticalAlignment="Center" />
-        </StackPanel>
-        </StackPanel>
-
-        <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,12"
-                    Orientation="Vertical" x:Name="TopBarButtons" Spacing="3">
-                        <components:SplitButton Text="{loc:T action.browse}" IconData="{StaticResource Search}" Tone="Brand" Height="40" Click="BrowseMod_Click" IsVisible="{Binding HasMods}">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16" Margin="3,0,3,12" VerticalAlignment="Bottom">
+            <StackPanel Spacing="6">
+                <components:ToggleCheckBox Variant="Switch" x:Name="EnableAllCheckbox" Content="{loc:T action.enable_all}"
+                                           HorizontalAlignment="Left" IsVisible="{Binding HasMods}" Click="ToggleButton_OnIsCheckedChanged" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding StoragePageTitle}" Classes="PageTitleText" Margin="0" />
+                    <components:StatusBadge Text="0" x:Name="ListItemCount" VerticalAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+            <components:SplitButton Grid.Column="1" Text="{loc:T action.browse}" IconData="{StaticResource Search}"
+                                    Tone="Secondary" Height="36" VerticalAlignment="Bottom" Click="BrowseMod_Click">
                 <components:SplitButton.Flyout>
                     <MenuFlyout>
                         <components:SplitButtonItem Header="{loc:T action.browse}" IconData="{StaticResource Search}" Click="BrowseMod_Click" />
@@ -43,7 +74,7 @@
                     </MenuFlyout>
                 </components:SplitButton.Flyout>
             </components:SplitButton>
-        </StackPanel>
+        </Grid>
 
         <!-- Empty Mods Message -->
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="PageWithoutMods"
@@ -63,117 +94,111 @@
 
         <Grid Grid.Row="1" x:Name="PageWithMods" RowDefinitions="Auto,*" IsVisible="{Binding HasMods}">
 
-            <!-- Mods List (Blocks / arrow mode) -->
-            <ListBox Grid.Row="1" x:Name="ModsListBox" ItemsSource="{Binding Mods}" Margin="10,5" Padding="0,0,0,68">
+            <ListBox Grid.Row="1" x:Name="ModsListBox" ItemsSource="{Binding Mods}" Margin="6,16,6,1" Padding="0">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate><VirtualizingStackPanel Margin="0,0,0,68" /></ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Classes="BoxItemBackground" Height="50">
-                            <Border.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="{loc:T action.rename}" Click="RenameMod_Click" />
-                                    <MenuItem Header="{loc:T action.delete}" Click="DeleteMod_Click" />
-                                    <Separator />
-                                    <MenuItem Header="{loc:T action.convert_to_patches}"
-                                              IsEnabled="{Binding Mod.HasIncompatibleFiles}"
-                                              Click="ConvertToPatches_Click" />
-                                    <Separator />
-                                    <MenuItem Header="{loc:T action.view_mod}" Click="ViewMod_Click" />
-                                    <MenuItem Header="{loc:T action.open_folder}" Click="OpenFolder_Click" />
-                                </ContextMenu>
-                            </Border.ContextMenu>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="30" />
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Border Classes="LibraryRow" Classes.Placeholder="{Binding IsPlaceholder}" Height="50" Padding="0">
+                                <Border.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{loc:T action.rename}" Click="RenameMod_Click" />
+                                        <MenuItem Header="{loc:T action.delete}" Click="DeleteMod_Click" />
+                                        <Separator />
+                                        <MenuItem Header="{loc:T action.convert_to_patches}"
+                                                  IsEnabled="{Binding Mod.HasIncompatibleFiles}"
+                                                  Click="ConvertToPatches_Click" />
+                                        <Separator />
+                                        <MenuItem Header="{loc:T action.view_mod}" Click="ViewMod_Click" />
+                                        <MenuItem Header="{loc:T action.open_folder}" Click="OpenFolder_Click" />
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="36" />
+                                        <ColumnDefinition Width="1" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- Drag handle -->
-                                <Panel Grid.Column="0" Background="Transparent" Cursor="Hand"
-                                       PointerPressed="DragHandle_PointerPressed">
-                                    <PathIcon Data="{StaticResource Grip}" Width="12" Height="12"
-                                              Foreground="{StaticResource Neutral500}" />
-                                </Panel>
+                                    <Panel Grid.Column="0" Classes="LibraryGrip" Cursor="SizeAll"
+                                           PointerPressed="DragHandle_PointerPressed">
+                                        <PathIcon Data="{StaticResource Grip}" Width="12" Height="12"
+                                                  Foreground="{StaticResource Neutral500}" />
+                                    </Panel>
+                                    <Border Grid.Column="1" Background="{StaticResource Neutral700}" />
 
-                                <components:ToggleCheckBox Grid.Column="1" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
-                                          Variant="Switch" Margin="0,5"
-                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding Mod.Title}" FontSize="14"
-                                           Foreground="{StaticResource Neutral100}"
-                                           Grid.Column="2" VerticalAlignment="Center" Margin="10,0,8,0"
-                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                                    <Grid Grid.Column="2" Classes="LibraryRowMain" ColumnDefinitions="60,*,Auto">
+                                        <Button Grid.ColumnSpan="3" Classes="LibraryTitle" Click="ViewMod_Click"
+                                                AutomationProperties.Name="{Binding Mod.Title}" />
+                                        <components:ToggleCheckBox Grid.Column="0" IsChecked="{Binding Mod.IsEnabled, Mode=TwoWay}"
+                                                  Variant="Switch" Margin="0,5"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Mod.Title}" FontSize="14" Margin="8,0"
+                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" IsHitTestVisible="False"
+                                                   Foreground="{StaticResource Neutral100}" />
 
 
-                                <!-- Yes i know that it already works without any change event if we remove Mode=OneWay -->
-                                <!-- Removing that will make it so editing that will also edit the model -->
-                                <!-- however, it works really weird if you do that -->
-                                <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right"
-                                            VerticalAlignment="Center">
-                                    <components:InputField Text="{Binding Mod.Priority, Mode=OneWay}"
-                                             TextChanged="PriorityText_OnTextChanged"
-                                             LostFocus="PriorityText_OnLostFocus" HorizontalContentAlignment="Center"
-                                             KeyDown="PriorityText_OnKeyDown"
-                                             x:Name="VisibleWithRows"
-                                             MinWidth="25" MaxWidth="50" MinHeight="28" Height="28" Padding="2,0" VerticalAlignment="Center" VerticalContentAlignment="Center">
-                                    </components:InputField>
+                                        <!-- Commit priority edits on blur instead of on each keystroke. -->
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                                                    VerticalAlignment="Center" Margin="0,0,8,0">
+                                            <components:InputField Text="{Binding Mod.Priority, Mode=OneWay}"
+                                                     TextChanged="PriorityText_OnTextChanged"
+                                                     LostFocus="PriorityText_OnLostFocus" HorizontalContentAlignment="Center"
+                                                     KeyDown="PriorityText_OnKeyDown"
+                                                     MinWidth="25" MaxWidth="50" MinHeight="28" Height="28" Padding="2,0" VerticalAlignment="Center" VerticalContentAlignment="Center">
+                                            </components:InputField>
 
-                                    <Border Width="16" Margin="8,0" VerticalAlignment="Center">
-                                        <PathIcon Data="{StaticResource WarningTip}" Width="16" Height="16"
-                                                  Foreground="{StaticResource Danger500}"
-                                                  IsVisible="{Binding Mod.HasIncompatibleFiles}" ToolTip.Placement="Top">
-                                    <ToolTip.Tip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
-                                                       FontWeight="Bold"
-                                                       Foreground="{StaticResource Neutral50}" />
-                                            <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}"
-                                                       TextWrapping="Wrap"
-                                                       Foreground="{StaticResource Neutral100}" />
+                                            <Button Classes="LibraryTitle" IsVisible="{Binding Mod.HasIncompatibleFiles}" Width="16" Margin="8,0" VerticalAlignment="Center" Click="ViewMod_Click" AutomationProperties.Name="{loc:T action.view_mod}">
+                                                <PathIcon Data="{StaticResource WarningTip}" Width="16" Height="16"
+                                                          Foreground="{StaticResource Danger500}"
+                                                          IsVisible="{Binding Mod.HasIncompatibleFiles}" ToolTip.Placement="Top">
+                                            <ToolTip.Tip>
+                                                <StackPanel MaxWidth="300">
+                                                    <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleTitle}"
+                                                               FontWeight="Bold"
+                                                               Foreground="{StaticResource Neutral50}" />
+                                                    <TextBlock Text="{x:Static patches:ModPatchCompatibilityText.IncompatibleMessage}"
+                                                               TextWrapping="Wrap"
+                                                               Foreground="{StaticResource Neutral100}" />
+                                                </StackPanel>
+                                            </ToolTip.Tip>
+                                                </PathIcon>
+                                            </Button>
+                                            <StackPanel Margin="10,0,0,0" Spacing="2">
+                                                <components:ActionButton Tone="Secondary" HorizontalAlignment="Right"
+                                                                   Size="Compact" MinHeight="20" Height="20" Padding="6,0"
+                                                                   IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}"
+                                                                   Click="ButtonUp_OnClick">
+                                                    <PathIcon Data="{StaticResource Chevron}" Width="15" Height="15"
+                                                              RenderTransform="rotate(180deg)" RenderTransformOrigin="50%,50%" />
+                                                </components:ActionButton>
+                                                <components:ActionButton Tone="Secondary" HorizontalAlignment="Right"
+                                                                   IconData="{StaticResource Chevron}" Size="Compact" MinHeight="20" Height="20" Padding="6,0"
+                                                                   IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}"
+                                                                   Click="ButtonDown_OnClick" />
+
+
+                                            </StackPanel>
+
                                         </StackPanel>
-                                    </ToolTip.Tip>
-                                        </PathIcon>
-                                    </Border>
-                                    <StackPanel Margin="10,0,0,0" Spacing="2" x:Name="VisibleWithBlocks">
-                                        <components:ActionButton Tone="Secondary" HorizontalAlignment="Right"
-                                                           Size="Compact" MinHeight="20" Height="20" Padding="6,0"
-                                                           IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}"
-                                                           Click="ButtonUp_OnClick">
-                                            <PathIcon Data="{StaticResource Chevron}" Width="15" Height="15"
-                                                      RenderTransform="rotate(180deg)" RenderTransformOrigin="50%,50%" />
-                                        </components:ActionButton>
-                                        <components:ActionButton Tone="Secondary" HorizontalAlignment="Right"
-                                                           IconData="{StaticResource Chevron}" Size="Compact" MinHeight="20" Height="20" Padding="6,0"
-                                                           IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}"
-                                                           Click="ButtonDown_OnClick" />
 
-
-                                    </StackPanel>
-
-                                    <StackPanel.Styles>
-                                        <Style Selector="ListBox.Rows ListBoxItem StackPanel#VisibleWithBlocks">
-                                            <Setter Property="IsVisible" Value="False" />
-                                        </Style>
-                                        <Style Selector="ListBox.Blocks ListBoxItem TextBox#VisibleWithRows">
-                                            <Setter Property="IsVisible" Value="False" />
-                                        </Style>
-                                    </StackPanel.Styles>
-                                </StackPanel>
-
-                                <!-- <components:StatusBadge Grid.Column="1" Text="{Binding Priority}"
-                                                  TipText="Priority" Variant="Gray" TipPlacement="Top"
-                                                  HorizontalAlignment="Right" VerticalAlignment="Center" /> -->
-                            </Grid>
-                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                            <Rectangle IsVisible="{Binding IsPlaceholder}" IsHitTestVisible="False" Margin="0,3"
+                                       RadiusX="6" RadiusY="6" Stroke="{StaticResource Brand400}" StrokeThickness="1.5" StrokeDashArray="4,3" />
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
 
             <!-- Mods Grid (Rows / priority text mode) -->
-            <ScrollViewer Grid.Row="1" x:Name="ModsGridView" IsVisible="False" Margin="10,5"
+            <ScrollViewer Grid.Row="1" x:Name="ModsGridView" IsVisible="False" Margin="4,16,4,1"
                           HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                           VerticalContentAlignment="Top">
-                <ItemsControl ItemsSource="{Binding Mods}" VerticalAlignment="Top" Margin="0,0,0,68">
+                <ItemsControl x:Name="ModsGridItems" ItemsSource="{Binding Mods}" VerticalAlignment="Top" Margin="0,0,0,68">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="2" VerticalAlignment="Top" />
@@ -182,7 +207,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border>
-                                <mods:GridModPanel />
+                                <mods:GridModPanel ViewRequested="ViewMod_Click" DragRequested="DragHandle_PointerPressed" />
                                 <Border.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{loc:T action.rename}" Click="RenameMod_Click" />
@@ -202,14 +227,16 @@
                 </ItemsControl>
             </ScrollViewer>
             <components:SegmentedControl Grid.Row="1" x:Name="ViewModeToggle" ZIndex="10" Variant="Light"
-                Margin="0,0,12,12" HorizontalAlignment="Right" VerticalAlignment="Bottom" SelectionChanged="ModsView_OnSelectionChanged">
+                                          Margin="0,0,12,12" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                          SelectionChanged="ModsView_OnSelectionChanged">
                 <components:SegmentOption x:Name="GridViewOption" IconData="{StaticResource Grid2x2}" AutomationProperties.Name="Grid view" ToolTip.Tip="Grid view" Width="40" Height="40" />
                 <components:SegmentOption x:Name="ListViewOption" IconData="{StaticResource Rows3}" AutomationProperties.Name="List view" ToolTip.Tip="List view" Width="40" Height="40" />
             </components:SegmentedControl>
+
         </Grid>
 
         <!-- Drag-and-drop overlay canvas -->
-        <Canvas x:Name="DragCanvas" IsVisible="False" IsHitTestVisible="False"
+        <Canvas x:Name="DragCanvas" IsVisible="False" IsHitTestVisible="False" ClipToBounds="True"
                 Grid.RowSpan="2" ZIndex="1000" />
     </Grid>
 </UserControl>

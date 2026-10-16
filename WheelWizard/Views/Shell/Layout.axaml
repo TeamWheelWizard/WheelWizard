@@ -152,10 +152,14 @@
                 x:Name="LiveStatusBorder" IsVisible="False"
                 Width="28" Height="28"
                 Classes="BottomSidebarIcon">
-            <PathIcon Width="24" Height="24"
-                      Margin="-2"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center" />
+            <Panel>
+                <PathIcon x:Name="LiveStatusIcon" Width="24" Height="24" Margin="-2"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <PathIcon x:Name="LiveStatusHighlight" Width="24" Height="24" Margin="-2"
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Data="{Binding #LiveStatusIcon.Data}" Foreground="White"
+                          Opacity="0.25" IsHitTestVisible="False" />
+            </Panel>
             <Border.Styles>
                 <Style Selector="Border PathIcon">
                     <Setter Property="Foreground" Value="Transparent" />
@@ -184,8 +188,11 @@
                     <Setter Property="Foreground" Value="{StaticResource Danger300}" />
                     <Setter Property="Data" Value="{StaticResource StarIcon}" />
                 </Style>
-                <Style Selector="Border#LiveStatusBorder:pointerover PathIcon">
-                    <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+                <Style Selector="PathIcon#LiveStatusHighlight">
+                    <Setter Property="IsVisible" Value="False" />
+                </Style>
+                <Style Selector="Border#LiveStatusBorder:pointerover PathIcon#LiveStatusHighlight">
+                    <Setter Property="IsVisible" Value="True" />
                 </Style>
             </Border.Styles>
         </Border>

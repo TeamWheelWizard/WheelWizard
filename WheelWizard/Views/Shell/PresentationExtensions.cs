@@ -52,7 +52,7 @@ public static class PresentationExtensions
         });
         services.AddSingleton<IPageFactory, PageFactory>();
         services.AddSingleton<INavigationService, NavigationService>();
-        services.AddSingleton<IPopupFactory, PopupFactory>();
+        services.AddSingleton<IModalFactory, ModalFactory>();
         services.AddTransient<ModContent>();
         services.AddTransient<VrHistoryViewModel>();
         services.AddTransient<VrHistoryGraph>();

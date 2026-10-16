@@ -14,8 +14,7 @@
              x:DataType="community:FriendsPage"
              xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
     <!-- THE FRIEND WALL: a grid of portrait cards. Online friends are awake in a lit, teal-rimmed portrait; offline
-         ones sleep in a dimmed one; pending ones glare from a warm one. Clicking a card (or right-clicking it) opens
-         everything you can do with that friend. -->
+         ones sleep in a dimmed one; pending ones glare from a warm one. Click to view a profile; right-click for actions. -->
     <UserControl.Styles>
         <!-- CARD -->
         <Style Selector="Border.FriendCard">
@@ -26,13 +25,9 @@
             <Setter Property="CornerRadius" Value="12" />
             <Setter Property="ClipToBounds" Value="True" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Property="BorderBrush" Duration="0:0:0.2" />
-                </Transitions>
-            </Setter>
         </Style>
         <Style Selector="Border.FriendCard:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
             <Setter Property="BorderBrush" Value="{StaticResource Neutral600}" />
         </Style>
         <Style Selector="Border.FriendCard.Online">
@@ -68,11 +63,6 @@
             <Setter Property="Background" Value="{StaticResource Neutral950}" />
             <Setter Property="Opacity" Value="0.38" />
             <Setter Property="IsHitTestVisible" Value="False" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
-                </Transitions>
-            </Setter>
         </Style>
         <Style Selector="Border.FriendCard:pointerover Border.NightShade">
             <Setter Property="Opacity" Value="0" />
@@ -129,19 +119,6 @@
             <Setter Property="Foreground" Value="{StaticResource Neutral50}" />
         </Style>
 
-        <!-- The "more" dots: only while hovered, to say the card opens a menu -->
-        <Style Selector="Border.FriendCard PathIcon.MoreHint">
-            <Setter Property="Opacity" Value="0" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="Border.FriendCard:pointerover PathIcon.MoreHint">
-            <Setter Property="Opacity" Value="1" />
-        </Style>
-
         <!-- STATUS DOT AND FRIEND CODE -->
         <Style Selector="Border.FriendCard Ellipse.StatusDot">
             <Setter Property="Fill" Value="{StaticResource Neutral600}" />
@@ -187,43 +164,43 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}" Height="1" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                    Spacing="6">
-            <TextBlock Text="{loc:T page_title.friends}" Classes="PageTitleText" />
-            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6,0,0,0"
-                    ToolTip.Tip="{loc:T hover.friends_page_disclaimer}"
-                    ToolTip.Placement="Top" ToolTip.ShowDelay="20"
-                    Width="18" Height="18">
-                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
-                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
-            </Border>
-        </StackPanel>
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6" Margin="3,0,3,12" VerticalAlignment="Bottom">
+            <StackPanel Grid.Row="0" x:Name="CountLine" Orientation="Horizontal" Spacing="8"
+                        VerticalAlignment="Center">
+                <Ellipse x:Name="OnlineDot" Width="8" Height="8" VerticalAlignment="Center" />
+                <TextBlock FontSize="14" Foreground="{StaticResource Neutral400}" VerticalAlignment="Center"
+                           TextWrapping="NoWrap">
+                    <Run Text="{Binding OnlineCount}" FontWeight="SemiBold" Foreground="{StaticResource Neutral50}" />
+                    <Run Text=" of " />
+                    <Run Text="{Binding FriendCount}" FontWeight="SemiBold" Foreground="{StaticResource Neutral200}" />
+                    <Run Text=" online" />
+                </TextBlock>
+            </StackPanel>
 
-        <Grid Grid.Row="1" x:Name="VisibleWhenFriends" RowDefinitions="Auto,*" Margin="0,0,0,1">
-            <!-- HEADER: who's around, and the order -->
-            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="6,14,6,6">
-                <StackPanel Grid.Column="0" x:Name="CountLine" Orientation="Horizontal" Spacing="8"
-                            VerticalAlignment="Center">
-                    <Ellipse x:Name="OnlineDot" Width="8" Height="8" VerticalAlignment="Center" />
-                    <TextBlock FontSize="14" Foreground="{StaticResource Neutral400}" VerticalAlignment="Center"
-                               TextWrapping="NoWrap">
-                        <Run Text="{Binding OnlineCount}" FontWeight="SemiBold" Foreground="{StaticResource Neutral50}" />
-                        <Run Text=" of " />
-                        <Run Text="{Binding FriendCount}" FontWeight="SemiBold" Foreground="{StaticResource Neutral200}" />
-                        <Run Text=" online" />
-                    </TextBlock>
-                </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center"
+                        Spacing="6">
+                <TextBlock Text="{loc:T page_title.friends}" Classes="PageTitleText" Margin="0" />
+                <Border VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6,0,0,0"
+                        ToolTip.Tip="{loc:T hover.friends_page_disclaimer}"
+                        ToolTip.Placement="Top" ToolTip.ShowDelay="20"
+                        Width="18" Height="18">
+                    <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
+                </Border>
+            </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                    <TextBlock Text="{loc:T attribute.sort_by}" FontSize="13" Foreground="{StaticResource Neutral500}"
-                               VerticalAlignment="Center" TextWrapping="NoWrap" />
-                    <components:Dropdown Variant="Borderless" FontSize="13" MinWidth="0" VerticalAlignment="Center"
-                                         ItemsSource="{Binding SortOptions}" SelectedIndex="{Binding SortIndex, Mode=TwoWay}" />
-                </StackPanel>
-            </Grid>
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
+                        IsVisible="{Binding #VisibleWhenFriends.IsVisible}">
+                <TextBlock Text="{loc:T attribute.sort_by}" FontSize="13" Foreground="{StaticResource Neutral500}"
+                           VerticalAlignment="Center" TextWrapping="NoWrap" />
+                <components:Dropdown Variant="Borderless" FontSize="13" MinWidth="0" VerticalAlignment="Center"
+                                     ItemsSource="{Binding SortOptions}" SelectedIndex="{Binding SortIndex, Mode=TwoWay}" />
+            </StackPanel>
+        </Grid>
 
+        <Grid Grid.Row="1" x:Name="VisibleWhenFriends" Margin="0,8,0,1">
             <!-- THE WALL -->
-            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                           IsScrollInertiaEnabled="True">
                 <!-- Not virtualized: a friend list holds at most 30, and a virtualizing panel rebuilds each card (and
                      restarts its live 3D Mii) every time it is scrolled back into view. -->
@@ -239,6 +216,7 @@
                                     Classes.Online="{Binding IsOnline}"
                                     Classes.Pending="{Binding IsPending}"
                                     PointerReleased="Card_OnPointerReleased">
+                                <Border CornerRadius="11" ClipToBounds="True">
                                 <Grid RowDefinitions="156,Auto">
 
                                     <!-- PHOTO -->
@@ -308,9 +286,6 @@
                                                      ToolTip.Placement="Top" ToolTip.ShowDelay="20" />
                                             <TextBlock Grid.Column="1" Classes="FriendName" Text="{Binding NameOfMii}"
                                                        VerticalAlignment="Center" />
-                                            <PathIcon Grid.Column="2" Classes="MoreHint" Data="{StaticResource ContextDots}"
-                                                      Width="10" Height="12" Margin="6,0,0,0" VerticalAlignment="Center"
-                                                      Foreground="{StaticResource Neutral500}" />
                                         </Grid>
 
                                         <Grid ColumnDefinitions="*,Auto">
@@ -330,7 +305,9 @@
                                     </StackPanel>
                                 </Grid>
 
-                                <!-- Everything you can do with a friend: on a click or a right-click of the card. -->
+                                </Border>
+
+                                <!-- Additional friend actions stay available on right-click. -->
                                 <Border.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{loc:T action.view_room}" IsVisible="{Binding IsOnline}"

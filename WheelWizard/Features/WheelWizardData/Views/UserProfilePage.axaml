@@ -94,6 +94,7 @@
                 <!-- THE LICENSE. Fixed height: the photo has to stay at least as wide as it is tall, or the Mii no
                      longer lines up with the bottom edge it stands behind. -->
                 <Border Classes="License" Classes.Online="{Binding IsOnline}" Height="176">
+                    <Border CornerRadius="11" ClipToBounds="True">
                     <Grid ColumnDefinitions="176,*">
 
                         <!-- PHOTO: the Mii stands behind the card's bottom edge, like in a window -->
@@ -264,6 +265,7 @@
                             </Grid>
                         </Grid>
                     </Grid>
+                    </Border>
                 </Border>
 
                 <!-- VR HISTORY: gets the rest of the page (the chart grows to fill it, see code-behind) -->

@@ -1,9 +1,10 @@
-<dialogBase:PopupContent xmlns="https://github.com/avaloniaui"
+<dialogBase:ModalContent xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:components="clr-namespace:WheelWizard.Views.Components"
                    xmlns:loc="clr-namespace:WheelWizard.Localization"
+                   xmlns:miiAnimations="using:WheelWizard.MiiAnimations"
                    xmlns:miiVars="using:WheelWizard.MiiImages.Domain"
                    xmlns:conv="clr-namespace:WheelWizard.Views.Converters"
                    mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="700" ClipToBounds="False"
@@ -12,7 +13,7 @@
         xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base"
         xmlns:communityDialogs="clr-namespace:WheelWizard.WheelWizardData.Views.Dialogs">
-    <Grid Width="540" MinHeight="400" MaxHeight="760" RowDefinitions="Auto,*">
+    <Grid Width="540" MinHeight="400" MaxHeight="760" RowDefinitions="Auto,*,Auto">
         <components:ModalHeading Margin="0,0,0,12">
             <TextBlock Classes="TitleText" Text="Player profile" />
         </components:ModalHeading>
@@ -32,67 +33,87 @@
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                       IsVisible="{Binding Profile, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <StackPanel Spacing="12" Margin="0,8,0,4">
-                <Grid ColumnDefinitions="Auto,*">
-                    <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True"
-                            Background="{StaticResource Neutral950}" Width="84" Height="84" Margin="0,0,14,0">
-                        <miiImages:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                 LoadingColor="{StaticResource Neutral600}"
-                                                 Mii="{Binding DisplayMii}"
-                                                 FallBackColor="{StaticResource Neutral600}"
-                                                 ImageVariant="{x:Static miiVars:MiiImageVariants.OnlinePlayerSmall}" />
+            <StackPanel Spacing="24" Margin="0,8,0,4">
+                <Border x:Name="ProfileCard" Height="176" Background="{StaticResource Neutral900}"
+                        BorderBrush="{StaticResource Neutral900}" BorderThickness="1" CornerRadius="12" ClipToBounds="True">
+                    <Border CornerRadius="11" ClipToBounds="True">
+                        <Grid ColumnDefinitions="176,*">
+                            <Panel ClipToBounds="True">
+                                <Panel.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                        <GradientStop Color="{StaticResource Neutral800}" Offset="0" />
+                                        <GradientStop Color="#3A3D49" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Panel.Background>
+                                <miiImages:MiiAnimatedImage x:Name="ProfileMii" Mii="{Binding DisplayMii}"
+                                                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                            LoadingColor="Transparent" FallBackColor="{StaticResource Neutral600}"
+                                                            Performance="{x:Static miiAnimations:MiiPerformances.ProfileWindow}"
+                                                            MaxFramesPerSecond="60"
+                                                            ImageVariant="{x:Static miiVars:MiiImageVariants.CurrentUserWindowLive}"
+                                                            StillVariant="{x:Static miiVars:MiiImageVariants.CurrentUserSideProfile}" />
+                                <components:StatusBadge Text="Suspicious" Variant="Error" Margin="10"
+                                                        HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                        IsVisible="{Binding Profile.IsSuspicious}" />
+                            </Panel>
+                            <Grid Grid.Column="1" Margin="18,13,14,13" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
+                                <TextBlock Text="{Binding Profile.Name}" FontSize="20" FontWeight="Bold"
+                                           Foreground="{StaticResource Neutral50}" TextTrimming="CharacterEllipsis"
+                                           ToolTip.Tip="{Binding Profile.Name}" />
+                                <SelectableTextBlock Grid.Row="1" Text="{Binding Profile.FriendCode}" FontSize="13"
+                                                     LetterSpacing="0.6" Margin="0,1,0,0" Foreground="{StaticResource Neutral400}" />
+                                <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="5" ToolTip.Tip="{loc:T attribute.vr_full}">
+                                        <TextBlock Text="{Binding Profile.Vr, StringFormat='{}{0:N0}'}" FontSize="30" FontWeight="Bold"
+                                                   Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
+                                        <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource Neutral500}" VerticalAlignment="Bottom" Margin="0,0,0,6" />
+                                    </StackPanel>
+                                    <components:StatusBadge Grid.Column="1" Text="{Binding Profile.Rank, StringFormat='Rank #{0}'}"
+                                                            Variant="Brand" VerticalAlignment="Center"
+                                                            IsVisible="{Binding Profile.Rank, Converter={x:Static conv:NumberConverters.GreaterThan0}}" />
+                                </Grid>
+                                <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="6" Margin="0,3,0,0">
+                                    <TextBlock Text="Last seen" FontSize="12" Foreground="{StaticResource Neutral500}" />
+                                    <TextBlock Text="{Binding LastSeenText}" FontSize="12" Foreground="{StaticResource Neutral300}" />
+                                </StackPanel>
+                                <Grid Grid.Row="5" ColumnDefinitions="*,*,*" ColumnSpacing="8" Margin="0,10,0,0">
+                                    <Grid.Styles>
+                                        <Style Selector="TextBlock.StatLabel">
+                                            <Setter Property="FontSize" Value="11" />
+                                            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+                                        </Style>
+                                        <Style Selector="TextBlock.StatValue">
+                                            <Setter Property="FontSize" Value="12" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+                                        </Style>
+                                    </Grid.Styles>
+                                    <StackPanel>
+                                        <TextBlock Text="VR (24h)" Classes="StatLabel" />
+                                        <TextBlock Text="{Binding Vr24HoursText}" Classes="StatValue" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="VR (Week)" Classes="StatLabel" />
+                                        <TextBlock Text="{Binding VrWeekText}" Classes="StatValue" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="VR (Month)" Classes="StatLabel" />
+                                        <TextBlock Text="{Binding VrMonthText}" Classes="StatValue" />
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Grid>
                     </Border>
-
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
-                        <TextBlock Text="{Binding Profile.Name}" Classes="TitleText" FontSize="20"
-                                   Foreground="{StaticResource FormFieldLabelColor}" />
-                        <TextBlock Text="{Binding Profile.FriendCode}" Classes="BodyText" FontSize="12"
-                                   Foreground="{StaticResource Neutral400}" />
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <components:StatusBadge Text="{Binding Profile.Rank, StringFormat='Rank #{0}'}"
-                                                 Variant="Brand" HorizontalAlignment="Left"
-                                                 IsVisible="{Binding Profile.Rank, Converter={x:Static conv:NumberConverters.GreaterThan0}}" />
-                            <components:StatusBadge Text="Suspicious" Variant="Error"
-                                                 HorizontalAlignment="Left"
-                                                 IsVisible="{Binding Profile.IsSuspicious}" />
-                        </StackPanel>
-                    </StackPanel>
-                </Grid>
-
-                <Border Background="{StaticResource BackgroundLineColor}" Height="1" />
-
-                <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
-                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,12,8">
-                        <components:FormFieldLabel Text="{loc:T attribute.vr_abbreviation}"
-                                                   TipText="{loc:T attribute.vr_full}" />
-                        <TextBlock Text="{Binding Profile.Vr, StringFormat='{}{0:N0}'}" Classes="BodyText" FontSize="14" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,12,8">
-                        <components:FormFieldLabel Text="Last Seen" />
-                        <TextBlock Text="{Binding LastSeenText}" Classes="BodyText" FontSize="12" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2" Grid.Row="0" Margin="0,0,0,8">
-                        <components:FormFieldLabel Text="VR (24h)" />
-                        <TextBlock Text="{Binding Vr24HoursText}" Classes="BodyText" FontSize="12" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,0,12,0">
-                        <components:FormFieldLabel Text="VR (Week)" />
-                        <TextBlock Text="{Binding VrWeekText}" Classes="BodyText" FontSize="12" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,12,0">
-                        <components:FormFieldLabel Text="VR (Month)" />
-                        <TextBlock Text="{Binding VrMonthText}" Classes="BodyText" FontSize="12" />
-                    </StackPanel>
-                </Grid>
-
-                <Border Background="{StaticResource BackgroundLineColor}" Height="1" />
+                </Border>
 
                 <ContentControl x:Name="HistoryHost" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
             </StackPanel>
         </ScrollViewer>
+        <Border Grid.Row="2" BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,1,0,0" Padding="0,12,0,0" Margin="0,12,0,0"
+                IsVisible="{Binding Profile, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <components:ActionButton Text="{loc:T action.view_player_rwfc}" Tone="Primary" IconData="{StaticResource ExternalLink}"
+                                     IsIconLeft="False" HorizontalAlignment="Right" Click="ViewOnRwfc_OnClick" />
+        </Border>
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

@@ -146,7 +146,6 @@
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityCountBadge.axaml" />
 
         <!-- PAGE/WHWZ SPECIFIC COMPONENTS -->
-        <StyleInclude Source="avares://WheelWizard/Features/Mods/Views/ModBrowserListItem.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/RrRooms/Views/PlayerListItem.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WheelWizardData/Views/CommunityBadge.axaml" />
         <StyleInclude Source="avares://WheelWizard/Features/WiiManagement/MiiManagement/Views/MiiBlock.axaml" />

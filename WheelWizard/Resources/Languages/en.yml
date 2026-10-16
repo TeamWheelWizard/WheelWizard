@@ -167,6 +167,7 @@ en:
     change: "Change"
     view_mod: "View Mod"
     save_external_mii: "Add Mii to \"My Miis\""
+    view_player_rwfc: "View player on RWFC"
     view_profile: "View Profile"
     duplicate: "Duplicate"
     back: "Back"
@@ -739,6 +740,7 @@ en:
     dropdown:
       search_placeholder: "Search..."
       empty: "No options found"
+      remove: "Remove %{option}"
     input:
       invalid_number: "Enter a number"
   onboarding:
@@ -857,3 +859,28 @@ en:
     linking_wiicompiled: "Updating WiiCompiled"
     status_extracted: "extracted"
     wiicompiled_needs_update: "WiiCompiled needs an update that can use your extracted game files. Update it from Home once one is available."
+
+  mod_browser:
+    title: "Browse mods"
+    my_mods: "My mods"
+    search_placeholder: "Search mods"
+    patches_only: "Patches only"
+    patches: "Patches"
+    retry: "Try again"
+    loading: "Loading mods…"
+    short_search: "Enter at least 2 characters to search."
+    load_error: "Couldn't load mods from GameBanana. Check your connection and try again."
+    empty_title: "No matching mods"
+    empty_body: "Try another search or adjust your filters."
+    filters: "Filters"
+    mod_type: "Mod type"
+    all_types: "All types"
+    apply_filters: "Apply filter"
+    skin_types: "Characters and skins"
+    ui_types: "UI categories"
+    all_skins: "All characters and skins"
+    all_ui: "All UI categories"
+
+  mod_library:
+    priority: "Load priority"
+    reorder: "Drag to reorder"

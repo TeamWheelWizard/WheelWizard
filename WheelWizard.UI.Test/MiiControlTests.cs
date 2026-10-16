@@ -60,29 +60,22 @@ public class MiiControlTests
         await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
         Assert.Equal(info.Text, header.Text);
         Assert.NotEqual("X", header.Text);
-        var window = new Window
+        using var window = new UiTestWindow
         {
             Content = page,
             Width = 572,
             Height = 700,
         };
-        try
-        {
-            window.Show();
-            header.Text = "Short";
-            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
-            window.UpdateLayout();
-            var shortWidth = header.Bounds.Width;
-            header.Text = "LongerName";
-            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
-            window.UpdateLayout();
-            Assert.True(header.Bounds.Width > shortWidth, $"Short: {shortWidth}; long: {header.Bounds.Width}");
-            Assert.True(header.Bounds.Right < page.FindControl<StackPanel>("TopActions")!.Bounds.Left);
-        }
-        finally
-        {
-            window.Close();
-        }
+        window.Show();
+        header.Text = "Short";
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        window.UpdateLayout();
+        var shortWidth = header.Bounds.Width;
+        header.Text = "LongerName";
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        window.UpdateLayout();
+        Assert.True(header.Bounds.Width > shortWidth, $"Short: {shortWidth}; long: {header.Bounds.Width}");
+        Assert.True(header.Bounds.Right < page.FindControl<StackPanel>("TopActions")!.Bounds.Left);
     }
 
     [AvaloniaFact]
@@ -133,29 +126,22 @@ public class MiiControlTests
             false
         );
         await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
-        var window = new Window
+        using var window = new UiTestWindow
         {
             Content = stage,
             Width = 440,
             Height = 380,
         };
-        try
+        window.Show();
+        window.UpdateLayout();
+        var stills = stage.Children.OfType<MiiImageLoader>().ToArray();
+        Assert.Equal(3, stills.Length);
+        foreach (var (still, step) in stills.Zip(steps.Reverse()))
         {
-            window.Show();
-            window.UpdateLayout();
-            var stills = stage.Children.OfType<MiiImageLoader>().ToArray();
-            Assert.Equal(3, stills.Length);
-            foreach (var (still, step) in stills.Zip(steps.Reverse()))
-            {
-                Assert.InRange(Math.Abs(still.Bounds.Center.X - step.Bounds.Center.X), 0, 1);
-                Assert.InRange(Math.Abs(still.Bounds.Y + still.Bounds.Height * 0.975 - step.Bounds.Y), 0, 1);
-                Assert.Equal(still.Bounds.Width, still.Bounds.Height);
-                Assert.True(still.DesiredSize.Width < stage.Bounds.Height);
-            }
-        }
-        finally
-        {
-            window.Close();
+            Assert.InRange(Math.Abs(still.Bounds.Center.X - step.Bounds.Center.X), 0, 1);
+            Assert.InRange(Math.Abs(still.Bounds.Y + still.Bounds.Height * 0.975 - step.Bounds.Y), 0, 1);
+            Assert.Equal(still.Bounds.Width, still.Bounds.Height);
+            Assert.True(still.DesiredSize.Width < stage.Bounds.Height);
         }
     }
 
@@ -204,33 +190,26 @@ public class MiiControlTests
             Height = 100,
             Performance = MiiPerformances.SidebarPlayer,
         };
-        var window = new Window { Content = new StackPanel { Children = { normal, hover, interactive, animated } } };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
+        using var window = new UiTestWindow { Content = new StackPanel { Children = { normal, hover, interactive, animated } } };
+        window.Show();
+        window.UpdateLayout();
 
-            var normalView = Assert.Single(normal.GetVisualDescendants().OfType<MiiImageView>());
-            normal.FallBackColor = Brushes.Red;
-            normal.Margin = new Thickness(7);
-            Assert.Same(Brushes.Red, normalView.FallBackColor);
-            Assert.Equal(default, normalView.Margin);
-            var hoverView = Assert.Single(hover.GetVisualDescendants().OfType<MiiImageView>());
-            Assert.Same(MiiImageVariants.MiiListTileHover, hoverView.HoverVariant);
-            var render = Assert.Single(interactive.GetVisualDescendants().OfType<MiiRenderView>());
-            Assert.False(render.Interactive);
-            interactive.Interactive = true;
-            Assert.True(render.Interactive);
-            // Animations are off in these tests, so the animated Mii is its still picture.
-            var still = Assert.Single(animated.GetVisualDescendants().OfType<MiiImageView>());
-            Assert.True(still.IsVisible);
-            Assert.Empty(animated.GetVisualDescendants().OfType<MiiRealtimeView>());
-            images.DidNotReceiveWithAnyArgs().GetImageAsync(default, default!);
-        }
-        finally
-        {
-            window.Close();
-        }
+        var normalView = Assert.Single(normal.GetVisualDescendants().OfType<MiiImageView>());
+        normal.FallBackColor = Brushes.Red;
+        normal.Margin = new Thickness(7);
+        Assert.Same(Brushes.Red, normalView.FallBackColor);
+        Assert.Equal(default, normalView.Margin);
+        var hoverView = Assert.Single(hover.GetVisualDescendants().OfType<MiiImageView>());
+        Assert.Same(MiiImageVariants.MiiListTileHover, hoverView.HoverVariant);
+        var render = Assert.Single(interactive.GetVisualDescendants().OfType<MiiRenderView>());
+        Assert.False(render.Interactive);
+        interactive.Interactive = true;
+        Assert.True(render.Interactive);
+        // Animations are off in these tests, so the animated Mii is its still picture.
+        var still = Assert.Single(animated.GetVisualDescendants().OfType<MiiImageView>());
+        Assert.True(still.IsVisible);
+        Assert.Empty(animated.GetVisualDescendants().OfType<MiiRealtimeView>());
+        images.DidNotReceiveWithAnyArgs().GetImageAsync(default, default!);
     }
 
     [AvaloniaFact]
@@ -245,28 +224,21 @@ public class MiiControlTests
             Height = 100,
             Mii = first,
         };
-        var window = new Window { Content = control };
-        try
-        {
-            await images.DidNotReceiveWithAnyArgs().GetImageAsync(default, default!);
-            window.Show();
-            window.UpdateLayout();
-            await images.Received().GetImageAsync(first, Arg.Any<MiiImageSpecifications>());
+        using var window = new UiTestWindow { Content = control };
+        await images.DidNotReceiveWithAnyArgs().GetImageAsync(default, default!);
+        window.Show();
+        window.UpdateLayout();
+        await images.Received().GetImageAsync(first, Arg.Any<MiiImageSpecifications>());
 
-            control.Mii = second;
-            await images.Received().GetImageAsync(second, Arg.Any<MiiImageSpecifications>());
-            images.ClearReceivedCalls();
-            window.Content = null;
-            control.Mii = first;
-            await images.DidNotReceiveWithAnyArgs().GetImageAsync(default, default!);
-            window.Content = control;
-            window.UpdateLayout();
-            await images.Received().GetImageAsync(first, Arg.Any<MiiImageSpecifications>());
-        }
-        finally
-        {
-            window.Close();
-        }
+        control.Mii = second;
+        await images.Received().GetImageAsync(second, Arg.Any<MiiImageSpecifications>());
+        images.ClearReceivedCalls();
+        window.Content = null;
+        control.Mii = first;
+        await images.DidNotReceiveWithAnyArgs().GetImageAsync(default, default!);
+        window.Content = control;
+        window.UpdateLayout();
+        await images.Received().GetImageAsync(first, Arg.Any<MiiImageSpecifications>());
     }
 
     [AvaloniaFact]
@@ -283,7 +255,7 @@ public class MiiControlTests
         };
         var loaded = 0;
         control.MiiImageLoaded += (_, _) => ++loaded;
-        var window = new Window { Content = control };
+        using var window = new UiTestWindow { Content = control };
         window.Show();
         window.UpdateLayout();
         window.Close();
@@ -309,27 +281,20 @@ public class MiiControlTests
             ImageVariant = normal,
             HoverVariant = hover,
         };
-        var window = new Window { Content = control };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            images.ClearReceivedCalls();
-            control.IsHovered = true;
-            await images.Received().GetImageAsync(first, hover);
-            images.ClearReceivedCalls();
-            control.Mii = second;
-            await images.Received().GetImageAsync(second, normal);
-            await images.Received().GetImageAsync(second, hover);
-            await images.DidNotReceive().GetImageAsync(first, Arg.Any<MiiImageSpecifications>());
-            var replacement = normal.Clone();
-            control.ImageVariant = replacement;
-            await images.Received().GetImageAsync(second, replacement);
-        }
-        finally
-        {
-            window.Close();
-        }
+        using var window = new UiTestWindow { Content = control };
+        window.Show();
+        window.UpdateLayout();
+        images.ClearReceivedCalls();
+        control.IsHovered = true;
+        await images.Received().GetImageAsync(first, hover);
+        images.ClearReceivedCalls();
+        control.Mii = second;
+        await images.Received().GetImageAsync(second, normal);
+        await images.Received().GetImageAsync(second, hover);
+        await images.DidNotReceive().GetImageAsync(first, Arg.Any<MiiImageSpecifications>());
+        var replacement = normal.Clone();
+        control.ImageVariant = replacement;
+        await images.Received().GetImageAsync(second, replacement);
     }
 
     [AvaloniaFact]
@@ -353,17 +318,10 @@ public class MiiControlTests
             Mii = mii,
         };
         Assert.False(rendered.Task.IsCompleted);
-        var window = new Window { Content = control };
-        try
-        {
-            window.Show();
-            window.UpdateLayout();
-            Assert.Same(mii, await rendered.Task.WaitAsync(TimeSpan.FromSeconds(5)));
-        }
-        finally
-        {
-            window.Close();
-        }
+        using var window = new UiTestWindow { Content = control };
+        window.Show();
+        window.UpdateLayout();
+        Assert.Same(mii, await rendered.Task.WaitAsync(TimeSpan.FromSeconds(5)));
     }
 
     [AvaloniaFact]
@@ -385,46 +343,39 @@ public class MiiControlTests
         foreach (var card in cards)
             panel.Children.Add(card);
         var scroller = new ScrollViewer { Content = panel, Height = 300 };
-        var window = new Window
+        using var window = new UiTestWindow
         {
             Content = scroller,
             Width = 300,
             Height = 300,
         };
-        try
+        window.Show();
+        window.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        static bool IsLive(MiiAnimatedImage card) => card.GetVisualDescendants().OfType<MiiRealtimeView>().Any();
+        Assert.True(IsLive(cards[0]));
+        Assert.False(IsLive(cards[^1]));
+        // Nothing is rendered for cards that wait to be seen (no still pictures either).
+        Assert.All(
+            cards.Where(card => !IsLive(card)),
+            card => Assert.Null(card.GetVisualDescendants().OfType<MiiImageView>().Single().Mii)
+        );
+
+        scroller.Offset = new Vector(0, panel.Bounds.Height);
+        window.UpdateLayout();
+        // Live Miis start one per frame.
+        for (var frame = 0; frame < cards.Count; frame++)
         {
-            window.Show();
-            window.UpdateLayout();
+            Avalonia.Headless.AvaloniaHeadlessPlatform.ForceRenderTimerTick();
             Dispatcher.UIThread.RunJobs();
-
-            static bool IsLive(MiiAnimatedImage card) => card.GetVisualDescendants().OfType<MiiRealtimeView>().Any();
-            Assert.True(IsLive(cards[0]));
-            Assert.False(IsLive(cards[^1]));
-            // Nothing is rendered for cards that wait to be seen (no still pictures either).
-            Assert.All(
-                cards.Where(card => !IsLive(card)),
-                card => Assert.Null(card.GetVisualDescendants().OfType<MiiImageView>().Single().Mii)
-            );
-
-            scroller.Offset = new Vector(0, panel.Bounds.Height);
-            window.UpdateLayout();
-            // Live Miis start one per frame.
-            for (var frame = 0; frame < cards.Count; frame++)
-            {
-                Avalonia.Headless.AvaloniaHeadlessPlatform.ForceRenderTimerTick();
-                Dispatcher.UIThread.RunJobs();
-            }
-            Assert.True(IsLive(cards[^1]));
-            // Scrolled back and forth, a card keeps its live view.
-            var live = cards[0].GetVisualDescendants().OfType<MiiRealtimeView>().Single();
-            scroller.Offset = default;
-            window.UpdateLayout();
-            Assert.Same(live, cards[0].GetVisualDescendants().OfType<MiiRealtimeView>().Single());
         }
-        finally
-        {
-            window.Close();
-        }
+        Assert.True(IsLive(cards[^1]));
+        // Scrolled back and forth, a card keeps its live view.
+        var live = cards[0].GetVisualDescendants().OfType<MiiRealtimeView>().Single();
+        scroller.Offset = default;
+        window.UpdateLayout();
+        Assert.Same(live, cards[0].GetVisualDescendants().OfType<MiiRealtimeView>().Single());
     }
 
     private static IMiiImagesSingletonService InstallThemes(IMiiNativeRenderer? nativeRenderer = null, bool animate = false)
