@@ -96,7 +96,10 @@
 
         <TextBlock Text="{loc:T category.general}" Classes="SidebarSectionText"
                    VerticalAlignment="Bottom" Grid.Row="3" /> <!-- Repurposing this translation from settings -->
-        <StackPanel x:Name="SidePanelButtons" Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="4" VerticalAlignment="Top">
+        <!-- Clip navigation to the sidebar column, leaving room for the first and last curved joins. -->
+        <Border Grid.Column="0" Grid.Row="4" ClipToBounds="True" VerticalAlignment="Top"
+                Margin="0,-7,0,-7" Padding="0,7,0,7">
+        <StackPanel x:Name="SidePanelButtons" components:Dropdown.AllowDismissInteraction="True">
             <shellControls:SidebarRadioButton IconData="{StaticResource Home}"
                                            Text="{loc:T page_title.home}"
                                            PageType="{x:Type shellViews:HomePage}"
@@ -134,6 +137,7 @@
                                            PageType="{x:Type design:TestingPage}"
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
         </StackPanel>
+        </Border>
 
         <components:ActionButton Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="5"
                                     x:Name="SupportUsButton"

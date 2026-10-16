@@ -79,15 +79,15 @@
             />
           </Grid>
         </Border>
-        <!-- End the curve at the page edge; overlap only the straight edge inside the selected button. -->
+        <!-- Keep the curve unrounded and bleed its straight edge into the navigation container's clip. -->
         <Path x:Name="PART_TopJoin" IsHitTestVisible="False"
-              Width="7" Height="7" ClipToBounds="True" HorizontalAlignment="Right" VerticalAlignment="Top"
-              Margin="0,-6,0,0" Fill="{DynamicResource Neutral950}"
-              Data="M 0,6 L 1,6 A 6,6 0 0 0 7,0 L 7,7 L 0,7 Z" />
+              Width="8" Height="7" UseLayoutRounding="False" HorizontalAlignment="Right" VerticalAlignment="Top"
+              Margin="0,-6,-1,0" Fill="{DynamicResource Neutral950}"
+              Data="M 0,6 L 1,6 A 6,6 0 0 0 7,0 L 8,0 L 8,7 L 0,7 Z" />
         <Path x:Name="PART_BottomJoin" IsHitTestVisible="False"
-              Width="7" Height="7" ClipToBounds="True" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-              Margin="0,0,0,-6" Fill="{DynamicResource Neutral950}"
-              Data="M 0,1 L 1,1 A 6,6 0 0 1 7,7 L 7,0 L 0,0 Z" />
+              Width="8" Height="7" UseLayoutRounding="False" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+              Margin="0,0,-1,-6" Fill="{DynamicResource Neutral950}"
+              Data="M 0,1 L 1,1 A 6,6 0 0 1 7,7 L 8,7 L 8,0 L 0,0 Z" />
         </Grid>
       </ControlTemplate>
     </Setter>

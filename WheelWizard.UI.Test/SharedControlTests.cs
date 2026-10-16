@@ -233,6 +233,36 @@ public class SharedControlTests
     }
 
     [AvaloniaFact]
+    public void SegmentedControl_InitialSelectionAndResizeDoNotAnimateTheIndicator()
+    {
+        var segments = new SegmentedControl();
+        segments.Items.Add(new SegmentOption { Text = "One" });
+        segments.Items.Add(new SegmentOption { Text = "Two" });
+        var selected = new SegmentOption { Text = "Three" };
+        segments.Items.Add(selected);
+        segments.SelectedIndex = 2;
+        using var window = new UiTestWindow
+        {
+            Content = segments,
+            Width = 600,
+            Height = 80,
+        };
+        window.Resources["SegmentAnimationDuration"] = TimeSpan.FromSeconds(2);
+        window.Show();
+        foreach (var width in new[] { 600d, 300d, 600d })
+        {
+            window.Width = width;
+            window.UpdateLayout();
+            var indicator = segments.GetVisualDescendants().OfType<Border>().Single(control => control.Name == "PART_SelectionIndicator");
+            var target = selected.TranslatePoint(default, indicator.GetVisualParent()!)!.Value;
+            var transform = Assert.IsType<TranslateTransform>(indicator.RenderTransform);
+            Assert.Equal(target.X, transform.X);
+            Assert.Equal(target.Y, transform.Y);
+            Assert.Equal(selected.Bounds.Width, indicator.Bounds.Width);
+        }
+    }
+
+    [AvaloniaFact]
     public void SegmentedControl_UsesEqualWidthsAndMovesItsSingleSelection()
     {
         var segments = new SegmentedControl { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };

@@ -51,6 +51,7 @@ public sealed class HorizontalPanBehavior : AvaloniaObject
             viewer.AddHandler(InputElement.PointerPressedEvent, Pressed, RoutingStrategies.Tunnel);
             viewer.AddHandler(InputElement.PointerMovedEvent, Moved, RoutingStrategies.Tunnel);
             viewer.AddHandler(InputElement.PointerReleasedEvent, Released, RoutingStrategies.Tunnel);
+            viewer.AddHandler(InputElement.PointerWheelChangedEvent, WheelChanged, RoutingStrategies.Tunnel);
             viewer.PointerCaptureLost += CaptureLost;
             viewer.DetachedFromVisualTree += Detached;
         }
@@ -77,6 +78,28 @@ public sealed class HorizontalPanBehavior : AvaloniaObject
             _pointer = e.Pointer;
             _start = e.GetPosition(_viewer);
             _offset = _viewer.Offset;
+        }
+
+        private void WheelChanged(object? sender, PointerWheelEventArgs e)
+        {
+            if (
+                e.Handled
+                || e.Delta.X != 0
+                || e.KeyModifiers != KeyModifiers.None
+                || _viewer.HorizontalScrollBarVisibility == ScrollBarVisibility.Disabled
+                || _viewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled
+                || _viewer.Extent.Width <= _viewer.Viewport.Width
+            )
+                return;
+            for (var visual = e.Source as Visual; visual != null && visual != _viewer; visual = visual.GetVisualParent())
+                if (visual is ScrollViewer or TextBox or RangeBase)
+                    return;
+
+            _viewer.Offset = new Vector(
+                Math.Clamp(_viewer.Offset.X - e.Delta.Y * 50, 0, _viewer.Extent.Width - _viewer.Viewport.Width),
+                _viewer.Offset.Y
+            );
+            e.Handled = true;
         }
 
         private void Moved(object? sender, PointerEventArgs e)
@@ -134,6 +157,7 @@ public sealed class HorizontalPanBehavior : AvaloniaObject
             _viewer.RemoveHandler(InputElement.PointerPressedEvent, Pressed);
             _viewer.RemoveHandler(InputElement.PointerMovedEvent, Moved);
             _viewer.RemoveHandler(InputElement.PointerReleasedEvent, Released);
+            _viewer.RemoveHandler(InputElement.PointerWheelChangedEvent, WheelChanged);
             _viewer.PointerCaptureLost -= CaptureLost;
             _viewer.DetachedFromVisualTree -= Detached;
         }

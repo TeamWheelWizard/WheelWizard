@@ -54,6 +54,8 @@ public sealed record MiiStepper(int Min, int Max, Func<Mii, int> Get, Func<Mii, 
 /// </summary>
 public sealed record MiiVariants(int First, int Count, Func<Mii, int> Get, Func<Mii, int, bool> Set)
 {
+    public int? NoneValue { get; init; }
+
     /// <summary>Icon resource prefix (e.g. "MiiEye" for MiiEye00..), or null to show <see cref="Label"/> instead.</summary>
     public string? IconPrefix { get; init; }
 
@@ -103,7 +105,7 @@ public sealed class MiiPartDefinition
     /// </summary>
     public required string Icon { get; init; }
 
-    public Action<MultiIconRadioButton>? StyleIcon { get; init; }
+    public Action<MultiColoredIcon>? StyleIcon { get; init; }
 
     public MiiVariants? Variants { get; init; }
     public MiiColors? Colors { get; init; }
@@ -184,50 +186,45 @@ public static class MiiEditorParts
         var skinBorder = new SolidColorBrush(ViewUtils.Colors.Neutral300);
         var black = new SolidColorBrush(ViewUtils.Colors.Black);
         var none = new SolidColorBrush(ViewUtils.Colors.Danger400);
-        var noneSelected = new SolidColorBrush(ViewUtils.Colors.Danger500);
 
-        void FaceIcon(MultiIconRadioButton b)
+        void FaceIcon(MultiColoredIcon b)
         {
             b.Color1 = skin;
             b.Color2 = skinBorder;
             b.Color3 = Brushes.Transparent;
         }
 
-        void HairIcon(MultiIconRadioButton b)
+        void HairIcon(MultiColoredIcon b)
         {
             b.Color1 = new SolidColorBrush(ViewUtils.Colors.Neutral100);
             b.Color2 = skinBorder;
-            b.Color3 = black;
+            b.Color3 = Brushes.Black;
             b.Color4 = new SolidColorBrush(ViewUtils.Colors.Brand800);
             b.Color5 = new SolidColorBrush(ViewUtils.Colors.Brand900);
         }
 
-        void EyeIcon(MultiIconRadioButton b)
+        void EyeIcon(MultiColoredIcon b)
         {
             b.Color1 = new SolidColorBrush(ViewUtils.Colors.Neutral50);
-            b.Color2 = new SolidColorBrush(ViewUtils.Colors.Neutral950);
-            b.SelectedColor2 = black;
-            b.Color3 = new SolidColorBrush(ViewUtils.Colors.Brand400);
-            b.SelectedColor3 = new SolidColorBrush(ViewUtils.Colors.Brand300);
+            b.Color2 = Brushes.Black;
+            b.Color3 = Brushes.Black;
         }
 
-        void BrowIcon(MultiIconRadioButton b)
+        void BrowIcon(MultiColoredIcon b)
         {
             b.Color1 = none;
-            b.SelectedColor1 = noneSelected;
             b.Color2 = black;
         }
 
-        void SkinPartIcon(MultiIconRadioButton b, IBrush partColor)
+        void SkinPartIcon(MultiColoredIcon b, IBrush partColor)
         {
             b.Color1 = skin;
             b.Color2 = skinBorder;
             b.Color3 = partColor;
             b.Color4 = none;
-            b.SelectedColor4 = noneSelected;
         }
 
-        void MouthIcon(MultiIconRadioButton b)
+        void MouthIcon(MultiColoredIcon b)
         {
             b.Color1 = new SolidColorBrush(new Color(255, 165, 57, 29));
             b.Color2 = new SolidColorBrush(new Color(255, 255, 93, 13));
@@ -235,7 +232,7 @@ public static class MiiEditorParts
             b.Color4 = Brushes.White;
         }
 
-        void NoseIcon(MultiIconRadioButton b) => b.Color1 = black;
+        void NoseIcon(MultiColoredIcon b) => b.Color1 = black;
 
         static IReadOnlyList<Color> Swatches<TEnum>(IReadOnlyDictionary<TEnum, Color> mapping)
             where TEnum : struct, Enum =>
@@ -300,6 +297,7 @@ public static class MiiEditorParts
             )
             {
                 Label = v => t($"attribute.mii_feature.{FeatureKey((MiiFacialFeature)v)}"),
+                NoneValue = 0,
             },
         };
 
@@ -349,7 +347,11 @@ public static class MiiEditorParts
             TitleKey = "attribute.mii_section.hair",
             Icon = "MiiHair33",
             StyleIcon = HairIcon,
-            Variants = new MiiVariants(0, 72, m => m.MiiHair.HairType, (m, v) => SetHair(m, type: v)) { IconPrefix = "MiiHair" },
+            Variants = new MiiVariants(0, 72, m => m.MiiHair.HairType, (m, v) => SetHair(m, type: v))
+            {
+                IconPrefix = "MiiHair",
+                NoneValue = 30,
+            },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.HairColor),
                 m => (int)m.MiiHair.MiiHairColor,
@@ -443,7 +445,11 @@ public static class MiiEditorParts
             TitleKey = "attribute.mii_section.eyebrows",
             Icon = "MiiEyebrow06",
             StyleIcon = BrowIcon,
-            Variants = new MiiVariants(0, 24, m => m.MiiEyebrows.Type, (m, v) => SetBrows(m, type: v)) { IconPrefix = "MiiEyebrow" },
+            Variants = new MiiVariants(0, 24, m => m.MiiEyebrows.Type, (m, v) => SetBrows(m, type: v))
+            {
+                IconPrefix = "MiiEyebrow",
+                NoneValue = 23,
+            },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.HairColor),
                 m => (int)m.MiiEyebrows.Color,
@@ -483,6 +489,7 @@ public static class MiiEditorParts
             Variants = new MiiVariants(1, 9, m => (int)m.MiiGlasses.Type, (m, v) => SetGlasses(m, type: (MiiGlassesType)v))
             {
                 IconPrefix = "MiiGlasses",
+                NoneValue = 0,
             },
             Colors = new MiiColors(
                 Swatches(MiiColorMappings.GlassesColor),
@@ -593,6 +600,7 @@ public static class MiiEditorParts
             Variants = new MiiVariants(1, 4, m => (int)m.MiiFacialHair.MiiBeardType, (m, v) => SetFacialHair(m, beard: (MiiBeardType)v))
             {
                 IconPrefix = "MiiGoatee",
+                NoneValue = 0,
             },
             Colors = facialHairColors,
             Presence = new MiiPresence(
@@ -617,6 +625,7 @@ public static class MiiEditorParts
             )
             {
                 IconPrefix = "MiiMustache",
+                NoneValue = 0,
             },
             Colors = facialHairColors,
             Presence = new MiiPresence(

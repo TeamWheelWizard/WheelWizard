@@ -15,6 +15,57 @@ namespace WheelWizard.UI.Test;
 public class HorizontalPanTests
 {
     [AvaloniaFact]
+    public void MouseWheelPansHorizontalChoicesAndClampsAtBothEnds()
+    {
+        var scroll = new ScrollViewer
+        {
+            Content = new Border
+            {
+                Width = 1200,
+                Height = 60,
+                Background = Avalonia.Media.Brushes.Transparent,
+            },
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+        };
+        using var owner = new UiTestHost { Width = 320, Height = 150 };
+        owner.Body.Child = scroll;
+        owner.Show();
+        Dispatcher.UIThread.RunJobs();
+        var point = scroll.TranslatePoint(new Point(100, 30), owner)!.Value;
+        owner.MouseWheel(point, new Vector(0, -1));
+        Assert.Equal(50, scroll.Offset.X);
+        owner.MouseWheel(point, new Vector(0, -100));
+        Assert.Equal(scroll.Extent.Width - scroll.Viewport.Width, scroll.Offset.X);
+        owner.MouseWheel(point, new Vector(0, 100));
+        Assert.Equal(0, scroll.Offset.X);
+        Assert.Equal(0, scroll.Offset.Y);
+    }
+
+    [AvaloniaFact]
+    public void MouseWheelKeepsVerticalScrollingWhenBothDirectionsAreAvailable()
+    {
+        var scroll = new ScrollViewer
+        {
+            Content = new Border
+            {
+                Width = 1200,
+                Height = 1200,
+                Background = Avalonia.Media.Brushes.Transparent,
+            },
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+        };
+        using var owner = new UiTestHost { Width = 320, Height = 150 };
+        owner.Body.Child = scroll;
+        owner.Show();
+        Dispatcher.UIThread.RunJobs();
+        owner.MouseWheel(scroll.TranslatePoint(new Point(100, 30), owner)!.Value, new Vector(0, -1));
+        Assert.Equal(0, scroll.Offset.X);
+        Assert.True(scroll.Offset.Y > 0);
+    }
+
+    [AvaloniaFact]
     public void DraggingContentPansWithoutClicking_OrdinaryClicksStillWork()
     {
         var clicks = 0;
