@@ -68,9 +68,13 @@ public partial class DevToolWindow : ModalContent, IPollingListener
     private void LoadSettings()
     {
         WhWzTopMost.IsChecked = ViewUtils.GetLayout().Topmost;
+        SuccessStatusIconOverride.IsChecked = ViewUtils.GetLayout().DevSuccessStatusIconOverride;
     }
 
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
+
+    private void SuccessStatusIconOverride_OnClick(object sender, RoutedEventArgs e) =>
+        ViewUtils.GetLayout().SetDevSuccessStatusIconOverride(SuccessStatusIconOverride.IsChecked == true);
 
     private void ShowMiiAnimator_OnClick(object sender, RoutedEventArgs e) => Popups.Create<MiiAnimatorDevWindow>().Show();
 

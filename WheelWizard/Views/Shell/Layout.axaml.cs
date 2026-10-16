@@ -62,6 +62,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private int _testerClickCount;
     private bool _testerPromptOpen;
+    private bool _devSuccessStatusIconOverride;
     private IDisposable? _settingsSignalSubscription;
     private readonly Task _modsLoaded;
     private readonly TaskCompletionSource _loaded = new();
@@ -403,22 +404,36 @@ public partial class Layout : BaseWindow, IPollingListener
 
     public void UpdateLiveAlert() => UpdateLiveAlert(LiveStatus);
 
+    public bool DevSuccessStatusIconOverride => _devSuccessStatusIconOverride;
+
+    public void SetDevSuccessStatusIconOverride(bool enabled)
+    {
+        _devSuccessStatusIconOverride = enabled;
+        UpdateLiveAlert(LiveStatus);
+    }
+
     private void UpdateLiveAlert(LiveStatusService sender)
     {
         var hasVariant = sender.Status?.Variant != null && sender.Status.Variant != WhWzStatusVariant.None;
-        var hasCustomIcon = !string.IsNullOrEmpty(sender.Status?.Icon);
-        var visible = hasVariant || hasCustomIcon;
+        var hasCustomIcon = !_devSuccessStatusIconOverride && !string.IsNullOrEmpty(sender.Status?.Icon);
+        var visible = _devSuccessStatusIconOverride || hasVariant || hasCustomIcon;
 
         LiveStatusBorder.IsVisible = visible;
         if (!visible)
             return;
 
-        ToolTip.SetTip(LiveStatusBorder, sender.Status!.Message);
+        ToolTip.SetTip(LiveStatusBorder, sender.Status?.Message ?? "Success status (developer preview)");
         LiveStatusBorder.Classes.Clear();
         LiveStatusBorder.Classes.Add("BottomSidebarIcon");
 
+        if (_devSuccessStatusIconOverride)
+        {
+            LiveStatusIcon.ClearValue(PathIcon.DataProperty);
+            LiveStatusIcon.ClearValue(PathIcon.ForegroundProperty);
+            LiveStatusBorder.Classes.Add("Success");
+        }
         // If custom icon is provided, use it instead of variant
-        if (hasCustomIcon)
+        else if (hasCustomIcon)
         {
             // Clear any variant-based classes
             LiveStatusBorder.Classes.Add("Custom");

@@ -34,6 +34,10 @@
                           x:Name="WhWzTopMost" Click="WhWzTopMost_OnClick">
                     Wheel Wizard always on top
                 </components:ToggleCheckBox>
+                <components:ToggleCheckBox Margin="0,2" IsChecked="False" Variant="Switch"
+                          x:Name="SuccessStatusIconOverride" Click="SuccessStatusIconOverride_OnClick">
+                    Force success status icon (dev only)
+                </components:ToggleCheckBox>
 
                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" Margin="0,8" ColumnSpacing="8" RowSpacing="6">
                 <components:ActionButton Grid.Row="0" Grid.Column="0" Tone="Brand" Text="Mii Channel" IconData="{StaticResource DolphinIcon}"

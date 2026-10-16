@@ -58,12 +58,12 @@
                             </Panel>
                             <Grid Grid.Column="1" Margin="18,13,14,13" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
                                 <TextBlock Text="{Binding Profile.Name}" FontSize="20" FontWeight="Bold"
-                                           Foreground="{StaticResource Neutral50}" TextTrimming="CharacterEllipsis"
-                                           ToolTip.Tip="{Binding Profile.Name}" />
+                                           Foreground="{StaticResource Neutral50}" TextTrimming="CharacterEllipsis" />
                                 <SelectableTextBlock Grid.Row="1" Text="{Binding Profile.FriendCode}" FontSize="13"
                                                      LetterSpacing="0.6" Margin="0,1,0,0" Foreground="{StaticResource Neutral400}" />
                                 <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                    <StackPanel Orientation="Horizontal" Spacing="5" ToolTip.Tip="{loc:T attribute.vr_full}">
+                                    <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Left"
+                                                ToolTip.Tip="{loc:T attribute.vr_full}" ToolTip.Placement="Top">
                                         <TextBlock Text="{Binding Profile.Vr, StringFormat='{}{0:N0}'}" FontSize="30" FontWeight="Bold"
                                                    Foreground="{StaticResource Neutral50}" VerticalAlignment="Bottom" />
                                         <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="13" FontWeight="SemiBold"
