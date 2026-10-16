@@ -73,7 +73,8 @@ namespace WheelWizard.Test.Features
 
             // Act
             var result = await _service.GetModSearchResults(emptySearchTerm, page, 10082);
-            var request = (Expression<Func<IGameBananaApi, Task<GameBananaSearchResults>>>)_apiCaller.ReceivedCalls().Single().GetArguments()[0]!;
+            var request =
+                (Expression<Func<IGameBananaApi, Task<GameBananaSearchResults>>>)_apiCaller.ReceivedCalls().Single().GetArguments()[0]!;
             await request.Compile()(_api);
             await _api.Received(1).GetMods(5896, 10082, 1, 12);
 
@@ -122,6 +123,24 @@ namespace WheelWizard.Test.Features
             Assert.Equal("Test Author", result.Value.Author.Name);
 
             await _apiCaller.Received(1).CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<GameBananaModDetails>>>>());
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetModDetails_WithNullRequiredObject_ReturnsFailure(bool missingCategory)
+        {
+            var details = CreateFakeModDetails(123);
+            if (missingCategory)
+                details.Category = null!;
+            else
+                details.Author = null!;
+            _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<GameBananaModDetails>>>>()).Returns(Ok(details));
+
+            var result = await _service.GetModDetails(123);
+
+            Assert.True(result.IsFailure);
+            Assert.Contains("incomplete mod details", result.Error.Message);
         }
 
         [Fact]

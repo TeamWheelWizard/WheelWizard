@@ -21,6 +21,39 @@ namespace WheelWizard.UI.Test;
 
 public class ModBrowserTests
 {
+    [AvaloniaTheory]
+    [InlineData(0)]
+    [InlineData(3)]
+    public async Task SparsePagesYieldEvenBatchesAndContinueWithoutScrolling(int earlyMatches)
+    {
+        var api = Substitute.For<IGameBananaSingletonService>();
+        api.GetModSearchResults("", Arg.Any<int>())
+            .Returns(call =>
+            {
+                var page = call.ArgAt<int>(1);
+                var response = Results($"Mod {page}");
+                response.Records[0].Id = page;
+                response.Records[0].HasContentRatings = page > earlyMatches && page < 6;
+                response.MetaData.IsComplete = page == 6;
+                return OperationResult.Ok(response);
+            });
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>(), Substitute.For<IModManager>());
+        await model.SearchAsync();
+        Assert.Equal(5, api.ReceivedCalls().Count());
+        Assert.Equal(earlyMatches - earlyMatches % 2, model.Results.Count);
+        Assert.True(model.CanLoadMore);
+        Assert.False(model.IsEmpty);
+
+        api.ClearReceivedCalls();
+        using var owner = new UiTestHost { Height = 540 };
+        owner.Body.Child = new ModBrowserPage(model, Substitute.For<INavigationService>(), Substitute.For<IModalFactory>());
+        owner.Show();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(6, api.ReceivedCalls().Count());
+        Assert.Equal(earlyMatches + 1, model.Results.Count);
+        Assert.False(model.CanLoadMore);
+    }
+
     [AvaloniaFact]
     public async Task Subcategories_CombineWithinEachSelectedType()
     {

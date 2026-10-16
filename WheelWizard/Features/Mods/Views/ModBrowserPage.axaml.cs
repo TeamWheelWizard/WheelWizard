@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using WheelWizard.Mods.ViewModels;
 using WheelWizard.Mods.Views.Dialogs;
 using WheelWizard.Views.Dialogs;
@@ -14,6 +15,7 @@ public partial class ModBrowserPage : UserControl, ILockedSidebarPage
     private readonly ModBrowserViewModel _model;
     private readonly INavigationService _navigation;
     private readonly IModalFactory _modals;
+    private bool _fillingViewport;
 
     public ModBrowserPage(ModBrowserViewModel model, INavigationService navigation, IModalFactory modals)
     {
@@ -22,16 +24,12 @@ public partial class ModBrowserPage : UserControl, ILockedSidebarPage
         _modals = modals;
         InitializeComponent();
         DataContext = model;
-        Loaded += async (_, _) => await _model.SearchAsync();
-        ResultsScroll.ScrollChanged += async (_, _) =>
+        Loaded += async (_, _) =>
         {
-            if (
-                IsLoaded
-                && _model.CanLoadMore
-                && ResultsScroll.Extent.Height - ResultsScroll.Offset.Y - ResultsScroll.Viewport.Height < 200
-            )
-                await _model.LoadMoreAsync();
+            await _model.SearchAsync();
+            await FillViewportAsync();
         };
+        ResultsScroll.ScrollChanged += async (_, _) => await FillViewportAsync();
         ResultsScroll.SizeChanged += (_, _) =>
         {
             var columns = ResultsScroll.Bounds.Width >= 520 ? 2 : 1;
@@ -39,6 +37,32 @@ public partial class ModBrowserPage : UserControl, ILockedSidebarPage
                 grid.Columns = columns;
             LoadingGrid.Columns = columns;
         };
+    }
+
+    private async Task FillViewportAsync()
+    {
+        if (_fillingViewport)
+            return;
+        _fillingViewport = true;
+        try
+        {
+            while (IsLoaded)
+            {
+                // Let each bounded batch render before deciding whether the viewport needs more results.
+                await Dispatcher.UIThread.InvokeAsync(ResultsScroll.UpdateLayout, DispatcherPriority.Background);
+                if (
+                    !IsLoaded
+                    || !_model.CanLoadMore
+                    || ResultsScroll.Extent.Height - ResultsScroll.Offset.Y - ResultsScroll.Viewport.Height >= 200
+                )
+                    break;
+                await _model.LoadMoreAsync();
+            }
+        }
+        finally
+        {
+            _fillingViewport = false;
+        }
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -53,6 +77,7 @@ public partial class ModBrowserPage : UserControl, ILockedSidebarPage
     {
         ResultsScroll.Offset = default;
         await _model.SearchAsync();
+        await FillViewportAsync();
     }
 
     private void Search_KeyDown(object? sender, KeyEventArgs e)
@@ -70,9 +95,14 @@ public partial class ModBrowserPage : UserControl, ILockedSidebarPage
         FilterButton.Flyout?.Hide();
         ResultsScroll.Offset = default;
         await _model.ApplyFiltersAsync();
+        await FillViewportAsync();
     }
 
-    private async void Retry_Click(object? sender, RoutedEventArgs e) => await _model.RetryAsync();
+    private async void Retry_Click(object? sender, RoutedEventArgs e)
+    {
+        await _model.RetryAsync();
+        await FillViewportAsync();
+    }
 
     private async void Card_Loaded(object? sender, RoutedEventArgs e)
     {

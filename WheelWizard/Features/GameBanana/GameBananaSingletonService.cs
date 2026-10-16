@@ -30,6 +30,9 @@ public class GameBananaSingletonService(IApiCaller<IGameBananaApi> apiService) :
 
     public async Task<OperationResult<GameBananaModDetails>> GetModDetails(int modId)
     {
-        return await apiService.CallApiAsync(gitHubApi => gitHubApi.GetModDetails(modId));
+        var result = await apiService.CallApiAsync(gitHubApi => gitHubApi.GetModDetails(modId));
+        if (result.IsSuccess && result.Value is not { Author: not null, Category: not null })
+            return Fail("GameBanana returned incomplete mod details.");
+        return result;
     }
 }

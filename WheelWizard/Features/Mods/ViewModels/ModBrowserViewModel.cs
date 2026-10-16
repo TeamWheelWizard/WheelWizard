@@ -69,7 +69,7 @@ public sealed class ModBrowserViewModel : INotifyPropertyChanged
     public bool IsLoading { get; private set; }
     public string? Error { get; private set; }
     public bool HasError => Error != null;
-    public bool IsEmpty => !IsLoading && !HasError && Results.Count == 0;
+    public bool IsEmpty => !IsLoading && !HasError && !CanLoadMore && Results.Count == 0;
     public bool CanLoadMore => (_hasMore || _pending.Count > 0) && !IsLoading && !HasError;
     public bool ShowInitialLoading => IsLoading && Results.Count == 0;
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -160,7 +160,7 @@ public sealed class ModBrowserViewModel : INotifyPropertyChanged
         try
         {
             // API pages include excluded entries; buffer matching results into even batches.
-            while (_pending.Count < 12 && _hasMore)
+            for (var fetched = 0; _pending.Count < 12 && _hasMore && fetched < 5; fetched++)
             {
                 var response = await api.GetModSearchResults(_query, _page + 1, _categoryId).WaitAsync(search.Token);
                 if (search != _search)
@@ -185,7 +185,10 @@ public sealed class ModBrowserViewModel : INotifyPropertyChanged
                     _pending.Enqueue(mod);
                 }
             }
-            for (var i = 0; i < 12 && _pending.TryDequeue(out var mod); i++)
+            var count = Math.Min(12, _pending.Count);
+            if (_hasMore)
+                count -= count % 2;
+            for (var i = 0; i < count && _pending.TryDequeue(out var mod); i++)
             {
                 var image = mod.PreviewMedia?.Images?.FirstOrDefault();
                 var url = image == null ? "" : $"{image.BaseUrl}/{image.File530 ?? image.File220 ?? image.File}";

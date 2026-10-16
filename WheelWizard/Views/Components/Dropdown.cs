@@ -358,14 +358,16 @@ public class Dropdown : ComboBox
         for (var index = 0; index < ItemCount; index++)
         {
             var item = ItemsView[index];
-            if (item is InputElement { IsEnabled: false } || ContainerFromIndex(index) is { IsEnabled: false })
+            if (!Matches(item) || item is InputElement { IsEnabled: false } || ContainerFromIndex(index) is { IsEnabled: false })
                 continue;
             if (OptionText(item).StartsWith(_searchTerm, StringComparison.OrdinalIgnoreCase))
             {
                 if (Multiple)
                 {
                     SetCurrentValue(IsDropDownOpenProperty, true);
-                    ContainerFromIndex(index)?.Focus(NavigationMethod.Directional);
+                    _menu?.UpdateLayout();
+                    if (ContainerFromIndex(index)?.Focus(NavigationMethod.Directional) != true)
+                        continue;
                 }
                 else
                     SetCurrentValue(SelectedIndexProperty, index);

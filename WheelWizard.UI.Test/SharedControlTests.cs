@@ -21,6 +21,26 @@ namespace WheelWizard.UI.Test;
 public class SharedControlTests
 {
     [AvaloniaFact]
+    public void Dropdown_TypeAheadSkipsSelectedOptions()
+    {
+        var dropdown = new Dropdown
+        {
+            Multiple = true,
+            ItemsSource = new[] { "Mario", "Marina" },
+            SelectedItems = new System.Collections.ObjectModel.ObservableCollection<object> { "Mario" },
+            MenuAnimationDuration = TimeSpan.Zero,
+        };
+        using var window = new UiTestWindow { Content = dropdown };
+        window.Show();
+        dropdown.Focus();
+        window.KeyTextInput("Mar");
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(dropdown.IsDropDownOpen);
+        Assert.True(dropdown.ContainerFromIndex(1)!.IsFocused);
+        Assert.Equal("Mario", Assert.Single(dropdown.SelectedItems!.Cast<string>()));
+    }
+
+    [AvaloniaFact]
     public void Dropdown_MultipleSearchAddsBadgesAndRemovesWithoutClosing()
     {
         var required = new DropdownOption("You") { IsSelectionRequired = true };
