@@ -56,7 +56,6 @@ public partial class GameSetupPage : UserControl, IBlockingPage
 
     private void Refresh()
     {
-        _gameFiles.RecoverInterruptedWork();
         _status = _gameFiles.GetStatus();
         if (!IsNeeded(_status))
         {
