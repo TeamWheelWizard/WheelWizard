@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using WheelWizard.CustomDistributions;
 using WheelWizard.DolphinInstaller;
+using WheelWizard.GameFiles;
 using WheelWizard.Onboarding;
 using WheelWizard.Recomp;
 
@@ -17,6 +18,7 @@ public sealed class StartupMaintenance(
     IManagedDolphinService managedDolphin,
     IRetroRewindMigrationService migration,
     IOnboardingService onboarding,
+    IGameFilesService gameFiles,
     IServiceProvider services,
     ILogger<StartupMaintenance> logger
 ) : IStartupMaintenance
@@ -35,6 +37,9 @@ public sealed class StartupMaintenance(
             );
             if (result.IsSuccess && result.Value == RetroRewindMigrationOutcome.Moved)
                 ApplyRecompPaths();
+
+            // An extraction interrupted by a crash or power cut is finished or cleaned up before anything looks at it.
+            await Task.Run(gameFiles.RecoverInterruptedWork, cancellationToken);
 
             onboarding.MarkCompletedIfAlreadySetUp();
         }

@@ -3,6 +3,7 @@ using Testably.Abstractions.Testing;
 using WheelWizard.ApplicationData;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
+using WheelWizard.GameFiles;
 using WheelWizard.Launching;
 using WheelWizard.Mods;
 using WheelWizard.Settings;
@@ -22,12 +23,13 @@ public class LaunchPathTests
     {
         var fs = new MockFileSystem(options => options.SimulatingOperatingSystem(SimulationMode.Linux));
         fs.Directory.CreateDirectory("/output");
-        var settings = CreateSettings();
         var paths = Substitute.For<ICustomDistributionPaths>();
         paths.LaunchJsonFilePath.Returns("/output/RR.json");
         paths.RootFolderPath.Returns("/distribution");
         paths.XmlFilePath.Returns("/distribution/RR.xml");
-        var descriptor = new RetroRewindLaunchDescriptor(fs, settings, paths);
+        var gameFiles = Substitute.For<IGameFilesPaths>();
+        gameFiles.MainDolPath.Returns("/data/GAME/DATA/sys/main.dol");
+        var descriptor = new RetroRewindLaunchDescriptor(fs, paths, gameFiles);
 
         if (beta)
             descriptor.GenerateLaunchJson("/distribution/RRBeta.xml");
@@ -36,7 +38,8 @@ public class LaunchPathTests
 
         using var json = JsonDocument.Parse(fs.File.ReadAllText("/output/RR.json"));
         var root = json.RootElement;
-        Assert.Equal("/game.iso", root.GetProperty("base-file").GetString());
+        // Dolphin boots the extracted game, never the image it came from.
+        Assert.Equal("/data/GAME/DATA/sys/main.dol", root.GetProperty("base-file").GetString());
         Assert.Equal("dolphin-game-mod-descriptor", root.GetProperty("type").GetString());
         var patch = root.GetProperty("riivolution").GetProperty("patches")[0];
         Assert.Equal("/distribution", patch.GetProperty("root").GetString());
@@ -81,7 +84,8 @@ public class LaunchPathTests
             descriptor,
             environment,
             Substitute.For<ILaunchPrompts>(),
-            new InlineModPresentation()
+            new InlineModPresentation(),
+            ReadyGame()
         );
         Assert.True((await launcher.LaunchAsync(beta)).IsFailure);
 
@@ -89,6 +93,13 @@ public class LaunchPathTests
         Assert.Empty(mods.ReceivedCalls());
         Assert.Empty(remotes.ReceivedCalls());
         Assert.Empty(descriptor.ReceivedCalls());
+    }
+
+    private static IGameFilesService ReadyGame()
+    {
+        var gameFiles = Substitute.For<IGameFilesService>();
+        gameFiles.GetStatus().Returns(new GameFilesStatus(GameFilesState.Ready, null, "/game.iso"));
+        return gameFiles;
     }
 
     private static ISettingsManager CreateSettings()

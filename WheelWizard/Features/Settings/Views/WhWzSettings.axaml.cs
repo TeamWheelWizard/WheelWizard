@@ -8,6 +8,8 @@ using WheelWizard.DiscImages;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
+using WheelWizard.GameFiles;
+using WheelWizard.GameFiles.Views;
 using WheelWizard.Models.Enums;
 using WheelWizard.Recomp;
 using WheelWizard.Settings;
@@ -48,6 +50,10 @@ public partial class WhWzSettings : UserControl
     private IManagedDolphinService ManagedDolphin { get; }
 
     private IServiceProvider Services { get; }
+
+    private IGameFilesService GameFiles => Services.GetRequiredService<IGameFilesService>();
+
+    private IGameFilesPaths GameFilesPaths => Services.GetRequiredService<IGameFilesPaths>();
 
     public WhWzSettings(
         IApplicationLogFiles logFiles,
@@ -231,37 +237,29 @@ public partial class WhWzSettings : UserControl
         if (string.IsNullOrEmpty(filePath))
             return;
 
-        var info = DiscImages.ReadInfo(filePath);
-        if (info.IsFailure || GameRegion.FromGameId(info.Value.GameId) == MarioKartWiiEnums.Regions.None)
-        {
-            var reason = info.IsFailure
-                ? t("message_error.invalid_game_file.unreadable")
-                : t("message_error.invalid_game_file.wrong_game", new { name = info.Value.InternalName, id = info.Value.GameId });
-            await new MessageBoxWindow()
-                .SetMessageType(MessageBoxWindow.MessageType.Error)
-                .SetTitleText(t("message_error.invalid_game_file.title"))
-                .SetInfoText(reason)
-                .ShowDialog();
+        // The flow checks the file, asks before replacing an extracted game, and extracts it.
+        var changed = await Services.GetRequiredService<IGameFilesFlow>().ChangeImageAsync(filePath);
+        UpdateLocationRows();
+        if (!changed)
             return;
-        }
 
-        if (await ApplyLocationSettingAsync(SettingsService.GAME_LOCATION, filePath))
-        {
-            // A game from another region switches to that region's save.
-            var layout = ViewUtils.GetLayout();
-            layout.UpdateSidebarProfile();
-            layout.UpdateFriendCount();
-        }
+        // A game from another region switches to that region's save.
+        var layout = ViewUtils.GetLayout();
+        layout.UpdateSidebarProfile();
+        layout.UpdateFriendCount();
+        await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Success_PathSettingsSaved);
     }
 
     private void UpdateGameFileDetails()
     {
-        var info = DiscImages.ReadInfo(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
-        var region = info.IsSuccess ? GameRegion.FromGameId(info.Value.GameId) : MarioKartWiiEnums.Regions.None;
+        var status = GameFiles.GetStatus();
+        var region = GameRegion.FromGameId(status.Manifest?.GameId);
         MarioKartHelperText.Text =
-            region != MarioKartWiiEnums.Regions.None
-                ? $"Mario Kart Wii · {GameRegion.GetDisplayName(region)} · {info.Value.Format.ToString().ToUpperInvariant()}"
+            status.Manifest is not null && region != MarioKartWiiEnums.Regions.None
+                ? $"Mario Kart Wii · {GameRegion.GetDisplayName(region)} · {t("game_files.status_extracted")}"
                 : t("helper_text.end_with_x") + " " + string.Join("/", DiscImages.SupportedExtensions);
+        // The image the game was extracted from, which is no longer needed but good to know.
+        ToolTip.SetTip(MarioKartHelperText, status.ImagePath);
     }
 
     private async void DolphinUserPathBrowse_OnClick(object sender, RoutedEventArgs e)
@@ -342,8 +340,11 @@ public partial class WhWzSettings : UserControl
 
     private void DolphinExecutableOpen_OnClick(object sender, RoutedEventArgs e) => OpenContainingFolder(DolphinPaths.ExecutablePath);
 
-    private void GameLocationOpen_OnClick(object sender, RoutedEventArgs e) =>
-        OpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
+    private void GameLocationOpen_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (Directory.Exists(GameFilesPaths.RootPath))
+            FilePicker.OpenFolderInFileManager(GameFilesPaths.RootPath);
+    }
 
     private void DolphinUserFolderOpen_OnClick(object sender, RoutedEventArgs e)
     {
@@ -382,13 +383,7 @@ public partial class WhWzSettings : UserControl
             DolphinExecutableChangeButton,
             SettingsService.DOLPHIN_LOCATION.IsValid() && !string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath)
         );
-        SetLocationRowState(
-            GameLocationCompleteIcon,
-            GameLocationWarningIcon,
-            GameLocationChangeButton,
-            SettingsService.GAME_LOCATION.IsValid()
-                && !string.IsNullOrWhiteSpace(SettingsService.Get<string>(SettingsService.GAME_LOCATION))
-        );
+        SetLocationRowState(GameLocationCompleteIcon, GameLocationWarningIcon, GameLocationChangeButton, GameFiles.GetStatus().IsReady);
         SetLocationRowState(
             DolphinUserFolderCompleteIcon,
             DolphinUserFolderWarningIcon,
@@ -405,7 +400,7 @@ public partial class WhWzSettings : UserControl
         DolphinExecutableOpenButton.IsVisible = !OperatingSystem.IsLinux() || IsConfiguredExecutableFile(DolphinPaths.ExecutablePath);
         DolphinExecutableOpenButton.IsEnabled =
             DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(DolphinPaths.ExecutablePath);
-        GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
+        GameLocationOpenButton.IsEnabled = Directory.Exists(GameFilesPaths.RootPath);
         UpdateGameFileDetails();
         DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(DolphinPaths.UserFolderPath);
     }
@@ -654,6 +649,8 @@ public partial class WhWzSettings : UserControl
             {
                 await HandleSuccessfulAppdataMoveAsync(details, errorMessage);
                 FollowRelocatedDataFolder();
+                // The extracted game moved with the data folder; WiiCompiled still names the old place until relinked.
+                await Services.GetRequiredService<IGameFilesFlow>().LinkWiiCompiledAsync();
             }
             else
             {

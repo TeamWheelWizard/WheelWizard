@@ -2,8 +2,8 @@ using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using WheelWizard.CustomDistributions;
+using WheelWizard.GameFiles;
 using WheelWizard.Models.RRLaunchModels;
-using WheelWizard.Settings;
 
 namespace WheelWizard.Launching;
 
@@ -13,7 +13,7 @@ public interface IRetroRewindLaunchDescriptor
     void GenerateLaunchJson(string xmlFilePath);
 }
 
-public sealed class RetroRewindLaunchDescriptor(IFileSystem fileSystem, ISettingsManager settings, ICustomDistributionPaths paths)
+public sealed class RetroRewindLaunchDescriptor(IFileSystem fileSystem, ICustomDistributionPaths paths, IGameFilesPaths gameFiles)
     : IRetroRewindLaunchDescriptor
 {
     private string XmlFilePath => paths.XmlFilePath;
@@ -46,7 +46,8 @@ public sealed class RetroRewindLaunchDescriptor(IFileSystem fileSystem, ISetting
     {
         var launchConfig = new LaunchConfig
         {
-            BaseFile = fileSystem.Path.GetFullPath(settings.Get<string>(settings.GAME_LOCATION)),
+            // Dolphin opens an extracted disc through its sys/main.dol and finds the rest of the layout around it.
+            BaseFile = fileSystem.Path.GetFullPath(gameFiles.MainDolPath),
             DisplayName = "RR",
             Riivolution = new()
             {

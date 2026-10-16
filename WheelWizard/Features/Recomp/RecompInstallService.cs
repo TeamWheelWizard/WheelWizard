@@ -77,6 +77,13 @@ public interface IRecompInstallService : IDisposable
     /// no registry entry exists and the Retro Rewind installation is deliberately left in place.
     /// </summary>
     Task<OperationResult> UninstallAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Points the installation at Wheel Wizard's extracted game, which also lets it drop the copy it extracted
+    /// itself. Quick: nothing is rebuilt. Fails when the installed setup is too old to do that, which leaves
+    /// WiiCompiled asking for an update.
+    /// </summary>
+    Task<OperationResult> LinkGameDataAsync(CancellationToken cancellationToken = default);
 }
 
 /// <inheritdoc />
@@ -183,6 +190,10 @@ public sealed class RecompInstallService : IRecompInstallService
         var hasInstalledHost = fileSystem.File.Exists(environment.InstalledSetupFilePath);
         if (hasInstalledHost && state != null && !IsCurrentInstallState(state))
             return IsGameFileConfigured() ? WheelWizardStatus.OutOfDate : WheelWizardStatus.ConfigNotFinished;
+
+        // An installation still reading a game copy of its own can't launch until it reads the extracted game.
+        if (hasInstalledHost && IsCurrentInstallState(state) && IsGameFileConfigured() && !IsLinkedToGameFiles(state))
+            return WheelWizardStatus.OutOfDate;
 
         var installedVersion = IsCurrentInstallState(state) ? state!.SetupVersion : null;
         var latestRelease = await TryGetLatestReleaseAsync(cancellationToken);
@@ -410,22 +421,40 @@ public sealed class RecompInstallService : IRecompInstallService
         // rebuilds when told the payload choice changed, and --check-products alone never says so.
         var forceRetroRebuild = state is { IsRetroWfcPayloadSkipped: true } && payloadMode == RecompRetroWfcPayloadMode.Download;
 
+        // An installation that still reads a game copy of its own is pointed at the extracted game first. A host
+        // too old to do that can only be replaced by a release that can.
+        var needsLink = hasInstalledHost && IsCurrentInstallState(state) && !IsLinkedToGameFiles(state);
+        if (needsLink && await hosts.SupportsGameDirAsync(environment.InstalledSetupFilePath, cancellationToken))
+        {
+            var linked = await RunLinkGameDataAsync(progress, cancellationToken);
+            if (linked.IsFailure)
+                return linked;
+            needsLink = false;
+        }
+
         // A repair is deliberately independent of GitHub: once a setup host has been installed,
         // it owns the installed toolkit/workspace and can bring changed compile inputs current offline.
         if (release is null)
         {
-            if (hasInstalledHost && await InstalledHostCanRepairAsync(installedVersion, cancellationToken))
+            if (!needsLink && hasInstalledHost && await InstalledHostCanRepairAsync(installedVersion, cancellationToken))
                 return await RepairWhatTheCheckDemandsAsync(progress, payloadMode, forceRetroRebuild, cancellationToken);
 
-            return Fail("Could not verify a current WiiCompiled setup release or installed repair host.");
+            return Fail(
+                needsLink
+                    ? t("game_files.wiicompiled_needs_update")
+                    : "Could not verify a current WiiCompiled setup release or installed repair host."
+            );
         }
 
-        if (hasInstalledHost && await InstalledHostCanRepairAsync(release.TagName, cancellationToken))
+        if (!needsLink && hasInstalledHost && await InstalledHostCanRepairAsync(release.TagName, cancellationToken))
             return await RepairWhatTheCheckDemandsAsync(progress, payloadMode, forceRetroRebuild, cancellationToken);
 
         var setupResult = await hosts.EnsureSetupDownloadedAsync(release, environment.CacheFolderPath, progress, cancellationToken);
         if (setupResult.IsFailure)
             return setupResult.Error;
+        // WiiCompiled reads the extracted game in place; a release from before that has nothing to read it with.
+        if (!await hosts.SupportsGameDirAsync(setupResult.Value, cancellationToken))
+            return Fail(t("game_files.wiicompiled_needs_update"));
 
         return await RunSilentInstallAsync(setupResult.Value, payloadMode, progress, cancellationToken);
     }
@@ -462,6 +491,8 @@ public sealed class RecompInstallService : IRecompInstallService
             return Fail("WiiCompiled requires a current install-state.json for its fixed installation path.");
         if (!await SetupMatchesVersionAsync(environment.InstalledSetupFilePath, state.SetupVersion, cancellationToken))
             return Fail("The installed WiiCompiled host does not match its current install state.");
+        if (!IsLinkedToGameFiles(state))
+            return Fail(t("game_files.wiicompiled_needs_update"));
 
         // A launch never asks about offline play and never forces the payload upgrade: the user pressed
         // Play, not Update. A repair the check demands anyway still gains the payload when it is reachable.
@@ -533,6 +564,68 @@ public sealed class RecompInstallService : IRecompInstallService
             return launchResult.Error;
         return launchResult.Value == 0 ? Ok() : Fail($"WiiCompiled exited with code {launchResult.Value}.");
     }
+
+    public async Task<OperationResult> LinkGameDataAsync(CancellationToken cancellationToken = default)
+    {
+        if (!await _operationGate.WaitAsync(0, cancellationToken))
+            return Fail(OperationAlreadyRunningMessage);
+
+        try
+        {
+            if (!IsInstalled)
+                return Ok();
+            var state = ReadCurrentInstallState();
+            if (state is null)
+                return Fail("WiiCompiled requires a current install-state.json for its fixed installation path.");
+            if (IsLinkedToGameFiles(state))
+                return Ok();
+            if (!IsGameFileConfigured())
+                return Fail(t("game_files.not_extracted"));
+            if (!await hosts.SupportsGameDirAsync(environment.InstalledSetupFilePath, cancellationToken))
+                return Fail(t("game_files.wiicompiled_needs_update"));
+            return await RunLinkGameDataAsync(progress: null, cancellationToken);
+        }
+        finally
+        {
+            _operationGate.Release();
+        }
+    }
+
+    private async Task<OperationResult> RunLinkGameDataAsync(
+        IProgress<RecompInstallProgress>? progress,
+        CancellationToken cancellationToken
+    )
+    {
+        var arguments = RecompSetupCommandBuilder.BuildLinkGameDirArguments(environment.InstallFolderPath, environment.GameFolderPath);
+        logger.LogInformation("Pointing WiiCompiled at the extracted game: {Arguments}", string.Join(' ', arguments));
+        var resultHolder = new EventHolder<RecompSetupResultEvent>();
+        OperationResult<int> runResult;
+        try
+        {
+            runResult = await processRunner.RunAsync(
+                environment.InstalledSetupFilePath,
+                arguments,
+                environment.InstallFolderPath,
+                line => HandleSetupOutput(line, progress, resultHolder),
+                cancellationToken
+            );
+        }
+        finally
+        {
+            _launchReconciled = false;
+        }
+
+        var finished = FinishSetupRun(runResult, resultHolder, progress, reportCompletion: false);
+        if (finished.IsFailure)
+            return finished;
+        return IsLinkedToGameFiles(ReadInstalledState())
+            ? Ok()
+            : Fail("WiiCompiled finished, but does not report reading the extracted game.");
+    }
+
+    /// <summary>Whether the installation reads Wheel Wizard's extracted game rather than a copy of its own.</summary>
+    private bool IsLinkedToGameFiles(RecompInstallState? state) =>
+        state is not null && PathsMatch(state.GameDataDir, fileSystem.Path.Combine(environment.GameFolderPath, "DATA"));
 
     public async Task<OperationResult> UninstallAsync(CancellationToken cancellationToken = default)
     {
@@ -607,7 +700,7 @@ public sealed class RecompInstallService : IRecompInstallService
     {
         var request = new RecompInstallRequest
         {
-            GameFilePath = environment.GameFilePath,
+            GameFolderPath = environment.GameFolderPath,
             InstallFolderPath = environment.InstallFolderPath,
             RetroRewindFolderPath = environment.RetroRewindFolderPath,
             Portable = environment.IsPortableInstall,
@@ -857,11 +950,7 @@ public sealed class RecompInstallService : IRecompInstallService
         }
     }
 
-    private bool IsGameFileConfigured()
-    {
-        var gameFilePath = environment.GameFilePath;
-        return !string.IsNullOrWhiteSpace(gameFilePath) && fileSystem.File.Exists(gameFilePath);
-    }
+    private bool IsGameFileConfigured() => environment.IsGameReady;
 
     private static void Report(IProgress<RecompInstallProgress>? progress, string message, int percent) =>
         RecompSetupHostAcquirer.Report(progress, message, percent);

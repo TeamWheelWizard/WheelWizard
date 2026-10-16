@@ -10,6 +10,7 @@ using WheelWizard.DolphinInstaller;
 using WheelWizard.Features.Archives;
 using WheelWizard.Features.Patches;
 using WheelWizard.GameBanana;
+using WheelWizard.GameFiles;
 using WheelWizard.GitHub;
 using WheelWizard.Launching;
 using WheelWizard.Localization;
@@ -46,6 +47,7 @@ public static class SetupExtensions
         services.AddRrRooms();
         services.AddWhWzData();
         services.AddDiscImages();
+        services.AddGameFiles();
         services.AddWiiManagement();
         services.AddGameBanana();
         services.AddMiiImages();

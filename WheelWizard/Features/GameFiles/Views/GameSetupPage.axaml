@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="600"
+             x:Class="WheelWizard.GameFiles.Views.GameSetupPage">
+    <UserControl.Styles>
+        <Style Selector="Border.InfoBox">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}" />
+            <Setter Property="Padding" Value="14,12" />
+        </Style>
+        <Style Selector="TextBlock.Muted">
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+        </Style>
+        <Style Selector="TextBlock.Error">
+            <Setter Property="Foreground" Value="{StaticResource Danger400}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <StackPanel Width="420" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+            <StackPanel Spacing="6">
+                <TextBlock x:Name="TitleText" Classes="TitleText" TextWrapping="Wrap" />
+                <TextBlock x:Name="BodyText" Classes="BodyText Muted" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Border x:Name="GameBox" Classes="InfoBox">
+                <Grid ColumnDefinitions="Auto,*">
+                    <PathIcon x:Name="GameIcon" Width="18" Height="18" Margin="0,0,12,0" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="2">
+                        <TextBlock x:Name="GameNameText" Classes="BodyText" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <SelectableTextBlock x:Name="GamePathText" Classes="TinyText" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <StackPanel x:Name="ProgressPanel" Spacing="8">
+                <ProgressBar x:Name="ExtractProgressBar" Minimum="0" Maximum="100" Height="8" />
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock x:Name="ProgressText" Classes="TinyText" TextWrapping="Wrap" VerticalAlignment="Center" />
+                    <components:ActionButton x:Name="CancelButton" Grid.Column="1"
+                                             Variant="Link" Tone="Secondary" Padding="0" MinHeight="0"
+                                             Text="{loc:T game_files.cancel}" Click="Cancel_OnClick" />
+                </Grid>
+            </StackPanel>
+
+            <TextBlock x:Name="ErrorText" Classes="BodyText Error" TextWrapping="Wrap" />
+
+            <StackPanel x:Name="ActionsPanel" Spacing="8">
+                <components:ActionButton x:Name="PrimaryButton" Tone="Brand" HorizontalAlignment="Stretch" Click="Primary_OnClick" />
+                <components:ActionButton x:Name="SecondaryButton" Tone="Secondary" HorizontalAlignment="Stretch" Click="Secondary_OnClick" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+                    <components:ActionButton x:Name="PickOtherButton" Variant="Link" Tone="Secondary"
+                                             Text="{loc:T game_files.pick_other}" Click="PickOther_OnClick" />
+                    <components:ActionButton Variant="Link" Tone="Secondary"
+                                             Text="{loc:T game_files.open_settings}" Click="OpenSettings_OnClick" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

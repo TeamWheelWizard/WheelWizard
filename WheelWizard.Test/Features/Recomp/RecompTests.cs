@@ -17,7 +17,7 @@ public class RecompTests
         var arguments = RecompSetupCommandBuilder.BuildSilentInstallArguments(
             new()
             {
-                GameFilePath = @"D:\Games\Mario Kart Wii.rvz",
+                GameFolderPath = @"D:\WheelWizard\GAME",
                 InstallFolderPath = @"D:\WheelWizard\Recomp\Install",
                 RetroRewindFolderPath = @"D:\WheelWizard\RetroRewind6",
                 Portable = true,
@@ -27,8 +27,8 @@ public class RecompTests
         Assert.Equal(
             [
                 "--silent",
-                "--game",
-                @"D:\Games\Mario Kart Wii.rvz",
+                "--game-dir",
+                @"D:\WheelWizard\GAME",
                 "--install-dir",
                 @"D:\WheelWizard\Recomp\Install",
                 "--portable",
@@ -47,7 +47,7 @@ public class RecompTests
         var arguments = RecompSetupCommandBuilder.BuildSilentInstallArguments(
             new()
             {
-                GameFilePath = @"D:\Games\Mario Kart Wii.rvz",
+                GameFolderPath = @"D:\WheelWizard\GAME",
                 InstallFolderPath = @"D:\WheelWizard\Recomp\Install",
                 RetroRewindFolderPath = @"D:\WheelWizard\RetroRewind6",
                 RetroWfcPayloadMode = RecompRetroWfcPayloadMode.Skip,

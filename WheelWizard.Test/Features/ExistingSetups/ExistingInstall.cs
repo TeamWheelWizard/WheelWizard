@@ -10,6 +10,7 @@ using WheelWizard.DiscImages;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
+using WheelWizard.GameFiles;
 using WheelWizard.Launching;
 using WheelWizard.Onboarding;
 using WheelWizard.Recomp;
@@ -224,6 +225,16 @@ internal sealed class ExistingInstall
         return this;
     }
 
+    /// <summary>A real (synthetic) Mario Kart Wii image instead of a placeholder file, for setups that get extracted.</summary>
+    public ExistingInstall WithRealGame(string path, string gameId = "RMCP01")
+    {
+        GameFile = path;
+        Config["GameLocation"] = path;
+        Fs.Directory.CreateDirectory(Fs.Path.GetDirectoryName(path)!);
+        Fs.File.WriteAllBytes(path, new GameFiles.SyntheticWiiDisc { GameId = gameId }.Build("rvz"));
+        return this;
+    }
+
     public ExistingInstall WithConfig(string key, object? value)
     {
         Config[key] = value;
@@ -352,6 +363,8 @@ internal sealed class Session
     public RecompSettingManager RecompSettings { get; }
     public RecompPaths RecompPaths { get; }
     public RetroRewindLaunchDescriptor LaunchDescriptor { get; }
+    public GameFilesPaths GamePaths { get; }
+    public GameFilesService GameFiles { get; }
     public IDolphinPaths DolphinPaths { get; }
     public List<string?> Statuses { get; } = [];
 
@@ -439,8 +452,26 @@ internal sealed class Session
             services,
             NullLogger<OnboardingService>.Instance
         );
-        Maintenance = new StartupMaintenance(ManagedDolphin, Migration, Onboarding, services, NullLogger<StartupMaintenance>.Instance);
-        LaunchDescriptor = new RetroRewindLaunchDescriptor(fs, Settings, Paths);
+        GamePaths = new GameFilesPaths(location, fs);
+        GameFiles = new GameFilesService(
+            GamePaths,
+            new DiscExtractor(fs),
+            Settings,
+            fs,
+            Substitute.For<IProcessLauncher>(),
+            DolphinPaths,
+            new DiscImageService(fs),
+            NullLogger<GameFilesService>.Instance
+        );
+        Maintenance = new StartupMaintenance(
+            ManagedDolphin,
+            Migration,
+            Onboarding,
+            GameFiles,
+            services,
+            NullLogger<StartupMaintenance>.Instance
+        );
+        LaunchDescriptor = new RetroRewindLaunchDescriptor(fs, Paths, GamePaths);
     }
 
     /// <summary>What Desktop startup runs before the main window decides which page to open.</summary>

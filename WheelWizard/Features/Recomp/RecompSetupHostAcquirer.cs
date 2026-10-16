@@ -114,6 +114,28 @@ public sealed class RecompSetupHostAcquirer(
             && cachedVersion.ComparePrecedenceTo(expected) == 0;
     }
 
+    /// <summary>
+    /// Whether the setup can read Wheel Wizard's extracted game in place (<c>--game-dir</c>, <c>--link-game-dir</c>).
+    /// A setup from before that rejects <c>--capabilities</c>, which reads as no.
+    /// </summary>
+    public async Task<bool> SupportsGameDirAsync(string setupFilePath, CancellationToken cancellationToken)
+    {
+        RecompCapabilitiesEvent? capabilities = null;
+        var runResult = await processRunner.RunAsync(
+            setupFilePath,
+            RecompSetupCommandBuilder.BuildCapabilitiesArguments(),
+            workingDirectory: null,
+            line =>
+            {
+                if (RecompSetupOutputParser.Parse(line) is RecompCapabilitiesEvent parsed)
+                    capabilities = parsed;
+            },
+            cancellationToken
+        );
+
+        return runResult.IsSuccess && runResult.Value == 0 && capabilities?.Has(RecompCapabilitiesEvent.GameDir) == true;
+    }
+
     public static bool VersionsMatch(string? first, string? second) =>
         RecompVersion.TryParse(first, out var parsedFirst)
         && RecompVersion.TryParse(second, out var parsedSecond)

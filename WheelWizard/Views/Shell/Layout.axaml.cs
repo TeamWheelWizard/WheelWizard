@@ -8,6 +8,8 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
+using WheelWizard.GameFiles;
+using WheelWizard.GameFiles.Views;
 using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
@@ -83,6 +85,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private IOnboardingService Onboarding { get; }
 
+    private IGameFilesService GameFiles { get; }
+
     public Layout(
         INavigationService navigation,
         LiveRoomsService liveRooms,
@@ -93,10 +97,12 @@ public partial class Layout : BaseWindow, IPollingListener
         ISettingsSignalBus settingsSignalBus,
         IModManager modManagerService,
         IAutoUpdaterSingletonService autoUpdater,
-        IOnboardingService onboarding
+        IOnboardingService onboarding,
+        IGameFilesService gameFiles
     )
     {
         Onboarding = onboarding;
+        GameFiles = gameFiles;
         Navigation = navigation;
         LiveRooms = liveRooms;
         LiveStatus = liveStatus;
@@ -151,6 +157,8 @@ public partial class Layout : BaseWindow, IPollingListener
             Navigation_OnPageChanged(this, page);
         else if (Onboarding.IsRequired)
             Navigation.NavigateTo<OnboardingPage>();
+        else if (IsGameSetupNeeded())
+            Navigation.NavigateTo<GameSetupPage>();
         else
             Navigation.NavigateTo<HomePage>();
         _loaded.TrySetResult();
@@ -277,7 +285,30 @@ public partial class Layout : BaseWindow, IPollingListener
     //     ModsButton.WarningTip = "Some mods need to be converted to patches.";
     // }
 
-    private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
+    private void Navigation_OnPageChanged(object? sender, UserControl page)
+    {
+        // Until the game files are usable only the setup page and Settings (to make room or move the data folder)
+        // can be shown; anything else goes back to the setup page.
+        if (page is not (GameSetupPage or SettingsPage or OnboardingPage) && IsGameSetupNeeded())
+        {
+            Navigation.NavigateAway(typeof(GameSetupPage));
+            return;
+        }
+
+        NavigateToPage(page);
+    }
+
+    private bool IsGameSetupNeeded()
+    {
+        try
+        {
+            return !Onboarding.IsRequired && GameSetupPage.IsNeeded(GameFiles.GetStatus());
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     /// <summary>
     /// The current page may ask before letting you go (see <see cref="INavigationGuard"/>); until it does, the

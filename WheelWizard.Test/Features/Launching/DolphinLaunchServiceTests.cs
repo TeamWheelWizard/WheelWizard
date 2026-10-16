@@ -3,6 +3,7 @@ using Testably.Abstractions.Testing;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.DolphinInstaller;
+using WheelWizard.GameFiles;
 using WheelWizard.Launching;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
@@ -108,8 +109,7 @@ public class DolphinLaunchServiceTests
     [InlineData(1, true)]
     public async Task PortalExport_OnlySkipsFilesystemPermissionAfterSuccessfulExit(int exitCode, bool expectedFallback)
     {
-        var fixture = new Fixture(command: "flatpak run org.DolphinEmu.dolphin-emu");
-        fixture.GamePath.Set("/run/user/1000/doc/game/game.iso", skipSave: true);
+        var fixture = new Fixture(command: "flatpak run org.DolphinEmu.dolphin-emu", distributionRoot: "/run/user/1000/doc/rr");
         fixture
             .LinuxProcesses.Run("flatpak", Arg.Any<IEnumerable<string>>(), out Arg.Any<string>(), out Arg.Any<string>())
             .Returns(Ok(exitCode));
@@ -119,15 +119,46 @@ public class DolphinLaunchServiceTests
         Assert.True((await fixture.Service.LaunchDolphin(versionPreflightResult: Ok())).IsSuccess);
 
         Assert.NotNull(captured);
-        Assert.Equal(expectedFallback, captured.ArgumentList[^1].Contains("--filesystem='/run/user/1000/doc/game/game.iso':ro"));
+        Assert.Equal(expectedFallback, captured.ArgumentList[^1].Contains("--filesystem='/run/user/1000/doc/rr':rw"));
         fixture
             .LinuxProcesses.Received(1)
             .Run(
                 "flatpak",
-                Arg.Is<IEnumerable<string>>(args => args.Contains("/run/user/1000/doc/game/game.iso")),
+                Arg.Is<IEnumerable<string>>(args => args.Contains("/run/user/1000/doc/rr")),
                 out Arg.Any<string>(),
                 out Arg.Any<string>()
             );
+    }
+
+    [Fact]
+    public async Task FlatpakDolphin_GetsReadOnlyAccessToTheWholeExtractedGame()
+    {
+        var fixture = new Fixture(command: "flatpak run org.DolphinEmu.dolphin-emu");
+        ProcessStartInfo? captured = null;
+        fixture.Processes.When(process => process.Start(Arg.Any<ProcessStartInfo>())).Do(call => captured = call.Arg<ProcessStartInfo>());
+
+        Assert.True((await fixture.Service.LaunchDolphin(versionPreflightResult: Ok())).IsSuccess);
+
+        Assert.NotNull(captured);
+        // Dolphin boots DATA/sys/main.dol but reads disc/ and the rest of DATA/ around it.
+        Assert.Contains("--filesystem='/data/GAME':ro", captured.ArgumentList[^1]);
+        Assert.DoesNotContain("game.iso", captured.ArgumentList[^1]);
+    }
+
+    [Fact]
+    public async Task FlatpakDolphin_AlsoGetsTheFolderALinkedGamePointsTo()
+    {
+        var fixture = new Fixture(command: "flatpak run org.DolphinEmu.dolphin-emu");
+        fixture.GameFiles.IsLinked.Returns(true);
+        fixture.GameFiles.ResolvedRootPath.Returns("/mnt/big/GAME");
+        ProcessStartInfo? captured = null;
+        fixture.Processes.When(process => process.Start(Arg.Any<ProcessStartInfo>())).Do(call => captured = call.Arg<ProcessStartInfo>());
+
+        Assert.True((await fixture.Service.LaunchDolphin(versionPreflightResult: Ok())).IsSuccess);
+
+        Assert.NotNull(captured);
+        Assert.Contains("--filesystem='/data/GAME':ro", captured.ArgumentList[^1]);
+        Assert.Contains("--filesystem='/mnt/big/GAME':ro", captured.ArgumentList[^1]);
     }
 
     [Fact]
@@ -154,10 +185,10 @@ public class DolphinLaunchServiceTests
         public IDolphinVersionService Versions { get; } = Substitute.For<IDolphinVersionService>();
         public ILinuxDolphinInstaller Installer { get; } = Substitute.For<ILinuxDolphinInstaller>();
         public IDolphinLaunchPresentation Presentation { get; } = Substitute.For<IDolphinLaunchPresentation>();
-        public WhWzSetting<string> GamePath { get; } = new("GamePath", "/game.iso");
+        public IGameFilesPaths GameFiles { get; } = Substitute.For<IGameFilesPaths>();
         public DolphinLaunchService Service { get; }
 
-        public Fixture(bool windows = false, string command = "dolphin-emu")
+        public Fixture(bool windows = false, string command = "dolphin-emu", string distributionRoot = "/distribution")
         {
             var fs = new MockFileSystem(options =>
                 options.SimulatingOperatingSystem(windows ? SimulationMode.Windows : SimulationMode.Linux)
@@ -168,19 +199,18 @@ public class DolphinLaunchServiceTests
             environment.GetFolderPath(Environment.SpecialFolder.UserProfile).Returns("/home/test");
             environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).Returns("/home/test/.config");
             environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).Returns("/home/test/.local/share");
-            var settings = Substitute.For<ISettingsManager>();
-            settings.GAME_LOCATION.Returns(GamePath);
-            settings.Get<string>(GamePath).Returns(_ => (string)GamePath.Get());
+            GameFiles.RootPath.Returns("/data/GAME");
+            GameFiles.ResolvedRootPath.Returns("/data/GAME");
             var paths = Substitute.For<IDolphinPaths>();
             var user = windows ? @"C:\Dolphin User" : "/dolphin-user";
             paths.UserFolderPath.Returns(user);
             paths.ExecutablePath.Returns(windows ? @"C:\Dolphin\Dolphin.exe" : command);
             paths.Layout.Returns(new DolphinPathLayout(fs.Path, environment, false, command, user));
             var distribution = Substitute.For<ICustomDistributionPaths>();
-            distribution.RootFolderPath.Returns("/distribution");
+            distribution.RootFolderPath.Returns(distributionRoot);
             distribution.LaunchJsonFilePath.Returns("/distribution/RR.json");
             Versions.CheckConfiguredDolphin().Returns((DolphinVersionStatus.Supported, "2606a"));
-            Service = new(settings, paths, distribution, fs, environment, Processes, LinuxProcesses, Versions, Installer, Presentation);
+            Service = new(paths, distribution, fs, environment, Processes, LinuxProcesses, Versions, Installer, Presentation, GameFiles);
         }
     }
 }

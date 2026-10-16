@@ -99,9 +99,22 @@ public sealed class DirectoryTransferService(IFileSystem fileSystem) : IDirector
 
         progress?.Report(0.0);
 
-        var directories = fileSystem.Directory.GetDirectories(normalizedSource, "*", SearchOption.AllDirectories);
-        var files = fileSystem.Directory.GetFiles(normalizedSource, "*", SearchOption.AllDirectories);
-        var totalSteps = directories.Length + files.Length;
+        // A linked folder (e.g. a game folder the user put on another drive) moves as a link; only when the link can't
+        // be recreated here are its contents copied instead. Deleting the source then removes the link, never its target.
+        var directories = new List<string>();
+        var files = new List<string>();
+        var sourceLinks = new List<string>();
+        try
+        {
+            Collect(normalizedSource, normalizedSource, normalizedDestination, directories, files, sourceLinks, insideLink: false);
+        }
+        catch (Exception ex)
+        {
+            progress?.Report(1.0);
+            return CreateResult(DirectoryMoveOutcome.CopyFailed, errorMessage: $"Failed to copy data: {ex.Message}", exception: ex);
+        }
+
+        var totalSteps = directories.Count + files.Count;
         var processedSteps = 0;
 
         void ReportProgress()
@@ -118,7 +131,7 @@ public sealed class DirectoryTransferService(IFileSystem fileSystem) : IDirector
             progress.Report(Math.Clamp((double)processedSteps / totalSteps, 0.0, 1.0));
         }
 
-        var copyAttempted = directories.Length > 0 || files.Length > 0;
+        var copyAttempted = directories.Count > 0 || files.Count > 0;
 
         try
         {
@@ -213,6 +226,11 @@ public sealed class DirectoryTransferService(IFileSystem fileSystem) : IDirector
         {
             try
             {
+                // Links (recreated at the destination, or copied through when that wasn't possible) go first, on their
+                // own: that keeps the recursive delete away from their targets and from junctions, which Windows
+                // refuses to delete that way. Deepest first, in case a linked folder held links of its own.
+                foreach (var link in sourceLinks.OrderByDescending(link => link.Length))
+                    DeleteLink(link);
                 fileSystem.Directory.Delete(normalizedSource, true);
             }
             catch (Exception ex)
@@ -236,5 +254,65 @@ public sealed class DirectoryTransferService(IFileSystem fileSystem) : IDirector
             verificationAttempted: verificationAttempted,
             sourceDeletionSucceeded: true
         );
+    }
+
+    private void Collect(
+        string sourceRoot,
+        string folder,
+        string destinationRoot,
+        List<string> directories,
+        List<string> files,
+        List<string> sourceLinks,
+        bool insideLink
+    )
+    {
+        foreach (var directory in fileSystem.Directory.EnumerateDirectories(folder))
+        {
+            var link = fileSystem.DirectoryInfo.New(directory).LinkTarget;
+            var isLink = !string.IsNullOrEmpty(link);
+            if (isLink)
+            {
+                // Only links in the folder itself are removed later; one inside a linked folder is not ours to touch.
+                if (!insideLink)
+                    sourceLinks.Add(directory);
+                if (TryRecreateLink(directory, link!, sourceRoot, destinationRoot))
+                    continue;
+            }
+
+            directories.Add(directory);
+            Collect(sourceRoot, directory, destinationRoot, directories, files, sourceLinks, insideLink || isLink);
+        }
+
+        files.AddRange(fileSystem.Directory.EnumerateFiles(folder));
+    }
+
+    private void DeleteLink(string path)
+    {
+        if (fileSystem.Path.DirectorySeparatorChar == '\\')
+            fileSystem.Directory.Delete(path, recursive: false);
+        else
+            fileSystem.File.Delete(path);
+    }
+
+    private bool TryRecreateLink(string linkPath, string target, string sourceRoot, string destinationRoot)
+    {
+        try
+        {
+            var destination = fileSystem.Path.Combine(destinationRoot, fileSystem.Path.GetRelativePath(sourceRoot, linkPath));
+            if (fileSystem.Directory.Exists(destination) || fileSystem.File.Exists(destination))
+                return false;
+            fileSystem.Directory.CreateDirectory(fileSystem.Path.GetDirectoryName(destination)!);
+            // A relative target keeps pointing at the same place only when it is resolved from the old folder.
+            var absoluteTarget = fileSystem.Path.IsPathRooted(target)
+                ? target
+                : fileSystem.Path.GetFullPath(fileSystem.Path.Combine(fileSystem.Path.GetDirectoryName(linkPath)!, target));
+            fileSystem.Directory.CreateSymbolicLink(destination, absoluteTarget);
+            return true;
+        }
+        catch
+        {
+            // Windows only lets some accounts create links; the contents are copied instead.
+            return false;
+        }
     }
 }

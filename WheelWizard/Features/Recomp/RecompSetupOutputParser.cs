@@ -38,6 +38,7 @@ public static class RecompSetupOutputParser
                 "progress" => ParseProgress(root),
                 "result" => ParseResult(root),
                 "products" => ParseProducts(root),
+                "capabilities" => ParseCapabilities(root),
                 _ => null,
             };
         }
@@ -45,6 +46,21 @@ public static class RecompSetupOutputParser
         {
             return null;
         }
+    }
+
+    private static RecompCapabilitiesEvent ParseCapabilities(JsonElement root)
+    {
+        var capabilities = new List<string>();
+        if (root.TryGetProperty("capabilities", out var list) && list.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var item in list.EnumerateArray())
+            {
+                if (item.ValueKind == JsonValueKind.String && item.GetString() is { } capability)
+                    capabilities.Add(capability);
+            }
+        }
+
+        return new(capabilities);
     }
 
     private static RecompSetupProgressEvent ParseProgress(JsonElement root) =>

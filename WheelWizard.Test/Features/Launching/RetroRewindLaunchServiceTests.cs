@@ -1,6 +1,7 @@
 using Testably.Abstractions.Testing;
 using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
+using WheelWizard.GameFiles;
 using WheelWizard.Launching;
 using WheelWizard.Mods;
 using WheelWizard.Recomp;
@@ -38,6 +39,31 @@ public class RetroRewindLaunchServiceTests
             );
     }
 
+    [Theory]
+    [InlineData(GameFilesState.CodeModified)]
+    [InlineData(GameFilesState.UnknownFolder)]
+    [InlineData(GameFilesState.ImageMissing)]
+    public async Task GameFilesNotReady_NeverStartsDolphin(GameFilesState state)
+    {
+        var fixture = new Fixture();
+        fixture.GameFiles.GetStatus().Returns(new GameFilesStatus(state, null, "/game.iso"));
+
+        Assert.True((await fixture.Service.LaunchAsync()).IsFailure);
+
+        Assert.Empty(fixture.Dolphin.ReceivedCalls());
+        Assert.Empty(fixture.Mods.ReceivedCalls());
+    }
+
+    [Fact]
+    public async Task DeletedImage_StillLaunchesOnceExtracted()
+    {
+        var fixture = new Fixture();
+        fixture.Fs.File.Delete("/game.iso");
+
+        Assert.True((await fixture.Service.LaunchAsync()).IsSuccess);
+        await fixture.Dolphin.Received(1).LaunchDolphin(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<OperationResult>());
+    }
+
     [Fact]
     public async Task FailedModPreparation_DoesNotWriteDescriptorOrStartGame()
     {
@@ -56,7 +82,7 @@ public class RetroRewindLaunchServiceTests
     public async Task MissingBetaGame_StopsBeforeVersionCheckOrPreparation()
     {
         var fixture = new Fixture();
-        fixture.Fs.File.Delete("/game.iso");
+        fixture.GameFiles.GetStatus().Returns(new GameFilesStatus(GameFilesState.NeedsExtraction, null, "/game.iso"));
 
         Assert.True((await fixture.Service.LaunchAsync(true)).IsFailure);
 
@@ -115,11 +141,13 @@ public class RetroRewindLaunchServiceTests
         public IModsLaunchService Mods { get; } = Substitute.For<IModsLaunchService>();
         public IRetroRewindLaunchDescriptor Descriptor { get; } = Substitute.For<IRetroRewindLaunchDescriptor>();
         public IWiiRemoteConfigurationService Remotes { get; } = Substitute.For<IWiiRemoteConfigurationService>();
+        public IGameFilesService GameFiles { get; } = Substitute.For<IGameFilesService>();
         public ILaunchPrompts Prompts { get; } = Substitute.For<ILaunchPrompts>();
         public RetroRewindLaunchService Service { get; }
 
         public Fixture()
         {
+            GameFiles.GetStatus().Returns(new GameFilesStatus(GameFilesState.Ready, null, "/game.iso"));
             Fs.File.WriteAllText("/game.iso", "game");
             var settings = Substitute.For<ISettingsManager>();
             settings.GAME_LOCATION.Returns(new WhWzSetting<string>("Game", "/game.iso"));
@@ -149,7 +177,8 @@ public class RetroRewindLaunchServiceTests
                 Descriptor,
                 Substitute.For<IRuntimeEnvironment>(),
                 Prompts,
-                new InlineModPresentation()
+                new InlineModPresentation(),
+                GameFiles
             );
         }
     }

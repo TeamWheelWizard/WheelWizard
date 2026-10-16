@@ -184,6 +184,10 @@
                         <PathIcon x:Name="GameResultIcon" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" />
                         <TextBlock x:Name="GameResultText" Grid.Column="1" Classes="BodyText" TextWrapping="Wrap" VerticalAlignment="Center" />
                     </Grid>
+                    <StackPanel x:Name="GameProgressPanel" Spacing="8" IsVisible="False">
+                        <ProgressBar x:Name="GameProgressBar" Minimum="0" Maximum="100" Height="8" />
+                        <TextBlock x:Name="GameProgressText" Classes="TinyText" TextWrapping="Wrap" />
+                    </StackPanel>
                     <components:ActionButton x:Name="GameContinueButton" Tone="Brand" HorizontalAlignment="Stretch"
                                              Text="{loc:T onboarding.continue}" Click="GameContinue_OnClick" />
                 </StackPanel>

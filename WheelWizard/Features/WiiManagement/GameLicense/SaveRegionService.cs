@@ -1,5 +1,5 @@
 using System.IO.Abstractions;
-using WheelWizard.DiscImages;
+using WheelWizard.GameFiles;
 using WheelWizard.Models.Enums;
 using WheelWizard.Settings;
 
@@ -9,7 +9,7 @@ public interface ISaveRegionService
 {
     List<MarioKartWiiEnums.Regions> GetAvailableRegions(string saveDirectory);
 
-    /// <summary>The region of the Mario Kart Wii game file in the settings, or <c>None</c> when it can't be read.</summary>
+    /// <summary>The region of the extracted game (or of the picked image before that), or <c>None</c> when it can't be read.</summary>
     MarioKartWiiEnums.Regions GetGameFileRegion();
 
     /// <summary>
@@ -19,7 +19,7 @@ public interface ISaveRegionService
     MarioKartWiiEnums.Regions ResolveActiveRegion(string saveDirectory);
 }
 
-public sealed class SaveRegionService(IFileSystem fileSystem, ISettingsManager settings, IDiscImageService discImages) : ISaveRegionService
+public sealed class SaveRegionService(IFileSystem fileSystem, ISettingsManager settings, IGameFilesService gameFiles) : ISaveRegionService
 {
     public List<MarioKartWiiEnums.Regions> GetAvailableRegions(string saveDirectory)
     {
@@ -49,11 +49,7 @@ public sealed class SaveRegionService(IFileSystem fileSystem, ISettingsManager s
         return validRegions;
     }
 
-    public MarioKartWiiEnums.Regions GetGameFileRegion()
-    {
-        var info = discImages.ReadInfo(settings.Get<string>(settings.GAME_LOCATION));
-        return info.IsSuccess ? GameRegion.FromGameId(info.Value.GameId) : MarioKartWiiEnums.Regions.None;
-    }
+    public MarioKartWiiEnums.Regions GetGameFileRegion() => gameFiles.GetRegion();
 
     public MarioKartWiiEnums.Regions ResolveActiveRegion(string saveDirectory)
     {

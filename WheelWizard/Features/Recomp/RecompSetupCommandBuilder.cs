@@ -21,12 +21,12 @@ public static class RecompSetupCommandBuilder
     public static IReadOnlyList<string> BuildSilentInstallArguments(RecompInstallRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (string.IsNullOrWhiteSpace(request.GameFilePath))
-            throw new ArgumentException("A game image path is required.", nameof(request));
+        if (string.IsNullOrWhiteSpace(request.GameFolderPath))
+            throw new ArgumentException("The extracted game folder is required.", nameof(request));
         if (string.IsNullOrWhiteSpace(request.InstallFolderPath))
             throw new ArgumentException("An install directory is required.", nameof(request));
 
-        var arguments = new List<string> { "--silent", "--game", request.GameFilePath, "--install-dir", request.InstallFolderPath };
+        var arguments = new List<string> { "--silent", "--game-dir", request.GameFolderPath, "--install-dir", request.InstallFolderPath };
 
         // Only a silent install may request the portable layout, and only when WheelWizard actually
         // handed over its own portable location. An installation that predates portable mode keeps
@@ -104,6 +104,23 @@ public static class RecompSetupCommandBuilder
     /// Builds the arguments that make the setup executable print its own semantic version.
     /// </summary>
     public static IReadOnlyList<string> BuildVersionArguments() => ["--version"];
+
+    /// <summary>Asks the setup what it supports. Shared by both platforms' setups.</summary>
+    public static IReadOnlyList<string> BuildCapabilitiesArguments() => ["--capabilities"];
+
+    /// <summary>
+    /// Points an existing installation at Wheel Wizard's extracted game and drops the copy it extracted itself,
+    /// without rebuilding anything.
+    /// </summary>
+    public static IReadOnlyList<string> BuildLinkGameDirArguments(string installFolderPath, string gameFolderPath)
+    {
+        if (string.IsNullOrWhiteSpace(installFolderPath))
+            throw new ArgumentException("An install directory is required.", nameof(installFolderPath));
+        if (string.IsNullOrWhiteSpace(gameFolderPath))
+            throw new ArgumentException("The extracted game folder is required.", nameof(gameFolderPath));
+
+        return ["--link-game-dir", "--install-dir", installFolderPath, "--game-dir", gameFolderPath, "--progress-json"];
+    }
 
     // The contract requires exactly one payload option whenever --retro-dir is passed. WheelWizard
     // downloads unless the payload service is unreachable and the user chose an offline-only build.
