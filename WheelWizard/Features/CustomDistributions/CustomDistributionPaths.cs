@@ -100,7 +100,23 @@ public sealed class CustomDistributionPaths(IApplicationDataLocation application
             // which would wrongly look empty.
             if (!dolphin.HasCustomLoadFolder && !string.IsNullOrWhiteSpace(dolphin.ConfiguredLoadFolderPath))
                 return false;
-            return IsReadable(dolphin.HasCustomLoadFolder ? dolphin.LoadFolderPath : dolphin.UserFolderPath);
+            if (!IsReadable(dolphin.HasCustomLoadFolder ? dolphin.LoadFolderPath : dolphin.UserFolderPath))
+                return false;
+            // A legacy folder that is there but cannot be listed (wrong owner, a flaky share) looks empty to
+            // IsLegacyRootActive; ruling it out would hide that install and its saves for good.
+            return !SafeDirectoryExists(LegacyRootFolderPath) || IsReadable(LegacyRootFolderPath);
+        }
+    }
+
+    private bool SafeDirectoryExists(string folder)
+    {
+        try
+        {
+            return fileSystem.Directory.Exists(folder);
+        }
+        catch
+        {
+            return true;
         }
     }
 

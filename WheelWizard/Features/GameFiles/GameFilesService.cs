@@ -475,7 +475,7 @@ public sealed class GameFilesService(
         try
         {
             fileSystem.Directory.CreateDirectory(folder);
-            var drive = fileSystem.DriveInfo.New(fileSystem.Path.GetPathRoot(fileSystem.Path.GetFullPath(folder))!);
+            var drive = fileSystem.DriveContaining(folder);
             var needed = required + FreeSpaceMargin;
             if (drive.AvailableFreeSpace >= needed)
                 return Ok();

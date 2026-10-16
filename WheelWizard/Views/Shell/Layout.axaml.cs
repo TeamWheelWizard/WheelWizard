@@ -303,7 +303,10 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         try
         {
-            return !Onboarding.IsRequired && GameSetupPage.IsNeeded(GameFiles.GetStatus());
+            // A game image that is not reachable right now (an unplugged drive) only stops playing, as it did before
+            // the extracted game existed: Home says so and links to Settings, and the rest of the app stays usable.
+            var status = GameFiles.GetStatus();
+            return !Onboarding.IsRequired && status.State != GameFilesState.ImageMissing && GameSetupPage.IsNeeded(status);
         }
         catch
         {

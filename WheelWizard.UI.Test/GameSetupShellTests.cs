@@ -85,4 +85,54 @@ public class GameSetupShellTests
             window.Close();
         }
     }
+
+    [AvaloniaFact]
+    public async Task AnUpgradingUser_WhoseGameDriveIsUnplugged_KeepsTheRestOfTheApp()
+    {
+        var fileSystem = new MockFileSystem();
+        var directory = Path.Combine(Path.GetTempPath(), "wheelwizard-ui-game-unplugged");
+        fileSystem.Directory.CreateDirectory(directory);
+        var image = Path.Combine(directory, "Mario Kart Wii.wbfs");
+        fileSystem.File.WriteAllText(image, "an image on a drive that is not connected today");
+        var location = Substitute.For<IApplicationDataLocation>();
+        location.DirectoryPath.Returns(directory);
+        var registrations = new ServiceCollection();
+        registrations.AddWheelWizardServices(location);
+        registrations.AddSingleton<IFileSystem>(fileSystem);
+        registrations.AddTransient(typeof(IApiCaller<>), typeof(ApplicationCompositionTests.OfflineApiCaller<>));
+        var mods = Substitute.For<IModManager>();
+        mods.ReloadAsync().Returns(Task.FromResult(OperationResult.Ok()));
+        registrations.AddSingleton(mods);
+        using var services = registrations.BuildServiceProvider(
+            new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }
+        );
+        services.GetRequiredService<ISettingsStartupInitializer>().Initialize();
+        var settings = services.GetRequiredService<ISettingsManager>();
+        settings.NAND_ROOT_PATH.Set(directory, skipSave: true);
+        settings.LOAD_PATH.Set(directory, skipSave: true);
+        Assert.True(settings.GAME_LOCATION.Set(image, skipSave: true));
+        settings.ONBOARDING_COMPLETED.Set(true, skipSave: true);
+        fileSystem.File.Delete(image);
+        services.GetRequiredService<MiiControlThemes>().Install(Application.Current!.Resources);
+        services.GetRequiredService<WindowAppearance>().Install(Application.Current.Resources);
+
+        var window = services.GetRequiredService<Layout>();
+        var navigation = services.GetRequiredService<INavigationService>();
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+
+            // Only playing needs the game; as before the extracted game existed, Home says so and the rest stays open.
+            Assert.IsType<HomePage>(navigation.CurrentPage);
+            Assert.True(window.FindControl<Grid>("SidebarGrid")!.IsEnabled);
+            Assert.Equal(image, settings.GAME_LOCATION.Get());
+        }
+        finally
+        {
+            navigation.IsLocked = false;
+            window.Close();
+        }
+    }
 }

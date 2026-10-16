@@ -380,7 +380,7 @@ public class SettingsManager : ISettingsManager, IDisposable
             !EqualityComparer<T>.Default.Equals(previous, value)
             && (ReferenceEquals(setting, USER_FOLDER_PATH) || ReferenceEquals(setting, DOLPHIN_LOCATION))
         )
-            _dolphinSettingManager.ReloadSettings(_dolphinPaths.Resolve(DOLPHIN_LOCATION.Value, USER_FOLDER_PATH.Value).ConfigFolderPath);
+            _dolphinSettingManager.ReloadSettings(DolphinConfigFolderPath());
         return true;
     }
 
@@ -452,16 +452,24 @@ public class SettingsManager : ISettingsManager, IDisposable
             return;
 
         _whWzSettingManager.LoadSettings(_fileSystem.Path.Combine(_applicationData.DirectoryPath, "config.json"));
-        // Where Dolphin keeps its config can depend on which Dolphin it is (Linux splits it from the data folder). A
-        // Dolphin that is not there today still says where its Dolphin.ini is, and the Load folder is written in it.
-        var dolphinLocation = Get<string>(DOLPHIN_LOCATION);
-        if (string.IsNullOrWhiteSpace(dolphinLocation))
-            dolphinLocation = DOLPHIN_LOCATION.UnavailableValue ?? "";
-        _dolphinSettingManager.LoadSettings(_dolphinPaths.Resolve(dolphinLocation, Get<string>(USER_FOLDER_PATH)).ConfigFolderPath);
+        _dolphinSettingManager.LoadSettings(DolphinConfigFolderPath());
         _recompSettingManager.LoadSettings(_recompPaths.ConfigFilePath);
         _hasLoadedSettings = true;
     }
     #endregion
+
+    /// <summary>
+    /// Where Dolphin keeps its config can depend on which Dolphin it is (Linux splits it from the data folder). A Dolphin
+    /// that is not there today (not on PATH right now) still says where its Dolphin.ini is; reading and writing both
+    /// follow it, so a setting is never read from one Dolphin.ini and saved into another.
+    /// </summary>
+    private string DolphinConfigFolderPath()
+    {
+        var dolphinLocation = Get<string>(DOLPHIN_LOCATION);
+        if (string.IsNullOrWhiteSpace(dolphinLocation))
+            dolphinLocation = DOLPHIN_LOCATION.UnavailableValue ?? "";
+        return _dolphinPaths.Resolve(dolphinLocation, Get<string>(USER_FOLDER_PATH)).ConfigFolderPath;
+    }
 
     #region Registration Helpers
     private WhWzSetting<T> RegisterWhWz<T>(string name, T defaultValue, Func<T, bool>? validation = null, bool retainUnavailable = false)
@@ -491,11 +499,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         var setting = new DolphinSetting<T>(
             location,
             defaultValue!,
-            setting =>
-                _dolphinSettingManager.SaveSettings(
-                    _dolphinPaths.Resolve(Get<string>(DOLPHIN_LOCATION), Get<string>(USER_FOLDER_PATH)).ConfigFolderPath,
-                    setting
-                )
+            setting => _dolphinSettingManager.SaveSettings(DolphinConfigFolderPath(), setting)
         );
         if (validation != null)
             setting.SetValidation(validation);

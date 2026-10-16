@@ -194,10 +194,12 @@ public sealed class OnboardingService(
         string? version = null;
         try
         {
-            var arguments = environment.IsLinux && !layout.IsFlatpakDolphinFilePath(location) ? "QT_QPA_PLATFORM=wayland;xcb " : "";
-            var result = services
-                .GetRequiredService<IUnixProcessService>()
-                .Run("/usr/bin/env", ["sh", "-c", "--", $"{arguments}{location} --version"], out var stdOut, out var stdErr);
+            // Set through env, not inside the sh -c script: there the ';' would end the command.
+            List<string> arguments = [];
+            if (environment.IsLinux && !layout.IsFlatpakDolphinFilePath(location))
+                arguments.Add("QT_QPA_PLATFORM=wayland;xcb");
+            arguments.AddRange(["sh", "-c", "--", $"{location} --version"]);
+            var result = services.GetRequiredService<IUnixProcessService>().Run("/usr/bin/env", arguments, out var stdOut, out var stdErr);
             if (result.IsSuccess && result.Value == 0)
                 DolphinVersion.GetStatus(string.IsNullOrWhiteSpace(stdOut) ? stdErr : stdOut, out version);
         }

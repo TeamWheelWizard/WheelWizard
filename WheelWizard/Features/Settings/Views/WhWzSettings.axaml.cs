@@ -432,6 +432,10 @@ public partial class WhWzSettings : UserControl
         // Read the current Dolphin's data folders before the switch points the settings elsewhere.
         var sourceWii = SettingsService.USER_FOLDER_PATH.IsValid() ? DolphinPaths.WiiFolderPath : null;
         var sourceConfig = SettingsService.USER_FOLDER_PATH.IsValid() ? DolphinPaths.ConfigFolderPath : null;
+        // The switch points the settings at the managed Dolphin before the import; a failure goes back to the user's own.
+        var previousLocation = SettingsService.Get(SettingsService.DOLPHIN_LOCATION);
+        var previousUserFolder = SettingsService.Get(SettingsService.USER_FOLDER_PATH);
+        var wasManaged = ManagedDolphin.IsActive;
 
         var window = new ProgressWindow(t("onboarding.dolphin_installing_title"));
         OperationResult result;
@@ -450,6 +454,13 @@ public partial class WhWzSettings : UserControl
         finally
         {
             window.Close();
+        }
+
+        if (result.IsFailure && !wasManaged)
+        {
+            ManagedDolphin.Deactivate();
+            SettingsService.Set(SettingsService.DOLPHIN_LOCATION, previousLocation);
+            SettingsService.Set(SettingsService.USER_FOLDER_PATH, previousUserFolder);
         }
 
         UpdateLocationRows();

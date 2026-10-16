@@ -38,6 +38,8 @@ public sealed class RetroRewindMigrationService(
     ILogger<RetroRewindMigrationService> logger
 ) : IRetroRewindMigrationService
 {
+    private const long FreeSpaceMargin = 64L * 1024 * 1024;
+
     public bool IsPending => paths.IsLegacyRootActive;
 
     public OperationResult<RetroRewindMigrationOutcome> Migrate(Action? copyStarted = null, IProgress<double>? progress = null)
@@ -76,7 +78,14 @@ public sealed class RetroRewindMigrationService(
                 return RetroRewindMigrationOutcome.Moved;
             }
 
-            // Another drive: copy next to the managed root first, so an interrupted copy never becomes the active install.
+            // Another drive. Only start when it fits, so a full disk is a quick check each start, not a copy thrown away.
+            if (!HasRoomFor(source, parent ?? destination))
+            {
+                logger.LogWarning("Not enough free space to move Retro Rewind from {Source}; checking again next start", source);
+                return RetroRewindMigrationOutcome.Deferred;
+            }
+
+            // Copy next to the managed root first, so an interrupted copy never becomes the active install.
             copyStarted?.Invoke();
             var result = transfer.MoveContents(source, staging, deleteSource: false, progress);
             if (!result.IsSuccessful)
@@ -140,6 +149,21 @@ public sealed class RetroRewindMigrationService(
         var backup = $"{destination}.old-{time.GetLocalNow():yyyyMMdd-HHmmss}";
         fileSystem.Directory.Move(destination, backup);
         logger.LogInformation("Kept the existing managed Retro Rewind as {Backup}", backup);
+    }
+
+    private bool HasRoomFor(string source, string destinationFolder)
+    {
+        try
+        {
+            var needed = fileSystem.DirectoryInfo.New(source).EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length);
+            return fileSystem.DriveContaining(destinationFolder).AvailableFreeSpace >= needed + FreeSpaceMargin;
+        }
+        catch (Exception exception)
+        {
+            // Some drives cannot say; the copy itself still stops on a full disk.
+            logger.LogWarning(exception, "Could not check the free space for moving Retro Rewind");
+            return true;
+        }
     }
 
     private bool TryRename(string source, string destination)

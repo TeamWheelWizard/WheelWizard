@@ -1,4 +1,5 @@
 using Testably.Abstractions.Testing;
+using Testably.Abstractions.Testing.FileSystem;
 using WheelWizard.CustomDistributions;
 using static WheelWizard.Test.Features.ExistingSetups.ExistingSetupAssertions;
 
@@ -248,5 +249,57 @@ public class ExistingSetupMigrationSafetyTests
         Assert.False(
             install.Fs.File.Exists(install.Combine(session.Paths.RetroRewindFolderPath, CustomDistributionPaths.MigratedMarkerFileName))
         );
+    }
+
+    [Fact]
+    public void ACopyThatCannotFit_IsNotStarted_AndRunsOnceThereIsRoom()
+    {
+        var install = CrossDriveInstall();
+        var files = install.WithRetroRewind(extraFiles: 30);
+        install.FlushConfig();
+        // The data folder's drive has room for its own files, but not for Retro Rewind and a safety margin.
+        var drive = install.Fs.DriveInfo.New(@"C:\");
+        var used = drive.TotalSize - drive.AvailableFreeSpace;
+        install.Fs.WithDrive(@"C:\", d => d.SetTotalSize(used + 32L * 1024 * 1024));
+        var copies = 0;
+        using var counting = install.Fs.Notify.OnEvent(
+            _ => copies++,
+            change =>
+                change.ChangeType == WatcherChangeTypes.Created && change.Path.Contains(".migrating", StringComparison.OrdinalIgnoreCase)
+        );
+
+        var full = install.Boot();
+
+        AssertStillWorks(full, files, install.LegacyRoot);
+        Assert.Equal(0, copies);
+        Assert.False(install.Fs.File.Exists(full.Paths.MigratedMarkerFilePath));
+        Assert.False(install.Fs.Directory.Exists(install.ManagedRoot + ".migrating"));
+
+        install.Fs.WithDrive(@"C:\", d => d.SetTotalSize(used + 1024L * 1024 * 1024));
+        var roomy = install.Boot();
+
+        AssertStillWorks(roomy, files, install.ManagedRoot);
+        Assert.False(install.Fs.Directory.Exists(install.LegacyRoot));
+    }
+
+    [Fact]
+    public void ALegacyFolderThatCannotBeListed_IsNotRuledOut_SoItsSaveIsNeverHidden()
+    {
+        var install = SameDriveInstall();
+        var files = install.WithRetroRewind();
+        install.FlushConfig();
+        var legacy = install.LegacyRoot;
+        install.Fs.WithAccessControlStrategy(
+            new DefaultAccessControlStrategy((path, _) => !path.StartsWith(legacy, StringComparison.OrdinalIgnoreCase))
+        );
+
+        var denied = install.Boot();
+
+        Assert.False(install.Fs.File.Exists(denied.Paths.MigratedMarkerFilePath), "a folder that could not be read is not an empty one");
+
+        install.Fs.WithAccessControlStrategy(new DefaultAccessControlStrategy((_, _) => true));
+        var readable = install.Boot();
+
+        AssertStillWorks(readable, files, install.ManagedRoot);
     }
 }
