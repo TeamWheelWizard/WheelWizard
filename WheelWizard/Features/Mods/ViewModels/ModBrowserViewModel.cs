@@ -5,7 +5,19 @@ using WheelWizard.GameBanana.Domain;
 
 namespace WheelWizard.Mods.ViewModels;
 
-public sealed record ModBrowserItem(GameBananaModPreview Mod, ModPreviewViewModel Preview);
+public sealed record ModBrowserItem(GameBananaModPreview Mod, ModPreviewViewModel Preview) : INotifyPropertyChanged
+{
+    public bool IsInstalled { get; private set; }
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public void UpdateInstalled(bool installed)
+    {
+        if (IsInstalled == installed)
+            return;
+        IsInstalled = installed;
+        PropertyChanged?.Invoke(this, new(nameof(IsInstalled)));
+    }
+}
 
 public sealed class ModBrowserViewModel : INotifyPropertyChanged
 {
@@ -18,15 +30,17 @@ public sealed class ModBrowserViewModel : INotifyPropertyChanged
     private readonly HashSet<int> _seen = [];
     private readonly IGameBananaSingletonService api;
     private readonly IGameBananaMediaService media;
+    private readonly IModManager _mods;
     private GameBananaModType[] _types = [],
         _skins = [],
         _ui = [];
     private int? _categoryId;
 
-    public ModBrowserViewModel(IGameBananaSingletonService api, IGameBananaMediaService media)
+    public ModBrowserViewModel(IGameBananaSingletonService api, IGameBananaMediaService media, IModManager mods)
     {
         this.api = api;
         this.media = media;
+        _mods = mods;
         DraftModTypes.CollectionChanged += (_, _) =>
         {
             if (!ShowSkinFilters)
@@ -130,6 +144,7 @@ public sealed class ModBrowserViewModel : INotifyPropertyChanged
         }
         if (_patchesOnly && _query.Length == 0)
             _query = "Patches";
+        _mods.PropertyChanged += InstalledModsChanged;
         _search = new();
         await LoadMoreAsync();
     }
@@ -174,7 +189,9 @@ public sealed class ModBrowserViewModel : INotifyPropertyChanged
             {
                 var image = mod.PreviewMedia?.Images?.FirstOrDefault();
                 var url = image == null ? "" : $"{image.BaseUrl}/{image.File530 ?? image.File220 ?? image.File}";
-                Results.Add(new(mod, new ModPreviewViewModel(mod.Id, api, media, url)));
+                var item = new ModBrowserItem(mod, new ModPreviewViewModel(mod.Id, api, media, url));
+                item.UpdateInstalled(_mods.IsModInstalled(mod.Id));
+                Results.Add(item);
             }
         }
         catch (OperationCanceledException) when (search.IsCancellationRequested) { }
@@ -188,8 +205,16 @@ public sealed class ModBrowserViewModel : INotifyPropertyChanged
         }
     }
 
+    private void InstalledModsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(IModManager.Mods))
+            foreach (var item in Results)
+                item.UpdateInstalled(_mods.IsModInstalled(item.Mod.Id));
+    }
+
     public void Deactivate()
     {
+        _mods.PropertyChanged -= InstalledModsChanged;
         var previous = _search;
         _search = null;
         previous?.Cancel();

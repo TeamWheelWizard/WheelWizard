@@ -126,6 +126,8 @@
                                             <PathIcon Data="{StaticResource CubesStacked}" Width="28" Height="28" Foreground="{StaticResource Neutral600}" />
                                             <Image Source="{Binding Preview.Image}" Stretch="UniformToFill" />
                                             <views:ModImagePlaceholder IsVisible="{Binding Preview.IsLoading}" />
+                                            <components:StatusBadge Text="{loc:T state.installed}" Variant="Brand" IsVisible="{Binding IsInstalled}"
+                                                                    HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" />
                                         </Grid>
                                     </Border>
                                     <StackPanel Margin="12,10" Spacing="8">

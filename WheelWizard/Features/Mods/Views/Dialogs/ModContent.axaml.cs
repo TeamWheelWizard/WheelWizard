@@ -109,7 +109,6 @@ public partial class ModContent : UserControl
             CurrentMod = modDetailsResult.Value;
             ModTitle.Text = CurrentMod.Name;
             AuthorName.Text = CurrentMod.Author.Name;
-            GameName.Text = CurrentMod.Game.Name;
             CategoryBadge.Text = CurrentMod.Category.Name;
             CategoryBadge.IsVisible = !string.IsNullOrWhiteSpace(CurrentMod.Category.Name);
             VersionBadge.Text = CurrentMod.Version;
@@ -470,12 +469,6 @@ public partial class ModContent : UserControl
         var profileUrl = CurrentMod?.Author.ProfileUrl;
         if (profileUrl != null)
             ViewUtils.OpenLink(profileUrl);
-    }
-
-    private void GameLink_Click(object? sender, RoutedEventArgs e)
-    {
-        if (CurrentMod?.Game.ProfileUrl is { } url)
-            ViewUtils.OpenLink(url);
     }
 
     private void GameBananaLink_Click(object? sender, RoutedEventArgs eventArgs)

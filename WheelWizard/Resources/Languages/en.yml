@@ -167,6 +167,7 @@ en:
     change: "Change"
     view_mod: "View Mod"
     save_external_mii: "Add Mii to \"My Miis\""
+    view_player_rwfc: "View player on RWFC"
     view_profile: "View Profile"
     duplicate: "Duplicate"
     back: "Back"
@@ -763,3 +764,7 @@ en:
     ui_types: "UI categories"
     all_skins: "All characters and skins"
     all_ui: "All UI categories"
+
+  mod_library:
+    priority: "Load priority"
+    reorder: "Drag to reorder"

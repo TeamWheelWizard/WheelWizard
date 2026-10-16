@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -21,8 +23,6 @@ using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Navigation;
 
 namespace WheelWizard.Mods.Views;
-
-public record ModListItem(Mod Mod, bool IsLowest, bool IsHighest, ModPreviewViewModel Preview);
 
 public partial class ModsPage : UserControl, INotifyPropertyChanged
 {
@@ -52,15 +52,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
 
     public IModManager ModManager => ModManagerService;
 
-    public ObservableCollection<ModListItem> Mods =>
-        new(
-            ModManager.Mods.Select(mod => new ModListItem(
-                mod,
-                mod.Priority == ModManager.GetLowestActivePriority(),
-                mod.Priority == ModManager.GetHighestActivePriority(),
-                GetPreview(mod.ModID)
-            ))
-        );
+    public ObservableCollection<ModListItem> Mods { get; } = [];
 
     public string StoragePageTitle => t("page_title.patches");
 
@@ -85,11 +77,10 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     private Point _dragStartPoint;
     private ModListItem? _draggedItem;
     private int _dragStartIndex;
-    private int _currentDropIndex;
-    private ListBoxItem? _draggedListBoxItem;
-    private double _dragOffsetY;
+    private int _previewIndex;
+    private Control? _draggedContainer;
+    private Point _dragOffset;
     private Border? _dragAdorner;
-    private Border? _dropIndicatorLine;
     private IPointer? _capturedPointer;
     private bool _viewInitialized;
     private const double DragThreshold = 5.0;
@@ -123,6 +114,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         DataContext = this;
         Focusable = true;
         ModManager.PropertyChanged += OnModsChanged;
+        OnModsChanged();
         _ = ReloadModsAndShowErrorsAsync();
         SetModsViewVariant();
         _viewInitialized = true;
@@ -136,8 +128,17 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         PointerCaptureLost += OnDragPointerCaptureLost;
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        ModManager.PropertyChanged -= OnModsChanged;
+        ModManager.PropertyChanged += OnModsChanged;
+        OnModsChanged(refreshPatches: true);
+    }
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        CancelDrag();
         ModManager.PropertyChanged -= OnModsChanged;
         foreach (var preview in _previews.Values)
             preview.Dispose();
@@ -153,15 +154,95 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
             UpdateEnableAllCheckboxState();
     }
 
-    private void OnModsChanged()
+    private void OnModsChanged(bool refreshPatches = false)
     {
         if (_isDragging)
-            return; // Suppress UI updates during drag to prevent stale container references
+            return; // Keep the preview order until the drag ends.
 
         ListItemCount.Text = ModManager.Mods.Count.ToString();
-        OnPropertyChanged(nameof(Mods));
         HasMods = ModManager.Mods.Count > 0;
+        UpdateModLayout(() =>
+        {
+            var lowest = ModManager.GetLowestActivePriority();
+            var highest = ModManager.GetHighestActivePriority();
+            for (var i = Mods.Count - 1; i >= 0; i--)
+                if (!ModManager.Mods.Contains(Mods[i].Mod))
+                    Mods.RemoveAt(i);
+            for (var i = 0; i < ModManager.Mods.Count; i++)
+            {
+                var mod = ModManager.Mods[i];
+                var item = Mods.FirstOrDefault(item => ReferenceEquals(item.Mod, mod));
+                var preview = GetPreview(mod.ModID);
+                var hasPatches = item != null && !refreshPatches ? item.HasPatches : ModPatchConversionService.HasPatches(mod);
+                if (item == null)
+                    Mods.Insert(i, new(mod, mod.Priority == lowest, mod.Priority == highest, preview, hasPatches));
+                else
+                {
+                    var index = Mods.IndexOf(item);
+                    if (index != i)
+                        Mods.Move(index, i);
+                    if (
+                        item.IsLowest != (mod.Priority == lowest)
+                        || item.IsHighest != (mod.Priority == highest)
+                        || item.Preview != preview
+                        || item.HasPatches != hasPatches
+                    )
+                        Mods[i] = new(mod, mod.Priority == lowest, mod.Priority == highest, preview, hasPatches);
+                }
+            }
+        });
         UpdateEnableAllCheckboxState();
+    }
+
+    private void UpdateModLayout(Action update)
+    {
+        var duration = this.FindResource(WindowAppearance.ControlAnimationDurationResourceKey) is TimeSpan value ? value : TimeSpan.Zero;
+        var before = new Dictionary<Mod, Point>();
+        foreach (var control in GetDragItems())
+        {
+            if (
+                duration > TimeSpan.Zero
+                && control.DataContext is ModListItem item
+                && control.TranslatePoint(default, this) is { } position
+            )
+                before[item.Mod] = position;
+            control.RenderTransform = null;
+        }
+        update();
+        if (TopLevel.GetTopLevel(this) == null)
+            return;
+        UpdateLayout();
+        foreach (var control in GetDragItems())
+        {
+            if (
+                control.DataContext is not ModListItem { IsPlaceholder: false } item
+                || !before.TryGetValue(item.Mod, out var oldPosition)
+                || control.TranslatePoint(default, this) is not { } position
+            )
+                continue;
+            var delta = oldPosition - position;
+            if (Math.Abs(delta.X) < 0.5 && Math.Abs(delta.Y) < 0.5)
+                continue;
+            var offset = new TranslateTransform(delta.X, delta.Y);
+            control.RenderTransform = offset;
+            offset.Transitions = new Transitions
+            {
+                new DoubleTransition
+                {
+                    Property = TranslateTransform.XProperty,
+                    Duration = duration,
+                    Easing = new CubicEaseOut(),
+                },
+                new DoubleTransition
+                {
+                    Property = TranslateTransform.YProperty,
+                    Duration = duration,
+                    Easing = new CubicEaseOut(),
+                },
+            };
+            offset.X = 0;
+            offset.Y = 0;
+        }
     }
 
     private void UpdateEnableAllCheckboxState()
@@ -279,7 +360,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
             (progress, cancellation) => ModPatchConversionService.ConvertToPatchesAsync(selectedMod.Mod, cancellation, progress),
             canCancel: true
         );
-        OnModsChanged();
+        OnModsChanged(refreshPatches: true);
 
         if (result.IsSuccess)
         {
@@ -344,8 +425,9 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         }
 
         var modPopup = Popups.Create<ModIndependentWindow>();
+        modPopup.SetModalOwner(this);
+        modPopup.Show();
         _ = modPopup.LoadModAsync(selectedMod.Mod.ModID);
-        modPopup.ShowDialog();
     }
 
     /// <summary>
@@ -353,7 +435,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     /// </summary>
     private ModListItem? GetContextModListItem(object? sender)
     {
-        if (sender is MenuItem { DataContext: ModListItem item })
+        if (sender is Control { DataContext: ModListItem item })
             return item;
         return ModsListBox.SelectedItem as ModListItem;
     }
@@ -438,26 +520,11 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
 
     private void SetModsViewVariant()
     {
-        Control[] elementsToSwapClasses = [ModsListBox];
-        var asRows = SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW);
-
-        foreach (var elementToSwapClass in elementsToSwapClasses)
-        {
-            if (asRows)
-                elementToSwapClass.Classes.Remove("Blocks");
-            else
-                elementToSwapClass.Classes.Add("Blocks");
-
-            if (asRows)
-                elementToSwapClass.Classes.Add("Rows");
-            else
-                elementToSwapClass.Classes.Remove("Rows");
-        }
-
-        // Toggle between list view (Blocks/arrows mode) and grid view (Rows/priority text mode)
-        ModsListBox.IsVisible = !asRows;
-        ModsGridView.IsVisible = asRows;
-        ViewModeToggle.SelectedIndex = asRows ? 0 : 1;
+        CancelDrag();
+        var grid = SettingsService.Get<bool>(SettingsService.PREFERS_MODS_ROW_VIEW);
+        ModsListBox.IsVisible = !grid;
+        ModsGridView.IsVisible = grid;
+        ViewModeToggle.SelectedIndex = grid ? 0 : 1;
     }
 
     private void PriorityText_OnKeyDown(object? sender, KeyEventArgs e)
@@ -489,21 +556,19 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
 
-        var listBoxItem = ViewUtils.FindParent<ListBoxItem>(sender);
-        if (listBoxItem?.Content is not ModListItem modItem)
+        var container = sender as GridModPanel ?? (Control?)ViewUtils.FindParent<ListBoxItem>(sender);
+        if (container?.DataContext is not ModListItem modItem || Mods.Count <= 1)
             return;
 
-        if (Mods.Count <= 1)
-            return;
-
-        ModsListBox.SelectedItem = modItem;
+        if (container is ListBoxItem)
+            ModsListBox.SelectedItem = modItem;
 
         _isDragPending = true;
         _isDragging = false;
         _dragStartPoint = e.GetPosition(this);
-        _draggedItem = modItem;
-        _draggedListBoxItem = listBoxItem;
-        _dragOffsetY = e.GetPosition(listBoxItem).Y;
+        _draggedItem = Mods.First(item => ReferenceEquals(item.Mod, modItem.Mod));
+        _draggedContainer = container;
+        _dragOffset = e.GetPosition(container);
 
         _capturedPointer = e.Pointer;
         e.Pointer.Capture(this);
@@ -534,7 +599,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     {
         if (_isDragging)
         {
-            await EndDragAsync(commit: true);
+            await EndDragAsync();
             e.Handled = true;
         }
         else if (_isDragPending)
@@ -563,180 +628,124 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
     {
         _isDragPending = false;
         _isDragging = true;
+        Cursor = new Cursor(StandardCursorType.SizeAll);
 
         _dragStartIndex = GetModIndex(_draggedItem!);
-        _currentDropIndex = _dragStartIndex;
-
-        if (_draggedListBoxItem != null)
-            _draggedListBoxItem.Opacity = 0.3;
+        _previewIndex = _dragStartIndex;
 
         CreateDragAdorner(currentPos);
-        CreateDropIndicator();
+        _draggedItem!.IsPlaceholder = true;
     }
 
     private void CreateDragAdorner(Point pos)
     {
-        var title = _draggedItem?.Mod.Title ?? "Mod";
-
-        var content = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            VerticalAlignment = VerticalAlignment.Center,
-            Spacing = 10,
-        };
-
-        try
-        {
-            if (this.FindResource("Grip") is Geometry gripData)
+        var shadow = new BoxShadows(
+            new BoxShadow
             {
-                content.Children.Add(
-                    new PathIcon
-                    {
-                        Data = gripData,
-                        Width = 12,
-                        Height = 12,
-                        Foreground = new SolidColorBrush(Color.Parse("#6C7389")),
-                    }
-                );
-            }
-        }
-        catch
-        {
-            // Resource not found, skip grip icon
-        }
-
-        content.Children.Add(
-            new TextBlock
-            {
-                Text = title,
-                Foreground = new SolidColorBrush(Colors.White),
-                FontSize = 14,
-                VerticalAlignment = VerticalAlignment.Center,
+                Blur = 20,
+                Color = Color.Parse("#70000000"),
+                OffsetY = 6,
             }
         );
-
-        _dragAdorner = new Border
+        if (ModsGridView.IsVisible)
         {
-            Background = new SolidColorBrush(Color.Parse("#474B5D")),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(15, 0),
-            Height = 50,
-            MinWidth = 250,
-            RenderTransform = new RotateTransform(1.5),
-            Opacity = 0.95,
-            BoxShadow = new BoxShadows(
-                new BoxShadow
+            var card = new GridModPanel
+            {
+                DataContext = new ModListItem(
+                    _draggedItem!.Mod,
+                    _draggedItem.IsLowest,
+                    _draggedItem.IsHighest,
+                    _draggedItem.Preview,
+                    _draggedItem.HasPatches
+                ),
+                IsHitTestVisible = false,
+            };
+            var border = card.FindControl<Border>("RootCardBorder")!;
+            border.BoxShadow = shadow;
+            border.BorderBrush = new SolidColorBrush((Color)this.FindResource("Brand400")!);
+            _dragAdorner = new Border { Width = _draggedContainer!.Bounds.Width, Child = card };
+        }
+        else
+        {
+            _dragAdorner = new Border
+            {
+                Width = 250,
+                Padding = new Thickness(12),
+                CornerRadius = new CornerRadius(8),
+                BoxShadow = shadow,
+                Background = new SolidColorBrush((Color)this.FindResource("Neutral900")!),
+                BorderBrush = new SolidColorBrush((Color)this.FindResource("Brand400")!),
+                BorderThickness = new Thickness(1),
+                Child = new StackPanel
                 {
-                    Blur = 15,
-                    Color = Color.Parse("#80000000"),
-                    OffsetX = 0,
-                    OffsetY = 4,
-                }
-            ),
-            Child = content,
-        };
-
-        Canvas.SetLeft(_dragAdorner, pos.X - 30);
-        Canvas.SetTop(_dragAdorner, pos.Y - _dragOffsetY);
-
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        new PathIcon
+                        {
+                            Data = (Geometry)this.FindResource("Grip")!,
+                            Width = 12,
+                            Height = 12,
+                            Foreground = new SolidColorBrush((Color)this.FindResource("Neutral400")!),
+                        },
+                        new TextBlock
+                        {
+                            Text = _draggedItem?.Mod.Title,
+                            FontSize = 13,
+                            FontWeight = FontWeight.SemiBold,
+                            TextTrimming = TextTrimming.CharacterEllipsis,
+                            MaxWidth = 200,
+                            Foreground = new SolidColorBrush((Color)this.FindResource("Neutral100")!),
+                            VerticalAlignment = VerticalAlignment.Center,
+                        },
+                    },
+                },
+            };
+        }
+        _dragAdorner.ZIndex = 1;
         DragCanvas.Children.Add(_dragAdorner);
         DragCanvas.IsVisible = true;
+        PositionDragAdorner(pos);
     }
 
-    private void CreateDropIndicator()
+    private void PositionDragAdorner(Point pos)
     {
-        _dropIndicatorLine = new Border
-        {
-            Height = 3,
-            Background = new SolidColorBrush(Color.Parse("#34EAC5")),
-            CornerRadius = new CornerRadius(2),
-            IsVisible = false,
-        };
-
-        DragCanvas.Children.Add(_dropIndicatorLine);
+        if (_dragAdorner == null)
+            return;
+        var grid = ModsGridView.IsVisible;
+        Canvas.SetLeft(_dragAdorner, pos.X - (grid ? _dragOffset.X : 30));
+        Canvas.SetTop(_dragAdorner, pos.Y - (grid ? _dragOffset.Y : Math.Min(_dragOffset.Y, 25)));
     }
 
     private void UpdateDrag(PointerEventArgs e, Point currentPos)
     {
-        if (_dragAdorner != null)
-        {
-            Canvas.SetLeft(_dragAdorner, currentPos.X - 30);
-            Canvas.SetTop(_dragAdorner, currentPos.Y - _dragOffsetY);
-        }
-
-        var dropIndex = CalculateDropIndex(e);
-        _currentDropIndex = dropIndex;
-        UpdateDropIndicator(dropIndex);
+        PositionDragAdorner(currentPos);
         HandleAutoScroll(e);
-    }
-
-    private int CalculateDropIndex(PointerEventArgs e)
-    {
-        var posInListBox = e.GetPosition(ModsListBox);
-        var items = GetListBoxItems();
-
-        if (items.Count == 0)
-            return 0;
-
-        for (var i = 0; i < items.Count; i++)
-        {
-            var itemPos = items[i].TranslatePoint(new Point(0, 0), ModsListBox);
-            if (itemPos == null)
-                continue;
-
-            var midY = itemPos.Value.Y + items[i].Bounds.Height / 2;
-            if (posInListBox.Y < midY)
-                return i;
-        }
-
-        return items.Count;
-    }
-
-    private void UpdateDropIndicator(int gapIndex)
-    {
-        if (_dropIndicatorLine == null)
-            return;
-
-        var items = GetListBoxItems();
-        if (items.Count == 0)
-            return;
-
-        // Hide indicator when hovering over the no-op zone (same position)
-        if (gapIndex == _dragStartIndex || gapIndex == _dragStartIndex + 1)
-        {
-            _dropIndicatorLine.IsVisible = false;
-            return;
-        }
-
-        _dropIndicatorLine.IsVisible = true;
-
-        if (gapIndex < items.Count)
-        {
-            var item = items[gapIndex];
-            var itemPos = item.TranslatePoint(new Point(0, -2), DragCanvas);
-            if (itemPos != null)
+        var pos = e.GetPosition(this);
+        // Compare layout slots, not animated positions, so moving items cannot make the target oscillate.
+        var nearest = GetDragItems()
+            .MinBy(control =>
             {
-                Canvas.SetLeft(_dropIndicatorLine, itemPos.Value.X);
-                Canvas.SetTop(_dropIndicatorLine, itemPos.Value.Y);
-                _dropIndicatorLine.Width = item.Bounds.Width;
-            }
-        }
-        else
-        {
-            var lastItem = items[^1];
-            var itemPos = lastItem.TranslatePoint(new Point(0, lastItem.Bounds.Height + 2), DragCanvas);
-            if (itemPos != null)
-            {
-                Canvas.SetLeft(_dropIndicatorLine, itemPos.Value.X);
-                Canvas.SetTop(_dropIndicatorLine, itemPos.Value.Y);
-                _dropIndicatorLine.Width = lastItem.Bounds.Width;
-            }
-        }
+                var origin = control.GetVisualParent()?.TranslatePoint(control.Bounds.Position, this) ?? default;
+                var dx = ModsGridView.IsVisible ? pos.X - origin.X - control.Bounds.Width / 2 : 0;
+                var dy = pos.Y - origin.Y - control.Bounds.Height / 2;
+                return dx * dx + dy * dy;
+            });
+        if (nearest?.DataContext is not ModListItem target)
+            return;
+        var index = Mods.IndexOf(target);
+        if (index < 0 || index == _previewIndex)
+            return;
+        UpdateModLayout(() => Mods.Move(_previewIndex, index));
+        _previewIndex = index;
     }
 
     private void HandleAutoScroll(PointerEventArgs e)
     {
-        var scrollViewer = ModsListBox.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+        var scrollViewer = ModsGridView.IsVisible
+            ? ModsGridView
+            : ModsListBox.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
         if (scrollViewer == null)
             return;
 
@@ -760,66 +769,45 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         }
     }
 
-    private List<ListBoxItem> GetListBoxItems()
-    {
-        var items = new List<ListBoxItem>();
-        for (var i = 0; i < Mods.Count; i++)
-        {
-            if (ModsListBox.ContainerFromIndex(i) is ListBoxItem lbi)
-                items.Add(lbi);
-        }
-        return items;
-    }
+    private IEnumerable<Control> GetDragItems() =>
+        ModsGridView.IsVisible ? ModsGridItems.GetVisualDescendants().OfType<GridModPanel>() : ModsListBox.GetRealizedContainers();
 
-    private int GetModIndex(ModListItem modItem)
-    {
-        for (var i = 0; i < Mods.Count; i++)
-        {
-            if (Mods[i].Mod == modItem.Mod)
-                return i;
-        }
-        return -1;
-    }
+    private int GetModIndex(ModListItem modItem) => ModManager.Mods.IndexOf(modItem.Mod);
 
-    private async Task EndDragAsync(bool commit)
+    private async Task EndDragAsync()
     {
-        if (_draggedListBoxItem != null)
-            _draggedListBoxItem.Opacity = 1.0;
-
         var modToMove = _draggedItem?.Mod;
-        var targetGapIndex = _currentDropIndex;
+        var targetIndex = _previewIndex;
         var sourceIndex = _dragStartIndex;
-        var shouldCommit = commit && modToMove != null && targetGapIndex != sourceIndex && targetGapIndex != sourceIndex + 1;
-
         CleanupDrag();
-
-        if (shouldCommit)
+        if (modToMove != null && targetIndex != sourceIndex)
         {
-            var moveResult = await ModManager.MoveModToIndexAsync(modToMove!, targetGapIndex);
+            var gap = targetIndex > sourceIndex ? targetIndex + 1 : targetIndex;
+            var moveResult = await ModManager.MoveModToIndexAsync(modToMove, gap);
             if (moveResult.IsFailure)
                 MessageTranslationHelper.ShowMessage(moveResult.Error);
         }
+        OnModsChanged();
     }
 
     private void CancelDrag()
     {
         if (!_isDragging && !_isDragPending)
             return;
-
-        if (_draggedListBoxItem != null)
-            _draggedListBoxItem.Opacity = 1.0;
-
         CleanupDrag();
+        OnModsChanged();
     }
 
     private void CleanupDrag()
     {
         _isDragging = false;
         _isDragPending = false;
+        if (_draggedItem != null)
+            _draggedItem.IsPlaceholder = false;
         _draggedItem = null;
-        _draggedListBoxItem = null;
+        _draggedContainer = null;
         _dragAdorner = null;
-        _dropIndicatorLine = null;
+        ClearValue(CursorProperty);
 
         DragCanvas.Children.Clear();
         DragCanvas.IsVisible = false;

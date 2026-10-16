@@ -8,6 +8,7 @@ using Avalonia.VisualTree;
 using NSubstitute;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
+using WheelWizard.Mods;
 using WheelWizard.Mods.ViewModels;
 using WheelWizard.Mods.Views;
 using WheelWizard.Mods.Views.Dialogs;
@@ -24,7 +25,7 @@ public class ModBrowserTests
     public async Task Subcategories_CombineWithinEachSelectedType()
     {
         var api = Substitute.For<IGameBananaSingletonService>();
-        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>(), Substitute.For<IModManager>());
         var response = Results("Mario");
         response.Records = new[] { (10080, 10082), (10080, 10083), (10080, 10084), (2083, 2085), (2083, 2084), (799, 6534) }
             .Select(
@@ -80,7 +81,7 @@ public class ModBrowserTests
         var pending = new TaskCompletionSource<OperationResult<GameBananaSearchResults>>();
         api.GetModSearchResults("", 1).Returns(OperationResult.Ok(first));
         api.GetModSearchResults("", 2).Returns(pending.Task);
-        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>(), Substitute.For<IModManager>());
         var page = new ModBrowserPage(model, Substitute.For<INavigationService>(), Substitute.For<IModalFactory>());
         using var owner = new UiTestHost { Height = 540 };
         owner.Body.Child = page;
@@ -115,7 +116,7 @@ public class ModBrowserTests
         other.Tags = response.Records[0].Tags;
         response.Records.Add(other);
         api.GetModSearchResults("Patches", 1, 799).Returns(OperationResult.Ok(response));
-        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>(), Substitute.For<IModManager>());
         model.PrepareFilters();
         model.DraftPatchesOnly = true;
         model.DraftModTypes.Add(tracks);
@@ -137,7 +138,7 @@ public class ModBrowserTests
         var api = Substitute.For<IGameBananaSingletonService>();
         api.GetModSearchResults(Arg.Any<string>(), 1).Returns(call => OperationResult.Ok(Results(call.ArgAt<string>(0))));
         api.GetModDetails(1).Returns(OperationResult.Ok(ModTestFixture.CreateMod(1, "Selected mod")));
-        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>());
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>(), Substitute.For<IModManager>());
         var navigation = Substitute.For<INavigationService>();
         var factory = Substitute.For<IModalFactory>();
         var modal = new ModIndependentWindow(ModTestFixture.CreateContent(api));
@@ -195,7 +196,10 @@ public class ModBrowserTests
         var pending = new TaskCompletionSource<OperationResult<GameBananaSearchResults>>();
         api.GetModSearchResults("old", 1).Returns(pending.Task);
         api.GetModSearchResults("new", 1).Returns(OperationResult.Ok(Results("new")));
-        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>()) { SearchText = "old" };
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>(), Substitute.For<IModManager>())
+        {
+            SearchText = "old",
+        };
         var first = model.SearchAsync();
         model.SearchText = "new";
         await model.SearchAsync();
@@ -223,7 +227,10 @@ public class ModBrowserTests
         response.Records.Add(Results("Ordinary mod").Records[0]);
         api.GetModSearchResults("Patches", 1).Returns(OperationResult.Ok(response));
         api.GetModSearchResults("Patches", 2).Returns((OperationResult<GameBananaSearchResults>)new OperationError { Message = "Offline" });
-        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>()) { PatchesOnly = true };
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>(), Substitute.For<IModManager>())
+        {
+            PatchesOnly = true,
+        };
         await model.SearchAsync();
         Assert.Empty(model.Results);
         Assert.True(model.HasError);
@@ -240,6 +247,29 @@ public class ModBrowserTests
         await model.SearchAsync();
         Assert.True(model.HasError);
         await api.DidNotReceive().GetModSearchResults("x", 1);
+        model.Deactivate();
+    }
+
+    [AvaloniaFact]
+    public async Task InstalledBadgeTracksInstallsAndRemovals()
+    {
+        var api = Substitute.For<IGameBananaSingletonService>();
+        api.GetModSearchResults("", 1).Returns(OperationResult.Ok(Results("Installed mod")));
+        var manager = Substitute.For<IModManager>();
+        manager.IsModInstalled(1).Returns(true);
+        var model = new ModBrowserViewModel(api, Substitute.For<IGameBananaMediaService>(), manager);
+        await model.SearchAsync();
+        var item = Assert.Single(model.Results);
+        Assert.True(item.IsInstalled);
+        foreach (var installed in new[] { false, true })
+        {
+            manager.IsModInstalled(1).Returns(installed);
+            manager.PropertyChanged += Raise.Event<System.ComponentModel.PropertyChangedEventHandler>(
+                manager,
+                new System.ComponentModel.PropertyChangedEventArgs(nameof(IModManager.Mods))
+            );
+            Assert.Equal(installed, item.IsInstalled);
+        }
         model.Deactivate();
     }
 

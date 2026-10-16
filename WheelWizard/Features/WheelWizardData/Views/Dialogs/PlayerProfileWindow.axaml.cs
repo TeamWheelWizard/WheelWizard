@@ -1,11 +1,13 @@
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Data;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views.Dialogs.Base;
+using WheelWizard.Views.Shell;
 using WheelWizard.WheelWizardData.Views;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -26,6 +28,7 @@ public partial class PlayerProfileWindow : ModalContent, INotifyPropertyChanged
         ApiCaller = apiCaller;
         InitializeComponent();
         IsDismissible = true;
+        ProfileMii.ArriveWith(["profile/window/hello", "profile/window/funny"]);
         HistoryHost.Content = historyGraph;
         historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("Profile.FriendCode") { Source = this });
         DataContext = this;
@@ -135,6 +138,12 @@ public partial class PlayerProfileWindow : ModalContent, INotifyPropertyChanged
                 IsLoading = false;
             }
         });
+    }
+
+    private void ViewOnRwfc_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (Profile is { } profile)
+            ViewUtils.OpenRwfcPlayer(profile.FriendCode);
     }
 
     private static string FormatSignedValue(int value)
