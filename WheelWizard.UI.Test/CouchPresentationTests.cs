@@ -19,6 +19,7 @@ using WheelWizard.Shared.Services;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Couch;
+using WheelWizard.Views.Shell.Couch.Input;
 using WheelWizard.Views.Shell.Navigation;
 
 namespace WheelWizard.UI.Test;
@@ -105,6 +106,52 @@ public class CouchPresentationTests
         finally
         {
             layout.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void OptionsMenuQuit_PreservesUnsavedWorkUntilLeavingIsConfirmed()
+    {
+        using var services = CreateServices();
+        var layout = services.GetRequiredService<Layout>();
+        var navigation = services.GetRequiredService<INavigationService>();
+        try
+        {
+            layout.Show();
+            Dispatcher.UIThread.RunJobs();
+            layout.TogglePresentation();
+            navigation.NavigateTo<UnsavedEditor>();
+            var editor = Assert.IsType<UnsavedEditor>(navigation.CurrentPage);
+            editor.Field.Text = "Keep this edit";
+            QuitFromMenu();
+            Assert.True(layout.IsVisible);
+            Assert.False(layout.Modals.HasModals);
+            Assert.Same(editor, navigation.CurrentPage);
+            Assert.Equal("Keep this edit", editor.Field.Text);
+            Assert.Equal(1, editor.LeaveQuestions);
+
+            editor.AllowLeave = true;
+            QuitFromMenu();
+            Assert.False(layout.IsVisible);
+            Assert.Equal(2, editor.LeaveQuestions);
+        }
+        finally
+        {
+            navigation.NavigateAway(typeof(UserControl));
+            layout.Close();
+        }
+
+        void QuitFromMenu()
+        {
+            layout.KeyPress(Key.F10, RawInputModifiers.None, PhysicalKey.None, "");
+            layout.KeyRelease(Key.F10, RawInputModifiers.None, PhysicalKey.None, "");
+            Dispatcher.UIThread.RunJobs();
+            layout.UpdateLayout();
+            var menu = Assert.IsType<CouchMenu>(layout.Modals.TopModal);
+            var quit = menu.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "QuitLauncherButton");
+            quit.Focus(NavigationMethod.Directional);
+            CouchNativeInput.SendKey(quit, Key.Space);
+            Dispatcher.UIThread.RunJobs();
         }
     }
 
@@ -258,6 +305,7 @@ public class CouchPresentationTests
     {
         public TextBox Field { get; } = new();
         public int LeaveQuestions { get; private set; }
+        public bool AllowLeave { get; set; }
         public bool HasUnsavedWork => true;
 
         public UnsavedEditor() => Content = Field;
@@ -265,7 +313,7 @@ public class CouchPresentationTests
         public Task<bool> ConfirmLeaveAsync()
         {
             LeaveQuestions++;
-            return Task.FromResult(false);
+            return Task.FromResult(AllowLeave);
         }
     }
 }

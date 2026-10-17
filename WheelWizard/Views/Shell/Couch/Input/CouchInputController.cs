@@ -448,7 +448,8 @@ public sealed class CouchInputController : IDisposable
             textTarget is { IsReadOnly: false },
             _window.ShowSettings,
             _window.ToggleCouchFullscreen,
-            () => ShowTextInput(textTarget)
+            () => ShowTextInput(textTarget),
+            () => _window.Close()
         );
         menu.SetModalOwner(_window.Modals.TopModal ?? (Control)_window).Show();
     }

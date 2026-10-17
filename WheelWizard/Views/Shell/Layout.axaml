@@ -45,6 +45,9 @@
             <Setter Property="BorderBrush" Value="{DynamicResource Brand400}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
+        <Style Selector="Window.couch components|ModalHeading /template/ components|ActionButton#PART_CloseButton">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
     </Window.Styles>
     <Grid x:Name="WindowFrame" RowDefinitions="30,*"
           Background="{StaticResource FrameColor}">

@@ -14,7 +14,7 @@ internal sealed class CouchMenu : ModalContent
 {
     private readonly ActionButton _resume;
 
-    public CouchMenu(string? error, bool canNavigate, bool canEditText, Action settings, Action fullscreen, Action textInput)
+    public CouchMenu(string? error, bool canNavigate, bool canEditText, Action settings, Action fullscreen, Action textInput, Action quit)
         : base(t("couch.menu"))
     {
         IsDismissible = true;
@@ -31,6 +31,7 @@ internal sealed class CouchMenu : ModalContent
             Add(t("couch.text_input"), textInput, prompt: CouchPrompt.TextInput);
         Add(t("page_title.settings"), settings, enabled: canNavigate, icon: "Gear");
         Add(t("couch.toggle_fullscreen"), fullscreen, enabled: canNavigate);
+        Add(t("couch.quit"), quit, ActionButtonTone.Danger, enabled: canNavigate).Name = "QuitLauncherButton";
         body.Children.Add(actions);
         if (!canNavigate)
             body.Children.Add(new TextBlock { Text = t("couch.navigation_blocked"), Classes = { "BodyText" } });

@@ -31,6 +31,7 @@ public sealed class ModalHeading : ContentControl
                 row.Children.Add(title);
                 var close = new ActionButton
                 {
+                    Name = "PART_CloseButton",
                     Text = "",
                     IconData = heading.FindResource("XMark") as Geometry,
                     Tone = ActionButtonTone.Secondary,
@@ -53,6 +54,7 @@ public sealed class ModalHeading : ContentControl
                         IsVisibleProperty,
                         new MultiBinding
                         {
+                            Priority = BindingPriority.Style,
                             Converter = BoolConverters.Or,
                             Bindings =
                             {

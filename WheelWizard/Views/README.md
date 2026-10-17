@@ -42,6 +42,8 @@ The active popup child takes focus precedence over its owning modal, then the pa
 
 `ModalContent` always presents through the originating window's `ModalHost`. Call `SetModalOwner(originatingControl)` before asynchronous presentation; prompts owned by a closing modal close with it, without closing unrelated operations. Do not introduce native-window fallbacks for production dialogs. Framework popup/tooltip overlay hosting is configured in application styles, with platform overlay options where available. Native storage-provider portals and OS-managed menus are intentional external surfaces.
 
+Couch mode hides modal-header and drawn-window close buttons; controller Back/Escape and each dialog's own actions remain available. **Quit launcher** lives in the couch menu and uses `Window.Close()` so unsaved-work guards still run. Quit is unavailable while another modal owns an operation. Desktop close buttons are unchanged.
+
 `COUCH_VIEW` persists the presentation preference. `--view=couch` / `--view=desktop` override startup selection without rewriting it; `--fullscreen` applies when starting in couch mode. Fullscreen and presentation are independent. Returning to desktop restores its window geometry and scaling.
 
 The only user-facing presentation switch is **Settings → Appearance → Couch View**. Shell chrome and the controller menu link to settings rather than exposing another mode toggle.

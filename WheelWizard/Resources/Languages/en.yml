@@ -12,6 +12,7 @@ en:
     text_input: "Text input"
     resume: "Resume"
     toggle_fullscreen: "Toggle fullscreen"
+    quit: "Quit launcher"
     navigation_blocked: "Close the current dialog before changing sections."
     case: "Case"
     space: "Space"
