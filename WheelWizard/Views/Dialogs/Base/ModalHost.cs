@@ -30,7 +30,6 @@ public sealed class ModalHost : Grid
         IsVisible = false;
         ClipToBounds = true;
         ZIndex = 1000;
-        Margin = new Thickness(0, Math.Max(0, _owner.ExtendClientAreaTitleBarHeightHint), 0, 0);
         _owner.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Bubble);
         _owner.AddHandler(GotFocusEvent, OnGotFocus);
     }

@@ -114,7 +114,6 @@ public partial class Layout : BaseWindow, IPollingListener
         SidebarCurrentUserProfile.ProfileRequested += (_, _) => NavigateFromSidebar(typeof(UserProfilePage));
         UpdateSidebarProfile();
 
-        ClampSavedWindowScaleToCurrentScreen();
         OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();

@@ -55,6 +55,8 @@ public partial class Layout
             (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Args ?? Environment.GetCommandLineArgs();
         var requested = arguments.LastOrDefault(argument => argument is "--view=couch" or "--view=desktop");
         var couch = requested == "--view=couch" || (requested == null && SettingsService.COUCH_VIEW.Get());
+        if (!couch)
+            ClampSavedWindowScaleToCurrentScreen();
         ApplyPresentation(couch);
         if (couch && arguments.Contains("--fullscreen", StringComparer.Ordinal))
             WindowState = WindowState.FullScreen;
@@ -109,7 +111,7 @@ public partial class Layout
             Grid.SetRowSpan(Snackbar, couch ? 1 : 2);
             Snackbar.Margin = couch ? new Thickness(30, 13, 30, 80) : new Thickness(30, 13, 30, 16);
             Snackbar.ZIndex = 10;
-            (couch ? PresentationRoot : CompleteGrid).Children.Add(Snackbar);
+            (couch ? CouchContentRoot : CompleteGrid).Children.Add(Snackbar);
             CouchMode.SetIsEnabled(this, couch);
             Classes.Set("couch", couch);
             CompleteGrid.IsVisible = !couch;

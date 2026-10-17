@@ -44,12 +44,7 @@ internal sealed class CouchKeyboard : ModalContent
         _editor.SelectionEnd = target.SelectionEnd;
         AddHandler(InputElement.TextInputEvent, OnPhysicalTextInput, RoutingStrategies.Tunnel);
         AddHandler(InputElement.KeyDownEvent, OnPhysicalEditingKey, RoutingStrategies.Tunnel);
-        var body = new StackPanel
-        {
-            Spacing = 10,
-            Width = 860,
-            MaxWidth = 860,
-        };
+        var body = new StackPanel { Spacing = 10, MaxWidth = 860 };
         body.Children.Add(
             new ModalHeading
             {

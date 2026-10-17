@@ -196,6 +196,126 @@ public class CouchPresentationTests
     }
 
     [AvaloniaFact]
+    public void CouchScalePreview_RevertsAndAppliesWithoutResizingTheWindow()
+    {
+        using var services = CreateServices();
+        var layout = services.GetRequiredService<Layout>();
+        try
+        {
+            layout.Show();
+            Pump();
+            layout.TogglePresentation();
+            var navigation = services.GetRequiredService<INavigationService>();
+            navigation.NavigateTo<WheelWizard.Settings.Views.SettingsPage>(typeof(WheelWizard.Settings.Views.AppearanceSettings));
+            Pump();
+            var page = Assert.IsType<WheelWizard.Settings.Views.SettingsPage>(navigation.CurrentPage);
+            var appearance = (Control)page.FindControl<ContentControl>("SettingsContent")!.Content!;
+            var scale = appearance.FindControl<WheelWizard.Views.Components.Dropdown>("WindowScaleDropdown")!;
+            var settings = services.GetRequiredService<ISettingsManager>();
+            var size = layout.ClientSize;
+            var savedScale = settings.SAVED_WINDOW_SCALE.Get();
+
+            scale.SelectedItem = "140%";
+            Pump();
+            Assert.Equal(1.4, page.TransformToVisual(layout)!.Value.M11, 5);
+            Assert.Equal(size, layout.ClientSize);
+            var prompt = Assert.IsType<YesNoWindow>(layout.Modals.TopModal);
+            Assert.Equal(1.4, prompt.TransformToVisual(layout)!.Value.M11, 5);
+            prompt.FindControl<Button>("NoButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Pump();
+            Assert.Equal(savedScale, settings.WINDOW_SCALE.Get());
+            Assert.Equal(savedScale, settings.SAVED_WINDOW_SCALE.Get());
+            Assert.Equal(savedScale, page.TransformToVisual(layout)!.Value.M11, 5);
+            Assert.Equal(size, layout.ClientSize);
+
+            scale.SelectedItem = "150%";
+            Pump();
+            prompt = Assert.IsType<YesNoWindow>(layout.Modals.TopModal);
+            prompt.FindControl<Button>("YesButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Pump();
+            Assert.Equal(1.5, settings.SAVED_WINDOW_SCALE.Get());
+            Assert.Equal(1.5, page.TransformToVisual(layout)!.Value.M11, 5);
+            Assert.Equal(size, layout.ClientSize);
+            layout.TogglePresentation();
+            Pump();
+            layout.TogglePresentation();
+            Pump();
+            Assert.Same(page, navigation.CurrentPage);
+            Assert.Equal(1.5, page.TransformToVisual(layout)!.Value.M11, 5);
+            Assert.Equal(size, layout.ClientSize);
+        }
+        finally
+        {
+            layout.Close();
+        }
+
+        void Pump()
+        {
+            Dispatcher.UIThread.RunJobs();
+            layout.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+        }
+    }
+
+    [AvaloniaFact]
+    public void StartupInCouchView_PreservesScaleAboveTheDesktopScreenLimit()
+    {
+        using var services = CreateServices();
+        var settings = services.GetRequiredService<ISettingsManager>();
+        settings.SAVED_WINDOW_SCALE.Set(2.0, skipSave: true);
+        settings.COUCH_VIEW.Set(true, skipSave: true);
+        var layout = services.GetRequiredService<Layout>();
+        try
+        {
+            layout.Show();
+            Dispatcher.UIThread.RunJobs();
+            layout.UpdateLayout();
+            Assert.True(layout.IsCouchMode);
+            Assert.Equal(2.0, settings.SAVED_WINDOW_SCALE.Get());
+            var page = services.GetRequiredService<INavigationService>().CurrentPage!;
+            Assert.Equal(2.0, page.TransformToVisual(layout)!.Value.M11, 5);
+        }
+        finally
+        {
+            layout.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void ScaledKeyboard_KeepsBothEdgesOfTheKeyGridInsideTheWindow()
+    {
+        using var services = CreateServices();
+        var layout = services.GetRequiredService<Layout>();
+        try
+        {
+            layout.Show();
+            Dispatcher.UIThread.RunJobs();
+            layout.TogglePresentation();
+            layout.Width = 1280;
+            layout.Height = 720;
+            services.GetRequiredService<ISettingsManager>().WINDOW_SCALE.Set(1.5, skipSave: true);
+            var dialog = new TextInputWindow().SetInitialText("Steam Deck");
+            dialog.SetModalOwner(layout).Show();
+            layout.UpdateLayout();
+            var keyboard = new CouchKeyboard(dialog.FindControl<WheelWizard.Views.Components.InputField>("InputField")!, () => { });
+            keyboard.SetModalOwner(dialog).Show();
+            Dispatcher.UIThread.RunJobs();
+            layout.UpdateLayout();
+            var keys = keyboard.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.UniformGrid>().Single(grid => grid.Rows == 5);
+            foreach (var key in new[] { keys.Children.First(), keys.Children.Last() })
+            {
+                var rectangle = new Rect(key.Bounds.Size).TransformToAABB(key.TransformToVisual(layout)!.Value);
+                Assert.True(rectangle.Left >= 0, $"Left edge is clipped: {rectangle}.");
+                Assert.True(rectangle.Right <= layout.ClientSize.Width, $"Right edge is clipped: {rectangle}.");
+            }
+        }
+        finally
+        {
+            layout.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void NavigatingAwayInCouchMode_LeavesEveryPageUsableWhenReturningToDesktop()
     {
         using var services = CreateServices();

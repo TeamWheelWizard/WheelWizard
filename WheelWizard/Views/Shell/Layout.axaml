@@ -48,6 +48,14 @@
         <Style Selector="Window.couch components|ModalHeading /template/ components|ActionButton#PART_CloseButton">
             <Setter Property="IsVisible" Value="False" />
         </Style>
+        <Style Selector="Window.couch LayoutTransformControl#ModalScaleHost">
+            <Setter Property="LayoutTransform">
+                <ScaleTransform ScaleX="{DynamicResource WindowScale}" ScaleY="{DynamicResource WindowScale}" />
+            </Setter>
+        </Style>
+        <Style Selector="Window.couch Popup">
+            <Setter Property="InheritsTransform" Value="True" />
+        </Style>
     </Window.Styles>
     <Grid x:Name="WindowFrame" RowDefinitions="30,*"
           Background="{StaticResource FrameColor}">
@@ -524,7 +532,14 @@
             </Grid.Styles>
         </Grid>
     </Grid>
-        <couch:CouchView x:Name="CouchPresentation" IsVisible="False" />
+        <LayoutTransformControl x:Name="CouchScaleHost" IsVisible="{Binding #CouchPresentation.IsVisible}">
+            <LayoutTransformControl.LayoutTransform>
+                <ScaleTransform ScaleX="{DynamicResource WindowScale}" ScaleY="{DynamicResource WindowScale}" />
+            </LayoutTransformControl.LayoutTransform>
+            <Grid x:Name="CouchContentRoot">
+                <couch:CouchView x:Name="CouchPresentation" IsVisible="False" />
+            </Grid>
+        </LayoutTransformControl>
     </Grid>
         <Border Grid.RowSpan="2" ZIndex="999" IsVisible="False" IsHitTestVisible="False"
                 x:Name="DisabledDarkenEffect" Background="Black" Opacity="0.3" />

@@ -135,13 +135,14 @@ public partial class AppearanceSettings : UserControl
 
     private async void WindowScaleDropdown_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (!_pageLoaded || _editingScale)
+        if (!_pageLoaded || _editingScale || TopLevel.GetTopLevel(this) is not Layout layout)
             return;
 
         _editingScale = true;
         var selectedScale = WindowScaleDropdown.SelectedItem?.ToString() ?? "1";
         var scale = double.Parse(selectedScale.Split(" ").Last().Replace("%", "")) / 100;
-        scale = ViewUtils.GetUsableWindowScale(scale, new Avalonia.Size(Layout.WindowWidth, Layout.WindowHeight), ViewUtils.GetLayout());
+        if (!layout.IsCouchMode)
+            scale = ViewUtils.GetUsableWindowScale(scale, new Avalonia.Size(Layout.WindowWidth, Layout.WindowHeight), layout);
         var selectedItemText = ScaleToString(scale);
         if (!WindowScaleDropdown.Items.Contains(selectedItemText))
             WindowScaleDropdown.Items.Add(selectedItemText);

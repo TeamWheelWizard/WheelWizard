@@ -71,7 +71,14 @@ public abstract class BaseWindow : Window
         };
         root.Children.Add(_modalChromeDimmer);
         _modals = new ModalHost(this);
-        root.Children.Add(_modals);
+        root.Children.Add(
+            new LayoutTransformControl
+            {
+                Name = "ModalScaleHost",
+                Child = _modals,
+                Margin = new Thickness(0, Math.Max(0, ExtendClientAreaTitleBarHeightHint), 0, 0),
+            }
+        );
         Content = root;
     }
 
