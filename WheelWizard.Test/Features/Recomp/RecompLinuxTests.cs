@@ -78,6 +78,7 @@ public class RecompLinuxTests
                 new GithubAsset { Name = "WiiCompiled-Setup.exe", BrowserDownloadUrl = "https://example.com/exe" },
                 new GithubAsset { Name = "WiiCompiled-Setup-x86_64.AppImage", BrowserDownloadUrl = "https://example.com/x86_64" },
                 new GithubAsset { Name = "WiiCompiled-Setup-aarch64.AppImage", BrowserDownloadUrl = "https://example.com/aarch64" },
+                new GithubAsset { Name = RecompPlatform.MacReleaseAssetName, BrowserDownloadUrl = "https://example.com/macos" },
             ],
         };
         var windowsOnly = new GithubRelease
@@ -93,6 +94,12 @@ public class RecompLinuxTests
 
         Assert.Equal("v0.3.0", RecompReleaseResolver.FindLatest([release, windowsOnly], "WiiCompiled-Setup.exe")?.TagName);
         Assert.Null(RecompReleaseResolver.FindLatest([windowsOnly], "WiiCompiled-Setup-aarch64.AppImage"));
+
+        Assert.Equal(
+            "https://example.com/macos",
+            RecompReleaseResolver.FindLatest([release, windowsOnly], RecompPlatform.MacReleaseAssetName)?.SetupDownloadUrl
+        );
+        Assert.Null(RecompReleaseResolver.FindLatest([windowsOnly], RecompPlatform.MacReleaseAssetName));
     }
 
     [Fact]
