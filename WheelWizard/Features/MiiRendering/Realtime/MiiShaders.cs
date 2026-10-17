@@ -1,7 +1,7 @@
 namespace WheelWizard.MiiRendering.Realtime;
 
 /// <summary>
-/// GLSL ports of WheelWizard's CPU Mii shading (NativeMiiRenderer.EvaluateModulateColor) so the
+/// GLSL ports of WheelWizard's CPU Mii shading (NativeMiiRenderer.Shade) so the
 /// realtime view looks like WheelWizard's rendered images. Written for both GLSL 330 core and GLSL ES 300.
 /// </summary>
 internal static class MiiShaders
@@ -20,10 +20,9 @@ internal static class MiiShaders
         uniform vec3 uMatSpec;
         uniform vec3 uMatRim;
         uniform float uSpecPow;
-        uniform int uSpecMode;
         uniform float uProfile[7]; // ambientScale, dirInfluence, diffuseScale, diffuseFloor, specularScale, rimScale, rimPower
 
-        vec3 shade(vec3 baseRgb, vec3 viewPos, vec3 normal, vec3 tangent, vec4 param)
+        vec3 shade(vec3 baseRgb, vec3 viewPos, vec3 normal)
         {
             vec3 n = length(normal) > 1e-5 ? normalize(normal) : vec3(0.0, 0.0, 1.0);
             vec3 eye = length(viewPos) > 1e-5 ? normalize(-viewPos) : vec3(0.0, 0.0, 1.0);
@@ -32,23 +31,9 @@ internal static class MiiShaders
             float dirDiffuse = max(dot(l, n), uProfile[3]);
             float diffuseFactor = 1.0 + (dirDiffuse - 1.0) * uProfile[1];
             vec3 diffuse = uLightDiff * uMatDiff * (diffuseFactor * uProfile[2]);
-            float blinn = pow(max(dot(reflect(-l, n), eye), 0.0), uSpecPow);
-            float strength = param.y;
-            float reflection;
-            if (uSpecMode == 0) {
-                strength = 1.0;
-                reflection = blinn;
-            } else {
-                vec3 t = length(tangent) > 1e-5 ? normalize(tangent) : vec3(1.0, 0.0, 0.0);
-                float dotLt = dot(l, t);
-                float dotVt = dot(eye, t);
-                float dotLn = sqrt(max(0.0, 1.0 - dotLt * dotLt));
-                float dotVr = dotLn * sqrt(max(0.0, 1.0 - dotVt * dotVt)) - dotLt * dotVt;
-                float aniso = pow(max(0.0, dotVr), uSpecPow);
-                reflection = aniso + (blinn - aniso) * param.x;
-            }
-            vec3 specular = uLightSpec * uMatSpec * reflection * strength * uProfile[4];
-            float rimFactor = pow(max(0.0, param.w * (1.0 - abs(n.z))), uProfile[6]);
+            float reflection = pow(max(dot(reflect(-l, n), eye), 0.0), uSpecPow);
+            vec3 specular = uLightSpec * uMatSpec * reflection * uProfile[4];
+            float rimFactor = pow(max(0.0, 1.0 - abs(n.z)), uProfile[6]);
             vec3 rim = uMatRim * (rimFactor * uProfile[5]);
             return clamp((ambient + diffuse) * baseRgb + specular + rim, 0.0, 1.0);
         }
@@ -74,25 +59,19 @@ internal static class MiiShaders
     public const string HeadVertex = """
         layout(location = 0) in vec3 aPos;
         layout(location = 1) in vec3 aNormal;
-        layout(location = 2) in vec3 aTangent;
-        layout(location = 3) in vec2 aUv;
-        layout(location = 4) in vec4 aParam;
+        layout(location = 2) in vec2 aUv;
         uniform mat4 uModel;
         uniform mat4 uView;
         uniform mat4 uProj;
         out vec3 vViewPos;
         out vec3 vNormal;
-        out vec3 vTangent;
         out vec2 vUv;
-        out vec4 vParam;
         void main() {
             mat4 modelView = uView * uModel;
             vec4 viewPos = modelView * vec4(aPos, 1.0);
             vViewPos = viewPos.xyz;
             vNormal = mat3(modelView) * aNormal;
-            vTangent = mat3(modelView) * aTangent;
             vUv = aUv;
-            vParam = aParam;
             gl_Position = uProj * viewPos;
         }
         """;
@@ -104,16 +83,10 @@ internal static class MiiShaders
 
             in vec3 vViewPos;
             in vec3 vNormal;
-            in vec3 vTangent;
             in vec2 vUv;
-            in vec4 vParam;
-            uniform int uMode;
-            uniform vec4 uColR;
-            uniform vec4 uColG;
-            uniform vec4 uColB;
+            uniform vec4 uColor;
             uniform sampler2D uTex;
             uniform int uHasTex;
-            uniform int uHasTangent;
             uniform vec4 uTint; // rgb = color to mix towards, a = mix amount
             uniform float uAlpha;
             uniform vec2 uUvOffset;
@@ -121,18 +94,12 @@ internal static class MiiShaders
             out vec4 fragColor;
             void main() {
                 vec2 uv = vUv + uUvOffset;
+                // Sampled before any discard: the mipmap level comes from neighbouring pixels, which must still be running.
+                vec4 t = texture(uTex, uv);
                 if (uv.x < uUvClip.x || uv.y < uUvClip.y || uv.x > uUvClip.z || uv.y > uUvClip.w) discard;
-                vec4 t = uHasTex != 0 ? texture(uTex, uv) : vec4(1.0);
-                vec4 base;
-                if (uMode == 0) base = vec4(uColR.rgb, 1.0);
-                else if (uMode == 1) base = t;
-                else if (uMode == 2) base = vec4(t.r * uColR.rgb + t.g * uColG.rgb + t.b * uColB.rgb, t.a);
-                else if (uMode == 3) base = vec4(uColR.rgb, t.r);
-                else if (uMode == 4) base = vec4(t.g * uColR.rgb, t.r);
-                else if (uMode == 5) base = vec4(t.r * uColR.rgb, 1.0);
-                else base = vec4(1.0);
-                if (uMode != 0 && base.a <= 0.0) discard;
-                vec3 lit = shade(base.rgb, vViewPos, vNormal, uHasTangent != 0 ? vTangent : vec3(0.0), vParam);
+                vec4 base = uHasTex != 0 ? t : vec4(uColor.rgb, 1.0);
+                if (base.a <= 0.0) discard;
+                vec3 lit = shade(base.rgb, vViewPos, vNormal);
                 lit = locked(mix(lit, uTint.rgb, uTint.a));
                 fragColor = vec4(lit, clamp(base.a, 0.0, 1.0) * uAlpha);
             }
@@ -179,7 +146,7 @@ internal static class MiiShaders
             uniform float uAlpha;
             out vec4 fragColor;
             void main() {
-                vec3 lit = shade(uColor.rgb, vViewPos, vNormal, vec3(0.0), vec4(1.0, 1.0, 0.0, 1.0));
+                vec3 lit = shade(uColor.rgb, vViewPos, vNormal);
                 lit = mix(lit, lit * vec3(1.25, 1.05, 0.55) + vec3(0.18, 0.1, 0.0), vHighlight * 0.6);
                 lit = mix(lit, vec3(1.0), vHover * (1.0 - vHighlight) * 0.25);
                 lit = locked(mix(lit, uTint.rgb, uTint.a));

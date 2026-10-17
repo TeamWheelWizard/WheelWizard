@@ -32,7 +32,7 @@ public static class MiiStage
         Matrix4x4.CreateScale(bodyScale * MiiBodyModel.CanonicalToRenderUnits)
         * Matrix4x4.CreateTranslation(TravelCorrection(pose, bodyScale));
 
-    /// <summary>FFL head mesh → stage.</summary>
+    /// <summary>Head mesh → stage.</summary>
     public static Matrix4x4 HeadToStage(MiiPose pose, Vector3 bodyScale) =>
         pose.HeadMatrixForRender(bodyScale) * Matrix4x4.CreateTranslation(TravelCorrection(pose, bodyScale));
 

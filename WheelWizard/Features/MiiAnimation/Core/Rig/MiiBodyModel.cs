@@ -29,7 +29,7 @@ public sealed class MiiBodyModel
     public const float CanonicalToRenderUnits = 0.7f;
 
     /// <summary>
-    /// Where the FFL head sits in the rest pose. WheelWizard uses headYTranslate 10.7766 * modelScale 7 (render units).
+    /// Where the head sits in the rest pose. WheelWizard uses headYTranslate 10.7766 * modelScale 7 (render units).
     /// </summary>
     public static readonly Vector3 HeadRestPosition = new(0f, 10.7766f * 7f / CanonicalToRenderUnits, 0f);
 

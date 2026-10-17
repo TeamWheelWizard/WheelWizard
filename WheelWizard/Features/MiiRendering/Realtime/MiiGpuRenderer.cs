@@ -3,6 +3,7 @@ using MiiAnim.Core.Evaluation;
 using MiiAnim.Core.Rig;
 using Silk.NET.OpenGL;
 using WheelWizard.MiiRendering.Configuration;
+using WheelWizard.MiiRendering.FaceLibrary;
 using WheelWizard.MiiRendering.Services;
 
 namespace WheelWizard.MiiRendering.Realtime;
@@ -66,7 +67,7 @@ public sealed record HeadPass(string HeadKey, IReadOnlyList<HeadMeshData> Head)
 public sealed record MaskLayerPass(string Key, MiiMaskLayerTexture Texture);
 
 /// <summary>
-/// OpenGL renderer for one Mii (skinned body + FFL head) with the same shading as the CPU renderer.
+/// OpenGL renderer for one Mii (skinned body + head) with the same shading as the CPU renderer.
 /// Clears to transparent so it can sit on top of any UI. All calls must happen on the GL thread.
 /// </summary>
 internal sealed unsafe class MiiGpuRenderer : IDisposable
@@ -93,6 +94,16 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
     private uint _layerDepth;
     private (int Width, int Height) _layerSize;
     private bool _layerBroken;
+
+    // Multisampled frame: everything is drawn into it for smooth mesh edges, then it's resolved and laid over the target.
+    private const int MaxSamples = 4;
+    private uint _msaaFbo;
+    private uint _msaaColor;
+    private uint _msaaDepth;
+    private uint _resolveFbo;
+    private uint _resolveTexture;
+    private (int Width, int Height) _msaaSize;
+    private bool _msaaBroken;
 
     /// <summary>Height of the frame being drawn, in pixels.</summary>
     private int _height;
@@ -127,8 +138,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         if (frame is null)
             return;
-        // Where the frame goes (the UI's framebuffer), to come back to after drawing into the fade layer.
-        var target = (uint)_gl.GetInteger(GetPName.DrawFramebufferBinding);
+        // Where the frame goes (the UI's framebuffer). It's drawn into the multisampled one when the driver can.
+        var output = (uint)_gl.GetInteger(GetPName.DrawFramebufferBinding);
+        var target = BeginMultisample(width, height) ? _msaaFbo : output;
 
         _gl.Enable(EnableCap.DepthTest);
         _gl.DepthFunc(DepthFunction.Lequal);
@@ -160,6 +172,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
 
         if (frame.Particles.Count > 0)
             _particles?.Draw(frame.Particles, setup.StageToWorld, setup.View, setup.Projection);
+
+        if (target != output)
+            EndMultisample(output, width, height);
 
         _gl.Disable(EnableCap.CullFace);
         _gl.BindVertexArray(0);
@@ -252,24 +267,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
             DeleteLayer();
             _layerFbo = _gl.GenFramebuffer();
             _gl.BindFramebuffer(FramebufferTarget.Framebuffer, _layerFbo);
-            _layerTexture = _gl.GenTexture();
-            _gl.BindTexture(TextureTarget.Texture2D, _layerTexture);
-            _gl.TexImage2D(
-                TextureTarget.Texture2D,
-                0,
-                InternalFormat.Rgba8,
-                (uint)width,
-                (uint)height,
-                0,
-                PixelFormat.Rgba,
-                PixelType.UnsignedByte,
-                null
-            );
-            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-            _gl.BindTexture(TextureTarget.Texture2D, 0);
+            _layerTexture = CreateTargetTexture(width, height);
             _gl.FramebufferTexture2D(
                 FramebufferTarget.Framebuffer,
                 FramebufferAttachment.ColorAttachment0,
@@ -309,8 +307,145 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         return true;
     }
 
+    /// <summary>
+    /// Starts drawing into the (cleared) multisampled frame, made or resized as needed. False when the driver can't
+    /// multisample, and the frame is drawn straight into the target instead.
+    /// </summary>
+    private bool BeginMultisample(int width, int height)
+    {
+        if (_msaaBroken)
+            return false;
+        if (_msaaFbo == 0 || _msaaSize != (width, height))
+        {
+            DeleteMultisample();
+            const GLEnum maxSamplesQuery = (GLEnum)0x8D57; // GL_MAX_SAMPLES
+            var samples = Math.Min(MaxSamples, _gl.GetInteger(maxSamplesQuery));
+            if (samples < 2)
+            {
+                _msaaBroken = true;
+                return false;
+            }
+
+            _msaaFbo = _gl.GenFramebuffer();
+            _gl.BindFramebuffer(FramebufferTarget.Framebuffer, _msaaFbo);
+            _msaaColor = _gl.GenRenderbuffer();
+            _gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _msaaColor);
+            _gl.RenderbufferStorageMultisample(
+                RenderbufferTarget.Renderbuffer,
+                (uint)samples,
+                InternalFormat.Rgba8,
+                (uint)width,
+                (uint)height
+            );
+            _gl.FramebufferRenderbuffer(
+                FramebufferTarget.Framebuffer,
+                FramebufferAttachment.ColorAttachment0,
+                RenderbufferTarget.Renderbuffer,
+                _msaaColor
+            );
+            _msaaDepth = _gl.GenRenderbuffer();
+            _gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _msaaDepth);
+            _gl.RenderbufferStorageMultisample(
+                RenderbufferTarget.Renderbuffer,
+                (uint)samples,
+                InternalFormat.DepthComponent24,
+                (uint)width,
+                (uint)height
+            );
+            _gl.FramebufferRenderbuffer(
+                FramebufferTarget.Framebuffer,
+                FramebufferAttachment.DepthAttachment,
+                RenderbufferTarget.Renderbuffer,
+                _msaaDepth
+            );
+            _gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+            var complete = _gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) == GLEnum.FramebufferComplete;
+
+            // A plain texture of the same format to resolve into (blitting into the UI's framebuffer directly needs its
+            // format to match exactly, which OpenGL ES doesn't promise).
+            _resolveFbo = _gl.GenFramebuffer();
+            _gl.BindFramebuffer(FramebufferTarget.Framebuffer, _resolveFbo);
+            _resolveTexture = CreateTargetTexture(width, height);
+            _gl.FramebufferTexture2D(
+                FramebufferTarget.Framebuffer,
+                FramebufferAttachment.ColorAttachment0,
+                TextureTarget.Texture2D,
+                _resolveTexture,
+                0
+            );
+            complete &= _gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) == GLEnum.FramebufferComplete;
+            _msaaSize = (width, height);
+            if (!complete)
+            {
+                _msaaBroken = true;
+                DeleteMultisample();
+                return false;
+            }
+        }
+
+        _gl.BindFramebuffer(FramebufferTarget.Framebuffer, _msaaFbo);
+        _gl.Viewport(0, 0, (uint)width, (uint)height);
+        _gl.ClearColor(0f, 0f, 0f, 0f);
+        _gl.ClearDepth(1f);
+        _gl.DepthMask(true);
+        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        return true;
+    }
+
+    /// <summary>Resolves the multisampled frame and lays it over <paramref name="output"/>.</summary>
+    private void EndMultisample(uint output, int width, int height)
+    {
+        _gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _msaaFbo);
+        _gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _resolveFbo);
+        _gl.BlitFramebuffer(0, 0, width, height, 0, 0, width, height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+        Composite(_resolveTexture, output, width, height, 1f);
+    }
+
+    private void DeleteMultisample()
+    {
+        if (_msaaFbo != 0)
+            _gl.DeleteFramebuffer(_msaaFbo);
+        if (_msaaColor != 0)
+            _gl.DeleteRenderbuffer(_msaaColor);
+        if (_msaaDepth != 0)
+            _gl.DeleteRenderbuffer(_msaaDepth);
+        if (_resolveFbo != 0)
+            _gl.DeleteFramebuffer(_resolveFbo);
+        if (_resolveTexture != 0)
+            _gl.DeleteTexture(_resolveTexture);
+        _msaaFbo = _msaaColor = _msaaDepth = _resolveFbo = _resolveTexture = 0;
+        _msaaSize = default;
+    }
+
+    /// <summary>An RGBA8 texture to draw into, read back pixel for pixel.</summary>
+    private uint CreateTargetTexture(int width, int height)
+    {
+        var texture = _gl.GenTexture();
+        _gl.BindTexture(TextureTarget.Texture2D, texture);
+        _gl.TexImage2D(
+            TextureTarget.Texture2D,
+            0,
+            InternalFormat.Rgba8,
+            (uint)width,
+            (uint)height,
+            0,
+            PixelFormat.Rgba,
+            PixelType.UnsignedByte,
+            null
+        );
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+        _gl.BindTexture(TextureTarget.Texture2D, 0);
+        return texture;
+    }
+
     /// <summary>Back to <paramref name="target"/>, and lays the layer over it at <paramref name="alpha"/>.</summary>
-    private void EndLayer(uint target, int width, int height, float alpha)
+    private void EndLayer(uint target, int width, int height, float alpha) => Composite(_layerTexture, target, width, height, alpha);
+
+    /// <summary>Lays a texture of premultiplied colour over <paramref name="target"/> at <paramref name="alpha"/>.</summary>
+    private void Composite(uint texture, uint target, int width, int height, float alpha)
     {
         _gl.BindFramebuffer(FramebufferTarget.Framebuffer, target);
         _gl.Viewport(0, 0, (uint)width, (uint)height);
@@ -322,7 +457,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.Uniform1(Uniform(_compositeProgram, "uTex"), 0);
         _gl.Uniform1(Uniform(_compositeProgram, "uAlpha"), alpha);
         _gl.ActiveTexture(TextureUnit.Texture0);
-        _gl.BindTexture(TextureTarget.Texture2D, _layerTexture);
+        _gl.BindTexture(TextureTarget.Texture2D, texture);
         _gl.BindVertexArray(_emptyVao);
         _gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
         _gl.BindTexture(TextureTarget.Texture2D, 0);
@@ -374,7 +509,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         foreach (var mesh in meshes)
         {
             var material = NativeMiiRenderer.BodyMaterial(mesh.IsPants);
-            SetMaterial(_bodyProgram, material.Ambient, material.Diffuse, material.Specular, material.Power, 0, material.Rim);
+            SetMaterial(_bodyProgram, material.Ambient, material.Diffuse, material.Specular, material.Power, material.Rim);
             SetVec4(_bodyProgram, "uColor", mesh.IsPants ? setup.PantsColor : setup.BodyColor);
             _gl.BindVertexArray(mesh.Vao);
             _gl.DrawElements(PrimitiveType.Triangles, (uint)mesh.IndexCount, DrawElementsType.UnsignedInt, null);
@@ -407,35 +542,18 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
             var uvOffset = isMask ? pass.MaskUvOffset : Vector2.Zero;
             _gl.Uniform2(Uniform(_headProgram, "uUvOffset"), uvOffset.X, uvOffset.Y);
             SetVec4(_headProgram, "uUvClip", isMask && pass.MaskUvClip is { } clip ? clip : NoClip);
-            if (data.CullMode == 1)
+            if (data.DoubleSided)
+            {
+                _gl.Disable(EnableCap.CullFace);
+            }
+            else
             {
                 _gl.Enable(EnableCap.CullFace);
                 _gl.CullFace(TriangleFace.Back);
             }
-            else if (data.CullMode == 2)
-            {
-                _gl.Enable(EnableCap.CullFace);
-                _gl.CullFace(TriangleFace.Front);
-            }
-            else
-            {
-                _gl.Disable(EnableCap.CullFace);
-            }
 
-            SetMaterial(
-                _headProgram,
-                data.Ambient,
-                data.Diffuse,
-                data.Specular,
-                data.SpecularPower,
-                data.HasTangent ? data.SpecularMode : 0,
-                data.RimColor
-            );
-            _gl.Uniform1(Uniform(_headProgram, "uMode"), data.ModulateMode);
-            SetVec4(_headProgram, "uColR", data.ColorR);
-            SetVec4(_headProgram, "uColG", data.ColorG);
-            SetVec4(_headProgram, "uColB", data.ColorB);
-            _gl.Uniform1(Uniform(_headProgram, "uHasTangent"), data.HasTangent ? 1 : 0);
+            SetMaterial(_headProgram, data.Ambient, data.Diffuse, data.Specular, data.SpecularPower, data.RimColor);
+            SetVec4(_headProgram, "uColor", data.Color);
             var texture = isMask && maskTexture != 0 ? maskTexture : mesh.Texture;
             _gl.Uniform1(Uniform(_headProgram, "uHasTex"), texture != 0 ? 1 : 0);
             _gl.ActiveTexture(TextureUnit.Texture0);
@@ -472,6 +590,14 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         return texture;
     }
 
+    private static TextureWrapMode WrapMode(MiiTextureWrap wrap) =>
+        wrap switch
+        {
+            MiiTextureWrap.Repeat => TextureWrapMode.Repeat,
+            MiiTextureWrap.Mirror => TextureWrapMode.MirroredRepeat,
+            _ => TextureWrapMode.ClampToEdge,
+        };
+
     private uint UploadTexture(byte[] pixels, int width, int height, TextureWrapMode wrap)
     {
         var texture = _gl.GenTexture();
@@ -488,7 +614,9 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
                 PixelType.UnsignedByte,
                 p
             );
-        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+        // Mipmapped: a 512 px face drawn small would otherwise sparkle.
+        _gl.GenerateMipmap(TextureTarget.Texture2D);
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
@@ -567,42 +695,33 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         foreach (var mesh in data)
         {
             var count = mesh.Positions.Length;
-            var interleaved = new float[count * 16];
+            var interleaved = new float[count * 8];
             for (var v = 0; v < count; v++)
             {
-                var o = v * 16;
+                var o = v * 8;
                 interleaved[o] = mesh.Positions[v].X;
                 interleaved[o + 1] = mesh.Positions[v].Y;
                 interleaved[o + 2] = mesh.Positions[v].Z;
                 interleaved[o + 3] = mesh.Normals[v].X;
                 interleaved[o + 4] = mesh.Normals[v].Y;
                 interleaved[o + 5] = mesh.Normals[v].Z;
-                interleaved[o + 6] = mesh.Tangents[v].X;
-                interleaved[o + 7] = mesh.Tangents[v].Y;
-                interleaved[o + 8] = mesh.Tangents[v].Z;
-                interleaved[o + 9] = mesh.Texcoords[v].X;
-                interleaved[o + 10] = mesh.Texcoords[v].Y;
-                interleaved[o + 11] = mesh.Parameters[v].X;
-                interleaved[o + 12] = mesh.Parameters[v].Y;
-                interleaved[o + 13] = mesh.Parameters[v].Z;
-                interleaved[o + 14] = mesh.Parameters[v].W;
+                interleaved[o + 6] = mesh.Texcoords[v].X;
+                interleaved[o + 7] = mesh.Texcoords[v].Y;
             }
 
             var vao = _gl.GenVertexArray();
             _gl.BindVertexArray(vao);
             var vbo = UploadArray(interleaved);
             var ebo = UploadIndices(mesh.Indices);
-            const uint stride = 16 * 4;
+            const uint stride = 8 * 4;
             Attribute(0, 3, stride, 0);
             Attribute(1, 3, stride, 12);
-            Attribute(2, 3, stride, 24);
-            Attribute(3, 2, stride, 36);
-            Attribute(4, 4, stride, 44);
+            Attribute(2, 2, stride, 24);
             _gl.BindVertexArray(0);
 
             uint texture = 0;
-            if (mesh.TexturePixels is { } pixels && mesh.TextureWidth > 0 && mesh.TextureHeight > 0)
-                texture = UploadTexture(pixels, mesh.TextureWidth, mesh.TextureHeight, TextureWrapMode.MirroredRepeat);
+            if (mesh.Texture is { } image)
+                texture = UploadTexture(image.Rgba, image.Width, image.Height, WrapMode(image.Wrap));
 
             meshes.Add(new GpuMesh(vao, vbo, ebo, mesh.Indices.Length, texture, mesh, false));
         }
@@ -655,14 +774,13 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.Uniform1(Uniform(program, "uProfile"), 7, profile);
     }
 
-    private void SetMaterial(uint program, Vector3 ambient, Vector3 diffuse, Vector3 specular, float power, int specularMode, Vector3 rim)
+    private void SetMaterial(uint program, Vector3 ambient, Vector3 diffuse, Vector3 specular, float power, Vector3 rim)
     {
         SetVec3(program, "uMatAmb", ambient);
         SetVec3(program, "uMatDiff", diffuse);
         SetVec3(program, "uMatSpec", specular);
         SetVec3(program, "uMatRim", rim);
         _gl.Uniform1(Uniform(program, "uSpecPow"), power);
-        _gl.Uniform1(Uniform(program, "uSpecMode"), specularMode);
     }
 
     private void SetLocked(uint program, MiiGpuFrame frame) =>
@@ -708,6 +826,7 @@ internal sealed unsafe class MiiGpuRenderer : IDisposable
         _gl.DeleteProgram(_compositeProgram);
         _gl.DeleteVertexArray(_emptyVao);
         DeleteLayer();
+        DeleteMultisample();
         _particles?.Dispose();
     }
 }

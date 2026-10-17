@@ -69,7 +69,7 @@ public sealed class MiiHeadStore
                 renderer.BuildHeadModel(studio, 0, detail) is { IsSuccess: true } head
                     ? (
                         head.Value,
-                        head.Value.Sum(mesh => mesh.Positions.Length * 64L + mesh.Indices.Length * 4L + (mesh.TexturePixels?.Length ?? 0))
+                        head.Value.Sum(mesh => mesh.Positions.Length * 32L + mesh.Indices.Length * 4L + (mesh.Texture?.Rgba.Length ?? 0))
                     )
                     : (null, 0),
             wanted,

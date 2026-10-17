@@ -1,6 +1,6 @@
 namespace MiiAnim.Core.Animation;
 
-/// <summary>FFL expression ids (the value stored in the Expression track).</summary>
+/// <summary>Mii expression ids (the value stored in the Expression track).</summary>
 public enum MiiExpression : byte
 {
     Normal = 0,
@@ -27,7 +27,7 @@ public enum MiiExpression : byte
 public static class MiiExpressionInfo
 {
     /// <summary>
-    /// Which of the Mii's own face parts an expression swaps out (FFL's expression table). Everything else,
+    /// Which of the Mii's own face parts an expression swaps out. Everything else,
     /// and every part with <see cref="MiiExpression.Normal"/>, is the Mii's own eyes, mouth and eyebrows.
     /// </summary>
     public static (bool Eyes, bool OneEye, bool Mouth) Replaces(MiiExpression expression) =>

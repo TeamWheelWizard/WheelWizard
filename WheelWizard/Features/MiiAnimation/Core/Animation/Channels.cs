@@ -40,7 +40,7 @@ public enum Channel : byte
     IkStretch = 24,
 
     // Global channels.
-    /// <summary>FFL expression id, stepped.</summary>
+    /// <summary>Expression id (MiiExpression), stepped.</summary>
     Expression = 32,
 
     /// <summary>1 = shown, 0 = hidden (stepped). Lets extra Miis appear or leave mid-animation.</summary>

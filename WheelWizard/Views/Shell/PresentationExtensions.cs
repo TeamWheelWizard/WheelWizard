@@ -63,7 +63,6 @@ public static class PresentationExtensions
         services.AddSingleton<WindowAppearance>();
         services.AddSingleton<IDesktopStartup, DesktopStartup>();
         services.AddSingleton<IManagedDolphinUpdatePrompt, ManagedDolphinUpdatePrompt>();
-        services.AddSingleton<IMiiSetupPresentation, MiiSetupPresentation>();
         services.AddSingleton<IModOperationPresentation, ModOperationPresentation>();
         services.AddTransient<AvaloniaLoggerAdapter>();
         services.AddSingleton<ILaunchPrompts, LaunchPrompts>();

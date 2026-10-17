@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
 using WheelWizard.ApplicationData;
 using WheelWizard.Dolphin.Paths;
-using WheelWizard.MiiRendering.Configuration;
 using WheelWizard.Mods;
 using WheelWizard.Shared.Downloads;
 using WheelWizard.Shared.Platform;
@@ -23,13 +22,11 @@ public sealed class ServiceRegistrationTests
         services.AddWheelWizardServices(location);
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
         var mods = provider.GetRequiredService<IModPaths>();
-        var rendering = provider.GetRequiredService<IMiiRenderingPaths>();
 
         Assert.Same(location, provider.GetRequiredService<IApplicationDataLocation>());
         Assert.Equal(Path.Combine(directory, "Mods", "Temp"), mods.DownloadFolderPath);
         directory = Path.Combine(Path.GetTempPath(), "relocated-data");
         Assert.Equal(Path.Combine(directory, "Mods", "Temp"), mods.DownloadFolderPath);
-        Assert.Equal(Path.Combine(directory, "MiiRendering", "FFLResHigh.dat"), rendering.ManagedResourcePath);
     }
 
     [Fact]

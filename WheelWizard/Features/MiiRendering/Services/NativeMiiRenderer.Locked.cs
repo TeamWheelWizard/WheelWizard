@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using System.Numerics;
-using WheelWizard.MiiImages.Domain;
+using WheelWizard.MiiRendering.FaceLibrary;
 
 namespace WheelWizard.MiiRendering.Services;
 
@@ -8,7 +8,7 @@ namespace WheelWizard.MiiRendering.Services;
 public sealed partial class NativeMiiRenderer
 {
     /// <summary>Locked faces by studio data and mask resolution. Only ever the locked Mii's model, so just a few.</summary>
-    private static readonly ConcurrentDictionary<(string Studio, int Resolution), (IntPtr Handle, TextureData Texture)> LockedFaces = new();
+    private static readonly ConcurrentDictionary<(string Studio, int Resolution), MiiTexture> LockedFaces = new();
 
     // The question mark, in glyph units: 1 tall, x centred, y down. A hook that's most of a circle, a stem and a dot.
     private const float GlyphStroke = 0.075f;
@@ -33,51 +33,23 @@ public sealed partial class NativeMiiRenderer
         if (charInfoResult.IsFailure)
             return charInfoResult.Error!;
 
-        // Same resolution as the head's own mask (BuildManagedDrawParams).
-        var request = BuildRequest(studioData, new MiiImageSpecifications { Size = SizeFor(detail) });
-        var face = LockedFace(studioData, charInfoResult.Value, request.Width <= 384 ? 256 : 512);
-        return new MiiMaskLayerTexture(face.Texture.Pixels, face.Texture.Width, face.Texture.Height);
+        var face = LockedFace(studioData, charInfoResult.Value, MaskResolution(detail));
+        return new MiiMaskLayerTexture(face.Rgba, face.Width, face.Height);
     }
 
     /// <summary>The head of a locked Mii: its face mask swapped for the question mark, and without the nose.</summary>
-    private static List<DecodedDrawMesh> WithLockedFace(
-        IReadOnlyList<DecodedDrawMesh> meshes,
+    private static List<HeadMeshData> WithLockedFace(
+        IReadOnlyList<HeadMeshData> meshes,
         string studioData,
-        FflNativeInterop.FFLiCharInfo charInfo,
+        RflCharInfo charInfo,
         int resolution
     )
     {
-        var face = LockedFace(studioData, charInfo, resolution).Handle;
-        var locked = new List<DecodedDrawMesh>(meshes.Count);
-        foreach (var mesh in meshes)
-        {
-            var type = mesh.DrawParam.modulateParam.type;
-            if (type is FflNativeInterop.ModulateTypeShapeNose or FflNativeInterop.ModulateTypeShapeNoseLine)
-                continue;
-            if (type != FflNativeInterop.ModulateTypeShapeMask)
-            {
-                locked.Add(mesh);
-                continue;
-            }
-
-            var drawParam = mesh.DrawParam;
-            drawParam.modulateParam.pTexture2D = face;
-            locked.Add(
-                new DecodedDrawMesh(
-                    drawParam,
-                    mesh.Positions,
-                    mesh.Texcoords,
-                    mesh.Normals,
-                    mesh.Tangents,
-                    mesh.VertexParameters,
-                    mesh.Indices,
-                    mesh.HasTangent,
-                    mesh.Material
-                )
-            );
-        }
-
-        return locked;
+        var face = LockedFace(studioData, charInfo, resolution);
+        return meshes
+            .Where(mesh => mesh.Shape is not (HeadShape.Nose or HeadShape.NoseLine))
+            .Select(mesh => mesh.Shape == HeadShape.Mask ? mesh with { Texture = face } : mesh)
+            .ToList();
     }
 
     /// <summary>
@@ -95,48 +67,32 @@ public sealed partial class NativeMiiRenderer
         }
     }
 
-    /// <summary>The question mark face of a Mii, painted on a mask texture (registered, so draw params can use it).</summary>
-    private static (IntPtr Handle, TextureData Texture) LockedFace(
-        string studioData,
-        FflNativeInterop.FFLiCharInfo charInfo,
-        int resolution
-    ) =>
-        LockedFaces.GetOrAdd(
-            (studioData, resolution),
-            _ =>
-            {
-                var texture = new TextureData(
-                    resolution,
-                    resolution,
-                    FflNativeInterop.TextureFormatRgba8,
-                    4,
-                    PaintLockedFace(charInfo, resolution)
-                );
-                return (TextureRegistry.RegisterTexture(texture), texture);
-            }
-        );
+    /// <summary>The question mark face of a Mii, painted on a mask texture.</summary>
+    private static MiiTexture LockedFace(string studioData, RflCharInfo charInfo, int resolution) =>
+        LockedFaces.GetOrAdd((studioData, resolution), _ => new MiiTexture(resolution, resolution, PaintLockedFace(charInfo, resolution)));
 
     /// <summary>
     /// A mask texture (RGBA8) with one big question mark where the eyebrows, eyes and mouth would be, upright and
     /// readable however the mask is laid out on the face.
     /// </summary>
-    private static byte[] PaintLockedFace(FflNativeInterop.FFLiCharInfo charInfo, int size)
+    private static byte[] PaintLockedFace(RflCharInfo charInfo, int size)
     {
-        var parts = BuildRawMaskParts(charInfo);
+        var quads = RflHead.MaskPartQuads(charInfo);
         Vector2 Center(Vector2[] quad) => (quad[0] + quad[1] + quad[2] + quad[3]) / 4f;
-        var eyeRight = MaskQuad(parts.EyeR);
-        var eyeLeft = MaskQuad(parts.EyeL);
+        var eyeRight = quads[MiiMaskLayers.Eyes][0];
+        var eyeLeft = quads[MiiMaskLayers.Eyes][1];
+        var mouth = quads[MiiMaskLayers.Mouth][0];
         var eyes = (Center(eyeRight) + Center(eyeLeft)) / 2f;
 
         // The Mii's right eye is on the left of the face as you look at it: that gives "right" on the texture, and
         // the mouth gives "down".
         var right = Vector2.Normalize(Center(eyeLeft) - Center(eyeRight));
         var down = new Vector2(-right.Y, right.X);
-        if (Vector2.Dot(down, Center(MaskQuad(parts.Mouth)) - eyes) < 0f)
+        if (Vector2.Dot(down, Center(mouth) - eyes) < 0f)
             down = -down;
 
         // From the top of the eyes to the bottom of the mouth (the eyebrows are too close to the hair).
-        Vector2[][] features = [eyeRight, eyeLeft, MaskQuad(parts.Mouth)];
+        Vector2[][] features = [eyeRight, eyeLeft, mouth];
         var top = features.SelectMany(quad => quad).Min(corner => Vector2.Dot(corner - eyes, down));
         var bottom = features.SelectMany(quad => quad).Max(corner => Vector2.Dot(corner - eyes, down));
         var glyphHeight = bottom - top;

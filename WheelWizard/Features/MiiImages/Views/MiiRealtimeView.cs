@@ -32,7 +32,7 @@ public sealed partial class MiiRealtimeView : OpenGlControlBase
 {
     private static readonly TimeSpan InitTimeout = TimeSpan.FromSeconds(3);
 
-    /// <summary>Centre of the FFL head in head-mesh units (the head is roughly an ellipsoid around it).</summary>
+    /// <summary>Centre of the head in head-mesh units (the head is roughly an ellipsoid around it).</summary>
     private static readonly Vector3 HeadCenter = new(0f, 35f, -3.7f);
 
     private readonly IMiiNativeRenderer _renderer;

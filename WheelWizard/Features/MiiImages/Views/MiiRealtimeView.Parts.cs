@@ -357,7 +357,7 @@ public sealed partial class MiiRealtimeView
                     continue;
                 var uv = mesh.Texcoords[a] * (1f - u - v) + mesh.Texcoords[b] * u + mesh.Texcoords[c] * v;
                 // See-through parts of the glasses don't count, so you can click the eyes behind them.
-                if (mesh.Shape == HeadShape.Glass && SampleAlpha(mesh, uv, alphaInRed: true) < 0.2f)
+                if (mesh.Shape == HeadShape.Glass && mesh.Texture is { } glass && glass.Sample(uv.X, uv.Y).A < 0.2f)
                     continue;
                 bestDistance = distance;
                 best = new HeadHit(mesh.Shape, uv, origin + direction * distance);
@@ -516,24 +516,6 @@ public sealed partial class MiiRealtimeView
         }
 
         return false;
-    }
-
-    private static float SampleAlpha(HeadMeshData mesh, Vector2 uv, bool alphaInRed)
-    {
-        if (mesh.TexturePixels is not { } pixels || mesh.TextureWidth <= 0 || mesh.TextureHeight <= 0)
-            return 1f;
-        static float Mirror(float value)
-        {
-            var wrapped = value % 2f;
-            if (wrapped < 0f)
-                wrapped += 2f;
-            return wrapped <= 1f ? wrapped : 2f - wrapped;
-        }
-
-        var x = Math.Clamp((int)(Mirror(uv.X) * (mesh.TextureWidth - 1)), 0, mesh.TextureWidth - 1);
-        var y = Math.Clamp((int)(Mirror(uv.Y) * (mesh.TextureHeight - 1)), 0, mesh.TextureHeight - 1);
-        var offset = (y * mesh.TextureWidth + x) * 4;
-        return pixels[offset + (alphaInRed ? 0 : 3)] / 255f;
     }
 
     #endregion

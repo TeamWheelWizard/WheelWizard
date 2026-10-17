@@ -68,6 +68,47 @@ public class DiscImageServiceTests
         Assert.Equal(new[] { ".iso", ".gcm", ".gcz", ".ciso", ".wbfs", ".wia", ".rvz" }.Order(), extensions.Order());
     }
 
+    [Theory]
+    [InlineData("iso")]
+    [InlineData("rvz")]
+    public void ReadFile_ReadsAFileFromTheGamePartition(string format)
+    {
+        var fs = Games();
+        var library = SyntheticWiiDisc.Bytes(3000, 5);
+        var disc = new SyntheticWiiDisc
+        {
+            Files = new() { ["contents/RFLRes01.arc"] = library, ["rel/StaticR.rel"] = [1, 2, 3] },
+        };
+        fs.File.WriteAllBytes("/games/game." + format, disc.Build(format));
+
+        var file = new DiscImageService(fs).ReadFile("/games/game." + format, "contents/RFLRes01.arc");
+
+        Assert.True(file.IsSuccess, file.IsFailure ? file.Error.Message : null);
+        Assert.Equal(library, file.Value);
+    }
+
+    [Fact]
+    public void ReadFile_FailsForFileNotOnTheDisc()
+    {
+        var fs = Games();
+        fs.File.WriteAllBytes("/games/game.iso", new SyntheticWiiDisc().BuildIso());
+
+        var file = new DiscImageService(fs).ReadFile("/games/game.iso", "contents/RFLRes01.arc");
+
+        Assert.True(file.IsFailure);
+        Assert.Contains("contents/RFLRes01.arc", file.Error.Message);
+    }
+
+    [Fact]
+    public void ReadFile_FailsForFilesThatAreNotWiiDiscs()
+    {
+        var fs = Games();
+        fs.File.WriteAllBytes("/games/notes.iso", new byte[0x8000]);
+
+        Assert.True(new DiscImageService(fs).ReadFile("/games/notes.iso", "contents/RFLRes01.arc").IsFailure);
+        Assert.True(new DiscImageService(fs).ReadFile("/games/missing.iso", "contents/RFLRes01.arc").IsFailure);
+    }
+
     // A file can't be written to a drive root the mock hasn't seen yet, which the Windows CI runner hits on D:.
     private static MockFileSystem Games()
     {

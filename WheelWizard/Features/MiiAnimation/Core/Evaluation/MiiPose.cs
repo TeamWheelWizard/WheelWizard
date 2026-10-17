@@ -33,7 +33,7 @@ public sealed class MiiPose
     public Matrix4x4 GlobalMatrix { get; set; } = Matrix4x4.Identity;
 
     /// <summary>
-    /// Transform for the FFL head mesh in canonical character space: head-local → character space.
+    /// Transform for the head mesh in canonical character space: head-local → character space.
     /// Contains head rotation and squash; translation is in canonical units.
     /// </summary>
     public Matrix4x4 HeadMatrix { get; set; } = Matrix4x4.Identity;

@@ -11,23 +11,16 @@ public class MiiHeadStoreTests
         [
             new()
             {
+                Shape = HeadShape.Faceline,
                 Positions = [default],
                 Normals = [default],
-                Tangents = [default],
                 Texcoords = [default],
-                Parameters = [default],
                 Indices = [0, 0, 0],
-                CullMode = 0,
-                ModulateMode = 0,
-                ColorR = default,
-                ColorG = default,
-                ColorB = default,
-                HasTangent = false,
+                Color = default,
                 Ambient = default,
                 Diffuse = default,
                 Specular = default,
                 SpecularPower = 0,
-                SpecularMode = 0,
                 RimColor = default,
             },
         ];
