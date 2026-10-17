@@ -494,6 +494,59 @@ public class InAppModalTests
         Assert.False(save.IsEnabled);
     }
 
+    [AvaloniaTheory]
+    [InlineData(0)]
+    [InlineData(120)]
+    public async Task ClosingModal_CompletesOwnedDescendantsOnce_AndLeavesSiblingOperationsOpen(int animationMilliseconds)
+    {
+        var owner = new ModalTestWindow();
+        owner.Resources[WindowAppearance.ControlAnimationDurationResourceKey] = TimeSpan.FromMilliseconds(animationMilliseconds);
+        owner.Show();
+        try
+        {
+            var parent = new TestModal();
+            var parentClosed = parent.ShowDialog();
+            Layout(owner);
+            var child = new TestModal();
+            child.SetModalOwner(parent);
+            var childClosed = child.ShowDialog();
+            Layout(owner);
+            var grandchild = new TestModal();
+            grandchild.SetModalOwner(child);
+            var grandchildClosed = grandchild.ShowDialog();
+            var sibling = new TestModal();
+            sibling.SetModalOwner(owner);
+            var siblingClosed = sibling.ShowDialog();
+            var closingCount = 0;
+            parent.Closing += (_, _) => closingCount++;
+
+            parent.Close();
+            parent.Close();
+
+            await Task.WhenAll(parentClosed, childClosed, grandchildClosed).WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.Equal(1, closingCount);
+            Assert.Equal(1, parent.ClosedCount);
+            Assert.Equal(1, child.ClosedCount);
+            Assert.Equal(1, grandchild.ClosedCount);
+            Assert.Null(TopLevel.GetTopLevel(parent));
+            Assert.Null(TopLevel.GetTopLevel(child));
+            Assert.Null(TopLevel.GetTopLevel(grandchild));
+            Assert.False(siblingClosed.IsCompleted);
+            Assert.Same(sibling, owner.Modals.TopModal);
+            Assert.False(owner.CanInteract);
+
+            sibling.Close();
+            await siblingClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.Equal(1, sibling.ClosedCount);
+            Assert.False(owner.Modals.HasModals);
+            Assert.True(owner.CanInteract);
+        }
+        finally
+        {
+            owner.Close();
+        }
+    }
+
     private static void Dismiss(Window owner, string gesture)
     {
         if (gesture == "escape")

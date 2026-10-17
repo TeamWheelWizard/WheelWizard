@@ -542,7 +542,7 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         var priorityResult = await ModManager.DecreasePriorityAsync(mod);
         if (priorityResult.IsFailure)
             MessageTranslationHelper.ShowMessage(priorityResult.Error);
-        RestoreCouchModFocus(mod, t("couch.move_up"));
+        RestoreCouchModFocus(mod, "move-up");
     }
 
     private async void ButtonDown_OnClick(object? sender, RoutedEventArgs e)
@@ -554,10 +554,10 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
         var priorityResult = await ModManager.IncreasePriorityAsync(mod);
         if (priorityResult.IsFailure)
             MessageTranslationHelper.ShowMessage(priorityResult.Error);
-        RestoreCouchModFocus(mod, t("couch.move_down"));
+        RestoreCouchModFocus(mod, "move-down");
     }
 
-    private void RestoreCouchModFocus(Mod mod, string? preferredName)
+    private void RestoreCouchModFocus(Mod mod, string preferredAction)
     {
         if (!CouchMode.GetIsEnabled(this))
             return;
@@ -576,8 +576,8 @@ public partial class ModsPage : UserControl, INotifyPropertyChanged
                     )
                     .ToArray();
                 var target =
-                    actions.FirstOrDefault(button => Avalonia.Automation.AutomationProperties.GetName(button) == preferredName)
-                    ?? actions.FirstOrDefault(button => button.Text == "…");
+                    actions.FirstOrDefault(button => Equals(button.Tag, preferredAction))
+                    ?? actions.FirstOrDefault(button => Equals(button.Tag, "more-actions"));
                 target?.BringIntoView();
                 target?.Focus(NavigationMethod.Directional);
             },

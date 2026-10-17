@@ -28,7 +28,11 @@ Mode switching synchronously moves the same `ContentArea` host between presentat
 
 `NavigationService` and its unsaved-work guards remain the authority for route changes. `ICouchNavigationPage` supplies an actionable entry focus target and consumes Back only for a real inner transition; the shell handles outer navigation. Do not focus the page root or hidden panels as a recovery target. Rebuilt editor actions restore focus by semantic identity, with an enabled sibling as the fallback.
 
+Generated editor and mod actions use stable `Tag` identities to restore focus after rebuilding. Never identify an action by its translated label, icon, or child index. At a mod reorder boundary, fall back to that mod's More Actions button.
+
 `CouchInputController` maps SDL3 gamepads and keyboard actions to native control/focus semantics. Buttons use scoped directional focus search rather than arrow events that can change radio selection. Sliders adjust on their own axis and leave on the perpendicular axis; their synthetic keys use the native editing path rather than Avalonia's separate gamepad engagement state. Scroll-clipped controls remain reachable and are brought into view. Selectable labels are not couch focus targets.
+
+`SdlGamepadBackend` uses one button-to-action mapping for held-state polling and queued button-down events. Keep those paths aligned so short taps and held presses cannot acquire different meanings.
 
 `CouchInputHints` renders the shell and keyboard legends using Kenney Input Prompts (Steam Deck monochrome set) and localized action labels. `CouchInputGlyphs` shares decoded bitmaps across the footer, keyboard, and text-entry menu; its eight 128-pixel source images and original CC0 license are embedded from `Resources/Images/ControllerPrompts`. Render the original white artwork at reduced opacity for grey prompts, without modifying the upstream assets. Glyphs remain unmirrored in right-to-left layouts. These legends are noninteractive: keep fullscreen in the controller menu and Back in input routing, not in footer buttons.
 

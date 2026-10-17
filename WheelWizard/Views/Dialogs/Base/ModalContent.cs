@@ -22,7 +22,6 @@ public abstract class ModalContent : UserControl
     private BaseWindow? _owner;
     private ModalContent? _modalParent;
     internal event EventHandler? Closing;
-    private bool _disableOpening;
     private TaskCompletionSource? _completion;
     private double? _preferredContentWidth;
     private double? _preferredContentHeight;
@@ -105,11 +104,6 @@ public abstract class ModalContent : UserControl
     public void Show()
     {
         Dispatcher.UIThread.VerifyAccess();
-        if (_disableOpening)
-        {
-            BeforeClose();
-            return;
-        }
         if (_host != null)
         {
             Focus();
@@ -185,11 +179,4 @@ public abstract class ModalContent : UserControl
     }
 
     public void Focus() => _host?.FocusTopModal();
-
-    protected void DisableOpen(bool value)
-    {
-        _disableOpening = value;
-        if (value)
-            Close();
-    }
 }

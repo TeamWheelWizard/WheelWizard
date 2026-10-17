@@ -6,6 +6,9 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings.Views;
+using WheelWizard.Views.Dialogs;
+using WheelWizard.Views.Dialogs.Base;
+using WheelWizard.Views.Shell.Controls;
 using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.Couch.Input;
 using WheelWizard.Views.Shell.Views;
@@ -65,7 +68,7 @@ public partial class Layout
         // Saving publishes synchronously; the signal applies the presentation only after a successful save.
         if (!SettingsService.Set(SettingsService.COUCH_VIEW, couch))
         {
-            new Dialogs.MessageBoxWindow()
+            new MessageBoxWindow()
                 .SetTitleText(t("couch.enabled"))
                 .SetInfoText(SettingsService.COUCH_VIEW.SaveError?.Message ?? t("couch.save_failed"))
                 .Show();
@@ -190,7 +193,7 @@ public partial class Layout
 
     private void RefreshCouchNavigation()
     {
-        CouchPresentation.SetRoutes(SidePanelButtons.Children.OfType<Controls.SidebarRadioButton>());
+        CouchPresentation.SetRoutes(SidePanelButtons.Children.OfType<SidebarRadioButton>());
         CouchPresentation.RefreshLabels();
         if (Navigation.CurrentPage is { } page)
             CouchPresentation.SelectPage(page);
@@ -219,7 +222,7 @@ public partial class Layout
     {
         if (!IsCouchMode)
             return;
-        if (Dialogs.Base.PopupNavigation.TryCloseTopPopup(this, Modals.TopModal ?? (Control)this))
+        if (PopupNavigation.TryCloseTopPopup(this, Modals.TopModal ?? (Control)this))
             return;
         if (Modals.TopModal is { } modal)
         {

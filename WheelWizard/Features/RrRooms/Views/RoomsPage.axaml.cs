@@ -97,9 +97,8 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingLi
             RrPlayer player => Rooms.FirstOrDefault(candidate => candidate.Players.Contains(player)),
             _ => null,
         };
-        if (room is null)
-            return;
-        Navigation.NavigateTo<RoomDetailsPage>(room);
+        if (room is not null)
+            Navigation.NavigateTo<RoomDetailsPage>(room);
         list.SelectedItem = null;
     }
 
@@ -163,37 +162,11 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingLi
 
     private void RoomsView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (CouchMode.GetIsEnabled(this))
+        if (CouchMode.GetIsEnabled(this) || e.Source is not ListBox list)
             return;
-        if (e.Source is not ListBox listBox)
-            return;
-        if (listBox.SelectedItem is not RrRoom selectedRoom)
-            return;
-
-        Navigation.NavigateTo<RoomDetailsPage>(selectedRoom);
-        listBox.SelectedItem = null;
-        // Deselect the item immediately after navigating. This is important
-        // for a good user experience. Otherwise, the item stays selected,
-        // and if you navigate back, you can't re-select the same item.
-    }
-
-    private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (CouchMode.GetIsEnabled(this))
-            return;
-        if (e.Source is not ListBox listBox)
-            return;
-        if (listBox.SelectedItem is not RrPlayer selectedRoom)
-            return;
-
-        var room = Rooms.FirstOrDefault(r => r.Players.Any(p => p.Equals(selectedRoom)));
-
-        if (room is not null)
-            Navigation.NavigateTo<RoomDetailsPage>(room);
-        listBox.SelectedItem = null;
-        // Deselect the item immediately after navigating. This is important
-        // for a good user experience. Otherwise, the item stays selected,
-        // and if you navigate back, you can't re-select the same item.
+        // Desktop selection and explicit couch activation use the same room resolution.
+        // Clear the selection so returning to this page allows opening the same room again.
+        OpenSelectedRoom(list);
     }
 
     #region PropertyChanged

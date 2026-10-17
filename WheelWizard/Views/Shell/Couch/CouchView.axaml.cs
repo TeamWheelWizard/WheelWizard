@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using WheelWizard.Localization;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings.Views;
 using WheelWizard.Views.Components;

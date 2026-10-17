@@ -246,8 +246,8 @@ public partial class MiiEditorPage
                 );
             if (definition.Variants is not null)
             {
-                AddCouchPartAction(t("hover.mii_editor.previous")!, true, () => Cycle(-1));
-                AddCouchPartAction(t("hover.mii_editor.next")!, true, () => Cycle(1));
+                AddCouchPartAction(t("hover.mii_editor.previous")!, true, () => Cycle(-1), "variant-previous");
+                AddCouchPartAction(t("hover.mii_editor.next")!, true, () => Cycle(1), "variant-next");
             }
             if (definition.IsPresent(mii))
             {
@@ -277,12 +277,12 @@ public partial class MiiEditorPage
         }
     }
 
-    private void AddCouchPartAction(string label, bool enabled, Action action, object? key = null)
+    private void AddCouchPartAction(string label, bool enabled, Action action, object key)
     {
         var button = new ActionButton
         {
             Text = label,
-            Tag = key ?? label,
+            Tag = key,
             Tone = ActionButtonTone.Secondary,
             Variant = ActionButtonVariant.Ghost,
             IsEnabled = enabled,

@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -37,12 +36,13 @@ public class MiiEditorCouchNavigationTests
         fixture.Activate(fixture.Side("attribute.mii_section.info"));
         var name = fixture.Page.FindControl<InputField>("NameField")!;
         var creator = fixture.Page.FindControl<InputField>("CreatorField")!;
-        var color = fixture.Page.FindControl<Button>("ColorButton")!;
+        var swatches = fixture.Selection("SwatchItems");
         fixture.MoveTo(name);
         Assert.True(CouchInputController.MoveFocus(fixture.Window, name, NavigationDirection.Down));
         Assert.Same(creator, fixture.Window.FocusManager!.GetFocusedElement());
         Assert.True(CouchInputController.MoveFocus(fixture.Window, creator, NavigationDirection.Down));
-        Assert.Same(color, fixture.Window.FocusManager.GetFocusedElement());
+        var focusedColor = Assert.IsAssignableFrom<Control>(fixture.Window.FocusManager.GetFocusedElement());
+        Assert.True(ReferenceEquals(swatches, focusedColor) || swatches.IsVisualAncestorOf(focusedColor));
     }
 
     [AvaloniaFact]
@@ -82,14 +82,26 @@ public class MiiEditorCouchNavigationTests
                 }
                 if (definition.Variants is not null)
                 {
-                    var variant = fixture.Panel("VariantItems").Children.OfType<ToggleButton>().First(button => button.IsChecked != true);
+                    var variants = fixture.Selection("VariantItems");
+                    var variant = variants.Items.OfType<SegmentOption>().First(option => !option.IsSelected);
                     fixture.Activate(variant);
-                    Assert.True(variant.IsChecked);
-                    var focusedVariant = fixture.Window.FocusManager.GetFocusedElement() as Control;
-                    Assert.True(
-                        ReferenceEquals(variant, focusedVariant),
-                        $"{definition.Part}: expected variant {variant.Tag} in {variant.Parent?.GetType().Name}; actual {focusedVariant?.GetType().Name}:{focusedVariant?.Tag} in {focusedVariant?.Parent?.GetType().Name}; variant panel opacity={page.FindControl<Border>("VariantPanel")!.Opacity}."
+                    Assert.Same(variant, variants.SelectedItem);
+                    Assert.Same(variant, fixture.Window.FocusManager.GetFocusedElement());
+                    fixture.Activate(
+                        fixture
+                            .Panel("CouchPartActions")
+                            .Children.OfType<ActionButton>()
+                            .Single(button => Equals(button.Tag, "variant-next"))
                     );
+                    Assert.NotEqual(variant.Tag, Assert.IsType<SegmentOption>(variants.SelectedItem).Tag);
+                    Assert.Equal("variant-next", Assert.IsType<ActionButton>(fixture.Window.FocusManager.GetFocusedElement()).Tag);
+                    fixture.Activate(
+                        fixture
+                            .Panel("CouchPartActions")
+                            .Children.OfType<ActionButton>()
+                            .Single(button => Equals(button.Tag, "variant-previous"))
+                    );
+                    Assert.Equal(variant.Tag, Assert.IsType<SegmentOption>(variants.SelectedItem).Tag);
                 }
                 // Optional parts may have just been removed. Only visible, enabled edit actions are used.
                 foreach (
@@ -120,15 +132,21 @@ public class MiiEditorCouchNavigationTests
                 }
                 if (definition.Colors is not null)
                 {
-                    fixture.Activate(page.FindControl<Button>("ColorButton")!);
-                    var swatch = fixture
-                        .Panel("SwatchItems")
-                        .Children.OfType<Button>()
-                        .First(button => !button.Classes.Contains("selected"));
+                    var colorButton = page.FindControl<Button>("ColorButton")!;
+                    var opensColors = colorButton.IsEffectivelyVisible;
+                    if (opensColors)
+                        fixture.Activate(colorButton);
+                    var swatches = fixture.Selection("SwatchItems");
+                    var swatch = swatches.Items.OfType<SegmentOption>().First(option => !option.IsSelected);
                     fixture.Activate(swatch);
-                    Assert.Contains("selected", swatch.Classes);
-                    Assert.False(page.FindControl<ScrollViewer>("SwatchScroller")!.IsVisible);
-                    Assert.Same(page.FindControl<Button>("ColorButton"), fixture.Window.FocusManager.GetFocusedElement());
+                    Assert.Same(swatch, swatches.SelectedItem);
+                    Assert.Same(swatch, fixture.Window.FocusManager.GetFocusedElement());
+                    if (opensColors)
+                    {
+                        fixture.Key(Key.Escape);
+                        Assert.False(page.FindControl<ScrollViewer>("SwatchScroller")!.IsVisible);
+                        Assert.Same(fixture.Selection("VariantItems").SelectedItem, fixture.Window.FocusManager.GetFocusedElement());
+                    }
                 }
             }
             fixture.Key(Key.Escape);
@@ -142,10 +160,10 @@ public class MiiEditorCouchNavigationTests
         fixture.Window.KeyTextInput("Controller");
         fixture.Pump();
         Assert.True(page.HasUnsavedWork);
-        var save = page.FindControl<StackPanel>("CouchEditorActions")!.Children.OfType<ActionButton>().Last();
-        fixture.Activate(save);
+        fixture.Activate(page.FindControl<ActionButton>("CouchSaveButton")!);
         Assert.NotNull(fixture.SavedMii);
-        Assert.True(fixture.SavedMii!.IsGirl);
+        Assert.Equal("Controller", fixture.SavedMii!.Name.ToString());
+        Assert.True(fixture.SavedMii.IsGirl);
         Assert.IsType<MiiListPage>(fixture.Navigation.CurrentPage);
     }
 
@@ -161,17 +179,26 @@ public class MiiEditorCouchNavigationTests
         fixture.Window.KeyTextInput("Couch Mii");
         fixture.Pump();
         Assert.Equal("Couch Mii", name.Text);
-        fixture.Activate(page.FindControl<Button>("ColorButton")!);
-        Assert.Same(page.CouchFocusTarget, fixture.Window.FocusManager!.GetFocusedElement());
         Assert.True(page.FindControl<ScrollViewer>("SwatchScroller")!.IsVisible);
-        fixture.Key(Key.Escape);
-        Assert.False(page.FindControl<ScrollViewer>("SwatchScroller")!.IsVisible);
-        Assert.Same(page.FindControl<Button>("ColorButton"), fixture.Window.FocusManager.GetFocusedElement());
         Assert.True(page.FindControl<Border>("InfoCard")!.IsVisible);
         fixture.Key(Key.Escape);
         Assert.False(page.FindControl<Border>("InfoCard")!.IsVisible);
         Assert.False(page.TryGoBack());
         Assert.Equal("Couch Mii", name.Text);
+
+        fixture.Activate(fixture.Side("attribute.mii_section.head"));
+        fixture.Activate(fixture.Side(MiiEditorParts.GroupTitleKey(MiiHeadGroup.Hair)));
+        fixture.Activate(page.FindControl<Button>("ColorButton")!);
+        Assert.Same(page.CouchFocusTarget, fixture.Window.FocusManager!.GetFocusedElement());
+        Assert.True(page.FindControl<ScrollViewer>("SwatchScroller")!.IsVisible);
+        fixture.Key(Key.Escape);
+        Assert.False(page.FindControl<ScrollViewer>("SwatchScroller")!.IsVisible);
+        Assert.Same(fixture.Selection("VariantItems").SelectedItem, fixture.Window.FocusManager.GetFocusedElement());
+        Assert.True(page.TryGoBack());
+        fixture.Pump();
+        Assert.NotNull(fixture.Side(MiiEditorParts.GroupTitleKey(MiiHeadGroup.Hair)));
+        fixture.Key(Key.Escape);
+        Assert.False(page.TryGoBack());
 
         fixture.Window.TogglePresentation();
         fixture.Pump();
@@ -179,10 +206,9 @@ public class MiiEditorCouchNavigationTests
         fixture.Pump();
         Assert.Equal("Couch Mii", name.Text);
         Assert.IsAssignableFrom<Button>(page.CouchFocusTarget);
-        var actions = page.FindControl<StackPanel>("CouchEditorActions")!.Children.OfType<ActionButton>().ToArray();
-        fixture.Activate(actions[0]);
+        fixture.Activate(page.FindControl<ActionButton>("CouchUndoButton")!);
         Assert.NotEqual("Couch Mii", name.Text);
-        fixture.Activate(actions[1]);
+        fixture.Activate(page.FindControl<ActionButton>("CouchRedoButton")!);
         Assert.Equal("Couch Mii", name.Text);
 
         fixture.Activate(fixture.Side("attribute.mii_section.body"));
@@ -281,6 +307,8 @@ public class MiiEditorCouchNavigationTests
 
         public Panel Panel(string name) => Page.FindControl<Panel>(name)!;
 
+        public SegmentedControl Selection(string name) => Page.FindControl<SegmentedControl>(name)!;
+
         public Button Side(string key) => Panel("SidebarItems").Children.OfType<Button>().Single(button => Equals(button.Tag, key));
 
         public void Pump()
@@ -297,7 +325,7 @@ public class MiiEditorCouchNavigationTests
             Pump();
         }
 
-        // Native Tab traversal crosses rebuilds without forcing focus onto every requested control.
+        // Native Tab traversal crosses rebuilds; segmented options use their native arrow-key selection.
         public void MoveTo(Control target)
         {
             Pump();
@@ -307,7 +335,24 @@ public class MiiEditorCouchNavigationTests
                 if (ReferenceEquals(target, Window.FocusManager!.GetFocusedElement()))
                     return;
                 if (Window.FocusManager!.GetFocusedElement() is Control focused)
+                {
                     visited.Add($"{focused.GetType().Name}:{focused.Name}:{focused.Tag}");
+                    if (
+                        target is SegmentOption option
+                        && option.FindAncestorOfType<SegmentedControl>() is { } selection
+                        && (focused == selection || selection.IsVisualAncestorOf(focused))
+                    )
+                    {
+                        var index = selection.Items.IndexOf(option);
+                        var key =
+                            index == selection.SelectedIndex ? Avalonia.Input.Key.Home
+                            : index < selection.SelectedIndex ? Avalonia.Input.Key.Left
+                            : Avalonia.Input.Key.Right;
+                        CouchNativeInput.SendKey(focused, key);
+                        Pump();
+                        continue;
+                    }
+                }
                 Key(Avalonia.Input.Key.Tab);
             }
             var ancestry = target
@@ -324,7 +369,7 @@ public class MiiEditorCouchNavigationTests
         public void Activate(Control target)
         {
             MoveTo(target);
-            Key(Avalonia.Input.Key.Space);
+            Key(target is Button ? Avalonia.Input.Key.Space : Avalonia.Input.Key.Enter);
         }
 
         public void Dispose()

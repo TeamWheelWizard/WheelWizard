@@ -147,7 +147,7 @@
                      Padding="0" Margin="0" Background="Transparent" ItemsSource="{Binding Players}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     SelectionChanged="PlayerView_SelectionChanged"
+                     SelectionChanged="RoomsView_SelectionChanged"
                      KeyDown="RoomsView_OnKeyDown">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

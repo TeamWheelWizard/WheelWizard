@@ -287,11 +287,11 @@
                 <TextBlock Grid.Column="1" Text="{Binding Text, ElementName=NameField}" Classes="TitleText"
                            Margin="16,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                 <StackPanel x:Name="CouchEditorActions" Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                    <components:ActionButton Text="{loc:T action.undo}" Tone="Secondary" Variant="Ghost" Click="UndoButton_OnClick"
+                    <components:ActionButton x:Name="CouchUndoButton" Text="{loc:T action.undo}" Tone="Secondary" Variant="Ghost" Click="UndoButton_OnClick"
                                              IsEnabled="{Binding IsEnabled, ElementName=UndoButton}" />
-                    <components:ActionButton Text="{loc:T action.redo}" Tone="Secondary" Variant="Ghost" Click="RedoButton_OnClick"
+                    <components:ActionButton x:Name="CouchRedoButton" Text="{loc:T action.redo}" Tone="Secondary" Variant="Ghost" Click="RedoButton_OnClick"
                                              IsEnabled="{Binding IsEnabled, ElementName=RedoButton}" />
-                    <components:ActionButton Text="{loc:T action.save}" Tone="Brand" Click="SaveButton_OnClick"
+                    <components:ActionButton x:Name="CouchSaveButton" Text="{loc:T action.save}" Tone="Brand" Click="SaveButton_OnClick"
                                              IsEnabled="{Binding IsEnabled, ElementName=SaveButton}" />
                 </StackPanel>
             </Grid>

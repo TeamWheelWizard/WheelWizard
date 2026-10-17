@@ -22,6 +22,7 @@ internal enum CouchButtons
 internal sealed class SdlGamepadBackend : IDisposable
 {
     private const uint GamepadSubsystem = 0x2000;
+    private const int LastMappedButton = 14; // SDL_GAMEPAD_BUTTON_DPAD_RIGHT
     private readonly Dictionary<uint, nint> _devices = [];
     private readonly List<uint> _disconnected = [];
     public int Generation { get; private set; }
@@ -102,26 +103,13 @@ internal sealed class SdlGamepadBackend : IDisposable
                 _disconnected.Add(id);
                 continue;
             }
-            if (SDL_GetGamepadButton(device, 0))
-                buttons |= CouchButtons.Confirm;
-            if (SDL_GetGamepadButton(device, 1) || SDL_GetGamepadButton(device, 4))
-                buttons |= CouchButtons.Back;
-            if (SDL_GetGamepadButton(device, 3))
-                buttons |= CouchButtons.TextInput;
-            if (SDL_GetGamepadButton(device, 6))
-                buttons |= CouchButtons.Menu;
-            if (SDL_GetGamepadButton(device, 9))
-                buttons |= CouchButtons.PreviousSection;
-            if (SDL_GetGamepadButton(device, 10))
-                buttons |= CouchButtons.NextSection;
-            if (SDL_GetGamepadButton(device, 11))
-                buttons |= CouchButtons.Up;
-            if (SDL_GetGamepadButton(device, 12))
-                buttons |= CouchButtons.Down;
-            if (SDL_GetGamepadButton(device, 13))
-                buttons |= CouchButtons.Left;
-            if (SDL_GetGamepadButton(device, 14))
-                buttons |= CouchButtons.Right;
+            // Share the event mapping so held and short presses cannot drift apart.
+            for (var button = 0; button <= LastMappedButton; button++)
+            {
+                var mapped = MapButton(button);
+                if (mapped != CouchButtons.None && SDL_GetGamepadButton(device, button))
+                    buttons |= mapped;
+            }
             var x = SDL_GetGamepadAxis(device, 0);
             var y = SDL_GetGamepadAxis(device, 1);
             // Radial intent: a diagonal stick selects one axis instead of racing two moves.
@@ -146,7 +134,7 @@ internal sealed class SdlGamepadBackend : IDisposable
         return state;
     }
 
-    private static CouchButtons MapButton(byte button) =>
+    private static CouchButtons MapButton(int button) =>
         button switch
         {
             0 => CouchButtons.Confirm,

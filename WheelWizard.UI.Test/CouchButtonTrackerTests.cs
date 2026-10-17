@@ -5,6 +5,19 @@ namespace WheelWizard.UI.Test;
 public class CouchButtonTrackerTests
 {
     [Fact]
+    public void HeldButtons_ProduceOnePressAndRemainHeldUntilReleased()
+    {
+        var input = new CouchButtonTracker();
+        input.Reset(CouchButtons.None);
+        const CouchButtons held = CouchButtons.Confirm | CouchButtons.Right;
+
+        Assert.Equal(new CouchGamepadState(held, held), input.Update(new(held, CouchButtons.None), false));
+        Assert.Equal(new CouchGamepadState(held, CouchButtons.None), input.Update(new(held, CouchButtons.None), false));
+        Assert.Equal(default, input.Update(default, false));
+        Assert.Equal(new CouchGamepadState(held, held), input.Update(new(held, CouchButtons.None), false));
+    }
+
+    [Fact]
     public void ScopeChange_BlocksHeldConfirmButAcceptsFreshBackImmediately()
     {
         var input = new CouchButtonTracker();

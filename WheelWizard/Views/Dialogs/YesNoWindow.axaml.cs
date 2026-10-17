@@ -60,7 +60,7 @@ public partial class YesNoWindow : ModalContent
     private void yesButton_Click(object sender, RoutedEventArgs e)
     {
         Result = true;
-        _tcs?.TrySetResult(true); // Signal that the task is complete
+        _tcs?.TrySetResult(true);
         Close();
     }
 
@@ -72,7 +72,6 @@ public partial class YesNoWindow : ModalContent
 
     protected override void BeforeClose()
     {
-        // If you want to return something different, then to the TrySetResult before you close it
         _tcs?.TrySetResult(false);
     }
 

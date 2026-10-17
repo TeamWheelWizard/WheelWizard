@@ -312,39 +312,35 @@ public class WindowCompositionTests
     }
 
     [AvaloniaFact]
-    public void DisabledWindows_RejectNativeCloseButAllowCompletionAndShutdown()
+    public void DisabledWindow_RejectsNativeCloseButAllowsCompletionAndShutdown()
     {
-        var main = new TestWindow();
-        (BaseWindow Window, Action<WindowClosingEventArgs> RequestClose)[] windows = [(main, main.RequestClose)];
-        foreach (var (window, requestClose) in windows)
+        var window = new TestWindow();
+        try
         {
-            try
-            {
-                window.SetInteractable(false);
-                var native = CreateClosingArgs(false);
-                requestClose(native);
-                Assert.True(native.Cancel);
-                foreach (
-                    var args in new[]
-                    {
-                        CreateClosingArgs(true),
-                        CreateClosingArgs(false, WindowCloseReason.OwnerWindowClosing),
-                        CreateClosingArgs(false, WindowCloseReason.ApplicationShutdown),
-                    }
-                )
+            window.SetInteractable(false);
+            var native = CreateClosingArgs(false);
+            window.RequestClose(native);
+            Assert.True(native.Cancel);
+            foreach (
+                var args in new[]
                 {
-                    requestClose(args);
-                    Assert.False(args.Cancel);
+                    CreateClosingArgs(true),
+                    CreateClosingArgs(false, WindowCloseReason.OwnerWindowClosing),
+                    CreateClosingArgs(false, WindowCloseReason.ApplicationShutdown),
                 }
-                window.SetInteractable(true);
-                var allowed = CreateClosingArgs(false);
-                requestClose(allowed);
-                Assert.False(allowed.Cancel);
-            }
-            finally
+            )
             {
-                window.Close();
+                window.RequestClose(args);
+                Assert.False(args.Cancel);
             }
+            window.SetInteractable(true);
+            var allowed = CreateClosingArgs(false);
+            window.RequestClose(allowed);
+            Assert.False(allowed.Cancel);
+        }
+        finally
+        {
+            window.Close();
         }
     }
 
