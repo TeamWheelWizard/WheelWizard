@@ -32,6 +32,8 @@ Generated editor and mod actions use stable `Tag` identities to restore focus af
 
 `CouchInputController` maps SDL3 gamepads and keyboard actions to native control/focus semantics. Buttons use scoped directional focus search rather than arrow events that can change radio selection. Sliders adjust on their own axis and leave on the perpendicular axis; their synthetic keys use the native editing path rather than Avalonia's separate gamepad engagement state. Scroll-clipped controls remain reachable and are brought into view. Selectable labels are not couch focus targets.
 
+Couch focus uses a window-scoped native `FocusAdorner`: a rounded teal outline with a translucent inner halo, using the shared brand colors and corner radius. Keep it noninteractive and out of layout; do not thicken control borders on focus or stack button-template rings over it. Desktop retains its existing focus styling.
+
 `SdlGamepadBackend` uses one button-to-action mapping for held-state polling and queued button-down events. Keep those paths aligned so short taps and held presses cannot acquire different meanings.
 
 `CouchInputHints` renders the shell and keyboard legends using Kenney Input Prompts (Steam Deck monochrome set) and localized action labels. `CouchInputGlyphs` shares decoded bitmaps across the footer, keyboard, and text-entry menu; its eight 128-pixel source images and original CC0 license are embedded from `Resources/Images/ControllerPrompts`. Render the original white artwork at reduced opacity for grey prompts, without modifying the upstream assets. Glyphs remain unmirrored in right-to-left layouts. These legends are noninteractive: keep fullscreen in the controller menu and Back in input routing, not in footer buttons.

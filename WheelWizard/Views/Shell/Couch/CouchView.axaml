@@ -17,9 +17,6 @@
             <Setter Property="Background" Value="{DynamicResource FrameColor}" />
             <Setter Property="BorderBrush" Value="{DynamicResource Brand400}" />
         </Style>
-        <Style Selector="components|ActionButton /template/ Border#PART_FocusRing">
-            <Setter Property="BorderThickness" Value="2" />
-        </Style>
     </UserControl.Styles>
     <Grid RowDefinitions="Auto,*,Auto" Margin="20,12,20,12" RowSpacing="12">
         <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">

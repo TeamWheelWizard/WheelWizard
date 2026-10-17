@@ -26,12 +26,24 @@
         <Style Selector="Window.couch SelectableTextBlock">
             <Setter Property="Focusable" Value="False" />
         </Style>
-        <Style Selector="Window.couch components|ActionButton:focus-visible /template/ Border#PART_FocusRing">
-            <Setter Property="BorderThickness" Value="3" />
+        <Style Selector="Window.couch :is(Control)">
+            <Setter Property="FocusAdorner">
+                <Template>
+                    <Panel IsHitTestVisible="False">
+                        <Border BorderBrush="{DynamicResource Brand400}" BorderThickness="6"
+                                CornerRadius="{StaticResource GlobalCornerRadius}" Opacity="0.16" />
+                        <Border BorderBrush="{DynamicResource Brand300}" BorderThickness="2"
+                                CornerRadius="{StaticResource GlobalCornerRadius}" />
+                    </Panel>
+                </Template>
+            </Setter>
         </Style>
-        <Style Selector="Window.couch :is(Button):focus-visible, Window.couch ListBoxItem:focus-visible, Window.couch TextBox:focus-visible, Window.couch components|SegmentOption:focus-visible, Window.couch components|Dropdown:focus-visible">
-            <Setter Property="BorderBrush" Value="{DynamicResource Brand300}" />
-            <Setter Property="BorderThickness" Value="3" />
+        <Style Selector="Window.couch components|ActionButton:focus-visible /template/ Border#PART_FocusRing">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="Window.couch miis|MiiBlock:focus-visible /template/ Border#PART_MainBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource Brand400}" />
+            <Setter Property="BorderThickness" Value="1" />
         </Style>
     </Window.Styles>
     <Grid x:Name="WindowFrame" RowDefinitions="30,*"
