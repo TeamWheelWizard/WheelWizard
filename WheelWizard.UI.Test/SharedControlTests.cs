@@ -21,6 +21,36 @@ namespace WheelWizard.UI.Test;
 public class SharedControlTests
 {
     [AvaloniaFact]
+    public void OverflowingContent_KeepsScrollbarsInsideTheViewport()
+    {
+        var scroll = new ScrollViewer
+        {
+            HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+            Content = new Border { Width = 600, Height = 1000 },
+        };
+        using var window = new UiTestWindow
+        {
+            Width = 320,
+            Height = 240,
+            Content = scroll,
+        };
+        window.Show();
+        window.UpdateLayout();
+
+        foreach (var name in new[] { "PART_VerticalScrollBar", "PART_HorizontalScrollBar" })
+        {
+            var bar = scroll.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ScrollBar>().Single(bar => bar.Name == name);
+            Assert.True(bar.IsVisible);
+            var corner = bar.TranslatePoint(new Point(bar.Bounds.Width, bar.Bounds.Height), scroll)!.Value;
+            Assert.InRange(corner.X, 0, scroll.Bounds.Width);
+            Assert.InRange(corner.Y, 0, scroll.Bounds.Height);
+        }
+        scroll.Offset = new Vector(0, 200);
+        Assert.Equal(200, scroll.Offset.Y);
+    }
+
+    [AvaloniaFact]
     public void Dropdown_TypeAheadSkipsSelectedOptions()
     {
         var dropdown = new Dropdown

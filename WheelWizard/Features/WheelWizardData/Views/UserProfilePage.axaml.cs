@@ -18,7 +18,6 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
-using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement;
@@ -34,7 +33,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 {
     private ICustomCharactersService CustomCharacters { get; }
 
-    private INavigationService Navigation { get; }
+    private IModalFactory Popups { get; }
 
     private LicenseProfile? currentPlayer;
     private Mii? _currentMii;
@@ -228,7 +227,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
     public UserProfilePage(
         VrHistoryGraph historyGraph,
         ICustomCharactersService customCharacters,
-        INavigationService navigation,
+        IModalFactory popups,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameLicenseService,
         IWhWzDataSingletonService badgeService,
@@ -237,7 +236,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
     )
     {
         CustomCharacters = customCharacters;
-        Navigation = navigation;
+        Popups = popups;
         LiveRooms = liveRooms;
         GameLicenseService = gameLicenseService;
         BadgeService = badgeService;
@@ -403,7 +402,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
             if (room.Players.All(player => player.FriendCode != currentPlayer?.FriendCode))
                 continue;
 
-            Navigation.NavigateTo<RoomDetailsPage>(room);
+            Popups.Create<RoomDetailsWindow>(room).Show();
             return;
         }
 

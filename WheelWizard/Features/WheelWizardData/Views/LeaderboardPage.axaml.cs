@@ -15,7 +15,6 @@ using WheelWizard.Settings;
 using WheelWizard.Shared.Calendar;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
-using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WheelWizardData.Views.Dialogs;
@@ -42,7 +41,7 @@ public sealed record LeaderboardPlayerItem
     public bool IsFriend { get; init; }
     public bool IsOnline { get; init; }
 
-    // Keep parity with RoomDetailsPage player template bindings.
+    // Keep parity with RoomDetailsWindow player template bindings.
     public string VrDisplay => VrText;
     public Mii? FirstMii => Mii;
     public bool HasBadges => HasBadge;
@@ -59,8 +58,6 @@ public sealed record LeaderboardPlayerItem
 public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 {
     private IModalFactory Popups { get; }
-
-    private INavigationService Navigation { get; }
 
     private static readonly LeaderboardPlayerItem EmptyPodiumPlayer = new()
     {
@@ -185,7 +182,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 
     public LeaderboardPage(
         IModalFactory popups,
-        INavigationService navigation,
         LiveRoomsService liveRooms,
         IRrLeaderboardSingletonService leaderboardService,
         IWhWzDataSingletonService badgeService,
@@ -198,7 +194,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
     )
     {
         Popups = popups;
-        Navigation = navigation;
         LiveRooms = liveRooms;
         LeaderboardService = leaderboardService;
         BadgeService = badgeService;
@@ -222,9 +217,26 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         await ReloadLeaderboardAsync();
     }
 
+    public void ShowAsSection(bool podiumOnly = false)
+    {
+        PageGrid.RowDefinitions[0].Height = new GridLength(0);
+        PageHeading.IsVisible = HeaderDivider.IsVisible = BottomDivider.IsVisible = false;
+        RankedPlayersList.IsVisible = !podiumOnly;
+        PlayersHeader.IsVisible = !podiumOnly;
+        PlayersScroll.Margin = new(0);
+        PlayersScroll.VerticalScrollBarVisibility = podiumOnly
+            ? Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled
+            : Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
+        PlayersContent.Margin = podiumOnly ? new(0) : new(0, 0, 0, 12);
+        if (podiumOnly)
+            PodiumStage.Height = 270;
+    }
+
     private void LeaderboardPage_Unloaded(object? sender, RoutedEventArgs e)
     {
         CancelCurrentLoad();
+        if (IsLoading)
+            _hasLoadedOnce = false;
     }
 
     private void RemainingPlayers_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -569,7 +581,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
             if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;
 
-            Navigation.NavigateTo<RoomDetailsPage>(room);
+            Popups.Create<RoomDetailsWindow>(room).Show();
             return;
         }
 
@@ -580,7 +592,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
     {
         if (sender is not Control control)
             return null;
-        return control.DataContext as LeaderboardPlayerItem;
+        return control.Tag as LeaderboardPlayerItem ?? control.DataContext as LeaderboardPlayerItem;
     }
 
     private static OperationResult<string> NormalizeFriendCode(string friendCode)

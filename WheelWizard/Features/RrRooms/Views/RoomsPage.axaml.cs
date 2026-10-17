@@ -5,14 +5,14 @@ using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Shared.Polling;
-using WheelWizard.Views.Shell.Navigation;
+using WheelWizard.Views.Dialogs;
 using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.RrRooms.Views;
 
 public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
-    private INavigationService Navigation { get; }
+    private IModalFactory Popups { get; }
 
     private LiveRoomsService LiveRooms { get; }
 
@@ -42,9 +42,9 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingLi
         }
     }
 
-    public RoomsPage(INavigationService navigation, LiveRoomsService liveRooms)
+    public RoomsPage(IModalFactory popups, LiveRoomsService liveRooms)
     {
-        Navigation = navigation;
+        Popups = popups;
         LiveRooms = liveRooms;
         InitializeComponent();
         DataContext = this;
@@ -63,20 +63,24 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingLi
         var count = liveRooms.RoomCount;
         EmptyRoomsView.IsVisible = count == 0;
         RoomsListViewContainer.IsVisible = count != 0;
-        if (count == 0)
-            return;
-
-        foreach (var room in liveRooms.CurrentRooms)
+        foreach (var room in liveRooms.CurrentRooms.OrderByDescending(room => room.PlayerCount))
             Rooms.Add(room);
 
         RoomsListItemCount.Text = liveRooms.CurrentRooms.Count.ToString();
         PerformSearch(_searchQuery);
     }
 
+    public void ShowAsSection()
+    {
+        PageGrid.RowDefinitions[0].Height = new GridLength(0);
+        foreach (var control in PageGrid.Children.Where(child => Grid.GetRow(child) == 0))
+            control.IsVisible = false;
+    }
+
     private void PerformSearch(string? query)
     {
         var isStringEmpty = string.IsNullOrWhiteSpace(query);
-        RoomsListViewContainer.IsVisible = isStringEmpty;
+        RoomsListViewContainer.IsVisible = isStringEmpty && Rooms.Count > 0;
         PlayerListViewContainer.IsVisible = !isStringEmpty;
 
         if (isStringEmpty)
@@ -119,28 +123,17 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingLi
         if (listBox.SelectedItem is not RrRoom selectedRoom)
             return;
 
-        Navigation.NavigateTo<RoomDetailsPage>(selectedRoom);
+        Popups.Create<RoomDetailsWindow>(selectedRoom).Show();
         listBox.SelectedItem = null;
         // Deselect the item immediately after navigating. This is important
         // for a good user experience. Otherwise, the item stays selected,
         // and if you navigate back, you can't re-select the same item.
     }
 
-    private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private void Player_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (e.Source is not ListBox listBox)
-            return;
-        if (listBox.SelectedItem is not RrPlayer selectedRoom)
-            return;
-
-        var room = Rooms.FirstOrDefault(r => r.Players.Any(p => p.Equals(selectedRoom)));
-
-        if (room is not null)
-            Navigation.NavigateTo<RoomDetailsPage>(room);
-        listBox.SelectedItem = null;
-        // Deselect the item immediately after navigating. This is important
-        // for a good user experience. Otherwise, the item stays selected,
-        // and if you navigate back, you can't re-select the same item.
+        if (sender is PlayerListItem { DataContext: RrPlayer player } && !string.IsNullOrWhiteSpace(player.FriendCode))
+            Popups.Create<WheelWizard.WheelWizardData.Views.Dialogs.PlayerProfileWindow>(player.FriendCode).Show();
     }
 
     #region PropertyChanged

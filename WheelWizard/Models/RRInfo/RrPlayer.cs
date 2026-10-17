@@ -26,7 +26,7 @@ public class RrPlayer : IEquatable<RrPlayer>
 
     public Mii? FirstMii => Mii;
 
-    public string VrDisplay => Vr?.ToString() ?? "--";
+    public string VrDisplay => Vr?.ToString("N0") ?? "--";
     public string BrDisplay => Br?.ToString() ?? "--";
 
     public BadgeVariant[] BadgeVariants { get; set; } = [];

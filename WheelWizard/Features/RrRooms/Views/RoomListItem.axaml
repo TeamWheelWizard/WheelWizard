@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
+             xmlns:models="clr-namespace:WheelWizard.Models.RRInfo"
+             x:Class="WheelWizard.RrRooms.Views.RoomListItem" x:DataType="models:RrRoom">
+    <UserControl.Styles>
+        <Style Selector="rooms|RoomListItem.Compact Border.RoomRow">
+            <Setter Property="Padding" Value="4,8" />
+        </Style>
+        <Style Selector="Border.RoomRow:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+        </Style>
+    </UserControl.Styles>
+    <Border Classes="RoomRow" BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,0,0,1" Padding="4,14">
+        <Grid ColumnDefinitions="54,*,Auto">
+            <PathIcon Data="{StaticResource Road}" Width="34" Height="34"
+                      Foreground="{StaticResource Neutral500}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4" Margin="0,0,12,0">
+                <TextBlock Text="{Binding GameMode}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource Neutral100}" />
+                <TextBlock Text="{Binding RaceDescription}" FontSize="12" Foreground="{StaticResource Neutral300}" TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="{Binding RaceDescription}" />
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Id}" FontSize="11" Foreground="{StaticResource Neutral500}" />
+                    <TextBlock Text="·" FontSize="11" Foreground="{StaticResource Neutral500}" />
+                    <TextBlock Text="{Binding TimeOnline}" FontSize="11" Foreground="{StaticResource Neutral500}" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="3">
+                <TextBlock Text="{Binding PlayerCount}" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource Neutral100}" HorizontalAlignment="Right" />
+                <PathIcon Data="{StaticResource UserCouple}" Width="15" Height="15" Foreground="{StaticResource Neutral500}" HorizontalAlignment="Right" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

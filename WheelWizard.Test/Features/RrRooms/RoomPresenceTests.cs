@@ -135,6 +135,45 @@ public class RoomPresenceTests
         licenses.Received(1).RefreshOnlineStatus();
     }
 
+    [Fact]
+    public async Task RaceMetadata_SurvivesRoomSplitting_AndClearsWhenAbsent()
+    {
+        const string json = """
+            {"rooms":[{"id":"room","type":"anybody","created":"2026-10-17T09:00:00Z",
+            "race":{"num":12,"course":359,"cc":2,"trackName":"Wii Rainbow Road"},
+            "players":[{"pid":"1","connectionMap":["0","1","0"]},
+                       {"pid":"2","connectionMap":["1","0","0"]},
+                       {"pid":"3","connectionMap":["0","0","0"]}]}]}
+            """;
+        var response = System.Text.Json.JsonSerializer.Deserialize<RwfcRoomStatusResponse>(
+            json,
+            new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)
+        )!;
+        var rooms = Substitute.For<IRrRoomsSingletonService>();
+        rooms.GetRoomsAsync().Returns(Ok(response.Rooms));
+        var leaderboard = Substitute.For<IRrLeaderboardSingletonService>();
+        leaderboard.GetTopPlayersAsync(50).Returns(Ok(new List<RwfcLeaderboardEntry>()));
+        var licenses = Substitute.For<IGameLicenseSingletonService>();
+        licenses.ActiveCurrentFriends.Returns([]);
+        using var service = new TestRooms(Substitute.For<IWhWzDataSingletonService>(), rooms, leaderboard, licenses, new RoomPresence());
+
+        await service.Refresh();
+
+        Assert.Equal(2, service.CurrentRooms.Count);
+        Assert.All(
+            service.CurrentRooms,
+            room =>
+            {
+                Assert.Equal(359, room.Race!.Course);
+                Assert.Equal("Race 12 · Wii Rainbow Road", room.RaceDescription);
+            }
+        );
+
+        response.Rooms[0].Race = null;
+        await service.Refresh();
+        Assert.All(service.CurrentRooms, room => Assert.Equal("No race reported", room.RaceDescription));
+    }
+
     private sealed class TestRooms(
         IWhWzDataSingletonService data,
         IRrRoomsSingletonService rooms,

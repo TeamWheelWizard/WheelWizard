@@ -11,44 +11,27 @@
              x:DataType="community:LeaderboardPage"
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
         xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views">
-    <UserControl.Styles>
-        <!-- Match RoomDetailsPage entry background treatment for PlayerListItem -->
-        <Style Selector="rooms|PlayerListItem /template/ Border.BoxItemBackground">
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Margin" Value="0,3" />
-            <Setter Property="Padding" Value="7,0" />
-            <Setter Property="Background" Value="{StaticResource Neutral900}" />
-        </Style>
-        <Style Selector="rooms|PlayerListItem:pointerover /template/ Border.BoxItemBackground">
-            <Setter Property="Background" Value="{StaticResource Neutral700}" />
-        </Style>
-    </UserControl.Styles>
-
-    <Grid>
+    <Grid x:Name="PageGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <RowDefinition Height="*" />
             <RowDefinition Height="1" />
         </Grid.RowDefinitions>
-        <Border Grid.Row="0"
+        <Border x:Name="HeaderDivider" Grid.Row="0"
                 Background="{StaticResource BackgroundLineColor}"
                 Height="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" />
-
-        <StackPanel Grid.Row="0" VerticalAlignment="Bottom" Spacing="6" Margin="3,0,3,12">
+        <StackPanel x:Name="PageHeading" Grid.Row="0" VerticalAlignment="Bottom" Spacing="6" Margin="3,0,3,12">
             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" IsVisible="{Binding HasData}">
                 <Ellipse Width="7" Height="7" Fill="{StaticResource Brand300}" VerticalAlignment="Center" />
                 <TextBlock Text="{loc:T text.live_rwfc}" Classes="TinyText"
                            Foreground="{StaticResource Neutral300}" VerticalAlignment="Center" />
             </StackPanel>
-
             <TextBlock Text="{loc:T page_title.leaderboard}" Classes="PageTitleText" Margin="0" />
         </StackPanel>
-
-        <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" ZIndex="1"
+        <Border x:Name="BottomDivider" Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" ZIndex="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-
         <Grid Grid.Row="1">
             <StackPanel IsVisible="{Binding IsLoading}"
                         HorizontalAlignment="Center"
@@ -63,7 +46,6 @@
                            FontSize="14"
                            HorizontalAlignment="Center" />
             </StackPanel>
-
             <StackPanel IsVisible="{Binding HasError}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
@@ -90,7 +72,6 @@
                                    HorizontalAlignment="Center"
                                    Click="RetryButton_OnClick" />
             </StackPanel>
-
             <StackPanel IsVisible="{Binding HasNoData}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
@@ -105,13 +86,12 @@
                                    HorizontalAlignment="Center"
                                    Click="RetryButton_OnClick" />
             </StackPanel>
-
-            <ScrollViewer IsVisible="{Binding HasData}"
+            <ScrollViewer x:Name="PlayersScroll" IsVisible="{Binding HasData}"
                           Margin="10,0,10,0"
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto"
                           IsScrollInertiaEnabled="True">
-                <StackPanel Spacing="10"
+                <StackPanel x:Name="PlayersContent" Spacing="10"
                             Margin="0,0,0,12">
                     <community:LeaderboardPodiumStage x:Name="PodiumStage"
                                                       Height="380"
@@ -119,6 +99,7 @@
                                                       Second="{Binding PodiumSecond.Mii}"
                                                       Third="{Binding PodiumThird.Mii}">
                         <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="2"
+                                                         Click="ViewProfile_OnClick" Tag="{Binding PodiumSecond}" Cursor="Hand"
                                                          Classes="Silver"
                                                          IsVisible="{Binding HasPodiumSecond}"
                                                          Rank="{Binding PodiumSecond.Rank}"
@@ -140,6 +121,7 @@
                             </community:LeaderboardPodiumStep.ContextMenu>
                         </community:LeaderboardPodiumStep>
                         <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="1"
+                                                         Click="ViewProfile_OnClick" Tag="{Binding PodiumFirst}" Cursor="Hand"
                                                          Classes="Gold"
                                                          IsVisible="{Binding HasPodiumFirst}"
                                                          Rank="{Binding PodiumFirst.Rank}"
@@ -161,6 +143,7 @@
                             </community:LeaderboardPodiumStep.ContextMenu>
                         </community:LeaderboardPodiumStep>
                         <community:LeaderboardPodiumStep community:LeaderboardPodiumStage.Place="3"
+                                                         Click="ViewProfile_OnClick" Tag="{Binding PodiumThird}" Cursor="Hand"
                                                          Classes="Bronze"
                                                          IsVisible="{Binding HasPodiumThird}"
                                                          Rank="{Binding PodiumThird.Rank}"
@@ -182,11 +165,17 @@
                             </community:LeaderboardPodiumStep.ContextMenu>
                         </community:LeaderboardPodiumStep>
                     </community:LeaderboardPodiumStage>
-
-                    <ItemsControl ItemsSource="{Binding RemainingPlayers}">
+                    <Border x:Name="PlayersHeader" BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,0,0,1" Padding="4,8">
+                        <Grid ColumnDefinitions="60,49,*,Auto,32">
+                            <TextBlock Text="Position" Classes="TinyText" />
+                            <TextBlock Grid.Column="2" Text="Name" Classes="TinyText" />
+                            <TextBlock Grid.Column="3" Text="{loc:T attribute.vr_abbreviation}" Classes="TinyText" />
+                        </Grid>
+                    </Border>
+                    <ItemsControl x:Name="RankedPlayersList" ItemsSource="{Binding RemainingPlayers}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="community:LeaderboardPlayerItem">
-                                <rooms:PlayerListItem UserName="{Binding Name}"
+                                <rooms:PlayerListItem Click="ViewProfile_OnClick" UserName="{Binding Name}"
                                                            FriendCode="{Binding FriendCode}"
                                                            Vr="{Binding VrDisplay}"
                                                            Mii="{Binding FirstMii}"

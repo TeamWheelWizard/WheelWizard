@@ -13,7 +13,6 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
-using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData.Views.Dialogs;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
@@ -24,8 +23,6 @@ namespace WheelWizard.WheelWizardData.Views;
 public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
     private IModalFactory Popups { get; }
-
-    private INavigationService Navigation { get; }
 
     // Made this static intentionally.
     // I personally don't think its worth saving it as a setting.
@@ -96,7 +93,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
 
     public FriendsPage(
         IModalFactory popups,
-        INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameLicenseService,
         IMiiDbService miiDbService,
@@ -104,7 +100,6 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     )
     {
         Popups = popups;
-        Navigation = navigation;
         LiveRooms = liveRooms;
         GameLicenseService = gameLicenseService;
         MiiDbService = miiDbService;
@@ -302,7 +297,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
             if (room.Players.All(player => player.FriendCode != friendCode))
                 continue;
 
-            Navigation.NavigateTo<RoomDetailsPage>(room);
+            Popups.Create<RoomDetailsWindow>(room).Show();
             return;
         }
 

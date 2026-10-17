@@ -16,6 +16,7 @@ using WheelWizard.Localization;
 using WheelWizard.MiiAnimations;
 using WheelWizard.MiiImages;
 using WheelWizard.Mods;
+using WheelWizard.Online;
 using WheelWizard.Recomp;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
@@ -43,6 +44,7 @@ public static class SetupExtensions
         services.AddBranding();
         services.AddGitHub();
         services.AddRrRooms();
+        services.AddOnline();
         services.AddWhWzData();
         services.AddDiscImages();
         services.AddWiiManagement();

@@ -10,6 +10,10 @@ public class RrRoom
     public required bool Suspend { get; set; }
     public string? Rk { get; set; } // RK does not exists in private rooms
     public required List<RrPlayer> Players { get; set; }
+    public WheelWizard.RrRooms.RwfcRoomRace? Race { get; set; }
+
+    // The endpoint retains the last race, including in empty rooms. Do not infer that a race is in progress.
+    public string RaceDescription => Race is null ? "No race reported" : $"Race {Race.Num} · {Race.TrackName ?? $"Course {Race.Course}"}";
 
     public int PlayerCount => Players.Count;
 

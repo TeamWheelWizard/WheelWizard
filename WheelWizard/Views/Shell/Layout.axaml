@@ -16,6 +16,7 @@
         xmlns:mods="clr-namespace:WheelWizard.Mods.Views"
         xmlns:miis="clr-namespace:WheelWizard.WiiManagement.MiiManagement.Views"
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
+        xmlns:online="clr-namespace:WheelWizard.Online.Views"
         xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views"
         xmlns:shellViews="clr-namespace:WheelWizard.Views.Shell.Views"
         xmlns:design="clr-namespace:WheelWizard.Views.DesignTime"
@@ -116,15 +117,12 @@
             <TextBlock Text="{loc:T attribute.status_online}" Classes="SidebarSectionText" />
             <!-- Repurposing this translation from values -->
             <shellControls:SidebarRadioButton IconData="{StaticResource RoomUsers}"
-                                           PageType="{x:Type rooms:RoomsPage}"
-                                           Text="{loc:T page_title.rooms}" x:Name="RoomsButton"
+                                           PageType="{x:Type online:OnlinePage}"
+                                           Text="{loc:T attribute.status_online}" x:Name="RoomsButton"
                                            BoxText="0"
                                            BoxIconData="{StaticResource UserCouple}"
                                            BoxIconSize="14"
                                            BoxTip="{loc:T hover.players_online.none}" />
-            <shellControls:SidebarRadioButton IconData="{StaticResource Award}"
-                                           PageType="{x:Type community:LeaderboardPage}"
-                                           Text="{loc:T page_title.leaderboard}" />
             <shellControls:SidebarRadioButton IconData="{StaticResource Friends}"
                                            Text="{loc:T page_title.friends}" x:Name="FriendsButton"
                                            PageType="{x:Type community:FriendsPage}"

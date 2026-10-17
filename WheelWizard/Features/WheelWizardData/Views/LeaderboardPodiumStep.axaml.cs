@@ -1,5 +1,5 @@
 using Avalonia;
-using Avalonia.Controls.Primitives;
+using Avalonia.Controls;
 using WheelWizard.WheelWizardData.Domain;
 
 namespace WheelWizard.WheelWizardData.Views;
@@ -9,7 +9,7 @@ namespace WheelWizard.WheelWizardData.Views;
 /// <see cref="LeaderboardPodiumStage"/> it's placed in. Style it with the Gold, Silver or Bronze class; the stage adds
 /// Lit once the Mii has landed, which turns on the light behind it.
 /// </summary>
-public class LeaderboardPodiumStep : TemplatedControl
+public class LeaderboardPodiumStep : Button
 {
     public static readonly StyledProperty<int> RankProperty = AvaloniaProperty.Register<LeaderboardPodiumStep, int>(nameof(Rank));
 

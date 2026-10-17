@@ -113,6 +113,7 @@ public class LiveRoomsService : ObservablePollingService
             Type = room.Type,
             Suspend = room.Suspend,
             Rk = room.Rk,
+            Race = room.Race,
             Players = room
                 .Players.Select(p => MapPlayer(p, whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
                 .ToList(),
@@ -274,6 +275,7 @@ public class LiveRoomsService : ObservablePollingService
                         Created = room.Created,
                         Host = room.Host,
                         Rk = room.Rk,
+                        Race = room.Race,
                         Suspend = room.Suspend,
                         Players = comp.Select(idx => room.Players[idx]).ToList(),
                     })

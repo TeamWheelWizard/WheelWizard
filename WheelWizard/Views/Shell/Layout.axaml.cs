@@ -316,13 +316,11 @@ public partial class Layout : BaseWindow, IPollingListener
     public void NavigateToPage(UserControl page)
     {
         var oldPage = ContentArea.Content as Control;
-        var isRoomsToDetails = oldPage is RoomsPage && page is RoomDetailsPage;
-        var isDetailsToRooms = oldPage is RoomDetailsPage && page is RoomsPage;
         var isMiisToEditor = oldPage is MiiListPage && page is MiiEditorPage;
         var isEditorToMiis = oldPage is MiiEditorPage && page is MiiListPage;
 
-        ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms || isMiisToEditor || isEditorToMiis ? RoomsPageTransition : null;
-        ContentArea.IsTransitionReversed = isDetailsToRooms || isEditorToMiis;
+        ContentArea.PageTransition = isMiisToEditor || isEditorToMiis ? RoomsPageTransition : null;
+        ContentArea.IsTransitionReversed = isEditorToMiis;
         if (page is SettingsPage settingsPage)
             settingsPage.UpdateLayoutWidth(
                 (CompleteGrid.Bounds.Width > 0 ? CompleteGrid.Bounds.Width : WindowWidth)
@@ -347,8 +345,6 @@ public partial class Layout : BaseWindow, IPollingListener
             button.IsChecked = buttonPageType == page.GetType();
 
             // TODO: make a better way to have these type of exceptions
-            if (button.PageType == typeof(RoomsPage) && typeof(RoomDetailsPage) == page.GetType())
-                button.IsChecked = true;
             if (button.PageType == typeof(ModsPage) && page is ModBrowserPage)
                 button.IsChecked = true;
             if (button.PageType == typeof(MiiListPage) && page is MiiEditorPage)

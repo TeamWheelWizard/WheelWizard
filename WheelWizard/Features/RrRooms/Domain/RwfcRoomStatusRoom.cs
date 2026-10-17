@@ -13,4 +13,5 @@ public sealed class RwfcRoomStatusRoom
     public required List<RwfcRoomStatusPlayer> Players { get; set; }
 
     public bool Suspend { get; set; }
+    public RwfcRoomRace? Race { get; set; }
 }

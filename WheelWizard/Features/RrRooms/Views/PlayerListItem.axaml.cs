@@ -8,7 +8,7 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.RrRooms.Views;
 
-public class PlayerListItem : TemplatedControl
+public class PlayerListItem : Button
 {
     public static readonly StyledProperty<BadgeVariant[]> BadgeVariantsProperty = AvaloniaProperty.Register<PlayerListItem, BadgeVariant[]>(
         nameof(BadgeVariants),
@@ -143,6 +143,7 @@ public class PlayerListItem : TemplatedControl
         if (string.IsNullOrWhiteSpace(FriendCode))
             return;
 
+        e.Handled = true;
         JoinRoomAction?.Invoke(FriendCode);
     }
 

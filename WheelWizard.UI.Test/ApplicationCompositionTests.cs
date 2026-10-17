@@ -17,6 +17,7 @@ using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
 using WheelWizard.Mods.Views;
+using WheelWizard.Online.Views;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Views;
@@ -143,6 +144,7 @@ public class ApplicationCompositionTests
                 typeof(ModBrowserPage),
                 typeof(MiiListPage),
                 typeof(LeaderboardPage),
+                typeof(OnlinePage),
                 typeof(UserProfilePage),
                 typeof(TestingPage),
                 typeof(SettingsPage),
@@ -155,6 +157,93 @@ public class ApplicationCompositionTests
                 navigation.NavigateTo(page);
                 original.UpdateLayout();
                 Assert.IsType(page, navigation.CurrentPage);
+                if (navigation.CurrentPage is OnlinePage online)
+                {
+                    Assert.False(typeof(ILockedSidebarPage).IsAssignableFrom(online.GetType()));
+                    var sections = online.FindControl<StackPanel>("OnlineSections")!;
+                    Assert.Equal(Avalonia.Layout.Orientation.Horizontal, sections.Orientation);
+                    var podium = Assert.IsType<LeaderboardPage>(online.FindControl<ContentControl>("Podium")!.Content);
+                    Assert.NotNull(podium.FindControl<LeaderboardPodiumStage>("PodiumStage"));
+                    Assert.False(podium.FindControl<ItemsControl>("RankedPlayersList")!.IsVisible);
+                    Assert.False(podium.FindControl<Border>("PlayersHeader")!.IsVisible);
+                    Assert.Equal(
+                        Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
+                        podium.FindControl<ScrollViewer>("PlayersScroll")!.VerticalScrollBarVisibility
+                    );
+                    var liveRooms = services.GetRequiredService<WheelWizard.RrRooms.LiveRoomsService>();
+                    var previewRooms = Enumerable
+                        .Range(1, 2)
+                        .Select(index => new WheelWizard.Models.RRInfo.RrRoom
+                        {
+                            Id = $"preview-{index}",
+                            Created = DateTime.UtcNow,
+                            Type = "public",
+                            Suspend = false,
+                            Players =
+                            [
+                                new()
+                                {
+                                    Pid = "1",
+                                    Name = "Player",
+                                    FriendCode = "1234-5678-9012",
+                                },
+                            ],
+                        })
+                        .ToList();
+                    liveRooms.CurrentRooms.AddRange(previewRooms);
+                    ((WheelWizard.Online.ViewModels.OnlineViewModel)online.DataContext!).OnUpdate(liveRooms);
+                    original.UpdateLayout();
+                    var overview = online.FindControl<StackPanel>("Overview")!;
+                    Assert.True(overview.DesiredSize.Height <= ((Control)overview.Parent!).Bounds.Height);
+                    var roomRows = overview.GetVisualDescendants().OfType<RoomListItem>().ToList();
+                    Assert.Equal(2, roomRows.Count);
+                    Assert.All(
+                        roomRows,
+                        row => Assert.True(row.TranslatePoint(default, online)!.Value.Y + row.Bounds.Height <= online.Bounds.Height)
+                    );
+                    liveRooms.CurrentRooms.Clear();
+                    online.FindControl<ToggleRadioButton>("LeaderboardTab")!.IsChecked = true;
+                    Assert.IsType<LeaderboardPage>(online.FindControl<ContentControl>("SectionContent")!.Content);
+                    online.FindControl<ToggleRadioButton>("RoomsTab")!.IsChecked = true;
+                    Assert.IsType<RoomsPage>(online.FindControl<ContentControl>("SectionContent")!.Content);
+                    var room = new WheelWizard.Models.RRInfo.RrRoom
+                    {
+                        Id = "test-room",
+                        Created = DateTime.UtcNow,
+                        Type = "public",
+                        Suspend = false,
+                        Players =
+                        [
+                            new()
+                            {
+                                Pid = "1",
+                                Name = "Player",
+                                FriendCode = "1234-5678-9012",
+                                Vr = 9000,
+                            },
+                        ],
+                    };
+                    var details = services.GetRequiredService<IModalFactory>().Create<RoomDetailsWindow>(room);
+                    var closed = details.ShowDialog();
+                    Assert.Same(details, original.Modals.TopModal);
+                    Assert.Same(online, navigation.CurrentPage);
+                    original.UpdateLayout();
+                    var playerCard = Assert.Single(details.GetVisualDescendants().OfType<PlayerListItem>());
+                    var portrait = Assert.Single(playerCard.GetVisualDescendants().OfType<MiiImageLoader>());
+                    Assert.Same(WheelWizard.MiiImages.Domain.MiiImageVariants.FriendsSideProfile, portrait.ImageVariant);
+                    Assert.Null(portrait.HoverVariant);
+                    playerCard.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    var profile = Assert.IsType<WheelWizard.WheelWizardData.Views.Dialogs.PlayerProfileWindow>(original.Modals.TopModal);
+                    var profileClosed = profile.ShowDialog();
+                    profile.Close();
+                    await profileClosed.WaitAsync(TimeSpan.FromSeconds(2));
+                    Assert.Same(details, original.Modals.TopModal);
+                    // A room disappearing closes its modal without changing the underlying section.
+                    details.OnUpdate(services.GetRequiredService<WheelWizard.RrRooms.LiveRoomsService>());
+                    await closed.WaitAsync(TimeSpan.FromSeconds(2));
+                    Assert.Same(online, navigation.CurrentPage);
+                    Assert.IsType<RoomsPage>(online.FindControl<ContentControl>("SectionContent")!.Content);
+                }
                 if (page == typeof(LeaderboardPage))
                 {
                     Assert.Equal(sidebarBounds, sidebar.Bounds);

@@ -17,13 +17,11 @@
                                        HasBadges="True"
                                        IsTopPlayer="True"
                                        TopLabel="TOP 3" />
-
             <rooms:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Someone Else"
                                        Vr="5000"
                                        HasBadges="True" />
-
             <rooms:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="WantToBeeMe"
@@ -31,13 +29,11 @@
                                        HasBadges="False"
                                        IsTopPlayer="True"
                                        TopLabel="TOP 12" />
-
             <rooms:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Random Guy"
                                        Vr="5000"
                                        HasBadges="False" />
-
             <rooms:PlayerListItem Width="428" Height="124"
                                        FriendCode="1234-5678-9012"
                                        UserName="Someone Else"
@@ -45,88 +41,116 @@
                                        HasBadges="False" />
         </StackPanel>
     </Design.PreviewWith>
-
     <Style Selector="rooms|PlayerListItem">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Classes="BoxItemBackground">
-                    <Grid ColumnDefinitions="Auto,130,80,*">
-                        <Border Grid.Column="0" CornerRadius="999999" ClipToBounds="True"
-                                Background="{StaticResource Neutral950}" Width="50" Height="50" Margin="0,3">
-                            <miiImages:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                              LoadingColor="{StaticResource Neutral600}"
-                                                              Mii="{TemplateBinding Mii}"
-                                                              FallBackColor="{StaticResource Neutral600}"
-                                                              ImageVariant="{x:Static miiVars:MiiImageVariants.PlayerListAvatar}" />
-                        </Border>
-
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <components:FormFieldLabel Text="{TemplateBinding UserName}" Margin="10,0,0,0" />
-                            <TextBlock Text="{TemplateBinding FriendCode}" FontSize="14"
-                                       Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                       Margin="10,0,0,0" />
-                        </StackPanel>
-
-
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                            <components:FormFieldLabel Text="{loc:T attribute.vr_abbreviation}"
-                                                       Margin="10,0,0,0" />
-                            <TextBlock Text="{TemplateBinding Vr}" FontSize="14"
-                                       Classes="TinyText" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                       Margin="10,0,0,0" />
-                        </StackPanel>
-
-                        <Grid Grid.Column="3" ColumnDefinitions="*,Auto,Auto,Auto" VerticalAlignment="Center">
-                            <Border Grid.Column="0" Background="Transparent" HorizontalAlignment="Stretch"
-                                    IsVisible="{TemplateBinding HasBadges}" Margin="0,0,6,0"
-                                    CornerRadius="6" Height="40" BorderThickness="1"
-                                    BorderBrush="{StaticResource Neutral600}" VerticalAlignment="Center">
-                                <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{TemplateBinding BadgeVariants}" x:Name="PART_BadgeContainer">
+                <Grid x:Name="RowFrame">
+                    <Border Classes="PlayerRow" Padding="4,12">
+                        <Grid x:Name="PlayerLayout" ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                            <TextBlock Grid.Column="0" Text="{TemplateBinding TopLabel}" IsVisible="{TemplateBinding IsTopPlayer}"
+                                       MinWidth="52" Margin="0,0,8,0" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource Neutral400}" VerticalAlignment="Center" />
+                            <Border x:Name="Portrait" Grid.Column="1" CornerRadius="{StaticResource GlobalCornerRadius}" ClipToBounds="True"
+                                    Width="42" Height="42" BorderThickness="1" BorderBrush="{StaticResource Neutral600}"
+                                    Background="{StaticResource Neutral900}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <miiImages:MiiImageLoader Mii="{TemplateBinding Mii}" LoadingColor="{StaticResource Neutral950}"
+                                    FallBackColor="{StaticResource Neutral500}" ImageOnlyMargin="-2,-4,-2,0"
+                                    ImageVariant="{x:Static miiVars:MiiImageVariants.MiiListTile}"
+                                    HoverVariant="{x:Static miiVars:MiiImageVariants.MiiListTileHover}" ReloadMethod="KeepAllUntilNew" />
+                            </Border>
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="7,0,10,0" Spacing="3">
+                                <TextBlock x:Name="PlayerName" Text="{TemplateBinding UserName}" FontSize="15" FontWeight="SemiBold"
+                                           Foreground="{StaticResource Neutral100}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock x:Name="FriendCode" Text="{TemplateBinding FriendCode}" FontSize="11" Foreground="{StaticResource Neutral400}" />
+                                <StackPanel x:Name="GridRating" Orientation="Horizontal" Spacing="4">
+                                    <TextBlock Text="{TemplateBinding Vr}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource Neutral100}" />
+                                    <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="10" Foreground="{StaticResource Neutral500}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <ItemsControl ItemsSource="{TemplateBinding BadgeVariants}" IsVisible="{TemplateBinding HasBadges}" x:Name="PART_BadgeContainer">
                                         <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="3" /></ItemsPanelTemplate>
+                                            <ItemsPanelTemplate><WrapPanel Orientation="Horizontal" /></ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate x:DataType="domain:BadgeVariant">
-                                                <communityControls:CommunityBadge Variant="{Binding}" Width="30" Height="30" />
+                                                <communityControls:CommunityBadge Variant="{Binding}" Width="18" Height="18" Margin="0,0,3,0" />
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
-                                </ScrollViewer>
-                            </Border>
-
-                            <components:ActionButton x:Name="PART_JoinRoomButton"
-                                               Grid.Column="1"
-                                               IsVisible="False"
-                                               Tone="Brand"
-                                               Text=""
-                                               IconData="{StaticResource Road}"
-                                               FontSize="12"
-                                               Padding="8,5"
-                                               Margin="0,0,8,0"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Right"
-                                               ToolTip.Tip="{loc:T action.view_room}"
-                                               ToolTip.Placement="Pointer"
-                                               ToolTip.HorizontalOffset="12"
-                                               ToolTip.VerticalOffset="0"
-                                               ToolTip.ShowDelay="20" />
-
-                            <components:StatusBadge x:Name="PART_TopLabelBadge" Grid.Column="2"
-                                    VerticalAlignment="Center" HorizontalAlignment="Right"
-                                    IsVisible="{TemplateBinding IsTopPlayer}" Margin="0,0,10,0"
-                                    Text="{TemplateBinding TopLabel}" Variant="{TemplateBinding TopLabelVariant}" />
-
-                            <components:StatusBadge Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right"
-                                IsVisible="{TemplateBinding IsOpenHost}" IconData="{StaticResource LockOpen}"
-                                Variant="Brand" Text="" Margin="0,0,10,0" ToolTip.Tip="Open Host" ToolTip.Placement="Top" ToolTip.ShowDelay="20" />
+                                    <PathIcon Grid.Column="1" Margin="5,0,0,0" IsVisible="{TemplateBinding IsOpenHost}" Data="{StaticResource LockOpen}" Width="13" Height="13"
+                                              Foreground="{StaticResource Brand300}" ToolTip.Tip="Open Host" />
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel x:Name="RowRating" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="2">
+                                <TextBlock Text="{TemplateBinding Vr}" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource Neutral100}" HorizontalAlignment="Right" />
+                                <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="11" Foreground="{StaticResource Neutral500}" HorizontalAlignment="Right" />
+                            </StackPanel>
+                            <Border Grid.Column="4" Width="32" IsVisible="{TemplateBinding ShowJoinRoomButton}" />
+                            <components:ActionButton x:Name="PART_JoinRoomButton" Grid.Column="4" IsVisible="False" Tone="Brand" Variant="Ghost"
+                                IconData="{StaticResource Road}" Text="" Padding="6" Margin="6,0,0,0" Size="Compact"
+                                VerticalAlignment="Center" ToolTip.Tip="{loc:T action.view_room}" />
                         </Grid>
+                    </Border>
+                    <Border Height="1" Background="{StaticResource Neutral600}" VerticalAlignment="Bottom" Margin="0,0,0,1" IsHitTestVisible="False" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="rooms|PlayerListItem /template/ StackPanel#GridRating">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="rooms|PlayerListItem.RoomGrid">
+        <Setter Property="Margin" Value="0,0,8,8" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Classes="PlayerRow" Background="Transparent" BorderBrush="{StaticResource Neutral600}"
+                        BorderThickness="1" CornerRadius="{StaticResource GlobalCornerRadius}" MinHeight="86" Padding="4">
+                    <Grid ColumnDefinitions="68,*">
+                        <miiImages:MiiImageLoader Mii="{TemplateBinding Mii}" Width="76" Height="76"
+                            Margin="-6,0,0,0" VerticalAlignment="Bottom" IsHitTestVisible="False"
+                            LoadingColor="Transparent" FallBackColor="{StaticResource Neutral500}"
+                            ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" ReloadMethod="KeepAllUntilNew" />
+                        <StackPanel Grid.Column="1" Spacing="4" Margin="2,4,6,4" VerticalAlignment="Center">
+                            <TextBlock Text="{TemplateBinding UserName}" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource Neutral200}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{TemplateBinding FriendCode}" FontSize="10" Foreground="{StaticResource Neutral400}" />
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                    <TextBlock Text="{TemplateBinding Vr}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource Neutral100}" />
+                                    <TextBlock Text="{loc:T attribute.vr_abbreviation}" FontSize="10" Foreground="{StaticResource Neutral500}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <ItemsControl Grid.Column="1" ItemsSource="{TemplateBinding BadgeVariants}" IsVisible="{TemplateBinding HasBadges}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><WrapPanel Orientation="Horizontal" MaxWidth="60" /></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="domain:BadgeVariant">
+                                            <communityControls:CommunityBadge Variant="{Binding}" Width="15" Height="15" Margin="3,0,0,0" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </StackPanel>
                     </Grid>
                 </Border>
             </ControlTemplate>
         </Setter>
     </Style>
-
+    <Style Selector="rooms|PlayerListItem:focus-visible /template/ Border.PlayerRow">
+        <Setter Property="Background" Value="{StaticResource Neutral900}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brand300}" />
+    </Style>
+    <Style Selector="rooms|PlayerListItem:pointerover /template/ Border.PlayerRow">
+        <Setter Property="Background" Value="{StaticResource Neutral900}" />
+    </Style>
+    <Style Selector="rooms|PlayerListItem:pointerover /template/ miiImages|MiiImageLoader">
+        <Setter Property="IsHovered" Value="True" />
+    </Style>
     <Style Selector="rooms|PlayerListItem[ShowJoinRoomButton=true][IsOnline=true] /template/ components|ActionButton#PART_JoinRoomButton">
         <Setter Property="IsVisible" Value="True" />
     </Style>

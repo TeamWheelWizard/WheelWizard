@@ -9,14 +9,14 @@
 
     <Styles.Resources>
         <ControlTheme x:Key="WheelWizardScrollThumb" TargetType="Thumb">
-            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="Background" Value="{StaticResource Neutral600}" />
             <Setter Property="Template">
                 <ControlTemplate>
                     <Border Background="{TemplateBinding Background}" CornerRadius="3" />
                 </ControlTemplate>
             </Setter>
             <Style Selector="^:pointerover, ^:pressed">
-                <Setter Property="Background" Value="{StaticResource Neutral700}" />
+                <Setter Property="Background" Value="{StaticResource Neutral400}" />
             </Style>
         </ControlTheme>
         <ControlTheme x:Key="WheelWizardScrollBar" TargetType="ScrollBar">
@@ -57,16 +57,6 @@
         <Setter Property="behaviors:HorizontalPanBehavior.IsEnabled" Value="True" />
         <Setter Property="AllowAutoHide" Value="False" />
         <Setter Property="ClipToBounds" Value="False" />
-    </Style>
-    <Style Selector="ScrollViewer /template/ ScrollContentPresenter#PART_ContentPresenter">
-        <Setter Property="Grid.ColumnSpan" Value="2" />
-        <Setter Property="Grid.RowSpan" Value="1" />
-        <Setter Property="ClipToBounds" Value="True" />
-    </Style>
-    <Style Selector="ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar">
-        <Setter Property="RenderTransform">
-            <TranslateTransform X="11" />
-        </Setter>
     </Style>
     <Style Selector="ScrollBar:horizontal /template/ Thumb">
         <Setter Property="Background" Value="{StaticResource Neutral600}" />

@@ -11,8 +11,8 @@ using WheelWizard.Settings;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Dialogs;
+using WheelWizard.Views.Dialogs.Base;
 using WheelWizard.Views.Shell;
-using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Views.Dialogs;
 using WheelWizard.WiiManagement.FriendCodes;
@@ -21,11 +21,9 @@ using WheelWizard.WiiManagement.MiiManagement;
 
 namespace WheelWizard.RrRooms.Views;
 
-public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPollingListener
+public partial class RoomDetailsWindow : ModalContent, INotifyPropertyChanged, IPollingListener
 {
     private IModalFactory Popups { get; } = null!;
-
-    private INavigationService Navigation { get; } = null!;
 
     private LiveRoomsService LiveRooms { get; } = null!;
 
@@ -59,17 +57,18 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         }
     }
 
-    public RoomDetailsPage()
+    public RoomDetailsWindow()
     {
+        IsDismissible = true;
+        ModalTitle = t("page_title.room_details");
         InitializeComponent();
         DataContext = this;
         Room = RrRoomFactory.Instance.Create(); // Create a fake room for design-time preview
         PlayersList = new(Room.Players);
     }
 
-    public RoomDetailsPage(
+    public RoomDetailsWindow(
         IModalFactory popups,
-        INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameDataService,
         IMiiDbService miiDbService,
@@ -78,19 +77,17 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
     )
     {
         Popups = popups;
-        Navigation = navigation;
         LiveRooms = liveRooms;
         GameDataService = gameDataService;
         MiiDbService = miiDbService;
         SettingsService = settingsService;
+        IsDismissible = true;
+        ModalTitle = t("page_title.room_details");
         InitializeComponent();
         DataContext = this;
         Room = room;
 
         PlayersList = new(Room.Players);
-
-        LiveRooms.Subscribe(this);
-        Unloaded += RoomsDetailPage_Unloaded;
     }
 
     public void OnUpdate(ObservablePollingService sender)
@@ -102,8 +99,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
 
         if (room == null)
         {
-            // Reason we do this incase room gets disbanded or something idk
-            Navigation.NavigateTo<RoomsPage>();
+            Close();
             return;
         }
 
@@ -115,11 +111,13 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         }
     }
 
-    private void GoBackClick(object? sender, RoutedEventArgs eventArgs) => Navigation.NavigateTo<RoomsPage>();
+    protected override void BeforeOpen() => LiveRooms.Subscribe(this);
+
+    protected override void BeforeClose() => LiveRooms.Unsubscribe(this);
 
     private void CopyFriendCode_OnClick(object sender, RoutedEventArgs e)
     {
-        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
+        if ((sender as Control)?.DataContext is not RrPlayer selectedPlayer)
             return;
         TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(selectedPlayer.FriendCode);
         ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
@@ -127,7 +125,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
 
     private void ViewProfile_OnClick(object sender, RoutedEventArgs e)
     {
-        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
+        if ((sender as Control)?.DataContext is not RrPlayer selectedPlayer)
             return;
         if (string.IsNullOrEmpty(selectedPlayer.FriendCode))
             return;
@@ -136,13 +134,13 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
 
     private void ViewOnRwfc_OnClick(object sender, RoutedEventArgs e)
     {
-        if (PlayersListView.SelectedItem is RrPlayer selectedPlayer)
+        if ((sender as Control)?.DataContext is RrPlayer selectedPlayer)
             ViewUtils.OpenRwfcPlayer(selectedPlayer.FriendCode);
     }
 
     private async void AddFriend_OnClick(object sender, RoutedEventArgs e)
     {
-        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
+        if ((sender as Control)?.DataContext is not RrPlayer selectedPlayer)
             return;
 
         if (selectedPlayer.FirstMii == null)
@@ -241,18 +239,6 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
             return Fail("Invalid friend code.");
 
         return formatted;
-    }
-
-    private void RoomsDetailPage_Unloaded(object? sender, RoutedEventArgs e)
-    {
-        LiveRooms.Unsubscribe(this);
-    }
-
-    private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (e.Source is not ListBox listBox)
-            return;
-        listBox.ContextMenu?.Open();
     }
 
     #region PropertyChanged
