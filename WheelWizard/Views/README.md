@@ -48,6 +48,8 @@ Couch mode hides modal-header and drawn-window close buttons; controller Back/Es
 
 `COUCH_VIEW` persists the presentation preference. `--view=couch` / `--view=desktop` override startup selection without rewriting it; `--fullscreen` applies when starting in couch mode. Fullscreen and presentation are independent. Returning to desktop restores its window geometry and scaling.
 
+Couch entry limits both its preferred 960×540 minimum and its remembered client size to the screen's logical working area (physical working area divided by screen scaling). Set the clamped minimums before assigning the client dimensions so high-DPI screens can fit the window. Returning to desktop resets both minimums to zero before restoring desktop geometry.
+
 **Window Scale** changes couch UI size inside the existing window or fullscreen viewport, not the native window dimensions. `CouchScaleHost` scales the page, navigation, footer, and snackbars; `ModalScaleHost` scales dialogs and the keyboard while keeping native chrome outside the transform. Framework popups inherit their placement target's transform. Keep keyboard width constrained by the viewport rather than fixed. Couch scale previews use the normal Apply/Revert flow and are not clamped against desktop window dimensions; desktop layout and modal scaling remain unchanged.
 
 The only user-facing presentation switch is **Settings → Appearance → Couch View**. Shell chrome and the controller menu link to settings rather than exposing another mode toggle.

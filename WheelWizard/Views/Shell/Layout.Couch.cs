@@ -119,8 +119,6 @@ public partial class Layout
             WindowState = WindowState.Normal;
             CanResize = couch;
             CanMaximize = couch;
-            MinWidth = couch ? 960 : 0;
-            MinHeight = couch ? 540 : 0;
             if (couch)
             {
                 RefreshCouchNavigation();
@@ -128,11 +126,15 @@ public partial class Layout
                 CouchPresentation.ContentHost.Children.Add(ContentArea);
                 var screen = Screens.ScreenFromWindow(this);
                 var available = screen?.WorkingArea.Size.ToSize(screen.Scaling) ?? new Size(1280, 800);
+                MinWidth = Math.Min(960, available.Width);
+                MinHeight = Math.Min(540, available.Height);
                 Width = Math.Min(_couchSize.Width, available.Width);
                 Height = Math.Min(_couchSize.Height, available.Height);
             }
             else
             {
+                MinWidth = 0;
+                MinHeight = 0;
                 ContentArea.Margin = (Thickness)this.FindResource("EdgeGap")!;
                 DesktopContentHost.Children.Add(ContentArea);
                 OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);

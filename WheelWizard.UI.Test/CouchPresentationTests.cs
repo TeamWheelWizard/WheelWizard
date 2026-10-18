@@ -6,6 +6,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Interactivity;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,6 +78,67 @@ public class CouchPresentationTests
             // Closing the fixture should not prompt about the intentionally unsaved test page.
             services.GetRequiredService<INavigationService>().NavigateAway(typeof(UserControl));
             layout.Close();
+        }
+    }
+
+    [AvaloniaTheory]
+    [InlineData(1280, 800, 1.5)]
+    [InlineData(1280, 1600, 1.5)]
+    [InlineData(1920, 800, 1.5)]
+    public void CouchMinimums_AllowTheWindowToFitTheScaledWorkingArea(int width, int height, double scaling)
+    {
+        using var services = CreateServices();
+        var layout = services.GetRequiredService<Layout>();
+        var screen = layout.Screens.Primary!;
+        var originalBounds = screen.Bounds;
+        var originalWorkingArea = screen.WorkingArea;
+        var originalScaling = screen.Scaling;
+        try
+        {
+            SetScreenMetrics(new PixelRect(0, 0, width, height), new PixelRect(0, 0, width, height), scaling);
+            layout.SetRenderScaling(scaling);
+            layout.Show();
+            Dispatcher.UIThread.RunJobs();
+            var desktopSize = layout.ClientSize;
+            var available = screen.WorkingArea.Size.ToSize(scaling);
+            var minimum = new Size(Math.Min(960, available.Width), Math.Min(540, available.Height));
+            layout.TogglePresentation();
+            layout.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(minimum.Width, layout.MinWidth);
+            Assert.Equal(minimum.Height, layout.MinHeight);
+            Assert.InRange(layout.ClientSize.Width, minimum.Width, available.Width);
+            Assert.InRange(layout.ClientSize.Height, minimum.Height, available.Height);
+
+            layout.Width = minimum.Width - 100;
+            layout.Height = minimum.Height - 100;
+            layout.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(minimum.Width, layout.ClientSize.Width, precision: 5);
+            Assert.Equal(minimum.Height, layout.ClientSize.Height, precision: 5);
+
+            layout.TogglePresentation();
+            layout.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0, layout.MinWidth);
+            Assert.Equal(0, layout.MinHeight);
+            // Restoring a fractional logical size can round to a neighboring physical pixel.
+            Assert.InRange(Math.Abs(layout.ClientSize.Width - desktopSize.Width), 0, 1 / scaling);
+            Assert.InRange(Math.Abs(layout.ClientSize.Height - desktopSize.Height), 0, 1 / scaling);
+        }
+        finally
+        {
+            SetScreenMetrics(originalBounds, originalWorkingArea, originalScaling);
+            layout.Close();
+        }
+
+        // The pinned headless backend has no monitor configuration API; restore its shared
+        // screen in finally so the simulated desktop cannot affect other UI tests.
+        void SetScreenMetrics(PixelRect bounds, PixelRect workingArea, double scale)
+        {
+            typeof(Screen).GetProperty(nameof(Screen.Bounds))!.SetValue(screen, bounds);
+            typeof(Screen).GetProperty(nameof(Screen.WorkingArea))!.SetValue(screen, workingArea);
+            typeof(Screen).GetProperty(nameof(Screen.Scaling))!.SetValue(screen, scale);
         }
     }
 
