@@ -110,13 +110,13 @@
             </ControlTheme>
             <ControlTheme x:Key="CouchWindowDecorations" TargetType="WindowDrawnDecorations"
                           BasedOn="{StaticResource DesktopWindowDecorations}">
-                <Style Selector="^ /template/ Button#PART_CloseButton">
+                <Style Selector="^ /template/ Button#PART_MinimizeButton, ^ /template/ Button#PART_MaximizeButton, ^ /template/ Button#PART_CloseButton">
                     <Setter Property="IsVisible" Value="False" />
                 </Style>
             </ControlTheme>
             <ControlTheme x:Key="CouchLinuxWindowDecorations" TargetType="WindowDrawnDecorations"
                           BasedOn="{StaticResource LinuxWindowDecorations}">
-                <Style Selector="^ /template/ Button#PART_CloseButton">
+                <Style Selector="^ /template/ Button#PART_MinimizeButton, ^ /template/ Button#PART_MaximizeButton, ^ /template/ Button#PART_CloseButton">
                     <Setter Property="IsVisible" Value="False" />
                 </Style>
             </ControlTheme>
