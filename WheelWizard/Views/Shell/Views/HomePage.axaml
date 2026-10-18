@@ -209,7 +209,7 @@
         <ScrollViewer x:Name="CouchHome" IsVisible="False" IsEnabled="{Binding IsInteractable}" Margin="20"
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                       HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-            <Grid ColumnDefinitions="3*,2*" ColumnSpacing="32" Height="{Binding #CouchHome.Viewport.Height}" MinHeight="260">
+            <Grid ColumnDefinitions="3*,2*" ColumnSpacing="32" Height="{Binding #CouchHome.Viewport.Height}">
                 <Button x:Name="CouchProfileButton" Click="CouchProfileButton_OnClick" IsEnabled="False"
                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                         AutomationProperties.Name="{loc:T couch.open_primary_profile}">

@@ -80,10 +80,20 @@ public class MiiEditorCouchNavigationTests
                     fixture.Activate(presence);
                     Assert.Equal(definition.Part, Assert.IsType<ActionButton>(fixture.Window.FocusManager.GetFocusedElement()).Tag);
                 }
-                if (definition.Variants is not null)
+                if (definition.Variants is { } variantDefinition)
                 {
                     var variants = fixture.Selection("VariantItems");
-                    var variant = variants.Items.OfType<SegmentOption>().First(option => !option.IsSelected);
+                    // Optional parts expose "none" in the strip, but previous/next cycle only present variants.
+                    if (variantDefinition.NoneValue is { } none && none < variantDefinition.First)
+                    {
+                        var absent = variants.Items.OfType<SegmentOption>().Single(option => Equals(option.Tag, none));
+                        fixture.Activate(absent);
+                        Assert.Same(absent, variants.SelectedItem);
+                        Assert.Same(absent, fixture.Window.FocusManager.GetFocusedElement());
+                    }
+                    var variant = variants
+                        .Items.OfType<SegmentOption>()
+                        .First(option => !option.IsSelected && option.Tag is int index && index >= variantDefinition.First);
                     fixture.Activate(variant);
                     Assert.Same(variant, variants.SelectedItem);
                     Assert.Same(variant, fixture.Window.FocusManager.GetFocusedElement());
