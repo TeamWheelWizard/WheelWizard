@@ -13,6 +13,8 @@ en:
     resume: "Resume"
     toggle_fullscreen: "Toggle fullscreen"
     quit: "Quit launcher"
+    open_primary_profile: "View primary license"
+    no_primary_license: "No primary license"
     navigation_blocked: "Close the current dialog before changing sections."
     case: "Case"
     space: "Space"

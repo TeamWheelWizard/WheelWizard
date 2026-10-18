@@ -9,10 +9,34 @@
              x:DataType="shellViewModels:HomeViewModel"
              x:Class="WheelWizard.Views.Shell.Views.HomePage"
         xmlns:shellViewModels="clr-namespace:WheelWizard.Views.Shell.ViewModels"
-        xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls">
+        xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls"
+        xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
+        xmlns:miiVariants="clr-namespace:WheelWizard.MiiImages.Domain"
+        xmlns:miiAnimations="clr-namespace:WheelWizard.MiiAnimations">
     <UserControl.Styles>
         <Style Selector="components|ActionButton#DolphinButton /template/ PathIcon#PART_LeftIcon">
             <Setter Property="RenderTransform" Value="scale(2.5)" />
+        </Style>
+        <Style Selector="Button#CouchProfileButton">
+            <Setter Property="Background" Value="{StaticResource FrameColor}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource GlobalCornerRadius}" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}"
+                                          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button#CouchProfileButton:pointerover, Button#CouchProfileButton:pressed">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
         </Style>
         <Style Selector="shellControls|WheelTrail.HoverEnterTrail">
             <Style.Animations>
@@ -182,19 +206,42 @@
                                Width="137" Angle="-35" X="40" Y="30" ExtendedHeight="1000" IsVisible="False"
                                Background="{StaticResource Brand600}" Foreground="{StaticResource Brand800}" />
     </Grid>
-        <ScrollViewer x:Name="CouchHome" IsVisible="False" IsEnabled="{Binding IsInteractable}"
-                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <Grid ColumnDefinitions="3*,2*" Margin="24" MinHeight="320">
-                <Border Background="{StaticResource FrameColor}" CornerRadius="{StaticResource GlobalCornerRadius}" Padding="24" Margin="0,0,24,0">
-                    <StackPanel Spacing="24" VerticalAlignment="Center">
-                        <PathIcon Data="{StaticResource WheelIcon}" Width="160" Height="160"
-                                  Foreground="{StaticResource Brand400}" HorizontalAlignment="Left" />
-                        <TextBlock Text="{Binding GameTitle}" FontSize="36" FontWeight="Bold" TextWrapping="Wrap" />
-                        <TextBlock Text="{loc:T page_title.home}" Classes="BodyText" />
-                    </StackPanel>
-                </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="20">
-                    <TextBlock Text="{Binding GameTitle}" Classes="TitleText" TextWrapping="Wrap" />
+        <ScrollViewer x:Name="CouchHome" IsVisible="False" IsEnabled="{Binding IsInteractable}" Margin="20"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                      HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <Grid ColumnDefinitions="3*,2*" ColumnSpacing="32" Height="{Binding #CouchHome.Viewport.Height}" MinHeight="260">
+                <Button x:Name="CouchProfileButton" Click="CouchProfileButton_OnClick" IsEnabled="False"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        AutomationProperties.Name="{loc:T couch.open_primary_profile}">
+                    <Grid RowDefinitions="Auto,*,Auto" IsHitTestVisible="False">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{StaticResource StarIcon}" Width="14" Height="14"
+                                      Foreground="{StaticResource Brand300}" VerticalAlignment="Center" />
+                            <TextBlock Text="{loc:T state.primary}" Foreground="{StaticResource Neutral300}" FontSize="14" />
+                        </StackPanel>
+                        <Grid Grid.Row="1" MinHeight="120" RowDefinitions="4*,*">
+                            <Ellipse Grid.Row="1" Height="40" MaxWidth="220" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                     Fill="{StaticResource Neutral800}" Stroke="{StaticResource Neutral600}" StrokeThickness="1" />
+                            <miiImages:MiiAnimatedImage x:Name="CouchPrimaryMii" Grid.RowSpan="2"
+                                                       MaxWidth="420" LoadingColor="Transparent"
+                                                       FallBackColor="{StaticResource Neutral600}"
+                                                       Performance="{x:Static miiAnimations:MiiPerformances.HomePlayer}"
+                                                       ImageVariant="{x:Static miiVariants:MiiImageVariants.FullBodyCarousel}" />
+                        </Grid>
+                        <StackPanel Grid.Row="2" Spacing="6" HorizontalAlignment="Center" Margin="0,12,0,0">
+                            <TextBlock x:Name="CouchPrimaryName" FontSize="24" FontWeight="SemiBold"
+                                       Foreground="{StaticResource Neutral100}" TextWrapping="Wrap"
+                                       TextAlignment="Center" />
+                            <TextBlock Text="{loc:T couch.open_primary_profile}" FontSize="14"
+                                       Foreground="{StaticResource Neutral400}" HorizontalAlignment="Center"
+                                       IsVisible="{Binding #CouchProfileButton.IsEnabled}" />
+                        </StackPanel>
+                    </Grid>
+                </Button>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="16">
+                    <PathIcon Data="{StaticResource WheelIcon}" Width="48" Height="48"
+                              Foreground="{StaticResource Brand400}" HorizontalAlignment="Left" />
+                    <TextBlock Text="{Binding GameTitle}" FontSize="32" FontWeight="Bold" TextWrapping="Wrap" />
                     <components:ActionButton x:Name="CouchPlayButton" IsLoading="{Binding IsLoading}"
                                              IsEnabled="{Binding CanExecuteMain}" Tone="{Binding ButtonTone}"
                                              Text="{Binding ButtonText}" IconData="{StaticResource Play}"

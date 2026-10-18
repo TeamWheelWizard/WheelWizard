@@ -30,6 +30,8 @@ The existing desktop layout remains available. Turn on **Settings → Appearance
 
 For Steam shortcuts, add `--view=couch --fullscreen` to the launch arguments. `--view=desktop` overrides the saved preference for that launch. Couch view also works windowed and can be resized independently of the fixed desktop layout.
 
+Couch Home shows an animated, full-body Mii for your primary license beside the launch actions. Select the Mii card to open that license's profile; changing the primary license updates the preview. Turning off animations uses a still preview. An empty primary slot stays empty rather than showing another license, and missing Mii rendering resources do not block launching or profile navigation. Desktop Home is unchanged.
+
 | Action | Controller | Keyboard |
 |--------|------------|----------|
 | Move focus / edit native controls | D-pad or left stick | Arrow keys / Tab |
