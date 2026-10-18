@@ -136,6 +136,40 @@ public class InAppModalTests
         Assert.True(origin.CanInteract);
     }
 
+    [AvaloniaFact]
+    public async Task ExplicitOwner_KeepsNestedModPromptInsideTheMainWindow()
+    {
+        var main = new ModalTestWindow();
+        main.Show();
+        var mod = new TestModal();
+        mod.SetModalOwner(main);
+        var modClosed = mod.ShowDialog();
+        try
+        {
+            Layout(main);
+            var size = main.ClientSize;
+            var prompt = new MessageBoxWindow().SetTitleText("Mod question");
+            prompt.SetModalOwner(mod);
+            var closed = prompt.ShowDialog();
+            Layout(main);
+            Assert.Same(main, TopLevel.GetTopLevel(mod));
+            Assert.Same(main, TopLevel.GetTopLevel(prompt));
+            Assert.Same(prompt, main.Modals.TopModal);
+            Assert.Equal(size, main.ClientSize);
+            prompt.Close();
+            await closed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.False(main.CanInteract);
+            mod.Close();
+            await modClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.True(main.CanInteract);
+        }
+        finally
+        {
+            mod.Close();
+            main.Close();
+        }
+    }
+
     [AvaloniaTheory]
     [InlineData(480, 420)]
     [InlineData(656, 876)]
@@ -460,6 +494,59 @@ public class InAppModalTests
         Assert.False(save.IsEnabled);
     }
 
+    [AvaloniaTheory]
+    [InlineData(0)]
+    [InlineData(120)]
+    public async Task ClosingModal_CompletesOwnedDescendantsOnce_AndLeavesSiblingOperationsOpen(int animationMilliseconds)
+    {
+        var owner = new ModalTestWindow();
+        owner.Resources[WindowAppearance.ControlAnimationDurationResourceKey] = TimeSpan.FromMilliseconds(animationMilliseconds);
+        owner.Show();
+        try
+        {
+            var parent = new TestModal();
+            var parentClosed = parent.ShowDialog();
+            Layout(owner);
+            var child = new TestModal();
+            child.SetModalOwner(parent);
+            var childClosed = child.ShowDialog();
+            Layout(owner);
+            var grandchild = new TestModal();
+            grandchild.SetModalOwner(child);
+            var grandchildClosed = grandchild.ShowDialog();
+            var sibling = new TestModal();
+            sibling.SetModalOwner(owner);
+            var siblingClosed = sibling.ShowDialog();
+            var closingCount = 0;
+            parent.Closing += (_, _) => closingCount++;
+
+            parent.Close();
+            parent.Close();
+
+            await Task.WhenAll(parentClosed, childClosed, grandchildClosed).WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.Equal(1, closingCount);
+            Assert.Equal(1, parent.ClosedCount);
+            Assert.Equal(1, child.ClosedCount);
+            Assert.Equal(1, grandchild.ClosedCount);
+            Assert.Null(TopLevel.GetTopLevel(parent));
+            Assert.Null(TopLevel.GetTopLevel(child));
+            Assert.Null(TopLevel.GetTopLevel(grandchild));
+            Assert.False(siblingClosed.IsCompleted);
+            Assert.Same(sibling, owner.Modals.TopModal);
+            Assert.False(owner.CanInteract);
+
+            sibling.Close();
+            await siblingClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.Equal(1, sibling.ClosedCount);
+            Assert.False(owner.Modals.HasModals);
+            Assert.True(owner.CanInteract);
+        }
+        finally
+        {
+            owner.Close();
+        }
+    }
+
     private static void Dismiss(Window owner, string gesture)
     {
         if (gesture == "escape")
@@ -503,6 +590,52 @@ public class InAppModalTests
         }
 
         protected override void BeforeClose() => ClosedCount++;
+    }
+
+    [AvaloniaFact]
+    public async Task ClosingModSurface_CompletesItsNestedPromptWithoutClosingTheShell()
+    {
+        var owner = new ModalTestWindow();
+        owner.Show();
+        try
+        {
+            var surface = new TestModal();
+            var surfaceClosed = surface.ShowDialog();
+            var prompt = new YesNoWindow().SetMainText("Install this mod?");
+            prompt.SetModalOwner(surface);
+            var answer = prompt.AwaitAnswer();
+            surface.Close();
+            Assert.False(await answer.WaitAsync(TimeSpan.FromSeconds(2)));
+            await surfaceClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.True(owner.IsVisible);
+            Assert.False(owner.Modals.HasModals);
+            Assert.True(owner.CanInteract);
+        }
+        finally
+        {
+            owner.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void ModalFocus_CannotEscapeToDirectionalChromeNavigation()
+    {
+        var owner = new ModalTestWindow { Width = 1280, Height = 720 };
+        owner.Show();
+        try
+        {
+            var modal = new TestModal();
+            modal.Show();
+            Layout(owner);
+            owner.CaptionButton.Focus(NavigationMethod.Directional);
+            var focused = Assert.IsAssignableFrom<Control>(owner.FocusManager!.GetFocusedElement());
+            Assert.NotSame(owner.CaptionButton, focused);
+            Assert.Contains(modal, focused.GetVisualAncestors());
+        }
+        finally
+        {
+            owner.Close();
+        }
     }
 
     private sealed class ModalTestWindow : BaseWindow, IDisposable

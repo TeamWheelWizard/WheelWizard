@@ -26,7 +26,7 @@
                 ClipToBounds="True"
                 BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,0,1,0"
                 CornerRadius="0">
-            <Grid RowDefinitions="*,Auto" Width="157" HorizontalAlignment="Right">
+            <Grid x:Name="SettingsNavigationBody" RowDefinitions="*,Auto" Width="157" HorizontalAlignment="Right">
             <ScrollViewer Grid.Row="0" Margin="8,8,10,12" HorizontalScrollBarVisibility="Disabled">
             <components:SegmentedControl x:Name="SettingPages" Orientation="Vertical" HasBorder="False" Variant="Dark" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" SelectionChanged="SettingsNavigation_OnSelectionChanged">
                 <components:SegmentOption HorizontalContentAlignment="Left" Padding="10,12" Tag="WhWzSettings"
@@ -48,7 +48,10 @@
             </Grid>
         </Border>
 
-        <ContentControl Grid.Column="1" x:Name="SettingsContent" Margin="10,0,0,0" />
+        <ScrollViewer Grid.Column="1" x:Name="SettingsScroll" Margin="10,0,0,0"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
+            <ContentControl x:Name="SettingsContent" HorizontalContentAlignment="Stretch" />
+        </ScrollViewer>
         </Grid>
 
         <components:ActionButton Grid.Row="0" x:Name="DevButton" IsVisible="False"

@@ -23,6 +23,9 @@ public static class MiiPerformances
     /// <summary>The license card on the profile page, which the Mii stands behind like a window.</summary>
     public static readonly MiiPerformance ProfileWindow = new("profile/window/idle", "profile/idle");
 
+    /// <summary>The primary-license Mii on Couch Home: relaxed, full-body idles.</summary>
+    public static readonly MiiPerformance HomePlayer = new("editor/idle");
+
     /// <summary>
     /// A Mii peeking over the edge of a card (see MiiPeeker) while nobody pays attention: dozing on the edge, and very
     /// now and then slipping off it and startling awake.

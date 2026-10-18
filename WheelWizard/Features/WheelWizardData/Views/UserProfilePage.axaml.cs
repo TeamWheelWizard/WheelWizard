@@ -18,6 +18,7 @@ using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
@@ -32,6 +33,7 @@ namespace WheelWizard.WheelWizardData.Views;
 
 public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 {
+    private readonly GridLength _desktopHeaderHeight;
     private ICustomCharactersService CustomCharacters { get; }
 
     private INavigationService Navigation { get; }
@@ -245,6 +247,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         SettingsService = settingsService;
         HistoryGraph = historyGraph;
         InitializeComponent();
+        _desktopHeaderHeight = ProfileLayout.RowDefinitions[0].Height;
         HistoryHost.Content = historyGraph;
         historyGraph.Bind(VrHistoryGraph.FriendCodeProperty, new Binding("CurrentFriendCode") { Source = this });
         _currentUserIndex = FocusedUser;
@@ -254,6 +257,23 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         ProfileContent.SizeChanged += (_, _) => FitChart();
         ProfileBody.SizeChanged += (_, _) => FitChart();
         CardFace.SizeChanged += (_, e) => BrStat.IsVisible = e.NewSize.Width >= BrStatMinWidth;
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property != CouchMode.IsEnabledProperty || ProfileLayout is null)
+            return;
+
+        var couch = CouchMode.GetIsEnabled(this);
+        ProfileLayout.RowDefinitions[0].Height = couch ? new GridLength(72) : _desktopHeaderHeight;
+        ProfileBody.ColumnDefinitions = couch ? new ColumnDefinitions("3*,4*") : new ColumnDefinitions("*");
+        ProfileBody.RowDefinitions = couch ? new RowDefinitions("96,Auto") : new RowDefinitions("96,Auto,Auto");
+        Grid.SetColumn(HistoryHost, couch ? 1 : 0);
+        Grid.SetRow(HistoryHost, couch ? 0 : 2);
+        Grid.SetRowSpan(HistoryHost, couch ? 2 : 1);
+        HistoryHost.Margin = couch ? new Thickness(24, 0, 2, 0) : new Thickness(2, 26, 2, 0);
+        FitChart();
     }
 
     internal void RefreshSelectedProfile()

@@ -36,6 +36,24 @@
         <Style Selector="Button.LibraryPreview:focus-visible">
             <Setter Property="Background" Value="{StaticResource Neutral800}" />
         </Style>
+        <Style Selector="Border.LibraryThumbnail">
+            <Setter Property="Height" Value="108" />
+        </Style>
+        <Style Selector="mods|GridModPanel.couch Border.LibraryThumbnail">
+            <Setter Property="Height" Value="140" />
+        </Style>
+        <Style Selector="mods|GridModPanel.couch components|InputField#PriorityTextBox, mods|GridModPanel.couch Border#DragHandle">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="mods|GridModPanel.couch components|ToggleCheckBox#EnableSwitch">
+            <Setter Property="MinHeight" Value="44" />
+        </Style>
+        <Style Selector="Border.LibraryFooterSpace">
+            <Setter Property="Height" Value="44" />
+        </Style>
+        <Style Selector="mods|GridModPanel.couch Border.LibraryFooterSpace">
+            <Setter Property="Height" Value="60" />
+        </Style>
     </UserControl.Styles>
     <Grid>
         <Border Classes.Placeholder="{Binding IsPlaceholder}" x:Name="RootCardBorder" Background="{StaticResource Neutral900}" BorderThickness="1"
@@ -43,7 +61,7 @@
             <Grid>
                 <Button x:Name="PreviewButton" Classes="LibraryPreview" Click="View_Click" AutomationProperties.Name="{Binding Mod.Title}">
                     <StackPanel>
-                        <Border Height="108" CornerRadius="6,6,0,0" Background="{StaticResource Neutral800}" ClipToBounds="True">
+                        <Border Classes="LibraryThumbnail" CornerRadius="6,6,0,0" Background="{StaticResource Neutral800}" ClipToBounds="True">
                             <Grid>
                                 <PathIcon IsVisible="{Binding Preview.ShowPlaceholder}" Data="{StaticResource CubesStacked}"
                                           Width="30" Height="30" Foreground="{StaticResource Neutral600}" />
@@ -62,7 +80,7 @@
                         <TextBlock Text="{Binding Mod.Title}" Margin="10,9" Height="36" LineHeight="18" FontSize="13" FontWeight="SemiBold"
                                    Foreground="{StaticResource Neutral100}" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
                         <Border Height="1" Background="{StaticResource BackgroundLineColor}" Margin="10,0" />
-                        <Border Height="44" />
+                        <Border Classes="LibraryFooterSpace" />
                     </StackPanel>
                 </Button>
                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6" Margin="10,8" VerticalAlignment="Bottom">

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -8,6 +9,7 @@ using WheelWizard.RrRooms;
 using WheelWizard.Shared.Services;
 using WheelWizard.Views.Dialogs.Base;
 using WheelWizard.Views.Shell;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.WheelWizardData.Views;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -34,6 +36,22 @@ public partial class PlayerProfileWindow : ModalContent, INotifyPropertyChanged
         DataContext = this;
         ModalTitle = friendCode;
         LoadProfile(friendCode);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property != CouchMode.IsEnabledProperty || PlayerProfileLayout is null)
+            return;
+
+        var couch = CouchMode.GetIsEnabled(this);
+        PlayerProfileLayout.Width = couch ? 920 : 540;
+        PlayerProfileLayout.MaxHeight = couch ? 480 : 760;
+        PlayerProfileBody.ColumnDefinitions = couch ? new ColumnDefinitions("500,*") : new ColumnDefinitions("*");
+        PlayerProfileBody.RowDefinitions = couch ? new RowDefinitions("Auto") : new RowDefinitions("Auto,Auto");
+        Grid.SetColumn(HistoryHost, couch ? 1 : 0);
+        Grid.SetRow(HistoryHost, couch ? 0 : 1);
+        HistoryHost.Margin = couch ? new Thickness(24, 0, 0, 0) : new Thickness(0);
     }
 
     public PlayerProfileResponse? Profile

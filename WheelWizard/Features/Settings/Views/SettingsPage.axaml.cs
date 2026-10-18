@@ -1,11 +1,15 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Views;
 using WheelWizard.Shared;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.DesignTime;
 using WheelWizard.Views.Dialogs;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.Navigation;
 
 namespace WheelWizard.Settings.Views;
@@ -50,6 +54,39 @@ public partial class SettingsPage : UserControl, ILockedSidebarPage
         _navigationReady = true;
     }
 
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        _settingsSignalSubscription ??= SettingsSignalBus.Subscribe(OnSettingChanged);
+        UpdateTabVisibility();
+        ApplyPresentation();
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == CouchMode.IsEnabledProperty && SettingsBody is not null)
+            ApplyPresentation();
+    }
+
+    private void ApplyPresentation()
+    {
+        var couch = CouchMode.GetIsEnabled(this);
+        SettingsBody.ColumnDefinitions[0].Width = new GridLength(couch ? 220 : 157);
+        SettingsNavigationBody.Width = couch ? 220 : 157;
+        SettingsContent.MaxWidth = couch ? 1000 : double.PositiveInfinity;
+        SettingsContent.HorizontalAlignment = couch ? HorizontalAlignment.Left : HorizontalAlignment.Stretch;
+        SettingsScroll.VerticalScrollBarVisibility =
+            couch && SettingsContent.Content is VideoSettings or OtherSettings ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
+        foreach (var option in SettingPages.Items.OfType<SegmentOption>())
+        {
+            if (couch)
+                option.MinHeight = 56;
+            else
+                option.ClearValue(MinHeightProperty);
+        }
+    }
+
     protected override void OnUnloaded(RoutedEventArgs e)
     {
         _settingsSignalSubscription?.Dispose();
@@ -82,6 +119,7 @@ public partial class SettingsPage : UserControl, ILockedSidebarPage
         var fallback = Pages.Create<WhWzSettings>();
         SettingsContent.Content = fallback;
         SetCheckedSidebarButton(fallback);
+        ApplyPresentation();
     }
 
     private void SettingsNavigation_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -97,6 +135,7 @@ public partial class SettingsPage : UserControl, ILockedSidebarPage
             return;
 
         SettingsContent.Content = Pages.Create(type);
+        ApplyPresentation();
     }
 
     private void SetCheckedSidebarButton(UserControl settingsPage)

@@ -86,6 +86,14 @@
         <Style Selector="^:pointerover /template/ Border#PART_NameBorder">
             <Setter Property="Opacity" Value="1" />
         </Style>
+        <Style Selector="^:focus-visible /template/ Border#PART_MainBorder">
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral50}" />
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
+        <Style Selector="^:focus-visible /template/ Border#PART_NameBorder">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+
         
         <Style Selector="^:pointerover /template/ miiImages|MiiImageLoader#PART_MiiImageLoader">
             <Setter Property="IsHovered" Value="True" />

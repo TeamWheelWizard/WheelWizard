@@ -45,7 +45,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid x:Name="ProfileLayout" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource TopRowSize}" />
             <!-- This is the total height as the (Title + infoSection) - (padding) -->
@@ -67,7 +67,7 @@
         <ScrollViewer Grid.Row="1" x:Name="ProfileContent" Margin="0,0,0,1"
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- Room at the top for the nametags on the peeking Miis. -->
-            <StackPanel x:Name="ProfileBody" Margin="4,23,4,20">
+            <Grid x:Name="ProfileBody" RowDefinitions="96,Auto,Auto" Margin="4,23,4,20">
 
                 <!-- LICENSES: their Miis peek over the top of the license and hide behind it -->
                 <ItemsControl ItemsSource="{Binding LicenseTabs}" Height="96">
@@ -93,7 +93,7 @@
 
                 <!-- THE LICENSE. Fixed height: the photo has to stay at least as wide as it is tall, or the Mii no
                      longer lines up with the bottom edge it stands behind. -->
-                <Border Classes="License" Classes.Online="{Binding IsOnline}" Height="176">
+                <Border Grid.Row="1" x:Name="LicenseCard" Classes="License" Classes.Online="{Binding IsOnline}" Height="176">
                     <Border CornerRadius="11" ClipToBounds="True">
                     <Grid ColumnDefinitions="176,*">
 
@@ -269,8 +269,8 @@
                 </Border>
 
                 <!-- VR HISTORY: gets the rest of the page (the chart grows to fill it, see code-behind) -->
-                <ContentControl x:Name="HistoryHost" HorizontalContentAlignment="Stretch" Margin="2,26,2,0" />
-            </StackPanel>
+                <ContentControl Grid.Row="2" x:Name="HistoryHost" HorizontalContentAlignment="Stretch" Margin="2,26,2,0" />
+            </Grid>
         </ScrollViewer>
 
         <!-- repurposing the common state text -->

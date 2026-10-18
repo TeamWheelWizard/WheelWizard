@@ -46,6 +46,7 @@ public class ToolTipBubbleBehaviorTests
         Assert.True(ToolTip.GetIsOpen(target));
         Assert.Equal(PlacementMode.TopEdgeAlignedRight, ToolTip.GetPlacement(target));
         var tip = Assert.IsType<WheelWizard.Views.Components.HintTooltip>(ToolTip.GetTip(target));
+        Assert.Same(window, TopLevel.GetTopLevel(tip));
         Assert.Contains("BubbleAnimateIn", tip.Classes);
         Assert.Contains("BubblePointerRight", tip.Classes);
         Assert.True(

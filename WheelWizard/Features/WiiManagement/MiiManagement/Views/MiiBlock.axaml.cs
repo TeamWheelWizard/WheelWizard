@@ -7,6 +7,7 @@ using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Views.Components;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
@@ -15,6 +16,8 @@ namespace WheelWizard.WiiManagement.MiiManagement.Views;
 
 public class MiiBlock : ToggleRadioButton
 {
+    private Key? _confirmKey;
+
     public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<MiiBlock, Mii?>(nameof(Mii));
 
     public Mii? Mii
@@ -57,9 +60,50 @@ public class MiiBlock : ToggleRadioButton
             MiiName = mii?.Name.ToString();
             IsFavorite = mii?.IsFavorite ?? false;
         }
+        if (change.Property == CouchMode.IsEnabledProperty)
+        {
+            if (CouchMode.GetIsEnabled(this))
+                Focusable = true;
+            else
+                ClearValue(FocusableProperty);
+        }
 
         Tag = MiiName ?? String.Empty;
+        Avalonia.Automation.AutomationProperties.SetName(this, MiiName ?? "Create Mii");
         ClipToBounds = string.IsNullOrWhiteSpace(MiiName);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (CouchMode.GetIsEnabled(this) && e.Key is Key.Enter or Key.Space)
+        {
+            _confirmKey ??= e.Key;
+            e.Handled = true;
+            return;
+        }
+        base.OnKeyDown(e);
+    }
+
+    protected override void OnKeyUp(KeyEventArgs e)
+    {
+        if (CouchMode.GetIsEnabled(this) && e.Key is Key.Enter or Key.Space)
+        {
+            e.Handled = true;
+            if (_confirmKey == e.Key)
+            {
+                _confirmKey = null;
+                IsChecked = !IsChecked;
+                RaiseEvent(new RoutedEventArgs(ClickEvent));
+            }
+            return;
+        }
+        base.OnKeyUp(e);
+    }
+
+    protected override void OnLostFocus(FocusChangedEventArgs e)
+    {
+        _confirmKey = null;
+        base.OnLostFocus(e);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

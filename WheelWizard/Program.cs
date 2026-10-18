@@ -69,7 +69,8 @@ public class Program : IDesignerEntryPoint
         AppBuilder
             .Configure<App>()
             .UsePlatformDetect()
-            .With(new X11PlatformOptions { EnableDrawnDecorations = true })
+            .With(new X11PlatformOptions { EnableDrawnDecorations = true, OverlayPopups = true })
+            .With(new Win32PlatformOptions { OverlayPopups = true })
             .With(MacOptions)
             .WithInterFont();
 #pragma warning restore AVALONIA_X11_CSD
@@ -82,6 +83,7 @@ public class Program : IDesignerEntryPoint
         new()
         {
             RenderingMode = [AvaloniaNativeRenderingMode.OpenGl, AvaloniaNativeRenderingMode.Metal, AvaloniaNativeRenderingMode.Software],
+            OverlayPopups = true,
         };
 
     /// <summary>
@@ -136,13 +138,14 @@ public class Program : IDesignerEntryPoint
         var isFlatpak = new RuntimeEnvironment().IsFlatpakSandboxed(new RealFileSystem());
         var flatpakAppId = isFlatpak ? Environment.GetEnvironmentVariable("FLATPAK_ID") : null;
 #pragma warning disable AVALONIA_X11_CSD
-        var x11Options = new X11PlatformOptions { EnableDrawnDecorations = true };
+        var x11Options = new X11PlatformOptions { EnableDrawnDecorations = true, OverlayPopups = true };
 #pragma warning restore AVALONIA_X11_CSD
         x11Options.WmClass = flatpakAppId ?? x11Options.WmClass;
         var builder = AppBuilder
             .Configure(() => new App(createStartup))
             .UsePlatformDetect()
             .With(x11Options)
+            .With(new Win32PlatformOptions { OverlayPopups = true })
             .With(MacOptions)
             .WithInterFont();
 

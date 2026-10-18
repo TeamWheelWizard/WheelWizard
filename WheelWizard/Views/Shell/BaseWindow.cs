@@ -12,6 +12,8 @@ public abstract class BaseWindow : Window
 {
     private ModalHost? _modals;
     private Border? _modalChromeDimmer;
+    private Border? _startupLoading;
+    internal bool IsStartupLoading { get; private set; }
     private static readonly List<BaseWindow> OpenWindows = [];
     public ModalHost Modals => _modals ?? throw new InvalidOperationException("The window must be open before showing a modal.");
 
@@ -39,6 +41,24 @@ public abstract class BaseWindow : Window
         Content = null;
         var root = new Grid();
         root.Children.Add(content);
+        _startupLoading = new Border
+        {
+            Name = "StartupLoading",
+            Background = this.FindResource("BackgroundColor") as IBrush,
+            IsVisible = IsStartupLoading,
+            Child = new StackPanel
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Spacing = 16,
+                Children =
+                {
+                    new TextBlock { Text = t("state.loading"), HorizontalAlignment = HorizontalAlignment.Center },
+                    new ProgressBar { IsIndeterminate = true, Width = 180 },
+                },
+            },
+        };
+        root.Children.Add(_startupLoading);
         _modalChromeDimmer = new Border
         {
             Name = "ModalChromeDimmer",
@@ -51,15 +71,30 @@ public abstract class BaseWindow : Window
         };
         root.Children.Add(_modalChromeDimmer);
         _modals = new ModalHost(this);
-        root.Children.Add(_modals);
+        root.Children.Add(
+            new LayoutTransformControl
+            {
+                Name = "ModalScaleHost",
+                Child = _modals,
+                Margin = new Thickness(0, Math.Max(0, ExtendClientAreaTitleBarHeightHint), 0, 0),
+            }
+        );
         Content = root;
+    }
+
+    internal void SetStartupLoading(bool loading)
+    {
+        IsStartupLoading = loading;
+        if (_startupLoading != null)
+            _startupLoading.IsVisible = loading;
+        UpdateModalInteraction();
     }
 
     internal void UpdateModalInteraction()
     {
         InteractionOverlay.IsVisible = _disableCount != 0;
         InteractionContent.IsEnabled = _disableCount == 0;
-        ModalInteractionContent.IsEnabled = _disableCount == 0 && !(_modals?.HasModals ?? false);
+        ModalInteractionContent.IsEnabled = !IsStartupLoading && _disableCount == 0 && !(_modals?.HasModals ?? false);
         if (_modals != null)
             _modals.IsEnabled = _disableCount == 0;
         UpdateModalChromeDimming();
@@ -124,9 +159,25 @@ public abstract class BaseWindow : Window
         };
     }
 
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property != CanResizeProperty || _setWaylandSizeConstraints == null)
+            return;
+        if (CanResize)
+            _setWaylandSizeConstraints(new Size(MinWidth, MinHeight), new Size(MaxWidth, MaxHeight));
+        else
+            UpdateWaylandSizeConstraints();
+    }
+
     protected override void OnResized(WindowResizedEventArgs e)
     {
         base.OnResized(e);
+        UpdateWaylandSizeConstraints();
+    }
+
+    private void UpdateWaylandSizeConstraints()
+    {
         if (CanResize || _setWaylandSizeConstraints == null || _waylandSizeUpdateQueued)
             return;
 
@@ -148,10 +199,10 @@ public abstract class BaseWindow : Window
         );
     }
 
-    private void AttachMacWindowMenu()
+    protected void AttachMacWindowMenu()
     {
         if (IsVisible && TryGetPlatformHandle()?.HandleDescriptor == "NSWindow")
-            MacWindowMenu.Attach(TryGetPlatformHandle()!.Handle);
+            MacWindowMenu.Attach(TryGetPlatformHandle()!.Handle, this is Layout { IsCouchMode: true });
     }
 
     protected override void OnOpened(EventArgs e)

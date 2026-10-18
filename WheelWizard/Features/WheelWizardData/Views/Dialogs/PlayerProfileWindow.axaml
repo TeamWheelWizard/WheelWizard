@@ -13,7 +13,7 @@
         xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base"
         xmlns:communityDialogs="clr-namespace:WheelWizard.WheelWizardData.Views.Dialogs">
-    <Grid Width="540" MinHeight="400" MaxHeight="760" RowDefinitions="Auto,*,Auto">
+    <Grid x:Name="PlayerProfileLayout" Width="540" MinHeight="400" MaxHeight="760" RowDefinitions="Auto,*,Auto">
         <components:ModalHeading Margin="0,0,0,12">
             <TextBlock Classes="TitleText" Text="Player profile" />
         </components:ModalHeading>
@@ -33,7 +33,7 @@
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                       IsVisible="{Binding Profile, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <StackPanel Spacing="24" Margin="0,8,0,4">
+            <Grid x:Name="PlayerProfileBody" RowDefinitions="Auto,Auto" RowSpacing="24" Margin="0,8,0,4">
                 <Border x:Name="ProfileCard" Height="176" Background="{StaticResource Neutral900}"
                         BorderBrush="{StaticResource Neutral900}" BorderThickness="1" CornerRadius="12" ClipToBounds="True">
                     <Border CornerRadius="11" ClipToBounds="True">
@@ -107,8 +107,8 @@
                     </Border>
                 </Border>
 
-                <ContentControl x:Name="HistoryHost" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
-            </StackPanel>
+                <ContentControl Grid.Row="1" x:Name="HistoryHost" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+            </Grid>
         </ScrollViewer>
         <Border Grid.Row="2" BorderBrush="{StaticResource BackgroundLineColor}" BorderThickness="0,1,0,0" Padding="0,12,0,0" Margin="0,12,0,0"
                 IsVisible="{Binding Profile, Converter={x:Static ObjectConverters.IsNotNull}}">

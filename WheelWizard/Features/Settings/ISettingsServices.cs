@@ -48,6 +48,7 @@ public interface ISettingsProperties
     Setting<int> FOCUSED_USER { get; }
     Setting<bool> ENABLE_ANIMATIONS { get; }
     Setting<bool> SIDEBAR_COLLAPSED { get; }
+    Setting<bool> COUCH_VIEW { get; }
     Setting<bool> TESTING_MODE_ENABLED { get; }
     Setting<double> SAVED_WINDOW_SCALE { get; }
     Setting<MarioKartWiiEnums.Regions> RR_REGION { get; }

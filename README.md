@@ -24,6 +24,34 @@
 
 Wheel Wizard, our mod manager, is created for the sole purpose of convenience. Technically, these mods and Retro Rewind are all doable without this app, but this app makes it possible with just a few clicks. It still has a lot of features in the planning stage and is fully in development, so keep an eye out for updates.
 
+## Desktop and Couch views
+
+The existing desktop layout remains available. Turn on **Settings → Appearance → Couch View** for a separate landscape presentation with larger actions, horizontal navigation, and controller support. Turn the same setting off to return to Desktop View. Your preference is saved; switching keeps the current page and unsaved edits. Close active dialogs before switching.
+
+For Steam shortcuts, add `--view=couch --fullscreen` to the launch arguments. `--view=desktop` overrides the saved preference for that launch. Couch view also works windowed and can be resized independently of the fixed desktop layout.
+
+Couch Home shows an animated, full-body Mii for your primary license beside the launch actions. Select the Mii card to open that license's profile; changing the primary license updates the preview. Turning off animations uses a still preview. An empty primary slot stays empty rather than showing another license, and missing Mii rendering resources do not block launching or profile navigation. Desktop Home is unchanged.
+
+| Action | Controller | Keyboard |
+|--------|------------|----------|
+| Move focus / edit native controls | D-pad or left stick | Arrow keys / Tab |
+| Activate | South face button | Enter / Space |
+| Back / dismiss | East face button | Escape |
+| Previous / next section | LB / RB | Page Up / Page Down |
+| Couch menu | Menu / Start | F10 |
+| Edit focused text | North face button (Y) or confirm | F2 |
+
+Couch view includes an in-window on-screen keyboard; text is applied on Submit and discarded on Cancel. The board provides ASCII letters, numbers, and punctuation; physical keyboards and clipboard input remain available for other characters. Mouse and touch remain usable.
+
+The couch menu provides Resume, Settings, and fullscreen controls; text entry appears when a text field is focused. The footer is a noninteractive glyph legend, not a row of Back/fullscreen buttons. Back remains on the controller or Escape, and fullscreen remains in the menu. The footer, text-entry menu, and on-screen keyboard use subdued grey Steam Deck prompts from [Kenney Input Prompts](https://kenney.nl/assets/input-prompts), with short action labels. Only the required high-resolution images are bundled, together with their [CC0 license](WheelWizard/Resources/Images/ControllerPrompts/License.txt). SDL input handling does not depend on Steam.
+
+The Mii maker exposes gender selection, categories, variants, optional parts, movement, colors, and save actions as focusable controls. Confirm activates an action; focusing a name field does not open the keyboard until Confirm or Y. A slider's own axis adjusts its value; the perpendicular axis moves focus away. Back closes an open dropdown or color picker first, then steps out of the editor section before leaving the page. Unsaved edits still require confirmation before leaving.
+
+Startup, mod browsing/details, dialogs, menus, dropdowns, and tooltips are hosted within the main window to avoid separate application popup windows under gamescope. OS file/folder pickers, system menus, external browser links, and launched games remain external.
+
+Controller input uses bundled SDL3 runtimes and does not require Steam. On Linux, the process must have access to the controller's input/HID devices; sandbox packaging must grant the appropriate device access. If initialization fails, the couch menu reports the error. Controller input is suspended while Wheel Wizard is inactive. Buttons held across activation or a dialog boundary must be released before reuse; fresh presses are not delayed.
+
+
 ## Requirements
 
 In order to play, a Mario Kart Wii game backup, dumped by you, is required. Accepted formats are .iso, .gcm, .gcz, .ciso, .wbfs, .wia and .rvz. Depending on what you like to play, a specific game version may be required.

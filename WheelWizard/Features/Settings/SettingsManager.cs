@@ -217,6 +217,7 @@ public class SettingsManager : ISettingsManager, IDisposable
 
         ENABLE_ANIMATIONS = RegisterWhWz("EnableAnimations", true);
         SIDEBAR_COLLAPSED = RegisterWhWz("SidebarCollapsed", false);
+        COUCH_VIEW = RegisterWhWz("CouchView", false);
         TESTING_MODE_ENABLED = RegisterWhWz("TestingModeEnabled", false);
         SAVED_WINDOW_SCALE = RegisterWhWz("WindowScale", 1.0, SettingValues.IsValidWindowScale);
         RR_REGION = RegisterWhWz("RR_Region", MarioKartWiiEnums.Regions.None);
@@ -323,6 +324,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     public Setting<int> FOCUSED_USER { get; }
     public Setting<bool> ENABLE_ANIMATIONS { get; }
     public Setting<bool> SIDEBAR_COLLAPSED { get; }
+    public Setting<bool> COUCH_VIEW { get; }
     public Setting<bool> TESTING_MODE_ENABLED { get; }
     public Setting<double> SAVED_WINDOW_SCALE { get; }
     public Setting<MarioKartWiiEnums.Regions> RR_REGION { get; }

@@ -44,6 +44,27 @@
         <Style Selector="Panel.LibraryGrip:pointerover, Grid.LibraryRowMain:pointerover">
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
+        <Style Selector="Border.LibraryRow">
+            <Setter Property="Height" Value="50" />
+        </Style>
+        <Style Selector="mods|ModsPage.couch Border.LibraryRow">
+            <Setter Property="Height" Value="76" />
+        </Style>
+        <Style Selector="StackPanel.CouchModActions">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="mods|ModsPage.couch StackPanel.CouchModActions">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="mods|ModsPage.couch StackPanel.DesktopModPriority">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="UniformGrid">
+            <Setter Property="Columns" Value="2" />
+        </Style>
+        <Style Selector="mods|ModsPage.couch UniformGrid">
+            <Setter Property="Columns" Value="3" />
+        </Style>
     </UserControl.Styles>
     <Grid>
         <Grid.RowDefinitions>
@@ -101,7 +122,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <Border Classes="LibraryRow" Classes.Placeholder="{Binding IsPlaceholder}" Height="50" Padding="0">
+                            <Border Classes="LibraryRow" Classes.Placeholder="{Binding IsPlaceholder}" Padding="0">
                                 <Border.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{loc:T action.rename}" Click="RenameMod_Click" />
@@ -120,6 +141,7 @@
                                         <ColumnDefinition Width="36" />
                                         <ColumnDefinition Width="1" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
                                     <Panel Grid.Column="0" Classes="LibraryGrip" Cursor="SizeAll"
@@ -141,7 +163,7 @@
 
 
                                         <!-- Commit priority edits on blur instead of on each keystroke. -->
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                                        <StackPanel Grid.Column="2" Classes="DesktopModPriority" Orientation="Horizontal" HorizontalAlignment="Right"
                                                     VerticalAlignment="Center" Margin="0,0,8,0">
                                             <components:InputField Text="{Binding Mod.Priority, Mode=OneWay}"
                                                      TextChanged="PriorityText_OnTextChanged"
@@ -185,6 +207,13 @@
                                         </StackPanel>
 
                                     </Grid>
+                                    <StackPanel Grid.Column="3" Classes="CouchModActions" Orientation="Horizontal" Spacing="8" Margin="8,0" VerticalAlignment="Center">
+                                        <components:ActionButton Tag="move-up" Tone="Secondary" Variant="Ghost" IconData="{StaticResource ArrowUp}" AutomationProperties.Name="{loc:T couch.move_up}" MinHeight="44" MinWidth="44"
+                                                                 IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}" Click="ButtonUp_OnClick" />
+                                        <components:ActionButton Tag="move-down" Tone="Secondary" Variant="Ghost" IconData="{StaticResource ArrowDown}" AutomationProperties.Name="{loc:T couch.move_down}" MinHeight="44" MinWidth="44"
+                                                                 IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}" Click="ButtonDown_OnClick" />
+                                        <components:ActionButton Tag="more-actions" Tone="Secondary" Variant="Ghost" Text="…" AutomationProperties.Name="{loc:T action.more_actions}" MinHeight="44" MinWidth="44" Click="ModActions_OnClick" />
+                                    </StackPanel>
                                 </Grid>
                             </Border>
                             <Rectangle IsVisible="{Binding IsPlaceholder}" IsHitTestVisible="False" Margin="0,3"
@@ -201,13 +230,22 @@
                 <ItemsControl x:Name="ModsGridItems" ItemsSource="{Binding Mods}" VerticalAlignment="Top" Margin="0,0,0,68">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="2" VerticalAlignment="Top" />
+                            <UniformGrid VerticalAlignment="Top" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border>
-                                <mods:GridModPanel ViewRequested="ViewMod_Click" DragRequested="DragHandle_PointerPressed" />
+                                <StackPanel>
+                                    <mods:GridModPanel ViewRequested="ViewMod_Click" DragRequested="DragHandle_PointerPressed" />
+                                    <StackPanel Classes="CouchModActions" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="4,0,4,12">
+                                        <components:ActionButton Tag="move-up" Tone="Secondary" Variant="Ghost" IconData="{StaticResource ArrowUp}" AutomationProperties.Name="{loc:T couch.move_up}" MinHeight="44" MinWidth="44"
+                                                                 IsEnabled="{Binding IsLowest, Converter={x:Static BoolConverters.Not}}" Click="ButtonUp_OnClick" />
+                                        <components:ActionButton Tag="move-down" Tone="Secondary" Variant="Ghost" IconData="{StaticResource ArrowDown}" AutomationProperties.Name="{loc:T couch.move_down}" MinHeight="44" MinWidth="44"
+                                                                 IsEnabled="{Binding IsHighest, Converter={x:Static BoolConverters.Not}}" Click="ButtonDown_OnClick" />
+                                        <components:ActionButton Tag="more-actions" Tone="Secondary" Variant="Ghost" Text="…" AutomationProperties.Name="{loc:T action.more_actions}" MinHeight="44" MinWidth="44" Click="ModActions_OnClick" />
+                                    </StackPanel>
+                                </StackPanel>
                                 <Border.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{loc:T action.rename}" Click="RenameMod_Click" />

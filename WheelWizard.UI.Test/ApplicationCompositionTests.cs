@@ -92,26 +92,24 @@ public class ApplicationCompositionTests
         var windows = services.GetRequiredService<IMainWindowService>();
         try
         {
-            var splash = new SplashWindow();
-            desktop.MainWindow = splash;
-            splash.Show();
-            Assert.True(splash.IsVisible);
             using var shutdown = new CancellationTokenSource();
             var opening = windows.ShowAsync(desktop, shutdown.Token);
             if (opening.IsFaulted)
                 await opening;
             Assert.False(opening.IsCompleted);
-            Assert.True(splash.IsVisible);
-            Assert.Equal(0, desktop.MainWindow!.Opacity);
-            Assert.False(desktop.MainWindow.ShowInTaskbar);
+            var shell = Assert.IsType<Layout>(desktop.MainWindow);
+            Assert.True(shell.IsVisible);
+            Assert.Equal(1, shell.Opacity);
+            Assert.True(shell.ShowInTaskbar);
+            var loading = shell.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "StartupLoading");
+            Assert.True(loading.IsVisible);
             if (completion == "shutdown")
             {
                 shutdown.Cancel();
                 await Assert.ThrowsAnyAsync<OperationCanceledException>(() => opening);
-                Assert.Equal(0, desktop.MainWindow.Opacity);
-                Assert.True(splash.IsVisible);
+                Assert.Same(shell, desktop.MainWindow);
+                Assert.True(loading.IsVisible);
                 modsLoaded.SetResult(OperationResult.Ok());
-                splash.Close();
                 return;
             }
             if (completion == "timeout")
@@ -119,9 +117,9 @@ public class ApplicationCompositionTests
             else
                 modsLoaded.SetResult(OperationResult.Ok());
             await opening;
-            Assert.False(splash.IsVisible);
-            Assert.Equal(1, desktop.MainWindow.Opacity);
-            Assert.True(desktop.MainWindow.ShowInTaskbar);
+            Assert.Same(shell, desktop.MainWindow);
+            Assert.False(loading.IsVisible);
+            Assert.True(shell.IsVisible);
             if (completion == "timeout")
             {
                 Assert.False(modsLoaded.Task.IsCompleted);

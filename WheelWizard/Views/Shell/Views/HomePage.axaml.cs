@@ -4,15 +4,21 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Testably.Abstractions;
 using WheelWizard.Models.Enums;
+using WheelWizard.Settings;
+using WheelWizard.Shared.Polling;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Shell.Controls;
+using WheelWizard.Views.Shell.Couch;
+using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.Views.Shell.ViewModels;
+using WheelWizard.WiiManagement.GameLicense;
 
 namespace WheelWizard.Views.Shell.Views;
 
-public partial class HomePage : UserControl
+public partial class HomePage : UserControl, ICouchNavigationPage, IPollingListener
 {
     private HomeViewModel Model { get; }
 
@@ -21,13 +27,25 @@ public partial class HomePage : UserControl
     private readonly WheelTrail[] _trails;
     private WheelTrailState _currentTrailState = WheelTrailState.Static_None;
     private bool _isAttached;
+    private bool _hasRefreshed;
     private readonly TaskCompletionSource _initialContent = new();
     public Task InitialContentReady => _initialContent.Task;
 
-    public HomePage(HomeViewModel model, IRandomSystem randomSystem)
+    public HomePage(
+        HomeViewModel model,
+        IRandomSystem randomSystem,
+        IGameLicenseSingletonService gameLicenseService,
+        ISettingsManager settings,
+        ISettingsSignalBus settingsSignals,
+        INavigationService navigation
+    )
     {
         Model = model;
         RandomSystem = randomSystem;
+        _gameLicenses = gameLicenseService;
+        _settings = settings;
+        _settingsSignals = settingsSignals;
+        _navigation = navigation;
         InitializeComponent();
         _trails = [HomeTrail1, HomeTrail2, HomeTrail3, HomeTrail4, HomeTrail5];
         RandomSystem.Random.Shared.Shuffle(_trails);
@@ -36,12 +54,31 @@ public partial class HomePage : UserControl
             ApplyDolphinTrailColors();
     }
 
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == CouchMode.IsEnabledProperty && CompleteGrid is not null)
+            ApplyPresentation();
+    }
+
+    private void ApplyPresentation()
+    {
+        var couch = CouchMode.GetIsEnabled(this);
+        CompleteGrid.IsVisible = !couch;
+        CouchHome.IsVisible = couch;
+        UpdatePrimaryLicenseSubscription();
+    }
+
     protected override async void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         _isAttached = true;
+        ApplyPresentation();
         Model.PropertyChanged += Model_OnPropertyChanged;
         Model.MainActionStarted += Model_OnMainActionStarted;
+        if (_hasRefreshed)
+            return;
+        _hasRefreshed = true;
         try
         {
             await Model.RefreshAsync();
@@ -56,16 +93,29 @@ public partial class HomePage : UserControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _isAttached = false;
+        UpdatePrimaryLicenseSubscription();
         Model.PropertyChanged -= Model_OnPropertyChanged;
         Model.MainActionStarted -= Model_OnMainActionStarted;
-        Model.Dispose();
+        // Moving the existing page between shell hosts detaches it briefly. Only a real
+        // navigation away should end the launch model's lifetime.
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                if (!_isAttached)
+                    Model.Dispose();
+            },
+            DispatcherPriority.Background
+        );
         base.OnDetachedFromVisualTree(e);
     }
 
     private void Model_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (!string.IsNullOrEmpty(Model.IconName) && this.FindResource(Model.IconName) is Geometry geometry)
+        {
             PlayButton.IconData = geometry;
+            CouchPlayButton.IconData = geometry;
+        }
         if (Model.Status == WheelWizardStatus.Ready && !Model.IsBusy)
             PlayEntranceAnimation();
     }

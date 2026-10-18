@@ -39,7 +39,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => WindowFrame;
-    protected override Control ModalInteractionContent => CompleteGrid;
+    protected override Control ModalInteractionContent => PresentationRoot;
 
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
@@ -102,11 +102,8 @@ public partial class Layout : BaseWindow, IPollingListener
         SettingsSignalBus = settingsSignalBus;
         ModManagerService = modManagerService;
         InitializeComponent();
-        CompleteGrid.SizeChanged += (_, e) =>
-        {
-            if (ContentArea.Content is SettingsPage settingsPage)
-                settingsPage.UpdateLayoutWidth(e.NewSize.Width - 64 - ContentArea.Margin.Left - ContentArea.Margin.Right);
-        };
+        InitializeCouchPresentation();
+        CompleteGrid.SizeChanged += (_, _) => UpdateCurrentPageWidth();
         _autoUpdater = autoUpdater;
         _autoUpdater.UpdateAvailable += OnUpdateAvailable;
         UpdateVersionBadge();
@@ -117,7 +114,6 @@ public partial class Layout : BaseWindow, IPollingListener
         SidebarCurrentUserProfile.ProfileRequested += (_, _) => NavigateFromSidebar(typeof(UserProfilePage));
         UpdateSidebarProfile();
 
-        ClampSavedWindowScaleToCurrentScreen();
         OnSettingChanged(SettingsService.SAVED_WINDOW_SCALE);
         _settingsSignalSubscription = SettingsSignalBus.Subscribe(OnSettingSignal);
         UpdateTestingButtonVisibility();
@@ -141,6 +137,7 @@ public partial class Layout : BaseWindow, IPollingListener
         Title = BrandingService.Branding.DisplayName;
         VersionTagText.Text = $"v{BrandingService.Branding.Version}";
         UpdateModsButtonText();
+        InitializePresentationMode();
         // UpdateModsActionIndicator();
 
         if (Navigation.CurrentPage is { } page)
@@ -170,6 +167,7 @@ public partial class Layout : BaseWindow, IPollingListener
     protected override void OnClosed(EventArgs e)
     {
         _autoUpdater.UpdateAvailable -= OnUpdateAvailable;
+        _couchInput?.Dispose();
         Navigation.PageChanged -= Navigation_OnPageChanged;
         DetachLiveSubscriptions();
         _settingsSignalSubscription?.Dispose();
@@ -198,6 +196,8 @@ public partial class Layout : BaseWindow, IPollingListener
         UpdateMadeByText();
         UpdatePlayerAndRoomCount();
         UpdateLiveAlert();
+        if (_presentationReady)
+            RefreshCouchNavigation();
     }
 
     private void UpdateMadeByText()
@@ -228,9 +228,20 @@ public partial class Layout : BaseWindow, IPollingListener
     private void OnSettingChanged(Setting setting)
     {
         // Note that this method will also be called whenever the setting changes
+        if (setting == SettingsService.COUCH_VIEW && _presentationReady)
+        {
+            if (!IsVisible || !Modals.HasModals)
+                ApplyPresentation(SettingsService.COUCH_VIEW.Get());
+            return;
+        }
         if (setting == SettingsService.WINDOW_SCALE || setting == SettingsService.SAVED_WINDOW_SCALE)
         {
             var scaleFactor = GetUsableWindowScale(SettingsService.WINDOW_SCALE.Value);
+            if (IsCouchMode)
+            {
+                _desktopSize = new Size(WindowWidth * scaleFactor, WindowHeight * scaleFactor);
+                return;
+            }
             CompleteGrid.Resources["SettingsRowGap"] = 2d / scaleFactor;
             Height = WindowHeight * scaleFactor;
             // Reserve native chrome inside the existing window height, outside content scaling.
@@ -323,16 +334,13 @@ public partial class Layout : BaseWindow, IPollingListener
 
         ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms || isMiisToEditor || isEditorToMiis ? RoomsPageTransition : null;
         ContentArea.IsTransitionReversed = isDetailsToRooms || isEditorToMiis;
-        if (page is SettingsPage settingsPage)
-            settingsPage.UpdateLayoutWidth(
-                (CompleteGrid.Bounds.Width > 0 ? CompleteGrid.Bounds.Width : WindowWidth)
-                    - 64
-                    - ContentArea.Margin.Left
-                    - ContentArea.Margin.Right
-            );
         ContentArea.Content = page;
+        UpdateCurrentPageWidth();
+        CouchPresentation.SelectPage(page);
         UpdateSidebarSelection(page);
         _ = LockSidebarAsync(page is ILockedSidebarPage);
+        if (IsCouchMode)
+            Dispatcher.UIThread.Post(FocusCouchPage, DispatcherPriority.Loaded);
     }
 
     private void UpdateSidebarSelection(UserControl page)
@@ -527,6 +535,8 @@ public partial class Layout : BaseWindow, IPollingListener
     private void UpdateOtherSectionVisibility()
     {
         OtherSectionText.IsVisible = TestingButton.IsVisible;
+        if (_presentationReady)
+            RefreshCouchNavigation();
     }
 
     public void HideDevelopmentFeatures()
@@ -584,7 +594,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void SupportUs_OnClick(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
-    public bool CompleteContentEnabled => ModalInteractionContent.IsEnabled;
+    public bool CompleteContentEnabled => PresentationRoot.IsEnabled;
 
     public void ShowAppInfo() => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
 

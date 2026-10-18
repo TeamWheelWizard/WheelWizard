@@ -20,7 +20,43 @@
         xmlns:shellViews="clr-namespace:WheelWizard.Views.Shell.Views"
         xmlns:design="clr-namespace:WheelWizard.Views.DesignTime"
         xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
-        xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls">
+        xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls"
+        xmlns:couch="clr-namespace:WheelWizard.Views.Shell.Couch">
+    <Window.Styles>
+        <Style Selector="Window.couch SelectableTextBlock">
+            <Setter Property="Focusable" Value="False" />
+        </Style>
+        <Style Selector="Window.couch :is(Control)">
+            <Setter Property="FocusAdorner">
+                <Template>
+                    <Panel IsHitTestVisible="False">
+                        <Border BorderBrush="{DynamicResource Brand400}" BorderThickness="6"
+                                CornerRadius="{StaticResource GlobalCornerRadius}" Opacity="0.16" />
+                        <Border BorderBrush="{DynamicResource Brand300}" BorderThickness="2"
+                                CornerRadius="{StaticResource GlobalCornerRadius}" />
+                    </Panel>
+                </Template>
+            </Setter>
+        </Style>
+        <Style Selector="Window.couch components|ActionButton:focus-visible /template/ Border#PART_FocusRing">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="Window.couch miis|MiiBlock:focus-visible /template/ Border#PART_MainBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource Brand400}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Window.couch components|ModalHeading /template/ components|ActionButton#PART_CloseButton">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="Window.couch LayoutTransformControl#ModalScaleHost">
+            <Setter Property="LayoutTransform">
+                <ScaleTransform ScaleX="{DynamicResource WindowScale}" ScaleY="{DynamicResource WindowScale}" />
+            </Setter>
+        </Style>
+        <Style Selector="Window.couch Popup">
+            <Setter Property="InheritsTransform" Value="True" />
+        </Style>
+    </Window.Styles>
     <Grid x:Name="WindowFrame" RowDefinitions="30,*"
           Background="{StaticResource FrameColor}">
         <Border Grid.Row="0" Background="Transparent"
@@ -38,13 +74,14 @@
                 </StackPanel>
             </Grid>
         </Border>
-    <Grid Grid.Row="1" ColumnDefinitions="221,*" RowDefinitions="0,17,18,96,*,80" x:Name="CompleteGrid"
+    <Grid Grid.Row="1" x:Name="PresentationRoot">
+    <Grid ColumnDefinitions="221,*" RowDefinitions="0,17,18,96,*,80" x:Name="CompleteGrid"
           Background="{StaticResource FrameColor}">
 
         <Border x:Name="ContentBackground" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"
                 CornerRadius="{StaticResource WindowCornerRadiusLeftRightTwix}"
                 Background="{StaticResource BackgroundColor}" />
-        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="True">
+        <Grid x:Name="DesktopContentHost" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" ClipToBounds="True">
             <TransitioningContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                          ClipToBounds="False"
                                          x:Name="ContentArea"
@@ -494,6 +531,15 @@
                 </Style>
             </Grid.Styles>
         </Grid>
+    </Grid>
+        <LayoutTransformControl x:Name="CouchScaleHost" IsVisible="{Binding #CouchPresentation.IsVisible}">
+            <LayoutTransformControl.LayoutTransform>
+                <ScaleTransform ScaleX="{DynamicResource WindowScale}" ScaleY="{DynamicResource WindowScale}" />
+            </LayoutTransformControl.LayoutTransform>
+            <Grid x:Name="CouchContentRoot">
+                <couch:CouchView x:Name="CouchPresentation" IsVisible="False" />
+            </Grid>
+        </LayoutTransformControl>
     </Grid>
         <Border Grid.RowSpan="2" ZIndex="999" IsVisible="False" IsHitTestVisible="False"
                 x:Name="DisabledDarkenEffect" Background="Black" Opacity="0.3" />

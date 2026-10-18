@@ -1,10 +1,13 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Shared.Polling;
+using WheelWizard.Views.Shell.Couch;
 using WheelWizard.Views.Shell.Navigation;
 using WheelWizard.WheelWizardData;
 
@@ -12,6 +15,7 @@ namespace WheelWizard.RrRooms.Views;
 
 public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
+    private readonly GridLength _desktopHeaderHeight;
     private INavigationService Navigation { get; }
 
     private LiveRoomsService LiveRooms { get; }
@@ -47,11 +51,55 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingLi
         Navigation = navigation;
         LiveRooms = liveRooms;
         InitializeComponent();
+        _desktopHeaderHeight = RoomsLayout.RowDefinitions[0].Height;
         DataContext = this;
         LiveRooms.Subscribe(this);
 
         OnUpdate(LiveRooms);
         Unloaded += RoomsPage_Unloaded;
+        Loaded += (_, _) => LiveRooms.Subscribe(this);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property != CouchMode.IsEnabledProperty || RoomsLayout is null)
+            return;
+
+        var couch = CouchMode.GetIsEnabled(this);
+        CouchRoomActions.IsVisible = couch;
+        RoomsLayout.RowDefinitions[0].Height = couch ? new GridLength(72) : _desktopHeaderHeight;
+        RoomsListViewContainer.RowDefinitions[0].Height = couch ? GridLength.Auto : new GridLength(1, GridUnitType.Star);
+        RoomsListViewContainer.RowDefinitions[1].Height = new GridLength(couch ? 1 : 16, GridUnitType.Star);
+        PlayerListViewContainer.RowDefinitions[0].Height = couch ? GridLength.Auto : new GridLength(1, GridUnitType.Star);
+        PlayerListViewContainer.RowDefinitions[1].Height = new GridLength(couch ? 1 : 16, GridUnitType.Star);
+    }
+
+    private void RoomsView_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (!CouchMode.GetIsEnabled(this) || e.Key is not (Key.Enter or Key.Space) || sender is not ListBox list)
+            return;
+        OpenSelectedRoom(list);
+        e.Handled = true;
+    }
+
+    private void OpenSelectedRoom_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: ListBox list })
+            OpenSelectedRoom(list);
+    }
+
+    private void OpenSelectedRoom(ListBox list)
+    {
+        var room = list.SelectedItem switch
+        {
+            RrRoom selectedRoom => selectedRoom,
+            RrPlayer player => Rooms.FirstOrDefault(candidate => candidate.Players.Contains(player)),
+            _ => null,
+        };
+        if (room is not null)
+            Navigation.NavigateTo<RoomDetailsPage>(room);
+        list.SelectedItem = null;
     }
 
     public void OnUpdate(ObservablePollingService sender)
@@ -114,33 +162,11 @@ public partial class RoomsPage : UserControl, INotifyPropertyChanged, IPollingLi
 
     private void RoomsView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (e.Source is not ListBox listBox)
+        if (CouchMode.GetIsEnabled(this) || e.Source is not ListBox list)
             return;
-        if (listBox.SelectedItem is not RrRoom selectedRoom)
-            return;
-
-        Navigation.NavigateTo<RoomDetailsPage>(selectedRoom);
-        listBox.SelectedItem = null;
-        // Deselect the item immediately after navigating. This is important
-        // for a good user experience. Otherwise, the item stays selected,
-        // and if you navigate back, you can't re-select the same item.
-    }
-
-    private void PlayerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (e.Source is not ListBox listBox)
-            return;
-        if (listBox.SelectedItem is not RrPlayer selectedRoom)
-            return;
-
-        var room = Rooms.FirstOrDefault(r => r.Players.Any(p => p.Equals(selectedRoom)));
-
-        if (room is not null)
-            Navigation.NavigateTo<RoomDetailsPage>(room);
-        listBox.SelectedItem = null;
-        // Deselect the item immediately after navigating. This is important
-        // for a good user experience. Otherwise, the item stays selected,
-        // and if you navigate back, you can't re-select the same item.
+        // Desktop selection and explicit couch activation use the same room resolution.
+        // Clear the selection so returning to this page allows opening the same room again.
+        OpenSelectedRoom(list);
     }
 
     #region PropertyChanged

@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:couch="clr-namespace:WheelWizard.Views.Shell.Couch"
+             x:Class="WheelWizard.Views.Shell.Couch.CouchView"
+             FontSize="18">
+    <UserControl.Styles>
+        <Style Selector="components|ActionButton.couch-navigation">
+            <Setter Property="MinHeight" Value="48" />
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Tone" Value="Secondary" />
+            <Setter Property="Variant" Value="Ghost" />
+        </Style>
+        <Style Selector="components|ActionButton.couch-navigation.selected">
+            <Setter Property="Foreground" Value="{DynamicResource Brand300}" />
+            <Setter Property="Background" Value="{DynamicResource FrameColor}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brand400}" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20,12,20,12" RowSpacing="12">
+        <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="NavigationButtons" Orientation="Horizontal" Spacing="4" />
+        </ScrollViewer>
+        <Border Grid.Row="1" Background="{DynamicResource BackgroundColor}"
+                CornerRadius="{StaticResource GlobalCornerRadius}" Padding="{StaticResource EdgeGap}" ClipToBounds="True">
+            <Grid x:Name="PageHost" />
+        </Border>
+        <couch:CouchInputHints x:Name="InputHints" Grid.Row="2" />
+    </Grid>
+</UserControl>

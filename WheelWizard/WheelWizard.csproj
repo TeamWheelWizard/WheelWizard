@@ -20,6 +20,10 @@
         <ApplicationIcon>car-wheel.ico</ApplicationIcon>
     </PropertyGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="WheelWizard.UI.Test" />
+    </ItemGroup>
+
     <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
         <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
@@ -41,6 +45,8 @@
         <PackageReference Include="Avalonia.HtmlRenderer" Version="12.0.0" />
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.22" />
         <PackageReference Include="Avalonia.Wayland" Version="12.1.4" />
+        <!-- SDL3 includes native gamepad runtimes for Windows, macOS and Linux desktop RIDs. -->
+        <PackageReference Include="ppy.SDL3-CS" Version="2026.1002.1" />
         <!-- Realtime (GPU) Mii rendering -->
         <PackageReference Include="Silk.NET.OpenGL" Version="2.22.0" />
         <!-- Draws the SVG particle images animations carry. 5.1.x is the last line built on Avalonia's SkiaSharp 3. -->
@@ -110,6 +116,8 @@
         <AvaloniaResource Include="..\Flatpak\io.github.TeamWheelWizard.WheelWizard.png" Link="Resources\Images\AppIcon.png" />
         <AvaloniaResource Include="Resources\Images\WiiCompiled.png" />
         <AvaloniaResource Include="Resources\Images\MiiEditorFloor.svg" />
+        <AvaloniaResource Include="Resources\Images\ControllerPrompts\*.png" />
+        <AvaloniaResource Include="Resources\Images\ControllerPrompts\License.txt" />
     </ItemGroup>
 
     <ItemGroup Label="Mii Rendering Resources">

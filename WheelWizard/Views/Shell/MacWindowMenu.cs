@@ -16,6 +16,7 @@ internal static class MacWindowMenu
 
     // Owned for the process lifetime. NSApplication and the active menu bar also retain this menu.
     private static nint _menu;
+    private static bool _allowFullScreen;
     private static readonly InsertItemCallback InsertItem = InsertWindowItem;
     private static nint _insertItemImplementation;
 
@@ -28,7 +29,7 @@ internal static class MacWindowMenu
         // The unavailable full-screen tile group follows the positioning submenu
         // and has no action or submenu. Avoid matching localized system menu titles.
         if (Send(item, Selector("action")) == Selector("toggleFullScreen:"))
-            Send(item, Selector("setHidden:"), 1);
+            Send(item, Selector("setHidden:"), _allowFullScreen ? 0 : 1);
         else if (
             Send(item, Selector("action")) == 0
             && Send(item, Selector("submenu")) == 0
@@ -51,14 +52,15 @@ internal static class MacWindowMenu
         return customClass;
     }
 
-    public static void Attach(nint window)
+    public static void Attach(nint window, bool allowFullScreen)
     {
         if (!OperatingSystem.IsMacOS())
             return;
-        // Explicitly opt every window out of full screen, including split-screen tiling.
+        _allowFullScreen = allowFullScreen;
+        // Desktop remains fixed; couch mode may enter fullscreen without enabling split-screen tiling.
         var behavior = Send(window, Selector("collectionBehavior"));
-        behavior &= ~(FullScreenPrimary | FullScreenAuxiliary | FullScreenAllowsTiling);
-        behavior |= FullScreenNone | FullScreenDisallowsTiling;
+        behavior &= ~(FullScreenPrimary | FullScreenAuxiliary | FullScreenAllowsTiling | FullScreenNone);
+        behavior |= FullScreenDisallowsTiling | (allowFullScreen ? FullScreenPrimary : FullScreenNone);
         Send(window, Selector("setCollectionBehavior:"), behavior);
         var app = Send(GetClass("NSApplication"), Selector("sharedApplication"));
         var bar = Send(app, Selector("mainMenu"));
@@ -105,7 +107,7 @@ internal static class MacWindowMenu
         {
             var item = Send(_menu, Selector("itemAtIndex:"), index);
             if (Send(item, Selector("action")) == Selector("toggleFullScreen:"))
-                Send(item, Selector("setHidden:"), 1);
+                Send(item, Selector("setHidden:"), _allowFullScreen ? 0 : 1);
         }
     }
 

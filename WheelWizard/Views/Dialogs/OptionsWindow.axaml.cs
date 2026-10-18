@@ -69,7 +69,6 @@ public partial class OptionsWindow : ModalContent
 
     protected override void BeforeClose()
     {
-        // If you want to return something different, then to the TrySetResult before you close it
         _tcs?.TrySetResult(null);
     }
 
@@ -80,7 +79,7 @@ public partial class OptionsWindow : ModalContent
             return await Dispatcher.UIThread.InvokeAsync(() => AwaitAnswer());
         }
         _tcs = new();
-        Show(); // Or ShowDialog(parentWindow) if you need it to be modal
+        Show();
         return await _tcs.Task;
     }
 }
