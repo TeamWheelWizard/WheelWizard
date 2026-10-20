@@ -100,8 +100,8 @@
                     <ContextMenu>
                         <MenuItem Header="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" />
                         <Separator />
-                        <MenuItem Header="View Profile" Click="ViewProfile_OnClick" />
-                        <MenuItem Header="View player on RWFC" Click="ViewOnRwfc_OnClick" />
+                        <MenuItem Header="{loc:T action.view_profile}" Click="ViewProfile_OnClick" />
+                        <MenuItem Header="{loc:T action.view_player_rwfc}" Click="ViewOnRwfc_OnClick" />
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
