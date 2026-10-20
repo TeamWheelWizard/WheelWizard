@@ -223,7 +223,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         }
 
         ViewUtils.GetLayout().UpdateFriendCount();
-        ViewUtils.ShowSnackbar(t("snackbar_success.friend_added", selectedPlayer.Name));
+        ViewUtils.ShowSnackbar(t("snackbar_success.friend_added", new { name = player.Name }));
     }
 
     private static OperationResult<string> NormalizeFriendCode(string friendCode)
