@@ -23,7 +23,7 @@ public static class ViewUtils
     public static void OpenLink(string link)
     {
         Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
-        ShowSnackbar("Opened link");
+        ShowSnackbar(t("snackbar_success.link_opened"));
     }
 
     public static void OpenRwfcPlayer(string? friendCode)

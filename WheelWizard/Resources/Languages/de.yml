@@ -573,6 +573,7 @@ de:
     created_duplicates_miis: "%{amount} duplizierte Miis erstellt"
     profile_set_primary: "Profil als Hauptprofil festlegen"
     dolphin_updated: "Dolphin Emulator wurde aktualisiert"
+    link_opened: "Link geöffnet"
   snackbar_error:
     mii_failure_deserialize: "Daten von Mii '%{error}' konnten nicht deserialisiert werden."
     mii_failure_update: "Mii '%{error}' konnte nicht aktualisiert werden."
