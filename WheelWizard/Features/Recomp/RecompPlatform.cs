@@ -11,6 +11,8 @@ namespace WheelWizard.Recomp;
 /// </summary>
 public static class RecompPlatform
 {
+    private static readonly System.IO.Abstractions.IPath NativePath = new Testably.Abstractions.RealFileSystem().Path;
+
     /// <summary>
     /// Whether this is a Linux build on an architecture the recomp publishes an AppImage for. The AppImage
     /// is always run unpacked (see <see cref="RecompProcessRunner"/>), so this holds inside a Flatpak
@@ -43,9 +45,9 @@ public static class RecompPlatform
     public static string CachedSetupFileName(string tagName)
     {
         var sanitized = new string(tagName.Select(character => char.IsLetterOrDigit(character) ? character : '-').ToArray());
-        return $"WiiCompiled-Setup-{sanitized}{Path.GetExtension(SetupFileName)}";
+        return $"WiiCompiled-Setup-{sanitized}{NativePath.GetExtension(SetupFileName)}";
     }
 
     /// <summary>The pattern that matches every cached setup of this platform, for pruning superseded ones.</summary>
-    public static string CachedSetupSearchPattern => $"WiiCompiled-Setup-*{Path.GetExtension(SetupFileName)}";
+    public static string CachedSetupSearchPattern => $"WiiCompiled-Setup-*{NativePath.GetExtension(SetupFileName)}";
 }

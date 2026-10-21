@@ -1,4 +1,5 @@
 using NSubstitute;
+using Testably.Abstractions.Testing;
 using WheelWizard.GameBanana;
 using WheelWizard.GameBanana.Domain;
 using WheelWizard.Mods;
@@ -11,6 +12,7 @@ internal static class ModTestFixture
 {
     public static ModContent CreateContent(IGameBananaSingletonService api, IGameBananaMediaService? media = null) =>
         new(
+            new MockFileSystem(),
             Substitute.For<IModManager>(),
             api,
             Substitute.For<IDownloadService>(),

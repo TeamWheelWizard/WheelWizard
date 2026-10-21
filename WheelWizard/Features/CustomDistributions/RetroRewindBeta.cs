@@ -261,7 +261,9 @@ public class RetroRewindBeta : IDistribution
     private bool TryGetRelativeExtractionPath(string normalizedPath, out string relativePath)
     {
         relativePath = string.Empty;
-        var archivePath = normalizedPath.Replace(Path.DirectorySeparatorChar, '/').Replace(Path.AltDirectorySeparatorChar, '/');
+        var archivePath = normalizedPath
+            .Replace(_fileSystem.Path.DirectorySeparatorChar, '/')
+            .Replace(_fileSystem.Path.AltDirectorySeparatorChar, '/');
 
         if (archivePath.Equals(FolderName, StringComparison.OrdinalIgnoreCase))
         {
@@ -271,7 +273,10 @@ public class RetroRewindBeta : IDistribution
 
         if (archivePath.StartsWith($"{FolderName}/", StringComparison.OrdinalIgnoreCase))
         {
-            relativePath = Path.Combine(FolderName, archivePath.Substring(FolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar));
+            relativePath = _fileSystem.Path.Combine(
+                FolderName,
+                archivePath.Substring(FolderName.Length + 1).Replace('/', _fileSystem.Path.DirectorySeparatorChar)
+            );
             return true;
         }
 
@@ -283,9 +288,9 @@ public class RetroRewindBeta : IDistribution
 
         if (archivePath.StartsWith($"{XMLFolderName}/", StringComparison.OrdinalIgnoreCase))
         {
-            relativePath = Path.Combine(
+            relativePath = _fileSystem.Path.Combine(
                 XMLFolderName,
-                archivePath.Substring(XMLFolderName.Length + 1).Replace('/', Path.DirectorySeparatorChar)
+                archivePath.Substring(XMLFolderName.Length + 1).Replace('/', _fileSystem.Path.DirectorySeparatorChar)
             );
             return true;
         }
@@ -331,16 +336,18 @@ public class RetroRewindBeta : IDistribution
         return Ok(manifestEntries);
     }
 
-    private static bool IsRiivolutionPath(string relativePath)
+    private bool IsRiivolutionPath(string relativePath)
     {
-        var normalized = relativePath.Replace(Path.DirectorySeparatorChar, '/').Replace(Path.AltDirectorySeparatorChar, '/');
+        var normalized = relativePath
+            .Replace(_fileSystem.Path.DirectorySeparatorChar, '/')
+            .Replace(_fileSystem.Path.AltDirectorySeparatorChar, '/');
         return normalized.StartsWith("riivolution/", StringComparison.OrdinalIgnoreCase)
             || normalized.Equals("riivolution", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static bool IsBetaRiivolutionFile(string relativePath)
+    private bool IsBetaRiivolutionFile(string relativePath)
     {
-        var fileName = Path.GetFileName(relativePath);
+        var fileName = _fileSystem.Path.GetFileName(relativePath);
         return fileName.StartsWith("RRBeta", StringComparison.OrdinalIgnoreCase);
     }
 

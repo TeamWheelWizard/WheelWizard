@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -24,6 +25,8 @@ namespace WheelWizard.Settings.Views;
 
 public partial class WhWzSettings : UserControl
 {
+    private readonly IFileSystem fileSystem;
+
     // #todo: move settings state and location-change workflows into a view model so this page mostly handles the controls.
     private readonly IApplicationLogFiles _logFiles;
 
@@ -44,6 +47,7 @@ public partial class WhWzSettings : UserControl
     private IDiscImageService DiscImages { get; }
 
     public WhWzSettings(
+        IFileSystem fileSystem,
         IApplicationLogFiles logFiles,
         IFilePickerService filePicker,
         IDolphinPaths dolphinPaths,
@@ -54,6 +58,7 @@ public partial class WhWzSettings : UserControl
         IDiscImageService discImages
     )
     {
+        this.fileSystem = fileSystem;
         DiscImages = discImages;
         FilePicker = filePicker;
         DolphinPaths = dolphinPaths;
@@ -166,7 +171,7 @@ public partial class WhWzSettings : UserControl
                 if (string.IsNullOrWhiteSpace(resolvedFolder))
                     return;
 
-                var executablePath = Path.Combine(resolvedFolder, "Contents", "MacOS", "Dolphin");
+                var executablePath = fileSystem.Path.Combine(resolvedFolder, "Contents", "MacOS", "Dolphin");
                 await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, ShellQuoting.QuoteUnixArgument(executablePath));
             }
 
@@ -178,7 +183,7 @@ public partial class WhWzSettings : UserControl
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if (string.Equals(Path.GetFileName(filePath), "DolphinTool.exe", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(fileSystem.Path.GetFileName(filePath), "DolphinTool.exe", StringComparison.OrdinalIgnoreCase))
                 {
                     await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Warning_DolphinToolSelected);
                     return;
@@ -283,7 +288,7 @@ public partial class WhWzSettings : UserControl
         var currentFolder = (string)SettingsService.USER_FOLDER_PATH.Get();
         var topLevel = TopLevel.GetTopLevel(this);
         // If a current folder exists and is valid, suggest it as the starting location
-        if (!string.IsNullOrEmpty(currentFolder) && Directory.Exists(currentFolder))
+        if (!string.IsNullOrEmpty(currentFolder) && fileSystem.Directory.Exists(currentFolder))
         {
             var folder = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentFolder);
             var folders = await FilePicker.SelectFolderAsync("Select Dolphin User Path", folder);
@@ -312,7 +317,7 @@ public partial class WhWzSettings : UserControl
 
     private async Task<bool> ApplyLocationSettingAsync(Setting<string> setting, string path)
     {
-        var normalizedPath = setting == SettingsService.USER_FOLDER_PATH ? Path.TrimEndingDirectorySeparator(path) : path;
+        var normalizedPath = setting == SettingsService.USER_FOLDER_PATH ? fileSystem.Path.TrimEndingDirectorySeparator(path) : path;
 
         if (!SettingsEditing.Set(SettingsService, setting, normalizedPath))
         {
@@ -333,7 +338,7 @@ public partial class WhWzSettings : UserControl
 
     private void DolphinUserFolderOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if (Directory.Exists(DolphinPaths.UserFolderPath))
+        if (!string.IsNullOrWhiteSpace(DolphinPaths.UserFolderPath) && fileSystem.Directory.Exists(DolphinPaths.UserFolderPath))
             FilePicker.OpenFolderInFileManager(DolphinPaths.UserFolderPath);
     }
 
@@ -342,8 +347,8 @@ public partial class WhWzSettings : UserControl
         try
         {
             var unquotedPath = filePath.Trim().Trim('\'', '"');
-            var folderPath = Path.GetDirectoryName(Path.GetFullPath(unquotedPath));
-            if (!string.IsNullOrWhiteSpace(folderPath) && Directory.Exists(folderPath))
+            var folderPath = fileSystem.Path.GetDirectoryName(fileSystem.Path.GetFullPath(unquotedPath));
+            if (!string.IsNullOrWhiteSpace(folderPath) && fileSystem.Directory.Exists(folderPath))
                 FilePicker.OpenFolderInFileManager(folderPath);
         }
         catch
@@ -354,8 +359,8 @@ public partial class WhWzSettings : UserControl
 
     private void AppDataLocationOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if (!Directory.Exists(ApplicationData.DirectoryPath))
-            Directory.CreateDirectory(ApplicationData.DirectoryPath);
+        if (!fileSystem.Directory.Exists(ApplicationData.DirectoryPath))
+            fileSystem.Directory.CreateDirectory(ApplicationData.DirectoryPath);
 
         FilePicker.OpenFolderInFileManager(ApplicationData.DirectoryPath);
     }
@@ -391,7 +396,9 @@ public partial class WhWzSettings : UserControl
             DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(DolphinPaths.ExecutablePath);
         GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
         UpdateGameFileDetails();
-        DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(DolphinPaths.UserFolderPath);
+        DolphinUserFolderOpenButton.IsEnabled = (
+            !string.IsNullOrWhiteSpace(DolphinPaths.UserFolderPath) && fileSystem.Directory.Exists(DolphinPaths.UserFolderPath)
+        );
     }
 
     private static void SetLocationRowState(PathIcon completeIcon, PathIcon warningIcon, SettingsButton changeButton, bool isValid)
@@ -401,13 +408,13 @@ public partial class WhWzSettings : UserControl
         changeButton.Tone = isValid ? ActionButtonTone.Secondary : ActionButtonTone.Brand;
     }
 
-    private static bool CanOpenContainingFolder(string filePath)
+    private bool CanOpenContainingFolder(string filePath)
     {
         try
         {
             var unquotedPath = filePath.Trim().Trim('\'', '"');
-            var folderPath = Path.GetDirectoryName(Path.GetFullPath(unquotedPath));
-            return !string.IsNullOrWhiteSpace(folderPath) && Directory.Exists(folderPath);
+            var folderPath = fileSystem.Path.GetDirectoryName(fileSystem.Path.GetFullPath(unquotedPath));
+            return !string.IsNullOrWhiteSpace(folderPath) && fileSystem.Directory.Exists(folderPath);
         }
         catch
         {
@@ -415,7 +422,8 @@ public partial class WhWzSettings : UserControl
         }
     }
 
-    private static bool IsConfiguredExecutableFile(string value) => File.Exists(value.Trim().Trim('\'', '"'));
+    private bool IsConfiguredExecutableFile(string value) =>
+        !string.IsNullOrWhiteSpace(value.Trim().Trim('\'', '"')) && fileSystem.File.Exists(value.Trim().Trim('\'', '"'));
 
     private void UpdateAppDataLocationUi()
     {
@@ -661,7 +669,7 @@ public partial class WhWzSettings : UserControl
         IStorageFolder? suggestedStart = null;
 
         var currentPath = ApplicationData.DirectoryPath;
-        if (!string.IsNullOrWhiteSpace(currentPath) && Directory.Exists(currentPath))
+        if (!string.IsNullOrWhiteSpace(currentPath) && fileSystem.Directory.Exists(currentPath))
             suggestedStart = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentPath);
 
         var folders = await FilePicker.SelectFolderAsync("Select Wheel Wizard data folder", suggestedStart);

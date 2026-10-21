@@ -4,6 +4,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NSubstitute;
+using Testably.Abstractions;
 using WheelWizard.GameBanana;
 using WheelWizard.Mods;
 using WheelWizard.Mods.Views.Dialogs;
@@ -47,7 +48,15 @@ public class ModInstallOwnerLifetimeTests
                 // Deliberately return late instead of honoring cancellation, to exercise the race.
                 return finished.Task;
             });
-        var content = new ModContent(manager, gameBanana, downloads, Substitute.For<IGameBananaMediaService>(), paths, presentation);
+        var content = new ModContent(
+            new RealFileSystem(),
+            manager,
+            gameBanana,
+            downloads,
+            Substitute.For<IGameBananaMediaService>(),
+            paths,
+            presentation
+        );
         var mod = ModTestFixture.CreateMod(123, "Test mod");
         mod.Files = [new() { FileName = "mod.zip", DownloadUrl = "https://example.com/mod.zip" }];
         typeof(ModContent).GetProperty("CurrentMod", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(content, mod);

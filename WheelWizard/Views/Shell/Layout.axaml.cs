@@ -442,7 +442,7 @@ public partial class Layout : BaseWindow, IPollingListener
             if (this.FindControl<PathIcon>("LiveStatusIcon") is { } pathIcon)
             {
                 // Parse the SVG path data
-                var geometry = Geometry.Parse(sender.Status.Icon!);
+                var geometry = Geometry.Parse(sender.Status!.Icon!);
                 pathIcon.Data = geometry;
 
                 // Apply custom color if provided, otherwise use a default
@@ -461,7 +461,7 @@ public partial class Layout : BaseWindow, IPollingListener
             LiveStatusIcon.ClearValue(PathIcon.DataProperty);
             LiveStatusIcon.ClearValue(PathIcon.ForegroundProperty);
             // Use variant-based styling
-            LiveStatusBorder.Classes.Add(sender.Status.Variant.ToString()!);
+            LiveStatusBorder.Classes.Add(sender.Status!.Variant.ToString()!);
         }
     }
 
