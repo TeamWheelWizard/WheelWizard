@@ -48,7 +48,12 @@ public static class PathSafety
             return false;
 
         var trimmedPath = path.Trim();
-        if (NativePath.IsPathFullyQualified(trimmedPath) || trimmedPath.StartsWith('/') || trimmedPath.StartsWith('\\'))
+        if (
+            NativePath.IsPathFullyQualified(trimmedPath)
+            || trimmedPath.StartsWith('/')
+            || trimmedPath.StartsWith('\\')
+            || IsWindowsDriveRooted(trimmedPath)
+        )
             return false;
 
         var segments = trimmedPath.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries).Where(segment => segment != ".");
@@ -56,7 +61,7 @@ public static class PathSafety
         var safeSegments = new List<string>();
         foreach (var segment in segments)
         {
-            if (segment == ".." || segment.Contains(':'))
+            if (segment == ".." || segment.Contains(NativePath.VolumeSeparatorChar))
                 return false;
 
             safeSegments.Add(segment);
@@ -68,6 +73,10 @@ public static class PathSafety
         normalizedPath = NativePath.Combine(safeSegments.ToArray());
         return true;
     }
+
+    // Windows drive paths are rejected on every platform, even where ':' is a valid filename character.
+    private static bool IsWindowsDriveRooted(string path) =>
+        path.Length >= 2 && char.IsAsciiLetter(path[0]) && path[1] == ':' && (path.Length == 2 || path[2] is '/' or '\\');
 
     public static bool TryGetSafeFileName(string fileName, out string safeFileName)
     {

@@ -338,7 +338,7 @@ public partial class WhWzSettings : UserControl
 
     private void DolphinUserFolderOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if ((!string.IsNullOrWhiteSpace(DolphinPaths.UserFolderPath) && fileSystem.Directory.Exists(DolphinPaths.UserFolderPath)))
+        if (!string.IsNullOrWhiteSpace(DolphinPaths.UserFolderPath) && fileSystem.Directory.Exists(DolphinPaths.UserFolderPath))
             FilePicker.OpenFolderInFileManager(DolphinPaths.UserFolderPath);
     }
 

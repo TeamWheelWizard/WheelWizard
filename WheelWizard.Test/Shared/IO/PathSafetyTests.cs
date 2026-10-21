@@ -10,6 +10,7 @@ public class PathSafetyTests
     [InlineData("nested\\..\\outside.bin")]
     [InlineData("/absolute.bin")]
     [InlineData("C:\\absolute.bin")]
+    [InlineData("C:/absolute.bin")]
     [InlineData(" ")]
     public void UnsafeRelativePathsAreRejected(string path)
     {
@@ -25,6 +26,13 @@ public class PathSafetyTests
         Assert.Equal(Path.Combine(root, "nested", "file.bin"), path);
         Assert.False(PathSafety.IsPathWithinDirectory(root, root + "-sibling/file.bin"));
         Assert.True(PathSafety.IsPathWithinDirectory(root, root));
+    }
+
+    [Fact]
+    public void ColonInSegmentFollowsPlatformRules()
+    {
+        var accepted = PathSafety.TryGetPathWithinDirectory(Path.GetTempPath(), "nested/data:variant.bin", out _);
+        Assert.Equal(!OperatingSystem.IsWindows(), accepted);
     }
 
     [Theory]
