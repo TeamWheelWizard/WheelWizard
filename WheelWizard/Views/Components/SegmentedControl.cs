@@ -43,6 +43,8 @@ public class SegmentedControl : ListBox
         set => SetValue(VariantProperty, value);
     }
     private Border? _indicator;
+    private Control? _indicatorSelection;
+    private Point? _indicatorPosition;
 
     public SegmentedControl() =>
         LayoutUpdated += (_, _) =>
@@ -103,6 +105,8 @@ public class SegmentedControl : ListBox
     {
         base.OnApplyTemplate(e);
         _indicator = e.NameScope.Find<Border>("PART_SelectionIndicator");
+        _indicatorSelection = null;
+        _indicatorPosition = null;
         UpdateIndicator();
     }
 
@@ -114,12 +118,26 @@ public class SegmentedControl : ListBox
         var position = selected?.TranslatePoint(default, _indicator.GetVisualParent()!);
         _indicator.IsVisible = position.HasValue && selected!.Bounds.Width > 0;
         if (!_indicator.IsVisible)
+        {
+            _indicatorSelection = null;
+            _indicatorPosition = null;
             return;
+        }
         _indicator.Width = selected!.Bounds.Width;
         _indicator.Height = selected.Bounds.Height;
+        if (ReferenceEquals(_indicatorSelection, selected) && _indicatorPosition == position)
+            return;
+        var animate = _indicatorSelection is not null && !ReferenceEquals(_indicatorSelection, selected);
         var transform = (TranslateTransform)_indicator.RenderTransform!;
+        var transitions = transform.Transitions;
+        if (!animate)
+            transform.Transitions = null;
         transform.X = position!.Value.X;
         transform.Y = position.Value.Y;
+        if (!animate)
+            transform.Transitions = transitions;
+        _indicatorSelection = selected;
+        _indicatorPosition = position;
     }
 }
 

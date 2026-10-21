@@ -18,7 +18,7 @@ using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.DesignTime;
 
-public partial class DevToolWindow : PopupContent, IPollingListener
+public partial class DevToolWindow : ModalContent, IPollingListener
 {
     private IMemoryCache Cache { get; }
 
@@ -29,7 +29,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     private DevelopmentRefreshService DevelopmentRefresh { get; }
     private INavigationService Navigation { get; }
 
-    private IPopupFactory Popups { get; }
+    private IModalFactory Popups { get; }
 
     public DevToolWindow(
         IMemoryCache cache,
@@ -37,9 +37,9 @@ public partial class DevToolWindow : PopupContent, IPollingListener
         LiveRoomsService liveRooms,
         DevelopmentRefreshService developmentRefresh,
         INavigationService navigation,
-        IPopupFactory popups
+        IModalFactory popups
     )
-        : base(true, true, true, "Dev Tool")
+        : base("Dev Tool")
     {
         Cache = cache;
         DolphinLaunchService = dolphinLaunchService;
@@ -48,6 +48,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
         Navigation = navigation;
         Popups = popups;
         InitializeComponent();
+        IsDismissible = true;
         DevelopmentRefresh.Subscribe(this);
         LoadSettings();
     }
@@ -67,9 +68,13 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     private void LoadSettings()
     {
         WhWzTopMost.IsChecked = ViewUtils.GetLayout().Topmost;
+        SuccessStatusIconOverride.IsChecked = ViewUtils.GetLayout().DevSuccessStatusIconOverride;
     }
 
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
+
+    private void SuccessStatusIconOverride_OnClick(object sender, RoutedEventArgs e) =>
+        ViewUtils.GetLayout().SetDevSuccessStatusIconOverride(SuccessStatusIconOverride.IsChecked == true);
 
     private void ShowMiiAnimator_OnClick(object sender, RoutedEventArgs e) => Popups.Create<MiiAnimatorDevWindow>().Show();
 

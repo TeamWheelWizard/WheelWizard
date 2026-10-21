@@ -198,7 +198,6 @@ pt:
       other: "Tens %{count} amigos online"
     rooms_page_disclaimer: "Tem em conta que esta página não te oferece a funcionalidade de entrares  diretamente numa sala. Para entrares numa sala em específico, terás de entrar através de um amigo, ou então esperas que entres na sala ao entrares nos servers online"
     friends_page_disclaimer: "Para adicionar amigos precisas de adicioná-los dentro do jogo."
-    region_user_selection: "Isto só mostra regiões onde TU já jogaste."
     primary_profile: "O perfil primário é usado como referência no cliente do Wheel Wizard."
   empty_content:
     no_profiles: "Tens de jogar o jogo pelo menos uma vez para poderes ver o teu perfil aqui escrito"

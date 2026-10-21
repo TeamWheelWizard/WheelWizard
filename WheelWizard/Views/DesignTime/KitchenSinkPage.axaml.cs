@@ -25,6 +25,7 @@ public partial class KitchenSinkPage : UserControl, ILockedSidebarPage
         ("Button", CreateButtonExample),
         ("Tooltip", CreateTooltipExample),
         ("Spinner", CreateSpinnerExample),
+        ("Slider", CreateSliderExample),
         ("Segmented control", CreateSegmentedExample),
         ("Split button", CreateSplitButtonExample),
     ];
@@ -90,6 +91,7 @@ public partial class KitchenSinkPage : UserControl, ILockedSidebarPage
             .Choice(nameof(preview.Variant), "Bordered", Enum.GetValues<DropdownVariant>())
             .Text(nameof(preview.Note), "")
             .Switch(nameof(preview.Search), "False")
+            .Switch(nameof(preview.Multiple), "False")
             .Text(nameof(preview.SearchPlaceholder), preview.SearchPlaceholder ?? "Search...")
             .Text(nameof(preview.EmptyText), preview.EmptyText ?? "No options found")
             .Text(nameof(preview.ErrorText), "")
@@ -184,6 +186,28 @@ public partial class KitchenSinkPage : UserControl, ILockedSidebarPage
         var preview = new Spinner();
         preview.Bind(HeightProperty, new Binding(nameof(preview.Width)) { Source = preview });
         return new Example("Spinner", preview).Choice(nameof(preview.Width), "24", new double[] { 16, 24, 32, 48 }).Build();
+    }
+
+    private static Control CreateSliderExample()
+    {
+        var preview = new ValueSlider
+        {
+            Classes = { "KitchenSinkPreview" },
+            Value = 40,
+            HorizontalAlignment = HorizontalAlignment.Left,
+        };
+        var value = Label("");
+        value.Bind(TextBlock.TextProperty, new Binding(nameof(preview.Value)) { Source = preview, StringFormat = "Value: {0:0}" });
+        return new Example("Slider", preview, "Slider", new StackPanel { Spacing = 8, Children = { preview, value } })
+            .Text(nameof(preview.Value), "40")
+            .Choice(nameof(preview.Minimum), "0", new double[] { 0, 10, 20 })
+            .Choice(nameof(preview.Maximum), "100", new double[] { 100, 150, 200 })
+            .Choice(nameof(preview.Orientation), "Horizontal", Enum.GetValues<Orientation>())
+            .Choice(nameof(preview.TickCount), "1", new[] { 1, 3, 5, 10 })
+            .Switch(nameof(preview.FillTrack), "True")
+            .Switch(nameof(preview.IsDirectionReversed), "False")
+            .Switch(nameof(preview.IsEnabled), "True")
+            .Build();
     }
 
     private static Control CreateSegmentedExample()

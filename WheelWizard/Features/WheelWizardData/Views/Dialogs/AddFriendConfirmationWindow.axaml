@@ -1,4 +1,4 @@
-<dialogBase:PopupContent xmlns="https://github.com/avaloniaui"
+<dialogBase:ModalContent xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,38 +11,45 @@
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base"
         xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
         xmlns:communityDialogs="clr-namespace:WheelWizard.WheelWizardData.Views.Dialogs">
-    <Grid Width="400" RowDefinitions="Auto,Auto,Auto,Auto">
-        <TextBlock Grid.Row="0" Classes="TitleText" FontSize="20"
-                   Foreground="{StaticResource FormFieldLabelColor}"
-                   Text="Is this who you want to add?"
-                   TextWrapping="Wrap" />
+    <Grid Width="400" RowDefinitions="Auto,*,Auto">
+        <components:ModalHeading>
+            <TextBlock Grid.Row="0" Classes="TitleText" FontSize="20"
+                       Foreground="{StaticResource FormFieldLabelColor}"
+                       Text="Is this who you want to add?"
+                       TextWrapping="Wrap" />
+        </components:ModalHeading>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid RowDefinitions="Auto,Auto,Auto">
 
-        <Grid Grid.Row="1" Margin="0,16,0,10" ColumnDefinitions="Auto,*">
-            <Border Grid.Column="0" Width="96" Height="96" CornerRadius="999999"
-                    ClipToBounds="True" Background="{StaticResource Neutral950}" Margin="0,0,16,0">
-                <miiImages:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                         Mii="{Binding FriendMii}"
-                                         LoadingColor="{StaticResource Neutral600}"
-                                         FallBackColor="{StaticResource Neutral600}"
-                                         ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
-            </Border>
 
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
-                <TextBlock Classes="BodyText" FontSize="18"
-                           Foreground="{StaticResource FormFieldLabelColor}"
-                           Text="{Binding FriendName}" />
-                <TextBlock Classes="BodyText" FontSize="14"
-                           Foreground="{StaticResource Neutral300}"
-                           Text="{Binding FriendCode}" />
-                <components:StatusBadge Text="{Binding FriendVr, StringFormat='VR {0}'}"
-                                     Variant="Success"
-                                     HorizontalAlignment="Left" />
-            </StackPanel>
-        </Grid>
+                <Grid Grid.Row="1" Margin="0,16,0,10" ColumnDefinitions="Auto,*">
+                    <Border Grid.Column="0" Width="96" Height="96" CornerRadius="999999"
+                            ClipToBounds="True" Background="{StaticResource Neutral950}" Margin="0,0,16,0">
+                        <miiImages:MiiImageLoader HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                 Mii="{Binding FriendMii}"
+                                                 LoadingColor="{StaticResource Neutral600}"
+                                                 FallBackColor="{StaticResource Neutral600}"
+                                                 ImageVariant="{x:Static miiVars:MiiImageVariants.FriendsSideProfile}" />
+                    </Border>
 
-        <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
+                        <TextBlock Classes="BodyText" FontSize="18"
+                                   Foreground="{StaticResource FormFieldLabelColor}"
+                                   Text="{Binding FriendName}" />
+                        <TextBlock Classes="BodyText" FontSize="14"
+                                   Foreground="{StaticResource Neutral300}"
+                                   Text="{Binding FriendCode}" />
+                        <components:StatusBadge Text="{Binding FriendVr, StringFormat='VR {0}'}"
+                                             Variant="Success"
+                                             HorizontalAlignment="Left" />
+                    </StackPanel>
+                </Grid>
 
-        <UniformGrid Grid.Row="3" Columns="2" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}" Height="1" />
+
+            </Grid>
+        </ScrollViewer>
+        <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right" Margin="0,10,0,0">
             <components:ActionButton Text="{loc:T action.cancel}"
                                IconData="{StaticResource XMark}"
                                Margin="0,0,6,0"
@@ -53,4 +60,4 @@
                                Click="AddFriend_OnClick"  Tone="Brand"/>
         </UniformGrid>
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

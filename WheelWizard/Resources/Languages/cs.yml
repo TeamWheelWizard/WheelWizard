@@ -190,7 +190,6 @@ cs:
       Upozorňujeme, že tato stránka nenabízí žádnou funkci pro přímé připojení k místnosti.
       Chceš-li se připojit ke konkrétní místnosti, budeš se muset buď připojit prostřednictvím kamaráda, nebo doufat, že se k ní připojíš připojením k online serverům.
     friends_page_disclaimer: "Chceš-li přidat kamarády, musíš je přidat ve hře."
-    region_user_selection: "To ukazuje pouze regiony, ve kterých TY jsi hrál"
     primary_profile: "Primární profil se používá jako reference v klientovi Wheel Wizard"
   empty_content:
     no_profiles: "Hru musíš hrát aspoň jednou, abys viděl tvé profily zde uvedené"

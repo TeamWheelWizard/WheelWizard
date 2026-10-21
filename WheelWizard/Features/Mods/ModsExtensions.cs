@@ -8,6 +8,7 @@ public static class ModsExtensions
         services.AddSingleton<IModInstallationService, ModInstallationService>();
         services.AddSingleton<IModManager, ModManager>();
         services.AddSingleton<IModsLaunchService, ModsLaunchService>();
+        services.AddTransient<ViewModels.ModBrowserViewModel>();
         return services;
     }
 }

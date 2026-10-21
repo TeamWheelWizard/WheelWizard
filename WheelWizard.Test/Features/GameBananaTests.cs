@@ -51,7 +51,7 @@ namespace WheelWizard.Test.Features
         }
 
         [Fact]
-        public async Task GetModSearchResults_WithEmptySearchTerm_UsesDefaultTerm()
+        public async Task GetModSearchResults_WithEmptySearchTerm_UsesCategoryCatalog()
         {
             // Arrange
             var emptySearchTerm = "";
@@ -72,7 +72,11 @@ namespace WheelWizard.Test.Features
                 .Returns(Ok(expectedResults));
 
             // Act
-            var result = await _service.GetModSearchResults(emptySearchTerm, page);
+            var result = await _service.GetModSearchResults(emptySearchTerm, page, 10082);
+            var request =
+                (Expression<Func<IGameBananaApi, Task<GameBananaSearchResults>>>)_apiCaller.ReceivedCalls().Single().GetArguments()[0]!;
+            await request.Compile()(_api);
+            await _api.Received(1).GetMods(5896, 10082, 1, 12);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -121,6 +125,24 @@ namespace WheelWizard.Test.Features
             await _apiCaller.Received(1).CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<GameBananaModDetails>>>>());
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetModDetails_WithNullRequiredObject_ReturnsFailure(bool missingCategory)
+        {
+            var details = CreateFakeModDetails(123);
+            if (missingCategory)
+                details.Category = null!;
+            else
+                details.Author = null!;
+            _apiCaller.CallApiAsync(Arg.Any<Expression<Func<IGameBananaApi, Task<GameBananaModDetails>>>>()).Returns(Ok(details));
+
+            var result = await _service.GetModDetails(123);
+
+            Assert.True(result.IsFailure);
+            Assert.Contains("incomplete mod details", result.Error.Message);
+        }
+
         [Fact]
         public async Task GetModDetails_WithApiError_ReturnsFailure()
         {
@@ -136,21 +158,6 @@ namespace WheelWizard.Test.Features
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(expectedError, result.Error.Message);
-        }
-
-        [Fact]
-        public void GetLoadingPreview_ReturnsValidLoadingPreview()
-        {
-            // Act
-            var result = _service.GetLoadingPreview();
-
-            // Assert
-            Assert.Equal("LOADING", result.Name);
-            Assert.Equal("LOADING", result.Author.Name);
-            // The only 2 important properties are Name and Author.Name
-            // For all the other properties the values all don't matter
-            // These 2 properties are used in the ModBrowserListItem component, so if you want to change this, you will
-            // also have to change it there
         }
 
         [Fact]

@@ -23,7 +23,7 @@ namespace WheelWizard.WheelWizardData.Views;
 
 public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
-    private IPopupFactory Popups { get; }
+    private IModalFactory Popups { get; }
 
     private INavigationService Navigation { get; }
 
@@ -95,7 +95,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     }
 
     public FriendsPage(
-        IPopupFactory popups,
+        IModalFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameLicenseService,
@@ -223,14 +223,14 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
 
     private static FriendProfile? FriendOf(object? sender) => (sender as StyledElement)?.DataContext as FriendProfile;
 
-    /// <summary>A left click on a card opens the same menu a right-click does (its buttons handle their own clicks).</summary>
+    /// <summary>Open the profile on left-click; nested buttons handle their own clicks.</summary>
     private void Card_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (sender is not Control card || e.InitialPressMouseButton != MouseButton.Left)
             return;
         if (!new Rect(card.Bounds.Size).Contains(e.GetPosition(card)))
             return;
-        card.ContextMenu?.Open(card);
+        ViewProfile(FriendOf(card));
         e.Handled = true;
     }
 
@@ -260,7 +260,9 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     {
         if (string.IsNullOrEmpty(selectedPlayer?.FriendCode))
             return;
-        Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode).Show();
+        var profile = Popups.Create<PlayerProfileWindow>(selectedPlayer.FriendCode);
+        profile.SetModalOwner(this);
+        profile.Show();
     }
 
     private void ViewOnRwfc(FriendProfile? selectedPlayer)

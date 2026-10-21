@@ -5,8 +5,10 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationLifecycle.Logging;
+using WheelWizard.DiscImages;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
+using WheelWizard.Models.Enums;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Desktop.Storage;
@@ -16,6 +18,7 @@ using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
+using WheelWizard.WiiManagement.GameLicense;
 using SettingsButton = WheelWizard.Views.Components.ActionButton;
 
 namespace WheelWizard.Settings.Views;
@@ -41,6 +44,8 @@ public partial class WhWzSettings : UserControl
 
     private IApplicationDataLocation ApplicationData { get; }
 
+    private IDiscImageService DiscImages { get; }
+
     public WhWzSettings(
         IFileSystem fileSystem,
         IApplicationLogFiles logFiles,
@@ -49,10 +54,12 @@ public partial class WhWzSettings : UserControl
         ISettingsManager settingsService,
         IDolphinSettingManager dolphinSettingsService,
         IDolphinDiscoveryService dolphinDiscovery,
-        IApplicationDataLocation applicationData
+        IApplicationDataLocation applicationData,
+        IDiscImageService discImages
     )
     {
         this.fileSystem = fileSystem;
+        DiscImages = discImages;
         FilePicker = filePicker;
         DolphinPaths = dolphinPaths;
         SettingsService = settingsService;
@@ -80,7 +87,7 @@ public partial class WhWzSettings : UserControl
 
     private void RefreshLocalizedCodeText()
     {
-        MarioKartHelperText.Text = t("helper_text.end_with_x") + " .iso/.gcm/.gcz/.ciso/.wbfs/.wia/.rvz";
+        UpdateGameFileDetails();
         if (string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath))
             DolphinExecutableValueText.Text = GetDolphinExecutableHelperText();
     }
@@ -212,14 +219,44 @@ public partial class WhWzSettings : UserControl
     {
         var fileType = new FilePickerFileType("Game files")
         {
-            Patterns = ["*.iso", "*.gcm", "*.gcz", "*.ciso", "*.wbfs", "*.wia", "*.rvz"],
+            Patterns = DiscImages.SupportedExtensions.Select(extension => "*" + extension).ToArray(),
         };
 
         var filePath = await FilePicker.OpenSingleFileAsync("Select Mario Kart Wii Game File", [fileType]);
-        if (!string.IsNullOrEmpty(filePath))
+        if (string.IsNullOrEmpty(filePath))
+            return;
+
+        var info = DiscImages.ReadInfo(filePath);
+        if (info.IsFailure || GameRegion.FromGameId(info.Value.GameId) == MarioKartWiiEnums.Regions.None)
         {
-            await ApplyLocationSettingAsync(SettingsService.GAME_LOCATION, filePath);
+            var reason = info.IsFailure
+                ? t("message_error.invalid_game_file.unreadable")
+                : t("message_error.invalid_game_file.wrong_game", new { name = info.Value.InternalName, id = info.Value.GameId });
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText(t("message_error.invalid_game_file.title"))
+                .SetInfoText(reason)
+                .ShowDialog();
+            return;
         }
+
+        if (await ApplyLocationSettingAsync(SettingsService.GAME_LOCATION, filePath))
+        {
+            // A game from another region switches to that region's save.
+            var layout = ViewUtils.GetLayout();
+            layout.UpdateSidebarProfile();
+            layout.UpdateFriendCount();
+        }
+    }
+
+    private void UpdateGameFileDetails()
+    {
+        var info = DiscImages.ReadInfo(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
+        var region = info.IsSuccess ? GameRegion.FromGameId(info.Value.GameId) : MarioKartWiiEnums.Regions.None;
+        MarioKartHelperText.Text =
+            region != MarioKartWiiEnums.Regions.None
+                ? $"Mario Kart Wii · {GameRegion.GetDisplayName(region)} · {info.Value.Format.ToString().ToUpperInvariant()}"
+                : t("helper_text.end_with_x") + " " + string.Join("/", DiscImages.SupportedExtensions);
     }
 
     private async void DolphinUserPathBrowse_OnClick(object sender, RoutedEventArgs e)
@@ -358,6 +395,7 @@ public partial class WhWzSettings : UserControl
         DolphinExecutableOpenButton.IsEnabled =
             DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(DolphinPaths.ExecutablePath);
         GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
+        UpdateGameFileDetails();
         DolphinUserFolderOpenButton.IsEnabled = (
             !string.IsNullOrWhiteSpace(DolphinPaths.UserFolderPath) && fileSystem.Directory.Exists(DolphinPaths.UserFolderPath)
         );

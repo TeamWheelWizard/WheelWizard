@@ -6,7 +6,7 @@ using WheelWizard.Views.Dialogs.Base;
 
 namespace WheelWizard.Views.Dialogs;
 
-public partial class ProgressWindow : PopupContent
+public partial class ProgressWindow : ModalContent
 {
     private const double EtaWarmupSeconds = 5;
     private const double EtaIncreaseSmoothingSeconds = 5;
@@ -28,10 +28,11 @@ public partial class ProgressWindow : PopupContent
         : this("Progress Window") { }
 
     public ProgressWindow(string windowTitle)
-        : base(false, false, true, windowTitle)
+        : base(windowTitle)
     {
         InitializeComponent();
-        Window.Closing += OnWindowClosing;
+        GoalTextBlock.Text = string.IsNullOrWhiteSpace(windowTitle) || windowTitle == "Progress Window" ? t("state.loading") : windowTitle;
+        CancelAction = RequestCancellation;
         _updateTimer = new();
         _updateTimer.Interval = TimeSpan.FromMilliseconds(100); // Update every 100ms
         _updateTimer.Tick += UpdateTimer_Tick;
@@ -160,25 +161,17 @@ public partial class ProgressWindow : PopupContent
             WasCancellationRequested = false;
 
         CancelButton.IsVisible = cancellationTokenSource != null;
-        CancelButton.IsEnabled = cancellationTokenSource is { IsCancellationRequested: false };
+        IsCancelable = cancellationTokenSource is { IsCancellationRequested: false };
+        CancelButton.IsEnabled = IsCancelable;
         return this;
     }
 
     public ProgressWindow MarkCancellationRequested()
     {
         WasCancellationRequested = true;
+        IsCancelable = false;
         CancelButton.IsEnabled = false;
         return SetExtraText($"{t("action.cancel")}...");
-    }
-
-    private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
-    {
-        if (e.IsProgrammatic || e.CloseReason != WindowCloseReason.WindowClosing || _downloadCancellationTokenSource == null)
-            return;
-
-        // Match Cancel: keep the progress popup open until the operation finishes cleanup.
-        e.Cancel = true;
-        RequestCancellation();
     }
 
     private void CancelButton_OnClick(object? sender, RoutedEventArgs e) => RequestCancellation();

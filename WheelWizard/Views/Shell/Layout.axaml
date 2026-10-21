@@ -96,7 +96,10 @@
 
         <TextBlock Text="{loc:T category.general}" Classes="SidebarSectionText"
                    VerticalAlignment="Bottom" Grid.Row="3" /> <!-- Repurposing this translation from settings -->
-        <StackPanel x:Name="SidePanelButtons" Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="4" VerticalAlignment="Top">
+        <!-- Clip navigation to the sidebar column, leaving room for the first and last curved joins. -->
+        <Border Grid.Column="0" Grid.Row="4" ClipToBounds="True" VerticalAlignment="Top"
+                Margin="0,-7,0,-7" Padding="0,7,0,7">
+        <StackPanel x:Name="SidePanelButtons" components:Dropdown.AllowDismissInteraction="True">
             <shellControls:SidebarRadioButton IconData="{StaticResource Home}"
                                            Text="{loc:T page_title.home}"
                                            PageType="{x:Type shellViews:HomePage}"
@@ -134,6 +137,7 @@
                                            PageType="{x:Type design:TestingPage}"
                                            Text="Testing Mode" x:Name="TestingButton" IsVisible="False" />
         </StackPanel>
+        </Border>
 
         <components:ActionButton Grid.Column="0" components:Dropdown.AllowDismissInteraction="True" Grid.Row="5"
                                     x:Name="SupportUsButton"
@@ -152,10 +156,14 @@
                 x:Name="LiveStatusBorder" IsVisible="False"
                 Width="28" Height="28"
                 Classes="BottomSidebarIcon">
-            <PathIcon Width="24" Height="24"
-                      Margin="-2"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center" />
+            <Panel>
+                <PathIcon x:Name="LiveStatusIcon" Width="24" Height="24" Margin="-2"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <PathIcon x:Name="LiveStatusHighlight" Width="24" Height="24" Margin="-2"
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Data="{Binding #LiveStatusIcon.Data}" Foreground="White"
+                          Opacity="0.25" IsHitTestVisible="False" />
+            </Panel>
             <Border.Styles>
                 <Style Selector="Border PathIcon">
                     <Setter Property="Foreground" Value="Transparent" />
@@ -184,8 +192,11 @@
                     <Setter Property="Foreground" Value="{StaticResource Danger300}" />
                     <Setter Property="Data" Value="{StaticResource StarIcon}" />
                 </Style>
-                <Style Selector="Border#LiveStatusBorder:pointerover PathIcon">
-                    <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
+                <Style Selector="PathIcon#LiveStatusHighlight">
+                    <Setter Property="IsVisible" Value="False" />
+                </Style>
+                <Style Selector="Border#LiveStatusBorder:pointerover PathIcon#LiveStatusHighlight">
+                    <Setter Property="IsVisible" Value="True" />
                 </Style>
             </Border.Styles>
         </Border>

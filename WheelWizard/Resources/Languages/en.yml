@@ -167,6 +167,7 @@ en:
     change: "Change"
     view_mod: "View Mod"
     save_external_mii: "Add Mii to \"My Miis\""
+    view_player_rwfc: "View player on RWFC"
     view_profile: "View Profile"
     duplicate: "Duplicate"
     back: "Back"
@@ -260,7 +261,7 @@ en:
       Please note that this page does not offer any functionality to join a room directly.
       To join a specific room, you'll need to either join through a friend, or hope to join it by joining the online servers.
     friends_page_disclaimer: "To add friends you need to add them in-game."
-    region_user_selection: "This only shows regions YOU have played on"
+    region_from_game: "Your save region follows the region of your Mario Kart Wii game file"
     primary_profile: "The primary profile is used as reference in the wheel wizard client"
   empty_content:
     no_profiles: "You have to play the game at least once in order to see your profiles listed here"
@@ -527,6 +528,10 @@ en:
     mod_download_fail:
       title: "Mod download failed."
       extra: "An error occurred during download: %{error}"
+    invalid_game_file:
+      title: "Not a Mario Kart Wii game"
+      unreadable: "Wheel Wizard couldn't read this file as a Wii disc image."
+      wrong_game: "This file is %{name} (%{id}). Please select a Mario Kart Wii disc image."
     failed_vr_history: "Failed to load VR history"
     failed_load_leaderboard: "Could not load leaderboard."
   message_success:
@@ -735,5 +740,31 @@ en:
     dropdown:
       search_placeholder: "Search..."
       empty: "No options found"
+      remove: "Remove %{option}"
     input:
       invalid_number: "Enter a number"
+
+  mod_browser:
+    title: "Browse mods"
+    my_mods: "My mods"
+    search_placeholder: "Search mods"
+    patches_only: "Patches only"
+    patches: "Patches"
+    retry: "Try again"
+    loading: "Loading mods…"
+    short_search: "Enter at least 2 characters to search."
+    load_error: "Couldn't load mods from GameBanana. Check your connection and try again."
+    empty_title: "No matching mods"
+    empty_body: "Try another search or adjust your filters."
+    filters: "Filters"
+    mod_type: "Mod type"
+    all_types: "All types"
+    apply_filters: "Apply filter"
+    skin_types: "Characters and skins"
+    ui_types: "UI categories"
+    all_skins: "All characters and skins"
+    all_ui: "All UI categories"
+
+  mod_library:
+    priority: "Load priority"
+    reorder: "Drag to reorder"

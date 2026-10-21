@@ -11,6 +11,7 @@ using WheelWizard.Branding;
 using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
+using WheelWizard.Mods.Views;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
@@ -38,6 +39,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     protected override Control InteractionOverlay => DisabledDarkenEffect;
     protected override Control InteractionContent => WindowFrame;
+    protected override Control ModalInteractionContent => CompleteGrid;
 
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
@@ -60,6 +62,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private int _testerClickCount;
     private bool _testerPromptOpen;
+    private bool _devSuccessStatusIconOverride;
     private IDisposable? _settingsSignalSubscription;
     private readonly Task _modsLoaded;
     private readonly TaskCompletionSource _loaded = new();
@@ -214,7 +217,10 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         var reloadResult = await ModManagerService.ReloadAsync();
         if (reloadResult.IsFailure)
+        {
+            await _loaded.Task;
             MessageTranslationHelper.ShowMessage(reloadResult.Error);
+        }
     }
 
     private void OnSettingSignal(SettingChangedSignal signal) => OnSettingChanged(signal.Setting);
@@ -279,6 +285,7 @@ public partial class Layout : BaseWindow, IPollingListener
     }
 
     private bool _closeConfirmed;
+    private bool _closePromptOpen;
 
     protected override async void OnClosing(WindowClosingEventArgs e)
     {
@@ -286,10 +293,20 @@ public partial class Layout : BaseWindow, IPollingListener
         {
             e.Cancel = true;
             base.OnClosing(e);
-            if (!await guard.ConfirmLeaveAsync())
+            if (_closePromptOpen)
                 return;
-            _closeConfirmed = true;
-            Close();
+            _closePromptOpen = true;
+            try
+            {
+                if (!await guard.ConfirmLeaveAsync())
+                    return;
+                _closeConfirmed = true;
+                Close();
+            }
+            finally
+            {
+                _closePromptOpen = false;
+            }
             return;
         }
 
@@ -331,6 +348,8 @@ public partial class Layout : BaseWindow, IPollingListener
 
             // TODO: make a better way to have these type of exceptions
             if (button.PageType == typeof(RoomsPage) && typeof(RoomDetailsPage) == page.GetType())
+                button.IsChecked = true;
+            if (button.PageType == typeof(ModsPage) && page is ModBrowserPage)
                 button.IsChecked = true;
             if (button.PageType == typeof(MiiListPage) && page is MiiEditorPage)
                 button.IsChecked = true;
@@ -385,31 +404,45 @@ public partial class Layout : BaseWindow, IPollingListener
 
     public void UpdateLiveAlert() => UpdateLiveAlert(LiveStatus);
 
+    public bool DevSuccessStatusIconOverride => _devSuccessStatusIconOverride;
+
+    public void SetDevSuccessStatusIconOverride(bool enabled)
+    {
+        _devSuccessStatusIconOverride = enabled;
+        UpdateLiveAlert(LiveStatus);
+    }
+
     private void UpdateLiveAlert(LiveStatusService sender)
     {
         var hasVariant = sender.Status?.Variant != null && sender.Status.Variant != WhWzStatusVariant.None;
-        var hasCustomIcon = !string.IsNullOrEmpty(sender.Status?.Icon);
-        var visible = hasVariant || hasCustomIcon;
+        var hasCustomIcon = !_devSuccessStatusIconOverride && !string.IsNullOrEmpty(sender.Status?.Icon);
+        var visible = _devSuccessStatusIconOverride || hasVariant || hasCustomIcon;
 
         LiveStatusBorder.IsVisible = visible;
         if (!visible)
             return;
 
-        ToolTip.SetTip(LiveStatusBorder, sender.Status!.Message);
+        ToolTip.SetTip(LiveStatusBorder, sender.Status?.Message ?? "Success status (developer preview)");
         LiveStatusBorder.Classes.Clear();
         LiveStatusBorder.Classes.Add("BottomSidebarIcon");
 
+        if (_devSuccessStatusIconOverride)
+        {
+            LiveStatusIcon.ClearValue(PathIcon.DataProperty);
+            LiveStatusIcon.ClearValue(PathIcon.ForegroundProperty);
+            LiveStatusBorder.Classes.Add("Success");
+        }
         // If custom icon is provided, use it instead of variant
-        if (hasCustomIcon)
+        else if (hasCustomIcon)
         {
             // Clear any variant-based classes
             LiveStatusBorder.Classes.Add("Custom");
 
             // Find the PathIcon in the LiveStatusBorder and update it dynamically
-            if (LiveStatusBorder.Child is PathIcon pathIcon)
+            if (this.FindControl<PathIcon>("LiveStatusIcon") is { } pathIcon)
             {
                 // Parse the SVG path data
-                var geometry = Geometry.Parse(sender.Status.Icon!);
+                var geometry = Geometry.Parse(sender.Status!.Icon!);
                 pathIcon.Data = geometry;
 
                 // Apply custom color if provided, otherwise use a default
@@ -425,8 +458,10 @@ public partial class Layout : BaseWindow, IPollingListener
         }
         else
         {
+            LiveStatusIcon.ClearValue(PathIcon.DataProperty);
+            LiveStatusIcon.ClearValue(PathIcon.ForegroundProperty);
             // Use variant-based styling
-            LiveStatusBorder.Classes.Add(sender.Status.Variant.ToString()!);
+            LiveStatusBorder.Classes.Add(sender.Status!.Variant.ToString()!);
         }
     }
 
@@ -438,7 +473,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private async void TitleLabel_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed || Modals.HasModals)
             return;
 
         e.Handled = true;
@@ -549,7 +584,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void SupportUs_OnClick(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
-    public bool CompleteContentEnabled => InteractionContent.IsEnabled;
+    public bool CompleteContentEnabled => ModalInteractionContent.IsEnabled;
 
     public void ShowAppInfo() => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
 

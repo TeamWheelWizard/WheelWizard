@@ -1,4 +1,4 @@
-<dialogBase:PopupContent x:Class="WheelWizard.Views.Dialogs.MessageBoxWindow"
+<dialogBase:ModalContent x:Class="WheelWizard.Views.Dialogs.MessageBoxWindow"
                    xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,23 +7,24 @@
                    ClipToBounds="False"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base">
-    <Grid Width="400" MinHeight="150" MaxHeight="350" RowDefinitions="40,2*,1*">
+    <Grid Width="400" MinHeight="150" MaxHeight="600" RowDefinitions="40,*,Auto">
 
         <!-- Message Title -->
-        <Border Grid.Row="0" Margin="-10" x:Name="TitleBorder">
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <Border CornerRadius="4" Padding="5" VerticalAlignment="Center" Margin="0,0,10,0"
-                        IsVisible="False" x:Name="MessageTagBlock">
-                    <SelectableTextBlock x:Name="MessageTag" Classes="TitleText" FontSize="12"
-                                         HorizontalAlignment="Left" VerticalAlignment="Center"
+        <Border Grid.Row="0" Margin="{StaticResource NegativeEdgeGap}" x:Name="TitleBorder">
+            <components:ModalHeading Margin="{StaticResource EdgeGap}">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Border CornerRadius="4" Padding="5" VerticalAlignment="Center" Margin="0,0,10,0"
+                            IsVisible="False" x:Name="MessageTagBlock">
+                        <SelectableTextBlock x:Name="MessageTag" Classes="TitleText" FontSize="12"
+                                             HorizontalAlignment="Left" VerticalAlignment="Center"
+                                             Foreground="{StaticResource Brand50}" />
+                    </Border>
+                    <SelectableTextBlock Grid.Column="1" x:Name="MessageTitleBlock"
+                                         Classes="TitleText" FontSize="18" TextTrimming="CharacterEllipsis"
+                                         HorizontalAlignment="Stretch" VerticalAlignment="Center"
                                          Foreground="{StaticResource Brand50}" />
-                </Border>
-
-                <SelectableTextBlock x:Name="MessageTitleBlock"
-                                     Classes="TitleText" FontSize="18"
-                                     HorizontalAlignment="Left" VerticalAlignment="Center"
-                                     Foreground="{StaticResource Brand50}" />
-            </StackPanel>
+                </Grid>
+            </components:ModalHeading>
         </Border>
 
         <!-- Message Text -->
@@ -70,4 +71,4 @@
             </Style>
         </Grid.Styles>
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

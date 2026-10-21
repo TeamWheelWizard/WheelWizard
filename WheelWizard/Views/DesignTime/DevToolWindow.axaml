@@ -1,4 +1,4 @@
-<dialogBase:PopupContent xmlns="https://github.com/avaloniaui"
+<dialogBase:ModalContent xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,11 +6,14 @@
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="WheelWizard.Views.DesignTime.DevToolWindow"
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base">
-    <Grid Width="520" MaxHeight="600">
-        <ScrollViewer>
+    <Grid Width="520" MaxHeight="600" RowDefinitions="Auto,*">
+        <components:ModalHeading>
+            <TextBlock Text="Monitoring" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
+        </components:ModalHeading>
+        <ScrollViewer Grid.Row="1">
             <StackPanel>
                 <!-- MONITORING BIT -->
-                <TextBlock Text="Monitoring" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
+
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                     <components:StatusBadge x:Name="MiiImagesCashed" Variant="Gray" Text="0"
                                          TipPlacement="Top" Margin="10,0,0,0"
@@ -23,20 +26,24 @@
                 </StackPanel>
                 <Border Background="{StaticResource BackgroundLineColor}" Margin="-10,10" Height="1"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
-                
-                
+
+
                 <!-- TOOLS BIT -->
                 <TextBlock Text="Tools" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
                 <components:ToggleCheckBox Margin="0,2" IsChecked="False" Variant="Switch"
                           x:Name="WhWzTopMost" Click="WhWzTopMost_OnClick">
                     Wheel Wizard always on top
                 </components:ToggleCheckBox>
+                <components:ToggleCheckBox Margin="0,2" IsChecked="False" Variant="Switch"
+                          x:Name="SuccessStatusIconOverride" Click="SuccessStatusIconOverride_OnClick">
+                    Force success status icon (dev only)
+                </components:ToggleCheckBox>
 
                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" Margin="0,8" ColumnSpacing="8" RowSpacing="6">
                 <components:ActionButton Grid.Row="0" Grid.Column="0" Tone="Brand" Text="Mii Channel" IconData="{StaticResource DolphinIcon}"
                                    HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="MiiChannel_OnClick" />
-                
+
                 <components:ActionButton Grid.Row="0" Grid.Column="1" Tone="Secondary" Text="Show Mii Animator" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="ShowMiiAnimator_OnClick" />
                 <components:ActionButton Grid.Row="1" Grid.Column="0" Tone="Secondary" Text="Force enable layout" HorizontalAlignment="Stretch" Margin="0,2"
@@ -51,8 +58,8 @@
                 </Grid>
                 <Border Background="{StaticResource BackgroundLineColor}" Margin="-10,10" Height="1"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
-                
-                
+
+
                 <!-- POPUP TESTS -->
                 <TextBlock Text="Popups" HorizontalAlignment="Left" VerticalAlignment="Top" Classes="PageTitleText" />
                 <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,0,0,4">
@@ -70,4 +77,4 @@
             </StackPanel>
         </ScrollViewer>
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

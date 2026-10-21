@@ -694,20 +694,18 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             if (!_fileSystem.Directory.Exists(_distributionPaths.SaveFolderPath))
                 return Fail("Save folder not found");
 
-            var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
+            // Dolphin uses the save of the game's region, so follow the game file instead of letting the user pick.
+            var currentRegion = _saveRegions.ResolveActiveRegion(_distributionPaths.SaveFolderPath);
             if (currentRegion == MarioKartWiiEnums.Regions.None)
+                return Fail("No valid regions found");
+
+            var previousRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
+            if (currentRegion != previousRegion)
             {
-                // Double check if there's at least one valid region
-                var validRegions = _saveRegions.GetAvailableRegions(_distributionPaths.SaveFolderPath);
-                if (validRegions.First() != MarioKartWiiEnums.Regions.None)
-                {
-                    currentRegion = validRegions.First();
-                    _settingsManager.Set(_settingsManager.RR_REGION, currentRegion);
-                }
-                else
-                {
-                    return Fail("No valid regions found");
-                }
+                _settingsManager.Set(_settingsManager.RR_REGION, currentRegion);
+                // The focused slot belonged to the other region's save.
+                if (previousRegion != MarioKartWiiEnums.Regions.None)
+                    _settingsManager.Set(_settingsManager.FOCUSED_USER, 0);
             }
 
             var saveFileFolder = _fileSystem.Path.Combine(_distributionPaths.SaveFolderPath, GameRegion.GetGameId(currentRegion));

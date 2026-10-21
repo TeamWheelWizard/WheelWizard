@@ -6,7 +6,7 @@ using Button = WheelWizard.Views.Components.ActionButton;
 
 namespace WheelWizard.Views.Dialogs;
 
-public partial class MessageBoxWindow : PopupContent
+public partial class MessageBoxWindow : ModalContent
 {
     public enum MessageType
     {
@@ -18,9 +18,10 @@ public partial class MessageBoxWindow : PopupContent
     private MessageType messageType = MessageType.Message;
 
     public MessageBoxWindow()
-        : base(true, false, true, t("attribute.message"))
+        : base(t("attribute.message"))
     {
         InitializeComponent();
+        IsDismissible = true;
         SetMessageType(messageType);
     }
 
@@ -29,7 +30,7 @@ public partial class MessageBoxWindow : PopupContent
         messageType = newType;
         CancelButton.Tone = messageType == MessageType.Message ? ActionButtonTone.Brand : ActionButtonTone.Secondary;
 
-        Window.WindowTitle = messageType.ToString();
+        ModalTitle = messageType.ToString();
         TitleBorder.Classes.Add(messageType.ToString());
         return this;
     }
@@ -48,7 +49,7 @@ public partial class MessageBoxWindow : PopupContent
 
     public MessageBoxWindow SetWindowTitle(string title)
     {
-        Window.WindowTitle = title;
+        ModalTitle = title;
         return this;
     }
 

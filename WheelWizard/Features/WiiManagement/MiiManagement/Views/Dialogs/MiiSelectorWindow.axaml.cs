@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
@@ -9,17 +11,20 @@ using WheelWizard.WiiManagement.MiiManagement.Views;
 
 namespace WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
 
-public partial class MiiSelectorWindow : PopupContent
+public partial class MiiSelectorWindow : ModalContent
 {
     public Mii? Result { get; private set; } = null;
     private TaskCompletionSource<Mii?>? _tcs;
+    private Mii? _initialMii;
 
     public MiiSelectorWindow()
-        : base(true, false, false, t("popup_title.mii_selector"))
+        : base(t("popup_title.mii_selector"))
     {
         InitializeComponent();
+        IsDismissible = true;
         SaveButton.Text = t("action.save");
         CancelButton.Text = t("action.cancel");
+        UpdateSaveState();
     }
 
     public MiiSelectorWindow SetButtonText(string saveText, string cancelText)
@@ -38,6 +43,7 @@ public partial class MiiSelectorWindow : PopupContent
 
     public MiiSelectorWindow SetMiiOptions(List<Mii> miis, Mii? selected, string localMacAddress)
     {
+        _initialMii = selected;
         MiiList.Children.Clear();
         foreach (var mii in miis.OrderByDescending(m => m.IsFavorite))
         {
@@ -50,20 +56,28 @@ public partial class MiiSelectorWindow : PopupContent
                 Margin = new(8, 10),
                 IsChecked = mii.IsTheSameAs(selected),
             };
-            miiBlock.Click += ChangeMii_Click;
+            miiBlock.PropertyChanged += (_, change) =>
+            {
+                if (change.Property == ToggleButton.IsCheckedProperty)
+                    UpdateSaveState();
+            };
             MiiList.Children.Add(miiBlock);
         }
+        UpdateSaveState();
         return this;
     }
 
-    private void ChangeMii_Click(object? sender, RoutedEventArgs e)
+    private void UpdateSaveState()
     {
         var selected = MiiList.Children.OfType<MiiBlock>().FirstOrDefault(block => block.IsChecked == true)?.Mii;
-        SaveButton.IsEnabled = selected != null;
+        SaveButton.IsEnabled = selected != null && !selected.IsTheSameAs(_initialMii);
     }
 
     private void yesButton_Click(object sender, RoutedEventArgs e)
     {
+        UpdateSaveState();
+        if (!SaveButton.IsEnabled)
+            return;
         Result = MiiList.Children.OfType<MiiBlock>().FirstOrDefault(block => block.IsChecked == true)?.Mii;
         _tcs?.TrySetResult(Result); // Signal that the task is complete
         Close();

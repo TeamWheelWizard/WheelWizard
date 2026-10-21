@@ -33,7 +33,7 @@ namespace WheelWizard.Views.DesignTime;
 /// Dev tool: plays a .miianim (made with the Mii Animator) on any of the user's Miis, looping.
 /// Uses the realtime GPU view; falls back to the CPU renderer when OpenGL isn't available.
 /// </summary>
-public partial class MiiAnimatorDevWindow : PopupContent
+public partial class MiiAnimatorDevWindow : ModalContent
 {
     private static readonly double[] Speeds = [0.25, 0.5, 1, 2];
     private static readonly FilePickerFileType MiiAnimFiles = new("Mii animation") { Patterns = ["*" + MiiAnimFormat.FileExtension] };
@@ -80,7 +80,7 @@ public partial class MiiAnimatorDevWindow : PopupContent
         IFilePickerService filePicker,
         IFileSystem fileSystem
     )
-        : base(true, true, false, "Mii Animator")
+        : base("Mii Animator")
     {
         MiiDb = miiDb;
         Renderer = renderer;
@@ -88,6 +88,7 @@ public partial class MiiAnimatorDevWindow : PopupContent
         FilePicker = filePicker;
         FileSystem = fileSystem;
         InitializeComponent();
+        IsDismissible = true;
 
         // The realtime view is transparent: it sits on the preview's background like any other control.
         _realtime = new MiiRealtimeView(renderer) { IsHitTestVisible = false };

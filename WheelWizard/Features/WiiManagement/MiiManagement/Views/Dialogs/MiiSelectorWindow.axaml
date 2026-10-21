@@ -1,4 +1,4 @@
-<dialogBase:PopupContent xmlns="https://github.com/avaloniaui"
+<dialogBase:ModalContent xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,18 +7,21 @@
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="WheelWizard.WiiManagement.MiiManagement.Views.Dialogs.MiiSelectorWindow"
         xmlns:dialogBase="clr-namespace:WheelWizard.Views.Dialogs.Base">
-    <Grid MinWidth="400" MaxHeight="950" RowDefinitions="*,*,*">
-        <ScrollViewer Margin="0,0,0,10">
-            <UniformGrid Columns="5" HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="MiiList">
+    <Grid Width="540" RowDefinitions="Auto,*,Auto,Auto">
+        <components:ModalHeading Margin="0,0,0,12">
+            <TextBlock Classes="TitleText" Text="{ReflectionBinding ModalTitle, RelativeSource={RelativeSource AncestorType=dialogBase:ModalContent}}" TextWrapping="Wrap" />
+        </components:ModalHeading>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,10">
+            <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="MiiList">
               <!-- the list off Miis are generated in this thing here -->
-            </UniformGrid>
+            </WrapPanel>
         </ScrollViewer>
-        <Border Grid.Row="1" Background="{StaticResource BackgroundLineColor}"
+        <Border Grid.Row="2" Background="{StaticResource BackgroundLineColor}"
                 Height="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-        <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+        <UniformGrid Grid.Row="3" Columns="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                      x:Name="ButtonContainer"  Margin="0,10,0,0">
             <components:ActionButton x:Name="CancelButton"
-                               IsEnabled="True" Text="{loc:T action.cancel}" 
+                               IsEnabled="True" Text="{loc:T action.cancel}"
                                IconData="{StaticResource XMark}"
                                Click="noButton_Click" Margin="0,0,5,0" Tone="Secondary"/>
             <components:ActionButton x:Name="SaveButton"
@@ -27,4 +30,4 @@
                                Click="yesButton_Click" Margin="5,0,0,0" Tone="Brand"/>
         </UniformGrid>
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

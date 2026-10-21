@@ -59,16 +59,10 @@
                    VerticalAlignment="Bottom"
                    Classes="PageTitleText" />
 
-        <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
-            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="18" Height="18" Margin="10,0,10,12"
-                    ToolTip.Tip="{loc:T hover.region_user_selection}" ToolTip.Placement="Top"
-                    ToolTip.ShowDelay="20">
-                <PathIcon Foreground="{StaticResource TitleIconColor}" Margin="0"
-                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Data="{StaticResource InfoTip}" />
-            </Border>
-            <components:Dropdown x:Name="RegionDropdown" Margin="3,0,0,10" MinWidth="160"
-                      HorizontalAlignment="Right" VerticalAlignment="Bottom" />
-        </StackPanel>
+        <TextBlock Grid.Row="0" x:Name="RegionBadge" Classes="BodyText" Margin="0,0,0,14"
+                   Foreground="{StaticResource TitleIconColor}"
+                   HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   ToolTip.Tip="{loc:T hover.region_from_game}" ToolTip.Placement="Top" ToolTip.ShowDelay="20" />
 
         <ScrollViewer Grid.Row="1" x:Name="ProfileContent" Margin="0,0,0,1"
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
@@ -100,6 +94,7 @@
                 <!-- THE LICENSE. Fixed height: the photo has to stay at least as wide as it is tall, or the Mii no
                      longer lines up with the bottom edge it stands behind. -->
                 <Border Classes="License" Classes.Online="{Binding IsOnline}" Height="176">
+                    <Border CornerRadius="11" ClipToBounds="True">
                     <Grid ColumnDefinitions="176,*">
 
                         <!-- PHOTO: the Mii stands behind the card's bottom edge, like in a window -->
@@ -270,6 +265,7 @@
                             </Grid>
                         </Grid>
                     </Grid>
+                    </Border>
                 </Border>
 
                 <!-- VR HISTORY: gets the rest of the page (the chart grows to fill it, see code-behind) -->

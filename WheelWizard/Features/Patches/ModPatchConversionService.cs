@@ -17,6 +17,8 @@ public interface IModPatchConversionService
 {
     bool HasIncompatibleSzsFiles(Mod mod);
 
+    bool HasPatches(Mod mod);
+
     IReadOnlyList<string> GetConvertibleArchiveFiles(Mod mod);
 
     void RefreshCompatibility(Mod mod);
@@ -37,6 +39,24 @@ public sealed class ModPatchConversionService(
 ) : IModPatchConversionService
 {
     public bool HasIncompatibleSzsFiles(Mod mod) => GetConvertibleArchiveFiles(mod).Any();
+
+    public bool HasPatches(Mod mod)
+    {
+        var directory = paths.GetModDirectoryPath(mod.Title);
+        return fileSystem.Directory.Exists(directory)
+            && fileSystem
+                .Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories)
+                .Any(file =>
+                {
+                    var name = fileSystem.Path.GetFileName(file);
+                    if (IsModdingArchiveFile(name) || LooseBrsarPatchFileName.TryGetNormalizedFileName(name, out _))
+                        return true;
+                    // Loose archive patches use the target archive tag as their final extension.
+                    var tag = fileSystem.Path.GetExtension(name).TrimStart('.');
+                    return fileSystem.Path.GetFileNameWithoutExtension(name).Contains('.')
+                        && baselineStore.FindCandidates($"{tag}.szs", "szs").Count > 0;
+                });
+    }
 
     public IReadOnlyList<string> GetConvertibleArchiveFiles(Mod mod)
     {

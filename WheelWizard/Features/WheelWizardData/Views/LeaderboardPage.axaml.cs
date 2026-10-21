@@ -58,7 +58,7 @@ public sealed record LeaderboardPlayerItem
 
 public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 {
-    private IPopupFactory Popups { get; }
+    private IModalFactory Popups { get; }
 
     private INavigationService Navigation { get; }
 
@@ -184,7 +184,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
     public bool HasPodiumThird => _podiumThird != null;
 
     public LeaderboardPage(
-        IPopupFactory popups,
+        IModalFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IRrLeaderboardSingletonService leaderboardService,

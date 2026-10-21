@@ -1,7 +1,10 @@
+using System.Collections;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
+using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
@@ -17,6 +20,22 @@ namespace WheelWizard.Views.Components;
 
 public class Dropdown : ComboBox
 {
+    public static readonly StyledProperty<bool> MultipleProperty = AvaloniaProperty.Register<Dropdown, bool>(nameof(Multiple));
+    public static new readonly DirectProperty<SelectingItemsControl, IList?> SelectedItemsProperty =
+        SelectingItemsControl.SelectedItemsProperty;
+
+    public bool Multiple
+    {
+        get => GetValue(MultipleProperty);
+        set => SetValue(MultipleProperty, value);
+    }
+
+    public new IList? SelectedItems
+    {
+        get => base.SelectedItems;
+        set => base.SelectedItems = value;
+    }
+
     public static readonly AttachedProperty<bool> AllowDismissInteractionProperty = AvaloniaProperty.RegisterAttached<
         Dropdown,
         Control,
@@ -88,12 +107,23 @@ public class Dropdown : ComboBox
                 },
                 DispatcherPriority.Input
             );
-        ItemsView.CollectionChanged += (_, _) => Dispatcher.UIThread.Post(FilterOptions);
+        ItemsView.CollectionChanged += (_, _) => Dispatcher.UIThread.Post(UpdateMultipleSelection);
+        SelectionChanged += (_, _) =>
+        {
+            FilterOptions();
+            // The bound list finishes resetting after SelectionChanged is raised.
+            if (Multiple)
+                Dispatcher.UIThread.Post(UpdateMultipleSelection);
+        };
         DataTemplates.Add(
             new FuncDataTemplate<DropdownOption>(
                 (option, _) =>
                 {
-                    var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                    var row = new Grid
+                    {
+                        ColumnDefinitions = ColumnDefinitions.Parse("Auto,*"),
+                        ColumnSpacing = option.Icon is null ? 0 : 8,
+                    };
                     if (option.Icon is not null)
                         row.Children.Add(
                             new PathIcon
@@ -105,7 +135,14 @@ public class Dropdown : ComboBox
                                 VerticalAlignment = VerticalAlignment.Center,
                             }
                         );
-                    row.Children.Add(new TextBlock { Text = option.Text, VerticalAlignment = VerticalAlignment.Center });
+                    var label = new TextBlock
+                    {
+                        Text = option.Text,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        TextTrimming = TextTrimming.CharacterEllipsis,
+                    };
+                    Grid.SetColumn(label, 1);
+                    row.Children.Add(label);
                     return row;
                 }
             )
@@ -130,6 +167,116 @@ public class Dropdown : ComboBox
     private long _searchTime;
     private InputField? _searchInput;
     private TextBlock? _empty;
+    private ItemsControl? _selectedItems;
+    private bool _updatingSelection;
+
+    private void UpdateMultipleSelection()
+    {
+        if (_updatingSelection)
+            return;
+        _updatingSelection = true;
+        try
+        {
+            if (Multiple)
+                for (var i = 0; i < ItemCount; i++)
+                    if (ItemsView[i] is DropdownOption { IsSelectionRequired: true })
+                        Selection.Select(i);
+            FilterOptions();
+        }
+        finally
+        {
+            _updatingSelection = false;
+        }
+    }
+
+    private Control CreateSelectionBadge(object item)
+    {
+        var row = new Grid { ColumnDefinitions = ColumnDefinitions.Parse("*,Auto"), ColumnSpacing = 4 };
+        row.Children.Add(
+            new ContentPresenter
+            {
+                Content = item,
+                ContentTemplate = SelectionBoxItemTemplate ?? ItemTemplate,
+                VerticalAlignment = VerticalAlignment.Center,
+            }
+        );
+        if (item is DropdownOption { IsSelectionRequired: true })
+        {
+            var icon = new PathIcon
+            {
+                Data = this.FindResource("Lock") as Geometry,
+                Width = 12,
+                Height = 12,
+            };
+            Grid.SetColumn(icon, 1);
+            row.Children.Add(icon);
+        }
+        else
+        {
+            var remove = new ActionButton
+            {
+                Classes = { "DropdownRemove" },
+                IconData = this.FindResource("XMark") as Geometry,
+                Variant = ActionButtonVariant.Label,
+                Tone = ActionButtonTone.Brand,
+                Size = ButtonSize.Compact,
+                Width = 20,
+                Height = 20,
+                MinWidth = 0,
+                MinHeight = 0,
+                Padding = new Thickness(3),
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            AutomationProperties.SetName(remove, t("component.dropdown.remove", new { option = OptionText(item) }));
+            remove.Click += (_, e) =>
+            {
+                SelectedItems?.Remove(item);
+                e.Handled = true;
+                if (Search && IsDropDownOpen)
+                    _searchInput?.Focus();
+                else
+                    Focus();
+            };
+            Grid.SetColumn(remove, 1);
+            row.Children.Add(remove);
+        }
+        var badge = new Border { Classes = { "DropdownSelectionBadge" }, Child = row };
+        badge.Bind(MaxWidthProperty, new Binding("Bounds.Width") { Source = _selectedItems });
+        return badge;
+    }
+
+    private static bool IsRemoveButton(Visual source) =>
+        source.GetVisualAncestors().Prepend(source).OfType<Control>().Any(control => control.Classes.Contains("DropdownRemove"));
+
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        if (Multiple && e.Source is Visual source && IsRemoveButton(source))
+            return;
+        base.OnPointerPressed(e);
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        if (Multiple && e.Source is Visual source && IsRemoveButton(source))
+            return;
+        base.OnPointerReleased(e);
+    }
+
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+    {
+        if (!Multiple)
+            base.OnPointerWheelChanged(e);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (Multiple && !e.Handled && !IsDropDownOpen && e.Key is Key.Up or Key.Down)
+        {
+            SetCurrentValue(IsDropDownOpenProperty, true);
+            e.Handled = true;
+        }
+        base.OnKeyDown(e);
+    }
 
     private static string OptionText(object? item)
     {
@@ -139,7 +286,8 @@ public class Dropdown : ComboBox
     }
 
     private bool Matches(object? item) =>
-        !Search || OptionText(item).Contains(_searchInput?.Text?.Trim() ?? "", StringComparison.CurrentCultureIgnoreCase);
+        (!Multiple || SelectedItems?.Contains(item) != true)
+        && (!Search || OptionText(item).Contains(_searchInput?.Text?.Trim() ?? "", StringComparison.CurrentCultureIgnoreCase));
 
     private void FilterOptions()
     {
@@ -179,6 +327,12 @@ public class Dropdown : ComboBox
         {
             if (options.Length > 0)
             {
+                if (Multiple)
+                {
+                    SelectMultiple(options[0]);
+                    e.Handled = true;
+                    return;
+                }
                 if (!options.Contains(SelectedIndex))
                     SetCurrentValue(SelectedIndexProperty, options[0]);
                 SetCurrentValue(IsDropDownOpenProperty, false);
@@ -204,11 +358,19 @@ public class Dropdown : ComboBox
         for (var index = 0; index < ItemCount; index++)
         {
             var item = ItemsView[index];
-            if (item is InputElement { IsEnabled: false } || ContainerFromIndex(index) is { IsEnabled: false })
+            if (!Matches(item) || item is InputElement { IsEnabled: false } || ContainerFromIndex(index) is { IsEnabled: false })
                 continue;
             if (OptionText(item).StartsWith(_searchTerm, StringComparison.OrdinalIgnoreCase))
             {
-                SetCurrentValue(SelectedIndexProperty, index);
+                if (Multiple)
+                {
+                    SetCurrentValue(IsDropDownOpenProperty, true);
+                    _menu?.UpdateLayout();
+                    if (ContainerFromIndex(index)?.Focus(NavigationMethod.Directional) != true)
+                        continue;
+                }
+                else
+                    SetCurrentValue(SelectedIndexProperty, index);
                 break;
             }
         }
@@ -247,9 +409,11 @@ public class Dropdown : ComboBox
         _menu = e.NameScope.Get<Border>("PART_Menu");
         _searchInput = e.NameScope.Get<InputField>("PART_Search");
         _empty = e.NameScope.Get<TextBlock>("PART_Empty");
+        _selectedItems = e.NameScope.Get<ItemsControl>("PART_SelectedItems");
+        _selectedItems.ItemTemplate = new FuncDataTemplate<object>((item, _) => CreateSelectionBadge(item));
         _searchInput.TextChanged += SearchTextChanged;
         _searchInput.AddHandler(KeyDownEvent, SearchKeyDown, RoutingStrategies.Tunnel);
-        FilterOptions();
+        UpdateMultipleSelection();
         _popup.Closed += OnPopupClosed;
         if (IsDropDownOpen)
             _ = UpdateMenuAsync();
@@ -258,6 +422,11 @@ public class Dropdown : ComboBox
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
+        if (change.Property == MultipleProperty)
+        {
+            SelectionMode = Multiple ? SelectionMode.Multiple : SelectionMode.Single;
+            UpdateMultipleSelection();
+        }
         if (change.Property == ErrorTextProperty || change.Property == NoteProperty)
         {
             SetAndRaise(HasErrorProperty, ref _hasError, !string.IsNullOrWhiteSpace(ErrorText));
@@ -288,7 +457,7 @@ public class Dropdown : ComboBox
                 {
                     PointerEventArgs pointer => ShouldTriggerSelection(container, pointer),
                     KeyEventArgs key => ShouldTriggerSelection(container, key),
-                    FocusChangedEventArgs => !Search,
+                    FocusChangedEventArgs => !Search && !Multiple,
                     _ => false,
                 }
             )
@@ -297,10 +466,26 @@ public class Dropdown : ComboBox
         var index = IndexFromContainer(container);
         if (index < 0)
             return false;
+        if (Multiple)
+        {
+            SelectMultiple(index);
+            eventArgs.Handled = true;
+            return true;
+        }
         SetCurrentValue(SelectedIndexProperty, index);
         eventArgs.Handled = true;
         SetCurrentValue(IsDropDownOpenProperty, false);
         return true;
+    }
+
+    private void SelectMultiple(int index)
+    {
+        Selection.Select(index);
+        _searchInput?.SetCurrentValue(TextBox.TextProperty, "");
+        if (Search)
+            _searchInput?.Focus();
+        else
+            Focus();
     }
 
     private async Task UpdateMenuAsync()
@@ -392,6 +577,8 @@ public class Dropdown : ComboBox
     {
         if (_popup is null || e.Source is not Visual source || _popup.IsInsidePopup(source))
             return;
+        if (Multiple && IsRemoveButton(source))
+            return;
         SetCurrentValue(IsDropDownOpenProperty, false);
         if (source.GetVisualAncestors().Prepend(source).OfType<Control>().Any(GetAllowDismissInteraction))
             CleanupMenu();
@@ -451,6 +638,7 @@ public sealed class DropdownOption : InputElement
 
     public string Text { get; }
     public Geometry? Icon { get; }
+    public bool IsSelectionRequired { get; set; }
 
     public override string ToString() => Text;
 }

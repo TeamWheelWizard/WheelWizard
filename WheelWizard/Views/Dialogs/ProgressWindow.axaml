@@ -1,4 +1,4 @@
-<dialogBase:PopupContent x:Class="WheelWizard.Views.Dialogs.ProgressWindow"
+<dialogBase:ModalContent x:Class="WheelWizard.Views.Dialogs.ProgressWindow"
                     xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,24 +12,29 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Goal Description -->
-        <Border Grid.Row="0" Background="{StaticResource Brand500}" Margin="-10" >
-            <SelectableTextBlock Margin="10" x:Name="GoalTextBlock"
-                                 Classes="TitleText" FontSize="18"
-                                 HorizontalAlignment="Left" VerticalAlignment="Center"
-                                 Foreground="{StaticResource Brand50}" />
+        <Border Grid.Row="0" Background="{StaticResource Brand500}" Margin="{StaticResource NegativeEdgeGap}" x:Name="GoalBorder">
+            <components:ModalHeading Margin="{StaticResource EdgeGap}">
+                <SelectableTextBlock x:Name="GoalTextBlock"
+                                     Classes="TitleText" FontSize="18" TextTrimming="CharacterEllipsis"
+                                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                     Foreground="{StaticResource Brand50}" />
+            </components:ModalHeading>
         </Border>
 
-        <Grid Grid.Row="1" Margin="0,10" RowDefinitions="*,Auto,Auto">
+        <Grid Grid.Row="1" Margin="0,10" RowDefinitions="*,Auto">
             <!-- Extra Information -->
-            <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <SelectableTextBlock Classes="BodyText" x:Name="ExtraTextBlock"
-                                     FontSize="14" HorizontalAlignment="Left" Margin="0,10,0,0" />
-                <SelectableTextBlock Classes="BodyText" x:Name="LiveTextBlock"
-                                     FontSize="14" HorizontalAlignment="Left" Margin="0,10,0,0" />
-            </StackPanel>
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                    <SelectableTextBlock Classes="BodyText" x:Name="ExtraTextBlock"
+                                         FontSize="14" TextWrapping="Wrap" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                    <SelectableTextBlock Classes="BodyText" x:Name="LiveTextBlock"
+                                         FontSize="14" TextWrapping="Wrap" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                </StackPanel>
+            </ScrollViewer>
 
             <!-- Progress Bar -->
             <ProgressBar Grid.Row="1" VerticalAlignment="Bottom" x:Name="ProgressBar" Height="20"
@@ -40,13 +45,13 @@
                          Background="{StaticResource BackgroundLineColor}"
                          Margin="0,10,0,0" />
 
-            <components:ActionButton Grid.Row="2"
-                               x:Name="CancelButton"
-                               Text="{loc:T action.cancel}"
-                               IsVisible="False"
-                               HorizontalAlignment="Right"
-                               Margin="0,10,0,0"
-                               Click="CancelButton_OnClick"  Tone="Danger"/>
         </Grid>
+        <components:ActionButton Grid.Row="2"
+                           x:Name="CancelButton"
+                           Text="{loc:T action.cancel}"
+                           IsVisible="False"
+                           HorizontalAlignment="Right"
+                           Margin="0,10,0,0"
+                           Click="CancelButton_OnClick"  Tone="Danger"/>
     </Grid>
-</dialogBase:PopupContent>
+</dialogBase:ModalContent>

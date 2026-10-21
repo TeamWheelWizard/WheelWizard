@@ -18,38 +18,6 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="components|ToggleRadioButton.MiiTextVariant">
-            <Setter Property="Height" Value="46" />
-            <Setter Property="Padding" Value="12,0" />
-            <Setter Property="Margin" Value="2,0" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Background" Value="{StaticResource Neutral600}" />
-            <Setter Property="Foreground" Value="{StaticResource Neutral300}" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"
-                                          Foreground="{TemplateBinding Foreground}" />
-                    </Border>
-                </ControlTemplate>
-            </Setter>
-        </Style>
-        <Style Selector="components|ToggleRadioButton.MiiTextVariant:pointerover">
-            <Setter Property="Background" Value="{StaticResource Neutral700}" />
-        </Style>
-        <Style Selector="components|ToggleRadioButton.MiiTextVariant:checked">
-            <Setter Property="Background" Value="{StaticResource Brand600}" />
-        </Style>
-        <Style Selector="components|ToggleRadioButton.MiiTextVariant:checked:pointerover">
-            <Setter Property="Background" Value="{StaticResource Brand700}" />
-        </Style>
-        <Style Selector="components|ToggleRadioButton.MiiTextVariant:disabled">
-            <Setter Property="Background" Value="{StaticResource Neutral800}" />
-            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
-        </Style>
         <!-- Floating panels over the Mii. -->
         <Style Selector="Border.Floating">
             <Setter Property="Background" Value="{StaticResource Neutral900}" />
@@ -68,7 +36,6 @@
             <Setter Property="Opacity" Value="0" />
             <Setter Property="IsHitTestVisible" Value="False" />
         </Style>
-        <!-- Floating without a card behind it (the sliders, and the colour button while it's closed). -->
         <Style Selector="Border.Floating.Bare">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Transparent" />
@@ -91,9 +58,12 @@
             <Setter Property="Margin" Value="6,3" />
             <Setter Property="Background" Value="{StaticResource Neutral700}" />
         </Style>
-        <Style Selector="components|MultiIconRadioButton.Variant">
+        <Style Selector="components|ActionButton.CardSwitch">
             <Setter Property="Width" Value="54" />
             <Setter Property="Height" Value="54" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Variant" Value="Label" />
+            <Setter Property="Tone" Value="Secondary" />
         </Style>
 
         <!-- Upright body sliders. -->
@@ -110,29 +80,16 @@
         <Style Selector="StackPanel.BodySlider:pointerover PathIcon">
             <Setter Property="Foreground" Value="{StaticResource Brand300}" />
         </Style>
-        <Style Selector="StackPanel.BodySlider Slider">
+        <Style Selector="StackPanel.BodySlider components|ValueSlider">
             <Setter Property="Height" Value="210" />
             <Setter Property="HorizontalAlignment" Value="Center" />
         </Style>
 
-        <!-- Colour swatches. -->
-        <Style Selector="Button.Swatch">
-            <Setter Property="Width" Value="34" />
-            <Setter Property="Height" Value="34" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="CornerRadius" Value="17" />
-            <Setter Property="BorderThickness" Value="2" />
-            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+        <Style Selector="Border.SwatchHighlight">
+            <Setter Property="Opacity" Value="0" />
         </Style>
-        <Style Selector="Button.Swatch /template/ ContentPresenter">
-            <Setter Property="CornerRadius" Value="17" />
-        </Style>
-        <Style Selector="Button.Swatch:pointerover /template/ ContentPresenter">
-            <Setter Property="BorderBrush" Value="{StaticResource Neutral200}" />
-        </Style>
-        <Style Selector="Button.Swatch.selected /template/ ContentPresenter">
-            <Setter Property="BorderBrush" Value="{StaticResource Brand300}" />
+        <Style Selector="components|SegmentOption.Swatch:pointerover Border.SwatchHighlight">
+            <Setter Property="Opacity" Value="0.12" />
         </Style>
     </UserControl.Styles>
 
@@ -196,12 +153,12 @@
             <StackPanel Orientation="Horizontal" Spacing="6">
                 <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.height}">
                     <PathIcon Data="{StaticResource MiiEditorHeightIcon}" />
-                    <Slider x:Name="HeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
+                    <components:ValueSlider x:Name="HeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
                             ValueChanged="HeightSlider_OnValueChanged" />
                 </StackPanel>
                 <StackPanel Classes="BodySlider" ToolTip.Tip="{loc:T attribute.mii.width}">
                     <PathIcon Data="{StaticResource MiiEditorWeightIcon}" />
-                    <Slider x:Name="WeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
+                    <components:ValueSlider x:Name="WeightSlider" Orientation="Vertical" Minimum="0" Maximum="127"
                             ValueChanged="WeightSlider_OnValueChanged" />
                 </StackPanel>
             </StackPanel>
@@ -241,26 +198,35 @@
             </StackPanel>
         </Border>
 
-        <!-- Bottom, over the Mii: every variant of the selected part, and the colour button in the corner. -->
-        <Grid x:Name="BottomBar" Height="78" VerticalAlignment="Bottom">
-            <Border x:Name="VariantPanel" Classes="Floating hidden" Margin="0,0,70,0" Padding="4">
-                <ScrollViewer x:Name="VariantScroller" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                    <StackPanel x:Name="VariantItems" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" />
-                </ScrollViewer>
-            </Border>
-
-            <Border x:Name="ColorPanel" Classes="Floating Bare hidden" HorizontalAlignment="Right" Width="62" Padding="6"
-                    ClipToBounds="True">
-                <Grid ColumnDefinitions="*,Auto">
-                    <ScrollViewer x:Name="SwatchScroller" Opacity="0" HorizontalScrollBarVisibility="Auto"
-                                  VerticalScrollBarVisibility="Disabled" Margin="4,0,8,0">
-                        <StackPanel x:Name="SwatchItems" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" />
-                    </ScrollViewer>
-                    <Button x:Name="ColorButton" Grid.Column="1" Classes="Swatch" Width="48" Height="48" CornerRadius="24"
-                            Click="ColorButton_OnClick" ToolTip.Tip="{loc:T hover.mii_editor.color}">
-                        <Border x:Name="ColorDot" Width="36" Height="36" CornerRadius="18" BorderThickness="2"
-                                BorderBrush="{StaticResource Neutral900}" />
-                    </Button>
+        <Grid x:Name="BottomBar" Height="78" VerticalAlignment="Bottom" Margin="0,0,0,16">
+            <Border x:Name="VariantPanel" Classes="Floating hidden" Padding="4" ClipToBounds="True">
+                <Grid x:Name="SelectionContent" ColumnDefinitions="*,Auto">
+                    <Grid ClipToBounds="True">
+                        <ScrollViewer x:Name="VariantScroller" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                            <components:SegmentedControl x:Name="VariantItems" HasBorder="False" Variant="Light" Padding="0"
+                                                         HorizontalAlignment="Left"
+                                                         VerticalAlignment="Center" SelectionChanged="VariantItems_OnSelectionChanged" />
+                        </ScrollViewer>
+                        <components:ActionButton x:Name="VariantButton" Classes="CardSwitch" IsVisible="False"
+                                                        HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0"
+                                                        Focusable="False" Click="VariantButton_OnClick" />
+                    </Grid>
+                    <Grid x:Name="ColorPanel" Grid.Column="1" Width="62" ColumnDefinitions="1,*" ClipToBounds="True">
+                        <Border x:Name="ColorDivider" Background="{StaticResource Neutral700}" Margin="0,8" />
+                        <Grid Grid.Column="1">
+                            <ScrollViewer x:Name="SwatchScroller" IsVisible="False" HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Disabled" Margin="10,0,6,0">
+                                <components:SegmentedControl x:Name="SwatchItems" HasBorder="False" Variant="Light" Padding="0"
+                                                             HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                             SelectionChanged="SwatchItems_OnSelectionChanged" />
+                            </ScrollViewer>
+                            <components:ActionButton x:Name="ColorButton" Classes="CardSwitch"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Click="ColorButton_OnClick" ToolTip.Tip="{loc:T hover.mii_editor.color}">
+                                <Border x:Name="ColorDot" Width="28" Height="28" CornerRadius="14" IsHitTestVisible="False" />
+                            </components:ActionButton>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Border>
 

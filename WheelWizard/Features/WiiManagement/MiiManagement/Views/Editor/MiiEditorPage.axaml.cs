@@ -2,6 +2,7 @@ using System.Numerics;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -66,6 +67,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
 
     private Mii? _dragStart;
     private bool _colorOpen;
+    private CancellationTokenSource? _colorPanelAnimation;
     private bool _updatingFields;
     private Mii? _preview;
 
@@ -113,6 +115,8 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
         _random = random;
         _animate = settings.ENABLE_ANIMATIONS.Get();
         InitializeComponent();
+        SelectionContent.SizeChanged += (_, _) => UpdateColorLayout(animate: false);
+        DetachedFromVisualTree += (_, _) => _colorPanelAnimation?.Cancel();
 
         _scene = new MiiEditorScene(renderer, animations, calendar, random.Random.Shared, _animate);
         StageHost.Children.Add(_scene);
@@ -364,10 +368,10 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
     }
 
     private void AddSideButton(MiiPartDefinition definition, string titleKey, bool isChecked, Action click) =>
-        AddSideButton(definition.Icon, titleKey, isChecked, click, definition.StyleIcon);
+        AddSideButton(definition.Icon, titleKey, isChecked, click, icon => StylePartIcon(definition, icon));
 
     /// <summary>A sidebar button with a Mii part icon (coloured by <paramref name="styleIcon"/>) or a one-colour geometry.</summary>
-    private void AddSideButton(string icon, string titleKey, bool isChecked, Action click, Action<MultiIconRadioButton>? styleIcon = null)
+    private void AddSideButton(string icon, string titleKey, bool isChecked, Action click, Action<MultiColoredIcon>? styleIcon = null)
     {
         var button = new MultiIconRadioButton
         {
@@ -384,7 +388,16 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             button.Classes.Add("Geometry");
         }
 
-        styleIcon?.Invoke(button);
+        if (styleIcon is not null && button.IconData is not null)
+        {
+            var palette = new MultiColoredIcon();
+            styleIcon(palette);
+            button.Color1 = palette.Color1;
+            button.Color2 = palette.Color2;
+            button.Color3 = palette.Color3;
+            button.Color4 = palette.Color4;
+            button.Color5 = palette.Color5;
+        }
         ToolTip.SetTip(button, t(titleKey));
         button.Click += (_, _) => click();
         SidebarItems.Children.Add(button);
@@ -413,6 +426,7 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
 
         var colors = _section == Section.Body ? MiiEditorParts.FavoriteColors : definition?.Colors;
         SetColors(colors, mii);
+        SetShown(VariantPanel, definition?.Variants is not null || colors is not null);
 
         SetShown(BodyPanel, _section == Section.Body);
         SetShown(InfoCard, _section == Section.Info);
@@ -487,67 +501,110 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
     }
 
     private MiiEditPart? _variantsBuiltFor;
+    private bool _updatingVariants;
+
+    private MultiColoredIcon CreatePartIcon(MiiPartDefinition definition, string key)
+    {
+        var icon = new MultiColoredIcon
+        {
+            IconData = (DrawingImage)FindIcon(key),
+            Width = 42,
+            Height = 42,
+        };
+        StylePartIcon(definition, icon);
+        return icon;
+    }
+
+    private void StylePartIcon(MiiPartDefinition definition, MultiColoredIcon icon)
+    {
+        definition.StyleIcon?.Invoke(icon);
+        if (definition.Part == MiiEditPart.Eyes && definition.Colors is { } colors && _session is { } session)
+            icon.Color3 = new SolidColorBrush(colors.Swatches[colors.Get(session.Mii)]);
+        else if (definition.Part == MiiEditPart.Mouth && _session is { } mouthSession)
+        {
+            icon.Color1 = new SolidColorBrush(MiiColorMappings.LipTopColor[mouthSession.Mii.MiiLips.Color]);
+            icon.Color2 = new SolidColorBrush(MiiColorMappings.LipBottomColor[mouthSession.Mii.MiiLips.Color]);
+        }
+    }
+
+    private void VariantItems_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (!_updatingVariants && VariantItems.SelectedItem is SegmentOption { Tag: int index })
+            PickVariant(index);
+    }
 
     private void RebuildVariants(MiiPartDefinition? definition, Mii mii)
     {
-        if (definition?.Variants is not { } variants)
+        _updatingVariants = true;
+        try
         {
-            _variantsBuiltFor = null;
-            VariantItems.Children.Clear();
-            SetShown(VariantPanel, false);
-            return;
-        }
-
-        var current = variants.Get(mii);
-        if (_variantsBuiltFor != definition.Part)
-        {
-            _variantsBuiltFor = definition.Part;
-            VariantItems.Children.Clear();
-            for (var i = variants.First; i < variants.Count; i++)
+            if (definition?.Variants is not { } variants)
             {
-                var index = i;
-                ToggleButton button;
-                if (variants.IconPrefix is { } prefix)
-                {
-                    var icon = new MultiIconRadioButton
-                    {
-                        Classes = { "Variant" },
-                        Focusable = false,
-                        IconData = (DrawingImage)FindIcon($"{prefix}{index:00}"),
-                        GroupName = "MiiEditorVariants" + GetHashCode(),
-                    };
-                    definition.StyleIcon?.Invoke(icon);
-                    button = icon;
-                }
-                else
-                {
-                    button = new ToggleRadioButton
-                    {
-                        Classes = { "MiiTextVariant" },
-                        GroupName = "MiiEditorVariants" + GetHashCode(),
-                        Focusable = false,
-                        Content = new TextBlock { Text = variants.Label?.Invoke(index) ?? index.ToString(), Classes = { "BodyText" } },
-                    };
-                }
-
-                button.Tag = index;
-                button.Click += (_, _) => PickVariant(index);
-                VariantItems.Children.Add(button);
+                _variantsBuiltFor = null;
+                VariantItems.Items.Clear();
+                return;
             }
-        }
 
-        foreach (var child in VariantItems.Children.OfType<ToggleButton>())
-            child.IsChecked = child.Tag is int index && index == current && definition.IsPresent(mii);
-        SetShown(VariantPanel, true);
-        // Keep the selected one in view (after layout, so new buttons have their place).
-        Dispatcher.UIThread.Post(
-            () =>
+            var current = variants.Get(mii);
+            if (_variantsBuiltFor != definition.Part)
             {
-                if (VariantItems.Children.OfType<ToggleButton>().FirstOrDefault(b => b.IsChecked == true) is { } selected)
-                    selected.BringIntoView();
-            },
-            DispatcherPriority.Background
-        );
+                CloseColors(animate: false);
+                _variantsBuiltFor = definition.Part;
+                VariantItems.Items.Clear();
+                var first = Math.Min(variants.First, variants.NoneValue ?? variants.First);
+                var indices = Enumerable.Range(first, variants.Count - first).OrderBy(index => index == variants.NoneValue ? 0 : 1);
+                foreach (var index in indices)
+                {
+                    var option = new SegmentOption
+                    {
+                        Tag = index,
+                        Height = 54,
+                        Padding = new Thickness(6),
+                        Focusable = false,
+                    };
+                    var label = index == variants.NoneValue ? t("attribute.mii_feature.none") : variants.Label?.Invoke(index);
+                    if (variants.IconPrefix is { } prefix)
+                    {
+                        option.Width = 54;
+                        option.Content = CreatePartIcon(definition, $"{prefix}{index:00}");
+                        ToolTip.SetTip(option, label ?? $"{t(definition.TitleKey)} {index + 1}");
+                    }
+                    else
+                    {
+                        option.Text = label ?? index.ToString();
+                        option.Padding = new Thickness(12, 0);
+                    }
+                    AutomationProperties.SetName(option, label ?? $"{t(definition.TitleKey)} {index + 1}");
+                    VariantItems.Items.Add(option);
+                }
+            }
+
+            VariantItems.SelectedItem = VariantItems
+                .Items.OfType<SegmentOption>()
+                .FirstOrDefault(option => option.Tag is int index && index == current);
+            if (definition.Part is MiiEditPart.Eyes or MiiEditPart.Mouth)
+                foreach (var icon in VariantItems.Items.OfType<SegmentOption>().Select(option => option.Content).OfType<MultiColoredIcon>())
+                    StylePartIcon(definition, icon);
+            if (variants.IconPrefix is { } selectedPrefix)
+            {
+                VariantButton.Content = CreatePartIcon(definition, $"{selectedPrefix}{current:00}");
+            }
+            ToolTip.SetTip(VariantButton, t(definition.TitleKey));
+            AutomationProperties.SetName(VariantButton, t(definition.TitleKey));
+            // Keep the selected one in view (after layout, so new buttons have their place).
+            Dispatcher.UIThread.Post(
+                () =>
+                {
+                    if (VariantItems.SelectedItem is SegmentOption selected)
+                        selected.BringIntoView();
+                },
+                DispatcherPriority.Background
+            );
+        }
+        finally
+        {
+            _updatingVariants = false;
+        }
     }
 
     #endregion
@@ -555,46 +612,75 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
     #region Colours
 
     private MiiColors? _colors;
+    private bool _updatingColors;
+
+    private void SwatchItems_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (!_updatingColors && SwatchItems.SelectedItem is SegmentOption { Tag: int index })
+            PickColor(index);
+    }
 
     private void SetColors(MiiColors? colors, Mii mii)
     {
-        if (!ReferenceEquals(colors, _colors))
+        _updatingColors = true;
+        try
         {
-            _colors = colors;
-            if (_colorOpen)
-                CloseColors(animate: false);
-            SwatchItems.Children.Clear();
-            if (colors is not null)
+            if (!ReferenceEquals(colors, _colors))
             {
-                for (var i = 0; i < colors.Swatches.Count; i++)
+                _colors = colors;
+                if (_colorOpen)
+                    CloseColors(animate: false);
+                SwatchItems.Items.Clear();
+                if (colors is not null)
                 {
-                    var index = i;
-                    var swatch = new Button
+                    for (var i = 0; i < colors.Swatches.Count; i++)
                     {
-                        Classes = { "Swatch" },
-                        Focusable = false,
-                        Background = new SolidColorBrush(colors.Swatches[i]),
-                        Tag = index,
-                    };
-                    swatch.Click += (_, _) => PickColor(index);
-                    swatch.PointerEntered += (_, _) => PreviewColor(index);
-                    swatch.PointerExited += (_, _) => EndPreview();
-                    SwatchItems.Children.Add(swatch);
+                        var index = i;
+                        var swatch = new SegmentOption
+                        {
+                            Classes = { "Swatch" },
+                            Focusable = false,
+                            Width = 54,
+                            Height = 54,
+                            Padding = new Thickness(10),
+                            Content = new Border
+                            {
+                                Width = 34,
+                                Height = 34,
+                                CornerRadius = new CornerRadius(17),
+                                Background = new SolidColorBrush(colors.Swatches[i]),
+                                Child = new Border
+                                {
+                                    Classes = { "SwatchHighlight" },
+                                    Background = Brushes.White,
+                                    CornerRadius = new CornerRadius(17),
+                                },
+                            },
+                            Tag = index,
+                        };
+                        AutomationProperties.SetName(swatch, $"{t("hover.mii_editor.color")} {i + 1}");
+                        swatch.PointerEntered += (_, _) => PreviewColor(index);
+                        swatch.PointerExited += (_, _) => EndPreview();
+                        SwatchItems.Items.Add(swatch);
+                    }
                 }
             }
-        }
 
-        if (colors is null)
+            if (colors is null)
+            {
+                UpdateColorLayout(animate: false);
+                return;
+            }
+
+            var current = colors.Get(mii);
+            ColorDot.Background = new SolidColorBrush(colors.Swatches[Math.Clamp(current, 0, colors.Swatches.Count - 1)]);
+            SwatchItems.SelectedIndex = current;
+            UpdateColorLayout(animate: false);
+        }
+        finally
         {
-            SetShown(ColorPanel, false);
-            return;
+            _updatingColors = false;
         }
-
-        var current = colors.Get(mii);
-        ColorDot.Background = new SolidColorBrush(colors.Swatches[Math.Clamp(current, 0, colors.Swatches.Count - 1)]);
-        foreach (var swatch in SwatchItems.Children.OfType<Button>())
-            swatch.Classes.Set("selected", swatch.Tag is int index && index == current);
-        SetShown(ColorPanel, true);
     }
 
     private void ColorButton_OnClick(object? sender, RoutedEventArgs e)
@@ -605,58 +691,87 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             OpenColors();
     }
 
-    /// <summary>The colour button grows to the left over the variants and shows every colour.</summary>
     private void OpenColors()
     {
         if (_colors is null)
             return;
         _colorOpen = true;
-        // Closed it's just the round button; open it's a card holding every colour.
-        ColorPanel.Classes.Remove("Bare");
-        var full = Math.Max(ColorPanelClosedWidth, BottomBar.Bounds.Width);
-        AnimateWidth(ColorPanel, ColorPanel.Bounds.Width, full);
-        SwatchScroller.Opacity = 1;
-        VariantPanel.Opacity = 0;
-        VariantPanel.IsHitTestVisible = false;
+        UpdateColorLayout(animate: true);
+    }
+
+    private void VariantButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        CloseColors(animate: true);
     }
 
     private void CloseColors(bool animate)
     {
         _colorOpen = false;
-        ColorPanel.Classes.Add("Bare");
         EndPreview();
-        if (animate)
-            AnimateWidth(ColorPanel, ColorPanel.Bounds.Width, ColorPanelClosedWidth);
-        else
-            ColorPanel.Width = ColorPanelClosedWidth;
-        SwatchScroller.Opacity = 0;
-        VariantPanel.ClearValue(OpacityProperty);
-        VariantPanel.ClearValue(IsHitTestVisibleProperty);
+        UpdateColorLayout(animate);
     }
 
-    private void AnimateWidth(Control control, double from, double to)
+    private void UpdateColorLayout(bool animate)
     {
-        control.Width = to;
-        if (!_animate)
-            return;
-        var animation = new Animation
+        var hasVariants = _variantsBuiltFor is not null;
+        var showColors = _colors is not null && (_colorOpen || !hasVariants);
+        ColorPanel.IsVisible = _colors is not null;
+        ColorDivider.IsVisible = hasVariants;
+        ColorButton.IsVisible = !showColors;
+        SwatchScroller.IsVisible = showColors;
+        VariantButton.IsVisible = showColors && hasVariants;
+        VariantScroller.Opacity = showColors ? 0 : 1;
+        VariantScroller.IsHitTestVisible = !showColors;
+        VariantScroller.IsVisible = hasVariants;
+        var width = showColors
+            ? Math.Max(0, SelectionContent.Bounds.Width - (hasVariants ? ColorPanelClosedWidth : 0))
+            : ColorPanelClosedWidth;
+        _ = ResizeColorPanelAsync(width, animate && _animate);
+    }
+
+    private async Task ResizeColorPanelAsync(double width, bool animate)
+    {
+        var from = ColorPanel.Bounds.Width;
+        _colorPanelAnimation?.Cancel();
+        using var cancellation = new CancellationTokenSource();
+        _colorPanelAnimation = cancellation;
+        VariantScroller.HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
+        SwatchScroller.HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
+        ColorPanel.Width = width;
+        try
         {
-            Duration = ColorPanelDuration,
-            Easing = new CubicEaseOut(),
-            Children =
+            if (animate && from != width)
             {
-                new KeyFrame { Cue = new Cue(0), Setters = { new Setter(WidthProperty, from) } },
-                new KeyFrame { Cue = new Cue(1), Setters = { new Setter(WidthProperty, to) } },
-            },
-        };
-        _ = animation.RunAsync(control);
+                var animation = new Animation
+                {
+                    Duration = ColorPanelDuration,
+                    Easing = new CubicEaseOut(),
+                    Children =
+                    {
+                        new KeyFrame { Cue = new Cue(0), Setters = { new Setter(WidthProperty, from) } },
+                        new KeyFrame { Cue = new Cue(1), Setters = { new Setter(WidthProperty, width) } },
+                    },
+                };
+                await animation.RunAsync(ColorPanel, cancellation.Token);
+            }
+            if (!cancellation.IsCancellationRequested)
+            {
+                VariantScroller.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+                SwatchScroller.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            }
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { }
+        finally
+        {
+            if (ReferenceEquals(_colorPanelAnimation, cancellation))
+                _colorPanelAnimation = null;
+        }
     }
 
     private void PickColor(int index)
     {
         _preview = null;
         var colors = _colors;
-        CloseColors(animate: true);
         if (colors is null || _session is null)
             return;
         var reaction = _section == Section.Body ? MiiEditorReaction.FavoriteColor : (MiiEditorReaction?)null;
@@ -1089,9 +1204,6 @@ public partial class MiiEditorPage : UserControl, INavigationGuard, ILockedSideb
             return;
         }
 
-        // Clicking anywhere outside the open colour panel closes it.
-        if (_colorOpen && e.Source is Visual source && !ColorPanel.IsVisualAncestorOf(source))
-            CloseColors(animate: true);
         // Keep the keyboard shortcuts working after clicking around, but don't pull focus out of the text boxes.
         if ((e.Source as Visual)?.FindAncestorOfType<TextBox>(includeSelf: true) is null)
             Focus();

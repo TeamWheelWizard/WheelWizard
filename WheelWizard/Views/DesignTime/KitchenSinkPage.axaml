@@ -36,6 +36,14 @@
         <Style Selector="Border.BlockBackground900 Border.KitchenSinkAttributeHeader">
             <Setter Property="Background" Value="{StaticResource Neutral800}" />
         </Style>
+        <Style Selector="components|ValueSlider.KitchenSinkPreview:horizontal">
+            <Setter Property="Width" Value="260" />
+            <Setter Property="Height" Value="32" />
+        </Style>
+        <Style Selector="components|ValueSlider.KitchenSinkPreview:vertical">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="180" />
+        </Style>
     </UserControl.Styles>
     <Grid>
         <Grid.RowDefinitions>
