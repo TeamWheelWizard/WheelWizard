@@ -8,6 +8,8 @@ public static class DolphinInstallerExtensions
     {
         services.AddSingleton<ILinuxDolphinInstaller, LinuxDolphinInstaller>();
         services.AddSingleton<IDolphinVersionService, DolphinVersionService>();
+        services.AddSingleton<IDolphinReleaseClient, DolphinReleaseClient>();
+        services.AddSingleton<IManagedDolphinService, ManagedDolphinService>();
         return services;
     }
 }

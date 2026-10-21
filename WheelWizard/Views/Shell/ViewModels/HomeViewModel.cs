@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Testably.Abstractions;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Launching;
 using WheelWizard.Models.Enums;
 using WheelWizard.Settings;
@@ -27,8 +28,11 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
     private readonly ISeasonalCalendar _calendar;
     private readonly IRandomSystem _random;
     private readonly TimeProvider _time;
+    private readonly IRetroRewindBackgroundInstall _backgroundInstall;
+    private readonly SynchronizationContext? _context = SynchronizationContext.Current;
     private readonly CancellationTokenSource _lifetime = new();
     private int _refreshGeneration;
+    private string? _repairMessage;
     private bool _disposed;
     private bool _busy;
     private WheelWizardStatus _status = WheelWizardStatus.Loading;
@@ -40,9 +44,12 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
         IHomePresentation presentation,
         ISeasonalCalendar calendar,
         IRandomSystem random,
-        TimeProvider time
+        TimeProvider time,
+        IRetroRewindBackgroundInstall backgroundInstall
     )
     {
+        _backgroundInstall = backgroundInstall;
+        _backgroundInstall.Changed += BackgroundInstall_OnChanged;
         _launcher = launchers.GetActiveLauncher();
         _dolphin = dolphin;
         _settings = settings;
@@ -57,11 +64,19 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
     public WheelWizardStatus Status => _status;
     public bool IsBusy => _busy;
     public bool IsInteractable => !_busy && !_disposed;
+
+    /// <summary>The onboarding's Retro Rewind download is still running; Play waits for it.</summary>
+    public bool IsBackgroundInstalling => _backgroundInstall.IsRunning;
+
+    /// <summary>What stops a setup from playing right now, e.g. a Dolphin folder on an unplugged drive; <see langword="null"/> when nothing does.</summary>
+    public string? RepairMessage => _repairMessage;
+    public bool IsRepairVisible => _repairMessage is not null;
     public bool IsDolphinVisible => !_settings.IsRecompModeActive();
     public bool AnimationsEnabled => _settings.Get<bool>(_settings.ENABLE_ANIMATIONS);
     public string GameTitle => _launcher.GameTitle == "Retro Rewind" && _calendar.IsAprilFirst ? "Retro Beefbai" : _launcher.GameTitle;
     public bool CanExecuteMain =>
         IsInteractable
+        && !IsBackgroundInstalling
         && _status
             is WheelWizardStatus.NoServerButInstalled
                 or WheelWizardStatus.NoDolphin
@@ -76,19 +91,21 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
         && _status is not (WheelWizardStatus.Loading or WheelWizardStatus.NoDolphin or WheelWizardStatus.NoDolphinExtension);
 
     public string ButtonText =>
-        _status switch
-        {
-            WheelWizardStatus.NoServer => t("state.no_server"),
-            WheelWizardStatus.NoDolphinExtension => t("state.no_dolphin_extension"),
-            WheelWizardStatus.NoRecompExtension => t("state.no_recomp_extension"),
-            WheelWizardStatus.NoServerButInstalled => t("action.play_offline"),
-            WheelWizardStatus.NoDolphin => "Dolphin not setup",
-            WheelWizardStatus.ConfigNotFinished => t("state.config_not_finished"),
-            WheelWizardStatus.NotInstalled => t("action.install"),
-            WheelWizardStatus.OutOfDate => t("action.update"),
-            WheelWizardStatus.Ready => t("action.play"),
-            _ => t("state.loading"),
-        };
+        IsBackgroundInstalling
+            ? t("onboarding.rr_installing_button", new { percent = _backgroundInstall.Percent })
+            : _status switch
+            {
+                WheelWizardStatus.NoServer => t("state.no_server"),
+                WheelWizardStatus.NoDolphinExtension => t("state.no_dolphin_extension"),
+                WheelWizardStatus.NoRecompExtension => t("state.no_recomp_extension"),
+                WheelWizardStatus.NoServerButInstalled => t("action.play_offline"),
+                WheelWizardStatus.NoDolphin => "Dolphin not setup",
+                WheelWizardStatus.ConfigNotFinished => t("state.config_not_finished"),
+                WheelWizardStatus.NotInstalled => t("action.install"),
+                WheelWizardStatus.OutOfDate => t("action.update"),
+                WheelWizardStatus.Ready => t("action.play"),
+                _ => t("state.loading"),
+            };
 
     public ActionButtonTone ButtonTone =>
         _status switch
@@ -100,7 +117,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
             _ => ActionButtonTone.Primary,
         };
 
-    public bool IsLoading => IsBusy || Status == WheelWizardStatus.Loading;
+    public bool IsLoading => IsBusy || IsBackgroundInstalling || Status == WheelWizardStatus.Loading;
 
     public string IconName =>
         _status switch
@@ -130,10 +147,40 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
             if (!_disposed && generation == _refreshGeneration)
                 _presentation.ShowError(new OperationError { Message = "Failed to check game status.", Exception = ex });
         }
+        var repairMessage = status is WheelWizardStatus.NoDolphin or WheelWizardStatus.ConfigNotFinished
+            ? await Task.Run(GetRepairMessage)
+            : null;
         if (_disposed || generation != _refreshGeneration)
             return;
         _status = status;
+        _repairMessage = repairMessage;
         NotifyStateChanged();
+    }
+
+    public void OpenSettings() => _presentation.OpenSettings();
+
+    private string? GetRepairMessage()
+    {
+        try
+        {
+            var report = _settings.ValidateCorePathSettings();
+            if (report is not { IsSuccess: true })
+                return null;
+            var codes = report.Value.Issues.Select(issue => issue.Code).ToHashSet();
+            // A missing Dolphin usually takes its user folder with it, so that is the one to name.
+            if (codes.Contains(SettingsValidationCode.InvalidDolphinLocation))
+                return t("onboarding.repair_dolphin");
+            if (codes.Contains(SettingsValidationCode.InvalidUserFolderPath))
+                return t("onboarding.repair_user_folder");
+            if (codes.Contains(SettingsValidationCode.InvalidGameLocation))
+                return t("onboarding.repair_game");
+            return null;
+        }
+        catch
+        {
+            // The banner only explains the Settings button; it must never break Home.
+            return null;
+        }
     }
 
     public async Task ExecuteMainAsync()
@@ -221,11 +268,30 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
 
     private void NotifyStateChanged() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
 
+    private void BackgroundInstall_OnChanged(object? sender, EventArgs e)
+    {
+        void Apply()
+        {
+            if (_disposed)
+                return;
+            if (_backgroundInstall.IsRunning)
+                NotifyStateChanged();
+            else
+                _ = RefreshAsync();
+        }
+
+        if (_context is null)
+            Apply();
+        else
+            _context.Post(_ => Apply(), null);
+    }
+
     public void Dispose()
     {
         if (_disposed)
             return;
         _disposed = true;
+        _backgroundInstall.Changed -= BackgroundInstall_OnChanged;
         ++_refreshGeneration;
         _lifetime.Cancel();
         _lifetime.Dispose();

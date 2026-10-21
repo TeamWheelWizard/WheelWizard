@@ -29,7 +29,7 @@ public class RecompLauncherTests
             .Install.Received(1)
             .InstallAsync(Arg.Any<IProgress<RecompInstallProgress>>(), Arg.Any<Func<Task<bool>>>(), CancellationToken.None);
         Assert.Contains(fixture.Progress, value => value.CanCancel == false);
-        fixture.Nand.Received(1).ApplyNandToRecompConfig();
+        fixture.Nand.Received(1).ApplyPathsToRecompConfig();
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class RecompLauncherTests
         await fixture
             .Install.DidNotReceive()
             .InstallAsync(Arg.Any<IProgress<RecompInstallProgress>>(), Arg.Any<Func<Task<bool>>>(), Arg.Any<CancellationToken>());
-        fixture.Nand.DidNotReceive().ApplyNandToRecompConfig();
+        fixture.Nand.DidNotReceive().ApplyPathsToRecompConfig();
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class RecompLauncherTests
             fixture.Nand.CopyNandForRecomp();
             fixture.Nand.SetCopyEnabled(true);
             fixture.Nand.SetSharingEnabled(false);
-            fixture.Nand.ApplyNandToRecompConfig();
+            fixture.Nand.ApplyPathsToRecompConfig();
         });
     }
 
@@ -165,7 +165,7 @@ public class RecompLauncherTests
             Install
                 .InstallAsync(Arg.Any<IProgress<RecompInstallProgress>>(), Arg.Any<Func<Task<bool>>>(), Arg.Any<CancellationToken>())
                 .Returns(Ok());
-            Nand.ApplyNandToRecompConfig().Returns(Ok());
+            Nand.ApplyPathsToRecompConfig().Returns(Ok());
             Presentation
                 .RunAsync(Arg.Any<RecompOperationKind>(), Arg.Any<Func<RecompOperation, Task<OperationResult>>>())
                 .Returns(async call =>

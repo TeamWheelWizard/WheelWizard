@@ -7,6 +7,9 @@ public interface IWhWzSetting
     string Name { get; }
     object? GetValue();
     bool SetFromJson(JsonElement value, bool skipSave = false);
+
+    /// <summary>Remembers a stored value the setting could not take (see <see cref="Setting{T}.UnavailableValue"/>).</summary>
+    void RememberUnavailable(JsonElement value);
     void Reset(bool skipSave = false);
 }
 
@@ -20,7 +23,19 @@ public class WhWzSetting<T>(string name, T defaultValue, Action<IWhWzSetting>? s
             saveAction?.Invoke(this);
     }
 
-    object? IWhWzSetting.GetValue() => Value;
+    // Until a value is picked again, a choice that could not be used at load (an unplugged drive) is written back as it was.
+    object? IWhWzSetting.GetValue() =>
+        HasUnavailableValue && EqualityComparer<T>.Default.Equals(Value, DefaultValue) ? UnavailableValue : Value;
+
+    void IWhWzSetting.RememberUnavailable(JsonElement value)
+    {
+        try
+        {
+            if (value.Deserialize<T>() is { } parsed)
+                KeepUnavailable(parsed);
+        }
+        catch (JsonException) { }
+    }
 
     public bool SetFromJson(JsonElement value, bool skipSave = false)
     {

@@ -7,6 +7,7 @@ public static class ApplicationLifecycleExtensions
     public static IServiceCollection AddApplicationLifecycle(this IServiceCollection services)
     {
         services.AddSingleton<IApplicationStartup, ApplicationStartup>();
+        services.AddSingleton<IStartupMaintenance, StartupMaintenance>();
         services.AddSingleton<IApplicationLiveUpdates, ApplicationLiveUpdates>();
         services.AddSingleton<ILogFileFactory, LogFileFactory>();
         services.AddSingleton<ApplicationLogFiles>();

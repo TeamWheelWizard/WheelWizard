@@ -51,7 +51,8 @@ public class HomeDolphinLaunchTests
             presentation,
             Substitute.For<ISeasonalCalendar>(),
             Substitute.For<IRandomSystem>(),
-            new ElapsedTimeProvider()
+            new ElapsedTimeProvider(),
+            Substitute.For<IRetroRewindBackgroundInstall>()
         );
     }
 
