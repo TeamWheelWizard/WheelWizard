@@ -112,8 +112,9 @@ Music packs are usually zips of BRSTM files named after the game's music (`n_Cir
   higher priority is shown, as in game. A song chosen here still wins, because the Custom Music patch has the highest
   priority.
 - **Dropped on the page.** Dropping a pack's zip (or a folder) on the page extracts its audio files into the library and
-  matches them to their tracks by file name; BRSTMs keep their loop points and are loudness-matched like any song.
-  Archives over 4 GB are refused.
+  matches them to their tracks by file name. BRSTMs keep their loop points and are loudness-matched like any song; one
+  with several tracks is decoded the way the row plays it (the first track in races, every track mixed for Retro
+  Rewind's menu music). Archives over 4 GB are refused.
 
 Files extracted straight into Retro Rewind's own `Patches` folder are not seen: Wheel Wizard replaces that folder's
 contents with the enabled patches when it launches the game, so packs should be added on the Patches page.

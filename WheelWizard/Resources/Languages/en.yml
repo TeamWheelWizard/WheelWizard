@@ -840,7 +840,7 @@ en:
       loop_file: "Loops %{start} → %{end} (loop points from the file)"
       loop_found: "Loops %{start} → %{end} (seamless loop found in the music)"
       loop_crossfade: "Loops %{start} → %{end} (the ending crossfades into the opening)"
-      volume_offset: "Volume adjusted by %{amount} dB"
+      volume_offset: "Volume adjusted by %{amount}"
       reference_problem: "Volume not matched: %{message}"
     category:
       retro_rewind: "Retro Rewind"
@@ -932,3 +932,4 @@ en:
       load_failed: "Couldn't load the music list: %{message}"
       pack: "Couldn't open the music pack: %{message}"
       family: "%{failed} of %{amount} tracks couldn't be converted."
+      folder: "Couldn't read the folder: %{message}"

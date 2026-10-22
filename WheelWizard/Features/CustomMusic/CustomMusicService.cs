@@ -29,8 +29,11 @@ public interface ICustomMusicService
     /// <summary>Installs <paramref name="entries"/> into the game (via the "Custom Music" patch) and remembers them.</summary>
     Task<OperationResult> SaveAsync(IReadOnlyCollection<CustomMusicEntry> entries, IReadOnlyCollection<MusicSlot> catalog, CancellationToken cancellationToken = default);
 
-    /// <summary>Deletes converted files of conversions that were never saved.</summary>
-    void DiscardUnsaved();
+    /// <summary>
+    /// Deletes converted files and extracted music packs that no saved song uses. Only safe while no unsaved
+    /// conversion is wanted: those files are deleted too.
+    /// </summary>
+    void DeleteUnsavedFiles();
 
     string? GetCoverPath(CustomMusicEntry entry);
 
@@ -104,7 +107,7 @@ public sealed class CustomMusicService(
             progress?.Report(0.02);
             var reference = await references.GetReferenceAsync(slot, cancellationToken);
 
-            var audio = await AudioFileDecoder.DecodeAsync(fileSystem, sourcePath, cancellationToken);
+            var audio = await AudioFileDecoder.DecodeAsync(fileSystem, sourcePath, slot.PlaysAllTracks, cancellationToken);
             progress?.Report(0.25);
 
             var options = new ConversionOptions
@@ -223,13 +226,14 @@ public sealed class CustomMusicService(
             if (saveResult.IsFailure)
                 return saveResult;
 
-            library.DeleteUnused(entries);
+            // Unused files are not deleted here: a song converted while saving is not in `entries` yet.
+            // The page calls DeleteUnsavedFiles once nothing is pending.
         }
 
         return Ok();
     }
 
-    public void DiscardUnsaved()
+    public void DeleteUnsavedFiles()
     {
         lock (_libraryLock)
             library.DeleteUnused(library.Load().Entries);

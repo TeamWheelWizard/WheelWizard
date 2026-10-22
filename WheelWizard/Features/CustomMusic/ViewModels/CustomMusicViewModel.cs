@@ -461,9 +461,18 @@ public sealed class CustomMusicViewModel(
         {
             if (fileSystem.Directory.Exists(path))
             {
-                songs.AddRange(
-                    await Task.Run(() => fileSystem.Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories).Where(AudioFileDecoder.IsSupportedExtension).ToList())
-                );
+                try
+                {
+                    // Folders the user may not open (system folders inside a drive, say) are skipped.
+                    var options = new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true };
+                    songs.AddRange(
+                        await Task.Run(() => fileSystem.Directory.EnumerateFiles(path, "*", options).Where(AudioFileDecoder.IsSupportedExtension).ToList(), _lifetime.Token)
+                    );
+                }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+                {
+                    return new OperationError { Message = t("custom_music.error.folder", new { message = exception.Message }), Exception = exception };
+                }
             }
             else if (PathText.Extension(path) == ".zip")
             {
@@ -519,16 +528,23 @@ public sealed class CustomMusicViewModel(
         IsSaving = true;
         try
         {
-            var entries = _items.Where(item => item.Current != null).Select(item => item.Current!).Concat(_orphanedEntries).ToList();
+            // Songs can still be dropped while saving; those changes stay pending.
+            var snapshot = _items.Select(item => (Item: item, Entry: item.Current)).ToList();
+            var entries = snapshot.Where(pair => pair.Entry != null).Select(pair => pair.Entry!).Concat(_orphanedEntries).ToList();
             var result = await service.SaveAsync(entries, _catalog.Slots.ToList(), _lifetime.Token);
             if (result.IsFailure)
                 return result;
 
-            foreach (var item in _items)
+            foreach (var (item, entry) in snapshot)
             {
-                item.Saved = item.Current;
-                item.Error = null;
+                item.Saved = entry;
+                if (ReferenceEquals(item.Current, entry))
+                    item.Error = null;
             }
+
+            // Songs that were replaced or reset are no longer needed, unless a change made meanwhile still is.
+            if (!_items.Any(item => item.IsPending || item.IsProcessing))
+                service.DeleteUnsavedFiles();
 
             RefreshModState();
             return Ok();
@@ -548,7 +564,7 @@ public sealed class CustomMusicViewModel(
                 UndoChange(item);
         }
 
-        service.DiscardUnsaved();
+        service.DeleteUnsavedFiles();
         NotifyState();
     }
 
@@ -599,7 +615,7 @@ public sealed class CustomMusicViewModel(
         try
         {
             var loaded = custom ? await preview.LoadCustomAsync(item.Current!, _lifetime.Token)
-                : item.Pack is { } pack ? await preview.LoadFileAsync(pack.Path, _lifetime.Token)
+                : item.Pack is { } pack ? await preview.LoadFileAsync(pack.Path, item.Slot, _lifetime.Token)
                 : await preview.LoadOriginalAsync(item.Slot, _lifetime.Token);
             if (request != _previewRequest)
                 return Ok(); // something else was started meanwhile

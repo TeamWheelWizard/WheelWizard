@@ -24,7 +24,12 @@ public static class AudioFileDecoder
         return NativeExtensions.Contains(extension) || FfmpegExtensions.Contains(extension);
     }
 
-    public static async Task<AudioBuffer> DecodeAsync(IFileSystem fileSystem, string path, CancellationToken cancellationToken = default)
+    /// <param name="fileSystem">The file system the song lives on.</param>
+    /// <param name="path">The song file.</param>
+    /// <param name="allBrstmTracks">For BRSTM files: mix every track, as Retro Rewind does for its menu music, instead of
+    /// keeping only the first track, which is what races play.</param>
+    /// <param name="cancellationToken">Stops decoding.</param>
+    public static async Task<AudioBuffer> DecodeAsync(IFileSystem fileSystem, string path, bool allBrstmTracks = false, CancellationToken cancellationToken = default)
     {
         var info = fileSystem.FileInfo.New(path);
         if (!info.Exists)
@@ -33,7 +38,7 @@ public static class AudioFileDecoder
             throw new InvalidDataException("This audio file is too large to convert.");
 
         var bytes = await fileSystem.File.ReadAllBytesAsync(path, cancellationToken);
-        var buffer = await DecodeAsync(fileSystem, bytes, path, cancellationToken);
+        var buffer = await DecodeAsync(fileSystem, bytes, path, allBrstmTracks, cancellationToken);
 
         // Generic folder art (cover.jpg, ...) only belongs to songs that are part of a tagged album; a loose
         // download in a shared folder would otherwise pick up some other album's cover.
@@ -44,8 +49,15 @@ public static class AudioFileDecoder
     /// <param name="fileSystem">Used to find FFmpeg for formats without a managed decoder.</param>
     /// <param name="bytes">The whole audio file.</param>
     /// <param name="pathForFallback">Where the file is, for FFmpeg (which reads the file itself).</param>
+    /// <param name="allBrstmTracks">For BRSTM files: mix every track instead of keeping only the first.</param>
     /// <param name="cancellationToken">Stops decoding.</param>
-    public static async Task<AudioBuffer> DecodeAsync(IFileSystem fileSystem, byte[] bytes, string pathForFallback, CancellationToken cancellationToken = default)
+    public static async Task<AudioBuffer> DecodeAsync(
+        IFileSystem fileSystem,
+        byte[] bytes,
+        string pathForFallback,
+        bool allBrstmTracks = false,
+        CancellationToken cancellationToken = default
+    )
     {
         AudioBuffer buffer;
         if (WavReader.IsWav(bytes))
@@ -57,7 +69,7 @@ public static class AudioFileDecoder
         else if (OggVorbisReader.IsVorbis(bytes))
             buffer = await Task.Run(() => OggVorbisReader.Read(bytes, cancellationToken), cancellationToken);
         else if (BrstmReader.IsBrstm(bytes))
-            buffer = await Task.Run(() => BrstmReader.Decode(bytes), cancellationToken);
+            buffer = await Task.Run(() => BrstmReader.DecodeAsPlayed(bytes, allBrstmTracks), cancellationToken);
         else if (Mp4TagReader.IsMp4(bytes))
         {
             buffer = await FfmpegReader.ReadAsync(fileSystem, pathForFallback, cancellationToken);

@@ -114,6 +114,49 @@ public class CustomMusicAudioTests
     }
 
     [Fact]
+    public async Task AudioFileDecoder_KeepsTheBrstmTracksTheSlotPlays()
+    {
+        // A race BRSTM with an alternative mix in its second track: only the first track belongs in a race song.
+        var main = ToPcm16(Tone(Rate, Rate, [(440, 0.3)]));
+        var alternative = ToPcm16(Tone(Rate, Rate, [(1200, 0.3)]));
+        var file = BrstmWriter.Write(new BrstmStream { Channels = [main, main, alternative, alternative] });
+        var fs = new MockFileSystem(options => options.SimulatingOperatingSystem(SimulationMode.Linux));
+
+        var race = await AudioFileDecoder.DecodeAsync(fs, file, "/music/n_Circuit32_n.brstm");
+        var menu = await AudioFileDecoder.DecodeAsync(fs, file, "/music/title_bg.brstm", allBrstmTracks: true);
+
+        var firstTrack = BrstmReader.Decode(file).Channels[0];
+        Assert.Equal(2, race.ChannelCount);
+        Assert.Equal(firstTrack, race.Channels[0]);
+        Assert.Equal(BrstmReader.DecodeAsPlayed(file, allTracks: true).Channels[0], menu.Channels[0]);
+    }
+
+    [Theory]
+    [InlineData("mpeg", true)]
+    [InlineData("id3+mpeg", true)]
+    [InlineData("id3+padding+mpeg", true)]
+    [InlineData("id3+adts", false)]
+    [InlineData("adts", false)]
+    [InlineData("junk+mpeg", false)]
+    public void Mp3Reader_RecognisesMpegAudioByItsFirstFrame(string layout, bool isMp3)
+    {
+        byte[] id3 = [(byte)'I', (byte)'D', (byte)'3', 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0];
+        byte[] mpeg = [0xFF, 0xFB, 0x90, 0x64, 0, 0, 0, 0]; // MPEG-1 Layer III
+        byte[] adts = [0xFF, 0xF1, 0x50, 0x80, 0, 0, 0, 0]; // AAC
+        var data = layout switch
+        {
+            "mpeg" => mpeg,
+            "id3+mpeg" => [.. id3, .. mpeg],
+            "id3+padding+mpeg" => [.. id3, 0, 0, 0, .. mpeg],
+            "id3+adts" => [.. id3, .. adts],
+            "adts" => adts,
+            _ => [1, 2, 3, .. mpeg],
+        };
+
+        Assert.Equal(isMp3, Mp3Reader.LooksLikeMp3(data));
+    }
+
+    [Fact]
     public void LoudnessMeter_MeasuresAMinus20DbfsStereoSineAsMinus20Lufs()
     {
         // BS.1770: a 1 kHz sine at -20 dBFS (peak) in both channels reads -20 LUFS.
