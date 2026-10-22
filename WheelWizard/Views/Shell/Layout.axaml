@@ -14,6 +14,7 @@
         ExtendClientAreaTitleBarHeightHint="30"
         CanResize="False" CanMaximize="False" Background="Transparent"
         xmlns:mods="clr-namespace:WheelWizard.Mods.Views"
+        xmlns:music="clr-namespace:WheelWizard.CustomMusic.Views"
         xmlns:miis="clr-namespace:WheelWizard.WiiManagement.MiiManagement.Views"
         xmlns:rooms="clr-namespace:WheelWizard.RrRooms.Views"
         xmlns:community="clr-namespace:WheelWizard.WheelWizardData.Views"
@@ -110,6 +111,9 @@
             <shellControls:SidebarRadioButton IconData="{StaticResource CubesStacked}"
                                            PageType="{x:Type mods:ModsPage}"
                                            Text="{loc:T page_title.patches}" x:Name="ModsButton" />
+            <shellControls:SidebarRadioButton IconData="{StaticResource MusicNote}"
+                                           PageType="{x:Type music:CustomMusicPage}"
+                                           Text="{loc:T page_title.custom_music}" x:Name="CustomMusicButton" />
             <shellControls:SidebarRadioButton IconData="{StaticResource Shirt}"
                                            PageType="{x:Type miis:MiiListPage}"
                                            Text="{loc:T page_title.my_miis}" />
