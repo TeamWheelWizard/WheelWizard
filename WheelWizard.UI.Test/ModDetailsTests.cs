@@ -229,15 +229,13 @@ public class ModDetailsTests
         public void Dispose() => Close();
 
         private readonly Grid _body = new();
-        private readonly Border _overlay = new();
         protected override Control InteractionContent => _body;
-        protected override Control InteractionOverlay => _overlay;
 
         public TestWindow()
         {
             Width = 656;
             Height = 876;
-            Content = new Grid { Children = { _body, _overlay } };
+            Content = new Grid { Children = { _body } };
         }
     }
 }

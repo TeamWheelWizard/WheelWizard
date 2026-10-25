@@ -14,7 +14,7 @@ public interface IHomePresentation
 {
     void ShowError(OperationError error);
     void OpenSettings();
-    void SetApplicationInteractable(bool interactable);
+    void SetCloseGuarded(bool guarded);
     Task ShowLaunchPromptAsync(HomeLaunchPrompt prompt);
 }
 
@@ -177,7 +177,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
         try
         {
             if (setup)
-                _presentation.SetApplicationInteractable(false);
+                _presentation.SetCloseGuarded(true);
             var result = await action();
             if (showResultErrors && result.IsFailure && !_disposed)
                 _presentation.ShowError(result.Error);
@@ -190,7 +190,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged, IDisposable
         finally
         {
             if (setup)
-                _presentation.SetApplicationInteractable(true);
+                _presentation.SetCloseGuarded(false);
             var remaining = TimeSpan.FromSeconds(2) - _time.GetElapsedTime(started);
             try
             {

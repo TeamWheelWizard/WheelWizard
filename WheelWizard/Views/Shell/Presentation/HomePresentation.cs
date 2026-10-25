@@ -13,7 +13,7 @@ public sealed class HomePresentation(INavigationService navigation) : IHomePrese
 
     public void OpenSettings() => navigation.NavigateTo<SettingsPage>();
 
-    public void SetApplicationInteractable(bool interactable) => ViewUtils.GetLayout().SetInteractable(interactable);
+    public void SetCloseGuarded(bool guarded) => ViewUtils.GetLayout().SetCloseGuarded(guarded);
 
     public async Task ShowLaunchPromptAsync(HomeLaunchPrompt prompt) =>
         await new YesNoWindow()

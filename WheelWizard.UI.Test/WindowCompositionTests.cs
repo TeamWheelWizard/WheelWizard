@@ -229,25 +229,6 @@ public class WindowCompositionTests
     }
 
     [AvaloniaFact]
-    public void DisabledWindow_RejectsNativeCloseButAllowsCompletionAndShutdown()
-    {
-        using var window = new TestWindow();
-        window.SetInteractable(false);
-        var native = CreateClosingArgs(false);
-        window.RequestClose(native);
-        Assert.True(native.Cancel);
-        foreach (var args in new[] { CreateClosingArgs(true), CreateClosingArgs(false, WindowCloseReason.ApplicationShutdown) })
-        {
-            window.RequestClose(args);
-            Assert.False(args.Cancel);
-        }
-        window.SetInteractable(true);
-        var allowed = CreateClosingArgs(false);
-        window.RequestClose(allowed);
-        Assert.False(allowed.Cancel);
-    }
-
-    [AvaloniaFact]
     public void MessagePopup_GrowsForLateContentWithoutEnlargingItsTitle()
     {
         var content = new MessageBoxWindow().SetTitleText("A stable title").SetInfoText("Loading...");
@@ -361,7 +342,7 @@ public class WindowCompositionTests
         Assert.False(owner.CanInteract);
     }
 
-    private static WindowClosingEventArgs CreateClosingArgs(
+    internal static WindowClosingEventArgs CreateClosingArgs(
         bool programmatic,
         WindowCloseReason reason = WindowCloseReason.WindowClosing
     ) =>
@@ -378,11 +359,7 @@ public class WindowCompositionTests
     {
         public void Dispose() => Close();
 
-        public void RequestClose(WindowClosingEventArgs args) => OnClosing(args);
-
-        private readonly Border _overlay = new();
         private readonly Border _content = new();
-        protected override Control InteractionOverlay => _overlay;
         protected override Control InteractionContent => _content;
         public bool CanInteract => _content.IsEnabled;
 

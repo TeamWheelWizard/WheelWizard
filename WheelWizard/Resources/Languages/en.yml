@@ -175,6 +175,8 @@ en:
     redo: "Redo"
     leave: "Leave"
     keep_editing: "Keep editing"
+    quit: "Quit"
+    keep_installing: "Keep installing"
     surprise_me: "Surprise me"
     unfavorite: "Unfavorite"
     favorite: "Favorite"
@@ -340,6 +342,9 @@ en:
     leave_mii_editor:
       title: "Leave without saving?"
       extra: "Your changes to this Mii will be lost."
+    quit_during_setup:
+      title: "Quit while installing?"
+      extra: "An install or update is still running. Quitting now can leave the game incomplete."
     recomp_uninstall:
       title: "Uninstall WiiCompiled?"
       extra_shared: "This removes the WiiCompiled installation. Your saves stay in Dolphin's Wii folder, and Retro Rewind stays installed."

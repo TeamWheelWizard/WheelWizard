@@ -21,7 +21,7 @@
         xmlns:design="clr-namespace:WheelWizard.Views.DesignTime"
         xmlns:miiImages="clr-namespace:WheelWizard.MiiImages.Views"
         xmlns:shellControls="clr-namespace:WheelWizard.Views.Shell.Controls">
-    <Grid x:Name="WindowFrame" RowDefinitions="30,*"
+    <Grid RowDefinitions="30,*"
           Background="{StaticResource FrameColor}">
         <Border Grid.Row="0" Background="Transparent"
                 WindowDecorationProperties.ElementRole="TitleBar"
@@ -495,7 +495,5 @@
             </Grid.Styles>
         </Grid>
     </Grid>
-        <Border Grid.RowSpan="2" ZIndex="999" IsVisible="False" IsHitTestVisible="False"
-                x:Name="DisabledDarkenEffect" Background="Black" Opacity="0.3" />
     </Grid>
 </Window>

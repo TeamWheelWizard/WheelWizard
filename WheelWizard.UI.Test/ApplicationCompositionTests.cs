@@ -214,6 +214,32 @@ public class ApplicationCompositionTests
                 Assert.Equal(LocalizationProvider.Translate("component.dropdown.search_placeholder"), languages.SearchPlaceholder);
                 Assert.Equal(LocalizationProvider.Translate("component.dropdown.empty"), languages.EmptyText);
             }
+
+            // Closing during setup asks first, and the question stays answerable.
+            var onClosing = typeof(Layout).GetMethod(
+                "OnClosing",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            )!;
+            original.SetCloseGuarded(true);
+            var guardedClose = WindowCompositionTests.CreateClosingArgs(false);
+            onClosing.Invoke(original, [guardedClose]);
+            Assert.True(guardedClose.Cancel);
+            var quitQuestion = Assert.IsType<YesNoWindow>(original.Modals.TopModal);
+            Assert.True(quitQuestion.IsEffectivelyEnabled);
+            var quitClosed = quitQuestion.ShowDialog();
+            quitQuestion.FindControl<ActionButton>("NoButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await quitClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            Assert.True(original.IsVisible);
+            var programmaticClose = WindowCompositionTests.CreateClosingArgs(true);
+            onClosing.Invoke(original, [programmaticClose]);
+            Assert.False(programmaticClose.Cancel);
+            original.SetCloseGuarded(false);
+            var unguardedClose = WindowCompositionTests.CreateClosingArgs(false);
+            onClosing.Invoke(original, [unguardedClose]);
+            Assert.False(unguardedClose.Cancel);
+            Assert.Null(original.Modals.TopModal);
+
             Assert.Equal(Avalonia.Controls.ShutdownMode.OnMainWindowClose, desktop.ShutdownMode);
             desktop.DidNotReceive().Shutdown(Arg.Any<int>());
         }

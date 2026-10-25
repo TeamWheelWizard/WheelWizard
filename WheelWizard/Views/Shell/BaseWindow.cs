@@ -17,10 +17,10 @@ public abstract class BaseWindow : Window
 
     internal static BaseWindow GetModalOwner()
     {
-        var foreground = OpenWindows.LastOrDefault(window => window.IsActive && window.IsVisible && window.Modals.IsEnabled);
+        var foreground = OpenWindows.LastOrDefault(window => window.IsActive && window.IsVisible);
         if (foreground != null)
             return foreground;
-        var current = OpenWindows.LastOrDefault(window => window.IsVisible && window.Modals.IsEnabled);
+        var current = OpenWindows.LastOrDefault(window => window.IsVisible);
         if (current != null)
             return current;
         if (
@@ -57,11 +57,7 @@ public abstract class BaseWindow : Window
 
     internal void UpdateModalInteraction()
     {
-        InteractionOverlay.IsVisible = _disableCount != 0;
-        InteractionContent.IsEnabled = _disableCount == 0;
-        ModalInteractionContent.IsEnabled = _disableCount == 0 && !(_modals?.HasModals ?? false);
-        if (_modals != null)
-            _modals.IsEnabled = _disableCount == 0;
+        InteractionContent.IsEnabled = !(_modals?.HasModals ?? false);
         UpdateModalChromeDimming();
     }
 
@@ -75,14 +71,10 @@ public abstract class BaseWindow : Window
         }
     }
 
-    private int _disableCount = 0;
     private readonly Action<Size, Size>? _setWaylandSizeConstraints;
     private bool _waylandSizeUpdateQueued;
 
-    protected abstract Control InteractionOverlay { get; } // Just the visual part of the interaction
-    protected abstract Control InteractionContent { get; } // The content that will be disabled when the overlay is shown
-
-    protected virtual Control ModalInteractionContent => InteractionContent;
+    protected abstract Control InteractionContent { get; } // The content that will be disabled while a modal is shown
 
     private void InstallMacWindowMenu()
     {
@@ -162,28 +154,10 @@ public abstract class BaseWindow : Window
         base.OnOpened(e);
     }
 
-    protected override void OnClosing(WindowClosingEventArgs e)
-    {
-        // Blocking application work still gates native close; in-app modals leave window controls usable.
-        if (_disableCount != 0 && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing)
-            e.Cancel = true;
-        base.OnClosing(e);
-    }
-
     protected override void OnClosed(EventArgs e)
     {
         _modals?.CloseAll();
         OpenWindows.Remove(this);
         base.OnClosed(e);
-    }
-
-    public void SetInteractable(bool value)
-    {
-        if (!value)
-            _disableCount++;
-        else if (_disableCount > 0)
-            _disableCount--;
-
-        UpdateModalInteraction();
     }
 }

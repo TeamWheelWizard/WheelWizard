@@ -41,12 +41,12 @@ public class HomeViewModelTests
         await fixture.Model.ExecuteMainAsync();
         Assert.True(fixture.Model.IsBusy);
         Assert.False(fixture.Model.CanExecuteMain);
-        fixture.Presentation.Received(1).SetApplicationInteractable(false);
+        fixture.Presentation.Received(1).SetCloseGuarded(true);
         install.SetResult(Ok());
         await first;
 
         await fixture.Launcher.Received(1).Install();
-        fixture.Presentation.Received(1).SetApplicationInteractable(true);
+        fixture.Presentation.Received(1).SetCloseGuarded(false);
         Assert.False(fixture.Model.IsBusy);
         Assert.True(fixture.Model.IsInteractable);
     }
@@ -62,7 +62,7 @@ public class HomeViewModelTests
         await fixture.Model.ExecuteMainAsync();
 
         fixture.Presentation.Received(1).ShowError(Arg.Is<OperationError>(error => error.Exception is IOException));
-        fixture.Presentation.Received(1).SetApplicationInteractable(true);
+        fixture.Presentation.Received(1).SetCloseGuarded(false);
         Assert.True(fixture.Model.CanExecuteMain);
     }
 
