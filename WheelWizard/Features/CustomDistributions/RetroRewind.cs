@@ -66,7 +66,8 @@ public class RetroRewind : IDistribution
 
         if (HasOldRksys())
         {
-            if (await _prompts.ConfirmOldSaveBackupAsync())
+            // Backing up only copies the old save next to the new install, so it is the safe unattended answer.
+            if (operation.Unattended || await _prompts.ConfirmOldSaveBackupAsync())
                 await BackupOldrksys();
         }
         var serverResponse = await _api.CallApiAsync(api => api.Ping()); // actual response doesnt matter

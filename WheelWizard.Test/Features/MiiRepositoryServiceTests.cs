@@ -1,4 +1,5 @@
 using Testably.Abstractions.Testing;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.Recomp;
@@ -44,7 +45,8 @@ public sealed class MiiRepositoryServiceTests
             Substitute.For<IRecompSettingManager>(),
             _fileSystem,
             Substitute.For<IDolphinDiscoveryService>(),
-            _recompPaths
+            _recompPaths,
+            Substitute.For<ICustomDistributionPaths>()
         );
         _repository = new MiiRepositoryServiceService(_fileSystem, _settings, _recompPaths, _dolphinPaths, _dolphinData);
     }

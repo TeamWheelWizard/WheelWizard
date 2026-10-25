@@ -10,6 +10,8 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
     private readonly object _sync = new();
     private bool _loaded;
     private Exception? _loadError;
+
+    public bool HadLoadError => _loadError is not null;
     private readonly Dictionary<string, IWhWzSetting> _settings = new();
     private readonly Dictionary<string, JsonElement> _unknownSettings = new();
 
@@ -74,7 +76,10 @@ public class WhWzSettingManager(ILogger<WhWzSettingManager> logger, IFileSystem 
                     try
                     {
                         if (!setting.SetFromJson(value, skipSave: true))
+                        {
                             setting.Reset(skipSave: true);
+                            setting.RememberUnavailable(value);
+                        }
                     }
                     catch (Exception exception)
                     {

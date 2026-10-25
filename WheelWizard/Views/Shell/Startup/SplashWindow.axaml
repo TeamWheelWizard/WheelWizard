@@ -10,9 +10,17 @@
             <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" />
         </ControlTemplate>
     </Window.Template>
-    <Grid x:Name="Entrance" Width="220" Height="220" HorizontalAlignment="Center" VerticalAlignment="Center"
-          RenderTransformOrigin="50%,50%">
-        <Image x:Name="Wheel" Source="/Resources/Images/AppIcon.png" Stretch="Uniform" RenderTransformOrigin="50%,50%" />
+    <Grid>
+        <Grid x:Name="Entrance" Width="220" Height="220" HorizontalAlignment="Center" VerticalAlignment="Center"
+              RenderTransformOrigin="50%,50%">
+            <Image x:Name="Wheel" Source="/Resources/Images/AppIcon.png" Stretch="Uniform" RenderTransformOrigin="50%,50%" />
+        </Grid>
+        <!-- Only shown for slow one-time work, such as moving Retro Rewind to another drive. -->
+        <Border x:Name="StatusBorder" IsVisible="False"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Background="#E6202024" CornerRadius="999" Padding="12,5">
+            <TextBlock x:Name="StatusText" Foreground="#FFE4E4E7" FontSize="12" />
+        </Border>
     </Grid>
 </Window>
 

@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <!-- xunit.v3 forces an apphost; on osx-arm64 the SDK's RID-less apphost inference breaks, so pin the host RID -->
+        <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' and $([MSBuild]::IsOSPlatform('OSX'))">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.2" />

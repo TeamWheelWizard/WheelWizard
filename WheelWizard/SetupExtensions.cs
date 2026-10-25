@@ -16,6 +16,7 @@ using WheelWizard.Localization;
 using WheelWizard.MiiAnimations;
 using WheelWizard.MiiImages;
 using WheelWizard.Mods;
+using WheelWizard.Onboarding;
 using WheelWizard.Recomp;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
@@ -54,6 +55,7 @@ public static class SetupExtensions
         services.AddPatches();
         services.AddMods();
         services.AddRecomp();
+        services.AddOnboarding();
         services.AddPresentation();
     }
 }

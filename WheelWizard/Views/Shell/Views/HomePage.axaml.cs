@@ -76,6 +76,8 @@ public partial class HomePage : UserControl
 
     private async void DolphinButton_OnClick(object? sender, RoutedEventArgs e) => await Model.LaunchDolphinAsync();
 
+    private void RepairButton_OnClick(object? sender, RoutedEventArgs e) => Model.OpenSettings();
+
     private void ApplyDolphinTrailColors()
     {
         RecolorTrail(HomeTrail1, "Blue400", "Blue700");

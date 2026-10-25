@@ -1,5 +1,7 @@
 using Testably.Abstractions;
+using WheelWizard.CustomDistributions;
 using WheelWizard.Launching;
+using WheelWizard.Localization;
 using WheelWizard.Models.Enums;
 using WheelWizard.Settings;
 using WheelWizard.Shared;
@@ -99,6 +101,35 @@ public class HomeViewModelTests
     }
 
     [Fact]
+    public async Task ABrokenSetup_ExplainsWhatIsMissing_AndHidesOnceFixed()
+    {
+        using var fixture = new Fixture();
+        fixture.Launcher.GetCurrentStatus().Returns(WheelWizardStatus.ConfigNotFinished);
+        fixture
+            .Settings.ValidateCorePathSettings()
+            .Returns(
+                Ok(
+                    new SettingsValidationReport(
+                        [
+                            new(SettingsValidationCode.InvalidUserFolderPath, "UserFolderPath", ""),
+                            new(SettingsValidationCode.InvalidGameLocation, "GameLocation", ""),
+                        ]
+                    )
+                )
+            );
+
+        await fixture.Model.RefreshAsync();
+
+        Assert.True(fixture.Model.IsRepairVisible);
+        Assert.Equal(TranslationFunctions.t("onboarding.repair_user_folder"), fixture.Model.RepairMessage);
+
+        fixture.Launcher.GetCurrentStatus().Returns(WheelWizardStatus.Ready);
+        await fixture.Model.RefreshAsync();
+
+        Assert.False(fixture.Model.IsRepairVisible);
+    }
+
+    [Fact]
     public async Task RecompMode_HidesAndDisablesDirectDolphinLaunch()
     {
         using var fixture = new Fixture();
@@ -166,7 +197,8 @@ public class HomeViewModelTests
                 Presentation,
                 Calendar,
                 Substitute.For<IRandomSystem>(),
-                new ElapsedTimeProvider()
+                new ElapsedTimeProvider(),
+                Substitute.For<IRetroRewindBackgroundInstall>()
             );
         }
 

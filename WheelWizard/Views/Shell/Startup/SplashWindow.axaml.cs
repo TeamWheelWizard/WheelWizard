@@ -21,6 +21,14 @@ public partial class SplashWindow : Window
             WindowDecorationsTheme = null;
     }
 
+    /// <summary>Shows a short line under the wheel; <see langword="null"/> hides it.</summary>
+    public void SetStatus(string? status)
+    {
+        var border = this.FindControl<Border>("StatusBorder")!;
+        this.FindControl<TextBlock>("StatusText")!.Text = status;
+        border.IsVisible = !string.IsNullOrEmpty(status);
+    }
+
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);

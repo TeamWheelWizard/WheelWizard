@@ -9,6 +9,10 @@ public interface IDolphinSetting
     string Section { get; }
     string GetStringValue();
     bool SetFromString(string value, bool skipSave = false);
+
+    /// <summary>Remembers a stored value the setting could not take (see <see cref="Setting{T}.UnavailableValue"/>).</summary>
+    void RememberUnavailable(string value);
+
     void Reset(bool skipSave = false);
 }
 
@@ -54,6 +58,12 @@ public class DolphinSetting<T> : Setting<T>, IDolphinSetting
         {
             return false;
         }
+    }
+
+    public void RememberUnavailable(string value)
+    {
+        if (value is T text)
+            KeepUnavailable(text);
     }
 
     public new DolphinSetting<T> SetValidation(Func<T, bool> validation)

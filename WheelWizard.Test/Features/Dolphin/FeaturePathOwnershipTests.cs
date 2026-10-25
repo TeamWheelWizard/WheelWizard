@@ -71,22 +71,41 @@ public class FeaturePathOwnershipTests
     }
 
     [Fact]
-    public void DistributionWithDolphin_UsesEffectiveLoadDirectory_WhileDownloadsFollowAppData()
+    public void DistributionWithDolphin_UsesManagedFolder_WhenNoLegacyInstallExists()
+    {
+        var fs = NewFileSystem();
+        var (_, dolphin) = CreateDolphinPaths(fs, "/dolphin-user");
+        var location = Substitute.For<IApplicationDataLocation>();
+        location.DirectoryPath.Returns("/launcher-data");
+        var paths = new CustomDistributionPaths(location, dolphin, fs);
+        fs.Directory.CreateDirectory("/dolphin-user/Load/Riivolution/WheelWizard");
+
+        Assert.Equal("/launcher-data/RetroRewind", paths.RootFolderPath);
+        Assert.Equal("/dolphin-user/Load/Riivolution/WheelWizard", paths.LegacyRootFolderPath);
+        Assert.False(paths.IsLegacyRootActive);
+    }
+
+    [Fact]
+    public void DistributionWithLegacyInstall_StaysInEffectiveLoadDirectory_UntilMoved()
     {
         var fs = NewFileSystem();
         var (settings, dolphin) = CreateDolphinPaths(fs, "/dolphin-user");
         var location = Substitute.For<IApplicationDataLocation>();
         location.DirectoryPath.Returns("/launcher-data");
         var paths = new CustomDistributionPaths(location, dolphin, fs);
-
-        Assert.Equal("/dolphin-user/Load/Riivolution/WheelWizard", paths.RootFolderPath);
-        fs.Directory.CreateDirectory("/custom-load");
+        fs.Directory.CreateDirectory("/custom-load/Riivolution/WheelWizard/RetroRewind6");
         settings.LOAD_PATH.Set("/custom-load", skipSave: true);
         location.DirectoryPath.Returns("/relocated");
 
         Assert.Equal("/custom-load/Riivolution/WheelWizard", paths.RootFolderPath);
         Assert.Equal("/custom-load/Riivolution/WheelWizard/RRBeta/Patches", paths.BetaPatchesFolderPath);
         Assert.Equal("/relocated/Mods/Temp/RetroRewind.zip", paths.RetroRewindArchivePath);
+
+        // Once moved, a leftover that could not be deleted is never picked again.
+        fs.Directory.CreateDirectory("/relocated/RetroRewind");
+        fs.File.WriteAllText(paths.MigratedMarkerFilePath, "/custom-load/Riivolution/WheelWizard");
+
+        Assert.Equal("/relocated/RetroRewind", paths.RootFolderPath);
     }
 
     private static MockFileSystem NewFileSystem() => new(options => options.SimulatingOperatingSystem(SimulationMode.Linux));

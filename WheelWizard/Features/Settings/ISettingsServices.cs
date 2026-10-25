@@ -8,6 +8,9 @@ public interface IWhWzSettingManager
     void RegisterSetting(IWhWzSetting setting);
     void SaveSettings(string configPath, IWhWzSetting invokingSetting);
     void LoadSettings(string configPath);
+
+    /// <summary>The settings file exists but could not be read, so what the user had in it is unknown (and it is left untouched).</summary>
+    bool HadLoadError { get; }
 }
 
 public interface IDolphinSettingManager
@@ -37,6 +40,9 @@ public interface ISettingsProperties
     Setting<string> USER_FOLDER_PATH { get; }
     Setting<string> DOLPHIN_LOCATION { get; }
     Setting<string> GAME_LOCATION { get; }
+    Setting<bool> DOLPHIN_MANAGED { get; }
+    Setting<bool> ONBOARDING_COMPLETED { get; }
+    Setting<bool> ONBOARDING_STARTED { get; }
     Setting<bool> FORCE_WIIMOTE { get; }
     Setting<bool> LAUNCH_WITH_DOLPHIN { get; }
     Setting<bool> LAUNCH_RR_ON_STARTUP { get; }
@@ -67,6 +73,7 @@ public interface ISettingsProperties
     Setting<bool> RECOMP_PREVENT_STUTTERS { get; }
     Setting<bool> RECOMP_GX_WORKER { get; }
     Setting<string> RECOMP_NAND_ROOT { get; }
+    Setting<string> RECOMP_RETRO_REWIND_ROOT { get; }
 }
 
 public interface ISettingsManager : ISettingsProperties
@@ -85,6 +92,9 @@ public interface ISettingsManager : ISettingsProperties
     /// flag can never activate recomp behavior on a platform the recomp does not run on.
     /// </summary>
     bool IsRecompModeActive();
+
+    /// <summary>The settings file exists but could not be read; every setting is at its default and says nothing about the user.</summary>
+    bool SettingsFileUnreadable { get; }
 
     void LoadSettings();
 }
