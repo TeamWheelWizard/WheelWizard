@@ -94,7 +94,7 @@
                     </Grid>
                 </Border>
 
-                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,16,0"
@@ -109,6 +109,27 @@
                         </StackPanel>
                         <components:ToggleCheckBox Grid.Column="1"
                                   x:Name="PreventStutters"
+                                  Variant="Switch"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components:FormFieldLabel Text="{loc:T option.recomp_gx_worker}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.recomp_gx_worker}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components:ToggleCheckBox Grid.Column="1"
+                                  x:Name="GxWorker"
                                   Variant="Switch"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
