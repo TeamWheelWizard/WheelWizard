@@ -46,14 +46,12 @@
 
                 <components:ActionButton Grid.Row="0" Grid.Column="1" Tone="Secondary" Text="Show Mii Animator" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="ShowMiiAnimator_OnClick" />
-                <components:ActionButton Grid.Row="1" Grid.Column="0" Tone="Secondary" Text="Force enable layout" HorizontalAlignment="Stretch" Margin="0,2"
-                                   Click="ForceEnableLayout_OnClick" />
-                <components:ActionButton Grid.Row="1" Grid.Column="1" Tone="Secondary" Text="Kitchen Sink"
+                <components:ActionButton Grid.Row="1" Grid.Column="0" Tone="Secondary" Text="Kitchen Sink"
                                    IconData="{StaticResource Sink}" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="KitchenSink_OnClick" />
-                <components:ActionButton Grid.Row="2" Grid.Column="0" Tone="Secondary" Text="Clear Cache" HorizontalAlignment="Stretch" Margin="0,2"
+                <components:ActionButton Grid.Row="1" Grid.Column="1" Tone="Secondary" Text="Clear Cache" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="ClearCache_OnClick" />
-                <components:ActionButton Grid.Row="2" Grid.Column="1" Tone="Primary" Text="Hide all dev things" HorizontalAlignment="Stretch" Margin="0,2"
+                <components:ActionButton Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Tone="Primary" Text="Hide all dev things" HorizontalAlignment="Stretch" Margin="0,2"
                                    Click="HideDevelopmentFeatures_OnClick" />
                 </Grid>
                 <Border Background="{StaticResource BackgroundLineColor}" Margin="-10,10" Height="1"

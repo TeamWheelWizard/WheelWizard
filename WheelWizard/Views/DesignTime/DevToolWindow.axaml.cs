@@ -78,8 +78,6 @@ public partial class DevToolWindow : ModalContent, IPollingListener
 
     private void ShowMiiAnimator_OnClick(object sender, RoutedEventArgs e) => Popups.Create<MiiAnimatorDevWindow>().Show();
 
-    private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
-
     private void ClearCache_OnClick(object sender, RoutedEventArgs e) => ((MemoryCache)Cache).Clear();
 
     private void KitchenSink_OnClick(object sender, RoutedEventArgs e)

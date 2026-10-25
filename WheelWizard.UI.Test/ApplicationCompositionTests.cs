@@ -214,6 +214,47 @@ public class ApplicationCompositionTests
                 Assert.Equal(LocalizationProvider.Translate("component.dropdown.search_placeholder"), languages.SearchPlaceholder);
                 Assert.Equal(LocalizationProvider.Translate("component.dropdown.empty"), languages.EmptyText);
             }
+
+            // Closing during setup asks first, and the question stays answerable.
+            var onClosing = typeof(Layout).GetMethod(
+                "OnClosing",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            )!;
+            original.SetCloseGuarded(true);
+            var guardedClose = WindowCompositionTests.CreateClosingArgs(false);
+            onClosing.Invoke(original, [guardedClose]);
+            Assert.True(guardedClose.Cancel);
+            var quitQuestion = Assert.IsType<YesNoWindow>(original.Modals.TopModal);
+            Assert.True(quitQuestion.IsEffectivelyEnabled);
+            var quitClosed = quitQuestion.ShowDialog();
+            quitQuestion.FindControl<ActionButton>("NoButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await quitClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            Assert.True(original.IsVisible);
+            var programmaticClose = WindowCompositionTests.CreateClosingArgs(true);
+            onClosing.Invoke(original, [programmaticClose]);
+            Assert.False(programmaticClose.Cancel);
+            original.SetCloseGuarded(false);
+            var unguardedClose = WindowCompositionTests.CreateClosingArgs(false);
+            onClosing.Invoke(original, [unguardedClose]);
+            Assert.False(unguardedClose.Cancel);
+            Assert.Null(original.Modals.TopModal);
+
+            // Quitting during setup still asks a page with unsaved work.
+            navigation.NavigateTo<GuardedTestPage>();
+            var guardedPage = Assert.IsType<GuardedTestPage>(navigation.CurrentPage);
+            original.SetCloseGuarded(true);
+            onClosing.Invoke(original, [WindowCompositionTests.CreateClosingArgs(false)]);
+            var setupQuestion = Assert.IsType<YesNoWindow>(original.Modals.TopModal);
+            var setupClosed = setupQuestion.ShowDialog();
+            setupQuestion.FindControl<ActionButton>("YesButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            await setupClosed.WaitAsync(TimeSpan.FromSeconds(2));
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            Assert.Equal(1, guardedPage.ConfirmCount);
+            Assert.True(original.IsVisible);
+            original.SetCloseGuarded(false);
+            guardedPage.HasUnsavedWork = false;
+
             Assert.Equal(Avalonia.Controls.ShutdownMode.OnMainWindowClose, desktop.ShutdownMode);
             desktop.DidNotReceive().Shutdown(Arg.Any<int>());
         }
@@ -226,6 +267,18 @@ public class ApplicationCompositionTests
             CultureInfo.DefaultThreadCurrentCulture = previousDefaultCulture;
             CultureInfo.DefaultThreadCurrentUICulture = previousDefaultUiCulture;
             LocalizationProvider.Use(previousLocalization);
+        }
+    }
+
+    public sealed class GuardedTestPage : UserControl, INavigationGuard
+    {
+        public bool HasUnsavedWork { get; set; } = true;
+        public int ConfirmCount { get; private set; }
+
+        public Task<bool> ConfirmLeaveAsync()
+        {
+            ConfirmCount++;
+            return Task.FromResult(false);
         }
     }
 

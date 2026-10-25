@@ -525,12 +525,9 @@ public class InAppModalTests
 
         public void RequestNativeClose(WindowClosingEventArgs args) => base.OnClosing(args);
 
-        private readonly Border _overlay = new();
         public Button BackgroundButton { get; } = new() { Content = "Background" };
         public bool CanInteract => _body.IsEnabled;
-        protected override Control InteractionContent => _frame;
-        protected override Control InteractionOverlay => _overlay;
-        protected override Control ModalInteractionContent => _body;
+        protected override Control InteractionContent => _body;
 
         public ModalTestWindow()
         {
@@ -544,7 +541,6 @@ public class InAppModalTests
             _body.Children.Add(BackgroundButton);
             Grid.SetRow(_body, 1);
             _frame.Children.Add(_body);
-            _frame.Children.Add(_overlay);
             Content = _frame;
         }
     }

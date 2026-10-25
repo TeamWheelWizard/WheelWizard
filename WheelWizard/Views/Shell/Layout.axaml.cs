@@ -19,6 +19,7 @@ using WheelWizard.Settings.Types;
 using WheelWizard.Settings.Views;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell.Controls;
 using WheelWizard.Views.Shell.Navigation;
@@ -37,9 +38,7 @@ public partial class Layout : BaseWindow, IPollingListener
     private INavigationService Navigation { get; }
     private readonly IAutoUpdaterSingletonService _autoUpdater;
 
-    protected override Control InteractionOverlay => DisabledDarkenEffect;
-    protected override Control InteractionContent => WindowFrame;
-    protected override Control ModalInteractionContent => CompleteGrid;
+    protected override Control InteractionContent => CompleteGrid;
 
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
@@ -286,32 +285,56 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private bool _closeConfirmed;
     private bool _closePromptOpen;
+    private int _closeGuards;
+
+    /// <summary>While guarded, closing the window asks before abandoning the running work.</summary>
+    public void SetCloseGuarded(bool guarded) => _closeGuards = Math.Max(0, _closeGuards + (guarded ? 1 : -1));
 
     protected override async void OnClosing(WindowClosingEventArgs e)
     {
-        if (!_closeConfirmed && Navigation.CurrentPage is INavigationGuard { HasUnsavedWork: true } guard && InteractionContent.IsEnabled)
+        var confirm = GetCloseConfirmation(e);
+        if (confirm == null)
         {
-            e.Cancel = true;
             base.OnClosing(e);
-            if (_closePromptOpen)
-                return;
-            _closePromptOpen = true;
-            try
-            {
-                if (!await guard.ConfirmLeaveAsync())
-                    return;
-                _closeConfirmed = true;
-                Close();
-            }
-            finally
-            {
-                _closePromptOpen = false;
-            }
             return;
         }
 
+        e.Cancel = true;
         base.OnClosing(e);
+        if (_closePromptOpen)
+            return;
+        _closePromptOpen = true;
+        try
+        {
+            if (!await confirm())
+                return;
+            _closeConfirmed = true;
+            Close();
+        }
+        finally
+        {
+            _closePromptOpen = false;
+        }
     }
+
+    private Func<Task<bool>>? GetCloseConfirmation(WindowClosingEventArgs e)
+    {
+        if (_closeConfirmed)
+            return null;
+        var setup = _closeGuards > 0 && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing;
+        var page = Navigation.CurrentPage is INavigationGuard { HasUnsavedWork: true } guard ? guard : null;
+        if (!setup && page == null)
+            return null;
+        return async () => (!setup || await ConfirmQuitDuringSetupAsync()) && (page == null || await page.ConfirmLeaveAsync());
+    }
+
+    private static Task<bool> ConfirmQuitDuringSetupAsync() =>
+        new YesNoWindow()
+            .SetMainText(t("question.quit_during_setup.title"))
+            .SetExtraText(t("question.quit_during_setup.extra"))
+            .SetButtonText(t("action.quit"), t("action.keep_installing"))
+            .SetButtonTones(ActionButtonTone.Danger, ActionButtonTone.Secondary)
+            .AwaitAnswer();
 
     public void NavigateToPage(UserControl page)
     {
@@ -584,7 +607,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void SupportUs_OnClick(object? sender, RoutedEventArgs e) => ViewUtils.OpenLink(BrandingService.Branding.SupportUrl.ToString());
 
-    public bool CompleteContentEnabled => ModalInteractionContent.IsEnabled;
+    public bool CompleteContentEnabled => InteractionContent.IsEnabled;
 
     public void ShowAppInfo() => Navigation.NavigateTo<SettingsPage>(typeof(AppInfo));
 
