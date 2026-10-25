@@ -5,6 +5,7 @@ using WheelWizard.AutoUpdating;
 using WheelWizard.Branding;
 using WheelWizard.CustomCharacters;
 using WheelWizard.CustomDistributions;
+using WheelWizard.CustomMusic;
 using WheelWizard.DiscImages;
 using WheelWizard.DolphinInstaller;
 using WheelWizard.Features.Archives;
@@ -53,6 +54,7 @@ public static class SetupExtensions
         services.AddArchives();
         services.AddPatches();
         services.AddMods();
+        services.AddCustomMusic();
         services.AddRecomp();
         services.AddPresentation();
     }

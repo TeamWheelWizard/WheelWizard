@@ -1,0 +1,409 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="clr-namespace:WheelWizard.Localization"
+             xmlns:components="clr-namespace:WheelWizard.Views.Components"
+             xmlns:vm="clr-namespace:WheelWizard.CustomMusic.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="876"
+             x:Class="WheelWizard.CustomMusic.Views.CustomMusicPage"
+             x:DataType="vm:CustomMusicViewModel"
+             DragDrop.AllowDrop="True">
+    <UserControl.Styles>
+        <!-- Rows -->
+        <Style Selector="Border.MusicRow">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Margin" Value="0,3" />
+            <Setter Property="Padding" Value="8,0,6,0" />
+            <Setter Property="Height" Value="62" />
+            <Setter Property="ClipToBounds" Value="True" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="{DynamicResource ControlAnimationDuration}" />
+                    <BrushTransition Property="BorderBrush" Duration="{DynamicResource ControlAnimationDuration}" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.MusicRow:pointerover">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral800}" />
+        </Style>
+        <!-- Customised music gets the brand tint so it stands out from the original tracks. -->
+        <Style Selector="Border.MusicRow.Custom">
+            <Setter Property="Background" Value="{StaticResource Brand950}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand800}" />
+        </Style>
+        <Style Selector="Border.MusicRow.Custom:pointerover">
+            <Setter Property="Background" Value="{StaticResource Brand900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand700}" />
+        </Style>
+        <Style Selector="Border.MusicRow.Failed">
+            <Setter Property="BorderBrush" Value="{StaticResource Danger800}" />
+        </Style>
+        <Style Selector="Border.MusicRow.DropTarget, Border.MusicRow.Custom.DropTarget">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+        </Style>
+
+        <Style Selector="Border.MusicArt">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="ClipToBounds" Value="True" />
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Border.MusicRow:pointerover Border.MusicArt">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+        </Style>
+        <Style Selector="Border.MusicArt PathIcon">
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+        </Style>
+        <Style Selector="Border.MusicRow.Custom Border.MusicArt">
+            <Setter Property="Background" Value="{StaticResource Brand800}" />
+        </Style>
+        <Style Selector="Border.MusicRow.Custom Border.MusicArt PathIcon">
+            <Setter Property="Foreground" Value="{StaticResource Brand200}" />
+        </Style>
+
+        <Style Selector="TextBlock.RowTitle">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral100}" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+        <Style Selector="TextBlock.RowSubtitle">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral400}" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+        <Style Selector="Border.MusicRow.Custom TextBlock.RowSubtitle">
+            <Setter Property="Foreground" Value="{StaticResource Brand300}" />
+        </Style>
+        <Style Selector="Border.MusicRow.Failed TextBlock.RowSubtitle">
+            <Setter Property="Foreground" Value="{StaticResource Danger300}" />
+        </Style>
+
+        <Style Selector="TextBlock.GroupHeader">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral500}" />
+            <Setter Property="Margin" Value="4,16,0,3" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+        <Style Selector="TextBlock.GroupHeader.First">
+            <Setter Property="Margin" Value="4,2,0,3" />
+        </Style>
+
+        <!-- The whole row is a button (choose a song), sitting behind the row content. -->
+        <Style Selector="Button.RowButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="-8,0,-6,0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1" CornerRadius="6" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.RowButton:focus-visible">
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+        </Style>
+
+        <!-- Notices above the list -->
+        <Style Selector="Border.Notice">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,8" />
+        </Style>
+        <Style Selector="Border.Notice.Warning">
+            <Setter Property="BorderBrush" Value="{StaticResource Warning800}" />
+        </Style>
+        <Style Selector="Border.Notice TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{StaticResource Neutral200}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="FlyoutPresenter.MusicOptions">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral700}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="18" />
+        </Style>
+
+        <!-- The list's scroll bar sits inside the list (the app default moves it into the page margin, where this
+             page clips it) and uses a thumb that stands out from the dark rows. -->
+        <Style Selector="ListBox#MusicList /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar">
+            <Setter Property="RenderTransform">
+                <TranslateTransform X="0" />
+            </Setter>
+        </Style>
+        <Style Selector="ListBox#MusicList /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar /template/ Thumb">
+            <Setter Property="Background" Value="{StaticResource Neutral600}" />
+        </Style>
+        <Style Selector="ListBox#MusicList /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar /template/ Thumb:pointerover, ListBox#MusicList /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar /template/ Thumb:pressed">
+            <Setter Property="Background" Value="{StaticResource Neutral400}" />
+        </Style>
+
+        <Style Selector="Border.PlayerBar">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand800}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="10,8" />
+        </Style>
+
+        <Style Selector="Border.DropHint">
+            <Setter Property="Background" Value="{StaticResource Neutral800}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brand400}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="BoxShadow" Value="0 6 20 0 #70000000" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource TopRowSize}" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="3,0,3,12" VerticalAlignment="Bottom">
+            <StackPanel Spacing="2" VerticalAlignment="Bottom">
+                <TextBlock Text="{Binding Summary}" Classes="TinyText" TextTrimming="CharacterEllipsis" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{loc:T page_title.custom_music}" Classes="PageTitleText" Margin="0" />
+                    <components:StatusBadge Text="{Binding CustomCount}" Variant="Brand" VerticalAlignment="Center"
+                                            TipText="{loc:T custom_music.custom_count_tip}" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Bottom">
+                <components:ActionButton x:Name="DiscardButton" IsCircular="True" Variant="Ghost" Tone="Secondary"
+                                         IconData="{StaticResource RotateLeft}" IsVisible="{Binding HasPendingChanges}"
+                                         ToolTip.Tip="{loc:T custom_music.discard}" AutomationProperties.Name="{loc:T custom_music.discard}"
+                                         Click="Discard_Click" />
+                <components:ActionButton x:Name="SaveButton" Tone="Brand" IconData="{StaticResource CheckMark}"
+                                         Text="{loc:T action.save}" IsEnabled="{Binding CanSave}" IsLoading="{Binding IsSaving}"
+                                         ToolTip.Tip="{Binding PendingText}" Click="Save_Click" />
+            </StackPanel>
+        </Grid>
+        <Border Grid.Row="0" Background="{StaticResource BackgroundLineColor}" Height="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+
+        <!-- Search, sort and options -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="3,12,3,0">
+            <components:InputField x:Name="SearchInput" Text="{Binding SearchText, Mode=TwoWay}"
+                                   Placeholder="{loc:T custom_music.search_placeholder}" IconData="{StaticResource Search}"
+                                   Height="36" VerticalAlignment="Center" />
+            <components:Dropdown Grid.Column="1" x:Name="SortDropdown" MinWidth="140" VerticalAlignment="Center"
+                                 ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSort, Mode=TwoWay}"
+                                 AutomationProperties.Name="{loc:T custom_music.sort.label}" ToolTip.Tip="{loc:T custom_music.sort.label}" />
+            <components:ActionButton Grid.Column="2" x:Name="OptionsButton" IconData="{StaticResource Gear}" Tone="Secondary"
+                                     Width="36" Height="36" Padding="8" VerticalAlignment="Center"
+                                     AutomationProperties.Name="{loc:T custom_music.options}" ToolTip.Tip="{loc:T custom_music.options}">
+                <Button.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedRight" FlyoutPresenterClasses="MusicOptions">
+                        <StackPanel Width="270" Spacing="12">
+                            <TextBlock Text="{loc:T custom_music.options}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource Neutral100}" />
+                            <StackPanel Spacing="6">
+                                <components:FormFieldLabel Text="{loc:T custom_music.final_lap.label}" />
+                                <components:Dropdown x:Name="FinalLapDropdown" HorizontalAlignment="Stretch"
+                                                     ItemsSource="{Binding FinalLapOptions}" SelectedItem="{Binding SelectedFinalLap, Mode=TwoWay}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T custom_music.final_lap.help}" />
+                            </StackPanel>
+                            <Border Height="1" Background="{StaticResource Neutral700}" />
+                            <StackPanel Spacing="6">
+                                <components:FormFieldLabel Text="{loc:T custom_music.loudness.label}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T custom_music.loudness.help}" />
+                                <components:FormFieldLabel Text="{loc:T custom_music.volume.label}" Margin="0,6,0,0" />
+                                <components:Dropdown x:Name="VolumeDropdown" HorizontalAlignment="Stretch"
+                                                     ItemsSource="{Binding VolumeOptions}" SelectedItem="{Binding SelectedVolume, Mode=TwoWay}" />
+                                <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T custom_music.volume.help}" />
+                            </StackPanel>
+                            <Border Height="1" Background="{StaticResource Neutral700}" />
+                            <TextBlock Classes="TinyText" TextWrapping="Wrap" Text="{loc:T custom_music.formats_help}" />
+                            <components:ActionButton Text="{loc:T custom_music.reset_all.button}" Variant="Ghost" Tone="Danger"
+                                                     IconData="{StaticResource RotateLeft}" HorizontalAlignment="Left"
+                                                     IsEnabled="{Binding HasCustomMusic}" Click="ResetAll_Click" />
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+            </components:ActionButton>
+        </Grid>
+
+        <!-- Notices -->
+        <StackPanel Grid.Row="2" Spacing="6" Margin="3,10,3,0">
+            <Border Classes="Notice Warning" IsVisible="{Binding IsModDisabled}">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <PathIcon Data="{StaticResource WarningTip}" Width="16" Height="16" Foreground="{StaticResource Warning500}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{loc:T custom_music.notice.disabled}" />
+                    <components:ActionButton Grid.Column="2" Text="{loc:T custom_music.notice.enable}" Tone="Brand" Size="Compact"
+                                             VerticalAlignment="Center" Click="EnableMod_Click" />
+                </Grid>
+            </Border>
+            <Border Classes="Notice Warning" IsVisible="{Binding HasConflicts}">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <PathIcon Data="{StaticResource WarningTip}" Width="16" Height="16" Foreground="{StaticResource Warning500}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding ConflictText}" />
+                </Grid>
+            </Border>
+            <Border Classes="Notice" IsVisible="{Binding IsRetroRewindMissing}">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <PathIcon Data="{StaticResource InfoTip}" Width="16" Height="16" Foreground="{StaticResource Neutral300}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{loc:T custom_music.notice.no_retro_rewind}" />
+                </Grid>
+            </Border>
+            <Border Classes="Notice Warning" IsVisible="{Binding IsRetroRewindUnreadable}">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <PathIcon Data="{StaticResource WarningTip}" Width="16" Height="16" Foreground="{StaticResource Warning500}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{loc:T custom_music.notice.unreadable}" />
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- The music list -->
+        <Grid Grid.Row="3">
+            <ListBox x:Name="MusicList" ItemsSource="{Binding Rows}" Margin="0,8,0,1" Padding="0" Focusable="False"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <!-- Right margin keeps the rows' buttons clear of the scroll bar. -->
+                        <VirtualizingStackPanel Margin="3,0,16,24" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.DataTemplates>
+                    <DataTemplate x:DataType="vm:MusicGroupHeader">
+                        <TextBlock Text="{Binding Title}" Classes="GroupHeader" Classes.First="{Binding IsFirst}" />
+                    </DataTemplate>
+                    <DataTemplate x:DataType="vm:MusicSlotItem">
+                        <Border Classes="MusicRow" Classes.Custom="{Binding IsCustom}" Classes.Failed="{Binding HasError}"
+                                Classes.DropTarget="{Binding IsDropTarget}"
+                                ToolTip.Tip="{Binding Details}" ToolTip.ShowDelay="700" ToolTip.Placement="Top">
+                            <Border.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{loc:T custom_music.menu.choose}" Click="ChooseSong_Click" />
+                                    <MenuItem Header="{Binding FamilyMenuText}" Click="UseForFamily_Click" IsVisible="{Binding HasFamily}" />
+                                    <MenuItem Header="{loc:T custom_music.menu.play_original}" Click="PlayOriginal_Click" IsVisible="{Binding CanPreviewOriginal}" />
+                                    <MenuItem Header="{loc:T custom_music.menu.play_custom}" Click="PlayCustom_Click" IsVisible="{Binding IsCustom}" />
+                                    <MenuItem Header="{loc:T custom_music.menu.louder}" Click="Louder_Click" IsVisible="{Binding IsCustom}" />
+                                    <MenuItem Header="{loc:T custom_music.menu.quieter}" Click="Quieter_Click" IsVisible="{Binding IsCustom}" />
+                                    <MenuItem Header="{loc:T custom_music.menu.undo}" Click="UndoChange_Click" IsVisible="{Binding IsPending}" />
+                                    <MenuItem Header="{loc:T custom_music.menu.reset}" Click="Reset_Click" IsVisible="{Binding IsCustom}" />
+                                    <Separator IsVisible="{Binding IsCustom}" />
+                                    <MenuItem Header="{loc:T custom_music.menu.show_source}" Click="ShowSource_Click" IsVisible="{Binding IsCustom}" />
+                                </ContextMenu>
+                            </Border.ContextMenu>
+                            <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="10">
+                                <Button Grid.ColumnSpan="3" Classes="RowButton" Click="ChooseSong_Click"
+                                        AutomationProperties.Name="{Binding Name}" />
+
+                                <Border Grid.Column="0" Classes="MusicArt" IsHitTestVisible="False">
+                                    <Panel>
+                                        <PathIcon Data="{StaticResource MusicNote}" Width="18" Height="18"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  IsVisible="{Binding ShowNoteIcon}" />
+                                        <Image Source="{Binding Cover}" Stretch="UniformToFill" IsVisible="{Binding HasCover}" />
+                                        <components:Spinner Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                            IsVisible="{Binding IsProcessing}" />
+                                    </Panel>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2" IsHitTestVisible="False">
+                                    <TextBlock Text="{Binding Name}" Classes="RowTitle" />
+                                    <TextBlock Text="{Binding Subtitle}" Classes="RowSubtitle" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                                    <components:StatusBadge Text="{loc:T custom_music.unsaved}" Variant="Warning" VerticalAlignment="Center"
+                                                            IsVisible="{Binding IsPending}" IsHitTestVisible="False" />
+                                    <components:ActionButton IconData="{StaticResource Play}" Variant="Ghost" Tone="Secondary"
+                                                             IsCircular="True" Size="Compact" VerticalAlignment="Center"
+                                                             IsVisible="{Binding ShowPlayButton}"
+                                                             ToolTip.Tip="{loc:T custom_music.preview.play_tip}"
+                                                             AutomationProperties.Name="{loc:T custom_music.preview.play_tip}"
+                                                             Click="PlayOriginal_Click" />
+                                    <components:ActionButton IconData="{StaticResource Stop}" Variant="Ghost" Tone="Brand"
+                                                             IsCircular="True" Size="Compact" VerticalAlignment="Center"
+                                                             IsVisible="{Binding IsPreviewing}"
+                                                             ToolTip.Tip="{loc:T custom_music.preview.stop_tip}"
+                                                             AutomationProperties.Name="{loc:T custom_music.preview.stop_tip}"
+                                                             Click="StopPreview_Click" />
+                                    <components:ActionButton IconData="{StaticResource ContextDots}" Variant="Ghost" Tone="Secondary"
+                                                             IsCircular="True" Size="Compact" VerticalAlignment="Center"
+                                                             AutomationProperties.Name="{loc:T custom_music.menu.more}"
+                                                             Click="RowMenu_Click" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.DataTemplates>
+            </ListBox>
+
+            <components:EmptyPageInfo IsVisible="{Binding HasNoResults}" IconData="{StaticResource MusicNote}"
+                                      Title="{loc:T custom_music.empty.title}" BodyText="{loc:T custom_music.empty.body}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+            <components:Spinner Width="28" Height="28" IsVisible="{Binding IsLoading}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+            <!-- Shown while files are dragged over the page -->
+            <Border x:Name="DropHint" Classes="DropHint" IsVisible="False" IsHitTestVisible="False"
+                    VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="12,0,12,14">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <PathIcon Data="{StaticResource MusicNote}" Width="18" Height="18" Foreground="{StaticResource Brand300}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" x:Name="DropHintText" Text="{loc:T custom_music.drop_hint}" TextWrapping="Wrap"
+                               FontSize="13" Foreground="{StaticResource Neutral100}" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Preview player -->
+        <Border Grid.Row="4" Classes="PlayerBar" IsVisible="{Binding IsPlayerVisible}" Margin="3,4,3,10">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Panel VerticalAlignment="Center">
+                    <components:ActionButton IconData="{StaticResource Pause}" IsCircular="True" Tone="Brand" Size="Compact"
+                                             IsVisible="{Binding IsPlaying}" ToolTip.Tip="{loc:T custom_music.preview.pause_tip}"
+                                             AutomationProperties.Name="{loc:T custom_music.preview.pause_tip}" Click="PlayPause_Click" />
+                    <components:ActionButton IconData="{StaticResource Play}" IsCircular="True" Tone="Brand" Size="Compact"
+                                             IsVisible="{Binding !IsPlaying}" IsEnabled="{Binding !IsPreviewLoading}"
+                                             ToolTip.Tip="{loc:T custom_music.preview.resume_tip}"
+                                             AutomationProperties.Name="{loc:T custom_music.preview.resume_tip}" Click="PlayPause_Click" />
+                </Panel>
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{Binding NowPlayingTitle}" Classes="RowTitle" MaxWidth="260" />
+                            <TextBlock Text="{Binding NowPlayingKind}" Classes="RowSubtitle" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding PlaybackTime}" Classes="RowSubtitle" VerticalAlignment="Center" />
+                    </Grid>
+                    <!-- Clicking the bar jumps to that point of the song. -->
+                    <Panel Background="Transparent" Height="14" Cursor="Hand" PointerPressed="Seek_PointerPressed">
+                        <ProgressBar Minimum="0" Maximum="1" Value="{Binding PlaybackFraction}" Height="4"
+                                     VerticalAlignment="Center" IsHitTestVisible="False" />
+                    </Panel>
+                </StackPanel>
+                <components:ActionButton Grid.Column="2" IconData="{StaticResource Stop}" IsCircular="True" Variant="Ghost" Tone="Secondary"
+                                         Size="Compact" VerticalAlignment="Center" ToolTip.Tip="{loc:T custom_music.preview.stop_tip}"
+                                         AutomationProperties.Name="{loc:T custom_music.preview.stop_tip}" Click="StopPreview_Click" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

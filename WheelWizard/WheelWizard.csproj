@@ -72,6 +72,10 @@
         </PackageReference>
         <PackageReference Include="Testably.Abstractions" Version="9.0.0" />
         <PackageReference Include="YamlDotNet" Version="17.1.0" />
+
+        <!-- Custom Music: fully managed MP3 and Ogg Vorbis decoders (both MIT licensed, no native code) -->
+        <PackageReference Include="NLayer" Version="3.0.0" />
+        <PackageReference Include="NVorbis" Version="0.10.5" />
     </ItemGroup>
 
     <ItemGroup Label="Embedded Resources">
