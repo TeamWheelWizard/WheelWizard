@@ -63,6 +63,7 @@ public partial class RecompSettings : UserControl
         GraphicsApiDropdown.SelectionChanged += GraphicsApi_OnChanged;
         ShowFps.IsCheckedChanged += ShowFps_OnChanged;
         PreventStutters.IsCheckedChanged += PreventStutters_OnChanged;
+        GxWorker.IsCheckedChanged += GxWorker_OnChanged;
     }
 
     private bool IsInstalled => RecompInstallService is { IsInstalled: true };
@@ -140,6 +141,7 @@ public partial class RecompSettings : UserControl
 
         ShowFps.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMP_SHOW_FPS);
         PreventStutters.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMP_PREVENT_STUTTERS);
+        GxWorker.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMP_GX_WORKER);
     }
 
     /// <summary>
@@ -196,6 +198,14 @@ public partial class RecompSettings : UserControl
             return;
 
         SettingsEditing.Set(SettingsService, SettingsService.RECOMP_PREVENT_STUTTERS, PreventStutters.IsChecked == true);
+    }
+
+    private void GxWorker_OnChanged(object? sender, RoutedEventArgs e)
+    {
+        if (_loading)
+            return;
+
+        SettingsEditing.Set(SettingsService, SettingsService.RECOMP_GX_WORKER, GxWorker.IsChecked == true);
     }
 
     #endregion

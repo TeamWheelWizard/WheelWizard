@@ -65,6 +65,7 @@ public interface ISettingsProperties
     Setting<string> RECOMP_GRAPHICS_API { get; }
     Setting<bool> RECOMP_SHOW_FPS { get; }
     Setting<bool> RECOMP_PREVENT_STUTTERS { get; }
+    Setting<bool> RECOMP_GX_WORKER { get; }
     Setting<string> RECOMP_NAND_ROOT { get; }
 }
 
