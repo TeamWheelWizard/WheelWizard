@@ -321,9 +321,11 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         if (_closeConfirmed)
             return null;
-        if (_closeGuards > 0 && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing)
-            return ConfirmQuitDuringSetupAsync;
-        return Navigation.CurrentPage is INavigationGuard { HasUnsavedWork: true } guard ? guard.ConfirmLeaveAsync : null;
+        var setup = _closeGuards > 0 && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing;
+        var page = Navigation.CurrentPage is INavigationGuard { HasUnsavedWork: true } guard ? guard : null;
+        if (!setup && page == null)
+            return null;
+        return async () => (!setup || await ConfirmQuitDuringSetupAsync()) && (page == null || await page.ConfirmLeaveAsync());
     }
 
     private static Task<bool> ConfirmQuitDuringSetupAsync() =>
