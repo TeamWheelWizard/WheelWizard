@@ -1,648 +1,698 @@
+---
 fi:
-  page_title:
-    home: "Etusivu"
-    settings: "Asetukset"
-    mods: "My Stuff"
-    patches: "Paikkaukset"
-    my_profiles: "Omat profiilit"
-    rooms: "Huoneet"
-    friends: "Kaverit"
-    leaderboard: "Tulostaulu"
-    room_details: "Huoneen tiedot"
-    my_miis: "Omat Miit"
-  attribute:
-    status_online: "Online"
-    enabled: "Käytössä"
-    title: "Otsikko"
-    all: "Kaikki"
-    status_offline: "Offline"
-    name: "Nimi"
-    id: "ID"
-    type: "Tyyppi"
-    speed: "Nopeus"
-    mod_name: "Modin nimi"
-    average_room_vr: "Keskiarvoinen KP"
-    losses: "Häviöt"
-    wins: "Voitot"
-    races_played: "Kisoja pelattu"
-    friend_code: "Kaverikoodi"
-    player_count: "Pelaajia"
-    time_online: "Aika verkossa"
-    message: "Viesti"
-    is_online: "Paikalla"
-    vr_history: "KP-historia"
-    start_vr: "KP alussa"
-    end_vr: "KP lopussa"
-    net_change: "Nettomuutos"
-    mii:
-      gender_male: "Mies"
-      gender: "Sukupuoli"
-      gender_female: "Nainen"
-      vertical_position: "Pystysuuntainen sijainti"
-      size: "Koko"
-      nose_type: "Nenän tyyli"
-      horizontal_position: "Vaakasuuntainen sijainti"
-      mouth_type: "Huulien tyyli"
-      hair_color: "Hiusväri"
-      hair_type: "Hiustyyli"
-      mirror_hair: "Peilaa hiukset"
-      glasses_type: "Silmälasien tyyli"
-      glasses_color: "Silmälasien väri"
-      name: "Miin nimi"
-      creator_name: "Tekijän nimi"
-      height: "Pituus"
-      width: "Leveys"
-      fav_color: "Lempiväri"
-      skin_color: "Ihonväri"
-      head_shape: "Pään muoto"
-      facial_feature: "Kasvojen ominaisuus"
-      irish_color: "Silmien väri"
-      space_between: "Välitys"
-      rotation: "Kierto (vasen/oikea)"
-      eyebrow_type: "Kulmakarvojen tyyli"
-      mustache_type: "Viiksityyli"
-      mustache_vertical_position: "Viiksien pystysuuntainen sijainti"
-      mustache_size: "Viiksien koko"
-      beard_type: "Partatyyli"
-      default_name: "Uusi Mii"
-    status: "Status"
-    priority: "Prioriteetti"
-    sort_by: "Järjestä"
-    match: "Ottelu"
-    enable_matches: "Ottelua"
-    total_games_won: "Kisoja voitettu yhteensä"
-    total_games_played: "Kisoja pelattu yhteensä"
-    vr_abbreviation: "KP"
-    br_abbreviation: "TP"
-    br_full: "Taistelupisteet"
-    vr_full: "Kilpailupisteet"
-    description: "Kuvaus"
-    images: "Kuvat"
-    likes: "Tykkäykset"
-    views: "Näyttökerrat"
-    downloads: "Lataukset"
-    mii_section:
-      general: "Yleiset"
-      face: "Kasvot"
-      hair: "Hiukset"
-      eyebrows: "Kulmakarvat"
-      eyes: "Silmät"
-      nose: "Nenä"
-      lips: "Huulet"
-      glasses: "Silmälasit"
-      facial_hair: "Naamakarvoitus"
-      mole: "Luomi"
-    gender: "Sukupuoli"
-    gender_female: "Nainen"
-    gender_male: "Mies"
-  state:
-    loading: "Ladataan..."
-    installing: "Asennetaan..."
-    updating: "Päivitetään..."
-    config_not_finished: "Määritys kesken"
-    no_server: "Ei palvelinta"
-    unknown: "Tuntematon"
-    error: "Virhe"
-    warning: "Varoitus"
-    success: "Onnistui"
-    extracting: "Puretaan tiedostoja..."
-    no_name: "Ei nimeä"
-    no_license: "Ei ajokorttia"
-    no_profiles: "Ei profiileja"
-    custom: "Mukautettu"
-    installed: "Asennettu"
   action:
-    play: "Pelaa"
-    open: "Avoin"
-    play_offline: "Pelaa offline-tilassa"
-    play_anyway: "Pelaa silti"
-    install: "Asenna"
-    update: "Päivitä"
-    import: "Tuo"
-    clone: "Kloonaa"
-    convert_to_patches: "Muunna paikkauksiksi"
-    enable_all: "Ota kaikki käyttöön"
-    disable_all: "Poista kaikki"
-    rename: "Nimeä uudelleen"
-    delete: "Poista"
-    open_folder: "Avaa kansio"
-    edit: "Muokkaa"
-    cancel: "Peruuta"
-    save: "Tallenna"
-    copy_friend_code: "Kopioi kaverikoodi"
-    export: "Vie"
-    apply: "Käytä"
-    "yes": "Kyllä"
-    "no": "Ei"
-    keep: "Säilytä"
-    ok: "Ok"
-    revert: "Palauta"
-    maybe_later: "Myöhemmin"
-    browse: "Selaa"
-    change: "Muuta"
-    view_mod: "Näytä modi"
-    save_external_mii: "Lisää Mii omiin Mii-hahmoihin"
-    duplicate: "Monista"
-    back: "Takaisin"
-    unfavorite: "Poista suosikeista"
-    favorite: "Suosikki"
-    view_room: "Näytä huone"
-    recomp_nand_copy: "Luo kopio"
-    recomp_nand_share: "Käytä suoraan"
-    recomp_install_offline: "Asenna vain offline-tilassa"
+    apply: Käytä
+    back: Takaisin
+    browse: Selaa
+    cancel: Peruuta
+    change: Muuta
+    clone: Kloonaa
+    convert_to_patches: Muunna paikkauksiksi
+    copy_friend_code: Kopioi kaverikoodi
+    delete: Poista
+    disable_all: Poista kaikki
+    do_manually: Tee manuaalisesti
+    download_and_install: Lataa ja asenna
+    duplicate: Monista
+    edit: Muokkaa
+    enable_all: Ota kaikki käyttöön
+    export: Vie
+    favorite: Suosikki
+    gamebanana_page: Gamebanana-sivusto
+    import: Tuo
+    install: Asenna
+    keep: Säilytä
+    launch_dolphin: Käynnistä Dolphin
     link:
-      discord: "Puhu meille!"
-      github: "Lähdekoodi"
-      support: "Tue meitä!"
-    launch_dolphin: "Käynnistä Dolphin"
-    randomize: "Satunnaista"
-    do_manually: "Tee manuaalisesti"
-    gamebanana_page: "Gamebanana-sivusto"
-    report: "Ilmoita"
-    un_install: "Poista asennus"
-    download_and_install: "Lataa ja asenna"
-    view_custom_chars: "Näytä mukautetut hahmot"
-    submit: "Lähetä"
-  region:
-    japan: "Japani"
-    europe: "Eurooppa"
-    china: "Kiina"
-    south_korea: "Etelä-Korea"
-    taiwan: "Taiwan"
-    america: "Amerikka"
-    australia: "Australia"
-  list_title:
-    friends: "Kaverit"
-    players: "Pelaajat"
-    rooms: "Huoneet"
-    miis: "Miit"
-  popup_title:
-    mod_details: "Modin tiedot"
-    mod_browser: "Modiselain"
-    mii_selector: "Miin valinta"
-    mii_editor: "Mii-editori"
-  text:
-    made_by_string: |-
-      Tehnyt: %{firstAuthor}
-      ja %{secondAuthor}
-    thanks_translators: "Suuret kiitokset kaikille kääntäjille:"
-    wh_wz_translation_percentage: "Tämän kielen käännökset ovat %{percentage} % valmiita."
-    powered_gamebanana: "Palvelun tarjoaa GameBanana"
-    language_translated_by: "Tämän kielen käännökset tarjoaa: %{translators}"
-    external_reference: "Ulkoinen viite"
-    external_reference_with_path: "Ulkoinen viite: %{path}"
-    modified_archive_member: "Muokattu arkiston jäsen"
-    new_archive_member: "Uusi arkiston jäsen"
-    whole_file_override: "Koko tiedoston ohitus"
+      discord: Puhu meille!
+      github: Lähdekoodi
+      support: Tue meitä!
+    maybe_later: Myöhemmin
+    'no': Ei
+    ok: Ok
+    open: Avoin
+    open_folder: Avaa kansio
+    play: Pelaa
+    play_anyway: Pelaa silti
+    play_offline: Pelaa offline-tilassa
+    randomize: Satunnaista
+    recomp_install_offline: Asenna vain offline-tilassa
+    recomp_nand_copy: Luo kopio
+    recomp_nand_share: Käytä suoraan
+    rename: Nimeä uudelleen
+    report: Ilmoita
+    revert: Palauta
+    save: Tallenna
+    save_external_mii: Lisää Mii omiin Mii-hahmoihin
+    submit: Lähetä
+    un_install: Poista asennus
+    unfavorite: Poista suosikeista
+    update: Päivitä
+    view_custom_chars: Näytä mukautetut hahmot
+    view_mod: Näytä modi
+    view_room: Näytä huone
+    'yes': Kyllä
+  attribute:
+    all: Kaikki
+    average_room_vr: Keskiarvoinen KP
+    br_abbreviation: TP
+    br_full: Taistelupisteet
+    description: Kuvaus
+    downloads: Lataukset
+    enable_matches: Ottelua
+    enabled: Käytössä
+    end_vr: KP lopussa
+    friend_code: Kaverikoodi
+    gender: Sukupuoli
+    gender_female: Nainen
+    gender_male: Mies
+    id: ID
+    images: Kuvat
+    is_online: Paikalla
+    likes: Tykkäykset
+    losses: Häviöt
+    match: Ottelu
+    message: Viesti
+    mii:
+      beard_type: Partatyyli
+      creator_name: Tekijän nimi
+      default_name: Uusi Mii
+      eyebrow_type: Kulmakarvojen tyyli
+      facial_feature: Kasvojen ominaisuus
+      fav_color: Lempiväri
+      gender: Sukupuoli
+      gender_female: Nainen
+      gender_male: Mies
+      glasses_color: Silmälasien väri
+      glasses_type: Silmälasien tyyli
+      hair_color: Hiusväri
+      hair_type: Hiustyyli
+      head_shape: Pään muoto
+      height: Pituus
+      horizontal_position: Vaakasuuntainen sijainti
+      irish_color: Silmien väri
+      mirror_hair: Peilaa hiukset
+      mouth_type: Huulien tyyli
+      mustache_size: Viiksien koko
+      mustache_type: Viiksityyli
+      mustache_vertical_position: Viiksien pystysuuntainen sijainti
+      name: Miin nimi
+      nose_type: Nenän tyyli
+      rotation: Kierto (vasen/oikea)
+      size: Koko
+      skin_color: Ihonväri
+      space_between: Välitys
+      vertical_position: Pystysuuntainen sijainti
+      width: Leveys
+    mii_section:
+      eyebrows: Kulmakarvat
+      eyes: Silmät
+      face: Kasvot
+      facial_hair: Naamakarvoitus
+      general: Yleiset
+      glasses: Silmälasit
+      hair: Hiukset
+      lips: Huulet
+      mole: Luomi
+      nose: Nenä
+    mod_name: Modin nimi
+    name: Nimi
+    net_change: Nettomuutos
+    player_count: Pelaajia
+    priority: Prioriteetti
+    races_played: Kisoja pelattu
+    sort_by: Järjestä
+    speed: Nopeus
+    start_vr: KP alussa
+    status: Status
+    status_offline: Offline
+    status_online: Online
+    time_online: Aika verkossa
+    title: Otsikko
+    total_games_played: Kisoja pelattu yhteensä
+    total_games_won: Kisoja voitettu yhteensä
+    type: Tyyppi
+    views: Näyttökerrat
+    vr_abbreviation: KP
+    vr_full: Kilpailupisteet
+    vr_history: KP-historia
+    wins: Voitot
+  category:
+    about: Tietoa
+    dolphin: Dolphin
+    general: Yleiset
+    other: Muut
+    video: Video
+  empty_content:
+    no_friends: Voit lisätä kavereita pelissä
+    no_friends_title: Ei kavereita vielä.
+    no_miis: Mii-tietojen lukeminen järjestelmältäsi epäonnistui. Varmista, että olet
+      käynnistänyt pelin ainakin kerran.
+    no_miis_title: Ei Mii-hahmoja vielä.
+    no_mod_selected: Valitse modi listalta nähdäksesi sen tiedot
+    no_mod_selected_title: Ei modia valittuna
+    no_mods: Modit voivat muuttaa pelin toimintoja. Tuo ensimmäinen modisi painamalla
+      alla olevaa painiketta.
+    no_mods_title: Modeja ei löytynyt
+    no_profiles: Sinun on pelattava peliä vähintään kerran nähdäksesi profiilisi listalla
+    no_rooms: Sinulta joko puuttuu internet-yhteys tai kukaan ei ole pelaamassa tällä
+      hetkellä.
+    no_rooms_title: Huoneita ei löytynyt
+    no_vr_history: Kaverikoodi vaaditaan KP-historian lataamiseen.
+    no_vr_history_range: Tällä aikavälillä ei löydy KP-historiaa.
+    no_vr_history_title: Ei KP-historiaa
+  file_picker:
+    select_mod_file: Valittu moditiedosto
+  helper_note:
+    creator_name_less10: Tekijän nimen täytyy olla alle 10 merkkiä pitkä.
+    creator_name_less11: Tekijän nimen täytyy olla alle 11 merkkiä pitkä.
+    name_must_between: Nimien täytyy olla 3–10 merkkiä pitkä.
+  helper_text:
+    30_fps: Pakottaa pelin toimimaan 30 FPS -tilassa (oletus on 60)
+    enable_animations: Ottaa käyttöön animaatiot Wheel Wizard -sovelluksessa
+    enable_recomp: Käyttää WiiCompiledia käynnistysohjelmana kotisivulla. Poista tämä
+      käytöstä käyttääksesi Dolphinia ja Retro Rewindia. Vain Windowsille.
+    end_with_exe: Polun täytyy loppua päätteeseen .exe
+    end_with_x: 'Polku voi loppua:'
+    force_disable_wiimote: Poistaa Wiimoten käytöstä pelissä, mutta ottaa sen käyttöön
+      Wii-valikossa
+    installed_version: 'Asennettu versio: %{version}'
+    launch_rr_on_startup: Retro Rewind käynnistetään heti kun Wheel Wizard käynnistyy
+    launch_with_dolphin: Käynnistää Dolphinin pääikkunan pelin mukana
+    must_set_game_path: Sinun on valittava Mario Kart Wii -pelitiedostosi ennen kuin
+      voit pelata WiiCompiledia
+    must_set_paths: Nämä 3 polkua on määritettävä ennen kuin voit pelata Retro Rewindia
+    optional: Valinnainen
+    recommended: Muuttaa joitakin Dolphinin asetuksia pätkimisen ja lagipiikkien vähentämiseksi
+    recomp_clone_dolphin_data: Kopioi Dolphinin nykyiset tallennukset, Miit ja Wii-asetukset
+      yksityiseksi WiiCompiled-dataksi.
+    recomp_dolphin_data_not_found: Määritä ensin olemassa oleva Dolphin-käyttäjäkansio
+      sijaintiasetuksissa. Sen on sisällettävä Wii-kansio.
+    recomp_graphics_api: Vain DirectX 12 ja Vulkan suorittavat WiiCompiledia luotettavasti,
+      joten muita vaihtoehtoja ei ole tarjolla.
+    recomp_prevent_stutters: Varjostinta käännettäessä sitä tarvitsevat objektit ohitetaan
+      muutaman kuvan ajan sen sijaan, että koko peli jumiutuisi, kunnes se on valmis.
+      Vähentää pätkimistä grafiikan äkillisen ilmestymisen kustannuksella.
+    recomp_share_dolphin_data: WiiCompiled ja Dolphin käyttävät samoja tallennuksia,
+      Miitä ja Wii-asetuksia.
+    recomp_shared_nand_warning: Älä käytä Dolphinia ja WiiCompiledia samaan aikaan,
+      kun NAND-data jaetaan.
+    recomp_use_dolphin_data: Käytä Dolphinin olemassa olevaa Wii-kansiota, jotta WiiCompiled
+      jakaa tallennukset, Miit ja Wii-asetukset. Muutos tulee voimaan, kun WiiCompiled
+      käynnistyy seuraavan kerran.
+    renderer: Valitsee grafiikkaohjelman, jota Dolphin käyttää pelin renderöintiin.
+    resolution_scale: 1x on alkuperäinen resoluutio
+    retro_rewind_folder: Avaa kansion, joka sisältää asennetut Retro Rewind -tiedostot.
+    retro_rewind_version: 'Asennettu versio: %{version}'
+    select_dolphin_linux: Valitse Dolphin-ohjelmatiedosto tai anna käynnistyskomento
+    select_dolphin_macos: Valitse Dolphin.app
+    topbar:
+      location_warning: Asetukset on lukittu, suorita sijaintipolkujen asetukset ensin
+    v_sync: Synkronoi pelin kuvataajuuden näyttösi kanssa estääkseen kuvan pilkottumista.
+    wh_wz_language: Muuttaa Wheel Wizardin käyttämää kieltä, mutta ei pelin sisäistä
+      kieltä.
+    wheel_wizard_data_folder: Valitse Wheel Wizardin tiedostosijainti. Siirtäminen
+      voi kestää hetken.
   hover:
-    players_online:
-      none: "Ei pelaajia paikalla"
-      one: "1 pelaaja on paikalla"
-      other: "%{count} pelaajaa on paikalla"
-    rooms_online:
-      none: "Ei aktiivisia huoneita"
-      one: "1 aktiivinen huone"
-      other: "%{count} aktiivista huonetta"
     friends_online:
-      none: "Ei kavereita paikalla"
-      one: "1 kaveri on paikalla"
+      none: Ei kavereita paikalla
+      one: 1 kaveri on paikalla
       other: "%{count} kaveria on paikalla"
+    friends_page_disclaimer: Kavereiden lisääminen täytyy tehdä pelin sisällä.
+    players_online:
+      none: Ei pelaajia paikalla
+      one: 1 pelaaja on paikalla
+      other: "%{count} pelaajaa on paikalla"
+    primary_profile: Pääprofiilia käytetään viitteenä Wheel Wizardissa
+    rooms_online:
+      none: Ei aktiivisia huoneita
+      one: 1 aktiivinen huone
+      other: "%{count} aktiivista huonetta"
     rooms_page_disclaimer: |-
       Huomioi, että tältä sivulta ei voi liittyä huoneeseen suoraan.
       Liittyäksesi tiettyyn huoneeseen, se tulee tehdä joko kaverin kautta tai toivoa että pääset siihen liittymällä verkkopeliin.
-    friends_page_disclaimer: "Kavereiden lisääminen täytyy tehdä pelin sisällä."
-    primary_profile: "Pääprofiilia käytetään viitteenä Wheel Wizardissa"
-  empty_content:
-    no_profiles: "Sinun on pelattava peliä vähintään kerran nähdäksesi profiilisi listalla"
-    no_friends_title: "Ei kavereita vielä."
-    no_friends: "Voit lisätä kavereita pelissä"
-    no_mods: "Modit voivat muuttaa pelin toimintoja. Tuo ensimmäinen modisi painamalla alla olevaa painiketta."
-    no_mods_title: "Modeja ei löytynyt"
-    no_rooms: "Sinulta joko puuttuu internet-yhteys tai kukaan ei ole pelaamassa tällä hetkellä."
-    no_rooms_title: "Huoneita ei löytynyt"
-    no_miis_title: "Ei Mii-hahmoja vielä."
-    no_miis: "Mii-tietojen lukeminen järjestelmältäsi epäonnistui. Varmista, että olet käynnistänyt pelin ainakin kerran."
-    no_mod_selected_title: "Ei modia valittuna"
-    no_mod_selected: "Valitse modi listalta nähdäksesi sen tiedot"
-    no_vr_history_title: "Ei KP-historiaa"
-    no_vr_history: "Kaverikoodi vaaditaan KP-historian lataamiseen."
-    no_vr_history_range: "Tällä aikavälillä ei löydy KP-historiaa."
-  time:
-    days:
-      one: "1 pv"
-      other: "%{count} pv"
-    hours:
-      one: "1 t"
-      other: "%{count} t"
-    minutes:
-      one: "1 min"
-      other: "%{count} min"
-    seconds:
-      one: "1 s"
-      other: "%{count} s"
-    last_24_hours: "Viimeiset 24 tuntia"
-    last_7_days: "Viimeiset 7 päivää"
-    last_30_days: "Viimeiset 30 päivää"
-    last_60_days: "Viimeiset 60 päivää"
-    lifetime: "Koko ajalta"
-    lifetime_history: "Koko ajan historia"
-    past_n_days_with_range: "Viimeiset %{days} päivää (%{fromDate}–%{toDate})"
-  progress:
-    estimated_time_remaining: "Arvioitu kestoaika:"
-    downloading_mb: "Ladataan %{megabytes} Mt"
-    installing_mods: "Asennetaan modeja"
-    installing_mods_count: "Asennetaan %{amount} modia"
-    processing_xof_y: "Käsitellään %{processed}/%{total} tiedostoa..."
-    update_rr: "Päivitetään Retro Rewindia"
-    latest_wh_wz_github: "Hankitaan uusinta Wheel Wizard -versiota GitHubista"
-    update_wh_wz: "Päivitetään Wheel Wizardia"
-    installing_rr: "Asennetaan Retro Rewindia"
-    installing_rr_first_time: "Asennetaan Retro Rewindia ensimmäistä kertaa"
-    installing_dolphin: "Asennetaan Dolphin-emulaattoria"
-    updating_dolphin: "Päivitetään Dolphin-emulaattoria"
-    this_may_take_a_while: "Tässä voi kestää jonkin aikaa riippuen internet-yhteydestäsi."
-    applying_converted_mod: "Sovelletaan muunnettu modi"
-    combining_files: "Yhdistetään tiedostoja"
-    converting_file: "Muunnetaan %{fileName}"
-    converting_files_count: "Muunnetaan %{amount} tiedostoa"
-    converting_mod_to_patches: "Muunnetaan modi paikkauksiksi"
-    downloading_mod: "Ladataan %{modName}"
-    installing_mod: "Asennetaan modia"
-    preparing_files_count: "Valmistellaan %{amount} tiedostoa"
-    installing_recomp: "Asennetaan WiiCompiled"
-    updating_recomp: "Päivitetään WiiCompiled"
-    uninstalling_recomp: "Poistetaan WiiCompiled-asennusta"
-    recomp_checking_release: "Etsitään uusinta WiiCompiled-versiota"
-    recomp_downloading_setup: "Ladataan WiiCompiledin asennusohjelmaa"
-    recomp_running_setup: "Käynnistetään WiiCompiledin asennusohjelmaa"
-    recomp_finished: "WiiCompiled on valmis pelattavaksi"
-    recomp_copying_nand: "Kopioidaan Dolphin-dataa"
-  question:
-    recomp_uninstall:
-      title: "Poistetaanko WiiCompiledin asennus?"
-      extra_shared: "Poistaa WiiCompiledin asennuksen. Tallennuksesi säilyy Dolphinin Wii-kansiossa, ja Retro Rewind pysyy asennettuna."
-      extra_private: "Poistaa WiiCompiledin asennuksen sekä sen yksityiset Wii-tallennustiedot. Retro Rewind pysyy asennettuna."
-      extra_copy: "Poistaa WiiCompiledin asennuksen sekä sen kopiot Dolphin-datastasi. Alkuperäinen Dolphin-data pysyy muuttumattomana, ja Retro Rewind pysyy asennettuna."
-    recomp_use_dolphin_nand:
-      title: "Käytetäänkö Dolphin-tallennustietoja?"
-      extra: "WiiCompiled voi käyttää tallennuksia, Miitä ja kaverikoodeja, jotka ovat jo käytössä Dolphinissa. Jos niitä ei ole, se aloittaa alusta omalla Wii-datallaan."
-    recomp_retro_wfc_unavailable:
-      title: "Retro WFC:hen ei saada yhteyttä"
-      extra: "WiiCompiled vaatii Retro WFC -palvelimia verkkopelaamista varten, ja ne eivät vastaa juuri nyt. Voit asentaa ilman verkkopeliä nyt; WiiCompiled lisää sen automaattisesti seuraavalla päivityskerralla, kun palvelimet ovat taas toiminnassa."
-    recomp_nand_mode:
-      title: "Kopioidaanko Dolphin-data vai käytetäänkö niitä suoraan?"
-      extra: "Dolphin suosittelee, etteivät muut ohjelmat käytä Wii-dataa (NAND) suoraan, koska kaksi samaan aikaan siihen kirjoittavaa ohjelmaa voi vioittaa sen. Kopio pitää WiiCompiledin täysin erillään, mutta toisessa tehdyt edistymiset eivät näy toisessa."
-    recomp_share_dolphin_data:
-      title: "Jaetaanko NAND-data Dolphinin kanssa?"
-      extra: "Kloonaus antaa WiiCompiledille samat nykyiset tallennukset, Miit ja Wii-asetukset, mutta pitää kopion erillään ja on turvallisempi. Suora jakaminen antaa Dolphinille ja WiiCompiledille mahdollisuuden kirjoittaa samaan NAND-muistiin, mikä voi vioittaa sitä, jos molemmat suorittavat samanaikaisesti. Jatka vain, jos ymmärrät riskin."
-    recomp_overwrite_dolphin_clone:
-      title: "Korvataanko yksityinen Dolphin-klooni?"
-      extra: "Korvaa nykyisen kloonin Dolphinin tiedoilla. Vain WiiCompiledissa muutetut tallennukset, Miit ja Wii-asetukset menetetään."
-    launch_clear_mods_found:
-      title: "Modeja löytyi"
-      extra: |-
-        Aiot käynnistää pelin ilman modeja.
-        Haluatko tyhjentää 'my-stuff'-kansiosi?
-    sure_delete:
-      title: "Haluatko varmasti poistaa '%{name}'?"
-      extra: "Poistaminen on pysyvää eikä sitä voi perua."
-      title_miis: "Haluatko varmasti poistaa %{amount} Miitä?"
-    apply_scale:
-      title: "Haluatko ottaa uuden skaalan käyttöön?"
-      extra: "Muutos perutaan %{remainingTime} kuluttua, ellet aio pitää muutosta."
-    move_data:
-      title: "Siirretäänkö Wheel Wizardin tiedot?"
-      extra: |-
-        Wheel Wizardin tiedostot siirretään sijaintiin:
-        %{path}
-        Tässä saattaa mennä hetki riippuen tietojen määrästä.
-    dolphin_found:
-      title: "Dolphin-emulaattorin kansio löytyi"
-      extra: |-
-        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä'.
-        Dolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?
-    dolphin_outdated:
-      title: "Dolphin-emulaattorisi on vanhentunut"
-      extra: |-
-        Tässä Dolphin-versiossa (%{currentVersion}) on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
-
-        Päivitä versioon %{minimumVersion} tai uudempaan varmuuden vuoksi.
-    dolphin_program_found:
-      title: "Dolphin-emulaattori löytyi"
-      extra: |-
-        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä'.
-        Dolphin-emulaattori löytyi. Haluatko käyttää sitä?
-    new_version_wh_wz:
-      title: "Wheel Wizard -päivitys saatavilla"
-      extra: "Wheel Wizardin versio %{latestVersion} on saatavilla (nykyinen versio: %{currentVersion}). Haluatko päivittää heti?"
-    update_admin:
-      title: "Päivitä järjestelmänvalvojana"
-      extra: "Joskus päivitys vaatii järjestelmänvalvojan oikeuet. Haluatko aktivoida ne tätä päivitystä varten?"
-    reinstall_rr:
-      title: "Asenna Retro Rewind uudelleen"
-      extra: "Haluatko varmasti asentaa Retro Rewindin uudelleen?"
-    old_rksys_found:
-      title: "Vanha rksys.dat löytyi"
-      extra: "Vanhoja tallennustietoja löytyi. Haluatko käyttää sitä? (suositeltu)"
-    rr_to_old:
-      extra: |-
-        Retro Rewind -versiosi on liian vanha päivittämiseen. Haluatko asentaa Retro Rewindin uudelleen?
-
-      title: "Retro Rewind -versio on liian vanha."
-    rr_not_determined:
-      title: "Lataa Retro Rewind"
-      extra: "Retro Rewind -versiotasi ei voitu määrittää. Haluatko ladata Retro Rewindin?"
-    dolphin_flatpak:
-      title: "Dolphin Flatpakin asennus"
-      extra: "Dolphin-emulaattorin Flatpak-versio ei näytä olevan asennettuna. Haluatko, että asennamme sen vain omalle käyttäjätilillesi?"
-    install_mod:
-      title: "Haluatko ladata ja asentaa modin: %{modName}?"
-    search_mod: "Haetaan modeja..."
-    enter_new_name:
-      title: "Anna uusi nimi"
-      extra: "Muutetaan nimeä: %{name}"
-    enter_mod_name:
-      title: "Modin nimi:"
-    launch_clear_patches_found:
-      extra: "Olet käynnistämässä pelin ilman modeja. Haluatko tyhjentää paikkauskansiosi? Pelin käynnistyy muuten nykyisen paikkauskansion ollessa aktiivinen."
-    apply_language_settings:
-      title: "Tämä sulkee ikkunan ja avaa uuden valitulla kieliasetuksella."
-      extra: "Haluatko ottaa uuden kieliasetuksen käyttöön?"
-  message_warning:
-    recomp_operation_cancelled:
-      title: "WiiCompiledin toiminto peruttiin"
-      extra: "Toiminto pysäytettiin ennen sen valmistumista. Voit aloittaa sen uudelleen milloin tahansa."
-    not_find_dolphin:
-      extra: "Dolphin-emulaattoria ei löytynyt. Määritä sijaintipolku asetuksissa."
-    not_find_game:
-      extra: "Peliä ei löytynyt. Määritä sijaintipolku asetuksissa."
-    multiple_files_selected:
-      title: "Usea tiedosto valittuna"
-    invalid_name:
+  list_title:
+    friends: Kaverit
+    miis: Miit
+    players: Pelaajat
+    rooms: Huoneet
+  message_error:
+    abort_rr:
       extra:
-        mod_name_exists: "Modi nimellä '%{modName}' on jo olemassa."
-      title: "Nimi ei kelpaa."
-    invalid_paths:
-      extra: "Varmista, että kaikki polut ovat oikein ja yritä uudelleen."
-      title: "Virheelliset polut."
+        failed_update_apply: Päivityksen käyttöönotto epäonnistui. Perutaan.
+        failed_update_delete: Tiedostojen poistaminen päivitystä varten epäonnistui.
+          Perutaan.
+        invalid_file_path: |-
+          Virheellinen polku. Ota yhteyttä kehittäjiin.
+          Palvelinvirhe: %{error}
+      title: Perutaan RR-päivitys
+    data_folder_move:
+      title: Tietojen siirto epäonnistui
+    failed_change_mii:
+      title: Miin vaihtaminen epäonnistui
+    failed_change_name:
+      title: Nimen vaihtaminen epäonnistui
+    failed_create_mii_db:
+      title: Mii-tietokannan luominen epäonnistui
+    failed_install_dolphin:
+      extra: Dolphin-emulaattorin asennus epäonnistui. Kokeile asentaa Flatpak Dolphin
+        manuaalisesti.
+      title: Dolphinin asennus epäonnistui.
+    failed_retrieve_mod:
+      title: Modin tietojen noutaminen epäonnistui
+    failed_vr_history: KP-historian lataaminen epäonnistui
+    generic_error:
+      title: Tapahtui virhe.
+    mod_download_fail:
+      extra: 'Ladattaessa tapahtui virhe: %{error}'
+      title: Modin lataus epäonnistui.
+    no_mod_folder:
+      extra: Modikansiota ei ole olemassa
+    restart_admin_fail:
+      extra: Käynnistäminen järjestelmänvalvojan oikeuksilla epäonnistui.
+  message_success:
+    data_folder_moved:
+      extra: |-
+        Wheel Wizardin tiedot sijaitsevat nyt kohteessa:
+        %{path}
+      title: Tietokansio päivitetty
+    mii_changed: Mii vaihdettu!
+    mod_converted_to_patches:
+      title: Muunnettu paikkauksiksi
+    mod_installed:
+      extra: Modi '%{modName}' asennettu.
+      title: Modi asennettu!
+    patch_conversion_notes: 'Huomautus: %{amount}'
+    patch_conversion_result: "%{fileCount} tiedostoa muunnettu %{patchCount} paikkaustiedostoksi."
+    patch_conversion_skipped: "%{amount} tiedostoa ei muutettu, koska niitä ei voitu
+      muuntaa."
+    rr_up_to_date:
+      title: Retro Rewind on ajan tasalla.
+    settings_saved:
+      title: Asetukset tallennettu!
+  message_warning:
+    cannot_delete_fav_mii:
+      extra: Yksi tai useampi valituista Miistä on merkitty suosikiksi. Vahinkopoistojen
+        välttämiseksi Miit voi poistaa vain, jos ne eivät ole suosikkeja.
+      title: Suosikki-Miitä ei voi poistaa
+    cant_view_mod:
+      extra:
+        not_from_browser: Ei voida näyttää modia, jota ei ole asennettu modiselaimen
+          kautta.
+        something_else: Jokin meni pieleen avatessa valittua modia.
+      title: Tätä modia ei voi näyttää
+    could_not_convert_mod:
+      title: Modia ei voitu muuntaa
     dolphin_not_found:
-      title: "Dolphin-emulaattorin kansiota ei löytynyt"
-      extra: "Dolphin-emulaattorin kansiota ei löytynyt automaattisesti. Yritä etsiä kansio mauaalisesti. Lisätietoa saat napsauttamalla 'Ohje'."
+      extra: Dolphin-emulaattorin kansiota ei löytynyt automaattisesti. Yritä etsiä
+        kansio mauaalisesti. Lisätietoa saat napsauttamalla 'Ohje'.
+      title: Dolphin-emulaattorin kansiota ei löytynyt
+    dolphin_tool_selected:
+      extra: Sinulla on DolphinTool.exe valittuna. Ole hyvä ja valitse Dolphin.exe
+        (Dolphin-emulaattorin käynnistystiedosto) sen sijaan.
+      title: Kelvoton Dolphinin käynnistystiedosto valittuna
     dolphin_version_unverified:
-      title: "Dolphin-emulaattorin versiota ei voitu vahvistaa"
       extra: |-
         Wheel Wizard ei voinut lukea määrittämääsi Dolphin-emulaattorin versiota, joten se ei voi tietää, onko siinä tietoturvakorjauksia.
 
         Tarkista, että käytät %{minimumVersion}-versiota tai uudempaa. Vanhemmissa versioissa on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
-    dolphin_tool_selected:
-      title: "Kelvoton Dolphinin käynnistystiedosto valittuna"
-      extra: "Sinulla on DolphinTool.exe valittuna. Ole hyvä ja valitse Dolphin.exe (Dolphin-emulaattorin käynnistystiedosto) sen sijaan."
+      title: Dolphin-emulaattorin versiota ei voitu vahvistaa
     fail_check_updates:
-      title: "Päivitysten tarkistus epäonnistui"
-      extra: "Päivityksiä ei voi tarkistaa juuri nyt. Internet-yhteyttä ei ole tai palvelimessa on ongelma."
+      extra: Päivityksiä ei voi tarkistaa juuri nyt. Internet-yhteyttä ei ole tai
+        palvelimessa on ongelma.
+      title: Päivitysten tarkistus epäonnistui
+    invalid_name:
+      extra:
+        mod_name_exists: Modi nimellä '%{modName}' on jo olemassa.
+      title: Nimi ei kelpaa.
+    invalid_paths:
+      extra: Varmista, että kaikki polut ovat oikein ja yritä uudelleen.
+      title: Virheelliset polut.
+    mod_name_empty:
+      extra: Anna modille nimi.
+      title: Modin nimi ei voi olla tyhjä.
+    mod_name_invalid:
+      extra: Modin nimi sisältää virheellisiä merkkejä.
+      title: Modin nimi on virheellinen.
+    multiple_files_selected:
+      title: Usea tiedosto valittuna
+    no_connect_server:
+      extra: Yhdistäminen palvelimelle epäonnistui. Yritä myöhemmin uudelleen.
+      title: Yhdistäminen palvelimelle epäonnistui.
+    not_find_dolphin:
+      extra: Dolphin-emulaattoria ei löytynyt. Määritä sijaintipolku asetuksissa.
+    not_find_game:
+      extra: Peliä ei löytynyt. Määritä sijaintipolku asetuksissa.
+    recomp_operation_cancelled:
+      extra: Toiminto pysäytettiin ennen sen valmistumista. Voit aloittaa sen uudelleen
+        milloin tahansa.
+      title: WiiCompiledin toiminto peruttiin
+    unable_download_mod:
+      extra: Tiedostoja ei löytynyt.
+      title: Modia ei voi ladata
     unable_update_wh_wz:
       extra:
-        reason_network: |-
-          Ei voitu tarkistaa, onko Wheel Wizard ajan tasalla.
-          Syynä saattaa olla verkkoyhteysongelmat.
         reason_location: |-
           Wheel Wizardia ei voi päivittää. Varmista, että sovellus sijaitsee kansiossa, johon voi kirjoittaa tietoja.
           Nykyistä kansiota ei löytynyt.
-      title: "Wheel Wizardia ei voi päivittää."
-    no_connect_server:
-      extra: "Yhdistäminen palvelimelle epäonnistui. Yritä myöhemmin uudelleen."
-      title: "Yhdistäminen palvelimelle epäonnistui."
-    cant_view_mod:
-      title: "Tätä modia ei voi näyttää"
-      extra:
-        something_else: "Jokin meni pieleen avatessa valittua modia."
-        not_from_browser: "Ei voida näyttää modia, jota ei ole asennettu modiselaimen kautta."
-    cannot_delete_fav_mii:
-      title: "Suosikki-Miitä ei voi poistaa"
-      extra: "Yksi tai useampi valituista Miistä on merkitty suosikiksi. Vahinkopoistojen välttämiseksi Miit voi poistaa vain, jos ne eivät ole suosikkeja."
-    mod_name_invalid:
-      title: "Modin nimi on virheellinen."
-      extra: "Modin nimi sisältää virheellisiä merkkejä."
-    mod_name_empty:
-      title: "Modin nimi ei voi olla tyhjä."
-      extra: "Anna modille nimi."
-    unable_download_mod:
-      title: "Modia ei voi ladata"
-      extra: "Tiedostoja ei löytynyt."
-    could_not_convert_mod:
-      title: "Modia ei voitu muuntaa"
-  placeholder:
-    enter_mod_name: "Anna modin nimi..."
-    search_mod: "Hae modeja..."
-    enter_mii_name: "Anna Miin nimi..."
-    enter_text_here: "Kirjoita tähän..."
-    search_for_players: "Hae pelaajia..."
-    enter_path: "Anna haluttu polku tähän..."
-  message_error:
-    no_mod_folder:
-      extra: "Modikansiota ei ole olemassa"
-    data_folder_move:
-      title: "Tietojen siirto epäonnistui"
-    abort_rr:
-      extra:
-        failed_update_delete: "Tiedostojen poistaminen päivitystä varten epäonnistui. Perutaan."
-        failed_update_apply: "Päivityksen käyttöönotto epäonnistui. Perutaan."
-        invalid_file_path: |-
-          Virheellinen polku. Ota yhteyttä kehittäjiin.
-          Palvelinvirhe: %{error}
-      title: "Perutaan RR-päivitys"
-    restart_admin_fail:
-      extra: "Käynnistäminen järjestelmänvalvojan oikeuksilla epäonnistui."
-    generic_error:
-      title: "Tapahtui virhe."
-    failed_create_mii_db:
-      title: "Mii-tietokannan luominen epäonnistui"
-    failed_change_name:
-      title: "Nimen vaihtaminen epäonnistui"
-    failed_change_mii:
-      title: "Miin vaihtaminen epäonnistui"
-    failed_install_dolphin:
-      title: "Dolphinin asennus epäonnistui."
-      extra: "Dolphin-emulaattorin asennus epäonnistui. Kokeile asentaa Flatpak Dolphin manuaalisesti."
-    failed_retrieve_mod:
-      title: "Modin tietojen noutaminen epäonnistui"
-    mod_download_fail:
-      title: "Modin lataus epäonnistui."
-      extra: "Ladattaessa tapahtui virhe: %{error}"
-    failed_vr_history: "KP-historian lataaminen epäonnistui"
-  message_success:
-    settings_saved:
-      title: "Asetukset tallennettu!"
-    data_folder_moved:
-      title: "Tietokansio päivitetty"
-      extra: |-
-        Wheel Wizardin tiedot sijaitsevat nyt kohteessa:
-        %{path}
-    rr_up_to_date:
-      title: "Retro Rewind on ajan tasalla."
-    mii_changed: "Mii vaihdettu!"
-    mod_converted_to_patches:
-      title: "Muunnettu paikkauksiksi"
-    mod_installed:
-      extra: "Modi '%{modName}' asennettu."
-      title: "Modi asennettu!"
-    patch_conversion_result: "%{fileCount} tiedostoa muunnettu %{patchCount} paikkaustiedostoksi."
-    patch_conversion_skipped: "%{amount} tiedostoa ei muutettu, koska niitä ei voitu muuntaa."
-    patch_conversion_notes: "Huomautus: %{amount}"
-  snackbar_warning:
-    cant_save_mii: "Miitä ei voi tallentaa"
-    no_mii_export: "Vietäviä Miitä ei ole"
-    no_mii_delete: "Poistettavia Miitä ei ole"
-  snackbar_success:
-    mii_added: "Mii on lisätty omiin Miihin"
-    copied_fc: "Kaverikoodi kopioitu leikepöydälle"
-    name_change: "Nimeksi vaihdettiin '%{name}'"
-    saved_mii: "Mii '%{name}' tallennettiin tiedostoon '%{fileName}'"
-    deleted: "%{name}' poistettu"
-    deleted_miis: "%{amount} Miitä poistettu"
-    created_duplicate: "%{name}' kopioitu"
-    created_duplicates_miis: "%{amount}' kopioitua Miitä luotu"
-    profile_set_primary: "Aseta profiili ensisijaiseksi"
-    dolphin_updated: "Dolphin-emulaattori on päivitetty"
-  snackbar_error:
-    mii_failure_deserialize: "Miin '%{error}' deserialisointi epäonnistui"
-    mii_failure_update: "Miin '%{error}' päivittäminen epäonnistui"
-    mii_failure_save: "Miin '%{error}' tallentaminen epäonnistui"
-    mii_failure_get: "Miin '%{error}' noutaminen epäonnistui"
-    mii_failure_serialize: "Miin '%{error}' serialistointi epäonnistui"
-    mii_failure_create: "Miin '%{error}' luominen epäonnistui"
-    mii_failure_duplicate: "Miin '%{error}' kopioiminen epäonnistui"
-  helper_note:
-    name_must_between: "Nimien täytyy olla 3–10 merkkiä pitkä."
-    creator_name_less11: "Tekijän nimen täytyy olla alle 11 merkkiä pitkä."
-    creator_name_less10: "Tekijän nimen täytyy olla alle 10 merkkiä pitkä."
-  file_picker:
-    select_mod_file: "Valittu moditiedosto"
+        reason_network: |-
+          Ei voitu tarkistaa, onko Wheel Wizard ajan tasalla.
+          Syynä saattaa olla verkkoyhteysongelmat.
+      title: Wheel Wizardia ei voi päivittää.
+  option:
+    dolphin_emulator_exe: Dolphin-emulaattorin käynnistystiedosto
+    dolphin_user_path: Dolphin-käyttäjäkansio
+    enable_animations: Animaatiot
+    enable_recomp: Käytä WiiCompiledia (beta)
+    force_disable_wiimote: Pakota Wiimote pois käytöstä
+    installation_folder: Asennuskansio
+    launch_rr_on_startup: Käynnistä Retro Rewind heti
+    launch_with_dolphin: Käynnistä peli Dolphin-ikkunassa
+    make_primary: Aseta ensisijaiseksi
+    mario_kart_game: Mario Kart Wii -pelitiedosto
+    open_config: Avaa asetuskansio
+    open_game_folder: Avaa pelikansio
+    open_save_folder: Avaa tallennuskansio
+    recommended: Suositellut asetukset
+    recomp_clone_dolphin_data: Kloonaa Dolphinin NAND
+    recomp_graphics_api: Grafiikan API
+    recomp_installation: WiiCompiled -asennus
+    recomp_prevent_stutters: Estä pätkiminen
+    recomp_resolution: Resoluutio
+    recomp_share_dolphin_data: Jaa NAND-data Dolphinin kanssa
+    recomp_use_dolphin_data: Jaa Dolphin-tallennustiedot
+    reinstall: Asenna RR uudelleen
+    renderer: Renderöijä
+    reset_data_folder: Käytä oletussijaintia
+    retro_rewind_folder: Retro Rewind -kansio
+    retro_rewind_installation: Retro Rewind -asennus
+    save_folder: Tallennuskansio
+    show_fps: Näytä kuvalaskuri
+    v_sync: Pystytahdistus (V-Sync)
+    wh_wz_language: Wheel Wizardin kieli
+    wheel_wizard_data_folder: Wheel Wizardinin tietokansio
+    window_scale: Ikkunan koko
+  page_title:
+    friends: Kaverit
+    home: Etusivu
+    leaderboard: Tulostaulu
+    mods: My Stuff
+    my_miis: Omat Miit
+    my_profiles: Omat profiilit
+    patches: Paikkaukset
+    room_details: Huoneen tiedot
+    rooms: Huoneet
+    settings: Asetukset
   patch:
     incompatible_mod:
-      message: "Tämä modi on yhteensopimaton muiden modien kanssa. Pelin käynnistäminen tämän modin kanssa voi aiheuttaa virheellistä toimintaa tai kaatumisia. Harkitse modin muuntamista paikkauksiksi napsauttamalla sitä hiiren oikealla painikkeella."
-      title: "YHTEENSOPIMATON MODI"
-  warning:
-    brsar_external_count: "%{amount} BRSAR-tiedostomerkintää ovat ulkoisia viittauksia, eikä niitä voida viedä."
-    brsar_file_id_external: "BRSAR-tiedostotunnus %{fileId} on ulkoinen tiedostoviittaus, eikä sitä voida viedä."
-  option:
-    wh_wz_language: "Wheel Wizardin kieli"
-    force_disable_wiimote: "Pakota Wiimote pois käytöstä"
-    launch_with_dolphin: "Käynnistä peli Dolphin-ikkunassa"
-    launch_rr_on_startup: "Käynnistä Retro Rewind heti"
-    retro_rewind_installation: "Retro Rewind -asennus"
-    save_folder: "Tallennuskansio"
-    installation_folder: "Asennuskansio"
-    recomp_installation: "WiiCompiled -asennus"
-    v_sync: "Pystytahdistus (V-Sync)"
-    recommended: "Suositellut asetukset"
-    show_fps: "Näytä kuvalaskuri"
-    renderer: "Renderöijä"
-    window_scale: "Ikkunan koko"
-    open_config: "Avaa asetuskansio"
-    wheel_wizard_data_folder: "Wheel Wizardinin tietokansio"
-    retro_rewind_folder: "Retro Rewind -kansio"
-    reset_data_folder: "Käytä oletussijaintia"
-    dolphin_user_path: "Dolphin-käyttäjäkansio"
-    mario_kart_game: "Mario Kart Wii -pelitiedosto"
-    dolphin_emulator_exe: "Dolphin-emulaattorin käynnistystiedosto"
-    make_primary: "Aseta ensisijaiseksi"
-    enable_animations: "Animaatiot"
-    reinstall: "Asenna RR uudelleen"
-    open_game_folder: "Avaa pelikansio"
-    open_save_folder: "Avaa tallennuskansio"
-    enable_recomp: "Käytä WiiCompiledia (beta)"
-    recomp_use_dolphin_data: "Jaa Dolphin-tallennustiedot"
-    recomp_share_dolphin_data: "Jaa NAND-data Dolphinin kanssa"
-    recomp_clone_dolphin_data: "Kloonaa Dolphinin NAND"
-    recomp_resolution: "Resoluutio"
-    recomp_graphics_api: "Grafiikan API"
-    recomp_prevent_stutters: "Estä pätkiminen"
+      message: Tämä modi on yhteensopimaton muiden modien kanssa. Pelin käynnistäminen
+        tämän modin kanssa voi aiheuttaa virheellistä toimintaa tai kaatumisia. Harkitse
+        modin muuntamista paikkauksiksi napsauttamalla sitä hiiren oikealla painikkeella.
+      title: YHTEENSOPIMATON MODI
+  placeholder:
+    enter_mii_name: Anna Miin nimi...
+    enter_mod_name: Anna modin nimi...
+    enter_path: Anna haluttu polku tähän...
+    enter_text_here: Kirjoita tähän...
+    search_for_players: Hae pelaajia...
+    search_mod: Hae modeja...
+  popup_title:
+    mii_editor: Mii-editori
+    mii_selector: Miin valinta
+    mod_browser: Modiselain
+    mod_details: Modin tiedot
+  progress:
+    applying_converted_mod: Sovelletaan muunnettu modi
+    combining_files: Yhdistetään tiedostoja
+    converting_file: Muunnetaan %{fileName}
+    converting_files_count: Muunnetaan %{amount} tiedostoa
+    converting_mod_to_patches: Muunnetaan modi paikkauksiksi
+    downloading_mb: Ladataan %{megabytes} Mt
+    downloading_mod: Ladataan %{modName}
+    estimated_time_remaining: 'Arvioitu kestoaika:'
+    installing_dolphin: Asennetaan Dolphin-emulaattoria
+    installing_mod: Asennetaan modia
+    installing_mods: Asennetaan modeja
+    installing_mods_count: Asennetaan %{amount} modia
+    installing_recomp: Asennetaan WiiCompiled
+    installing_rr: Asennetaan Retro Rewindia
+    installing_rr_first_time: Asennetaan Retro Rewindia ensimmäistä kertaa
+    latest_wh_wz_github: Hankitaan uusinta Wheel Wizard -versiota GitHubista
+    preparing_files_count: Valmistellaan %{amount} tiedostoa
+    processing_xof_y: Käsitellään %{processed}/%{total} tiedostoa...
+    recomp_checking_release: Etsitään uusinta WiiCompiled-versiota
+    recomp_copying_nand: Kopioidaan Dolphin-dataa
+    recomp_downloading_setup: Ladataan WiiCompiledin asennusohjelmaa
+    recomp_finished: WiiCompiled on valmis pelattavaksi
+    recomp_running_setup: Käynnistetään WiiCompiledin asennusohjelmaa
+    this_may_take_a_while: Tässä voi kestää jonkin aikaa riippuen internet-yhteydestäsi.
+    uninstalling_recomp: Poistetaan WiiCompiled-asennusta
+    update_rr: Päivitetään Retro Rewindia
+    update_wh_wz: Päivitetään Wheel Wizardia
+    updating_dolphin: Päivitetään Dolphin-emulaattoria
+    updating_recomp: Päivitetään WiiCompiled
+  question:
+    apply_language_settings:
+      extra: Haluatko ottaa uuden kieliasetuksen käyttöön?
+      title: Tämä sulkee ikkunan ja avaa uuden valitulla kieliasetuksella.
+    apply_scale:
+      extra: Muutos perutaan %{remainingTime} kuluttua, ellet aio pitää muutosta.
+      title: Haluatko ottaa uuden skaalan käyttöön?
+    dolphin_flatpak:
+      extra: Dolphin-emulaattorin Flatpak-versio ei näytä olevan asennettuna. Haluatko,
+        että asennamme sen vain omalle käyttäjätilillesi?
+      title: Dolphin Flatpakin asennus
+    dolphin_found:
+      extra: |-
+        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä'.
+        Dolphin-emulaattorin kansio löytyi. Haluatko käyttää tätä kansiota?
+      title: Dolphin-emulaattorin kansio löytyi
+    dolphin_outdated:
+      extra: |-
+        Tässä Dolphin-versiossa (%{currentVersion}) on tunnettu tietoturvaongelma, jossa haitalliset pelitiedostot, modit tai huijaavat verkkopelaajat voivat tartuttaa tietokoneesi haittaohjelmilla.
+
+        Päivitä versioon %{minimumVersion} tai uudempaan varmuuden vuoksi.
+      title: Dolphin-emulaattorisi on vanhentunut
+    dolphin_program_found:
+      extra: |-
+        Jos et tiedä, mitä kaikki tarkoittaa, paina vain 'Kyllä'.
+        Dolphin-emulaattori löytyi. Haluatko käyttää sitä?
+      title: Dolphin-emulaattori löytyi
+    enter_mod_name:
+      title: 'Modin nimi:'
+    enter_new_name:
+      extra: 'Muutetaan nimeä: %{name}'
+      title: Anna uusi nimi
+    install_mod:
+      title: 'Haluatko ladata ja asentaa modin: %{modName}?'
+    launch_clear_mods_found:
+      extra: |-
+        Aiot käynnistää pelin ilman modeja.
+        Haluatko tyhjentää 'my-stuff'-kansiosi?
+      title: Modeja löytyi
+    launch_clear_patches_found:
+      extra: Olet käynnistämässä pelin ilman modeja. Haluatko tyhjentää paikkauskansiosi?
+        Pelin käynnistyy muuten nykyisen paikkauskansion ollessa aktiivinen.
+    move_data:
+      extra: |-
+        Wheel Wizardin tiedostot siirretään sijaintiin:
+        %{path}
+        Tässä saattaa mennä hetki riippuen tietojen määrästä.
+      title: Siirretäänkö Wheel Wizardin tiedot?
+    new_version_wh_wz:
+      extra: 'Wheel Wizardin versio %{latestVersion} on saatavilla (nykyinen versio:
+        %{currentVersion}). Haluatko päivittää heti?'
+      title: Wheel Wizard -päivitys saatavilla
+    old_rksys_found:
+      extra: Vanhoja tallennustietoja löytyi. Haluatko käyttää sitä? (suositeltu)
+      title: Vanha rksys.dat löytyi
+    recomp_nand_mode:
+      extra: Dolphin suosittelee, etteivät muut ohjelmat käytä Wii-dataa (NAND) suoraan,
+        koska kaksi samaan aikaan siihen kirjoittavaa ohjelmaa voi vioittaa sen. Kopio
+        pitää WiiCompiledin täysin erillään, mutta toisessa tehdyt edistymiset eivät
+        näy toisessa.
+      title: Kopioidaanko Dolphin-data vai käytetäänkö niitä suoraan?
+    recomp_overwrite_dolphin_clone:
+      extra: Korvaa nykyisen kloonin Dolphinin tiedoilla. Vain WiiCompiledissa muutetut
+        tallennukset, Miit ja Wii-asetukset menetetään.
+      title: Korvataanko yksityinen Dolphin-klooni?
+    recomp_retro_wfc_unavailable:
+      extra: WiiCompiled vaatii Retro WFC -palvelimia verkkopelaamista varten, ja
+        ne eivät vastaa juuri nyt. Voit asentaa ilman verkkopeliä nyt; WiiCompiled
+        lisää sen automaattisesti seuraavalla päivityskerralla, kun palvelimet ovat
+        taas toiminnassa.
+      title: Retro WFC:hen ei saada yhteyttä
+    recomp_share_dolphin_data:
+      extra: Kloonaus antaa WiiCompiledille samat nykyiset tallennukset, Miit ja Wii-asetukset,
+        mutta pitää kopion erillään ja on turvallisempi. Suora jakaminen antaa Dolphinille
+        ja WiiCompiledille mahdollisuuden kirjoittaa samaan NAND-muistiin, mikä voi
+        vioittaa sitä, jos molemmat suorittavat samanaikaisesti. Jatka vain, jos ymmärrät
+        riskin.
+      title: Jaetaanko NAND-data Dolphinin kanssa?
+    recomp_uninstall:
+      extra_copy: Poistaa WiiCompiledin asennuksen sekä sen kopiot Dolphin-datastasi.
+        Alkuperäinen Dolphin-data pysyy muuttumattomana, ja Retro Rewind pysyy asennettuna.
+      extra_private: Poistaa WiiCompiledin asennuksen sekä sen yksityiset Wii-tallennustiedot.
+        Retro Rewind pysyy asennettuna.
+      extra_shared: Poistaa WiiCompiledin asennuksen. Tallennuksesi säilyy Dolphinin
+        Wii-kansiossa, ja Retro Rewind pysyy asennettuna.
+      title: Poistetaanko WiiCompiledin asennus?
+    recomp_use_dolphin_nand:
+      extra: WiiCompiled voi käyttää tallennuksia, Miitä ja kaverikoodeja, jotka ovat
+        jo käytössä Dolphinissa. Jos niitä ei ole, se aloittaa alusta omalla Wii-datallaan.
+      title: Käytetäänkö Dolphin-tallennustietoja?
+    reinstall_rr:
+      extra: Haluatko varmasti asentaa Retro Rewindin uudelleen?
+      title: Asenna Retro Rewind uudelleen
+    rr_not_determined:
+      extra: Retro Rewind -versiotasi ei voitu määrittää. Haluatko ladata Retro Rewindin?
+      title: Lataa Retro Rewind
+    rr_to_old:
+      extra: Retro Rewind -versiosi on liian vanha päivittämiseen. Haluatko asentaa
+        Retro Rewindin uudelleen?
+      title: Retro Rewind -versio on liian vanha.
+    search_mod: Haetaan modeja...
+    sure_delete:
+      extra: Poistaminen on pysyvää eikä sitä voi perua.
+      title: Haluatko varmasti poistaa '%{name}'?
+      title_miis: Haluatko varmasti poistaa %{amount} Miitä?
+    update_admin:
+      extra: Joskus päivitys vaatii järjestelmänvalvojan oikeuet. Haluatko aktivoida
+        ne tätä päivitystä varten?
+      title: Päivitä järjestelmänvalvojana
+  region:
+    america: Amerikka
+    australia: Australia
+    china: Kiina
+    europe: Eurooppa
+    japan: Japani
+    south_korea: Etelä-Korea
+    taiwan: Taiwan
   section:
-    graphics: "Grafiikka"
-    general: "Yleiset"
-    retro_rewind: "Retro Rewind"
-    language: "Kieli"
-    wii: "Wii-asetukset"
-    resolution: "Resoluutio"
-    performance: "Suorituskyvyn asetukset"
-    renderer: "Renderöintiasetukset"
-    location_paths: "Sijaintiasetukset"
-    wh_wz_appearance: "Wheel Wizardin ulkoasu"
-    installation: "Asennus"
-    setup: "Kokoonpano"
-    recomp: "WiiCompiled (beta)"
-    recomp_dolphin_data: "Dolphin-data"
-    recomp_video: "Video"
-  helper_text:
-    topbar:
-      location_warning: "Asetukset on lukittu, suorita sijaintipolkujen asetukset ensin"
-    enable_recomp: "Käyttää WiiCompiledia käynnistysohjelmana kotisivulla. Poista tämä käytöstä käyttääksesi Dolphinia ja Retro Rewindia. Vain Windowsille."
-    recomp_use_dolphin_data: "Käytä Dolphinin olemassa olevaa Wii-kansiota, jotta WiiCompiled jakaa tallennukset, Miit ja Wii-asetukset. Muutos tulee voimaan, kun WiiCompiled käynnistyy seuraavan kerran."
-    recomp_share_dolphin_data: "WiiCompiled ja Dolphin käyttävät samoja tallennuksia, Miitä ja Wii-asetuksia."
-    recomp_shared_nand_warning: "Älä käytä Dolphinia ja WiiCompiledia samaan aikaan, kun NAND-data jaetaan."
-    recomp_clone_dolphin_data: "Kopioi Dolphinin nykyiset tallennukset, Miit ja Wii-asetukset yksityiseksi WiiCompiled-dataksi."
-    recomp_graphics_api: "Vain DirectX 12 ja Vulkan suorittavat WiiCompiledia luotettavasti, joten muita vaihtoehtoja ei ole tarjolla."
-    recomp_dolphin_data_not_found: "Määritä ensin olemassa oleva Dolphin-käyttäjäkansio sijaintiasetuksissa. Sen on sisällettävä Wii-kansio."
-    recomp_prevent_stutters: "Varjostinta käännettäessä sitä tarvitsevat objektit ohitetaan muutaman kuvan ajan sen sijaan, että koko peli jumiutuisi, kunnes se on valmis. Vähentää pätkimistä grafiikan äkillisen ilmestymisen kustannuksella."
-    launch_with_dolphin: "Käynnistää Dolphinin pääikkunan pelin mukana"
-    launch_rr_on_startup: "Retro Rewind käynnistetään heti kun Wheel Wizard käynnistyy"
-    retro_rewind_version: "Asennettu versio: %{version}"
-    installed_version: "Asennettu versio: %{version}"
-    force_disable_wiimote: "Poistaa Wiimoten käytöstä pelissä, mutta ottaa sen käyttöön Wii-valikossa"
-    resolution_scale: "1x on alkuperäinen resoluutio"
-    renderer: "Valitsee grafiikkaohjelman, jota Dolphin käyttää pelin renderöintiin."
-    v_sync: "Synkronoi pelin kuvataajuuden näyttösi kanssa estääkseen kuvan pilkottumista."
-    recommended: "Muuttaa joitakin Dolphinin asetuksia pätkimisen ja lagipiikkien vähentämiseksi"
-    30_fps: "Pakottaa pelin toimimaan 30 FPS -tilassa (oletus on 60)"
-    wheel_wizard_data_folder: "Valitse Wheel Wizardin tiedostosijainti. Siirtäminen voi kestää hetken."
-    retro_rewind_folder: "Avaa kansion, joka sisältää asennetut Retro Rewind -tiedostot."
-    end_with_exe: "Polun täytyy loppua päätteeseen .exe"
-    select_dolphin_linux: "Valitse Dolphin-ohjelmatiedosto tai anna käynnistyskomento"
-    select_dolphin_macos: "Valitse Dolphin.app"
-    enable_animations: "Ottaa käyttöön animaatiot Wheel Wizard -sovelluksessa"
-    end_with_x: "Polku voi loppua:"
-    wh_wz_language: "Muuttaa Wheel Wizardin käyttämää kieltä, mutta ei pelin sisäistä kieltä."
-    optional: "Valinnainen"
-    must_set_paths: "Nämä 3 polkua on määritettävä ennen kuin voit pelata Retro Rewindia"
-    must_set_game_path: "Sinun on valittava Mario Kart Wii -pelitiedostosi ennen kuin voit pelata WiiCompiledia"
-  category:
-    dolphin: "Dolphin"
-    about: "Tietoa"
-    other: "Muut"
-    general: "Yleiset"
-    video: "Video"
+    general: Yleiset
+    graphics: Grafiikka
+    installation: Asennus
+    language: Kieli
+    location_paths: Sijaintiasetukset
+    performance: Suorituskyvyn asetukset
+    recomp: WiiCompiled (beta)
+    recomp_dolphin_data: Dolphin-data
+    recomp_video: Video
+    renderer: Renderöintiasetukset
+    resolution: Resoluutio
+    retro_rewind: Retro Rewind
+    setup: Kokoonpano
+    wh_wz_appearance: Wheel Wizardin ulkoasu
+    wii: Wii-asetukset
+  snackbar_error:
+    mii_failure_create: Miin '%{error}' luominen epäonnistui
+    mii_failure_deserialize: Miin '%{error}' deserialisointi epäonnistui
+    mii_failure_duplicate: Miin '%{error}' kopioiminen epäonnistui
+    mii_failure_get: Miin '%{error}' noutaminen epäonnistui
+    mii_failure_save: Miin '%{error}' tallentaminen epäonnistui
+    mii_failure_serialize: Miin '%{error}' serialistointi epäonnistui
+    mii_failure_update: Miin '%{error}' päivittäminen epäonnistui
+  snackbar_success:
+    copied_fc: Kaverikoodi kopioitu leikepöydälle
+    created_duplicate: "%{name}' kopioitu"
+    created_duplicates_miis: "%{amount}' kopioitua Miitä luotu"
+    deleted: "%{name}' poistettu"
+    deleted_miis: "%{amount} Miitä poistettu"
+    dolphin_updated: Dolphin-emulaattori on päivitetty
+    mii_added: Mii on lisätty omiin Miihin
+    name_change: Nimeksi vaihdettiin '%{name}'
+    profile_set_primary: Aseta profiili ensisijaiseksi
+    saved_mii: Mii '%{name}' tallennettiin tiedostoon '%{fileName}'
+  snackbar_warning:
+    cant_save_mii: Miitä ei voi tallentaa
+    no_mii_delete: Poistettavia Miitä ei ole
+    no_mii_export: Vietäviä Miitä ei ole
+  state:
+    config_not_finished: Määritys kesken
+    custom: Mukautettu
+    error: Virhe
+    extracting: Puretaan tiedostoja...
+    installed: Asennettu
+    installing: Asennetaan...
+    loading: Ladataan...
+    no_license: Ei ajokorttia
+    no_name: Ei nimeä
+    no_profiles: Ei profiileja
+    no_server: Ei palvelinta
+    success: Onnistui
+    unknown: Tuntematon
+    updating: Päivitetään...
+    warning: Varoitus
   status:
-    recomp_dolphin_clone_available: "Yksityinen klooni: %{path}"
-    recomp_dolphin_clone_missing: "Yksityistä kloonia ei ole luotu."
-    recomp_dolphin_data_cloned: "Dolphin-data kloonattu WiiCompiledille"
-    recomp_dolphin_data_not_linked: "Ei linkitetty. WiiCompiled käyttää omaa yksityistä Wii-dataa."
-    recomp_dolphin_data_linked: "Jaetaan Dolphin-dataa kohteesta %{path}"
-    recomp_dolphin_data_copied: "Käytetään Dolphin-datasi kopiota kohteessa %{path}"
-    recomp_dolphin_data_not_found: "Dolphin-dataa ei löytynyt"
-    recomp_not_installed: "WiiCompiledia ei ole vielä asennettu. Asenna se ensin kotisivulta."
-    recomp_uninstalled: "WiiCompiledin asennus on poistettu"
     data_folder:
-      default: "Käytetään oletussijaintia."
-      custom: "Käytetään mukautettua sijaintia."
-      moving: "Siirretään tietoja, odota hetki..."
+      custom: Käytetään mukautettua sijaintia.
+      default: Käytetään oletussijaintia.
+      moving: Siirretään tietoja, odota hetki...
+    recomp_dolphin_clone_available: 'Yksityinen klooni: %{path}'
+    recomp_dolphin_clone_missing: Yksityistä kloonia ei ole luotu.
+    recomp_dolphin_data_cloned: Dolphin-data kloonattu WiiCompiledille
+    recomp_dolphin_data_copied: Käytetään Dolphin-datasi kopiota kohteessa %{path}
+    recomp_dolphin_data_linked: Jaetaan Dolphin-dataa kohteesta %{path}
+    recomp_dolphin_data_not_found: Dolphin-dataa ei löytynyt
+    recomp_dolphin_data_not_linked: Ei linkitetty. WiiCompiled käyttää omaa yksityistä
+      Wii-dataa.
+    recomp_not_installed: WiiCompiledia ei ole vielä asennettu. Asenna se ensin kotisivulta.
+    recomp_uninstalled: WiiCompiledin asennus on poistettu
+  text:
+    external_reference: Ulkoinen viite
+    external_reference_with_path: 'Ulkoinen viite: %{path}'
+    language_translated_by: 'Tämän kielen käännökset tarjoaa: %{translators}'
+    made_by_string: |-
+      Tehnyt: %{firstAuthor}
+      ja %{secondAuthor}
+    modified_archive_member: Muokattu arkiston jäsen
+    new_archive_member: Uusi arkiston jäsen
+    powered_gamebanana: Palvelun tarjoaa GameBanana
+    thanks_translators: 'Suuret kiitokset kaikille kääntäjille:'
+    wh_wz_translation_percentage: Tämän kielen käännökset ovat %{percentage} % valmiita.
+    whole_file_override: Koko tiedoston ohitus
+  time:
+    days:
+      one: 1 pv
+      other: "%{count} pv"
+    hours:
+      one: 1 t
+      other: "%{count} t"
+    last_24_hours: Viimeiset 24 tuntia
+    last_30_days: Viimeiset 30 päivää
+    last_60_days: Viimeiset 60 päivää
+    last_7_days: Viimeiset 7 päivää
+    lifetime: Koko ajalta
+    lifetime_history: Koko ajan historia
+    minutes:
+      one: 1 min
+      other: "%{count} min"
+    past_n_days_with_range: Viimeiset %{days} päivää (%{fromDate}–%{toDate})
+    seconds:
+      one: 1 s
+      other: "%{count} s"
   value:
     language:
-      france: "Ranska"
-      dutch: "Hollanti"
-      english: "Englanti"
-      german: "Saksa"
-      italian: "Italia"
-      japanese: "Japani"
-      turkish: "Turkki"
-      spanish: "Espanja"
-      finnish: "Suomi"
-      korean: "Korea"
-      russian: "Venäjä"
-      arabic: "Arabia"
-      czech: "Tšekki"
-      norwegian: "Norja"
-      chinese: "Kiina"
-      polish: "Puola"
-      portuguese: "Portugali"
-      z_translators: "Clavey, Alokas"
+      arabic: Arabia
+      chinese: Kiina
+      czech: Tšekki
+      dutch: Hollanti
+      english: Englanti
+      finnish: Suomi
+      france: Ranska
+      german: Saksa
+      italian: Italia
+      japanese: Japani
+      korean: Korea
+      norwegian: Norja
+      polish: Puola
+      portuguese: Portugali
+      russian: Venäjä
+      spanish: Espanja
+      turkish: Turkki
+      z_translators: Clavey, Alokas
+  warning:
+    brsar_external_count: "%{amount} BRSAR-tiedostomerkintää ovat ulkoisia viittauksia,
+      eikä niitä voida viedä."
+    brsar_file_id_external: BRSAR-tiedostotunnus %{fileId} on ulkoinen tiedostoviittaus,
+      eikä sitä voida viedä.

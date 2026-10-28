@@ -1,475 +1,497 @@
+---
 pl:
-  page_title:
-    home: "Strona główna"
-    settings: "Ustawienia"
-    mods: "My Stuff"
-    patches: "Poprawki"
-    my_profiles: "Moje Profile"
-    rooms: "Pokoje"
-    friends: "Przyjaciele"
-    leaderboard: "Tabela Wyników"
-    room_details: "Szczegóły Pokoju"
-    my_miis: "Moje Mii"
-  attribute:
-    status_online: "Online"
-    enabled: "Włączone"
-    title: "Tytuł"
-    all: "Wszystko"
-    status_offline: "Offline"
-    name: "Nazwa"
-    id: "ID"
-    type: "Typ"
-    speed: "Prędkość"
-    mod_name: "Nazwa Moda"
-    average_room_vr: "Średni OV*"
-    losses: "Przegrane"
-    wins: "Wygrane"
-    races_played: "Wyścigi zagrane"
-    friend_code: "Kod Przyjaciela"
-    player_count: "Graczy"
-    time_online: "Czas Online"
-    message: "Wiadomość"
-    is_online: "Jest Online"
-    mii:
-      gender_male: "Mężczyzna"
-      gender: "Płeć"
-      gender_female: "Kobieta"
-      vertical_position: "Pionowa Pozycja (Góra/Dół)"
-      size: "Rozmiar"
-      nose_type: "Rodzaj Nosa"
-      horizontal_position: "Pozioma Pozycja (Lewo/Prawo)"
-      mouth_type: "Rodzaj Ust"
-      hair_color: "Kolor Włosów"
-      hair_type: "Rodzaj Włosów"
-      mirror_hair: "Odwrócone Włosy"
-      glasses_type: "Rodzaj Okularów"
-      glasses_color: "Kolor Okularów"
-      name: "Imię Mii"
-      creator_name: "Imię Twórcy"
-      height: "Wysokość"
-      width: "Szerokość"
-      fav_color: "Ulubiony Kolor"
-      skin_color: "Kolor Skóry"
-      head_shape: "Kształt Głowy"
-      irish_color: "Kolor Oczu"
-      space_between: "Miejsce Pomiędzy"
-      rotation: "Obrót (Obróć Lewo/Prawo)"
-      eyebrow_type: "Rodzaj Brwi"
-      mustache_type: "Rodzaj Wąsa"
-      mustache_vertical_position: "Pionowa Pozycja Wąsa (Góra/Dół)"
-      mustache_size: "Rozmiar Wąsa"
-      beard_type: "Rodzaj Brody"
-      default_name: "Nowy Mii"
-    status: "Status"
-    priority: "Priorytet"
-    sort_by: "Sortuj Według"
-    total_games_won: "Ilość wygranych gier"
-    total_games_played: "Ilość zagranych gier"
-    vr_abbreviation: "OV*"
-    br_abbreviation: "OB"
-    br_full: "Ocena Bitewna"
-    vr_full: "Ocena Versus*"
-    description: "Opis"
-    images: "Obrazy"
-    likes: "Polubienia"
-    views: "Wyświetlenia"
-    downloads: "Pobrania"
-    mii_section:
-      general: "Ogólne"
-      face: "Twarz"
-      hair: "Włosy"
-      eyebrows: "Brwi"
-      eyes: "Oczy"
-      nose: "Nos"
-      lips: "Usta"
-      glasses: "Okulary"
-      facial_hair: "Zarost"
-      mole: "Pieprzyk"
-    gender: "Płeć"
-    gender_female: "Kobieta"
-    gender_male: "Mężczyzna"
-  state:
-    loading: "Ładowanie..."
-    installing: "Instalowanie..."
-    updating: "Aktualizowanie..."
-    config_not_finished: "Konfiguracja nie zakończona"
-    no_server: "Brak Serwera"
-    unknown: "Nieznany"
-    error: "Błąd"
-    warning: "Ostrzeżenie"
-    success: "Sukces"
-    extracting: "Wyodrębnianie plików..."
-    no_name: "Brak Nazwy"
-    no_license: "Brak Licencji"
-    no_profiles: "Brak Profili"
-    custom: "Niestandardowe"
-    installed: "Zainstalowane"
   action:
-    play: "Graj"
-    play_offline: "Graj Offline"
-    install: "Instaluj"
-    update: "Aktualizuj"
-    import: "Importuj"
-    convert_to_patches: "Konwertuj na poprawki"
-    enable_all: "Włącz wszystkie"
-    disable_all: "Wyłącz wszystkie"
-    rename: "Zmień Nazwe"
-    delete: "Usuń"
-    open_folder: "Otwórz Folder"
-    edit: "Edytuj"
-    cancel: "Anuluj"
-    save: "Zapisz"
-    copy_friend_code: "Kopiuj Kod Przyjaciela"
-    export: "Eksportuj"
-    apply: "Zastosuj"
-    "yes": "Tak"
-    "no": "Nie"
-    keep: "Zostaw"
-    ok: "Okej"
-    revert: "Przywróć"
-    maybe_later: "Może Później"
-    browse: "Przeglądaj"
-    view_mod: "Zobacz Moda"
-    save_external_mii: "Dodaj Mii do \"Moje Mii\""
-    duplicate: "Duplikuj"
-    back: "Wróć"
-    unfavorite: "Odulub"
-    favorite: "Ulubione"
-    view_room: "Zobacz Pokój"
+    apply: Zastosuj
+    back: Wróć
+    browse: Przeglądaj
+    cancel: Anuluj
+    convert_to_patches: Konwertuj na poprawki
+    copy_friend_code: Kopiuj Kod Przyjaciela
+    delete: Usuń
+    disable_all: Wyłącz wszystkie
+    do_manually: Wykonaj ręcznie
+    download_and_install: Pobierz i Instaluj
+    duplicate: Duplikuj
+    edit: Edytuj
+    enable_all: Włącz wszystkie
+    export: Eksportuj
+    favorite: Ulubione
+    gamebanana_page: Strona Gamebanana
+    import: Importuj
+    install: Instaluj
+    keep: Zostaw
+    launch_dolphin: Uruchom Dolphin
     link:
-      discord: "Pogadaj z nami!"
-      github: "Kod źródłowy"
-      support: "Wesprzyj nas!"
-    launch_dolphin: "Uruchom Dolphin"
-    randomize: "Losuj"
-    do_manually: "Wykonaj ręcznie"
-    gamebanana_page: "Strona Gamebanana"
-    report: "Zgłoś"
-    un_install: "Odinstaluj"
-    download_and_install: "Pobierz i Instaluj"
-    view_custom_chars: "Zobacz Niestandardowe Znaki"
-    submit: "Potwierdź"
-  region:
-    japan: "Japonia"
-    europe: "Europa"
-    china: "Chiny"
-    south_korea: "Korea Południowa"
-    taiwan: "Tajwan"
-    america: "Ameryka"
-    australia: "Australia"
-  list_title:
-    friends: "Przyjaciele"
-    players: "Gracze"
-    rooms: "Pokoje"
-    miis: "Mii"
-  popup_title:
-    mod_details: "Szczegóły Moda"
-    mod_browser: "Przeglądacz Modów"
-    mii_selector: "Selektor Mii"
-    mii_editor: "Edytor Mii"
-  text:
-    made_by_string: |-
-      Stworzone przez: %{firstAuthor}
-      i %{secondAuthor}
-    thanks_translators: "Dziękujemy bardzo wszystkim tłumaczą:"
-    wh_wz_translation_percentage: "Tłumaczenie dla tego języka jest skończone w %{percentage}%"
-    powered_gamebanana: "Wsparci Przez Gamebanana"
-    language_translated_by: "Ten język jest przetłumaczony przez: %{translators}"
-  hover:
-    players_online:
-      none: "Nie ma żadnych graczy online"
-      one: "Jest 1 gracz online"
-      other: "jest teraz %{count} graczy online"
-    rooms_online:
-      none: "Nie ma żadnych aktywnych pokoi"
-      one: "Jest 1 aktywny pokój"
-      other: "jest teraz %{count} aktywnych pokoi"
-    friends_online:
-      none: "żaden z twoich przyjaciół nie jest onllne"
-      one: "Jest teraz 1 przyjaciel online"
-      other: "Jest teraz %{count} przyjaciół online"
-    rooms_page_disclaimer: "Prosze pamiętaj, że ta strona nie daje możliwości dołączenia prosto do pokoju. By dołączyć do specyficznego pokoju musisz dołączyć poprzez przyjaciela lub mieć nadzieje, że uda ci się połączyć poprzez losowy serwer."
-    friends_page_disclaimer: "By dodać przyjaciół musisz ich dodać w grze"
+      discord: Pogadaj z nami!
+      github: Kod źródłowy
+      support: Wesprzyj nas!
+    maybe_later: Może Później
+    'no': Nie
+    ok: Okej
+    open_folder: Otwórz Folder
+    play: Graj
+    play_offline: Graj Offline
+    randomize: Losuj
+    rename: Zmień Nazwe
+    report: Zgłoś
+    revert: Przywróć
+    save: Zapisz
+    save_external_mii: Dodaj Mii do "Moje Mii"
+    submit: Potwierdź
+    un_install: Odinstaluj
+    unfavorite: Odulub
+    update: Aktualizuj
+    view_custom_chars: Zobacz Niestandardowe Znaki
+    view_mod: Zobacz Moda
+    view_room: Zobacz Pokój
+    'yes': Tak
+  attribute:
+    all: Wszystko
+    average_room_vr: Średni OV*
+    br_abbreviation: OB
+    br_full: Ocena Bitewna
+    description: Opis
+    downloads: Pobrania
+    enabled: Włączone
+    friend_code: Kod Przyjaciela
+    gender: Płeć
+    gender_female: Kobieta
+    gender_male: Mężczyzna
+    id: ID
+    images: Obrazy
+    is_online: Jest Online
+    likes: Polubienia
+    losses: Przegrane
+    message: Wiadomość
+    mii:
+      beard_type: Rodzaj Brody
+      creator_name: Imię Twórcy
+      default_name: Nowy Mii
+      eyebrow_type: Rodzaj Brwi
+      fav_color: Ulubiony Kolor
+      gender: Płeć
+      gender_female: Kobieta
+      gender_male: Mężczyzna
+      glasses_color: Kolor Okularów
+      glasses_type: Rodzaj Okularów
+      hair_color: Kolor Włosów
+      hair_type: Rodzaj Włosów
+      head_shape: Kształt Głowy
+      height: Wysokość
+      horizontal_position: Pozioma Pozycja (Lewo/Prawo)
+      irish_color: Kolor Oczu
+      mirror_hair: Odwrócone Włosy
+      mouth_type: Rodzaj Ust
+      mustache_size: Rozmiar Wąsa
+      mustache_type: Rodzaj Wąsa
+      mustache_vertical_position: Pionowa Pozycja Wąsa (Góra/Dół)
+      name: Imię Mii
+      nose_type: Rodzaj Nosa
+      rotation: Obrót (Obróć Lewo/Prawo)
+      size: Rozmiar
+      skin_color: Kolor Skóry
+      space_between: Miejsce Pomiędzy
+      vertical_position: Pionowa Pozycja (Góra/Dół)
+      width: Szerokość
+    mii_section:
+      eyebrows: Brwi
+      eyes: Oczy
+      face: Twarz
+      facial_hair: Zarost
+      general: Ogólne
+      glasses: Okulary
+      hair: Włosy
+      lips: Usta
+      mole: Pieprzyk
+      nose: Nos
+    mod_name: Nazwa Moda
+    name: Nazwa
+    player_count: Graczy
+    priority: Priorytet
+    races_played: Wyścigi zagrane
+    sort_by: Sortuj Według
+    speed: Prędkość
+    status: Status
+    status_offline: Offline
+    status_online: Online
+    time_online: Czas Online
+    title: Tytuł
+    total_games_played: Ilość zagranych gier
+    total_games_won: Ilość wygranych gier
+    type: Typ
+    views: Wyświetlenia
+    vr_abbreviation: OV*
+    vr_full: Ocena Versus*
+    wins: Wygrane
+  category:
+    other: Inne
+    video: Wideo
   empty_content:
-    no_profiles: "Musisz zagrać w gre przynajmniej raz by zobaczyć tu swoje profle"
-    no_friends_title: "Brak przyjaciół!"
-    no_friends: "Możesz dodać przyjaciół w grze"
-    no_mods: "Mody mogą zmienić jak gra działa. Zacznij importować swój pierwszy mod klikając przycisk poniżej."
-    no_mods_title: "Nie znaleziono modów"
-    no_rooms: "Możesz nie mieć połączenia z internetem lub nikt teraz nie gra."
-    no_rooms_title: "Nie znaleziono pokoi"
-    no_miis_title: "Brak Mii!"
-    no_miis: "Nie możemy odczytać danych Mii z twojego systemu. Upewnij sie, że uruchomiłeś gre przynajmniej raz"
-    no_mod_selected_title: "Nie wybrano moda"
-    no_mod_selected: "Wybierz moda na liście by zobaczyć jego szczegóły"
-  time:
-    days:
-      one: "1 dzień"
-      other: "%{count} dni"
-    hours:
-      one: "1 godz"
-      other: "%{count} godz"
-    minutes:
-      one: "1 min"
-      other: "%{count} min"
-    seconds:
-      one: "1 sek"
-      other: "%{count} sek"
+    no_friends: Możesz dodać przyjaciół w grze
+    no_friends_title: Brak przyjaciół!
+    no_miis: Nie możemy odczytać danych Mii z twojego systemu. Upewnij sie, że uruchomiłeś
+      gre przynajmniej raz
+    no_miis_title: Brak Mii!
+    no_mod_selected: Wybierz moda na liście by zobaczyć jego szczegóły
+    no_mod_selected_title: Nie wybrano moda
+    no_mods: Mody mogą zmienić jak gra działa. Zacznij importować swój pierwszy mod
+      klikając przycisk poniżej.
+    no_mods_title: Nie znaleziono modów
+    no_profiles: Musisz zagrać w gre przynajmniej raz by zobaczyć tu swoje profle
+    no_rooms: Możesz nie mieć połączenia z internetem lub nikt teraz nie gra.
+    no_rooms_title: Nie znaleziono pokoi
+  file_picker:
+    select_mod_file: Wybierz Plik Moda
+  helper_note:
+    creator_name_less10: Nazwa twórcy musi mieć mniej niż 10 znaków.
+    creator_name_less11: Nazwa twórcy musi mieć mniej niż 11 znaków.
+    name_must_between: Nazwy muszą mieć od 3 do 10 znaków.
+  hover:
+    friends_online:
+      none: żaden z twoich przyjaciół nie jest onllne
+      one: Jest teraz 1 przyjaciel online
+      other: Jest teraz %{count} przyjaciół online
+    friends_page_disclaimer: By dodać przyjaciół musisz ich dodać w grze
+    players_online:
+      none: Nie ma żadnych graczy online
+      one: Jest 1 gracz online
+      other: jest teraz %{count} graczy online
+    rooms_online:
+      none: Nie ma żadnych aktywnych pokoi
+      one: Jest 1 aktywny pokój
+      other: jest teraz %{count} aktywnych pokoi
+    rooms_page_disclaimer: Prosze pamiętaj, że ta strona nie daje możliwości dołączenia
+      prosto do pokoju. By dołączyć do specyficznego pokoju musisz dołączyć poprzez
+      przyjaciela lub mieć nadzieje, że uda ci się połączyć poprzez losowy serwer.
+  list_title:
+    friends: Przyjaciele
+    miis: Mii
+    players: Gracze
+    rooms: Pokoje
+  message_error:
+    abort_rr:
+      extra:
+        failed_update_apply: Nie udało się zastosować aktualizacji. Abortowanie
+        failed_update_delete: Nie udało się usunąć plików dla aktualizacji. Abortowanie.
+        invalid_file_path: |-
+          Wykryto nieprawidłową ścieżkę do pliku. Proszę skontaktuj się z deweloperami.
+          Błąd Serwera: %{error}
+      title: Abortowanie aktualizacji Retro Rewind
+    data_folder_move:
+      title: Nie udało się przenieść danych
+    failed_change_mii:
+      title: Nie udało się zmienić Mii
+    failed_change_name:
+      title: Nie udało się zmienić imienia.
+    failed_create_mii_db:
+      title: Nie udało się stworzyć bazy danych dla Mii
+    failed_install_dolphin:
+      extra: Instalacja Emulatora Dolphin się nie powiodła. Proszę spróbuj manualnie
+        zainstalować Dolphina poprzez Flatpak.
+      title: Nie udało się zainstalować Dolphina
+    failed_retrieve_mod:
+      title: Nie udało się odzyskać informacji moda
+    generic_error:
+      title: Wystąpił błąd.
+    mod_download_fail:
+      extra: 'Wystąpił błąd podczas pobierania: %{error}'
+      title: Nie udało się pobrać moda.
+    no_mod_folder:
+      extra: Folder modów nie istnieje
+    restart_admin_fail:
+      extra: Nie udało się zrestartować z uprawnieniami administracyjnymi.
+  message_success:
+    data_folder_moved:
+      extra: |-
+        Dane Wheel Wizard są teraz przechowywane w:
+        %{path}
+      title: Zaktualizowano folder danych
+    mii_changed: Zmieniono Mii pomyślnie
+    mod_converted_to_patches:
+      title: Konwertuj na poprawki
+    mod_installed:
+      extra: Mod "%{modName}" zainstalowany pomyślnie.
+      title: Zainstalowano moda pomyślnie!
+    patch_conversion_skipped: Zostawiono %{amount} plik(i/ów) niezmienionych bo nie
+      mogły być skonwertowane.
+    rr_up_to_date:
+      title: Retro Rewind jest na najnowszej wersji.
+    settings_saved:
+      title: Ustawienia zapisane pomyślnie!
+  message_warning:
+    cannot_delete_fav_mii:
+      extra: Jeden lub więcej z zaznaczonych Mii jest ulubiony. Mii mogą być tylko
+        usunięte jeżeli nie są z listy ulubionych by zapobiec przed przypadkowym usunięciem.
+      title: Nie można usunąć ulubionych Mii
+    cant_view_mod:
+      extra:
+        not_from_browser: Nie można zobaczyć moda, który nie był zainstalowany poprzez
+          Przeglądacza Modów.
+        something_else: Coś poszło nie tak próbując otworzyć wybrany mod.
+      title: Nie można zobaczyć tego moda.
+    could_not_convert_mod:
+      title: Nie można skonwertować moda
+    dolphin_not_found:
+      extra: Folder Emulatora Dolphin nie został znaleziony automatycznie. Proszę
+        spróbuj znaleść folder manualnie kliknij "pomoc" po więcej informacji
+      title: Nie znaleziono folderu Emulatora Dolphin
+    dolphin_tool_selected:
+      extra: Wybrałeś DolphinTool.exe. Proszę wybierz Dolphin.exe (Plik wykonywalny
+        Emulatora Dolphin) zamiast tego
+      title: Wybrano zły plik wykonywalny Dolphina
+    fail_check_updates:
+      extra: Nie udało się sprawdzić dostępności aktualizacji w tej chwili. Możesz
+        nie być podłączony do internetu lub serwer może teraz nie działać.
+      title: Nie udało się sprawdzić dostępności aktualizacji
+    invalid_name:
+      extra:
+        mod_name_exists: Mod z nazwą "%{modName}" już istnieje
+      title: Nazwa niedozwolona
+    invalid_paths:
+      extra: Proszę się upewnij, że wszystkie ścieżki są poprawnę i spróbuj ponownie.
+      title: Niepoprawne ścieżki
+    mod_name_empty:
+      extra: Proszę podaj nazwe moda.
+      title: Nazwa moda nie może być pusta.
+    mod_name_invalid:
+      extra: Nazwa moda zawiera nieprawidłowe znaki.
+      title: Nieprawidłowa nazwa moda.
+    multiple_files_selected:
+      title: Wybrano Wiele Plików
+    no_connect_server:
+      extra: Nie można połączyć się ze serwerem. Spróbuj ponownie później.
+      title: Nie można połączyć się ze serwerem
+    not_find_dolphin:
+      extra: Nie można było znaleść Emulatora Dolphin prosze ustaw ścieżkę w ustawieniach
+    not_find_game:
+      extra: Nie można było znaleść gry prosze ustaw ścieżkę w ustawieniach
+    unable_download_mod:
+      extra: Nie można znaleść plików.
+      title: Nie można pobrać moda
+    unable_update_wh_wz:
+      extra:
+        reason_location: |-
+          Nie można zaktualizować Wheel Wizard. Proszę upewnij się, że aplikacja jest zlokalizowana w folderze, który ma możliwość zapisu.
+          Nie można znaleść obecnego folderu.
+        reason_network: |-
+          Nie można sprawdzić czy Wheel Wizard jest na najnowszej wersji.
+          Możesz mieć problem z internetem.
+      title: Nie można zaktualizować Wheel Wizard.
+  option:
+    dolphin_user_path: Folder Użytkownika Dolphina
+    force_disable_wiimote: Zmuś Wyłączenie Wiimota
+    launch_rr_on_startup: Uruchom Retro Rewind razem z uruchomieniem Wheel Wizard.
+    launch_with_dolphin: Uruchom grę razem z oknem Dolphina
+    mario_kart_game: Plik gry Mario Kart Wii
+    open_config: Otwórz folder konfiguracji
+    open_game_folder: Otwórz Folder Gry
+    open_save_folder: Otwórz Folder Zapisów
+    recommended: Polecane ustawienia
+    reset_data_folder: Użyj domyślnej lokacji
+    show_fps: Pokaż FPS
+    v_sync: VSync
+    wh_wz_language: Język Wheel Wizard
+    wheel_wizard_data_folder: Folder danych Wheel Wizard
+    window_scale: Skala Okna
+  page_title:
+    friends: Przyjaciele
+    home: Strona główna
+    leaderboard: Tabela Wyników
+    mods: My Stuff
+    my_miis: Moje Mii
+    my_profiles: Moje Profile
+    patches: Poprawki
+    room_details: Szczegóły Pokoju
+    rooms: Pokoje
+    settings: Ustawienia
+  patch:
+    incompatible_mod:
+      message: Ten mod jest niekompatybilny z innymi modami. Uruchamianie gry z tym
+        modem może spowodować niepoprawne zachowanie albo nagłe wyłączenie gry. Rozważ
+        skonwertowanie go na poprawki poprzez klikanie na moda prawym przyciskiem
+        myszy.
+      title: MOD NIEKOMPATYBILNY
+  placeholder:
+    enter_mii_name: Wpisz imię Mii...
+    enter_mod_name: Wpisz nazwe moda...
+    enter_path: Podaj chcianą ścieżkę tutaj...
+    enter_text_here: Wpisz tutaj tekst...
+    search_for_players: Szukaj Graczy...
+    search_mod: Szukaj modów...
+  popup_title:
+    mii_editor: Edytor Mii
+    mii_selector: Selektor Mii
+    mod_browser: Przeglądacz Modów
+    mod_details: Szczegóły Moda
   progress:
-    estimated_time_remaining: "Oszacowany pozostały czas."
-    downloading_mb: "Pobieranie %{megabytes} MB"
-    installing_mods: "Instalowanie modów"
-    installing_mods_count: "Instalowanie %{amount} modów"
-    processing_xof_y: "Procesowanie %{processed} z %{total} Plików"
-    update_rr: "Aktualizowanie Retro Rewind"
-    update_wh_wz: "Aktualizowanie Wheel Wizard"
-    installing_rr: "Instalowanie Retro Rewind"
-    installing_rr_first_time: "Instalowanie Retro Rewind pierwszy raz"
-    installing_dolphin: "Instalowanie Emulatora Dolphin"
-    this_may_take_a_while: "Może to zająć chwile zależnie od twojego połączenia z internetem."
-    applying_converted_mod: "Zastosowywanie skonwertowanych modów"
-    combining_files: "Łączenie plików"
-    converting_file: "Konwertowanie %{fileName}"
-    converting_files_count: "Konwertowanie %{amount} Pliku(ów)"
-    converting_mod_to_patches: "Konwertowanie modów na poprawki"
-    downloading_mod: "Pobieranie %{modName}"
-    installing_mod: "Instalowanie Moda"
-    preparing_files_count: "Przygotowywanie %{amount} Pliku(ów)"
+    applying_converted_mod: Zastosowywanie skonwertowanych modów
+    combining_files: Łączenie plików
+    converting_file: Konwertowanie %{fileName}
+    converting_files_count: Konwertowanie %{amount} Pliku(ów)
+    converting_mod_to_patches: Konwertowanie modów na poprawki
+    downloading_mb: Pobieranie %{megabytes} MB
+    downloading_mod: Pobieranie %{modName}
+    estimated_time_remaining: Oszacowany pozostały czas.
+    installing_dolphin: Instalowanie Emulatora Dolphin
+    installing_mod: Instalowanie Moda
+    installing_mods: Instalowanie modów
+    installing_mods_count: Instalowanie %{amount} modów
+    installing_rr: Instalowanie Retro Rewind
+    installing_rr_first_time: Instalowanie Retro Rewind pierwszy raz
+    preparing_files_count: Przygotowywanie %{amount} Pliku(ów)
+    processing_xof_y: Procesowanie %{processed} z %{total} Plików
+    this_may_take_a_while: Może to zająć chwile zależnie od twojego połączenia z internetem.
+    update_rr: Aktualizowanie Retro Rewind
+    update_wh_wz: Aktualizowanie Wheel Wizard
   question:
-    launch_clear_mods_found:
-      title: "Znaleziono Mody"
-      extra: "Zaraz uruchomisz grę bez żadnych modów. Czy chcesz wyczyścić twój my-stuff folder?"
-    sure_delete:
-      title: "Jesteś pewien, że chcesz usunąć %{name}?"
-      extra: "Usuwanie jest nie odwracalne."
-      title_miis: "Jesteś pewien, że chcesz usunąć %{amount} Mii?"
+    apply_language_settings:
+      extra: Czy chcesz zastosować nowe ustawienia językowe?
+      title: To zamknie obecne okno i otworzy nowe z nowymi ustawieniami językowymi.
     apply_scale:
-      title: "Czy chcesz zastosować nową skalę?"
-      extra: "Ta zmiana zostanie cofnięta za %{remainingTime} może, że postanowisz ją zastosować."
+      extra: Ta zmiana zostanie cofnięta za %{remainingTime} może, że postanowisz
+        ją zastosować.
+      title: Czy chcesz zastosować nową skalę?
+    dolphin_found:
+      extra: |-
+        Jeżeli nie wiesz co to wszystko znaczy poprostu naciśnij tak :)
+        Znaleziono folder Emulatora Dolphin. Chciałbyś użyć ten folder?
+      title: Znaleziono folder Emulatora Dolphin
+    enter_mod_name:
+      title: 'Nazwa Moda:'
+    enter_new_name:
+      extra: 'Zmienianie imienia z: %{name}'
+      title: Wpisz nowe imię
+    install_mod:
+      title: 'Czy chcesz pobrać i zainstalować mod: %{modName}?'
+    launch_clear_mods_found:
+      extra: Zaraz uruchomisz grę bez żadnych modów. Czy chcesz wyczyścić twój my-stuff
+        folder?
+      title: Znaleziono Mody
+    launch_clear_patches_found:
+      extra: Zaraz uruchomisz grę bez modów. Czy chcesz wyczyścić swój folder poprawek?
+        Uruchamianie gry tak czy siak uruchomi ją z aktualnym folderem poprawek dalej
+        aktywnym!
     move_data:
-      title: "Przenieść dane z Wheel Wizard?"
       extra: |-
         Wheel Wizard przeniesie swoje pliki do:
         %{path}
         to może zająć chwile zależnie od ilości danych.
-    dolphin_found:
-      title: "Znaleziono folder Emulatora Dolphin"
-      extra: |-
-        Jeżeli nie wiesz co to wszystko znaczy poprostu naciśnij tak :)
-        Znaleziono folder Emulatora Dolphin. Chciałbyś użyć ten folder?
+      title: Przenieść dane z Wheel Wizard?
     new_version_wh_wz:
-      title: "Aktualizacja do Wheel Wizard dostępna"
-      extra: "Wersja %{latestVersion} Wheel Wizard jest dostępna (obecnie na %{currentVersion}). Chcesz aktualizować teraz?"
-    update_admin:
-      title: "Aktualizuj używając uprawnień administratora"
-      extra: "Czasami aktualizacja wymaga uprawnień administratora czy chcesz je aktywować dla tej aktualizacji?"
-    reinstall_rr:
-      title: "Zainstaluj Retro Rewind ponownie"
-      extra: "Jesteś pewien, że chcesz zainstalować Retro Rewind ponownie?"
+      extra: Wersja %{latestVersion} Wheel Wizard jest dostępna (obecnie na %{currentVersion}).
+        Chcesz aktualizować teraz?
+      title: Aktualizacja do Wheel Wizard dostępna
     old_rksys_found:
-      title: "Znaleziono stary plik rksys.dat"
-      extra: "Znaleziono stary zapis. Chciałbyś go użyć? (Zalecane)"
+      extra: Znaleziono stary zapis. Chciałbyś go użyć? (Zalecane)
+      title: Znaleziono stary plik rksys.dat
+    reinstall_rr:
+      extra: Jesteś pewien, że chcesz zainstalować Retro Rewind ponownie?
+      title: Zainstaluj Retro Rewind ponownie
     rr_to_old:
-      extra: "Twoja wersja Retro Rewind jest zbyt stara by ją aktualizować. Chcesz zainstalować Retro Rewind ponownie?"
-      title: "Wersja Retro Rewind jest zbyt stara."
-    install_mod:
-      title: "Czy chcesz pobrać i zainstalować mod: %{modName}?"
-    search_mod: "Szukaj modów..."
-    enter_new_name:
-      title: "Wpisz nowe imię"
-      extra: "Zmienianie imienia z: %{name}"
-    enter_mod_name:
-      title: "Nazwa Moda:"
-    launch_clear_patches_found:
-      extra: "Zaraz uruchomisz grę bez modów. Czy chcesz wyczyścić swój folder poprawek? Uruchamianie gry tak czy siak uruchomi ją z aktualnym folderem poprawek dalej aktywnym!"
-    apply_language_settings:
-      title: "To zamknie obecne okno i otworzy nowe z nowymi ustawieniami językowymi."
-      extra: "Czy chcesz zastosować nowe ustawienia językowe?"
-  message_warning:
-    not_find_dolphin:
-      extra: "Nie można było znaleść Emulatora Dolphin prosze ustaw ścieżkę w ustawieniach"
-    not_find_game:
-      extra: "Nie można było znaleść gry prosze ustaw ścieżkę w ustawieniach"
-    multiple_files_selected:
-      title: "Wybrano Wiele Plików"
-    invalid_name:
-      extra:
-        mod_name_exists: "Mod z nazwą \"%{modName}\" już istnieje"
-      title: "Nazwa niedozwolona"
-    invalid_paths:
-      extra: "Proszę się upewnij, że wszystkie ścieżki są poprawnę i spróbuj ponownie."
-      title: "Niepoprawne ścieżki"
-    dolphin_not_found:
-      title: "Nie znaleziono folderu Emulatora Dolphin"
-      extra: "Folder Emulatora Dolphin nie został znaleziony automatycznie. Proszę spróbuj znaleść folder manualnie kliknij \"pomoc\" po więcej informacji"
-    dolphin_tool_selected:
-      title: "Wybrano zły plik wykonywalny Dolphina"
-      extra: "Wybrałeś DolphinTool.exe. Proszę wybierz Dolphin.exe (Plik wykonywalny Emulatora Dolphin) zamiast tego"
-    fail_check_updates:
-      title: "Nie udało się sprawdzić dostępności aktualizacji"
-      extra: "Nie udało się sprawdzić dostępności aktualizacji w tej chwili. Możesz nie być podłączony do internetu lub serwer może teraz nie działać."
-    unable_update_wh_wz:
-      extra:
-        reason_network: |-
-          Nie można sprawdzić czy Wheel Wizard jest na najnowszej wersji.
-          Możesz mieć problem z internetem.
-        reason_location: |-
-          Nie można zaktualizować Wheel Wizard. Proszę upewnij się, że aplikacja jest zlokalizowana w folderze, który ma możliwość zapisu.
-          Nie można znaleść obecnego folderu.
-      title: "Nie można zaktualizować Wheel Wizard."
-    no_connect_server:
-      extra: "Nie można połączyć się ze serwerem. Spróbuj ponownie później."
-      title: "Nie można połączyć się ze serwerem"
-    cant_view_mod:
-      title: "Nie można zobaczyć tego moda."
-      extra:
-        something_else: "Coś poszło nie tak próbując otworzyć wybrany mod."
-        not_from_browser: "Nie można zobaczyć moda, który nie był zainstalowany poprzez Przeglądacza Modów."
-    cannot_delete_fav_mii:
-      title: "Nie można usunąć ulubionych Mii"
-      extra: "Jeden lub więcej z zaznaczonych Mii jest ulubiony. Mii mogą być tylko usunięte jeżeli nie są z listy ulubionych by zapobiec przed przypadkowym usunięciem."
-    mod_name_invalid:
-      title: "Nieprawidłowa nazwa moda."
-      extra: "Nazwa moda zawiera nieprawidłowe znaki."
-    mod_name_empty:
-      title: "Nazwa moda nie może być pusta."
-      extra: "Proszę podaj nazwe moda."
-    unable_download_mod:
-      title: "Nie można pobrać moda"
-      extra: "Nie można znaleść plików."
-    could_not_convert_mod:
-      title: "Nie można skonwertować moda"
-  placeholder:
-    enter_mod_name: "Wpisz nazwe moda..."
-    search_mod: "Szukaj modów..."
-    enter_mii_name: "Wpisz imię Mii..."
-    enter_text_here: "Wpisz tutaj tekst..."
-    search_for_players: "Szukaj Graczy..."
-    enter_path: "Podaj chcianą ścieżkę tutaj..."
-  message_error:
-    no_mod_folder:
-      extra: "Folder modów nie istnieje"
-    data_folder_move:
-      title: "Nie udało się przenieść danych"
-    abort_rr:
-      extra:
-        failed_update_delete: "Nie udało się usunąć plików dla aktualizacji. Abortowanie."
-        failed_update_apply: "Nie udało się zastosować aktualizacji. Abortowanie"
-        invalid_file_path: |-
-          Wykryto nieprawidłową ścieżkę do pliku. Proszę skontaktuj się z deweloperami.
-          Błąd Serwera: %{error}
-      title: "Abortowanie aktualizacji Retro Rewind"
-    restart_admin_fail:
-      extra: "Nie udało się zrestartować z uprawnieniami administracyjnymi."
-    generic_error:
-      title: "Wystąpił błąd."
-    failed_create_mii_db:
-      title: "Nie udało się stworzyć bazy danych dla Mii"
-    failed_change_name:
-      title: "Nie udało się zmienić imienia."
-    failed_change_mii:
-      title: "Nie udało się zmienić Mii"
-    failed_install_dolphin:
-      title: "Nie udało się zainstalować Dolphina"
-      extra: "Instalacja Emulatora Dolphin się nie powiodła. Proszę spróbuj manualnie zainstalować Dolphina poprzez Flatpak."
-    failed_retrieve_mod:
-      title: "Nie udało się odzyskać informacji moda"
-    mod_download_fail:
-      title: "Nie udało się pobrać moda."
-      extra: "Wystąpił błąd podczas pobierania: %{error}"
-  message_success:
-    settings_saved:
-      title: "Ustawienia zapisane pomyślnie!"
-    data_folder_moved:
-      title: "Zaktualizowano folder danych"
-      extra: |-
-        Dane Wheel Wizard są teraz przechowywane w:
-        %{path}
-    rr_up_to_date:
-      title: "Retro Rewind jest na najnowszej wersji."
-    mii_changed: "Zmieniono Mii pomyślnie"
-    mod_converted_to_patches:
-      title: "Konwertuj na poprawki"
-    mod_installed:
-      extra: "Mod \"%{modName}\" zainstalowany pomyślnie."
-      title: "Zainstalowano moda pomyślnie!"
-    patch_conversion_skipped: "Zostawiono %{amount} plik(i/ów) niezmienionych bo nie mogły być skonwertowane."
-  snackbar_warning:
-    cant_save_mii: "Nie można zapisać Mii"
-    no_mii_export: "Wygląda na to, że nie było żadnych Mii do eksportowania"
-    no_mii_delete: "Wygląda na to, że nie było żadnych Mii do usunięcia"
-  snackbar_success:
-    mii_added: "Mii został dodany do twoich Mii"
-    copied_fc: "Skopiowano kod przyjaciela do schowka"
-    name_change: "Pomyślnie zmieniono imię na \"%{name}\""
-    saved_mii: "Zapisano Mii \"%{name}\" do pliku \"%{fileName}\""
-    deleted: "Usunięto \"%{name}\""
-    deleted_miis: "Usunięto %{amount} Mii"
-    created_duplicate: "Stworzono kopie \"%{name}\""
-    created_duplicates_miis: "Stworzono %{amount} kopi Mii"
-    profile_set_primary: "Ustaw jako główny profil"
-  snackbar_error:
-    mii_failure_update: "Nie udało się zaktualizować Mii \"%{error}\""
-    mii_failure_save: "Nie udało się zapisać Mii \"%{error}\""
-    mii_failure_get: "Nie udało się zdobyć Mii \"%{error}\""
-    mii_failure_create: "Nie udało się stworzyć Mii \"%{error}\""
-    mii_failure_duplicate: "Nie udało się skopiować Mii \"%{error}\""
-  helper_note:
-    name_must_between: "Nazwy muszą mieć od 3 do 10 znaków."
-    creator_name_less11: "Nazwa twórcy musi mieć mniej niż 11 znaków."
-    creator_name_less10: "Nazwa twórcy musi mieć mniej niż 10 znaków."
-  file_picker:
-    select_mod_file: "Wybierz Plik Moda"
-  patch:
-    incompatible_mod:
-      message: "Ten mod jest niekompatybilny z innymi modami. Uruchamianie gry z tym modem może spowodować niepoprawne zachowanie albo nagłe wyłączenie gry. Rozważ skonwertowanie go na poprawki poprzez klikanie na moda prawym przyciskiem myszy."
-      title: "MOD NIEKOMPATYBILNY"
-  option:
-    wh_wz_language: "Język Wheel Wizard"
-    force_disable_wiimote: "Zmuś Wyłączenie Wiimota"
-    launch_with_dolphin: "Uruchom grę razem z oknem Dolphina"
-    launch_rr_on_startup: "Uruchom Retro Rewind razem z uruchomieniem Wheel Wizard."
-    v_sync: "VSync"
-    recommended: "Polecane ustawienia"
-    show_fps: "Pokaż FPS"
-    window_scale: "Skala Okna"
-    open_config: "Otwórz folder konfiguracji"
-    wheel_wizard_data_folder: "Folder danych Wheel Wizard"
-    reset_data_folder: "Użyj domyślnej lokacji"
-    dolphin_user_path: "Folder Użytkownika Dolphina"
-    mario_kart_game: "Plik gry Mario Kart Wii"
-    open_game_folder: "Otwórz Folder Gry"
-    open_save_folder: "Otwórz Folder Zapisów"
+      extra: Twoja wersja Retro Rewind jest zbyt stara by ją aktualizować. Chcesz
+        zainstalować Retro Rewind ponownie?
+      title: Wersja Retro Rewind jest zbyt stara.
+    search_mod: Szukaj modów...
+    sure_delete:
+      extra: Usuwanie jest nie odwracalne.
+      title: Jesteś pewien, że chcesz usunąć %{name}?
+      title_miis: Jesteś pewien, że chcesz usunąć %{amount} Mii?
+    update_admin:
+      extra: Czasami aktualizacja wymaga uprawnień administratora czy chcesz je aktywować
+        dla tej aktualizacji?
+      title: Aktualizuj używając uprawnień administratora
+  region:
+    america: Ameryka
+    australia: Australia
+    china: Chiny
+    europe: Europa
+    japan: Japonia
+    south_korea: Korea Południowa
+    taiwan: Tajwan
   section:
-    graphics: "Grafika"
-    general: "Ogólne"
-    language: "Język"
-    wii: "Ustawienia Wii"
-    resolution: "Rezolucja"
-    performance: "Ustawienia Wydajności"
-    location_paths: "Ustawienia Lokacji"
-    wh_wz_appearance: "Wygląd Wheel Wizard"
-    installation: "Instalacja"
-  category:
-    other: "Inne"
-    video: "Wideo"
+    general: Ogólne
+    graphics: Grafika
+    installation: Instalacja
+    language: Język
+    location_paths: Ustawienia Lokacji
+    performance: Ustawienia Wydajności
+    resolution: Rezolucja
+    wh_wz_appearance: Wygląd Wheel Wizard
+    wii: Ustawienia Wii
+  snackbar_error:
+    mii_failure_create: Nie udało się stworzyć Mii "%{error}"
+    mii_failure_duplicate: Nie udało się skopiować Mii "%{error}"
+    mii_failure_get: Nie udało się zdobyć Mii "%{error}"
+    mii_failure_save: Nie udało się zapisać Mii "%{error}"
+    mii_failure_update: Nie udało się zaktualizować Mii "%{error}"
+  snackbar_success:
+    copied_fc: Skopiowano kod przyjaciela do schowka
+    created_duplicate: Stworzono kopie "%{name}"
+    created_duplicates_miis: Stworzono %{amount} kopi Mii
+    deleted: Usunięto "%{name}"
+    deleted_miis: Usunięto %{amount} Mii
+    mii_added: Mii został dodany do twoich Mii
+    name_change: Pomyślnie zmieniono imię na "%{name}"
+    profile_set_primary: Ustaw jako główny profil
+    saved_mii: Zapisano Mii "%{name}" do pliku "%{fileName}"
+  snackbar_warning:
+    cant_save_mii: Nie można zapisać Mii
+    no_mii_delete: Wygląda na to, że nie było żadnych Mii do usunięcia
+    no_mii_export: Wygląda na to, że nie było żadnych Mii do eksportowania
+  state:
+    config_not_finished: Konfiguracja nie zakończona
+    custom: Niestandardowe
+    error: Błąd
+    extracting: Wyodrębnianie plików...
+    installed: Zainstalowane
+    installing: Instalowanie...
+    loading: Ładowanie...
+    no_license: Brak Licencji
+    no_name: Brak Nazwy
+    no_profiles: Brak Profili
+    no_server: Brak Serwera
+    success: Sukces
+    unknown: Nieznany
+    updating: Aktualizowanie...
+    warning: Ostrzeżenie
+  text:
+    language_translated_by: 'Ten język jest przetłumaczony przez: %{translators}'
+    made_by_string: |-
+      Stworzone przez: %{firstAuthor}
+      i %{secondAuthor}
+    powered_gamebanana: Wsparci Przez Gamebanana
+    thanks_translators: 'Dziękujemy bardzo wszystkim tłumaczą:'
+    wh_wz_translation_percentage: Tłumaczenie dla tego języka jest skończone w %{percentage}%
+  time:
+    days:
+      one: 1 dzień
+      other: "%{count} dni"
+    hours:
+      one: 1 godz
+      other: "%{count} godz"
+    minutes:
+      one: 1 min
+      other: "%{count} min"
+    seconds:
+      one: 1 sek
+      other: "%{count} sek"
   value:
     language:
-      france: "Francuski"
-      dutch: "Holenderski"
-      english: "Angielski"
-      german: "Niemiecki"
-      italian: "Włoski"
-      japanese: "Japoński"
-      turkish: "Turecki"
-      spanish: "Hiszpański"
-      finnish: "Fiński"
-      korean: "Koreański"
-      russian: "Rosyjski"
-      arabic: "Arabski"
-      czech: "Czeski"
-      norwegian: "Norweski"
-      chinese: "Chinski"
-      polish: "Polski"
-      portuguese: "Portugalski"
-      z_translators: "tim13."
+      arabic: Arabski
+      chinese: Chinski
+      czech: Czeski
+      dutch: Holenderski
+      english: Angielski
+      finnish: Fiński
+      france: Francuski
+      german: Niemiecki
+      italian: Włoski
+      japanese: Japoński
+      korean: Koreański
+      norwegian: Norweski
+      polish: Polski
+      portuguese: Portugalski
+      russian: Rosyjski
+      spanish: Hiszpański
+      turkish: Turecki
+      z_translators: tim13.
