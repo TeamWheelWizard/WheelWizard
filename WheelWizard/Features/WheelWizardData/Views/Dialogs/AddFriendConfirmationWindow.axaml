@@ -54,7 +54,7 @@
                                IconData="{StaticResource XMark}"
                                Margin="0,0,6,0"
                                Click="Cancel_OnClick"  Tone="Secondary"/>
-            <components:ActionButton Text="Add Friend"
+            <components:ActionButton Text="{loc:T action.add_friend}"
                                IconData="{StaticResource CheckMark}"
                                Margin="6,0,0,0"
                                Click="AddFriend_OnClick"  Tone="Brand"/>
