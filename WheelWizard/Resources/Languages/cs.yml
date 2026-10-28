@@ -1,417 +1,428 @@
+---
 cs:
-  page_title:
-    home: "Domů"
-    settings: "Nastavení"
-    mods: "My Stuff"
-    my_profiles: "Moje profily"
-    rooms: "Místnosti"
-    friends: "Kamarádi"
-    room_details: "Podrobnosti o Místnosti"
-    my_miis: "Moje Miiy"
-  attribute:
-    status_online: "Online"
-    enabled: "Zapnuto"
-    title: "Název"
-    status_offline: "Offline"
-    name: "Jméno"
-    id: "ID"
-    type: "Typ"
-    speed: "Rychlost"
-    mod_name: "Jméno Modu"
-    average_room_vr: "Průměrný ZH"
-    losses: "Prohry"
-    wins: "Vyhry"
-    races_played: "Zahrané závody"
-    friend_code: "Kód Kamaráda"
-    player_count: "Hráči"
-    time_online: "Čas Online"
-    message: "Vzkaz"
-    is_online: "Je Online"
-    mii:
-      gender_male: "Muž"
-      gender: "Pohlaví"
-      gender_female: "Žena"
-      vertical_position: "Vertikální Poloha (Nahoru/Dolů)"
-      size: "Velikost"
-      nose_type: "Typ Nosu"
-      horizontal_position: "Horizontální Poloha (Vlevo/Vpravo)"
-      mouth_type: "Typ Úst"
-      hair_color: "Barva Vlasů"
-      hair_type: "Typ Vlasů"
-      mirror_hair: "Zrcadlové Vlasy"
-      glasses_type: "Typ Brýlí"
-      glasses_color: "Barva Brýlí"
-      name: "Mii Jmeno"
-      creator_name: "Jméno Tvůrce"
-      height: "Výška"
-      width: "Šířka"
-      fav_color: "Oblíbená Barva"
-      skin_color: "Barva Pleti"
-      head_shape: "Tvar Hlavy"
-      facial_feature: "Obličejové Rysy"
-      irish_color: "Barva Očí"
-      space_between: "Rozteč Mezi Nimi"
-      rotation: "Rotace (Vleva/Vprava)"
-      eyebrow_type: "Typ Obočí"
-      mustache_type: "Typ Kníru"
-      mustache_vertical_position: "Vertikální Poloha Kníru (Nahoru/Dolů)"
-      mustache_size: "Velikost Kníru"
-      beard_type: "Typ Vousů"
-      default_name: "Nové Mii"
-    status: "Status"
-    priority: "Přednost"
-    sort_by: "Seřadit podle"
-    total_games_won: "Celkem vyhraných her"
-    total_games_played: "Celkem zahraných her"
-    vr_abbreviation: "ZH"
-    br_abbreviation: "BH"
-    br_full: "Bitevní Hodnocení"
-    vr_full: "Závodní Hodnocení"
-    description: "Popis"
-    images: "Obrázky"
-    likes: "Lajky"
-    views: "Zhlédnutí"
-    downloads: "Stažení"
-    mii_section:
-      general: "Obecný"
-      face: "Obličej"
-      hair: "Vlasy"
-      eyebrows: "Obočí"
-      eyes: "Oči"
-      nose: "Nos"
-      lips: "Rty"
-      glasses: "Brýle"
-      facial_hair: "Vousy"
-      mole: "Mateřské Znaménko"
-    gender: "Pohlaví"
-    gender_female: "Žena"
-    gender_male: "Muž"
-  state:
-    loading: "Načítání..."
-    installing: "Instalování..."
-    updating: "Aktualizování..."
-    config_not_finished: "Konfigurace Nedokončena"
-    no_server: "Žádný server"
-    unknown: "Stav: Neznámý"
-    error: "Chyba"
-    warning: "Varování"
-    success: "Úspěch"
-    extracting: "Extrahování souborů..."
-    no_name: "Žádné jméno"
-    no_license: "Žádný účet"
-    no_profiles: "Žádné profily"
-    custom: "Vlastní"
-    installed: "Instalováno"
   action:
-    play: "Hrát"
-    play_offline: "Hrát Offline"
-    play_anyway: "Přesto hrát"
-    install: "Nainstalovat"
-    update: "Aktualizovat"
-    import: "Importovat"
-    clone: "Klonovat"
-    enable_all: "Zapnout Vše"
-    disable_all: "Vypnout Vše"
-    rename: "Přejmenovat"
-    delete: "Smazat"
-    open_folder: "Otevřít Složku"
-    edit: "Upravit"
-    cancel: "Zrušit"
-    save: "Uložit"
-    copy_friend_code: "Kopírovat Kód Kamaráda"
-    export: "Exportovat"
-    apply: "Použít"
-    "yes": "Ano"
-    "no": "Ne"
-    keep: "Nechat"
-    ok: "OK"
-    revert: "Vrátit"
-    maybe_later: "Možná Později"
-    browse: "Prohlížet"
-    change: "Změnit"
-    view_mod: "Zobrazit Mod"
-    save_external_mii: "Přidat Mii do \"Moje Miiy“"
-    duplicate: "Duplikovat"
-    back: "Zpět"
-    unfavorite: "Odebrat z Oblíbených"
-    favorite: "Dát do Oblíbených"
-    view_room: "Zobrazit Místnost"
-    recomp_nand_copy: "Vytvořit kopii"
-    recomp_nand_share: "Použít přímo"
-    recomp_install_offline: "Instalovat pouze offline"
+    apply: Použít
+    back: Zpět
+    browse: Prohlížet
+    cancel: Zrušit
+    change: Změnit
+    clone: Klonovat
+    copy_friend_code: Kopírovat Kód Kamaráda
+    delete: Smazat
+    disable_all: Vypnout Vše
+    do_manually: Udělat ručně
+    download_and_install: Stáhnout a Nainstalovat
+    duplicate: Duplikovat
+    edit: Upravit
+    enable_all: Zapnout Vše
+    export: Exportovat
+    favorite: Dát do Oblíbených
+    gamebanana_page: Stránka Gamebanana
+    import: Importovat
+    install: Nainstalovat
+    keep: Nechat
+    launch_dolphin: Spouštět Dolphin
     link:
-      discord: "Mluvte s námi!"
-      github: "Zdrojový kód"
-      support: "Podpořte nás!"
-    launch_dolphin: "Spouštět Dolphin"
-    randomize: "Náhodně Rozdělit"
-    do_manually: "Udělat ručně"
-    gamebanana_page: "Stránka Gamebanana"
-    report: "Nahlásít"
-    un_install: "Odinstalovat"
-    download_and_install: "Stáhnout a Nainstalovat"
-    view_custom_chars: "Zobrazit Vlastní Postavy"
-    submit: "Odeslat"
-  region:
-    japan: "Japonsko"
-    europe: "Evropa"
-    china: "Čína"
-    south_korea: "Jižní Korea"
-    taiwan: "Tchaj-wan"
-    america: "Amerika"
-    australia: "Austrálie"
-  list_title:
-    friends: "Kamarádi"
-    players: "Hráči"
-    rooms: "Místnosti"
-    miis: "Miiy"
-  text:
-    made_by_string: |-
-      Vytvořili: %{firstAuthor}
-      a %{secondAuthor}
-    thanks_translators: "Díky moc všem překladatelům:"
-    wh_wz_translation_percentage: "Překlady pro tento jazyk jsou z %{percentage}% kompletní"
-    powered_gamebanana: "Poháněno společností GameBanana"
-    language_translated_by: "Tento jazyk překládá: %{translators}"
+      discord: Mluvte s námi!
+      github: Zdrojový kód
+      support: Podpořte nás!
+    maybe_later: Možná Později
+    'no': Ne
+    ok: OK
+    open_folder: Otevřít Složku
+    play: Hrát
+    play_anyway: Přesto hrát
+    play_offline: Hrát Offline
+    randomize: Náhodně Rozdělit
+    recomp_install_offline: Instalovat pouze offline
+    recomp_nand_copy: Vytvořit kopii
+    recomp_nand_share: Použít přímo
+    rename: Přejmenovat
+    report: Nahlásít
+    revert: Vrátit
+    save: Uložit
+    save_external_mii: Přidat Mii do "Moje Miiy“
+    submit: Odeslat
+    un_install: Odinstalovat
+    unfavorite: Odebrat z Oblíbených
+    update: Aktualizovat
+    view_custom_chars: Zobrazit Vlastní Postavy
+    view_mod: Zobrazit Mod
+    view_room: Zobrazit Místnost
+    'yes': Ano
+  attribute:
+    average_room_vr: Průměrný ZH
+    br_abbreviation: BH
+    br_full: Bitevní Hodnocení
+    description: Popis
+    downloads: Stažení
+    enabled: Zapnuto
+    friend_code: Kód Kamaráda
+    gender: Pohlaví
+    gender_female: Žena
+    gender_male: Muž
+    id: ID
+    images: Obrázky
+    is_online: Je Online
+    likes: Lajky
+    losses: Prohry
+    message: Vzkaz
+    mii:
+      beard_type: Typ Vousů
+      creator_name: Jméno Tvůrce
+      default_name: Nové Mii
+      eyebrow_type: Typ Obočí
+      facial_feature: Obličejové Rysy
+      fav_color: Oblíbená Barva
+      gender: Pohlaví
+      gender_female: Žena
+      gender_male: Muž
+      glasses_color: Barva Brýlí
+      glasses_type: Typ Brýlí
+      hair_color: Barva Vlasů
+      hair_type: Typ Vlasů
+      head_shape: Tvar Hlavy
+      height: Výška
+      horizontal_position: Horizontální Poloha (Vlevo/Vpravo)
+      irish_color: Barva Očí
+      mirror_hair: Zrcadlové Vlasy
+      mouth_type: Typ Úst
+      mustache_size: Velikost Kníru
+      mustache_type: Typ Kníru
+      mustache_vertical_position: Vertikální Poloha Kníru (Nahoru/Dolů)
+      name: Mii Jmeno
+      nose_type: Typ Nosu
+      rotation: Rotace (Vleva/Vprava)
+      size: Velikost
+      skin_color: Barva Pleti
+      space_between: Rozteč Mezi Nimi
+      vertical_position: Vertikální Poloha (Nahoru/Dolů)
+      width: Šířka
+    mii_section:
+      eyebrows: Obočí
+      eyes: Oči
+      face: Obličej
+      facial_hair: Vousy
+      general: Obecný
+      glasses: Brýle
+      hair: Vlasy
+      lips: Rty
+      mole: Mateřské Znaménko
+      nose: Nos
+    mod_name: Jméno Modu
+    name: Jméno
+    player_count: Hráči
+    priority: Přednost
+    races_played: Zahrané závody
+    sort_by: Seřadit podle
+    speed: Rychlost
+    status: Status
+    status_offline: Offline
+    status_online: Online
+    time_online: Čas Online
+    title: Název
+    total_games_played: Celkem zahraných her
+    total_games_won: Celkem vyhraných her
+    type: Typ
+    views: Zhlédnutí
+    vr_abbreviation: ZH
+    vr_full: Závodní Hodnocení
+    wins: Vyhry
+  category:
+    about: O tomto
+    general: Obecný
+    other: Ostatní
+    video: Video
+  empty_content:
+    no_friends: Můžeš přidat kamarádi ve hře
+    no_friends_title: Zatím žádní kamarádi!
+    no_miis: Nemůžeme číst data Mii z tvého systému. Ujisti se, že jsi hru aspoň jednou
+      spustil
+    no_miis_title: Zatím žádné Miiy!
+    no_mod_selected: Vyber mod v seznamu pro zobrazení jeho podrobností
+    no_mod_selected_title: Není vybrán žádný mod
+    no_mods: Mody mohou změnit fungování hry. Začni importovat tvůj první mod kliknutím
+      na tlačítko níže.
+    no_mods_title: Nebyly nalezeny žádné mody
+    no_profiles: Hru musíš hrát aspoň jednou, abys viděl tvé profily zde uvedené
+    no_rooms: Možná nemáš připojení k internetu, nebo nikdo nehraje.
+    no_rooms_title: Nebyly nalezeny žádné místnosti
+  helper_note:
+    creator_name_less10: Jméno tvůrce musí být kratší než 10 znaků.
+    creator_name_less11: Jméno tvůrce musí být kratší než 11 znaků.
+    name_must_between: Jména musí mít délku 3 až 10 znaků.
+  helper_text:
+    30_fps: Toto nastavení donutí hru běžet za 30 FPS (výchozí je 60)
+    enable_animations: To aktivuje animace v aplikaci Wheel Wizard
+    end_with_exe: Cesta musí končit .exe
+    end_with_x: 'Cesta může končit:'
+    launch_with_dolphin: Spustí hlavní okno Dolphin spolu s hrou
+    must_set_paths: Musíš nastavit tyto 3 cesty než začneš hrát Retro Rewind.
+    optional: Volitelný
+    topbar:
+      location_warning: Nastavení jsou vypnuté, nejprve dokonči nastavení umístění
   hover:
-    players_online:
-      none: "Právě nejsou žádní hráči online"
-      one: "Právě je 1 hráč online"
-      other: "Právě jsou %{count} hráči online"
-    rooms_online:
-      none: "Momentálně nejsou žádné aktivní místnosti"
-      one: "Momentálně je aktivní 1 místnost"
-      other: "Momentálně jsou aktivní %{count} místnosti"
     friends_online:
-      none: "Právě nejsou žádní kamarádi online"
-      one: "Právě je 1 kamarád online"
-      other: "Právě jsou %{count} kamarádi online"
+      none: Právě nejsou žádní kamarádi online
+      one: Právě je 1 kamarád online
+      other: Právě jsou %{count} kamarádi online
+    friends_page_disclaimer: Chceš-li přidat kamarády, musíš je přidat ve hře.
+    players_online:
+      none: Právě nejsou žádní hráči online
+      one: Právě je 1 hráč online
+      other: Právě jsou %{count} hráči online
+    primary_profile: Primární profil se používá jako reference v klientovi Wheel Wizard
+    rooms_online:
+      none: Momentálně nejsou žádné aktivní místnosti
+      one: Momentálně je aktivní 1 místnost
+      other: Momentálně jsou aktivní %{count} místnosti
     rooms_page_disclaimer: |-
       Upozorňujeme, že tato stránka nenabízí žádnou funkci pro přímé připojení k místnosti.
       Chceš-li se připojit ke konkrétní místnosti, budeš se muset buď připojit prostřednictvím kamaráda, nebo doufat, že se k ní připojíš připojením k online serverům.
-    friends_page_disclaimer: "Chceš-li přidat kamarády, musíš je přidat ve hře."
-    primary_profile: "Primární profil se používá jako reference v klientovi Wheel Wizard"
-  empty_content:
-    no_profiles: "Hru musíš hrát aspoň jednou, abys viděl tvé profily zde uvedené"
-    no_friends_title: "Zatím žádní kamarádi!"
-    no_friends: "Můžeš přidat kamarádi ve hře"
-    no_mods: "Mody mohou změnit fungování hry. Začni importovat tvůj první mod kliknutím na tlačítko níže."
-    no_mods_title: "Nebyly nalezeny žádné mody"
-    no_rooms: "Možná nemáš připojení k internetu, nebo nikdo nehraje."
-    no_rooms_title: "Nebyly nalezeny žádné místnosti"
-    no_miis_title: "Zatím žádné Miiy!"
-    no_miis: "Nemůžeme číst data Mii z tvého systému. Ujisti se, že jsi hru aspoň jednou spustil"
-    no_mod_selected_title: "Není vybrán žádný mod"
-    no_mod_selected: "Vyber mod v seznamu pro zobrazení jeho podrobností"
-  time:
-    days:
-      one: "1 den"
-      other: "%{count} dny"
-    hours:
-      one: "1 hodina"
-      other: "%{count} hodiny"
-    minutes:
-      one: "1 minuta"
-      other: "%{count} minuty"
-    seconds:
-      one: "1 sekunda"
-      other: "%{count} sekundy"
-  progress:
-    estimated_time_remaining: "Předpokládaný zbývající čas:"
-    downloading_mb: "Stahování %{megabytes} MB"
-    installing_mods: "Instalování mody"
-    installing_mods_count: "Instalování %{amount} mody"
-    update_rr: "Aktualizování Retro Rewind"
-    update_wh_wz: "Aktualizování Wheel Wizard"
-    installing_rr: "Instalování Retro Rewind"
-    installing_rr_first_time: "Instalování Retro Rewind poprvé"
-    installing_dolphin: "Instalování Dolphin Emulator"
-  question:
-    launch_clear_mods_found:
-      title: "Nalezené mody"
-      extra: "Chystáš se spustit hru bez jakýchkoliv modů. Chceš vymazat složku my-stuff?"
-    sure_delete:
-      title: "Opravdu chceš smazat %{name}?"
-      extra: "Smazání je trvalé a není možné je vrátit zpět."
-      title_miis: "Opravdu chceš smazat %{amount} Miiy?"
-    dolphin_found:
-      title: "Nalezena Složka Dolphin Emulator"
-    update_admin:
-      title: "Aktualizovat pomocí admin"
-      extra: "Někdy aktualizace vyžaduje administrátorská práva. Chceš je pro tuto aktualizaci aktivovat?"
-    reinstall_rr:
-      title: "Přeinstalovat Retro Rewind"
-      extra: "Opravdu chceš reinstalovat Retro Rewind?"
-    old_rksys_found:
-      title: "Starý rksys.dat nalezen"
-    rr_to_old:
-      extra: "Tvoje verze Retro Rewind je moc stará na aktualizaci. Chtěl bys znovu nainstalovat Retro Rewind?"
-      title: "Verze Retro Rewind je moc stará."
-    rr_not_determined:
-      title: "Stáhnout Retro Rewind"
-      extra: "Tvojí verzi Retro Rewind se nepodařilo určit. Chtěl bys si stáhnout Retro Rewind?"
-    dolphin_flatpak:
-      title: "Instalace Dolphin Flatpak"
-    install_mod:
-      title: "Chceš stáhnout a nainstalovat mod: %{modName}?"
-    search_mod: "Hledej mody..."
-    enter_new_name:
-      title: "Zadej nové jméno"
-      extra: "Změna jména z: %{name}"
-  message_warning:
-    not_find_dolphin:
-      extra: "Nepodařilo se najít Dolphin Emulator, prosím nastav cestu v nastavení."
-    not_find_game:
-      extra: "Nepodařilo se najít hru, prosím nastav cestu v nastavení."
-    multiple_files_selected:
-      title: "Vybráno Více Souborů"
-    invalid_name:
-      extra:
-        mod_name_exists: "Mod s jménem '%{modName}' již existuje."
-      title: "Jméno není možné."
-    invalid_paths:
-      extra: "Zkontroluj prosím, zda jsou všechny cesty správné, a zkus to znovu."
-      title: "Neplatné Cesty."
-    dolphin_not_found:
-      title: "Složka Dolphin Emulator Nebyla Nalezena"
-      extra: "Složka Dolphin Emulator nebyla automaticky nalezena. Zkus prosím složku najít ručně, klikni na 'Pomoc' pro více informací."
-    fail_check_updates:
-      title: "Kontrola aktualizací se nezdařila"
-      extra: "Aktualizace není možné právě teď zkontrolovat. Možná nejsi připojeni k internetu nebo server může být mimo provoz."
-    unable_update_wh_wz:
-      title: "Není možné aktualizovat Wheel Wizard"
-    no_connect_server:
-      extra: "Nepodařilo se připojit k serveru. Zkus to prosím znovu později."
-      title: "Nepodařilo se připojit k serveru."
-    cant_view_mod:
-      title: "Tento mod není možné zobrazit."
-      extra:
-        something_else: "Při pokusu o otevření vybraného modu se něco pokazilo."
-        not_from_browser: "Není možné zobrazit mod, který nebyl nainstalován prostřednictvím prohlížeče modů."
-    cannot_delete_fav_mii:
-      title: "Není možné odstranit oblíbené Mii(y)"
-      extra: "Jeden nebo více z vybraných Mii(y) je oblíbený. Miiy je možné smazat pouze v případě, že nejsou oblíbené, aby se zabránilo náhodnému smazání."
-    mod_name_invalid:
-      title: "Neplatný název modu."
-      extra: "Název modu obsahuje neplatné znaky."
-    mod_name_empty:
-      title: "Název modu nemůže být prázdný."
-      extra: "Prosím, uveď název modu."
-    unable_download_mod:
-      title: "Není možné stáhnout mod"
-      extra: "Soubory se nepodařilo nalézt."
-  placeholder:
-    enter_mod_name: "Zadej jméno modu..."
-    search_mod: "Hledej mody..."
-    enter_mii_name: "Zadej jméno Mii..."
-    enter_text_here: "Zadej text zde..."
-    search_for_players: "Hledej hráči..."
-    enter_path: "Zadej požadovanou cestu zde..."
+  list_title:
+    friends: Kamarádi
+    miis: Miiy
+    players: Hráči
+    rooms: Místnosti
   message_error:
-    no_mod_folder:
-      extra: "Složka s mody neexistuje"
     abort_rr:
       extra:
-        failed_update_delete: "Odstranění souborů pro aktualizaci se nezdařilo. Přerušení."
-        failed_update_apply: "Aktualizace aplikace se nezdařila. Přerušení."
-      title: "Přerušení Aktualizace RR"
-    restart_admin_fail:
-      extra: "Restartování s právy administrátor se nezdařilo."
-    generic_error:
-      title: "Došlo k chybě."
-    failed_create_mii_db:
-      title: "Vytvoření databáze Mii se nezdařilo"
-    failed_change_name:
-      title: "Změna jména se nezdařila"
+        failed_update_apply: Aktualizace aplikace se nezdařila. Přerušení.
+        failed_update_delete: Odstranění souborů pro aktualizaci se nezdařilo. Přerušení.
+      title: Přerušení Aktualizace RR
     failed_change_mii:
-      title: "Změna Mii se nezdařila"
+      title: Změna Mii se nezdařila
+    failed_change_name:
+      title: Změna jména se nezdařila
+    failed_create_mii_db:
+      title: Vytvoření databáze Mii se nezdařilo
     failed_install_dolphin:
-      title: "Instalace Dolphinu se nezdařila"
-      extra: "Instalace Dolphin Emulatoru se nezdařila. Zkus prosím ručně nainstalovat Flatpak Dolphin."
+      extra: Instalace Dolphin Emulatoru se nezdařila. Zkus prosím ručně nainstalovat
+        Flatpak Dolphin.
+      title: Instalace Dolphinu se nezdařila
     failed_retrieve_mod:
-      title: "Načtení informací o modu se nezdařilo"
+      title: Načtení informací o modu se nezdařilo
+    generic_error:
+      title: Došlo k chybě.
     mod_download_fail:
-      title: "Stažení modu se nezdařilo."
-      extra: "Během stahování došlo k chybě: %{error}"
+      extra: 'Během stahování došlo k chybě: %{error}'
+      title: Stažení modu se nezdařilo.
+    no_mod_folder:
+      extra: Složka s mody neexistuje
+    restart_admin_fail:
+      extra: Restartování s právy administrátor se nezdařilo.
   message_success:
-    settings_saved:
-      title: "Nastavení bylo úspěšně uloženo!"
+    mii_changed: Mii se úspěšně změnila
     rr_up_to_date:
-      title: "Retro Rewind je aktuální."
-    mii_changed: "Mii se úspěšně změnila"
-  snackbar_warning:
-    cant_save_mii: "Mii není možné uložit"
-    no_mii_export: "Zdá se, že tam nebyly žádné Miiy, které by bylo možné exportovat"
-    no_mii_delete: "Zdá se, že tam nebyly žádné Miiy, které by bylo možné smazat"
-  snackbar_success:
-    mii_added: "Mii byl přidán do tvého Miiy"
-    copied_fc: "Zkopírovaný kód kamaráda do schránky"
-    name_change: "Úspěšně změněn jméno na '%{name}'"
-    saved_mii: "Uloženo Mii '%{name}' do souboru '%{fileName}'"
-    deleted: "Smazáno '%{name}'"
-    deleted_miis: "Smazáno %{amount} Miiy"
-    profile_set_primary: "Nastavit profil jako primární"
-  helper_note:
-    name_must_between: "Jména musí mít délku 3 až 10 znaků."
-    creator_name_less11: "Jméno tvůrce musí být kratší než 11 znaků."
-    creator_name_less10: "Jméno tvůrce musí být kratší než 10 znaků."
+      title: Retro Rewind je aktuální.
+    settings_saved:
+      title: Nastavení bylo úspěšně uloženo!
+  message_warning:
+    cannot_delete_fav_mii:
+      extra: Jeden nebo více z vybraných Mii(y) je oblíbený. Miiy je možné smazat
+        pouze v případě, že nejsou oblíbené, aby se zabránilo náhodnému smazání.
+      title: Není možné odstranit oblíbené Mii(y)
+    cant_view_mod:
+      extra:
+        not_from_browser: Není možné zobrazit mod, který nebyl nainstalován prostřednictvím
+          prohlížeče modů.
+        something_else: Při pokusu o otevření vybraného modu se něco pokazilo.
+      title: Tento mod není možné zobrazit.
+    dolphin_not_found:
+      extra: Složka Dolphin Emulator nebyla automaticky nalezena. Zkus prosím složku
+        najít ručně, klikni na 'Pomoc' pro více informací.
+      title: Složka Dolphin Emulator Nebyla Nalezena
+    fail_check_updates:
+      extra: Aktualizace není možné právě teď zkontrolovat. Možná nejsi připojeni
+        k internetu nebo server může být mimo provoz.
+      title: Kontrola aktualizací se nezdařila
+    invalid_name:
+      extra:
+        mod_name_exists: Mod s jménem '%{modName}' již existuje.
+      title: Jméno není možné.
+    invalid_paths:
+      extra: Zkontroluj prosím, zda jsou všechny cesty správné, a zkus to znovu.
+      title: Neplatné Cesty.
+    mod_name_empty:
+      extra: Prosím, uveď název modu.
+      title: Název modu nemůže být prázdný.
+    mod_name_invalid:
+      extra: Název modu obsahuje neplatné znaky.
+      title: Neplatný název modu.
+    multiple_files_selected:
+      title: Vybráno Více Souborů
+    no_connect_server:
+      extra: Nepodařilo se připojit k serveru. Zkus to prosím znovu později.
+      title: Nepodařilo se připojit k serveru.
+    not_find_dolphin:
+      extra: Nepodařilo se najít Dolphin Emulator, prosím nastav cestu v nastavení.
+    not_find_game:
+      extra: Nepodařilo se najít hru, prosím nastav cestu v nastavení.
+    unable_download_mod:
+      extra: Soubory se nepodařilo nalézt.
+      title: Není možné stáhnout mod
+    unable_update_wh_wz:
+      title: Není možné aktualizovat Wheel Wizard
   option:
-    wh_wz_language: "Jazyk Wheel Wizard"
-    v_sync: "VSync"
-    recommended: "Doporučené Nastavení"
-    show_fps: "Zobrazit FPS"
-    renderer: "Renderování"
-    window_scale: "Měřítko Okna"
-    open_config: "Otevřít Konfigurační Složku"
-    dolphin_user_path: "Uživatelská Složka Dolphin"
-    mario_kart_game: "Soubor Hry Mario Kart Wii"
-    dolphin_emulator_exe: "Spustitelný soubor Dolphin Emulator"
-    enable_animations: "Zapnout Animace"
-    reinstall: "Reinstalovat RR"
-    open_game_folder: "Otevřít Složku Hry"
-    open_save_folder: "Otevřít Složku Uložení"
+    dolphin_emulator_exe: Spustitelný soubor Dolphin Emulator
+    dolphin_user_path: Uživatelská Složka Dolphin
+    enable_animations: Zapnout Animace
+    mario_kart_game: Soubor Hry Mario Kart Wii
+    open_config: Otevřít Konfigurační Složku
+    open_game_folder: Otevřít Složku Hry
+    open_save_folder: Otevřít Složku Uložení
+    recommended: Doporučené Nastavení
+    reinstall: Reinstalovat RR
+    renderer: Renderování
+    show_fps: Zobrazit FPS
+    v_sync: VSync
+    wh_wz_language: Jazyk Wheel Wizard
+    window_scale: Měřítko Okna
+  page_title:
+    friends: Kamarádi
+    home: Domů
+    mods: My Stuff
+    my_miis: Moje Miiy
+    my_profiles: Moje profily
+    room_details: Podrobnosti o Místnosti
+    rooms: Místnosti
+    settings: Nastavení
+  placeholder:
+    enter_mii_name: Zadej jméno Mii...
+    enter_mod_name: Zadej jméno modu...
+    enter_path: Zadej požadovanou cestu zde...
+    enter_text_here: Zadej text zde...
+    search_for_players: Hledej hráči...
+    search_mod: Hledej mody...
+  progress:
+    downloading_mb: Stahování %{megabytes} MB
+    estimated_time_remaining: 'Předpokládaný zbývající čas:'
+    installing_dolphin: Instalování Dolphin Emulator
+    installing_mods: Instalování mody
+    installing_mods_count: Instalování %{amount} mody
+    installing_rr: Instalování Retro Rewind
+    installing_rr_first_time: Instalování Retro Rewind poprvé
+    update_rr: Aktualizování Retro Rewind
+    update_wh_wz: Aktualizování Wheel Wizard
+  question:
+    dolphin_flatpak:
+      title: Instalace Dolphin Flatpak
+    dolphin_found:
+      title: Nalezena Složka Dolphin Emulator
+    enter_new_name:
+      extra: 'Změna jména z: %{name}'
+      title: Zadej nové jméno
+    install_mod:
+      title: 'Chceš stáhnout a nainstalovat mod: %{modName}?'
+    launch_clear_mods_found:
+      extra: Chystáš se spustit hru bez jakýchkoliv modů. Chceš vymazat složku my-stuff?
+      title: Nalezené mody
+    old_rksys_found:
+      title: Starý rksys.dat nalezen
+    reinstall_rr:
+      extra: Opravdu chceš reinstalovat Retro Rewind?
+      title: Přeinstalovat Retro Rewind
+    rr_not_determined:
+      extra: Tvojí verzi Retro Rewind se nepodařilo určit. Chtěl bys si stáhnout Retro
+        Rewind?
+      title: Stáhnout Retro Rewind
+    rr_to_old:
+      extra: Tvoje verze Retro Rewind je moc stará na aktualizaci. Chtěl bys znovu
+        nainstalovat Retro Rewind?
+      title: Verze Retro Rewind je moc stará.
+    search_mod: Hledej mody...
+    sure_delete:
+      extra: Smazání je trvalé a není možné je vrátit zpět.
+      title: Opravdu chceš smazat %{name}?
+      title_miis: Opravdu chceš smazat %{amount} Miiy?
+    update_admin:
+      extra: Někdy aktualizace vyžaduje administrátorská práva. Chceš je pro tuto
+        aktualizaci aktivovat?
+      title: Aktualizovat pomocí admin
+  region:
+    america: Amerika
+    australia: Austrálie
+    china: Čína
+    europe: Evropa
+    japan: Japonsko
+    south_korea: Jižní Korea
+    taiwan: Tchaj-wan
   section:
-    graphics: "Grafika"
-    general: "Obecné"
-    language: "Jazyk"
-    wii: "Nastavení Wii"
-    resolution: "Rozlišení"
-    performance: "Nastavení Výkonu"
-    renderer: "Nastavení Vykreslování"
-    location_paths: "Nastavení Umístění"
-    wh_wz_appearance: "Vzhled Wheel Wizard"
-    installation: "Instalace"
-  helper_text:
-    topbar:
-      location_warning: "Nastavení jsou vypnuté, nejprve dokonči nastavení umístění"
-    launch_with_dolphin: "Spustí hlavní okno Dolphin spolu s hrou"
-    30_fps: "Toto nastavení donutí hru běžet za 30 FPS (výchozí je 60)"
-    end_with_exe: "Cesta musí končit .exe"
-    enable_animations: "To aktivuje animace v aplikaci Wheel Wizard"
-    end_with_x: "Cesta může končit:"
-    optional: "Volitelný"
-    must_set_paths: "Musíš nastavit tyto 3 cesty než začneš hrát Retro Rewind."
-  category:
-    about: "O tomto"
-    other: "Ostatní"
-    general: "Obecný"
-    video: "Video"
+    general: Obecné
+    graphics: Grafika
+    installation: Instalace
+    language: Jazyk
+    location_paths: Nastavení Umístění
+    performance: Nastavení Výkonu
+    renderer: Nastavení Vykreslování
+    resolution: Rozlišení
+    wh_wz_appearance: Vzhled Wheel Wizard
+    wii: Nastavení Wii
+  snackbar_success:
+    copied_fc: Zkopírovaný kód kamaráda do schránky
+    deleted: Smazáno '%{name}'
+    deleted_miis: Smazáno %{amount} Miiy
+    mii_added: Mii byl přidán do tvého Miiy
+    name_change: Úspěšně změněn jméno na '%{name}'
+    profile_set_primary: Nastavit profil jako primární
+    saved_mii: Uloženo Mii '%{name}' do souboru '%{fileName}'
+  snackbar_warning:
+    cant_save_mii: Mii není možné uložit
+    no_mii_delete: Zdá se, že tam nebyly žádné Miiy, které by bylo možné smazat
+    no_mii_export: Zdá se, že tam nebyly žádné Miiy, které by bylo možné exportovat
+  state:
+    config_not_finished: Konfigurace Nedokončena
+    custom: Vlastní
+    error: Chyba
+    extracting: Extrahování souborů...
+    installed: Instalováno
+    installing: Instalování...
+    loading: Načítání...
+    no_license: Žádný účet
+    no_name: Žádné jméno
+    no_profiles: Žádné profily
+    no_server: Žádný server
+    success: Úspěch
+    unknown: 'Stav: Neznámý'
+    updating: Aktualizování...
+    warning: Varování
+  text:
+    language_translated_by: 'Tento jazyk překládá: %{translators}'
+    made_by_string: |-
+      Vytvořili: %{firstAuthor}
+      a %{secondAuthor}
+    powered_gamebanana: Poháněno společností GameBanana
+    thanks_translators: 'Díky moc všem překladatelům:'
+    wh_wz_translation_percentage: Překlady pro tento jazyk jsou z %{percentage}% kompletní
+  time:
+    days:
+      one: 1 den
+      other: "%{count} dny"
+    hours:
+      one: 1 hodina
+      other: "%{count} hodiny"
+    minutes:
+      one: 1 minuta
+      other: "%{count} minuty"
+    seconds:
+      one: 1 sekunda
+      other: "%{count} sekundy"
   value:
     language:
-      france: "Francouzština"
-      dutch: "Nizozemština"
-      english: "Angličtina"
-      german: "Němčina"
-      italian: "Italština"
-      japanese: "Japonština"
-      turkish: "Turečtina"
-      spanish: "Španělština"
-      finnish: "Finština"
-      korean: "Korejština"
-      russian: "Ruština"
-      arabic: "Arabština"
-      czech: "Čeština"
-      norwegian: "Norština"
-      chinese: "Čínština"
-      portuguese: "Portugalština"
-      z_translators: "Pattyrix"
+      arabic: Arabština
+      chinese: Čínština
+      czech: Čeština
+      dutch: Nizozemština
+      english: Angličtina
+      finnish: Finština
+      france: Francouzština
+      german: Němčina
+      italian: Italština
+      japanese: Japonština
+      korean: Korejština
+      norwegian: Norština
+      portuguese: Portugalština
+      russian: Ruština
+      spanish: Španělština
+      turkish: Turečtina
+      z_translators: Pattyrix

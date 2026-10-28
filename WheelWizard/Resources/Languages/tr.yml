@@ -1,456 +1,472 @@
+---
 tr:
-  page_title:
-    home: "Anasayfa"
-    settings: "Ayarlar"
-    mods: "My Stuff"
-    my_profiles: "Profillerim"
-    rooms: "Odalar"
-    friends: "Arkadaşlar"
-    room_details: "Oda Detayları"
-    my_miis: "Benim Mii'lerim"
-  attribute:
-    status_online: "Çevrimiçi"
-    enabled: "Etkin"
-    title: "Başlık"
-    status_offline: "Çevrimdışı"
-    name: "Ad"
-    id: "ID"
-    type: "Tür"
-    speed: "Hız"
-    mod_name: "Modların Adı"
-    average_room_vr: "Ortalama KP"
-    losses: "Kayıplar"
-    wins: "Galibiyetler"
-    races_played: "Oynanan Yarışlar"
-    friend_code: "Arkadaş Kodu"
-    player_count: "Oyuncular"
-    time_online: "Çevrimiçi Süre"
-    message: "Mesaj"
-    is_online: "Online"
-    mii:
-      gender_male: "Erkek"
-      gender: "Cinsiyet"
-      gender_female: "Kadın"
-      vertical_position: "Dikey Konum (Yukarı/Aşağı)"
-      size: "Boyut"
-      nose_type: "Burun Tipi"
-      horizontal_position: "Yatay Konum (Sağ/Sol)"
-      mouth_type: "Ağız Tipi"
-      hair_color: "Saç Rengi"
-      hair_type: "Saç Tipi"
-      mirror_hair: "Saç Yönünü Değiştir"
-      glasses_type: "Gözlük Tipi"
-      glasses_color: "Gözlük Rengi"
-      name: "Mii Adı"
-      creator_name: "Yapımcı Adı"
-      height: "Boy"
-      width: "Genişlik"
-      fav_color: "En Sevdiği Renk"
-      skin_color: "Ten Rengi"
-      head_shape: "Kafa Şekli"
-      facial_feature: "Yüz Özelliği"
-      irish_color: "Göz Rengi"
-      space_between: "Arası Boşluk"
-      rotation: "Çevir (Sağa/Sola Çevir)"
-      eyebrow_type: "Kaş Tipi"
-      mustache_type: "Bıyık Tipi"
-      mustache_vertical_position: "Bıyık Dikey Konumu (Yukarı/Aşağı)"
-      mustache_size: "Bıyık Büyüklüğü"
-      beard_type: "Sakal Tipi"
-      default_name: "Yeni Mii"
-    status: "Durum"
-    priority: "Öncelik"
-    sort_by: "Sıralama Tipi"
-    total_games_won: "Toplam kazanılan oyun"
-    total_games_played: "Toplam oynanan oyun"
-    vr_abbreviation: "KP"
-    br_abbreviation: "SP"
-    br_full: "Savaş Puanı"
-    vr_full: "Karşılaşma Puanı"
-    description: "Açıklama"
-    images: "Resimler"
-    likes: "Beğeniler"
-    views: "Görüntülenme"
-    downloads: "İndirilenler"
-    mii_section:
-      general: "Genel"
-      face: "Yüz"
-      hair: "Saç"
-      eyebrows: "Kaşlar"
-      eyes: "Gözler"
-      nose: "Burun"
-      lips: "Dudaklar"
-      glasses: "Gözlük"
-      facial_hair: "Sakal Bıyık"
-      mole: "Ben"
-    gender: "Cinsiyet"
-    gender_female: "Kadın"
-    gender_male: "Erkek"
-  state:
-    loading: "Yükleniyor..."
-    installing: "Yükleniyor..."
-    updating: "Güncelleniyor..."
-    config_not_finished: "Yapılandırma Tamamlanmadı"
-    no_server: "Sunucu Yok"
-    unknown: "Bilinmiyor"
-    error: "Hata"
-    warning: "Uyarı"
-    success: "Başarı"
-    extracting: "Dosyalar Çıkartılıyor..."
-    no_name: "Ad yok"
-    no_license: "Lisans yok"
-    no_profiles: "Profil yok"
-    custom: "Özel"
-    installed: "Yüklendi"
   action:
-    play: "Oyna"
-    play_offline: "Çevrimdışı Oyna"
-    install: "Yükle"
-    update: "Güncelle"
-    import: "İçe Aktar"
-    enable_all: "Hepsini Etkinleştir"
-    disable_all: "Hepsini Devre Dışı Bırak"
-    rename: "Yeniden Adlandır"
-    delete: "Sil"
-    open_folder: "Klasörü Aç"
-    edit: "Düzenle"
-    cancel: "İptal"
-    save: "Kaydet"
-    copy_friend_code: "Arkadaş Kodunu Kopyala"
-    export: "Dışa Aktar"
-    apply: "Uygula"
-    "yes": "Evet"
-    "no": "Hayır"
-    keep: "Sakla"
-    ok: "Tamam"
-    revert: "Geri Al"
-    maybe_later: "Belki Daha Sonra"
-    browse: "Gözat"
-    view_mod: "Modu Görüntüle"
-    save_external_mii: "Mii'yi \"Benim Mii'lerim\"'e ekle"
-    duplicate: "Çoğalt"
-    back: "Geri"
-    unfavorite: "Favoriyi kaldır"
-    favorite: "Favorile"
-    view_room: "Odayı Görüntüle"
+    apply: Uygula
+    back: Geri
+    browse: Gözat
+    cancel: İptal
+    copy_friend_code: Arkadaş Kodunu Kopyala
+    delete: Sil
+    disable_all: Hepsini Devre Dışı Bırak
+    do_manually: El ile yap
+    download_and_install: İndir ve Yükle
+    duplicate: Çoğalt
+    edit: Düzenle
+    enable_all: Hepsini Etkinleştir
+    export: Dışa Aktar
+    favorite: Favorile
+    gamebanana_page: Gamebanana Sayfası
+    import: İçe Aktar
+    install: Yükle
+    keep: Sakla
+    launch_dolphin: Dolphin'i başlat
     link:
-      discord: "Bizimle İletişime Geçin!"
-      github: "Kaynak Kodu"
-      support: "Bize Destek Olun!"
-    launch_dolphin: "Dolphin'i başlat"
-    randomize: "Rastgele Seç"
-    do_manually: "El ile yap"
-    gamebanana_page: "Gamebanana Sayfası"
-    report: "Raporla"
-    un_install: "Yüklemeye Kaldır"
-    download_and_install: "İndir ve Yükle"
-    view_custom_chars: "Özel Karakterleri Görüntüle"
-    submit: "Gönder"
-  region:
-    japan: "Japonya"
-    europe: "Avrupa"
-    china: "Çin"
-    south_korea: "Güney Kore"
-    taiwan: "Tayvan"
-    america: "Amerika"
-    australia: "Avustralya"
-  list_title:
-    friends: "Arkadaşlar"
-    players: "Oyuncular"
-    rooms: "Odalar"
-    miis: "Mii'ler"
-  popup_title:
-    mod_details: "Mod Detayları"
-    mod_browser: "Mod Gezgini"
-    mii_selector: "Mii Seçici"
-    mii_editor: "Mii Düzenleyicisi"
-  text:
-    made_by_string: |-
-      Yapımcı: %{firstAuthor}
-      Ve %{secondAuthor}
-    thanks_translators: "Tüm çevirmenlere çok teşekkür ederiz:"
-    wh_wz_translation_percentage: "Bu dilin çevirileri %{percentage}% tamamlandı"
-    powered_gamebanana: "GameBanana tarafından"
-    language_translated_by: "Bu dili çevirenler: %{translators}"
+      discord: Bizimle İletişime Geçin!
+      github: Kaynak Kodu
+      support: Bize Destek Olun!
+    maybe_later: Belki Daha Sonra
+    'no': Hayır
+    ok: Tamam
+    open_folder: Klasörü Aç
+    play: Oyna
+    play_offline: Çevrimdışı Oyna
+    randomize: Rastgele Seç
+    rename: Yeniden Adlandır
+    report: Raporla
+    revert: Geri Al
+    save: Kaydet
+    save_external_mii: Mii'yi "Benim Mii'lerim"'e ekle
+    submit: Gönder
+    un_install: Yüklemeye Kaldır
+    unfavorite: Favoriyi kaldır
+    update: Güncelle
+    view_custom_chars: Özel Karakterleri Görüntüle
+    view_mod: Modu Görüntüle
+    view_room: Odayı Görüntüle
+    'yes': Evet
+  attribute:
+    average_room_vr: Ortalama KP
+    br_abbreviation: SP
+    br_full: Savaş Puanı
+    description: Açıklama
+    downloads: İndirilenler
+    enabled: Etkin
+    friend_code: Arkadaş Kodu
+    gender: Cinsiyet
+    gender_female: Kadın
+    gender_male: Erkek
+    id: ID
+    images: Resimler
+    is_online: Online
+    likes: Beğeniler
+    losses: Kayıplar
+    message: Mesaj
+    mii:
+      beard_type: Sakal Tipi
+      creator_name: Yapımcı Adı
+      default_name: Yeni Mii
+      eyebrow_type: Kaş Tipi
+      facial_feature: Yüz Özelliği
+      fav_color: En Sevdiği Renk
+      gender: Cinsiyet
+      gender_female: Kadın
+      gender_male: Erkek
+      glasses_color: Gözlük Rengi
+      glasses_type: Gözlük Tipi
+      hair_color: Saç Rengi
+      hair_type: Saç Tipi
+      head_shape: Kafa Şekli
+      height: Boy
+      horizontal_position: Yatay Konum (Sağ/Sol)
+      irish_color: Göz Rengi
+      mirror_hair: Saç Yönünü Değiştir
+      mouth_type: Ağız Tipi
+      mustache_size: Bıyık Büyüklüğü
+      mustache_type: Bıyık Tipi
+      mustache_vertical_position: Bıyık Dikey Konumu (Yukarı/Aşağı)
+      name: Mii Adı
+      nose_type: Burun Tipi
+      rotation: Çevir (Sağa/Sola Çevir)
+      size: Boyut
+      skin_color: Ten Rengi
+      space_between: Arası Boşluk
+      vertical_position: Dikey Konum (Yukarı/Aşağı)
+      width: Genişlik
+    mii_section:
+      eyebrows: Kaşlar
+      eyes: Gözler
+      face: Yüz
+      facial_hair: Sakal Bıyık
+      general: Genel
+      glasses: Gözlük
+      hair: Saç
+      lips: Dudaklar
+      mole: Ben
+      nose: Burun
+    mod_name: Modların Adı
+    name: Ad
+    player_count: Oyuncular
+    priority: Öncelik
+    races_played: Oynanan Yarışlar
+    sort_by: Sıralama Tipi
+    speed: Hız
+    status: Durum
+    status_offline: Çevrimdışı
+    status_online: Çevrimiçi
+    time_online: Çevrimiçi Süre
+    title: Başlık
+    total_games_played: Toplam oynanan oyun
+    total_games_won: Toplam kazanılan oyun
+    type: Tür
+    views: Görüntülenme
+    vr_abbreviation: KP
+    vr_full: Karşılaşma Puanı
+    wins: Galibiyetler
+  category:
+    about: Hakkında
+    general: Genel
+    other: Diğer
+    video: Video
+  empty_content:
+    no_friends: Oyunda arkadaş ekleyebilirsiniz
+    no_friends_title: Henüz arkadaş yok!
+    no_miis: Sisteminizden Mii bilgisini okuyamıyoruz. Oyunu en az bir kez başlattığınıza
+      emin olun.
+    no_miis_title: Şimdilik Mii yok!
+    no_mod_selected: Detaylarını görmek için listeden bir mod seçin
+    no_mod_selected_title: Hiçbir mod seçilmedi
+    no_mods: Modlar oyunun işleyişini değiştirebilir. İlk modunuzu içe aktarmaya başlamak
+      için aşağıdaki butona tıklayın.
+    no_mods_title: Mod bulunamadı
+    no_profiles: Profillerinizi burada görmek için oyunu en az bir kez oynamanız gerekiyor.
+    no_rooms: İnternet bağlantınız olmayabilir veya kimse oyun oynamıyor olabilir.
+    no_rooms_title: Oda bulunamadı
+  helper_note:
+    creator_name_less10: Yapımcı adı 10 karakterden kısa olması gerekiyor.
+    creator_name_less11: Yapımcı adı 11 karakterden kısa olması gerekiyor.
+    name_must_between: Adın 3 ile 10 karakter arasında olması gerekiyor.
+  helper_text:
+    30_fps: Bu ayar, oyunu 30 FPS'de çalışmaya zorlar (varsayılan 60).
+    enable_animations: Bu, Wheel Wizard uygulamasındaki animasyonları etkinleştirir.
+    end_with_exe: Yol, .exe ile bitmelidir.
+    end_with_x: 'Yol, bunlar ile bitebilir:'
+    force_disable_wiimote: Bu ayar, Wiimote'u oyun içinde devre dışı bırakır, ancak
+      Wii kanalında etkinleştirir.
+    launch_with_dolphin: Oyunun yanı sıra Dolphin'in ana penceresini de başlatacak.
+    must_set_paths: Retro Rewind'ı oynayabilmek için önce bu üç yolu ayarlamanız gerekiyor
+    optional: Opsiyonel
+    recommended: Bu ayar, takılmaları ve gecikme dalgalanmalarını azaltmak için belirli
+      Dolphin ayarlarını değiştirir.
+    resolution_scale: 1x yerel çözünürlüktür.
+    topbar:
+      location_warning: Ayarlar devre dışı, önce konum ayarlarını tamamlayın.
   hover:
-    players_online:
-      none: "Şu anda çevrimiçi oyuncu yok."
-      one: "Şu anda çevrimiçi 1 oyuncu var"
-      other: "Şu anda çevrimiçi %{count} oyuncu var"
-    rooms_online:
-      none: "Şu anda aktif oda yok"
-      one: "Şu anda 1 aktif oda var"
-      other: "Şu anda %{count} aktif oda var"
     friends_online:
-      none: "Şu anda çevrimiçi arkadaş yok"
-      one: "Şu anda çevrimiçi 1 arkadaş var"
-      other: "Şu anda çevrimiçi %{count} arkadaş var"
+      none: Şu anda çevrimiçi arkadaş yok
+      one: Şu anda çevrimiçi 1 arkadaş var
+      other: Şu anda çevrimiçi %{count} arkadaş var
+    friends_page_disclaimer: Arkadaş eklemek için onları oyunun içinde eklemeniz gerekiyor.
+    players_online:
+      none: Şu anda çevrimiçi oyuncu yok.
+      one: Şu anda çevrimiçi 1 oyuncu var
+      other: Şu anda çevrimiçi %{count} oyuncu var
+    primary_profile: Ana profil, Wheel Wizard için referans olarak kullanılır.
+    rooms_online:
+      none: Şu anda aktif oda yok
+      one: Şu anda 1 aktif oda var
+      other: Şu anda %{count} aktif oda var
     rooms_page_disclaimer: |-
       Lütfen bu sayfanın doğrudan bir odaya katılma işlevi sunmadığını unutmayın.
       Belirli bir odaya katılmak için bir arkadaşınız aracılığıyla katılmanız veya çevrimiçi sunuculara katılarak bu odaya girmeyi ummanız gerekecek.
-    friends_page_disclaimer: "Arkadaş eklemek için onları oyunun içinde eklemeniz gerekiyor."
-    primary_profile: "Ana profil, Wheel Wizard için referans olarak kullanılır."
-  empty_content:
-    no_profiles: "Profillerinizi burada görmek için oyunu en az bir kez oynamanız gerekiyor."
-    no_friends_title: "Henüz arkadaş yok!"
-    no_friends: "Oyunda arkadaş ekleyebilirsiniz"
-    no_mods: "Modlar oyunun işleyişini değiştirebilir. İlk modunuzu içe aktarmaya başlamak için aşağıdaki butona tıklayın."
-    no_mods_title: "Mod bulunamadı"
-    no_rooms: "İnternet bağlantınız olmayabilir veya kimse oyun oynamıyor olabilir."
-    no_rooms_title: "Oda bulunamadı"
-    no_miis_title: "Şimdilik Mii yok!"
-    no_miis: "Sisteminizden Mii bilgisini okuyamıyoruz. Oyunu en az bir kez başlattığınıza emin olun."
-    no_mod_selected_title: "Hiçbir mod seçilmedi"
-    no_mod_selected: "Detaylarını görmek için listeden bir mod seçin"
-  time:
-    days:
-      one: "1 gün"
-      other: "%{count} gün"
-    hours:
-      one: "1 saat"
-      other: "%{count} saat"
-    minutes:
-      one: "1 dakika"
-      other: "%{count} dakika"
-    seconds:
-      one: "1 saniye"
-      other: "%{count} saniye"
-  progress:
-    estimated_time_remaining: "Kalan Tahmini Süre:"
-    downloading_mb: "%{megabytes} MB indiriliyor"
-    installing_mods: "Modlar Yükleniyor"
-    installing_mods_count: "%{amount} modları yükleniyor"
-    processing_xof_y: "%{processed} dosyasından %{total} işleniyor..."
-    update_rr: "Retro Rewind Güncelleniyor"
-    latest_wh_wz_github: "Github sürümlerinden en son Wheel Wizard alınıyor"
-    update_wh_wz: "Wheel Wizard güncelleniyor"
-    installing_rr: "Retro Rewind Yükleniyor"
-    installing_rr_first_time: "Retro Rewind ilk kez yükleniyor"
-    installing_dolphin: "Dolphin Emulator yükleniyor"
-    this_may_take_a_while: "Bu, internetinize bağlı biraz uzun sürebilir."
-  question:
-    launch_clear_mods_found:
-      title: "Modlar bulundu"
-      extra: "Mod olmadan oyunu başlatmak üzeresiniz. My-stuff klasörünüzü temizlemek ister misiniz?"
-    sure_delete:
-      title: "%{name}'i silmek istediğinizden emin misiniz?"
-      extra: "Silmek kalıcıdır ve geri alınamaz."
-      title_miis: "%{amount} tane Mii'yi silmek istediğinize emin misiniz?"
-    apply_scale:
-      title: "Yeni ölçeği uygulamak istiyor musunuz?"
-      extra: "Bu değişiklik onaylamadığınız takdirde %{remainingTime} içinde eski haline dönecek."
-    dolphin_found:
-      title: "Dolphin Emulator Klasörü Bulundu"
-      extra: |-
-        Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz :)
-        Dolphin Emulator klasörü bulundu. Bu klasörü kullanmak ister misiniz?
-    new_version_wh_wz:
-      title: "Wheel Wizard Güncellemesi Mevcut"
-      extra: "Wheel Wizard'ın %{latestVersion} sürümü mevcut (şu anda %{currentVersion}'de). Şimdi güncellemek ister misiniz?"
-    update_admin:
-      title: "Yönetici kullanarak güncelle"
-      extra: "Bazen bir güncelleme yönetici hakları gerektirir, bu güncelleme için onları aktif etmek ister misiniz?"
-    reinstall_rr:
-      title: "Retro Rewind'ı yeniden yükle"
-      extra: "Retro Rewind'ı tekrar yüklemek istediğinize emin misiniz?"
-    old_rksys_found:
-      title: "Eski rksys.dat bulundu"
-      extra: "Eski kayıt verisi bulundu. Kullanmak ister misiniz? (önerilir)"
-    rr_to_old:
-      extra: "Retro Rewind sürümünüz güncellemeye çok eski. Retro Rewind'ı yeniden yüklemek ister misiniz?"
-      title: "Retro Rewind sürümü çok eski."
-    rr_not_determined:
-      title: "Retro Rewind İndir"
-      extra: "Retro Rewind sürümünüz belirlenemedi. Retro Rewind'ı indirmek ister misiniz?"
-    dolphin_flatpak:
-      title: "Dolphin Flatpak Yüklemesi"
-      extra: "Bilgisayarınızda Dolphin Emulator'ın Flatpak sürümü bulunamadı. Yüklememizi ister misiniz? (kendi hesabın için)"
-    install_mod:
-      title: "Modu indirip kurmak ister misiniz: %{modName}?"
-    search_mod: "Modları ara..."
-    enter_new_name:
-      title: "Yeni adı girin:"
-      extra: "Ad değiştiriliyor. (Eski ad: %{name})"
-  message_warning:
-    not_find_dolphin:
-      extra: "Dolphin Emulator bulunamadı, lütfen yolu ayarlarda belirleyin"
-    not_find_game:
-      extra: "Oyun bulunamadı, lütfen yolu ayarlarda belirleyin"
-    multiple_files_selected:
-      title: "Birden Fazla Dosya Seçildi"
-    invalid_name:
-      extra:
-        mod_name_exists: "%{modName}' adıyla zaten bir mod mevcut."
-      title: "Ada izin verilmiyor."
-    invalid_paths:
-      extra: "Lütfen tüm yolların doğru olduğundan emin olun ve tekrar deneyin."
-      title: "Geçersiz yol."
-    dolphin_not_found:
-      title: "Dolphin Emulator Klasörü Bulunamadı"
-      extra: "Dolphin Emulator klasörü otomatik olarak bulunamadı. Lütfen klasörü manuel olarak bulmayı deneyin, daha fazla bilgi için 'yardım'ı tıklayın."
-    fail_check_updates:
-      title: "Güncellemeleri kontrol etme başarısız oldu"
-      extra: "Şu an güncellemeler kontrol edilemiyor. İnternete bağlı olmayabilirsiniz veya sunucular çalışmıyor olabilir."
-    unable_update_wh_wz:
-      extra:
-        reason_network: |-
-          Wheel Wizard'ın güncel olup olmadığını kontrol edilemedi.
-          Ağ sorunları yaşıyor olabilirsiniz.
-        reason_location: |-
-          Wheel Wizard güncellenemedi. Uygulamanın erişilebilir bir klasörde bulunduğundan emin olun.
-          İstenilen klasör bulunamadı.
-      title: "Wheel Wizard güncellenemedi."
-    no_connect_server:
-      extra: "Sunucuya bağlanılamadı. Lütfen daha sonra tekrar deneyin."
-      title: "Sunucuya bağlanılamıyor."
-    cant_view_mod:
-      title: "Bu mod görüntülenemiyor"
-      extra:
-        something_else: "Seçilen modu açmaya çalışırken bir hata oluştu"
-        not_from_browser: "Mod tarayıcısından indirilmemiş modlar görüntülenemez."
-    cannot_delete_fav_mii:
-      title: "Favori Mii silinemiyor"
-      extra: "Seçilen bir ya da daha fazla Mii favori olarak ayarlanmış. Mii'ler favori iken yanlışlıkla silmeyi engellemek için silinemezler"
-    mod_name_invalid:
-      title: "Mod adı geçersiz."
-      extra: "Mod adında geçersiz karakter bulunuyor."
-    mod_name_empty:
-      title: "Mod adı boş olamaz"
-      extra: "Lütfen bir mod adı girin."
-    unable_download_mod:
-      title: "Mod indirilemedi."
-      extra: "Dosyalar bulunamadı."
-  placeholder:
-    enter_mod_name: "Mod adı girin..."
-    search_mod: "Mod arayın..."
-    enter_mii_name: "Mii adı girin..."
-    enter_text_here: "Metni buraya girin..."
-    search_for_players: "Oyuncuları Ara..."
-    enter_path: "İstenen yolu buraya girin..."
+  list_title:
+    friends: Arkadaşlar
+    miis: Mii'ler
+    players: Oyuncular
+    rooms: Odalar
   message_error:
-    no_mod_folder:
-      extra: "Mod klasörü mevcut değil"
     abort_rr:
       extra:
-        failed_update_delete: "Güncelleme dosyalarını silmek başarısız oldu. İşlem iptal ediliyor."
-        failed_update_apply: "Güncellemeyi uygulamak başarısız oldu. İşlem iptal ediliyor."
+        failed_update_apply: Güncellemeyi uygulamak başarısız oldu. İşlem iptal ediliyor.
+        failed_update_delete: Güncelleme dosyalarını silmek başarısız oldu. İşlem
+          iptal ediliyor.
         invalid_file_path: |-
           Yanlış dosya yolu tespit edildi. Lütfen geliştiricilere bildirin.
           Sunucu hatası: %{error}
-      title: "Retro Rewind güncellemesi iptal ediliyor"
-    restart_admin_fail:
-      extra: "Yöneticilik haklarıyla yeniden başlatılamadı."
-    generic_error:
-      title: "Bir hata oluştu"
-    failed_create_mii_db:
-      title: "Mii Veritabanı oluşturulamadı"
-    failed_change_name:
-      title: "Ad değiştirme başarısız"
+      title: Retro Rewind güncellemesi iptal ediliyor
     failed_change_mii:
-      title: "Mii değiştirme başarısız"
+      title: Mii değiştirme başarısız
+    failed_change_name:
+      title: Ad değiştirme başarısız
+    failed_create_mii_db:
+      title: Mii Veritabanı oluşturulamadı
     failed_install_dolphin:
-      title: "Dolphin yüklemesi başarısız oldu."
-      extra: "Dolphin Emulator yüklemesi başarısız oldu. Lütfen manuel bir şekilde Flatpak Dolphin'i yüklemeyi deneyin."
+      extra: Dolphin Emulator yüklemesi başarısız oldu. Lütfen manuel bir şekilde
+        Flatpak Dolphin'i yüklemeyi deneyin.
+      title: Dolphin yüklemesi başarısız oldu.
     failed_retrieve_mod:
-      title: "Mod bilgisi alınamadı."
+      title: Mod bilgisi alınamadı.
+    generic_error:
+      title: Bir hata oluştu
     mod_download_fail:
-      title: "Mod indirmesi başarısız oldu."
-      extra: "İndirme sırasında bir hata oluştu: %{error}"
+      extra: 'İndirme sırasında bir hata oluştu: %{error}'
+      title: Mod indirmesi başarısız oldu.
+    no_mod_folder:
+      extra: Mod klasörü mevcut değil
+    restart_admin_fail:
+      extra: Yöneticilik haklarıyla yeniden başlatılamadı.
   message_success:
-    settings_saved:
-      title: "Ayarlar başarıyla kaydedildi!"
+    mii_changed: Mii başarıyla değiştirildi
     rr_up_to_date:
-      title: "Retro Rewind güncel."
-    mii_changed: "Mii başarıyla değiştirildi"
-  snackbar_warning:
-    cant_save_mii: "Mii kaydedilemiyor."
-    no_mii_export: "Aktarılıcak Mii bulunamadı"
-    no_mii_delete: "Silinecek Mii bulunamadı."
+      title: Retro Rewind güncel.
+    settings_saved:
+      title: Ayarlar başarıyla kaydedildi!
+  message_warning:
+    cannot_delete_fav_mii:
+      extra: Seçilen bir ya da daha fazla Mii favori olarak ayarlanmış. Mii'ler favori
+        iken yanlışlıkla silmeyi engellemek için silinemezler
+      title: Favori Mii silinemiyor
+    cant_view_mod:
+      extra:
+        not_from_browser: Mod tarayıcısından indirilmemiş modlar görüntülenemez.
+        something_else: Seçilen modu açmaya çalışırken bir hata oluştu
+      title: Bu mod görüntülenemiyor
+    dolphin_not_found:
+      extra: Dolphin Emulator klasörü otomatik olarak bulunamadı. Lütfen klasörü manuel
+        olarak bulmayı deneyin, daha fazla bilgi için 'yardım'ı tıklayın.
+      title: Dolphin Emulator Klasörü Bulunamadı
+    fail_check_updates:
+      extra: Şu an güncellemeler kontrol edilemiyor. İnternete bağlı olmayabilirsiniz
+        veya sunucular çalışmıyor olabilir.
+      title: Güncellemeleri kontrol etme başarısız oldu
+    invalid_name:
+      extra:
+        mod_name_exists: "%{modName}' adıyla zaten bir mod mevcut."
+      title: Ada izin verilmiyor.
+    invalid_paths:
+      extra: Lütfen tüm yolların doğru olduğundan emin olun ve tekrar deneyin.
+      title: Geçersiz yol.
+    mod_name_empty:
+      extra: Lütfen bir mod adı girin.
+      title: Mod adı boş olamaz
+    mod_name_invalid:
+      extra: Mod adında geçersiz karakter bulunuyor.
+      title: Mod adı geçersiz.
+    multiple_files_selected:
+      title: Birden Fazla Dosya Seçildi
+    no_connect_server:
+      extra: Sunucuya bağlanılamadı. Lütfen daha sonra tekrar deneyin.
+      title: Sunucuya bağlanılamıyor.
+    not_find_dolphin:
+      extra: Dolphin Emulator bulunamadı, lütfen yolu ayarlarda belirleyin
+    not_find_game:
+      extra: Oyun bulunamadı, lütfen yolu ayarlarda belirleyin
+    unable_download_mod:
+      extra: Dosyalar bulunamadı.
+      title: Mod indirilemedi.
+    unable_update_wh_wz:
+      extra:
+        reason_location: |-
+          Wheel Wizard güncellenemedi. Uygulamanın erişilebilir bir klasörde bulunduğundan emin olun.
+          İstenilen klasör bulunamadı.
+        reason_network: |-
+          Wheel Wizard'ın güncel olup olmadığını kontrol edilemedi.
+          Ağ sorunları yaşıyor olabilirsiniz.
+      title: Wheel Wizard güncellenemedi.
+  option:
+    dolphin_emulator_exe: Dolphin Emulator yürütülebilir dosyası
+    dolphin_user_path: Dolphin Kullanıcı Klasörü
+    enable_animations: Animasyonları Etkinleştir
+    force_disable_wiimote: Wiimote'u Zorla Devre Dışı Bırak
+    launch_with_dolphin: Dolphin Penceresi ile Oyunu Başlat
+    make_primary: Birincil Yap
+    mario_kart_game: Mario Kart Wii Oyun Dosyası
+    open_config: Yapılandırma Klasörü
+    open_game_folder: Oyun Klasörünü Aç
+    open_save_folder: Kayıt Klasörünü Aç
+    recommended: Tavsiye Edilen Ayarlar
+    reinstall: Retro Rewind'ı Tekrar Kur
+    renderer: Render
+    show_fps: FPS Göster
+    v_sync: VSync
+    wh_wz_language: Wheel Wizard Dili
+    window_scale: Pencere Ölçeği
+  page_title:
+    friends: Arkadaşlar
+    home: Anasayfa
+    mods: My Stuff
+    my_miis: Benim Mii'lerim
+    my_profiles: Profillerim
+    room_details: Oda Detayları
+    rooms: Odalar
+    settings: Ayarlar
+  placeholder:
+    enter_mii_name: Mii adı girin...
+    enter_mod_name: Mod adı girin...
+    enter_path: İstenen yolu buraya girin...
+    enter_text_here: Metni buraya girin...
+    search_for_players: Oyuncuları Ara...
+    search_mod: Mod arayın...
+  popup_title:
+    mii_editor: Mii Düzenleyicisi
+    mii_selector: Mii Seçici
+    mod_browser: Mod Gezgini
+    mod_details: Mod Detayları
+  progress:
+    downloading_mb: "%{megabytes} MB indiriliyor"
+    estimated_time_remaining: 'Kalan Tahmini Süre:'
+    installing_dolphin: Dolphin Emulator yükleniyor
+    installing_mods: Modlar Yükleniyor
+    installing_mods_count: "%{amount} modları yükleniyor"
+    installing_rr: Retro Rewind Yükleniyor
+    installing_rr_first_time: Retro Rewind ilk kez yükleniyor
+    latest_wh_wz_github: Github sürümlerinden en son Wheel Wizard alınıyor
+    processing_xof_y: "%{processed} dosyasından %{total} işleniyor..."
+    this_may_take_a_while: Bu, internetinize bağlı biraz uzun sürebilir.
+    update_rr: Retro Rewind Güncelleniyor
+    update_wh_wz: Wheel Wizard güncelleniyor
+  question:
+    apply_scale:
+      extra: Bu değişiklik onaylamadığınız takdirde %{remainingTime} içinde eski haline
+        dönecek.
+      title: Yeni ölçeği uygulamak istiyor musunuz?
+    dolphin_flatpak:
+      extra: Bilgisayarınızda Dolphin Emulator'ın Flatpak sürümü bulunamadı. Yüklememizi
+        ister misiniz? (kendi hesabın için)
+      title: Dolphin Flatpak Yüklemesi
+    dolphin_found:
+      extra: |-
+        Eğer bunların ne anlama geldiğini bilmiyorsanız, evet diyebilirsiniz :)
+        Dolphin Emulator klasörü bulundu. Bu klasörü kullanmak ister misiniz?
+      title: Dolphin Emulator Klasörü Bulundu
+    enter_new_name:
+      extra: 'Ad değiştiriliyor. (Eski ad: %{name})'
+      title: 'Yeni adı girin:'
+    install_mod:
+      title: 'Modu indirip kurmak ister misiniz: %{modName}?'
+    launch_clear_mods_found:
+      extra: Mod olmadan oyunu başlatmak üzeresiniz. My-stuff klasörünüzü temizlemek
+        ister misiniz?
+      title: Modlar bulundu
+    new_version_wh_wz:
+      extra: Wheel Wizard'ın %{latestVersion} sürümü mevcut (şu anda %{currentVersion}'de).
+        Şimdi güncellemek ister misiniz?
+      title: Wheel Wizard Güncellemesi Mevcut
+    old_rksys_found:
+      extra: Eski kayıt verisi bulundu. Kullanmak ister misiniz? (önerilir)
+      title: Eski rksys.dat bulundu
+    reinstall_rr:
+      extra: Retro Rewind'ı tekrar yüklemek istediğinize emin misiniz?
+      title: Retro Rewind'ı yeniden yükle
+    rr_not_determined:
+      extra: Retro Rewind sürümünüz belirlenemedi. Retro Rewind'ı indirmek ister misiniz?
+      title: Retro Rewind İndir
+    rr_to_old:
+      extra: Retro Rewind sürümünüz güncellemeye çok eski. Retro Rewind'ı yeniden
+        yüklemek ister misiniz?
+      title: Retro Rewind sürümü çok eski.
+    search_mod: Modları ara...
+    sure_delete:
+      extra: Silmek kalıcıdır ve geri alınamaz.
+      title: "%{name}'i silmek istediğinizden emin misiniz?"
+      title_miis: "%{amount} tane Mii'yi silmek istediğinize emin misiniz?"
+    update_admin:
+      extra: Bazen bir güncelleme yönetici hakları gerektirir, bu güncelleme için
+        onları aktif etmek ister misiniz?
+      title: Yönetici kullanarak güncelle
+  region:
+    america: Amerika
+    australia: Avustralya
+    china: Çin
+    europe: Avrupa
+    japan: Japonya
+    south_korea: Güney Kore
+    taiwan: Tayvan
+  section:
+    general: Genel
+    graphics: Grafik
+    installation: Kurulum
+    language: Dil
+    location_paths: Konum Ayarları
+    performance: Performans Ayarları
+    renderer: Render Ayarları
+    resolution: Çözünürlük
+    wh_wz_appearance: Wheel Wizard görünümü
+    wii: Wii Ayarları
+  snackbar_error:
+    mii_failure_create: Mii '%{error}' oluşturulamadı.
+    mii_failure_deserialize: Mii '%{error}' işlenemedi.
+    mii_failure_duplicate: Mii '%{error}' çoğaltılamadı.
+    mii_failure_get: Mii '%{error}' alınamadı.
+    mii_failure_save: Mii '%{error}' kaydedilemedi.
+    mii_failure_serialize: Mii '%{error}' işlenemedi.
+    mii_failure_update: Mii '%{error}' güncellenemedi.
   snackbar_success:
-    mii_added: "Mii, Mii'lerinize eklendi."
-    copied_fc: "Arkadaş kodu panoya kopyalandı."
-    name_change: "Ad, başarıyla yeni ada değiştirildi. '%{name}'"
-    saved_mii: "Mii '%{name}' '%{fileName}' dosyasına kaydedildi."
-    deleted: "%{name}' silindi."
-    deleted_miis: "%{amount}' Mii silindi"
+    copied_fc: Arkadaş kodu panoya kopyalandı.
     created_duplicate: "%{name}' nin kopyası oluşturuldu."
     created_duplicates_miis: "%{amount}' Mii kopyası oluşturuldu."
-    profile_set_primary: "Profil birincil olarak ayarlandı."
-  snackbar_error:
-    mii_failure_deserialize: "Mii '%{error}' işlenemedi."
-    mii_failure_update: "Mii '%{error}' güncellenemedi."
-    mii_failure_save: "Mii '%{error}' kaydedilemedi."
-    mii_failure_get: "Mii '%{error}' alınamadı."
-    mii_failure_serialize: "Mii '%{error}' işlenemedi."
-    mii_failure_create: "Mii '%{error}' oluşturulamadı."
-    mii_failure_duplicate: "Mii '%{error}' çoğaltılamadı."
-  helper_note:
-    name_must_between: "Adın 3 ile 10 karakter arasında olması gerekiyor."
-    creator_name_less11: "Yapımcı adı 11 karakterden kısa olması gerekiyor."
-    creator_name_less10: "Yapımcı adı 10 karakterden kısa olması gerekiyor."
-  option:
-    wh_wz_language: "Wheel Wizard Dili"
-    force_disable_wiimote: "Wiimote'u Zorla Devre Dışı Bırak"
-    launch_with_dolphin: "Dolphin Penceresi ile Oyunu Başlat"
-    v_sync: "VSync"
-    recommended: "Tavsiye Edilen Ayarlar"
-    show_fps: "FPS Göster"
-    renderer: "Render"
-    window_scale: "Pencere Ölçeği"
-    open_config: "Yapılandırma Klasörü"
-    dolphin_user_path: "Dolphin Kullanıcı Klasörü"
-    mario_kart_game: "Mario Kart Wii Oyun Dosyası"
-    dolphin_emulator_exe: "Dolphin Emulator yürütülebilir dosyası"
-    make_primary: "Birincil Yap"
-    enable_animations: "Animasyonları Etkinleştir"
-    reinstall: "Retro Rewind'ı Tekrar Kur"
-    open_game_folder: "Oyun Klasörünü Aç"
-    open_save_folder: "Kayıt Klasörünü Aç"
-  section:
-    graphics: "Grafik"
-    general: "Genel"
-    language: "Dil"
-    wii: "Wii Ayarları"
-    resolution: "Çözünürlük"
-    performance: "Performans Ayarları"
-    renderer: "Render Ayarları"
-    location_paths: "Konum Ayarları"
-    wh_wz_appearance: "Wheel Wizard görünümü"
-    installation: "Kurulum"
-  helper_text:
-    topbar:
-      location_warning: "Ayarlar devre dışı, önce konum ayarlarını tamamlayın."
-    launch_with_dolphin: "Oyunun yanı sıra Dolphin'in ana penceresini de başlatacak."
-    force_disable_wiimote: "Bu ayar, Wiimote'u oyun içinde devre dışı bırakır, ancak Wii kanalında etkinleştirir."
-    resolution_scale: "1x yerel çözünürlüktür."
-    recommended: "Bu ayar, takılmaları ve gecikme dalgalanmalarını azaltmak için belirli Dolphin ayarlarını değiştirir."
-    30_fps: "Bu ayar, oyunu 30 FPS'de çalışmaya zorlar (varsayılan 60)."
-    end_with_exe: "Yol, .exe ile bitmelidir."
-    enable_animations: "Bu, Wheel Wizard uygulamasındaki animasyonları etkinleştirir."
-    end_with_x: "Yol, bunlar ile bitebilir:"
-    optional: "Opsiyonel"
-    must_set_paths: "Retro Rewind'ı oynayabilmek için önce bu üç yolu ayarlamanız gerekiyor"
-  category:
-    about: "Hakkında"
-    other: "Diğer"
-    general: "Genel"
-    video: "Video"
+    deleted: "%{name}' silindi."
+    deleted_miis: "%{amount}' Mii silindi"
+    mii_added: Mii, Mii'lerinize eklendi.
+    name_change: Ad, başarıyla yeni ada değiştirildi. '%{name}'
+    profile_set_primary: Profil birincil olarak ayarlandı.
+    saved_mii: Mii '%{name}' '%{fileName}' dosyasına kaydedildi.
+  snackbar_warning:
+    cant_save_mii: Mii kaydedilemiyor.
+    no_mii_delete: Silinecek Mii bulunamadı.
+    no_mii_export: Aktarılıcak Mii bulunamadı
+  state:
+    config_not_finished: Yapılandırma Tamamlanmadı
+    custom: Özel
+    error: Hata
+    extracting: Dosyalar Çıkartılıyor...
+    installed: Yüklendi
+    installing: Yükleniyor...
+    loading: Yükleniyor...
+    no_license: Lisans yok
+    no_name: Ad yok
+    no_profiles: Profil yok
+    no_server: Sunucu Yok
+    success: Başarı
+    unknown: Bilinmiyor
+    updating: Güncelleniyor...
+    warning: Uyarı
+  text:
+    language_translated_by: 'Bu dili çevirenler: %{translators}'
+    made_by_string: |-
+      Yapımcı: %{firstAuthor}
+      Ve %{secondAuthor}
+    powered_gamebanana: GameBanana tarafından
+    thanks_translators: 'Tüm çevirmenlere çok teşekkür ederiz:'
+    wh_wz_translation_percentage: Bu dilin çevirileri %{percentage}% tamamlandı
+  time:
+    days:
+      one: 1 gün
+      other: "%{count} gün"
+    hours:
+      one: 1 saat
+      other: "%{count} saat"
+    minutes:
+      one: 1 dakika
+      other: "%{count} dakika"
+    seconds:
+      one: 1 saniye
+      other: "%{count} saniye"
   value:
     language:
-      france: "Fransızca"
-      dutch: "Hollandaca"
-      english: "İngilizce"
-      german: "Almanca"
-      italian: "İtalyanca"
-      japanese: "Japonca"
-      turkish: "Türkçe"
-      spanish: "İspanyolca"
-      finnish: "Fince"
-      korean: "Korece"
-      russian: "Rusça"
-      arabic: "Arapça"
-      czech: "Çekçe"
-      norwegian: "Norveççe"
-      chinese: "Çince"
-      portuguese: "Portekizce"
-      z_translators: "wrkus, Weebo"
+      arabic: Arapça
+      chinese: Çince
+      czech: Çekçe
+      dutch: Hollandaca
+      english: İngilizce
+      finnish: Fince
+      france: Fransızca
+      german: Almanca
+      italian: İtalyanca
+      japanese: Japonca
+      korean: Korece
+      norwegian: Norveççe
+      portuguese: Portekizce
+      russian: Rusça
+      spanish: İspanyolca
+      turkish: Türkçe
+      z_translators: wrkus, Weebo
