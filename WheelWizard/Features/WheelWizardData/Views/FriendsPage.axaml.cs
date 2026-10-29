@@ -36,6 +36,8 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
 
     private LiveRoomsService LiveRooms { get; }
 
+    private IRrLeaderboardSingletonService Leaderboard { get; }
+
     private IGameLicenseSingletonService GameLicenseService { get; }
 
     private IMiiDbService MiiDbService { get; }
@@ -98,6 +100,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         IModalFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
+        IRrLeaderboardSingletonService leaderboard,
         IGameLicenseSingletonService gameLicenseService,
         IMiiDbService miiDbService,
         ISettingsManager settingsService
@@ -106,6 +109,7 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
         Popups = popups;
         Navigation = navigation;
         LiveRooms = liveRooms;
+        Leaderboard = leaderboard;
         GameLicenseService = gameLicenseService;
         MiiDbService = miiDbService;
         SettingsService = settingsService;
@@ -133,6 +137,49 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
     private bool _addingCards;
 
     private void UpdateFriendList()
+    {
+        var ratings = LoadRatingsAsync(GameLicenseService.ActiveCurrentFriends);
+        ShowFriendList();
+        // Sort again once the missing ratings are loaded
+        if (!ratings.IsCompleted)
+            ratings.ContinueWith(_ => Dispatcher.UIThread.Post(ShowFriendList));
+    }
+
+    /// <summary>
+    /// rksys.dat only has a friend's VR to the hundred, as of the last time the game saw them. Online friends get their
+    /// exact VR from their live room, the others from the RWFC player data.
+    /// </summary>
+    private Task LoadRatingsAsync(List<FriendProfile> friends)
+    {
+        var lookups = new List<Task>();
+        foreach (var friend in friends)
+        {
+            if (LiveVr(friend) is { } liveVr)
+                friend.Vr = liveVr;
+            else
+                lookups.Add(LoadVrAsync(friend));
+        }
+        return Task.WhenAll(lookups);
+    }
+
+    private async Task LoadVrAsync(FriendProfile friend)
+    {
+        var player = await Leaderboard.GetPlayerAsync(friend.FriendCode);
+        // The friend may have come online while loading, their live VR is newer then
+        if (LiveVr(friend) is { } liveVr)
+            friend.Vr = liveVr;
+        else if (player.IsSuccess && player.Value.Vr > 0)
+            friend.Vr = (uint)player.Value.Vr;
+    }
+
+    private uint? LiveVr(FriendProfile friend) =>
+        (uint?)
+            LiveRooms
+                .CurrentRooms.SelectMany(room => room.Players)
+                .FirstOrDefault(player => player.FriendCode == friend.FriendCode && player.Vr > 0)
+                ?.Vr;
+
+    private void ShowFriendList()
     {
         _friends = GetSortedPlayerList();
         ApplyFriendList(Math.Max(FriendList.Count, CardsAtOnce));
