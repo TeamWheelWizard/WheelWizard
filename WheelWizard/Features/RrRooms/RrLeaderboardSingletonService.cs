@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using WheelWizard.Models;
 using WheelWizard.Shared.Services;
 
 namespace WheelWizard.RrRooms;
@@ -7,6 +8,9 @@ namespace WheelWizard.RrRooms;
 public interface IRrLeaderboardSingletonService
 {
     Task<OperationResult<List<RwfcLeaderboardEntry>>> GetTopPlayersAsync(int limit = 50);
+
+    /// <summary>A player's leaderboard data, cached for a few minutes (failures too, so they are not retried on every call).</summary>
+    Task<OperationResult<PlayerProfileResponse>> GetPlayerAsync(string friendCode);
 }
 
 public class RrLeaderboardSingletonService(
@@ -18,6 +22,7 @@ public class RrLeaderboardSingletonService(
     private const string FreshCacheKey = "rrrooms:leaderboard:fresh";
     private const string StaleCacheKey = "rrrooms:leaderboard:stale";
     private static readonly TimeSpan CacheLifetime = TimeSpan.FromSeconds(90);
+    private static readonly TimeSpan PlayerCacheLifetime = TimeSpan.FromMinutes(5);
 
     public async Task<OperationResult<List<RwfcLeaderboardEntry>>> GetTopPlayersAsync(int limit = 50)
     {
@@ -43,6 +48,17 @@ public class RrLeaderboardSingletonService(
 
         return TrimToLimit(fetchedEntries, boundedLimit);
     }
+
+    // The request itself is cached, so asking for a player that is still loading does not fetch it again.
+    public Task<OperationResult<PlayerProfileResponse>> GetPlayerAsync(string friendCode) =>
+        cache.GetOrCreate(
+            $"rrrooms:player:{friendCode}",
+            entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = PlayerCacheLifetime;
+                return apiCaller.CallApiAsync(api => api.GetPlayerProfileAsync(friendCode));
+            }
+        )!;
 
     private bool TryGetCached(string cacheKey, int limit, out OperationResult<List<RwfcLeaderboardEntry>> result)
     {
