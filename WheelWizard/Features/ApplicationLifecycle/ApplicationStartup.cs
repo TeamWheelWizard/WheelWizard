@@ -3,8 +3,8 @@ using WheelWizard.AutoUpdating;
 using WheelWizard.GameBanana.InstallRequests;
 using WheelWizard.Launching;
 using WheelWizard.Mods;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
-using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.ApplicationLifecycle;
 
@@ -17,7 +17,7 @@ public sealed class ApplicationStartup(
     IModManager mods,
     IModInstallRequestHandler installRequests,
     IAutoUpdaterSingletonService updates,
-    IWhWzDataSingletonService badges,
+    IRrBadgeSingletonService badges,
     IApplicationLiveUpdates liveUpdates,
     ISettingsManager settings,
     IRetroRewindLaunchService launch,

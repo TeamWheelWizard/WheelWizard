@@ -17,7 +17,7 @@
             <!-- WHWZ DEVS -->
             <Border Classes="AboutBlockStyle" Margin="0,10,0,0">
                 <Grid ColumnDefinitions="60,*">
-                    <communityControls:CommunityBadge Variant="WhWzDev" VerticalAlignment="Center" HorizontalAlignment="Left"
+                    <communityControls:CommunityBadge Variant="WheelWizardDeveloper" VerticalAlignment="Center" HorizontalAlignment="Left"
                                       Width="38" Height="38" Margin="1,0,0,0"/>
                     <Border Grid.Column="0" Classes="AboutBlockLineStyle" HorizontalAlignment="Right"/>
 
@@ -33,7 +33,7 @@
             <!-- RR dEVS -->
             <Border Classes="AboutBlockStyle" Margin="0,10,0,0">
                 <Grid ColumnDefinitions="60,*">
-                    <communityControls:CommunityBadge Variant="RrDev" VerticalAlignment="Center" HorizontalAlignment="Left"
+                    <communityControls:CommunityBadge Variant="RetroRewindDeveloper" VerticalAlignment="Center" HorizontalAlignment="Left"
                                       Width="38" Height="38" Margin="1,0,0,0"/>
                     <Border Grid.Column="0" Classes="AboutBlockLineStyle" HorizontalAlignment="Right"/>
 

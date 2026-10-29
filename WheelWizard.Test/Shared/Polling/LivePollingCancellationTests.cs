@@ -27,7 +27,7 @@ public class LivePollingCancellationTests
         var completion = new TaskCompletionSource<OperationResult<List<RwfcRoomStatusRoom>>>();
         rooms.GetRoomsAsync().Returns(completion.Task);
         using var service = new LiveRoomsService(
-            Substitute.For<IWhWzDataSingletonService>(),
+            Substitute.For<IRrBadgeSingletonService>(),
             rooms,
             rankings,
             licenses,

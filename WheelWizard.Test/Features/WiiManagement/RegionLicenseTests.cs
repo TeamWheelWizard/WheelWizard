@@ -8,7 +8,6 @@ using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Binary;
 using WheelWizard.Shared.Polling;
-using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 
@@ -78,7 +77,7 @@ public class RegionLicenseTests
         var service = new GameLicenseSingletonService(
             miis,
             fs,
-            Substitute.For<IWhWzDataSingletonService>(),
+            Substitute.For<IRrBadgeSingletonService>(),
             Substitute.For<IRrRatingReader>(),
             settings,
             Substitute.For<ISaveRegionService>(),

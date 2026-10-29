@@ -16,7 +16,6 @@ using WheelWizard.Shared.Calendar;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Navigation;
-using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WheelWizardData.Views.Dialogs;
 using WheelWizard.WiiManagement.FriendCodes;
@@ -35,7 +34,7 @@ public sealed record LeaderboardPlayerItem
     public required string VrText { get; init; }
     public Mii? Mii { get; init; }
     public BadgeVariant[] BadgeVariants { get; init; } = [];
-    public BadgeVariant PrimaryBadge { get; init; }
+    public BadgeVariant PrimaryBadge { get; init; } = BadgeVariant.None;
     public bool HasBadge { get; init; }
     public bool IsSuspicious { get; init; }
     public bool IsEvenRow { get; init; }
@@ -81,7 +80,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 
     private IRrLeaderboardSingletonService LeaderboardService { get; }
 
-    private IWhWzDataSingletonService BadgeService { get; }
+    private IRrBadgeSingletonService BadgeService { get; }
 
     private IGameLicenseSingletonService GameDataService { get; }
 
@@ -188,7 +187,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IRrLeaderboardSingletonService leaderboardService,
-        IWhWzDataSingletonService badgeService,
+        IRrBadgeSingletonService badgeService,
         IGameLicenseSingletonService gameDataService,
         ISettingsManager settingsManager,
         IMiiNativeRenderer miiRenderer,

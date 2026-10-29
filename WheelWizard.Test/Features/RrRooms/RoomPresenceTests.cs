@@ -5,7 +5,6 @@ using WheelWizard.Dolphin.Paths;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Polling;
-using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
@@ -34,7 +33,7 @@ public class RoomPresenceTests
         var service = new GameLicenseSingletonService(
             Substitute.For<IMiiDbService>(),
             Substitute.For<IFileSystem>(),
-            Substitute.For<IWhWzDataSingletonService>(),
+            Substitute.For<IRrBadgeSingletonService>(),
             Substitute.For<IRrRatingReader>(),
             Substitute.For<ISettingsManager>(),
             Substitute.For<ISaveRegionService>(),
@@ -104,7 +103,7 @@ public class RoomPresenceTests
         leaderboard.GetTopPlayersAsync(50).Returns(Ok(new List<RwfcLeaderboardEntry>()));
         var licenses = Substitute.For<IGameLicenseSingletonService>();
         licenses.ActiveCurrentFriends.Returns([]);
-        var service = new TestRooms(Substitute.For<IWhWzDataSingletonService>(), rooms, leaderboard, licenses, presence);
+        var service = new TestRooms(Substitute.For<IRrBadgeSingletonService>(), rooms, leaderboard, licenses, presence);
         rooms
             .GetRoomsAsync()
             .Returns(
@@ -136,7 +135,7 @@ public class RoomPresenceTests
     }
 
     private sealed class TestRooms(
-        IWhWzDataSingletonService data,
+        IRrBadgeSingletonService data,
         IRrRoomsSingletonService rooms,
         IRrLeaderboardSingletonService leaderboard,
         IGameLicenseSingletonService licenses,

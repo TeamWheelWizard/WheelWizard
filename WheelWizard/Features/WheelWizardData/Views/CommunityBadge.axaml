@@ -4,49 +4,54 @@
         xmlns:communityControls="clr-namespace:WheelWizard.WheelWizardData.Views">
     <Design.PreviewWith>
         <Border Padding="2" Background="{StaticResource Neutral950}">
-            <UniformGrid Columns="4">
+            <UniformGrid Columns="5">
                 <!-- Just so you know, the border is not necessary, its just here to also show the bounding box-->
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="WhWzDev" />
+                    <communityControls:CommunityBadge Variant="RetroRewindDeveloper" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="RrDev" />
+                    <communityControls:CommunityBadge Variant="WheelWizardDeveloper" />
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <communityControls:CommunityBadge Variant="MajorContributor" />
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <communityControls:CommunityBadge Variant="RWFCModerator" />
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <communityControls:CommunityBadge Variant="DiscordStaff" />
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <communityControls:CommunityBadge Variant="Contributor" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
                     <communityControls:CommunityBadge Variant="Translator" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="TranslatorLead" />
+                    <communityControls:CommunityBadge Variant="Supporter" />
+                </Border>
+                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
+                    <communityControls:CommunityBadge Variant="BetaTester" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
                     <communityControls:CommunityBadge Variant="Heart" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="Firestarter_GoldWinner" />
+                    <communityControls:CommunityBadge Variant="FireStarterGold" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="Firestarter_SilverWinner" />
+                    <communityControls:CommunityBadge Variant="FireStarterSilver" />
                 </Border>
                 <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="Firestarter_BronzeWinner" />
-                </Border>
-
-                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="SummitShowdown_GoldWinner" />
-                </Border>
-                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="SummitShowdown_SilverWinner" />
-                </Border>
-                <Border Width="31" Height="31" Margin="5" CornerRadius="999" Background="{StaticResource Neutral900}">
-                    <communityControls:CommunityBadge Variant="SummitShowdown_BronzeWinner" />
+                    <communityControls:CommunityBadge Variant="FireStarterBronze" />
                 </Border>
             </UniformGrid>
         </Border>
     </Design.PreviewWith>
 
 
-    <!-- 
-    IMPORTANT: 
+    <!--
+    IMPORTANT:
         No actual pixel values are allowed to be used. So any positioning should be done through:
         - Grids, and then specifically a grid with ratio based layouts
         - Scale transforms
@@ -63,6 +68,11 @@
             </ControlTemplate>
         </Setter>
 
+        <!-- Rounding each ratio column to whole pixels shifts the circles and icons off-centre at small sizes -->
+        <Style Selector="^ /template/ :is(Control)">
+            <Setter Property="UseLayoutRounding" Value="False" />
+        </Style>
+
         <Style Selector="^ /template/ Grid">
             <Setter Property="ToolTip.Tip" Value="{TemplateBinding HoverTip}" />
             <Setter Property="ToolTip.Placement" Value="Top" />
@@ -70,7 +80,7 @@
         </Style>
     </Style>
 
-    <Style Selector="communityControls|CommunityBadge[Variant=WhWzDev]">
+    <Style Selector="communityControls|CommunityBadge[Variant=WheelWizardDeveloper]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
@@ -89,7 +99,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="communityControls|CommunityBadge[Variant=RrDev]">
+    <Style Selector="communityControls|CommunityBadge[Variant=RetroRewindDeveloper]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
@@ -108,32 +118,93 @@
         </Setter>
     </Style>
 
-    <Style Selector="communityControls|CommunityBadge[Variant=TranslatorLead]">
+    <Style Selector="communityControls|CommunityBadge[Variant=MajorContributor]">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
                     <Border Grid.Row="0" Grid.Column="0"
                             Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
-                            Background="#FFC7FB" />
+                            Background="#C9F7D8" />
 
                     <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
-                            Background="#CB01AE" />
+                            Background="#1E9E52" />
 
-                    <Grid Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2"
-                          RowDefinitions="5.5*,3*,0*" ColumnDefinitions="0.6*,5*,4*">
-                        <Path Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                              Fill="#550C48" Data="{StaticResource StarIcon}"
-                              Stretch="Uniform" />
-                    </Grid>
+                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="#083A1C" Data="{StaticResource StarIcon}"
+                          Stretch="Uniform">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+                        </Path.RenderTransform>
+                    </Path>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 
-                    <Grid Grid.Column="2" Grid.Row="2"
-                          RowDefinitions="0*,10*,1*" ColumnDefinitions="1*,10*,0*">
-                        <Path Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                              Fill="#550C48" Data="{StaticResource Translation}"
-                              Stretch="Uniform" />
-                    </Grid>
+    <Style Selector="communityControls|CommunityBadge[Variant=RWFCModerator]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
+                            Background="{StaticResource Danger100}" />
 
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="{StaticResource Danger500}" />
 
+                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="{StaticResource Danger900}" Data="{StaticResource Shield}"
+                          Stretch="Uniform">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="0.7" ScaleY="0.7" />
+                        </Path.RenderTransform>
+                    </Path>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="communityControls|CommunityBadge[Variant=DiscordStaff]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
+                            Background="#DCDFFD" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="#5865F2" />
+
+                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="#1C2160" Data="{StaticResource DiscordIcon}"
+                          Stretch="Uniform">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="0.9" ScaleY="0.9" />
+                        </Path.RenderTransform>
+                    </Path>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="communityControls|CommunityBadge[Variant=Contributor]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
+                            Background="#C9F7D8" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="#1E9E52" />
+
+                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="#083A1C" Data="{StaticResource CubesStacked}"
+                          Stretch="Uniform">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+                        </Path.RenderTransform>
+                    </Path>
                 </Grid>
             </ControlTemplate>
         </Setter>
@@ -153,6 +224,52 @@
                     <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                           Fill="#400C55" Data="{StaticResource Translation}"
                           Stretch="Uniform" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="communityControls|CommunityBadge[Variant=Supporter]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
+                            Background="#FFE0C2" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="#E07B39" />
+
+                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="#4A2209" Data="{StaticResource CoffeeIcon}"
+                          Stretch="Uniform">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="0.8" ScaleY="0.8" />
+                        </Path.RenderTransform>
+                    </Path>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="communityControls|CommunityBadge[Variant=BetaTester]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*,1*,10*,1*,1*" ColumnDefinitions="1*,1*,10*,1*,1*">
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Grid.ColumnSpan="999" Grid.RowSpan="999" CornerRadius="999"
+                            Background="#C4F2EE" />
+
+                    <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" CornerRadius="999"
+                            Background="#139C93" />
+
+                    <Path Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Fill="#063936" Data="{StaticResource Flask}"
+                          Stretch="Uniform">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="0.7" ScaleY="0.7" />
+                        </Path.RenderTransform>
+                    </Path>
                 </Grid>
             </ControlTemplate>
         </Setter>
@@ -178,8 +295,8 @@
         </Setter>
     </Style>
 
-    <!-- FIRESTARTER BADGES -->
-    <Style Selector="communityControls|CommunityBadge[Variant=Firestarter_GoldWinner]">
+    <!-- TOURNAMENT BADGES: every tournament shares these, the :gold/:silver/:bronze pseudo classes are set in code -->
+    <Style Selector="communityControls|CommunityBadge:gold">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -200,7 +317,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="communityControls|CommunityBadge[Variant=Firestarter_SilverWinner]">
+    <Style Selector="communityControls|CommunityBadge:silver">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -221,7 +338,7 @@
         </Setter>
     </Style>
 
-    <Style Selector="communityControls|CommunityBadge[Variant=Firestarter_BronzeWinner]">
+    <Style Selector="communityControls|CommunityBadge:bronze">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
@@ -233,131 +350,6 @@
                         <Path.RenderTransform>
                             <TransformGroup>
                                 <RotateTransform Angle="21" />
-                            </TransformGroup>
-                        </Path.RenderTransform>
-                    </Path>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-   
-    <!-- SUMMIT SHOWDOWN BADGES -->
-    <Style Selector="communityControls|CommunityBadge[Variant=SummitShowdown_GoldWinner]">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
-                    <Border Grid.Row="1" Grid.Column="1"
-                            CornerRadius="999" Background="{StaticResource Warning100}" />
-
-                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
-                          Fill="{StaticResource Warning600}" Data="{StaticResource Award}"
-                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Path.RenderTransform>
-                            <TransformGroup>
-                                <RotateTransform Angle="21" />
-                            </TransformGroup>
-                        </Path.RenderTransform>
-                    </Path>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-
-    <Style Selector="communityControls|CommunityBadge[Variant=SummitShowdown_SilverWinner]">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
-                    <Border Grid.Row="1" Grid.Column="1"
-                            CornerRadius="999" Background="{StaticResource Neutral50}" />
-
-                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
-                          Fill="{StaticResource Neutral400}" Data="{StaticResource Award}"
-                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Path.RenderTransform>
-                            <TransformGroup>
-                                <RotateTransform Angle="21" />
-                            </TransformGroup>
-                        </Path.RenderTransform>
-                    </Path>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-
-    <Style Selector="communityControls|CommunityBadge[Variant=SummitShowdown_BronzeWinner]">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
-                    <Border Grid.Row="1" Grid.Column="1" CornerRadius="999" Background="#FFD19D" />
-
-                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
-                          Fill="#EC5616" Data="{StaticResource Award}"
-                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Path.RenderTransform>
-                            <TransformGroup>
-                                <RotateTransform Angle="21" />
-                            </TransformGroup>
-                        </Path.RenderTransform>
-                    </Path>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-        <!-- LEAFSTRUCK BADGES -->
-    <Style Selector="communityControls|CommunityBadge[Variant=Leafstruck_GoldWinner]">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
-                    <Border Grid.Row="1" Grid.Column="1"
-                            CornerRadius="999" Background="{StaticResource Warning100}" />
-                    
-                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
-                          Fill="{StaticResource Warning600}" Data="{StaticResource Award}"
-                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Path.RenderTransform>
-                            <TransformGroup>
-                                <RotateTransform Angle="21"/>
-                            </TransformGroup>
-                        </Path.RenderTransform>
-                    </Path>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-    
-    <Style Selector="communityControls|CommunityBadge[Variant=Leafstruck_SilverWinner]">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
-                    <Border Grid.Row="1" Grid.Column="1"
-                            CornerRadius="999" Background="{StaticResource Neutral50}" />
-                    
-                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
-                          Fill="{StaticResource Neutral400}" Data="{StaticResource Award}"
-                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Path.RenderTransform>
-                            <TransformGroup>
-                                <RotateTransform Angle="21"/>
-                            </TransformGroup>
-                        </Path.RenderTransform>
-                    </Path>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-    
-    <Style Selector="communityControls|CommunityBadge[Variant=Leafstruck_BronzeWinner]">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid RowDefinitions="1*, 2*, 2*" ColumnDefinitions="1*, 2*, 1*">
-                    <Border Grid.Row="1" Grid.Column="1" CornerRadius="999" Background="#FFD19D" />
-                    
-                    <Path Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
-                          Fill="#EC5616" Data="{StaticResource Award}"
-                          Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Path.RenderTransform>
-                            <TransformGroup>
-                                <RotateTransform Angle="21"/>
                             </TransformGroup>
                         </Path.RenderTransform>
                     </Path>
@@ -366,6 +358,3 @@
         </Setter>
     </Style>
 </Styles>
-
-    
-    
