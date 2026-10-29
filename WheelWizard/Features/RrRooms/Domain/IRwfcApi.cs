@@ -16,4 +16,7 @@ public interface IRwfcApi
 
     [Get("/api/leaderboard/player/{friendCode}/history")]
     Task<RwfcPlayerVrHistoryResponse> GetPlayerVrHistoryAsync(string friendCode, [AliasAs("days")] int days);
+
+    [Get("/api/badges/all")]
+    Task<RwfcBadgesResponse> GetAllBadgesAsync();
 }

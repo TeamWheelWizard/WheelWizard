@@ -9,7 +9,7 @@
                                                  ShowBadge="True" BadgeVariant="Translator" />
                 <community:LeaderboardPodiumStep Classes="Gold" Width="110" Height="122" VerticalAlignment="Bottom"
                                                  Rank="1" PlayerName="Patchzy" VrText="19,402"
-                                                 ShowBadge="True" BadgeVariant="WhWzDev" />
+                                                 ShowBadge="True" BadgeVariant="WheelWizardDeveloper" />
                 <community:LeaderboardPodiumStep Classes="Bronze" Width="110" Height="82" VerticalAlignment="Bottom"
                                                  Rank="3" PlayerName="WantToBeeMe" VrText="18,224" IsSuspicious="True" />
             </StackPanel>

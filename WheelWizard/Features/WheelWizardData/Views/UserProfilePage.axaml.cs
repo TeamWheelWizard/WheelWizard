@@ -19,7 +19,6 @@ using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Navigation;
-using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.GameLicense;
@@ -53,7 +52,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
 
     private IGameLicenseSingletonService GameLicenseService { get; }
 
-    private IWhWzDataSingletonService BadgeService { get; }
+    private IRrBadgeSingletonService BadgeService { get; }
 
     private IMiiDbService MiiDbService { get; }
 
@@ -231,7 +230,7 @@ public partial class UserProfilePage : UserControl, INotifyPropertyChanged
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameLicenseService,
-        IWhWzDataSingletonService badgeService,
+        IRrBadgeSingletonService badgeService,
         IMiiDbService miiDbService,
         ISettingsManager settingsService
     )

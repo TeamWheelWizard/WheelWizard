@@ -11,7 +11,6 @@ using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Binary;
 using WheelWizard.Shared.IO;
 using WheelWizard.Shared.Polling;
-using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
@@ -94,7 +93,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
 {
     private readonly IMiiDbService _miiService;
     private readonly IFileSystem _fileSystem;
-    private readonly IWhWzDataSingletonService _whWzDataSingletonService;
+    private readonly IRrBadgeSingletonService _badgeService;
     private readonly IRrRatingReader _rrratingReader;
     private readonly ISettingsManager _settingsManager;
     private readonly ISaveRegionService _saveRegions;
@@ -107,7 +106,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
     public GameLicenseSingletonService(
         IMiiDbService miiService,
         IFileSystem fileSystem,
-        IWhWzDataSingletonService whWzDataSingletonService,
+        IRrBadgeSingletonService badgeService,
         IRrRatingReader rrratingReader,
         ISettingsManager settingsManager,
         ISaveRegionService saveRegions,
@@ -122,7 +121,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
     {
         _miiService = miiService;
         _fileSystem = fileSystem;
-        _whWzDataSingletonService = whWzDataSingletonService;
+        _badgeService = badgeService;
         _rrratingReader = rrratingReader;
         _settingsManager = settingsManager;
         _saveRegions = saveRegions;
@@ -332,7 +331,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             Br = br,
             TotalRaceCount = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0xB4),
             TotalWinCount = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0xDC),
-            BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
+            BadgeVariants = _badgeService.GetBadges(friendCode),
             // Region is often found near offset 0x23308 + 0x3802 in RKGD. This code is a partial guess.
             // In practice, region might be read differently depending on your rksys layout.
             RegionId = BigEndianBinary.BufferToUint16(_rksysData, 0x23308 + 0x3802) / 4096,
@@ -416,7 +415,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
                 Losses = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x12),
                 CountryCode = _rksysData[currentOffset + 0x68],
                 RegionId = _rksysData[currentOffset + 0x69],
-                BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
+                BadgeVariants = _badgeService.GetBadges(friendCode),
                 IsPending = isPending,
                 Mii = miiResult.Value,
             };
