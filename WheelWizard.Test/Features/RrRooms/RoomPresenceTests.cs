@@ -4,6 +4,7 @@ using WheelWizard.CustomDistributions;
 using WheelWizard.Dolphin.Paths;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Shared.Processes;
 using WheelWizard.WiiManagement.GameLicense;
@@ -42,6 +43,7 @@ public class RoomPresenceTests
             Substitute.For<ICustomDistributionPaths>(),
             presence,
             Substitute.For<IProcessLauncher>(),
+            Substitute.For<IRuntimeEnvironment>(),
             Substitute.For<IPollingScheduler>(),
             TimeProvider.System,
             NullLogger<GameLicenseSingletonService>.Instance

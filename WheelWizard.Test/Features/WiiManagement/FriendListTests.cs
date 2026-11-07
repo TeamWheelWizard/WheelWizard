@@ -7,6 +7,7 @@ using WheelWizard.Models.Enums;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Binary;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Shared.Processes;
 using WheelWizard.WiiManagement.FriendCodes;
@@ -339,6 +340,63 @@ public class FriendListTests
     }
 
     [Fact]
+    public void ProcessLauncher_ReadsTheCurrentExecutable()
+    {
+        Assert.Equal(Environment.ProcessPath, new ProcessLauncher().GetExecutablePath(Environment.ProcessId));
+    }
+
+    [Theory]
+    [InlineData("dolphin", "/usr/bin/dolphin", false)]
+    [InlineData("Dolphin", "/opt/rr/Dolphin", true)]
+    [InlineData("dolphin-emu", "/usr/bin/dolphin-emu", true)]
+    [InlineData("Dolphin", "", true)]
+    public void FriendChanges_OnLinuxDistinguishTheFileManagerFromTheEmulator(string processName, string processPath, bool blocked)
+    {
+        var save = NewSave();
+        PutFriend(save, 0, 2001, 0x0001, 0x3800, withMii: true);
+        var (service, fs, processes) = Create(save, linux: true, executable: "/opt/rr/Dolphin");
+        processes
+            .GetProcessIds(Arg.Any<string>())
+            .Returns(call => call.Arg<string>().Equals(processName, StringComparison.OrdinalIgnoreCase) ? new[] { 1234 } : []);
+        processes.GetExecutablePath(1234).Returns(processPath);
+
+        Assert.Equal(blocked, service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+        Assert.Equal(blocked, service.RemoveFriend(0, FriendCodeOf(2001)).IsFailure);
+        if (blocked)
+            Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
+    }
+
+    [Fact]
+    public void FriendChanges_OnLinuxRecognizeASymlinkToTheConfiguredEmulator()
+    {
+        var save = NewSave();
+        var (service, fs, processes) = Create(save, linux: true, executable: "/opt/rr/Dolphin");
+        fs.Directory.CreateDirectory("/opt/rr");
+        fs.Directory.CreateDirectory("/opt/native");
+        fs.File.WriteAllText("/opt/native/rr-dolphin", "");
+        fs.File.CreateSymbolicLink("/opt/rr/Dolphin", "/opt/native/rr-dolphin");
+        processes.GetProcessIds("Dolphin").Returns([1234]);
+        processes.GetExecutablePath(1234).Returns("/opt/native/rr-dolphin");
+
+        Assert.True(service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+        Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
+    }
+
+    [Fact]
+    public void FriendChanges_AreRefusedWhenTheProcessIdentityCannotBeRead()
+    {
+        var save = NewSave();
+        PutFriend(save, 0, 2001, 0x0001, 0x3800, withMii: true);
+        var (service, fs, processes) = Create(save, linux: true, executable: "/opt/rr/Dolphin");
+        processes.GetProcessIds("Dolphin").Returns([1234]);
+        processes.GetExecutablePath(1234).Returns(_ => throw new IOException());
+
+        Assert.True(service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+        Assert.True(service.RemoveFriend(0, FriendCodeOf(2001)).IsFailure);
+        Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
+    }
+
+    [Fact]
     public void FriendChanges_AreRefusedWhileDolphinIsRunning()
     {
         var save = NewSave();
@@ -444,7 +502,11 @@ public class FriendListTests
         return data;
     }
 
-    private static (GameLicenseSingletonService, MockFileSystem, IProcessLauncher) Create(byte[] save)
+    private static (GameLicenseSingletonService, MockFileSystem, IProcessLauncher) Create(
+        byte[] save,
+        bool linux = false,
+        string executable = ""
+    )
     {
         var fs = new MockFileSystem();
         fs.Directory.CreateDirectory("/saves/RMCP");
@@ -458,6 +520,10 @@ public class FriendListTests
         saveRegions.ResolveActiveRegion(Arg.Any<string>()).Returns(MarioKartWiiEnums.Regions.Europe);
         var miis = Substitute.For<IMiiDbService>();
         miis.GetByAvatarId(Arg.Any<uint>()).Returns(Fail("Missing Mii"));
+        var environment = Substitute.For<IRuntimeEnvironment>();
+        environment.IsLinux.Returns(linux);
+        var dolphinPaths = Substitute.For<IDolphinPaths>();
+        dolphinPaths.ExecutablePath.Returns(executable);
         var processes = Substitute.For<IProcessLauncher>();
         processes.GetProcessIds(Arg.Any<string>()).Returns([]);
         var service = new GameLicenseSingletonService(
@@ -467,10 +533,11 @@ public class FriendListTests
             Substitute.For<IRrRatingReader>(),
             settings,
             saveRegions,
-            Substitute.For<IDolphinPaths>(),
+            dolphinPaths,
             paths,
             Substitute.For<IRoomPresence>(),
             processes,
+            environment,
             Substitute.For<IPollingScheduler>(),
             System.TimeProvider.System,
             NullLogger<GameLicenseSingletonService>.Instance

@@ -10,6 +10,7 @@ using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Binary;
 using WheelWizard.Shared.IO;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Polling;
 using WheelWizard.Shared.Processes;
 using WheelWizard.WiiManagement.FriendCodes;
@@ -102,6 +103,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
     private readonly ICustomDistributionPaths _distributionPaths;
     private readonly IRoomPresence _presence;
     private readonly IProcessLauncher _processes;
+    private readonly IRuntimeEnvironment _environment;
     private readonly ILogger<GameLicenseSingletonService> _logger;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
@@ -117,6 +119,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         ICustomDistributionPaths distributionPaths,
         IRoomPresence presence,
         IProcessLauncher processes,
+        IRuntimeEnvironment environment,
         IPollingScheduler scheduler,
         TimeProvider timeProvider,
         ILogger<GameLicenseSingletonService> logger
@@ -133,6 +136,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         _distributionPaths = distributionPaths;
         _presence = presence;
         _processes = processes;
+        _environment = environment;
         _logger = logger;
         Licenses = new();
     }
@@ -747,11 +751,21 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
     {
         try
         {
-            string[] processNames = ["Dolphin", "dolphin-emu", _fileSystem.Path.GetFileNameWithoutExtension(_dolphinPaths.ExecutablePath)];
+            var executable = _dolphinPaths.ExecutablePath;
+            var configuredName = _fileSystem.Path.GetFileNameWithoutExtension(executable);
+            string[] processNames = _environment.IsLinux ? ["dolphin-emu", configuredName] : ["Dolphin", "dolphin-emu", configuredName];
             return processNames
                 .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Distinct()
-                .Any(name => _processes.GetProcessIds(name).Count > 0);
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Any(name =>
+                    _processes
+                        .GetProcessIds(name)
+                        .Any(processId =>
+                            !_environment.IsLinux
+                            || name.Equals("dolphin-emu", StringComparison.OrdinalIgnoreCase)
+                            || IsConfiguredExecutable(processId, executable)
+                        )
+                );
         }
         catch (Exception e)
         {
@@ -759,6 +773,20 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             _logger.LogDebug(e, "Could not check whether Dolphin is running");
             return true;
         }
+    }
+
+    private bool IsConfiguredExecutable(int processId, string executable)
+    {
+        var runningExecutable = _processes.GetExecutablePath(processId);
+        if (string.IsNullOrWhiteSpace(runningExecutable))
+            throw new InvalidOperationException("The process executable is unavailable.");
+
+        var configuredExecutable = _fileSystem.File.Exists(executable)
+            ? _fileSystem.File.ResolveLinkTarget(executable, returnFinalTarget: true)?.FullName ?? executable
+            : executable;
+        return _fileSystem
+            .Path.GetFullPath(runningExecutable)
+            .Equals(_fileSystem.Path.GetFullPath(configuredExecutable), StringComparison.Ordinal);
     }
 
     private static OperationResult<string> NormalizeFriendCode(string friendCode)
