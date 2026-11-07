@@ -203,6 +203,49 @@ public class FriendListTests
     }
 
     [Fact]
+    public void AddFriend_ReplacesOrphanTokensAndPreservesOtherFriends()
+    {
+        var save = NewSave();
+        PutFriend(save, 0, 1000, 0x0001, 0x3800, withMii: true);
+        PutFriend(save, 3, 1003, 0x0003, 0x1000, withMii: false);
+        foreach (var slot in new[] { 1, 4 })
+        {
+            BigEndianBinary.WriteUInt32BigEndian(save, DwcOffset(slot), 0x3800);
+            BigEndianBinary.WriteUInt32BigEndian(save, DwcOffset(slot) + 4, FriendPid);
+        }
+        var (service, fs, _) = Create(save);
+
+        fs.Directory.CreateDirectory(SavePath + ".tmp");
+        Assert.True(service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+        Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
+        fs.Directory.Delete(SavePath + ".tmp");
+
+        Assert.True(service.AddFriend(0, FriendFc, FriendMii).IsSuccess);
+
+        var data = fs.File.ReadAllBytes(SavePath);
+        Assert.Equal(FriendPid, BigEndianBinary.BufferToUint32(data, MainOffset(1) + 4));
+        Assert.Equal(FriendChecksum, BigEndianBinary.BufferToUint32(data, DwcOffset(1) + 8));
+        Assert.All(data[DwcOffset(4)..(DwcOffset(4) + 12)], b => Assert.Equal(0, b));
+        foreach (var slot in new[] { 0, 3 })
+        {
+            Assert.Equal(save[MainOffset(slot)..(MainOffset(slot) + 0x1C0)], data[MainOffset(slot)..(MainOffset(slot) + 0x1C0)]);
+            Assert.Equal(save[DwcOffset(slot)..(DwcOffset(slot) + 12)], data[DwcOffset(slot)..(DwcOffset(slot) + 12)]);
+        }
+    }
+
+    [Fact]
+    public void AddFriend_DoesNotClearTokensWhenAMainEntryExistsInAnotherSlot()
+    {
+        var save = NewSave();
+        PutFriend(save, 3, FriendPid, 0x0003, 0x1000, withMii: false, dwcIndex: 1);
+        var (service, fs, _) = Create(save);
+
+        Assert.True(service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+
+        Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
+    }
+
+    [Fact]
     public void AddFriend_RepairsFriendKeysWrittenWithoutChecksum_AndLeavesOtherEntriesAlone()
     {
         var crc8ZeroPid = Enumerable

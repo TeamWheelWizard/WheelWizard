@@ -512,6 +512,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
                 if (HasFriend(data, rkpdOffset, friendProfileId))
                     return repairedProfileIds.Contains(friendProfileId) ? Ok() : Fail("This friend is already in your list.");
 
+                ClearDwcFriendData(data, rkpdOffset, friendProfileId);
                 var slotIndex = FindFirstEmptyFriendSlot(data, rkpdOffset);
                 if (slotIndex < 0)
                     return Fail("Your friend list is full. Remove a friend and try again.");
@@ -554,12 +555,9 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
                         Array.Clear(data, mainOffset, FriendDataSize);
                         removed = true;
                     }
-
-                    var dwcOffset = DwcFriendOffset(rkpdOffset, i);
-                    if (DwcFriendProfileId(data, dwcOffset) == friendProfileId)
-                        Array.Clear(data, dwcOffset, FriendSecondaryDataSize);
                 }
 
+                ClearDwcFriendData(data, rkpdOffset, friendProfileId);
                 return removed ? Ok() : Fail("Friend was not found in this license.");
             }
         );
@@ -682,11 +680,19 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             var mainOffset = FriendOffset(rkpdOffset, i);
             if (IsFriendAdded(data, mainOffset) && BigEndianBinary.BufferToUint32(data, mainOffset + 0x04) == friendProfileId)
                 return true;
-            if (DwcFriendProfileId(data, DwcFriendOffset(rkpdOffset, i)) == friendProfileId)
-                return true;
         }
 
         return false;
+    }
+
+    private static void ClearDwcFriendData(byte[] data, int rkpdOffset, uint friendProfileId)
+    {
+        for (var i = 0; i < MaxFriendNum; i++)
+        {
+            var dwcOffset = DwcFriendOffset(rkpdOffset, i);
+            if (DwcFriendProfileId(data, dwcOffset) == friendProfileId)
+                Array.Clear(data, dwcOffset, FriendSecondaryDataSize);
+        }
     }
 
     private static int FindFirstEmptyFriendSlot(byte[] data, int rkpdOffset)
