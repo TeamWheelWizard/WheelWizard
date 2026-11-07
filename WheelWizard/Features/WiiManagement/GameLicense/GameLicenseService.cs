@@ -752,6 +752,8 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         try
         {
             var executable = _dolphinPaths.ExecutablePath;
+            if (!_environment.IsWindows && ShellQuoting.TryUnquoteUnixArgument(executable, out var unquotedExecutable))
+                executable = unquotedExecutable;
             var configuredName = _fileSystem.Path.GetFileNameWithoutExtension(executable);
             string[] processNames = _environment.IsLinux ? ["dolphin-emu", configuredName] : ["Dolphin", "dolphin-emu", configuredName];
             return processNames

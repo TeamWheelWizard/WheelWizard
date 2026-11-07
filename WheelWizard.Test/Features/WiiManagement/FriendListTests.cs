@@ -339,10 +339,23 @@ public class FriendListTests
         Assert.Single(service.ActiveCurrentFriends);
     }
 
-    [Fact]
-    public void ProcessLauncher_ReadsTheCurrentExecutable()
+    [Theory]
+    [InlineData("/opt/rr/Dolphin", "/opt/rr/Dolphin", true)]
+    [InlineData("/opt/rr space/Dolphin", "/opt/rr space/Dolphin", true)]
+    [InlineData("/opt/rr's/Dolphin", "/opt/rr's/Dolphin", true)]
+    [InlineData("/opt/rr/Dolphin", "/usr/bin/dolphin", false)]
+    public void FriendChanges_OnLinuxDecodePickerPaths(string selectedPath, string processPath, bool blocked)
     {
-        Assert.Equal(Environment.ProcessPath, new ProcessLauncher().GetExecutablePath(Environment.ProcessId));
+        var save = NewSave();
+        PutFriend(save, 0, 2001, 0x0001, 0x3800, withMii: true);
+        var (service, fs, processes) = Create(save, linux: true, executable: ShellQuoting.QuoteUnixArgument(selectedPath));
+        processes.GetProcessIds("Dolphin").Returns([1234]);
+        processes.GetExecutablePath(1234).Returns(processPath);
+
+        Assert.Equal(blocked, service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+        Assert.Equal(blocked, service.RemoveFriend(0, FriendCodeOf(2001)).IsFailure);
+        if (blocked)
+            Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
     }
 
     [Theory]

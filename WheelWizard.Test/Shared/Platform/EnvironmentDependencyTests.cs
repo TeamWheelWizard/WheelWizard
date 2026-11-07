@@ -88,6 +88,26 @@ public class EnvironmentDependencyTests
     }
 
     [Fact]
+    public void ShellQuoting_DecodesItsOwnArgumentWithoutEvaluatingIt()
+    {
+        const string path = "a'b $value; file";
+
+        Assert.True(ShellQuoting.TryUnquoteUnixArgument(ShellQuoting.QuoteUnixArgument(path), out var decoded));
+        Assert.Equal(path, decoded);
+    }
+
+    [Theory]
+    [InlineData("dolphin-emu")]
+    [InlineData("'/opt/Dolphin' --flag")]
+    [InlineData("'one' 'two'")]
+    [InlineData("'unclosed")]
+    public void ShellQuoting_LeavesOtherCommandFormatsAlone(string command)
+    {
+        Assert.False(ShellQuoting.TryUnquoteUnixArgument(command, out var decoded));
+        Assert.Equal(command, decoded);
+    }
+
+    [Fact]
     public void PackageManagerDetection_PreservesPriorityAndFallsBackWhenUnavailable()
     {
         var processes = Substitute.For<IUnixProcessService>();
