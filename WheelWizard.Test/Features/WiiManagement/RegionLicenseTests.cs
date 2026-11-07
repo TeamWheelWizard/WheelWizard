@@ -88,6 +88,7 @@ public class RegionLicenseTests
             Substitute.For<IRoomPresence>(),
             Substitute.For<IProcessLauncher>(),
             Substitute.For<IRuntimeEnvironment>(),
+            Substitute.For<IUnixProcessService>(),
             Substitute.For<IPollingScheduler>(),
             System.TimeProvider.System,
             NullLogger<GameLicenseSingletonService>.Instance

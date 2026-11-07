@@ -44,6 +44,7 @@ public class RoomPresenceTests
             presence,
             Substitute.For<IProcessLauncher>(),
             Substitute.For<IRuntimeEnvironment>(),
+            Substitute.For<IUnixProcessService>(),
             Substitute.For<IPollingScheduler>(),
             TimeProvider.System,
             NullLogger<GameLicenseSingletonService>.Instance

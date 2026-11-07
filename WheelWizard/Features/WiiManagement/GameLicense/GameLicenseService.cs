@@ -104,6 +104,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
     private readonly IRoomPresence _presence;
     private readonly IProcessLauncher _processes;
     private readonly IRuntimeEnvironment _environment;
+    private readonly IUnixProcessService _unixProcesses;
     private readonly ILogger<GameLicenseSingletonService> _logger;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
@@ -120,6 +121,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         IRoomPresence presence,
         IProcessLauncher processes,
         IRuntimeEnvironment environment,
+        IUnixProcessService unixProcesses,
         IPollingScheduler scheduler,
         TimeProvider timeProvider,
         ILogger<GameLicenseSingletonService> logger
@@ -137,6 +139,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         _presence = presence;
         _processes = processes;
         _environment = environment;
+        _unixProcesses = unixProcesses;
         _logger = logger;
         Licenses = new();
     }
@@ -783,9 +786,16 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         if (string.IsNullOrWhiteSpace(runningExecutable))
             throw new InvalidOperationException("The process executable is unavailable.");
 
-        var configuredExecutable = _fileSystem.File.Exists(executable)
-            ? _fileSystem.File.ResolveLinkTarget(executable, returnFinalTarget: true)?.FullName ?? executable
-            : executable;
+        var resolution = _unixProcesses.Run(
+            "/usr/bin/env",
+            new[] { "realpath", "-e", "-z", "--", executable },
+            out var resolvedPath,
+            out _
+        );
+        if (resolution.IsFailure || resolution.Value != 0 || string.IsNullOrEmpty(resolvedPath))
+            throw new IOException("The configured executable could not be resolved.");
+
+        var configuredExecutable = resolvedPath.TrimEnd('\0');
         return _fileSystem
             .Path.GetFullPath(runningExecutable)
             .Equals(_fileSystem.Path.GetFullPath(configuredExecutable), StringComparison.Ordinal);

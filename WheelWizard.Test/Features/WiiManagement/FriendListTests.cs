@@ -383,7 +383,12 @@ public class FriendListTests
     public void FriendChanges_OnLinuxRecognizeASymlinkToTheConfiguredEmulator()
     {
         var save = NewSave();
-        var (service, fs, processes) = Create(save, linux: true, executable: "/opt/rr/Dolphin");
+        var (service, fs, processes) = Create(
+            save,
+            linux: true,
+            executable: "/opt/rr/Dolphin",
+            unixProcesses: CanonicalPathResolver("/opt/native/rr-dolphin")
+        );
         fs.Directory.CreateDirectory("/opt/rr");
         fs.Directory.CreateDirectory("/opt/native");
         fs.File.WriteAllText("/opt/native/rr-dolphin", "");
@@ -392,6 +397,51 @@ public class FriendListTests
         processes.GetExecutablePath(1234).Returns("/opt/native/rr-dolphin");
 
         Assert.True(service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+        Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
+    }
+
+    [Fact]
+    public void FriendChanges_OnLinuxRecognizeASymlinkedParentDirectory()
+    {
+        var save = NewSave();
+        var resolver = CanonicalPathResolver("/opt/native/Dolphin");
+        var (service, fs, processes) = Create(save, linux: true, executable: "/opt/current/Dolphin", unixProcesses: resolver);
+        fs.Directory.CreateDirectory("/opt/native");
+        fs.File.WriteAllText("/opt/native/Dolphin", "");
+        fs.Directory.CreateSymbolicLink("/opt/current", "/opt/native");
+        processes.GetProcessIds("Dolphin").Returns([1234]);
+        processes.GetExecutablePath(1234).Returns("/opt/native/Dolphin");
+
+        Assert.True(service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+        Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
+        resolver
+            .Received(1)
+            .Run(
+                "/usr/bin/env",
+                Arg.Is<IEnumerable<string>>(args => args.SequenceEqual(new[] { "realpath", "-e", "-z", "--", "/opt/current/Dolphin" })),
+                out Arg.Any<string>(),
+                out Arg.Any<string>()
+            );
+    }
+
+    [Theory]
+    [InlineData("/opt/rr/Dolphin", 1)]
+    [InlineData("", 0)]
+    public void FriendChanges_AreRefusedWhenTheConfiguredPathCannotBeResolved(string resolvedPath, int exitCode)
+    {
+        var save = NewSave();
+        PutFriend(save, 0, 2001, 0x0001, 0x3800, withMii: true);
+        var (service, fs, processes) = Create(
+            save,
+            linux: true,
+            executable: "/opt/rr/Dolphin",
+            unixProcesses: CanonicalPathResolver(resolvedPath, exitCode)
+        );
+        processes.GetProcessIds("Dolphin").Returns([1234]);
+        processes.GetExecutablePath(1234).Returns("/opt/native/Dolphin");
+
+        Assert.True(service.AddFriend(0, FriendFc, FriendMii).IsFailure);
+        Assert.True(service.RemoveFriend(0, FriendCodeOf(2001)).IsFailure);
         Assert.Equal(save, fs.File.ReadAllBytes(SavePath));
     }
 
@@ -515,10 +565,30 @@ public class FriendListTests
         return data;
     }
 
+    private static IUnixProcessService CanonicalPathResolver(string path, int exitCode = 0)
+    {
+        var resolver = Substitute.For<IUnixProcessService>();
+        resolver
+            .Run(
+                "/usr/bin/env",
+                Arg.Is<IEnumerable<string>>(args => args.Take(4).SequenceEqual(new[] { "realpath", "-e", "-z", "--" })),
+                out Arg.Any<string>(),
+                out Arg.Any<string>()
+            )
+            .Returns(call =>
+            {
+                call[2] = path + "\0";
+                call[3] = "";
+                return Ok(exitCode);
+            });
+        return resolver;
+    }
+
     private static (GameLicenseSingletonService, MockFileSystem, IProcessLauncher) Create(
         byte[] save,
         bool linux = false,
-        string executable = ""
+        string executable = "",
+        IUnixProcessService? unixProcesses = null
     )
     {
         var fs = new MockFileSystem();
@@ -539,6 +609,18 @@ public class FriendListTests
         dolphinPaths.ExecutablePath.Returns(executable);
         var processes = Substitute.For<IProcessLauncher>();
         processes.GetProcessIds(Arg.Any<string>()).Returns([]);
+        if (unixProcesses == null)
+        {
+            unixProcesses = Substitute.For<IUnixProcessService>();
+            unixProcesses
+                .Run("/usr/bin/env", Arg.Any<IEnumerable<string>>(), out Arg.Any<string>(), out Arg.Any<string>())
+                .Returns(call =>
+                {
+                    call[2] = call.Arg<IEnumerable<string>>().Last() + "\0";
+                    call[3] = "";
+                    return Ok(0);
+                });
+        }
         var service = new GameLicenseSingletonService(
             miis,
             fs,
@@ -551,6 +633,7 @@ public class FriendListTests
             Substitute.For<IRoomPresence>(),
             processes,
             environment,
+            unixProcesses,
             Substitute.For<IPollingScheduler>(),
             System.TimeProvider.System,
             NullLogger<GameLicenseSingletonService>.Instance
