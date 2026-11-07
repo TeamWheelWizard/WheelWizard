@@ -98,6 +98,7 @@
 
                 <ListBox.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Header="{loc:T action.add_friend}" Click="AddFriend_OnClick" />
                         <MenuItem Header="{loc:T action.copy_friend_code}" Click="CopyFriendCode_OnClick" />
                         <Separator />
                         <MenuItem Header="{loc:T action.view_profile}" Click="ViewProfile_OnClick" />

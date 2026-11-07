@@ -502,12 +502,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
             return;
         }
 
-        if (GameDataService.ActiveCurrentFriends.Count >= 30)
-        {
-            ViewUtils.ShowSnackbar(t("snackbar_warning.friend_list_full"), ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
         var normalizedFriendCodeResult = NormalizeFriendCode(player.FriendCode);
         if (normalizedFriendCodeResult.IsFailure)
         {
@@ -520,18 +514,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         if (activeUserPid == friendProfileId)
         {
             ViewUtils.ShowSnackbar(t("snackbar_warning.add_own_fc"), ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        var duplicateFriend = GameDataService.ActiveCurrentFriends.Any(friend =>
-        {
-            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
-            return existingPid != 0 && existingPid == friendProfileId;
-        });
-
-        if (duplicateFriend)
-        {
-            ViewUtils.ShowSnackbar(t("snackbar_warning.add_existing_friend"), ViewUtils.SnackbarType.Warning);
             return;
         }
 

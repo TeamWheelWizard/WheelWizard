@@ -129,6 +129,7 @@
                                                          IsSuspicious="{Binding PodiumSecond.IsSuspicious}">
                             <community:LeaderboardPodiumStep.ContextMenu>
                                 <ContextMenu DataContext="{Binding PodiumSecond}">
+                                    <MenuItem Header="{loc:T action.add_friend}" Click="AddFriend_OnClick" />
                                     <MenuItem Header="{loc:T action.copy_friend_code}"
                                               Click="CopyFriendCode_OnClick" />
                                     <Separator />
@@ -150,6 +151,7 @@
                                                          IsSuspicious="{Binding PodiumFirst.IsSuspicious}">
                             <community:LeaderboardPodiumStep.ContextMenu>
                                 <ContextMenu DataContext="{Binding PodiumFirst}">
+                                    <MenuItem Header="{loc:T action.add_friend}" Click="AddFriend_OnClick" />
                                     <MenuItem Header="{loc:T action.copy_friend_code}"
                                               Click="CopyFriendCode_OnClick" />
                                     <Separator />
@@ -171,6 +173,7 @@
                                                          IsSuspicious="{Binding PodiumThird.IsSuspicious}">
                             <community:LeaderboardPodiumStep.ContextMenu>
                                 <ContextMenu DataContext="{Binding PodiumThird}">
+                                    <MenuItem Header="{loc:T action.add_friend}" Click="AddFriend_OnClick" />
                                     <MenuItem Header="{loc:T action.copy_friend_code}"
                                               Click="CopyFriendCode_OnClick" />
                                     <Separator />
@@ -199,6 +202,7 @@
                                                            TopLabel="{Binding TopLabel}" TopLabelVariant="{Binding RankBadgeVariant}">
                                     <rooms:PlayerListItem.ContextMenu>
                                         <ContextMenu>
+                                            <MenuItem Header="{loc:T action.add_friend}" Click="AddFriend_OnClick" />
                                             <MenuItem Header="{loc:T action.copy_friend_code}"
                                                       Click="CopyFriendCode_OnClick" />
                                             <Separator />
