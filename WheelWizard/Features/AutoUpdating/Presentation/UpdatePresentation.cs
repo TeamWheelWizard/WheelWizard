@@ -1,11 +1,13 @@
 using Avalonia.Threading;
 using WheelWizard.AutoUpdating;
 using WheelWizard.Shared.Downloads;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Views.Dialogs;
+using WheelWizard.Views.Shell;
 
 namespace WheelWizard.AutoUpdating.Presentation;
 
-public sealed class UpdatePresentation : IUpdatePresentation
+public sealed class UpdatePresentation(IRuntimeEnvironment environment) : IUpdatePresentation
 {
     public async Task<bool> ConfirmUpdateAsync(string latestVersion, string currentVersion) =>
         await Dispatcher.UIThread.InvokeAsync(
@@ -46,25 +48,30 @@ public sealed class UpdatePresentation : IUpdatePresentation
         );
 
     public async Task ShowManualUpdateAsync(string latestVersion, string currentVersion) =>
-        await Dispatcher.UIThread.InvokeAsync(
-            () =>
-                new MessageBoxWindow()
-                    .SetTitleText("New Wheel Wizard version")
-                    .SetWindowTitle("Update available")
-                    .SetTag($"v{latestVersion}")
-                    .SetInfoText(
-                        $"There is a new Wheel Wizard version available!\nVersion {latestVersion} (You are currently on {currentVersion})\n\n"
-                            + "You can manually update it by going to the GitHub releases at:"
-                    )
-                    .SetLink("https://github.com/TeamWheelWizard/WheelWizard/releases")
-                    .Show()
-        );
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            var message = new MessageBoxWindow()
+                .SetTitleText("New Wheel Wizard version")
+                .SetWindowTitle("Update available")
+                .SetTag($"v{latestVersion}")
+                .SetInfoText(
+                    $"There is a new Wheel Wizard version available!\nVersion {latestVersion} (You are currently on {currentVersion})\n\n"
+                        + (
+                            environment.IsLinux
+                                ? "Update Wheel Wizard through your package manager.\n\nRelease details:"
+                                : "You can manually update it by going to the GitHub releases at:"
+                        )
+                );
+            message.SetLink("https://github.com/TeamWheelWizard/WheelWizard/releases");
+            message.Show();
+        });
 
     public async Task<OperationResult> RunUpdateAsync(
         Func<IProgress<DownloadProgress>, CancellationToken, Task<OperationResult>> operation
     ) =>
         await Dispatcher.UIThread.InvokeAsync(async () =>
         {
+            var owner = BaseWindow.GetModalOwner();
             using var cancellation = new CancellationTokenSource();
             ProgressWindow? window = null;
             var finished = false;
@@ -77,6 +84,7 @@ public sealed class UpdatePresentation : IUpdatePresentation
                     window = new ProgressWindow(t("progress.update_wh_wz"))
                         .SetExtraText(t("progress.latest_wh_wz_github"))
                         .SetCancellationTokenSource(cancellation);
+                    window.SetModalOwner(owner);
                     window.Show();
                 }
                 if (update.Retrying)

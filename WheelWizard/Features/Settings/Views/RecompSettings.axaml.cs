@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using WheelWizard.Recomp;
@@ -12,6 +13,8 @@ namespace WheelWizard.Settings.Views;
 
 public partial class RecompSettings : UserControl
 {
+    private readonly IFileSystem fileSystem;
+
     private bool _loading;
 
     private IFilePickerService FilePicker { get; }
@@ -29,6 +32,7 @@ public partial class RecompSettings : UserControl
     private IRecompPaths RecompPaths { get; }
 
     public RecompSettings(
+        IFileSystem fileSystem,
         IFilePickerService filePicker,
         ISettingsManager settingsService,
         IRecompSettingManager recompSettingsFile,
@@ -38,6 +42,7 @@ public partial class RecompSettings : UserControl
         IRecompInstallService? recompInstallService = null
     )
     {
+        this.fileSystem = fileSystem;
         FilePicker = filePicker;
         SettingsService = settingsService;
         RecompSettingsFile = recompSettingsFile;
@@ -58,6 +63,7 @@ public partial class RecompSettings : UserControl
         GraphicsApiDropdown.SelectionChanged += GraphicsApi_OnChanged;
         ShowFps.IsCheckedChanged += ShowFps_OnChanged;
         PreventStutters.IsCheckedChanged += PreventStutters_OnChanged;
+        GxWorker.IsCheckedChanged += GxWorker_OnChanged;
     }
 
     private bool IsInstalled => RecompInstallService is { IsInstalled: true };
@@ -74,7 +80,7 @@ public partial class RecompSettings : UserControl
 
             var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
             InstallLocationText.Text = installFolder;
-            OpenInstallFolder.IsEnabled = installed && Directory.Exists(installFolder);
+            OpenInstallFolder.IsEnabled = installed && fileSystem.Directory.Exists(installFolder);
             UninstallButton.IsEnabled = installed;
             WiiCompiledVersionText.Text = t(
                 "helper_text.installed_version",
@@ -90,7 +96,7 @@ public partial class RecompSettings : UserControl
             SharedNandWarningIcon.IsVisible = sharingDolphinData;
 
             var cloneFolder = RecompPaths.NandCopyFolderPath;
-            DolphinCloneStatus.Text = Directory.Exists(cloneFolder)
+            DolphinCloneStatus.Text = fileSystem.Directory.Exists(cloneFolder)
                 ? t("status.recomp_dolphin_clone_available", new { path = cloneFolder })
                 : t("status.recomp_dolphin_clone_missing");
         }
@@ -135,6 +141,7 @@ public partial class RecompSettings : UserControl
 
         ShowFps.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMP_SHOW_FPS);
         PreventStutters.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMP_PREVENT_STUTTERS);
+        GxWorker.IsChecked = SettingsService.Get<bool>(SettingsService.RECOMP_GX_WORKER);
     }
 
     /// <summary>
@@ -193,6 +200,14 @@ public partial class RecompSettings : UserControl
         SettingsEditing.Set(SettingsService, SettingsService.RECOMP_PREVENT_STUTTERS, PreventStutters.IsChecked == true);
     }
 
+    private void GxWorker_OnChanged(object? sender, RoutedEventArgs e)
+    {
+        if (_loading)
+            return;
+
+        SettingsEditing.Set(SettingsService, SettingsService.RECOMP_GX_WORKER, GxWorker.IsChecked == true);
+    }
+
     #endregion
 
     private async void ShareDolphinData_OnChanged(object? sender, RoutedEventArgs e)
@@ -226,7 +241,7 @@ public partial class RecompSettings : UserControl
             .SetMainText(t("question.recomp_share_dolphin_data.title"))
             .SetExtraText(t("question.recomp_share_dolphin_data.extra"))
             .SetButtonText(t("action.recomp_nand_share"), t("action.cancel"))
-            .SetButtonVariants(WheelWizard.Views.Components.ButtonVariant.Warning, WheelWizard.Views.Components.ButtonVariant.Default)
+            .SetButtonTones(WheelWizard.Views.Components.ActionButtonTone.Primary, WheelWizard.Views.Components.ActionButtonTone.Secondary)
             .AwaitAnswer();
         if (!confirmed)
         {
@@ -269,13 +284,16 @@ public partial class RecompSettings : UserControl
         }
 
         var cloneFolder = RecompPaths.NandCopyFolderPath;
-        if (Directory.Exists(cloneFolder))
+        if (fileSystem.Directory.Exists(cloneFolder))
         {
             var overwrite = await new YesNoWindow()
                 .SetMainText(t("question.recomp_overwrite_dolphin_clone.title"))
                 .SetExtraText(t("question.recomp_overwrite_dolphin_clone.extra"))
                 .SetButtonText(t("action.clone"), t("action.cancel"))
-                .SetButtonVariants(WheelWizard.Views.Components.ButtonVariant.Warning, WheelWizard.Views.Components.ButtonVariant.Default)
+                .SetButtonTones(
+                    WheelWizard.Views.Components.ActionButtonTone.Primary,
+                    WheelWizard.Views.Components.ActionButtonTone.Secondary
+                )
                 .AwaitAnswer();
             if (!overwrite)
                 return;
@@ -326,7 +344,7 @@ public partial class RecompSettings : UserControl
     private void OpenInstallFolder_OnClick(object? sender, RoutedEventArgs e)
     {
         var installFolder = RecompEnvironment?.InstallFolderPath ?? RecompPaths.InstallFolderPath;
-        if (Directory.Exists(installFolder))
+        if (fileSystem.Directory.Exists(installFolder))
             FilePicker.OpenFolderInFileManager(installFolder);
     }
 

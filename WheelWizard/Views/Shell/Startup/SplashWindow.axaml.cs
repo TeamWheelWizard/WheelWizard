@@ -13,7 +13,13 @@ public partial class SplashWindow : Window
     private CompositionVisual? _wheelVisual;
     private CompositionAnimationGroup? _motion;
 
-    public SplashWindow() => AvaloniaXamlLoader.Load(this);
+    public SplashWindow()
+    {
+        AvaloniaXamlLoader.Load(this);
+        // Linux's managed decoration border surrounds even this undecorated transparent window.
+        if (OperatingSystem.IsLinux())
+            WindowDecorationsTheme = null;
+    }
 
     protected override void OnOpened(EventArgs e)
     {

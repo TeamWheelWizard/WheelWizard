@@ -40,7 +40,7 @@ public class DesktopStartupTests
     }
 
     [Fact]
-    public async Task DeclinedResourceSetup_ShutsDownWithoutOpeningMainWindow()
+    public async Task DeclinedResourceSetup_ShutsDownTheOpenedMainWindow()
     {
         var fixture = new Fixture();
         fixture.Resources.GetResolvedResourcePath().Returns(new OperationError { Message = "Missing" });
@@ -49,12 +49,12 @@ public class DesktopStartupTests
         await fixture.Coordinator.StartAsync(fixture.Desktop, new StartupOptions(null, false), CancellationToken.None);
 
         fixture.Desktop.Received(1).Shutdown();
-        await fixture.Windows.DidNotReceiveWithAnyArgs().ShowAsync(default!, default);
+        await fixture.Windows.Received(1).ShowAsync(fixture.Desktop, Arg.Any<CancellationToken>());
         await fixture.Startup.DidNotReceiveWithAnyArgs().RunAsync(default!, default);
     }
 
     [Fact]
-    public async Task ShutdownDuringResourceSetup_DoesNotOpenAWindowAfterCompletion()
+    public async Task ShutdownDuringResourceSetup_DoesNotRunStartupAfterCompletion()
     {
         var fixture = new Fixture();
         fixture.Resources.GetResolvedResourcePath().Returns(new OperationError { Message = "Missing" });
@@ -66,8 +66,39 @@ public class DesktopStartupTests
         await start;
         setup.SetResult(true);
 
-        await fixture.Windows.DidNotReceiveWithAnyArgs().ShowAsync(default!, default);
+        await fixture.Windows.Received(1).ShowAsync(fixture.Desktop, Arg.Any<CancellationToken>());
         await fixture.Startup.DidNotReceiveWithAnyArgs().RunAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task MissingResources_ShowSetupInsideTheOpenedWindowBeforeStartup()
+    {
+        var fixture = new Fixture();
+        fixture.Resources.GetResolvedResourcePath().Returns(new OperationError { Message = "Missing" });
+        var sequence = new List<string>();
+        fixture
+            .Windows.ShowAsync(fixture.Desktop, Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                sequence.Add("window");
+                return Task.CompletedTask;
+            });
+        fixture
+            .Setup.ShowAsync()
+            .Returns(_ =>
+            {
+                sequence.Add("setup");
+                return Task.FromResult(true);
+            });
+        fixture
+            .Startup.RunAsync(Arg.Any<StartupOptions>(), Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                sequence.Add("startup");
+                return Task.CompletedTask;
+            });
+        await fixture.Coordinator.StartAsync(fixture.Desktop, new StartupOptions(null, false), CancellationToken.None);
+        Assert.Equal(["window", "setup", "startup"], sequence);
     }
 
     private sealed class Fixture

@@ -8,9 +8,22 @@ namespace WheelWizard.WiiManagement.GameLicense.Domain;
 public abstract class PlayerProfileBase : INotifyPropertyChanged
 {
     public required string FriendCode { get; init; }
-    public required uint Vr { get; init; }
     public required uint Br { get; init; }
     public required uint RegionId { get; init; }
+
+    private uint _vr;
+    public required uint Vr
+    {
+        get => _vr;
+        set
+        {
+            if (value == _vr)
+                return;
+            _vr = value;
+            OnPropertyChanged(nameof(Vr));
+        }
+    }
+
     public required Mii? Mii { get; set; }
 
     public string RegionName => GameLicenseDisplay.GetRegionName(RegionId);

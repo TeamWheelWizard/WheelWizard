@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using WheelWizard.Models.RRInfo;
 using WheelWizard.RrRooms;
 using WheelWizard.Shared.Polling;
-using WheelWizard.WheelWizardData;
 using WheelWizard.WiiManagement;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
@@ -13,7 +12,7 @@ namespace WheelWizard.RrRooms;
 
 public class LiveRoomsService : ObservablePollingService
 {
-    private readonly IWhWzDataSingletonService _whWzService;
+    private readonly IRrBadgeSingletonService _badgeService;
     private readonly IRrRoomsSingletonService _roomsService;
     private readonly IRrLeaderboardSingletonService _leaderboardService;
     private readonly IGameLicenseSingletonService _gameLicenseService;
@@ -25,7 +24,7 @@ public class LiveRoomsService : ObservablePollingService
     private readonly IRoomPresence _presence;
 
     public LiveRoomsService(
-        IWhWzDataSingletonService whWzService,
+        IRrBadgeSingletonService badgeService,
         IRrRoomsSingletonService roomsService,
         IRrLeaderboardSingletonService leaderboardService,
         IGameLicenseSingletonService gameLicenseService,
@@ -36,7 +35,7 @@ public class LiveRoomsService : ObservablePollingService
     )
         : base(40, scheduler, timeProvider, logger)
     {
-        _whWzService = whWzService;
+        _badgeService = badgeService;
         _roomsService = roomsService;
         _leaderboardService = leaderboardService;
         _gameLicenseService = gameLicenseService;
@@ -85,7 +84,7 @@ public class LiveRoomsService : ObservablePollingService
             .ToHashSet();
 
         var rrRooms = splitRaw
-            .Select(room => MapRoom(room, _whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
+            .Select(room => MapRoom(room, _badgeService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
             .ToList();
 
         PublishRooms(rrRooms);
@@ -100,7 +99,7 @@ public class LiveRoomsService : ObservablePollingService
 
     private static RrRoom MapRoom(
         RwfcRoomStatusRoom room,
-        IWhWzDataSingletonService whWzService,
+        IRrBadgeSingletonService badgeService,
         IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByPid,
         IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode,
         IReadOnlySet<uint> friendProfileIds
@@ -114,14 +113,14 @@ public class LiveRoomsService : ObservablePollingService
             Suspend = room.Suspend,
             Rk = room.Rk,
             Players = room
-                .Players.Select(p => MapPlayer(p, whWzService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
+                .Players.Select(p => MapPlayer(p, badgeService, leaderboardByPid, leaderboardByFriendCode, friendProfileIds))
                 .ToList(),
         };
     }
 
     private static RrPlayer MapPlayer(
         RwfcRoomStatusPlayer p,
-        IWhWzDataSingletonService whWzService,
+        IRrBadgeSingletonService badgeService,
         IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByPid,
         IReadOnlyDictionary<string, RwfcLeaderboardEntry> leaderboardByFriendCode,
         IReadOnlySet<uint> friendProfileIds
@@ -159,7 +158,7 @@ public class LiveRoomsService : ObservablePollingService
             IsSuspended = p.IsSuspended,
             ConnectionMap = p.ConnectionMap ?? [],
             Mii = mii,
-            BadgeVariants = whWzService.GetBadges(friendCode),
+            BadgeVariants = badgeService.GetBadges(friendCode),
             LeaderboardRank = leaderboardEntry?.Rank ?? leaderboardEntry?.ActiveRank,
             IsFriend = profileId != 0 && friendProfileIds.Contains(profileId),
         };

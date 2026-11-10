@@ -12,17 +12,16 @@
     <components:AspectGrid x:Name="MiiImageContainer" ClipToBounds="True" ColumnDefinitions="*,3*,*"
                              RowDefinitions="*,3*,*"
                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-        <components:LoadingIcon HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="MiiLoadingIcon"
-                                Foreground="{Binding LoadingColor, ElementName=Self}" Grid.Column="1" Grid.Row="1" >
-            <components:LoadingIcon.IsVisible>
+        <components:Spinner HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="MiiLoadingIcon" Grid.Column="1" Grid.Row="1" >
+            <components:Spinner.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="MiiLoaded" ElementName="Self"
                              Converter="{x:Static BoolConverters.Not}"/>
                     <Binding Path="GeneratedImages" ElementName="Self"
                              Converter="{x:Static conv:CollectionConverters.FirstIsNull}" />
                 </MultiBinding>
-            </components:LoadingIcon.IsVisible>
-        </components:LoadingIcon>
+            </components:Spinner.IsVisible>
+        </components:Spinner>
         
         <Path HorizontalAlignment="Center" VerticalAlignment="Bottom" Stretch="Uniform"
                 Grid.ColumnSpan="3" Grid.Column="0" Grid.RowSpan="2" Grid.Row="1"
@@ -38,15 +37,15 @@
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
               Margin="{Binding ImageOnlyMargin, ElementName=Self}" Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Grid.RowSpan="3">
            
-            <!-- LowQuality (or Normal if low quality doesn't exist) -->
+            <!-- Normal (or low quality while the full one loads) -->
             <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                    Source="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.First }}"
-                   IsVisible="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.SecondIsNull }}"/>
+                   IsVisible="{Binding !ShowSecondImage, ElementName=Self}"/>
            
-            <!-- Normal (if low quality exists) -->
+            <!-- Full quality, or the hover expression while hovered -->
             <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                    Source="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.Second }}"
-                   IsVisible="{Binding GeneratedImages, ElementName=Self, Converter={x:Static conv:CollectionConverters.SecondIsNotNull }}"/>
+                   IsVisible="{Binding ShowSecondImage, ElementName=Self}"/>
         </Grid>
      
     </components:AspectGrid>

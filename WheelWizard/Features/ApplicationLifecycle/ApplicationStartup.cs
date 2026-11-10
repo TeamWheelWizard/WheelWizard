@@ -3,8 +3,8 @@ using WheelWizard.AutoUpdating;
 using WheelWizard.GameBanana.InstallRequests;
 using WheelWizard.Launching;
 using WheelWizard.Mods;
+using WheelWizard.RrRooms;
 using WheelWizard.Settings;
-using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.ApplicationLifecycle;
 
@@ -17,10 +17,10 @@ public sealed class ApplicationStartup(
     IModManager mods,
     IModInstallRequestHandler installRequests,
     IAutoUpdaterSingletonService updates,
-    IWhWzDataSingletonService badges,
+    IRrBadgeSingletonService badges,
     IApplicationLiveUpdates liveUpdates,
     ISettingsManager settings,
-    IRetroRewindLaunchService launch,
+    ILauncherProvider launchers,
     ILogger<ApplicationStartup> logger
 ) : IApplicationStartup
 {
@@ -54,8 +54,7 @@ public sealed class ApplicationStartup(
 
             if (options.LaunchRetroRewind || (!openedProtocol && settings.Get<bool>(settings.LAUNCH_RR_ON_STARTUP)))
             {
-                // #todo: (#484) use the active launcher for startup too, and test both dolphin and recomp.
-                var result = await launch.LaunchAsync().WaitAsync(cancellationToken);
+                var result = await launchers.GetActiveLauncher().Launch().WaitAsync(cancellationToken);
                 if (result.IsFailure)
                     logger.LogError(result.Error.Exception, "Failed to launch Retro Rewind on startup: {Message}", result.Error.Message);
             }

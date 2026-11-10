@@ -1,10 +1,86 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="clr-namespace:WheelWizard.Views.Behaviors">
     <Design.PreviewWith>
         <Border Padding="20">
             <!-- Add Controls for Previewer Here -->
         </Border>
     </Design.PreviewWith>
+
+    <Styles.Resources>
+        <ControlTheme x:Key="WheelWizardScrollThumb" TargetType="Thumb">
+            <Setter Property="Background" Value="{StaticResource Neutral900}" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" CornerRadius="3" />
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover, ^:pressed">
+                <Setter Property="Background" Value="{StaticResource Neutral700}" />
+            </Style>
+        </ControlTheme>
+        <ControlTheme x:Key="WheelWizardScrollBar" TargetType="ScrollBar">
+            <Style Selector="^:vertical">
+                <Setter Property="MinWidth" Value="0" />
+                <Setter Property="Width" Value="14" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Track Margin="6,8,2,8" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                               Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
+                               Orientation="Vertical" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb MinHeight="18" Theme="{StaticResource WheelWizardScrollThumb}" />
+                            </Track.Thumb>
+                        </Track>
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+            <Style Selector="^:horizontal">
+                <Setter Property="MinHeight" Value="0" />
+                <Setter Property="Height" Value="14" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Track Margin="8,6,8,2" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                               Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
+                               Orientation="Horizontal">
+                            <Track.Thumb>
+                                <Thumb MinWidth="18" Theme="{StaticResource WheelWizardScrollThumb}" />
+                            </Track.Thumb>
+                        </Track>
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+        </ControlTheme>
+    </Styles.Resources>
+
+    <Style Selector="ScrollViewer">
+        <Setter Property="behaviors:HorizontalPanBehavior.IsEnabled" Value="True" />
+        <Setter Property="AllowAutoHide" Value="False" />
+        <Setter Property="ClipToBounds" Value="False" />
+    </Style>
+    <Style Selector="ScrollViewer /template/ ScrollContentPresenter#PART_ContentPresenter">
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+        <Setter Property="Grid.RowSpan" Value="1" />
+        <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+    <Style Selector="ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar">
+        <Setter Property="RenderTransform">
+            <TranslateTransform X="11" />
+        </Setter>
+    </Style>
+    <Style Selector="ScrollBar:horizontal /template/ Thumb">
+        <Setter Property="Background" Value="{StaticResource Neutral600}" />
+    </Style>
+    <Style Selector="ScrollBar:horizontal /template/ Thumb:pointerover, ScrollBar:horizontal /template/ Thumb:pressed">
+        <Setter Property="Background" Value="{StaticResource Neutral400}" />
+    </Style>
+    <Style Selector="ListBox">
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="ScrollBar">
+        <Setter Property="Theme" Value="{StaticResource WheelWizardScrollBar}" />
+    </Style>
 
     <Style Selector="Border.SettingsBlockStyle">
         <Setter Property="Background" Value="{StaticResource Neutral900}" />

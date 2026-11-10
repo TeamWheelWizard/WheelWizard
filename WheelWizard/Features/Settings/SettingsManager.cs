@@ -255,6 +255,7 @@ public class SettingsManager : ISettingsManager, IDisposable
         RECOMP_GRAPHICS_API = RegisterRecomp(("video", "graphics_api"), "auto");
         RECOMP_SHOW_FPS = RegisterRecomp(("video", "show_fps"), true);
         RECOMP_PREVENT_STUTTERS = RegisterRecomp(("video", "skip_unready_pipelines"), true);
+        RECOMP_GX_WORKER = RegisterRecomp(("video", "gx_worker"), true);
         // The Wii data folder the runtime should use, written by RecompDolphinDataService after an
         // install and whenever the sharing choice changes. Empty/absent means the runtime's private NAND.
         RECOMP_NAND_ROOT = RegisterRecomp(("paths", "nand_root"), "");
@@ -341,6 +342,7 @@ public class SettingsManager : ISettingsManager, IDisposable
     public Setting<string> RECOMP_GRAPHICS_API { get; }
     public Setting<bool> RECOMP_SHOW_FPS { get; }
     public Setting<bool> RECOMP_PREVENT_STUTTERS { get; }
+    public Setting<bool> RECOMP_GX_WORKER { get; }
     public Setting<string> RECOMP_NAND_ROOT { get; }
     #endregion
 

@@ -13,6 +13,7 @@ public static class RrRoomsExtensions
 
         services.AddSingleton<IRrRoomsSingletonService, RrRoomsSingletonService>();
         services.AddSingleton<IRrLeaderboardSingletonService, RrLeaderboardSingletonService>();
+        services.AddSingleton<IRrBadgeSingletonService, RrBadgeSingletonService>();
 
         services.AddSingleton<LiveRoomsService>();
         services.AddSingleton<IRoomPresence, RoomPresence>();

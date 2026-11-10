@@ -1,373 +1,348 @@
+using System.Linq.Expressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
-using Avalonia.Media;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Microsoft.Extensions.Logging.Abstractions;
+using NSubstitute;
+using WheelWizard.AutoUpdating.Presentation;
+using WheelWizard.Models;
+using WheelWizard.RrRooms;
+using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
+using WheelWizard.Shared;
+using WheelWizard.Shared.Platform;
+using WheelWizard.Shared.Services;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Dialogs.Base;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Controls;
+using WheelWizard.WheelWizardData.ViewModels;
+using WheelWizard.WheelWizardData.Views;
+using WheelWizard.WheelWizardData.Views.Dialogs;
 
 namespace WheelWizard.UI.Test;
 
 public class WindowCompositionTests
 {
     [AvaloniaTheory]
-    [InlineData(64.0)]
-    [InlineData(221.0)]
-    public void SidebarHover_MovesGlowWithoutChangingLayout(double width)
+    [InlineData("TitleBar")]
+    [InlineData("TitleBar, Border")]
+    [InlineData("TitleBar, Border, Shadow")]
+    public void LinuxCaptionButtons_FitTheCustomTitleBar(string decorationParts)
     {
-        var button = new WheelWizard.Views.Shell.Controls.SidebarRadioButton { Text = "Home" };
-        var window = new Window
-        {
-            Width = width,
-            Height = 46,
-            Content = button,
-        };
+        var popup = new TestWindow { ExtendClientAreaTitleBarHeightHint = 30 };
         try
         {
-            window.Show();
-            window.UpdateLayout();
-            var bounds = button.Bounds;
-            var desiredSize = button.DesiredSize;
-            var glow = button.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_HoverEffect");
-            Assert.False(glow.IsHitTestVisible);
-            foreach (var x in new[] { 2.0, width / 2, width - 1 })
+            popup.Show();
+            // Exercise the pinned framework's drawn decorations under the headless backend.
+            var host = typeof(TopLevel)
+                .GetProperty("TopLevelHost", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .GetValue(popup)!;
+            var theme = (ControlTheme)Application.Current!.Resources["LinuxWindowDecorations"]!;
+            var update = host.GetType()
+                .GetMethod(
+                    "UpdateDrawnDecorations",
+                    System.Reflection.BindingFlags.Instance
+                        | System.Reflection.BindingFlags.Public
+                        | System.Reflection.BindingFlags.NonPublic
+                )!;
+            var partsType = Nullable.GetUnderlyingType(update.GetParameters()[0].ParameterType)!;
+            var parts = Enum.Parse(partsType, decorationParts);
+            update.Invoke(host, [parts, WindowState.Normal, theme]);
+            popup.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var buttons = ((Visual)host)
+                .GetVisualDescendants()
+                .OfType<Button>()
+                .Where(button => button.Name is "PART_MinimizeButton" or "PART_MaximizeButton" or "PART_CloseButton")
+                .ToList();
+            Assert.NotEmpty(buttons);
+            foreach (var button in buttons)
             {
-                window.MouseMove(new Point(x, 23));
-                window.UpdateLayout();
-                Assert.True(glow.IsVisible);
-                Assert.Equal(x - 23, Assert.IsType<TranslateTransform>(glow.RenderTransform).X);
-                Assert.Equal(bounds, button.Bounds);
-                Assert.Equal(desiredSize, button.DesiredSize);
+                Assert.Equal(30, button.Bounds.Width);
+                Assert.Equal(30, button.Bounds.Height);
+                Assert.Equal(0, button.Margin.Top);
+                var position = button.TranslatePoint(default, popup)!.Value;
+                Assert.Equal(0, position.Y);
+                Assert.True(position.X + button.Bounds.Width <= popup.ClientSize.Width);
             }
+            var captionPanel = buttons[0].Parent as StackPanel;
+            Assert.NotNull(captionPanel);
+            Assert.Equal(new Thickness(0), captionPanel.Margin);
         }
         finally
         {
-            window.Close();
+            popup.Close();
         }
     }
 
-    [AvaloniaTheory]
-    [InlineData(400.0)]
-    [InlineData(500.0)]
-    public void ProgressContent_KeepsDefinedMeasuredWidth_ButFillsExtraAvailableWidth(double preferredWidth)
+    [AvaloniaFact]
+    public async Task LinuxManualUpdate_DirectsUsersToTheirPackageManager()
     {
-        var content = new WheelWizard.Views.Dialogs.ProgressWindow("Download");
-        Assert.IsType<Grid>(content.Content).Width = preferredWidth;
-        content.SetGoal(new string('W', 150));
-        content.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        Assert.Equal(preferredWidth, content.DesiredSize.Width);
-        content.Arrange(new Rect(0, 0, 600, 200));
-        Assert.Equal(600, Assert.IsType<Grid>(content.Content).Bounds.Width);
-        Assert.Equal(600, content.FindControl<ProgressBar>("ProgressBar")!.Bounds.Width);
-        content.Close();
+        var environment = Substitute.For<IRuntimeEnvironment>();
+        environment.IsLinux.Returns(true);
+        using var popup = new TestWindow { Width = 656, Height = 876 };
+        popup.Show();
+        await new UpdatePresentation(environment).ShowManualUpdateAsync("2.0.0", "1.0.0");
+        var content = Assert.IsType<MessageBoxWindow>(popup.Modals.TopModal);
+        Assert.Contains("through your package manager", content.FindControl<SelectableTextBlock>("MessageInformationBlock")!.Text);
+        Assert.Equal(
+            "https://github.com/TeamWheelWizard/WheelWizard/releases",
+            content.FindControl<WheelWizard.Views.Components.ActionButton>("MessageLink")!.Text
+        );
     }
 
-    [AvaloniaTheory]
-    [InlineData(true, false)]
-    [InlineData(false, false)]
-    [InlineData(true, true)]
-    public void ProgressNativeClose_CancelsOnlyCancelableUserRequests(bool canCancel, bool programmatic)
+    [AvaloniaFact]
+    public void AppearanceResources_FollowTheAnimationSettingAndUnsubscribe()
+    {
+        var settings = Substitute.For<ISettingsManager>();
+        var animations = new WhWzSetting<bool>("Animations", false);
+        var scale = new WhWzSetting<double>("Scale", 1);
+        settings.ENABLE_ANIMATIONS.Returns(animations);
+        settings.WINDOW_SCALE.Returns(scale);
+        settings.Get<double>(scale).Returns(_ => scale.Get());
+        var signals = new SettingsSignalBus(NullLogger<SettingsSignalBus>.Instance);
+        var resources = new ResourceDictionary();
+        using var appearance = new WindowAppearance(settings, signals);
+        appearance.Install(resources);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.ControlAnimationDurationResourceKey]);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.SegmentAnimationDurationResourceKey]);
+        Assert.Equal(false, resources[WindowAppearance.ControlAnimationsEnabledResourceKey]);
+        animations.Set(true);
+        signals.Publish(animations);
+        Assert.Equal(TimeSpan.FromMilliseconds(120), resources[WindowAppearance.ControlAnimationDurationResourceKey]);
+        Assert.Equal(TimeSpan.FromMilliseconds(240), resources[WindowAppearance.SegmentAnimationDurationResourceKey]);
+        Assert.Equal(true, resources[WindowAppearance.ControlAnimationsEnabledResourceKey]);
+        animations.Set(false);
+        signals.Publish(animations);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.ControlAnimationDurationResourceKey]);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.SegmentAnimationDurationResourceKey]);
+        Assert.Equal(false, resources[WindowAppearance.ControlAnimationsEnabledResourceKey]);
+        appearance.Dispose();
+        animations.Set(true);
+        signals.Publish(animations);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.ControlAnimationDurationResourceKey]);
+        Assert.Equal(TimeSpan.Zero, resources[WindowAppearance.SegmentAnimationDurationResourceKey]);
+    }
+
+    [AvaloniaFact]
+    public void SidebarLabels_SurviveRepeatedCollapseAndReattachment()
+    {
+        var button = new WheelWizard.Views.Shell.Controls.SidebarRadioButton { Text = "My Miis" };
+        var host = new Border { Child = button, Width = 221 };
+        using var window = new UiTestWindow
+        {
+            Content = host,
+            Width = 221,
+            Height = 46,
+        };
+        window.Show();
+        for (var cycle = 0; cycle < 3; cycle++)
+        {
+            button.Classes.Set("compact", true);
+            host.Width = 64;
+            window.UpdateLayout();
+            Assert.Equal(64, button.Bounds.Width);
+            var label = button.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "PART_Label");
+            Assert.Equal(0, label.Opacity);
+            host.Child = null;
+            host.Child = button;
+            button.Text = $"My Miis {cycle}";
+            button.Classes.Set("compact", false);
+            host.Width = 221;
+            window.UpdateLayout();
+            label = button.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "PART_Label");
+            Assert.Equal(1, label.Opacity);
+            Assert.Equal(button.Text, label.Text);
+        }
+    }
+
+    [AvaloniaFact]
+    public void SettingsContent_StaysStationaryWhileNavigationIsRevealed()
+    {
+        var pages = Substitute.For<WheelWizard.Views.Shell.Navigation.IPageFactory>();
+        pages.Create(Arg.Any<Type>(), Arg.Any<object[]>()).Returns(_ => new UserControl());
+        var page = new WheelWizard.Settings.Views.SettingsPage(
+            Substitute.For<IModalFactory>(),
+            Substitute.For<ISettingsManager>(),
+            new SettingsSignalBus(NullLogger<SettingsSignalBus>.Instance),
+            pages
+        );
+        page.UpdateLayoutWidth(572);
+        var host = new Border
+        {
+            Child = page,
+            Width = 415,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+        };
+        using var window = new UiTestWindow
+        {
+            Content = host,
+            Width = 572,
+            Height = 700,
+        };
+        window.Show();
+        window.UpdateLayout();
+        var content = page.FindControl<ContentControl>("SettingsContent")!;
+        var position = content.TranslatePoint(default, window);
+        var size = content.Bounds.Size;
+        foreach (var width in new[] { 415.0, 430.0, 480.0, 540.0, 572.0 })
+        {
+            host.Width = width;
+            window.UpdateLayout();
+            Assert.Equal(position, content.TranslatePoint(default, window));
+            Assert.Equal(size, content.Bounds.Size);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task ProgressDismissal_DoesNotCancelButExplicitCancelDoes()
     {
         using var cancellation = new CancellationTokenSource();
-        var content = new WheelWizard.Views.Dialogs.ProgressWindow("Download");
-        if (canCancel)
-            content.SetCancellationTokenSource(cancellation);
-        content.Show();
-        var popup = Assert.IsType<PopupWindow>(TopLevel.GetTopLevel(content));
-        try
-        {
-            var args = CreateClosingArgs(programmatic);
-            typeof(PopupWindow)
-                .GetMethod("OnClosing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
-                .Invoke(popup, [args]);
-            Assert.Equal(canCancel && !programmatic, cancellation.IsCancellationRequested);
-            Assert.Equal(canCancel && !programmatic, content.WasCancellationRequested);
-            Assert.Equal(!programmatic, args.Cancel);
-        }
-        finally
-        {
-            content.SetCancellationTokenSource(null);
-            content.Close();
-        }
-    }
-
-    [AvaloniaFact]
-    public void DesktopCaptionButtons_UseNavigationColorsAndMinimizeHoverBackground()
-    {
-        var popup = new PopupWindow(true, false, false, "Caption test");
-        try
-        {
-            popup.Show();
-            var host = popup.GetVisualParent()!;
-            // Headless windows do not request drawn chrome; request it through the same host path.
-            var update = host.GetType()
-                .GetMethod("UpdateDrawnDecorations", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
-            var parts = update.GetParameters()[0].ParameterType.GetGenericArguments()[0];
-            update.Invoke(
-                host,
-                [Enum.Parse(parts, "TitleBar, Border"), WindowState.Normal, Application.Current!.FindResource("DesktopWindowDecorations")]
-            );
-            popup.UpdateLayout();
-            var buttons = host.GetVisualDescendants().OfType<Button>().ToArray();
-            var minimize = buttons.Single(button => button.Name == "PART_MinimizeButton");
-            var maximize = buttons.Single(button => button.Name == "PART_MaximizeButton");
-            var close = buttons.Single(button => button.Name == "PART_CloseButton");
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral400"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(minimize.Foreground).Color
-            );
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral400"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(close.Foreground).Color
-            );
-            Assert.False(maximize.IsEnabled);
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral950"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(maximize.Foreground).Color
-            );
-            Assert.Equal(1, maximize.Opacity);
-            ((IPseudoClasses)minimize.Classes).Set(":pointerover", true);
-            var background = minimize.GetVisualDescendants().OfType<ContentPresenter>().Single();
-            Assert.Equal(
-                Application.Current!.FindResource("Neutral600"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(background.Background).Color
-            );
-        }
-        finally
-        {
-            popup.Close();
-        }
-    }
-
-    [AvaloniaFact]
-    public void PopupScale_UsesApplicationResourcesWithoutAServiceProvider()
-    {
-        Application.Current!.Resources[WindowAppearance.ScaleResourceKey] = 1.5;
-        var popup = new PopupWindow(true, false, false, "Scale test");
-        try
-        {
-            popup.Show();
-            popup.UpdateLayout();
-            Assert.Equal(1.5, popup.RequestedWindowScale);
-            Application.Current.Resources[WindowAppearance.ScaleResourceKey] = 1.25;
-            Assert.Equal(1.25, popup.RequestedWindowScale);
-        }
-        finally
-        {
-            popup.Close();
-            Application.Current.Resources.Remove(WindowAppearance.ScaleResourceKey);
-        }
-    }
-
-    [AvaloniaFact]
-    public void OwnedPopups_DisableOnlyTheirWindowGroup_AndRestoreInteraction()
-    {
-        var first = new TestWindow();
-        var second = new TestWindow();
-        var popup = new TestWindow();
-        var nested = new TestWindow();
-        try
-        {
-            first.Show();
-            second.Show();
-            Assert.True(first.CanInteract);
-            Assert.True(second.CanInteract);
-            popup.Show(first);
-            Assert.False(first.CanInteract);
-            Assert.True(second.CanInteract);
-            nested.Show(popup);
-            Assert.False(popup.CanInteract);
-            nested.Close();
-            Assert.True(popup.CanInteract);
-            Assert.False(first.CanInteract);
-            popup.Close();
-            Assert.True(first.CanInteract);
-        }
-        finally
-        {
-            nested.Close();
-            popup.Close();
-            first.Close();
-            second.Close();
-        }
-    }
-
-    [AvaloniaFact]
-    public void ClosingOwner_ClosesItsNonmodalPopups()
-    {
-        var owner = new TestWindow();
-        var popup = new TestWindow(allowParentInteraction: true);
+        using var owner = new TestWindow { Width = 656, Height = 876 };
         owner.Show();
-        popup.Show(owner);
+        var content = new ProgressWindow("Download").SetCancellationTokenSource(cancellation);
+        var closed = content.ShowDialog();
+        owner.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Same(owner, TopLevel.GetTopLevel(content));
+        owner.KeyPress(Avalonia.Input.Key.Escape, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.Escape, null);
+        owner.MouseDown(new Point(5, 50), Avalonia.Input.MouseButton.Left);
+        owner.MouseUp(new Point(5, 50), Avalonia.Input.MouseButton.Left);
+        Assert.False(cancellation.IsCancellationRequested);
+        Assert.Same(content, owner.Modals.TopModal);
+        var cancel = content.FindControl<WheelWizard.Views.Components.ActionButton>("CancelButton")!;
+        var point = cancel.TranslatePoint(new Point(cancel.Bounds.Width / 2, cancel.Bounds.Height / 2), owner)!.Value;
+        owner.MouseDown(point, Avalonia.Input.MouseButton.Left);
+        owner.MouseUp(point, Avalonia.Input.MouseButton.Left);
+        Assert.True(cancellation.IsCancellationRequested);
+        Assert.True(content.WasCancellationRequested);
+        Assert.Same(content, owner.Modals.TopModal);
+        content.Close();
+        await closed.WaitAsync(TimeSpan.FromSeconds(2));
         Assert.True(owner.CanInteract);
-        owner.Close();
-        Assert.False(popup.IsVisible);
     }
 
-    [AvaloniaTheory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void PopupShow_PreservesOwnershipAndClosesWithItsOwner(bool allowParentInteraction)
+    [AvaloniaFact]
+    public void MessagePopup_GrowsForLateContentWithoutEnlargingItsTitle()
     {
-        var owner = new TestWindow();
+        var content = new MessageBoxWindow().SetTitleText("A stable title").SetInfoText("Loading...");
+        using var owner = new TestWindow { Width = 656, Height = 876 };
         owner.Show();
-        var popup = new OwnedPopup(owner, allowParentInteraction);
-        try
-        {
-            popup.Show();
-            Assert.Same(owner, popup.Owner);
-            Assert.Equal(allowParentInteraction, owner.CanInteract);
-            owner.Close();
-            Assert.False(popup.IsVisible);
-        }
-        finally
-        {
-            popup.Close();
-            owner.Close();
-        }
+        content.Show();
+        var popup = Assert.IsType<TestWindow>(TopLevel.GetTopLevel(content));
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        var initialSize = content.Bounds.Size;
+        var title = content.FindControl<SelectableTextBlock>("MessageTitleBlock")!;
+        var titleSize = title.Bounds.Size;
+        var titleFontSize = title.FontSize;
+
+        content.SetInfoText(string.Join("\n", Enumerable.Repeat("Information loaded after opening.", 15)));
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(content.Bounds.Height > initialSize.Height);
+        Assert.Equal(initialSize.Width, content.Bounds.Width);
+        Assert.Equal(titleSize, title.Bounds.Size);
+        Assert.Equal(titleFontSize, title.FontSize);
+        foreach (var button in content.GetVisualDescendants().OfType<Button>())
+            AssertInsideWindow(button, popup);
     }
 
-    [AvaloniaTheory]
-    [InlineData(0.75)]
-    [InlineData(1.5)]
-    public void Popup_TitleBarDoesNotScaleWithContent(double scale)
+    private static void AssertInsideWindow(Control control, Window popup)
     {
-        var popup = new PopupWindow(true, false, false, "Scale test") { RequestedWindowScale = scale };
-        try
-        {
-            popup.SetWindowSize(new Size(300, 200));
-            Assert.Equal(300 * scale, popup.Width);
-            Assert.Equal(200 * scale + 30, popup.Height);
-            Assert.Equal(30, popup.ExtendClientAreaTitleBarHeightHint);
-            Assert.Equal(WindowDecorations.Full, popup.WindowDecorations);
-            var root = Assert.IsType<Grid>(popup.Content);
-            Assert.Null(root.RenderTransform);
-            Assert.Equal(30, root.RowDefinitions[0].Height.Value);
-        }
-        finally
-        {
-            popup.Close();
-        }
+        var position = control.TranslatePoint(default, popup)!.Value;
+        Assert.True(position.X >= 0 && position.Y >= 30);
+        Assert.True(position.X + control.Bounds.Width <= popup.ClientSize.Width);
+        Assert.True(position.Y + control.Bounds.Height <= popup.ClientSize.Height);
     }
 
     [AvaloniaFact]
-    public void PopupDimming_CoversTitleBarAndContent_AndRestoresTogether()
+    public async Task PlayerProfilePopup_FitsLateProfileAndHistoryWithoutScalingContent()
     {
-        var popup = new PopupWindow(true, false, false, "Dimming test");
-        try
+        var profileReady = new TaskCompletionSource<OperationResult<PlayerProfileResponse>>();
+        var historyReady = new TaskCompletionSource<OperationResult<RwfcPlayerVrHistoryResponse>>();
+        var caller = Substitute.For<IApiCaller<IRwfcApi>>();
+        caller.CallApiAsync(Arg.Any<Expression<Func<IRwfcApi, Task<PlayerProfileResponse>>>>()).Returns(profileReady.Task);
+        caller.CallApiAsync(Arg.Any<Expression<Func<IRwfcApi, Task<RwfcPlayerVrHistoryResponse>>>>()).Returns(historyReady.Task);
+        using var model = new VrHistoryViewModel(caller);
+        var history = new VrHistoryGraph(model);
+        var content = new PlayerProfileWindow(history, caller, "1234-5678-9012");
+        var loaded = new TaskCompletionSource();
+        content.PropertyChanged += (_, e) =>
         {
-            popup.Show();
-            popup.UpdateLayout();
-            var frame = Assert.IsType<Grid>(popup.Content);
-            var overlay = popup.FindControl<Border>("DisabledDarkenEffect")!;
-            popup.SetInteractable(false);
-            popup.UpdateLayout();
-            Assert.Contains(overlay, frame.Children);
-            Assert.Equal(2, Grid.GetRowSpan(overlay));
-            Assert.True(overlay.IsVisible);
-            Assert.Equal(frame.Bounds.Height, overlay.Bounds.Height);
-            Assert.False(frame.IsEnabled);
-            popup.SetInteractable(true);
-            Assert.False(overlay.IsVisible);
-            Assert.True(frame.IsEnabled);
-        }
-        finally
-        {
-            popup.Close();
-        }
-    }
+            if (e.PropertyName == nameof(content.IsLoading) && !content.IsLoading)
+                loaded.TrySetResult();
+        };
+        using var owner = new TestWindow { Width = 656, Height = 876 };
+        owner.Show();
+        content.Show();
+        var popup = Assert.IsType<TestWindow>(TopLevel.GetTopLevel(content));
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        var initialWidth = popup.ClientSize.Width;
+        Assert.True(content.IsLoading);
 
-    [AvaloniaFact]
-    public void NonClosablePopup_RejectsNativeCloseButAllowsProgrammaticCompletion()
-    {
-        var popup = new ClosingPopup();
-        var userClose = CreateClosingArgs(false);
-        popup.RequestClose(userClose);
-        Assert.True(userClose.Cancel);
-        var completion = CreateClosingArgs(true);
-        popup.RequestClose(completion);
-        Assert.False(completion.Cancel);
-        popup.CanClose = true;
-        var allowed = CreateClosingArgs(false);
-        popup.RequestClose(allowed);
-        Assert.False(allowed.Cancel);
-        popup.Close();
-    }
-
-    [AvaloniaFact]
-    public void DisabledWindows_RejectNativeCloseButAllowCompletionAndShutdown()
-    {
-        var main = new TestWindow();
-        var popup = new ClosingPopup { CanClose = true };
-        (BaseWindow Window, Action<WindowClosingEventArgs> RequestClose)[] windows =
-        [
-            (main, main.RequestClose),
-            (popup, popup.RequestClose),
-        ];
-        foreach (var (window, requestClose) in windows)
-        {
-            try
+        profileReady.SetResult(
+            new PlayerProfileResponse
             {
-                window.SetInteractable(false);
-                var native = CreateClosingArgs(false);
-                requestClose(native);
-                Assert.True(native.Cancel);
-                foreach (
-                    var args in new[]
+                Name = "Profile layout test",
+                FriendCode = "1234-5678-9012",
+                LastSeen = DateTime.UtcNow,
+                Vr = 12000,
+                Rank = 42,
+            }
+        );
+        await loaded.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        var title = content.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Text == "Profile layout test");
+        var titleSize = title.Bounds.Size;
+        Assert.Equal(20, title.FontSize);
+        Assert.Equal(initialWidth, popup.ClientSize.Width);
+        AssertInsideWindow(title, popup);
+
+        historyReady.SetResult(
+            new RwfcPlayerVrHistoryResponse
+            {
+                FromDate = DateTime.UtcNow.AddDays(-1),
+                ToDate = DateTime.UtcNow,
+                StartingVr = 11000,
+                EndingVr = 12000,
+                TotalVrChange = 1000,
+                History =
+                [
+                    new() { Date = DateTime.UtcNow.AddDays(-1), TotalVr = 11000 },
+                    new()
                     {
-                        CreateClosingArgs(true),
-                        CreateClosingArgs(false, WindowCloseReason.OwnerWindowClosing),
-                        CreateClosingArgs(false, WindowCloseReason.ApplicationShutdown),
-                    }
-                )
-                {
-                    requestClose(args);
-                    Assert.False(args.Cancel);
-                }
-                window.SetInteractable(true);
-                var allowed = CreateClosingArgs(false);
-                requestClose(allowed);
-                Assert.False(allowed.Cancel);
+                        Date = DateTime.UtcNow,
+                        TotalVr = 12000,
+                        VrChange = 1000,
+                    },
+                ],
             }
-            finally
-            {
-                window.Close();
-            }
-        }
+        );
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+        popup.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(history.HasData);
+        Assert.False(history.IsLoading);
+        Assert.Equal(initialWidth, popup.ClientSize.Width);
+        Assert.Equal(titleSize, title.Bounds.Size);
+        Assert.Equal(20, title.FontSize);
+        AssertInsideWindow(title, popup);
+        AssertInsideWindow(content.GetVisualDescendants().OfType<ScrollViewer>().First(), popup);
+        Assert.Same(content, owner.Modals.TopModal);
+        Assert.False(owner.CanInteract);
     }
 
-    [AvaloniaTheory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void PopupSize_ScreenCapCanReduceScaleBelowConfiguredMinimum(bool constrainedWidth)
-    {
-        var popup = new PopupWindow { RequestedWindowScale = SettingValues.MinWindowScale };
-        try
-        {
-            var screen = popup.Screens.Primary;
-            Assert.NotNull(screen);
-            var available = new Size(screen.WorkingArea.Width / screen.Scaling, screen.WorkingArea.Height / screen.Scaling);
-            var size = constrainedWidth
-                ? new Size(available.Width * 1.25 / SettingValues.MinWindowScale, 200)
-                : new Size(300, available.Height / SettingValues.MinWindowScale);
-            popup.SetWindowSize(size);
-            Assert.InRange(popup.Width, double.Epsilon, available.Width + 0.001);
-            Assert.InRange(popup.Height, 30, available.Height + 0.001);
-            Assert.True(popup.Width / size.Width < SettingValues.MinWindowScale);
-        }
-        finally
-        {
-            popup.Close();
-        }
-    }
-
-    private static WindowClosingEventArgs CreateClosingArgs(
+    internal static WindowClosingEventArgs CreateClosingArgs(
         bool programmatic,
         WindowCloseReason reason = WindowCloseReason.WindowClosing
     ) =>
@@ -380,33 +355,16 @@ public class WindowCompositionTests
                 culture: null
             )!;
 
-    private sealed class ClosingPopup : PopupWindow
+    private sealed class TestWindow : BaseWindow, IDisposable
     {
-        public void RequestClose(WindowClosingEventArgs args) => OnClosing(args);
-    }
+        public void Dispose() => Close();
 
-    private sealed class OwnedPopup : PopupWindow
-    {
-        public OwnedPopup(Window owner, bool allowParentInteraction)
-            : base(true, allowParentInteraction, false, "Owned popup")
-        {
-            Owner = owner;
-        }
-    }
-
-    private sealed class TestWindow : BaseWindow
-    {
-        public void RequestClose(WindowClosingEventArgs args) => OnClosing(args);
-
-        private readonly Border _overlay = new();
         private readonly Border _content = new();
-        protected override Control InteractionOverlay => _overlay;
         protected override Control InteractionContent => _content;
         public bool CanInteract => _content.IsEnabled;
 
-        public TestWindow(bool allowParentInteraction = false)
+        public TestWindow()
         {
-            AllowParentInteraction = allowParentInteraction;
             Content = _content;
         }
     }

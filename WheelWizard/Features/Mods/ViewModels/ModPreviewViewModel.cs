@@ -39,6 +39,7 @@ public sealed class ModPreviewViewModel(
             return _grayscaleImage = new Bitmap(stream);
         }
     }
+    public bool IsLoading { get; private set; }
     public bool ShowPlaceholder => Image is null;
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -54,6 +55,8 @@ public sealed class ModPreviewViewModel(
 
     private async Task LoadCoreAsync()
     {
+        IsLoading = true;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLoading)));
         try
         {
             var url = previewUrl;
@@ -81,6 +84,12 @@ public sealed class ModPreviewViewModel(
         catch
         {
             // Preview failures leave the card's placeholder; mod installation remains available.
+        }
+        finally
+        {
+            IsLoading = false;
+            if (!_disposed)
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLoading)));
         }
     }
 

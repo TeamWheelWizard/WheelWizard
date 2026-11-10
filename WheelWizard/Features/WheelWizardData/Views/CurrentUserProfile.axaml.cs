@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using WheelWizard.MiiImages.Domain;
 using WheelWizard.Settings.Types;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
@@ -55,7 +56,8 @@ public partial class CurrentUserProfile : UserControl
 
         UserName = name;
         FriendCode = friendCode;
-        Mii = mii;
+        // A license without a Mii shows the locked one.
+        Mii = LockedMii.For(mii);
     }
 
     public event EventHandler? ProfileRequested;

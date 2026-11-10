@@ -17,6 +17,21 @@ public static class Crc
         return crc;
     }
 
+    public static byte ComputeCrc8(byte[] buffer, int offset, int length)
+    {
+        const byte poly = 0x07;
+        byte crc = 0x00;
+
+        for (var i = offset; i < offset + length; i++)
+        {
+            crc ^= buffer[i];
+            for (var bit = 0; bit < 8; bit++)
+                crc = (crc & 0x80) != 0 ? (byte)((crc << 1) ^ poly) : (byte)(crc << 1);
+        }
+
+        return crc;
+    }
+
     public static uint ComputeCrc32(byte[] data, int offset, int length)
     {
         const uint poly = 0xEDB88320;

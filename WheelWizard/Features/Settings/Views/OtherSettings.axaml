@@ -8,7 +8,7 @@
              x:Class="WheelWizard.Settings.Views.OtherSettings">
 
     <Grid x:Name="DolphinBorder">
-        <StackPanel Margin="0,15,0,0">
+        <StackPanel Margin="0,10,0,0">
 
             <Grid Margin="0,-10,0,10" MinHeight="40" x:Name="DisabledWarningText">
                 <Border Background="{StaticResource Warning600}"
@@ -48,9 +48,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <CheckBox Grid.Column="1"
+                        <components1:ToggleCheckBox Grid.Column="1"
                                   x:Name="LaunchRrOnStartup"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
                                   IsChecked="False"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
@@ -70,9 +70,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <components1:Button Grid.Column="1"
+                        <components1:ActionButton Grid.Column="1"
                                             x:Name="DolphinReinstallButton"
-                                            Variant="Warning"
+                                            Tone="Danger"
                                             Size="Compact"
                                             IsEnabled="True"
                                             IconData="{StaticResource Download}"
@@ -96,9 +96,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <components1:Button Grid.Column="1"
+                        <components1:ActionButton Grid.Column="1"
                                             x:Name="OpenGameFolderButton"
-                                            Variant="Default"
+                                            Tone="Secondary"
                                             Size="Compact"
                                             IsEnabled="True"
                                             IconData="{StaticResource Folder}"
@@ -116,9 +116,9 @@
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
                                                     Text="{loc:T option.save_folder}" />
-                        <components1:Button Grid.Column="1"
+                        <components1:ActionButton Grid.Column="1"
                                             x:Name="OpenSaveFolderButton"
-                                            Variant="Default"
+                                            Tone="Secondary"
                                             Size="Compact"
                                             IsEnabled="True"
                                             IconData="{StaticResource Folder}"
@@ -132,7 +132,7 @@
 
             <components1:FormFieldLabel x:Name="RecompSectionLabel"
                                         Text="{loc:T section.recomp}"
-                                        Margin="0,0,0,4" />
+                                        Margin="0,10,0,4" />
             <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowSingle" x:Name="RecompBorder">
                 <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                     <StackPanel Grid.Column="0"
@@ -146,9 +146,9 @@
                                    TextAlignment="Left"
                                    TextWrapping="Wrap" />
                     </StackPanel>
-                    <CheckBox Grid.Column="1"
+                    <components1:ToggleCheckBox Grid.Column="1"
                               x:Name="EnableRecomp"
-                              Classes="SwitchDark"
+                              Variant="Switch"
                               IsChecked="False"
                               HorizontalAlignment="Right"
                               VerticalAlignment="Center" />

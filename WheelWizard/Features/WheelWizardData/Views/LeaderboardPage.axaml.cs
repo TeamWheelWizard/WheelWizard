@@ -4,22 +4,24 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Testably.Abstractions;
 using WheelWizard.Localization;
+using WheelWizard.MiiAnimations.Library;
+using WheelWizard.MiiRendering.Services;
 using WheelWizard.Models;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
+using WheelWizard.Shared.Calendar;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
 using WheelWizard.Views.Shell.Navigation;
-using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WheelWizardData.Views.Dialogs;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
-using WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
 
 namespace WheelWizard.WheelWizardData.Views;
 
@@ -32,7 +34,7 @@ public sealed record LeaderboardPlayerItem
     public required string VrText { get; init; }
     public Mii? Mii { get; init; }
     public BadgeVariant[] BadgeVariants { get; init; } = [];
-    public BadgeVariant PrimaryBadge { get; init; }
+    public BadgeVariant PrimaryBadge { get; init; } = BadgeVariant.None;
     public bool HasBadge { get; init; }
     public bool IsSuspicious { get; init; }
     public bool IsEvenRow { get; init; }
@@ -44,13 +46,18 @@ public sealed record LeaderboardPlayerItem
     public Mii? FirstMii => Mii;
     public bool HasBadges => HasBadge;
     public bool IsTopLeaderboardPlayer => true;
+    public WheelWizard.Views.Components.StatusVariant RankBadgeVariant =>
+        Rank is 4 or 5 ? WheelWizard.Views.Components.StatusVariant.Brand
+        : Rank is >= 6 and <= 10 ? WheelWizard.Views.Components.StatusVariant.Info
+        : WheelWizard.Views.Components.StatusVariant.Gray;
+
     public string TopLabel => t("placement.other", new { rank = Rank });
     public bool IsOpenHost => false;
 }
 
 public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 {
-    private IPopupFactory Popups { get; }
+    private IModalFactory Popups { get; }
 
     private INavigationService Navigation { get; }
 
@@ -73,7 +80,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
 
     private IRrLeaderboardSingletonService LeaderboardService { get; }
 
-    private IWhWzDataSingletonService BadgeService { get; }
+    private IRrBadgeSingletonService BadgeService { get; }
 
     private IGameLicenseSingletonService GameDataService { get; }
 
@@ -176,13 +183,17 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
     public bool HasPodiumThird => _podiumThird != null;
 
     public LeaderboardPage(
-        IPopupFactory popups,
+        IModalFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IRrLeaderboardSingletonService leaderboardService,
-        IWhWzDataSingletonService badgeService,
+        IRrBadgeSingletonService badgeService,
         IGameLicenseSingletonService gameDataService,
-        ISettingsManager settingsManager
+        ISettingsManager settingsManager,
+        IMiiNativeRenderer miiRenderer,
+        IMiiAnimationLibrary miiAnimations,
+        ISeasonalCalendar calendar,
+        IRandomSystem random
     )
     {
         Popups = popups;
@@ -194,6 +205,7 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         SettingsManager = settingsManager;
         InitializeComponent();
         DataContext = this;
+        PodiumStage.Initialize(miiRenderer, miiAnimations, random.Random.Shared, calendar, settingsManager.ENABLE_ANIMATIONS.Get());
         RemainingPlayers.CollectionChanged += RemainingPlayers_OnCollectionChanged;
 
         Loaded += LeaderboardPage_Loaded;
@@ -449,15 +461,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
     }
 
-    private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)
-    {
-        var player = GetContextPlayer(sender);
-        if (player?.FirstMii == null)
-            return;
-
-        new MiiCarouselWindow().SetMii(player.FirstMii).Show();
-    }
-
     private void ViewProfile_OnClick(object sender, RoutedEventArgs e)
     {
         var player = GetContextPlayer(sender);
@@ -499,12 +502,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
             return;
         }
 
-        if (GameDataService.ActiveCurrentFriends.Count >= 30)
-        {
-            ViewUtils.ShowSnackbar(t("snackbar_warning.friend_list_full"), ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
         var normalizedFriendCodeResult = NormalizeFriendCode(player.FriendCode);
         if (normalizedFriendCodeResult.IsFailure)
         {
@@ -517,18 +514,6 @@ public partial class LeaderboardPage : UserControl, INotifyPropertyChanged
         if (activeUserPid == friendProfileId)
         {
             ViewUtils.ShowSnackbar(t("snackbar_warning.add_own_fc"), ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        var duplicateFriend = GameDataService.ActiveCurrentFriends.Any(friend =>
-        {
-            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
-            return existingPid != 0 && existingPid == friendProfileId;
-        });
-
-        if (duplicateFriend)
-        {
-            ViewUtils.ShowSnackbar(t("snackbar_warning.add_existing_friend"), ViewUtils.SnackbarType.Warning);
             return;
         }
 

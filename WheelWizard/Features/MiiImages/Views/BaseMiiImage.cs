@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using WheelWizard.MiiImages;
 using WheelWizard.MiiImages.Domain;
@@ -72,10 +73,8 @@ public abstract class BaseMiiImage : UserControl, INotifyPropertyChanged
         }
     }
 
-    public static readonly StyledProperty<ReloadMethodType> ReloadMethodProperty = AvaloniaProperty.Register<
-        BaseMiiImage,
-        ReloadMethodType
-    >(nameof(ReloadMethod));
+    public static readonly StyledProperty<ReloadMethodType> ReloadMethodProperty =
+        MiiImageControl.ReloadMethodProperty.AddOwner<BaseMiiImage>();
 
     public ReloadMethodType ReloadMethod
     {
@@ -83,12 +82,28 @@ public abstract class BaseMiiImage : UserControl, INotifyPropertyChanged
         set => SetValue(ReloadMethodProperty, value);
     }
 
-    public static readonly StyledProperty<Mii?> MiiProperty = AvaloniaProperty.Register<BaseMiiImage, Mii?>(nameof(Mii));
+    public static readonly StyledProperty<Mii?> MiiProperty = MiiImageControl.MiiProperty.AddOwner<BaseMiiImage>();
 
     public Mii? Mii
     {
         get => GetValue(MiiProperty);
         set => SetValue(MiiProperty, value);
+    }
+
+    public static readonly StyledProperty<IBrush> LoadingColorProperty = MiiImageControl.LoadingColorProperty.AddOwner<BaseMiiImage>();
+
+    public IBrush LoadingColor
+    {
+        get => GetValue(LoadingColorProperty);
+        set => SetValue(LoadingColorProperty, value);
+    }
+
+    public static readonly StyledProperty<IBrush> FallBackColorProperty = MiiImageControl.FallBackColorProperty.AddOwner<BaseMiiImage>();
+
+    public IBrush FallBackColor
+    {
+        get => GetValue(FallBackColorProperty);
+        set => SetValue(FallBackColorProperty, value);
     }
 
     static BaseMiiImage()

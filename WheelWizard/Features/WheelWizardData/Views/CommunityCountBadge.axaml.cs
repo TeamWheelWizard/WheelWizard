@@ -30,17 +30,6 @@ public class CommunityCountBadge : TemplatedControl
         set => SetValue(IconDataProperty, value);
     }
 
-    public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<CommunityCountBadge, double>(
-        nameof(IconSize),
-        20
-    );
-
-    public double IconSize
-    {
-        get => GetValue(IconSizeProperty);
-        set => SetValue(IconSizeProperty, value);
-    }
-
     public static readonly StyledProperty<string> TipTextProperty = AvaloniaProperty.Register<CommunityCountBadge, string>(nameof(TipText));
 
     public string TipText
@@ -51,7 +40,7 @@ public class CommunityCountBadge : TemplatedControl
 
     public static readonly StyledProperty<StatusVariant> VariantProperty = AvaloniaProperty.Register<CommunityCountBadge, StatusVariant>(
         nameof(Variant),
-        StatusVariant.Default
+        StatusVariant.Gray
     );
 
     public StatusVariant Variant

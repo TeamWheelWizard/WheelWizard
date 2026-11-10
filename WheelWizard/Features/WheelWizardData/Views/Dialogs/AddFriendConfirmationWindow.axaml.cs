@@ -5,14 +5,15 @@ using WheelWizard.WiiManagement.MiiManagement.Domain.Mii;
 
 namespace WheelWizard.WheelWizardData.Views.Dialogs;
 
-public partial class AddFriendConfirmationWindow : PopupContent
+public partial class AddFriendConfirmationWindow : ModalContent
 {
     private TaskCompletionSource<bool> _tcs = new();
 
     public AddFriendConfirmationWindow()
-        : base(true, false, true, "Add Friend")
+        : base("Add Friend")
     {
         InitializeComponent();
+        IsDismissible = true;
     }
 
     public AddFriendConfirmationWindow(PlayerProfileResponse profile, Mii friendMii)

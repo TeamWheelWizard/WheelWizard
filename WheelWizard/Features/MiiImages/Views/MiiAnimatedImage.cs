@@ -1,0 +1,101 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using WheelWizard.MiiAnimations.Playback;
+using WheelWizard.MiiImages.Domain;
+
+namespace WheelWizard.MiiImages.Views;
+
+/// <summary>
+/// A Mii that lives: it plays its <see cref="Performance"/> (idles, extras) in realtime 3D, framed by
+/// <see cref="MiiImageControl.ImageVariant"/> (the clips move the Mii, so that usually has no character rotation).
+/// Without a performance, with animations turned off or without OpenGL it's a still image of
+/// <see cref="StillVariant"/> (or <see cref="MiiImageControl.ImageVariant"/>) instead.
+/// </summary>
+public sealed class MiiAnimatedImage : MiiImageControl
+{
+    static MiiAnimatedImage() => ImageVariantProperty.OverrideDefaultValue<MiiAnimatedImage>(MiiImageVariants.FriendsSideProfileLive);
+
+    public static readonly StyledProperty<MiiImageSpecifications?> StillVariantProperty = AvaloniaProperty.Register<
+        MiiAnimatedImage,
+        MiiImageSpecifications?
+    >(nameof(StillVariant));
+
+    /// <summary>The still image shown instead of the animated Mii; <see cref="MiiImageControl.ImageVariant"/> when not set.</summary>
+    public MiiImageSpecifications? StillVariant
+    {
+        get => GetValue(StillVariantProperty);
+        set => SetValue(StillVariantProperty, value);
+    }
+
+    public static readonly StyledProperty<MiiPerformance?> PerformanceProperty = AvaloniaProperty.Register<
+        MiiAnimatedImage,
+        MiiPerformance?
+    >(nameof(Performance));
+
+    /// <summary>What the Mii does (see <see cref="MiiAnimations.MiiPerformances"/>); null shows the still image.</summary>
+    public MiiPerformance? Performance
+    {
+        get => GetValue(PerformanceProperty);
+        set => SetValue(PerformanceProperty, value);
+    }
+
+    public static readonly StyledProperty<double> MaxFramesPerSecondProperty = AvaloniaProperty.Register<MiiAnimatedImage, double>(
+        nameof(MaxFramesPerSecond),
+        30
+    );
+
+    /// <summary>
+    /// Frame rate cap of the animated Mii. 30 suits calm idles and keeps lists of Miis cheap; use 0 (display rate)
+    /// for big, quick motion.
+    /// </summary>
+    public double MaxFramesPerSecond
+    {
+        get => GetValue(MaxFramesPerSecondProperty);
+        set => SetValue(MaxFramesPerSecondProperty, value);
+    }
+
+    private MiiAnimatedView? _view;
+
+    /// <summary>
+    /// Fired after every drawn frame of the live Mii with where its head is in this control, e.g. to keep a label on
+    /// it. Null when there's no live Mii to follow (a still picture, animations off, or no Mii).
+    /// </summary>
+    public event Action<MiiHeadOnScreen?>? HeadMoved;
+    private (IReadOnlyList<string> Entrance, IReadOnlyList<string>? Exit)? _arrival;
+
+    /// <summary>Plays a random clip from <paramref name="folders"/> once (a reaction), then the performance carries on.</summary>
+    public void Play(params string[] folders) => _view?.Play(folders);
+
+    /// <summary>
+    /// The next Mii that's set arrives with a clip from <paramref name="entrance"/> (which starts with the Mii out of
+    /// sight). When a Mii is showing, it first leaves with a clip from <paramref name="exit"/>, if given.
+    /// </summary>
+    public void ArriveWith(IReadOnlyList<string> entrance, IReadOnlyList<string>? exit = null)
+    {
+        if (_view is { } view)
+            view.ArriveWith(entrance, exit);
+        else
+            _arrival = (entrance, exit);
+    }
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        if (_view is not null)
+            _view.HeadMoved -= OnHeadMoved;
+        _view = e.NameScope.Find<MiiAnimatedView>("PART_Renderer");
+        if (_view is not null)
+            _view.HeadMoved += OnHeadMoved;
+        if (_view is not null && _arrival is { } arrival)
+        {
+            _arrival = null;
+            _view.ArriveWith(arrival.Entrance, arrival.Exit);
+        }
+    }
+
+    private void OnHeadMoved(MiiHeadOnScreen? head) => HeadMoved?.Invoke(head);
+}
+
+/// <summary>Where a live Mii's head is in its control: the middle of the head and the top of it (hair included).</summary>
+public readonly record struct MiiHeadOnScreen(Point Middle, Point Crown);

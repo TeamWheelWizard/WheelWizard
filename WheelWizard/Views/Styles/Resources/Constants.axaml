@@ -120,40 +120,40 @@
                             </Border>
                         </StackPanel>
 
-                        <!-- Primary Scale -->
+                        <!-- Brand Scale -->
                         <StackPanel Spacing="2">
-                            <TextBlock HorizontalAlignment="Center">Primary</TextBlock>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary50}">
+                            <TextBlock HorizontalAlignment="Center">Brand</TextBlock>
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand50}">
                                 <TextBlock Text="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary100}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand100}">
                                 <TextBlock Text="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary200}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand200}">
                                 <TextBlock Text="200" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary300}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand300}">
                                 <TextBlock Text="300" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary400}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand400}">
                                 <TextBlock Text="400" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary500}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand500}">
                                 <TextBlock Text="500" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary600}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand600}">
                                 <TextBlock Text="600" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary700}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand700}">
                                 <TextBlock Text="700" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary800}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand800}">
                                 <TextBlock Text="800" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary900}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand900}">
                                 <TextBlock Text="900" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
                             </Border>
-                            <Border Width="60" Height="30" Background="{DynamicResource Primary950}">
+                            <Border Width="60" Height="30" Background="{DynamicResource Brand950}">
                                 <TextBlock Text="950" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
                             </Border>
                         </StackPanel>
@@ -222,18 +222,18 @@
         <Color x:Key="Blue900">#103A69</Color>
         <Color x:Key="Blue950">#0A2547</Color>
 
-        <!-- Primary Scale -->
-        <Color x:Key="Primary50">#EEFFFA</Color>
-        <Color x:Key="Primary100">#C7FFF0</Color>
-        <Color x:Key="Primary200">#8EFFE2</Color>
-        <Color x:Key="Primary300">#34EAC5</Color>
-        <Color x:Key="Primary400">#01CBA5</Color>
-        <Color x:Key="Primary500">#00A488</Color>
-        <Color x:Key="Primary600">#00A488</Color>
-        <Color x:Key="Primary700">#03826E</Color>
-        <Color x:Key="Primary800">#08675A</Color>
-        <Color x:Key="Primary900">#0C554A</Color>
-        <Color x:Key="Primary950">#00342F</Color>
+        <!-- Brand Scale -->
+        <Color x:Key="Brand50">#EEFFFA</Color>
+        <Color x:Key="Brand100">#C7FFF0</Color>
+        <Color x:Key="Brand200">#8EFFE2</Color>
+        <Color x:Key="Brand300">#34EAC5</Color>
+        <Color x:Key="Brand400">#01CBA5</Color>
+        <Color x:Key="Brand500">#00A488</Color>
+        <Color x:Key="Brand600">#00A488</Color>
+        <Color x:Key="Brand700">#03826E</Color>
+        <Color x:Key="Brand800">#08675A</Color>
+        <Color x:Key="Brand900">#0C554A</Color>
+        <Color x:Key="Brand950">#00342F</Color>
     
         <Color x:Key="BlackIsh">#090A0C</Color>
     

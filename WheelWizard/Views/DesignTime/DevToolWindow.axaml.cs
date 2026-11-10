@@ -18,7 +18,7 @@ using WheelWizard.WheelWizardData;
 
 namespace WheelWizard.Views.DesignTime;
 
-public partial class DevToolWindow : PopupContent, IPollingListener
+public partial class DevToolWindow : ModalContent, IPollingListener
 {
     private IMemoryCache Cache { get; }
 
@@ -29,21 +29,26 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     private DevelopmentRefreshService DevelopmentRefresh { get; }
     private INavigationService Navigation { get; }
 
+    private IModalFactory Popups { get; }
+
     public DevToolWindow(
         IMemoryCache cache,
         IDolphinLaunchService dolphinLaunchService,
         LiveRoomsService liveRooms,
         DevelopmentRefreshService developmentRefresh,
-        INavigationService navigation
+        INavigationService navigation,
+        IModalFactory popups
     )
-        : base(true, true, true, "Dev Tool")
+        : base("Dev Tool")
     {
         Cache = cache;
         DolphinLaunchService = dolphinLaunchService;
         LiveRooms = liveRooms;
         DevelopmentRefresh = developmentRefresh;
         Navigation = navigation;
+        Popups = popups;
         InitializeComponent();
+        IsDismissible = true;
         DevelopmentRefresh.Subscribe(this);
         LoadSettings();
     }
@@ -63,11 +68,15 @@ public partial class DevToolWindow : PopupContent, IPollingListener
     private void LoadSettings()
     {
         WhWzTopMost.IsChecked = ViewUtils.GetLayout().Topmost;
+        SuccessStatusIconOverride.IsChecked = ViewUtils.GetLayout().DevSuccessStatusIconOverride;
     }
 
     private void WhWzTopMost_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().Topmost = WhWzTopMost.IsChecked == true;
 
-    private void ForceEnableLayout_OnClick(object sender, RoutedEventArgs e) => ViewUtils.GetLayout().SetInteractable(true);
+    private void SuccessStatusIconOverride_OnClick(object sender, RoutedEventArgs e) =>
+        ViewUtils.GetLayout().SetDevSuccessStatusIconOverride(SuccessStatusIconOverride.IsChecked == true);
+
+    private void ShowMiiAnimator_OnClick(object sender, RoutedEventArgs e) => Popups.Create<MiiAnimatorDevWindow>().Show();
 
     private void ClearCache_OnClick(object sender, RoutedEventArgs e) => ((MemoryCache)Cache).Clear();
 
@@ -142,7 +151,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
             .SetMainText("Do you click yes or no")
             .AwaitAnswer();
 
-        YesNoPopupButton.Variant = yesNoWindow ? ButtonVariant.Primary : ButtonVariant.Danger;
+        YesNoPopupButton.Tone = yesNoWindow ? ActionButtonTone.Brand : ActionButtonTone.Danger;
     }
 
     private async void OptionsPopup_OnClick(object sender, RoutedEventArgs e)
@@ -155,7 +164,7 @@ public partial class DevToolWindow : PopupContent, IPollingListener
             .AddOption("Banana", "Not an Option", () => { }, false)
             .AwaitAnswer();
 
-        OptionsPopupButton.Variant = optionsWindow != null ? ButtonVariant.Warning : ButtonVariant.Danger;
+        OptionsPopupButton.Tone = optionsWindow != null ? ActionButtonTone.Primary : ActionButtonTone.Danger;
         OptionsPopupButton.Text = optionsWindow ?? "Clicked away";
     }
 

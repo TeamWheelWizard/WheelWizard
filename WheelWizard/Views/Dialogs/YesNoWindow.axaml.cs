@@ -6,7 +6,7 @@ using WheelWizard.Views.Dialogs.Base;
 
 namespace WheelWizard.Views.Dialogs;
 
-public partial class YesNoWindow : PopupContent
+public partial class YesNoWindow : ModalContent
 {
     public bool Result { get; private set; } = false;
 
@@ -19,9 +19,10 @@ public partial class YesNoWindow : PopupContent
     private TaskCompletionSource<bool>? _tcs;
 
     public YesNoWindow()
-        : base(true, false, true, "Wheel Wizard")
+        : base("Wheel Wizard")
     {
         InitializeComponent();
+        IsDismissible = true;
         YesButton.Text = t("action.yes");
         NoButton.Text = t("action.no");
     }
@@ -49,10 +50,10 @@ public partial class YesNoWindow : PopupContent
         return this;
     }
 
-    public YesNoWindow SetButtonVariants(ButtonVariant yesVariant, ButtonVariant noVariant)
+    public YesNoWindow SetButtonTones(ActionButtonTone yesVariant, ActionButtonTone noVariant)
     {
-        YesButton.Variant = yesVariant;
-        NoButton.Variant = noVariant;
+        YesButton.Tone = yesVariant;
+        NoButton.Tone = noVariant;
         return this;
     }
 

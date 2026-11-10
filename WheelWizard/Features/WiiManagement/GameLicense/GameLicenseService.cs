@@ -10,8 +10,9 @@ using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Binary;
 using WheelWizard.Shared.IO;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Polling;
-using WheelWizard.WheelWizardData;
+using WheelWizard.Shared.Processes;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense.Domain;
 using WheelWizard.WiiManagement.MiiManagement;
@@ -94,26 +95,33 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
 {
     private readonly IMiiDbService _miiService;
     private readonly IFileSystem _fileSystem;
-    private readonly IWhWzDataSingletonService _whWzDataSingletonService;
+    private readonly IRrBadgeSingletonService _badgeService;
     private readonly IRrRatingReader _rrratingReader;
     private readonly ISettingsManager _settingsManager;
     private readonly ISaveRegionService _saveRegions;
     private readonly IDolphinPaths _dolphinPaths;
     private readonly ICustomDistributionPaths _distributionPaths;
     private readonly IRoomPresence _presence;
+    private readonly IProcessLauncher _processes;
+    private readonly IRuntimeEnvironment _environment;
+    private readonly IUnixProcessService _unixProcesses;
+    private readonly ILogger<GameLicenseSingletonService> _logger;
     private LicenseCollection Licenses { get; }
     private byte[]? _rksysData;
 
     public GameLicenseSingletonService(
         IMiiDbService miiService,
         IFileSystem fileSystem,
-        IWhWzDataSingletonService whWzDataSingletonService,
+        IRrBadgeSingletonService badgeService,
         IRrRatingReader rrratingReader,
         ISettingsManager settingsManager,
         ISaveRegionService saveRegions,
         IDolphinPaths dolphinPaths,
         ICustomDistributionPaths distributionPaths,
         IRoomPresence presence,
+        IProcessLauncher processes,
+        IRuntimeEnvironment environment,
+        IUnixProcessService unixProcesses,
         IPollingScheduler scheduler,
         TimeProvider timeProvider,
         ILogger<GameLicenseSingletonService> logger
@@ -122,13 +130,17 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
     {
         _miiService = miiService;
         _fileSystem = fileSystem;
-        _whWzDataSingletonService = whWzDataSingletonService;
+        _badgeService = badgeService;
         _rrratingReader = rrratingReader;
         _settingsManager = settingsManager;
         _saveRegions = saveRegions;
         _dolphinPaths = dolphinPaths;
         _distributionPaths = distributionPaths;
         _presence = presence;
+        _processes = processes;
+        _environment = environment;
+        _unixProcesses = unixProcesses;
+        _logger = logger;
         Licenses = new();
     }
 
@@ -144,14 +156,31 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
     private const int FriendSecondaryDataSize = 0x0C;
     private const int MiiSize = 0x4A;
 
-    // Pending one-sided friend entry (bit0 set, bit1 clear).
-    private const ushort FriendSlotStateAdded = 0x0001;
-    private const byte DwcFriendControlTypeInvalid = 0x00;
-    private const byte DwcFriendControlTypeFriendKey = 0x10;
-    private const ushort DefaultFriendCityId = 0;
-    private const byte DefaultFriendGameRegion = 0;
-    private const byte DefaultFriendCountryCode = 0xFF;
-    private const byte DefaultFriendRegionId = 0xFF;
+    // Friend flags: bit0 the entry is in use, bit1 the game still has to download the friend's info.
+    private const ushort FriendFlagAdded = 0x0001;
+    private const ushort FriendFlagInfoPending = 0x0002;
+    private const int FriendDwcIndexOffset = 0x66;
+
+    // First word of the DWC friend data: bits 11-12 hold the type, bit 13 is set once the friend added you back.
+    private const uint DwcFriendTypeMask = 0x1800;
+    private const uint DwcFriendTypeFriendKey = 0x1000;
+    private const uint DwcFriendTypeProfileId = 0x1800;
+    private const uint DwcFriendBuddyFlag = 0x2000;
+
+    // Retro Rewind stores a friend's VR/BR in rksys.dat as whole hundreds (29,367 VR is stored as 293).
+    private const uint FriendRatingScale = 100;
+    private const uint DefaultRating = 5000;
+    private const uint MaxRating = 1_000_000;
+
+    /// <summary>
+    /// Turns a friend's VR/BR from rksys.dat into rating points. Older WheelWizard versions stored full points instead,
+    /// so the default (5000) and anything above the highest stored rating are already points.
+    /// </summary>
+    public static uint FriendRatingFromRksys(uint stored) =>
+        stored == DefaultRating || stored > MaxRating / FriendRatingScale ? stored : stored * FriendRatingScale;
+
+    /// <summary>Turns rating points into the friend VR/BR stored in rksys.dat.</summary>
+    public static ushort FriendRatingToRksys(uint points) => (ushort)(Math.Min(points, MaxRating) / FriendRatingScale);
 
     /// <summary>
     /// Returns the "focused" or currently active license/user as determined by the Settings.
@@ -332,7 +361,7 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             Br = br,
             TotalRaceCount = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0xB4),
             TotalWinCount = BigEndianBinary.BufferToUint32(_rksysData, rkpdOffset + 0xDC),
-            BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
+            BadgeVariants = _badgeService.GetBadges(friendCode),
             // Region is often found near offset 0x23308 + 0x3802 in RKGD. This code is a partial guess.
             // In practice, region might be read differently depending on your rksys layout.
             RegionId = BigEndianBinary.BufferToUint16(_rksysData, 0x23308 + 0x3802) / 4096,
@@ -385,40 +414,38 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         if (_rksysData == null)
             return;
 
-        var friendOffset = userOffset + FriendDataOffset;
         for (var i = 0; i < MaxFriendNum; i++)
         {
-            var currentOffset = friendOffset + i * FriendDataSize;
-            if (!CheckForMiiData(currentOffset + 0x1A))
+            var currentOffset = FriendOffset(userOffset, i);
+            if (!IsFriendAdded(_rksysData, currentOffset))
                 continue;
 
-            var statusFlags = (ushort)BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x10);
-            var baseSlotState = (ushort)(statusFlags & 0x0003);
-            var secondaryOffset = userOffset + FriendSecondaryDataOffset + i * FriendSecondaryDataSize;
-            var secondaryControlByte = _rksysData[secondaryOffset + 0x2];
-            // Treat legacy one-sided entries with control byte 0x00 as pending as well.
-            var isPending =
-                baseSlotState == FriendSlotStateAdded
-                && (secondaryControlByte == DwcFriendControlTypeFriendKey || secondaryControlByte == DwcFriendControlTypeInvalid);
+            // Until the game has downloaded a friend's info the entry may not have a Mii yet.
+            Mii? mii = null;
+            if (HasMiiData(_rksysData, currentOffset))
+            {
+                var miiResult = MiiSerializer.Deserialize(_rksysData.AsSpan(currentOffset + 0x1A, MiiSize).ToArray());
+                if (miiResult.IsSuccess)
+                    mii = miiResult.Value;
+            }
 
-            var rawMiiBytes = _rksysData.AsSpan(currentOffset + 0x1A, MiiSize).ToArray();
+            var dwcOffset = DwcFriendOffset(userOffset, i);
+            var isRegistered =
+                IsRegisteredFriend(BigEndianBinary.BufferToUint32(_rksysData, dwcOffset))
+                && DwcFriendProfileId(_rksysData, dwcOffset) == BigEndianBinary.BufferToUint32(_rksysData, currentOffset + 0x04);
             var friendCode = FriendCode.GetFriendCode(_rksysData, currentOffset + 4);
-            var miiResult = MiiSerializer.Deserialize(rawMiiBytes);
-            if (miiResult.IsFailure)
-                continue;
-
             var friend = new FriendProfile
             {
-                Vr = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x16),
-                Br = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x18),
+                Vr = FriendRatingFromRksys(BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x16)),
+                Br = FriendRatingFromRksys(BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x18)),
                 FriendCode = friendCode,
                 Wins = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x14),
                 Losses = BigEndianBinary.BufferToUint16(_rksysData, currentOffset + 0x12),
                 CountryCode = _rksysData[currentOffset + 0x68],
                 RegionId = _rksysData[currentOffset + 0x69],
-                BadgeVariants = _whWzDataSingletonService.GetBadges(friendCode),
-                IsPending = isPending,
-                Mii = miiResult.Value,
+                BadgeVariants = _badgeService.GetBadges(friendCode),
+                IsPending = !isRegistered,
+                Mii = mii,
             };
             licenseProfile.Friends.Add(friend);
         }
@@ -465,13 +492,55 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
 
     public OperationResult AddFriend(int userIndex, string friendCode, Mii friendMii, uint vr = 5000, uint br = 5000)
     {
-        if (userIndex is < 0 or >= MaxPlayerNum)
-            return Fail("Invalid license index. Please select a valid license.");
         if (friendMii is null)
             return Fail("Friend Mii cannot be null.");
-        if (_rksysData is null || _rksysData.Length < RksysSize)
-            return Fail("Invalid or unloaded rksys.dat data.");
 
+        var normalizedFriendCode = NormalizeFriendCode(friendCode);
+        if (normalizedFriendCode.IsFailure)
+            return normalizedFriendCode.Error;
+
+        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode.Value);
+        if (friendProfileId is 0 or > int.MaxValue)
+            return Fail("Invalid friend code.");
+        if (!FriendCode.TryParseFriendCode(normalizedFriendCode.Value, out var friendCodeValue))
+            return Fail("Invalid friend code.");
+
+        var friendMiiDataResult = MiiSerializer.Serialize(friendMii);
+        if (friendMiiDataResult.IsFailure)
+            return friendMiiDataResult.Error;
+
+        return EditFriends(
+            userIndex,
+            (data, rkpdOffset, repairedProfileIds) =>
+            {
+                if (BigEndianBinary.BufferToUint32(data, rkpdOffset + 0x5C) == friendProfileId)
+                    return Fail("You cannot add your own friend code.");
+
+                if (HasFriend(data, rkpdOffset, friendProfileId))
+                    return repairedProfileIds.Contains(friendProfileId) ? Ok() : Fail("This friend is already in your list.");
+
+                ClearDwcFriendData(data, rkpdOffset, friendProfileId);
+                var slotIndex = FindFirstEmptyFriendSlot(data, rkpdOffset);
+                if (slotIndex < 0)
+                    return Fail("Your friend list is full. Remove a friend and try again.");
+
+                WriteFriendSlot(
+                    data,
+                    rkpdOffset,
+                    slotIndex,
+                    friendCodeValue,
+                    friendProfileId,
+                    friendMiiDataResult.Value,
+                    FriendRatingToRksys(vr),
+                    FriendRatingToRksys(br)
+                );
+                return Ok();
+            }
+        );
+    }
+
+    public OperationResult RemoveFriend(int userIndex, string friendCode)
+    {
         var normalizedFriendCode = NormalizeFriendCode(friendCode);
         if (normalizedFriendCode.IsFailure)
             return normalizedFriendCode.Error;
@@ -479,92 +548,175 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode.Value);
         if (friendProfileId == 0)
             return Fail("Invalid friend code.");
-        if (!FriendCode.TryParseFriendCode(normalizedFriendCode.Value, out var friendCodeValue))
-            return Fail("Invalid friend code.");
 
-        var selectedLicense = Licenses.Users[userIndex];
-        var currentUserPid = FriendCode.FriendCodeToProfileId(selectedLicense.FriendCode);
-        if (currentUserPid != 0 && currentUserPid == friendProfileId)
-            return Fail("You cannot add your own friend code.");
+        return EditFriends(
+            userIndex,
+            (data, rkpdOffset, _) =>
+            {
+                var removed = false;
+                for (var i = 0; i < MaxFriendNum; i++)
+                {
+                    var mainOffset = FriendOffset(rkpdOffset, i);
+                    if (IsFriendAdded(data, mainOffset) && BigEndianBinary.BufferToUint32(data, mainOffset + 0x04) == friendProfileId)
+                    {
+                        Array.Clear(data, mainOffset, FriendDataSize);
+                        removed = true;
+                    }
+                }
 
-        var duplicateFriend = selectedLicense.Friends.Any(friend =>
-        {
-            var pid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
-            return pid != 0 && pid == friendProfileId;
-        });
-        if (duplicateFriend)
-            return Fail("This friend is already in your list.");
+                ClearDwcFriendData(data, rkpdOffset, friendProfileId);
+                return removed ? Ok() : Fail("Friend was not found in this license.");
+            }
+        );
+    }
 
-        var friendMiiDataResult = MiiSerializer.Serialize(friendMii);
-        if (friendMiiDataResult.IsFailure)
-            return friendMiiDataResult.Error;
+    // Publish the fresh save only after the atomic write succeeds.
+    private OperationResult EditFriends(int userIndex, Func<byte[], int, IReadOnlySet<uint>, OperationResult> edit)
+    {
+        if (userIndex is < 0 or >= MaxPlayerNum || userIndex >= Licenses.Users.Count)
+            return Fail("Invalid license index. Please select a valid license.");
+        if (_rksysData is null || !_settingsManager.PathsSetupCorrectly())
+            return Fail("Invalid or unloaded rksys.dat data.");
+        if (IsDolphinRunning())
+            return Fail("Close Dolphin before changing your friend list, the game would undo the change.");
+
+        var path = RksysFilePath();
+        var readResult = TryCatch(() => _fileSystem.File.ReadAllBytes(path), "Failed to load rksys.dat.");
+        if (readResult.IsFailure)
+            return readResult.Error;
+
+        var data = readResult.Value;
+        if (data.Length != RksysSize || Encoding.ASCII.GetString(data, 0, RksysMagic.Length) != RksysMagic)
+            return Fail("rksys.dat is invalid, your friend list was not changed.");
 
         var rkpdOffset = RksysMagic.Length + userIndex * RkpdSize;
-        var slotIndex = FindFirstEmptyFriendSlot(rkpdOffset);
-        if (slotIndex < 0)
-            return Fail("Your friend list is full. Remove a friend and try again.");
+        var licenseProfileId = BigEndianBinary.BufferToUint32(data, rkpdOffset + 0x5C);
+        if (
+            Encoding.ASCII.GetString(data, rkpdOffset, RkpdMagic.Length) != RkpdMagic
+            || licenseProfileId == 0
+            || licenseProfileId != FriendCode.FriendCodeToProfileId(Licenses.Users[userIndex].FriendCode)
+        )
+            return Fail("This license changed since it was loaded. Please try again.");
 
-        WriteFriendSlot(
-            rkpdOffset,
-            slotIndex,
-            friendCodeValue,
-            friendProfileId,
-            friendMiiDataResult.Value,
-            (ushort)Math.Min(vr, ushort.MaxValue),
-            (ushort)Math.Min(br, ushort.MaxValue)
-        );
+        var repairedProfileIds = RepairFriendKeys(data, rkpdOffset);
+        var editResult = edit(data, rkpdOffset, repairedProfileIds);
+        if (editResult.IsFailure)
+            return editResult.Error;
 
-        var saveResult = SaveRksysToFile();
+        FixRksysCrc(data);
+        var saveResult = _fileSystem.WriteAllBytesAtomic(path, data, "Failed to save rksys.dat.");
         if (saveResult.IsFailure)
             return saveResult.Error;
 
+        _rksysData = data;
         return ParseUsers();
     }
 
-    private bool CheckForMiiData(int offset)
+    // Repair only incomplete friend-key tokens with a matching main entry.
+    private static HashSet<uint> RepairFriendKeys(byte[] data, int rkpdOffset)
     {
-        if (_rksysData == null || offset < 0 || offset + MiiSize > _rksysData.Length)
-            return false;
-
-        // If the entire 0x4A bytes are zero, we treat it as empty / no Mii data
-        for (var i = 0; i < MiiSize; i++)
+        var repaired = new HashSet<uint>();
+        for (var i = 0; i < MaxFriendNum; i++)
         {
-            if (_rksysData[offset + i] != 0)
+            var mainOffset = FriendOffset(rkpdOffset, i);
+            var flags = FriendFlags(data, mainOffset);
+            if ((flags & (FriendFlagAdded | FriendFlagInfoPending)) != FriendFlagAdded || data[mainOffset + FriendDwcIndexOffset] != i)
+                continue;
+
+            var profileId = BigEndianBinary.BufferToUint32(data, mainOffset + 0x04);
+            var friendKey = FriendKey(data, mainOffset);
+            if (profileId == 0 || friendKey != FriendCode.ProfileIdToFriendCode(profileId))
+                continue;
+
+            var dwcOffset = DwcFriendOffset(rkpdOffset, i);
+            if (
+                BigEndianBinary.BufferToUint32(data, dwcOffset) != DwcFriendTypeFriendKey
+                || BigEndianBinary.BufferToUint32(data, dwcOffset + 0x04) != profileId
+                || BigEndianBinary.BufferToUint32(data, dwcOffset + 0x08) != 0
+            )
+                continue;
+
+            // A key without checksum still works when either checksum DWC accepts is zero.
+            var checksum = (uint)(friendKey >> 32);
+            if (checksum == 0 || FriendCode.ProfileIdToCrc8Checksum(profileId) == 0)
+                continue;
+
+            BigEndianBinary.WriteUInt32BigEndian(data, dwcOffset + 0x08, checksum);
+            // Schedule the game's friend-info download.
+            BigEndianBinary.WriteUInt16BigEndian(data, mainOffset + 0x10, (ushort)(flags | FriendFlagInfoPending));
+            repaired.Add(profileId);
+        }
+
+        return repaired;
+    }
+
+    private static int FriendOffset(int rkpdOffset, int index) => rkpdOffset + FriendDataOffset + index * FriendDataSize;
+
+    private static int DwcFriendOffset(int rkpdOffset, int index) =>
+        rkpdOffset + FriendSecondaryDataOffset + index * FriendSecondaryDataSize;
+
+    private static ushort FriendFlags(byte[] data, int friendOffset) => (ushort)BigEndianBinary.BufferToUint16(data, friendOffset + 0x10);
+
+    private static ulong FriendKey(byte[] data, int friendOffset) =>
+        ((ulong)BigEndianBinary.BufferToUint32(data, friendOffset) << 32) | BigEndianBinary.BufferToUint32(data, friendOffset + 0x04);
+
+    private static bool HasMiiData(byte[] data, int friendOffset) =>
+        data.AsSpan(friendOffset + 0x1A, MiiSize).IndexOfAnyExcept((byte)0) >= 0;
+
+    private static bool IsFriendAdded(byte[] data, int friendOffset) =>
+        (FriendFlags(data, friendOffset) & FriendFlagAdded) != 0 && FriendKey(data, friendOffset) != 0;
+
+    private static bool IsFriendSlotEmpty(byte[] data, int friendOffset) =>
+        FriendKey(data, friendOffset) == 0 && (FriendFlags(data, friendOffset) & FriendFlagAdded) == 0 && !HasMiiData(data, friendOffset);
+
+    /// <summary>A friend is only registered once both players added each other.</summary>
+    private static bool IsRegisteredFriend(uint dwcFriendData) =>
+        (dwcFriendData & DwcFriendTypeMask) == DwcFriendTypeProfileId && (dwcFriendData & DwcFriendBuddyFlag) != 0;
+
+    /// <summary>The profile ID in DWC friend data, or 0 when it holds none.</summary>
+    private static uint DwcFriendProfileId(byte[] data, int dwcOffset)
+    {
+        var type = BigEndianBinary.BufferToUint32(data, dwcOffset) & DwcFriendTypeMask;
+        return type is DwcFriendTypeFriendKey or DwcFriendTypeProfileId ? BigEndianBinary.BufferToUint32(data, dwcOffset + 0x04) : 0;
+    }
+
+    private static bool HasFriend(byte[] data, int rkpdOffset, uint friendProfileId)
+    {
+        for (var i = 0; i < MaxFriendNum; i++)
+        {
+            var mainOffset = FriendOffset(rkpdOffset, i);
+            if (IsFriendAdded(data, mainOffset) && BigEndianBinary.BufferToUint32(data, mainOffset + 0x04) == friendProfileId)
                 return true;
         }
 
         return false;
     }
 
-    private int FindFirstEmptyFriendSlot(int rkpdOffset)
+    private static void ClearDwcFriendData(byte[] data, int rkpdOffset, uint friendProfileId)
     {
-        if (_rksysData == null)
-            return -1;
-
-        var friendOffset = rkpdOffset + FriendDataOffset;
         for (var i = 0; i < MaxFriendNum; i++)
         {
-            var currentOffset = friendOffset + i * FriendDataSize;
-            if (IsFriendSlotEmpty(currentOffset))
+            var dwcOffset = DwcFriendOffset(rkpdOffset, i);
+            if (DwcFriendProfileId(data, dwcOffset) == friendProfileId)
+                Array.Clear(data, dwcOffset, FriendSecondaryDataSize);
+        }
+    }
+
+    private static int FindFirstEmptyFriendSlot(byte[] data, int rkpdOffset)
+    {
+        for (var i = 0; i < MaxFriendNum; i++)
+        {
+            var dwcType = BigEndianBinary.BufferToUint32(data, DwcFriendOffset(rkpdOffset, i)) & DwcFriendTypeMask;
+            if (IsFriendSlotEmpty(data, FriendOffset(rkpdOffset, i)) && dwcType == 0)
                 return i;
         }
 
         return -1;
     }
 
-    private bool IsFriendSlotEmpty(int friendSlotOffset)
-    {
-        if (_rksysData == null)
-            return true;
-
-        var statusFlags = (ushort)BigEndianBinary.BufferToUint16(_rksysData, friendSlotOffset + 0x10);
-        var profileId = BigEndianBinary.BufferToUint32(_rksysData, friendSlotOffset + 0x04);
-        var hasMii = CheckForMiiData(friendSlotOffset + 0x1A);
-
-        return profileId == 0 && (statusFlags & 0x0003) == 0 && !hasMii;
-    }
-
-    private void WriteFriendSlot(
+    /// <summary>Writes a friend the way the game adds one by friend code.</summary>
+    private static void WriteFriendSlot(
+        byte[] data,
         int rkpdOffset,
         int slotIndex,
         ulong friendCodeValue,
@@ -574,93 +726,79 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
         ushort br
     )
     {
-        if (_rksysData == null)
-            return;
+        var mainOffset = FriendOffset(rkpdOffset, slotIndex);
+        var secondaryOffset = DwcFriendOffset(rkpdOffset, slotIndex);
 
-        var mainOffset = rkpdOffset + FriendDataOffset + slotIndex * FriendDataSize;
-        var secondaryOffset = rkpdOffset + FriendSecondaryDataOffset + slotIndex * FriendSecondaryDataSize;
+        Array.Clear(data, mainOffset, FriendDataSize);
+        Array.Clear(data, secondaryOffset, FriendSecondaryDataSize);
 
-        Array.Clear(_rksysData, mainOffset, FriendDataSize);
-        Array.Clear(_rksysData, secondaryOffset, FriendSecondaryDataSize);
+        BigEndianBinary.WriteUInt32BigEndian(data, mainOffset, (uint)(friendCodeValue >> 32));
+        BigEndianBinary.WriteUInt32BigEndian(data, mainOffset + 0x04, friendProfileId);
+        BigEndianBinary.WriteUInt16BigEndian(data, mainOffset + 0x10, FriendFlagAdded | FriendFlagInfoPending);
+        BigEndianBinary.WriteUInt16BigEndian(data, mainOffset + 0x16, vr);
+        BigEndianBinary.WriteUInt16BigEndian(data, mainOffset + 0x18, br);
 
-        // Friend identity key (high 32 bits + profile ID low 32 bits).
-        BigEndianBinary.WriteUInt32BigEndian(_rksysData, mainOffset, (uint)(friendCodeValue >> 32));
-        BigEndianBinary.WriteUInt32BigEndian(_rksysData, mainOffset + 0x04, friendProfileId);
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x10, FriendSlotStateAdded);
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x12, 0);
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x14, 0);
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x16, vr);
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x18, br);
-
-        Array.Copy(serializedMii, 0, _rksysData, mainOffset + 0x1A, MiiSize);
+        // Only a preview, the game replaces it with the friend's own info once they added you back.
+        Array.Copy(serializedMii, 0, data, mainOffset + 0x1A, MiiSize);
         var miiCrc = Crc.ComputeCrc16Ccitt(serializedMii, 0, serializedMii.Length);
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x64, miiCrc);
+        BigEndianBinary.WriteUInt16BigEndian(data, mainOffset + 0x64, miiCrc);
+        data[mainOffset + FriendDwcIndexOffset] = (byte)slotIndex;
 
-        _rksysData[mainOffset + 0x66] = (byte)slotIndex;
-        _rksysData[mainOffset + 0x67] = DefaultFriendGameRegion;
-        _rksysData[mainOffset + 0x68] = DefaultFriendCountryCode;
-        _rksysData[mainOffset + 0x69] = DefaultFriendRegionId;
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6A, DefaultFriendCityId);
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6C, 0);
-        BigEndianBinary.WriteUInt16BigEndian(_rksysData, mainOffset + 0x6E, 0);
-
-        for (var i = 0; i < 10; i++)
-        {
-            BigEndianBinary.WriteUInt32BigEndian(_rksysData, mainOffset + 0x70 + i * 8, 0xFFFFFFFF);
-        }
-
-        // One-sided pending friend request token.
-        _rksysData[secondaryOffset + 0x2] = DwcFriendControlTypeFriendKey;
-        BigEndianBinary.WriteUInt32BigEndian(_rksysData, secondaryOffset + 0x4, friendProfileId);
+        // Friend key token: type, profile ID and the friend code checksum.
+        BigEndianBinary.WriteUInt32BigEndian(data, secondaryOffset, DwcFriendTypeFriendKey);
+        BigEndianBinary.WriteUInt32BigEndian(data, secondaryOffset + 0x04, friendProfileId);
+        BigEndianBinary.WriteUInt32BigEndian(data, secondaryOffset + 0x08, (uint)(friendCodeValue >> 32));
     }
 
-    public OperationResult RemoveFriend(int userIndex, string friendCode)
+    private bool IsDolphinRunning()
     {
-        if (userIndex is < 0 or >= MaxPlayerNum)
-            return Fail("Invalid license index. Please select a valid license.");
-        if (_rksysData is null || _rksysData.Length < RksysSize)
-            return Fail("Invalid or unloaded rksys.dat data.");
-
-        var normalizedFriendCode = NormalizeFriendCode(friendCode);
-        if (normalizedFriendCode.IsFailure)
-            return normalizedFriendCode.Error;
-
-        var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode.Value);
-        if (friendProfileId == 0)
-            return Fail("Invalid friend code.");
-
-        var rkpdOffset = RksysMagic.Length + userIndex * RkpdSize;
-        var slotIndex = FindFriendSlotByProfileId(rkpdOffset, friendProfileId);
-        if (slotIndex < 0)
-            return Fail("Friend was not found in this license.");
-
-        var mainOffset = rkpdOffset + FriendDataOffset + slotIndex * FriendDataSize;
-        var secondaryOffset = rkpdOffset + FriendSecondaryDataOffset + slotIndex * FriendSecondaryDataSize;
-        Array.Clear(_rksysData, mainOffset, FriendDataSize);
-        Array.Clear(_rksysData, secondaryOffset, FriendSecondaryDataSize);
-
-        var saveResult = SaveRksysToFile();
-        if (saveResult.IsFailure)
-            return saveResult.Error;
-
-        return ParseUsers();
+        try
+        {
+            var executable = _dolphinPaths.ExecutablePath;
+            if (!_environment.IsWindows && ShellQuoting.TryUnquoteUnixArgument(executable, out var unquotedExecutable))
+                executable = unquotedExecutable;
+            var configuredName = _fileSystem.Path.GetFileNameWithoutExtension(executable);
+            string[] processNames = _environment.IsLinux ? ["dolphin-emu", configuredName] : ["Dolphin", "dolphin-emu", configuredName];
+            return processNames
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Any(name =>
+                    _processes
+                        .GetProcessIds(name)
+                        .Any(processId =>
+                            !_environment.IsLinux
+                            || name.Equals("dolphin-emu", StringComparison.OrdinalIgnoreCase)
+                            || IsConfiguredExecutable(processId, executable)
+                        )
+                );
+        }
+        catch (Exception e)
+        {
+            // Rather refuse the change than risk the game overwriting it.
+            _logger.LogDebug(e, "Could not check whether Dolphin is running");
+            return true;
+        }
     }
 
-    private int FindFriendSlotByProfileId(int rkpdOffset, uint friendProfileId)
+    private bool IsConfiguredExecutable(int processId, string executable)
     {
-        if (_rksysData == null || friendProfileId == 0)
-            return -1;
+        var runningExecutable = _processes.GetExecutablePath(processId);
+        if (string.IsNullOrWhiteSpace(runningExecutable))
+            throw new InvalidOperationException("The process executable is unavailable.");
 
-        var friendOffset = rkpdOffset + FriendDataOffset;
-        for (var i = 0; i < MaxFriendNum; i++)
-        {
-            var currentOffset = friendOffset + i * FriendDataSize;
-            var currentPid = BigEndianBinary.BufferToUint32(_rksysData, currentOffset + 0x04);
-            if (currentPid == friendProfileId)
-                return i;
-        }
+        var resolution = _unixProcesses.Run(
+            "/usr/bin/env",
+            new[] { "realpath", "-e", "-z", "--", executable },
+            out var resolvedPath,
+            out _
+        );
+        if (resolution.IsFailure || resolution.Value != 0 || string.IsNullOrEmpty(resolvedPath))
+            throw new IOException("The configured executable could not be resolved.");
 
-        return -1;
+        var configuredExecutable = resolvedPath.TrimEnd('\0');
+        return _fileSystem
+            .Path.GetFullPath(runningExecutable)
+            .Equals(_fileSystem.Path.GetFullPath(configuredExecutable), StringComparison.Ordinal);
     }
 
     private static OperationResult<string> NormalizeFriendCode(string friendCode)
@@ -694,20 +832,18 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             if (!_fileSystem.Directory.Exists(_distributionPaths.SaveFolderPath))
                 return Fail("Save folder not found");
 
-            var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
+            // Dolphin uses the save of the game's region, so follow the game file instead of letting the user pick.
+            var currentRegion = _saveRegions.ResolveActiveRegion(_distributionPaths.SaveFolderPath);
             if (currentRegion == MarioKartWiiEnums.Regions.None)
+                return Fail("No valid regions found");
+
+            var previousRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
+            if (currentRegion != previousRegion)
             {
-                // Double check if there's at least one valid region
-                var validRegions = _saveRegions.GetAvailableRegions(_distributionPaths.SaveFolderPath);
-                if (validRegions.First() != MarioKartWiiEnums.Regions.None)
-                {
-                    currentRegion = validRegions.First();
-                    _settingsManager.Set(_settingsManager.RR_REGION, currentRegion);
-                }
-                else
-                {
-                    return Fail("No valid regions found");
-                }
+                _settingsManager.Set(_settingsManager.RR_REGION, currentRegion);
+                // The focused slot belonged to the other region's save.
+                if (previousRegion != MarioKartWiiEnums.Regions.None)
+                    _settingsManager.Set(_settingsManager.FOCUSED_USER, 0);
             }
 
             var saveFileFolder = _fileSystem.Path.Combine(_distributionPaths.SaveFolderPath, GameRegion.GetGameId(currentRegion));
@@ -820,10 +956,14 @@ public class GameLicenseSingletonService : ObservablePollingService, IGameLicens
             return Fail($"Refusing to save rksys.dat: expected {RksysSize} bytes but got {_rksysData.Length}.");
 
         FixRksysCrc(_rksysData);
+        return _fileSystem.WriteAllBytesAtomic(RksysFilePath(), _rksysData, "Failed to save rksys.dat.");
+    }
+
+    private string RksysFilePath()
+    {
         var currentRegion = _settingsManager.Get<MarioKartWiiEnums.Regions>(_settingsManager.RR_REGION);
         var saveFolder = _fileSystem.Path.Combine(_distributionPaths.SaveFolderPath, GameRegion.GetGameId(currentRegion));
-        var path = _fileSystem.Path.Combine(saveFolder, "rksys.dat");
-        return _fileSystem.WriteAllBytesAtomic(path, _rksysData, "Failed to save rksys.dat.");
+        return _fileSystem.Path.Combine(saveFolder, "rksys.dat");
     }
 
     protected override Task ExecuteTaskAsync(CancellationToken cancellationToken)

@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="444" d:DesignHeight="716"
              x:Class="WheelWizard.Settings.Views.RecompSettings">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="0,15,0,0">
+        <StackPanel Margin="0,10,0,0">
             <Grid Margin="0,-10,0,10" MinHeight="40" x:Name="NotInstalledText" IsVisible="False">
                 <Border Background="{StaticResource Warning600}"
                         CornerRadius="9999"
@@ -51,7 +51,7 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <ComboBox Grid.Column="1"
+                        <components:Dropdown Grid.Column="1"
                                   x:Name="ResolutionDropdown"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
@@ -71,7 +71,7 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <ComboBox Grid.Column="1"
+                        <components:Dropdown Grid.Column="1"
                                   x:Name="GraphicsApiDropdown"
                                   PlaceholderText="Auto"
                                   HorizontalAlignment="Right"
@@ -86,15 +86,15 @@
                                                    HorizontalAlignment="Left"
                                                    VerticalAlignment="Center"
                                                    Text="{loc:T option.show_fps}" />
-                        <CheckBox Grid.Column="1"
+                        <components:ToggleCheckBox Grid.Column="1"
                                   x:Name="ShowFps"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
                     </Grid>
                 </Border>
 
-                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowMiddle">
                     <Grid ColumnDefinitions="*,Auto" MinHeight="40">
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,16,0"
@@ -107,9 +107,30 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <CheckBox Grid.Column="1"
+                        <components:ToggleCheckBox Grid.Column="1"
                                   x:Name="PreventStutters"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Border Classes="SettingsBlockStyle SettingsRowStyle SettingsRowBottom">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="40">
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,16,0"
+                                    Spacing="3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                            <components:FormFieldLabel Text="{loc:T option.recomp_gx_worker}" />
+                            <SelectableTextBlock Classes="TinyText"
+                                       Text="{loc:T helper_text.recomp_gx_worker}"
+                                       TextAlignment="Left"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <components:ToggleCheckBox Grid.Column="1"
+                                  x:Name="GxWorker"
+                                  Variant="Switch"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
                     </Grid>
@@ -145,9 +166,9 @@
                                                  TextAlignment="Left"
                                                  TextWrapping="Wrap" />
                         </StackPanel>
-                        <CheckBox Grid.Column="1"
+                        <components:ToggleCheckBox Grid.Column="1"
                                   x:Name="ShareDolphinData"
-                                  Classes="SwitchDark"
+                                  Variant="Switch"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center" />
                     </Grid>
@@ -170,9 +191,9 @@
                                                  TextAlignment="Left"
                                                  TextWrapping="Wrap" />
                         </StackPanel>
-                        <components:Button Grid.Column="1"
+                        <components:ActionButton Grid.Column="1"
                                            x:Name="CloneDolphinDataButton"
-                                           Variant="Default"
+                                           Tone="Secondary"
                                            Size="Compact"
                                            Text="{loc:T action.clone}"
                                            IconData="{StaticResource Duplicate}"
@@ -195,9 +216,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <components:Button Grid.Column="1"
+                        <components:ActionButton Grid.Column="1"
                                            x:Name="OpenInstallFolder"
-                                           Variant="Default"
+                                           Tone="Secondary"
                                            Size="Compact"
                                            IconData="{StaticResource Folder}"
                                            Text="{loc:T action.open}"
@@ -220,9 +241,9 @@
                                        TextAlignment="Left"
                                        TextWrapping="Wrap" />
                         </StackPanel>
-                        <components:Button Grid.Column="1"
+                        <components:ActionButton Grid.Column="1"
                                            x:Name="UninstallButton"
-                                           Variant="Danger"
+                                           Tone="Danger"
                                            Size="Compact"
                                            IconData="{StaticResource Trash}"
                                            Text="{loc:T action.un_install}"

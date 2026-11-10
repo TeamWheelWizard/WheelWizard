@@ -51,6 +51,9 @@ public class GameBananaModPreview
     [JsonPropertyName("_aRootCategory")]
     public required GameBananaCategory RootCategory { get; set; }
 
+    [JsonPropertyName("_aSubCategory")]
+    public GameBananaCategory? SubCategory { get; set; }
+
     /// <summary>
     /// e.g. "Mod" , "Question", "Thread", "Sound"
     /// </summary>

@@ -18,13 +18,12 @@ using WheelWizard.WheelWizardData.Views.Dialogs;
 using WheelWizard.WiiManagement.FriendCodes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
-using WheelWizard.WiiManagement.MiiManagement.Views.Dialogs;
 
 namespace WheelWizard.RrRooms.Views;
 
 public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPollingListener
 {
-    private IPopupFactory Popups { get; } = null!;
+    private IModalFactory Popups { get; } = null!;
 
     private INavigationService Navigation { get; } = null!;
 
@@ -69,7 +68,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
     }
 
     public RoomDetailsPage(
-        IPopupFactory popups,
+        IModalFactory popups,
         INavigationService navigation,
         LiveRoomsService liveRooms,
         IGameLicenseSingletonService gameDataService,
@@ -126,15 +125,6 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         ViewUtils.ShowSnackbar(t("snackbar_success.copied_fc"));
     }
 
-    private void OpenCarousel_OnClick(object sender, RoutedEventArgs e)
-    {
-        if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
-            return;
-        if (selectedPlayer.FirstMii == null)
-            return;
-        new MiiCarouselWindow().SetMii(selectedPlayer.FirstMii).Show();
-    }
-
     private void ViewProfile_OnClick(object sender, RoutedEventArgs e)
     {
         if (PlayersListView.SelectedItem is not RrPlayer selectedPlayer)
@@ -157,27 +147,21 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
 
         if (selectedPlayer.FirstMii == null)
         {
-            ViewUtils.ShowSnackbar("This player has no valid Mii data.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.mii_invalid"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
         var focusedUserIndex = SettingsService.Get<int>(SettingsService.FOCUSED_USER);
         if (focusedUserIndex is < 0 or > 3)
         {
-            ViewUtils.ShowSnackbar("Invalid license selected.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.license_invalid"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
         var activeUserPid = FriendCode.FriendCodeToProfileId(GameDataService.ActiveUser.FriendCode);
         if (activeUserPid == 0)
         {
-            ViewUtils.ShowSnackbar("Select a valid license before adding friends.", ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        if (GameDataService.ActiveCurrentFriends.Count >= 30)
-        {
-            ViewUtils.ShowSnackbar("Your friend list is full.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.license_invalid_self"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
@@ -192,19 +176,7 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         var friendProfileId = FriendCode.FriendCodeToProfileId(normalizedFriendCode);
         if (activeUserPid == friendProfileId)
         {
-            ViewUtils.ShowSnackbar("You cannot add your own friend code.", ViewUtils.SnackbarType.Warning);
-            return;
-        }
-
-        var duplicateFriend = GameDataService.ActiveCurrentFriends.Any(friend =>
-        {
-            var existingPid = FriendCode.FriendCodeToProfileId(friend.FriendCode);
-            return existingPid != 0 && existingPid == friendProfileId;
-        });
-
-        if (duplicateFriend)
-        {
-            ViewUtils.ShowSnackbar("This friend is already in your list.", ViewUtils.SnackbarType.Warning);
+            ViewUtils.ShowSnackbar(t("snackbar_warning.add_own_fc"), ViewUtils.SnackbarType.Warning);
             return;
         }
 
@@ -233,22 +205,22 @@ public partial class RoomDetailsPage : UserControl, INotifyPropertyChanged, IPol
         }
 
         ViewUtils.GetLayout().UpdateFriendCount();
-        ViewUtils.ShowSnackbar($"Added {selectedPlayer.Name} to your friend list.");
+        ViewUtils.ShowSnackbar(t("snackbar_success.friend_added", new { name = selectedPlayer.Name }));
     }
 
     private static OperationResult<string> NormalizeFriendCode(string friendCode)
     {
         if (string.IsNullOrWhiteSpace(friendCode))
-            return Fail("Friend code cannot be empty.");
+            return Fail(t("snackbar_warning.empty_fc"));
 
         var digits = new string(friendCode.Where(char.IsDigit).ToArray());
         if (digits.Length != 12 || !ulong.TryParse(digits, out _))
-            return Fail("Friend code must be exactly 12 digits.");
+            return Fail(t("snackbar_warning.invalid_fc"));
 
         var formatted = $"{digits[..4]}-{digits.Substring(4, 4)}-{digits.Substring(8, 4)}";
         var profileId = FriendCode.FriendCodeToProfileId(formatted);
         if (profileId == 0)
-            return Fail("Invalid friend code.");
+            return Fail(t("snackbar_warning.nonexisting_fc"));
 
         return formatted;
     }

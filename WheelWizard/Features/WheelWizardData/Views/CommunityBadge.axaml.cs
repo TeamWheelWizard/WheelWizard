@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using WheelWizard.WheelWizardData.Domain;
 
@@ -9,21 +10,38 @@ public class CommunityBadge : TemplatedControl
     private static readonly Dictionary<BadgeVariant, string> BadgeToolTip = new()
     {
         { BadgeVariant.None, "This is not a badge" },
-        { BadgeVariant.WhWzDev, "Wheel Wizard Developer (hiii!)" },
-        { BadgeVariant.RrDev, "Retro Rewind Developer" },
+        { BadgeVariant.RetroRewindDeveloper, "Retro Rewind Developer" },
+        { BadgeVariant.WheelWizardDeveloper, "Wheel Wizard Developer (hiii!)" },
+        { BadgeVariant.MajorContributor, "Major Contributor" },
+        { BadgeVariant.RWFCModerator, "Retro WFC Moderator" },
+        { BadgeVariant.DiscordStaff, "Discord Staff" },
+        { BadgeVariant.Contributor, "Contributor" },
         { BadgeVariant.Translator, "Translator" },
-        { BadgeVariant.TranslatorLead, "Translator Lead" },
+        { BadgeVariant.Supporter, "Supporter" },
+        { BadgeVariant.BetaTester, "Beta Tester" },
         { BadgeVariant.Heart, "Heart of the Community" },
         // winner badges
-        { BadgeVariant.Firestarter_GoldWinner, "Firestarter Tournament Winner" },
-        { BadgeVariant.Firestarter_SilverWinner, "Firestarter Tournament Runner-Up" },
-        { BadgeVariant.Firestarter_BronzeWinner, "Firestarter Tournament Runner-Up" },
-        { BadgeVariant.SummitShowdown_GoldWinner, "Summit Showdown Tournament Winner" },
-        { BadgeVariant.SummitShowdown_SilverWinner, "Summit Showdown Tournament Runner-Up" },
-        { BadgeVariant.SummitShowdown_BronzeWinner, "Summit Showdown Tournament Runner-Up" },
-        { BadgeVariant.Leafstruck_GoldWinner, "Leafstruck Tournament Winner" },
-        { BadgeVariant.Leafstruck_SilverWinner, "Leafstruck Tournament Runner-Up" },
-        { BadgeVariant.Leafstruck_BronzeWinner, "Leafstruck Tournament Runner-Up" },
+        { BadgeVariant.FireStarterGold, "Firestarter Tournament Winner" },
+        { BadgeVariant.FireStarterSilver, "Firestarter Tournament 2nd Place" },
+        { BadgeVariant.FireStarterBronze, "Firestarter Tournament 3rd Place" },
+        { BadgeVariant.LeafStruckGold, "Leafstruck Tournament Winner" },
+        { BadgeVariant.LeafStruckSilver, "Leafstruck Tournament 2nd Place" },
+        { BadgeVariant.LeafStruckBronze, "Leafstruck Tournament 3rd Place" },
+        { BadgeVariant.SummitShowdownGold, "Summit Showdown Tournament Winner" },
+        { BadgeVariant.SummitShowdownSilver, "Summit Showdown Tournament 2nd Place" },
+        { BadgeVariant.SummitShowdownBronze, "Summit Showdown Tournament 3rd Place" },
+        { BadgeVariant.HorizonGold, "Horizon Tournament Winner" },
+        { BadgeVariant.HorizonSilver, "Horizon Tournament 2nd Place" },
+        { BadgeVariant.HorizonBronze, "Horizon Tournament 3rd Place" },
+        { BadgeVariant.SunblossomGold, "Sunblossom Tournament Winner" },
+        { BadgeVariant.SunblossomSilver, "Sunblossom Tournament 2nd Place" },
+        { BadgeVariant.SunblossomBronze, "Sunblossom Tournament 3rd Place" },
+        { BadgeVariant.EarthboundGold, "Earthbound Tournament Winner" },
+        { BadgeVariant.EarthboundSilver, "Earthbound Tournament 2nd Place" },
+        { BadgeVariant.EarthboundBronze, "Earthbound Tournament 3rd Place" },
+        { BadgeVariant.BotBGold, "Bottom of the Barrel Tournament Winner" },
+        { BadgeVariant.BotBSilver, "Bottom of the Barrel Tournament 2nd Place" },
+        { BadgeVariant.BotBBronze, "Bottom of the Barrel Tournament 3rd Place" },
     };
 
     public static readonly StyledProperty<string> HoverTipProperty = AvaloniaProperty.Register<CommunityBadge, string>(
@@ -37,8 +55,10 @@ public class CommunityBadge : TemplatedControl
         set => SetValue(HoverTipProperty, value);
     }
 
+    // None has to be the explicit default, since 0 is a real badge id.
     public static readonly StyledProperty<BadgeVariant> VariantProperty = AvaloniaProperty.Register<CommunityBadge, BadgeVariant>(
-        nameof(Variant)
+        nameof(Variant),
+        BadgeVariant.None
     );
 
     public BadgeVariant Variant
@@ -47,9 +67,15 @@ public class CommunityBadge : TemplatedControl
         set => SetValue(VariantProperty, value);
     }
 
-    private void UpdateTooltip(BadgeVariant variant)
+    private void UpdateVariant(BadgeVariant variant)
     {
         HoverTip = BadgeToolTip.GetValueOrDefault(variant, BadgeToolTip[BadgeVariant.None]);
+
+        // Tournament ids come in gold/silver/bronze triplets starting at 2000, so they all share one style per tier.
+        var tournamentTier = variant >= BadgeVariant.FireStarterGold ? ((int)variant - (int)BadgeVariant.FireStarterGold) % 3 : -1;
+        PseudoClasses.Set(":gold", tournamentTier == 0);
+        PseudoClasses.Set(":silver", tournamentTier == 1);
+        PseudoClasses.Set(":bronze", tournamentTier == 2);
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -57,6 +83,6 @@ public class CommunityBadge : TemplatedControl
         base.OnPropertyChanged(change);
 
         if (change.Property == VariantProperty)
-            UpdateTooltip(change.GetNewValue<BadgeVariant>());
+            UpdateVariant(change.GetNewValue<BadgeVariant>());
     }
 }

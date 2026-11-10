@@ -7,15 +7,15 @@
         <Border Padding="20" Background="{StaticResource Neutral950}">
             <StackPanel Spacing="40" Orientation="Horizontal">
                 <StackPanel Spacing="10">
-                    <communityControls:CommunityCountBadge Text="10" IconSize="0" Enable67="False" Enable69="False"/>
-                    <communityControls:CommunityCountBadge Text="69" IconSize="0" Enable67="False" Enable69="False"/>
-                    <communityControls:CommunityCountBadge Text="67" IconSize="0" Enable67="False" Enable69="False"/>
+                    <communityControls:CommunityCountBadge Text="10" Enable67="False" Enable69="False"/>
+                    <communityControls:CommunityCountBadge Text="69" Enable67="False" Enable69="False"/>
+                    <communityControls:CommunityCountBadge Text="67" Enable67="False" Enable69="False"/>
                 </StackPanel>
                 
                 <StackPanel Spacing="10">
-                    <communityControls:CommunityCountBadge Text="10" IconSize="0" />
-                    <communityControls:CommunityCountBadge Text="69" IconSize="0" />
-                    <communityControls:CommunityCountBadge Text="67" IconSize="0" />
+                    <communityControls:CommunityCountBadge Text="10" />
+                    <communityControls:CommunityCountBadge Text="69" />
+                    <communityControls:CommunityCountBadge Text="67" />
                 </StackPanel>
                 
                 <StackPanel Spacing="10">
@@ -37,7 +37,6 @@
                         <!-- Normal State -->
                         <components:StatusBadge x:Name="PART_StateBox"
                                              IconData="{TemplateBinding IconData}"
-                                             IconSize="{TemplateBinding IconSize}"
                                              Text="{TemplateBinding Text}"
                                              FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=communityControls:CommunityCountBadge}}"
                                              Variant="{TemplateBinding Variant}"
@@ -46,7 +45,6 @@
                         <!-- 67 Special State -->
                         <components:StatusBadge x:Name="PART_SpecialBadge"
                                              IconData="{TemplateBinding IconData}"
-                                             IconSize="{TemplateBinding IconSize}"
                                              Variant="{TemplateBinding Variant}"
                                              FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=communityControls:CommunityCountBadge}}"
                                              TipText="{TemplateBinding TipText}"
@@ -66,7 +64,7 @@
                         </components:StatusBadge>
                     </Panel>
 
-                    <components:FormFieldLabel Foreground="{StaticResource Primary400}"
+                    <components:FormFieldLabel Foreground="{StaticResource Brand400}"
                                                Text="Nice!"
                                                x:Name="PART_NiceLabel"
                                                IsVisible="False"

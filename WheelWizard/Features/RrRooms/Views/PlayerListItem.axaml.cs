@@ -39,6 +39,16 @@ public class PlayerListItem : TemplatedControl
         string.Empty
     );
 
+    public static readonly StyledProperty<StatusVariant> TopLabelVariantProperty = AvaloniaProperty.Register<PlayerListItem, StatusVariant>(
+        nameof(TopLabelVariant),
+        StatusVariant.Brand
+    );
+    public StatusVariant TopLabelVariant
+    {
+        get => GetValue(TopLabelVariantProperty);
+        set => SetValue(TopLabelVariantProperty, value);
+    }
+
     public bool HasBadges
     {
         get => GetValue(HasBadgesProperty);

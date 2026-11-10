@@ -22,8 +22,7 @@
                         Spacing="8">
                 <TextBlock Text="{loc:T page_title.my_miis}"
                            Classes="PageTitleText" />
-                <components:StatusBadge Text="0"
-                                     IconSize="0"
+                <components:StatusBadge Height="24" Padding="8,3" Text="0"
                                      x:Name="ListItemCount"
                                      VerticalAlignment="Center" />
             </StackPanel>
@@ -35,43 +34,43 @@
                         Orientation="Horizontal"
                         Spacing="6"
                         IsVisible="{Binding IsVisible, ElementName=VisibleWhenDb}">
-                <components:Button Text="" Click="FavMii_OnClick" x:Name="FavoriteMiiButton"
-                                   Variant="Default" Padding="10"
+                <components:ActionButton Text="" Click="FavMii_OnClick" x:Name="FavoriteMiiButton"
+                                   Tone="Secondary"
                                    ToolTip.ShowDelay="0" ToolTip.Placement="Top">
-                    <components:Button.Styles>
-                        <Style Selector="components|Button">
+                    <components:ActionButton.Styles>
+                        <Style Selector="components|ActionButton">
                             <Setter Property="IconData" Value="{StaticResource StarIcon}"/>
                             <Setter Property="ToolTip.Tip" Value="{loc:T action.favorite}"/>
                         </Style>
-                        <Style Selector="components|Button.UnFav">
+                        <Style Selector="components|ActionButton.UnFav">
                             <Setter Property="IconData" Value="{StaticResource EmptyStarIcon}"/>
                             <Setter Property="ToolTip.Tip" Value="{loc:T action.unfavorite}"/>
                         </Style>
-                    </components:Button.Styles>
-                </components:Button>
-                <components:Button Text="" Click="EditMii_OnClick" x:Name="EditMiisButton"
+                    </components:ActionButton.Styles>
+                </components:ActionButton>
+                <components:ActionButton Text="" Click="EditMii_OnClick" x:Name="EditMiisButton"
                                    IconData="{StaticResource Pen}"
-                                   Variant="Default" Padding="10" IsVisible="False"
+                                   Tone="Secondary" IsVisible="False"
                                    ToolTip.ShowDelay="0" ToolTip.Placement="Top"
                                    ToolTip.Tip="{loc:T action.edit}" />
-                <components:Button Text="" Click="DuplicateMii_OnClick" x:Name="DuplicateMiisButton"
+                <components:ActionButton Text="" Click="DuplicateMii_OnClick" x:Name="DuplicateMiisButton"
                                    IconData="{StaticResource Duplicate}"
-                                   Variant="Default" Padding="10" IsVisible="False"
+                                   Tone="Secondary" IsVisible="False"
                                    ToolTip.ShowDelay="0" ToolTip.Placement="Top"
                                    ToolTip.Tip="{loc:T action.duplicate}" />
-                <components:Button Text="" Click="ExportMii_OnClick" x:Name="ExportMiisButton"
+                <components:ActionButton Text="" Click="ExportMii_OnClick" x:Name="ExportMiisButton"
                                    IconData="{StaticResource FileExport}"
-                                   Variant="Default" Padding="10" IsVisible="False"
+                                   Tone="Secondary" IsVisible="False"
                                    ToolTip.ShowDelay="0" ToolTip.Placement="Top"
                                    ToolTip.Tip="{loc:T action.export}" />
-                <components:Button Text="" Click="DeleteMii_OnClick" x:Name="DeleteMiisButton"
+                <components:ActionButton Text="" Click="DeleteMii_OnClick" x:Name="DeleteMiisButton"
                                    IconData="{StaticResource Trash}"
-                                   Variant="Danger" Padding="10" IsVisible="False"
+                                   Tone="Danger" IsVisible="False"
                                    ToolTip.ShowDelay="0" ToolTip.Placement="Top"
                                    ToolTip.Tip="{loc:T action.delete}" />
-                <components:Button Text="" Click="ImportMii_OnClick" x:Name="ImportMiiButton"
+                <components:ActionButton Text="" Click="ImportMii_OnClick" x:Name="ImportMiiButton"
                                    IconData="{StaticResource FileImport}"
-                                   Variant="Default" Padding="10"
+                                   Tone="Secondary"
                                    ToolTip.ShowDelay="0" ToolTip.Placement="Top"
                                    ToolTip.Tip="{loc:T action.import}" />
             </StackPanel>

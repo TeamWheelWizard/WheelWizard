@@ -1,12 +1,14 @@
+using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
 using WheelWizard.ApplicationData;
 using WheelWizard.ApplicationLifecycle.Logging;
+using WheelWizard.DiscImages;
 using WheelWizard.Dolphin.Discovery;
 using WheelWizard.Dolphin.Paths;
+using WheelWizard.Models.Enums;
 using WheelWizard.Settings;
 using WheelWizard.Settings.Types;
 using WheelWizard.Shared.Desktop.Storage;
@@ -16,25 +18,19 @@ using WheelWizard.Shared.Processes;
 using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell;
-using SettingsButton = WheelWizard.Views.Components.Button;
+using WheelWizard.WiiManagement.GameLicense;
+using SettingsButton = WheelWizard.Views.Components.ActionButton;
 
 namespace WheelWizard.Settings.Views;
 
 public partial class WhWzSettings : UserControl
 {
+    private readonly IFileSystem fileSystem;
+
     // #todo: move settings state and location-change workflows into a view model so this page mostly handles the controls.
-    private readonly IMainWindowService _mainWindow;
     private readonly IApplicationLogFiles _logFiles;
 
-    private sealed record LanguageDropdownItem(string Key, string DisplayName)
-    {
-        public override string ToString() => DisplayName;
-    }
-
-    private readonly bool _pageLoaded;
-    private bool _editingScale;
     private bool _isMovingAppData;
-    private bool _updatingLanguageDropdown;
 
     private IFilePickerService FilePicker { get; }
 
@@ -42,43 +38,40 @@ public partial class WhWzSettings : UserControl
 
     private ISettingsManager SettingsService { get; }
 
-    private ISettingsLocalizationService LocalizationService { get; }
-
     private IDolphinSettingManager DolphinSettingsService { get; }
 
     private IDolphinDiscoveryService DolphinDiscovery { get; }
 
     private IApplicationDataLocation ApplicationData { get; }
 
+    private IDiscImageService DiscImages { get; }
+
     public WhWzSettings(
+        IFileSystem fileSystem,
         IApplicationLogFiles logFiles,
-        IMainWindowService mainWindow,
         IFilePickerService filePicker,
         IDolphinPaths dolphinPaths,
         ISettingsManager settingsService,
-        ISettingsLocalizationService localizationService,
         IDolphinSettingManager dolphinSettingsService,
         IDolphinDiscoveryService dolphinDiscovery,
-        IApplicationDataLocation applicationData
+        IApplicationDataLocation applicationData,
+        IDiscImageService discImages
     )
     {
+        this.fileSystem = fileSystem;
+        DiscImages = discImages;
         FilePicker = filePicker;
         DolphinPaths = dolphinPaths;
         SettingsService = settingsService;
-        LocalizationService = localizationService;
         DolphinSettingsService = dolphinSettingsService;
         DolphinDiscovery = dolphinDiscovery;
         ApplicationData = applicationData;
-        _mainWindow = mainWindow;
         _logFiles = logFiles;
         InitializeComponent();
         ConfigureLocationFieldsForActiveFrontend();
         UpdateLocationRows();
-        LoadSettings();
+        RefreshLocalizedCodeText();
         UpdateAppDataLocationUi();
-        _pageLoaded = true;
-
-        WhWzLanguageDropdown.SelectionChanged += WhWzLanguageDropdown_OnSelectionChanged;
     }
 
     private void ConfigureLocationFieldsForActiveFrontend()
@@ -92,62 +85,11 @@ public partial class WhWzSettings : UserControl
         ToolTip.SetTip(LocationWarningIcon, recompEnabled ? t("helper_text.must_set_game_path") : t("helper_text.must_set_paths"));
     }
 
-    private void LoadSettings()
-    {
-        // -----------------
-        // Wheel Wizard Language Dropdown
-        // -----------------
-        RefreshLanguageDropdown();
-        RefreshLocalizedCodeText();
-
-        // -----------------
-        // Window Scale settings
-        // -----------------
-        // IMPORTANT: Make sure that the number and percentage is always the last word in the string,
-        // If you don't want this, you should change the code below that parses the string back to an actual value
-
-        foreach (var scale in SettingValues.WindowScales)
-        {
-            WindowScaleDropdown.Items.Add(ScaleToString(scale));
-        }
-
-        var selectedItemText = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
-        if (!WindowScaleDropdown.Items.Contains(selectedItemText))
-            WindowScaleDropdown.Items.Add(selectedItemText);
-        WindowScaleDropdown.SelectedItem = selectedItemText;
-
-        EnableAnimations.IsChecked = (bool)SettingsService.ENABLE_ANIMATIONS.Get();
-    }
-
-    private void RefreshLanguageDropdown()
-    {
-        var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-        _updatingLanguageDropdown = true;
-        try
-        {
-            WhWzLanguageDropdown.Items.Clear();
-            foreach (var (key, displayNameFactory) in SettingValues.WhWzLanguages)
-            {
-                WhWzLanguageDropdown.Items.Add(new LanguageDropdownItem(key, displayNameFactory()));
-            }
-
-            WhWzLanguageDropdown.SelectedItem = WhWzLanguageDropdown
-                .Items.OfType<LanguageDropdownItem>()
-                .FirstOrDefault(item => item.Key == currentWhWzLanguage);
-        }
-        finally
-        {
-            _updatingLanguageDropdown = false;
-        }
-    }
-
     private void RefreshLocalizedCodeText()
     {
-        MarioKartHelperText.Text = t("helper_text.end_with_x") + " .iso/.gcm/.gcz/.ciso/.wbfs/.wia/.rvz";
+        UpdateGameFileDetails();
         if (string.IsNullOrWhiteSpace(DolphinPaths.ExecutablePath))
             DolphinExecutableValueText.Text = GetDolphinExecutableHelperText();
-        TranslationsPercentageText.Text = t("text.language_translated_by", new { translators = t("value.language.z_translators") });
-        TranslationsPercentageText.IsVisible = t("value.language.z_translators") != "-";
     }
 
     private static string GetDolphinExecutableHelperText()
@@ -159,15 +101,6 @@ public partial class WhWzSettings : UserControl
         if (OperatingSystem.IsMacOS())
             return t("helper_text.select_dolphin_macos");
         return t("helper_text.select_dolphin_linux");
-    }
-
-    private static string ScaleToString(double scale)
-    {
-        var percentageString = (int)Math.Round(scale * 100) + "%";
-        if (SettingValues.WindowScales.Contains(scale))
-            return percentageString;
-
-        return t("state.custom") + ": " + percentageString;
     }
 
     private async void DolphinExeBrowse_OnClick(object sender, RoutedEventArgs e)
@@ -238,7 +171,7 @@ public partial class WhWzSettings : UserControl
                 if (string.IsNullOrWhiteSpace(resolvedFolder))
                     return;
 
-                var executablePath = Path.Combine(resolvedFolder, "Contents", "MacOS", "Dolphin");
+                var executablePath = fileSystem.Path.Combine(resolvedFolder, "Contents", "MacOS", "Dolphin");
                 await ApplyLocationSettingAsync(SettingsService.DOLPHIN_LOCATION, ShellQuoting.QuoteUnixArgument(executablePath));
             }
 
@@ -250,7 +183,7 @@ public partial class WhWzSettings : UserControl
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if (string.Equals(Path.GetFileName(filePath), "DolphinTool.exe", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(fileSystem.Path.GetFileName(filePath), "DolphinTool.exe", StringComparison.OrdinalIgnoreCase))
                 {
                     await MessageTranslationHelper.AwaitMessageAsync(MessageTranslation.Warning_DolphinToolSelected);
                     return;
@@ -286,14 +219,44 @@ public partial class WhWzSettings : UserControl
     {
         var fileType = new FilePickerFileType("Game files")
         {
-            Patterns = ["*.iso", "*.gcm", "*.gcz", "*.ciso", "*.wbfs", "*.wia", "*.rvz"],
+            Patterns = DiscImages.SupportedExtensions.Select(extension => "*" + extension).ToArray(),
         };
 
         var filePath = await FilePicker.OpenSingleFileAsync("Select Mario Kart Wii Game File", [fileType]);
-        if (!string.IsNullOrEmpty(filePath))
+        if (string.IsNullOrEmpty(filePath))
+            return;
+
+        var info = DiscImages.ReadInfo(filePath);
+        if (info.IsFailure || GameRegion.FromGameId(info.Value.GameId) == MarioKartWiiEnums.Regions.None)
         {
-            await ApplyLocationSettingAsync(SettingsService.GAME_LOCATION, filePath);
+            var reason = info.IsFailure
+                ? t("message_error.invalid_game_file.unreadable")
+                : t("message_error.invalid_game_file.wrong_game", new { name = info.Value.InternalName, id = info.Value.GameId });
+            await new MessageBoxWindow()
+                .SetMessageType(MessageBoxWindow.MessageType.Error)
+                .SetTitleText(t("message_error.invalid_game_file.title"))
+                .SetInfoText(reason)
+                .ShowDialog();
+            return;
         }
+
+        if (await ApplyLocationSettingAsync(SettingsService.GAME_LOCATION, filePath))
+        {
+            // A game from another region switches to that region's save.
+            var layout = ViewUtils.GetLayout();
+            layout.UpdateSidebarProfile();
+            layout.UpdateFriendCount();
+        }
+    }
+
+    private void UpdateGameFileDetails()
+    {
+        var info = DiscImages.ReadInfo(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
+        var region = info.IsSuccess ? GameRegion.FromGameId(info.Value.GameId) : MarioKartWiiEnums.Regions.None;
+        MarioKartHelperText.Text =
+            region != MarioKartWiiEnums.Regions.None
+                ? $"Mario Kart Wii · {GameRegion.GetDisplayName(region)} · {info.Value.Format.ToString().ToUpperInvariant()}"
+                : t("helper_text.end_with_x") + " " + string.Join("/", DiscImages.SupportedExtensions);
     }
 
     private async void DolphinUserPathBrowse_OnClick(object sender, RoutedEventArgs e)
@@ -325,7 +288,7 @@ public partial class WhWzSettings : UserControl
         var currentFolder = (string)SettingsService.USER_FOLDER_PATH.Get();
         var topLevel = TopLevel.GetTopLevel(this);
         // If a current folder exists and is valid, suggest it as the starting location
-        if (!string.IsNullOrEmpty(currentFolder) && Directory.Exists(currentFolder))
+        if (!string.IsNullOrEmpty(currentFolder) && fileSystem.Directory.Exists(currentFolder))
         {
             var folder = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentFolder);
             var folders = await FilePicker.SelectFolderAsync("Select Dolphin User Path", folder);
@@ -354,7 +317,7 @@ public partial class WhWzSettings : UserControl
 
     private async Task<bool> ApplyLocationSettingAsync(Setting<string> setting, string path)
     {
-        var normalizedPath = setting == SettingsService.USER_FOLDER_PATH ? Path.TrimEndingDirectorySeparator(path) : path;
+        var normalizedPath = setting == SettingsService.USER_FOLDER_PATH ? fileSystem.Path.TrimEndingDirectorySeparator(path) : path;
 
         if (!SettingsEditing.Set(SettingsService, setting, normalizedPath))
         {
@@ -375,7 +338,7 @@ public partial class WhWzSettings : UserControl
 
     private void DolphinUserFolderOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if (Directory.Exists(DolphinPaths.UserFolderPath))
+        if (!string.IsNullOrWhiteSpace(DolphinPaths.UserFolderPath) && fileSystem.Directory.Exists(DolphinPaths.UserFolderPath))
             FilePicker.OpenFolderInFileManager(DolphinPaths.UserFolderPath);
     }
 
@@ -384,8 +347,8 @@ public partial class WhWzSettings : UserControl
         try
         {
             var unquotedPath = filePath.Trim().Trim('\'', '"');
-            var folderPath = Path.GetDirectoryName(Path.GetFullPath(unquotedPath));
-            if (!string.IsNullOrWhiteSpace(folderPath) && Directory.Exists(folderPath))
+            var folderPath = fileSystem.Path.GetDirectoryName(fileSystem.Path.GetFullPath(unquotedPath));
+            if (!string.IsNullOrWhiteSpace(folderPath) && fileSystem.Directory.Exists(folderPath))
                 FilePicker.OpenFolderInFileManager(folderPath);
         }
         catch
@@ -396,8 +359,8 @@ public partial class WhWzSettings : UserControl
 
     private void AppDataLocationOpen_OnClick(object sender, RoutedEventArgs e)
     {
-        if (!Directory.Exists(ApplicationData.DirectoryPath))
-            Directory.CreateDirectory(ApplicationData.DirectoryPath);
+        if (!fileSystem.Directory.Exists(ApplicationData.DirectoryPath))
+            fileSystem.Directory.CreateDirectory(ApplicationData.DirectoryPath);
 
         FilePicker.OpenFolderInFileManager(ApplicationData.DirectoryPath);
     }
@@ -432,23 +395,26 @@ public partial class WhWzSettings : UserControl
         DolphinExecutableOpenButton.IsEnabled =
             DolphinExecutableOpenButton.IsVisible && CanOpenContainingFolder(DolphinPaths.ExecutablePath);
         GameLocationOpenButton.IsEnabled = CanOpenContainingFolder(SettingsService.Get<string>(SettingsService.GAME_LOCATION));
-        DolphinUserFolderOpenButton.IsEnabled = Directory.Exists(DolphinPaths.UserFolderPath);
+        UpdateGameFileDetails();
+        DolphinUserFolderOpenButton.IsEnabled = (
+            !string.IsNullOrWhiteSpace(DolphinPaths.UserFolderPath) && fileSystem.Directory.Exists(DolphinPaths.UserFolderPath)
+        );
     }
 
     private static void SetLocationRowState(PathIcon completeIcon, PathIcon warningIcon, SettingsButton changeButton, bool isValid)
     {
         completeIcon.IsVisible = isValid;
         warningIcon.IsVisible = !isValid;
-        changeButton.Variant = isValid ? ButtonVariant.Default : ButtonVariant.Warning;
+        changeButton.Tone = isValid ? ActionButtonTone.Secondary : ActionButtonTone.Brand;
     }
 
-    private static bool CanOpenContainingFolder(string filePath)
+    private bool CanOpenContainingFolder(string filePath)
     {
         try
         {
             var unquotedPath = filePath.Trim().Trim('\'', '"');
-            var folderPath = Path.GetDirectoryName(Path.GetFullPath(unquotedPath));
-            return !string.IsNullOrWhiteSpace(folderPath) && Directory.Exists(folderPath);
+            var folderPath = fileSystem.Path.GetDirectoryName(fileSystem.Path.GetFullPath(unquotedPath));
+            return !string.IsNullOrWhiteSpace(folderPath) && fileSystem.Directory.Exists(folderPath);
         }
         catch
         {
@@ -456,7 +422,8 @@ public partial class WhWzSettings : UserControl
         }
     }
 
-    private static bool IsConfiguredExecutableFile(string value) => File.Exists(value.Trim().Trim('\'', '"'));
+    private bool IsConfiguredExecutableFile(string value) =>
+        !string.IsNullOrWhiteSpace(value.Trim().Trim('\'', '"')) && fileSystem.File.Exists(value.Trim().Trim('\'', '"'));
 
     private void UpdateAppDataLocationUi()
     {
@@ -702,7 +669,7 @@ public partial class WhWzSettings : UserControl
         IStorageFolder? suggestedStart = null;
 
         var currentPath = ApplicationData.DirectoryPath;
-        if (!string.IsNullOrWhiteSpace(currentPath) && Directory.Exists(currentPath))
+        if (!string.IsNullOrWhiteSpace(currentPath) && fileSystem.Directory.Exists(currentPath))
             suggestedStart = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(currentPath);
 
         var folders = await FilePicker.SelectFolderAsync("Select Wheel Wizard data folder", suggestedStart);
@@ -720,60 +687,6 @@ public partial class WhWzSettings : UserControl
             return;
 
         await ConfirmAndMoveAppDataAsync(ApplicationData.DefaultDirectoryPath);
-    }
-
-    private async void WindowScaleDropdown_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_pageLoaded || _editingScale)
-            return;
-
-        _editingScale = true;
-        var selectedScale = WindowScaleDropdown.SelectedItem?.ToString() ?? "1";
-        var scale = double.Parse(selectedScale.Split(" ").Last().Replace("%", "")) / 100;
-        scale = ViewUtils.GetUsableWindowScale(scale, new Avalonia.Size(Layout.WindowWidth, Layout.WindowHeight), ViewUtils.GetLayout());
-        var selectedItemText = ScaleToString(scale);
-        if (!WindowScaleDropdown.Items.Contains(selectedItemText))
-            WindowScaleDropdown.Items.Add(selectedItemText);
-        WindowScaleDropdown.SelectedItem = selectedItemText;
-
-        if (!SettingsEditing.Set(SettingsService, SettingsService.WINDOW_SCALE, scale))
-        {
-            WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
-            _editingScale = false;
-            return;
-        }
-        var seconds = 10;
-
-        string ExtraScaleText() => t("question.apply_scale.extra", new { remainingTime = tTime(seconds) });
-
-        var yesNoWindow = new YesNoWindow()
-            .SetButtonText(t("action.apply"), t("action.revert"))
-            .SetMainText(t("question.apply_scale.title"))
-            .SetExtraText(ExtraScaleText());
-        // we want to now set up a timer every second to update the text, and at the last second close the window
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-
-        timer.Tick += (_, args) =>
-        {
-            seconds--;
-            yesNoWindow.SetExtraText(ExtraScaleText());
-            if (seconds != 0)
-                return;
-            yesNoWindow.Close();
-            timer.Stop();
-        };
-        timer.Start();
-
-        var yesNoAnswer = await yesNoWindow.AwaitAnswer();
-        if (yesNoAnswer)
-            SettingsEditing.Set(SettingsService, SettingsService.SAVED_WINDOW_SCALE, SettingsService.WINDOW_SCALE.Value);
-        else
-        {
-            SettingsService.WINDOW_SCALE.Set(SettingsService.SAVED_WINDOW_SCALE.Get());
-            WindowScaleDropdown.SelectedItem = ScaleToString((double)SettingsService.WINDOW_SCALE.Get());
-        }
-
-        _editingScale = false;
     }
 
     private async Task<string?> ResolveSelectedFolderPathAsync(IStorageFolder? folder)
@@ -797,53 +710,4 @@ public partial class WhWzSettings : UserControl
             .SetInfoText("Wheel Wizard couldn't resolve the selected folder. Please choose a different location.")
             .ShowDialog();
     }
-
-    private async void WhWzLanguageDropdown_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (_updatingLanguageDropdown)
-            return;
-
-        if (WhWzLanguageDropdown.SelectedItem == null)
-            return;
-
-        if (WhWzLanguageDropdown.SelectedItem is not LanguageDropdownItem selectedLanguage)
-            return;
-
-        var currentLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-        if (selectedLanguage.Key == currentLanguage)
-            return;
-
-        var titleCurrent = t($"{currentLanguage}.question.apply_language_settings.title");
-        var titleTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.title");
-
-        var extraCurrent = t($"{currentLanguage}.question.apply_language_settings.extra");
-        var extraTarget = t($"{selectedLanguage.Key}.question.apply_language_settings.extra");
-
-        // popup now shows its selection in both languages
-        var yesNoWindow = await new YesNoWindow()
-            .SetMainText($"{titleCurrent}\n\n{titleTarget}")
-            .SetExtraText($"{extraCurrent}\n\n{extraTarget}")
-            .SetButtonText(t("action.apply"), t("action.cancel"))
-            .AwaitAnswer();
-
-        if (!yesNoWindow)
-        {
-            var currentWhWzLanguage = (string)SettingsService.WW_LANGUAGE.Get();
-            WhWzLanguageDropdown.SelectedItem = WhWzLanguageDropdown
-                .Items.OfType<LanguageDropdownItem>()
-                .FirstOrDefault(item => item.Key == currentWhWzLanguage);
-            return; // We only want to change the setting if we really apply this change
-        }
-
-        if (SettingsEditing.Set(SettingsService, SettingsService.WW_LANGUAGE, selectedLanguage.Key))
-        {
-            LocalizationService.ApplyCurrentLanguage();
-            RefreshLanguageDropdown();
-            RefreshLocalizedCodeText();
-            _mainWindow.Refresh();
-        }
-    }
-
-    private void EnableAnimations_OnClick(object sender, RoutedEventArgs e) =>
-        SettingsEditing.Set(SettingsService, SettingsService.ENABLE_ANIMATIONS, EnableAnimations.IsChecked == true);
 }

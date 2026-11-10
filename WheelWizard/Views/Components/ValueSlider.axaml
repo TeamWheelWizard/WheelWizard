@@ -1,0 +1,102 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="clr-namespace:WheelWizard.Views.Components">
+    <Styles.Resources>
+        <ControlTheme x:Key="ValueSliderHorizontalTrack" TargetType="RepeatButton">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Grid Background="Transparent">
+                        <Border Height="4" VerticalAlignment="Center" Background="{TemplateBinding Background}" CornerRadius="2" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+        <ControlTheme x:Key="ValueSliderVerticalTrack" TargetType="RepeatButton">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Grid Background="Transparent">
+                        <Border Width="4" HorizontalAlignment="Center" Background="{TemplateBinding Background}" CornerRadius="2" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+        <ControlTheme x:Key="ValueSliderThumb" TargetType="Thumb">
+            <Setter Property="Background" Value="{StaticResource Brand300}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Neutral950}" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="2" CornerRadius="9" />
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover">
+                <Setter Property="Background" Value="{StaticResource Brand200}" />
+            </Style>
+            <Style Selector="^:pressed">
+                <Setter Property="Background" Value="{StaticResource Brand400}" />
+            </Style>
+        </ControlTheme>
+        <ControlTheme x:Key="ValueSliderTheme" TargetType="components:ValueSlider">
+            <Setter Property="Background" Value="{StaticResource Neutral700}" />
+            <Setter Property="Foreground" Value="{StaticResource Brand400}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Style Selector="^:horizontal">
+                <Setter Property="MinHeight" Value="32" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Track Name="PART_Track" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                               Value="{TemplateBinding Value, Mode=TwoWay}" Orientation="Horizontal"
+                               IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+                            <Track.DecreaseButton>
+                                <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource ValueSliderHorizontalTrack}"
+                                              Background="{TemplateBinding Foreground}" Focusable="False" />
+                            </Track.DecreaseButton>
+                            <Track.IncreaseButton>
+                                <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource ValueSliderHorizontalTrack}"
+                                              Background="{TemplateBinding Background}" Focusable="False" />
+                            </Track.IncreaseButton>
+                            <Track.Thumb>
+                                <Thumb Name="PART_Thumb" Width="18" Height="18" Theme="{StaticResource ValueSliderThumb}" />
+                            </Track.Thumb>
+                        </Track>
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+            <Style Selector="^:vertical">
+                <Setter Property="MinWidth" Value="32" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Track Name="PART_Track" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                               Value="{TemplateBinding Value, Mode=TwoWay}" Orientation="Vertical"
+                               IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+                            <Track.DecreaseButton>
+                                <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource ValueSliderVerticalTrack}"
+                                              Background="{TemplateBinding Foreground}" Focusable="False" />
+                            </Track.DecreaseButton>
+                            <Track.IncreaseButton>
+                                <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource ValueSliderVerticalTrack}"
+                                              Background="{TemplateBinding Background}" Focusable="False" />
+                            </Track.IncreaseButton>
+                            <Track.Thumb>
+                                <Thumb Name="PART_Thumb" Width="18" Height="18" Theme="{StaticResource ValueSliderThumb}" />
+                            </Track.Thumb>
+                        </Track>
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+            <Style Selector="^:focus-visible /template/ Thumb#PART_Thumb">
+                <Setter Property="BorderBrush" Value="{StaticResource Neutral50}" />
+            </Style>
+            <Style Selector="^[FillTrack=False]">
+                <Setter Property="Foreground" Value="{StaticResource Neutral700}" />
+            </Style>
+            <Style Selector="^:disabled">
+                <Setter Property="Opacity" Value="0.45" />
+                <Setter Property="Cursor" Value="Arrow" />
+            </Style>
+        </ControlTheme>
+    </Styles.Resources>
+    <Style Selector="components|ValueSlider">
+        <Setter Property="Theme" Value="{StaticResource ValueSliderTheme}" />
+    </Style>
+</Styles>

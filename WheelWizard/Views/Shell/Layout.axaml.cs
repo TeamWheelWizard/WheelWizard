@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -12,6 +11,7 @@ using WheelWizard.Branding;
 using WheelWizard.Localization;
 using WheelWizard.MiiImages.Views;
 using WheelWizard.Mods;
+using WheelWizard.Mods.Views;
 using WheelWizard.RrRooms;
 using WheelWizard.RrRooms.Views;
 using WheelWizard.Settings;
@@ -19,6 +19,7 @@ using WheelWizard.Settings.Types;
 using WheelWizard.Settings.Views;
 using WheelWizard.Shared.MessageTranslations;
 using WheelWizard.Shared.Polling;
+using WheelWizard.Views.Components;
 using WheelWizard.Views.Dialogs;
 using WheelWizard.Views.Shell.Controls;
 using WheelWizard.Views.Shell.Navigation;
@@ -27,6 +28,8 @@ using WheelWizard.WheelWizardData;
 using WheelWizard.WheelWizardData.Domain;
 using WheelWizard.WheelWizardData.Views;
 using WheelWizard.WiiManagement.GameLicense;
+using WheelWizard.WiiManagement.MiiManagement.Views;
+using WheelWizard.WiiManagement.MiiManagement.Views.Editor;
 
 namespace WheelWizard.Views.Shell;
 
@@ -35,8 +38,7 @@ public partial class Layout : BaseWindow, IPollingListener
     private INavigationService Navigation { get; }
     private readonly IAutoUpdaterSingletonService _autoUpdater;
 
-    protected override Control InteractionOverlay => DisabledDarkenEffect;
-    protected override Control InteractionContent => WindowFrame;
+    protected override Control InteractionContent => CompleteGrid;
 
     public const double WindowHeight = 876;
     public const double WindowWidth = 656;
@@ -59,6 +61,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private int _testerClickCount;
     private bool _testerPromptOpen;
+    private bool _devSuccessStatusIconOverride;
     private IDisposable? _settingsSignalSubscription;
     private readonly Task _modsLoaded;
     private readonly TaskCompletionSource _loaded = new();
@@ -98,22 +101,19 @@ public partial class Layout : BaseWindow, IPollingListener
         SettingsSignalBus = settingsSignalBus;
         ModManagerService = modManagerService;
         InitializeComponent();
+        CompleteGrid.SizeChanged += (_, e) =>
+        {
+            if (ContentArea.Content is SettingsPage settingsPage)
+                settingsPage.UpdateLayoutWidth(e.NewSize.Width - 64 - ContentArea.Margin.Left - ContentArea.Margin.Right);
+        };
         _autoUpdater = autoUpdater;
         _autoUpdater.UpdateAvailable += OnUpdateAvailable;
         UpdateVersionBadge();
 
-        // Wayland does not expose the drawn caption buttons from our platform decoration template.
-        HeaderWindowControls.IsVisible =
-            OperatingSystem.IsLinux() && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
-
-        // Respects tiling window managers better if resizable.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            CanResize = true;
-
         Navigation.PageChanged += Navigation_OnPageChanged;
         foreach (var button in SidePanelButtons.Children.OfType<SidebarRadioButton>())
-            button.NavigationRequested += (_, pageType) => Navigation.NavigateTo(pageType);
-        SidebarCurrentUserProfile.ProfileRequested += (_, _) => Navigation.NavigateTo<UserProfilePage>();
+            button.NavigationRequested += (_, pageType) => NavigateFromSidebar(pageType);
+        SidebarCurrentUserProfile.ProfileRequested += (_, _) => NavigateFromSidebar(typeof(UserProfilePage));
         UpdateSidebarProfile();
 
         ClampSavedWindowScaleToCurrentScreen();
@@ -195,6 +195,7 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         UpdateModsButtonText();
         UpdateMadeByText();
+        UpdatePlayerAndRoomCount();
         UpdateLiveAlert();
     }
 
@@ -215,7 +216,10 @@ public partial class Layout : BaseWindow, IPollingListener
     {
         var reloadResult = await ModManagerService.ReloadAsync();
         if (reloadResult.IsFailure)
+        {
+            await _loaded.Task;
             MessageTranslationHelper.ShowMessage(reloadResult.Error);
+        }
     }
 
     private void OnSettingSignal(SettingChangedSignal signal) => OnSettingChanged(signal.Setting);
@@ -268,22 +272,90 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private void Navigation_OnPageChanged(object? sender, UserControl page) => NavigateToPage(page);
 
-    private void HeaderMinimizeButton_Click(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+    /// <summary>
+    /// The current page may ask before letting you go (see <see cref="INavigationGuard"/>); until it does, the
+    /// sidebar keeps showing the page you're on.
+    /// </summary>
+    private void NavigateFromSidebar(Type pageType)
+    {
+        Navigation.NavigateTo(pageType);
+        if (Navigation.CurrentPage is { } current && current.GetType() != pageType)
+            UpdateSidebarSelection(current);
+    }
 
-    private void HeaderCloseButton_Click(object? sender, RoutedEventArgs e) => Close();
+    private bool _closeConfirmed;
+    private bool _closePromptOpen;
+    private int _closeGuards;
 
-    private static void WindowControl_PointerPressed(object? sender, PointerPressedEventArgs e) => e.Handled = true;
+    /// <summary>While guarded, closing the window asks before abandoning the running work.</summary>
+    public void SetCloseGuarded(bool guarded) => _closeGuards = Math.Max(0, _closeGuards + (guarded ? 1 : -1));
+
+    protected override async void OnClosing(WindowClosingEventArgs e)
+    {
+        var confirm = GetCloseConfirmation(e);
+        if (confirm == null)
+        {
+            base.OnClosing(e);
+            return;
+        }
+
+        e.Cancel = true;
+        base.OnClosing(e);
+        if (_closePromptOpen)
+            return;
+        _closePromptOpen = true;
+        try
+        {
+            if (!await confirm())
+                return;
+            _closeConfirmed = true;
+            Close();
+        }
+        finally
+        {
+            _closePromptOpen = false;
+        }
+    }
+
+    private Func<Task<bool>>? GetCloseConfirmation(WindowClosingEventArgs e)
+    {
+        if (_closeConfirmed)
+            return null;
+        var setup = _closeGuards > 0 && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing;
+        var page = Navigation.CurrentPage is INavigationGuard { HasUnsavedWork: true } guard ? guard : null;
+        if (!setup && page == null)
+            return null;
+        return async () => (!setup || await ConfirmQuitDuringSetupAsync()) && (page == null || await page.ConfirmLeaveAsync());
+    }
+
+    private static Task<bool> ConfirmQuitDuringSetupAsync() =>
+        new YesNoWindow()
+            .SetMainText(t("question.quit_during_setup.title"))
+            .SetExtraText(t("question.quit_during_setup.extra"))
+            .SetButtonText(t("action.quit"), t("action.keep_installing"))
+            .SetButtonTones(ActionButtonTone.Danger, ActionButtonTone.Secondary)
+            .AwaitAnswer();
 
     public void NavigateToPage(UserControl page)
     {
         var oldPage = ContentArea.Content as Control;
         var isRoomsToDetails = oldPage is RoomsPage && page is RoomDetailsPage;
         var isDetailsToRooms = oldPage is RoomDetailsPage && page is RoomsPage;
+        var isMiisToEditor = oldPage is MiiListPage && page is MiiEditorPage;
+        var isEditorToMiis = oldPage is MiiEditorPage && page is MiiListPage;
 
-        ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms ? RoomsPageTransition : null;
-        ContentArea.IsTransitionReversed = isDetailsToRooms;
+        ContentArea.PageTransition = isRoomsToDetails || isDetailsToRooms || isMiisToEditor || isEditorToMiis ? RoomsPageTransition : null;
+        ContentArea.IsTransitionReversed = isDetailsToRooms || isEditorToMiis;
+        if (page is SettingsPage settingsPage)
+            settingsPage.UpdateLayoutWidth(
+                (CompleteGrid.Bounds.Width > 0 ? CompleteGrid.Bounds.Width : WindowWidth)
+                    - 64
+                    - ContentArea.Margin.Left
+                    - ContentArea.Margin.Right
+            );
         ContentArea.Content = page;
         UpdateSidebarSelection(page);
+        _ = LockSidebarAsync(page is ILockedSidebarPage);
     }
 
     private void UpdateSidebarSelection(UserControl page)
@@ -299,6 +371,10 @@ public partial class Layout : BaseWindow, IPollingListener
 
             // TODO: make a better way to have these type of exceptions
             if (button.PageType == typeof(RoomsPage) && typeof(RoomDetailsPage) == page.GetType())
+                button.IsChecked = true;
+            if (button.PageType == typeof(ModsPage) && page is ModBrowserPage)
+                button.IsChecked = true;
+            if (button.PageType == typeof(MiiListPage) && page is MiiEditorPage)
                 button.IsChecked = true;
         }
     }
@@ -351,31 +427,45 @@ public partial class Layout : BaseWindow, IPollingListener
 
     public void UpdateLiveAlert() => UpdateLiveAlert(LiveStatus);
 
+    public bool DevSuccessStatusIconOverride => _devSuccessStatusIconOverride;
+
+    public void SetDevSuccessStatusIconOverride(bool enabled)
+    {
+        _devSuccessStatusIconOverride = enabled;
+        UpdateLiveAlert(LiveStatus);
+    }
+
     private void UpdateLiveAlert(LiveStatusService sender)
     {
         var hasVariant = sender.Status?.Variant != null && sender.Status.Variant != WhWzStatusVariant.None;
-        var hasCustomIcon = !string.IsNullOrEmpty(sender.Status?.Icon);
-        var visible = hasVariant || hasCustomIcon;
+        var hasCustomIcon = !_devSuccessStatusIconOverride && !string.IsNullOrEmpty(sender.Status?.Icon);
+        var visible = _devSuccessStatusIconOverride || hasVariant || hasCustomIcon;
 
         LiveStatusBorder.IsVisible = visible;
         if (!visible)
             return;
 
-        ToolTip.SetTip(LiveStatusBorder, sender.Status!.Message);
+        ToolTip.SetTip(LiveStatusBorder, sender.Status?.Message ?? "Success status (developer preview)");
         LiveStatusBorder.Classes.Clear();
         LiveStatusBorder.Classes.Add("BottomSidebarIcon");
 
+        if (_devSuccessStatusIconOverride)
+        {
+            LiveStatusIcon.ClearValue(PathIcon.DataProperty);
+            LiveStatusIcon.ClearValue(PathIcon.ForegroundProperty);
+            LiveStatusBorder.Classes.Add("Success");
+        }
         // If custom icon is provided, use it instead of variant
-        if (hasCustomIcon)
+        else if (hasCustomIcon)
         {
             // Clear any variant-based classes
             LiveStatusBorder.Classes.Add("Custom");
 
             // Find the PathIcon in the LiveStatusBorder and update it dynamically
-            if (LiveStatusBorder.Child is PathIcon pathIcon)
+            if (this.FindControl<PathIcon>("LiveStatusIcon") is { } pathIcon)
             {
                 // Parse the SVG path data
-                var geometry = Geometry.Parse(sender.Status.Icon!);
+                var geometry = Geometry.Parse(sender.Status!.Icon!);
                 pathIcon.Data = geometry;
 
                 // Apply custom color if provided, otherwise use a default
@@ -391,8 +481,10 @@ public partial class Layout : BaseWindow, IPollingListener
         }
         else
         {
+            LiveStatusIcon.ClearValue(PathIcon.DataProperty);
+            LiveStatusIcon.ClearValue(PathIcon.ForegroundProperty);
             // Use variant-based styling
-            LiveStatusBorder.Classes.Add(sender.Status.Variant.ToString()!);
+            LiveStatusBorder.Classes.Add(sender.Status!.Variant.ToString()!);
         }
     }
 
@@ -404,7 +496,7 @@ public partial class Layout : BaseWindow, IPollingListener
 
     private async void TitleLabel_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed || Modals.HasModals)
             return;
 
         e.Handled = true;
@@ -482,7 +574,7 @@ public partial class Layout : BaseWindow, IPollingListener
     private void SidebarProfileBlock_OnPointerEntered(object? sender, PointerEventArgs e)
     {
         SidebarProfileBlock.Background = GetResourceBrush("Neutral800");
-        SidebarProfileBlock.BorderBrush = GetResourceBrush("Primary400");
+        SidebarProfileBlock.BorderBrush = GetResourceBrush("Brand400");
         SidebarProfileHoverEffect.IsVisible = true;
     }
 
