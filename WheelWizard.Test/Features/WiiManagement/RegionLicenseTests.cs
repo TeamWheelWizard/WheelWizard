@@ -7,7 +7,9 @@ using WheelWizard.Models.Enums;
 using WheelWizard.RrRooms;
 using WheelWizard.Settings;
 using WheelWizard.Shared.Binary;
+using WheelWizard.Shared.Platform;
 using WheelWizard.Shared.Polling;
+using WheelWizard.Shared.Processes;
 using WheelWizard.WiiManagement.GameLicense;
 using WheelWizard.WiiManagement.MiiManagement;
 
@@ -84,6 +86,9 @@ public class RegionLicenseTests
             Substitute.For<IDolphinPaths>(),
             paths,
             Substitute.For<IRoomPresence>(),
+            Substitute.For<IProcessLauncher>(),
+            Substitute.For<IRuntimeEnvironment>(),
+            Substitute.For<IUnixProcessService>(),
             Substitute.For<IPollingScheduler>(),
             System.TimeProvider.System,
             NullLogger<GameLicenseSingletonService>.Instance

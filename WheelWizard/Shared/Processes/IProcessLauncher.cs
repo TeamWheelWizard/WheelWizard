@@ -7,6 +7,7 @@ public interface IProcessLauncher
     void Start(ProcessStartInfo startInfo);
     void KillByName(string processName);
     IReadOnlyList<int> GetProcessIds(string processName);
+    string GetExecutablePath(int processId);
 }
 
 public sealed class ProcessLauncher : IProcessLauncher
@@ -48,5 +49,11 @@ public sealed class ProcessLauncher : IProcessLauncher
             foreach (var process in processes)
                 process.Dispose();
         }
+    }
+
+    public string GetExecutablePath(int processId)
+    {
+        using var process = Process.GetProcessById(processId);
+        return process.MainModule?.FileName ?? throw new InvalidOperationException("The process executable is unavailable.");
     }
 }

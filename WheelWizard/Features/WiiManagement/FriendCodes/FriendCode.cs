@@ -29,6 +29,28 @@ public static class FriendCode
         if (profileId == 0)
             return 0;
 
+        var data = ChecksumInput(profileId);
+
+        // Calculate MD5 and get checksum (first byte >> 1)
+        using var md5 = MD5.Create();
+        var hashBytes = md5.ComputeHash(data);
+        var checksum = (uint)(hashBytes[0] >> 1);
+
+        // Return friend code: (checksum << 32) | profileId
+        return ((ulong)checksum << 32) | profileId;
+    }
+
+    /// <summary>
+    /// The CRC-8 checksum DWC also accepts in a friend key, next to the MD5 one used for friend codes.
+    /// </summary>
+    public static uint ProfileIdToCrc8Checksum(uint profileId)
+    {
+        var data = ChecksumInput(profileId);
+        return (uint)(Crc.ComputeCrc8(data, 0, data.Length) & 0x7F);
+    }
+
+    private static byte[] ChecksumInput(uint profileId)
+    {
         // Byte swap both values (same as Python _bswap32)
         var swappedProfileId = BSwap32(profileId);
         var swappedGameCode = BSwap32(GameCodeInt);
@@ -45,14 +67,7 @@ public static class FriendCode
         data[5] = (byte)(swappedGameCode >> 16);
         data[6] = (byte)(swappedGameCode >> 8);
         data[7] = (byte)swappedGameCode;
-
-        // Calculate MD5 and get checksum (first byte >> 1)
-        using var md5 = MD5.Create();
-        var hashBytes = md5.ComputeHash(data);
-        var checksum = (uint)(hashBytes[0] >> 1);
-
-        // Return friend code: (checksum << 32) | profileId
-        return ((ulong)checksum << 32) | profileId;
+        return data;
     }
 
     /// <summary>

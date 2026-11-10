@@ -339,7 +339,8 @@ public partial class FriendsPage : UserControl, INotifyPropertyChanged, IPolling
 
         UpdateFriendList();
         ViewUtils.GetLayout().UpdateFriendCount();
-        ViewUtils.ShowSnackbar($"Removed {selectedPlayer.NameOfMii} from your friend list.");
+        var removedName = string.IsNullOrEmpty(selectedPlayer.NameOfMii) ? selectedPlayer.FriendCode : selectedPlayer.NameOfMii;
+        ViewUtils.ShowSnackbar($"Removed {removedName} from your friend list.");
     }
 
     private void ViewRoom(string friendCode)

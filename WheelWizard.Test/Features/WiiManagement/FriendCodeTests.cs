@@ -1,3 +1,5 @@
+using System.Text;
+using WheelWizard.Shared.Binary;
 using WheelWizard.WiiManagement.FriendCodes;
 
 namespace WheelWizard.Test.Features.WiiManagement;
@@ -32,5 +34,13 @@ public class FriendCodeTests
         var friendCodeValue = FriendCode.ProfileIdToFriendCode(profileId);
 
         Assert.Equal(348484848484ul, friendCodeValue);
+    }
+
+    [Fact]
+    public void ComputeCrc8_MatchesTheStandardCheckValue()
+    {
+        var data = Encoding.ASCII.GetBytes("123456789");
+
+        Assert.Equal(0xF4, Crc.ComputeCrc8(data, 0, data.Length));
     }
 }
