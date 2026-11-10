@@ -222,11 +222,17 @@ public sealed class RecompLinuxInstallService : IRecompInstallService
     }
 
     /// <summary>
-    /// Decides based on the setup file path whether or not this is a bundled recomp setup binary
+    /// Decides based on the setup file path whether or not this is a bundled recomp setup binary. A
+    /// downloaded setup (the Linux AppImage or the macOS .run) shares the extension of this platform's
+    /// release asset; a bundled one, such as the Flatpak extension's wrapper, does not.
     /// </summary>
     private bool IsBundledRecomp(string setupFilePath)
     {
-        return !setupFilePath.EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase);
+        return !string.Equals(
+            fileSystem.Path.GetExtension(setupFilePath),
+            fileSystem.Path.GetExtension(RecompPlatform.SetupFileName),
+            StringComparison.OrdinalIgnoreCase
+        );
     }
 
     private async Task<OperationResult> InstallCoreAsync(

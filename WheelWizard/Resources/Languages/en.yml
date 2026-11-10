@@ -256,7 +256,7 @@ en:
     30_fps: This setting will force the game to run in 30 FPS (default is 60)
     enable_animations: This enables the animations in the Wheel Wizard app
     enable_recomp: Uses WiiCompiled as the home-page launcher. Turn this off to use
-      Dolphin and Retro Rewind instead. Windows only.
+      Dolphin and Retro Rewind instead. Windows, Linux, and macOS only.
     end_with_exe: Path must end with .exe
     end_with_x: 'Path can end with:'
     force_disable_wiimote: This setting disables Wiimote ingame, but enables it for
@@ -275,8 +275,8 @@ en:
       into private WiiCompiled data.
     recomp_dolphin_data_not_found: Set an existing Dolphin User Folder in Location
       Settings first. It must contain a Wii folder.
-    recomp_graphics_api: Only DirectX 12 and Vulkan run WiiCompiled reliably, so nothing
-      else is offered.
+    recomp_graphics_api: Only the graphics APIs that run WiiCompiled reliably on this
+      system are offered.
     recomp_gx_worker: Draws the game on its own thread so it runs faster. Turn this
       off if you get crashes or broken graphics. Takes effect the next time the game
       starts.
